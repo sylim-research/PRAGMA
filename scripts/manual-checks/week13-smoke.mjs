@@ -80,7 +80,8 @@ try {
       mission_schema_version: "mission_v5", mission_mpj_items: [{}, {}, {}, {}, {}],
       scenario_p: "equal", scenario_d: "close", scenario_r: index % 2 ? "high" : "low",
       core_content: { situation_ko: `검증용 장면 ${index + 1}. 서로 다른 상황에서 자료를 요청합니다.`,
-        source_text_ko: `검증용 원문 ${index + 1}`, direction: "ko_zh",
+        source_text_ko: `검증용 원문 ${index + 1}`, direction: "ko_zh", channel: "email",
+        pdr: { p: "equal", d: "close", r: index % 2 ? "high" : "low" },
         generation: { content_release_id: CURRENT_CONTENT_RELEASE_ID } },
     }));
     const assignments = scenarios.slice(0, 2).map((core, index) => ({
@@ -113,31 +114,59 @@ try {
   await page.reload();
   await expect(week13.getByText("미션 2개", { exact: true })).toBeVisible();
   await week13.scrollIntoViewIfNeeded();
-  await page.screenshot({ path: `${output}/composer.png` });
+  await page.screenshot({ animations: "disabled", path: `${output}/composer.png` });
   await page.getByRole("button", { name: "강의계획서", exact: true }).click();
   await expect(page.getByRole("columnheader", { name: "화행·활동", exact: true })).toBeVisible();
-  await page.screenshot({ path: `${output}/syllabus.png`, fullPage: true });
+  await page.screenshot({ animations: "disabled", path: `${output}/syllabus.png`, fullPage: true });
   await page.goto(`${base}/learner/course/${courseId}`);
   await expect(page.getByText("경험한 화행 0/9 · 미션 0/4", { exact: true })).toBeVisible();
   await expect(page.getByText("고부담 맥락 집중 실전", { exact: true })).toHaveCount(0);
-  await page.screenshot({ path: `${output}/learner-plan.png`, fullPage: true });
+  await page.screenshot({ animations: "disabled", path: `${output}/learner-plan.png`, fullPage: true });
   await page.goto(`${base}/learner/course/${courseId}/week/13`);
   await expect(page.getByRole("heading", { name: "선택 화행 집중 보완", exact: true })).toBeVisible();
   await expect(page.getByText("선택 화행 · 요청", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "중심 질문", exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /미션 [12] 시작하기/ })).toHaveCount(2);
-  await page.screenshot({ path: `${output}/learner-week13.png`, fullPage: true });
+  await page.screenshot({ animations: "disabled", path: `${output}/learner-week13.png`, fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.screenshot({ path: `${output}/learner-week13-mobile.png`, fullPage: true });
+  await page.screenshot({ animations: "disabled", path: `${output}/learner-week13-mobile.png`, fullPage: true });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.setViewportSize({ width: 1365, height: 1000 });
+  await page.goto(`${base}/admin/package?courseId=${courseId}&weekNo=13`);
+  const launch = page.getByRole("button", { name: "도입 수업 화면 열기", exact: true });
+  await expect(launch).toBeEnabled();
+  await launch.click();
+  const opening = page.getByRole("dialog", { name: "13주차 도입 수업", exact: true });
+  await expect(opening).toBeVisible();
+  await expect(opening.getByText(/이번 주 중심 질문/)).toBeVisible();
+  await expect(opening.getByRole("button", { name: /두 사람의 관계/ })).toHaveCount(0);
+  await page.screenshot({ animations: "disabled", path: `${output}/opening-desktop.png` });
+  await page.keyboard.press("ArrowRight");
+  await opening.getByRole("button", { name: /한 부분을 바꾸고 싶어요/ }).click();
+  await page.keyboard.press("ArrowRight");
+  await opening.getByRole("button", { name: /두 사람의 관계/ }).click();
+  await expect(opening.getByText(/두 사람은 평소 사적인 이야기도/)).toBeVisible();
+  await opening.getByRole("button", { name: /말 뒤에 있는 일/ }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await opening.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.screenshot({ animations: "disabled", path: `${output}/opening-mobile.png` });
+  await page.keyboard.press("ArrowRight");
+  await opening.getByRole("button", { name: /의견을 들은 뒤, 연결해 보기/ }).click();
+  await expect(opening.getByRole("heading", { name: "어떤 근거로 판단을 유지하거나 바꿨나요?" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(opening).toHaveCount(0);
+  await expect(launch).toBeFocused();
+  await launch.click();
+  await expect(opening.getByRole("heading", { name: "이대로 부탁해도 될까요?" })).toBeVisible();
+  await page.keyboard.press("Escape");
   expect(errors).toEqual([]);
   const result = { status: "PASS", data: "in-memory HTTP fixtures; no production writes", writes,
     selectedAct: fixture.weeks[12].speech_act, assignedWeek13: 2,
-    checks: ["choose/save/reload", "same-act candidates", "two-mission limit", "syllabus", "nine-act count", "learner links", "mobile overflow", "no page errors"] };
+    checks: ["choose/save/reload", "same-act candidates", "two-mission limit", "syllabus", "nine-act count", "learner links", "opening from assigned core", "clue reveal", "opening keyboard/reset/focus", "mobile overflow", "no page errors"] };
   await writeFile(`${output}/result.json`, JSON.stringify(result, null, 2));
   console.log(JSON.stringify(result));
 } catch (error) {
-  await page.screenshot({ path: `${output}/failure.png`, fullPage: true });
+  await page.screenshot({ animations: "disabled", path: `${output}/failure.png`, fullPage: true });
   console.log("PAGE", (await page.locator("body").innerText()).slice(-5000));
   throw error;
 } finally {

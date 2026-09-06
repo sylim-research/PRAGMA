@@ -158,6 +158,29 @@ describe("current content five-stage review", () => {
     expect(domain.dependencies).toEqual([example.scenarioId]);
   });
 
+  it("includes the separate opening and flexible question in the current weekly hash using assigned core context", async () => {
+    const source = { outline: { id: "course", title: "수업", level: "intermediate", domain: "school", language_direction: "ko_zh", course_mode: "translation", target_interpreting_week_count: 0 },
+      week: { week_no: 13, title: "고부담 맥락 집중 실전", type: "regular", speech_act: "request", can_do: [] },
+      assignments: [{ scenario_id: "m1", week_no: 13, position: 0 }],
+      scenarios: [{ scenario_id: "m1", speech_act: "request", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID,
+        mode: "translation", domain: "school",
+        core_content: { situation_ko: "PRIVATE_SCENE", source_text_ko: "PRIVATE_SOURCE", channel: "email", pdr: { p: "speaker_lower", d: "distant", r: "low" } } }],
+    };
+    const domain = buildContentReviewDomain("weekly_material", source);
+    const content = domain.snapshot.content as any;
+    const { opening, ...oldMaterial } = content.public_material;
+    expect(opening.status).toBe("draft");
+    expect(opening.weekTitle).toBe("선택 화행 집중 보완");
+    expect(JSON.stringify(opening)).not.toContain("PRIVATE_");
+    expect(opening.centralQuestion).toContain("선택한 화행");
+    const hash = await reviewHash(domain.snapshot);
+    expect(hash).not.toBe(await reviewHash({ ...domain.snapshot, content: { ...content, public_material: oldMaterial } }));
+    expect(opening.clues[0].fact).toContain("상대가 최종 결정");
+    const changed = buildContentReviewDomain("weekly_material", { ...source, scenarios: [{ ...source.scenarios[0], core_content: { ...source.scenarios[0].core_content, pdr: { p: "speaker_lower", d: "distant", r: "high" } } }] });
+    expect(await reviewHash(changed.snapshot)).not.toBe(hash);
+    expect(domain.rules.verdict).toBe("fail"); // 수업 도입이 있어도 미션 한 개 편성을 승인하지 않는다.
+  });
+
   it("saves successful provider metadata and never silently retries truncation or refusal", async () => {
     const output: ReviewResult = { verdict: "pass", summary_ko: "지적 없음", findings: [] };
     const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "reply-1", model: "gpt-test", usage: { total_tokens: 123 },

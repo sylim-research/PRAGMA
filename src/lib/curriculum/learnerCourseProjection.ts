@@ -58,6 +58,8 @@ export function assembleLearnerCourse({
             scenario_id: assignment.scenario_id,
             situation_ko: core.situation_ko,
             source_text: core.source_text_ko,
+            context: core.opening_context,
+            domain: core.domain,
             speech_act: core.speech_act,
             mission_status: core.mission_status,
             target_feature: core.target_feature,

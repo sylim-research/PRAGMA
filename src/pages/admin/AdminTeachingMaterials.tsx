@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { WeeklyMaterialDocument } from "@/components/curriculum/WeeklyMaterialDocument";
+import { WeeklyOpeningLesson } from "@/components/admin/WeeklyOpeningLesson";
 import { WeeklyInstructorNotes, type WeeklyMissionNotes } from "@/components/admin/WeeklyInstructorNotes";
 import { getCurriculumOutline, listCurriculumOutlines } from "@/lib/curriculum/api";
 import { listCoreScenarios, listWeekAssignments } from "@/lib/curriculum/composer";
@@ -202,7 +203,7 @@ const AdminTeachingMaterials = () => {
             </select>
           </label>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">주차 계획 → 미션 편성 → 주차 수업자료 순서입니다. 현재 저장된 편성과 기존 설명을 재사용하며 새 학습 콘텐츠는 생성하지 않습니다.</p>
+        <p className="mt-3 text-xs text-muted-foreground">교과목·주차 계획을 기준으로 도입 수업과 편성 미션을 연결합니다. 도입 예시도 수업 전 교수자가 적합성을 확인합니다.</p>
       </section>
       {outlines.isError && <p role="alert">교과목 목록을 불러오지 못했습니다.</p>}
       {outlines.isSuccess && outlines.data.length === 0 && <p className="text-sm">조회 가능한 교과목이 없습니다. 관리자 로그인과 <Link className="underline" to="/admin/composer">저장된 교과목</Link>을 확인해 주세요.</p>}
@@ -288,6 +289,7 @@ const AdminTeachingMaterials = () => {
         </div>
       </section>}
       {course && week && material && <>
+        {!projectorOpen && material.opening && <WeeklyOpeningLesson key={JSON.stringify(material.opening)} opening={material.opening} onStart={() => setNotesOpen(false)} />}
         {!projectorOpen && <details id="weekly-material-detail" open={reviewOpen} onToggle={(event) => setReviewOpen(event.currentTarget.open)} className="scroll-mt-5 rounded-xl border bg-white p-4">
           <summary className="cursor-pointer font-semibold">이 주차 수업자료 검수·확정</summary>
           {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}`} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}

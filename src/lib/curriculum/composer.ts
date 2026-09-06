@@ -12,6 +12,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Domain, GenMode, LanguageDirection, LearnerLevel, SpeechActUI } from "@/lib/pragma/enums";
 import { coreDirection } from "@/lib/pragma/coreSchema";
+import { weeklyOpeningContext } from "./weeklyOpeningContext";
 import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
 import {
   assertCurrentWeeklyMissionPairShapes,
@@ -50,6 +51,8 @@ export interface ComposerCore {
   direction: LanguageDirection;
   /** A/B가 실제로 바꾼 축을 저장값과 대조하기 위한 관찰 가능 맥락. */
   context: Record<WeeklyContextAxis, string | null>;
+  /** 공통 검수 원본의 core_content에서 읽는 수업 도입용 맥락. */
+  opening_context?: ReturnType<typeof weeklyOpeningContext>;
 }
 
 export interface WeekAssignment {
@@ -141,6 +144,7 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
             ? content.source_text
             : "",
       direction: coreDirection(r.core_content),
+      opening_context: weeklyOpeningContext(content),
       context: {
         counterpart,
         power: typeof r.scenario_p === "string" ? r.scenario_p : null,

@@ -5,6 +5,7 @@ import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourseProjection"
 import { buildWeeklyCourseMaterial } from "@/lib/curriculum/weeklyMaterials";
 import { weeklyInstructorContent } from "@/lib/curriculum/weeklyInstructorContent";
 import { weekRole } from "@/lib/curriculum/template";
+import { weeklyOpeningContext } from "@/lib/curriculum/weeklyOpeningContext";
 import { CONTENT_REVIEW_VERSION, instructionalMission, type ReviewFinding, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 
 // This entry is bundled for Edge from the same rule/catalog/material functions
@@ -41,6 +42,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     const cores = source.scenarios.map((row: any) => ({ ...row,
       situation_ko: row.core_content?.situation_ko ?? "",
       source_text_ko: row.core_content?.source_text_ko ?? row.core_content?.source_text ?? "",
+      opening_context: weeklyOpeningContext(row.core_content ?? {}),
     }));
     const course = assembleLearnerCourse({ outline: source.outline, weeks: [source.week], assignments: source.assignments, cores });
     const week = course.weeks[0];

@@ -5,6 +5,7 @@ import { LEVEL } from "@/lib/pragma/enums";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { weekRole } from "./template";
 import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "./weekGuidance";
+import { buildWeeklyOpening, type WeeklyOpening } from "./weeklyOpening";
 
 export interface WeeklyMaterialSection {
   id: string;
@@ -24,6 +25,8 @@ export interface WeeklyCourseMaterial {
   preparationNote: string;
   sections: WeeklyMaterialSection[];
   missions: Array<{ id: string; label: string; summary: string }>;
+  /** 교수자 수업 화면에서 단계적으로 공개하는 공통 도입. 기존 승인 스냅샷에는 없을 수 있다. */
+  opening?: WeeklyOpening;
 }
 
 export function missionSituationSummary(situation: string, maxLength = 78): string {
@@ -116,6 +119,7 @@ export function buildWeeklyCourseMaterial(
     contextLabel: [LEVEL[outline.level], note.directionLabel, mode ? (mode === "stt_interpreting" ? "통역" : "번역") : null].filter(Boolean).join(" · "),
     sections,
     missions,
+    opening: buildWeeklyOpening(outline, week),
   };
 }
 
