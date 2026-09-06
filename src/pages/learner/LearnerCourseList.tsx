@@ -86,7 +86,7 @@ const LearnerCourseList = () => {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-3">
-                        <span id={levelId} className="shrink-0 rounded-lg bg-[#15202B] px-3 py-2 text-[16px] font-bold leading-6 text-[#FAD338]">
+                        <span id={levelId} className="shrink-0 rounded-md border border-[#DED4B9] bg-[#F1EBD9] px-2.5 py-1.5 text-[14px] font-bold leading-5 text-[#69562D]">
                           <span className="sr-only">수준: </span>
                           {LEVEL[course.level as LearnerLevel] ?? course.level}
                         </span>
