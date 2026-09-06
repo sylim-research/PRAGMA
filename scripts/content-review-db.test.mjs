@@ -106,6 +106,7 @@ before(async () => {
     throw new Error(`QA migration line ${line}: ${error.message}`);
   }
   await db.exec(await sqlFile('20260905150000_instructor_review_experience.sql'));
+  await db.exec(await sqlFile('20260906100000_focused_content_review.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -181,7 +182,7 @@ test('missing/duplicate model output, unsettled professor decisions and stale co
   for (const bad of [null, {}, model('adjudication', { decisions: [] }),
     model('adjudication', { decisions: [...original.adjudication.result.decisions, ...original.adjudication.result.decisions] })]) {
     await db.query('update content_review_runs set adjudication = $2 where id = $1', [r.id, bad]);
-    await assert.rejects(finalize(m, r), /four QA stages|Incomplete model review|Adjudicate every Claude/);
+    await assert.rejects(finalize(m, r), /required quality evidence|four QA stages|Incomplete model review|Adjudicate every Claude/);
   }
   await db.query('update content_review_runs set adjudication = $2 where id = $1', [r.id, original.adjudication]);
   for (const decision of ['defer', 'revision_required']) {
@@ -215,4 +216,47 @@ test('weekly approval requires current mission QA and exposes only the public ap
   });
   await db.query("update curriculum_weeks set title = 'changed' where outline_id = $1", [courseId]);
   assert.equal(await publicRead(), null);
+});
+
+async function focusedReview(critical = false) {
+  const m = await mission();
+  m.content.provenance.mission_content_hash = hash;
+  m.content.quality_check = { verdict: critical ? 'fail' : 'pass', summary_ko: '생성 점검', model: 'gpt-4.1',
+    prompt_version: 'quality_fixture', checked_at: '2026-09-06T00:00:00Z', mission_content_hash: hash,
+    findings: critical ? [{code:'band_mismatch',where:'mpj_items[1].target',severity:'fail',note_ko:'판정 확인'}] : [] };
+  await db.query('update scenarios set mission_content=$2 where scenario_id=$1',[m.id,m.content]);
+  const r = await review(m.id);
+  const evidence = {mission_content_hash: hash, quality_check:m.content.quality_check};
+  await db.query(`update content_review_runs set approval_policy='focused_v1', generation_quality=$2,
+    openai_review=null,claude_review=null,adjudication=null,professor_decisions='[]' where id=$1`,[r.id,evidence]);
+  return {m,r,evidence};
+}
+
+test('focused review reuses exact current generation evidence without inventing model outputs', async () => {
+  const {m,r,evidence}=await focusedReview();
+  await db.query('update content_review_runs set generation_quality=$2 where id=$1',[r.id,{...evidence,mission_content_hash:'b'.repeat(64)}]);
+  await assert.rejects(finalize(m,r),/does not match/);
+  await db.query('update content_review_runs set generation_quality=$2 where id=$1',[r.id,evidence]);
+  assert.equal(await finalize(m,r),m.id);
+  assert.equal(await scalar('select claude_review from content_review_runs where id=$1',[r.id]),null);
+});
+
+test('focused review retains human decisions and existing critical issue override', async () => {
+  const {m,r}=await focusedReview(true);
+  await assert.rejects(finalize(m,r),/Record every professor decision/);
+  const decide=decision=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[r.id,hash,[{finding_id:'generation-1',decision,rationale_ko:rationale}]]));
+  await decide('defer');
+  await assert.rejects(finalize(m,r),/Record every professor decision/);
+  await decide('no_change');
+  await assert.rejects(finalize(m,r),/unresolved critical/);
+  assert.equal(await finalize(m,r,{issue_overrides:[{issue_index:0,code:'band_mismatch',where:'mpj_items[1].target',rationale_ko:rationale}]}),m.id);
+});
+
+test('requesting independent review makes that evidence required, while stale source remains blocked', async () => {
+  const {m,r}=await focusedReview();
+  await db.query('update content_review_runs set independent_review_requested=true where id=$1',[r.id]);
+  await assert.rejects(finalize(m,r),/required quality evidence/);
+  await db.query('update content_review_runs set claude_review=$2 where id=$1',[r.id,model('claude',pass)]);
+  await db.query(`update scenarios set core_content='{"situation_ko":"changed"}' where scenario_id=$1`,[m.id]);
+  await assert.rejects(finalize(m,r),/Content changed/);
 });

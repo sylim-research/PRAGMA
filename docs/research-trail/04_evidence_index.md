@@ -206,3 +206,16 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
   확보했다. 콘텐츠 승인·실제 학습자 수행·효과 검증으로 해석하지 않는다.
 - 관련: `DEC-20260906-02`, `docs/dev-log/2026-09-06-weekly-translation-interpreting.md`.
   기능 SHA·main·CI·운영 배포의 최종 증거는 해당 변경 PR 본문에 연결한다.
+
+## EVD-20260906-03 · 세 과목 54개 콘텐츠 후보와 검토 이력
+
+- 실제 DB 조회 기준: 2026-09-06T07:20:27.238Z. 과목별 18개, 번역·통역 각각 27개,
+  MJT 270개·DCT 54개, 교수자 승인 0개. 기존 편성 23행 유지.
+- 비공개 원본: `C:/PRAGMA_THESIS_LOCAL/05_증거/교과목콘텐츠/2026-09-06_A안_초안/`.
+  `review-book.html`(교수자 검토본), `content-matrix.md`(54슬롯 매핑),
+  `bundle-data.json`·`bundle.sha256`(DB 스냅샷), `plan.json`·`execution.jsonl`·
+  `replacement-state.json`(계획·실행·교체 이력), `plan-review.json`(독립 계획 검토).
+- 계획 hash: `3b3e49bdb42ff735ec71f6d92bac3a6759b72c3cf2434487606fcbac056ce693`.
+- 해석 한계: 54개는 완전한 구조의 초안 수량이다. 품질 fail 7개와 후속 검토 지적이 남아
+  있으며 36개는 추가 검토 전이다. 교수자 승인·학습자 편성·최종 LOCK·교육효과 증거가 아니다.
+- 관련: ITER-20260906-01, `docs/dev-log/2026-09-06-course-content-candidates.md`.

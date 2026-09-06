@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { CONTENT_REVIEW_VERSION, nextReviewStage, reviewHash, type ContentReviewRun, type ReviewInspection, type ReviewTarget } from "../_shared/contentReview.ts";
+import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type ReviewInspection, type ReviewTarget } from "../_shared/contentReview.ts";
 import { callContentReviewer } from "../_shared/contentReviewProvider.ts";
 import { OPENAI_MODEL_ROUTES } from "../_shared/openaiRequestContract.ts";
 import { buildContentReviewDomain } from "./domain.generated.mjs";
@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
     const { action, target, expectedVersion } = JSON.parse(rawBody) as {
       action: string; target: ReviewTarget; expectedVersion?: { contentHash: string; sourceHash: string };
     };
-    if (!["inspect", "rules", "openai", "claude", "adjudication"].includes(action)
+    if (!["inspect", "rules", "openai", "claude", "adjudication", "request_independent"].includes(action)
       || !target || !["mission", "weekly_material"].includes(target.kind) || !uuid.test(target.targetId)
       || (target.kind === "weekly_material" && (!Number.isInteger(target.weekNo) || target.weekNo! < 1 || target.weekNo! > 15))) {
       return json({ error: "검수 대상·단계를 확인해 주세요." }, 400);
@@ -59,7 +59,8 @@ Deno.serve(async (req) => {
         return { id, approved: Boolean(data?.length) };
       }));
       return { run: current.data as ContentReviewRun | null, contentHash, sourceHash: source.source_hash,
-        snapshot: domain.snapshot, rules: domain.rules, history: history.data ?? [], dependencies, models };
+        snapshot: domain.snapshot, rules: domain.rules, history: history.data ?? [], dependencies, models,
+        reusableGenerationQuality: target.kind === "mission" ? reusableGenerationQuality(source.source.scenario.mission_content ?? {}) : null };
     };
     const state = await inspect();
     if (action === "inspect") return json(state);
@@ -71,12 +72,25 @@ Deno.serve(async (req) => {
         const { error } = await db.from("content_review_runs").upsert({ kind: target.kind, target_id: target.targetId, week_no: weekNo,
           source_hash: state.sourceHash, content_hash: state.contentHash, criteria_version: CONTENT_REVIEW_VERSION,
           snapshot: state.snapshot, rules: state.rules, created_by: user.user.id,
+          approval_policy: CONTENT_APPROVAL_POLICY, generation_quality: state.reusableGenerationQuality,
         }, { onConflict: "kind,target_id,week_no,source_hash,content_hash,criteria_version", ignoreDuplicates: true });
         if (error) throw new Error(`규칙 검사 저장 실패: ${error.message}`);
+      } else if (!state.run.approved_at && !state.run.running_stage) {
+        const { error } = await db.from("content_review_runs").update({ approval_policy: CONTENT_APPROVAL_POLICY,
+          generation_quality: state.reusableGenerationQuality }).eq("id", state.run.id).is("approved_at", null).is("running_stage", null);
+        if (error) throw new Error(`기존 점검 연결 실패: ${error.message}`);
       }
       return json(await inspect());
     }
     const run = state.run;
+    if (action === "request_independent") {
+      if (!run || run.approval_policy !== CONTENT_APPROVAL_POLICY || run.approved_at || run.running_stage
+        || run.rules.verdict === "fail" || (!run.openai_review && !run.generation_quality)) return json({error:"현재 기본 점검을 먼저 준비하세요."},409);
+      const { error } = await db.from("content_review_runs").update({ independent_review_requested: true })
+        .eq("id",run.id).is("approved_at",null).is("running_stage",null);
+      if (error) throw new Error("추가 검토 선택 저장 실패");
+      return json(await inspect());
+    }
     if (!run || run.rules.verdict === "fail" || nextReviewStage(run) !== action) return json({ error: "선행 단계를 완료하거나 현재 콘텐츠의 규칙 오류를 수정해 주세요." }, 409);
     const stage = action as "openai" | "claude" | "adjudication";
     const apiKey = Deno.env.get(stage === "claude" ? "ANTHROPIC_API_KEY" : "OPENAI_API_KEY");

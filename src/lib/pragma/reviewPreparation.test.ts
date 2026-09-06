@@ -21,6 +21,19 @@ function requestFor(state: ReviewInspection) {
   });
 }
 describe("explicit AI review preparation", () => {
+  it("adopts current generation evidence without an additional paid call or approval", async () => {
+    const state = inspection(); state.run = run(); state.reusableGenerationQuality = null;
+    const request = vi.fn(async (_target, action: string) => {
+      if (action === "rules") {
+        state.run!.approval_policy = "focused_v1";
+        state.run!.generation_quality = { mission_content_hash: "a".repeat(64), quality_check: { verdict: "pass", summary_ko: "기존 검사", findings: [], model: "fixture", prompt_version: "fixture", checked_at: "2026-09-06", mission_content_hash: "a".repeat(64) } };
+      }
+      return structuredClone(state);
+    });
+    expect((await prepareContentReview(target, { request, stopped: () => false })).status).toBe("ready");
+    expect(request.mock.calls.map(call => call[1])).toEqual(["inspect", "rules"]);
+    expect(state.run.approved_at).toBeNull();
+  });
   it("runs all missing stages once, pins their version, and stops before professor approval", async () => {
     const state = inspection(); const request = requestFor(state);
     const result = await prepareContentReview(target, { request, stopped: () => false });
@@ -42,7 +55,7 @@ describe("explicit AI review preparation", () => {
     const state = inspection(); state.run = run();
     if (problem === "rules") state.run.rules.verdict = "fail";
     if (problem === "lease") { state.run.running_stage = "openai"; state.run.lease_until = new Date(Date.now() + 60_000).toISOString(); }
-    if (problem === "model") state.models.claude = null;
+    if (problem === "model") { state.models.claude = null; state.run.openai_review = { result: { verdict: "pass", findings: [] } } as ContentReviewRun["openai_review"]; }
     const request = requestFor(state);
     expect((await prepareContentReview(target, { request, stopped: () => false })).status).toBe("held");
     expect(request).toHaveBeenCalledTimes(1);
