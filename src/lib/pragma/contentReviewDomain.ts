@@ -6,6 +6,8 @@ import { buildWeeklyCourseMaterial } from "@/lib/curriculum/weeklyMaterials";
 import { weeklyInstructorContent } from "@/lib/curriculum/weeklyInstructorContent";
 import { weekRole } from "@/lib/curriculum/template";
 import { weeklyOpeningContext } from "@/lib/curriculum/weeklyOpeningContext";
+import { coreDirection } from "./coreSchema";
+import { WEEKLY_LEARNING_CONTRACT } from "@/lib/curriculum/courseModePolicy";
 import { CONTENT_REVIEW_VERSION, instructionalMission, type ReviewFinding, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 
 // This entry is bundled for Edge from the same rule/catalog/material functions
@@ -40,6 +42,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     content = { context: { ...context, core_content: instructionalMission(row.core_content ?? {}) }, mission: instructionalMission(raw ?? {}) };
   } else {
     const cores = source.scenarios.map((row: any) => ({ ...row,
+      direction: coreDirection(row.core_content),
       situation_ko: row.core_content?.situation_ko ?? "",
       source_text_ko: row.core_content?.source_text_ko ?? row.core_content?.source_text ?? "",
       opening_context: weeklyOpeningContext(row.core_content ?? {}),
@@ -53,6 +56,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     if (week.scenarios.length !== source.assignments.length) add("편성 중 미공개·누락 또는 수행모드가 다른 미션이 있습니다.");
     dependencies = week.scenarios.map((scenario) => scenario.scenario_id);
     content = {
+      weekly_learning_contract: WEEKLY_LEARNING_CONTRACT,
       public_material: buildWeeklyCourseMaterial(course.outline, week),
       instructor_only: weeklyInstructorContent(week, course.outline.language_direction),
       reused_mission_explanations: dependencies.map((id) => ({ scenario_id: id,

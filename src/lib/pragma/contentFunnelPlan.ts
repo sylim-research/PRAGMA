@@ -1,4 +1,3 @@
-import { expectedCoreModeForWeek } from "@/lib/curriculum/courseModePolicy";
 import { STANDARD_15WEEK } from "@/lib/curriculum/template";
 import type {
   BusinessFunction,
@@ -138,14 +137,15 @@ function topicForSlot(
 }
 
 function buildCourseSlots(preset: CoursePreset): CourseSlotRequirement[] {
-  const policy = {
-    courseMode: preset.course_mode,
-    interpretingWeekCount: preset.target_interpreting_week_count,
-  } as const;
+  // Scope Lock v1의 고정 생성 계획은 역사적 실행 인덱스·할당량을 보존한다.
+  // 현행 강좌 편성(A안)은 courseModePolicy의 미션별 모드를 사용하며 이 계획으로 결정하지 않는다.
+  const historicalLearningWeeks = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14];
+  const historicalInterpretingWeeks = preset.course_mode === "translation" ? []
+    : preset.course_mode === "interpreting" ? historicalLearningWeeks
+      : historicalLearningWeeks.slice(-preset.target_interpreting_week_count);
 
   return MANIFEST_WEEK_NOS.flatMap((weekNo, weekIndex) => {
-    const mode = expectedCoreModeForWeek(policy, weekNo);
-    if (!mode) throw new Error(`${preset.preset_code} ${weekNo}주차의 수행모드를 계산할 수 없습니다.`);
+    const mode: GenMode = historicalInterpretingWeeks.includes(weekNo) ? "stt_interpreting" : "translation";
 
     return ([1, 2] as const).map((position) => {
       const speechAct = speechActForSlot(weekNo, position);

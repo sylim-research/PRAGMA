@@ -35,6 +35,12 @@ const scenario = (id: string, runnable = true): LearnerWeekScenario => ({
 });
 
 describe("weekProgress", () => {
+  it("번역만 준비되어 완료했어도 통역 슬롯이 남은 주차를 완료로 표시하지 않는다", () => {
+    const w = week(2, { expected_mission_modes: ["translation", "stt_interpreting"], scenarios: [scenario("translation")] });
+    expect(weekProgress(w, new Set(["translation"])).state).toBe("doing");
+    w.scenarios.push({ ...scenario("interpreting"), mode: "stt_interpreting" });
+    expect(weekProgress(w, new Set(["translation", "interpreting"])).state).toBe("done");
+  });
   it("배정 미션을 전부 마쳐야 완료다 — 일부만 마치면 학습 중이다", () => {
     const w = week(2, { scenarios: [scenario("a"), scenario("b")] });
 

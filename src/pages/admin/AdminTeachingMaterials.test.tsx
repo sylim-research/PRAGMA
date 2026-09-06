@@ -39,7 +39,7 @@ beforeEach(() => {
   mocks.outlines.mockResolvedValue([outline]);
   mocks.curriculum.mockResolvedValue({ outline, weeks: courseWeeks });
   mocks.assignments.mockResolvedValue([{ week_no: 2, scenario_id: "mission-1", position: 0 }]);
-  mocks.cores.mockResolvedValue([{ scenario_id: "mission-1", mission_status: "reviewed", mode: "translation", situation_ko: "테스트 실습 상황입니다.", target_feature: "request_mitigation_optionality", content_release_id: CURRENT_CONTENT_RELEASE_ID }]);
+  mocks.cores.mockResolvedValue([{ scenario_id: "mission-1", speech_act: "request", learner_level: "intermediate", direction: "ko_zh", mission_status: "reviewed", mode: "translation", situation_ko: "테스트 실습 상황입니다.", target_feature: "request_mitigation_optionality", content_release_id: CURRENT_CONTENT_RELEASE_ID }]);
   mocks.operationLogs.mockResolvedValue([
     { mission_id: "mission-1", profile_id: "learner-1", mission_completed: true, completed_at: "2026-08-31T01:00:00Z", updated_at: "2026-08-31T01:00:00Z", context_judgment: null },
     { mission_id: "mission-1", profile_id: "learner-2", mission_completed: true, completed_at: "2026-08-31T02:00:00Z", updated_at: "2026-08-31T02:00:00Z", context_judgment: { learner_dissent: { reason_ko: "다르게 판단함" } } },
@@ -67,7 +67,7 @@ describe("교과목·주차 수업자료 연결", () => {
     const example = REFUSAL_TEACHING_CASE;
     mocks.curriculum.mockResolvedValue({ outline, weeks: [{ ...courseWeeks[0], week_no: 6, title: "거절", speech_act: "refusal" }] });
     mocks.assignments.mockResolvedValue([{ week_no: 6, scenario_id: example.scenarioId, position: 0 }]);
-    mocks.cores.mockResolvedValue([{ scenario_id: example.scenarioId, speech_act: "refusal", mission_status: "reviewed", mode: "translation", content_release_id: CURRENT_CONTENT_RELEASE_ID,
+    mocks.cores.mockResolvedValue([{ scenario_id: example.scenarioId, speech_act: "refusal", learner_level: "intermediate", direction: "ko_zh", mission_status: "reviewed", mode: "translation", content_release_id: CURRENT_CONTENT_RELEASE_ID,
       situation_ko: example.situationKo, source_text_ko: example.sourceText, target_feature: "refusal_softening" }]);
     const mission = structuredClone(SAMPLE_MISSION_V5_NATIVE);
     mission.production_task.situation_ko = example.situationKo;

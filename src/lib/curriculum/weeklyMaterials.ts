@@ -1,9 +1,8 @@
 import type { LearnerCourse, LearnerCourseWeek } from "./learnerCourse";
 import { buildWeeklyLearnerNote } from "./learnerNote";
-import { expectedCoreModeForWeek, type CourseMode } from "./courseModePolicy";
+import { expectedMissionModesForWeek, missionModesSummary, remainingMissionModes, type CourseMode } from "./courseModePolicy";
 import { LEVEL } from "@/lib/pragma/enums";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
-import { weekRole } from "./template";
 import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "./weekGuidance";
 import { buildWeeklyOpening, type WeeklyOpening } from "./weeklyOpening";
 
@@ -44,9 +43,13 @@ export function buildWeeklyCourseMaterial(
 ): WeeklyCourseMaterial {
   const direction = outline.language_direction === "zh_ko" ? "zh_ko" : "ko_zh";
   const note = buildWeeklyLearnerNote(week, direction);
-  const expectedMissions = week.speech_act || weekRole(week.week_no) === "contextualization" ? 2 : 0;
-  const pending = week.scenarios.length < expectedMissions;
-  const preparationLabel = pending
+  const modes = expectedMissionModesForWeek({ courseMode: outline.course_mode as CourseMode }, week.week_no);
+  const expectedMissions = modes.length;
+  const modesValid = remainingMissionModes(modes, week.scenarios.map((scenario) => scenario.mode)) !== null;
+  const pending = week.scenarios.length < expectedMissions || !modesValid;
+  const preparationLabel = !modesValid
+    ? "계획 미리보기 · 미션 수행 유형 확인 필요"
+    : pending
     ? `계획 미리보기 · 미션 ${week.scenarios.length}/${expectedMissions}개 편성`
     : week.scenarios.length ? `편성 미션 ${week.scenarios.length}개 반영` : "주차 계획 미리보기";
   const preparationNote = pending
@@ -54,10 +57,6 @@ export function buildWeeklyCourseMaterial(
     : week.scenarios.length
       ? "현재 편성의 상황·기본 원문과 기존 설명을 함께 구성했습니다. 수업 전 교수자가 내용의 적합성을 확인해 주세요."
       : "이번 주는 교수자 수업 안내와 기존 수행 기록을 활용합니다. 이 화면은 주차 계획이며 완성된 강의자료를 뜻하지 않습니다.";
-  const mode = expectedCoreModeForWeek({
-    courseMode: outline.course_mode as CourseMode,
-    interpretingWeekCount: outline.target_interpreting_week_count,
-  }, week.week_no);
   const sections: WeeklyMaterialSection[] = [{
     id: "goals",
     title: "이번 주 학습목표",
@@ -91,12 +90,12 @@ export function buildWeeklyCourseMaterial(
   });
   const missions = week.scenarios.map((scenario, index) => ({
     id: scenario.scenario_id,
-    label: `미션 ${index + 1}`,
+    label: `미션 ${index + 1} · ${scenario.mode === "stt_interpreting" ? "통역" : "번역"}`,
     summary: missionSituationSummary(scenario.situation_ko),
   }));
   week.scenarios.forEach((scenario, index) => sections.push({
     id: `mission-${scenario.scenario_id}`,
-    title: `미션 ${index + 1} · 상황과 기본 원문`,
+    title: `미션 ${index + 1} · ${scenario.mode === "stt_interpreting" ? "통역" : "번역"} · 상황과 기본 원문`,
     // 본문의 관계·부담·선행 사건을 보존한다. 첫 문장 요약은 연결된 미션 목록에만 쓴다.
     paragraphs: [scenario.situation_ko],
     items: scenario.source_text ? [scenario.source_text] : [],
@@ -116,7 +115,7 @@ export function buildWeeklyCourseMaterial(
     title: weekActivityLabel(week),
     preparationLabel,
     preparationNote,
-    contextLabel: [LEVEL[outline.level], note.directionLabel, mode ? (mode === "stt_interpreting" ? "통역" : "번역") : null].filter(Boolean).join(" · "),
+    contextLabel: [LEVEL[outline.level], note.directionLabel, missionModesSummary(modes)].filter(Boolean).join(" · "),
     sections,
     missions,
     opening: buildWeeklyOpening(outline, week),

@@ -55,8 +55,8 @@ describe("LearnerCourseList", () => {
     expect(list.getByText("중국어 → 한국어")).toBeInTheDocument();
     expect(list.queryByText("영역")).not.toBeInTheDocument();
     expect(list.getAllByText("|")).toHaveLength(3);
-    expect(list.getAllByText("번역 6주 · 통역 6주")).toHaveLength(2);
-    expect(list.getByText("번역 9주 · 통역 3주")).toBeInTheDocument();
+    expect(list.getAllByText("통번역", { exact: true })).toHaveLength(3);
+    expect(list.queryByText(/번역 \d+주|통역 \d+주/)).not.toBeInTheDocument();
     expect(list.getByText("대학생활, 유학·교류, 대인관계, 일상생활")).toBeInTheDocument();
     expect(list.getByText("콘텐츠·SNS, 취업·직장, 거래·고객응대, 대학생활 등")).toBeInTheDocument();
     expect(list.getByText("취업·직장, 거래·고객응대, 콘텐츠·SNS")).toBeInTheDocument();
@@ -65,7 +65,7 @@ describe("LearnerCourseList", () => {
     expect(screen.queryByText(/실제 학습 12주|교과목을 선택해|내 교과목/)).not.toBeInTheDocument();
   });
 
-  it("uses the saved mode weeks and themes instead of hardcoding preset counts", () => {
+  it("uses the saved course type and themes without displaying legacy week counts", () => {
     mockCourses([{
       ...courses[0],
       target_interpreting_week_count: 2,
@@ -74,7 +74,7 @@ describe("LearnerCourseList", () => {
     renderCourses();
 
     const card = within(screen.getByRole("link", { name: courses[0].title }));
-    expect(card.getByText("번역 10주 · 통역 2주")).toBeInTheDocument();
+    expect(card.getByText("통번역", { exact: true })).toBeInTheDocument();
     expect(card.getByText("일상생활")).toBeInTheDocument();
     expect(card.queryByText(/유학·교류| 등$/)).not.toBeInTheDocument();
   });

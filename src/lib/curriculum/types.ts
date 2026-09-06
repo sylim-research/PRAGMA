@@ -66,9 +66,9 @@ export interface CurriculumOutlineDraft {
   scenarios_per_week: number;
   /** 자동 편성에서 허용할 주제. 빈 배열은 전체 주제. */
   composition_theme_codes: ThemeCode[];
-  /** 번역·통역 전용 또는 실제 학습 12주를 나누는 혼합 강좌. */
+  /** 번역·통역 전용 또는 화행 주차마다 번역 1개·통역 1개를 수행하는 통번역형. */
   course_mode: CourseMode;
-  /** 통역으로 편성할 실제 학습 주차 수. 전용 강좌는 각각 0/12, 혼합은 1~11. */
+  /** 과거 주수 정책의 저장 호환값. 현행 미션 모드 배분에는 사용하지 않는다. */
   target_interpreting_week_count: number;
 }
 

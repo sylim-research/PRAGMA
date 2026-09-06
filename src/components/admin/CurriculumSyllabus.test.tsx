@@ -23,7 +23,7 @@ const outline = {
 const weeks = [
   {
     id: "week-1",
-    week_no: 1,
+    week_no: 2,
     type: "regular",
     title: "요청",
     speech_act: "request",
@@ -32,7 +32,7 @@ const weeks = [
 ] as CurriculumWeekRow[];
 
 const assignments: AssignMap = {
-  1: [
+  2: [
     { scenario_id: "scenario-a", slot_role: "A" },
     { scenario_id: "scenario-b", slot_role: "B" },
   ],
@@ -84,11 +84,19 @@ describe("CurriculumSyllabus", () => {
     expect(screen.getByRole("heading", { name: outline.title })).toBeInTheDocument();
     expect(screen.getByText(/교수자에게 기한 연장을 요청한다/)).toBeInTheDocument();
     expect(screen.getByText(/친구에게 도움을 요청한다/)).toBeInTheDocument();
-    expect(screen.getByText("미션 세트 A·B 수행 → 5 POINT LESSON → DCT 수정")).toBeInTheDocument();
+    expect(screen.getByText("번역 2개 · 각 미션의 판단 → 산출 → 피드백·수정")).toBeInTheDocument();
     expect(screen.getByText("배정 미션 완료 · 주차 학습노트 정리")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "학습목표–평가 근거 대응" })).toBeInTheDocument();
     expect(screen.getByText("최초 산출, 최소 피드백 반영, 수정본")).toBeInTheDocument();
     expect(screen.getByText("배정 미션은 해당 주차 안에 완료한다.")).toBeInTheDocument();
     expect(screen.getByText("40%")).toBeInTheDocument();
+  });
+
+  it("통번역형 계획은 과거 9/3 주수 대신 같은 화행의 번역·통역 미션을 표시한다", () => {
+    render(<CurriculumSyllabus outline={{ ...outline, course_mode: "mixed", target_interpreting_week_count: 3 }}
+      weeks={weeks} assignments={assignments}
+      coreById={{ ...coreById, "scenario-b": { ...coreById["scenario-b"], mode: "stt_interpreting" } }} />);
+    expect(screen.getByText("번역 1개 · 통역 1개 · 각 미션의 판단 → 산출 → 피드백·수정")).toBeInTheDocument();
+    expect(screen.queryByText(/번역 9주|통역 3주/)).not.toBeInTheDocument();
   });
 });

@@ -7,6 +7,25 @@ export const openingOutline = { id: "hook-course", title: "한중 학업 통번�
 export const openingWeek: LearnerCourseWeek = { week_no: 2, title: "상황에 맞게 요청하기", type: "regular", can_do: ["관계와 부담을 근거로 요청 표현을 선택할 수 있다."], competency_focus: "원문의 요청 의도와 태도 전달", speech_act: "request", channel: "messenger", pdr_power: "equal", pdr_distance: "formal", pdr_imposition: "low", domain: "school", review_released: false, scenarios: [] };
 
 describe("교과목·주차 도입 자료", () => {
+  it("통번역 두 미션의 역할과 P/D/R이 달라도 도입은 한 번역 예시의 조건으로만 구성한다", () => {
+    const translation = { scenario_id: "t", situation_ko: "PRIVATE_TEXT_SCENE", source_text: "PRIVATE_TEXT",
+      speech_act: "request" as const, mission_status: "reviewed", target_feature: null,
+      mode: "translation" as const, runnable: true, domain: "school" as const,
+      context: { power: "equal", distance: "close", burden: "low", channel: "email", counterpart: null } };
+    const interpreting = { ...translation, scenario_id: "i", mode: "stt_interpreting" as const,
+      situation_ko: "PRIVATE_SPOKEN_SCENE", source_text: "PRIVATE_SPEECH",
+      context: { power: "speaker_lower", distance: "distant", burden: "high", channel: "facetoface", counterpart: null } };
+    const week = { ...openingWeek, week_no: 13, channel: null, pdr_power: null, pdr_distance: null,
+      pdr_imposition: null, scenarios: [translation, interpreting] };
+    const before = JSON.stringify(week);
+    const result = buildWeeklyOpening({ ...openingOutline, course_mode: "mixed" }, week);
+    expect(result.status).toBe("draft");
+    expect(result.contextLabel).toContain("번역 예시");
+    expect(result.notice).toContain("두 미션의 공통 조건이 아니며");
+    expect(result.clues[1].fact).toContain("몇 분");
+    expect(JSON.stringify(result)).not.toContain("PRIVATE_");
+    expect(JSON.stringify(week)).toBe(before);
+  });
   it("9화행 × 3수준 × 양방향 × 두 수행모드가 실제 예문과 역할에 반영된다", () => {
     for (const act of Object.keys(SPEECH_ACT_UI) as SpeechActUI[]) for (const level of Object.keys(LEVEL) as LearnerLevel[]) for (const direction of ["ko_zh", "zh_ko"] as const) for (const interpreting of [false, true]) {
       const result = buildWeeklyOpening({ ...openingOutline, level, language_direction: direction, course_mode: interpreting ? "interpreting" : "translation", target_interpreting_week_count: interpreting ? 12 : 0 }, { ...openingWeek, speech_act: act, channel: interpreting ? "facetoface" : "email" });
@@ -35,7 +54,7 @@ describe("교과목·주차 도입 자료", () => {
   });
   it("미지정 또는 잘못된 조건을 임의로 보완하지 않는다", () => {
     expect(buildWeeklyOpening({ ...openingOutline, language_direction: "unknown" }, openingWeek).status).toBe("unavailable");
-    expect(buildWeeklyOpening({ ...openingOutline, course_mode: "mixed", target_interpreting_week_count: 12 }, openingWeek).status).toBe("unavailable");
+    expect(buildWeeklyOpening({ ...openingOutline, course_mode: "unknown" }, openingWeek).status).toBe("unavailable");
     expect(buildWeeklyOpening(openingOutline, { ...openingWeek, channel: "phone" }).status).toBe("unavailable");
     const missing = buildWeeklyOpening(openingOutline, { ...openingWeek, pdr_distance: null });
     expect(missing.status).toBe("planning");

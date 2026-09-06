@@ -13,6 +13,7 @@ import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { listCompletedMissionIds } from "@/lib/mission/missionLog";
 import { hasIntroArc } from "@/lib/mission/mockIntroArc";
+import { missionModesSummary, remainingMissionModes } from "@/lib/curriculum/courseModePolicy";
 
 function specialWeekCopy(weekNo: number): string {
   const role = weekRole(weekNo);
@@ -92,6 +93,8 @@ const LearnerCourseWeek = () => {
   const reinforcement = isReinforcementWeek(week);
   const speechActLabel = weekActivityLabel(week);
   const centralQuestion = weekCentralQuestion(week);
+  const expectedModes = week.expected_mission_modes ?? [];
+  const remainingModes = remainingMissionModes(expectedModes, week.scenarios.map((scenario) => scenario.mode));
   const goal = week.can_do[0] ?? null;
   const introAvailable = week.scenarios.some(
     (scenario) => scenario.runnable && hasIntroArc(scenario.target_feature),
@@ -146,11 +149,15 @@ const LearnerCourseWeek = () => {
                   ? "진행 상태 확인 필요"
                   : progressPending
                     ? "진행 상태 확인 중…"
-                    : `${completed.size}/${missionIds.length} 완료`}
+                    : `${completed.size}/${expectedModes.length || missionIds.length} 완료`}
               </span>
             )}
           </div>
 
+          {expectedModes.length > 0 && <p className="mt-2 text-[12px] text-muted-foreground">
+            {missionModesSummary(expectedModes)}
+            {remainingModes?.length ? ` · ${missionModesSummary(remainingModes)} 편성 준비 중` : ""}
+          </p>}
           {week.scenarios.length === 0 ? (
             <div className="mt-3 rounded-xl border border-[#EAE4D2] bg-[#FAF8F2] p-5 text-[13px] leading-6 text-muted-foreground">
               {emptyWeekCopy(week.week_no, Boolean(week.speech_act))}

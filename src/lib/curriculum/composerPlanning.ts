@@ -8,9 +8,8 @@ import type {
   SpeechActUI,
 } from "@/lib/pragma/enums";
 import {
-  ACTUAL_LEARNING_WEEK_NOS,
-  expectedCoreModeForWeek,
-  interpretingTargetWeekNumbers,
+  expectedMissionModesForWeek,
+  remainingMissionModes,
   isCourseModePolicyValid,
   type CourseModePolicy,
 } from "@/lib/curriculum/courseModePolicy";
@@ -70,31 +69,22 @@ export function buildAutomaticAssignments(options: AutoFillOptions): AutoFillRes
     allowThemeExpansion = false,
   } = options;
   if (!isCourseModePolicyValid(courseModePolicy)) {
-    throw new Error("강좌 수행모드와 통역 주차 수가 일치하지 않습니다.");
+    throw new Error("강좌 수행 유형을 확인해 주세요.");
   }
   const assignments: AssignMap = {};
   const usedIds = new Set<string>();
   const shortages: AutoFillResult["shortages"] = [];
   const expandedThemeWeeks: number[] = [];
-  const learningWeekNumbers = ACTUAL_LEARNING_WEEK_NOS.filter((weekNo) =>
-    weeks.some((week) => week.week_no === weekNo),
-  );
-  const interpretingWeekNumbers = interpretingTargetWeekNumbers(
-    courseModePolicy,
-    learningWeekNumbers,
-  );
+  const interpretingWeekNumbers: number[] = [];
   let filledWeeks = 0;
 
   for (const week of weeks) {
     if (week.type !== "regular" || !week.speech_act) continue;
     if (isReinforcementWeek(week) && !previouslyLearnedActs(weeks).includes(week.speech_act as SpeechActUI)) continue;
     const act = week.speech_act as SpeechActUI;
-    const slots = 2;
-    const expectedMode = expectedCoreModeForWeek(
-      courseModePolicy,
-      week.week_no,
-      learningWeekNumbers,
-    );
+    const expectedModes = expectedMissionModesForWeek(courseModePolicy, week.week_no);
+    if (expectedModes.length === 0) continue;
+    const slots = expectedModes.length;
     const isBaseEligible = (core: ComposerCore) =>
       isReviewedMission(core) &&
       core.is_native_mpj5 &&
@@ -102,7 +92,7 @@ export function buildAutomaticAssignments(options: AutoFillOptions): AutoFillRes
       core.speech_act === act &&
       core.learner_level === level &&
       core.direction === direction &&
-      core.mode === expectedMode;
+      expectedModes.includes(core.mode);
 
     let candidates = cores.filter(
       (core) =>
@@ -110,10 +100,10 @@ export function buildAutomaticAssignments(options: AutoFillOptions): AutoFillRes
         (themes.length === 0 ||
           (core.theme_code != null && themes.includes(core.theme_code))),
     );
-    let picked = pickDistinctSituationMissions(candidates, slots);
+    let picked = pickMissionsForModes(candidates, expectedModes);
     if (themes.length > 0 && picked.length < slots && allowThemeExpansion) {
       candidates = cores.filter(isBaseEligible);
-      picked = pickDistinctSituationMissions(candidates, slots);
+      picked = pickMissionsForModes(candidates, expectedModes);
       if (picked.length === slots) expandedThemeWeeks.push(week.week_no);
     }
 
@@ -122,6 +112,7 @@ export function buildAutomaticAssignments(options: AutoFillOptions): AutoFillRes
       continue;
     }
     picked.forEach((core) => usedIds.add(core.scenario_id));
+    if (picked.some((core) => core.mode === "stt_interpreting")) interpretingWeekNumbers.push(week.week_no);
     assignments[week.week_no] = picked.map((core) => ({
       scenario_id: core.scenario_id,
       slot_role: slotRoleFor(core),
@@ -156,7 +147,7 @@ export interface ManualCandidateOptions {
   direction: LanguageDirection;
   themes: ThemeCode[];
   assignments: AssignMap;
-  expectedMode?: GenMode | null;
+  expectedModes?: readonly GenMode[];
   weekNo?: number;
   coreById?: Record<string, ComposerCore>;
 }
@@ -190,6 +181,17 @@ export function pickDistinctSituationMissions(
   return picked;
 }
 
+/** 두 모드와 서로 다른 상황을 함께 만족시킨다. 첫 후보의 충돌 때문에 유효한 쌍을 놓치지 않는다. */
+export function pickMissionsForModes(candidates: readonly ComposerCore[], modes: readonly GenMode[]): ComposerCore[] {
+  if (modes.length !== 2) return [];
+  for (const first of candidates.filter((core) => core.mode === modes[0])) {
+    const second = candidates.find((core) => core.mode === modes[1]
+      && core.scenario_id !== first.scenario_id && !hasSameSituation(first, core));
+    if (second) return [first, second];
+  }
+  return [];
+}
+
 /** 수동 교체 후보도 자동 편성과 같은 절대 조건, 강좌 중복, 명백한 상황 복제 금지를 적용한다. */
 export function filterManualCandidates(
   candidates: ComposerCore[],
@@ -202,6 +204,10 @@ export function filterManualCandidates(
     : (options.assignments[options.weekNo] ?? [])
         .map((item) => options.coreById?.[item.scenario_id])
         .filter((core): core is ComposerCore => core != null);
+  const remaining = options.expectedModes
+    ? remainingMissionModes(options.expectedModes, weekCores.map((core) => core.mode))
+    : undefined;
+  if (remaining === null) return [];
   return candidates.filter(
     (core) =>
       isReviewedMission(core) &&
@@ -210,7 +216,7 @@ export function filterManualCandidates(
       (options.act ? core.speech_act === options.act : true) &&
       core.learner_level === options.level &&
       core.direction === options.direction &&
-      (options.expectedMode ? core.mode === options.expectedMode : true) &&
+      (remaining ? remaining.includes(core.mode) : true) &&
       !weekCores.some((assigned) => hasSameSituation(assigned, core)) &&
       (options.themes.length === 0 ||
         (core.theme_code != null && options.themes.includes(core.theme_code))),
@@ -238,21 +244,32 @@ export function addAssignment(
   assignments: AssignMap,
   weekNo: number,
   core: ComposerCore,
-  expectedMode?: GenMode | null,
+  expectedModes?: readonly GenMode[],
+  coreById: Record<string, ComposerCore> = {},
 ): AssignMap {
+  const previous = assignments[weekNo] ?? [];
+  const known = previous.map((item) => coreById[item.scenario_id]);
+  const remaining = expectedModes && known.every(Boolean)
+    ? remainingMissionModes(expectedModes, known.map((item) => item.mode))
+    : undefined;
   if (
     !isReviewedMission(core) ||
+    !core.is_native_mpj5 ||
     assignedScenarioIds(assignments).has(core.scenario_id) ||
-    (expectedMode ? core.mode !== expectedMode : false)
+    (expectedModes && (!remaining || !remaining.includes(core.mode))) ||
+    known.some((item) => item && hasSameSituation(item, core))
   ) {
     return assignments;
   }
   return {
     ...assignments,
     [weekNo]: [
-      ...(assignments[weekNo] ?? []),
+      ...previous,
       { scenario_id: core.scenario_id, slot_role: slotRoleFor(core) },
-    ],
+    ].sort((left, right) => expectedModes
+      ? expectedModes.indexOf((left.scenario_id === core.scenario_id ? core : coreById[left.scenario_id]).mode)
+        - expectedModes.indexOf((right.scenario_id === core.scenario_id ? core : coreById[right.scenario_id]).mode)
+      : 0),
   };
 }
 
@@ -318,9 +335,6 @@ export function assignmentStructureIssues(
 ): AssignmentStructureIssue[] {
   const issues: AssignmentStructureIssue[] = [];
   const weekByNo = new Map(weeks.map((week) => [week.week_no, week]));
-  const learningWeekNumbers = ACTUAL_LEARNING_WEEK_NOS.filter((weekNo) =>
-    weeks.some((week) => week.week_no === weekNo),
-  );
   if (courseModePolicy && !isCourseModePolicyValid(courseModePolicy)) {
     issues.push({ weekNo: 0, code: "course_mode_policy" });
   }
@@ -344,9 +358,9 @@ export function assignmentStructureIssues(
         issues.push({ weekNo, code: "reinforcement_act_not_learned" });
       }
     }
-    const expectedMode = courseModePolicy && isCourseModePolicyValid(courseModePolicy)
-      ? expectedCoreModeForWeek(courseModePolicy, weekNo, learningWeekNumbers)
-      : null;
+    const expectedModes = courseModePolicy && isCourseModePolicyValid(courseModePolicy)
+      ? expectedMissionModesForWeek(courseModePolicy, weekNo)
+      : undefined;
     if (items.length > slots) issues.push({ weekNo, code: "too_many_items" });
 
     for (const item of items) {
@@ -367,7 +381,7 @@ export function assignmentStructureIssues(
       if (week.speech_act && core.speech_act !== week.speech_act) {
         issues.push({ weekNo, scenarioId: item.scenario_id, code: "speech_act" });
       }
-      if (expectedMode && core.mode !== expectedMode) {
+      if (expectedModes && !expectedModes.includes(core.mode)) {
         issues.push({ weekNo, scenarioId: item.scenario_id, code: "course_mode" });
       }
     }
@@ -375,6 +389,9 @@ export function assignmentStructureIssues(
     const knownCores = items
       .map((item) => coreById[item.scenario_id])
       .filter((core): core is ComposerCore => core != null);
+    if (expectedModes && remainingMissionModes(expectedModes, knownCores.map((core) => core.mode)) === null) {
+      issues.push({ weekNo, code: "course_mode" });
+    }
     for (let index = 1; index < knownCores.length; index += 1) {
       if (
         knownCores

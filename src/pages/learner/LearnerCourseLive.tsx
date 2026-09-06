@@ -12,7 +12,7 @@ import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTI
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { isActWeek, weekProgress, type WeekState } from "@/lib/curriculum/learnerProgress";
 import { listCompletedMissionIds } from "@/lib/mission/missionLog";
-import { courseModeWeekSummary, expectedCoreModeForWeek, type CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { courseModeSummary, expectedMissionModesForWeek, missionModesSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 
 const STATE_BADGE: Record<WeekState, { label: string; cls: string }> = {
   done: { label: "완료", cls: "bg-[#E7F1EC] text-[#2E6F63]" },
@@ -101,7 +101,7 @@ const LearnerCourseLive = () => {
             </Link>
             <h1 className="mt-3 text-[21px] font-black text-[#15202B]">{courseDisplayTitle(course.outline)}</h1>
             <p className="mt-1 text-[12.5px] text-muted-foreground">
-              15주 강좌 · 실제 학습 12주 · {courseModeWeekSummary({
+              15주 강좌 · {courseModeSummary({
                 courseMode: course.outline.course_mode as CourseMode,
                 interpretingWeekCount: course.outline.target_interpreting_week_count,
               })}
@@ -134,7 +134,7 @@ const LearnerCourseLive = () => {
                 const isCourseMilestone = week.week_no === 1 || week.week_no === 8 || week.week_no === 15;
                 const reinforcement = isReinforcementWeek(week);
                 const centralQuestion = weekCentralQuestion(week);
-                const plannedMode = expectedCoreModeForWeek({
+                const plannedModes = expectedMissionModesForWeek({
                   courseMode: course.outline.course_mode as CourseMode,
                   interpretingWeekCount: course.outline.target_interpreting_week_count,
                 }, week.week_no);
@@ -163,7 +163,7 @@ const LearnerCourseLive = () => {
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-[10.5px] font-bold uppercase tracking-wide text-[#B8860B]">
                             {isCourseMilestone ? "학기 이정표" : reinforcement ? ROLE_LABEL[role] : week.speech_act ? "화행 학습" : ROLE_LABEL[role]}
-                            {plannedMode ? ` · ${plannedMode === "stt_interpreting" ? "통역" : "번역"}` : ""}
+                            {plannedModes.length ? ` · ${missionModesSummary(plannedModes)}` : ""}
                           </span>
                           <span className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold sm:hidden ${badge.cls}`}>
                             {badge.label}
