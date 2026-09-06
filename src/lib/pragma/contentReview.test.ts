@@ -2,7 +2,7 @@ import { webcrypto } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { buildContentReviewDomain } from "./contentReviewDomain";
-import { buildReviewPrompt, instructionalMission, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, reviewHash, validateAdjudication, validateReviewResult,
+import { buildReviewPrompt, instructionalMission, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
@@ -24,6 +24,29 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("current content five-stage review", () => {
+  it("reuses matching generation evidence and makes additional models opt-in", () => {
+    const hash = "a".repeat(64);
+    const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: "quality_v18",
+      checked_at: "2026-09-06T00:00:00Z", mission_content_hash: hash };
+    const evidence = reusableGenerationQuality({ provenance: {mission_content_hash: hash}, quality_check: quality });
+    expect(evidence).not.toBeNull();
+    expect(reusableGenerationQuality({ provenance: {mission_content_hash: "b".repeat(64)}, quality_check: quality })).toBeNull();
+    const focused = {...run(), approval_policy: "focused_v1" as const, generation_quality: evidence,
+      openai_review: null, claude_review: null};
+    expect(nextReviewStage(focused)).toBe("professor");
+    expect(nextReviewStage({...focused, independent_review_requested: true})).toBe("claude");
+    expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review})).toBe("adjudication");
+    expect(nextReviewStage({...focused, generation_quality: null})).toBe("openai");
+  });
+  it("keeps critical and uncertain findings from both models for human decisions", () => {
+    const original = run();
+    const focused = {...original, approval_policy: "focused_v1" as const,
+      openai_review: {...original.openai_review!, result: {verdict:"fail" as const, summary_ko:"문제",
+        findings:[{...audit.findings[0],id:"openai-1",severity:"fail" as const,needs_professor:false},
+          {...audit.findings[0],id:"openai-2",needs_professor:false}]}}};
+    expect(professorReviewFindings(focused).map(f=>f.id)).toEqual(["openai-1","claude-1"]);
+    expect(focused.openai_review.result.findings).toHaveLength(2);
+  });
   it("keeps Claude independent and excludes OpenAI's first judgment from adjudication", () => {
     const independent = buildReviewPrompt("claude", snapshot, run());
     expect(independent.user).not.toContain("OPENAI_PRIVATE_VERDICT");

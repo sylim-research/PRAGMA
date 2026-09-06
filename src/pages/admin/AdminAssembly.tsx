@@ -512,7 +512,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                   label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
                 })))}>선택 {reviewSelection.size}건 AI 검토 · 유료</Button>
             </div>
-            <p className="text-xs text-muted-foreground">선택한 미션의 규칙 검사 → OpenAI → Claude → 재검토를 이어서 실행합니다. 미션당 최대 3회 유료 호출, 완료 단계 재사용, 오류는 자동 재시도 없이 보류합니다. 교수자 최종 승인은 포함하지 않습니다.</p>
+            <p className="text-xs text-muted-foreground">선택한 미션의 규칙검사와 저장된 생성 품질점검을 연결합니다. 재사용 결과가 없을 때만 기본 AI 점검을 호출하며, 추가 모델 검토는 선택 사항입니다. 교수자 승인은 별도로 진행합니다.</p>
           </div>}
           <div className="flex items-baseline justify-between px-1">
             <div>

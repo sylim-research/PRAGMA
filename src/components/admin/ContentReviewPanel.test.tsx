@@ -50,12 +50,28 @@ async function enterDecision(decision: ProfessorFindingDecision["decision"]) {
 }
 
 describe("professor finding decisions", () => {
+  it("allows explicit human approval with primary evidence and keeps extra model review optional", async () => {
+    inspection.run!.approval_policy = "focused_v1";
+    inspection.run!.claude_review = null;
+    inspection.run!.adjudication = null;
+    inspection.models.claude = null;
+    showPanel();
+    const approve = await screen.findByRole("button", { name: "교수자 승인·확정" });
+    expect(approve).toBeDisabled();
+    expect(mocks.approve).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
+    expect(approve).toBeEnabled();
+    fireEvent.click(approve);
+    await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
+    expect(mocks.inspect.mock.calls.every(call => call.length === 1)).toBe(true);
+  });
   it.each(["revision_required", "defer"] as const)("preserves rejected Claude findings and saves %s without approval", async (decision) => {
     showPanel();
     await enterDecision(decision);
     expect(screen.getByText("Claude · 초대의 선택권 확인")).toBeInTheDocument();
     expect(screen.getByText(/OpenAI · 기각/)).toBeInTheDocument();
-    expect(screen.getByText(/불확실성: 수업에서/)).toBeInTheDocument();
+    expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
@@ -101,12 +117,12 @@ describe("professor finding decisions", () => {
     inspection.run!.adjudication!.result.decisions = [];
     showPanel();
     fireEvent.change(await screen.findByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
-    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본·OpenAI·Claude·재검토 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
     fireEvent.change(screen.getByRole("textbox", { name: "OpenAI 중대 지적 사용 근거" }), { target: { value: rationale } });
     expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
     fireEvent.click(screen.getByRole("checkbox", { name: /OpenAI 중대 지적을 검토했으며/ }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본·OpenAI·Claude·재검토 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 승인·확정" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
     expect(await screen.findByText(`OpenAI 중대 지적 사용 근거: ${rationale}`)).toBeVisible();

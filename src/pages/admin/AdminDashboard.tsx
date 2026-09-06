@@ -474,7 +474,7 @@ const AdminDashboard = () => {
           label="검수 대기 미션"
           value={snapshot?.content.reviewTargetCount ?? null}
           unit="개"
-          description="5단계 검수 진행 대상"
+          description="콘텐츠 검수 진행 대상"
           error={displayError}
           changed={changedKeys.has("reviewTarget")}
         />

@@ -1,6 +1,8 @@
 // Shared by the admin UI and Edge. A review concerns one current instructional
 // version; no model may approve, edit content, or erase another model's finding.
 export const CONTENT_REVIEW_VERSION = "content_review_v2";
+// Semantic criteria stay versioned separately, so completed reviews remain reusable.
+export const CONTENT_APPROVAL_POLICY = "focused_v1";
 export const CONTENT_REVIEW_STEPS = [
   { key: "rules", label: "규칙 검사" },
   { key: "openai", label: "OpenAI 품질 점검" },
@@ -43,6 +45,9 @@ export type ContentReviewRun = {
   id: string; kind: ReviewTarget["kind"]; target_id: string; week_no: number;
   source_hash: string; content_hash: string; criteria_version: string;
   snapshot: Record<string, unknown>; rules: ReviewResult;
+  approval_policy?: "multimodel_v2" | "focused_v1";
+  generation_quality?: GenerationQualityEvidence | null;
+  independent_review_requested?: boolean;
   openai_review: ModelReview<ReviewResult> | null;
   claude_review: ModelReview<ReviewResult> | null;
   adjudication: ModelReview<Adjudication> | null;
@@ -65,7 +70,51 @@ export type ReviewInspection = {
   snapshot: Record<string, unknown>; history: Array<Pick<ContentReviewRun, "id" | "created_at" | "approved_at" | "content_hash">>;
   dependencies: Array<{ id: string; approved: boolean }>;
   models: { openai: string; claude: string | null };
+  reusableGenerationQuality?: GenerationQualityEvidence | null;
 };
+export type GenerationQualityEvidence = {
+  mission_content_hash: string;
+  quality_check: { verdict: ReviewVerdict; summary_ko: string; model: string; prompt_version: string; checked_at: string;
+    mission_content_hash: string; findings: Array<{ code: string; severity: "warning" | "fail"; where: string; note_ko: string; evidence_excerpt?: string }> };
+};
+export function reusableGenerationQuality(raw: Record<string, any>): GenerationQualityEvidence | null {
+  const quality = raw.quality_check;
+  const hash = raw.provenance?.mission_content_hash;
+  if (!quality || !/^[0-9a-f]{64}$/.test(hash ?? "") || quality.mission_content_hash !== hash
+    || !["pass", "warning", "fail"].includes(quality.verdict) || !Array.isArray(quality.findings)
+    || !quality.model?.trim() || !quality.prompt_version?.trim() || !Number.isFinite(Date.parse(quality.checked_at))) return null;
+  if (quality.findings.some((f: any) => !["warning", "fail"].includes(f.severity) || !f.code || typeof f.where !== "string" || !f.note_ko)) return null;
+  const verdict = quality.findings.some((f: any) => f.severity === "fail") ? "fail" : quality.findings.length ? "warning" : "pass";
+  if (quality.verdict !== verdict) return null;
+  return { mission_content_hash: hash, quality_check: quality };
+}
+export function generationQualityResult(evidence: GenerationQualityEvidence): ReviewResult {
+  const q = evidence.quality_check;
+  return { verdict: q.verdict, summary_ko: q.summary_ko, findings: q.findings.map((f, i) => ({
+    id: `generation-${i + 1}`, severity: f.severity,
+    where: `/content/mission/${f.where.replace(/\[(\d+)\]/g, "/$1").replace(/\./g, "/")}`,
+    quote: f.evidence_excerpt ?? null, issue_ko: f.note_ko, reason_ko: f.note_ko,
+    suggestion_ko: "해당 표현·판정·해설을 확인하고 실제 오류를 수정하세요.", problem_type_ko: f.code,
+    needs_professor: f.severity === "fail", uncertainty_ko: f.severity === "fail" ? "생성 품질점검의 중대 지적입니다. 수정 또는 사용 근거를 교수자가 확인합니다." : "",
+  })) };
+}
+export function primaryReviewResult(run: ContentReviewRun): ReviewResult | null {
+  return run.openai_review?.result ?? (run.generation_quality ? generationQualityResult(run.generation_quality) : null);
+}
+export function professorReviewFindings(run: ContentReviewRun | null): ReviewFinding[] {
+  if (!run) return [];
+  if (run.approval_policy !== CONTENT_APPROVAL_POLICY) return run.claude_review?.result.findings ?? [];
+  const primary = primaryReviewResult(run)?.findings ?? [];
+  const generation = run.openai_review && run.generation_quality ? generationQualityResult(run.generation_quality).findings : [];
+  return [...primary, ...generation, ...(run.claude_review?.result.findings ?? [])]
+    .filter(f => f.severity === "fail" || f.needs_professor || run.professor_decisions.some(d => d.finding_id === f.id));
+}
+export function effectiveReviewSteps(run: ContentReviewRun | null) {
+  if (run && run.approval_policy !== CONTENT_APPROVAL_POLICY) return [...CONTENT_REVIEW_STEPS];
+  return CONTENT_REVIEW_STEPS.filter(s => s.key === "claude" ? run?.independent_review_requested
+    : s.key === "adjudication" ? run?.independent_review_requested && (!run.claude_review || run.claude_review.result.findings.length > 0 || run.adjudication)
+    : true).map(s => s.key === "openai" ? { ...s, label: "품질 점검" } : s);
+}
 
 export function canonicalReviewJson(value: unknown): string {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
@@ -85,6 +134,12 @@ export function instructionalMission(raw: Record<string, unknown>): Record<strin
 export function nextReviewStage(run: ContentReviewRun | null): ReviewStage | "professor" | "approved" {
   if (!run) return "rules";
   if (run.approved_at) return "approved";
+  if (run.approval_policy === CONTENT_APPROVAL_POLICY) {
+    if (!run.openai_review && !run.generation_quality) return "openai";
+    if (run.independent_review_requested && !run.claude_review) return "claude";
+    if (run.independent_review_requested && run.claude_review?.result.findings.length && !run.adjudication) return "adjudication";
+    return "professor";
+  }
   if (!run.openai_review) return "openai";
   if (!run.claude_review) return "claude";
   if (!run.adjudication) return "adjudication";

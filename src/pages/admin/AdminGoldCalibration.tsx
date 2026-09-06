@@ -321,7 +321,7 @@ const AdminGoldCalibration = () => {
         <div className="flex gap-3">
           <Info className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <p className="font-semibold">현재 수업 콘텐츠의 5단계 검수·승인과 별개인 연구용 파일럿입니다.</p>
+            <p className="font-semibold">현재 수업 콘텐츠의 콘텐츠 검수·승인과 별개인 연구용 파일럿입니다.</p>
             <p className="mt-1">0/{BOOTSTRAP_SEED_GOLD_CASE_COUNT}은 파일럿 예시에 대한 판정 기록이 없다는 뜻이며, 수업 준비율이나 미검수 수업 콘텐츠 수가 아닙니다. 지금 모두 평가할 필요는 없습니다.</p>
           </div>
         </div>

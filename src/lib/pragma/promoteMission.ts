@@ -1497,12 +1497,15 @@ export async function retryGeneratedMissionCandidateRepair(core: PromotableCore)
 export interface ProfessorMissionEdits {
   itemBlocks: Array<{ itemIndex: number; item: Record<string, unknown> }>;
   referenceAlternatives?: unknown[];
+  vocabularyHints?: Array<{ source: string; target: string }>;
+  diagnosticDimensions?: unknown[];
 }
 
 /** 교수자가 선택한 item block만 바꾸고, 구조검사·critic 후 append-only draft를 저장한다. */
 export async function reviseMissionDraft(
   core: PromotableCore,
   edits: ProfessorMissionEdits,
+  revisionSource: "professor" | "ai" = "professor",
 ): Promise<PromoteResult> {
   try {
     const current = await fetchGeneratedMissionContent(core.scenario_id);
@@ -1523,10 +1526,12 @@ export async function reviseMissionDraft(
       });
     }
     const patched = applyMissionRepairOperations(current, operations);
+    if (edits.vocabularyHints && isRecord(patched.production_task)) patched.production_task.vocabulary_hints = edits.vocabularyHints;
+    if (edits.diagnosticDimensions) patched.diagnostic_dimensions = edits.diagnosticDimensions;
     const currentAuthoring = isRecord(current.authoring) ? current.authoring : {};
     patched.authoring = {
       schema_version: "mission_authoring_v1",
-      stage: "professor_revised",
+      stage: revisionSource === "professor" ? "professor_revised" : "ai_repaired",
       lineage_status: "pending",
       repair_attempts: currentAuthoring.repair_attempts === 1 ? 1 : 0,
     };
@@ -1570,7 +1575,7 @@ export async function reviseMissionDraft(
       p_scenario_id: core.scenario_id,
       p_payload: {
         mission_content: patched,
-        validation_result: { result: check.result, violations, professor_revision: true },
+        validation_result: { result: check.result, violations, professor_revision: revisionSource === "professor", ai_editorial_revision: revisionSource === "ai" },
       },
     });
     if (error) return { ok: false, error: (error as { message?: string }).message ?? String(error) };
@@ -1601,7 +1606,7 @@ export async function reviewMission(
   approval?: { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string },
 ): Promise<{ ok: boolean; mission?: MissionRuntime; error?: string }> {
   try {
-    if (!approval) return { ok: false, error: "현재 버전의 5단계 검수에서 교수자 승인을 진행하세요." };
+    if (!approval) return { ok: false, error: "현재 버전의 콘텐츠 검수에서 교수자 승인을 진행하세요." };
     const current = await fetchGeneratedMissionContent(core.scenario_id);
     const featureCode = DEFAULT_FEATURE_BY_ACT[core.speech_act];
     const feature = featureCode ? getTargetFeature(featureCode) : undefined;
