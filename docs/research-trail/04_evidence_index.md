@@ -219,3 +219,11 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 해석 한계: 54개는 완전한 구조의 초안 수량이다. 품질 fail 7개와 후속 검토 지적이 남아
   있으며 36개는 추가 검토 전이다. 교수자 승인·학습자 편성·최종 LOCK·교육효과 증거가 아니다.
 - 관련: ITER-20260906-01, `docs/dev-log/2026-09-06-course-content-candidates.md`.
+
+
+## EVD-20260906-04 · 경량 검수와 7개 미션 편집
+
+- DEC-20260906-03 / ITER-20260906-02, dev-log/2026-09-06-focused-content-review.md.
+- 코드: PR88 818db3c, main f420fade574a31d45c8896bbbb5f453e8e61b7bf, CI34021273524, Railway6290811320, Edge content-review v15.
+- 비공개 원본: C:/PRAGMA_THESIS_LOCAL/05_증거/교과목콘텐츠/2026-09-06_경량검수/ — 검토본 v2, DB snapshot·SHA256, AI 수정안·이력·품질결과·점검 연결 기록·독립 검토 응답. 원래 초안은 별도 폴더 보존.
+- 범위: 콘텐츠 준비와 검수 절차 구현의 증거. 교수자 승인·학습자 수행·교육효과·최종 코퍼스 LOCK 증거는 아니다.

@@ -5,7 +5,8 @@ import type { ReviewVersion } from "./reviewPreparation";
 export type ContentReviewApproval = { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string };
 
 export async function contentReviewRequest(target: ReviewTarget, action = "inspect", expectedVersion?: ReviewVersion): Promise<ReviewInspection> {
-  const { data, error } = await supabase.functions.invoke("content-review", { body: { target, action, ...(expectedVersion ? { expectedVersion } : {}) } });
+  const version = expectedVersion ? { contentHash: expectedVersion.contentHash, sourceHash: expectedVersion.sourceHash } : undefined;
+  const { data, error } = await supabase.functions.invoke("content-review", { body: { target, action, ...(version ? { expectedVersion: version } : {}) } });
   if (error) {
     let message = "검수 서비스를 사용할 수 없습니다. 관리자 로그인과 content-review Edge·DB 배포 상태를 확인하세요.";
     if (error.context instanceof Response) {
