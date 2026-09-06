@@ -35,6 +35,10 @@ export function previouslyLearnedActs(weeks: readonly GuidanceWeek[]): SpeechAct
 /** 화행·활동 표시 전용. 저장 제목과 역사적 편성은 재작성하지 않는다. */
 export function weekActivityLabel(week: GuidanceWeek): string {
   if (isReinforcementWeek(week)) return REINFORCEMENT_TITLE;
+  if (week.type === "regular" && !week.speech_act) {
+    if (week.week_no === 7) return "중간 메타화용 토론";
+    if (week.week_no === 14) return "종합 메타화용 토론";
+  }
   if (week.speech_act && Object.prototype.hasOwnProperty.call(SPEECH_ACT_UI, week.speech_act)) {
     return SPEECH_ACT_UI[week.speech_act as SpeechActUI];
   }

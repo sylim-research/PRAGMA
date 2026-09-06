@@ -1,199 +1,189 @@
-import { useMemo } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useMemo } from "react";
+import { Link, useParams, useSearchParams } from "react-router-dom";
+import { ArrowRight, ChevronDown } from "lucide-react";
 
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
-import type { LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
-import { ROLE_LABEL, weekRole } from "@/lib/curriculum/template";
-import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
-import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
+import { MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
+import { isReinforcementWeek, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
-import { isActWeek, weekProgress, type WeekState } from "@/lib/curriculum/learnerProgress";
-import { listCompletedMissionIds } from "@/lib/mission/missionLog";
-import { courseModeSummary, expectedMissionModesForWeek, missionModesSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { expectedMissionModesForWeek, remainingMissionModes, type CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
+import type { LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 
-const STATE_BADGE: Record<WeekState, { label: string; cls: string }> = {
-  done: { label: "완료", cls: "bg-[#E7F1EC] text-[#2E6F63]" },
-  doing: { label: "학습 중", cls: "bg-[#FFF3C9] text-[#7A5E00]" },
-  todo: { label: "예정", cls: "bg-[#F0EDE4] text-[#7C7466]" },
-  empty: { label: "준비 중", cls: "bg-[#F0EDE4] text-[#A29A8B]" },
-  unknown: { label: "확인 필요", cls: "bg-[#F4EAEA] text-[#8A5B5B]" },
-};
-
-function weekGoal(week: LearnerCourseWeek): string | null {
-  return week.can_do[0] ?? null;
+function weekHeading(week: LearnerCourseWeek): string {
+  if (!week.speech_act) return weekActivityLabel(week);
+  const act = SPEECH_ACT_UI[week.speech_act];
+  return `${act} 화행${isReinforcementWeek(week) ? " · 새 상황에 적용하기" : ""}`;
 }
 
-function weekDescription(week: LearnerCourseWeek): string {
-  const role = weekRole(week.week_no);
-  if (week.week_no === 1) return "강좌 흐름을 확인하고 출발점 수행을 점검합니다.";
-  if (week.week_no === 8) return "전반부 화행 판단과 산출을 통합해 점검합니다.";
-  if (week.week_no === 15) return "학기 전체 화용 판단과 통번역 수행을 종합해 점검합니다.";
-  if (role === "metapragmatic") {
-    return week.week_no === 7
-      ? "완료한 두 학습 미션의 표현 선택과 수정 근거를 함께 검토합니다."
-      : "학기 전체 판단·산출·수정 기록을 종합해 통번역 의사결정을 정리합니다.";
+function savedWeek(key: string): number | null {
+  try {
+    const value = sessionStorage.getItem(key);
+    return value !== null && /^\d+$/.test(value) ? Number(value) : null;
+  } catch {
+    return null;
   }
-  if (role === "contextualization") {
-    return REINFORCEMENT_DESCRIPTION;
+}
+
+function activityCopy(week: LearnerCourseWeek): string {
+  if (week.week_no === 7 || week.week_no === 14) {
+    return "앞서 수행한 미션의 표현 선택과 수정 근거를 함께 돌아봅니다.";
   }
-  return weekGoal(week) ?? "이번 주 학습 목표를 확인합니다.";
+  if (week.type === "midterm" || week.type === "final") {
+    return "교수자 안내에 따라 지금까지의 화용 판단과 산출을 통합해 점검합니다.";
+  }
+  return "강좌의 학습 흐름을 살펴보고 출발점 수행을 확인합니다.";
 }
 
 const LearnerCourseLive = () => {
-  const navigate = useNavigate();
   const { courseId } = useParams<{ courseId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: course = null, error, isPending: loading } = useLearnerCourse(courseId);
+  const weeks = [...(course?.weeks ?? [])].sort((left, right) => left.week_no - right.week_no);
+  const memoryKey = `pragma:course-open-week:${courseId}`;
+  const remembered = useMemo(() => savedWeek(memoryKey), [memoryKey]);
+  const requested = searchParams.get("week");
+  const preferred = requested !== null && /^\d+$/.test(requested) ? Number(requested) : remembered;
+  const firstLearningWeek = weeks.find((week) => week.speech_act)?.week_no ?? weeks[0]?.week_no ?? 0;
+  // Zero deliberately means all weeks are closed; an unavailable week falls back
+  // to the first learning week. URL state also survives a mission/back navigation.
+  const openWeek = preferred === 0 ? 0
+    : weeks.some((week) => week.week_no === preferred) ? preferred!
+      : firstLearningWeek;
 
-  const runnableIds = useMemo(
-    () =>
-      course?.weeks.flatMap((week) =>
-        week.scenarios.filter((scenario) => scenario.runnable).map((scenario) => scenario.scenario_id),
-      ) ?? [],
-    [course],
-  );
-  const {
-    data: completedIds,
-    isError: progressFailed,
-    isPending: progressLoading,
-  } = useQuery({
-    queryKey: ["learner-course-progress", courseId, runnableIds],
-    queryFn: () => listCompletedMissionIds(runnableIds),
-    enabled: runnableIds.length > 0,
-  });
-  const completed = useMemo(() => new Set(completedIds ?? []), [completedIds]);
-  const weeks = useMemo(
-    () => [...(course?.weeks ?? [])].sort((left, right) => left.week_no - right.week_no),
-    [course],
-  );
-  const actWeeks = weeks.filter(isActWeek);
-  const actCount = new Set(actWeeks.map((week) => week.speech_act)).size;
-  const experienced = new Set(actWeeks.filter((week) => weekProgress(week, completed, progressFailed).doneCount > 0)
-    .map((week) => week.speech_act)).size;
-  const coursePath = courseId ? `/learner/course/${courseId}` : "/learner/course";
+  useEffect(() => {
+    if (!course) return;
+    try { sessionStorage.setItem(memoryKey, String(openWeek)); } catch { /* UI memory is optional. */ }
+  }, [course, memoryKey, openWeek]);
 
-  const openWeek = (weekNo: number) => navigate(`${coursePath}/week/${weekNo}`);
+  useEffect(() => {
+    if (!course || !openWeek || preferred === null) return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById(`week-toggle-${openWeek}`)?.scrollIntoView?.({ block: "nearest" });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [course, openWeek, preferred]);
+
+  function toggleWeek(weekNo: number) {
+    const next = new URLSearchParams(searchParams);
+    next.set("week", String(openWeek === weekNo ? 0 : weekNo));
+    setSearchParams(next, { replace: true, preventScrollReset: true });
+  }
 
   return (
-    <LearnerJourneyShell
-      headerRight={<span className="text-[12px] text-[#8899A6]">15주 학습계획</span>}
-    >
-      <div className="pb-24">
+    <LearnerJourneyShell>
+      <main className="pb-24">
         {loading ? (
           <p className="mt-6 text-[13px] text-muted-foreground">강좌를 불러오는 중…</p>
         ) : error ? (
-          <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
+          <div role="alert" className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
             {error instanceof Error ? error.message : "강좌를 불러오지 못했습니다."}
           </div>
         ) : !course || !courseId ? (
           <div className="mt-6 rounded-xl border border-dashed border-[#EAE4D2] bg-white px-6 py-10 text-center text-[13px] text-muted-foreground">
             선택한 교과목을 찾을 수 없습니다.
-            <Link to="/learner/course" className="mt-3 block font-bold text-[#15202B]">
-              교과목 선택으로 돌아가기
-            </Link>
+            <Link to="/learner/course" className="mt-3 block font-bold text-[#15202B]">교과목 선택으로 돌아가기</Link>
           </div>
         ) : (
           <>
-            <Link to="/learner/course" className="text-[12.5px] font-medium text-muted-foreground hover:text-foreground">
-              ← 교과목 선택
-            </Link>
-            <h1 className="mt-3 text-[21px] font-black text-[#15202B]">{courseDisplayTitle(course.outline)}</h1>
-            <p className="mt-1 text-[12.5px] text-muted-foreground">
-              15주 강좌 · {courseModeSummary({
-                courseMode: course.outline.course_mode as CourseMode,
-                interpretingWeekCount: course.outline.target_interpreting_week_count,
-              })}
-            </p>
+            <Link to="/learner/course" className="text-[12.5px] font-medium text-muted-foreground hover:text-foreground">← 교과목 선택</Link>
+            <h1 className="mt-5 break-keep text-[22px] font-bold leading-snug tracking-tight text-[#15202B] sm:text-[24px]">{courseDisplayTitle(course.outline)}</h1>
 
-            <div className="mt-6 flex flex-wrap items-end justify-between gap-2">
-              <div>
-                <h2 className="text-[16px] font-black text-[#15202B]">주차별 학습계획</h2>
-                <p className="mt-1 text-[12px] text-muted-foreground">
-                  화행 학습 9주 · 메타화용 2주 · 선택 화행 보완 1주
-                </p>
-              </div>
-              <p className="text-[12px] text-muted-foreground">
-                {progressFailed
-                  ? "진행 상태 확인 필요"
-                  : progressLoading && runnableIds.length > 0
-                    ? "진행 상태 확인 중…"
-                    : `경험한 화행 ${experienced}/${actCount} · 미션 ${completed.size}/${runnableIds.length}`}
-              </p>
-            </div>
-
-            <p className="mt-3 text-[12px] leading-5 text-muted-foreground">{CENTRAL_QUESTION_GUIDANCE}</p>
-            <ol className="mt-4 overflow-hidden rounded-xl border border-[#EAE4D2] bg-white">
+            <h2 className="mb-2.5 mt-7 text-[16px] font-semibold tracking-tight text-[#15202B]">주차별 학습계획</h2>
+            <ol aria-label="주차별 학습계획" className="overflow-hidden rounded-xl border border-[#E8E3D8] bg-white">
               {weeks.map((week) => {
-                const role = weekRole(week.week_no);
-                const progress = weekProgress(week, completed, progressFailed);
-                const speechActLabel = week.speech_act
-                  ? SPEECH_ACT_UI[week.speech_act as SpeechActUI]
-                  : null;
-                const isCourseMilestone = week.week_no === 1 || week.week_no === 8 || week.week_no === 15;
-                const reinforcement = isReinforcementWeek(week);
+                const expanded = openWeek === week.week_no;
+                const title = weekHeading(week);
                 const centralQuestion = weekCentralQuestion(week);
-                const plannedModes = expectedMissionModesForWeek({
+                const weekPath = `/learner/course/${courseId}/week/${week.week_no}`;
+                const modes = week.expected_mission_modes ?? expectedMissionModesForWeek({
                   courseMode: course.outline.course_mode as CourseMode,
                   interpretingWeekCount: course.outline.target_interpreting_week_count,
                 }, week.week_no);
-                const badge = progress.assigned.length > 0
-                  ? STATE_BADGE[progress.state]
-                  : week.speech_act
-                    ? STATE_BADGE.empty
-                    : role === "metapragmatic"
-                    ? { label: "수업 활동", cls: "bg-[#EEF0F4] text-[#5A6470]" }
-                    : role === "contextualization"
-                      ? { label: "편성 준비 중", cls: "bg-[#FFF3C9] text-[#7A5E00]" }
-                      : { label: "학기 일정", cls: "bg-[#F0EDE4] text-[#7C7466]" };
+                const missions = week.scenarios.filter((scenario) => scenario.runnable && scenario.assignment_id && scenario.mode);
+                const missingModes = remainingMissionModes(modes, missions.map((scenario) => scenario.mode)) ?? modes;
+                const headingId = `week-toggle-${week.week_no}`;
+                const panelId = `week-panel-${week.week_no}`;
 
                 return (
-                  <li key={week.week_no} className="border-b border-[#EFEBDD] last:border-b-0">
-                    <button
-                      type="button"
-                      onClick={() => openWeek(week.week_no)}
-                      className="grid w-full grid-cols-[54px_minmax(0,1fr)] gap-3 px-4 py-4 text-left transition-colors hover:bg-[#FAF8F2] sm:grid-cols-[66px_minmax(0,1fr)_auto] sm:items-center sm:px-5"
-                    >
-                      <div className="text-center">
-                        <span className="block text-[19px] font-black text-[#15202B]">{week.week_no}</span>
-                        <span className="block text-[10.5px] font-semibold text-muted-foreground">주차</span>
-                      </div>
-                      <div className="min-w-0 border-l border-[#EFEBDD] pl-4">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="text-[10.5px] font-bold uppercase tracking-wide text-[#B8860B]">
-                            {isCourseMilestone ? "학기 이정표" : reinforcement ? ROLE_LABEL[role] : week.speech_act ? "화행 학습" : ROLE_LABEL[role]}
-                            {plannedModes.length ? ` · ${missionModesSummary(plannedModes)}` : ""}
-                          </span>
-                          <span className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold sm:hidden ${badge.cls}`}>
-                            {badge.label}
-                          </span>
+                  <li key={week.week_no} className="border-b border-[#EEEAE2] last:border-b-0">
+                    <h3>
+                      <button
+                        id={headingId}
+                        type="button"
+                        aria-label={`${week.week_no}주차 ${title}`}
+                        aria-expanded={expanded}
+                        aria-controls={panelId}
+                        onClick={() => toggleWeek(week.week_no)}
+                        className={`flex min-h-12 w-full scroll-mt-20 scroll-mb-24 items-center gap-3 border-l-2 px-4 text-left transition-colors duration-150 focus-visible:relative focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#B8860B] sm:gap-4 sm:px-5 ${expanded ? "border-[#CFAD3C] bg-[#F6F0DA] py-3.5 text-[#24323D]" : "border-transparent py-3 text-[#24323D] hover:bg-[#FAF8F2]"}`}
+                      >
+                        <span className={`flex w-12 shrink-0 items-baseline gap-1 tabular-nums sm:w-14 ${expanded ? "text-[#8A6B24]" : "text-[#8F8164]"}`}>
+                          <span className="text-[17px] font-medium">{String(week.week_no).padStart(2, "0")}</span>
+                          <span className="text-[10px]">주차</span>
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className={`block break-keep leading-5 ${expanded ? "text-[17px] font-semibold" : "text-[14px] font-medium"}`}>{title}</span>
+                          {expanded && week.can_do[0] && <span className="mt-1 block break-keep text-[12px] font-normal leading-[18px] text-[#68757F]">{week.can_do[0]}</span>}
+                        </span>
+                        <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#969E9E]"}`} />
+                      </button>
+                    </h3>
+                    <div id={panelId} role="region" aria-labelledby={headingId} hidden={!expanded}>
+                      {expanded && (
+                        <div className="bg-[#FCFAF5] px-4 pb-4 pt-3 sm:px-5">
+                          <div className="flex items-baseline justify-between gap-3">
+                            {centralQuestion ? <h4 className="text-[11px] font-medium text-[#8A7847]">중심 질문</h4> : <span />}
+                            <Link to={`${weekPath}/note`} className="inline-flex shrink-0 items-center gap-1 rounded text-[12px] text-[#68757F] underline-offset-4 hover:text-[#15202B] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]">강의 유인물 <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
+                          </div>
+                          {centralQuestion && <p className="mt-1 break-keep text-[12.5px] leading-5 text-[#52606A]">{centralQuestion}</p>}
+
+                          {modes.length > 0 ? (
+                            <section aria-label="이번 주 학습 미션" className="mt-3.5">
+                              <h4 className="mb-2 text-[13px] font-semibold text-[#34434F]">이번 주 학습 미션 {modes.length}개</h4>
+                              <ul className="grid gap-2.5 sm:grid-cols-2">
+                                {missions.map((scenario, index) => {
+                                  const label = missionMenuTitle(scenario.brief_note_ko);
+                                  const modeLabel = MODE_LABEL[scenario.mode!];
+                                  const query = new URLSearchParams({ courseId, weekNo: String(week.week_no), assignmentId: scenario.assignment_id! });
+                                  return (
+                                    <li key={scenario.scenario_id}>
+                                      <Link
+                                        to={`/learner/practice/${scenario.scenario_id}?${query}`}
+                                        aria-label={`${modeLabel} 미션 시작${label ? ": " + label : ""}`}
+                                        className="group flex h-full flex-col rounded-lg border border-[#EAE5DB] bg-white p-3.5 transition-colors duration-150 hover:border-[#C1AE7C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+                                      >
+                                        <span className="text-[11px] font-medium text-[#967B3E]">미션 {index + 1} · {modeLabel}</span>
+                                        <h5 className="mb-3 mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]">{label ?? `${modeLabel} 학습 미션`}</h5>
+                                        <span className="mt-auto inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-md bg-[#243441] px-3 py-2 text-[12px] font-medium text-white transition-colors group-hover:bg-[#354B5B]">
+                                          {modeLabel} 미션 시작 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                                        </span>
+                                      </Link>
+                                    </li>
+                                  );
+                                })}
+                                {missingModes.map((mode, index) => (
+                                  <li key={`${mode}-${index}`} className="rounded-lg border border-dashed border-[#EAE5DB] p-3.5 text-[12px] text-muted-foreground">
+                                    <p className="font-semibold">{MODE_LABEL[mode]}</p>
+                                    <p className="mt-2">{week.speech_act ? "미션 준비 중" : "화행 선정 후 안내"}</p>
+                                  </li>
+                                ))}
+                              </ul>
+                            </section>
+                          ) : (
+                            <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#68757F]">{activityCopy(week)}</p>
+                          )}
                         </div>
-                        <div className="mt-1 text-[15px] font-bold text-[#15202B]">
-                          {weekActivityLabel(week)}
-                          {reinforcement && <span className="ml-2 text-[12px] font-medium">{speechActLabel ?? "화행 선정 예정"}</span>}
-                        </div>
-                        <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
-                          {weekDescription(week)}
-                        </p>
-                        {centralQuestion && <p className="mt-1 text-[12px] leading-5 text-[#52616B]"><span className="font-semibold">중심 질문 · </span>{centralQuestion}</p>}
-                        {progress.assigned.length > 0 && (
-                          <p className="mt-1 text-[11.5px] font-semibold text-[#3E4C57]">
-                            학습 미션 {progress.doneCount}/{progress.assigned.length}
-                          </p>
-                        )}
-                      </div>
-                      <span className={`hidden rounded-full px-2.5 py-1 text-[10.5px] font-bold sm:inline-flex ${badge.cls}`}>
-                        {badge.label}
-                      </span>
-                    </button>
+                      )}
+                    </div>
                   </li>
                 );
               })}
             </ol>
           </>
         )}
-      </div>
+      </main>
       <LearnerBottomNav />
     </LearnerJourneyShell>
   );

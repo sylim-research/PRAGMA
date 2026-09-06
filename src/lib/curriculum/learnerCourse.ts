@@ -29,6 +29,8 @@ export interface LearnerWeekScenario {
   assignment_id?: string;
   scenario_id: string;
   situation_ko: string;
+  /** 미션 선택에 쓰는 실제 저장된 상황 요약. */
+  brief_note_ko?: string;
   /** 편성된 코어의 기본 원문. DCT 참고 답안이 아니다. */
   source_text?: string;
   /** 수업 도입에 참조할 편성 코어의 맥락. 주차 공통 조건으로 저장하지 않는다. */

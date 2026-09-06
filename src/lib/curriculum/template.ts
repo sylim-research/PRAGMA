@@ -40,7 +40,7 @@ export type CurriculumWeekRole =
   | "integration" // 복합 화용 조정 — 복합 요구가 든 기존 미션 1개를 배정
   | "contextualization" // 선택한 한 화행 집중 보완(기존 역할 식별자 유지)
   | "project" // 통번역 의사결정 정리 — 기존 미션 1개, 설명 활동은 수업에서 운영
-  | "metapragmatic" // 메타화용 클리닉 — 누적된 판단·산출 기록을 수업에서 다시 검토
+  | "metapragmatic" // 메타화용 토론 — 누적된 판단·산출 기록을 수업에서 다시 검토
   | "assessment"; // 중간·기말 수행 슬롯
 
 /** 단계형 표기(구 '1/2/3순환' 대체 — 실제 반복 구조가 아니므로). */
@@ -62,7 +62,7 @@ export const ROLE_LABEL: Record<CurriculumWeekRole, string> = {
   integration: "통합·연쇄",
   contextualization: "선택 화행 보완",
   project: "프로젝트",
-  metapragmatic: "메타화용 클리닉",
+  metapragmatic: "메타화용 토론",
   assessment: "평가",
 };
 
@@ -92,14 +92,14 @@ export const STANDARD_15WEEK: readonly StandardWeekSpec[] = [
   { week_no: 4, db_type: "regular", role: "foundation", speech_act: "compliment", title: "칭찬" },
   { week_no: 5, db_type: "regular", role: "foundation", speech_act: "agreement", title: "초대" },
   { week_no: 6, db_type: "regular", role: "relationship", speech_act: "refusal", title: "거절" },
-  { week_no: 7, db_type: "regular", role: "metapragmatic", speech_act: null, title: "중간 메타화용 클리닉" },
+  { week_no: 7, db_type: "regular", role: "metapragmatic", speech_act: null, title: "중간 메타화용 토론" },
   { week_no: 8, db_type: "midterm", role: "assessment", speech_act: null, title: "중간 통합 점검" },
   { week_no: 9, db_type: "regular", role: "relationship", speech_act: "apology", title: "사과" },
   { week_no: 10, db_type: "regular", role: "relationship", speech_act: "proposal", title: "제안" },
   { week_no: 11, db_type: "regular", role: "relationship", speech_act: "opposition", title: "반대" },
   { week_no: 12, db_type: "regular", role: "relationship", speech_act: "complaint", title: "불만" },
   { week_no: 13, db_type: "regular", role: "contextualization", speech_act: null, title: REINFORCEMENT_TITLE },
-  { week_no: 14, db_type: "regular", role: "metapragmatic", speech_act: null, title: "종합 메타화용 클리닉" },
+  { week_no: 14, db_type: "regular", role: "metapragmatic", speech_act: null, title: "종합 메타화용 토론" },
   { week_no: 15, db_type: "final", role: "assessment", speech_act: null, title: "기말 통합 수행 점검" },
 ] as const;
 

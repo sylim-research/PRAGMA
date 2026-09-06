@@ -46,6 +46,8 @@ export interface ComposerCore {
   /** 현행 완전 미션 후보: mission_v5이며 독립 MPJ가 정확히 5개다. */
   is_native_mpj5: boolean;
   situation_ko: string;
+  /** 저장된 상황 요약. 학습자 미션 선택 카드에도 같은 문구를 사용한다. */
+  brief_note_ko?: string;
   source_text_ko: string;
   /** 언어 방향(0-l·82) — core_content.direction 우선, 없으면 ko_zh(v1 호환). 편성 필터용 */
   direction: LanguageDirection;
@@ -137,6 +139,7 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
         Array.isArray(r.mission_mpj_items) &&
         r.mission_mpj_items.length === 5,
       situation_ko: typeof content.situation_ko === "string" ? content.situation_ko : "",
+      brief_note_ko: typeof content.brief_note_ko === "string" ? content.brief_note_ko : undefined,
       source_text_ko:
         typeof content.source_text_ko === "string"
           ? content.source_text_ko

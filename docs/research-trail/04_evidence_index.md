@@ -227,3 +227,10 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 코드: PR88 818db3c, main f420fade574a31d45c8896bbbb5f453e8e61b7bf, CI34021273524, Railway6290811320, Edge content-review v15.
 - 비공개 원본: C:/PRAGMA_THESIS_LOCAL/05_증거/교과목콘텐츠/2026-09-06_경량검수/ — 검토본 v2, DB snapshot·SHA256, AI 수정안·이력·품질결과·점검 연결 기록·독립 검토 응답. 원래 초안은 별도 폴더 보존.
 - 범위: 콘텐츠 준비와 검수 절차 구현의 증거. 교수자 승인·학습자 수행·교육효과·최종 코퍼스 LOCK 증거는 아니다.
+
+## EVD-20260907-01 · 주차 아코디언과 미션 직접 시작
+
+- 관련 결정: DEC-20260906-05 / ITER-20260906-05. 사용자는 교과목 제목을 단순하게 표시하는 최종안을 확정하고 커밋·푸시·배포를 승인했다.
+- 구현·검증: `LearnerCourseLive.tsx`, `LearnerCourseWeek.tsx`, `missionMenuTitle.ts`, 교과목 데이터 투영 및 회귀 검사. 전체 771 tests 통과·9 skip, typecheck, 운영 소스 정책 5 tests, 로컬 PostgreSQL 승인 경계 10 tests, 운영용 build 통과.
+- 브라우저 근거: 로컬 실제 데이터의 주차 전환·키보드 조작·통역 미션 진입·복귀·모바일 배치와 최종 제목 화면. 상세 범위는 `docs/dev-log/2026-09-07-course-accordion.md` 참조.
+- 기능 SHA·main·CI·Railway 배포 및 운영 smoke의 최종 상태는 해당 변경 PR 본문에 연결한다. 학습자 응답 완료 저장·클릭률·학습효과의 검증 자료가 아니다.
