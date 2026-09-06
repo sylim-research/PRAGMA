@@ -11,6 +11,7 @@
 // cascading duplicate errors.
 
 import type { CurriculumOutlineDraft, CurriculumWeekDraft } from "./types";
+import { isReinforcementWeek, previouslyLearnedActs } from "./weekGuidance";
 
 export type CurriculumValidationIssue = {
   /** Stable machine-readable code — UI logic keys off this, not message. */
@@ -241,6 +242,10 @@ export function validateCurriculum(
   // ── per-week errors ──
 
   for (const w of weeks) {
+    if (isReinforcementWeek(w) && w.speech_act && !previouslyLearnedActs(weeks).includes(w.speech_act)) {
+      errors.push({ code: "REINFORCEMENT_ACT_NOT_LEARNED", week_no: w.week_no, field: "speech_act",
+        message: "13주는 앞선 주차에 편성된 화행 중 하나를 선택하세요." });
+    }
     if (w.type === "regular") {
       // (20)–(27) 정규 주차 필수 필드 요구 제거(2026-07-25 공통 골격 정비).
       // 화행 = 표준 골격 자동값 / P·D·R·채널·도메인·부담밴드·슬롯 = 배정 코어에서

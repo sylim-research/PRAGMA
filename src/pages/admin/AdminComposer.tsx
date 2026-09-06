@@ -71,6 +71,7 @@ import {
 import { getTargetFeature, DEFAULT_FEATURE_BY_ACT } from "@/lib/pragma/targetFeatures";
 import { weeklyMaterialsPath } from "@/lib/curriculum/weeklyMaterials";
 import { CurriculumEditor } from "./CurriculumEditor";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import {
   COURSE_MODE_LABEL,
   COURSE_MODES,
@@ -110,6 +111,7 @@ const AdminComposer = () => {
   const [weeks, setWeeks] = useState<CurriculumWeekRow[]>([]);
   const [loadingOutline, setLoadingOutline] = useState(false);
   const [structureEditor, setStructureEditor] = useState<"new" | "current" | null>(null);
+  const [editingWeek, setEditingWeek] = useState<number | null>(null);
   const [syllabusOpen, setSyllabusOpen] = useState(false);
   const [syllabusSettings, setSyllabusSettings] = useState<CurriculumSyllabusSettings>(
     EMPTY_SYLLABUS_SETTINGS,
@@ -577,6 +579,7 @@ const AdminComposer = () => {
     weeks: CurriculumWeekRow[];
   }) => {
     setStructureEditor(null);
+    setEditingWeek(null);
     setOutline(saved.outline);
     setWeeks(saved.weeks);
     setOutlineId(saved.outline.id);
@@ -617,6 +620,7 @@ const AdminComposer = () => {
         <section className="rounded-xl border border-[#D7E3DC] bg-[#F8FCF9] p-5">
           <CurriculumEditor
             outlineId={structureEditor === "new" ? null : outlineId}
+            initialOpenWeek={editingWeek}
             assignments={assign}
             coreById={coreById}
             compositionLevel={level}
@@ -624,7 +628,7 @@ const AdminComposer = () => {
             compositionThemes={themes}
             compositionCourseMode={courseMode}
             compositionInterpretingWeekCount={interpretingWeekCount}
-            onClose={() => setStructureEditor(null)}
+            onClose={() => { setStructureEditor(null); setEditingWeek(null); }}
             onSaved={handleStructureSaved}
           />
         </section>
@@ -1069,6 +1073,7 @@ const AdminComposer = () => {
             </span>
           </div>
 
+          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">{CENTRAL_QUESTION_GUIDANCE}</p>
           <div className="mt-2.5 grid items-start gap-3 xl:grid-cols-2">
             {[weeks.slice(0, weekColumnBreak), weeks.slice(weekColumnBreak)].map((column, columnIndex) => (
               <div
@@ -1086,6 +1091,7 @@ const AdminComposer = () => {
                     level={level}
                     themes={themes}
                     direction={direction}
+                    onEditWeek={() => { setEditingWeek(w.week_no); setStructureEditor("current"); }}
                     expectedMode={expectedCoreModeForWeek(
                       { courseMode, interpretingWeekCount },
                       w.week_no,
@@ -1138,6 +1144,7 @@ function WeekRow({
   onToggleAdd,
   onAdd,
   onRemove,
+  onEditWeek,
 }: {
   week: CurriculumWeekRow;
   items: AssignedItem[];
@@ -1153,16 +1160,19 @@ function WeekRow({
   onToggleAdd: () => void;
   onAdd: (c: ComposerCore) => void;
   onRemove: (scenarioId: string) => void;
+  onEditWeek: () => void;
 }) {
   const act = week.speech_act as SpeechActUI | null;
-  const isAssignable = week.type === "regular";
+  const reinforcement = isReinforcementWeek(week);
+  const isAssignable = week.type === "regular" && (!reinforcement || Boolean(act));
+  const centralQuestion = weekCentralQuestion(week);
   // 미션에 확정된 초점이 없을 때만 주차 화행의 기본 초점을 보조값으로 사용한다.
   // 교수자 화면에서는 연구 구현 단계명 대신 실제 학습 초점만 보여준다.
   const plannedFeatureCode = act ? DEFAULT_FEATURE_BY_ACT[act] : undefined;
   const plannedLabel = plannedFeatureCode
     ? getTargetFeature(plannedFeatureCode)?.learner_label ?? plannedFeatureCode
     : null;
-  const displayTitle = week.type === "orientation" ? "오리엔테이션" : week.title ?? "";
+  const displayTitle = week.type === "orientation" ? "오리엔테이션" : weekActivityLabel(week);
 
   const cands = filterManualCandidates(candidates, {
     act,
@@ -1176,12 +1186,17 @@ function WeekRow({
   });
 
   return (
-    <div className={`px-3 py-2 ${isAssignable ? "bg-white" : "bg-[#FAF8F2]"}`}>
+    <div role="group" aria-label={`${week.week_no}주차 편성`} className={`px-3 py-2 ${isAssignable ? "bg-white" : "bg-[#FAF8F2]"}`}>
       <div className="flex min-h-8 flex-wrap items-center gap-2">
         <span className="inline-flex h-6 min-w-[3rem] items-center justify-center rounded-md bg-[#ECEFF1] px-2 text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
         <span className="text-[13.5px] font-medium">{displayTitle}</span>
+        {reinforcement && (
+          <Button variant="outline" size="sm" className="h-7 text-[12px]" onClick={onEditWeek}>
+            {act ? `${SPEECH_ACT_UI[act]} · 화행 변경` : "화행 선택"}
+          </Button>
+        )}
         <Link to={weeklyMaterialsPath(week.outline_id, week.week_no)} className="text-[11.5px] font-semibold text-[#2F6F63] hover:underline">
           주차 수업자료
         </Link>
@@ -1196,11 +1211,19 @@ function WeekRow({
             variant="ghost"
             size="sm"
             onClick={onToggleAdd}
+            disabled={reinforcement && items.length >= 2 && !adding}
           >
             {adding ? "닫기" : "+ 미션"}
           </Button>
         ) : null}
       </div>
+
+      {centralQuestion && (
+        <p className="mt-1 text-[12px] leading-5 text-[#52616B]" title={CENTRAL_QUESTION_GUIDANCE}>
+          <span className="font-semibold">중심 질문 · </span>{centralQuestion}
+        </p>
+      )}
+      {reinforcement && <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">{REINFORCEMENT_DESCRIPTION}</p>}
 
       {/* 주차 흐름을 끊지 않도록 배정 미션은 별도 카드가 아닌 구분선 목록으로 표시한다. */}
       {items.length > 0 && (
@@ -1278,7 +1301,7 @@ function WeekRow({
                       {c.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
                     </p>
                   </div>
-                  <Button size="sm" variant="outline" onClick={() => onAdd(c)}>
+                  <Button size="sm" variant="outline" disabled={reinforcement && items.length >= 2} onClick={() => onAdd(c)}>
                     추가
                   </Button>
                 </li>

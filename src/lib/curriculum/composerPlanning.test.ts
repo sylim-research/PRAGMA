@@ -72,6 +72,56 @@ function presetPool(
   );
 }
 
+describe("13주 선택 화행 집중 보완", () => {
+  const policy = { courseMode: "translation" as const, interpretingWeekCount: 0 };
+  const options = { level: "intermediate" as const, direction: "ko_zh" as const, themes: [],
+    courseModePolicy: policy, defaultScenariosPerWeek: 2 };
+
+  it("교강사가 선택하기 전에는 후보와 배정을 허용하지 않고 초안은 보존한다", () => {
+    const weeks = createStandard15WeekTemplate();
+    const mission = core({ scenario_id: "new" });
+    expect(filterManualCandidates([mission], { ...options, act: null, assignments: {}, weekNo: 13 })).toEqual([]);
+    expect(assignmentStructureIssues({ 13: [] }, {}, weeks, options.level, options.direction, 2, policy)).toEqual([]);
+    expect(assignmentStructureIssues({ 13: [{ scenario_id: "new", slot_role: "primary" }] }, { new: mission },
+      weeks, options.level, options.direction, 2, policy).map((issue) => issue.code)).toContain("reinforcement_act_required");
+  });
+
+  it("선택한 같은 화행의 서로 다른 저부담·고부담 상황을 허용하고 다른 화행은 거부한다", () => {
+    const weeks = createStandard15WeekTemplate();
+    weeks[12].speech_act = "request";
+    const first = core({ scenario_id: "first", context: { power: "equal", distance: "close", burden: "low", channel: "written", counterpart: "친구" } });
+    const second = core({ scenario_id: "second", context: { power: "speaker_lower", distance: "distant", burden: "high", channel: "written", counterpart: "담당자" } });
+    const assignments = { 13: [first, second].map((item) => ({ scenario_id: item.scenario_id, slot_role: "primary" })) };
+    expect(assignmentStructureIssues(assignments, { first, second }, weeks, options.level, options.direction, 2, policy)).toEqual([]);
+    expect(assignmentStructureIssues(assignments, { first, second: { ...second, speech_act: "apology" } },
+      weeks, options.level, options.direction, 2, policy).map((issue) => issue.code)).toContain("speech_act");
+    weeks[12].scenario_slots = 5;
+    const third = core({ scenario_id: "third" });
+    expect(assignmentStructureIssues({ 13: [...assignments[13], { scenario_id: "third", slot_role: "primary" }] },
+      { first, second, third }, weeks, options.level, options.direction, 5, policy).map((issue) => issue.code)).toContain("too_many_items");
+  });
+
+  it("자동 편성도 교강사의 선택을 따르고 앞서 쓴 미션을 다시 배정하지 않는다", () => {
+    const weeks = createStandard15WeekTemplate();
+    weeks[12].speech_act = "request";
+    const cores = Array.from({ length: 4 }, (_, index) => core({ scenario_id: `request-${index}` }));
+    const result = buildAutomaticAssignments({ ...options, weeks, cores });
+    expect(result.assignments[2].map((item) => item.scenario_id)).toEqual(["request-0", "request-1"]);
+    expect(result.assignments[13].map((item) => item.scenario_id)).toEqual(["request-2", "request-3"]);
+    expect(duplicateScenarioIds(result.assignments)).toEqual([]);
+  });
+
+  it("앞선 주차에 없는 화행을 13주 보완 대상으로 자동 편성하거나 저장하지 않는다", () => {
+    const weeks = createStandard15WeekTemplate();
+    weeks[1].speech_act = "thanks";
+    weeks[12].speech_act = "request";
+    const mission = core({ scenario_id: "new" });
+    expect(buildAutomaticAssignments({ ...options, weeks, cores: [mission] }).assignments[13]).toBeUndefined();
+    expect(assignmentStructureIssues({ 13: [{ scenario_id: "new", slot_role: "primary" }] }, { new: mission },
+      weeks, options.level, options.direction, 2, policy).map((issue) => issue.code)).toContain("reinforcement_act_not_learned");
+  });
+});
+
 describe("프리셋 기반 15주 자동 편성", () => {
   it.each(COURSE_PRESETS)(
     "$label 프리셋이 공통 15주 골격의 9개 화행 주차를 검토 완료 미션으로 채운다",

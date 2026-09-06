@@ -1,10 +1,11 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { CurriculumSyllabus } from "@/components/admin/CurriculumSyllabus";
 import type { ComposerCore } from "@/lib/curriculum/composer";
 import type { AssignMap } from "@/lib/curriculum/composerPlanning";
 import type { CurriculumOutlineRow, CurriculumWeekRow } from "@/lib/curriculum/types";
 import type { CurriculumSyllabusSettings } from "@/lib/curriculum/syllabusSettings";
+import { createStandard15WeekTemplate } from "@/lib/curriculum/template";
 
 const outline = {
   id: "outline-1",
@@ -51,6 +52,24 @@ const settings: CurriculumSyllabusSettings = {
 };
 
 describe("CurriculumSyllabus", () => {
+  it("두 글자 화행·유연한 중심 질문과 선택 화행 보완을 저장된 과거 제목보다 우선 표시한다", () => {
+    const plan = createStandard15WeekTemplate().map((week) => ({ ...week, id: `week-${week.week_no}` })) as CurriculumWeekRow[];
+    plan[4].title = "초대 · 공동행동 권유";
+    plan[12].title = "고부담 맥락 집중 실전";
+    plan[12].speech_act = "request";
+    render(<CurriculumSyllabus outline={outline} weeks={plan} assignments={{}} coreById={{}} />);
+    const table = screen.getByRole("columnheader", { name: "화행·활동" }).closest("table")!;
+    const rows = within(table).getAllByRole("row");
+    for (const weekNo of [2, 3, 4, 5, 6, 9, 10, 11, 12]) {
+      expect(within(rows[weekNo]).getAllByRole("cell")[1].textContent).toHaveLength(2);
+    }
+    expect(within(rows[13]).getByText("선택 화행 집중 보완")).toBeInTheDocument();
+    expect(within(rows[13]).getByText("요청")).toBeInTheDocument();
+    expect(screen.getByText(/구체화하거나 바꿔 사용할 수 있습니다/)).toBeInTheDocument();
+    expect(screen.queryByText("고부담 맥락 집중 실전")).not.toBeInTheDocument();
+    expect(plan[12].title).toBe("고부담 맥락 집중 실전");
+  });
+
   it("projects the current course and both weekly mission sets without inventing policy", () => {
     render(
       <CurriculumSyllabus

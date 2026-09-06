@@ -4,6 +4,7 @@ import type { CurriculumWeekRow } from './types';
 import type { ChannelUI, Domain, PdrBurden, PdrDistance, PdrPower, SpeechActUI } from '@/lib/pragma/enums';
 import { isReviewedMission } from '@/lib/curriculum/composerEligibility';
 import { expectedCoreModeForWeek, type CourseMode } from './courseModePolicy';
+import { isReinforcementWeek } from './weekGuidance';
 
 export function assembleLearnerCourse({
   outline,
@@ -43,6 +44,11 @@ export function assembleLearnerCourse({
       scenarios: (byWeek.get(week.week_no) ?? []).flatMap((assignment) => {
         const core = coreById.get(assignment.scenario_id);
         if (!core || !isReviewedMission(core)) return [];
+        // 과거 13주 편성은 보존한다. 교강사가 한 화행을 정하기 전에는 실행 대상으로 삼지 않는다.
+        if (isReinforcementWeek(week) && (
+          !week.speech_act ||
+          core.speech_act !== week.speech_act
+        )) return [];
         // 과목 정책 변경 전 배정은 DB에 보존하되, 다른 수행모드로 실행하지 않는다.
         const expectedMode = expectedCoreModeForWeek(modePolicy, week.week_no);
         if (expectedMode && core.mode !== expectedMode) return [];
@@ -52,6 +58,8 @@ export function assembleLearnerCourse({
             scenario_id: assignment.scenario_id,
             situation_ko: core.situation_ko,
             source_text: core.source_text_ko,
+            context: core.opening_context,
+            domain: core.domain,
             speech_act: core.speech_act,
             mission_status: core.mission_status,
             target_feature: core.target_feature,

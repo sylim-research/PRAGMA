@@ -15,6 +15,7 @@ import {
   type CourseModePolicy,
 } from "@/lib/curriculum/courseModePolicy";
 import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
+import { isReinforcementWeek, previouslyLearnedActs, REINFORCEMENT_WEEK } from "./weekGuidance";
 import {
   weeklyMissionPairIssues,
   type WeeklyMissionPairAssignment,
@@ -86,6 +87,7 @@ export function buildAutomaticAssignments(options: AutoFillOptions): AutoFillRes
 
   for (const week of weeks) {
     if (week.type !== "regular" || !week.speech_act) continue;
+    if (isReinforcementWeek(week) && !previouslyLearnedActs(weeks).includes(week.speech_act as SpeechActUI)) continue;
     const act = week.speech_act as SpeechActUI;
     const slots = 2;
     const expectedMode = expectedCoreModeForWeek(
@@ -193,6 +195,7 @@ export function filterManualCandidates(
   candidates: ComposerCore[],
   options: ManualCandidateOptions,
 ): ComposerCore[] {
+  if (options.weekNo === REINFORCEMENT_WEEK && !options.act) return [];
   const usedIds = assignedScenarioIds(options.assignments);
   const weekCores = options.weekNo == null || !options.coreById
     ? []
@@ -286,6 +289,8 @@ export type AssignmentStructureIssueCode =
   | "missing_week"
   | "non_regular_week"
   | "speech_act"
+  | "reinforcement_act_required"
+  | "reinforcement_act_not_learned"
   | "course_mode_policy"
   | "course_mode"
   | "too_many_items"
@@ -331,7 +336,14 @@ export function assignmentStructureIssues(
       if (items.length > 0) issues.push({ weekNo, code: "non_regular_week" });
       continue;
     }
-    const slots = week.scenario_slots ?? defaultScenariosPerWeek;
+    const reinforcement = isReinforcementWeek(week);
+    const slots = reinforcement ? 2 : week.scenario_slots ?? defaultScenariosPerWeek;
+    if (reinforcement && items.length > 0) {
+      if (!week.speech_act) issues.push({ weekNo, code: "reinforcement_act_required" });
+      else if (!previouslyLearnedActs(weeks).includes(week.speech_act as SpeechActUI)) {
+        issues.push({ weekNo, code: "reinforcement_act_not_learned" });
+      }
+    }
     const expectedMode = courseModePolicy && isCourseModePolicyValid(courseModePolicy)
       ? expectedCoreModeForWeek(courseModePolicy, weekNo, learningWeekNumbers)
       : null;

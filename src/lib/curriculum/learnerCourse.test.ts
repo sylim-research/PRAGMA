@@ -117,19 +117,28 @@ describe("학습자 편성 강좌 조립", () => {
     expect(assignments).toEqual([assignment(2, "translation", 0), assignment(9, "old-translation", 0), assignment(9, "interpreting", 1)]);
   });
 
-  it("번역 전용 강좌의 고부담 주차도 통역·모드 불명 미션은 노출하지 않는다", () => {
+  it("선택 화행 보완 주차도 다른 화행·통역·모드 불명 미션은 노출하지 않는다", () => {
     const course = assembleLearnerCourse({
       outline,
-      weeks: [{ ...weeks[0], week_no: 13, speech_act: null }],
-      assignments: [assignment(13, "translation", 0), assignment(13, "interpreting", 1), assignment(13, "unknown", 2)],
+      weeks: [{ ...weeks[0], week_no: 13, speech_act: "request" }],
+      assignments: [assignment(13, "translation", 0), assignment(13, "interpreting", 1), assignment(13, "unknown", 2), assignment(13, "other-act", 3)],
       cores: [
         core("translation", "reviewed"),
         { ...core("interpreting", "reviewed"), mode: "stt_interpreting" },
         { ...core("unknown", "reviewed"), mode: null },
+        { ...core("other-act", "reviewed"), speech_act: "apology" },
       ],
     });
 
     expect(course.weeks[0].scenarios.map((item) => item.scenario_id)).toEqual(["translation"]);
+  });
+
+  it("화행 미선정인 과거 13주의 배정은 보존하되 학습 실행 목록에 섞지 않는다", () => {
+    const assignments = [assignment(13, "legacy", 0)];
+    const course = assembleLearnerCourse({ outline, weeks: [{ ...weeks[0], week_no: 13, speech_act: null }],
+      assignments, cores: [core("legacy", "reviewed")] });
+    expect(course.weeks[0].scenarios).toEqual([]);
+    expect(assignments).toHaveLength(1);
   });
 
   it("reviewed 미션만 원래 주차·순서대로 노출한다", () => {

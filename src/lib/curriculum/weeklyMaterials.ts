@@ -4,6 +4,8 @@ import { expectedCoreModeForWeek, type CourseMode } from "./courseModePolicy";
 import { LEVEL } from "@/lib/pragma/enums";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { weekRole } from "./template";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "./weekGuidance";
+import { buildWeeklyOpening, type WeeklyOpening } from "./weeklyOpening";
 
 export interface WeeklyMaterialSection {
   id: string;
@@ -23,6 +25,8 @@ export interface WeeklyCourseMaterial {
   preparationNote: string;
   sections: WeeklyMaterialSection[];
   missions: Array<{ id: string; label: string; summary: string }>;
+  /** 교수자 수업 화면에서 단계적으로 공개하는 공통 도입. 기존 승인 스냅샷에는 없을 수 있다. */
+  opening?: WeeklyOpening;
 }
 
 export function missionSituationSummary(situation: string, maxLength = 78): string {
@@ -60,6 +64,13 @@ export function buildWeeklyCourseMaterial(
     paragraphs: note.competencyFocus ? [note.competencyFocus] : [],
     items: note.canDos,
   }];
+  const centralQuestion = weekCentralQuestion(week);
+  if (centralQuestion) sections.push({
+    id: "central-question",
+    title: "중심 질문",
+    paragraphs: [centralQuestion, CENTRAL_QUESTION_GUIDANCE],
+    items: isReinforcementWeek(week) ? [REINFORCEMENT_DESCRIPTION] : [],
+  });
   if (note.contextCues.length) sections.push({
     id: "context",
     title: "상황을 읽는 기준",
@@ -102,12 +113,13 @@ export function buildWeeklyCourseMaterial(
     courseId: outline.id,
     courseTitle: courseDisplayTitle(outline),
     weekNo: week.week_no,
-    title: week.title,
+    title: weekActivityLabel(week),
     preparationLabel,
     preparationNote,
     contextLabel: [LEVEL[outline.level], note.directionLabel, mode ? (mode === "stt_interpreting" ? "통역" : "번역") : null].filter(Boolean).join(" · "),
     sections,
     missions,
+    opening: buildWeeklyOpening(outline, week),
   };
 }
 
