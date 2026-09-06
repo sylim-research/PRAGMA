@@ -4,6 +4,7 @@ import { expectedCoreModeForWeek, type CourseMode } from "./courseModePolicy";
 import { LEVEL } from "@/lib/pragma/enums";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { weekRole } from "./template";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "./weekGuidance";
 
 export interface WeeklyMaterialSection {
   id: string;
@@ -60,6 +61,13 @@ export function buildWeeklyCourseMaterial(
     paragraphs: note.competencyFocus ? [note.competencyFocus] : [],
     items: note.canDos,
   }];
+  const centralQuestion = weekCentralQuestion(week);
+  if (centralQuestion) sections.push({
+    id: "central-question",
+    title: "중심 질문",
+    paragraphs: [centralQuestion, CENTRAL_QUESTION_GUIDANCE],
+    items: isReinforcementWeek(week) ? [REINFORCEMENT_DESCRIPTION] : [],
+  });
   if (note.contextCues.length) sections.push({
     id: "context",
     title: "상황을 읽는 기준",
@@ -102,7 +110,7 @@ export function buildWeeklyCourseMaterial(
     courseId: outline.id,
     courseTitle: courseDisplayTitle(outline),
     weekNo: week.week_no,
-    title: week.title,
+    title: weekActivityLabel(week),
     preparationLabel,
     preparationNote,
     contextLabel: [LEVEL[outline.level], note.directionLabel, mode ? (mode === "stt_interpreting" ? "통역" : "번역") : null].filter(Boolean).join(" · "),

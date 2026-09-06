@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { ROLE_LABEL, weekRole } from "@/lib/curriculum/template";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
 import { MODE_LABEL, SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
@@ -19,7 +20,7 @@ function specialWeekCopy(weekNo: number): string {
     return "앞서 완료한 미션의 표현 선택과 수정 근거를 수업에서 다시 검토합니다.";
   }
   if (role === "contextualization") {
-    return "서로 다른 두 화행을 관계와 선택권의 부담이 큰 새 맥락에서 수행합니다.";
+    return REINFORCEMENT_DESCRIPTION;
   }
   if (role === "assessment") {
     return "교수자 안내에 따라 지금까지의 화용 판단과 산출을 통합해 점검합니다.";
@@ -33,7 +34,7 @@ function emptyWeekCopy(weekNo: number, isSpeechActWeek: boolean): string {
   }
   const role = weekRole(weekNo);
   if (role === "contextualization") {
-    return "고부담 실전 미션을 편성 중입니다. 배정 후 서로 다른 두 화행 미션을 이곳에서 수행합니다.";
+    return "교강사가 보완할 화행을 선정하고 있습니다. 편성 후 같은 화행의 새 상황 미션 두 개를 이곳에서 수행합니다.";
   }
   return `${specialWeekCopy(weekNo)} 교수자 수업 안내에 따라 진행합니다.`;
 }
@@ -88,9 +89,9 @@ const LearnerCourseWeek = () => {
   }
 
   const roleLabel = ROLE_LABEL[weekRole(week.week_no)];
-  const speechActLabel = week.speech_act
-    ? SPEECH_ACT_UI[week.speech_act as SpeechActUI]
-    : week.title;
+  const reinforcement = isReinforcementWeek(week);
+  const speechActLabel = weekActivityLabel(week);
+  const centralQuestion = weekCentralQuestion(week);
   const goal = week.can_do[0] ?? null;
   const introAvailable = week.scenarios.some(
     (scenario) => scenario.runnable && hasIntroArc(scenario.target_feature),
@@ -110,11 +111,18 @@ const LearnerCourseWeek = () => {
             {week.week_no}주차 · {roleLabel}
           </div>
           <h1 className="mt-1 text-[22px] font-black">{speechActLabel}</h1>
+          {reinforcement && <p className="mt-2 text-[13px] text-[#FAD338]">{week.speech_act ? `선택 화행 · ${SPEECH_ACT_UI[week.speech_act as SpeechActUI]}` : "화행 선정 예정"}</p>}
           {goal && <p className="mt-1 text-[13px] text-[#B9C4CE]">{goal}</p>}
-          {!week.speech_act && (
+          {(!week.speech_act || reinforcement) && (
             <p className="mt-3 text-[12.5px] leading-5 text-[#B9C4CE]">{specialWeekCopy(week.week_no)}</p>
           )}
         </section>
+
+        {centralQuestion && <section className="mt-4 rounded-xl border border-[#EAE4D2] bg-[#FAF8F2] p-4">
+          <h2 className="text-[12px] font-bold text-[#7A5E00]">중심 질문</h2>
+          <p className="mt-1 text-[14px] font-semibold leading-6">{centralQuestion}</p>
+          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">{CENTRAL_QUESTION_GUIDANCE}</p>
+        </section>}
 
         <div className="mt-4 flex flex-wrap gap-2">
           {introAvailable && (

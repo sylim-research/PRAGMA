@@ -128,7 +128,7 @@ describe("current content five-stage review", () => {
     const domain = buildContentReviewDomain("weekly_material", source);
     expect(domain.rules.verdict).toBe("fail");
     const content = domain.snapshot.content as any;
-    expect(content.public_material.sections[0].items).toContain("학습목표");
+    expect(content.public_material.sections.find((section: any) => section.id === "goals").items).toContain("학습목표");
     expect(content.instructor_only.features.length).toBeGreaterThan(0);
     expect(content.public_material).not.toHaveProperty("instructor_only");
     expect(domain.dependencies).toEqual(["m1"]);

@@ -55,6 +55,7 @@ import {
   LEVEL,
 } from "@/lib/pragma/enums";
 import { buildCanDoSuggestions } from "@/lib/curriculum/canDoGuide";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, previouslyLearnedActs, REINFORCEMENT_DESCRIPTION, REINFORCEMENT_TITLE, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import type {
   SpeechActUI,
   LearnerLevel,
@@ -87,6 +88,7 @@ const REGULAR_WEEK = "regular";
 interface CurriculumEditorProps {
   /** null = create a new outline; otherwise edit the existing one. */
   outlineId: string | null;
+  initialOpenWeek?: number | null;
   onClose: () => void;
   onSaved: (saved: CurriculumOutlineWithWeeks) => void;
   /** 현재 Composer 편성. 주차 계획 변경 전 공통 불변조건을 검사한다. */
@@ -101,6 +103,7 @@ interface CurriculumEditorProps {
 
 export const CurriculumEditor = ({
   outlineId,
+  initialOpenWeek = null,
   onClose,
   onSaved,
   assignments = {},
@@ -119,7 +122,7 @@ export const CurriculumEditor = ({
   // Validation is only surfaced after a save attempt (avoids nagging on load).
   const [issues, setIssues] = useState<CurriculumValidationResult | null>(null);
   // 주차별 상세 override 펼침 상태(기본 접힘 — 표준 골격은 수기 입력 불요).
-  const [openWeek, setOpenWeek] = useState<number | null>(null);
+  const [openWeek, setOpenWeek] = useState<number | null>(initialOpenWeek);
 
   useEffect(() => {
     let cancelled = false;
@@ -493,6 +496,8 @@ export const CurriculumEditor = ({
         </div>
         {weeks.map((w, i) => {
           const isRegular = w.type === REGULAR_WEEK;
+          const reinforcement = isReinforcementWeek(w);
+          const centralQuestion = weekCentralQuestion(w);
           const role = weekRole(w.week_no);
           const open = openWeek === w.week_no;
           const canDoSuggestions = buildCanDoSuggestions(
@@ -519,7 +524,7 @@ export const CurriculumEditor = ({
                     복습 공개
                   </span>
                 )}
-                <span className="min-w-0 flex-1 truncate text-[13.5px]">{w.title || "(제목 없음)"}</span>
+                <span className="min-w-0 flex-1 truncate text-[13.5px]">{weekActivityLabel(w)}</span>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -529,6 +534,14 @@ export const CurriculumEditor = ({
                   {open ? "닫기" : "수정"}
                 </Button>
               </div>
+
+              {centralQuestion && (
+                <div className="text-[12px] leading-5 text-muted-foreground">
+                  <p><span className="font-semibold">중심 질문 · </span>{centralQuestion}</p>
+                  {open && <p className="mt-1">{CENTRAL_QUESTION_GUIDANCE}</p>}
+                </div>
+              )}
+              {reinforcement && <p className="text-[12px] leading-5 text-muted-foreground">{REINFORCEMENT_DESCRIPTION}</p>}
 
               {open && (
                 <>
@@ -561,14 +574,19 @@ export const CurriculumEditor = ({
                   {isRegular && (
                     <div className="grid max-w-2xl gap-3 sm:grid-cols-2">
                       <NullableSelect
-                        label="수업 초점 · 화행"
+                        label={reinforcement ? "집중 보완할 화행" : "수업 초점 · 화행"}
                         value={w.speech_act}
-                        options={SPEECH_ACT_UI}
-                        onChange={(v) => patchWeek(i, { speech_act: v as SpeechActUI | null })}
+                        options={reinforcement
+                          ? Object.fromEntries(previouslyLearnedActs(weeks).map((act) => [act, SPEECH_ACT_UI[act]]))
+                          : SPEECH_ACT_UI}
+                        onChange={(v) => patchWeek(i, {
+                          speech_act: v as SpeechActUI | null,
+                          ...(reinforcement ? { title: REINFORCEMENT_TITLE, scenario_slots: 2 } : {}),
+                        })}
                       />
                       <div className="space-y-1.5">
                         <Label className="text-[12px]">이 주차의 미션 수</Label>
-                        <Input
+                        {reinforcement ? <p className="text-[13px]">같은 화행 · 새 상황의 미션 2개</p> : <Input
                           type="number"
                           min={0}
                           className="h-8"
@@ -577,7 +595,7 @@ export const CurriculumEditor = ({
                             patchWeek(i, { scenario_slots: inputToNullableNum(e.target.value) })
                           }
                           placeholder={`기본 ${outline.scenarios_per_week}개`}
-                        />
+                        />}
                       </div>
                     </div>
                   )}

@@ -14,6 +14,7 @@ import {
 } from "@/lib/pragma/enums";
 import { COURSE_MODE_LABEL, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import {
   EMPTY_SYLLABUS_SETTINGS,
   SYLLABUS_EVALUATION_ROWS,
@@ -30,12 +31,6 @@ interface CurriculumSyllabusProps {
   settings?: CurriculumSyllabusSettings;
 }
 
-const weekTypeLabel: Record<string, string> = {
-  orientation: "오리엔테이션",
-  midterm: "중간 점검",
-  final: "기말 점검",
-};
-
 function assignmentTitle(item: AssignedItem, coreById: Record<string, ComposerCore>) {
   const core = coreById[item.scenario_id];
   if (!core) return "배정 미션 확인 필요";
@@ -47,6 +42,7 @@ function weeklyActivity(week: CurriculumWeekRow, items: AssignedItem[]) {
   if (week.type === "orientation") return "수업 안내 · 학습 흐름 확인";
   if (week.type === "midterm") return "중간 수행 점검 · 피드백";
   if (week.type === "final") return "기말 수행 점검 · 성찰";
+  if (isReinforcementWeek(week)) return "선정 이유 공유 → 기존 사례 검토 → 같은 화행의 새 상황 수행 → 선택 이유 설명";
   if (!items.length) return "주차 계획에 따른 수업 활동";
   const setLabel = items.length >= 2 ? "A·B" : "A";
   return `미션 세트 ${setLabel} 수행 → 5 POINT LESSON → DCT 수정`;
@@ -130,13 +126,15 @@ export function CurriculumSyllabus({
 
       <section className="mt-6">
         <h2 className="border-l-4 border-[#FAD338] pl-2 text-lg font-bold">주차별 수업 계획</h2>
+        <p className="mt-2 text-[11px] leading-5 text-[#52616B]">{CENTRAL_QUESTION_GUIDANCE}</p>
+        <p className="mt-1 text-[11px] leading-5 text-[#52616B]">13주 · {REINFORCEMENT_DESCRIPTION}</p>
         <div className="mt-2 overflow-hidden rounded-lg border border-[#C9D2CE]">
           <table className="w-full table-fixed border-collapse text-left text-[9.5px] leading-snug">
             <thead className="bg-[#15202B] text-white">
               <tr>
                 <th className="w-[5%] px-1.5 py-2">주차</th>
-                <th className="w-[10%] px-1.5 py-2">화행·주제</th>
-                <th className="w-[17%] px-1.5 py-2">학습목표</th>
+                <th className="w-[10%] px-1.5 py-2">화행·활동</th>
+                <th className="w-[17%] px-1.5 py-2">중심 질문·학습목표</th>
                 <th className="w-[16%] px-1.5 py-2">미션 세트 A</th>
                 <th className="w-[16%] px-1.5 py-2">미션 세트 B</th>
                 <th className="w-[20%] px-1.5 py-2">수업활동</th>
@@ -146,18 +144,22 @@ export function CurriculumSyllabus({
             <tbody>
               {weeks.map((week) => {
                 const items = assignments[week.week_no] ?? [];
-                const title = week.speech_act
-                  ? SPEECH_ACT_UI[week.speech_act as SpeechActUI] ?? week.speech_act
-                  : weekTypeLabel[week.type] ?? week.title ?? "주차 계획";
+                const title = weekActivityLabel(week);
+                const centralQuestion = weekCentralQuestion(week);
                 const goals = week.can_do?.length
                   ? week.can_do.join(" · ")
-                  : week.competency_focus || week.title || "교수자 계획 참조";
+                  : week.competency_focus || (centralQuestion ? null : "교수자 계획 참조");
 
                 return (
                   <tr key={week.id} className="border-t border-[#DDE3E0] align-top even:bg-[#F8FAF9]">
                     <td className="px-1.5 py-2 font-bold">{week.week_no}</td>
-                    <td className="px-1.5 py-2 font-semibold">{title}</td>
-                    <td className="px-1.5 py-2">{goals}</td>
+                    <td className="px-1.5 py-2 font-semibold">{title}
+                      {isReinforcementWeek(week) && <p className="mt-1 font-normal">{week.speech_act ? SPEECH_ACT_UI[week.speech_act as SpeechActUI] : "교강사 선정 예정"}</p>}
+                    </td>
+                    <td className="px-1.5 py-2">
+                      {centralQuestion && <p><span className="font-semibold">중심 질문 · </span>{centralQuestion}</p>}
+                      {goals && <p className={centralQuestion ? "mt-1 text-[#52616B]" : ""}>{goals}</p>}
+                    </td>
                     <td className="px-1.5 py-2">{items[0] ? assignmentTitle(items[0], coreById) : "—"}</td>
                     <td className="px-1.5 py-2">{items[1] ? assignmentTitle(items[1], coreById) : "—"}</td>
                     <td className="px-1.5 py-2">{weeklyActivity(week, items)}</td>

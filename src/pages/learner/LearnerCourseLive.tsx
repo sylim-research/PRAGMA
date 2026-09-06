@@ -8,9 +8,8 @@ import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
 import type { LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 import { ROLE_LABEL, weekRole } from "@/lib/curriculum/template";
 import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
-import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
-import { friendlyFeatureLabel } from "@/lib/mission/learnerReport";
 import { isActWeek, weekProgress, type WeekState } from "@/lib/curriculum/learnerProgress";
 import { listCompletedMissionIds } from "@/lib/mission/missionLog";
 import { courseModeWeekSummary, expectedCoreModeForWeek, type CourseMode } from "@/lib/curriculum/courseModePolicy";
@@ -24,10 +23,7 @@ const STATE_BADGE: Record<WeekState, { label: string; cls: string }> = {
 };
 
 function weekGoal(week: LearnerCourseWeek): string | null {
-  const code = week.scenarios.find((scenario) => scenario.target_feature)?.target_feature;
-  if (!code) return week.can_do[0] ?? null;
-  const feature = getTargetFeature(code);
-  return friendlyFeatureLabel(code, feature?.learner_label ?? "");
+  return week.can_do[0] ?? null;
 }
 
 function weekDescription(week: LearnerCourseWeek): string {
@@ -41,7 +37,7 @@ function weekDescription(week: LearnerCourseWeek): string {
       : "학기 전체 판단·산출·수정 기록을 종합해 통번역 의사결정을 정리합니다.";
   }
   if (role === "contextualization") {
-    return "서로 다른 두 화행을 관계와 선택권의 부담이 큰 새 맥락에서 수행합니다.";
+    return REINFORCEMENT_DESCRIPTION;
   }
   return weekGoal(week) ?? "이번 주 학습 목표를 확인합니다.";
 }
@@ -73,7 +69,9 @@ const LearnerCourseLive = () => {
     [course],
   );
   const actWeeks = weeks.filter(isActWeek);
-  const experienced = actWeeks.filter((week) => weekProgress(week, completed, progressFailed).doneCount > 0).length;
+  const actCount = new Set(actWeeks.map((week) => week.speech_act)).size;
+  const experienced = new Set(actWeeks.filter((week) => weekProgress(week, completed, progressFailed).doneCount > 0)
+    .map((week) => week.speech_act)).size;
   const coursePath = courseId ? `/learner/course/${courseId}` : "/learner/course";
 
   const openWeek = (weekNo: number) => navigate(`${coursePath}/week/${weekNo}`);
@@ -113,7 +111,7 @@ const LearnerCourseLive = () => {
               <div>
                 <h2 className="text-[16px] font-black text-[#15202B]">주차별 학습계획</h2>
                 <p className="mt-1 text-[12px] text-muted-foreground">
-                  화행 학습 9주 · 메타화용 2주 · 고부담 실전 1주
+                  화행 학습 9주 · 메타화용 2주 · 선택 화행 보완 1주
                 </p>
               </div>
               <p className="text-[12px] text-muted-foreground">
@@ -121,10 +119,11 @@ const LearnerCourseLive = () => {
                   ? "진행 상태 확인 필요"
                   : progressLoading && runnableIds.length > 0
                     ? "진행 상태 확인 중…"
-                    : `경험한 화행 ${experienced}/${actWeeks.length} · 미션 ${completed.size}/${runnableIds.length}`}
+                    : `경험한 화행 ${experienced}/${actCount} · 미션 ${completed.size}/${runnableIds.length}`}
               </p>
             </div>
 
+            <p className="mt-3 text-[12px] leading-5 text-muted-foreground">{CENTRAL_QUESTION_GUIDANCE}</p>
             <ol className="mt-4 overflow-hidden rounded-xl border border-[#EAE4D2] bg-white">
               {weeks.map((week) => {
                 const role = weekRole(week.week_no);
@@ -133,6 +132,8 @@ const LearnerCourseLive = () => {
                   ? SPEECH_ACT_UI[week.speech_act as SpeechActUI]
                   : null;
                 const isCourseMilestone = week.week_no === 1 || week.week_no === 8 || week.week_no === 15;
+                const reinforcement = isReinforcementWeek(week);
+                const centralQuestion = weekCentralQuestion(week);
                 const plannedMode = expectedCoreModeForWeek({
                   courseMode: course.outline.course_mode as CourseMode,
                   interpretingWeekCount: course.outline.target_interpreting_week_count,
@@ -161,7 +162,7 @@ const LearnerCourseLive = () => {
                       <div className="min-w-0 border-l border-[#EFEBDD] pl-4">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-[10.5px] font-bold uppercase tracking-wide text-[#B8860B]">
-                            {isCourseMilestone ? "학기 이정표" : week.speech_act ? "화행 학습" : ROLE_LABEL[role]}
+                            {isCourseMilestone ? "학기 이정표" : reinforcement ? ROLE_LABEL[role] : week.speech_act ? "화행 학습" : ROLE_LABEL[role]}
                             {plannedMode ? ` · ${plannedMode === "stt_interpreting" ? "통역" : "번역"}` : ""}
                           </span>
                           <span className={`rounded-full px-2 py-0.5 text-[10.5px] font-bold sm:hidden ${badge.cls}`}>
@@ -169,11 +170,13 @@ const LearnerCourseLive = () => {
                           </span>
                         </div>
                         <div className="mt-1 text-[15px] font-bold text-[#15202B]">
-                          {speechActLabel ?? week.title}
+                          {weekActivityLabel(week)}
+                          {reinforcement && <span className="ml-2 text-[12px] font-medium">{speechActLabel ?? "화행 선정 예정"}</span>}
                         </div>
                         <p className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
                           {weekDescription(week)}
                         </p>
+                        {centralQuestion && <p className="mt-1 text-[12px] leading-5 text-[#52616B]"><span className="font-semibold">중심 질문 · </span>{centralQuestion}</p>}
                         {progress.assigned.length > 0 && (
                           <p className="mt-1 text-[11.5px] font-semibold text-[#3E4C57]">
                             학습 미션 {progress.doneCount}/{progress.assigned.length}

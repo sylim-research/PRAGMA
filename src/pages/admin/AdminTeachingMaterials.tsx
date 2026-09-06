@@ -13,6 +13,7 @@ import {
   weeklyMaterialsPath,
 } from "@/lib/curriculum/weeklyMaterials";
 import { weekRole } from "@/lib/curriculum/template";
+import { weekActivityLabel } from "@/lib/curriculum/weekGuidance";
 import {
   fetchCourseOperationLogs,
   summarizeCourseOperations,
@@ -197,7 +198,7 @@ const AdminTeachingMaterials = () => {
           <label className="text-sm font-semibold">주차
             <select aria-label="수업자료 주차" value={week?.week_no ?? ""} disabled={!course} onChange={(event) => setParams({ courseId, weekNo: event.target.value })} className="mt-2 h-10 w-full rounded-md border bg-white px-3 font-normal">
               {!week && <option value="">주차 선택</option>}
-              {course?.weeks.map((item) => <option key={item.week_no} value={item.week_no}>{item.week_no}주차 · {item.title}</option>)}
+              {course?.weeks.map((item) => <option key={item.week_no} value={item.week_no}>{item.week_no}주차 · {weekActivityLabel(item)}</option>)}
             </select>
           </label>
         </div>
@@ -251,7 +252,7 @@ const AdminTeachingMaterials = () => {
                   type="button"
                   onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
                   className="text-left text-sm font-black text-[#15202B] hover:underline"
-                >{item.week_no}주차 · {item.title}</button>
+                >{item.week_no}주차 · {weekActivityLabel(item)}</button>
                 {issue && <p className="mt-1 text-[11px] font-semibold text-amber-800">확인 · {issue}</p>}
               </div>
               <div className="flex flex-wrap gap-1.5">
