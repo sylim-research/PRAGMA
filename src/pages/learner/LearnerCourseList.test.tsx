@@ -60,7 +60,7 @@ describe("LearnerCourseList", () => {
     expect(list.getByText("대학생활, 유학·교류, 대인관계, 일상생활")).toBeInTheDocument();
     expect(list.getByText("콘텐츠·SNS, 취업·직장, 거래·고객응대, 대학생활 등")).toBeInTheDocument();
     expect(list.getByText("취업·직장, 거래·고객응대, 콘텐츠·SNS")).toBeInTheDocument();
-    expect(list.getAllByText("주제").every((label) => label.classList.contains("sr-only"))).toBe(true);
+    expect(list.getAllByText("주제")).toHaveLength(3);
     expect(list.queryByText(/개발 가성비|개 화행|%/)).not.toBeInTheDocument();
     expect(screen.queryByText(/실제 학습 12주|교과목을 선택해|내 교과목/)).not.toBeInTheDocument();
   });
@@ -112,7 +112,7 @@ describe("LearnerCourseList", () => {
     for (const course of courses) {
       const link = list.getByRole("link", { name: course.title });
       expect(link).toHaveAttribute("href", `/learner/course/${course.id}`);
-      expect(link).toHaveAccessibleDescription();
+      expect(link).toHaveAccessibleDescription(/^수준: (중급|고급) 언어방향/);
       const title = within(link).getByRole("heading", { level: 2, name: course.title });
       expect(title).toHaveClass("sm:whitespace-nowrap", "break-keep");
       expect(title).not.toHaveClass("truncate");

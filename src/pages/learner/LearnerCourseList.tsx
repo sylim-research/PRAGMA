@@ -74,25 +74,27 @@ const LearnerCourseList = () => {
                 interpretingWeekCount: course.target_interpreting_week_count,
               });
               const titleId = `course-title-${course.id}`;
+              const levelId = `course-level-${course.id}`;
               const detailsId = `course-details-${course.id}`;
               return (
                 <li key={course.id}>
                   <Link
                     to={`/learner/course/${course.id}`}
                     aria-labelledby={titleId}
-                    aria-describedby={detailsId}
+                    aria-describedby={`${levelId} ${detailsId}`}
                     className="group grid gap-3 rounded-2xl border border-[#E5E1D6] bg-white px-4 py-4 text-left shadow-[0_2px_8px_rgba(21,32,43,0.025)] transition-[border-color,box-shadow,background-color] duration-200 hover:border-[#C7BB96] hover:bg-[#FFFDF7] hover:shadow-[0_6px_20px_rgba(21,32,43,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transition-none sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6"
                   >
                     <div className="min-w-0">
-                      <div className="flex items-start gap-2.5 sm:items-center">
-                        <span className="mt-1 shrink-0 rounded-md bg-[#F6F2E5] px-2 py-0.5 text-[12px] font-semibold leading-5 text-[#786022] sm:mt-0">
+                      <div className="flex items-center gap-3">
+                        <span id={levelId} className="shrink-0 rounded-lg bg-[#15202B] px-3 py-2 text-[16px] font-bold leading-6 text-[#FAD338]">
+                          <span className="sr-only">수준: </span>
                           {LEVEL[course.level as LearnerLevel] ?? course.level}
                         </span>
                         <h2 id={titleId} className="break-keep text-[18px] font-bold leading-7 tracking-[-0.035em] text-[#15202B] sm:whitespace-nowrap sm:text-[20px]">
                           {courseDisplayTitle(course)}
                         </h2>
                       </div>
-                      <dl id={detailsId} className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5 text-[13px] leading-5 text-[#5C6A7A]">
+                      <dl id={detailsId} className="mt-3 flex flex-wrap gap-x-3 gap-y-2 text-[13px] leading-5 text-[#5C6A7A]">
                         <div className="flex items-baseline gap-1.5">
                           <dt className="sr-only">언어방향</dt>
                           <dd className="font-medium text-[#15202B]">{COURSE_DIRECTION[course.language_direction as LanguageDirection] ?? course.language_direction}</dd>
@@ -104,9 +106,9 @@ const LearnerCourseList = () => {
                             {modeSummary}{course.course_mode === "translation" ? " · 통역 없음" : ""}
                           </dd>
                         </div>
-                        <div className="w-full">
-                          <dt className="sr-only">주제</dt>
-                          <dd className="break-keep text-[#74808E]">{topicSummary}</dd>
+                        <div className="flex w-full items-baseline gap-2">
+                          <dt className="shrink-0 font-semibold text-[#786022]">주제</dt>
+                          <dd className="break-keep">{topicSummary}</dd>
                         </div>
                       </dl>
                     </div>
