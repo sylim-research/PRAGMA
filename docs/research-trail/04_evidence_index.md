@@ -182,3 +182,14 @@ EVD-20260905-05 후속 배포: 사용자 승인 후 PR #79, 기능 `1241a8d` →
 PR CI `33972276467`·main CI `33972444473` 성공, Railway 연동 deployment `6282164954`
 success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했다. 해당 dev-log의 운영 반영 절을
 참조한다. 이 후속 증거는 앞선 로컬 수정의 운영 반영 경계를 갱신하며 실제 학습자 종단은 포함하지 않는다.
+
+## EVD-20260906-01 · 13주 운영안·주차 HOOK 통합 배포
+
+- 기능 `ca8fc73`·`44eef0e` → 통합 `ea7f15e` → PR #83/main `244fa6c` 포함을 lineage 도구로 확인했다.
+- PR CI `34010951111`, main CI `34011066291` 성공. 전체 750 tests·9 skip, 승인 경계 7 tests,
+  typecheck·운영용 build·모의 데이터 브라우저 검증이 통과했다.
+- content-review v13 ACTIVE/JWT 검증 유지. Railway 연동 deployment `6289032090`은 같은 main SHA로 success.
+- 실제 관리자 API에서 2·13주 snapshot의 로컬/운영 일치, 원본 hash 및 검수 4건 유지,
+  새 주차 content hash를 확인했다. 운영 브라우저의 13주 선택·HOOK 진행안·중심 질문·모바일 확인을 포함한다.
+- 원본: `docs/dev-log/2026-09-06-week13-hook-integration-release.md`; `DEC-20260905-04`,
+  `DEC-20260906-01`, `ITER-20260905-04`. 실제 교수자 승인·학습 수행·교육 효과의 증거는 아니다.

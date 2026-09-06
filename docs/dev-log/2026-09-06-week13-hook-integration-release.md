@@ -35,5 +35,23 @@
 
 ## 운영 반영
 
-PR·CI·main 포함·Edge 버전·Railway 배포와 인증 조회 결과는 실제 확인한 뒤 아래에 추가한다.
+- 통합 커밋 `ea7f15eb31825d57a0858314de08c05590385953` → PR #83 CI `34010951111`
+  성공 → main `244fa6cac35333d97fc687dd5a63d5a1f8701cc8` 병합(2026-09-06 04:15:59 UTC).
+  main CI `34011066291` 성공. `release:lineage`로 `ca8fc73`·`44eef0e`·`ea7f15e` 포함을 확인했다.
+- content-review 한 개를 API 방식으로 배포했다. v13 ACTIVE, verify_jwt=true,
+  function ID `db156415-aa6c-4ddd-a06c-4182dda69bce`, bundle digest
+  `2d9c528440005f46abc31108aa8ae9fecabdf6a5d188dbfdcdce783e41693b0f`를 확인했다.
+- Railway GitHub 연동 deployment `6289032090`은 같은 main SHA이며 04:18:46 UTC에 success였다.
+  직접 업로드·보호 규칙 우회·DB 변경은 없었다.
+- 04:20:32 UTC 실제 관리자 인증으로 2·13주를 inspect했다. 배포된 전체 snapshot이 같은 원본으로
+  계산한 로컬 결과와 일치했다. 두 source hash는 배포 전과 같고, HOOK·중심 질문을 포함한
+  content hash는 바뀌었다. 검수 행은 전후 4개, 대상의 현재 승인 없음이 유지됐다.
+  `.tmp/hook-release-before.json`·`hook-release-after.json`에 결과를 보존했다.
+- 04:21:24 UTC 인증된 운영 브라우저에서 13주 화행 선택, 수업자료 도입 진행안·중심 질문,
+  키보드 이동·단서 공개·포커스 복귀·390px 넘침 없음·페이지 오류 0을 확인했다.
+  운영 원본의 해당 주차에 사용할 맥락이 없어 진행안을 표시하는 실제 상태를 확인한 것이다.
+  편성 코어를 사용하는 예시 화면은 별도의 모의 데이터 브라우저 검증과 구분한다.
+  `tmp/week13-production/result.json`과 캡처 두 장을 남겼다. 저장·승인·유료 호출은 실행하지 않았다.
+- 이 기록은 위 기능 배포의 근거다. 기록만 추가하는 후속 커밋은 기능 코드를 변경하지 않는다.
+
 중국어 TTS 별도 브랜치, DB migration, 실제 교수자 승인·편성·학습 수행과 유료 AI 호출은 이번 범위 밖이다.
