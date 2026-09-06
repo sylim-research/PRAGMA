@@ -13,6 +13,8 @@ const outline = {
   id: "outline-1",
   title: "검토 완료 미션 강좌",
   status: "published",
+  level: "intermediate",
+  language_direction: "ko_zh",
   course_mode: "translation",
   target_interpreting_week_count: 0,
 } as CurriculumOutlineRow;
@@ -99,11 +101,11 @@ function source(
 }
 
 describe("학습자 편성 강좌 조립", () => {
-  it("새 통역 주차와 다른 과거 번역 배정은 보존하되 학습자에게 실행시키지 않는다", () => {
+  it("통번역 주차는 기존 배정의 두 모드를 함께 읽고 원본은 보존한다", () => {
     const assignments = [assignment(2, "translation", 0), assignment(9, "old-translation", 0), assignment(9, "interpreting", 1)];
     const course = assembleLearnerCourse({
       outline: { ...outline, course_mode: "mixed", target_interpreting_week_count: 6 },
-      weeks: [weeks[0], { ...weeks[1], week_no: 9 }],
+      weeks: [weeks[0], { ...weeks[0], week_no: 9 }],
       assignments,
       cores: [
         core("translation", "reviewed"),
@@ -113,11 +115,12 @@ describe("학습자 편성 강좌 조립", () => {
     });
 
     expect(course.weeks[0].scenarios.map((item) => item.scenario_id)).toEqual(["translation"]);
-    expect(course.weeks[1].scenarios.map((item) => item.scenario_id)).toEqual(["interpreting"]);
+    expect(course.weeks[1].scenarios.map((item) => item.scenario_id)).toEqual(["old-translation", "interpreting"]);
+    expect(course.weeks[1].expected_mission_modes).toEqual(["translation", "stt_interpreting"]);
     expect(assignments).toEqual([assignment(2, "translation", 0), assignment(9, "old-translation", 0), assignment(9, "interpreting", 1)]);
   });
 
-  it("선택 화행 보완 주차도 다른 화행·통역·모드 불명 미션은 노출하지 않는다", () => {
+  it("선택 화행 보완 주차의 모드 정원을 어긴 과거 편성은 임의로 골라 실행시키지 않는다", () => {
     const course = assembleLearnerCourse({
       outline,
       weeks: [{ ...weeks[0], week_no: 13, speech_act: "request" }],
@@ -130,7 +133,7 @@ describe("학습자 편성 강좌 조립", () => {
       ],
     });
 
-    expect(course.weeks[0].scenarios.map((item) => item.scenario_id)).toEqual(["translation"]);
+    expect(course.weeks[0].scenarios).toEqual([]);
   });
 
   it("화행 미선정인 과거 13주의 배정은 보존하되 학습 실행 목록에 섞지 않는다", () => {

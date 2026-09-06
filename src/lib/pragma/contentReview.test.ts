@@ -122,7 +122,7 @@ describe("current content five-stage review", () => {
     const source = { outline: { id: "course", title: "수업", level: "intermediate", language_direction: "ko_zh", course_mode: "translation", target_interpreting_week_count: 0 },
       week: { week_no: 2, title: "요청", type: "regular", speech_act: "request", can_do: ["학습목표"] },
       assignments: [{ scenario_id: "m1", week_no: 2, position: 0 }],
-      scenarios: [{ scenario_id: "m1", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID,
+      scenarios: [{ scenario_id: "m1", speech_act: "request", learner_level: "intermediate", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID,
         mode: "translation", core_content: { situation_ko: "상황입니다.", source_text: "원문" } }],
     };
     const domain = buildContentReviewDomain("weekly_material", source);
@@ -143,7 +143,7 @@ describe("current content five-stage review", () => {
       outline: { id: "course", title: "수업", level: "intermediate", language_direction: "ko_zh", course_mode: "translation", target_interpreting_week_count: 0 },
       week: { week_no: 6, title: "거절", type: "regular", speech_act: "refusal", can_do: [] },
       assignments: [{ scenario_id: example.scenarioId, week_no: 6, position: 0 }],
-      scenarios: [{ scenario_id: example.scenarioId, speech_act: "refusal", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID, mode: "translation",
+      scenarios: [{ scenario_id: example.scenarioId, learner_level: "intermediate", speech_act: "refusal", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID, mode: "translation",
         core_content: { situation_ko: example.situationKo, source_text_ko: example.sourceText } }],
     });
     const content = domain.snapshot.content as any;
@@ -158,11 +158,39 @@ describe("current content five-stage review", () => {
     expect(domain.dependencies).toEqual([example.scenarioId]);
   });
 
+  it("중한 통번역 주차의 두 모드를 검토하고 이전 계약 해시와 구분한다", async () => {
+    const source = { outline: { id: "course", title: "수업", level: "intermediate",
+      language_direction: "zh_ko", course_mode: "mixed", target_interpreting_week_count: 3 },
+      week: { week_no: 2, title: "요청", type: "regular", speech_act: "request", can_do: ["학습목표"] },
+      assignments: [{ scenario_id: "t", week_no: 2, position: 0 }, { scenario_id: "i", week_no: 2, position: 1 }],
+      scenarios: ["translation", "stt_interpreting"].map((mode, index) => ({
+        scenario_id: index ? "i" : "t", speech_act: "request", learner_level: "intermediate",
+        mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID, mode, domain: "school",
+        core_content: { direction: "zh_ko", situation_ko: index ? "구두 요청 상황" : "서면 요청 상황",
+          source_text: index ? "请您再说一遍。" : "请您确认一下。",
+          channel: index ? "facetoface" : "email", pdr: { p: "equal", d: "close", r: "low" } },
+      })),
+    };
+    const domain = buildContentReviewDomain("weekly_material", source);
+    expect(domain.rules.verdict).toBe("pass");
+    expect(domain.dependencies).toEqual(["t", "i"]);
+    const content = domain.snapshot.content as any;
+    expect(content.public_material.missions.map((mission: any) => mission.label))
+      .toEqual(["미션 1 · 번역", "미션 2 · 통역"]);
+    const { weekly_learning_contract, ...oldContent } = content;
+    expect(weekly_learning_contract).toBe("speech-act-translation-interpreting-v1");
+    expect(await reviewHash(domain.snapshot)).not.toBe(await reviewHash({ ...domain.snapshot, content: oldContent }));
+    const invalid = buildContentReviewDomain("weekly_material", { ...source,
+      scenarios: source.scenarios.map((scenario) => ({ ...scenario, mode: "translation" })) });
+    expect(invalid.rules.verdict).toBe("fail");
+    expect(invalid.dependencies).toEqual([]);
+  });
+
   it("includes the separate opening and flexible question in the current weekly hash using assigned core context", async () => {
     const source = { outline: { id: "course", title: "수업", level: "intermediate", domain: "school", language_direction: "ko_zh", course_mode: "translation", target_interpreting_week_count: 0 },
       week: { week_no: 13, title: "고부담 맥락 집중 실전", type: "regular", speech_act: "request", can_do: [] },
       assignments: [{ scenario_id: "m1", week_no: 13, position: 0 }],
-      scenarios: [{ scenario_id: "m1", speech_act: "request", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID,
+      scenarios: [{ scenario_id: "m1", learner_level: "intermediate", speech_act: "request", mission_status: "reviewed", content_release_id: CURRENT_CONTENT_RELEASE_ID,
         mode: "translation", domain: "school",
         core_content: { situation_ko: "PRIVATE_SCENE", source_text_ko: "PRIVATE_SOURCE", channel: "email", pdr: { p: "speaker_lower", d: "distant", r: "low" } } }],
     };

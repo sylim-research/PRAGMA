@@ -5,28 +5,25 @@ export type CourseMode = (typeof COURSE_MODES)[number];
 
 /** 9개 목표 화행을 직접 학습하는 주차. */
 export const TARGET_SPEECH_ACT_WEEK_NOS = [2, 3, 4, 5, 6, 9, 10, 11, 12] as const;
-/** OT·중간·기말을 제외한 실제 학습 12주. 수행모드 비중의 유일한 분모다. */
+/** 기존 주수 필드의 읽기·저장 호환에만 사용한다. 현행 모드 배분의 분모가 아니다. */
 export const ACTUAL_LEARNING_WEEK_NOS = [2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14] as const;
 export const ACTUAL_LEARNING_WEEK_COUNT = ACTUAL_LEARNING_WEEK_NOS.length;
-/** 현행 세 표준 강좌가 사용하는 혼합 모드 빠른 선택값(9/3, 6/6). */
-export const MIXED_INTERPRETING_WEEK_PRESETS = [3, 6] as const;
+/** 9화행 학습과 선택 화행 보완. 클리닉·OT·시험에는 새 미션을 배정하지 않는다. */
+export const MISSION_WEEK_NOS = [...TARGET_SPEECH_ACT_WEEK_NOS, 13] as const;
+export const WEEKLY_LEARNING_CONTRACT = "speech-act-translation-interpreting-v1" as const;
 
 export interface CourseModePolicy {
   courseMode: CourseMode;
-  interpretingWeekCount: number;
+  /** 과거 DB 값의 호환용. 현행 미션 모드 결정에는 사용하지 않는다. */
+  interpretingWeekCount?: number;
 }
 
 export function isCourseModePolicyValid(policy: CourseModePolicy): boolean {
-  if (!Number.isInteger(policy.interpretingWeekCount)) return false;
-  if (policy.courseMode === "translation") return policy.interpretingWeekCount === 0;
-  if (policy.courseMode === "interpreting") {
-    return policy.interpretingWeekCount === ACTUAL_LEARNING_WEEK_COUNT;
-  }
-  return policy.interpretingWeekCount >= 1 && policy.interpretingWeekCount < ACTUAL_LEARNING_WEEK_COUNT;
+  return COURSE_MODES.includes(policy.courseMode);
 }
 
 /** legacy 비율은 역사값으로만 읽고 가장 가까운 12주 정수 정책으로 한 번 해석한다. */
-export function courseModePolicyFromLegacyRatio(ratio: number | null | undefined): CourseModePolicy {
+export function courseModePolicyFromLegacyRatio(ratio: number | null | undefined): CourseModePolicy & { interpretingWeekCount: number } {
   const finiteRatio = typeof ratio === "number" && Number.isFinite(ratio) ? ratio : 0;
   const interpretingWeekCount = Math.max(
     0,
@@ -39,40 +36,41 @@ export function courseModePolicyFromLegacyRatio(ratio: number | null | undefined
   return { courseMode: "mixed", interpretingWeekCount };
 }
 
-/** 혼합 강좌는 난도가 번역→통역으로 상승하도록 뒤쪽 n개 실제 학습 주차를 통역으로 둔다. */
-export function interpretingTargetWeekNumbers(
-  policy: CourseModePolicy,
-  targetWeekNumbers: readonly number[] = ACTUAL_LEARNING_WEEK_NOS,
-): number[] {
-  if (policy.courseMode === "translation") return [];
-  if (policy.courseMode === "interpreting") return [...targetWeekNumbers];
-  if (!isCourseModePolicyValid(policy) || targetWeekNumbers.length === 0) return [];
-
-  const count = Math.min(policy.interpretingWeekCount, targetWeekNumbers.length);
-  return targetWeekNumbers.slice(targetWeekNumbers.length - count);
-}
-
-export function expectedCoreModeForWeek(
+/** 유형별 두 완결 미션. 통번역형은 모든 화행 주차에서 번역·통역을 하나씩 수행한다. */
+export function expectedMissionModesForWeek(
   policy: CourseModePolicy,
   weekNo: number,
-  targetWeekNumbers: readonly number[] = ACTUAL_LEARNING_WEEK_NOS,
-): GenMode | null {
-  if (!targetWeekNumbers.includes(weekNo)) return null;
-  return interpretingTargetWeekNumbers(policy, targetWeekNumbers).includes(weekNo)
-    ? "stt_interpreting"
-    : "translation";
+): GenMode[] {
+  if (!isCourseModePolicyValid(policy) || !(MISSION_WEEK_NOS as readonly number[]).includes(weekNo)) return [];
+  if (policy.courseMode === "translation") return ["translation", "translation"];
+  if (policy.courseMode === "interpreting") return ["stt_interpreting", "stt_interpreting"];
+  return ["translation", "stt_interpreting"];
+}
+
+/** 부분 편성의 남은 슬롯을 계산한다. 같은 모드가 정원을 초과하면 무효다. */
+export function remainingMissionModes(expected: readonly GenMode[], assigned: readonly GenMode[]): GenMode[] | null {
+  const remaining = [...expected];
+  for (const mode of assigned) {
+    const index = remaining.indexOf(mode);
+    if (index < 0) return null;
+    remaining.splice(index, 1);
+  }
+  return remaining;
+}
+
+export function missionModesSummary(modes: readonly GenMode[]): string {
+  return (["translation", "stt_interpreting"] as const).flatMap((mode) => {
+    const count = modes.filter((item) => item === mode).length;
+    return count ? [`${mode === "translation" ? "번역" : "통역"} ${count}개`] : [];
+  }).join(" · ");
 }
 
 export const COURSE_MODE_LABEL: Record<CourseMode, string> = {
-  translation: "번역 강좌",
-  interpreting: "통역 강좌",
-  mixed: "혼합 강좌",
+  translation: "번역",
+  interpreting: "통역",
+  mixed: "통번역",
 };
 
-export function courseModeWeekSummary(policy: CourseModePolicy): string {
-  if (!isCourseModePolicyValid(policy)) return COURSE_MODE_LABEL[policy.courseMode];
-  const translationWeekCount = ACTUAL_LEARNING_WEEK_COUNT - policy.interpretingWeekCount;
-  if (policy.courseMode === "translation") return `번역 ${translationWeekCount}주`;
-  if (policy.courseMode === "interpreting") return `통역 ${policy.interpretingWeekCount}주`;
-  return `번역 ${translationWeekCount}주 · 통역 ${policy.interpretingWeekCount}주`;
+export function courseModeSummary(policy: CourseModePolicy): string {
+  return COURSE_MODE_LABEL[policy.courseMode] ?? "수행 유형 확인 필요";
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { courseModeWeekSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { courseModeSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { useLearnerCourses } from "@/lib/curriculum/useLearnerCourse";
 import {
   LEVEL,
@@ -69,7 +69,7 @@ const LearnerCourseList = () => {
                 .filter((code) => themeCodes.includes(code))
                 .map((code) => COURSE_TOPIC_LABEL[code]);
               const topicSummary = `${themes.slice(0, 4).join(", ")}${themes.length > 4 ? " 등" : ""}`;
-              const modeSummary = courseModeWeekSummary({
+              const modeSummary = courseModeSummary({
                 courseMode: course.course_mode as CourseMode,
                 interpretingWeekCount: course.target_interpreting_week_count,
               });
@@ -103,7 +103,7 @@ const LearnerCourseList = () => {
                           <dt className="sr-only">수행모드</dt>
                           <dd className="font-medium text-[#15202B]">
                             <span aria-hidden="true" className="mr-3 font-normal text-[#C7C2B4]">|</span>
-                            {modeSummary}{course.course_mode === "translation" ? " · 통역 없음" : ""}
+                            {modeSummary}
                           </dd>
                         </div>
                         <div className="flex w-full items-baseline gap-2">

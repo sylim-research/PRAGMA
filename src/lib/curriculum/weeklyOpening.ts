@@ -1,5 +1,5 @@
 import type { LearnerCourse, LearnerCourseWeek } from "./learnerCourse";
-import { expectedCoreModeForWeek, isCourseModePolicyValid, type CourseMode } from "./courseModePolicy";
+import { expectedMissionModesForWeek, isCourseModePolicyValid, remainingMissionModes, type CourseMode } from "./courseModePolicy";
 import { buildWeeklyLearnerNote } from "./learnerNote";
 import { CHANNEL_TO_MODE, CHANNEL_UI, DIRECTION_LABEL, DOMAIN, LEVEL, SPEECH_ACT_UI, type ChannelUI, type Domain, type LearnerLevel, type SpeechActUI, type PdrPower, type PdrDistance, type PdrBurden } from "@/lib/pragma/enums";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
@@ -93,12 +93,16 @@ export function buildWeeklyOpening(outline: LearnerCourse["outline"], week: Lear
   const direction = outline.language_direction;
   const level = outline.level as LearnerLevel;
   const policy = { courseMode: outline.course_mode as CourseMode, interpretingWeekCount: outline.target_interpreting_week_count };
-  const mode = expectedCoreModeForWeek(policy, week.week_no);
+  const modes = expectedMissionModesForWeek(policy, week.week_no);
+  const plannedMode = week.channel ? CHANNEL_TO_MODE[week.channel] : null;
   const completeContext = (context: { power?: string | null; distance?: string | null; burden?: string | null } | undefined): context is { power: PdrPower; distance: PdrDistance; burden: PdrBurden } => Boolean(context
     && ["higher", "equal", "lower"].includes(context.power ?? "")
     && ["close", "acquaintance", "formal"].includes(context.distance ?? "")
     && ["low", "mid", "high"].includes(context.burden ?? ""));
-  const assigned = week.scenarios.find((scenario) => scenario.speech_act === week.speech_act && scenario.mode === mode && completeContext(scenario.context));
+  const assigned = week.scenarios.find((scenario) => scenario.speech_act === week.speech_act
+    && modes.includes(scenario.mode) && (!plannedMode || scenario.mode === plannedMode) && completeContext(scenario.context));
+  // 도입은 하나의 별도 사례다. 통번역 주차 전체를 이 사례의 모드·관계로 묶지 않는다.
+  const mode = plannedMode ?? assigned?.mode ?? modes[0];
   const planned = { power: week.pdr_power, distance: week.pdr_distance, burden: week.pdr_imposition };
   const context = completeContext(planned) ? planned : assigned?.context;
   const domain = (week.domain ?? assigned?.domain ?? outline.domain) as Domain;
@@ -109,7 +113,7 @@ export function buildWeeklyOpening(outline: LearnerCourse["outline"], week: Lear
   const base: WeeklyOpening = {
     version: "weekly-opening-v1", courseId: outline.id, weekNo: week.week_no,
     courseTitle: courseDisplayTitle(outline), weekTitle: weekActivityLabel(week),
-    contextLabel: [LEVEL[level], DIRECTION_LABEL[direction], mode === "stt_interpreting" ? "통역" : mode === "translation" ? "번역" : "수업 활동", DOMAIN[domain], week.speech_act ? SPEECH_ACT_UI[week.speech_act] : null].filter(Boolean).join(" · "),
+    contextLabel: [LEVEL[level], DIRECTION_LABEL[direction], policy.courseMode === "mixed" && modes.length ? "통번역" : null, mode === "stt_interpreting" ? "통역 예시" : mode === "translation" ? "번역 예시" : "수업 활동", DOMAIN[domain], week.speech_act ? SPEECH_ACT_UI[week.speech_act] : null].filter(Boolean).join(" · "),
     goals, status: "draft", notice: "교수자 검토용 수업 예시 · 주차 목표와 예문의 적합성을 확인하세요.",
     question: "판단을 바꾼 단서는 무엇인가요?", scene: "이번 주 학습목표를 보고, 함께 이야기할 장면 하나를 떠올려 보세요.",
     centralQuestion: weekCentralQuestion(week), questionGuidance: CENTRAL_QUESTION_GUIDANCE,
@@ -143,8 +147,9 @@ export function buildWeeklyOpening(outline: LearnerCourse["outline"], week: Lear
     }
     return { ...base, status: "planning", notice: "이 주차는 개별 화행이 지정되지 않았습니다. 주차 목표에 따라 교수자가 장면을 제시하는 토론 진행안입니다." };
   }
-  if (!mode || (channel && CHANNEL_TO_MODE[channel] !== mode)) return unavailable("주차의 전달 채널과 번역·통역 편성 조건을 맞춰 주세요.");
-  if (week.scenarios.some((scenario) => (scenario.speech_act && scenario.speech_act !== week.speech_act) || scenario.mode !== mode)) return unavailable("편성 미션의 화행·수행모드가 주차 계획과 다릅니다. 편성을 확인해 주세요.");
+  if (!mode || !modes.includes(mode) || (channel && CHANNEL_TO_MODE[channel] !== mode)) return unavailable("도입 예시의 전달 채널과 번역·통역 조건을 맞춰 주세요.");
+  if (week.scenarios.some((scenario) => scenario.speech_act && scenario.speech_act !== week.speech_act)
+    || remainingMissionModes(modes, week.scenarios.map((scenario) => scenario.mode)) === null) return unavailable("편성 미션의 화행·수행모드가 주차 계획과 다릅니다. 편성을 확인해 주세요.");
   if (!completeContext(context)) return { ...base, status: "planning", notice: "도입 예시의 맥락 정보가 아직 없습니다. 교수자가 별도 장면을 제시해 이 진행안을 사용할 수 있습니다." };
   const seed = examples(domain)[week.speech_act];
   if (!seed) return unavailable("이 화행의 도입 예시가 아직 준비되지 않았습니다.");
@@ -181,6 +186,8 @@ export function buildWeeklyOpening(outline: LearnerCourse["outline"], week: Lear
       { observation: `${seed.consequence} · ${burden}`, choice: seed.focus },
       ...note.features.map((feature) => ({ observation: feature.label, choice: feature.principle })),
     ],
-    transfer: `이제 다른 장면의 ${SPEECH_ACT_UI[week.speech_act]} 미션에서, 원문의 뜻과 태도를 유지하며 상황에 맞는 ${mode === "stt_interpreting" ? "통역" : "번역"}을 해 봅시다.`,
+    transfer: policy.courseMode === "mixed"
+      ? `이제 ${SPEECH_ACT_UI[week.speech_act]}의 번역·통역 미션에서, 각 장면의 역할과 관계를 새로 확인하고 원문의 뜻과 태도를 전달해 봅시다.`
+      : `이제 다른 장면의 ${SPEECH_ACT_UI[week.speech_act]} 미션에서, 원문의 뜻과 태도를 유지하며 상황에 맞는 ${mode === "stt_interpreting" ? "통역" : "번역"}을 해 봅시다.`,
   };
 }

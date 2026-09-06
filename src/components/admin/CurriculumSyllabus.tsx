@@ -12,7 +12,7 @@ import {
   type LearnerLevel,
   type SpeechActUI,
 } from "@/lib/pragma/enums";
-import { COURSE_MODE_LABEL, type CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { COURSE_MODE_LABEL, expectedMissionModesForWeek, missionModesSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
 import {
@@ -38,14 +38,14 @@ function assignmentTitle(item: AssignedItem, coreById: Record<string, ComposerCo
   return `${mode} · ${core.situation_ko || "상황 제목 없음"}`;
 }
 
-function weeklyActivity(week: CurriculumWeekRow, items: AssignedItem[]) {
+function weeklyActivity(week: CurriculumWeekRow, items: AssignedItem[], courseMode: CourseMode) {
   if (week.type === "orientation") return "수업 안내 · 학습 흐름 확인";
   if (week.type === "midterm") return "중간 수행 점검 · 피드백";
   if (week.type === "final") return "기말 수행 점검 · 성찰";
   if (isReinforcementWeek(week)) return "선정 이유 공유 → 기존 사례 검토 → 같은 화행의 새 상황 수행 → 선택 이유 설명";
-  if (!items.length) return "주차 계획에 따른 수업 활동";
-  const setLabel = items.length >= 2 ? "A·B" : "A";
-  return `미션 세트 ${setLabel} 수행 → 5 POINT LESSON → DCT 수정`;
+  const planned = missionModesSummary(expectedMissionModesForWeek({ courseMode }, week.week_no));
+  if (!items.length) return planned ? `${planned} · 편성 준비` : "주차 계획에 따른 수업 활동";
+  return `${planned} · 각 미션의 판단 → 산출 → 피드백·수정`;
 }
 
 function weeklyAssignment(week: CurriculumWeekRow, items: AssignedItem[]) {
@@ -85,7 +85,7 @@ export function CurriculumSyllabus({
           ["수준", levelLabel],
           ["언어 방향", directionLabel],
           ["강좌 수행모드", courseModeLabel],
-          ["주차·미션", `${outline.week_count}주 · 화행 주차당 ${outline.scenarios_per_week}세트`],
+          ["주차·미션", `${outline.week_count}주 · 화행별 ${missionModesSummary(expectedMissionModesForWeek({ courseMode: outline.course_mode as CourseMode }, 2))}`],
           ["영역", DOMAIN[outline.domain as Domain] ?? outline.domain],
           ["핵심 화행", targetActs || "주차 계획 참조"],
           ["담당교수", settings.instructorName || "교수자 입력"],
@@ -117,7 +117,7 @@ export function CurriculumSyllabus({
       <section className="mt-6">
         <h2 className="border-l-4 border-[#FAD338] pl-2 text-lg font-bold">학습 운영 원칙</h2>
         <div className="mt-2 grid gap-2 text-[12px] leading-relaxed sm:grid-cols-2">
-          <p className="rounded-md bg-[#F7F9F8] px-3 py-2">같은 화행의 완결 미션 2세트를 수행하며, 각 세트는 MJT5+DCT1로 구성합니다.</p>
+          <p className="rounded-md bg-[#F7F9F8] px-3 py-2">같은 화행의 {missionModesSummary(expectedMissionModesForWeek({ courseMode: outline.course_mode as CourseMode }, 2))}를 서로 다른 상황에서 수행합니다. 각 미션은 MJT5+DCT1로 완결됩니다.</p>
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">MJT 수행 뒤 5 POINT LESSON으로 핵심 판단 근거를 확인합니다.</p>
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">DCT는 최초 산출 → 최소 피드백 → 수정 → 참고안 비교 순서로 진행합니다.</p>
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">교수자는 승인된 미션의 6단계 수업자료와 학생 활동지를 함께 활용합니다.</p>
@@ -162,7 +162,7 @@ export function CurriculumSyllabus({
                     </td>
                     <td className="px-1.5 py-2">{items[0] ? assignmentTitle(items[0], coreById) : "—"}</td>
                     <td className="px-1.5 py-2">{items[1] ? assignmentTitle(items[1], coreById) : "—"}</td>
-                    <td className="px-1.5 py-2">{weeklyActivity(week, items)}</td>
+                    <td className="px-1.5 py-2">{weeklyActivity(week, items, outline.course_mode as CourseMode)}</td>
                     <td className="px-1.5 py-2">{weeklyAssignment(week, items)}</td>
                   </tr>
                 );

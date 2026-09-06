@@ -23,7 +23,7 @@ import {
   COURSE_PRESETS,
   type CoursePreset,
 } from "@/lib/pragma/scenarioTopics";
-import { expectedCoreModeForWeek } from "@/lib/curriculum/courseModePolicy";
+import { expectedMissionModesForWeek } from "@/lib/curriculum/courseModePolicy";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
 
 function core(overrides: Partial<ComposerCore> & { scenario_id: string }): ComposerCore {
@@ -142,28 +142,26 @@ describe("프리셋 기반 15주 자동 편성", () => {
 
       expect(result.filledWeeks).toBe(9);
       expect(result.totalAssigned).toBe(18);
-      expect(result.interpretingWeekNumbers).toHaveLength(
-        preset.target_interpreting_week_count,
-      );
+      expect(result.interpretingWeekNumbers).toHaveLength(9);
       expect(duplicateScenarioIds(result.assignments)).toEqual([]);
 
       const byId = new Map(cores.map((item) => [item.scenario_id, item]));
       for (const [weekNoText, items] of Object.entries(result.assignments)) {
         expect(items).toHaveLength(2);
         expect(items.every((item) => item.pair_contract_version == null)).toBe(true);
-        const expectedMode = expectedCoreModeForWeek(
+        const expectedModes = expectedMissionModesForWeek(
           {
             courseMode: preset.course_mode,
             interpretingWeekCount: preset.target_interpreting_week_count,
           },
           Number(weekNoText),
         );
-        for (const item of items) {
+        for (const [index, item] of items.entries()) {
           const selected = byId.get(item.scenario_id);
           expect(selected?.mission_status).toBe("reviewed");
           expect(selected?.learner_level).toBe(preset.target_level);
           expect(selected?.direction).toBe(preset.language_direction);
-          expect(selected?.mode).toBe(expectedMode);
+          expect(selected?.mode).toBe(expectedModes[index]);
           expect(preset.included_themes).toContain(selected?.theme_code);
         }
       }
@@ -258,7 +256,7 @@ describe("프리셋 기반 15주 자동 편성", () => {
     ]);
   });
 
-  it("혼합 6/12는 전반부 화행을 번역, 후반부 화행을 통역으로 편성한다", () => {
+  it("통번역형은 모든 화행 주차에 번역 1개·통역 1개를 편성한다", () => {
     const preset = COURSE_PRESETS[0];
     const cores = presetPool(preset, "intermediate", "ko_zh");
     const result = buildAutomaticAssignments({
@@ -271,17 +269,11 @@ describe("프리셋 기반 15주 자동 편성", () => {
       defaultScenariosPerWeek: 2,
     });
 
-    expect(result.interpretingWeekNumbers).toEqual([9, 10, 11, 12, 13, 14]);
+    expect(result.interpretingWeekNumbers).toEqual([2, 3, 4, 5, 6, 9, 10, 11, 12]);
     const byId = new Map(cores.map((item) => [item.scenario_id, item]));
-    for (const weekNo of [2, 3, 4, 5, 6]) {
-      expect(result.assignments[weekNo].every(
-        (item) => byId.get(item.scenario_id)?.mode === "translation",
-      )).toBe(true);
-    }
-    for (const weekNo of [9, 10, 11, 12]) {
-      expect(result.assignments[weekNo].every(
-        (item) => byId.get(item.scenario_id)?.mode === "stt_interpreting",
-      )).toBe(true);
+    for (const weekNo of [2, 3, 4, 5, 6, 9, 10, 11, 12]) {
+      expect(result.assignments[weekNo].map((item) => byId.get(item.scenario_id)?.mode))
+        .toEqual(["translation", "stt_interpreting"]);
     }
   });
 });
@@ -289,6 +281,48 @@ describe("프리셋 기반 15주 자동 편성", () => {
 describe("주차 수동 교체", () => {
   const current = core({ scenario_id: "current" });
   const replacement = core({ scenario_id: "replacement" });
+
+  it("통번역형은 통역을 먼저 추가해도 번역·통역 순서로 저장하며 중복 모드를 차단한다", () => {
+    const interpreting = core({ scenario_id: "interpreting", mode: "stt_interpreting" });
+    const modes = ["translation", "stt_interpreting"] as const;
+    const byId = { current, replacement, interpreting };
+    const partial = addAssignment({}, 2, interpreting, modes, byId);
+    const candidates = filterManualCandidates([current, replacement, interpreting], {
+      act: "request", level: "intermediate", direction: "ko_zh", themes: [],
+      assignments: partial, weekNo: 2, expectedModes: modes, coreById: byId,
+    });
+    expect(candidates.map((item) => item.mode)).toEqual(["translation", "translation"]);
+    const complete = addAssignment(partial, 2, current, modes, byId);
+    expect(complete[2].map((item) => item.scenario_id)).toEqual(["current", "interpreting"]);
+    expect(addAssignment(complete, 2, replacement, modes, byId)).toBe(complete);
+    expect(assignmentStructureIssues({ 2: [
+      { scenario_id: "current", slot_role: "primary" }, { scenario_id: "replacement", slot_role: "primary" },
+    ] }, byId, createStandard15WeekTemplate(), "intermediate", "ko_zh", 2, { courseMode: "mixed" })
+      .some((issue) => issue.code === "course_mode")).toBe(true);
+  });
+
+  it("통역 후보가 없으면 번역 두 건으로 대체하지 않으며 13주도 선택 화행의 두 모드를 요구한다", () => {
+    const weeks = createStandard15WeekTemplate();
+    weeks[12].speech_act = "request";
+    const options = { weeks, level: "intermediate" as const, direction: "ko_zh" as const,
+      themes: [], defaultScenariosPerWeek: 2, courseModePolicy: { courseMode: "mixed" as const } };
+    expect(buildAutomaticAssignments({ ...options, cores: [current, replacement] }).totalAssigned).toBe(0);
+    const interpreting = core({ scenario_id: "interpreting", mode: "stt_interpreting" });
+    const interpreting13 = core({ scenario_id: "interpreting13", mode: "stt_interpreting",
+      context: { counterpart: "고객", power: "speaker_lower", distance: "distant", burden: "high", channel: "spoken" } });
+    const result = buildAutomaticAssignments({ ...options, cores: [current, replacement, interpreting, interpreting13] });
+    expect(result.assignments[2].map((item) => item.scenario_id)).toEqual(["current", "interpreting"]);
+    expect(result.assignments[13].map((item) => item.scenario_id)).toEqual(["replacement", "interpreting13"]);
+    expect(duplicateScenarioIds(result.assignments)).toEqual([]);
+  });
+
+  it("첫 번역 후보가 유일한 통역 상황과 겹치면 다음 번역 후보로 완전한 편성을 찾는다", () => {
+    const interpreting = core({ scenario_id: "interpreting", mode: "stt_interpreting", situation_ko: current.situation_ko });
+    const result = buildAutomaticAssignments({ weeks: createStandard15WeekTemplate(),
+      cores: [current, replacement, interpreting], level: "intermediate", direction: "ko_zh",
+      themes: [], defaultScenariosPerWeek: 2, courseModePolicy: { courseMode: "mixed" } });
+    expect(result.assignments[2].map((item) => item.scenario_id)).toEqual(["replacement", "interpreting"]);
+  });
 
   it("기존 항목을 제거한 뒤 검토 완료 대체 미션을 추가한다", () => {
     const before: AssignMap = {
@@ -351,10 +385,10 @@ describe("주차 수동 교체", () => {
       direction: "ko_zh",
       themes: ["campus_study"],
       assignments: {},
-      expectedMode: "stt_interpreting",
+      expectedModes: ["stt_interpreting", "stt_interpreting"],
     });
     expect(candidates.map((item) => item.scenario_id)).toEqual(["interpreting"]);
-    expect(addAssignment({}, 9, replacement, "stt_interpreting")).toEqual({});
+    expect(addAssignment({}, 9, replacement, ["stt_interpreting", "stt_interpreting"])).toEqual({});
 
     const issues = assignmentStructureIssues(
       { 9: [{ scenario_id: replacement.scenario_id, slot_role: "primary" }] },

@@ -75,9 +75,9 @@ import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTI
 import {
   COURSE_MODE_LABEL,
   COURSE_MODES,
-  MIXED_INTERPRETING_WEEK_PRESETS,
   courseModePolicyFromLegacyRatio,
-  expectedCoreModeForWeek,
+  expectedMissionModesForWeek,
+  missionModesSummary,
   isCourseModePolicyValid,
   type CourseMode,
 } from "@/lib/curriculum/courseModePolicy";
@@ -382,7 +382,8 @@ const AdminComposer = () => {
       prev,
       weekNo,
       c,
-      expectedCoreModeForWeek({ courseMode, interpretingWeekCount }, weekNo),
+      expectedMissionModesForWeek({ courseMode }, weekNo),
+      coreById,
     ));
 
   // 교과목 삭제 — 주차·미션 배정은 DB의 ON DELETE CASCADE가 함께 지운다.
@@ -544,19 +545,14 @@ const AdminComposer = () => {
   const assignedModeWeekCounts = useMemo(() => {
     let interpreting = 0;
     let translation = 0;
-    let mixed = 0;
     for (const week of weeks.filter((item) => item.type === "regular" && item.speech_act)) {
-      const modes = new Set(
-        (assign[week.week_no] ?? [])
-          .map((item) => coreById[item.scenario_id]?.mode)
-          .filter(Boolean),
-      );
-      if (modes.size === 0) continue;
-      if (modes.size > 1) mixed += 1;
-      else if (modes.has("stt_interpreting")) interpreting += 1;
-      else translation += 1;
+      for (const item of assign[week.week_no] ?? []) {
+        const mode = coreById[item.scenario_id]?.mode;
+        if (mode === "stt_interpreting") interpreting += 1;
+        else if (mode === "translation") translation += 1;
+      }
     }
-    return { interpreting, translation, mixed };
+    return { interpreting, translation };
   }, [assign, coreById, weeks]);
   const assignedMissionCount = useMemo(
     () => Object.values(assign).reduce((total, items) => total + items.length, 0),
@@ -925,39 +921,10 @@ const AdminComposer = () => {
                     <option key={mode} value={mode}>{COURSE_MODE_LABEL[mode]}</option>
                   ))}
                 </select>
-                {courseMode === "mixed" && (
-                  <div className="mt-2 space-y-2 rounded-md border border-[#D8D4C8] bg-white p-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      {MIXED_INTERPRETING_WEEK_PRESETS.map((count) => (
-                        <button
-                          key={count}
-                          type="button"
-                          onClick={() => setInterpretingWeekCount(count)}
-                          className={`rounded border px-2 py-0.5 text-[11.5px] ${
-                            interpretingWeekCount === count
-                              ? "border-[#15202B] bg-[#15202B] text-white"
-                              : "border-[#DED8C9] bg-white"
-                          }`}
-                        >
-                          통역 {count}/12주
-                        </button>
-                      ))}
-                      <select
-                        value={interpretingWeekCount}
-                        onChange={(event) => setInterpretingWeekCount(Number(event.target.value))}
-                        className="h-7 rounded border border-[#DED8C9] bg-white px-1 text-[11.5px]"
-                        aria-label="통역 주차 직접 설정"
-                      >
-                        {Array.from({ length: 11 }, (_, index) => index + 1).map((count) => (
-                          <option key={count} value={count}>직접 {count}/12주</option>
-                        ))}
-                      </select>
-                    </div>
-                    <p className="text-[11px] text-[#766C54]">
-                      앞 {12 - interpretingWeekCount}개 학습 주차는 번역 → 뒤 {interpretingWeekCount}개는 통역
-                    </p>
-                  </div>
-                )}
+                <p className="mt-2 text-[12px] leading-5 text-[#766C54]">
+                  화행 학습 주차마다 {missionModesSummary(expectedMissionModesForWeek({ courseMode }, 2))}
+                  {courseMode === "mixed" ? " · 각 역할에 맞는 별도의 상황으로 진행합니다." : " · 서로 다른 상황으로 진행합니다."}
+                </p>
               </div>
             </div>
 
@@ -1005,8 +972,7 @@ const AdminComposer = () => {
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-[#EAE4D2] pt-2.5 text-[11.5px] text-muted-foreground">
               {outline ? (
                 <span>
-                  현재 화행 주차 · 번역 {assignedModeWeekCounts.translation}주 / 통역 {assignedModeWeekCounts.interpreting}주
-                  {assignedModeWeekCounts.mixed > 0 ? ` / 주차 내 혼합 ${assignedModeWeekCounts.mixed}주` : ""}
+                  현재 편성 · 번역 {assignedModeWeekCounts.translation}개 / 통역 {assignedModeWeekCounts.interpreting}개
                 </span>
               ) : (
                 <span className="font-medium text-[#365F58]">교과목 생성 전 편성 조건</span>
@@ -1092,8 +1058,8 @@ const AdminComposer = () => {
                     themes={themes}
                     direction={direction}
                     onEditWeek={() => { setEditingWeek(w.week_no); setStructureEditor("current"); }}
-                    expectedMode={expectedCoreModeForWeek(
-                      { courseMode, interpretingWeekCount },
+                    expectedModes={expectedMissionModesForWeek(
+                      { courseMode },
                       w.week_no,
                     )}
                     adding={addingWeek === w.week_no}
@@ -1139,7 +1105,7 @@ function WeekRow({
   level,
   themes,
   direction,
-  expectedMode,
+  expectedModes,
   adding,
   onToggleAdd,
   onAdd,
@@ -1155,7 +1121,7 @@ function WeekRow({
   themes: ThemeCode[];
   /** 현재 편성 언어 방향 — 후보 필터 절대 조건(0-l·91, 오배정 창 방지) */
   direction: LanguageDirection;
-  expectedMode: GenMode | null;
+  expectedModes: GenMode[];
   adding: boolean;
   onToggleAdd: () => void;
   onAdd: (c: ComposerCore) => void;
@@ -1164,7 +1130,7 @@ function WeekRow({
 }) {
   const act = week.speech_act as SpeechActUI | null;
   const reinforcement = isReinforcementWeek(week);
-  const isAssignable = week.type === "regular" && (!reinforcement || Boolean(act));
+  const isAssignable = week.type === "regular" && expectedModes.length > 0 && Boolean(act);
   const centralQuestion = weekCentralQuestion(week);
   // 미션에 확정된 초점이 없을 때만 주차 화행의 기본 초점을 보조값으로 사용한다.
   // 교수자 화면에서는 연구 구현 단계명 대신 실제 학습 초점만 보여준다.
@@ -1180,7 +1146,7 @@ function WeekRow({
     direction,
     themes,
     assignments,
-    expectedMode,
+    expectedModes,
     weekNo: week.week_no,
     coreById,
   });
@@ -1192,6 +1158,7 @@ function WeekRow({
           {week.week_no}주차
         </span>
         <span className="text-[13.5px] font-medium">{displayTitle}</span>
+        {expectedModes.length > 0 && <span className="text-[11.5px] text-muted-foreground">{missionModesSummary(expectedModes)}</span>}
         {reinforcement && (
           <Button variant="outline" size="sm" className="h-7 text-[12px]" onClick={onEditWeek}>
             {act ? `${SPEECH_ACT_UI[act]} · 화행 변경` : "화행 선택"}
@@ -1211,7 +1178,7 @@ function WeekRow({
             variant="ghost"
             size="sm"
             onClick={onToggleAdd}
-            disabled={reinforcement && items.length >= 2 && !adding}
+            disabled={items.length >= expectedModes.length && !adding}
           >
             {adding ? "닫기" : "+ 미션"}
           </Button>
@@ -1278,9 +1245,7 @@ function WeekRow({
       {adding && isAssignable && (
         <div className="mt-3 rounded-lg border border-dashed border-[#D8D0BC] bg-[#FAF8F2] p-3">
           <p className="mb-2 text-[11.5px] text-muted-foreground">
-            {expectedMode
-              ? `현재 방향·수준·주제와 이 주차의 ${expectedMode === "stt_interpreting" ? "통역" : "번역"} 모드에 맞는 검토 완료 미션만 표시됩니다. 같은 주차의 명백한 상황 복제본은 제외됩니다.`
-              : "현재 방향·수준·주제와 맞는 검토 완료 미션만 표시됩니다. 같은 주차의 명백한 상황 복제본은 제외됩니다."}
+            현재 방향·수준·주제와 {missionModesSummary(expectedModes)} 구성에서 아직 채우지 않은 모드에 맞는 검토 완료 미션만 표시됩니다. 같은 상황의 복제본은 제외됩니다.
           </p>
           {cands.length === 0 ? (
             <p className="text-[12.5px] text-muted-foreground">

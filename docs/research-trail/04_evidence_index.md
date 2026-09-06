@@ -193,3 +193,16 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
   새 주차 content hash를 확인했다. 운영 브라우저의 13주 선택·HOOK 진행안·중심 질문·모바일 확인을 포함한다.
 - 원본: `docs/dev-log/2026-09-06-week13-hook-integration-release.md`; `DEC-20260905-04`,
   `DEC-20260906-01`, `ITER-20260905-04`. 실제 교수자 승인·학습 수행·교육 효과의 증거는 아니다.
+
+## EVD-20260906-02 · 화행별 번역·통역 병행 A안
+
+- 구현 근거: `src/lib/curriculum/courseModePolicy.ts`, `composerPlanning.ts`,
+  `learnerCourseProjection.ts`, `learnerProgress.ts`, `weeklyMaterials.ts`,
+  `weeklyOpening.ts`, `src/lib/pragma/contentReviewDomain.ts`와 각 회귀 테스트.
+- 확인: 전체 759 tests·9 skip, typecheck·운영용 build. 브라우저 모의 데이터 편성·저장·
+  재조회·번역/통역 링크·HOOK·모바일 PASS. 실행 스크립트는
+  `scripts/manual-checks/week13-smoke.mjs`; 로컬 캡처는 `tmp/plan-a-week13-smoke/`.
+- 실제 관리자 읽기 조회의 검토 4건·배정 23건과 세 교과목 2·13주 원본 hash를 배포 전 기준으로
+  확보했다. 콘텐츠 승인·실제 학습자 수행·효과 검증으로 해석하지 않는다.
+- 관련: `DEC-20260906-02`, `docs/dev-log/2026-09-06-weekly-translation-interpreting.md`.
+  기능 SHA·main·CI·운영 배포의 최종 증거는 해당 변경 PR 본문에 연결한다.

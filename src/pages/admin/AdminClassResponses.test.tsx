@@ -64,6 +64,7 @@ beforeEach(() => {
   mocks.assignments.mockResolvedValue([{ week_no: 2, scenario_id: "mission-1", position: 0 }]);
   mocks.cores.mockResolvedValue([{
     scenario_id: "mission-1",
+    speech_act: "request", learner_level: "intermediate", direction: "ko_zh",
     mission_status: "reviewed",
     content_release_id: CURRENT_CONTENT_RELEASE_ID,
     mode: "translation",

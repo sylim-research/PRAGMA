@@ -44,6 +44,8 @@ export interface LearnerWeekScenario {
 
 export interface LearnerCourseWeek {
   week_no: number;
+  /** 편성된 미션과 별개인 계획 슬롯. 미준비 미션을 완료 분모에서 누락시키지 않는다. */
+  expected_mission_modes?: Array<"translation" | "stt_interpreting">;
   title: string;
   type: string;
   can_do: string[];

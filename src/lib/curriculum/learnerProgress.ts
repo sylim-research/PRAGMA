@@ -33,7 +33,7 @@ export function weekProgress(
       ? "empty"
       : lookupFailed
         ? "unknown"
-        : doneCount === assigned.length
+        : doneCount === assigned.length && assigned.length === (week.expected_mission_modes?.length ?? assigned.length)
           ? "done"
           : doneCount > 0
             ? "doing"

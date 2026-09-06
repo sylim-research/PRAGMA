@@ -1,42 +1,44 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  MIXED_INTERPRETING_WEEK_PRESETS,
+  MISSION_WEEK_NOS,
+  courseModeSummary,
   courseModePolicyFromLegacyRatio,
-  expectedCoreModeForWeek,
-  interpretingTargetWeekNumbers,
-  isCourseModePolicyValid,
+  expectedMissionModesForWeek,
+  remainingMissionModes,
 } from "@/lib/curriculum/courseModePolicy";
 
 describe("강좌 수행 모드 정책", () => {
-  it("현행 혼합 강좌의 9/3·6/6 빠른 선택값만 노출한다", () => {
-    expect(MIXED_INTERPRETING_WEEK_PRESETS).toEqual([3, 6]);
+  it("교과목은 주수 대신 수행 유형을 표시한다", () => {
+    expect(courseModeSummary({ courseMode: "mixed", interpretingWeekCount: 3 })).toBe("통번역");
+    expect(courseModeSummary({ courseMode: "translation" })).toBe("번역");
+    expect(courseModeSummary({ courseMode: "interpreting" })).toBe("통역");
   });
 
-  it("전용 강좌와 혼합 n/12의 허용 범위를 고정한다", () => {
-    expect(isCourseModePolicyValid({ courseMode: "translation", interpretingWeekCount: 0 })).toBe(true);
-    expect(isCourseModePolicyValid({ courseMode: "interpreting", interpretingWeekCount: 12 })).toBe(true);
-    expect(isCourseModePolicyValid({ courseMode: "mixed", interpretingWeekCount: 4 })).toBe(true);
-    expect(isCourseModePolicyValid({ courseMode: "mixed", interpretingWeekCount: 0 })).toBe(false);
-    expect(isCourseModePolicyValid({ courseMode: "translation", interpretingWeekCount: 4 })).toBe(false);
+  it("전용 강좌는 같은 모드의 두 완결 미션을 유지한다", () => {
+    expect(expectedMissionModesForWeek({ courseMode: "translation" }, 2)).toEqual(["translation", "translation"]);
+    expect(expectedMissionModesForWeek({ courseMode: "interpreting" }, 2)).toEqual(["stt_interpreting", "stt_interpreting"]);
   });
 
-  it.each([
-    [2, [13, 14]],
-    [4, [11, 12, 13, 14]],
-    [6, [9, 10, 11, 12, 13, 14]],
-  ] as const)("혼합 %i/12는 뒤쪽 실제 학습 주차를 통역으로 둔다", (count, expected) => {
-    expect(interpretingTargetWeekNumbers({
-      courseMode: "mixed",
-      interpretingWeekCount: count,
-    })).toEqual(expected);
+  it.each([0, 3, 6, 12])("과거 %i주 값과 관계없이 모든 화행·보완 주차에 번역·통역을 하나씩 둔다", (count) => {
+    for (const weekNo of MISSION_WEEK_NOS) {
+      expect(expectedMissionModesForWeek({ courseMode: "mixed", interpretingWeekCount: count }, weekNo))
+        .toEqual(["translation", "stt_interpreting"]);
+    }
   });
 
-  it("같은 주차의 두 미션은 동일한 수행 모드 정책을 따른다", () => {
-    const policy = { courseMode: "mixed" as const, interpretingWeekCount: 4 };
-    expect(expectedCoreModeForWeek(policy, 6)).toBe("translation");
-    expect(expectedCoreModeForWeek(policy, 10)).toBe("translation");
-    expect(expectedCoreModeForWeek(policy, 13)).toBe("stt_interpreting");
+  it("OT·클리닉·시험 주차에는 새 미션 슬롯을 만들지 않는다", () => {
+    for (const weekNo of [1, 7, 8, 14, 15]) {
+      expect(expectedMissionModesForWeek({ courseMode: "mixed" }, weekNo)).toEqual([]);
+    }
+  });
+
+  it("부분 편성은 남은 모드를 계산하고 같은 모드의 정원 초과는 거부한다", () => {
+    const modes = expectedMissionModesForWeek({ courseMode: "mixed" }, 2);
+    expect(remainingMissionModes(modes, ["stt_interpreting"])).toEqual(["translation"]);
+    expect(remainingMissionModes(modes, ["stt_interpreting", "translation"])).toEqual([]);
+    expect(remainingMissionModes(modes, ["translation", "translation"])).toBeNull();
+    expect(remainingMissionModes([], ["translation"])).toBeNull();
   });
 
   it("legacy 비율은 가장 가까운 12주 정수 정책으로만 읽는다", () => {

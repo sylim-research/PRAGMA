@@ -4,7 +4,7 @@ import { chromium, expect } from "@playwright/test";
 import { mkdir, writeFile } from "node:fs/promises";
 
 const base = "http://127.0.0.1:8099";
-const output = "tmp/week13-smoke";
+const output = "tmp/plan-a-week13-smoke";
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({ channel: "msedge", headless: true });
 const page = await browser.newPage({ viewport: { width: 1365, height: 1000 } });
@@ -64,7 +64,7 @@ try {
     const preset = COURSE_PRESETS[0];
     const outline = { ...outlineDraftToInsert(createEmptyOutlineDraft()), id: preset.outline_id,
       title: "브라우저 검증용 교과목", status: "published", level: "intermediate",
-      language_direction: "ko_zh", course_mode: "translation", target_interpreting_week_count: 0,
+      language_direction: "ko_zh", course_mode: "mixed", target_interpreting_week_count: 6,
       midterm_week: 8, final_week: 15, scenarios_per_week: 2,
       composition_theme_codes: [], target_speech_acts: ["request", "thanks", "compliment", "agreement", "refusal", "apology", "proposal", "opposition", "complaint"],
       created_at: "2026-09-06T00:00:00Z", updated_at: "2026-09-06T00:00:00Z" };
@@ -75,12 +75,12 @@ try {
     const scenarios = Array.from({ length: 5 }, (_, index) => ({
       scenario_id: `20000000-0000-4000-8000-00000000000${index}`,
       speech_act: index === 4 ? "apology" : "request", learner_level: "intermediate",
-      domain: "school", mode: "translation", theme_code: "campus_study", topic_code: "test",
+      domain: "school", mode: index % 2 ? "stt_interpreting" : "translation", theme_code: "campus_study", topic_code: "test",
       mission_status: "reviewed", release_gate_mode: "legacy_reviewed", target_feature: "request_mitigation_optionality",
       mission_schema_version: "mission_v5", mission_mpj_items: [{}, {}, {}, {}, {}],
       scenario_p: "equal", scenario_d: "close", scenario_r: index % 2 ? "high" : "low",
       core_content: { situation_ko: `검증용 장면 ${index + 1}. 서로 다른 상황에서 자료를 요청합니다.`,
-        source_text_ko: `검증용 원문 ${index + 1}`, direction: "ko_zh", channel: "email",
+        source_text_ko: `검증용 원문 ${index + 1}`, direction: "ko_zh", channel: index % 2 ? "facetoface" : "email",
         pdr: { p: "equal", d: "close", r: index % 2 ? "high" : "low" },
         generation: { content_release_id: CURRENT_CONTENT_RELEASE_ID } },
     }));
@@ -111,6 +111,9 @@ try {
   await expect(week13.getByRole("button", { name: "+ 미션", exact: true })).toBeDisabled();
   await page.getByRole("button", { name: "편성 저장", exact: true }).click();
   await expect.poll(() => fixture.assignments.filter((item) => item.week_no === 13).length).toBe(2);
+  expect(fixture.assignments.filter((item) => item.week_no === 13).map((item) =>
+    fixture.scenarios.find((core) => core.scenario_id === item.scenario_id).mode))
+    .toEqual(["translation", "stt_interpreting"]);
   await page.reload();
   await expect(week13.getByText("미션 2개", { exact: true })).toBeVisible();
   await week13.scrollIntoViewIfNeeded();
@@ -126,6 +129,7 @@ try {
   await expect(page.getByRole("heading", { name: "선택 화행 집중 보완", exact: true })).toBeVisible();
   await expect(page.getByText("선택 화행 · 요청", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "중심 질문", exact: true })).toBeVisible();
+  await expect(page.getByText("번역 1개 · 통역 1개", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: /미션 [12] 시작하기/ })).toHaveCount(2);
   await page.screenshot({ animations: "disabled", path: `${output}/learner-week13.png`, fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });

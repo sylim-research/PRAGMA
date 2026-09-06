@@ -3,8 +3,7 @@ import type { ComposerCore } from './composer';
 import type { CurriculumWeekRow } from './types';
 import type { ChannelUI, Domain, PdrBurden, PdrDistance, PdrPower, SpeechActUI } from '@/lib/pragma/enums';
 import { isReviewedMission } from '@/lib/curriculum/composerEligibility';
-import { expectedCoreModeForWeek, type CourseMode } from './courseModePolicy';
-import { isReinforcementWeek } from './weekGuidance';
+import { expectedMissionModesForWeek, remainingMissionModes, type CourseMode } from './courseModePolicy';
 
 export function assembleLearnerCourse({
   outline,
@@ -28,8 +27,20 @@ export function assembleLearnerCourse({
   }
 
   const learnerWeeks: LearnerCourseWeek[] = weeks.map(
-    (week: CurriculumWeekRow) => ({
+    (week: CurriculumWeekRow) => {
+      const expectedModes = expectedMissionModesForWeek(modePolicy, week.week_no);
+      const reviewed = (byWeek.get(week.week_no) ?? []).filter((assignment) => {
+        const core = coreById.get(assignment.scenario_id);
+        return core && isReviewedMission(core);
+      });
+      const modesValid = remainingMissionModes(expectedModes, reviewed.map((item) => coreById.get(item.scenario_id)!.mode)) !== null;
+      // 이전 편성은 보존하되, 새 유형의 모드 정원을 초과한 주차는 임의로 한 미션을 골라 노출하지 않는다.
+      const visible = modesValid && week.type === "regular" && week.speech_act ? reviewed : [];
+      visible.sort((left, right) => expectedModes.indexOf(coreById.get(left.scenario_id)!.mode)
+        - expectedModes.indexOf(coreById.get(right.scenario_id)!.mode));
+      return {
       week_no: week.week_no,
+      expected_mission_modes: expectedModes,
       title: week.title ?? `${week.week_no}주차`,
       type: week.type,
       can_do: week.can_do ?? [],
@@ -41,17 +52,11 @@ export function assembleLearnerCourse({
       review_released: week.review_released ?? false,
       competency_focus: week.competency_focus ?? null,
       domain: (week.domain as Domain | null) ?? null,
-      scenarios: (byWeek.get(week.week_no) ?? []).flatMap((assignment) => {
+      scenarios: visible.flatMap((assignment) => {
         const core = coreById.get(assignment.scenario_id);
         if (!core || !isReviewedMission(core)) return [];
         // 과거 13주 편성은 보존한다. 교강사가 한 화행을 정하기 전에는 실행 대상으로 삼지 않는다.
-        if (isReinforcementWeek(week) && (
-          !week.speech_act ||
-          core.speech_act !== week.speech_act
-        )) return [];
-        // 과목 정책 변경 전 배정은 DB에 보존하되, 다른 수행모드로 실행하지 않는다.
-        const expectedMode = expectedCoreModeForWeek(modePolicy, week.week_no);
-        if (expectedMode && core.mode !== expectedMode) return [];
+        if (core.speech_act !== week.speech_act || core.learner_level !== outline.level || core.direction !== outline.language_direction) return [];
         return [
           {
             assignment_id: assignment.id ?? "",
@@ -68,7 +73,8 @@ export function assembleLearnerCourse({
           },
         ];
       }),
-    }),
+    };
+    },
   );
 
   return { outline, weeks: learnerWeeks };
