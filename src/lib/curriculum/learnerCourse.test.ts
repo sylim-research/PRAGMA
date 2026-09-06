@@ -101,6 +101,13 @@ function source(
 }
 
 describe("학습자 편성 강좌 조립", () => {
+  it("저장된 상황 요약을 미션 선택 카드에 전달한다", () => {
+    const course = assembleLearnerCourse(source([assignment(2, "mission", 0)], [
+      { ...core("mission", "reviewed"), brief_note_ko: "회의 일정 변경 요청" },
+    ]));
+    expect(course.weeks[0].scenarios[0].brief_note_ko).toBe("회의 일정 변경 요청");
+  });
+
   it("통번역 주차는 기존 배정의 두 모드를 함께 읽고 원본은 보존한다", () => {
     const assignments = [assignment(2, "translation", 0), assignment(9, "old-translation", 0), assignment(9, "interpreting", 1)];
     const course = assembleLearnerCourse({
