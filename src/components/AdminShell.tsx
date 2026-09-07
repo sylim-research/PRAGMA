@@ -84,8 +84,10 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
               const groupLabel = group.header.replace(/^\d+\.\s*/, "");
               const panelId = `admin-nav-group-${groupIndex}`;
 
+              // ml-3은 대시보드 링크와 같은 값이다 — 하위 항목의 세로선이 「운영 대시보드」 상자
+              // 왼쪽 테두리와 맞아 1~4번 묶음이 그 아래에 종속돼 보인다.
               return (
-                <div key={group.header} className="mt-2 flex flex-col">
+                <div key={group.header} className="ml-3 mt-2 flex flex-col">
                   <button
                     type="button"
                     aria-expanded={expanded}
