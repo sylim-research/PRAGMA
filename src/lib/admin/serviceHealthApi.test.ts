@@ -115,7 +115,7 @@ describe("fetchProviderStatuses", () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({ error: "not found" }, 404));
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(statuses.map((s) => s.tone)).toEqual(["manual", "manual"]);
-    expect(statuses[0].summary).toBe("자동 점검을 쓸 수 없습니다");
+    expect(statuses[0].summary).toBe("");
     expect(statuses[0].link?.label).toContain("OpenAI 콘솔");
   });
 

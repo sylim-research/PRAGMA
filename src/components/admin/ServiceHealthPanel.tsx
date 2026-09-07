@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   IDLE_STATUSES,
+  isStale,
+  readStoredReport,
   runServiceHealthCheck,
+  storeReport,
   type ServiceId,
   type ServiceStatus,
   type ServiceTone,
 } from "@/lib/admin/serviceHealthApi";
 
-// 시연·수업 직전에 한 번 누르는 점검. 화면 진입 시 자동 호출하지 않는다 —
-// 대시보드는 매일 여는 화면이라, 열 때마다 외부 API를 두드리면 요금과 혼란만 는다.
+// 시연·수업 직전에 확인하는 점검.
+//
+// 화면을 열면 마지막 결과를 먼저 보여 주고, 그것이 오래됐을 때만 조용히 다시 확인한다.
+// 빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
+// 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 생성·검수·음성 요청은 만들지 않는다.
 //
 // 각 줄에는 상태만 둔다. 잔액을 어떻게 관리하는지는 목록 아래 한 줄로 모았다 —
 // 같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
@@ -65,18 +71,18 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
               <span className="text-muted-foreground"> · {status.latencyMs}ms</span>
             )}
           </span>
+          {!pending && status.link && (
+            <a
+              className="text-sm text-muted-foreground underline underline-offset-2"
+              href={status.link.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {status.link.label} ↗
+            </a>
+          )}
         </div>
-        {!pending && (status.detail || status.link) && (
-          <p className="mt-0.5 text-xs text-muted-foreground">
-            {status.detail}
-            {status.detail && status.link && " · "}
-            {status.link && (
-              <a className="underline underline-offset-2" href={status.link.href} target="_blank" rel="noreferrer">
-                {status.link.label} ↗
-              </a>
-            )}
-          </p>
-        )}
+        {!pending && status.detail && <p className="mt-0.5 text-xs text-muted-foreground">{status.detail}</p>}
       </div>
     </li>
   );
@@ -87,8 +93,10 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
  * 저 컴포넌트는 AdminDashboard 안에 있어 가져다 쓸 수 없으므로 같은 클래스만 되풀이한다.
  */
 export const ServiceHealthPanel = () => {
-  const [statuses, setStatuses] = useState<ServiceStatus[]>(IDLE_STATUSES);
-  const [checkedAt, setCheckedAt] = useState<string | null>(null);
+  // 첫 그림부터 마지막 결과로 채운다 — 깜빡임 없이 「최근에 이랬다」를 보여 준다.
+  const stored = useRef(readStoredReport()).current;
+  const [statuses, setStatuses] = useState<ServiceStatus[]>(stored?.statuses ?? IDLE_STATUSES);
+  const [checkedAt, setCheckedAt] = useState<string | null>(stored?.checkedAt ?? null);
   const [pending, setPending] = useState(false);
 
   const runCheck = async () => {
@@ -97,6 +105,7 @@ export const ServiceHealthPanel = () => {
       const report = await runServiceHealthCheck();
       setStatuses(report.statuses);
       setCheckedAt(report.checkedAt);
+      storeReport(report);
     } catch {
       // 개별 서비스의 실패는 위에서 상태로 바뀐다. 여기까지 오면 점검 자체가 못 돈 것이다 —
       // 미점검으로 되돌리지 않고 실패로 표시해 「다시 시도」가 필요함을 보인다.
@@ -106,6 +115,15 @@ export const ServiceHealthPanel = () => {
       setPending(false);
     }
   };
+
+  // 보관된 결과가 없거나 오래됐으면 화면을 열 때 한 번 다시 확인한다.
+  // 잔량 조회·인증 확인뿐이라 토큰이나 글자 수를 쓰지 않는다.
+  useEffect(() => {
+    if (stored && !isStale(stored.checkedAt)) return;
+    void runCheck();
+    // 첫 그림에서만 판단한다 — 이후 갱신은 버튼으로 한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section aria-labelledby="service-health-title">
@@ -121,7 +139,7 @@ export const ServiceHealthPanel = () => {
         <p className="mt-0.5 text-[11px] text-muted-foreground">
           {checkedAt
             ? `마지막 점검 · ${formatStamp(checkedAt)}`
-            : "시연·수업 전에 눌러 확인합니다. 생성·검수·음성 요청은 만들지 않습니다."}
+            : "시연·수업 전 연동 상태를 확인합니다. 생성·검수·음성 요청은 만들지 않습니다."}
         </p>
       </div>
 

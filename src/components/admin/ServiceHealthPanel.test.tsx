@@ -2,6 +2,11 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ServiceHealthPanel } from "./ServiceHealthPanel";
+import { STALE_AFTER_MS } from "@/lib/admin/serviceHealthApi";
+
+const STORE_KEY = "pragma.admin.serviceHealth.v1";
+const storeAgeMs = (ms: number, statuses: unknown[]) =>
+  localStorage.setItem(STORE_KEY, JSON.stringify({ checkedAt: new Date(Date.now() - ms).toISOString(), statuses }));
 
 const mocks = vi.hoisted(() => ({ run: vi.fn() }));
 
@@ -15,6 +20,7 @@ vi.mock("@/integrations/supabase/client", () => ({
 }));
 
 beforeEach(() => {
+  localStorage.clear();
   mocks.run.mockReset();
   mocks.run.mockResolvedValue({
     checkedAt: "2026-09-07T12:04:00.000Z",
@@ -28,20 +34,45 @@ beforeEach(() => {
   });
 });
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});
 
 describe("외부 서비스 연동 점검 패널", () => {
-  it("진입 시에는 아무 호출도 하지 않고 다섯 줄 모두 미점검으로 둔다", () => {
+  it("보관된 결과가 없으면 화면을 열 때 한 번 확인한다 — 빈 목록으로 두지 않는다", async () => {
+    render(<ServiceHealthPanel />);
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(/마지막 점검/)).toBeVisible();
+    expect(screen.queryAllByRole("img", { name: "미점검" })).toHaveLength(0);
+  });
+
+  it("최근 결과가 보관돼 있으면 그것을 먼저 보여 주고 다시 부르지 않는다", () => {
+    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상", detail: "잔량 9,008 / 10,000자 (90.1%)" }]);
     render(<ServiceHealthPanel />);
     expect(mocks.run).not.toHaveBeenCalled();
-    expect(screen.getByText(/시연·수업 전에 눌러 확인합니다/)).toBeVisible();
-    expect(screen.queryByText(/마지막 점검/)).not.toBeInTheDocument();
-    expect(screen.getAllByRole("img", { name: "미점검" })).toHaveLength(5);
-    expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled();
+    expect(screen.getByText("잔량 9,008 / 10,000자 (90.1%)")).toBeVisible();
+    expect(screen.getByText(/마지막 점검/)).toBeVisible();
+  });
+
+  it("보관된 결과가 오래됐으면 조용히 다시 확인한다", async () => {
+    storeAgeMs(STALE_AFTER_MS + 60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상", detail: "옛 결과" }]);
+    render(<ServiceHealthPanel />);
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(/잔량 9,558/)).toBeVisible();
+  });
+
+  it("점검 결과를 보관해 다음에 열 때 쓴다", async () => {
+    render(<ServiceHealthPanel />);
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(localStorage.getItem(STORE_KEY)).toBeTruthy());
+    expect(JSON.parse(localStorage.getItem(STORE_KEY)!).statuses).toHaveLength(5);
   });
 
   it("「지금 점검」을 누르면 한 번 점검하고 결과·잔량·마지막 점검 시각을 보여 준다", async () => {
+    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상" }]);
     render(<ServiceHealthPanel />);
+    expect(mocks.run).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
     expect(screen.getByRole("button", { name: "점검 중…" })).toBeDisabled();
 
@@ -68,22 +99,21 @@ describe("외부 서비스 연동 점검 패널", () => {
       checkedAt: "2026-09-07T12:04:00.000Z",
       statuses: [
         { id: "elevenlabs", tone: "ok", summary: "정상" },
-        { id: "openai", tone: "manual", summary: "자동 점검을 쓸 수 없습니다", link: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/x" } },
-        { id: "anthropic", tone: "manual", summary: "자동 점검을 쓸 수 없습니다", link: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/x" } },
+        { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/x" } },
+        { id: "anthropic", tone: "manual", summary: "", link: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/x" } },
         { id: "supabase", tone: "ok", summary: "정상" },
         { id: "app", tone: "ok", summary: "정상" },
       ],
     });
     render(<ServiceHealthPanel />);
-    fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
     expect(await screen.findAllByRole("img", { name: "직접 확인" })).toHaveLength(2);
     expect(screen.queryByRole("img", { name: "실패" })).not.toBeInTheDocument();
+    expect(screen.queryByText(/자동 점검을 쓸 수 없습니다/)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: /OpenAI 콘솔에서 확인/ })).toHaveAttribute("href", "https://platform.openai.com/x");
   });
 
   it("설정된 모델명을 각 줄에 보여 준다", async () => {
     render(<ServiceHealthPanel />);
-    fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
     expect(await screen.findByText("gpt-4o · gpt-4.1 · gpt-4o-transcribe")).toBeVisible();
     expect(screen.getByText("claude-opus-5")).toBeVisible();
   });
@@ -91,7 +121,6 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("점검이 실패해도 버튼은 다시 살아난다", async () => {
     mocks.run.mockRejectedValueOnce(new Error("boom"));
     render(<ServiceHealthPanel />);
-    fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
     await waitFor(() => expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled());
     expect(screen.getAllByText(/점검을 실행하지 못했습니다/)).toHaveLength(5);
     expect(screen.getAllByRole("img", { name: "실패" })).toHaveLength(5);

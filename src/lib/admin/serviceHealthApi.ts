@@ -33,6 +33,39 @@ export type ServiceStatus = {
 
 export type ServiceHealthReport = { checkedAt: string; statuses: ServiceStatus[] };
 
+// 마지막 점검 결과를 이 브라우저에 남긴다. 화면을 열자마자 빈 상태가 아니라 「최근에 이랬다」를
+// 보여 주기 위해서다(빈 목록은 무엇을 보는 화면인지 알려 주지 못한다).
+const STORE_KEY = "pragma.admin.serviceHealth.v1";
+/** 이보다 오래된 결과는 화면을 열 때 조용히 다시 확인한다. */
+export const STALE_AFTER_MS = 30 * 60 * 1000;
+
+export function readStoredReport(): ServiceHealthReport | null {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as ServiceHealthReport;
+    if (typeof parsed?.checkedAt !== "string" || !Array.isArray(parsed.statuses) || parsed.statuses.length === 0) return null;
+    if (Number.isNaN(new Date(parsed.checkedAt).getTime())) return null;
+    return parsed;
+  } catch {
+    // 사생활 보호 모드 등에서 접근이 막힐 수 있다 — 없는 것으로 본다.
+    return null;
+  }
+}
+
+export function storeReport(report: ServiceHealthReport): void {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(report));
+  } catch {
+    // 보관은 편의 기능이다. 실패해도 점검 자체는 그대로 동작한다.
+  }
+}
+
+export const isStale = (checkedAt: string, now = Date.now()): boolean => {
+  const stamp = new Date(checkedAt).getTime();
+  return Number.isNaN(stamp) || now - stamp > STALE_AFTER_MS;
+};
+
 export type ElevenLabsUsage = {
   used: number;
   limit: number;
@@ -173,9 +206,10 @@ const bothFail = (summary: string): ServiceStatus[] => [
  * 점검 함수 자체에 닿지 못했을 때. 제공자의 상태는 우리가 모르는 것이지 나쁜 것이 아니다 —
  * 실패로 칠하지 않고 직접 볼 곳을 준다(예: service-health 배포 전).
  */
-const bothManual = (summary: string): ServiceStatus[] =>
+const bothManual = (): ServiceStatus[] =>
   (["openai", "anthropic"] as const).map((id) => ({
-    id, tone: "manual" as const, summary, link: PROVIDER_CONSOLE[id],
+    // 문장으로 사정을 설명하지 않는다 — 할 수 있는 일(콘솔에서 보기)만 남긴다.
+    id, tone: "manual" as const, summary: "", link: PROVIDER_CONSOLE[id],
   }));
 
 export async function fetchProviderStatuses(token: string, deps: Deps = {}): Promise<ServiceStatus[]> {
@@ -189,7 +223,7 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
     // 권한 문제는 우리가 고칠 수 있는 실제 문제다 — 이것만 빨간불.
     if (response.status === 401 || response.status === 403) return bothFail("관리자 로그인을 확인해 주세요");
     // 그 밖의 응답(미배포 404 포함)은 「제공자가 죽었다」가 아니라 「우리가 못 물어봤다」이다.
-    if (!response.ok) return bothManual("자동 점검을 쓸 수 없습니다");
+    if (!response.ok) return bothManual();
     const payload = (await response.json()) as { providers?: ProviderHealth[] };
     const providers = Array.isArray(payload.providers) ? payload.providers : [];
     const byId = new Map(providers.map((health) => [health.provider, providerStatus(health)]));
@@ -197,7 +231,7 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
       (id) => byId.get(id) ?? { id, tone: "fail", summary: "점검 결과가 없습니다" },
     );
   } catch {
-    return bothManual("자동 점검을 쓸 수 없습니다");
+    return bothManual();
   }
 }
 
