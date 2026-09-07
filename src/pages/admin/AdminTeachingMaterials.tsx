@@ -62,6 +62,17 @@ const AdminTeachingMaterials = () => {
   const projectorButtonRef = useRef<HTMLButtonElement>(null);
   const materialDetailRef = useRef<HTMLDetailsElement>(null);
 
+  const openMaterialDetail = () => {
+    setReviewOpen(true);
+    window.requestAnimationFrame(() => {
+      const detail = materialDetailRef.current;
+      if (!detail) return;
+      detail.open = true;
+      detail.focus({ preventScroll: true });
+      detail.scrollIntoView({ block: "start" });
+    });
+  };
+
   const outlines = useQuery({ queryKey: ["teaching-outlines"], queryFn: listCurriculumOutlines });
   const courseQuery = useQuery({
     queryKey: ["teaching-course", courseId],
@@ -140,8 +151,11 @@ const AdminTeachingMaterials = () => {
     if (!week || location.hash !== "#weekly-material-detail") return;
     setReviewOpen(true);
     const frame = window.requestAnimationFrame(() => {
-      materialDetailRef.current?.focus({ preventScroll: true });
-      materialDetailRef.current?.scrollIntoView({ block: "start" });
+      const detail = materialDetailRef.current;
+      if (!detail) return;
+      detail.open = true;
+      detail.focus({ preventScroll: true });
+      detail.scrollIntoView({ block: "start" });
     });
     return () => window.cancelAnimationFrame(frame);
   }, [location.key, location.hash, courseId, week]);
@@ -293,7 +307,7 @@ const AdminTeachingMaterials = () => {
               </div>
               <div className="flex flex-wrap gap-1.5 md:justify-end">
                 <Button size="sm" variant="outline" asChild>
-                  <Link to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
+                  <Link onClick={openMaterialDetail} to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
                 </Button>
                 {firstMission && <>
                   <Button size="sm" variant="outline" asChild>
