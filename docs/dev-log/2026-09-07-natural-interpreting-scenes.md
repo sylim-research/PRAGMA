@@ -31,6 +31,8 @@
 - 프롬프트 동기화와 변경된 검수 재사용 검사 34개 통과(앞선 검수 검사 19개와 중복).
 - 프롬프트 스냅숏과 content-review 공유 도메인 번들을 재생성했다.
 - 전체 테스트와 production build는 PR 필수 CI에서 수행한다.
+- 첫 PR CI는 769개 통과·1개 실패로, 읽기 전용 콘텐츠 버전 조회 SQL의 버전 표기 누락을
+  발견했다. 현재 릴리스 ID에 맞춰 수정하고 CI를 재실행한다.
 - PR/main/CI/Railway 및 generate-scenario·content-review·tts Edge 배포 증거는 연결 PR에 남긴다.
 
 ## 남은 콘텐츠·음성 설정
