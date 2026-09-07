@@ -8,7 +8,9 @@ import {
   classifyElevenLabs,
   fetchElevenLabsStatus,
   fetchProviderStatuses,
+  readStoredReport,
   runServiceHealthCheck,
+  storeReport,
 } from "./serviceHealthApi";
 
 const jsonResponse = (body: unknown, status = 200) =>
@@ -128,10 +130,14 @@ describe("fetchProviderStatuses", () => {
 });
 
 describe("runServiceHealthCheck", () => {
-  it("로그인이 없으면 외부 호출 없이 실패로 채운다", async () => {
+  it("로그인이 없으면 외부 호출 없이 실패로 채우고, 그 결과는 보관하지 않는다", async () => {
     const fetcher = vi.fn();
     const report = await runServiceHealthCheck({ fetcher, token: null });
     expect(fetcher).not.toHaveBeenCalled();
+    expect(report.authenticated).toBe(false);
+    localStorage.clear();
+    storeReport(report);
+    expect(readStoredReport()).toBeNull();
     expect(report.statuses.map((s) => s.id)).toEqual(["elevenlabs", "openai", "anthropic", "supabase", "app"]);
     expect(report.statuses.find((s) => s.id === "supabase")?.tone).toBe("fail");
     expect(report.statuses.find((s) => s.id === "app")?.tone).toBe("ok");
@@ -149,5 +155,18 @@ describe("runServiceHealthCheck", () => {
     expect(fetcher).toHaveBeenCalledTimes(2);
     expect(report.statuses.map((s) => s.tone)).toEqual(["ok", "ok", "ok", "ok", "ok"]);
     expect(new Date(report.checkedAt).getTime()).not.toBeNaN();
+    expect(report.authenticated).toBe(true);
+    localStorage.clear();
+    storeReport(report);
+    expect(readStoredReport()?.checkedAt).toBe(report.checkedAt);
+  });
+
+  it("로그인 전에 보관된 옛 형식(authenticated 없음)은 없는 것으로 보고 다시 확인하게 한다", () => {
+    localStorage.clear();
+    localStorage.setItem("pragma.admin.serviceHealth.v1", JSON.stringify({
+      checkedAt: new Date().toISOString(),
+      statuses: [{ id: "supabase", tone: "fail", summary: "로그인 세션이 없습니다" }],
+    }));
+    expect(readStoredReport()).toBeNull();
   });
 });

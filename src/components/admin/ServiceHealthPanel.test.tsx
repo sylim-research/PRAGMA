@@ -6,7 +6,7 @@ import { STALE_AFTER_MS } from "@/lib/admin/serviceHealthApi";
 
 const STORE_KEY = "pragma.admin.serviceHealth.v1";
 const storeAgeMs = (ms: number, statuses: unknown[]) =>
-  localStorage.setItem(STORE_KEY, JSON.stringify({ checkedAt: new Date(Date.now() - ms).toISOString(), statuses }));
+  localStorage.setItem(STORE_KEY, JSON.stringify({ checkedAt: new Date(Date.now() - ms).toISOString(), statuses, authenticated: true }));
 
 const ALL_OK = (["elevenlabs", "openai", "anthropic", "supabase", "app"] as const).map((id) => ({
   id, tone: "ok" as const, summary: "정상",
@@ -28,6 +28,7 @@ beforeEach(() => {
   mocks.run.mockReset();
   mocks.run.mockResolvedValue({
     checkedAt: "2026-09-07T12:04:00.000Z",
+    authenticated: true,
     statuses: [
       { id: "elevenlabs", tone: "ok", summary: "정상", detail: "잔량 9,558 / 10,000자 (95.6%) · free", latencyMs: 412 },
       { id: "openai", tone: "ok", summary: "정상", detail: "gpt-4o · gpt-4.1 · gpt-4o-transcribe", latencyMs: 331 },
@@ -151,6 +152,7 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("점검 경로가 없을 때는 빨간불 대신 회색 「직접 확인」과 콘솔 링크를 보여 준다", async () => {
     mocks.run.mockResolvedValueOnce({
       checkedAt: "2026-09-07T12:04:00.000Z",
+      authenticated: true,
       statuses: [
         { id: "elevenlabs", tone: "ok", summary: "정상" },
         { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/x" } },
