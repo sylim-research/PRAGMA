@@ -43,13 +43,14 @@ Deno.serve(async (req) => {
         checkedAt: new Date().toISOString() });
     }
     if (req.method !== 'POST') return json({ error: 'POST required' }, 405);
-    const { text, lang } = await req.json();
+    const { text, lang, level } = await req.json();
     if (typeof text !== 'string' || !text.trim()) return json({ error: 'text is required' }, 400);
     if (text.length > 4096) return json({ error: 'text too long (max 4096 chars)' }, 400);
     const language = lang === 'zh' ? 'zh' : 'ko';
+    const learnerLevel = level === 'advanced' || level === 'beginner' ? level : 'intermediate';
     const result = await synthesizeTts(text, language, {
       elevenlabs: Deno.env.get('ELEVENLABS_API_KEY'), openai: Deno.env.get('OPENAI_API_KEY'),
-    });
+    }, fetch, learnerLevel);
     if (!result.ok) return json({
       error: '음성을 생성할 수 없습니다. 잠시 후 다시 시도해 주세요.',
       providerCode: result.code, providerStatus: result.status,

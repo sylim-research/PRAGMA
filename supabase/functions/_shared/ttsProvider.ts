@@ -1,4 +1,4 @@
-import { OPENAI_TTS_INSTRUCTIONS, TTS_SPEED_BY_LANG, TTS_VOICE_BY_LANG, type TtsLang } from './ttsVoicePolicy.ts';
+import { OPENAI_TTS_INSTRUCTIONS, TTS_VOICE_BY_LANG, ttsSpeed, type TtsLang, type TtsLevel } from './ttsVoicePolicy.ts';
 
 type AudioResult =
   | { ok: true; audio: ArrayBuffer; provider: string; model: string; voice: string; fallbackUsed: boolean }
@@ -9,6 +9,7 @@ export async function synthesizeTts(
   lang: TtsLang,
   keys: { elevenlabs?: string; openai?: string },
   request: typeof fetch = fetch,
+  level: TtsLevel = 'intermediate',
 ): Promise<AudioResult> {
   const post = async (url: string, headers: Record<string, string>, body: unknown) => {
     try {
@@ -37,7 +38,7 @@ export async function synthesizeTts(
       { 'xi-api-key': keys.elevenlabs },
       { text, model_id: 'eleven_multilingual_v2', voice_settings: {
         stability: 0.5, similarity_boost: 0.75, style: 0.1,
-        use_speaker_boost: true, speed: TTS_SPEED_BY_LANG[lang],
+        use_speaker_boost: true, speed: ttsSpeed(lang, level),
       } },
     );
     if (attempt.ok === true) return { ...attempt, provider: 'elevenlabs', model: 'eleven_multilingual_v2',
@@ -51,7 +52,7 @@ export async function synthesizeTts(
   for (const model of ['gpt-4o-mini-tts', 'tts-1-hd']) {
     const attempt = await post('https://api.openai.com/v1/audio/speech',
       { Authorization: `Bearer ${keys.openai}` },
-      { model, voice, input: text, response_format: 'mp3', speed: TTS_SPEED_BY_LANG[lang],
+      { model, voice, input: text, response_format: 'mp3', speed: ttsSpeed(lang, level),
         ...(model === 'gpt-4o-mini-tts' ? { instructions: OPENAI_TTS_INSTRUCTIONS[lang] } : {}) });
     if (attempt.ok === true) return { ...attempt, provider: 'openai', model, voice, fallbackUsed: true };
     failure = attempt;

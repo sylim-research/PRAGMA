@@ -437,7 +437,9 @@ MJT5라는 문항 형식의 다양성만으로 화행의 다차원 학습 범위
 - `judge3`가 DCT 앵커와 같은 P·D·R의 Anchor A를 독립 판단한다. `fix_choice`와 `reason`은
   같은 Anchor A 상황을 공유한다. `fix_choice`는 대역 판단을 잠근 뒤 권장안 1개와 경계안 2개를 공개하고 가장 알맞은 수정안 하나를
   고르게 한다. 복수 선택 배열형 trace는 역사 응답 호환을 위해 유지한다.
-- `reason`은 이유 공개 전 `problem_band_code`와 같은 대역 체계로 최초 판단을 잠그고, 이유 3개와 단일 `accepted_reason_id` 중 하나를 고른다. 최초 판단과 이유 선택은 별도 trace로 남긴다.
+- `reason`은 `problem_band_code`로 부적절 대역을 검증한 표현에 대해 이유 3개와 단일
+  `accepted_reason_id` 중 하나를 바로 고른다. 학습자 응답 trace에는 선택 이유를 남기며,
+  형식적인 최초 적절성 판단은 새로 만들지 않는다. 기존 최초 판단 필드는 과거 응답 읽기 호환용이다.
 - `multi_judge` 후보 수는 모든 수준에서 4개로 고정한다. 역할은 `BEST 1·middle 2·WORST 1`이고,
   middle은 적정 대역의 수용 가능한 안 1개와 비적정 대역의 경계안 1개다. 후보마다 Judge3를
   반복하지 않고 네 후보를 동시에 보면서 BEST와 WORST를 하나씩 고른다.

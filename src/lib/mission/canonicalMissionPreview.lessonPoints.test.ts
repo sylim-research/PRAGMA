@@ -14,7 +14,7 @@ describe("CANONICAL_MISSION_PREVIEW lessonPoints", () => {
       "상황 비교",
       "고쳐 보기",
       "이유 찾기",
-      "적정안·조정안",
+      "BEST·WORST",
     ]);
     for (const point of lessonPoints) {
       expect(point.highlights?.length).toBeGreaterThan(0);

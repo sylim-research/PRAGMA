@@ -54,6 +54,7 @@ describe("InterpretingConsole", () => {
         sourceText="方便的话，请把修改意见发给我。"
         sourceLanguage={{ code: "zh", label: "중국어" }}
         targetLanguage={{ code: "ko", label: "한국어" }}
+        learnerLevel="advanced"
         replayLimit={2}
         onSubmit={() => {}}
       />,
@@ -86,6 +87,7 @@ describe("InterpretingConsole", () => {
         sourceText="方便的话，请把修改意见发给我。"
         sourceLanguage={{ code: "zh", label: "중국어" }}
         targetLanguage={{ code: "ko", label: "한국어" }}
+        learnerLevel="advanced"
         replayLimit={2}
         onSubmit={onSubmit}
       />,
@@ -95,6 +97,7 @@ describe("InterpretingConsole", () => {
     await waitFor(() => expect(requestTtsAudio).toHaveBeenCalledWith(expect.objectContaining({
       text: "方便的话，请把修改意见发给我。",
       lang: "zh",
+      level: "advanced",
     })));
 
     fireEvent.click(screen.getByRole("button", { name: "● 녹음 시작" }));

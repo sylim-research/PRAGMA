@@ -147,12 +147,13 @@ const LearnerCourseLive = () => {
                                   const label = missionMenuTitle(scenario.brief_note_ko);
                                   const modeLabel = MODE_LABEL[scenario.mode!];
                                   const query = new URLSearchParams({ courseId, weekNo: String(week.week_no), assignmentId: scenario.assignment_id! });
+                                  const missionPath = `/learner/practice/${scenario.scenario_id}?${query}`;
                                   return (
-                                    <li key={scenario.scenario_id}>
+                                    <li key={scenario.scenario_id} className="flex h-full flex-col rounded-lg border border-[#EAE5DB] bg-white transition-colors duration-150 hover:border-[#C1AE7C]">
                                       <Link
-                                        to={`/learner/practice/${scenario.scenario_id}?${query}`}
+                                        to={missionPath}
                                         aria-label={`${modeLabel} 미션 시작${label ? ": " + label : ""}`}
-                                        className="group flex h-full flex-col rounded-lg border border-[#EAE5DB] bg-white p-3.5 transition-colors duration-150 hover:border-[#C1AE7C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+                                        className="group flex flex-1 flex-col rounded-t-lg p-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
                                       >
                                         <span className="text-[11px] font-medium text-[#967B3E]">미션 {index + 1} · {modeLabel}</span>
                                         <h5 className="mb-3 mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]">{label ?? `${modeLabel} 학습 미션`}</h5>
@@ -160,6 +161,15 @@ const LearnerCourseLive = () => {
                                           {modeLabel} 미션 시작 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                         </span>
                                       </Link>
+                                      {scenario.mode === "stt_interpreting" && (
+                                        <Link
+                                          to={`${missionPath}&start=dct`}
+                                          aria-label={`통역 DCT 바로가기${label ? ": " + label : ""}`}
+                                          className="mx-3.5 mb-3.5 inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[#C9B46C] bg-[#FFF9E7] px-3 py-2 text-[12px] font-semibold text-[#6F5819] hover:bg-[#FFF2C8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+                                        >
+                                          통역 DCT 바로가기 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5" />
+                                        </Link>
+                                      )}
                                     </li>
                                   );
                                 })}

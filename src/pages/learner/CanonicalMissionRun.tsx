@@ -258,7 +258,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
   A1: "다음: 상황에 맞는지 판단하기",
   A2: "다음: 판단하고 고쳐 보기",
   A3: "다음: 부적절한 이유 찾기",
-  A4: "다음: 적정안·조정안 고르기",
+  A4: "다음: BEST·WORST 고르기",
 };
 
 function nextActionLabel(quest: MissionQuest) {
@@ -785,75 +785,28 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
 
 export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ReasonQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
   const acceptedReasonIds = quest.acceptedReasonIds ?? [quest.acceptedReasonId];
-  const judgmentOptions = [
-    { id: "appropriate", label: "적절하다" },
-    { id: "inappropriate", label: "적절하지 않다" },
-  ];
-  const [judgment, setJudgment] = useState<string | null>(() => devAutofill || revealAnswers ? quest.referenceJudgment : null);
-  const [judgmentLocked, setJudgmentLocked] = useState(revealAnswers);
-  const [reasonPhase, setReasonPhase] = useState(revealAnswers);
   const [reasonId, setReasonId] = useState<string | null>(() => devAutofill || revealAnswers ? quest.acceptedReasonId : null);
   const [answered, setAnswered] = useState(revealAnswers);
   const reasonOrder = useMemo(() => shuffle(quest.reasons), [quest.reasons]);
   const selectedReason = quest.reasons.find((reason) => reason.id === reasonId);
   const acceptedReason = quest.reasons.find((reason) => acceptedReasonIds.includes(reason.id));
   const reasonAccepted = reasonId ? acceptedReasonIds.includes(reasonId) : false;
-  const judgmentAccepted = judgment === quest.referenceJudgment;
-  const matrixFeedback = judgmentAccepted
-    ? reasonAccepted
-      ? {
-          verdict: "판단과 이유가 모두 맞아요",
-          intro: "상황에 맞지 않는다는 판단과 그 핵심 원인을 함께 찾았습니다.",
-          action: "다음 문항에서도 상황 단서와 표현의 기능을 연결해 보세요.",
-        }
-      : {
-          verdict: "판단 방향은 맞았어요",
-          intro: "처음 판단은 맞았습니다. 이제 그 판단을 설명하는 핵심 원인을 구분해 보세요.",
-          action: selectedReason ? `내가 고른 이유 · ${selectedReason.text}` : undefined,
-        }
-    : reasonAccepted
-      ? {
-          verdict: "핵심 이유는 찾았어요",
-          intro: "문제가 되는 단서는 찾았습니다. 이 단서가 있는 현재 상황에서는 적절성 방향도 ‘적절하지 않다’로 조정해야 합니다.",
-          action: "이유를 찾은 뒤 처음 판단의 방향까지 다시 맞춰 보세요.",
-        }
-      : {
-          verdict: "판단과 이유를 함께 다시 확인해요",
-          intro: "현재 상황의 적절성 방향과 그 핵심 원인을 함께 다시 연결해 보세요.",
-          action: selectedReason ? `내가 고른 이유 · ${selectedReason.text}` : undefined,
-        };
+  const reasonFeedback = reasonAccepted
+    ? {
+        verdict: "핵심 이유를 찾았어요",
+        intro: "이 상황에서 표현이 어색해지는 핵심 원인을 찾았습니다.",
+        action: "다음 문항에서도 상황 단서와 표현의 기능을 연결해 보세요.",
+      }
+    : {
+        verdict: "핵심 이유를 다시 확인해요",
+        intro: "선택한 이유보다 이 상황의 관계·거리·부담을 더 직접 설명하는 이유가 있습니다.",
+        action: selectedReason ? `내가 고른 이유 · ${selectedReason.text}` : undefined,
+      };
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
         <p className="mb-1 text-[11px] font-black text-[#6B7280]">지금 할 일</p>
-        {!reasonPhase ? (
-          <>
-            <h3 className="text-base font-bold">{quest.prompt}</h3>
-            <div role="radiogroup" aria-label="표현의 적절성 판단" className={optionGrid}>
-              {judgmentOptions.map((option) => (
-                <OptionButton
-                  key={option.id}
-                  option={option}
-                  value={judgment}
-                  disabled={judgmentLocked}
-                  answered={judgmentLocked}
-                  acceptedIds={[quest.referenceJudgment]}
-                  radio
-                  onSelect={setJudgment}
-                />
-              ))}
-            </div>
-            {judgmentLocked && (
-              <div className={`mt-4 rounded-xl border px-4 py-3 text-sm font-bold leading-6 ${judgment === quest.referenceJudgment ? "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]" : "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]"}`} role="status">
-                {judgment === quest.referenceJudgment
-                  ? "맞아요. 이 상황에서는 조정이 필요한 표현입니다."
-                  : "이 문항에서는 적절하지 않은 표현으로 판정합니다."}
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            <h3 className="text-base font-bold">그렇다면, 이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
+        <h3 className="text-base font-bold">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
             <div role="radiogroup" aria-label="가장 큰 이유 하나" className={optionGrid}>
               {reasonOrder.map((reason) => (
                 <OptionButton
@@ -869,31 +822,25 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
               ))}
             </div>
             {!answered && <p className="mt-2 break-keep text-xs leading-5 text-[#687387]">세 이유 중 이 상황의 화용적 부적절성을 가장 잘 설명하는 하나를 고르세요.</p>}
-          </>
-        )}
-        {reasonPhase && answered && acceptedReason && (
+        {answered && acceptedReason && (
           <div className="mt-4">
             <FeedbackBox
-              verdict={matrixFeedback.verdict}
-              feedback={`${matrixFeedback.intro} 핵심 이유는 “${acceptedReason.text}”입니다. ${quest.feedback}`}
-              action={matrixFeedback.action}
+              verdict={reasonFeedback.verdict}
+              feedback={`${reasonFeedback.intro} 핵심 이유는 “${acceptedReason.text}”입니다. ${quest.feedback}`}
+              action={reasonFeedback.action}
               highlights={quest.targetHighlights}
             />
           </div>
         )}
       </section>
-      <ActionBar hint={!judgmentLocked && !judgment ? "적절한지 먼저 판단해 주세요." : reasonPhase && !answered && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
-        {!judgmentLocked ? (
-          <Button className={`h-12 ${actionButton}`} disabled={!judgment} onClick={() => setJudgmentLocked(true)}>판단 확인하기</Button>
-        ) : !reasonPhase ? (
-          <Button className={`h-12 ${actionButton}`} onClick={() => setReasonPhase(true)}>이유 찾기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-        ) : !answered ? (
+      <ActionBar hint={!answered && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
+        {!answered ? (
           <Button className={`h-12 ${actionButton}`} disabled={!reasonId} onClick={() => setAnswered(true)}>이유 확인하기</Button>
         ) : (
           <Button
             className="h-12 w-full"
             onClick={() => {
-              if (judgment && reasonId) onDone({ initialJudgment: judgment, reasonId });
+              if (reasonId) onDone({ reasonId });
             }}
           >
             {nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" />
@@ -918,7 +865,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         {!answered && (
           <p className="mt-2 text-xs font-black text-[#687387]" aria-live="polite">
-            {best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "알맞은 표현 선택 완료 · 조정안을 골라주세요" : worst ? "조정안 선택 완료 · 알맞은 표현을 골라주세요" : "알맞은 표현과 조정이 필요한 표현을 하나씩 골라주세요"}
+            {best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "BEST 선택 완료 · WORST를 골라주세요" : worst ? "WORST 선택 완료 · BEST를 골라주세요" : "BEST와 WORST를 하나씩 골라주세요"}
           </p>
         )}
         <div className="mt-3 flex items-center gap-3">
@@ -930,9 +877,9 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
             const bestPicked = best === candidate.id;
             const worstPicked = worst === candidate.id;
             const role = candidate.role === "best"
-              ? "적정 대역"
+              ? "BEST · 가장 적절"
               : candidate.role === "worst"
-                ? "조정 필요"
+                ? "WORST · 가장 덜 적절"
                 : "가능한 표현";
             const isBestRole = candidate.role === "best";
             const isWorstRole = candidate.role === "worst";
@@ -951,8 +898,8 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
                       <span className={`rounded px-2 py-1 text-[11px] font-black ${isBestRole ? "bg-[#DCEFE4] text-[#245E44]" : isWorstRole ? "bg-[#F4D8D5] text-[#8B3531]" : "bg-[#EEECE6]"}`}>{role}</span>
-                      {bestPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 적정안</span>}
-                      {worstPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 조정안</span>}
+                      {bestPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 BEST</span>}
+                      {worstPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 WORST</span>}
                     </div>
                   </div>
                 ) : (
@@ -960,8 +907,8 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <p className={`${targetFont} min-w-0 text-[17px] leading-7`}>{candidate.text}</p>
                     <div className="flex shrink-0 gap-2">
-                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>알맞음</button>
-                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>조정 필요</button>
+                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>BEST</button>
+                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>WORST</button>
                     </div>
                   </div>
                 )}
@@ -970,7 +917,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
           })}
         </div>
       </section>
-      <ActionBar hint={!answered ? (best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "알맞은 표현 선택 완료 · 조정안을 골라주세요" : worst ? "조정안 선택 완료 · 알맞은 표현을 골라주세요" : "알맞은 표현과 조정이 필요한 표현을 하나씩 골라주세요") : undefined}>
+      <ActionBar hint={!answered ? (best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "BEST 선택 완료 · WORST를 골라주세요" : worst ? "WORST 선택 완료 · BEST를 골라주세요" : "BEST와 WORST를 하나씩 골라주세요") : undefined}>
         {!answered ? (
           <Button className={`h-12 ${actionButton}`} disabled={!best || !worst || best === worst} onClick={() => setAnswered(true)}>두 표현 확인하기</Button>
         ) : (
@@ -1329,7 +1276,7 @@ function buildDevPreviewResponses(preset: DevPreviewPreset, finalized: boolean) 
       judgment: quest.referenceJudgment,
       correctionIds: quest.corrections.filter((option) => option.valid).map((option) => option.id),
     };
-    if (quest.kind === "reason") result[quest.id] = { initialJudgment: quest.referenceJudgment, reasonId: quest.acceptedReasonId };
+    if (quest.kind === "reason") result[quest.id] = { reasonId: quest.acceptedReasonId };
     if (quest.kind === "best_worst") result[quest.id] = { best: quest.bestId, worst: quest.worstId };
     if (quest.kind === "dct") result[quest.id] = dctResponses[quest.id];
     if (quest.kind === "dct_feedback") result[quest.id] = dctResponses[quest.dctId];
@@ -1355,6 +1302,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
           sourceText={quest.source}
           sourceLanguage={mission.sourceLanguage}
           targetLanguage={mission.targetLanguage}
+          learnerLevel={mission.supportLevel}
           replayLimit={quest.replayLimit}
           onSubmit={(transcript) => onDone({ first: transcript, revised: transcript, reflected: false })}
         />
@@ -1836,14 +1784,14 @@ function responseLabel(quest: MissionQuest, response: QuestResponse) {
   if (quest.kind === "best_worst") {
     const best = quest.candidates.find((item) => item.id === response.best)?.text;
     const worst = quest.candidates.find((item) => item.id === response.worst)?.text;
-    return `내 적정안 · ${best ?? "-"}\n내 조정안 · ${worst ?? "-"}`;
+    return `내 BEST · ${best ?? "-"}\n내 WORST · ${worst ?? "-"}`;
   }
   return "";
 }
 
 function questFeedback(quest: MissionQuest) {
   if (quest.kind === "scale" || quest.kind === "fix_choice" || quest.kind === "reason") return quest.feedback;
-  if (quest.kind === "best_worst") return quest.candidates.map((item) => `${item.role === "best" ? "적정 대역" : item.role === "worst" ? "조정 필요" : "가능한 표현"} · ${item.note}`).join("\n");
+  if (quest.kind === "best_worst") return quest.candidates.map((item) => `${item.role === "best" ? "BEST · 가장 적절" : item.role === "worst" ? "WORST · 가장 덜 적절" : "가능한 표현"} · ${item.note}`).join("\n");
   return "";
 }
 
@@ -2234,8 +2182,12 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const sceneIntroConfig = isDevPreview && requestedMission === "B"
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(0);
-  const [questIndex, setQuestIndex] = useState(0);
+  const startAtDct = Boolean(runtime)
+    && mission.activityMode === "interpreting"
+    && new URLSearchParams(window.location.search).get("start") === "dct";
+  const dctQuestIndex = Math.max(0, mission.quests.findIndex((item) => item.kind === "dct"));
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(startAtDct ? null : 0);
+  const [questIndex, setQuestIndex] = useState(startAtDct ? dctQuestIndex : 0);
   const [completed, setCompleted] = useState(false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
@@ -2287,7 +2239,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       speechAct: runtime.speech_act,
       direction: runtime.direction,
       taskMode: runtime.mission.production_task.mode === "interpreting" ? "interpreting" : "translation",
-      payload: {},
+      payload: { entry_mode: startAtDct ? "dct_shortcut" : "full_mission" },
       courseContext: courseContext ?? undefined,
     });
   }, [attemptId, courseContext, demoMode, runtime]);
@@ -2420,7 +2372,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           revisedResponse: finalResponse.revised,
           ...(finalResponse.runtimeFeedback ? { feedback: finalResponse.runtimeFeedback } : {}),
           startedAtIso: startedAtRef.current,
-          mpjResponses: buildRuntimeMpjTraces(runtime, nextResponses),
+          mpjResponses: startAtDct ? [] : buildRuntimeMpjTraces(runtime, nextResponses),
           ...(finalResponse.dissent
             ? {
                 contextJudgment: {
@@ -2455,9 +2407,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   };
 
   const restart = () => {
-    setSceneIntroStep(0);
+    setSceneIntroStep(startAtDct ? null : 0);
     setMpjRecapOpen(false);
-    setQuestIndex(0);
+    setQuestIndex(startAtDct ? dctQuestIndex : 0);
     setCompleted(false);
     setReviewIndex(null);
     setResponses({});
@@ -2580,6 +2532,11 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         ) : (
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} />
+            {startAtDct && quest.kind === "dct" && (
+              <div className="rounded-xl border border-[#E3D08F] bg-[#FFF8E1] px-4 py-2.5 text-xs font-semibold text-[#6B5518]" role="status">
+                수업용 DCT 바로가기 · 앞의 표현 판단 활동은 수행 기록에 포함되지 않습니다.
+              </div>
+            )}
             <QuestRenderer
               key={`${quest.id}-${renderNonce}`}
               quest={quest}
