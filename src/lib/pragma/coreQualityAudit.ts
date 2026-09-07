@@ -27,6 +27,7 @@ export const CORE_QUALITY_AXES = [
   "participant_roles",
   "scene_source_alignment",
   "learner_scene",
+  "scene_plausibility",
 ] as const;
 
 export type CoreQualityAxis = (typeof CORE_QUALITY_AXES)[number];
@@ -48,6 +49,7 @@ export const CORE_AXIS_LABEL: Record<CoreQualityAxis, string> = {
   participant_roles: "통역 참여자",
   scene_source_alignment: "상황·원문 대응",
   learner_scene: "학생용 장면",
+  scene_plausibility: "장면 개연성",
 };
 export type CoreQualityVerdict = "pass" | "warning" | "fail";
 

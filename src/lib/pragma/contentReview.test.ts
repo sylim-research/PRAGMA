@@ -26,11 +26,12 @@ afterEach(() => vi.unstubAllGlobals());
 describe("current content five-stage review", () => {
   it("reuses matching generation evidence and makes additional models opt-in", () => {
     const hash = "a".repeat(64);
-    const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: "quality_v18",
+    const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: "quality_v19_scene_plausibility",
       checked_at: "2026-09-06T00:00:00Z", mission_content_hash: hash };
     const evidence = reusableGenerationQuality({ provenance: {mission_content_hash: hash}, quality_check: quality });
     expect(evidence).not.toBeNull();
     expect(reusableGenerationQuality({ provenance: {mission_content_hash: "b".repeat(64)}, quality_check: quality })).toBeNull();
+    expect(reusableGenerationQuality({ provenance: {mission_content_hash: hash}, quality_check: { ...quality, prompt_version: "quality_v18_zhko_bidirectional_fidelity" } })).toBeNull();
     const focused = {...run(), approval_policy: "focused_v1" as const, generation_quality: evidence,
       openai_review: null, claude_review: null};
     expect(nextReviewStage(focused)).toBe("professor");
@@ -135,7 +136,7 @@ describe("current content five-stage review", () => {
       core_content: {}, mission_content: SAMPLE_MISSION_V5_NATIVE,
     } });
     const { rules_version, ...previousCriteria } = domain.snapshot.criteria;
-    expect(rules_version).toBe("mission_rules_v9_r27_topology");
+    expect(rules_version).toBe("mission_rules_v10_natural_scene");
     expect(await reviewHash(domain.snapshot)).not.toBe(await reviewHash({
       ...domain.snapshot, criteria: previousCriteria,
     }));

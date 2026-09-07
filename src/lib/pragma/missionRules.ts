@@ -63,8 +63,6 @@ import {
 import {
   CORE_SOURCE_SENTENCE_MAX,
   CORE_SOURCE_SENTENCE_MIN,
-  coreBilingualSceneIssue,
-  coreBilingualSceneWarning,
   coreLearnerSceneIssue,
   countCoreSourceSentences,
 } from "../../../supabase/functions/_shared/coreSourceRepair";
@@ -455,23 +453,7 @@ function checkCoreCommon(
   ) {
     add(v, "R16", "fail", `통역 셀인데 situation_ko가 서면 수행을 명시함: "${situation.slice(0, 60)}"`);
   }
-  const bilingualSceneIssue = coreBilingualSceneIssue(
-    situation,
-    DIRECTION_LANGS[dir].source,
-    DIRECTION_LANGS[dir].target,
-    ctx.mode === "stt_interpreting",
-    core.relation_ko,
-  );
-  if (bilingualSceneIssue) {
-    add(v, "R16", "fail", `통역 셀인데 이중언어 화자·통역 개입 장면이 불명확함: ${bilingualSceneIssue.message}`);
-  }
-  const bilingualSceneWarning = coreBilingualSceneWarning(
-    situation,
-    ctx.mode === "stt_interpreting",
-  );
-  if (bilingualSceneWarning) {
-    add(v, "R16", "warning", `통역 역할 확인 필요: ${bilingualSceneWarning.message}`);
-  }
+  // R16 checks the performance medium. Interpreter role scaffolding is not learner scene content.
   const learnerSceneIssue = coreLearnerSceneIssue(situation);
   if (learnerSceneIssue) {
     add(v, "R30", "fail", `학생용 situation_ko에 답안 평가 기준이 노출됨: ${learnerSceneIssue.message}`);

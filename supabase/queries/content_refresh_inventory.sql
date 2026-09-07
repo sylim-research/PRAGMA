@@ -1,11 +1,11 @@
 -- PRAGMA generated-content refresh inventory (READ ONLY)
--- Current candidate: pragma_content_candidate_20260826_01_act_r_politeness_audit
+-- Current candidate: pragma_natural_scene_candidate_20260907_01
 --
 -- Supabase SQL Editor에서 실행한다. 결과 한 행은 삭제 대상과 보존/분리할 참조를
 -- 함께 보여 준다. 이 파일에는 쓰기 문장을 넣지 않는다.
 
 WITH settings AS (
-  SELECT 'pragma_zhko_bidirectional_candidate_20260904_02'::text AS current_release_id
+  SELECT 'pragma_natural_scene_candidate_20260907_01'::text AS current_release_id
 ),
 generated_scenarios AS (
   SELECT
