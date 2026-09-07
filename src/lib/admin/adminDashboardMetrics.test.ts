@@ -8,6 +8,9 @@ import {
   summarizeDashboardAssignments,
   summarizeDashboardContent,
   summarizeDashboardReviewStages,
+  countRulesFailures,
+  summarizeAssignmentApproval,
+  summarizeCourses,
   type DashboardReviewRunRow,
   type DashboardScenarioRow,
 } from "@/lib/admin/adminDashboardMetrics";
@@ -118,6 +121,34 @@ describe("admin dashboard metrics", () => {
       .toBe("professor");
     // 규칙 검사 fail은 정책과 무관하게 규칙 검사로 남는다.
     expect(focused({ rules_verdict: "fail", generation_quality_hash: "hash-1" })).toBe("rules");
+  });
+
+  it("규칙 검사 칸 안에서 검사 실패 수를 따로 센다", () => {
+    const rows = ["never", "failed", "passed"].map((id) => mission(id));
+    const runs = [run("failed", { rules_verdict: "fail" }), run("passed", { openai_response_id: "o" })];
+    expect(summarizeDashboardReviewStages(rows, runs).rules).toBe(2);
+    expect(countRulesFailures(rows, runs)).toBe(1);
+  });
+
+  it("편성된 미션을 승인 완료와 승인 전으로 나눈다 — 표에 없는 미션은 승인 전이다", () => {
+    const scenarios = [
+      mission("approved", { mission_status: "reviewed", authoring_stage: "professor_finalized" }),
+      mission("pending"),
+    ];
+    const assignments = [
+      { outline_id: "a", week_no: 1, scenario_id: "approved" },
+      { outline_id: "b", week_no: 2, scenario_id: "approved" },
+      { outline_id: "a", week_no: 3, scenario_id: "pending" },
+      { outline_id: "a", week_no: 4, scenario_id: "unknown" },
+    ];
+    expect(summarizeAssignmentApproval(assignments, scenarios))
+      .toEqual({ approvedMissionCount: 1, unapprovedMissionCount: 2 });
+  });
+
+  it("교과목은 공개(published)와 비공개로 나눈다", () => {
+    expect(summarizeCourses([{ status: "published" }, { status: "draft" }, { status: null }, { status: "published" }]))
+      .toEqual({ total: 4, published: 2, unpublished: 2 });
+    expect(summarizeCourses([])).toEqual({ total: 0, published: 0, unpublished: 0 });
   });
 
   it("returns edited content to R inspection instead of reusing a stale run", () => {

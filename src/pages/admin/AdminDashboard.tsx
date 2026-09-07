@@ -28,6 +28,10 @@ import {
   type DashboardReviewQueueStage,
   type DashboardReviewStageCounts,
   type DashboardScenarioRow,
+  countRulesFailures,
+  summarizeAssignmentApproval,
+  summarizeCourses,
+  type DashboardCourseRow,
 } from "@/lib/admin/adminDashboardMetrics";
 import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
 import { toast } from "sonner";
@@ -41,8 +45,12 @@ type DashboardSnapshot = {
   content: ReturnType<typeof summarizeDashboardContent>;
   review: DashboardReviewStageCounts;
   assignments: ReturnType<typeof summarizeDashboardAssignments>;
-  /** 만들어진 교과목 전체. 편성 여부와 무관하다(편성된 수는 assignments.courseCount). */
-  courseCount: number;
+  /** 편성된 미션(중복 제거) 중 승인 완료·승인 전. */
+  assignmentApproval: ReturnType<typeof summarizeAssignmentApproval>;
+  /** 교과목 전체와 공개(published)·비공개. */
+  courses: ReturnType<typeof summarizeCourses>;
+  /** 규칙 검사 칸 안의 검사 실패 수. */
+  rulesFailCount: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
 };
@@ -52,6 +60,7 @@ type DashboardMetricKey =
   | "mission"
   | "reviewTarget"
   | "finalized"
+  | "pending"
   | `review.${DashboardReviewQueueStage}`
   | "courses"
   | "assignments"
@@ -64,13 +73,15 @@ function dashboardMetricValues(snapshot: DashboardSnapshot): Record<DashboardMet
     mission: snapshot.content.generatedMissionCount,
     reviewTarget: snapshot.content.reviewTargetCount,
     finalized: snapshot.content.professorFinalizedCount,
+    pending: snapshot.content.pendingRevisionCount,
     "review.rules": snapshot.review.rules,
     "review.openai": snapshot.review.openai,
     "review.claude": snapshot.review.claude,
     "review.adjudication": snapshot.review.adjudication,
     "review.professor": snapshot.review.professor,
-    courses: snapshot.courseCount,
-    assignments: snapshot.assignments.missionCount,
+    courses: snapshot.courses.total,
+    // 큰 수 = 배정 건수(운영 단위). 서로 다른 미션 수는 설명줄에.
+    assignments: snapshot.assignments.assignmentCount,
     learners: snapshot.approvedLearnerCount,
     records: snapshot.learnerRecordCount,
   };
@@ -136,20 +147,22 @@ const SummaryMetric = ({
 
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
+// 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다
+// (논문 4.3.3: OpenAI 1차 검토 → Claude 별도 검토 → OpenAI가 Claude 의견을 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 기반 검사",
-  openai: "AI 검토",
-  claude: "AI 별도 검토",
-  adjudication: "AI 재검토",
-  professor: "교수자 최종 승인",
+  rules: "규칙 기반 검사 대기",
+  openai: "OpenAI 1차 검토 대기",
+  claude: "Claude 독립 검토 대기",
+  adjudication: "OpenAI 2차 검토 대기",
+  professor: "교수자 최종 승인 대기",
 };
 
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 검사 대기",
-  openai: "AI 검토 대기 · 재사용 가능하면 생략",
-  claude: "선택 시에만 · 별도 검토 대기",
-  adjudication: "선택 시에만 · 의견 재검토 대기",
-  professor: "최종 승인 대기",
+  rules: "필수 항목·형식 등 명시된 조건 확인",
+  openai: "콘텐츠 내용 검토 · 유효한 기존 결과는 재사용",
+  claude: "선택 시에만 · OpenAI 결과 없이 콘텐츠 검토",
+  adjudication: "선택 시에만 · Claude 검토 의견을 다시 검토",
+  professor: "교수자가 감수한 뒤 수정·보류·승인 결정",
 };
 
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
@@ -167,11 +180,13 @@ const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.map((stage, index) => ({
 const ReviewPipeline = ({
   review,
   dominant,
+  rulesFailCount,
   error,
   changedKeys,
 }: {
   review: DashboardReviewStageCounts | null;
   dominant: DashboardReviewQueueStage | null;
+  rulesFailCount: number;
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
@@ -212,7 +227,10 @@ const ReviewPipeline = ({
                 )}
                 {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">{stage.description}</span>
+              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
+                {stage.description}
+                {stage.key === "rules" && rulesFailCount > 0 && ` · 그중 검사 실패 ${rulesFailCount}`}
+              </span>
             </Link>
             {stage.step < REVIEW_STAGE_ITEMS.length && (
               <ArrowRight aria-hidden className="absolute -right-[26px] top-1/2 hidden h-5 w-5 -translate-y-1/2 text-[#81909A] xl:block" />
@@ -330,7 +348,7 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, assignmentRows, courseResult, learnerResult, learnerRecordResult] = await Promise.all([
+      const [scenarioRows, reviewRows, assignmentRows, courseRows, learnerResult, learnerRecordResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
@@ -351,13 +369,16 @@ const AdminDashboard = () => {
           .order("week_no", { ascending: true })
           .order("scenario_id", { ascending: true })
           .range(from, to)),
-        db.from("curriculum_outlines").select("id", { count: "exact" }).limit(1),
+        fetchAllDashboardRows<DashboardCourseRow>("교과목", (from, to) => db
+          .from("curriculum_outlines")
+          .select("status")
+          .order("id", { ascending: true })
+          .range(from, to)),
         db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
       ]);
 
       const results = [
-        ["교과목", courseResult],
         ["승인 학습자", learnerResult],
         ["학습 수행", learnerRecordResult],
       ] as const;
@@ -369,7 +390,9 @@ const AdminDashboard = () => {
         content: summarizeDashboardContent(scenarioRows),
         review: summarizeDashboardReviewStages(scenarioRows, reviewRows),
         assignments: summarizeDashboardAssignments(assignmentRows),
-        courseCount: courseResult.count ?? 0,
+        assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
+        courses: summarizeCourses(courseRows),
+        rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
       };
@@ -455,7 +478,7 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="운영 대시보드"
-      description="외부 연동, 콘텐츠 제작·검토·승인, 수업 운영·학습 수행 현황을 한눈에 확인합니다."
+      description="콘텐츠 제작·승인 상태와 수업 편성, 학습 기록을 확인합니다."
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -472,27 +495,24 @@ const AdminDashboard = () => {
         title="콘텐츠 제작 현황"
         action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
       />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* 위계: 재료(보유량) → 학습 미션(총수) → 그 총수를 나누는 세 상태(대기·수정 보류·승인).
+          재료와 미션은 같은 표의 같은 행이다 — 미션이 붙은 재료가 곧 학습 미션이다. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         <SummaryMetric
           to="/admin/library"
           label="미션 재료"
           value={snapshot?.content.coreCount ?? null}
           unit="개"
-          description="시나리오 코어 · 학습 미션 제작의 기본 자료"
+          description={snapshot ? `시나리오 코어 · 그중 학습 미션 생성 ${snapshot.content.generatedMissionCount}` : "시나리오 코어 · 상황과 출발텍스트 자료"}
           error={displayError}
           changed={changedKeys.has("core")}
         />
         <SummaryMetric
           to="/admin/assembly"
-          label="학습 미션 생성 완료"
+          label="학습 미션"
           value={snapshot?.content.generatedMissionCount ?? null}
           unit="개"
-          description={
-            // 오른쪽 두 카드와 더해지도록 나머지(수정 필요·보류)를 같이 적는다.
-            snapshot
-              ? `검토·승인 대기 ${snapshot.content.reviewTargetCount} · 승인 ${snapshot.content.professorFinalizedCount} · 수정 필요·보류 ${snapshot.content.pendingRevisionCount}`
-              : "생성·저장된 학습 미션"
-          }
+          description="생성된 미션 전체 · 오른쪽 세 상태로 나뉨"
           error={displayError}
           changed={changedKeys.has("mission")}
         />
@@ -501,26 +521,40 @@ const AdminDashboard = () => {
           label="검토·승인 대기"
           value={snapshot?.content.reviewTargetCount ?? null}
           unit="개"
-          description="규칙 검사·AI 검토·교수자 승인이 남은 미션"
+          description="다음 처리 단계는 아래 절에"
           error={displayError}
           changed={changedKeys.has("reviewTarget")}
         />
         <SummaryMetric
           to="/admin/review"
-          label="교수자 최종 승인"
+          label="수정 필요·보류"
+          value={snapshot?.content.pendingRevisionCount ?? null}
+          unit="개"
+          description="수정하거나 사용 여부를 다시 정할 미션"
+          error={displayError}
+          changed={changedKeys.has("pending")}
+        />
+        <SummaryMetric
+          to="/admin/review"
+          label="교수자 승인 완료"
           value={snapshot?.content.professorFinalizedCount ?? null}
           unit="개"
-          description="승인 마친 미션 · 수업 사용 후보"
+          description="수업 사용 후보 · 편성·공개 조건은 별도"
           error={displayError}
           changed={changedKeys.has("finalized")}
         />
       </div>
 
-      {/* 「검수」 단독 표기는 용어대장이 막는다(주체·권한이 빠진다) — 규칙은 검사하고, AI는 검토하고, 교수자가 승인한다. */}
-      <PanelHeader title="콘텐츠 검토·승인 진행" />
+      {/* 위 「검토·승인 대기」를 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가.
+          「검수」 단독 표기는 용어대장이 막는다 — 규칙은 검사하고, AI는 검토하고, 교수자가 승인한다. */}
+      <PanelHeader
+        title={snapshot ? `검토·승인 대기 ${snapshot.content.reviewTargetCount}개 — 다음 처리 단계` : "검토·승인 대기 — 다음 처리 단계"}
+        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다."
+      />
       <ReviewPipeline
         review={snapshot?.review ?? null}
         dominant={dominantReviewStage}
+        rulesFailCount={snapshot?.rulesFailCount ?? 0}
         error={displayError}
         changedKeys={changedKeys}
       />
@@ -528,47 +562,49 @@ const AdminDashboard = () => {
       <PanelHeader title="수업 운영·학습 수행 현황" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
-            큰 수는 만들어진 교과목 전체이고, 설명줄의 편성 수와 다르면 아직 빈 교과목이 있다는 뜻이다. */}
+            운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
           to="/admin/composer"
           label="교과목"
-          value={snapshot?.courseCount ?? null}
+          value={snapshot?.courses.total ?? null}
           unit="개"
-          description={
-            snapshot
-              ? snapshot.courseCount <= snapshot.assignments.courseCount
-                // 두 수는 다른 표에서 온다. 배정 쪽이 크게 나오는 경우(정리 중 등)에 음수를 적지 않는다.
-                ? "모두 미션 편성됨"
-                : `미션 편성 ${snapshot.assignments.courseCount}개 · 편성 전 ${snapshot.courseCount - snapshot.assignments.courseCount}개`
-              : "15주 수업의 단위"
-          }
+          description={snapshot ? `공개 ${snapshot.courses.published}개 · 비공개 ${snapshot.courses.unpublished}개` : "15주 수업의 단위"}
           error={displayError}
           changed={changedKeys.has("courses")}
         />
+        {/* 큰 수 = 배정 건수(운영 단위). 승인 전 미션이 섞여 있으면 게이트 이전의 옛 편성이다 —
+            새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          label="수업 편성 미션"
-          value={snapshot?.assignments.missionCount ?? null}
-          unit="개"
-          description={snapshot ? `${snapshot.assignments.weekCount}개 주차 · ${snapshot.assignments.assignmentCount}건 배정` : "편성 현황"}
+          label="미션 배정"
+          value={snapshot?.assignments.assignmentCount ?? null}
+          unit="건"
+          description={
+            snapshot
+              ? `서로 다른 미션 ${snapshot.assignments.missionCount}개(승인 완료 ${snapshot.assignmentApproval.approvedMissionCount}) · 주차 ${snapshot.assignments.weekCount}개`
+              : "교과목 주차에 놓인 미션"
+          }
           error={displayError}
           changed={changedKeys.has("assignments")}
         />
+        {/* 계정 이용 승인이지 교과목별 수강 등록이 아니다 — 「수강생」으로 부르지 않는다. */}
         <OperationMetric
           to="/admin/learners"
-          label="수업 참여 승인"
+          label="승인 학습자"
           value={snapshot?.approvedLearnerCount ?? null}
           unit="명"
-          description="수업 참여가 승인된 학습자"
+          description="계정 승인 · 전체 교과목 공통"
           error={displayError}
           changed={changedKeys.has("learners")}
         />
+        {/* 표 전체 행 수다 — 계정 역할·기간으로 거르지 않는다. 시험 기록과 실제 학습을 나누려면
+            시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          label="학습 수행 기록"
+          label="미션 수행 기록"
           value={snapshot?.learnerRecordCount ?? null}
           unit="건"
-          description="미션 한 차례 수행 = 1건"
+          description="전체 계정 · 전체 기간 누적 · 한 차례 수행 = 1건"
           error={displayError}
           changed={changedKeys.has("records")}
         />
