@@ -7,6 +7,7 @@ import { buildInstructorMissionGuide } from "@/lib/pragma/instructorGuide";
 import AdminTeachingMaterials from "./AdminTeachingMaterials";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
+import { parseMissionCourseLocation } from "@/lib/mission/missionCourseContext";
 
 const mocks = vi.hoisted(() => ({
   outlines: vi.fn(),
@@ -17,6 +18,7 @@ const mocks = vi.hoisted(() => ({
   missionRows: vi.fn(),
   operationLogs: vi.fn(),
   approvedWeekly: vi.fn(),
+  scrollIntoView: vi.fn(),
 }));
 vi.mock("@/lib/curriculum/api", () => ({ listCurriculumOutlines: mocks.outlines, getCurriculumOutline: mocks.curriculum }));
 vi.mock("@/lib/curriculum/composer", () => ({ listCoreScenarios: mocks.cores, listWeekAssignments: mocks.assignments }));
@@ -36,6 +38,7 @@ const guide = buildInstructorMissionGuide(SAMPLE_MISSION_V5_NATIVE, "요청");
 
 beforeEach(() => {
   vi.clearAllMocks();
+  Element.prototype.scrollIntoView = mocks.scrollIntoView;
   mocks.outlines.mockResolvedValue([outline]);
   mocks.curriculum.mockResolvedValue({ outline, weeks: courseWeeks });
   mocks.assignments.mockResolvedValue([{ week_no: 2, scenario_id: "mission-1", position: 0 }]);
@@ -63,6 +66,54 @@ function mountAt(entry: string) {
 }
 
 describe("교과목·주차 수업자료 연결", () => {
+  it("수업자료 버튼은 선택 주차의 상세를 열고 같은 링크 재클릭에도 이동한다", async () => {
+    mount();
+    await screen.findByText("2주차 목표");
+    const detail = screen.getByText("이 주차 수업자료 검수·확정").closest("details")!;
+    expect(detail).not.toHaveAttribute("open");
+    fireEvent.click(screen.getAllByRole("link", { name: "수업자료" })[1]);
+    await screen.findByText("3주차 목표");
+    await waitFor(() => expect(detail).toHaveAttribute("open"));
+    await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
+    expect(detail).toHaveFocus();
+
+    fireEvent.click(screen.getByText("이 주차 수업자료 검수·확정"));
+    await waitFor(() => expect(detail).not.toHaveAttribute("open"));
+    mocks.scrollIntoView.mockClear();
+    fireEvent.click(screen.getAllByRole("link", { name: "수업자료" })[1]);
+    await waitFor(() => expect(detail).toHaveAttribute("open"));
+    await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
+  });
+
+  it("외부 상세 링크도 비동기 자료 조회 후 열고 이동한다", async () => {
+    mountAt("/admin/package?courseId=course-a&weekNo=2#weekly-material-detail");
+    const summary = await screen.findByText("이 주차 수업자료 검수·확정");
+    await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
+    await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
+  });
+
+  it("운영 목록과 두 미션의 실행 링크는 각각 실제 배정 ID를 포함한다", async () => {
+    const courseId = "915fec24-cc38-4b00-a2a0-c3628abcd3f7";
+    const ids = ["c2c5b885-7e39-4c85-a764-9252ed2e4f24", "ebc8c340-0a2a-4491-9708-55d6a27b5b12"];
+    mocks.outlines.mockResolvedValue([{ ...outline, id: courseId }]);
+    mocks.curriculum.mockResolvedValue({ outline: { ...outline, id: courseId }, weeks: courseWeeks });
+    mocks.assignments.mockResolvedValue(ids.map((id, position) => ({ id, week_no: 2, scenario_id: `mission-${position + 1}`, position })));
+    mocks.cores.mockResolvedValue(ids.map((_, position) => ({ scenario_id: `mission-${position + 1}`, speech_act: "request", learner_level: "intermediate", direction: "ko_zh", mission_status: "reviewed", mode: "translation", situation_ko: "테스트 상황입니다.", target_feature: "request_mitigation_optionality", content_release_id: CURRENT_CONTENT_RELEASE_ID })));
+    mountAt(`/admin/package?courseId=${courseId}&weekNo=2`);
+    const overviewLink = await screen.findByRole("link", { name: "미션" });
+    const missionLinks = [overviewLink, screen.getByRole("link", { name: "미션 1 · 번역 열기 ↗" }), screen.getByRole("link", { name: "미션 2 · 번역 열기 ↗" })];
+    missionLinks.forEach((link, index) => {
+      const url = new URL(link.getAttribute("href")!, "https://pragma.test");
+      expect(parseMissionCourseLocation(url.search)).toEqual({ ok: true, context: { courseId, weekNo: 2, assignmentId: ids[index === 2 ? 1 : 0] } });
+    });
+  });
+
+  it("배정 ID가 없으면 불완전한 수행 주소 대신 해당 교과목 주차로 연결한다", async () => {
+    mount();
+    expect(await screen.findByRole("link", { name: "미션" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
+    expect(screen.getByRole("link", { name: "미션 1 · 번역 열기 ↗" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
+  });
+
   it("선택 거절 미션의 전체 상황과 사후 지도안을 분리하고 프로젝터에 답안을 내보내지 않는다", async () => {
     const example = REFUSAL_TEACHING_CASE;
     mocks.curriculum.mockResolvedValue({ outline, weeks: [{ ...courseWeeks[0], week_no: 6, title: "거절", speech_act: "refusal" }] });

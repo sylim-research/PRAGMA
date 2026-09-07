@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 type MaterialReviewState = "approved" | "pending" | "unavailable";
 
+function assignedMissionPath(courseId: string, weekNo: number, scenarioId: string, assignmentId?: string) {
+  if (!assignmentId) return `/learner/course/${encodeURIComponent(courseId)}/week/${weekNo}`;
+  const query = new URLSearchParams({ courseId, weekNo: String(weekNo), assignmentId });
+  return `/learner/practice/${scenarioId}?${query}`;
+}
+
 const StatusChip = ({ children, tone = "neutral" }: {
   children: React.ReactNode;
   tone?: "good" | "attention" | "neutral";
@@ -44,6 +50,7 @@ const StatusChip = ({ children, tone = "neutral" }: {
 ].join(" ")}>{children}</span>;
 
 const AdminTeachingMaterials = () => {
+  const location = useLocation();
   const [params, setParams] = useSearchParams();
   const courseId = params.get("courseId") ?? "";
   const requestedWeek = params.get("weekNo");
@@ -53,6 +60,7 @@ const AdminTeachingMaterials = () => {
   const [activeSection, setActiveSection] = useState(0);
   const projectorRef = useRef<HTMLDivElement>(null);
   const projectorButtonRef = useRef<HTMLButtonElement>(null);
+  const materialDetailRef = useRef<HTMLDetailsElement>(null);
 
   const outlines = useQuery({ queryKey: ["teaching-outlines"], queryFn: listCurriculumOutlines });
   const courseQuery = useQuery({
@@ -125,6 +133,18 @@ const AdminTeachingMaterials = () => {
     setProjectorOpen(false);
     setActiveSection(0);
   }, [courseId, requestedWeek]);
+
+  // SPA 링크는 hash만 바꾸므로, 비동기 주차 자료가 준비된 뒤 상세를 열고 이동한다.
+  // location.key를 사용해 같은 주차의 버튼을 다시 눌러도 이동한다.
+  useEffect(() => {
+    if (!week || location.hash !== "#weekly-material-detail") return;
+    setReviewOpen(true);
+    const frame = window.requestAnimationFrame(() => {
+      materialDetailRef.current?.focus({ preventScroll: true });
+      materialDetailRef.current?.scrollIntoView({ block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.key, location.hash, courseId, week]);
 
   // 화면 진입 시 첫 교과목을 기본 선택해, 빈 화면 대신 1주차 자료를 바로 보여 준다.
   // 미션 단독 주소로 들어온 경우에는 교강사가 직접 고르도록 자동 선택하지 않는다.
@@ -277,7 +297,7 @@ const AdminTeachingMaterials = () => {
                 </Button>
                 {firstMission && <>
                   <Button size="sm" variant="outline" asChild>
-                    <Link target="_blank" rel="noreferrer" to={`/learner/practice/${firstMission.scenario_id}?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}`}>미션</Link>
+                    <Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, item.week_no, firstMission.scenario_id, firstMission.assignment_id)}>미션</Link>
                   </Button>
                   <Button size="sm" variant="outline" asChild>
                     <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}&missionId=${encodeURIComponent(firstMission.scenario_id)}`}>응답 분포</Link>
@@ -290,7 +310,7 @@ const AdminTeachingMaterials = () => {
       </section>}
       {course && week && material && <>
         {!projectorOpen && material.opening && <WeeklyOpeningLesson key={JSON.stringify(material.opening)} opening={material.opening} onStart={() => setNotesOpen(false)} />}
-        {!projectorOpen && <details id="weekly-material-detail" open={reviewOpen} onToggle={(event) => setReviewOpen(event.currentTarget.open)} className="scroll-mt-5 rounded-xl border bg-white p-4">
+        {!projectorOpen && <details ref={materialDetailRef} id="weekly-material-detail" tabIndex={-1} open={reviewOpen} onToggle={(event) => setReviewOpen(event.currentTarget.open)} className="scroll-mt-5 rounded-xl border bg-white p-4">
           <summary className="cursor-pointer font-semibold">이 주차 수업자료 검수·확정</summary>
           {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}`} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}
         </details>}
@@ -310,7 +330,7 @@ const AdminTeachingMaterials = () => {
           <h2 className="font-semibold">연결된 실습</h2>
           <div className="mt-3 flex flex-wrap gap-2">
             {material.missions.map((mission) => <div key={mission.id} className="flex gap-1.5">
-              <Button variant="outline" asChild><Link target="_blank" rel="noreferrer" to={`/learner/practice/${mission.id}?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>{mission.label} 열기 ↗</Link></Button>
+              <Button variant="outline" asChild><Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, week.week_no, mission.id, week.scenarios.find((scenario) => scenario.scenario_id === mission.id)?.assignment_id)}>{mission.label} 열기 ↗</Link></Button>
               <Button variant="outline" asChild><Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(mission.id)}`}>{mission.label} 응답</Link></Button>
             </div>)}
             {!material.missions.length && <p className="text-sm text-muted-foreground">연결된 공개 미션이 없습니다. 미션을 사용하는 주차는 Composer에서 편성을 먼저 완료해 주세요.</p>}

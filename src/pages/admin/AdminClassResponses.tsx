@@ -28,7 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 const AdminClassResponses = () => {
   const queryClient = useQueryClient();
   const [params, setParams] = useSearchParams();
-  const [demo, setDemo] = useState(true);
+  const [demo, setDemo] = useState(() => !(params.get("courseId") && params.get("missionId")));
   const [projector, setProjector] = useState(false);
   const projectorRef = useRef<HTMLDivElement>(null);
   const courseId = params.get("courseId") ?? "";
