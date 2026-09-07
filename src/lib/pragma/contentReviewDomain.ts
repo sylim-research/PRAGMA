@@ -9,6 +9,7 @@ import { weeklyOpeningContext } from "@/lib/curriculum/weeklyOpeningContext";
 import { coreDirection } from "./coreSchema";
 import { WEEKLY_LEARNING_CONTRACT } from "@/lib/curriculum/courseModePolicy";
 import { CONTENT_REVIEW_VERSION, instructionalMission, type ReviewFinding, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
+import { NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../../../supabase/functions/_shared/learnerScene";
 
 // This entry is bundled for Edge from the same rule/catalog/material functions
 // as the app. No browser client, auth state, or second content generator.
@@ -66,7 +67,8 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   const featureCodes = act ? FEATURE_CODES_BY_ACT[act as keyof typeof FEATURE_CODES_BY_ACT] ?? [] : [];
   const snapshot = { content, criteria: { version: CONTENT_REVIEW_VERSION,
     // Rule corrections get a new content hash without replacing prior runs.
-    rules_version: "mission_rules_v9_r27_topology",
+    rules_version: "mission_rules_v10_natural_scene",
+    scene_policy: NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE,
     mission_design: "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
     features: featureCodes.map((code) => getTargetFeature(code)).filter(Boolean),
     scope: "수업에 채택할 현재 정적 콘텐츠 원본. 개별 학습자 실시간 피드백의 전수 감사는 포함하지 않음.",

@@ -1,3 +1,4 @@
+import { naturalLearnerScene } from "../../../supabase/functions/_shared/learnerScene";
 import { LEVEL, SPEECH_ACT_UI, type ChannelUI } from "@/lib/pragma/enums";
 import type { Pdr } from "@/lib/pragma/coreSchema";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
@@ -155,7 +156,7 @@ function contextFrom(input: {
   const fallbackChannel: MissionContext["channel"] = input.sourceModality === "spoken" ? "대면" : "위챗";
   return {
     situation: compactLearnerScenario(input.situation_ko),
-    relation: input.relation_ko,
+    relation: naturalLearnerScene(input.relation_ko),
     channel: input.channel ? CHANNEL_LABEL[input.channel] : fallbackChannel,
     pdr: {
       p: POWER_LABEL[input.pdr.p],
@@ -178,7 +179,7 @@ function clipped(value: string, max: number): string {
 
 /** 역사 장면도 학습자에게는 핵심 두 문장만 보여 주는 표시 전용 projection. */
 export function compactLearnerScenario(value: string): string {
-  const normalized = value.replace(/\s+/g, " ").trim();
+  const normalized = naturalLearnerScene(value);
   const sentences = normalized.match(/[^.!?。！？]+[.!?。！？]?/g)?.map((sentence) => sentence.trim()).filter(Boolean) ?? [];
   if (sentences.length === 0) return clipped(normalized, 140);
   const meaningful = sentences.filter((sentence, index) => index === 0 || !SCENE_META_SENTENCE.test(sentence));

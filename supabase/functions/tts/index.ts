@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
+import { selectTtsVoice } from '../_shared/ttsVoicePolicy.ts'
 
 const DEFAULT_VOICE_BY_LANG: Record<'ko' | 'zh', string> = {
   ko: '21m00Tcm4TlvDq8ikWAM',
@@ -186,14 +187,18 @@ Deno.serve(async (req) => {
     }
 
     const language = lang === 'zh' ? 'zh' : 'ko'
-    const requestedVoiceId = typeof voiceId === 'string' && voiceId.trim().length > 0
-      ? voiceId.trim()
-      : DEFAULT_VOICE_BY_LANG[language]
+    const selection = selectTtsVoice(Deno.env.get('ELEVENLABS_VOICE_ID'), voiceId, DEFAULT_VOICE_BY_LANG[language])
+    const requestedVoiceId = selection.voiceId
 
     const fallbackVoiceId = FREE_TIER_VOICE_IDS.find((candidate) => candidate !== requestedVoiceId) ?? FREE_TIER_VOICE_IDS[0]
 
     const apiKey = Deno.env.get('ELEVENLABS_API_KEY')
     if (!apiKey) {
+      if (selection.pinned) {
+        return new Response(JSON.stringify({ error: '선택한 음성의 연결 설정을 확인해 주세요.', providerCode: 'elevenlabs_key_missing' }), {
+          status: 503, headers: jsonHeaders,
+        })
+      }
       const openAiKey = Deno.env.get('OPENAI_API_KEY')
       if (!openAiKey) {
         return new Response(JSON.stringify({ error: 'TTS provider key not configured' }), {
@@ -244,7 +249,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    const shouldRetryWithFallback = isFallbackableProviderError(primaryAttempt.status, primaryAttempt.rawError)
+    const shouldRetryWithFallback = !selection.pinned && isFallbackableProviderError(primaryAttempt.status, primaryAttempt.rawError)
       && Boolean(fallbackVoiceId)
       && fallbackVoiceId !== requestedVoiceId
 

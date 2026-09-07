@@ -41,33 +41,19 @@ describe("prompt snapshot integrity", () => {
     });
   });
 
-  it("locks interpreting cores to a bilingual mediated scene", () => {
-    const system = prompt("core.system.zh_ko");
-    const response = prompt("core.user.spoken.zh_ko.response_act");
-    const repair = prompt("core.user.preceding_turn_repair");
-    const sceneRepair = prompt("core.user.bilingual_scene_repair");
-    const learnerSceneRepair = prompt("core.user.learner_scene_repair");
-
-    expect(system.text).toContain("A=중국어 원발화자(화행 목적의 소유자)");
-    expect(system.text).toContain("B=한국어 청자");
-    expect(system.text).toContain("P·D·R은 A↔B 관계로만 해석");
-    expect(system.text).toContain("기능적으로 등가하게 재현");
-    expect(system.text).toContain('A를 "저는"·"나는"으로 서술');
-    expect(response.text).toContain("통역 참여자 언어: A는 중국어 원발화자, B는 한국어 청자");
-    expect(response.text).toContain("C는 학습자 통역사");
-    expect(response.text).toContain("통역 P·D·R 준거: A↔B");
-    expect(response.text).toContain("필요한 형식 조정은 허용");
-    expect(response.text).toContain("서로 다른 언어인 것은 정상");
-    expect(response.text).toContain("두 턴을 같은 언어로 통일하지 마세요");
-    expect(repair.text).toContain("자연스러운 한국어 발화");
-    expect(repair.text).toContain("중국어로 쓰지 마세요");
-    expect(sceneRepair.text).toContain("A=중국어 원발화자, B=한국어 청자");
-    expect(sceneRepair.text).toContain("C=학습자 통역사");
-    expect(sceneRepair.text).toContain("자기 말을 스스로 통역");
-    expect(sceneRepair.text).toContain("P·D·R은 A↔B 관계");
-    expect(sceneRepair.text).toContain("기존 A/B 역할·P/D/R·사건은 바꾸지 말고");
-    expect(learnerSceneRepair.text).toContain("답의 방향을 알려 주는 표현만 제거");
-    expect(learnerSceneRepair.text).toContain("관찰 가능한 사실로 그대로 보존");
+  it("uses natural interpreting scenes and checks real-world plausibility", () => {
+    for (const key of ["core.system.zh_ko", "core.user.spoken.zh_ko.response_act", "mission.system.spoken"]) {
+      const text = prompt(key).text;
+      expect(text).toContain("나/저는의 훈련 시점");
+      expect(text).toContain("주어진 원문의 의미·의도·화용적 힘은 유지");
+      expect(text).not.toContain('로 정확히 시작');
+      expect(text).toContain("장면의 현실성·개연성");
+    }
+    expect(prompt("quality.system").text).toContain("implausible_scene");
+    expect(prompt("core_quality.system.zh_ko").text).toContain("scene_plausibility");
+    const repair = prompt("core.user.preceding_turn_repair").text;
+    expect(repair).toContain("자연스러운 한국어 발화");
+    expect(repair).toContain("중국어로 쓰지 마세요");
   });
 
   it("locks zh_ko translation across individual, outline, core, mission, quality, and feedback prompts", () => {
@@ -97,7 +83,7 @@ describe("prompt snapshot integrity", () => {
     expect(outline).toContain("지정 화행의 원문을 상대에게 보내려는 1인칭 발신 장면");
 
     expect(coreSystem).toContain("[중→한 방향 역할·원문 계약]");
-    expect(coreSystem).toContain("중국어 원발화자 A, 한국어 청자 B, 학습자 통역사 C");
+    expect(coreSystem).toContain("주어진 중국어 발화를 한국어로 옮기는 훈련");
     expect(coreUser).toContain("중→한 원문 계약");
     expect(coreUser).toContain("다른 화행 사건이나 목적을 대신 만들지 마세요");
 
@@ -125,14 +111,14 @@ describe("prompt snapshot integrity", () => {
 
     expect(spokenLegacy).toContain("중→한 비즈니스 통역 교육용 시나리오");
     expect(spokenLegacy).toContain("중국어(source) → 한국어(target)");
-    expect(spokenLegacy).toContain("A=중국어 원발화자, B=한국어 청자, C=학습자 통역사");
+    expect(spokenLegacy).toContain("나/저는의 훈련 시점");
     expect(spokenLegacy).toContain("한국어 후보 통역문");
     expect(spokenLegacy).not.toContain("자기 발신 상황의 화자");
-    expect(spokenCore).toContain("A는 중국어 원발화자, B는 한국어 청자, C는 학습자 통역사");
-    expect(spokenCore).toContain("기능적으로 등가 재현");
-    expect(spokenMission).toContain("A=중국어 원발화자, B=한국어 청자, C=학습자 통역사");
+    expect(spokenCore).toContain("나/저는의 훈련 시점");
+    expect(spokenCore).toContain("주어진 원문의 의미·의도·화용적 힘은 유지");
+    expect(spokenMission).toContain("나/저는의 훈련 시점");
     expect(spokenMission).not.toContain("[중→한 번역 정식 계약]");
-    expect(spokenQuality).toContain("A=원발화자, B=청자, C=학습자 통역사");
+    expect(spokenQuality).toContain("1인칭 훈련 시점이나 통역사 역할 설명의 생략은 결함이 아니다");
     expect(spokenQuality).not.toContain("중→한 번역 역할·등가 원칙");
     expect(spokenFeedback).toContain("[통역 전사 경계]");
     expect(spokenFeedback).not.toContain("[중→한 번역 피드백 경계]");
@@ -200,7 +186,7 @@ describe("prompt snapshot integrity", () => {
 
     expect(PROMPT_SNAPSHOT.edge_source_sha256).toBe(sourceHash);
     expect(canonicalSource).toContain(
-      "'scene_underspecified', 'primary_reason_ambiguity', 'context_plan_mismatch'",
+      "'scene_underspecified', 'implausible_scene', 'primary_reason_ambiguity', 'context_plan_mismatch'",
     );
     expect(canonicalSource).toContain("'diagnostic_coverage_mismatch'");
     for (const code of MISSION_DIAGNOSTIC_DIMENSIONS) {
@@ -289,7 +275,7 @@ describe("prompt snapshot integrity", () => {
 
     expect(system.text).toContain("[context_spec]의 역할 쌍·권리·의무·결정 권한");
     expect(system.text).toContain("화자 A와 상대 B");
-    expect(system.text).toContain("C=학습자 통역사");
+    expect(system.text).toContain("주어진 원문의 의미·의도·화용적 힘은 유지");
     expect(system.text).toContain("서로 다른 종류의 구체적 단서");
     expect(system.text).toContain("장면 시드와 topic_code");
     expect(system.text).toContain("host_family, hotel, neighbor");
@@ -307,7 +293,7 @@ describe("prompt snapshot integrity", () => {
     expect(critic.text).toContain("평가 기준처럼 설명");
     expect(critic.text).toContain("referents");
     expect(critic.text).toContain("decision_authority");
-    expect(critic.text).toContain("[축 — 15개 모두 빠짐없이 판정]");
+    expect(critic.text).toContain("[축 — 16개 모두 빠짐없이 판정]");
     expect(critic.text).toContain("participant_roles");
     expect(critic.text).toContain("scene_source_alignment");
     expect(critic.text).toContain("learner_scene");
@@ -322,7 +308,7 @@ describe("prompt snapshot integrity", () => {
     expect(prompt("core.user.source_repair").text).toContain("유효 글자 수를 반드시");
     expect(prompt("core.user.source_repair").text).toContain("인물·관계·상황·사실·화행 목적은 그대로 보존");
     expect(critic.text).toContain("국소적 두 턴만 본다");
-    expect(CURRENT_CORE_PROMPT_VERSIONS).toContain("core_v15_zhko_bidirectional_roles_v1");
+    expect(CURRENT_CORE_PROMPT_VERSIONS).toContain("core_v16_natural_scene_plausibility");
   });
   it("locks propositional supportive moves to server-authorized facts", () => {
     const mission = prompt("mission.system");
@@ -433,19 +419,17 @@ describe("prompt snapshot integrity", () => {
     expect(planned.text).toContain('"item_focus": "PROBE_FEATURE"');
   });
 
-  it("keeps translation first-person but interpreting in the learner-interpreter viewpoint", () => {
+  it("uses first-person training scenes without changing source fidelity", () => {
     const written = prompt("mission.system");
     const spoken = prompt("mission.system.spoken");
 
     expect(written.text).toContain("학습자 1인칭의 정확히 2개의 짧은 문장");
     expect(written.text).toContain("학습자가 마주한 상대의 역할·관계만 한 줄");
     expect(written.text).toContain('화자(나)의 역할, "A → B" 구조');
-    expect(spoken.text).not.toContain("학습자 1인칭의 현재 장면");
-    expect(spoken.text).toContain("학습자 통역사 C의 현재 장면");
-    expect(spoken.text).toContain("P·D·R은 A↔B 관계");
-    expect(spoken.text).toContain("A의 1인칭(저는·나는)");
-    expect(spoken.text).toContain("원발화자 A와 청자 B의 역할·관계만 한 줄");
-    expect(spoken.text).toContain("목표어 형식 조정은 허용");
+    expect(spoken.text).toContain("나/저는의 훈련 시점");
+    expect(spoken.text).not.toContain("학습자 통역사 C의 현재 장면");
+    expect(spoken.text).toContain("내부 A/B 표기는 원문을 말한 사람과 그 말의 상대");
+    expect(spoken.text).toContain("훈련 시점이 1인칭이어도 자유 발화 과제로 바꾸지 않는다");
 
     for (const entry of [prompt("core.system.ko_zh"), prompt("core.system.zh_ko")]) {
       expect(entry.text).toContain("학생용 장면 정보");

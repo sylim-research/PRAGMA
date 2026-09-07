@@ -34,6 +34,7 @@ const QUALITY_CODE_KO: Record<string, string> = {
   focus_contamination: "초점 오염(다차원 동시 변화)",
   unnatural_language: "부자연스러운 문장",
   internal_inconsistency: "내부 불일치",
+  implausible_scene: "장면 현실성·개연성",
   scene_underspecified: "장면 미명세(상상이 갈림)",
   primary_reason_ambiguity: "주원인 복수 해석",
   context_plan_mismatch: "앵커·대비 맥락 불일치",

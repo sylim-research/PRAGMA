@@ -799,7 +799,7 @@ const AdminBatch = () => {
                     };
                     const flaggedAxes = result.check
                       ? CORE_QUALITY_AXES.filter(
-                          (axis) => result.check?.axes[axis].verdict !== "pass",
+                          (axis) => result.check?.axes[axis] && result.check.axes[axis].verdict !== "pass",
                         )
                       : [];
                     return (
@@ -813,8 +813,8 @@ const AdminBatch = () => {
                         </div>
                         {flaggedAxes.map((axis) => (
                           <div key={axis} className="mt-1 text-amber-900">
-                            {CORE_AXIS_LABEL[axis]} {result.check?.axes[axis].verdict}:{" "}
-                            {result.check?.axes[axis].reason_ko}
+                            {CORE_AXIS_LABEL[axis]} {result.check?.axes[axis]?.verdict}:{" "}
+                            {result.check?.axes[axis]?.reason_ko}
                           </div>
                         ))}
                         {result.check && result.check.verdict !== "pass" && (

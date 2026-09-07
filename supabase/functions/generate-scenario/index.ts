@@ -1,3 +1,4 @@
+import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
 import {
   FEEDBACK_MAX_COMPLETION_TOKENS,
   feedbackPayloadIssue,
@@ -6,9 +7,6 @@ import { repairFeedbackPragmaticLeak } from '../_shared/feedbackLayerRepair.ts'
 import {
   buildCoreOutputRepairPrompt,
   buildCoreSourceRepairPrompt,
-  canonicalizeInterpreterPartyLabels,
-  canonicalizeInterpreterSituation,
-  coreBilingualSceneIssue,
   coreLearnerSceneIssue,
   corePrecedingTurnIssue,
   coreSourceIssue,
@@ -382,9 +380,7 @@ function buildSystemPrompt(
     ? `- 시나리오의 배경·등장인물·관계는 반드시 도메인 '직장'을 따르고, [생성 요청]에 '산업 분야'가 있으면 그 산업의 구체적 업무 상황으로 작성하세요. 다른 산업(예: 마케팅 일반)으로 대체하지 마세요.`
     : `- [중요] 이 시나리오는 업무·비즈니스 시나리오가 아닙니다. 회사·직장·동료·거래처·마케팅·협업·프로젝트 등 업무 소재를 절대 사용하지 마세요. 등장인물·관계·소재는 반드시 [생성 요청]의 '도메인' 설명을 따르세요.`
   const modeRoleRule = isSpoken
-    ? `- 통역의 참여자는 A=${srcL} 원발화자, B=${tgtL} 청자, C=학습자 통역사입니다. 세 사람을 분리하고 학습자를 A/B 또는 화행의 당사자로 만들지 마세요.
-- source_text는 A가 실제로 말할 구두 원발화이고 candidate_text는 C가 B에게 전달할 ${tgtL} 통역안입니다. C는 A의 명제·화행 목적·태도·화용적 힘을 기능적으로 등가 재현하고 자의적으로 더 공손하거나 더 좋은 말로 고치지 마세요.
-- situation은 C의 통역이 필요한 장면으로 쓰고 P·D·R은 A↔B 관계를 따릅니다. 이메일·메신저 작성 장면이나 자기 발화를 스스로 통역하는 장면을 만들지 마세요.`
+    ? NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE
     : direction === 'zh_ko'
       ? `- 이 번역의 학습자는 제3자 번역자가 아니라 자기 발신 상황의 화자입니다. source_text는 학습자가 상대에게 보낼 중국어 원문이고 candidate_text는 그 원문의 명제·화행·태도·화용적 힘을 보존한 한국어 실현이어야 합니다.
 - candidate_text는 실제 관계·채널·장르에서 자연스러운 한국어 담화로 쓰세요. 중국어 어순을 옮긴 번역투, 불필요한 주어 반복, 과잉 존대·사과·감사 누적을 우수성으로 취급하지 마세요.
@@ -448,7 +444,7 @@ function buildOutlineSystemPrompt(
         ? `대학·학업(교수·조교·동기·유학생·학사 업무 등) 상황의 ${shortDirection} ${modeLabel} 교육용 시나리오`
         : `${shortDirection} 비즈니스 ${modeLabel} 교육용 시나리오`
   const roleRule = isSpoken
-    ? `- 통역 개요는 A=${srcL} 원발화자, B=${tgtL} 청자, C=학습자 통역사의 서로 다른 세 참여자를 고정하고, C의 통역이 필요한 구두 장면으로 설계하세요. P·D·R은 A↔B 관계이며 자기 발화 통역은 금지합니다.`
+    ? NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE
     : '- 번역 학습자는 제3자 번역자가 아니라 자기 발신 상황의 화자입니다. 각 개요는 학습자가 지정 화행의 원문을 상대에게 보내려는 1인칭 발신 장면으로 설계하세요.'
   return `당신은 ${domainDesc}를 설계하는 전문가입니다.
 출력은 반드시 아래 JSON만, 마크다운·설명·주석 없이 그대로 반환합니다.
@@ -1018,9 +1014,9 @@ function buildCoreContextSpec(b: CoreGenBody): CoreContextSpec {
   const domain = coreDomainCode(b)
   const act = coreSpeechActCode(b)
   const key = `${b.pdr.p}|${b.pdr.d}`
-  const rolePair = TOPIC_ROLE_PAIRS[b.topic_code ?? '']?.[key] ?? ROLE_PAIRS[domain]?.[key] ?? {
-    speaker_ko: '지정된 P·D 조건을 따르는 화자',
-    addressee_ko: '지정된 P·D 조건을 따르는 상대',
+  const rolePair = TOPIC_ROLE_PAIRS[b.topic_code ?? '']?.[key] ?? {
+    speaker_ko: '장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.',
+    addressee_ko: '장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다.',
   }
   const isInterpreting = coreLengthMode(b) === 'stt_interpreting'
   return {
@@ -1050,7 +1046,7 @@ function buildCoreSystemPrompt(direction: Direction): string {
   const zhKoDirectionContract = direction === 'zh_ko'
     ? `
 [중→한 방향 역할·원문 계약]
-- 번역 셀이면 학습자는 자기 발신 상황의 화자이고 A/B/C 구조를 만들지 않는다. 통역 셀이면 중국어 원발화자 A, 한국어 청자 B, 학습자 통역사 C를 서로 다른 참여자로 유지한다.
+- 번역 셀이면 학습자는 자기 발신 상황의 화자이고 A/B/C 구조를 만들지 않는다. 통역 셀이면 주어진 중국어 발화를 한국어로 옮기는 훈련이며 내부 A/B 표기는 발화자와 상대를 식별하는 데만 쓴다.
 - source_text의 중심 화행은 [생성 요청]의 지정 화행과 정확히 같아야 한다. 다른 화행의 사건으로 바꾸거나, 중심 화행보다 초대·거절·감사 등 다른 목적을 더 두드러지게 만들지 않는다.
 - downstream 한국어 후보가 보존해야 할 명제·화행 목적·태도·화용적 힘이 source_text에 분명히 드러나야 한다. 단, 특정 한국어 존대형이나 완화 표현을 정답처럼 역산해 원문에 누적하지 않는다.
 `
@@ -1120,14 +1116,8 @@ ${zhKoDirectionContract}
 - 화자 A와 상대 B를 먼저 고정하고 situation_ko·relation_ko·preceding_turn·source_text
   전체에서 같은 인물로 유지한다. 문제를 일으킨 사람, 행위 대상, 소유자, 요청받은 수행자를
   대명사·소유 표현까지 포함해 뒤집지 않는다. 요청은 B가 수행하거나 결정할 수 있는 행위여야 한다.
-- 통역 셀에서 A=${srcL} 원발화자(화행 목적의 소유자), B=${tgtL} 청자, C=학습자 통역사다.
-  세 사람을 서로 다르게 고정하고 P·D·R은 A↔B 관계로만 해석한다. C를 A/B 또는 화행의
-  수행자·수신자로 만들거나, 자기 발화를 자기가 통역하게 하면 실패다.
-- 통역사 C는 A의 발화를 더 공손하거나 더 좋은 말로 자의적으로 개선하지 않는다. A의
-  의미·의도·화용적 힘을 B에게 기능적으로 등가하게 재현한다. 등가는 축자역이 아니므로
-  목표어에 필요한 형식 조정은 허용하지만 A의 힘·태도·화행 목적을 바꾸면 실패다.
-- 통역 situation_ko는 학습자 통역사 관점에서 서술한다. A를 "저는"·"나는"으로 서술하거나
-  A/B를 "학습자"라고 부르지 않는다. 생성 문체에서는 "직접"을 피한다.
+${NATURAL_INTERPRETING_SCENE_RULE}
+${SCENE_PLAUSIBILITY_RULE}
 - 산업 배경이 주어지면 직장 장면의 실제 업무·대상·어휘에 드러나야 한다. 산업명을 보지 않고도
   어느 분야인지 추론할 수 있도록 서로 다른 종류의 구체적 단서(업무/대상/전문 어휘) 두 가지 이상을
   넣는다. "회사·프로젝트·제품·고객·행사" 같은 범용어만으로 산업을 구현했다고 보지 않는다.
@@ -1153,11 +1143,9 @@ ${zhKoDirectionContract}
   제안·초대는 B에게 실질적 선택권이 있어야 하며, 불만은 문제 책임자나 조정 가능한 상대를 향한다.
 - 수행 모드와 situation_ko의 장면 서술은 반드시 일치해야 한다. 번역 셀을 "직접 말하는
   상황", 통역 셀을 "글로 작성해 보내는 상황"으로 서술하는 식의 명시적 모순은 금지한다.
-- 통역 셀에서는 situation_ko의 첫 문장을 "학습자 통역사 C인 당신은 ${srcL} 원발화자 A와 ${tgtL} 청자 B 사이에서 통역을 맡았습니다."로 정확히 시작한다. 이어 A와 B의 구체적 역할,
-  A↔B의 접촉 이력과 부담을 자연스럽게 드러낸다. A의 1인칭 시점과 "학습자가 직접
-  요청·사과·불만을 말한다" 같은 당사자 서술은 금지한다.
+- 통역 셀에서도 인물의 실제 관계·사건만 쓰고 역할 설명 첫 문장을 붙이지 않는다.
 - 출력 전에 화행·도메인·P·D·R·수행 모드뿐 아니라 행위자 지시·산업 단서·topic·인접쌍 명제·
-  결정 권한·통역 세 참여자 분리·학생용 평가 기준 비노출·상황과 원문의 사건 대응을 내부적으로
+  결정 권한·장면 개연성·학생용 평가 기준 비노출·상황과 원문의 사건 대응을 내부적으로
   하나씩 대조한다.
 - "중국인은/중국에서는/한국인은/한국에서는" 같은 국가 단위 일반화 표현 금지.
 - 정치·시사·정부 기관 소재 금지.`
@@ -1210,7 +1198,7 @@ function buildCoreUserPrompt(b: CoreGenBody): string {
   )
   if (isInterpreting) {
     parts.push(
-      '- 통역 역할 구조: A=원발화자, B=목표 청자, C=학습자 통역사. 세 역할은 서로 다른 사람이며 학습자는 C로만 부르세요.',
+      '- 내부 역할 표기는 발화자·상대를 식별할 뿐입니다. 학생용 상황에 A/B/C 소개를 쓰지 마세요.',
       '- 통역 P·D·R 준거: A↔B. 학습자 C와 A/B의 관계를 P·D·R 근거로 사용하지 마세요.',
     )
   }
@@ -1233,11 +1221,9 @@ function buildCoreUserPrompt(b: CoreGenBody): string {
   }
   if (b.source_modality === 'spoken') {
     parts.push(
-      `- 수행 모드: 통역 — source_text는 실제 '말로' 전달할 법한 자연스러운 ${srcL} 구두 담화체로 작성(문어체 낭독 금지). 기억 과부하를 유발하는 장문 금지. situation_ko는 통역사의 중개가 필요한 구두 장면으로 서술하며, 이메일·메신저·글을 작성해 보내는 장면으로 만들지 마세요.`,
-      `- 통역 참여자 언어: A는 ${srcL} 원발화자, B는 ${tgtL} 청자, C는 학습자 통역사입니다. situation_ko는 "학습자 통역사 C인 당신은 ${srcL} 원발화자 A와 ${tgtL} 청자 B 사이에서 통역을 맡았습니다."로 정확히 시작하고, A/B의 구체 역할과 A↔B 관계를 이어 쓰세요.`,
-      '- 금지: A/B를 학습자라고 부르기, 학습자가 화행을 직접 수행하거나 받기, 자기 발화를 스스로 통역하기, A를 `저는`·`나는`으로 서술하기, P·D·R을 C↔A/B 관계로 바꾸기.',
-      `- 등가 원칙: C는 A의 의미·의도·화용적 힘을 B에게 기능적으로 등가 재현합니다. ${tgtL}에 필요한 형식 조정은 허용하지만 A의 힘·태도·화행 목적을 더 좋게 고치거나 바꾸지 마세요.`,
-      '- 문체: 통역 situation_ko에서는 오해를 부르는 `직접`을 기본적으로 쓰지 마세요. `학습자가 현장에서 직접 통역한다`는 허용되지만, `학습자가 직접 요청한다`·`통역 없이 직접 대화한다`는 실패입니다.',
+      `- 수행 모드: 통역 — source_text는 실제 '말로' 전달할 법한 자연스러운 ${srcL} 구두 담화체로 작성(문어체 낭독 금지). 기억 과부하를 유발하는 장문 금지. situation_ko는 실제 말할 법한 구두 장면으로 서술하며, 이메일·메신저·글을 작성해 보내는 장면으로 만들지 마세요.`,
+      NATURAL_INTERPRETING_SCENE_RULE,
+      SCENE_PLAUSIBILITY_RULE,
     )
   } else {
     parts.push(
@@ -1419,15 +1405,7 @@ async function corePromptSnapshotHash(): Promise<string> {
         learnerSceneIssue: null,
       })
     ),
-    interpreter_scene_canonicalization: (['ko_zh', 'zh_ko'] as const).map((direction) => ({
-      direction,
-      output: canonicalizeInterpreterSituation(
-        '당신은 PROBE_ROLE로서 통역을 맡았습니다. PROBE_EVENT를 수행합니다.',
-        DIR_LANGS[direction].src,
-        DIR_LANGS[direction].tgt,
-        true,
-      ).value,
-    })),
+    learner_scene_normalization: naturalLearnerScene('학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 이웃 B에게 택배 수령을 부탁합니다.'),
     learner_scene_repair_prompt_template: buildCoreOutputRepairPrompt({
       originalUserPrompt: 'PROBE_USER_PROMPT',
       previousOutput: {
@@ -1933,9 +1911,7 @@ function buildMissionSystemPrompt(
   const gate1 = `🔴 게이트1(불변항 — 절대 규칙): target·모든 corrections.text·모든 candidates.text·recommended_example·reference_alternatives.text는 **먼저 각 원문의 명제·의도·화행 목적을 유지**해야 합니다. 의미나 의도가 달라진 문장은 화용 판단 후보가 될 수 없습니다. 부적절성은 오직 「${f.learner_label}」 초점의 **과소·적정·과잉 차이**로만 실현합니다. MPJ 문항에는 그 문항 source 밖의 새 사실·이유·대안·수리·보상·새 일정을 추가하지 마세요. DCT reference_alternatives만 사용자 요청서의 [사용 가능한 추가 사실] 폐쇄 목록을 사용할 수 있습니다.`
   const spokenRule = isSpoken
     ? `\n🔴 이 미션은 통역(구두 담화)입니다. source·target·모든 후보는 **실제 말로 주고받을 법한 구두체**로 작성하세요(이메일 문어체·서면 격식 표현 금지).
-- 모든 장면은 A=${srcL} 원발화자, B=${tgtL} 청자, C=학습자 통역사의 서로 다른 세 참여자로 구성합니다. P·D·R은 A↔B 관계입니다.
-- C는 A의 의미·의도·화용적 힘을 B에게 기능적으로 등가 재현합니다. 목표어 형식 조정은 허용하지만 A의 힘·태도·화행 목적을 자의적으로 개선하지 마세요.
-- situation_ko는 C의 관점으로 쓰고 A를 \`저는\`·\`나는\`으로 서술하지 마세요. A/B를 학습자라고 부르거나 C를 화행 수행자·수신자로 만들면 실패입니다.`
+${NATURAL_INTERPRETING_SCENE_RULE}`
     : ''
   const zhKoTranslationContract = !isSpoken && direction === 'zh_ko'
     ? `
@@ -1948,16 +1924,13 @@ function buildMissionSystemPrompt(
 `
     : ''
   const situationShape = isSpoken
-    ? '학습자 통역사 관점에서 A·B·C 역할과 사건·핵심 제약만 담은 짧은 한국어 2문장(A의 1인칭 금지)'
+    ? '나 또는 구체적인 역할명으로 관계·사건·핵심 제약만 담은 짧은 한국어 2문장'
     : '학습자 1인칭으로 상대·사건/할 일·핵심 제약만 담은 짧은 한국어 2문장'
   const relationShape = isSpoken
-    ? '원발화자 A와 청자 B의 역할·관계만 한 줄(학습자 C와의 관계·P/D/R 코드 제외)'
+    ? '실제 인물의 관계만 자연스럽게 한 줄(원발화자·청자·A/B/C·P/D/R 코드 제외)'
     : '학습자가 마주한 상대의 역할·관계만 한 줄(화자 역할·화살표 제외)'
   const sceneRules = isSpoken
-    ? `- 통역 situation_ko는 **학습자 통역사 C의 현재 장면**을 정확히 2개의 짧은 문장으로 씁니다.
-  첫 문장에는 A·B·C 역할과 사건을, 둘째 문장에는 A↔B 관계 또는 B가 감수할 핵심 부담·제약 하나만 드러내세요.
-  A의 1인칭(저는·나는), A/B를 학습자라고 부르는 표현, 학습자가 직접 화행을 수행·수신하는 표현, 역할 메타데이터 나열은 금지합니다.
-- 통역 relation_ko는 원발화자 A와 청자 B의 역할·관계를 한 줄로 쓰고, 학습자 C와 A/B의 관계를 P·D·R 근거로 쓰지 마세요.`
+    ? NATURAL_INTERPRETING_SCENE_RULE
     : `- 번역 situation_ko는 코드값을 풀어 쓰는 표가 아니라 **학습자 1인칭의 정확히 2개의 짧은 문장**이어야 합니다.
   첫 문장은 "나는 지금 누구에게 무엇을 하려 한다"가 자연스럽게 보이게 하고, 둘째 문장에는 관계 또는 상대가 감수할 핵심 부담·제약 하나만 구체화하세요.
   "상대는 …이고, 나는 …이다"처럼 역할 메타데이터를 나열하지 마세요.
@@ -2058,7 +2031,8 @@ ${JSON.stringify(candidateBlueprints, null, 2)}
 - 비현실적 극단화 없이, 비적정 후보도 인접한 실제 맥락 하나에서는 방어 가능한 경계 표현으로 만드세요.
 - 특정 후보의 대역을 구현할 수 없으면 다른 후보의 역할을 바꾸지 말고 해당 후보만 다시 작성하세요.` : ''}
 
-${gate1}${spokenRule}${zhKoTranslationContract}
+${gate1}
+${SCENE_PLAUSIBILITY_RULE}${spokenRule}${zhKoTranslationContract}
 
 MPJ ${itemCount}문항을 만듭니다. 학습 흐름은 ${learningFlow}입니다.
 Scale4는 종합 첫인상을 4점으로 받고 적절/부적절 방향만 채점합니다.${nativeJudgeIntro}
@@ -2382,13 +2356,15 @@ function buildMissionTopologyPrompt(
   const direction = normDir(b.direction)
   const isSpoken = b.core.source_modality === 'spoken'
   const situationRule = isSpoken
-    ? '학습자 통역사 C의 관점에서 A·B·C 역할과 구체적 사건을 담은 한국어 정확히 2문장(A의 1인칭 금지)'
+    ? '나 또는 구체적인 역할명으로 관계·사건·핵심 제약을 담은 한국어 정확히 2문장(통역사 역할 소개 제외)'
     : '학습자 1인칭으로 상대·구체적 사건·핵심 제약을 담은 한국어 정확히 2문장'
   const relationRule = isSpoken
-    ? '원발화자 A와 청자 B의 역할·관계만 한 줄'
+    ? '인물의 실제 관계만 한 줄(원발화자·청자·A/B/C 소개 제외)'
     : '학습자가 마주한 상대의 역할·관계만 한 줄'
   const channels = isSpoken ? 'facetoface 또는 phone' : 'email 또는 messenger'
   const system = `당신은 PRAGMA의 frozen mission scene topology 설계기입니다.
+${SCENE_PLAUSIBILITY_RULE}
+${isSpoken ? NATURAL_INTERPRETING_SCENE_RULE : ''}
 완전한 미션·문항·후보·정답·해설은 만들지 말고 X/Anchor A/Y 세 장면만 JSON으로 만드세요.
 - X, A, Y situation_ko는 각각 ${situationRule}이며 140자 이내입니다.
 - X/A/Y와 서버가 제시하는 DCT C는 글자까지 완전히 다른 구체적 사건이어야 합니다.
@@ -3457,8 +3433,8 @@ function buildQualitySystemPrompt(
     : '④앞선 대화가 있다면 그 사실과 preceding_turn을'
   const checklistRange = nativeMpj5 ? '①~⑬' : '①~⑩'
   const findingCodes = nativeMpj5
-    ? 'gate1_violation | implausible_distractor | answer_cue | band_mismatch | focus_contamination | unnatural_language | internal_inconsistency | scene_underspecified | primary_reason_ambiguity | context_plan_mismatch | comparison_quality_mismatch | diagnostic_coverage_mismatch | feedback_quality_mismatch'
-    : 'gate1_violation | implausible_distractor | answer_cue | band_mismatch | focus_contamination | unnatural_language | internal_inconsistency | scene_underspecified | primary_reason_ambiguity | context_plan_mismatch'
+    ? 'gate1_violation | implausible_distractor | answer_cue | band_mismatch | focus_contamination | unnatural_language | internal_inconsistency | scene_underspecified | implausible_scene | primary_reason_ambiguity | context_plan_mismatch | comparison_quality_mismatch | diagnostic_coverage_mismatch | feedback_quality_mismatch'
+    : 'gate1_violation | implausible_distractor | answer_cue | band_mismatch | focus_contamination | unnatural_language | internal_inconsistency | scene_underspecified | implausible_scene | primary_reason_ambiguity | context_plan_mismatch'
   const featureBoundaryAudit = `5. **제안 초점 경계 감사** — 화용 초점 code가 proposal_optionality_clarity일 때, 구체적인 대안 둘을 명시하고 어느 쪽이 좋은지 묻는 문장은 선택 가능성과 방안 명료성을 모두 갖춘 within_band다. 이런 문장을 too_tentative·too_directive로 라벨링했으면 반드시 fail band_mismatch로 보고하라. 같은 문장 또는 의미상 같은 문장을 문항 사이에서 적정/비적정으로 다르게 판정했으면 fail internal_inconsistency다.`
   return `너는 L2 화용 교육 자료의 **품질 심사자**다. 다른 모델이 생성한 학습 미션 1건을 받아
 결함을 찾아낸다. 너는 자료를 고쳐 쓰지 않고 **판정과 근거만** 낸다.
@@ -3526,10 +3502,8 @@ ${zhKoTranslationAudit}
 ⑥ unnatural_language — ${LANG_KO[tgt]} 문장이 교과서투·번역기투인가. ${targetNaturalness}면 지적하라.
    ※ 유행어를 넣으라는 뜻이 아니다. **그 관계에서 실제로 그렇게 말하는가**만 본다.
 ⑦ internal_inconsistency — 상황 설명·관계·선행 발화·해설·정답 키가 서로 어긋나는가.
-   통역 미션이면 각 MPJ 장면에서 A=원발화자, B=청자, C=학습자 통역사가 서로 다른지,
-   P·D·R이 A↔B인지 논항 구조로 확인한다. A/B를 학습자라고 부르거나 C가 화행을 직접
-   수행·수신하거나 A의 1인칭 시점으로 서술하면 fail이다. "듣는다"라는 동사만으로 판단하지
-   말고 C가 A의 원발화를 듣는지, B로서 감사·사과 등을 받는지를 구분한다.
+   통역에서도 원문의 발화자와 상대, P·D·R의 관계가 일관되는지 본다.
+   1인칭 훈련 시점이나 통역사 역할 설명의 생략은 결함이 아니다.
 ⑧ scene_underspecified — 학습자에게 보이는 situation_ko만 읽어도 **판단에 필요한 장면이
    관찰 가능한 사실로 그려지는가**(0-r·107). ①누구에게 무엇을 하려는지 ②관계·접촉 이력
    ③상대가 실제로 감당할 부담·조정 범위 ${precedingContextCheck} 확인하라. 이 핵심 사실이
@@ -3547,8 +3521,13 @@ ${comparisonQualityCheck}
 ${diagnosticCheck}
 ${feedbackQualityCheck}
 
+⑭ implausible_scene — ${SCENE_PLAUSIBILITY_RULE}
+학생용 장면만으로 관계·용건·권한의 연결을 설명할 수 없는 심한 부조화는 fail,
+필요한 배경이 불명확하지만 여러 해석이 가능하면 warning이다. 국적·직업에 대한 고정관념으로 판정하지 마라.
+MJT1~5와 DCT 각각을 확인하고 문제 장면의 경로와 실제 문구를 인용하라.
+
 [필수 확인 절차 — 건너뛰지 마라]
-${checklistRange}을 **하나씩 명시적으로 점검한 뒤** 판정하라. "전반적으로 괜찮아 보인다"로
+${checklistRange}과 ⑭를 **하나씩 명시적으로 점검한 뒤** 판정하라. "전반적으로 괜찮아 보인다"로
 넘어가지 마라. 심한 fail 하나를 찾았어도 나머지 검사를 중단하지 말고, 특히 native MPJ5는
 MPJ1~5의 feedback_quality와 MPJ5 comparison_quality를 별도로 끝까지 확인해 서로 다른 결함을
 각각 finding으로 보고하라. 특히 다음 두 가지는 **구체적 임계값**이 있다.
@@ -3562,7 +3541,7 @@ MPJ1~5의 feedback_quality와 MPJ5 comparison_quality를 별도로 끝까지 확
   이유만으로 보고하지 마라.
 
 [판정]
-- fail: 학습자가 **틀린 것을 배우게 되는** 결함이 하나라도 있다(①④⑦ 또는 심한 ②).
+- fail: 학습자가 **틀린 것을 배우게 되는** 결함이 하나라도 있다(①④⑦ 또는 심한 ②·⑭).
 - warning: 문항 가치가 떨어지지만 학습을 오도하지는 않는다.
 - pass: 위 항목에서 지적할 것이 없다.
 
@@ -3621,17 +3600,10 @@ ${zhKoTranslationAudit}
 - situation_ko는 학습자에게 보이는 장면이다. 내부 권리·의무나 정답에 포함할 표현 자원을
   평가 기준처럼 설명하거나, 기록 목적·즉시 반응 여부를 연구 설명처럼 서술하면 learner_scene을
   fail로 두고 관찰 가능한 상대·용건·접촉 이력·실제 부담만 남기도록 지적한다.
-- 통역 mode에서는 먼저 논항 구조를 적어 대조한다: 누가(A) 어떤 화행을 누구에게(B) 하며,
-  누가(C) 그 원발화를 옮기는가. A=source_text 원발화자, B=target 언어 청자, C=학습자
-  통역사는 서로 다른 세 사람이고 P·D·R은 A↔B 관계다. "학습자"는 C에만 결속한다.
-  A/B를 학습자라고 부르거나, C가 화행을 직접 수행·수신하거나, 자기 말을 통역하거나,
-  P·D·R을 C↔A/B 관계로 서술하면 participant_roles fail이다. 언어명과 '통역' 단어만
-  있다고 pass하지 마라. "듣는다" 자체는 결함이 아니며, C가 A의 원발화를 듣는지 B로서
-  감사·사과 등을 받는지를 논항으로 구분한다.
-- 통역 situation_ko는 C의 관점이어야 한다. A를 "저는"·"나는"으로 서술하면
-  participant_roles fail이다. "학습자가 현장에서 직접 통역한다"는 허용하고,
-  "학습자가 직접 [화행]한다"·"통역 없이 직접 대화한다"는 fail, A/B가 직접 협의한다고만
-  적어 중개가 모호하면 warning이다.
+- 통역의 내부 A/B 표기는 주어진 원문의 발화자와 상대다. P·D·R은 그 관계 기준이다.
+  학생용 장면의 1인칭 시점과 C 역할 설명의 생략은 결함이 아니다.
+  발화자·상대·소유자 또는 P·D·R의 관점이 실제로 뒤집힌 경우에만 participant_roles fail이다.
+${SCENE_PLAUSIBILITY_RULE}
 - 통역 target·후보는 A의 의미·의도·화용적 힘을 B에게 기능적으로 등가 재현해야 한다.
   목표어 형식 조정은 축자역을 피하기 위해 허용하지만, A의 힘·태도·화행 목적을 자의적으로
   더 좋게 고치면 의미 또는 후보 자격 결함이다.
@@ -3661,7 +3633,7 @@ ${zhKoTranslationAudit}
 - adjacency fail은 선행발화가 동일한 앞선 행위에 대한 거절·반대 응답을 이미 수행하여
   source_text가 병렬 응답이나 반복이 되는 경우처럼, 국소 인접쌍이 명백히 어긋날 때만 준다.
 
-[축 — 15개 모두 빠짐없이 판정]
+[축 — 16개 모두 빠짐없이 판정]
 1. speech_act: source_text가 지정 화행의 의도와 목적을 수행하는가
 2. power: 상황 속 화자와 상대의 실제 지위가 지정 P와 맞는가
 3. distance: 두 사람의 친밀도·낯섦이 지정 D와 맞는가
@@ -3674,9 +3646,10 @@ ${zhKoTranslationAudit}
 10. decision_authority: 화행별 결정·수행·승인 권한이 있는 사람을 향하는가
 11. topic_seed: 지정 시드의 핵심 관계·사건·목적을 유지했는가
 12. adjacency: 응답 화행의 명제와 화자 지시가 일관된 인접쌍인가
-13. participant_roles: 통역이면 A·B·학습자 통역사 C가 서로 다르고 P·D·R이 A↔B이며, 학습자가 화행 수행자·수신자가 아닌가
+13. participant_roles: 주어진 원문의 발화자·상대가 일관되고 P·D·R이 그 관계를 가리키는가(통역사 역할 설명 생략·1인칭 허용)
 14. scene_source_alignment: situation_ko와 source_text의 핵심 사건·행위자·대상이 대응하는가
-15. learner_scene: 학생용 상황문이 답의 화용 방향이나 내부 평가 기준을 노출하지 않는가
+15. learner_scene: 학생용 상황문이 답의 화용 방향이나 내부 평가 기준·통역사 역할 소개를 노출하지 않는가
+16. scene_plausibility: 관계·용건·권한·민감성·배경이 상식적으로 연결되는가. 심한 부조화는 fail, 근거가 불확실하면 warning
 
 [출력 — 오직 JSON, 설명·마크다운 금지]
 {
@@ -3697,7 +3670,8 @@ ${zhKoTranslationAudit}
     "adjacency": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" },
     "participant_roles": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" },
     "scene_source_alignment": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" },
-    "learner_scene": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" }
+    "learner_scene": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" },
+    "scene_plausibility": { "verdict": "pass | warning | fail", "reason_ko": "관찰 근거" }
   }
 }`
 }
@@ -4048,23 +4022,16 @@ Deno.serve(async (req) => {
       } catch (e) {
         return new Response(JSON.stringify({ error: '파싱 실패', detail: (e as Error).message }), { status: 502, headers: jsonHeaders })
       }
-      // 통역 역할·언어 첫 문장과 `학습자 A/B` 금지는 모델 repair에 맡기지 않고 서버가
-      // 결정론적으로 조립한다. 모델 repair는 분량·선행발화·평가기준 제거에만 사용한다.
+      // Learner scenes contain events, not an injected A/B/C introduction.
       const lengthLevel = coreLengthLevel(b)
       const lengthMode = coreLengthMode(b)
       const lengthRange = coreLengthRange(lengthLevel, lengthMode)
       const lengthHintKo = coreLengthHintKo(lengthLevel, lengthMode)
       const interpreterSceneRequired = b.source_modality === 'spoken'
-      const canonicalSituation = canonicalizeInterpreterSituation(
-        gen.situation_ko,
-        DIR_LANGS[coreDir].src,
-        DIR_LANGS[coreDir].tgt,
-        interpreterSceneRequired,
-      )
-      const canonicalRelation = canonicalizeInterpreterPartyLabels(
-        gen.relation_ko,
-        interpreterSceneRequired,
-      )
+      const originalSituation = String(gen.situation_ko ?? '')
+      const originalRelation = String(gen.relation_ko ?? '')
+      const canonicalSituation = { value: naturalLearnerScene(originalSituation), applied: naturalLearnerScene(originalSituation) !== originalSituation }
+      const canonicalRelation = { value: naturalLearnerScene(originalRelation), applied: naturalLearnerScene(originalRelation) !== originalRelation }
       const seedSituation = interpreterSceneRequired
         ? { value: canonicalSituation.value, applied: false }
         : canonicalizeCoreSituationFromSeed(b.situation_seed_ko, canonicalSituation.value)
@@ -4128,7 +4095,7 @@ Deno.serve(async (req) => {
               interpreterScene: {
                 sourceLanguage: DIR_LANGS[coreDir].src,
                 targetLanguage: DIR_LANGS[coreDir].tgt,
-                required: interpreterSceneRequired,
+                required: false, // No forced interpreter role sentence in learner scenes.
                 relationKo: gen.relation_ko,
               },
             })
@@ -4173,13 +4140,7 @@ Deno.serve(async (req) => {
         ? CURRENT_CORE_PROMPT_VERSIONS[1]
         : CURRENT_CORE_PROMPT_VERSIONS[0]
       const generatedAt = new Date().toISOString()
-      const bilingualSceneIssueRemaining = Boolean(coreBilingualSceneIssue(
-        gen.situation_ko,
-        DIR_LANGS[coreDir].src,
-        DIR_LANGS[coreDir].tgt,
-        interpreterSceneRequired,
-        gen.relation_ko,
-      ))
+      const bilingualSceneIssueRemaining = false // Narrative role-marker gate retired; R16 still checks medium.
       const hskLexicalAudit = coreDir === 'zh_ko'
         ? await createHskLexicalAudit({
             texts: [sourceText],
@@ -4759,7 +4720,7 @@ Deno.serve(async (req) => {
         'speech_act', 'power', 'distance', 'burden',
         'domain', 'industry', 'mode', 'context_spec', 'referents',
         'decision_authority', 'topic_seed', 'adjacency', 'participant_roles',
-        'scene_source_alignment', 'learner_scene',
+        'scene_source_alignment', 'learner_scene', 'scene_plausibility',
       ] as const
       const rawAxes = parsed.axes && typeof parsed.axes === 'object'
         ? parsed.axes as Record<string, unknown>
@@ -4841,7 +4802,7 @@ Deno.serve(async (req) => {
       const CODES = [
         'gate1_violation', 'implausible_distractor', 'answer_cue', 'band_mismatch',
         'focus_contamination', 'unnatural_language', 'internal_inconsistency',
-        'scene_underspecified', 'primary_reason_ambiguity', 'context_plan_mismatch',
+        'scene_underspecified', 'implausible_scene', 'primary_reason_ambiguity', 'context_plan_mismatch',
         'comparison_quality_mismatch', 'diagnostic_coverage_mismatch',
         'feedback_quality_mismatch',
       ]

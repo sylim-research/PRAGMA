@@ -166,14 +166,8 @@ describe("R16 명시적 수행 모드 모순", () => {
       channel: "facetoface",
     });
 
-    it("같은 언어 사용자끼리 통역 없이 대화하는 모호한 장면은 차단한다", () => {
-      const failures = r16Fails(
-        spokenCore("두 연구책임자가 처음 만나 예산 배분을 직접 논의한다."),
-        spokenContext,
-      );
-      expect(failures.map((item) => item.message)).toContainEqual(
-        expect.stringContaining("이중언어 화자·통역 개입 장면이 불명확"),
-      );
+    it("통역사 소개 없이 자연스러운 1인칭 훈련 장면을 허용한다", () => {
+      expect(r16Fails(spokenCore("나는 접수 직원에게 예약 변경을 문의합니다. 진료 시간과 회의가 겹칩니다."), spokenContext)).toEqual([]);
     });
 
     it("원발화자·학습자 통역사·청자의 세 역할이 분리된 장면은 통과한다", () => {
@@ -198,28 +192,8 @@ describe("R16 명시적 수행 모드 모순", () => {
       ).toEqual([]);
     });
 
-    it("학습자가 직접 화행을 수행하면서 통역하는 역할 중첩은 차단한다", () => {
-      const failures = r16Fails(
-        spokenCore(
-          "학습자는 중국 연구원을 직접 구두로 초대하고자 하며, 학습자가 한국 담당자에게 통역하는 상황이다.",
-        ),
-        spokenContext,
-      );
-      expect(failures.map((item) => item.message)).toContainEqual(
-        expect.stringContaining("학습자는 A/B나 화행 수행자·수신자를 겸할 수 없고"),
-      );
-    });
-
-    it("A/B의 직접 협의만 강조하면 차단 대신 사람 확인 경고를 남긴다", () => {
-      const warnings = r16Warnings(
-        spokenCore(
-          "한국어 원발화자와 중국어 청자가 직접 협의하며, 학습자는 두 사람 사이에서 통역한다.",
-        ),
-        spokenContext,
-      );
-      expect(warnings.map((item) => item.message)).toContainEqual(
-        expect.stringContaining("중개 역할이 모호"),
-      );
+    it("역할 소개 생략과 직접 대화에 기계적인 역할 경고를 붙이지 않는다", () => {
+      expect(r16Warnings(spokenCore("나는 동료와 회의 일정을 직접 논의합니다. 이번 주에 함께 진행할 발표가 있습니다."), spokenContext)).toEqual([]);
     });
 
     it("신규 통역 코어는 구조화된 A/B/C·PDR 역할 계약도 필요하다", () => {
