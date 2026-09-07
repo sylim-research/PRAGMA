@@ -5,6 +5,7 @@
 //
 // - ElevenLabs: 기존 `tts?action=usage`(PR #97)를 그대로 부른다. 여기서 다시 만들지 않는다.
 // - OpenAI·Anthropic: `service-health` 함수가 /v1/models 인증만 확인한다(토큰 소비 0).
+//   설정된 모델명도 함께 받아 화면에 보인다 — 「키가 산다」보다 「이 키로 이 모델을 부른다」가 더 쓸모 있다.
 // - Supabase·앱 배포: 이 화면이 열려 있고 세션이 있으면 정상이다. 추가 호출을 만들지 않는다.
 // - 키·청구 정보·제공자 오류 본문은 어디에서도 화면에 오지 않는다. 정해진 코드만 옮긴다.
 
@@ -135,18 +136,22 @@ type ProviderHealth = {
   code: "ok" | "missing_key" | "auth_failed" | "unreachable" | "provider_error";
   httpStatus: number | null;
   latencyMs: number | null;
+  models?: string[];
 };
 
 const KEY_NAME: Record<ProviderHealth["provider"], string> = { openai: "OPENAI_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
 
 const providerStatus = (health: ProviderHealth): ServiceStatus => {
   const { provider: id, latencyMs } = health;
+  // 설정된 모델은 상태와 무관하게 보여 준다 — 키가 죽어 있을 때도 「무엇을 부르려 했는가」는 유효한 정보다.
+  const models = Array.isArray(health.models) ? health.models.filter((name) => typeof name === "string" && name) : [];
+  const detail = models.length > 0 ? models.join(" · ") : undefined;
   switch (health.code) {
-    case "ok": return { id, tone: "ok", summary: "정상", latencyMs };
-    case "missing_key": return { id, tone: "fail", summary: `${KEY_NAME[id]}가 등록되지 않았습니다`, latencyMs };
-    case "auth_failed": return { id, tone: "fail", summary: "키 인증에 실패했습니다 — 키를 다시 확인해 주세요", latencyMs };
-    case "unreachable": return { id, tone: "fail", summary: "응답이 없습니다", latencyMs };
-    default: return { id, tone: "fail", summary: `제공자 오류 (${health.httpStatus ?? "?"})`, latencyMs };
+    case "ok": return { id, tone: "ok", summary: "정상", detail, latencyMs };
+    case "missing_key": return { id, tone: "fail", summary: `${KEY_NAME[id]}가 등록되지 않았습니다`, detail, latencyMs };
+    case "auth_failed": return { id, tone: "fail", summary: "키 인증에 실패했습니다 — 키를 다시 확인해 주세요", detail, latencyMs };
+    case "unreachable": return { id, tone: "fail", summary: "응답이 없습니다", detail, latencyMs };
+    default: return { id, tone: "fail", summary: `제공자 오류 (${health.httpStatus ?? "?"})`, detail, latencyMs };
   }
 };
 

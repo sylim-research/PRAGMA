@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+import { ServiceHealthPanel } from "@/components/admin/ServiceHealthPanel";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -533,6 +534,11 @@ const AdminDashboard = () => {
           changed={changedKeys.has("records")}
         />
       </div>
+
+      {/* 시연·수업 전 연동 점검. 매일 보는 운영 지표를 밀어내지 않도록 맨 아래에 둔다.
+          버튼을 눌렀을 때만 외부 호출이 생긴다 — 화면 진입 시 자동 호출 없음.
+          이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
+      <ServiceHealthPanel />
 
       {isAdmin && (
         <div className="mt-4 flex justify-end">

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ShieldCheck, Upload } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
-import { ServiceHealthPanel } from "@/components/admin/ServiceHealthPanel";
 import { Button } from "@/components/ui/button";
 import { DIRECTION_LABEL, DOMAIN, INDUSTRY, LEVEL } from "@/lib/pragma/enums";
 import type { Domain, IndustrySector, LanguageDirection, LearnerLevel } from "@/lib/pragma/enums";
@@ -315,11 +314,6 @@ const Page = () => {
       title="수업 데이터 백업·복원"
       description="현재 수업 구성을 백업 파일로 저장하고, 필요할 때 백업 시점의 구성으로 복원할 수 있습니다."
     >
-      {/* 시연·수업 직전 연동 점검. 버튼을 눌렀을 때만 외부 호출이 생긴다 — 진입 시 자동 호출 없음. */}
-      <div className="mb-4">
-        <ServiceHealthPanel />
-      </div>
-
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
         {/* 기본 흐름 = 교과목 선택 → 백업. 그래서 이쪽이 주(主)다. */}

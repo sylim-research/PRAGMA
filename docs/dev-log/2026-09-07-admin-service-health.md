@@ -6,16 +6,26 @@
 ## 무엇을
 
 시연·수업 직전에 웹앱이 기대는 외부 서비스가 살아 있는지 한 화면에서 확인한다.
-기존 `/admin/data-backup`(수업 데이터 백업·복원) 맨 위에 section 하나를 얹었다. **새 라우트·네비 항목·DB 테이블 없음.**
+**운영 대시보드(`/admin/dashboard`) 맨 아래**에 기존 세 절과 같은 형태의 절을 하나 더 뒀다.
+**새 라우트·네비 항목·DB 테이블 없음.**
+
+> 처음에는 `/admin/data-backup`에 뒀다가 옮겼다(연구자 검토). 그 화면의 제목은 「수업 데이터 백업·복원」이라
+> 연동 점검이 제목 밖의 내용이 된다. 대시보드는 설명문부터 「한눈에 확인」이고 이미 `LiveDatabaseStatus`로
+> DB 연결 상태를 보이고 있어, 연동 상태는 원래 이 화면의 관심사다. 시연 아침 동선도 대시보드에서 시작한다.
 
 | 서비스 | 확인 방식 | 비고 |
 |---|---|---|
 | ElevenLabs | 기존 `GET /functions/v1/tts?action=usage`(PR #97) 그대로 호출 | 잔량 글자 수 · 50%/20% 기준은 `docs/operations/TTS_CREDIT_MONITOR.md`와 동일 |
-| OpenAI · Anthropic | 신규 `GET /functions/v1/service-health` → 각 제공자 `/v1/models` 인증만 | 토큰 소비 0. 선불 잔액은 API로 조회 불가 → 화면에 「콘솔에서 자동 충전」 안내 + 링크 |
+| OpenAI · Anthropic | 신규 `GET /functions/v1/service-health` → 각 제공자 `/v1/models` 인증만 | 토큰 소비 0. 응답에 **설정된 모델명**도 함께 담는다 |
 | Supabase · 앱 배포 | 세션 존재 · 화면 렌더링으로 판정 | 추가 호출 없음 |
 
 - 페이지 진입 시 **자동 호출하지 않는다.** 「지금 점검」 버튼을 눌렀을 때만 두 요청이 나란히 나간다.
 - 상태는 정상/주의/실패/미점검 넷. 점검 자체가 못 돌면 다섯 줄 모두 실패로 표시하고 재시도를 유도한다.
+- **각 줄에는 상태만 둔다.** 잔액 관리 안내는 목록 아래 한 줄로 모았다(행마다 되풀이하면 상태 목록이
+  사과문처럼 읽힌다 — 연구자 지적). OpenAI·Anthropic 줄에는 대신 **설정된 모델명**을 적는다:
+  `gpt-4o · gpt-4.1 · gpt-4o-transcribe` / `CLAUDE_AUDIT_MODEL` 값. 「키가 산다」보다 「이 키로 이 모델을
+  부른다」가 시연 전 점검으로 더 쓸모 있고, 모델 교체가 실제로 반영됐는지도 여기서 확인된다.
+  모델명은 비밀값이 아니며, 키가 죽어 있을 때도 표시한다.
 - 키·청구·조직 정보와 제공자 오류 본문은 응답·화면 어디에도 싣지 않는다. edge function은 정해진 코드
   (`ok / missing_key / auth_failed / unreachable / provider_error`)와 HTTP 상태·지연만 돌려준다.
 - 관리자 가드는 `tts?action=usage`와 같다(Bearer 세션 → `is_admin()` RPC). `config.toml`에 `verify_jwt = true`.
@@ -25,11 +35,12 @@
 - `supabase/functions/service-health/index.ts` (신규) · `supabase/config.toml` (+3줄)
 - `src/lib/admin/serviceHealthApi.ts` · `.test.ts` (신규, 순수 분류 함수 + fetch 경로 11건)
 - `src/components/admin/ServiceHealthPanel.tsx` · `.test.tsx` (신규, 5건)
-- `src/pages/admin/AdminDataBackup.tsx` (+6줄: import 1 · 패널 삽입)
+- `src/pages/admin/AdminDashboard.tsx` (+6줄: import 1 · 마지막 절로 삽입)
+- 라우트는 `<RequireAdmin>`이 이미 막고 조회 함수도 `is_admin()`으로 다시 막으므로 화면단 재확인은 두지 않았다.
 
 ## 확인
 
-- `npm run typecheck` 통과 · eslint 통과 · `vitest` 신규 16건 통과 · `vite build --mode development` 통과.
+- `npm run typecheck` 통과 · eslint 통과 · `vitest` 신규 17건 통과 · `vite build --mode development` 통과.
 - 구현 중 잡은 것: jsdom에 `AbortSignal.timeout`이 없어 fetch 전에 던지던 문제(브라우저는 지원 — 방어 코드로
   처리) · 패널이 점검 실패를 잡지 않아 unhandled rejection이 나던 것(수정).
 - **미실시**: 관리자 로그인이 필요한 실제 화면 확인과 운영 배포. edge function `service-health`는 **배포 전**이라

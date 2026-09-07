@@ -76,16 +76,18 @@ describe("fetchProviderStatuses", () => {
   it("service-health 응답을 OpenAI·Anthropic 두 줄로 옮긴다", async () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({
       providers: [
-        { provider: "openai", code: "ok", httpStatus: 200, latencyMs: 331 },
-        { provider: "anthropic", code: "missing_key", httpStatus: null, latencyMs: null },
+        { provider: "openai", code: "ok", httpStatus: 200, latencyMs: 331, models: ["gpt-4o", "gpt-4.1"] },
+        { provider: "anthropic", code: "missing_key", httpStatus: null, latencyMs: null, models: ["claude-opus-5"] },
       ],
     }));
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(fetcher.mock.calls[0][0]).toContain("/functions/v1/service-health");
     expect(statuses.map((s) => s.id)).toEqual(["openai", "anthropic"]);
-    expect(statuses[0]).toMatchObject({ tone: "ok", summary: "정상", latencyMs: 331 });
+    expect(statuses[0]).toMatchObject({ tone: "ok", summary: "정상", detail: "gpt-4o · gpt-4.1", latencyMs: 331 });
     expect(statuses[1].tone).toBe("fail");
     expect(statuses[1].summary).toContain("ANTHROPIC_API_KEY");
+    // 키가 죽어 있어도 「무엇을 부르려 했는가」는 보여 준다.
+    expect(statuses[1].detail).toBe("claude-opus-5");
   });
 
   it("인증 실패 코드는 키 재확인으로 안내한다", async () => {

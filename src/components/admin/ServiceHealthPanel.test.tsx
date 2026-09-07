@@ -20,8 +20,8 @@ beforeEach(() => {
     checkedAt: "2026-09-07T12:04:00.000Z",
     statuses: [
       { id: "elevenlabs", tone: "ok", summary: "정상", detail: "잔량 9,558 / 10,000자 (95.6%) · free", latencyMs: 412 },
-      { id: "openai", tone: "ok", summary: "정상", latencyMs: 331 },
-      { id: "anthropic", tone: "fail", summary: "ANTHROPIC_API_KEY가 등록되지 않았습니다", latencyMs: null },
+      { id: "openai", tone: "ok", summary: "정상", detail: "gpt-4o · gpt-4.1 · gpt-4o-transcribe", latencyMs: 331 },
+      { id: "anthropic", tone: "fail", summary: "ANTHROPIC_API_KEY가 등록되지 않았습니다", detail: "claude-opus-5", latencyMs: null },
       { id: "supabase", tone: "ok", summary: "정상", detail: "로그인 세션이 있습니다" },
       { id: "app", tone: "ok", summary: "정상", detail: "이 화면이 열려 있습니다" },
     ],
@@ -34,7 +34,8 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("진입 시에는 아무 호출도 하지 않고 다섯 줄 모두 미점검으로 둔다", () => {
     render(<ServiceHealthPanel />);
     expect(mocks.run).not.toHaveBeenCalled();
-    expect(screen.getByText("아직 점검하지 않았습니다")).toBeVisible();
+    expect(screen.getByText(/시연·수업 전에 눌러 확인합니다/)).toBeVisible();
+    expect(screen.queryByText(/마지막 점검/)).not.toBeInTheDocument();
     expect(screen.getAllByRole("img", { name: "미점검" })).toHaveLength(5);
     expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled();
   });
@@ -53,13 +54,20 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled();
   });
 
-  it("OpenAI·Anthropic에는 잔액을 API로 볼 수 없다는 안내와 콘솔 링크를 붙인다", () => {
+  it("잔액 안내는 행마다 반복하지 않고 목록 아래 한 줄로만 둔다", () => {
     render(<ServiceHealthPanel />);
-    const links = screen.getAllByRole("link", { name: "콘솔 열기" });
-    expect(links).toHaveLength(2);
-    expect(links[0]).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
-    expect(links[1]).toHaveAttribute("href", expect.stringContaining("platform.claude.com"));
-    expect(screen.getAllByText(/잔액은 API로 확인할 수 없습니다/)).toHaveLength(2);
+    expect(screen.getByText(/선불 잔액은 콘솔의 자동 충전으로 관리합니다/)).toBeVisible();
+    expect(screen.getByRole("link", { name: "OpenAI 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
+    expect(screen.getByRole("link", { name: "Anthropic 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.claude.com"));
+    // 행에는 상태만 — 같은 안내를 되풀이하면 상태 목록이 사과문처럼 읽힌다.
+    expect(screen.queryByText(/확인할 수 없습니다/)).not.toBeInTheDocument();
+  });
+
+  it("설정된 모델명을 각 줄에 보여 준다", async () => {
+    render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
+    expect(await screen.findByText("gpt-4o · gpt-4.1 · gpt-4o-transcribe")).toBeVisible();
+    expect(screen.getByText("claude-opus-5")).toBeVisible();
   });
 
   it("점검이 실패해도 버튼은 다시 살아난다", async () => {
