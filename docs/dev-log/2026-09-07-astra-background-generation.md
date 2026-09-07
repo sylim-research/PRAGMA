@@ -36,3 +36,15 @@ Responses `background:true, store:true`로 접수하고 응답 ID를 저장한�
 관련: DEC-20260907-07, ITER-20260907-04, EVD-20260907-04.
 
 API 근거: [OpenAI Background mode](https://developers.openai.com/api/docs/guides/background), [Astra](https://developers.openai.com/api/docs/models/gpt-6-astra).
+
+## 운영 확인에서 발견한 확장 기본 권한
+
+실제 서버 회수는 완료됐고 관리자 요청 200·비로그인/잘못된 worker token 401을 확인했다.
+그 뒤 권한 조회에서 pg_net의 `net.http_request_queue`가 PUBLIC 읽기를 허용함을 확인했다.
+큐에는 서버 인증 헤더가 잠시 들어가므로 해당 큐의 PUBLIC/anon/authenticated 권한을 회수하고
+worker token을 회전하는 추가 migration을 적용한다. 실제 외부 유출을 관찰했다는 뜻은 아니다.
+같은 PUBLIC 기본 권한을 재현한 회귀 검사 1개를 추가해 작업 DB 검사는 총 4개다.
+일반 생성 입력은 처음부터 DB에 저장된다. 로컬 파일럿을 격리 DB 행으로 옮긴 smoke에서는
+JSONB 키 순서 때문에 처음 일치 검사가 중단됐으며, 입력 의미 동일성을 확인한 뒤 검증 행의
+대응 해시만 정렬해 재개했다. 새 유료 호출 없이 생성 본문을 회수했고 내용 차이는 없었다.
+생성 시각·그에 따른 provenance hash는 재실행 시 달라진다.
