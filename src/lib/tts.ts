@@ -1,19 +1,9 @@
+import { TTS_VOICE_BY_LANG, type TtsLang } from "../../supabase/functions/_shared/ttsVoicePolicy";
+export type { TtsLang } from "../../supabase/functions/_shared/ttsVoicePolicy";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-export type TtsLang = "ko" | "zh";
-
-export const DEFAULT_TTS_VOICE_BY_LANG: Record<TtsLang, string> = {
-  ko: "21m00Tcm4TlvDq8ikWAM",
-  zh: "21m00Tcm4TlvDq8ikWAM",
-};
-
-export const FREE_TIER_TTS_VOICE_IDS = [
-  "EXAVITQu4vr4xnSDxMaL",
-  "9BWtsMINqrJLrRacOk9x",
-] as const;
-
-const DISABLED_TTS_VOICE_STORAGE_KEY = "tts-disabled-voices";
+export const DEFAULT_TTS_VOICE_BY_LANG = TTS_VOICE_BY_LANG;
 
 type TtsSuccess = {
   ok: true;
@@ -21,6 +11,8 @@ type TtsSuccess = {
   requestedVoiceId: string;
   usedVoiceId: string;
   fallbackUsed: boolean;
+  provider?: string;
+  model?: string;
 };
 
 type TtsFailure = {
@@ -33,50 +25,6 @@ type TtsFailure = {
 };
 
 export type TtsResult = TtsSuccess | TtsFailure;
-
-const canUseSessionStorage = () => typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
-
-const readDisabledVoices = () => {
-  if (!canUseSessionStorage()) return new Set<string>();
-
-  try {
-    const raw = window.sessionStorage.getItem(DISABLED_TTS_VOICE_STORAGE_KEY);
-    if (!raw) return new Set<string>();
-
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? new Set(parsed.filter((value): value is string => typeof value === "string")) : new Set<string>();
-  } catch {
-    return new Set<string>();
-  }
-};
-
-const writeDisabledVoices = (voices: Set<string>) => {
-  if (!canUseSessionStorage()) return;
-
-  try {
-    window.sessionStorage.setItem(DISABLED_TTS_VOICE_STORAGE_KEY, JSON.stringify(Array.from(voices)));
-  } catch {
-    // ignore session storage errors
-  }
-};
-
-export const disableTtsVoiceForSession = (voiceId?: string | null) => {
-  if (!voiceId) return;
-  const voices = readDisabledVoices();
-  voices.add(voiceId);
-  writeDisabledVoices(voices);
-};
-
-export const getSessionTtsVoice = (lang: TtsLang, preferredVoiceId?: string) => {
-  const preferred = preferredVoiceId ?? DEFAULT_TTS_VOICE_BY_LANG[lang];
-  const disabledVoices = readDisabledVoices();
-
-  if (!disabledVoices.has(preferred)) {
-    return preferred;
-  }
-
-  return FREE_TIER_TTS_VOICE_IDS.find((voiceId) => !disabledVoices.has(voiceId)) ?? preferred;
-};
 
 export const isTtsRelatedErrorMessage = (value: unknown) => {
   const text = typeof value === "string"
@@ -92,32 +40,19 @@ export const isTtsRelatedErrorMessage = (value: unknown) => {
   return /functions\/v1\/tts|edge function returned|paid_plan_required|voice_not_found|unauthorized_free_user|detected_unusual_activity|tts/i.test(text);
 };
 
-const isFallbackableProviderCode = (code?: string) =>
-  Boolean(code && [
-    "paid_plan_required",
-    "voice_not_found",
-    "unauthorized_free_user",
-    "payment_required",
-    "detected_unusual_activity",
-    "http_401",
-    "http_402",
-  ].includes(code));
-
 export const requestTtsAudio = async ({
   text,
   lang,
-  preferredVoiceId,
   logPrefix = "[TTS]",
 }: {
   text: string;
   lang: TtsLang;
-  preferredVoiceId?: string;
   logPrefix?: string;
 }): Promise<TtsResult> => {
-  const requestedVoiceId = getSessionTtsVoice(lang, preferredVoiceId);
+  const requestedVoiceId = DEFAULT_TTS_VOICE_BY_LANG[lang];
 
   try {
-    console.log(`${logPrefix} sending:`, { text, lang, requestedVoiceId });
+    console.log(`${logPrefix} sending:`, { textLength: text.length, lang, requestedVoiceId });
 
     const response = await fetch(`${SUPABASE_URL}/functions/v1/tts`, {
       method: "POST",
@@ -147,16 +82,14 @@ export const requestTtsAudio = async ({
         };
       }
 
-      if (fallbackUsed && usedVoiceId !== requestedVoiceId) {
-        disableTtsVoiceForSession(requestedVoiceId);
-      }
-
       return {
         ok: true,
         blob,
         requestedVoiceId,
         usedVoiceId,
         fallbackUsed,
+        provider: response.headers.get("X-TTS-Provider") || undefined,
+        model: response.headers.get("X-TTS-Model") || undefined,
       };
     }
 
@@ -168,18 +101,11 @@ export const requestTtsAudio = async ({
     }
 
     const providerCode = typeof payload?.providerCode === "string" ? payload.providerCode : undefined;
-    const disabledVoiceId = typeof payload?.disabledVoiceId === "string" ? payload.disabledVoiceId : undefined;
     const message = typeof payload?.error === "string"
       ? payload.error
       : !response.ok
         ? `TTS 실패 (${response.status})`
         : "오디오 응답이 아닙니다.";
-
-    if (disabledVoiceId) {
-      disableTtsVoiceForSession(disabledVoiceId);
-    } else if (isFallbackableProviderCode(providerCode)) {
-      disableTtsVoiceForSession(requestedVoiceId);
-    }
 
     console.warn(`${logPrefix} non-audio response:`, {
       status: response.status,
