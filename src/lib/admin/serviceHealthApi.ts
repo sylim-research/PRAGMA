@@ -31,7 +31,12 @@ export type ServiceStatus = {
   link?: { label: string; href: string };
 };
 
-export type ServiceHealthReport = { checkedAt: string; statuses: ServiceStatus[] };
+export type ServiceHealthReport = {
+  checkedAt: string;
+  statuses: ServiceStatus[];
+  /** 관리자 세션이 있는 상태에서 얻은 결과인가. 없이 얻은 결과는 「로그인 필요」뿐이라 보관할 가치가 없다. */
+  authenticated: boolean;
+};
 
 // 마지막 점검 결과를 이 브라우저에 남긴다. 화면을 열자마자 빈 상태가 아니라 「최근에 이랬다」를
 // 보여 주기 위해서다(빈 목록은 무엇을 보는 화면인지 알려 주지 못한다).
@@ -43,10 +48,13 @@ export function readStoredReport(): ServiceHealthReport | null {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as ServiceHealthReport;
+    const parsed = JSON.parse(raw) as Partial<ServiceHealthReport>;
     if (typeof parsed?.checkedAt !== "string" || !Array.isArray(parsed.statuses) || parsed.statuses.length === 0) return null;
     if (Number.isNaN(new Date(parsed.checkedAt).getTime())) return null;
-    return parsed;
+    // 로그인 전에 돈 결과(또는 이 필드가 없던 옛 형식)는 「관리자 로그인이 필요합니다」 다섯 줄이다.
+    // 그것을 로그인 뒤에도 보여 주면 멀쩡한 시스템이 죽은 것처럼 보인다 — 없는 것으로 보고 다시 확인한다.
+    if (parsed.authenticated !== true) return null;
+    return parsed as ServiceHealthReport;
   } catch {
     // 사생활 보호 모드 등에서 접근이 막힐 수 있다 — 없는 것으로 본다.
     return null;
@@ -54,6 +62,7 @@ export function readStoredReport(): ServiceHealthReport | null {
 }
 
 export function storeReport(report: ServiceHealthReport): void {
+  if (!report.authenticated) return;
   try {
     localStorage.setItem(STORE_KEY, JSON.stringify(report));
   } catch {
@@ -243,6 +252,7 @@ export async function runServiceHealthCheck(deps: Deps = {}): Promise<ServiceHea
     const summary = "관리자 로그인이 필요합니다";
     return {
       checkedAt: new Date().toISOString(),
+      authenticated: false,
       statuses: [
         { id: "elevenlabs", tone: "fail", summary },
         ...bothFail(summary),
@@ -257,6 +267,7 @@ export async function runServiceHealthCheck(deps: Deps = {}): Promise<ServiceHea
   ]);
   return {
     checkedAt: new Date().toISOString(),
+    authenticated: true,
     statuses: [
       elevenlabs,
       ...providers,

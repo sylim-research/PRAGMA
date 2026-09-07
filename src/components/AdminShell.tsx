@@ -36,7 +36,7 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
       active
         ? "bg-[#FAD338] text-[#15202B]"
         : "bg-[#F7F2DF] text-[#15202B] hover:bg-[#FFF1B8]",
@@ -68,7 +68,7 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
 
       <div className={`flex gap-6 pl-5 pr-8 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
         <aside className="hidden w-[285px] shrink-0 md:block print:hidden">
-          <nav className="-mt-1 flex flex-col px-1">
+          <nav className="-mt-1 flex flex-col pl-6 pr-1">
             <Link
               to={ADMIN_DASHBOARD_ITEM.to}
               className={standaloneClasses(pathname === ADMIN_DASHBOARD_ITEM.to)}
@@ -84,15 +84,17 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
               const groupLabel = group.header.replace(/^\d+\.\s*/, "");
               const panelId = `admin-nav-group-${groupIndex}`;
 
+              // ml-3은 대시보드 링크와 같은 값이다 — 하위 항목의 세로선이 「운영 대시보드」 상자
+              // 왼쪽 테두리와 맞아 1~4번 묶음이 그 아래에 종속돼 보인다.
               return (
-                <div key={group.header} className="mt-2 flex flex-col">
+                <div key={group.header} className="ml-3 mt-2 flex flex-col">
                   <button
                     type="button"
                     aria-expanded={expanded}
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[13.5px] font-semibold transition-colors",
+                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14px] font-semibold transition-colors",
                       groupActive
                         ? "rounded-md bg-[#15202B] text-white shadow-sm"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",

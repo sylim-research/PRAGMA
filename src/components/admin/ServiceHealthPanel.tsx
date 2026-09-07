@@ -156,7 +156,7 @@ export const ServiceHealthPanel = () => {
   const tone = TONE[pending ? "idle" : summary.tone];
 
   return (
-    <section aria-labelledby="service-health-title" className="mt-5">
+    <section aria-labelledby="service-health-title" className="mt-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-2">
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}

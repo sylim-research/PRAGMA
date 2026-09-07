@@ -22,12 +22,26 @@ export type DashboardReviewRunRow = {
   claude_response_id: string | null;
   adjudication_response_id: string | null;
   created_at: string;
+  /** 'focused_v1'(2026-09-06 경량 검수) 또는 'multimodel_v2'(그 이전). 없으면 이전 규칙으로 본다. */
+  approval_policy?: string | null;
+  /** 경량 검수에서 교수자가 추가 모델 검토를 선택했는가. */
+  independent_review_requested?: boolean | null;
+  /** 재사용 가능한 생성 품질 결과가 붙어 있는가(값 자체가 아니라 존재 여부만 읽는다). */
+  generation_quality_hash?: string | null;
+  /** Claude 별도 검토에 의견이 하나라도 있는가(첫 의견 id — 있으면 재검토 대상). */
+  claude_first_finding?: string | null;
+  approved_at?: string | null;
 };
 
 export type DashboardAssignmentRow = {
   outline_id: string;
   week_no: number;
   scenario_id: string;
+};
+
+export type DashboardCourseRow = {
+  /** 'published'(학습자에게 공개) 또는 'draft'. */
+  status: string | null;
 };
 
 export type DashboardReviewQueueStage =
@@ -55,6 +69,11 @@ function isProfessorFinalized(row: DashboardScenarioRow): boolean {
   return row.authoring_stage === "professor_finalized";
 }
 
+/** 교수자 최종 승인을 마친 현재본(논문 4.3.4: 수업 사용 후보 자격, 노출 자체는 아님). */
+export function isFinalizedMission(row: DashboardScenarioRow): boolean {
+  return ["reviewed", "released"].includes(row.mission_status ?? "") && isProfessorFinalized(row);
+}
+
 /** `/admin/review`의 기본 「미션 생성됨(검수 대기)」 분모와 같은 조건이다. */
 export function isDashboardReviewTarget(row: DashboardScenarioRow): boolean {
   return row.content_format === "scenario_core_v1"
@@ -65,17 +84,20 @@ export function isDashboardReviewTarget(row: DashboardScenarioRow): boolean {
 
 export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[]) {
   const currentCoreRows = rows.filter((row) => row.content_format === "scenario_core_v1");
+  const generated = currentCoreRows.filter(
+    (row) => ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
+      && hasMissionContent(row),
+  );
+  const reviewTargets = generated.filter(isDashboardReviewTarget);
+  const finalized = generated.filter(isFinalizedMission);
   return {
     coreCount: currentCoreRows.length,
-    generatedMissionCount: currentCoreRows.filter(
-      (row) => ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
-        && hasMissionContent(row),
-    ).length,
-    reviewTargetCount: currentCoreRows.filter(isDashboardReviewTarget).length,
-    professorFinalizedCount: currentCoreRows.filter(
-      (row) => ["reviewed", "released"].includes(row.mission_status ?? "")
-        && isProfessorFinalized(row),
-    ).length,
+    generatedMissionCount: generated.length,
+    reviewTargetCount: reviewTargets.length,
+    professorFinalizedCount: finalized.length,
+    // 생성 완료 = 검토 대상 + 승인 완료 + 나머지. 나머지는 「수정 필요」로 되돌아간 것과
+    // 최종 승인 없이 reviewed/released로 남은 옛 항목이다. 화면에서 세 수가 더해지도록 함께 보인다.
+    pendingRevisionCount: generated.length - reviewTargets.length - finalized.length,
   };
 }
 
@@ -87,18 +109,24 @@ function runIsCurrentForRow(run: DashboardReviewRunRow, row: DashboardScenarioRo
   return runTime >= rowTime;
 }
 
+const FOCUSED_POLICY = "focused_v1";
+
 /**
  * 현재 generated 미션이 다음에 처리해야 할 단계를 하나만 반환한다.
  *
- * 생성 시 저장된 `mission_content.quality_check`(production quality critic)는 의도적으로
- * 읽지 않는다. 콘텐츠가 마지막 검수 run 뒤 수정됐다면 과거 결과를 재사용하지 않고 R 검사로
- * 되돌린다. R fail도 원본 수정 뒤 R을 다시 확인해야 하므로 rules에 남긴다.
+ * `supabase/functions/_shared/contentReview.ts`의 `nextReviewStage`와 같은 규칙이어야 한다.
+ * 2026-09-06 경량 검수(focused_v1)에서는 규칙 검사 → (재사용 가능한 생성 품질 결과가 없을 때만)
+ * AI 검토 1회 → 교수자 최종 승인이 기본이고, Claude 별도 검토와 그 의견의 재검토는 교수자가
+ * 추가로 선택했을 때만 거친다. 이전 정책(multimodel_v2)은 네 단계를 모두 거친다.
+ *
+ * 콘텐츠가 마지막 검수 run 뒤 수정됐다면 과거 결과를 재사용하지 않고 규칙 검사로 되돌린다.
+ * 규칙 검사 fail도 원본 수정 뒤 다시 확인해야 하므로 rules에 남긴다.
  */
-export function nextDashboardReviewStage(
+function latestCurrentRun(
   row: DashboardScenarioRow,
   runs: readonly DashboardReviewRunRow[],
-): DashboardReviewQueueStage {
-  const run = runs
+): DashboardReviewRunRow | undefined {
+  return runs
     .filter(
       (candidate) => candidate.kind === "mission"
         && candidate.criteria_version === DASHBOARD_REVIEW_CRITERIA_VERSION
@@ -106,8 +134,21 @@ export function nextDashboardReviewStage(
         && runIsCurrentForRow(candidate, row),
     )
     .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at))[0];
+}
+
+export function nextDashboardReviewStage(
+  row: DashboardScenarioRow,
+  runs: readonly DashboardReviewRunRow[],
+): DashboardReviewQueueStage {
+  const run = latestCurrentRun(row, runs);
 
   if (!run || run.rules_verdict === "fail") return "rules";
+  if (run.approval_policy === FOCUSED_POLICY) {
+    if (!run.openai_response_id && !run.generation_quality_hash) return "openai";
+    if (run.independent_review_requested && !run.claude_response_id) return "claude";
+    if (run.independent_review_requested && run.claude_first_finding && !run.adjudication_response_id) return "adjudication";
+    return "professor";
+  }
   if (!run.openai_response_id) return "openai";
   if (!run.claude_response_id) return "claude";
   if (!run.adjudication_response_id) return "adjudication";
@@ -126,6 +167,17 @@ export function summarizeDashboardReviewStages(
     counts[nextDashboardReviewStage(row, runs)] += 1;
   }
   return counts;
+}
+
+/**
+ * 「규칙 기반 검사」 칸에는 아직 검사하지 않은 미션과 검사에 실패한 미션이 함께 들어간다.
+ * 실패는 재검사가 아니라 내용 수정이 필요하므로 그 수를 따로 보인다.
+ */
+export function countRulesFailures(
+  rows: readonly DashboardScenarioRow[],
+  runs: readonly DashboardReviewRunRow[],
+): number {
+  return rows.filter(isDashboardReviewTarget).filter((row) => latestCurrentRun(row, runs)?.rules_verdict === "fail").length;
 }
 
 export function dominantDashboardReviewStage(
@@ -147,5 +199,29 @@ export function summarizeDashboardAssignments(rows: readonly DashboardAssignment
     assignmentCount: rows.length,
     missionCount: new Set(rows.map((row) => row.scenario_id)).size,
     weekCount: new Set(rows.map((row) => `${row.outline_id}:${row.week_no}`)).size,
+    // 배정이 하나라도 있는 교과목만 센다. 만들어 두고 미션을 붙이지 않은 교과목은 여기 없다.
+    courseCount: new Set(rows.map((row) => row.outline_id)).size,
   };
+}
+
+/**
+ * 편성된 미션(중복 제거) 가운데 교수자 최종 승인을 마친 것과 아닌 것.
+ * 새 편성은 승인·현행 릴리스 미션으로 제한되지만(composerEligibility), 게이트 이전의 옛 편성이 남아 있을 수 있다.
+ * 미션 표에 없는 scenario_id는 승인 전으로 센다(모르는 것을 승인으로 치지 않는다).
+ */
+export function summarizeAssignmentApproval(
+  assignments: readonly DashboardAssignmentRow[],
+  scenarios: readonly DashboardScenarioRow[],
+) {
+  const finalizedIds = new Set(scenarios.filter(isFinalizedMission).map((row) => row.scenario_id));
+  const assignedIds = new Set(assignments.map((row) => row.scenario_id));
+  let approved = 0;
+  for (const id of assignedIds) if (finalizedIds.has(id)) approved += 1;
+  return { approvedMissionCount: approved, unapprovedMissionCount: assignedIds.size - approved };
+}
+
+/** 학습자는 status='published'인 교과목만 본다. 나머지는 모두 비공개로 센다. */
+export function summarizeCourses(rows: readonly DashboardCourseRow[]) {
+  const published = rows.filter((row) => row.status === "published").length;
+  return { total: rows.length, published, unpublished: rows.length - published };
 }
