@@ -13,6 +13,9 @@ before(async () => {
     CREATE FUNCTION public.is_admin() RETURNS boolean LANGUAGE sql AS $$ SELECT current_setting('request.jwt.claim.sub',true) = '${admin}' $$;
     GRANT USAGE ON SCHEMA public, auth TO anon, authenticated, service_role;`);
   await db.exec(await readFile(new URL('../supabase/migrations/20260907180000_background_generation_jobs.sql', import.meta.url), 'utf8'));
+  // Reproduce pg_net's default PUBLIC table grant without loading its native extension in PGlite.
+  await db.exec('CREATE SCHEMA net; GRANT USAGE ON SCHEMA net TO PUBLIC; CREATE TABLE net.http_request_queue(headers jsonb); GRANT SELECT ON net.http_request_queue TO PUBLIC;');
+  await db.exec(await readFile(new URL('../supabase/migrations/20260907181000_generation_worker_queue_permissions.sql', import.meta.url), 'utf8'));
 });
 after(() => db.close());
 async function as(role, user, sql) {
@@ -43,4 +46,9 @@ test('only the worker writes; one lease excludes a second worker; completed jobs
 test('the same owner and request key cannot create duplicate work', async () => {
   await assert.rejects(db.exec(`INSERT INTO generation_jobs(owner_id,request_key,request_body,release_id,model)
     VALUES ('${admin}','key','{}','release','gpt-6-astra')`), /duplicate key/);
+});
+test('browser roles cannot read scheduler credentials from the pg_net request queue', async () => {
+  for (const [role, user] of [['anon',''],['authenticated',learner],['authenticated',admin]]) {
+    await assert.rejects(as(role,user,'SELECT headers FROM net.http_request_queue'),/permission denied/);
+  }
 });
