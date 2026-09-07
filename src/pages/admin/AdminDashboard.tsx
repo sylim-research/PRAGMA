@@ -41,6 +41,8 @@ type DashboardSnapshot = {
   content: ReturnType<typeof summarizeDashboardContent>;
   review: DashboardReviewStageCounts;
   assignments: ReturnType<typeof summarizeDashboardAssignments>;
+  /** 만들어진 교과목 전체. 편성 여부와 무관하다(편성된 수는 assignments.courseCount). */
+  courseCount: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
 };
@@ -51,6 +53,7 @@ type DashboardMetricKey =
   | "reviewTarget"
   | "finalized"
   | `review.${DashboardReviewQueueStage}`
+  | "courses"
   | "assignments"
   | "learners"
   | "records";
@@ -66,6 +69,7 @@ function dashboardMetricValues(snapshot: DashboardSnapshot): Record<DashboardMet
     "review.claude": snapshot.review.claude,
     "review.adjudication": snapshot.review.adjudication,
     "review.professor": snapshot.review.professor,
+    courses: snapshot.courseCount,
     assignments: snapshot.assignments.missionCount,
     learners: snapshot.approvedLearnerCount,
     records: snapshot.learnerRecordCount,
@@ -81,7 +85,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-7 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
+  <div className="mb-2 mt-4 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -110,7 +114,7 @@ const SummaryMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[98px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
       changed ? "border-[#D6B84A] bg-[#FFFBE8] ring-2 ring-[#F4D85E]/30" : "border-border",
     ].join(" ")}
@@ -120,7 +124,7 @@ const SummaryMetric = ({
       {value === null && !error ? (
         <span aria-label="불러오는 중" className="h-7 w-14 rounded bg-muted motion-safe:animate-pulse" />
       ) : (
-        <span className="text-[27px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+        <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
       )}
@@ -130,27 +134,34 @@ const SummaryMetric = ({
   </Link>
 );
 
+// 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
+// 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 기반 점검",
-  openai: "AI 1차 검토",
-  claude: "AI 교차 검토",
-  adjudication: "검토 결과 정리",
+  rules: "규칙 기반 검사",
+  openai: "AI 검토",
+  claude: "AI 별도 검토",
+  adjudication: "AI 재검토",
   professor: "교수자 최종 승인",
 };
 
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
-  rules: "자동 규칙 점검 필요",
-  openai: "1차 검토 대기",
-  claude: "독립 교차검토 대기",
-  adjudication: "지적별 판정 대기",
+  rules: "규칙 검사 대기",
+  openai: "AI 검토 대기 · 재사용 가능하면 생략",
+  claude: "선택 시에만 · 별도 검토 대기",
+  adjudication: "선택 시에만 · 의견 재검토 대기",
   professor: "최종 승인 대기",
 };
+
+// 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
+// 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
+const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "adjudication"]);
 
 const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.map((stage, index) => ({
   ...stage,
   step: index + 1,
   displayLabel: REVIEW_STAGE_DISPLAY_LABELS[stage.key],
   description: REVIEW_STAGE_DESCRIPTIONS[stage.key],
+  optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
 }));
 
 const ReviewPipeline = ({
@@ -174,11 +185,13 @@ const ReviewPipeline = ({
             <Link
               to="/admin/review"
               className={[
-                "group flex min-h-[98px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+                "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
                 "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 active ? "border-[#D6B84A] bg-[#FFFBE8]" : "border-border",
+                stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
+              data-optional={stage.optional ? "true" : undefined}
             >
               <div className="flex items-center gap-2">
                 <span className={[
@@ -193,7 +206,7 @@ const ReviewPipeline = ({
                 {value === null && !error ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="text-[27px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
                   </span>
                 )}
@@ -230,7 +243,7 @@ const OperationMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[98px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#789184] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-border",
     ].join(" ")}
@@ -240,7 +253,7 @@ const OperationMetric = ({
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
       <span className="mt-1.5 flex items-end gap-1.5">
-        <span className="text-[27px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+        <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
         {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
@@ -317,7 +330,7 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, assignmentRows, learnerResult, learnerRecordResult] = await Promise.all([
+      const [scenarioRows, reviewRows, assignmentRows, courseResult, learnerResult, learnerRecordResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
@@ -326,7 +339,7 @@ const AdminDashboard = () => {
           .range(from, to)),
         fetchAllDashboardRows<DashboardReviewRunRow>("검수 이력", (from, to) => db
           .from("content_review_runs")
-          .select("target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at")
+          .select("target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id")
           .eq("kind", "mission")
           .eq("criteria_version", DASHBOARD_REVIEW_CRITERIA_VERSION)
           .order("created_at", { ascending: false })
@@ -338,11 +351,13 @@ const AdminDashboard = () => {
           .order("week_no", { ascending: true })
           .order("scenario_id", { ascending: true })
           .range(from, to)),
+        db.from("curriculum_outlines").select("id", { count: "exact" }).limit(1),
         db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
       ]);
 
       const results = [
+        ["교과목", courseResult],
         ["승인 학습자", learnerResult],
         ["학습 수행", learnerRecordResult],
       ] as const;
@@ -354,6 +369,7 @@ const AdminDashboard = () => {
         content: summarizeDashboardContent(scenarioRows),
         review: summarizeDashboardReviewStages(scenarioRows, reviewRows),
         assignments: summarizeDashboardAssignments(assignmentRows),
+        courseCount: courseResult.count ?? 0,
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
       };
@@ -439,7 +455,7 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="운영 대시보드"
-      description="콘텐츠 준비, 검수, 수업 현황을 한눈에 확인합니다."
+      description="외부 연동, 콘텐츠 제작·검토·승인, 수업 운영·학습 수행 현황을 한눈에 확인합니다."
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -453,16 +469,16 @@ const AdminDashboard = () => {
       <ServiceHealthPanel />
 
       <PanelHeader
-        title="콘텐츠 준비 현황"
+        title="콘텐츠 제작 현황"
         action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
       />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryMetric
           to="/admin/library"
-          label="시나리오 원안"
+          label="미션 재료"
           value={snapshot?.content.coreCount ?? null}
           unit="개"
-          description="학습 미션 제작의 기본 자료"
+          description="시나리오 코어 · 학습 미션 제작의 기본 자료"
           error={displayError}
           changed={changedKeys.has("core")}
         />
@@ -471,34 +487,37 @@ const AdminDashboard = () => {
           label="학습 미션 생성 완료"
           value={snapshot?.content.generatedMissionCount ?? null}
           unit="개"
-          description="생성·저장된 학습 미션"
+          description={
+            // 오른쪽 두 카드와 더해지도록 나머지(수정 필요·보류)를 같이 적는다.
+            snapshot
+              ? `검토·승인 대기 ${snapshot.content.reviewTargetCount} · 승인 ${snapshot.content.professorFinalizedCount} · 수정 필요·보류 ${snapshot.content.pendingRevisionCount}`
+              : "생성·저장된 학습 미션"
+          }
           error={displayError}
           changed={changedKeys.has("mission")}
         />
         <SummaryMetric
           to="/admin/review"
-          label="검수 대기 미션"
+          label="검토·승인 대기"
           value={snapshot?.content.reviewTargetCount ?? null}
           unit="개"
-          description="콘텐츠 검수 진행 대상"
+          description="규칙 검사·AI 검토·교수자 승인이 남은 미션"
           error={displayError}
           changed={changedKeys.has("reviewTarget")}
         />
         <SummaryMetric
           to="/admin/review"
-          label="교수자 승인 완료"
+          label="교수자 최종 승인"
           value={snapshot?.content.professorFinalizedCount ?? null}
           unit="개"
-          description="수업 사용 최종 승인"
+          description="승인 마친 미션 · 수업 사용 후보"
           error={displayError}
           changed={changedKeys.has("finalized")}
         />
       </div>
 
-      <PanelHeader
-        title="콘텐츠 검수 진행 현황"
-        action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
-      />
+      {/* 「검수」 단독 표기는 용어대장이 막는다(주체·권한이 빠진다) — 규칙은 검사하고, AI는 검토하고, 교수자가 승인한다. */}
+      <PanelHeader title="콘텐츠 검토·승인 진행" />
       <ReviewPipeline
         review={snapshot?.review ?? null}
         dominant={dominantReviewStage}
@@ -506,16 +525,31 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader
-        title="수업·학습 현황"
-        action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
-      />
+      <PanelHeader title="수업 운영·학습 수행 현황" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
+            큰 수는 만들어진 교과목 전체이고, 설명줄의 편성 수와 다르면 아직 빈 교과목이 있다는 뜻이다. */}
+        <OperationMetric
+          to="/admin/composer"
+          label="교과목"
+          value={snapshot?.courseCount ?? null}
+          unit="개"
+          description={
+            snapshot
+              ? snapshot.courseCount <= snapshot.assignments.courseCount
+                // 두 수는 다른 표에서 온다. 배정 쪽이 크게 나오는 경우(정리 중 등)에 음수를 적지 않는다.
+                ? "모두 미션 편성됨"
+                : `미션 편성 ${snapshot.assignments.courseCount}개 · 편성 전 ${snapshot.courseCount - snapshot.assignments.courseCount}개`
+              : "15주 수업의 단위"
+          }
+          error={displayError}
+          changed={changedKeys.has("courses")}
+        />
         <OperationMetric
           to="/admin/composer"
           label="수업 편성 미션"
           value={snapshot?.assignments.missionCount ?? null}
-          unit="개 미션"
+          unit="개"
           description={snapshot ? `${snapshot.assignments.weekCount}개 주차 · ${snapshot.assignments.assignmentCount}건 배정` : "편성 현황"}
           error={displayError}
           changed={changedKeys.has("assignments")}
@@ -525,7 +559,7 @@ const AdminDashboard = () => {
           label="수업 참여 승인"
           value={snapshot?.approvedLearnerCount ?? null}
           unit="명"
-          description="승인된 학습자"
+          description="수업 참여가 승인된 학습자"
           error={displayError}
           changed={changedKeys.has("learners")}
         />
@@ -534,7 +568,7 @@ const AdminDashboard = () => {
           label="학습 수행 기록"
           value={snapshot?.learnerRecordCount ?? null}
           unit="건"
-          description="누적 학습 수행 기록"
+          description="미션 한 차례 수행 = 1건"
           error={displayError}
           changed={changedKeys.has("records")}
         />
