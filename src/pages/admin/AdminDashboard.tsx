@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+import { ServiceHealthPanel } from "@/components/admin/ServiceHealthPanel";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -445,6 +446,11 @@ const AdminDashboard = () => {
           운영 지표를 처음 불러오지 못했습니다. {displayError}
         </p>
       )}
+
+      {/* 연동이 끊겨 있으면 아래 지표를 보기 전에 알아야 한다 — 스크롤 없이 보이는 자리에 둔다.
+          평소에는 한 줄로 접혀 있고, 정상이 아닌 항목이 있으면 스스로 펼쳐진다.
+          이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
+      <ServiceHealthPanel />
 
       <PanelHeader
         title="콘텐츠 준비 현황"
