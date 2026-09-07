@@ -380,7 +380,7 @@ function buildSystemPrompt(
     ? `- 시나리오의 배경·등장인물·관계는 반드시 도메인 '직장'을 따르고, [생성 요청]에 '산업 분야'가 있으면 그 산업의 구체적 업무 상황으로 작성하세요. 다른 산업(예: 마케팅 일반)으로 대체하지 마세요.`
     : `- [중요] 이 시나리오는 업무·비즈니스 시나리오가 아닙니다. 회사·직장·동료·거래처·마케팅·협업·프로젝트 등 업무 소재를 절대 사용하지 마세요. 등장인물·관계·소재는 반드시 [생성 요청]의 '도메인' 설명을 따르세요.`
   const modeRoleRule = isSpoken
-    ? NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE
+    ? NATURAL_INTERPRETING_SCENE_RULE
     : direction === 'zh_ko'
       ? `- 이 번역의 학습자는 제3자 번역자가 아니라 자기 발신 상황의 화자입니다. source_text는 학습자가 상대에게 보낼 중국어 원문이고 candidate_text는 그 원문의 명제·화행·태도·화용적 힘을 보존한 한국어 실현이어야 합니다.
 - candidate_text는 실제 관계·채널·장르에서 자연스러운 한국어 담화로 쓰세요. 중국어 어순을 옮긴 번역투, 불필요한 주어 반복, 과잉 존대·사과·감사 누적을 우수성으로 취급하지 마세요.
@@ -421,6 +421,7 @@ function buildSystemPrompt(
 ${domainRule}
 - 언어 방향: ${srcL}(source) → ${tgtL}(target). source_text는 반드시 ${srcL}, candidate_text는 반드시 ${tgtL}.
 ${modeRoleRule}
+${SCENE_PLAUSIBILITY_RULE}
 - 위 JSON 외 어떤 텍스트도 출력하지 마세요.`
 }
 
@@ -444,7 +445,7 @@ function buildOutlineSystemPrompt(
         ? `대학·학업(교수·조교·동기·유학생·학사 업무 등) 상황의 ${shortDirection} ${modeLabel} 교육용 시나리오`
         : `${shortDirection} 비즈니스 ${modeLabel} 교육용 시나리오`
   const roleRule = isSpoken
-    ? NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE
+    ? NATURAL_INTERPRETING_SCENE_RULE
     : '- 번역 학습자는 제3자 번역자가 아니라 자기 발신 상황의 화자입니다. 각 개요는 학습자가 지정 화행의 원문을 상대에게 보내려는 1인칭 발신 장면으로 설계하세요.'
   return `당신은 ${domainDesc}를 설계하는 전문가입니다.
 출력은 반드시 아래 JSON만, 마크다운·설명·주석 없이 그대로 반환합니다.
@@ -461,6 +462,7 @@ function buildOutlineSystemPrompt(
 - 개요끼리 상황·소재·인물이 뚜렷이 달라야 합니다.
 - [생성 요청]의 화행·도메인·P·D·R 조건에 모두 부합해야 합니다.
 ${roleRule}
+${SCENE_PLAUSIBILITY_RULE}
 - 위 JSON 외 어떤 텍스트도 출력하지 마세요.`
 }
 

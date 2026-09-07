@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { PROMPT_SNAPSHOT } from "@/lib/pragma/promptSnapshot.generated";
+import { SCENE_PLAUSIBILITY_RULE } from "../../../supabase/functions/_shared/learnerScene";
 import {
   MISSION_DIAGNOSTIC_DIMENSIONS,
   MISSION_DIAGNOSTIC_EVIDENCE_REFS,
@@ -25,6 +26,15 @@ function prompt(key: string) {
 }
 
 describe("prompt snapshot integrity", () => {
+  it("shares plausibility across translation and interpreting generation and review in both directions", () => {
+    const shared = PROMPT_SNAPSHOT.prompts.filter(({ key }) =>
+      /^(core\.system\.|mission\.system|quality\.system|core_quality\.system|legacy\.(individual|outline)\.system)/.test(key));
+    expect(shared.length).toBeGreaterThanOrEqual(12);
+    for (const entry of shared) {
+      expect(entry.text, entry.key).toContain(SCENE_PLAUSIBILITY_RULE);
+      expect(entry.text, entry.key).toContain("요청·거절·사과·감사·제안·초대·반대·칭찬·불만의 모든 미션");
+    }
+  });
   it("captures the separate mission_v5 item-lineage attribution contract", () => {
     const lineage = prompt("mission.item_lineage.system");
     expect(lineage.text).toContain("provenance 분류자");
