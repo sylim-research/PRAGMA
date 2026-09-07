@@ -1,0 +1,48 @@
+{
+  "context": {
+    "speech_act": "request",
+    "level": "intermediate",
+    "domain": "daily",
+    "theme_code": "daily_living",
+    "topic_code": "hospital_pharmacy_visit",
+    "industry": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "planned_target_feature": "request_mitigation_optionality",
+    "direction": "ko_zh"
+  },
+  "ok": true,
+  "result": "warning",
+  "violations": [
+    {
+      "id": "R5",
+      "level": "warning",
+      "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+    },
+    {
+      "id": "R5",
+      "level": "warning",
+      "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 3 — \"방금 산 공책 영수증이 필요해요. 종이 영수…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 4 — \"방금 산 공책 영수증이 필요해요. 종이 영수…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我需要刚买的本子的收据。把纸质收据打印出来。\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我需要刚买的本子的收据。把纸质收据打印出来。\""
+    }
+  ]
+}

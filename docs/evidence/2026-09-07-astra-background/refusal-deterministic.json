@@ -1,0 +1,48 @@
+{
+  "context": {
+    "speech_act": "refusal",
+    "level": "advanced",
+    "domain": "daily",
+    "theme_code": "relationship_social",
+    "topic_code": "invitation_refusal",
+    "industry": null,
+    "mode": "translation",
+    "source_modality": "written",
+    "planned_target_feature": "refusal_softening",
+    "direction": "zh_ko"
+  },
+  "ok": true,
+  "result": "warning",
+  "violations": [
+    {
+      "id": "R5",
+      "level": "warning",
+      "message": "문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=60자, 후보 2[too_blunt]=67자, 후보 3[within_band]=65자, 후보 4[over_elaborate]=93자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요"
+    },
+    {
+      "id": "R5",
+      "level": "warning",
+      "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 3 — \"今天下午之前我没法帮你看报告。我自己的报告今天也…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 4 — \"今天下午之前我没法帮你看报告。我自己的报告今天也…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"오늘 오후까지 검토는 못 해요. 제 보고서도…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"오늘 오후까지 검토는 못 해요. 제 보고서도…\""
+    }
+  ]
+}

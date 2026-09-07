@@ -1,3 +1,4 @@
+import { GenerationJobsPanel } from '@/components/admin/GenerationJobsPanel';
 // 「학습 미션 조립」 — /admin/assembly (2026-07-30 신설, 사용자·Codex·Claude 수렴안).
 //
 // 코어(미션 재료)가 학습 콘텐츠(네이티브 MPJ5+DCT1 미션)로 바뀌는 결정적 변환이 이전에는
@@ -130,6 +131,7 @@ const progressLabel = (stage: PromoteStage) => {
 const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   const [searchParams] = useSearchParams();
   const [rows, setRows] = useState<CoreRow[]>([]);
+  const [generationModel, setGenerationModel] = useState<"existing" | "astra">("existing");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -245,12 +247,16 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
 
-  const onAssemble = async (r: CoreRow) => {
+  const onAssemble = async (r: CoreRow, resumeAstra = false, generationJobId?: string) => {
     setBusy(r.scenario_id);
     setAssemblyProgress({ id: r.scenario_id, stage: { phase: "preparing" } });
     setRowMsg((m) => ({ ...m, [r.scenario_id]: "" }));
     try {
       const res = await promoteCore(r as unknown as PromotableCore, {
+        generationModel: resumeAstra ? "astra" : generationModel,
+        generationJobId,
+        onGenerationJob: (job) => setRowMsg(m => ({ ...m, [r.scenario_id]: job.status === "completed"
+          ? "Astra 생성 완료 · 품질 점검 시작" : "Astra 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
         onProgress: (stage) =>
           setAssemblyProgress((current) =>
             current?.id === r.scenario_id ? { ...current, stage } : current,
@@ -415,6 +421,22 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
       description={reviewMode ? "수업에 사용할 콘텐츠의 현재 버전을 검수하고 교수자가 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 검수 가능한 학습 미션으로 저장합니다."}
     >
       <div className="max-w-[1080px]">
+      {!reviewMode && <>
+        <label className="my-4 flex flex-wrap items-center gap-3 text-sm">미션 생성 모델
+          <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
+            onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="rounded-lg border bg-white px-3 py-2">
+            <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
+          </select>
+          <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 기존 품질 점검을 진행합니다.</span>
+        </label>
+        <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
+          onResume={async (id, jobId) => {
+            const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
+            if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
+            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 검수 화면에서 확인해 주세요."); return; }
+            setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
+          }} />
+      </>}
       {reviewMode && <section className="mb-4 space-y-3 rounded-xl border bg-white p-4 text-sm">
         <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) => step.label).join(" → ")}</p>
         <p>미션은 편성 전에, 주차 수업자료는 미션 편성 후에 검수합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
@@ -615,6 +637,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                         <span className="text-[11.5px] text-muted-foreground">{rowMsg[r.scenario_id]}</span>
                       )}
                     </div>
+                    {isAssembling && rowMsg[r.scenario_id] && <p className="mt-2 text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
                     {isAssembling && assemblyProgress && (
                       <AssemblyProgressView stage={assemblyProgress.stage} />
                     )}

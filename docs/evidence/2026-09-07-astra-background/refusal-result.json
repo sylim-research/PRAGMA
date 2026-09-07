@@ -1,0 +1,355 @@
+{
+  "mission_content": {
+    "schema_version": "mission_v5",
+    "direction": "zh_ko",
+    "learning_goal": {
+      "kind": "speech_act",
+      "speech_act": "refusal"
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "refusal",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "authoring": {
+      "schema_version": "mission_authoring_v1",
+      "stage": "ai_draft",
+      "lineage_status": "pending",
+      "repair_attempts": 0
+    },
+    "unit": {
+      "target_feature": "refusal_softening",
+      "target_feature_version": "1.1",
+      "learner_label": "완충과 대안",
+      "closing_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다."
+    },
+    "diagnostic_dimensions": [
+      {
+        "code": "illocutionary_clarity",
+        "evidence_refs": [
+          "mpj:3",
+          "mpj:5",
+          "dct"
+        ],
+        "evidence_ko": "수행 불가를 명확히 밝히는 표현과 거절을 여러 겹의 메타발화로 감싸는 표현을 비교하고, 산출 과제에서는 이번 모임의 불참을 분명히 전달한다."
+      },
+      {
+        "code": "supportive_move_fit",
+        "evidence_refs": [
+          "mpj:1",
+          "mpj:3",
+          "mpj:5",
+          "dct"
+        ],
+        "evidence_ko": "이미 공유된 제약의 확인, 짧은 사과, 이유의 선행 배치가 각각 거절을 어떻게 뒷받침하는지 관찰하며, 산출에서는 감사·이유·유감·기원을 원문에 맞게 배열한다."
+      },
+      {
+        "code": "relational_calibration",
+        "evidence_refs": [
+          "mpj:2",
+          "mpj:4",
+          "mpj:5"
+        ],
+        "evidence_ko": "어색한 협업 동료의 검토 부탁과 친한 동료의 물품 대여 부탁에서, 같은 수행 불가 명제를 전달하면서 상대의 부탁을 밀어내는 인상을 줄이는 방식을 관찰한다."
+      }
+    ],
+    "mpj_items": [
+      {
+        "type": "scale4",
+        "channel": "messenger",
+        "situation_ko": "나는 팀장에게 다음 주 월요일 오전 신입사원 교육을 대신 진행해 달라는 메시지를 받았다. 그 시간에는 자격시험 응시로 이미 휴가를 승인받아 교육을 맡을 수 없다고 답하려 한다.",
+        "relation_ko": "업무로는 교류하지만 사적으로는 가깝지 않은 나의 팀장",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "speaker_lower"
+        },
+        "source": "谢谢你想到让我代上培训。下周一上午我已经获准请假，要去参加资格考试。所以新员工培训我没法代上。祝培训顺利。",
+        "preceding_turn": null,
+        "target": "교육을 맡길 사람으로 생각해 주셔서 고마워요. 다음 주 월요일 오전에는 자격시험 때문에 이미 휴가를 승인받았어요. 그래서 교육은 대신 맡을 수 없어요. 교육 잘 진행되길 바라요.",
+        "highlights": [
+          "이미 휴가를 승인받았어요",
+          "교육은 대신 맡을 수 없어요"
+        ],
+        "accepted_scale_codes": [
+          "very_appropriate",
+          "somewhat_appropriate"
+        ],
+        "reference_scale_code": "very_appropriate",
+        "explanation_ko": "팀장이 이미 승인한 휴가와 시험 일정이 있으므로, 제약을 확인하고 '대신 맡을 수 없어요'라고 짧게 결론을 내려도 적절해요. 감사와 기원은 별도로 전달하면서 수행 불가를 분명히 해 업무 조정을 돕기 때문에, 거절 문장에 사과나 유보를 더 쌓을 필요는 없어요.",
+        "recommended_example": "교육을 맡길 사람으로 생각해 주셔서 고마워요. 다음 주 월요일 오전에는 자격시험 때문에 이미 휴가를 승인받았어요. 그래서 교육은 대신 맡을 수 없어요. 교육 잘 진행되길 바라요.",
+        "id": 1,
+        "item_focus": "refusal_softening",
+        "axis_feature": "refusal_softening"
+      },
+      {
+        "type": "judge3",
+        "channel": "messenger",
+        "situation_ko": "나는 몇 차례 협업한 동료에게 오늘 오후까지 열 쪽짜리 보고서를 검토해 달라는 메시지를 받았다. 내 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어 부탁을 거절하려 한다.",
+        "relation_ko": "몇 차례 협업했지만 사적으로는 가깝지 않은 동등한 직급의 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "今天下午之前我没法帮你看报告。我自己的报告今天也要交。实在抽不出时间帮你审阅。",
+        "preceding_turn": null,
+        "target": "오늘 오후까지 검토는 못 해요. 제 보고서도 오늘 마감이에요. 검토할 시간은 없어요.",
+        "highlights": [
+          "검토는 못 해요",
+          "검토할 시간은 없어요"
+        ],
+        "accepted_band_codes": [
+          "too_blunt"
+        ],
+        "explanation_ko": "첫 장면의 '수행 불가를 직접 밝히고 일정 제약을 제시하기'는 유지되지만, P가 팀장보다 낮은 관계에서 동등한 동료 관계로 바뀌었어요. 이번에는 이미 승인된 부재를 확인하는 것이 아니라 협업 동료의 도움 요청에 처음 답하는데, 이유를 사이에 두고 '못 해요'와 '시간은 없어요'로 두 번 닫아 부탁을 밀어내는 인상이 두드러져요. 거절은 한 번 분명히 밝히고 짧은 미안함을 연결하는 정도로 조정해 보세요.",
+        "recommended_example": "미안해요. 제 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어요. 오늘 오후까지 검토하기는 어렵겠어요.",
+        "id": 2,
+        "item_focus": "refusal_softening",
+        "axis_feature": "refusal_softening"
+      },
+      {
+        "type": "fix_choice",
+        "channel": "messenger",
+        "situation_ko": "나는 몇 차례 협업한 동료에게 오늘 오후까지 열 쪽짜리 보고서를 검토해 달라는 메시지를 받았다. 내 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어 부탁을 거절하려 한다.",
+        "relation_ko": "몇 차례 협업했지만 사적으로는 가깝지 않은 동등한 직급의 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "今天下午之前我没法帮你看报告。我自己的报告今天也要交。实在抽不出时间帮你审阅。",
+        "preceding_turn": null,
+        "target": "오늘 오후까지 검토는 못 해요. 제 보고서도 오늘 마감이에요. 검토할 시간은 없어요.",
+        "highlights": [
+          "검토는 못 해요",
+          "검토할 시간은 없어요"
+        ],
+        "accepted_band_codes": [
+          "too_blunt"
+        ],
+        "corrections": [
+          {
+            "text": "미안해요. 제 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어요. 오늘 오후까지 검토하기는 어렵겠어요.",
+            "is_valid": true,
+            "note_ko": "아직 어색한 협업 동료의 부탁에 짧은 '미안해요'와 마감 이유를 연결해 도움을 주지 못하는 아쉬움을 표시하므로, 수행 불가를 분명히 밝히는 결론과 함께 유지해요."
+          },
+          {
+            "text": "오늘 오후까지 검토는 안 돼요. 제 보고서도 오늘 마감이라 검토할 시간 없어요.",
+            "is_valid": false,
+            "note_ko": "마감 이유와 검토 불가는 유지하되, 아쉬움을 동반한 수행 불가를 단정적인 '안 돼요'와 '시간 없어요'로 바꿨어요. 제약을 이미 공유하고 즉답만 구한 상황이라면 가능하지만, 여기서는 협업 동료의 부탁을 일방적으로 차단하는 인상이 앞서 too_blunt로 내려가요. 짧다는 사실 자체가 판단 근거는 아니에요."
+          },
+          {
+            "text": "미안해요. 제 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어요. 오늘 오후까지 검토하기는 어렵다고 말씀드려야 할 것 같은데, 이렇게 말씀드려도 될지 모르겠어요.",
+            "is_valid": false,
+            "note_ko": "사과와 마감 제약은 그대로 두고, 결론만 거절을 말해도 되는지 망설이는 메타발화로 감쌌어요. 검토 불가를 통보하면서도 그 통보의 수용 여부를 다시 열어, 동료가 결론보다 화자의 난처함에 응답하게 만든다는 점에서 over_elaborate예요."
+          }
+        ],
+        "explanation_ko": "동료에게는 오늘 오후 검토가 불가능하다는 답과 도움을 주지 못하는 데 대한 짧은 배려가 필요해요. 원래 초안의 반복적인 부정 대신 권장안은 '미안해요'를 이유와 연결해 거절의 명료성을 유지하면서 관계적 마찰을 줄여요. 반대로 '얘기를 해야 할 것 같아요'까지 덧씌우면 수행 가능 여부보다 말하기의 망설임이 앞서므로 결론을 간단히 유지하세요.",
+        "recommended_example": "미안해요. 제 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어요. 오늘 오후까지 검토하기는 어렵겠어요.",
+        "id": 3,
+        "item_focus": "refusal_softening",
+        "axis_feature": "refusal_softening"
+      },
+      {
+        "type": "reason",
+        "channel": "messenger",
+        "situation_ko": "나는 몇 차례 협업한 동료에게 오늘 오후까지 열 쪽짜리 보고서를 검토해 달라는 메시지를 받았다. 내 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어 부탁을 거절하려 한다.",
+        "relation_ko": "몇 차례 협업했지만 사적으로는 가깝지 않은 동등한 직급의 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "今天下午之前我没法帮你看报告。我自己的报告今天也要交。实在抽不出时间帮你审阅。",
+        "preceding_turn": null,
+        "target": "오늘 오후까지 검토는 못 해요. 제 보고서도 오늘 마감이에요. 검토할 시간은 없어요.",
+        "highlights": [
+          "검토는 못 해요",
+          "검토할 시간은 없어요"
+        ],
+        "problem_band_code": "too_blunt",
+        "reasons": [
+          {
+            "id": "r1",
+            "text_ko": "'오늘 오후까지'라고 거절 범위를 한정해 동료에게 그 이후의 검토를 다시 요청하도록 유도하기 때문이다.",
+            "kind": "pragmatic_misconception"
+          },
+          {
+            "id": "r2",
+            "text_ko": "'검토는 못 해요'가 시간 부족이 아니라 보고서를 검토할 능력이 없다는 뜻으로 원문의 이유를 바꾸기 때문이다.",
+            "kind": "meaning_grammar_context"
+          },
+          {
+            "id": "r3",
+            "text_ko": "마감 이유는 제시하지만 '못 해요'와 '시간은 없어요'로 거절을 거듭 닫아, 아직 어색한 협업 동료의 부탁을 받아 주지 못하는 데 대한 배려보다 차단하는 인상이 앞서기 때문이다.",
+            "kind": "primary"
+          }
+        ],
+        "accepted_reason_id": "r3",
+        "explanation_ko": "아직 어색한 동료의 도움 요청에 답하면서 마감 이유는 제대로 전달하고 있지만, '못 해요'와 '시간은 없어요'가 연이어 거절을 닫는다는 점이 주된 문제예요. 뒤의 마감 설명 덕분에 능력 부족이라는 해석은 맞지 않으며, '오늘 오후까지'도 새 검토 시간을 제안한 것이 아니에요. 명제는 유지하고 반복적인 차단을 짧은 미안함과 하나의 거절 결론으로 조정하세요.",
+        "recommended_example": "미안해요. 제 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어요. 오늘 오후까지 검토하기는 어렵겠어요.",
+        "id": 4,
+        "item_focus": "refusal_softening",
+        "axis_feature": "refusal_softening"
+      },
+      {
+        "type": "multi_judge",
+        "channel": "messenger",
+        "situation_ko": "나는 친한 동료에게 노트북이 고장 났다며 이번 주말 동안 내 개인 노트북을 빌려 달라는 메시지를 받았다. 주말 내내 그 노트북으로 온라인 수업을 들어야 해서 빌려주지 못한다고 답하려 한다.",
+        "relation_ko": "평소 사적인 고민도 나누는 친한 동등한 직급의 동료",
+        "pdr": {
+          "d": "close",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "这周末我的笔记本电脑没法借给你。整个周末我都得用它上网课。这两天我自己一直要用，实在抽不出空当借给你。",
+        "preceding_turn": null,
+        "candidates": [
+          {
+            "text": "미안해요. 이번 주말에는 노트북 못 빌려줘요. 주말 내내 온라인 수업에 써야 해서 이틀 다 제가 써야 해요.",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "노트북 고장으로 도움을 청한 친한 동료에게 '미안해요'로 아쉬움을 짧게 표시한 뒤 불가와 이유를 밝혀 정서적 배려와 즉답을 함께 전달하므로, 이 간결한 배열을 유지해요."
+          },
+          {
+            "text": "이번 주말에는 노트북 못 빌려줘요. 주말 내내 온라인 수업에 써야 해서 이틀 다 제가 써야 해요. 빌려주는 건 안 돼요.",
+            "accepted_band_codes": [
+              "too_blunt"
+            ],
+            "note_ko": "주말 내내 사용해야 한다는 이유는 유지하고, 짧은 미안함 대신 마지막에 '빌려주는 건 안 돼요'로 거절을 재차 못 박았어요. 친한 동료가 고장 때문에 도움을 구한 첫 응답에서 필요 이상의 차단을 드러내므로 too_blunt예요. 이미 거절한 뒤 같은 부탁을 거듭 받는 인접 상황에서는 가능한 표현이에요."
+          },
+          {
+            "text": "주말 내내 노트북으로 온라인 수업을 들어야 해서 이틀 다 제가 써야 해요. 그래서 이번 주말에는 빌려주기 어렵겠어요.",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "친한 동료가 제약을 이해할 수 있도록 이틀간의 사용 이유를 먼저 제시하고 '빌려주기 어렵겠어요'로 연결해 개인적 거부가 아닌 일정 충돌로 받아들이게 하므로, 이유 중심의 배열을 유지해요."
+          },
+          {
+            "text": "주말 내내 노트북으로 온라인 수업을 들어야 해서 이틀 다 제가 써야 해요. 그래서 이번 주말에는 빌려주기 어렵겠는데, 이걸 어떻게 말씀드려야 덜 서운하실지 모르겠네요.",
+            "accepted_band_codes": [
+              "over_elaborate"
+            ],
+            "note_ko": "사용 제약과 대여 불가는 유지하면서, 종결하던 거절을 연결형으로 열고 상대의 서운함을 염려하는 메타발화를 붙였어요. 친한 동료에게 필요한 일정 설명을 넘어 거절을 전달하는 방식 자체를 고민거리로 넘겨, 대여 가능 여부보다 관계적 달램이 응답의 중심이 되므로 over_elaborate예요."
+          }
+        ],
+        "explanation_ko": "앵커에서 P와 R은 유지하고 D만 친한 사이로 바뀌었지만, 고장으로 도움을 청한 상황이므로 사정을 알리는 방식은 여전히 중요해요. 첫 적정안은 '미안해요'로 아쉬움을 직접 표시하고, 다른 적정안은 이유를 앞세워 일정상 불가임을 이해시키며 두 방식 모두 유지할 수 있어요. 긴 과소안은 설명량보다 반복적인 차단이 문제이고, 과잉안은 '얘기를 해야 할 것 같아요'가 거절 전달을 감싸는 것이 문제이므로 각각 반복과 메타발화를 줄이세요.",
+        "recommended_example": "주말 내내 노트북으로 온라인 수업을 들어야 해서 이틀 다 제가 써야 해요. 그래서 이번 주말에는 빌려주기 어렵겠어요.",
+        "id": 5,
+        "item_focus": "refusal_softening",
+        "axis_feature": "refusal_softening"
+      }
+    ],
+    "production_task": {
+      "mode": "translation",
+      "source_modality": "written",
+      "situation_ko": "나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.",
+      "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "source_text": "谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。",
+      "preceding_turn": null,
+      "vocabulary_hints": [
+        {
+          "source": "聚会",
+          "target": "모임"
+        },
+        {
+          "source": "和家人有约",
+          "target": "가족과 약속이 있다"
+        }
+      ],
+      "reference_alternatives": [
+        {
+          "text": "토요일 저녁 모임에 따로 초대해 줘서 고마워요. 일할 때뿐 아니라 이런 자리에도 저를 떠올리고 불러 줘서 기뻐요. 다만 그날 저녁에는 이미 가족과 약속이 있어 시간이 겹치는 바람에 이번에는 참석할 수 없어요. 함께 모여 시간을 보내지 못해 아쉽지만, 토요일 저녁 즐겁게 보내길 바라요.",
+          "note_ko": "초대에 대한 감사와 업무 밖에서도 떠올려 준 데 대한 기쁨을 모두 옮겼어요. 가족과의 선약 및 시간 충돌을 근거로 이번 불참을 분명히 밝힌 뒤, 함께하지 못하는 아쉬움과 즐거운 모임을 바라는 마음으로 마무리하며 새 약속은 만들지 않아요."
+        }
+      ],
+      "focal_segments": [
+        {
+          "text": "这次没办法参加了。",
+          "role": "head"
+        },
+        {
+          "text": "不过那天晚上我已经和家人有约，时间上确实冲突，",
+          "role": "support"
+        }
+      ]
+    },
+    "provenance": {
+      "model": "gpt-6-astra",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+      "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+      "mission_content_hash": "c12be6448ff4a44f1437f4ba37b202c68ba3ed9673232829a3fdf1aaf881bef7",
+      "generated_at": "2026-09-07T11:57:44.279Z",
+      "generation_attempt": 1,
+      "scene_topology": {
+        "version": "mission_scene_topology_evidence_v1",
+        "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+        "first_pass_result": "pass",
+        "final_result": "pass",
+        "attempts": 1,
+        "regeneration_count": 0,
+        "findings": []
+      },
+      "band_targeting": {
+        "version": "relative_band_targeting_v2_bounded_fallback",
+        "within_regeneration_count": 0,
+        "candidate_regeneration_counts": {},
+        "boundary_fallback": {
+          "eligible_paths": [],
+          "attempted_paths": [],
+          "succeeded_paths": [],
+          "situation_unchanged": true,
+          "immutable_candidates_unchanged": true
+        },
+        "within_warnings": []
+      }
+    }
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:57:44.279Z"
+  }
+}

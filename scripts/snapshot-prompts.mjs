@@ -14,6 +14,7 @@ import { createHash } from "node:crypto";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSync } from "esbuild";
+import { createRequire } from "node:module";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const EDGE = "supabase/functions/generate-scenario/index.ts";
@@ -56,11 +57,12 @@ const executable = buildSync({
   },
   bundle: true,
   write: false,
-  platform: "neutral",
+  platform: "node",
+  define: { "import.meta.main": "false" },
   format: "iife",
   target: "es2022",
 }).outputFiles[0].text;
-(0, eval)(executable);
+new Function("require", executable)(createRequire(import.meta.url));
 const S = globalThis.__S;
 
 const sha = (s) => createHash("sha256").update(s, "utf8").digest("hex");

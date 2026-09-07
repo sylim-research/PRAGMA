@@ -727,3 +727,11 @@ Edge 배포 버전, migration 적용 여부, 스모크 결과, 테스트 수, �
 - 제품·연구 정체성: `docs/research/PRAGMA_PRODUCT_RESEARCH_IDENTITY_2026-07-28.md`
 - Can-do 원칙: `docs/research/PRAGMA_CAN_DO_ALIGNMENT_PRINCIPLES_2026-07-28.md`
 - 화용론 설계 원칙: `docs/research/PRAGMA_PRAGMATICS_DESIGN_PRINCIPLES_2026-07-27.md`
+
+### 장시간 생성의 결과 보존
+
+선택형 Astra 미션 생성은 제공자 응답 ID와 요청 버전을 보존하고 완료 결과를 비동기로 회수한다.
+작업의 `completed`는 생성 본문의 확보만 뜻하며, 기존 규칙·AI 검사·초안 저장·교수자 승인 게이트를
+대체하지 않는다. 화면 복귀 시 저장된 결과로 기존 점검을 이어간다. 접수 여부가 불명확한 요청을
+자동 재전송하지 않으며, 재개에서도 기존 완료 응답과 호출 이력을 유지한다.
+학습설계·미션 스키마·교수자 승인·학습자 공개 조건은 그대로다.

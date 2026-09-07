@@ -1,3 +1,4 @@
+import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
 import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
@@ -87,6 +88,7 @@ const PROVIDER = 'openai'
 const PRIMARY_MODEL = OPENAI_MODEL_ROUTES.default.primary
 const FALLBACK_MODEL = OPENAI_MODEL_ROUTES.default.fallback
 const MISSION_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.mission.primary
+const missionModel = () => backgroundContext.getStore() ? ASTRA_GENERATION_MODEL : MISSION_PRIMARY_MODEL
 const CRITIC_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.critic.primary
 const FEEDBACK_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.feedback.primary
 const FEEDBACK_FALLBACK_MODEL = OPENAI_MODEL_ROUTES.feedback.fallback
@@ -621,6 +623,7 @@ async function recordOpenAIInvocation(args: {
   raw: string
   durationMs: number
   requestId: string | null
+  eventId?: string
 }): Promise<boolean> {
   const url = Deno.env.get('SUPABASE_URL')
   const key = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
@@ -632,6 +635,7 @@ async function recordOpenAIInvocation(args: {
   const metadata = parseOpenAIInvocationMetadata(args.raw)
   const t = args.telemetry
   const payload = {
+    ...(args.eventId ? { id: args.eventId } : {}),
     request_group_id: t.requestGroupId,
     provider: PROVIDER,
     operation: t.operation,
@@ -666,7 +670,7 @@ async function recordOpenAIInvocation(args: {
         apikey: key,
         Authorization: `Bearer ${key}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=minimal',
+        Prefer: args.eventId ? 'return=minimal,resolution=ignore-duplicates' : 'return=minimal',
       },
       body: JSON.stringify(payload),
     })
@@ -689,6 +693,16 @@ async function callOpenAI(
   temperature = 0.8,
   options: OpenAICallOptions,
 ) {
+  const context = backgroundContext.getStore()
+  if (context) {
+    const completed = await context.call({ model, system, user, temperature,
+      maxCompletionTokens: options.maxCompletionTokens, responseFormat: options.responseFormat })
+    const logged = await recordOpenAIInvocation({ telemetry: { ...options.telemetry, requestGroupId: context.jobId },
+      modelRequested: model, statusCode: 200, ok: true, raw: completed.raw, durationMs: completed.durationMs,
+      requestId: null, eventId: completed.eventId })
+    if (!logged) throw new GenerationStopped('LLM 호출 장부 저장 실패 — 생성 결과는 작업에 보존됩니다.')
+    return { ok: true as const, raw: completed.raw }
+  }
   const startedAt = Date.now()
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
@@ -2378,7 +2392,7 @@ async function generateFrozenMissionTopology(args: {
   let previousPlan: unknown
   for (let attempt = 1; attempt <= NATIVE_MPJ5_TOPOLOGY_MAX_ATTEMPTS; attempt += 1) {
     const prompt = buildMissionTopologyPrompt(args.body, allFindings, previousPlan)
-    const response = await callOpenAI(MISSION_PRIMARY_MODEL, args.apiKey, prompt.system, prompt.user, 0.2, {
+    const response = await callOpenAI(missionModel(), args.apiKey, prompt.system, prompt.user, 0.2, {
       responseFormat: {
         type: 'json_schema',
         json_schema: {
@@ -2614,7 +2628,7 @@ ${zhKoDirectionRule}
 [counter-rule] ${args.feature.counter_rule_note}
 [candidate packets]
 ${JSON.stringify(packets, null, 2)}`
-  const att = await callOpenAI(MISSION_PRIMARY_MODEL, args.apiKey, system, user, 0.2, {
+  const att = await callOpenAI(missionModel(), args.apiKey, system, user, 0.2, {
     telemetry: args.telemetryFor('mission_generate', true, {
       invocationAttempt: args.invocationAttempt,
       promptVersion: MISSION_CANDIDATE_GENERATION_PROMPT_VERSION,
@@ -3915,7 +3929,7 @@ function parseOpenAIContent(raw: string): unknown {
   return JSON.parse(content)
 }
 
-Deno.serve(async (req) => {
+export async function handleGenerateScenario(req: Request): Promise<Response> {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: jsonHeaders })
 
   try {
@@ -4188,7 +4202,7 @@ Deno.serve(async (req) => {
         topology_evidence: generated.evidence,
         meta: {
           provider: PROVIDER,
-          model: MISSION_PRIMARY_MODEL,
+          model: missionModel(),
           prompt_version: MISSION_TOPOLOGY_PROMPT_VERSION,
           content_release_id: CURRENT_CONTENT_RELEASE_ID,
           generated_at: new Date().toISOString(),
@@ -4232,11 +4246,11 @@ Deno.serve(async (req) => {
       }
       const sys = buildMissionSystemPrompt(b.feature, b.is_response_act, isSpoken, missionDir, isMiniDiscourse)
       const usr = buildMissionUserPrompt(b, isMiniDiscourse)
-      const model = MISSION_PRIMARY_MODEL
+      const model = missionModel()
       const missionPromptVersion = isMiniDiscourse
         ? CURRENT_MISSION_PROMPT_VERSIONS[0]
         : CURRENT_MISSION_PROMPT_VERSIONS[1]
-      const att = await callOpenAI(MISSION_PRIMARY_MODEL, apiKey, sys, usr, temp, {
+      const att = await callOpenAI(missionModel(), apiKey, sys, usr, temp, {
         telemetry: telemetryFor('mission_generate', true, {
           promptVersion: missionPromptVersion,
         }),
@@ -4449,7 +4463,7 @@ Deno.serve(async (req) => {
         candidate_checks: checked.results,
         meta: {
           provider: PROVIDER,
-          model: MISSION_PRIMARY_MODEL,
+          model: missionModel(),
           prompt_version: MISSION_CANDIDATE_GENERATION_PROMPT_VERSION,
           critic_model: CRITIC_PRIMARY_MODEL,
           critic_prompt_version: MISSION_CANDIDATE_CHECK_PROMPT_VERSION,
@@ -4471,7 +4485,7 @@ Deno.serve(async (req) => {
         return new Response(JSON.stringify({ operations: [] }), { status: 200, headers: jsonHeaders })
       }
       const prompt = buildMissionRepairPrompt(b)
-      const att = await callOpenAI(MISSION_PRIMARY_MODEL, apiKey, prompt.system, prompt.user, 0.2, {
+      const att = await callOpenAI(missionModel(), apiKey, prompt.system, prompt.user, 0.2, {
         telemetry: telemetryFor('mission_repair', true, {
           promptVersion: MISSION_ITEM_REPAIR_PROMPT_VERSION,
         }),
@@ -4490,7 +4504,7 @@ Deno.serve(async (req) => {
           operations: sanitizeMissionRepairOperations(b.mission_content, b.findings, parsed),
           meta: {
             provider: PROVIDER,
-            model: MISSION_PRIMARY_MODEL,
+            model: missionModel(),
             prompt_version: MISSION_ITEM_REPAIR_PROMPT_VERSION,
             generated_at: new Date().toISOString(),
           },
@@ -5044,10 +5058,13 @@ Deno.serve(async (req) => {
       { status: 200, headers: jsonHeaders },
     )
   } catch (e) {
+    if (e instanceof GenerationPending || e instanceof GenerationStopped) throw e
     console.error('generate-scenario error', e)
     return new Response(JSON.stringify({ error: (e as Error).message }), {
       status: 500,
       headers: jsonHeaders,
     })
   }
-})
+}
+
+if (import.meta.main) Deno.serve(handleGenerateScenario)

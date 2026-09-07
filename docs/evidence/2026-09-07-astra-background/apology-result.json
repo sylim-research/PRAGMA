@@ -1,0 +1,345 @@
+{
+  "mission_content": {
+    "schema_version": "mission_v5",
+    "direction": "zh_ko",
+    "learning_goal": {
+      "kind": "speech_act",
+      "speech_act": "apology"
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "apology",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "authoring": {
+      "schema_version": "mission_authoring_v1",
+      "stage": "ai_draft",
+      "lineage_status": "pending",
+      "repair_attempts": 0
+    },
+    "unit": {
+      "target_feature": "apology_accountability_repair",
+      "target_feature_version": "1.0",
+      "learner_label": "책임 인정과 수리",
+      "closing_ko": "사과는 세게 말하는 것이 아니라, 실제 책임과 상대가 받은 영향에 맞게 인정하고 필요한 수리를 제시할 때 적절합니다."
+    },
+    "diagnostic_dimensions": [
+      {
+        "code": "force_calibration",
+        "evidence_refs": [
+          "mpj:1",
+          "mpj:2",
+          "mpj:3",
+          "mpj:5"
+        ],
+        "evidence_ko": "친구에게 하는 완화된 책임 인정, 동료의 추가 작업을 작게 평가하는 표현, 잠깐의 펜 착각을 큰 잘못으로 평가하는 표현을 통해 사건의 무게에 맞는 사과 강도를 관찰한다."
+      },
+      {
+        "code": "supportive_move_fit",
+        "evidence_refs": [
+          "mpj:1",
+          "mpj:5",
+          "dct"
+        ],
+        "evidence_ko": "손상된 책을 같은 책으로 바꾸겠다는 수리, 잘못 가져온 펜의 반환, 밤에는 가구를 옮기지 않겠다는 재발 방지가 각각 원문에서 허용된 범위 안에서 사과를 뒷받침한다."
+      }
+    ],
+    "mpj_items": [
+      {
+        "type": "scale4",
+        "channel": "facetoface",
+        "situation_ko": "나는 친한 친구에게 빌린 소설책에 커피를 쏟아 여러 장을 읽기 어렵게 만들었다. 친구를 만나 내 부주의를 사과하고 같은 책으로 바꿔 주겠다고 말한다.",
+        "relation_ko": "오랫동안 가깝게 지낸 대등한 친구",
+        "pdr": {
+          "d": "close",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "我把咖啡洒在你借给我的小说上，好几页都看不清了。是我不小心，不好意思。我给你换一本同样的。",
+        "preceding_turn": null,
+        "target": "빌려준 소설책에 제가 커피를 쏟아서 여러 장을 읽기 어렵게 됐어요. 제가 좀 부주의했네요, 미안해요. 같은 책으로 바꿔 줄게요.",
+        "highlights": [
+          "제가 좀 부주의했네요, 미안해요.",
+          "같은 책으로 바꿔 줄게요."
+        ],
+        "accepted_scale_codes": [
+          "very_appropriate",
+          "somewhat_appropriate"
+        ],
+        "reference_scale_code": "somewhat_appropriate",
+        "explanation_ko": "가까운 친구에게 책을 손상한 일을 사과하면서, 손상 결과를 밝히고 같은 책으로 바꾸겠다고 책임을 맡고 있어요. ‘좀 부주의했네요’는 완화된 인정이지만 구체적인 수리가 함께 있어 책임 회피로 흐르지 않으므로, 사과를 더 강하게 늘리기보다 잘못과 수리를 연결한 구성을 유지하면 됩니다.",
+        "recommended_example": "빌려준 소설책에 제가 커피를 쏟아서 여러 장을 읽기 어렵게 됐어요. 제가 좀 부주의했네요, 미안해요. 같은 책으로 바꿔 줄게요.",
+        "id": 1,
+        "item_focus": "apology_accountability_repair",
+        "axis_feature": "apology_accountability_repair"
+      },
+      {
+        "type": "judge3",
+        "channel": "facetoface",
+        "situation_ko": "나는 동급 동료의 발표 자료를 수정하다가 도표를 잘못 지워, 동료가 복구에 30분을 쓰게 했다. 자료가 복구된 뒤 동료를 만나 내 실수로 추가 작업을 하게 한 점을 사과한다.",
+        "relation_ko": "가끔 함께 일하는 동급 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "我改你的演示文稿时，误删了图表。害你多花了半个小时才恢复，是我不小心。给你添麻烦了，对不起。",
+        "preceding_turn": null,
+        "target": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 작은 실수로 복구에 30분을 더 쓰게 했네요. 좀 번거롭게 했네요, 미안해요.",
+        "highlights": [
+          "제 작은 실수로",
+          "좀 번거롭게 했네요"
+        ],
+        "accepted_band_codes": [
+          "under_acknowledged"
+        ],
+        "explanation_ko": "첫 장면처럼 완화된 책임 인정과 짧은 사과를 쓰며, P/D/R 코드에서는 동등한 지위와 중간 부담을 유지하고 거리만 가까운 친구에서 어색한 동료로 바뀌었어요. 여기서는 30분의 추가 작업을 인정하면서도 ‘제 작은 실수’라고 잘못의 무게를 먼저 낮춰 상대의 수고를 가볍게 평가하는 인상을 주므로, 사과를 늘리기보다 ‘작은’을 빼고 부주의와 부담을 연결하세요.",
+        "recommended_example": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 했네요. 번거롭게 해서 미안해요.",
+        "id": 2,
+        "item_focus": "apology_accountability_repair",
+        "axis_feature": "apology_accountability_repair"
+      },
+      {
+        "type": "fix_choice",
+        "channel": "facetoface",
+        "situation_ko": "나는 동급 동료의 발표 자료를 수정하다가 도표를 잘못 지워, 동료가 복구에 30분을 쓰게 했다. 자료가 복구된 뒤 동료를 만나 내 실수로 추가 작업을 하게 한 점을 사과한다.",
+        "relation_ko": "가끔 함께 일하는 동급 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "我改你的演示文稿时，误删了图表。害你多花了半个小时才恢复，是我不小心。给你添麻烦了，对不起。",
+        "preceding_turn": null,
+        "target": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 작은 실수로 복구에 30분을 더 쓰게 했네요. 좀 번거롭게 했네요, 미안해요.",
+        "highlights": [
+          "제 작은 실수로",
+          "좀 번거롭게 했네요"
+        ],
+        "accepted_band_codes": [
+          "under_acknowledged"
+        ],
+        "corrections": [
+          {
+            "text": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 했네요. 번거롭게 해서 미안해요.",
+            "is_valid": true,
+            "note_ko": "동료가 복구에 30분을 쓴 상황에서 ‘제 부주의로’가 원인과 부담을 연결해 수고를 인정하므로, 실제 책임을 축소하거나 확대하지 않는 이 연결을 유지하세요."
+          },
+          {
+            "text": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 했네요. 조금 번거롭게 한 정도지만 미안해요.",
+            "is_valid": false,
+            "note_ko": "원인과 30분의 추가 작업은 유지하되, ‘조금 번거롭게 한 정도지만’으로 피해를 제한적으로 평가한다. 상대의 수고를 화자가 먼저 축소하므로 적정 대역에서 부족함 쪽으로 이동한다."
+          },
+          {
+            "text": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 한 건 심각한 잘못이에요. 번거롭게 해서 미안해요.",
+            "is_valid": false,
+            "note_ko": "부주의와 추가 작업의 인과관계는 그대로 두고, 책임 평가를 ‘심각한 잘못’으로 높인다. 복구가 완료되고 부담이 30분으로 한정된 상황보다 잘못의 중대성을 크게 잡아 과함 쪽 경계를 넘는다."
+          }
+        ],
+        "explanation_ko": "자료는 복구됐지만 동료가 들인 30분은 실제로 발생한 부담이에요. 원래 초안의 ‘제 작은 실수’를 권장안처럼 ‘제 부주의로’로 바꾸면 상대의 수고를 낮춰 평가하지 않으면서 책임을 인정하므로, 새 보상이나 약속을 붙이지 말고 책임을 축소하는 평가만 조정하세요.",
+        "recommended_example": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 했네요. 번거롭게 해서 미안해요.",
+        "id": 3,
+        "item_focus": "apology_accountability_repair",
+        "axis_feature": "apology_accountability_repair"
+      },
+      {
+        "type": "reason",
+        "channel": "facetoface",
+        "situation_ko": "나는 동급 동료의 발표 자료를 수정하다가 도표를 잘못 지워, 동료가 복구에 30분을 쓰게 했다. 자료가 복구된 뒤 동료를 만나 내 실수로 추가 작업을 하게 한 점을 사과한다.",
+        "relation_ko": "가끔 함께 일하는 동급 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "我改你的演示文稿时，误删了图表。害你多花了半个小时才恢复，是我不小心。给你添麻烦了，对不起。",
+        "preceding_turn": null,
+        "target": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 작은 실수로 복구에 30분을 더 쓰게 했네요. 좀 번거롭게 했네요, 미안해요.",
+        "highlights": [
+          "제 작은 실수로",
+          "좀 번거롭게 했네요"
+        ],
+        "problem_band_code": "under_acknowledged",
+        "reasons": [
+          {
+            "id": "r2",
+            "text_ko": "‘미안해요’가 가끔 함께 일하는 동료에게 실제보다 가까운 관계를 전제하는 사과 표현이기 때문이다.",
+            "kind": "pragmatic_misconception"
+          },
+          {
+            "id": "r3",
+            "text_ko": "‘30분을 더’가 원문의 복구 시간에 별도의 30분을 추가해 작업 시간을 늘려 전달하기 때문이다.",
+            "kind": "meaning_grammar_context"
+          },
+          {
+            "id": "r1",
+            "text_ko": "30분의 추가 작업을 인정하면서도 ‘제 작은 실수’라고 평가해, 자신이 초래한 부담의 무게를 낮추기 때문이다.",
+            "kind": "primary"
+          }
+        ],
+        "accepted_reason_id": "r1",
+        "explanation_ko": "동료가 복구에 30분을 썼다는 영향과 화자의 실수는 초안에도 나타나 있어요. 문제는 그것들이 없다는 점이 아니라 ‘제 작은 실수’라는 평가가 책임 인정을 약화해 상대의 수고를 가볍게 보는 인상을 준다는 점이므로, 문법이나 사과 말투 대신 그 축소 표현을 조정하세요.",
+        "recommended_example": "발표 자료를 수정하다가 제가 도표를 잘못 지웠어요. 제 부주의로 복구에 30분을 더 쓰게 했네요. 번거롭게 해서 미안해요.",
+        "id": 4,
+        "item_focus": "apology_accountability_repair",
+        "axis_feature": "apology_accountability_repair"
+      },
+      {
+        "type": "multi_judge",
+        "channel": "facetoface",
+        "situation_ko": "나는 동급 동료의 펜을 내 것으로 착각해 회의실 자리에서 가져왔고, 동료는 펜을 잠깐 찾았다. 곧 착각을 알아차린 나는 펜을 돌려주며 잘못 가져간 일을 사과한다.",
+        "relation_ko": "가끔 인사를 나누는 동급 동료",
+        "pdr": {
+          "d": "acquaintance",
+          "r": "low",
+          "p": "equal"
+        },
+        "source": "我把你的笔当成自己的拿走了。让你找了一会儿，不好意思。笔还给你。",
+        "preceding_turn": null,
+        "candidates": [
+          {
+            "text": "제 펜인 줄 알고 가져갔어요. 잠깐 찾게 해서 미안해요. 여기 돌려드릴게요.",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "잠깐 찾은 뒤 바로 반환하는 상황에서 ‘찾게 해서 미안해요’가 상대의 수고를 사과에 직접 연결해 배려를 드러내므로, 간결한 영향 인정과 반환을 유지하세요."
+          },
+          {
+            "text": "제 펜인 줄 알고 가져갔어요. 잠깐 찾게 한 것뿐이지만 미안해요. 여기 돌려드릴게요.",
+            "accepted_band_codes": [
+              "under_acknowledged"
+            ],
+            "note_ko": "착각에 의한 반출, 잠깐의 수고, 사과와 반환은 유지한다. ‘것뿐이지만’이 영향 인정을 방어적인 축소 평가로 바꾸어, 가끔 인사하는 동료의 불편을 충분히 받아들이지 않는 부족함 대역을 만든다."
+          },
+          {
+            "text": "제 펜인 줄 알고 가져간 제 실수예요. 잠깐 찾으셨죠, 미안해요. 여기 돌려드릴게요.",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "곧바로 회복되는 착각에 ‘제 실수예요’로 책임을 분명히 하고 ‘잠깐 찾으셨죠’로 경험을 짚어 방어하지 않는 인상을 주므로, 책임을 앞세운 이 구성을 유지하세요."
+          },
+          {
+            "text": "제 펜인 줄 알고 가져간 건 가볍게 넘길 잘못이 아니에요. 잠깐 찾으셨죠, 미안해요. 여기 돌려드릴게요.",
+            "accepted_band_codes": [
+              "overextended"
+            ],
+            "note_ko": "책임을 앞세우는 구성과 상대 경험 확인, 사과와 반환은 유지한다. ‘제 실수예요’를 ‘가볍게 넘길 잘못이 아니에요’로 바꾸어 즉시 회복된 착각에 필요 이상의 도덕적 무게를 부여하므로 과함 대역으로 이동한다."
+          }
+        ],
+        "explanation_ko": "앵커와 지위·거리는 같고 부담만 낮아져, 잠깐의 불편과 즉시 반환에 맞는 책임 인정이면 충분해요. 첫째는 상대 영향에 사과를 연결하고 셋째는 자기 책임을 앞세워 각각 배려와 비방어적 태도를 드러내므로 둘 다 유지할 수 있어요. 둘째의 ‘별일은 아니었네요’는 상대 경험을 축소하고 넷째의 ‘큰 잘못’은 사건을 확대하므로, 말의 길이가 아니라 그 평가를 조정하세요.",
+        "recommended_example": "제 펜인 줄 알고 가져갔어요. 잠깐 찾게 해서 미안해요. 여기 돌려드릴게요.",
+        "id": 5,
+        "item_focus": "apology_accountability_repair",
+        "axis_feature": "apology_accountability_repair"
+      }
+    ],
+    "production_task": {
+      "mode": "interpreting",
+      "source_modality": "spoken",
+      "situation_ko": "나는 다음 날 복도에서 아래층 이웃을 만나 어젯밤 늦게 가구를 옮기며 낸 소음을 사과하고, 앞으로 밤에는 옮기지 않겠다고 말한다. 얼굴을 몇 차례 본 어색한 사이이며, 이웃은 내가 낸 소음으로 늦은 시간에 불편을 겪었다.",
+      "relation_ko": "얼굴을 몇 차례 본 사이인 위층 거주자와 소음 피해를 겪은 아래층 이웃",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "source_text": "昨晚我在家挪家具，时间那么晚了还弄出噪音，打扰到你了，真对不起。这么晚还搬动家具，确实是我考虑不周，没有顾及楼下邻居的感受。以后我不会再在晚上挪家具了。",
+      "preceding_turn": null,
+      "replay_limit": 2,
+      "reference_alternatives": [
+        {
+          "text": "어젯밤 집에서 가구를 옮기다가 늦은 시간에 소음을 내서 불편을 드렸어요. 정말 죄송해요. 그렇게 늦게 가구를 옮긴 건 제가 생각이 짧았고, 아래층 이웃 입장을 배려하지 못했어요. 앞으로는 밤에 가구를 옮기지 않을게요.",
+          "note_ko": "늦은 소음으로 겪은 불편을 먼저 사과하고 자신의 배려 부족을 인정한 뒤, 원문에 있는 재발 방지 약속으로 마무리하는 영향 중심 전략입니다."
+        },
+        {
+          "text": "어젯밤 집에서 그렇게 늦게 가구를 옮긴 건 제가 생각이 짧았어요. 아래층 이웃 입장을 배려하지 못하고 소음을 내서 불편을 드렸네요. 정말 죄송해요. 앞으로 밤에는 가구를 옮기지 않을게요.",
+          "note_ko": "늦은 시간에 옮긴 자신의 판단부터 인정하고 이웃의 불편과 사과를 연결하는 책임 중심 전략으로, 소음·배려 부족·재발 방지까지 원문의 내용을 모두 담았습니다."
+        }
+      ],
+      "focal_segments": [
+        {
+          "text": "真对不起。",
+          "role": "head"
+        },
+        {
+          "text": "确实是我考虑不周，没有顾及楼下邻居的感受。",
+          "role": "support"
+        },
+        {
+          "text": "以后我不会再在晚上挪家具了。",
+          "role": "support"
+        }
+      ]
+    },
+    "provenance": {
+      "model": "gpt-6-astra",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+      "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+      "mission_content_hash": "3d827a8fd84cb443d5dcd0398f31d34ecd894a821ab8655ec9d0f8024bf73685",
+      "generated_at": "2026-09-07T11:56:28.388Z",
+      "generation_attempt": 1,
+      "scene_topology": {
+        "version": "mission_scene_topology_evidence_v1",
+        "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+        "first_pass_result": "pass",
+        "final_result": "pass",
+        "attempts": 1,
+        "regeneration_count": 0,
+        "findings": []
+      },
+      "band_targeting": {
+        "version": "relative_band_targeting_v2_bounded_fallback",
+        "within_regeneration_count": 0,
+        "candidate_regeneration_counts": {},
+        "boundary_fallback": {
+          "eligible_paths": [],
+          "attempted_paths": [],
+          "succeeded_paths": [],
+          "situation_unchanged": true,
+          "immutable_candidates_unchanged": true
+        },
+        "within_warnings": []
+      }
+    }
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:56:28.388Z"
+  }
+}

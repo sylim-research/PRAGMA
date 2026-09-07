@@ -1,0 +1,43 @@
+{
+  "context": {
+    "speech_act": "apology",
+    "level": "advanced",
+    "domain": "daily",
+    "theme_code": "daily_living",
+    "topic_code": "neighbor_noise_apology",
+    "industry": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "planned_target_feature": "apology_accountability_repair",
+    "direction": "zh_ko"
+  },
+  "ok": true,
+  "result": "warning",
+  "violations": [
+    {
+      "id": "R5",
+      "level": "warning",
+      "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 3 — \"我改你的演示文稿时,误删了图表。害你多花了半个小…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "source 완전 중복: 문항 2 = 문항 4 — \"我改你的演示文稿时,误删了图表。害你多花了半个小…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"발표 자료를 수정하다가 제가 도표를 잘못 지…\""
+    },
+    {
+      "id": "R19",
+      "level": "warning",
+      "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"발표 자료를 수정하다가 제가 도표를 잘못 지…\""
+    }
+  ]
+}

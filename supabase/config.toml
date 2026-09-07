@@ -45,6 +45,10 @@ skip_nonce_check = false
 [functions.generate-scenario]
 verify_jwt = true
 
+# Cron uses a private DB-held worker token; user requests require getUser + is_admin inside the handler.
+[functions.generation-jobs]
+verify_jwt = false
+
 [functions.tts]
 verify_jwt = true
 
