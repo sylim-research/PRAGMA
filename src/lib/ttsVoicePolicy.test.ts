@@ -10,12 +10,16 @@ beforeEach(() => vi.stubGlobal('AbortSignal', { timeout: () => new AbortControll
 afterEach(() => { vi.unstubAllGlobals(); vi.restoreAllMocks(); });
 
 describe('language-specific designed TTS voices', () => {
-  it.each(['ko', 'zh'] as const)('uses the chosen %s voice and language pace', async lang => {
+  it.each([
+    ['ko', 'intermediate', 0.85],
+    ['zh', 'intermediate', 0.7],
+    ['zh', 'advanced', 0.8],
+  ] as const)('uses the chosen %s voice at %s pace', async (lang, level, speed) => {
     const request = vi.fn().mockResolvedValue(audio());
-    const result = await synthesizeTts('sample', lang, { elevenlabs: 'test', openai: 'test' }, request);
+    const result = await synthesizeTts('sample', lang, { elevenlabs: 'test', openai: 'test' }, request, level);
     expect(request).toHaveBeenCalledTimes(1);
     expect(request.mock.calls[0][0]).toContain(TTS_VOICE_BY_LANG[lang]);
-    expect(body(request).voice_settings).toMatchObject({ speed: lang === 'zh' ? 0.85 : 1, style: 0.1 });
+    expect(body(request).voice_settings).toMatchObject({ speed, style: 0.1 });
     expect(result).toMatchObject({ ok: true, provider: 'elevenlabs', voice: TTS_VOICE_BY_LANG[lang], fallbackUsed: false });
   });
   it('uses instructed OpenAI audio when ElevenLabs has no key', async () => {
@@ -23,7 +27,7 @@ describe('language-specific designed TTS voices', () => {
     expect(await synthesizeTts('中文', 'zh', { openai: 'test' }, request)).toMatchObject({
       ok: true, provider: 'openai', model: 'gpt-4o-mini-tts', voice: 'shimmer', fallbackUsed: true,
     });
-    expect(body(request)).toMatchObject({ speed: 0.85, instructions: expect.stringContaining('Mandarin') });
+    expect(body(request)).toMatchObject({ speed: 0.7, instructions: expect.stringContaining('Mandarin') });
   });
   it('falls back to the same language on ElevenLabs failure without trying the other designed voice', async () => {
     const request = vi.fn().mockResolvedValueOnce(failure(429)).mockResolvedValueOnce(audio());

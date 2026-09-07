@@ -1,5 +1,5 @@
-import { TTS_VOICE_BY_LANG, type TtsLang } from "../../supabase/functions/_shared/ttsVoicePolicy";
-export type { TtsLang } from "../../supabase/functions/_shared/ttsVoicePolicy";
+import { TTS_VOICE_BY_LANG, type TtsLang, type TtsLevel } from "../../supabase/functions/_shared/ttsVoicePolicy";
+export type { TtsLang, TtsLevel } from "../../supabase/functions/_shared/ttsVoicePolicy";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
@@ -43,10 +43,12 @@ export const isTtsRelatedErrorMessage = (value: unknown) => {
 export const requestTtsAudio = async ({
   text,
   lang,
+  level = "intermediate",
   logPrefix = "[TTS]",
 }: {
   text: string;
   lang: TtsLang;
+  level?: TtsLevel;
   logPrefix?: string;
 }): Promise<TtsResult> => {
   const requestedVoiceId = DEFAULT_TTS_VOICE_BY_LANG[lang];
@@ -61,7 +63,7 @@ export const requestTtsAudio = async ({
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         apikey: SUPABASE_ANON_KEY,
       },
-      body: JSON.stringify({ text, lang, voiceId: requestedVoiceId }),
+      body: JSON.stringify({ text, lang, level, voiceId: requestedVoiceId }),
     });
 
     const contentType = response.headers.get("content-type") || "";

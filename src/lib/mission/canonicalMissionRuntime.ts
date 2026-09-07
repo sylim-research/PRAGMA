@@ -469,7 +469,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       {
         ...common(3, reason),
         kind: "reason",
-        prompt: "이 표현은 이 상황에 적절한가요?",
+        prompt: "이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?",
         target: reason.target,
         referenceJudgment: "inappropriate",
         reasons: reason.reasons.map((item, index) => ({

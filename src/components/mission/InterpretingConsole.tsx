@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
-import { requestTtsAudio, type TtsLang } from "@/lib/tts";
+import { requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
 
 type LanguageSpec = {
   code: "ko" | "zh";
@@ -13,12 +13,14 @@ export function InterpretingConsole({
   sourceText,
   sourceLanguage,
   targetLanguage,
+  learnerLevel = "intermediate",
   replayLimit = 2,
   onSubmit,
 }: {
   sourceText: string;
   sourceLanguage: LanguageSpec;
   targetLanguage: LanguageSpec;
+  learnerLevel?: TtsLevel;
   replayLimit?: number;
   onSubmit: (transcript: string) => void;
 }) {
@@ -57,6 +59,7 @@ export function InterpretingConsole({
         const result = await requestTtsAudio({
           text: sourceText,
           lang: sourceLanguage.code as TtsLang,
+          level: learnerLevel,
           logPrefix: "[canonical-mission-tts]",
         });
         setTtsLoading(false);

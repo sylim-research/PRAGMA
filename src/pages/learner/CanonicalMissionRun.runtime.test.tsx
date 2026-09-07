@@ -29,6 +29,7 @@ import CanonicalMissionRun, {
 describe("CanonicalMissionRun live CTA route", () => {
   beforeEach(() => {
     window.scrollTo = vi.fn();
+    window.history.replaceState({}, "", "/");
     fetchMissionByScenario.mockResolvedValue({
       scenario_id: scenarioId,
       speech_act: "request",
@@ -65,6 +66,33 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByText(/^D · /)).toBeInTheDocument();
     expect(screen.getByText(/^R · /)).toBeInTheDocument();
     expect(fetchMissionByScenario).toHaveBeenCalledWith(scenarioId);
+  });
+
+  it("opens an interpreting DCT directly and labels the skipped judgments", async () => {
+    const interpretingMission = structuredClone(SAMPLE_MISSION_V5);
+    interpretingMission.production_task.mode = "interpreting";
+    fetchMissionByScenario.mockResolvedValueOnce({
+      scenario_id: scenarioId,
+      speech_act: "request",
+      learner_level: "intermediate",
+      mission_status: "reviewed",
+      release_gate_mode: "legacy_reviewed",
+      direction: "ko_zh",
+      mission: interpretingMission,
+    });
+
+    window.history.replaceState({}, "", "/?start=dct");
+    render(
+      <MemoryRouter initialEntries={[`/learner/practice/${scenarioId}?start=dct`]}>
+        <Routes>
+          <Route path="/learner/practice/:scenarioId" element={<CanonicalMissionRun />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("통역 수행 콘솔")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("앞의 표현 판단 활동은 수행 기록에 포함되지 않습니다.");
+    expect(screen.queryByRole("heading", { name: "상황에 맞는 표현 판단하기" })).not.toBeInTheDocument();
   });
 
   it("does not render a native MPJ5 preceding-turn card even for a response act", async () => {

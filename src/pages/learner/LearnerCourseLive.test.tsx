@@ -49,6 +49,10 @@ describe("주차를 펼쳐 보는 강의계획서", () => {
       expect(url.pathname).toBe(`/learner/practice/${scenario.scenario_id}`);
       expect(Object.fromEntries(url.searchParams)).toEqual({ courseId, weekNo: "2", assignmentId: scenario.assignment_id });
     }
+    const shortcut = panel.getByRole("link", { name: "통역 DCT 바로가기: 병원 예약 변경 요청" });
+    expect(Object.fromEntries(new URL(shortcut.getAttribute("href")!, "https://example.test").searchParams)).toEqual({
+      courseId, weekNo: "2", assignmentId: "assignment-spoken", start: "dct",
+    });
     expect(panel.getByRole("link", { name: "강의 유인물" })).toHaveAttribute("href", `/learner/course/${courseId}/week/2/note`);
     expect(screen.queryByText(missionWeek.scenarios[0].brief_note_ko!)).not.toBeInTheDocument();
     expect(screen.queryByText(/0\/2|시작 전|예정|학기 일정|수업 활동|통역사 C|중심 질문은 수업의 방향/)).not.toBeInTheDocument();
