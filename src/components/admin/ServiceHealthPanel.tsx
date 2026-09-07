@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   IDLE_STATUSES,
@@ -11,14 +12,15 @@ import {
   type ServiceTone,
 } from "@/lib/admin/serviceHealthApi";
 
-// 시연·수업 직전에 확인하는 점검.
+// 시연·수업 직전에 확인하는 연동 상태. 화면 맨 위에 두되 평소에는 한 줄만 차지한다.
 //
-// 화면을 열면 마지막 결과를 먼저 보여 주고, 그것이 오래됐을 때만 조용히 다시 확인한다.
-// 빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
-// 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 생성·검수·음성 요청은 만들지 않는다.
-//
-// 각 줄에는 상태만 둔다. 잔액을 어떻게 관리하는지는 목록 아래 한 줄로 모았다 —
-// 같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
+// - 화면을 열면 마지막 결과를 먼저 보여 주고, 오래됐을 때만 조용히 다시 확인한다.
+//   빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
+// - 모두 정상이면 접어 둔다. 매일 보는 운영 지표를 밀어내지 않기 위해서다.
+//   대신 정상이 아닌 항목이 하나라도 있으면 스스로 펼쳐 눈에 걸리게 한다.
+// - 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 토큰·글자 수를 쓰지 않는다.
+// - 각 줄에는 상태만 둔다. 잔액 관리 안내는 목록 아래 한 줄로 모았다 —
+//   같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
 
 const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
   elevenlabs: { name: "ElevenLabs", role: "음성 합성" },
@@ -42,6 +44,9 @@ const CONSOLES = [
   { label: "Anthropic 콘솔", href: "https://platform.claude.com/dashboard" },
 ];
 
+/** 접힌 줄에서 쓰는 우선순위 — 가장 나쁜 상태 하나가 전체를 대표한다. */
+const SEVERITY: ServiceTone[] = ["fail", "warn", "manual", "idle", "ok"];
+
 const formatStamp = (iso: string) => {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
@@ -49,6 +54,15 @@ const formatStamp = (iso: string) => {
   const meridiem = hour < 12 ? "오전" : "오후";
   const hour12 = hour % 12 === 0 ? 12 : hour % 12;
   return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}. ${meridiem} ${hour12}:${String(date.getMinutes()).padStart(2, "0")}`;
+};
+
+/** 접힌 줄의 요약: 무엇이 몇 건인지와 어느 서비스인지까지 적는다. */
+const summarizeStatuses = (statuses: ServiceStatus[]) => {
+  const worst = SEVERITY.find((tone) => statuses.some((status) => status.tone === tone)) ?? "idle";
+  if (worst === "ok") return { tone: worst, text: `${statuses.length}개 서비스 모두 정상` };
+  if (worst === "idle") return { tone: worst, text: "아직 점검하지 않았습니다" };
+  const names = statuses.filter((status) => status.tone === worst).map((status) => SERVICE_META[status.id].name);
+  return { tone: worst, text: `${TONE[worst].label} ${names.length}건 · ${names.join(" · ")}` };
 };
 
 const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolean }) => {
@@ -88,16 +102,17 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
   );
 };
 
-/**
- * 머리 띠는 운영 대시보드의 `PanelHeader`와 같은 형태로 맞춘다(같은 화면의 다른 절과 한 몸으로 읽히게).
- * 저 컴포넌트는 AdminDashboard 안에 있어 가져다 쓸 수 없으므로 같은 클래스만 되풀이한다.
- */
 export const ServiceHealthPanel = () => {
   // 첫 그림부터 마지막 결과로 채운다 — 깜빡임 없이 「최근에 이랬다」를 보여 준다.
   const stored = useRef(readStoredReport()).current;
   const [statuses, setStatuses] = useState<ServiceStatus[]>(stored?.statuses ?? IDLE_STATUSES);
   const [checkedAt, setCheckedAt] = useState<string | null>(stored?.checkedAt ?? null);
   const [pending, setPending] = useState(false);
+  // null = 아직 손대지 않음(상태에 따라 자동으로 결정). 한 번 누르면 그 선택을 따른다.
+  const [opened, setOpened] = useState<boolean | null>(null);
+
+  const summary = useMemo(() => summarizeStatuses(statuses), [statuses]);
+  const open = opened ?? summary.tone !== "ok";
 
   const runCheck = async () => {
     setPending(true);
@@ -117,7 +132,6 @@ export const ServiceHealthPanel = () => {
   };
 
   // 보관된 결과가 없거나 오래됐으면 화면을 열 때 한 번 다시 확인한다.
-  // 잔량 조회·인증 확인뿐이라 토큰이나 글자 수를 쓰지 않는다.
   useEffect(() => {
     if (stored && !isStale(stored.checkedAt)) return;
     void runCheck();
@@ -125,41 +139,61 @@ export const ServiceHealthPanel = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const tone = TONE[pending ? "idle" : summary.tone];
+
   return (
-    <section aria-labelledby="service-health-title">
-      <div className="mb-2 mt-7 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 id="service-health-title" className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">
-            외부 서비스 연동
-          </h2>
-          <Button size="sm" variant="outline" className="ml-auto h-7" onClick={runCheck} disabled={pending}>
+    <section aria-labelledby="service-health-title" className="mt-5">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-2">
+        <span
+          className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
+          aria-hidden="true"
+        />
+        <h2 id="service-health-title" className="text-sm font-semibold text-[#1B2A36]">
+          외부 서비스 연동
+        </h2>
+        <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>
+        {checkedAt && !pending && (
+          <span className="text-xs text-muted-foreground">마지막 점검 · {formatStamp(checkedAt)}</span>
+        )}
+
+        <div className="ml-auto flex items-center gap-1">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs text-muted-foreground"
+            aria-expanded={open}
+            aria-controls="service-health-list"
+            onClick={() => setOpened(!open)}
+          >
+            {open ? "접기" : "자세히"}
+            <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
+          </Button>
+          <Button size="sm" variant="outline" className="h-7" onClick={runCheck} disabled={pending}>
             {pending ? "점검 중…" : "지금 점검"}
           </Button>
         </div>
-        <p className="mt-0.5 text-[11px] text-muted-foreground">
-          {checkedAt
-            ? `마지막 점검 · ${formatStamp(checkedAt)}`
-            : "시연·수업 전 연동 상태를 확인합니다. 생성·검수·음성 요청은 만들지 않습니다."}
-        </p>
       </div>
 
-      <ul className="divide-y divide-border rounded-lg border border-border bg-card px-4">
-        {statuses.map((status) => (
-          <StatusRow key={status.id} status={status} pending={pending} />
-        ))}
-      </ul>
-
-      <p className="mt-2 text-[11px] text-muted-foreground">
-        OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
-        {CONSOLES.map((item, index) => (
-          <span key={item.href}>
-            {index > 0 && " · "}
-            <a className="underline underline-offset-2" href={item.href} target="_blank" rel="noreferrer">
-              {item.label}
-            </a>
-          </span>
-        ))}
-      </p>
+      {open && (
+        <div id="service-health-list">
+          <ul className="mt-2 divide-y divide-border rounded-lg border border-border bg-card px-4">
+            {statuses.map((status) => (
+              <StatusRow key={status.id} status={status} pending={pending} />
+            ))}
+          </ul>
+          <p className="mt-2 text-[11px] text-muted-foreground">
+            OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
+            {CONSOLES.map((item, index) => (
+              <span key={item.href}>
+                {index > 0 && " · "}
+                <a className="underline underline-offset-2" href={item.href} target="_blank" rel="noreferrer">
+                  {item.label}
+                </a>
+              </span>
+            ))}
+          </p>
+        </div>
+      )}
     </section>
   );
 };

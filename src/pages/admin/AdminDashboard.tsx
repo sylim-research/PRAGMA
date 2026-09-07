@@ -447,6 +447,11 @@ const AdminDashboard = () => {
         </p>
       )}
 
+      {/* 연동이 끊겨 있으면 아래 지표를 보기 전에 알아야 한다 — 스크롤 없이 보이는 자리에 둔다.
+          평소에는 한 줄로 접혀 있고, 정상이 아닌 항목이 있으면 스스로 펼쳐진다.
+          이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
+      <ServiceHealthPanel />
+
       <PanelHeader
         title="콘텐츠 준비 현황"
         action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
@@ -534,11 +539,6 @@ const AdminDashboard = () => {
           changed={changedKeys.has("records")}
         />
       </div>
-
-      {/* 시연·수업 전 연동 점검. 매일 보는 운영 지표를 밀어내지 않도록 맨 아래에 둔다.
-          버튼을 눌렀을 때만 외부 호출이 생긴다 — 화면 진입 시 자동 호출 없음.
-          이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
-      <ServiceHealthPanel />
 
       {isAdmin && (
         <div className="mt-4 flex justify-end">

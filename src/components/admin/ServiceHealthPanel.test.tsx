@@ -8,6 +8,10 @@ const STORE_KEY = "pragma.admin.serviceHealth.v1";
 const storeAgeMs = (ms: number, statuses: unknown[]) =>
   localStorage.setItem(STORE_KEY, JSON.stringify({ checkedAt: new Date(Date.now() - ms).toISOString(), statuses }));
 
+const ALL_OK = (["elevenlabs", "openai", "anthropic", "supabase", "app"] as const).map((id) => ({
+  id, tone: "ok" as const, summary: "정상",
+}));
+
 const mocks = vi.hoisted(() => ({ run: vi.fn() }));
 
 vi.mock("@/lib/admin/serviceHealthApi", async (importOriginal) => {
@@ -47,8 +51,36 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(screen.queryAllByRole("img", { name: "미점검" })).toHaveLength(0);
   });
 
+  it("모두 정상이면 한 줄로 접어 두고 요약만 보여 준다", () => {
+    storeAgeMs(60_000, ALL_OK);
+    render(<ServiceHealthPanel />);
+    expect(screen.getByText("5개 서비스 모두 정상")).toBeVisible();
+    expect(screen.queryByTestId("service-openai")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /자세히/ })).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("정상이 아닌 항목이 있으면 스스로 펼쳐 어느 서비스인지 알린다", () => {
+    storeAgeMs(60_000, [
+      ...ALL_OK.slice(0, 1),
+      { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://x" } },
+      { id: "anthropic", tone: "manual", summary: "", link: { label: "Anthropic 콘솔에서 확인", href: "https://y" } },
+      ...ALL_OK.slice(3),
+    ]);
+    render(<ServiceHealthPanel />);
+    expect(screen.getByText("직접 확인 2건 · OpenAI · Anthropic")).toBeVisible();
+    expect(screen.getByTestId("service-openai")).toBeVisible();
+    expect(screen.getByRole("button", { name: /접기/ })).toHaveAttribute("aria-expanded", "true");
+  });
+
+  it("접힌 상태에서도 눌러서 펼칠 수 있다", () => {
+    storeAgeMs(60_000, ALL_OK);
+    render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: /자세히/ }));
+    expect(screen.getByTestId("service-openai")).toBeVisible();
+  });
+
   it("최근 결과가 보관돼 있으면 그것을 먼저 보여 주고 다시 부르지 않는다", () => {
-    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상", detail: "잔량 9,008 / 10,000자 (90.1%)" }]);
+    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "warn", summary: "잔량 50% 이하", detail: "잔량 9,008 / 10,000자 (90.1%)" }]);
     render(<ServiceHealthPanel />);
     expect(mocks.run).not.toHaveBeenCalled();
     expect(screen.getByText("잔량 9,008 / 10,000자 (90.1%)")).toBeVisible();
@@ -56,7 +88,7 @@ describe("외부 서비스 연동 점검 패널", () => {
   });
 
   it("보관된 결과가 오래됐으면 조용히 다시 확인한다", async () => {
-    storeAgeMs(STALE_AFTER_MS + 60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상", detail: "옛 결과" }]);
+    storeAgeMs(STALE_AFTER_MS + 60_000, [{ id: "elevenlabs", tone: "warn", summary: "옛 상태", detail: "옛 결과" }]);
     render(<ServiceHealthPanel />);
     await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/잔량 9,558/)).toBeVisible();
@@ -70,7 +102,7 @@ describe("외부 서비스 연동 점검 패널", () => {
   });
 
   it("「지금 점검」을 누르면 한 번 점검하고 결과·잔량·마지막 점검 시각을 보여 준다", async () => {
-    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "ok", summary: "정상" }]);
+    storeAgeMs(60_000, [{ id: "elevenlabs", tone: "warn", summary: "옛 상태" }]);
     render(<ServiceHealthPanel />);
     expect(mocks.run).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
@@ -85,8 +117,9 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled();
   });
 
-  it("잔액 안내는 행마다 반복하지 않고 목록 아래 한 줄로만 둔다", () => {
+  it("잔액 안내는 행마다 반복하지 않고 목록 아래 한 줄로만 둔다", async () => {
     render(<ServiceHealthPanel />);
+    await screen.findByTestId("service-openai");
     expect(screen.getByText(/선불 잔액은 콘솔의 자동 충전으로 관리합니다/)).toBeVisible();
     expect(screen.getByRole("link", { name: "OpenAI 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
     expect(screen.getByRole("link", { name: "Anthropic 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.claude.com"));
