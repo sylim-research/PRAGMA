@@ -1,0 +1,78 @@
+{
+  "status": 200,
+  "data": {
+    "frozen_topology": {
+      "version": "native_mpj5_scene_topology_v1",
+      "source_modality": "spoken",
+      "x": {
+        "situation_ko": "저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.",
+        "relation_ko": "친구 사이로 친밀한 관계입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "equal",
+          "d": "close",
+          "r": "low"
+        }
+      },
+      "anchor": {
+        "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+        "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "equal",
+          "d": "distant",
+          "r": "low"
+        }
+      },
+      "y": {
+        "situation_ko": "저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.",
+        "relation_ko": "직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "speaker_higher",
+          "d": "distant",
+          "r": "low"
+        }
+      },
+      "c": {
+        "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+        "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "equal",
+          "d": "distant",
+          "r": "low"
+        }
+      }
+    },
+    "topology_evidence": {
+      "version": "mission_scene_topology_evidence_v1",
+      "prompt_version": "mission_scene_topology_v1_constraint_by_construction",
+      "first_pass_result": "fail",
+      "final_result": "pass",
+      "attempts": 2,
+      "regeneration_count": 1,
+      "findings": [
+        {
+          "code": "R28",
+          "path": "x.channel",
+          "message": "X channel이 spoken 수행 방식과 맞지 않음",
+          "attempt": 1
+        },
+        {
+          "code": "R28",
+          "path": "anchor.channel",
+          "message": "ANCHOR channel이 spoken 수행 방식과 맞지 않음",
+          "attempt": 1
+        }
+      ]
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "prompt_version": "mission_scene_topology_v1_constraint_by_construction",
+      "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+      "generated_at": "2026-09-07T09:11:04.408Z"
+    }
+  }
+}

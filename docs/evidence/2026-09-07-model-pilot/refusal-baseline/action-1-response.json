@@ -1,0 +1,88 @@
+{
+  "status": 200,
+  "data": {
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+      "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+      "source_modality": "written",
+      "source_text": "谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。",
+      "preceding_turn": "이번 주 토요일 저녁에 다 같이 모여서 식사하려고 하는데, 시간 괜찮으세요?",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.invitation_refusal.refusal",
+        "role_pair": {
+          "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+          "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+        },
+        "speaker_entitlement": "화자는 앞선 요청·제안·초대의 수용 여부를 결정할 재량이 있다.",
+        "addressee_obligation": "상대는 거절 대상 행동을 먼저 요청·제안·초대한 사람이며, 거절을 수용할 여지가 있어야 한다.",
+        "decision_authority": "화자가 자신의 참여·수락 여부를 결정하며, 거절 대상과 범위가 분명해야 한다."
+      },
+      "brief_note_ko": "주말 모임 초대를 거절하는 메시지",
+      "focal_segments": [
+        {
+          "text": "这次周六晚上我已经有家庭安排了，可能无法参加。",
+          "role": "head"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 80,
+        "max": 110,
+        "actual": 50
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_repair",
+        "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+        "generated_at": "2026-09-07T09:18:42.048Z"
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 6,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 25,
+        "matched_token_count": 19,
+        "coverage_ratio": 0.76,
+        "out_of_reference_candidates": [
+          "你的",
+          "这次",
+          "周六",
+          "已经有",
+          "下次",
+          "还有"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "core_v16_natural_scene_repair",
+      "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+      "generation_attempt": 2,
+      "source_repair_applied": false,
+      "preceding_turn_repair_applied": true,
+      "bilingual_scene_repair_applied": false,
+      "bilingual_scene_canonicalization_applied": false,
+      "situation_seed_canonicalization_applied": false,
+      "bilingual_scene_issue_remaining": false,
+      "learner_scene_repair_applied": false,
+      "length_policy_version": "effective_chars_v2_min_warning",
+      "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+      "generated_at": "2026-09-07T09:18:42.048Z"
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPrKmeeagrl7KRl8nJk3LnGaVFWI",
+    "object": "chat.completion",
+    "created": 1788772998,
+    "model": "gpt-6-astra",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"x\": {\n    \"situation_ko\": \"나는 몇 번 함께 일한 동료의 펜을 실수로 바닥에 떨어뜨렸지만, 펜은 손상되지 않았다. 바로 펜을 주워 건네며 떨어뜨린 일을 사과한다.\",\n    \"relation_ko\": \"몇 번 함께 일한 같은 직급의 동료 사이\",\n    \"channel\": \"facetoface\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"acquaintance\",\n      \"r\": \"low\"\n    }\n  },\n  \"anchor\": {\n    \"situation_ko\": \"나는 몇 번 함께 일한 동료에게 빌린 발표용 연결 장치를 제때 돌려주지 않아 동료의 발표가 20분 늦어졌다. 발표가 끝난 뒤 동료를 만나 늦게 반환해 생긴 차질을 사과한다.\",\n    \"relation_ko\": \"몇 번 함께 일한 같은 직급의 동료 사이\",\n    \"channel\": \"facetoface\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"acquaintance\",\n      \"r\": \"mid\"\n    }\n  },\n  \"y\": {\n    \"situation_ko\": \"나는 친한 친구에게 전시회가 열린다고 잘못 알려 친구가 휴관일에 전시장까지 갔다가 돌아왔다. 그날 친구를 만나 잘못된 안내로 헛걸음하게 한 일을 사과한다.\",\n    \"relation_ko\": \"오랫동안 친하게 지낸 동갑 친구 사이\",\n    \"channel\": \"facetoface\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"close\",\n      \"r\": \"mid\"\n    }\n  }\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1850,
+      "completion_tokens": 799,
+      "total_tokens": 2649,
+      "prompt_tokens_details": {
+        "cached_tokens": 1431,
+        "cache_write_tokens": 416,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 398,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

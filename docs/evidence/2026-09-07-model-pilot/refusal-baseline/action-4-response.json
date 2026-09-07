@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "data": {
+    "quality_check": {
+      "verdict": "warning",
+      "summary_ko": "모든 문항이 상황에 맞는 거절의 완충과 대안 표현을 적절히 구분하며, 실제로 학습자가 잘못 배우게 되는 결함이 없다.",
+      "findings": [
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[0].note_ko",
+          "evidence_excerpt": "간결하지만 필요한 완화 표현을 사용하여 부드럽게 거절합니다.",
+          "note_ko": "관계적 효과(예: 거리감, 협의 가능성 등)나 인상 차이에 대한 구체적 언급 없이, 단순히 '완화 표현' 사용 여부와 부드러움만 언급하고 있습니다. 다른 후보와의 관계적 인상 차이를 명확히 설명해야 합니다."
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[1].note_ko",
+          "evidence_excerpt": "간결하게 거절하면서도 최소한의 배려를 유지하여 너무 단칼로 들리지 않도록 조정했습니다.",
+          "note_ko": "'최소한의 배려'와 '너무 단칼로 들리지 않도록'이라는 평가는 실제 표현의 관계적 효과(예: 거리감, 부담 귀속 등) 차이를 구체적으로 설명하지 않고, 결국 부드러움/배려의 정도로만 환원됩니다."
+        }
+      ],
+      "mission_content_hash": "939dff0a3d71a01d896fa2c458ef7478d3dc19611e86d1a15aa6577b1ea8066a",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "checked_at": "2026-09-07T09:19:38.285Z"
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "generated_at": "2026-09-07T09:19:38.285Z"
+    }
+  }
+}

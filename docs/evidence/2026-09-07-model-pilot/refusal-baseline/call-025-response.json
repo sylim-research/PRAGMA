@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPnjHVDdJrpAnEmtkQoXEU8WJjHq",
+    "object": "chat.completion",
+    "created": 1788772775,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"findings\":[{\"code\":\"comparison_quality_mismatch\",\"severity\":\"warning\",\"where\":\"mpj_items[4].candidates[0].note_ko\",\"evidence_excerpt\":\"간결하지만 필요한 완화 표현을 사용하여 부드럽게 거절합니다.\",\"note_ko\":\"관계적 효과(예: 거리감, 협의 가능성 등)나 인상 차이에 대한 구체적 언급 없이, 단순히 '완화 표현' 사용 여부와 부드러움만 언급하고 있습니다. 다른 후보와의 관계적 인상 차이를 명확히 설명해야 합니다.\"},{\"code\":\"comparison_quality_mismatch\",\"severity\":\"warning\",\"where\":\"mpj_items[4].candidates[1].note_ko\",\"evidence_excerpt\":\"간결하게 거절하면서도 최소한의 배려를 유지하여 너무 단칼로 들리지 않도록 조정했습니다.\",\"note_ko\":\"'최소한의 배려'와 '너무 단칼로 들리지 않도록'이라는 평가는 실제 표현의 관계적 효과(예: 거리감, 부담 귀속 등) 차이를 구체적으로 설명하지 않고, 결국 부드러움/배려의 정도로만 환원됩니다.\"}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4127,
+      "completion_tokens": 257,
+      "total_tokens": 4384,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_75ee2801f7"
+  }
+}

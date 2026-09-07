@@ -1,0 +1,422 @@
+<!doctype html><html lang="ko"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PRAGMA 모델 비교 · 미션 3개</title><style>body{margin:0;background:#f8f6ee;color:#1c2530;font:16px/1.75 system-ui,sans-serif}header{background:#1c2530;color:white;padding:28px max(24px,calc((100vw - 1140px)/2))}header small{color:#e4cd5b;letter-spacing:.15em}header h1{font-size:28px;margin:8px 0}main{max-width:1140px;margin:26px auto;padding:0 20px}h2{font-size:23px}h3{margin-top:32px}p{white-space:pre-wrap}nav{display:flex;gap:8px;margin:20px 0;flex-wrap:wrap}button{font:inherit;border:1px solid #cfcbbd;border-radius:24px;background:white;padding:9px 20px;cursor:pointer}button.active{background:#e4cd5b;border-color:#e4cd5b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #dedbd0;border-radius:18px;padding:25px;min-width:0}.panel[hidden]{display:none}.eyebrow{color:#756428;font-weight:700}.status{font-weight:700}.metrics{display:flex;gap:24px;border-block:1px solid #e8e4d8;padding:16px 0}.metrics b{display:block;font-size:24px}.metrics span,.field>span{font-size:13px;color:#6e7780}.field p{margin:4px 0 17px}.field{margin:14px 0}details{border-top:1px solid #ddd9ce;padding:12px 0}summary{cursor:pointer;font-weight:600}pre{font:12px/1.6 monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f6f6f2;padding:12px}.notice{padding:14px;border-left:4px solid #e4cd5b;background:#faf6df}.option{padding:12px;border:1px solid #e3dfd2;margin:10px 0;border-radius:8px}.review{margin-top:25px}.method{font-size:14px;color:#636b73}footer{margin:30px 0;color:#6e7780;font-size:13px}@media(max-width:850px){.grid{grid-template-columns:1fr}}</style><header><small>PRAGMA / MODEL PILOT</small><h1>같은 조건, 미션 3개</h1><div>요청 · 거절 · 사과 — 2026. 09. 07</div></header><main><p class="notice"><b>파일럿 결과이며 운영 채택본이 아닙니다.</b> 장면·원문과 전체 미션 생성의 성공 여부를 구분해 비교합니다. AI 검수의 fail 개수는 정확도 점수가 아닙니다.</p><p class="method">기존 생성: GPT-4.1 mini / GPT-4o / GPT-4.1 · 비교 생성: GPT-6 Astra medium · 독립 검수: Fable 5.1 / Opus 5 medium. 같은 경우의 최초 코어 프롬프트를 고정했습니다. 이후 단계는 각 모델이 생성한 내용을 입력하므로 전체 흐름 비교입니다.</p><nav><button class="active" data-select="request">요청</button><button class="" data-select="refusal">거절</button><button class="" data-select="apology">사과</button></nav><div class="grid"><section class="panel" data-case="request" data-route="baseline"><div class="eyebrow">기존 모델</div><h2>병원 접수 직원에게 예약 변경 문의</h2><p class="status">문항 생성 완료</p><div class="metrics"><div><b>53초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.133</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.</p></div><div class="field"><span>관계</span><p>환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.</p></div><div class="field"><span>원문</span><p>안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.</p></div><div class="field"><span>코어 규칙 결과</span><p>pass</p></div><h3>생성된 학습 미션</h3><p class="notice">교수자 채택 전 초안입니다. 아래 검수 지적을 함께 확인하세요.</p><details><summary>MJT 1 · scale4</summary><div class="field"><span>상황</span><p>저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.</p></div><div class="field"><span>관계</span><p>친구 사이로 친밀한 관계입니다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;close&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>다음 주에 같이 영화 보러 갈래? 새로 개봉한 영화가 있어서 꼭 보고 싶어.</p></div><div class="field"><span>판단할 표현</span><p>下周一起去看电影好吗？有部新上映的电影我很想看。</p></div><div class="field"><span>해설</span><p>친구 사이의 친밀한 관계에서 간단한 제안은 직접적이어도 적절합니다. '好吗'를 사용해 선택권을 남기며 자연스럽게 요청합니다.</p></div><div class="field"><span>추천 표현</span><p>下周一起去看电影好吗？</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;scale4&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;situation_ko&quot;: &quot;저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.&quot;,
+  &quot;relation_ko&quot;: &quot;친구 사이로 친밀한 관계입니다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;close&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;다음 주에 같이 영화 보러 갈래? 새로 개봉한 영화가 있어서 꼭 보고 싶어.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;下周一起去看电影好吗？有部新上映的电影我很想看。&quot;,
+  &quot;highlights&quot;: [
+    &quot;下周一起去看电影好吗&quot;
+  ],
+  &quot;accepted_scale_codes&quot;: [
+    &quot;very_appropriate&quot;,
+    &quot;somewhat_appropriate&quot;
+  ],
+  &quot;reference_scale_code&quot;: &quot;very_appropriate&quot;,
+  &quot;explanation_ko&quot;: &quot;친구 사이의 친밀한 관계에서 간단한 제안은 직접적이어도 적절합니다. '好吗'를 사용해 선택권을 남기며 자연스럽게 요청합니다.&quot;,
+  &quot;recommended_example&quot;: &quot;下周一起去看电影好吗？&quot;,
+  &quot;id&quot;: 1,
+  &quot;item_focus&quot;: &quot;request_mitigation_optionality&quot;,
+  &quot;axis_feature&quot;: &quot;request_mitigation_optionality&quot;
+}</pre></details></details><details><summary>MJT 2 · judge3</summary><div class="field"><span>상황</span><p>저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.</p></div><div class="field"><span>관계</span><p>직장 동료 사이로 친밀하지 않은 관계입니다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;distant&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.</p></div><div class="field"><span>판단할 표현</span><p>下周的会议时间能调整一下吗？我有其他重要的安排。</p></div><div class="field"><span>해설</span><p>동료와의 관계에서 직접적인 요청은 부담을 줄 수 있습니다. '能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다.</p></div><div class="field"><span>추천 표현</span><p>如果方便的话，下周的会议时间能调整一下吗？</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;judge3&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;situation_ko&quot;: &quot;저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.&quot;,
+  &quot;relation_ko&quot;: &quot;직장 동료 사이로 친밀하지 않은 관계입니다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;distant&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;下周的会议时间能调整一下吗？我有其他重要的安排。&quot;,
+  &quot;highlights&quot;: [
+    &quot;下周的会议时间能调整一下吗&quot;
+  ],
+  &quot;accepted_band_codes&quot;: [
+    &quot;too_direct&quot;
+  ],
+  &quot;explanation_ko&quot;: &quot;동료와의 관계에서 직접적인 요청은 부담을 줄 수 있습니다. '能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다.&quot;,
+  &quot;recommended_example&quot;: &quot;如果方便的话，下周的会议时间能调整一下吗？&quot;,
+  &quot;id&quot;: 2,
+  &quot;item_focus&quot;: &quot;request_mitigation_optionality&quot;,
+  &quot;axis_feature&quot;: &quot;request_mitigation_optionality&quot;
+}</pre></details></details><details><summary>MJT 3 · fix_choice</summary><div class="field"><span>상황</span><p>저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.</p></div><div class="field"><span>관계</span><p>직장 동료 사이로 친밀하지 않은 관계입니다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;distant&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.</p></div><div class="field"><span>판단할 표현</span><p>下周的会议时间能调整一下吗？我有其他重要的安排。</p></div><article class="option"><strong>1. 如果方便的话，下周的会议时间能调整一下吗？</strong><div class="field"><span>해설</span><p>조건절 '如果方便的话'를 추가하여 요청의 부담을 줄이고 선택권을 남깁니다.</p></div><div class="field"><span>판정</span><p>true</p></div></article><article class="option"><strong>2. 请您调整下周的会议时间。</strong><div class="field"><span>해설</span><p>'请您调整'로 직접 요청하여 선택권이 줄어듭니다.</p></div><div class="field"><span>판정</span><p>false</p></div></article><article class="option"><strong>3. 不知道您是否能考虑调整下周的会议时间。</strong><div class="field"><span>해설</span><p>'不知道您是否能考虑'로 요청이 흐려져 지나치게 우회적입니다.</p></div><div class="field"><span>판정</span><p>false</p></div></article><div class="field"><span>해설</span><p>현재 상황에서는 직접적인 요청이 부담을 줄 수 있습니다. 수정안은 조건절을 추가하여 완화하고 선택권을 남깁니다.</p></div><div class="field"><span>추천 표현</span><p>如果方便的话，下周的会议时间能调整一下吗？</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;fix_choice&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;situation_ko&quot;: &quot;저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.&quot;,
+  &quot;relation_ko&quot;: &quot;직장 동료 사이로 친밀하지 않은 관계입니다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;distant&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;下周的会议时间能调整一下吗？我有其他重要的安排。&quot;,
+  &quot;highlights&quot;: [
+    &quot;下周的会议时间能调整一下吗&quot;
+  ],
+  &quot;accepted_band_codes&quot;: [
+    &quot;too_direct&quot;
+  ],
+  &quot;corrections&quot;: [
+    {
+      &quot;text&quot;: &quot;如果方便的话，下周的会议时间能调整一下吗？&quot;,
+      &quot;is_valid&quot;: true,
+      &quot;note_ko&quot;: &quot;조건절 '如果方便的话'를 추가하여 요청의 부담을 줄이고 선택권을 남깁니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;请您调整下周的会议时间。&quot;,
+      &quot;is_valid&quot;: false,
+      &quot;note_ko&quot;: &quot;'请您调整'로 직접 요청하여 선택권이 줄어듭니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;不知道您是否能考虑调整下周的会议时间。&quot;,
+      &quot;is_valid&quot;: false,
+      &quot;note_ko&quot;: &quot;'不知道您是否能考虑'로 요청이 흐려져 지나치게 우회적입니다.&quot;
+    }
+  ],
+  &quot;explanation_ko&quot;: &quot;현재 상황에서는 직접적인 요청이 부담을 줄 수 있습니다. 수정안은 조건절을 추가하여 완화하고 선택권을 남깁니다.&quot;,
+  &quot;recommended_example&quot;: &quot;如果方便的话，下周的会议时间能调整一下吗？&quot;,
+  &quot;id&quot;: 3,
+  &quot;item_focus&quot;: &quot;request_mitigation_optionality&quot;,
+  &quot;axis_feature&quot;: &quot;request_mitigation_optionality&quot;
+}</pre></details></details><details><summary>MJT 4 · reason</summary><div class="field"><span>상황</span><p>저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.</p></div><div class="field"><span>관계</span><p>직장 동료 사이로 친밀하지 않은 관계입니다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;distant&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.</p></div><div class="field"><span>판단할 표현</span><p>下周的会议时间能调整一下吗？我有其他重要的安排。</p></div><article class="option"><strong>1. 문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.</strong></article><article class="option"><strong>2. 요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다.</strong></article><article class="option"><strong>3. 문장 구조상 오류는 없지만, 더 완화된 표현이 필요합니다.</strong></article><div class="field"><span>해설</span><p>현재 상황에서는 요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다. 조건절을 추가하여 완화할 필요가 있습니다.</p></div><div class="field"><span>추천 표현</span><p>如果方便的话，下周的会议时间能调整一下吗？</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;reason&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;situation_ko&quot;: &quot;저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.&quot;,
+  &quot;relation_ko&quot;: &quot;직장 동료 사이로 친밀하지 않은 관계입니다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;distant&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;下周的会议时间能调整一下吗？我有其他重要的安排。&quot;,
+  &quot;highlights&quot;: [
+    &quot;下周的会议时间能调整一下吗&quot;
+  ],
+  &quot;problem_band_code&quot;: &quot;too_direct&quot;,
+  &quot;reasons&quot;: [
+    {
+      &quot;id&quot;: &quot;r1&quot;,
+      &quot;text_ko&quot;: &quot;문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.&quot;,
+      &quot;kind&quot;: &quot;pragmatic_misconception&quot;
+    },
+    {
+      &quot;id&quot;: &quot;r2&quot;,
+      &quot;text_ko&quot;: &quot;요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다.&quot;,
+      &quot;kind&quot;: &quot;primary&quot;
+    },
+    {
+      &quot;id&quot;: &quot;r3&quot;,
+      &quot;text_ko&quot;: &quot;문장 구조상 오류는 없지만, 더 완화된 표현이 필요합니다.&quot;,
+      &quot;kind&quot;: &quot;meaning_grammar_context&quot;
+    }
+  ],
+  &quot;accepted_reason_id&quot;: &quot;r2&quot;,
+  &quot;explanation_ko&quot;: &quot;현재 상황에서는 요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다. 조건절을 추가하여 완화할 필요가 있습니다.&quot;,
+  &quot;recommended_example&quot;: &quot;如果方便的话，下周的会议时间能调整一下吗？&quot;,
+  &quot;id&quot;: 4,
+  &quot;item_focus&quot;: &quot;request_mitigation_optionality&quot;,
+  &quot;axis_feature&quot;: &quot;request_mitigation_optionality&quot;
+}</pre></details></details><details><summary>MJT 5 · multi_judge</summary><div class="field"><span>상황</span><p>저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.</p></div><div class="field"><span>관계</span><p>직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;speaker_higher&quot;,&quot;d&quot;:&quot;distant&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>다음 주 휴가 승인해 주실 수 있나요? 가족 모임이 있어서 꼭 참석해야 합니다.</p></div><article class="option"><strong>1. 如果方便的话，下周的假期能批准一下吗？</strong><div class="field"><span>해설</span><p>조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.</p></div><div class="field"><span>판정</span><p>within_band</p></div></article><article class="option"><strong>2. 请您批准下周的假期。</strong><div class="field"><span>해설</span><p>'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.</p></div><div class="field"><span>판정</span><p>too_direct</p></div></article><article class="option"><strong>3. 我想请您考虑一下下周的假期。</strong><div class="field"><span>해설</span><p>완화된 표현으로 요청의 부담을 줄이며 선택권을 남깁니다.</p></div><div class="field"><span>판정</span><p>within_band</p></div></article><article class="option"><strong>4. 不知道您是否能批准下周的假期。</strong><div class="field"><span>해설</span><p>'不知道您是否能'로 요청이 흐려져 지나치게 우회적입니다.</p></div><div class="field"><span>판정</span><p>too_indirect</p></div></article><div class="field"><span>해설</span><p>현재 상황에서는 상사에게 요청할 때 적절한 완화와 선택권을 남기는 것이 중요합니다. 각 후보는 다른 완화 전략을 사용하여 관계적 효과를 다르게 만듭니다.</p></div><div class="field"><span>추천 표현</span><p>如果方便的话，下周的假期能批准一下吗？</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;multi_judge&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;situation_ko&quot;: &quot;저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.&quot;,
+  &quot;relation_ko&quot;: &quot;직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;speaker_higher&quot;,
+    &quot;d&quot;: &quot;distant&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;다음 주 휴가 승인해 주실 수 있나요? 가족 모임이 있어서 꼭 참석해야 합니다.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;candidates&quot;: [
+    {
+      &quot;text&quot;: &quot;如果方便的话，下周的假期能批准一下吗？&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;within_band&quot;
+      ],
+      &quot;note_ko&quot;: &quot;조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;请您批准下周的假期。&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;too_direct&quot;
+      ],
+      &quot;note_ko&quot;: &quot;'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;我想请您考虑一下下周的假期。&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;within_band&quot;
+      ],
+      &quot;note_ko&quot;: &quot;완화된 표현으로 요청의 부담을 줄이며 선택권을 남깁니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;不知道您是否能批准下周的假期。&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;too_indirect&quot;
+      ],
+      &quot;note_ko&quot;: &quot;'不知道您是否能'로 요청이 흐려져 지나치게 우회적입니다.&quot;
+    }
+  ],
+  &quot;explanation_ko&quot;: &quot;현재 상황에서는 상사에게 요청할 때 적절한 완화와 선택권을 남기는 것이 중요합니다. 각 후보는 다른 완화 전략을 사용하여 관계적 효과를 다르게 만듭니다.&quot;,
+  &quot;recommended_example&quot;: &quot;如果方便的话，下周的假期能批准一下吗？&quot;,
+  &quot;id&quot;: 5,
+  &quot;item_focus&quot;: &quot;request_mitigation_optionality&quot;,
+  &quot;axis_feature&quot;: &quot;request_mitigation_optionality&quot;
+}</pre></details></details><details><summary>DCT · 직접 산출</summary><div class="field"><span>상황</span><p>저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.</p></div><div class="field"><span>원문</span><p>안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.</p></div><div class="field"><span>참고 산출 1</span><p>您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。</p></div><div class="field"><span>해설</span><p>조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.</p></div><pre>{
+  &quot;mode&quot;: &quot;interpreting&quot;,
+  &quot;source_modality&quot;: &quot;spoken&quot;,
+  &quot;situation_ko&quot;: &quot;저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.&quot;,
+  &quot;relation_ko&quot;: &quot;환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.&quot;,
+  &quot;channel&quot;: &quot;facetoface&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;distant&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source_text&quot;: &quot;안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;replay_limit&quot;: 2,
+  &quot;reference_alternatives&quot;: [
+    {
+      &quot;text&quot;: &quot;您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。&quot;,
+      &quot;note_ko&quot;: &quot;조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.&quot;
+    }
+  ],
+  &quot;focal_segments&quot;: [
+    {
+      &quot;text&quot;: &quot;혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?&quot;,
+      &quot;role&quot;: &quot;head&quot;
+    },
+    {
+      &quot;text&quot;: &quot;일정이 변경되어서 기존 시간에 방문이 어렵습니다.&quot;,
+      &quot;role&quot;: &quot;support&quot;
+    }
+  ]
+}</pre></details><div class="review"><h4>Fable 독립 검수 · fail</h4><p>코어 장면(환자→병원 접수 직원 예약 변경)은 현실적이고 P/D/R과 원문이 잘 맞습니다. 그러나 MJT 쪽에 실제 결함이 여럿 있습니다. MJT1은 요청이 아닌 제안·초대 화행이며, MJT2·3·4가 공유하는 앵커의 한국어 원문이 '친밀하지 않은 동료'에게 반말을 쓰고 '能…一下吗'를 too_direct로 판정한 근거가 기준(표현형만으로 판단하지 않음, 직접적이면 나쁘다는 오류 경계)과 충돌합니다. MJT4의 세 이유가 사실상 같은 내용이어서 변별력이 없고, MJT5는 부하→상사 요청인데 p가 speaker_higher로 잘못 표기되어 있으며 후보 표현(批准一下, 존재하지 않는 麻烦您 비교)에도 문제가 있습니다. DCT 참고산출 메모도 실제 표현과 불일치합니다.</p><details><summary>fail · MJT1의 원문 '다음 주에 같이 영화 보러 갈래?'는 요청(request)이 아니라 제안·초대 화행입니다. explanation_ko도 '간단한 제안'이라고 스스로 서술합니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/0/source</p></div><div class="field"><span>근거</span><p>미션 학습목표는 request이고 축은 request_mitigation_optionality입니다. 상대에게 행동을 요구하는 요청이 아닌 공동 활동 제안을 요청 완화·선택권의 적절 반례로 쓰면 학습목표 일관성이 깨지고, 학생이 '요청의 직접형이 적절한 경우'를 배울 수 없습니다.</p></div><div class="field"><span>제안</span><p>친밀·저부담 관계에서 상대에게 실제 행동을 부탁하는 요청 장면(예: 이미 합의된 자료를 짧게 재확인하는 요청 등 counter_rule_note 취지)으로 교체하고, 그에 맞게 target·highlights·explanation을 수정하십시오.</p></div></details><details><summary>fail · 앵커 원문 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'가 반말(해체)인데 relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'(d=distant)입니다. 같은 원문이 MJT3·MJT4에도 공유됩니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/source</p></div><div class="field"><span>근거</span><p>한국어에서 친밀하지 않은 동료에게 반말로 부탁하는 것은 관계 설정과 어긋나 장면 현실성이 떨어지고, 통역 학습자가 원문의 화용적 힘을 기준으로 중국어 산출을 평가하는 데 혼선을 줍니다.</p></div><div class="field"><span>제안</span><p>원문을 해요체로 수정(예: '다음 주 회의 일정 조정해 주실 수 있어요? 다른 중요한 일정이 겹쳐서요.')하거나 relation_ko·pdr을 원문 어투에 맞게 조정하고 MJT2·3·4에 동일하게 반영하십시오.</p></div></details><details><summary>fail · '下周的会议时间能调整一下吗？我有其他重要的安排。'를 too_direct로 판정했지만, 능원동사 의문형(能…吗)+一下+사유 제시는 기준의 relevant_resources에 명시된 완화 자원이며 동등·저부담 동료 관계에서 통상 알맞은 표현입니다. explanation_ko도 '선택권을 남기지만'이라고 인정하면서 '더 완화된 표현이 필요'라고만 합니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/accepted_band_codes</p></div><div class="field"><span>근거</span><p>criteria는 '표현형·표지 수만으로 적절성을 결정하지 않는다', '직접적이면 나쁘다의 반례를 설계한다'고 명시합니다. 조건절 하나를 더하지 않았다는 이유로 too_direct를 부여하는 것은 표지 수 기준 판정이며 잘못된 단일 정답화입니다. 이 앵커 판정은 MJT3·MJT4의 problem_band_code와 corrections 논리의 전제이므로 파급 범위가 큽니다.</p></div><div class="field"><span>제안</span><p>앵커를 실제로 too_direct인 표현(예: '下周的会议时间调整一下。' 또는 '把下周的会议改到别的时间。')으로 바꾸어 MJT2·3·4에 공유하고, 현재 표현은 within_band 예시로 활용하십시오. 또는 상황에 부담을 높이는 근거(상대가 이미 여러 번 조정했다는 선행 사실 등)를 명시해 too_direct 판정 근거를 상황에서 제시하십시오.</p></div><div class="field"><span>유보</span><p>교수자가 해당 관계에서 조건절 없는 能…吗 형을 경계 사례로 의도적으로 잡았을 가능성이 있어 최종 판정은 교수자 확인이 필요합니다.</p></div></details><details><summary>fail · r1 '선택권을 충분히 남기지 않아 부담을 줄 수 있다', r2(정답) '요청의 직접성이 높아 부담을 줄 수 있다', r3 '더 완화된 표현이 필요하다'가 사실상 동일한 내용입니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/3/reasons</p></div><div class="field"><span>근거</span><p>reason 문항은 정답 이유와 오개념·문법맥락 유형의 오답 이유가 구별되어야 진단 기능을 합니다. 세 선택지가 모두 '직접적이어서 부담'이라는 같은 결론을 말하므로 학생이 r2를 고를 근거가 없고, r1의 kind가 pragmatic_misconception이라는 표기와도 내용이 맞지 않습니다.</p></div><div class="field"><span>제안</span><p>r1은 실제 화용 오개념(예: '동료 사이에는 어떤 표현이든 부담이 없으므로 문제가 없다' 또는 '您을 안 써서 문제다' 같은 공손성 축 혼동)으로, r3는 의미·문법 오답(예: '겹쳐서'의 의미가 누락되었기 때문이다)으로 다시 쓰고 r2와 명확히 구분하십시오.</p></div></details><details><summary>fail · MJT5는 부하 직원이 상사에게 휴가 승인을 요청하는 장면인데 pdr.p가 speaker_higher로 표기되어 있습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/pdr/p</p></div><div class="field"><span>근거</span><p>화자(부하)가 청자(상사)보다 낮은 위치이므로 speaker_lower(또는 상응 코드)여야 합니다. P 라벨 오류는 학생 화면과 판정 근거의 기본 전제를 뒤집습니다.</p></div><div class="field"><span>제안</span><p>pdr.p를 화자가 낮은 위치를 나타내는 코드로 수정하십시오.</p></div></details><details><summary>warning · 후보 2의 메모가 &quot;'麻烦您'보다 덜 완화되어&quot;라고 비교하지만 네 후보 어디에도 麻烦您이 등장하지 않습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/1/note_ko</p></div><div class="field"><span>근거</span><p>존재하지 않는 표현과 비교하는 해설은 학생에게 혼란을 주고 판정 근거의 설득력을 떨어뜨립니다. 또한 '약간의 공손함을 더하면서도'라는 표현은 공손성 축(您)과 완화·선택권 축을 섞어 설명합니다.</p></div><div class="field"><span>제안</span><p>메모를 '명령형 请您…으로 상대의 선택권을 거의 남기지 않아 too_direct'로 축 초점에 맞게 다시 쓰고 麻烦您 비교를 삭제하십시오.</p></div></details><details><summary>warning · '如果方便的话，下周的假期能批准一下吗？'에서 批准一下는 어색한 결합이고, 휴가 승인 여부를 '방편하다면(如果方便的话)'으로 조건 짓는 것도 의미상 부자연스럽습니다. 동일 표현이 recommended_example로도 쓰였습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/0/text</p></div><div class="field"><span>근거</span><p>승인(批准)은 결정 행위이므로 동작 경감 표지 一下와 잘 어울리지 않으며, 상사의 승인 여부는 '편의'가 아니라 업무 상황에 달린 문제라 조건절이 어색합니다. within_band 대표 예문의 자연성 문제는 학생이 어색한 표현을 정답으로 학습하게 합니다.</p></div><div class="field"><span>제안</span><p>예: '如果安排上允许，下周我想请几天假，可以吗？' 또는 '下周我想请假，您看能不能批准？'처럼 자연스러운 완화형으로 교체하십시오.</p></div><div class="field"><span>유보</span><p>批准一下의 수용 가능성은 화자별 편차가 있어 중국어 원어민 교수자의 확인이 필요합니다.</p></div></details><details><summary>warning · '我想请您考虑一下下周的假期。'는 휴가를 '고려해 달라'는 말이어서 승인 요청이라는 원문 의도(승인해 주실 수 있나요)가 흐려지는데 within_band로 판정되었습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/2/text</p></div><div class="field"><span>근거</span><p>기준의 too_indirect 정의는 '요청이 흐려짐'입니다. 이 문장은 무엇을 승인해 달라는지 명시하지 않아 후보 4(不知道您是否能批准…)보다 요청 명료성이 오히려 낮을 수 있어 판정 경계가 불안정합니다.</p></div><div class="field"><span>제안</span><p>'我想请您考虑一下，能不能批准我下周的假期？'처럼 요청 내용을 명시하거나 판정을 재검토하십시오.</p></div><div class="field"><span>유보</span><p>경계 사례로 교수자가 의도한 대비일 수 있습니다.</p></div></details><details><summary>warning · 메모가 '조건절과 완화 표현을 사용'했다고 하지만 참고산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'에는 조건절이 없습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/production_task/reference_alternatives/0/note_ko</p></div><div class="field"><span>근거</span><p>참고산출 해설이 실제 표현과 불일치하면 평가 기준 안내로서 신뢰성이 떨어집니다. 참고산출 자체는 자연스럽고 상황에 알맞습니다.</p></div><div class="field"><span>제안</span><p>메모를 '可以…吗 의문형과 帮我로 선택권을 남기고 사유를 덧붙였습니다' 정도로 실제 표현에 맞게 수정하십시오.</p></div></details><details><summary>warning · 'MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어'라고 하지만 두 문항의 target은 동일합니다. 차이는 MJT3의 corrections에만 있습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/diagnostic_dimensions/0/evidence_ko</p></div><div class="field"><span>근거</span><p>진단 차원 근거 서술이 실제 문항 구조와 맞지 않습니다.</p></div><div class="field"><span>제안</span><p>'MJT2 판정과 MJT3 수정안 비교에서 완화 표지 유무에 따른 관계적 효과를 관찰한다'로 서술을 수정하십시오.</p></div></details></div><div class="review"><h4>Opus 독립 검수 · fail</h4><p>코어 장면(병원 접수 창구 예약 변경)은 개연성이 충분하고 원문·초점 분절·참고 산출의 의미 보존도 대체로 양호합니다. 그러나 앵커 A(MJT2·3·4)의 판정이 criteria와 충돌하고(能…吗 완화형을 too_direct로 단정), 앵커 원문의 반말이 '친밀하지 않은 동료' 관계와 어긋나며, MJT5의 P 설정이 관계 서술과 정반대이고 후보 해설이 배제 교란 요인(您/请您 공손성 축)과 설계 메타 표현을 노출합니다. MJT1은 요청이 아닌 제안 장면으로 학습목표와 초점이 흔들립니다. 수정 없이 채택하기 어렵습니다.</p><details><summary>fail · MJT2의 정답 밴드가 too_direct인데, 대상 산출은 '下周的会议时间能调整一下吗？我有其他重要的安排。'로 능원동사 의문형(能…一下吗)을 사용해 이미 조정 여지를 남깁니다. 해설도 &quot;'能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다&quot;라며 스스로 완화 기능을 인정합니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/accepted_band_codes/0</p></div><div class="field"><span>근거</span><p>criteria의 operational_definition은 표현형·표지 수만으로 적절성을 결정하지 말라고 하며, 能不能·可以…吗를 relevant_resources의 완화 자원으로 명시합니다. 동등·distant·저부담(회의 시간 조정)이라는 상황에서 이 산출은 within_band로 보는 것이 자연스럽고, too_direct 단정은 '표지가 더 많아야 적절하다'는 잘못된 단일 정답화를 학습자에게 심어 줍니다. MJT3·4가 같은 앵커를 공유하므로 오판이 세 문항에 전파됩니다.</p></div><div class="field"><span>제안</span><p>앵커 산출을 within_band로 재판정하거나, too_direct를 유지하려면 앵커 산출 자체를 완화 자원이 없는 직접형(예: 把下周的会议时间调一下)으로 교체하고 MJT2·3·4의 해설·수정안 근거를 그에 맞춰 다시 씁니다. 해설에서 '선택권을 남기지만'과 too_direct 판정이 공존하지 않도록 정리합니다.</p></div><div class="field"><span>유보</span><p>동일 앵커를 세 문항이 공유하므로 재판정 범위(판정 변경 vs 산출 교체)는 교수자의 난이도 의도 확인이 필요합니다.</p></div></details><details><summary>fail · MJT5의 relation_ko는 '직장 상사와 부하 직원 사이로 상사가 더 높은 위치'이고 화자는 휴가 승인을 요청하는 부하 직원인데, pdr.p가 speaker_higher로 되어 있습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/pdr/p</p></div><div class="field"><span>근거</span><p>화자가 상사보다 낮은 위치이므로 speaker_lower여야 하며, P 라벨이 반대로 설정되면 요청의 부담·완화 정도 판단 근거가 상황 서술과 충돌합니다.</p></div><div class="field"><span>제안</span><p>pdr.p를 speaker_lower로 수정합니다.</p></div></details><details><summary>fail · 후보 해설이 &quot;'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다&quot;라고 서술합니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/1/note_ko</p></div><div class="field"><span>근거</span><p>criteria의 excluded_confounds에 '호칭(您 vs 你) — 공손성 축'이 명시되어 있어 공손 표지로 밴드를 설명하면 초점 축이 흐려집니다. 또한 'too_direct 방향으로 조정되었습니다'는 설계 의도를 드러내는 메타 서술로, 학습자에게 판정 근거가 아니라 출제 사정으로 읽힙니다.</p></div><div class="field"><span>제안</span><p>공손 표지 언급을 삭제하고 '승인 여부에 대한 선택 여지를 남기지 않고 지시형으로 요구한다'처럼 요청 명료성·조정 여지 근거로만 서술하며, 설계 메타 문장을 제거합니다.</p></div></details><details><summary>warning · 앵커 원문이 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'로 반말인데, relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'입니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/source</p></div><div class="field"><span>근거</span><p>친밀하지 않은 동료에게 반말을 쓰는 발화는 한국어 장면으로 개연성이 낮고, 학습자가 '반말=직접적'이라는 높임 등급 단서로 밴드를 추론하게 되어 초점(완화·선택권)과 공손성 축이 뒤섞입니다.</p></div><div class="field"><span>제안</span><p>원문을 '다음 주 회의 시간 조정해 주실 수 있나요?'류의 해요체/합쇼체로 바꾸거나, 반말을 유지하려면 relation_ko를 친밀한 동료로 조정합니다(MJT2·3·4 공통 반영).</p></div></details><details><summary>warning · MJT1은 '친구에게 다음 주에 같이 영화 보러 가자고 제안'하는 장면이며 해설도 '간단한 제안'이라고 서술합니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/0/situation_ko</p></div><div class="field"><span>근거</span><p>미션의 learning_goal과 contrast_plan은 speech_act=request인데, 이 문항은 공동 활동 제안(제안/초대)에 가까워 요청의 부담·선택권 축을 관찰하기 어렵고, '직접형도 적절하다'는 반례로서의 근거도 요청 장면에서 오지 않습니다.</p></div><div class="field"><span>제안</span><p>친밀 관계에서의 저부담 요청 장면(예: 이미 합의한 자료를 짧게 재확인하는 요청)으로 교체하거나, 최소한 화자가 상대에게 행동을 부탁하는 형태로 원문·해설을 요청 화행으로 다시 씁니다.</p></div><div class="field"><span>유보</span><p>교수자가 MJT1을 화행 경계 확장 목적으로 의도했을 가능성이 있어 교체 여부는 확인이 필요합니다.</p></div></details><details><summary>warning · 후보 '我想请您考虑一下下周的假期。'가 within_band로 판정되어 있습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/2/accepted_band_codes/0</p></div><div class="field"><span>근거</span><p>이 표현은 '휴가를 승인해 달라'는 원발화의 명제·요청 목적(批准)을 '고려해 달라'로 약화시켜, criteria가 요구하는 '원문의 명제·의도·화행 목적 보존'에 미달하고 요청이 흐려지는 쪽(too_indirect)에 가깝습니다.</p></div><div class="field"><span>제안</span><p>'不知道…' 후보와 구별되는 별도의 적정안이 필요하면 '想请您看一下能不能批准我下周的假期'처럼 승인 요청이 분명한 완화형으로 교체하거나, 현재 문안을 유지할 경우 밴드를 재검토합니다.</p></div><div class="field"><span>유보</span><p>완화 정도의 경계 판단이므로 교수자의 밴드 기준 확인이 유용합니다.</p></div></details><details><summary>warning · 참고 산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'의 해설이 '조건절과 완화 표현을 사용하여'라고 설명하지만, 실제 산출에는 조건절(如果…的话류)이 없습니다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/production_task/reference_alternatives/0/note_ko</p></div><div class="field"><span>근거</span><p>해설과 산출이 불일치하여 학습자가 조건절을 필수 요소로 오해할 수 있고, 완화 자원 식별 훈련에 혼선을 줍니다.</p></div><div class="field"><span>제안</span><p>'可以…吗' 의문형 완화와 사유 제시로 선택권을 남긴다는 식으로 실제 사용된 자원에 맞게 note_ko를 수정합니다.</p></div></details></div></section><section class="panel" data-case="request" data-route="astra"><div class="eyebrow">Astra</div><h2>병원 접수 직원에게 예약 변경 문의</h2><p class="status">전체 문항 생성 시간 초과</p><div class="metrics"><div><b>177초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.126 + 미확정</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>나는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 다음 주 화요일로 바꿀 수 있는지 묻는다. 직원은 예약 시스템에서 빈 시간을 확인해 통상적인 예약 변경을 처리할 수 있다.</p></div><div class="field"><span>관계</span><p>예약 변경을 문의하는 환자와 처음 응대하는 병원 접수 직원</p></div><div class="field"><span>원문</span><p>개인 일정이 바뀌어서 예약한 시간에 오기 어려워졌어요. 진료 예약을 다음 주 화요일로 바꿀 수 있을까요?</p></div><div class="field"><span>코어 규칙 결과</span><p>pass</p></div><p class="notice">미션 생성 호출 실패: Pilot transport 502: Signal timed out.</p><p>완성 미션의 품질을 비교할 수 없는 결과입니다. 실패도 실험 결과에 포함하며 자동 재생성하지 않았습니다.</p></section><section class="panel" data-case="refusal" data-route="baseline"><div class="eyebrow">기존 모델</div><h2>기존 일정 때문에 동료의 주말 모임 초대 거절</h2><p class="status">문항 생성 완료</p><div class="metrics"><div><b>71초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.173</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.</p></div><div class="field"><span>원문</span><p>谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。</p></div><div class="field"><span>코어 규칙 결과</span><p>warning</p></div><h3>생성된 학습 미션</h3><p class="notice">교수자 채택 전 초안입니다. 아래 검수 지적을 함께 확인하세요.</p><details><summary>MJT 1 · scale4</summary><div class="field"><span>상황</span><p>친구가 주말에 등산을 가자고 했다. 나는 몸이 안 좋아서 못 간다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 자주 연락하는 친구이다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;close&quot;,&quot;r&quot;:&quot;mid&quot;}</p></div><div class="field"><span>원문</span><p>谢谢你的邀请，但我身体不太舒服，可能不能参加。</p></div><div class="field"><span>판단할 표현</span><p>초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.</p></div><div class="field"><span>해설</span><p>친구와의 관계에서 몸 상태를 이유로 부드럽게 거절하여 관계를 해치지 않고 상황을 설명합니다.</p></div><div class="field"><span>추천 표현</span><p>초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;scale4&quot;,
+  &quot;channel&quot;: &quot;messenger&quot;,
+  &quot;situation_ko&quot;: &quot;친구가 주말에 등산을 가자고 했다. 나는 몸이 안 좋아서 못 간다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 자주 연락하는 친구이다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;close&quot;,
+    &quot;r&quot;: &quot;mid&quot;
+  },
+  &quot;source&quot;: &quot;谢谢你的邀请，但我身体不太舒服，可能不能参加。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.&quot;,
+  &quot;highlights&quot;: [
+    &quot;몸이 안 좋아서 이번에는 못 갈 것 같아&quot;
+  ],
+  &quot;accepted_scale_codes&quot;: [
+    &quot;very_appropriate&quot;,
+    &quot;somewhat_appropriate&quot;
+  ],
+  &quot;reference_scale_code&quot;: &quot;very_appropriate&quot;,
+  &quot;explanation_ko&quot;: &quot;친구와의 관계에서 몸 상태를 이유로 부드럽게 거절하여 관계를 해치지 않고 상황을 설명합니다.&quot;,
+  &quot;recommended_example&quot;: &quot;초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.&quot;,
+  &quot;id&quot;: 1,
+  &quot;item_focus&quot;: &quot;refusal_softening&quot;,
+  &quot;axis_feature&quot;: &quot;refusal_softening&quot;
+}</pre></details></details><details><summary>MJT 2 · judge3</summary><div class="field"><span>상황</span><p>상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 나의 상사이다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;acquaintance&quot;,&quot;r&quot;:&quot;mid&quot;}</p></div><div class="field"><span>원문</span><p>谢谢您的邀请，但我有个人事务，可能无法参加。</p></div><div class="field"><span>판단할 표현</span><p>초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.</p></div><div class="field"><span>해설</span><p>상사에게 직접적으로 거절하여 부드러움이 부족해 보입니다. 관계를 고려하여 완화 표현을 추가할 필요가 있습니다.</p></div><div class="field"><span>추천 표현</span><p>초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;judge3&quot;,
+  &quot;channel&quot;: &quot;email&quot;,
+  &quot;situation_ko&quot;: &quot;상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 나의 상사이다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;acquaintance&quot;,
+    &quot;r&quot;: &quot;mid&quot;
+  },
+  &quot;source&quot;: &quot;谢谢您的邀请，但我有个人事务，可能无法参加。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.&quot;,
+  &quot;highlights&quot;: [
+    &quot;개인 사정으로 참석이 어렵습니다&quot;
+  ],
+  &quot;accepted_band_codes&quot;: [
+    &quot;too_blunt&quot;
+  ],
+  &quot;explanation_ko&quot;: &quot;상사에게 직접적으로 거절하여 부드러움이 부족해 보입니다. 관계를 고려하여 완화 표현을 추가할 필요가 있습니다.&quot;,
+  &quot;recommended_example&quot;: &quot;초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.&quot;,
+  &quot;id&quot;: 2,
+  &quot;item_focus&quot;: &quot;refusal_softening&quot;,
+  &quot;axis_feature&quot;: &quot;refusal_softening&quot;
+}</pre></details></details><details><summary>MJT 3 · fix_choice</summary><div class="field"><span>상황</span><p>상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 나의 상사이다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;acquaintance&quot;,&quot;r&quot;:&quot;mid&quot;}</p></div><div class="field"><span>원문</span><p>谢谢您的邀请，但我有个人事务，可能无法参加。</p></div><div class="field"><span>판단할 표현</span><p>초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.</p></div><article class="option"><strong>1. 초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.</strong><div class="field"><span>해설</span><p>완화 표현을 추가하여 부드럽게 거절합니다.</p></div><div class="field"><span>판정</span><p>true</p></div></article><article class="option"><strong>2. 초대 감사합니다. 개인 사정으로 참석이 어렵습니다.</strong><div class="field"><span>해설</span><p>직접적 표현으로 여전히 부드러움이 부족합니다.</p></div><div class="field"><span>판정</span><p>false</p></div></article><article class="option"><strong>3. 초대 감사합니다. 개인 사정이 있어서 이번에는 참석이 어려울 것 같습니다. 다음 기회에 꼭 참석하고 싶습니다.</strong><div class="field"><span>해설</span><p>거절 의도를 흐리지 않으면서도 다음 기회에 대한 의사를 표현하여 지나치게 장황하게 만듭니다.</p></div><div class="field"><span>판정</span><p>false</p></div></article><div class="field"><span>해설</span><p>현재 상황에서 직접적인 거절 표현을 완화하여 부드럽게 조정합니다. 관계를 고려하여 완화 표현을 추가합니다.</p></div><div class="field"><span>추천 표현</span><p>초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;fix_choice&quot;,
+  &quot;channel&quot;: &quot;email&quot;,
+  &quot;situation_ko&quot;: &quot;상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 나의 상사이다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;acquaintance&quot;,
+    &quot;r&quot;: &quot;mid&quot;
+  },
+  &quot;source&quot;: &quot;谢谢您的邀请，但我有个人事务，可能无法参加。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.&quot;,
+  &quot;highlights&quot;: [
+    &quot;개인 사정으로 참석이 어렵습니다&quot;
+  ],
+  &quot;accepted_band_codes&quot;: [
+    &quot;too_blunt&quot;
+  ],
+  &quot;corrections&quot;: [
+    {
+      &quot;text&quot;: &quot;초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.&quot;,
+      &quot;is_valid&quot;: true,
+      &quot;note_ko&quot;: &quot;완화 표현을 추가하여 부드럽게 거절합니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;초대 감사합니다. 개인 사정으로 참석이 어렵습니다.&quot;,
+      &quot;is_valid&quot;: false,
+      &quot;note_ko&quot;: &quot;직접적 표현으로 여전히 부드러움이 부족합니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;초대 감사합니다. 개인 사정이 있어서 이번에는 참석이 어려울 것 같습니다. 다음 기회에 꼭 참석하고 싶습니다.&quot;,
+      &quot;is_valid&quot;: false,
+      &quot;note_ko&quot;: &quot;거절 의도를 흐리지 않으면서도 다음 기회에 대한 의사를 표현하여 지나치게 장황하게 만듭니다.&quot;
+    }
+  ],
+  &quot;explanation_ko&quot;: &quot;현재 상황에서 직접적인 거절 표현을 완화하여 부드럽게 조정합니다. 관계를 고려하여 완화 표현을 추가합니다.&quot;,
+  &quot;recommended_example&quot;: &quot;초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.&quot;,
+  &quot;id&quot;: 3,
+  &quot;item_focus&quot;: &quot;refusal_softening&quot;,
+  &quot;axis_feature&quot;: &quot;refusal_softening&quot;
+}</pre></details></details><details><summary>MJT 4 · reason</summary><div class="field"><span>상황</span><p>상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 나의 상사이다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;acquaintance&quot;,&quot;r&quot;:&quot;mid&quot;}</p></div><div class="field"><span>원문</span><p>谢谢您的邀请，但我有个人事务，可能无法参加。</p></div><div class="field"><span>판단할 표현</span><p>초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.</p></div><article class="option"><strong>1. 상사에게는 좀 더 공손한 표현이 필요합니다.</strong></article><article class="option"><strong>2. 완화 표현이 부족하여 너무 단호하게 들립니다.</strong></article><article class="option"><strong>3. 문법적으로는 문제가 없습니다.</strong></article><div class="field"><span>해설</span><p>현재 상황에서 완화 표현이 부족하여 거절이 너무 단호하게 들립니다. 부드러운 거절을 위해 완화 표현을 추가할 필요가 있습니다.</p></div><div class="field"><span>추천 표현</span><p>초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;reason&quot;,
+  &quot;channel&quot;: &quot;email&quot;,
+  &quot;situation_ko&quot;: &quot;상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 나의 상사이다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;acquaintance&quot;,
+    &quot;r&quot;: &quot;mid&quot;
+  },
+  &quot;source&quot;: &quot;谢谢您的邀请，但我有个人事务，可能无法参加。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;target&quot;: &quot;초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.&quot;,
+  &quot;highlights&quot;: [
+    &quot;개인 사정으로 참석이 어렵습니다&quot;
+  ],
+  &quot;problem_band_code&quot;: &quot;too_blunt&quot;,
+  &quot;reasons&quot;: [
+    {
+      &quot;id&quot;: &quot;r1&quot;,
+      &quot;text_ko&quot;: &quot;상사에게는 좀 더 공손한 표현이 필요합니다.&quot;,
+      &quot;kind&quot;: &quot;pragmatic_misconception&quot;
+    },
+    {
+      &quot;id&quot;: &quot;r2&quot;,
+      &quot;text_ko&quot;: &quot;완화 표현이 부족하여 너무 단호하게 들립니다.&quot;,
+      &quot;kind&quot;: &quot;primary&quot;
+    },
+    {
+      &quot;id&quot;: &quot;r3&quot;,
+      &quot;text_ko&quot;: &quot;문법적으로는 문제가 없습니다.&quot;,
+      &quot;kind&quot;: &quot;meaning_grammar_context&quot;
+    }
+  ],
+  &quot;accepted_reason_id&quot;: &quot;r2&quot;,
+  &quot;explanation_ko&quot;: &quot;현재 상황에서 완화 표현이 부족하여 거절이 너무 단호하게 들립니다. 부드러운 거절을 위해 완화 표현을 추가할 필요가 있습니다.&quot;,
+  &quot;recommended_example&quot;: &quot;초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.&quot;,
+  &quot;id&quot;: 4,
+  &quot;item_focus&quot;: &quot;refusal_softening&quot;,
+  &quot;axis_feature&quot;: &quot;refusal_softening&quot;
+}</pre></details></details><details><summary>MJT 5 · multi_judge</summary><div class="field"><span>상황</span><p>이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.</p></div><div class="field"><span>관계</span><p>나는 가끔 마주치는 이웃이다.</p></div><div class="field"><span>P / D / R</span><p>{&quot;p&quot;:&quot;equal&quot;,&quot;d&quot;:&quot;acquaintance&quot;,&quot;r&quot;:&quot;low&quot;}</p></div><div class="field"><span>원문</span><p>谢谢你的邀请，但我有其他安排，可能无法参加。</p></div><article class="option"><strong>1. 초대 고마워요. 이번에는 참석이 어려울 것 같아요.</strong><div class="field"><span>해설</span><p>간결한 거절로 명확히 전달하면서도 '어려울 것 같아요'라는 표현을 사용하여 부드럽게 완화합니다. 이는 상대방에게 거절의 이유를 간접적으로 전달하며, 관계적 거리감을 최소화합니다.</p></div><div class="field"><span>판정</span><p>within_band</p></div></article><article class="option"><strong>2. 초대 고마워요. 이번에는 안 될 것 같아요.</strong><div class="field"><span>해설</span><p>'안 될 것 같아요'라는 표현을 사용하여 간결하게 거절하며, 최소한의 완화로 인해 상대방에게 다소 단칼로 들릴 수 있습니다. 이는 관계적 거리감을 약간 증가시킬 수 있습니다.</p></div><div class="field"><span>판정</span><p>too_blunt</p></div></article><article class="option"><strong>3. 초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.</strong><div class="field"><span>해설</span><p>완화 표현과 함께 다음 기회를 언급하여 부드럽게 거절합니다.</p></div><div class="field"><span>판정</span><p>within_band</p></div></article><article class="option"><strong>4. 초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요. 다음에 꼭 갈게요.</strong><div class="field"><span>해설</span><p>불필요한 세부 설명을 추가하여 거절의 명확성이 흐려집니다.</p></div><div class="field"><span>판정</span><p>over_elaborate</p></div></article><div class="field"><span>해설</span><p>현재 상황에서 네 후보는 각각 다른 완화 표현과 설명 수준을 사용하여 거절의 부드러움과 명확성을 조절합니다. 각 후보의 표현 자원과 관계적 효과를 고려하여 적절성을 평가합니다.</p></div><div class="field"><span>추천 표현</span><p>초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.</p></div><details><summary>문항 원본 JSON</summary><pre>{
+  &quot;type&quot;: &quot;multi_judge&quot;,
+  &quot;channel&quot;: &quot;messenger&quot;,
+  &quot;situation_ko&quot;: &quot;이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 가끔 마주치는 이웃이다.&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;acquaintance&quot;,
+    &quot;r&quot;: &quot;low&quot;
+  },
+  &quot;source&quot;: &quot;谢谢你的邀请，但我有其他安排，可能无法参加。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;candidates&quot;: [
+    {
+      &quot;text&quot;: &quot;초대 고마워요. 이번에는 참석이 어려울 것 같아요.&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;within_band&quot;
+      ],
+      &quot;note_ko&quot;: &quot;간결한 거절로 명확히 전달하면서도 '어려울 것 같아요'라는 표현을 사용하여 부드럽게 완화합니다. 이는 상대방에게 거절의 이유를 간접적으로 전달하며, 관계적 거리감을 최소화합니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;초대 고마워요. 이번에는 안 될 것 같아요.&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;too_blunt&quot;
+      ],
+      &quot;note_ko&quot;: &quot;'안 될 것 같아요'라는 표현을 사용하여 간결하게 거절하며, 최소한의 완화로 인해 상대방에게 다소 단칼로 들릴 수 있습니다. 이는 관계적 거리감을 약간 증가시킬 수 있습니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;within_band&quot;
+      ],
+      &quot;note_ko&quot;: &quot;완화 표현과 함께 다음 기회를 언급하여 부드럽게 거절합니다.&quot;
+    },
+    {
+      &quot;text&quot;: &quot;초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요. 다음에 꼭 갈게요.&quot;,
+      &quot;accepted_band_codes&quot;: [
+        &quot;over_elaborate&quot;
+      ],
+      &quot;note_ko&quot;: &quot;불필요한 세부 설명을 추가하여 거절의 명확성이 흐려집니다.&quot;
+    }
+  ],
+  &quot;explanation_ko&quot;: &quot;현재 상황에서 네 후보는 각각 다른 완화 표현과 설명 수준을 사용하여 거절의 부드러움과 명확성을 조절합니다. 각 후보의 표현 자원과 관계적 효과를 고려하여 적절성을 평가합니다.&quot;,
+  &quot;recommended_example&quot;: &quot;초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.&quot;,
+  &quot;id&quot;: 5,
+  &quot;item_focus&quot;: &quot;refusal_softening&quot;,
+  &quot;axis_feature&quot;: &quot;refusal_softening&quot;
+}</pre></details></details><details><summary>DCT · 직접 산출</summary><div class="field"><span>상황</span><p>동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.</p></div><div class="field"><span>원문</span><p>谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。</p></div><div class="field"><span>참고 산출 1</span><p>초대 감사합니다. 이번 주 토요일 저녁에는 가족과의 약속이 있어서 참석이 어려울 것 같습니다. 다음에 기회가 되면 꼭 함께 하고 싶습니다.</p></div><div class="field"><span>해설</span><p>가족과의 약속을 이유로 부드럽게 거절하며, 다음 기회를 언급하여 관계를 유지합니다.</p></div><pre>{
+  &quot;mode&quot;: &quot;translation&quot;,
+  &quot;source_modality&quot;: &quot;written&quot;,
+  &quot;situation_ko&quot;: &quot;동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.&quot;,
+  &quot;relation_ko&quot;: &quot;나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.&quot;,
+  &quot;channel&quot;: &quot;messenger&quot;,
+  &quot;pdr&quot;: {
+    &quot;p&quot;: &quot;equal&quot;,
+    &quot;d&quot;: &quot;acquaintance&quot;,
+    &quot;r&quot;: &quot;mid&quot;
+  },
+  &quot;source_text&quot;: &quot;谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。&quot;,
+  &quot;preceding_turn&quot;: null,
+  &quot;vocabulary_hints&quot;: [
+    {
+      &quot;source&quot;: &quot;邀请&quot;,
+      &quot;target&quot;: &quot;초대&quot;
+    },
+    {
+      &quot;source&quot;: &quot;家庭安排&quot;,
+      &quot;target&quot;: &quot;가족과의 약속&quot;
+    }
+  ],
+  &quot;reference_alternatives&quot;: [
+    {
+      &quot;text&quot;: &quot;초대 감사합니다. 이번 주 토요일 저녁에는 가족과의 약속이 있어서 참석이 어려울 것 같습니다. 다음에 기회가 되면 꼭 함께 하고 싶습니다.&quot;,
+      &quot;note_ko&quot;: &quot;가족과의 약속을 이유로 부드럽게 거절하며, 다음 기회를 언급하여 관계를 유지합니다.&quot;
+    }
+  ],
+  &quot;focal_segments&quot;: [
+    {
+      &quot;text&quot;: &quot;这次周六晚上我已经有家庭安排了，可能无法参加。&quot;,
+      &quot;role&quot;: &quot;head&quot;
+    }
+  ]
+}</pre></details><div class="review"><h4>Fable 독립 검수 · fail</h4><p>코어 장면과 DCT는 개연성이 있으나, MJT 앵커(2·3·4)의 관계 서술이 '나는 나의 상사이다'로 잘못 기술되고 P 값이 equal로 상사 관계와 충돌한다. 앵커의 too_blunt 판정과 MJT5 후보 2의 too_blunt 판정은 이미 완화된 표현('참석이 어렵습니다', '안 될 것 같아요')을 표지 유무만으로 단칼로 보는 것으로 기준의 반례 원칙과 어긋나며, 수정 후보 3의 해설은 자기모순이다. 원문에 없는 약속 추가, 참고 산출의 원문 일부 누락, 길이 정책 미달 등도 확인이 필요하다.</p><details><summary>fail · 관계 서술이 '나는 나의 상사이다'로 되어 있어 화자가 자기 자신의 상사라는 뜻이 된다. 상황문은 상사가 초대하고 내가 거절하는 장면이므로 상대가 상사여야 한다. 동일 문구가 mpj_items/2, /3에도 반복된다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/relation_ko</p></div><div class="field"><span>근거</span><p>학생이 장면을 읽는 순간 역할 혼란이 생기며, 거절 화행의 화자·수신자 판정 근거가 무너진다.</p></div><div class="field"><span>제안</span><p>'상대는 나의 직속 상사이다' 또는 '나는 상사와 업무상 이메일로 연락하는 사이이다' 등으로 세 문항 모두 수정.</p></div></details><details><summary>fail · 상사에게 거절하는 장면인데 P가 equal로 지정되어 있다(mpj_items/2, /3 동일). 코어 P·D 값을 그대로 복사한 것으로 보인다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/pdr/p</p></div><div class="field"><span>근거</span><p>P/D/R 라벨과 실제 관계가 충돌하면 학습자에게 제시되는 판단 기준이 일관되지 않고, 판정 해설('상사에게…')과도 어긋난다.</p></div><div class="field"><span>제안</span><p>관계를 상사로 유지하려면 P를 화자가 낮은 값으로 조정하고, 앵커 세 문항에 동일 적용. 코어 PDR과의 일치가 필요하다면 상대를 동료급으로 바꾸고 해설도 함께 수정.</p></div></details><details><summary>warning · '초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다'를 too_blunt로 판정하고 '어려울 것 같습니다'만 추가한 안을 알맞음으로 제시한다. '참석이 어렵습니다'는 한국어에서 이미 관용적인 간접 거절이며, 두 안의 차이는 유보 표지 하나뿐이다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/accepted_band_codes</p></div><div class="field"><span>근거</span><p>criteria는 표지 수·표현형만으로 적절성을 결정하지 않는다고 명시하고, 반례 노트도 간결한 거절이 적절할 수 있다고 한다. 앵커의 실제 결함은 오히려 원문 '可能'의 누락(의미 보존)인데 해설은 이를 언급하지 않고 '직접적 거절'로만 설명해 2·3·4 문항 전체의 판정 근거가 약하다.</p></div><div class="field"><span>제안</span><p>앵커를 실제로 배려가 빠진 표현(예: '하지만 참석은 못 합니다' 등 원문의 완화 표지를 모두 지운 안)으로 조정하거나, 해설에서 원문의 可能이 누락되어 거절 강도가 원문보다 높아졌다는 점을 근거로 명시.</p></div><div class="field"><span>유보</span><p>'참석이 어렵습니다'를 상사 대상 이메일에서 단칼로 볼지 여부는 교수자의 대역 경계 판단이 필요하다.</p></div></details><details><summary>fail · 세 번째 수정 후보 해설이 '거절 의도를 흐리지 않으면서도 … 지나치게 장황하게 만듭니다'라고 하여 자기모순이다. 대역 정의상 over_elaborate는 거절이 흐려지는 경우인데, 흐려지지 않는다고 스스로 인정하면서 무효로 판정한다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/2/corrections/2/note_ko</p></div><div class="field"><span>근거</span><p>학생이 무효 판정의 이유를 이해할 수 없고, 같은 구조(감사+이유+유보+다음 기회)를 코어 DCT 참고 산출은 적절 예로 제시하므로 미션 내부 기준이 충돌한다. 이 후보가 무효일 실제 근거는 원문(可能无法参加)에 없는 '다음 기회에 꼭 참석' 약속을 추가한 점이다.</p></div><div class="field"><span>제안</span><p>해설을 '원문과 상황에 없는 다음 기회 약속을 덧붙여 허용된 사실 범위를 벗어난다'로 바꾸거나, 후보 문장을 실제로 거절이 흐려지는 장황한 안으로 교체.</p></div></details><details><summary>warning · 오답 선택지 r3 '문법적으로는 문제가 없습니다'는 문제의 원인을 설명하는 이유가 아니라 단순 진술이어서 선택지로 기능하지 않는다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/3/reasons/2/text_ko</p></div><div class="field"><span>근거</span><p>이유 선택 문항에서 한 선택지가 명백히 이유가 아니면 실질적으로 2지선다가 되어 진단력이 떨어진다.</p></div><div class="field"><span>제안</span><p>meaning_grammar_context 유형의 그럴듯한 오답(예: '원문의 개인 사정을 잘못 옮겨 의미가 달라졌습니다')으로 교체.</p></div></details><details><summary>fail · '초대 고마워요. 이번에는 안 될 것 같아요'를 too_blunt로 판정하지만 감사 표현과 '-ㄹ 것 같아요' 유보가 모두 있고, 알맞음으로 판정한 후보 1('참석이 어려울 것 같아요')과의 차이는 어휘 하나뿐이다. 두 후보 모두 원문의 이유(我有其他安排)를 생략한 점은 동일하다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/1/accepted_band_codes</p></div><div class="field"><span>근거</span><p>R이 low인 가벼운 집들이 초대에서 이 표현은 자연스러운 거절이며, criteria의 반례 노트('오늘은 안 되겠어요'도 적절할 수 있음)와 직접 충돌한다. 어휘 형태만으로 대역을 가르면 '완충 표지가 많을수록 좋다'는 오개념을 강화한다.</p></div><div class="field"><span>제안</span><p>후보 2를 실제로 배려가 빠진 안(예: 감사 없이 '이번엔 안 가요' 등)으로 교체하거나, 판정을 within_band로 바꾸고 다른 후보를 too_blunt로 재설계하여 within 2·조정 2 구성을 유지.</p></div><div class="field"><span>유보</span><p>'안 될 것 같아요'와 '참석이 어려울 것 같아요'의 배려 차이를 유의미하게 볼지는 교수자 판단이 필요하다.</p></div></details><details><summary>warning · 후보 3은 '다음에 꼭 갈게요'라는 약속을 덧붙였으나 원문 '谢谢你的邀请，但我有其他安排，可能无法参加'에는 다음 기회 언급이 없다. 그런데 within_band로 판정된다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/2/text</p></div><div class="field"><span>근거</span><p>criteria와 closing_ko는 '없는 사유나 약속을 덧붙이지 않는다'를 원칙으로 하고, 같은 미션의 mpj_items/2 수정 후보 3은 약속 추가를 이유로 무효 처리되어 기준 적용이 일관되지 않다.</p></div><div class="field"><span>제안</span><p>'다음에 꼭 갈게요'를 삭제하거나, 원문에 下次 관련 표현을 추가하여 허용된 사실로 만들기.</p></div></details><details><summary>warning · '나는 가끔 마주치는 이웃이다'는 화자 자신이 이웃이라는 서술로 읽히며 상대 관계 기술로 부자연스럽다. 또한 가끔 마주치는 정도의 이웃이 메신저로 집들이에 초대하는 접촉 이력이 장면에 없다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/relation_ko</p></div><div class="field"><span>근거</span><p>장면 정책은 인물·채널·접촉 이력이 서로 맞아야 한다고 요구한다. 메신저 연락처가 있는 관계라면 '가끔 마주치는' 이상의 관계 기술이 필요하다.</p></div><div class="field"><span>제안</span><p>'상대는 같은 층에 살며 메신저로 가끔 연락하는 이웃이다'처럼 채널과 맞는 관계로 수정.</p></div></details><details><summary>warning · 실효 글자수 actual 50이 정책 최소 80에 미달한다.</summary><div class="field"><span>근거 위치</span><p>/content/context/core_content/length_policy/actual</p></div><div class="field"><span>근거</span><p>advanced 수준 번역 과제로서 원문 분량이 정책 하한보다 크게 짧다.</p></div><div class="field"><span>제안</span><p>원문을 정책 범위로 보완하거나 교수자가 짧은 원문을 의도적으로 승인했는지 확인.</p></div><div class="field"><span>유보</span><p>min_warning 정책이므로 교수자 승인으로 수용 가능한지 확인이 필요하다.</p></div></details><details><summary>warning · 참고 산출이 원문 두 번째 절 '很高兴收到你的消息'를 옮기지 않았다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/production_task/reference_alternatives/0/text</p></div><div class="field"><span>근거</span><p>고급 번역 과제의 참고 산출은 원문 명제를 보존해야 하며, 생략이 의도적이라면 note에 근거를 밝혀야 한다.</p></div><div class="field"><span>제안</span><p>'연락 주셔서 반가웠습니다' 등을 추가하거나 note_ko에 생략 허용 근거를 명시.</p></div></details><details><summary>warning · 코어에는 동료의 초대 발화(preceding_turn)가 있으나 production_task에서는 null이다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/production_task/preceding_turn</p></div><div class="field"><span>근거</span><p>거절은 앞선 초대에 대한 응답이므로 DCT 화면에도 동일한 선행 발화가 제시되어야 장면 연결이 유지된다.</p></div><div class="field"><span>제안</span><p>코어의 preceding_turn을 production_task에도 동일하게 채우기.</p></div></details><details><summary>warning · relational_calibration 근거가 '친구와의 관계'만 언급하지만 evidence_refs에 dct(동료 관계)가 포함되어 있다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/diagnostic_dimensions/1/evidence_ko</p></div><div class="field"><span>근거</span><p>근거 서술과 참조 문항의 관계 유형이 맞지 않아 진단 차원 설명이 부정확하다.</p></div><div class="field"><span>제안</span><p>'친구·동료 등 대등한 관계에서'로 서술을 넓히거나 refs를 조정.</p></div></details></div><div class="review"><h4>Opus 독립 검수 · fail</h4><p>핵심 결함 두 가지가 확인된다. 첫째, MPJ 2·3·4의 앵커 장면이 '나는 나의 상사이다'라는 잘못된 관계 서술과 p=equal의 P 라벨 불일치를 갖고 있어, 상하 관계 장면을 대등 관계로 표시한 상태에서 판정이 이루어진다. 둘째, MPJ5 후보3은 원문·상황에 없는 '다음에 꼭 갈게요'라는 미래 약속을 추가했는데 within_band로 판정되어, criteria의 '없는 사유·조건·약속을 만들지 않는다' 및 MPJ3에서 동일 유형(다음 기회 언급)을 오답 처리한 것과 정면 충돌한다. 그 밖에 앵커 target의 too_blunt 판정 근거 취약, MPJ3 오답 후보가 원 target과 실질 동일, 코어 length_policy 미달, 진단 차원 근거 불일치, 선행 발화 언어·제공 여부 불일치가 확인된다.</p><details><summary>fail · MPJ2(그리고 동일 앵커를 공유하는 MPJ3·MPJ4)의 relation_ko가 '나는 나의 상사이다'로, 화자와 상대를 뒤바꾼 비문이다. 코어의 '나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다' 같은 관계 서술 형식과도 어긋난다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/relation_ko</p></div><div class="field"><span>근거</span><p>학생이 누가 누구에게 거절하는지 파악할 수 없고, 거절의 화행 주체·수신자 관계가 불명확해져 판정 근거를 읽을 수 없다.</p></div><div class="field"><span>제안</span><p>'나는 상사의 요청을 받은 부서원이다' 또는 '나는 평소 보고 관계인 상사와 이메일로 연락한다'처럼 화자 시점의 관계 서술로 수정하고, MPJ3·MPJ4의 동일 문구도 함께 정정한다.</p></div></details><details><summary>fail · 상사가 참석을 요청한 장면인데 pdr의 p가 'equal'로 설정되어 있다. MPJ3·MPJ4도 동일하다. 반면 MPJ1(친구)·MPJ5(이웃)도 모두 p=equal이어서 앵커의 권력 대비가 라벨상 사라졌다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/pdr/p</p></div><div class="field"><span>근거</span><p>거절 완충의 조정 근거가 되는 권력 관계가 실제 장면(상사→부서원)과 라벨(대등)에서 불일치하여, 미션의 대비 설계와 해설(‘상사에게는 좀 더 공손한 표현’)이 서로 어긋난다.</p></div><div class="field"><span>제안</span><p>앵커 장면을 상사 관계로 유지한다면 p를 상대 우위(예: lower/higher 규약에 맞게)로 정정하고, 대등 관계를 유지하려면 장면을 '함께 행사를 준비하는 동료'로 바꿔 해설의 상사 언급을 함께 수정한다.</p></div></details><details><summary>fail · MPJ5 후보3 '초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.'가 within_band로 판정되어 있다. 그러나 이 문항의 원문(谢谢你的邀请，但我有其他安排，可能无法参加。)과 상황문에는 다음 참석 약속이 없다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/4/candidates/2</p></div><div class="field"><span>근거</span><p>criteria의 operational_definition은 '원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다'고 규정하며, unit closing_ko도 '없는 사유나 약속을 덧붙이지 않습니다'라고 명시한다. 또한 MPJ3에서는 '다음 기회에 꼭 참석하고 싶습니다'를 포함한 후보를 is_valid:false로 처리해 동일 자원에 상반된 판정을 내리고 있다.</p></div><div class="field"><span>제안</span><p>후보3의 '다음에 꼭 갈게요'를 삭제하거나 '다음에 기회가 되면 좋겠어요'처럼 약속이 아닌 희망 표현으로 바꾸고, 그대로 둘 경우 판정을 조정 필요 계열로 바꾸어 MPJ3의 처리와 일관되게 맞춘다.</p></div></details><details><summary>warning · 앵커 target '초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.'가 too_blunt로 고정되어 있다. 이 문장은 이미 감사 표시, 이유 제시, '어렵습니다'라는 간접 부정을 포함한다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/1/accepted_band_codes</p></div><div class="field"><span>근거</span><p>criteria는 표현형·표지 수만으로 적절성을 결정하지 말라고 하고, counter_rule_note는 간결한 거절도 적절할 수 있음을 반례로 설계하라고 한다. 현재 판정은 '-을 것 같습니다' 유보 표지의 유무만으로 단칼 여부를 가르는 결과가 되어 반례 원칙과 상충할 수 있다.</p></div><div class="field"><span>제안</span><p>앵커 문장을 실제로 배려가 결여된 형태(예: '초대 감사합니다. 개인 사정이 있어서 못 갑니다.')로 강화하거나, 이메일·상사라는 즉답 요구 없는 채널 조건에서 왜 이 문장이 배려를 놓치는지 explanation_ko에 상황 근거를 추가한다.</p></div><div class="field"><span>유보</span><p>해당 문장을 too_blunt로 볼지 within_band로 볼지는 채널·격식 관행에 대한 교수자 판단이 필요하다.</p></div></details><details><summary>warning · MPJ3의 오답 후보 '초대 감사합니다. 개인 사정으로 참석이 어렵습니다.'가 문항의 원 target과 '하지만' 유무만 다른 사실상 동일 문장이다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/2/corrections/1</p></div><div class="field"><span>근거</span><p>수정 선택 과제에서 원문과 동일한 문장을 선택지로 제시하면 '수정하지 않음'이 선택지로 들어가 과제 논리가 흐려지고, 학생이 인쇄 오류로 오해할 수 있다.</p></div><div class="field"><span>제안</span><p>이 후보를 다른 유형의 부적절 수정(예: 거절을 흐리는 유보 과다 또는 이유 삭제형)으로 교체하거나, note_ko에 '원문과 동일하여 문제가 해결되지 않음'을 명시한다.</p></div></details><details><summary>warning · 코어 length_policy의 min이 80인데 actual이 50으로 하한에 크게 미달한다.</summary><div class="field"><span>근거 위치</span><p>/content/context/core_content/length_policy</p></div><div class="field"><span>근거</span><p>고급 수준 번역 과제의 분량 기준을 충족하지 못해 산출 난도와 진단 정보량이 설계 의도보다 낮아진다.</p></div><div class="field"><span>제안</span><p>원문에 상황이 허용하는 범위의 정보를 보강해 분량을 하한에 맞추거나, 이 장면에 맞게 min 값을 조정한 근거를 남긴다.</p></div><div class="field"><span>유보</span><p>원문 확장과 정책 하한 조정 중 어느 쪽이 수업 의도에 맞는지는 교수자 결정이 필요하다.</p></div></details><details><summary>warning · relational_calibration의 근거가 '친구와의 관계에서 부드러운 거절'로 서술되어 있으나, evidence_refs에 포함된 dct(생산 과제)는 친구가 아니라 '몇 차례 함께 일한 동료' 장면이다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/diagnostic_dimensions/1/evidence_ko</p></div><div class="field"><span>근거</span><p>진단 차원의 근거 서술과 실제 참조 문항의 관계 설정이 불일치하여 피드백 근거로 사용될 때 오류가 전파된다.</p></div><div class="field"><span>제안</span><p>'가까운 친구(MPJ1)와 일상적으로 연락하는 동료(DCT)의 관계 차이에 따른 완충 조정'처럼 참조 문항의 실제 관계를 반영해 서술을 수정한다.</p></div></details><details><summary>warning · 코어에는 초대 발화 preceding_turn이 있으나 production_task의 preceding_turn은 null이어서 학습자 과제에는 선행 발화가 제공되지 않는다. 또한 코어 preceding_turn이 한국어로 되어 있는데 학습자가 옮길 원문은 중국어여서, 초대는 한국어로 오고 답장은 중국어로 온 것이 되어 언어 상황이 어긋난다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/production_task/preceding_turn</p></div><div class="field"><span>근거</span><p>거절은 선행 초대와의 연결이 판정의 핵심 근거이므로 선행 발화 제공 여부와 언어가 일관되어야 하고, 그렇지 않으면 무엇을 거절하는지의 맥락이 약해진다.</p></div><div class="field"><span>제안</span><p>production_task에도 동일한 선행 발화를 제공하고, 코어 preceding_turn을 중국어 초대 발화(예: 这周六晚上大家一起吃个饭，你有时间吗？)로 바꾸어 원문 언어와 정렬한다.</p></div></details><details><summary>warning · MPJ1 '나는 자주 연락하는 친구이다', MPJ5 '나는 가끔 마주치는 이웃이다'처럼 관계 서술이 화자 자신을 상대 역할로 진술하는 형태여서 코어의 서술 방식과 불일치한다.</summary><div class="field"><span>근거 위치</span><p>/content/mission/mpj_items/0/relation_ko</p></div><div class="field"><span>근거</span><p>관계 서술 주체가 뒤바뀌어 읽히면 학생이 누가 거절 주체인지 판단하는 데 혼선이 생기고, 미션 전체의 서술 형식 일관성이 깨진다.</p></div><div class="field"><span>제안</span><p>'나는 자주 연락하는 친구와 메신저로 대화한다', '나는 가끔 마주치는 이웃과 연락하는 사이이다'처럼 화자 시점의 관계 서술로 통일한다.</p></div></details></div></section><section class="panel" data-case="refusal" data-route="astra"><div class="eyebrow">Astra</div><h2>기존 일정 때문에 동료의 주말 모임 초대 거절</h2><p class="status">전체 문항 생성 시간 초과</p><div class="metrics"><div><b>198초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.155 + 미확정</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.</p></div><div class="field"><span>관계</span><p>몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료</p></div><div class="field"><span>원문</span><p>谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。</p></div><div class="field"><span>코어 규칙 결과</span><p>pass</p></div><p class="notice">미션 생성 호출 실패: Pilot transport 502: Signal timed out.</p><p>완성 미션의 품질을 비교할 수 없는 결과입니다. 실패도 실험 결과에 포함하며 자동 재생성하지 않았습니다.</p></section><section class="panel" data-case="apology" data-route="baseline"><div class="eyebrow">기존 모델</div><h2>조용한 시간에 낸 소음에 이웃에게 사과</h2><p class="status">장면 구성 규칙에서 중단</p><div class="metrics"><div><b>14초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.032</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.</p></div><div class="field"><span>관계</span><p>나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.</p></div><div class="field"><span>원문</span><p>昨天晚上我在搬家具的时候声音有点大，没想到会打扰到你，真的很抱歉。以后我会特别注意，晚上绝对不会再这样做了。如果昨天让你休息不好，真的很对不起。</p></div><div class="field"><span>코어 규칙 결과</span><p>pass</p></div><p class="notice">Bounded topology regeneration 뒤에도 deterministic topology를 통과하지 못했습니다.</p><p>완성 미션의 품질을 비교할 수 없는 결과입니다. 실패도 실험 결과에 포함하며 자동 재생성하지 않았습니다.</p></section><section class="panel" data-case="apology" data-route="astra"><div class="eyebrow">Astra</div><h2>조용한 시간에 낸 소음에 이웃에게 사과</h2><p class="status">전체 문항 생성 시간 초과</p><div class="metrics"><div><b>194초</b><span>생성 흐름 소요 · 독립 검수 제외</span></div><div><b>$0.156 + 미확정</b><span>생성 응답 사용량 추산</span></div></div><div class="field"><span>장면</span><p>나는 다음 날 복도에서 아래층 이웃을 만나 어젯밤 늦게 가구를 옮기며 낸 소음을 사과하고, 앞으로 밤에는 옮기지 않겠다고 말한다. 얼굴을 몇 차례 본 어색한 사이이며, 이웃은 내가 낸 소음으로 늦은 시간에 불편을 겪었다.</p></div><div class="field"><span>관계</span><p>얼굴을 몇 차례 본 사이인 위층 거주자와 소음 피해를 겪은 아래층 이웃</p></div><div class="field"><span>원문</span><p>昨晚我在家挪家具，时间那么晚了还弄出噪音，打扰到你了，真对不起。这么晚还搬动家具，确实是我考虑不周，没有顾及楼下邻居的感受。以后我不会再在晚上挪家具了。</p></div><div class="field"><span>코어 규칙 결과</span><p>pass</p></div><p class="notice">미션 생성 호출 실패: Pilot transport 502: Signal timed out.</p><p>완성 미션의 품질을 비교할 수 없는 결과입니다. 실패도 실험 결과에 포함하며 자동 재생성하지 않았습니다.</p></section></div><footer>응답이 확보된 40회 호출의 일반 단가 추산 합계 $2.975. 응답을 확보하지 못한 3회는 과금액 미확정으로 별도입니다. 캐시 할인·세금·실제 청구서를 반영한 확정 금액이 아닙니다. 운영 미션·편성·모델 설정은 변경하지 않았습니다.</footer></main><script>const pick=id=>{document.querySelectorAll('.panel').forEach(p=>p.hidden=p.dataset.case!==id);document.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.select===id))};document.querySelectorAll('button').forEach(b=>b.onclick=()=>pick(b.dataset.select));pick('request');</script></html>

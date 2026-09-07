@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPkCEGmDoPHaNjFx18CvfZxi5oOC",
+    "object": "chat.completion",
+    "created": 1788772556,
+    "model": "gpt-6-astra",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"situation_ko\": \"나는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 다음 주 화요일로 바꿀 수 있는지 묻는다. 직원은 예약 시스템에서 빈 시간을 확인해 통상적인 예약 변경을 처리할 수 있다.\",\n  \"relation_ko\": \"예약 변경을 문의하는 환자와 처음 응대하는 병원 접수 직원\",\n  \"source_text\": \"개인 일정이 바뀌어서 예약한 시간에 오기 어려워졌어요. 진료 예약을 다음 주 화요일로 바꿀 수 있을까요?\",\n  \"preceding_turn\": null,\n  \"brief_note_ko\": \"처음 만난 병원 접수 직원에게 다음 주 화요일로 진료 예약 변경 요청\",\n  \"focal_segments\": [\n    {\n      \"text\": \"진료 예약을 다음 주 화요일로 바꿀 수 있을까요?\",\n      \"role\": \"head\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5237,
+      "completion_tokens": 380,
+      "total_tokens": 5617,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 5234,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 157,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

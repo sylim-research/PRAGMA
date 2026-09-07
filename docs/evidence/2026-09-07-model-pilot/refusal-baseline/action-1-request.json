@@ -1,0 +1,32 @@
+{
+  "action": "core",
+  "telemetry": {
+    "generation_run_id": "model-pilot-20260907-refusal-baseline",
+    "generation_item_key": "zh_ko|refusal|advanced|daily|translation|equal|acquaintance|mid|relationship_social|invitation_refusal|-|-|0",
+    "invocation_attempt": 1
+  },
+  "core": {
+    "direction": "zh_ko",
+    "speech_act": "refusal",
+    "speech_act_ko": "거절",
+    "level": "advanced",
+    "level_ko": "고급",
+    "domain": "daily",
+    "domain_ko": "일상",
+    "industry": null,
+    "func": null,
+    "topic_code": "invitation_refusal",
+    "mode": "translation",
+    "channel": "messenger",
+    "channel_ko": "서면(번역)",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "mid"
+    },
+    "source_modality": "written",
+    "situation_seed_ko": "직장에서 몇 차례 함께 일한 동료가 위챗으로 토요일 저녁 모임에 초대했다. 나는 이미 가족과의 약속이 있어 참석하지 못한다고 답장을 보낸다. 초대를 고맙게 받아들이면서 이번에는 참석하지 못한다는 뜻을 분명히 전한다.",
+    "is_response_act": true,
+    "length_hint_ko": "유효 글자 80~110자(공백·문장부호 제외), 종결부호 기준 2~4문장의 실무 메시지 담화"
+  }
+}

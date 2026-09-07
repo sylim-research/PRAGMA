@@ -1,0 +1,69 @@
+{
+  "createdAt": "2026-09-07T09:07:43.328Z",
+  "scope": "3 fixed cases, 2 generation routes; local draft artifacts only",
+  "reasoningEffort": "medium",
+  "maxOutputTokens": 16000,
+  "maxEstimatedUsd": 30,
+  "cases": [
+    {
+      "id": "request",
+      "title": "병원 접수 직원에게 예약 변경 문의",
+      "cell": {
+        "industry": null,
+        "business_function": null,
+        "count": 1,
+        "pdr_power": "equal",
+        "pdr_distance": "formal",
+        "pdr_burden": "low",
+        "domain": "daily",
+        "speech_act_ui": "request",
+        "level": "intermediate",
+        "mode": "stt_interpreting",
+        "direction": "ko_zh",
+        "theme_code": "daily_living",
+        "topic_code": "hospital_pharmacy_visit",
+        "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다."
+      }
+    },
+    {
+      "id": "refusal",
+      "title": "기존 일정 때문에 동료의 주말 모임 초대 거절",
+      "cell": {
+        "industry": null,
+        "business_function": null,
+        "count": 1,
+        "pdr_power": "equal",
+        "pdr_distance": "acquaintance",
+        "pdr_burden": "mid",
+        "domain": "daily",
+        "speech_act_ui": "refusal",
+        "level": "advanced",
+        "mode": "translation",
+        "direction": "zh_ko",
+        "theme_code": "relationship_social",
+        "topic_code": "invitation_refusal",
+        "situation_seed_ko": "직장에서 몇 차례 함께 일한 동료가 위챗으로 토요일 저녁 모임에 초대했다. 나는 이미 가족과의 약속이 있어 참석하지 못한다고 답장을 보낸다. 초대를 고맙게 받아들이면서 이번에는 참석하지 못한다는 뜻을 분명히 전한다."
+      }
+    },
+    {
+      "id": "apology",
+      "title": "조용한 시간에 낸 소음에 이웃에게 사과",
+      "cell": {
+        "industry": null,
+        "business_function": null,
+        "count": 1,
+        "pdr_power": "equal",
+        "pdr_distance": "acquaintance",
+        "pdr_burden": "mid",
+        "domain": "daily",
+        "speech_act_ui": "apology",
+        "level": "advanced",
+        "mode": "stt_interpreting",
+        "direction": "zh_ko",
+        "theme_code": "daily_living",
+        "topic_code": "neighbor_noise_apology",
+        "situation_seed_ko": "어젯밤 늦게 가구 위치를 옮기다가 아래층에 소음을 냈다. 다음 날 복도에서 얼굴을 몇 차례 본 아래층 이웃을 만나, 늦은 시간에 시끄럽게 한 일을 사과하고 앞으로 밤에는 가구를 옮기지 않겠다고 말한다. 소음의 책임은 나에게 있다."
+      }
+    }
+  ]
+}

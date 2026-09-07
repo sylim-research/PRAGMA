@@ -1,0 +1,31 @@
+{
+  "ok": false,
+  "error": "미션 생성 호출 실패: Pilot transport 502: Signal timed out.",
+  "attempts": 1,
+  "terminal": {
+    "terminalStage": "mission_generation",
+    "itemCandidatePaths": [],
+    "deterministicFailureCodes": [],
+    "criticVerdict": "UNKNOWN",
+    "criticFindingCodes": [],
+    "criticFindings": [],
+    "topology": {
+      "firstPassResult": "pass",
+      "finalResult": "pass",
+      "attempts": 1,
+      "regenerationCount": 0,
+      "findings": []
+    },
+    "initialR27Findings": [],
+    "r27RepairAttempted": false,
+    "postRepairDeterministicResult": "not_attempted",
+    "postRepairDeterministicFindings": [],
+    "attemptNo": 1,
+    "regenerationCount": 0,
+    "operation": "none",
+    "operationResult": "not_attempted",
+    "infrastructureError": true,
+    "providerStatus": 500,
+    "finalOutcome": "terminal_dropout"
+  }
+}

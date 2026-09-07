@@ -1,0 +1,42 @@
+{
+  "status": 200,
+  "data": {
+    "quality_check": {
+      "verdict": "fail",
+      "summary_ko": "multi_judge 후보 중 하나가 실제로는 적정 대역인데 too_direct로 잘못 분류되어 band_mismatch가 발생함.",
+      "findings": [
+        {
+          "code": "band_mismatch",
+          "severity": "fail",
+          "where": "mpj_items[4].candidates[1]",
+          "evidence_excerpt": "麻烦您批准下周的假期。",
+          "note_ko": "'麻烦您'는 중국어에서 완화된 요청 표현으로, 상사에게 휴가 승인을 요청하는 상황에서 충분히 적정 대역에 해당한다. 실제로는 within_band임에도 too_direct로 잘못 분류되어 학습자가 잘못 배우게 된다."
+        },
+        {
+          "code": "feedback_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[1].note_ko",
+          "evidence_excerpt": "'麻烦您'로 직접적이지만 약간의 완화가 있습니다.",
+          "note_ko": "'麻烦您'가 실제로 요청을 완화하는 구체적 기능(예: 부담의 귀속, 완화의 정도 등)이나 선택권의 남김이 어떻게 실현되는지, 또는 다른 후보와의 관계적 효과 차이를 명확히 연결하지 않고 있음."
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[0].note_ko",
+          "evidence_excerpt": "조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+          "note_ko": "'조건절'과 '麻烦您'의 관계적 인상 차이가 구체적으로 설명되지 않고, 두 note 모두 '부담을 줄이고 선택권을 남긴다'로 환원되어 실제 관계적 효과의 차이가 드러나지 않음."
+        }
+      ],
+      "mission_content_hash": "522dfad5b3e110bf0c7ee4374a1e3283084a5b053b2878d0344dbcbc8460cd70",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "checked_at": "2026-09-07T09:11:37.536Z"
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "generated_at": "2026-09-07T09:11:37.536Z"
+    }
+  }
+}

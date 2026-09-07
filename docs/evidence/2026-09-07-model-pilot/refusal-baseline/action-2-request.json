@@ -1,0 +1,113 @@
+{
+  "action": "mission_topology",
+  "telemetry": {
+    "scenario_id": "38b1e66e-6f23-49d5-8665-c312e593f903",
+    "generation_run_id": "model-pilot-20260907-refusal-baseline",
+    "generation_item_key": "zh_ko|refusal|advanced|daily|translation|equal|acquaintance|mid|relationship_social|invitation_refusal|-|-|0",
+    "invocation_attempt": 1
+  },
+  "mission": {
+    "direction": "zh_ko",
+    "learner_level": "advanced",
+    "speech_act": "refusal",
+    "speech_act_ko": "거절",
+    "level_ko": "고급",
+    "level_policy_ko": "고급: 담화 조직·복합 전략. 자원 선택 배열. 원문 3~5문장(통역은 짧은 구두 담화).",
+    "feature": {
+      "code": "refusal_softening",
+      "version": "1.1",
+      "learner_label": "완충과 대안",
+      "operational_definition": "상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.",
+      "band_schema": [
+        {
+          "code": "too_blunt",
+          "label_ko": "너무 단칼 (상황에 필요한 배려 부족)"
+        },
+        {
+          "code": "within_band",
+          "label_ko": "알맞음"
+        },
+        {
+          "code": "over_elaborate",
+          "label_ko": "지나치게 장황 (거절이 흐려짐)"
+        }
+      ],
+      "within_band_code": "within_band",
+      "relevant_resources": [
+        "유보·완화 표현 (좀 어려울 것 같아요·-기는 힘들 것 같아요·아무래도 -겠는데요)",
+        "사과·유감 (죄송하지만·아쉽지만·미안한데)",
+        "이유 제시 (-아/어서·그날은 선약이 있어서)",
+        "대안·미래 약속 (다음에는 꼭·대신 -면 어떨까요·요일을 바꾸면 어때요)",
+        "부분 수용 후 전환 (그건 좋은데·-는 되는데 -는 어려워요)"
+      ],
+      "excluded_confounds": [
+        "높임 등급·경어 선택 — 공손성 축",
+        "거절의 명제 자체(무엇을 거절하는가)는 불변항",
+        "문장 길이 자체"
+      ],
+      "closing_principle_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다.",
+      "counter_rule_note": "\"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(\"오늘은 안 되겠어요\")도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다."
+    },
+    "core": {
+      "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+      "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+      "source_text_ko": "谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。",
+      "preceding_turn_zh": "이번 주 토요일 저녁에 다 같이 모여서 식사하려고 하는데, 시간 괜찮으세요?",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "messenger",
+      "source_modality": "written",
+      "usable_facts": [],
+      "focal_segments": [
+        {
+          "text": "这次周六晚上我已经有家庭安排了，可能无法参加。",
+          "role": "head"
+        }
+      ]
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "refusal",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "error_pattern_hints_ko": [
+      "L2 학습자가 모어 화자보다 장황해지는 경향 — 완화·부연을 과잉 적재 (예: 완화 표현 6겹을 겹쳐 요청의 핵심이 흐려지는 후보)"
+    ],
+    "is_response_act": true
+  }
+}

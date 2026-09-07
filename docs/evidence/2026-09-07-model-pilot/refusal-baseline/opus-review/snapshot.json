@@ -1,0 +1,417 @@
+{
+  "content": {
+    "context": {
+      "speech_act": "refusal",
+      "learner_level": "advanced",
+      "domain": "daily",
+      "industry_sector": null,
+      "business_function": null,
+      "mode": "translation",
+      "source_modality": "written",
+      "theme_code": "relationship_social",
+      "topic_code": "invitation_refusal",
+      "language_direction": "zh_ko",
+      "core_content": {
+        "schema_version": "scenario_core_v3",
+        "direction": "zh_ko",
+        "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+        "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+        "source_modality": "written",
+        "source_text": "谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。",
+        "preceding_turn": "이번 주 토요일 저녁에 다 같이 모여서 식사하려고 하는데, 시간 괜찮으세요?",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        },
+        "channel": "messenger",
+        "context_spec": {
+          "standard_situation_code": "daily.invitation_refusal.refusal",
+          "role_pair": {
+            "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+            "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+          },
+          "speaker_entitlement": "화자는 앞선 요청·제안·초대의 수용 여부를 결정할 재량이 있다.",
+          "addressee_obligation": "상대는 거절 대상 행동을 먼저 요청·제안·초대한 사람이며, 거절을 수용할 여지가 있어야 한다.",
+          "decision_authority": "화자가 자신의 참여·수락 여부를 결정하며, 거절 대상과 범위가 분명해야 한다."
+        },
+        "brief_note_ko": "주말 모임 초대를 거절하는 메시지",
+        "focal_segments": [
+          {
+            "text": "这次周六晚上我已经有家庭安排了，可能无法参加。",
+            "role": "head"
+          }
+        ],
+        "length_policy": {
+          "version": "effective_chars_v2_min_warning",
+          "unit": "effective_chars",
+          "min": 80,
+          "max": 110,
+          "actual": 50
+        },
+        "generation": {
+          "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+          "prompt_version": "core_v16_natural_scene_repair",
+          "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+          "generated_at": "2026-09-07T09:18:42.048Z"
+        }
+      }
+    },
+    "mission": {
+      "schema_version": "mission_v5",
+      "direction": "zh_ko",
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "refusal"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "speech_act": "refusal",
+        "mission_goal": "integrated_speech_act",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ]
+      },
+      "unit": {
+        "target_feature": "refusal_softening",
+        "target_feature_version": "1.1",
+        "learner_label": "완충과 대안",
+        "closing_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다."
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3"
+          ],
+          "evidence_ko": "상사에게 거절할 때 직접적인 표현을 사용하여 강도가 높아지는 것을 관찰할 수 있습니다."
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_refs": [
+            "mpj:1",
+            "dct"
+          ],
+          "evidence_ko": "친구와의 관계에서 부드러운 거절을 통해 관계를 유지하려는 노력을 관찰할 수 있습니다."
+        }
+      ],
+      "mpj_items": [
+        {
+          "type": "scale4",
+          "channel": "messenger",
+          "situation_ko": "친구가 주말에 등산을 가자고 했다. 나는 몸이 안 좋아서 못 간다고 답장을 보낸다.",
+          "relation_ko": "나는 자주 연락하는 친구이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "close",
+            "r": "mid"
+          },
+          "source": "谢谢你的邀请，但我身体不太舒服，可能不能参加。",
+          "preceding_turn": null,
+          "target": "초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.",
+          "highlights": [
+            "몸이 안 좋아서 이번에는 못 갈 것 같아"
+          ],
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "very_appropriate",
+          "explanation_ko": "친구와의 관계에서 몸 상태를 이유로 부드럽게 거절하여 관계를 해치지 않고 상황을 설명합니다.",
+          "recommended_example": "초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.",
+          "id": 1,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "judge3",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "explanation_ko": "상사에게 직접적으로 거절하여 부드러움이 부족해 보입니다. 관계를 고려하여 완화 표현을 추가할 필요가 있습니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 2,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "fix_choice",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "corrections": [
+            {
+              "text": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+              "is_valid": true,
+              "note_ko": "완화 표현을 추가하여 부드럽게 거절합니다."
+            },
+            {
+              "text": "초대 감사합니다. 개인 사정으로 참석이 어렵습니다.",
+              "is_valid": false,
+              "note_ko": "직접적 표현으로 여전히 부드러움이 부족합니다."
+            },
+            {
+              "text": "초대 감사합니다. 개인 사정이 있어서 이번에는 참석이 어려울 것 같습니다. 다음 기회에 꼭 참석하고 싶습니다.",
+              "is_valid": false,
+              "note_ko": "거절 의도를 흐리지 않으면서도 다음 기회에 대한 의사를 표현하여 지나치게 장황하게 만듭니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서 직접적인 거절 표현을 완화하여 부드럽게 조정합니다. 관계를 고려하여 완화 표현을 추가합니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 3,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "reason",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "problem_band_code": "too_blunt",
+          "reasons": [
+            {
+              "id": "r1",
+              "text_ko": "상사에게는 좀 더 공손한 표현이 필요합니다.",
+              "kind": "pragmatic_misconception"
+            },
+            {
+              "id": "r2",
+              "text_ko": "완화 표현이 부족하여 너무 단호하게 들립니다.",
+              "kind": "primary"
+            },
+            {
+              "id": "r3",
+              "text_ko": "문법적으로는 문제가 없습니다.",
+              "kind": "meaning_grammar_context"
+            }
+          ],
+          "accepted_reason_id": "r2",
+          "explanation_ko": "현재 상황에서 완화 표현이 부족하여 거절이 너무 단호하게 들립니다. 부드러운 거절을 위해 완화 표현을 추가할 필요가 있습니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 4,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "multi_judge",
+          "channel": "messenger",
+          "situation_ko": "이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.",
+          "relation_ko": "나는 가끔 마주치는 이웃이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "source": "谢谢你的邀请，但我有其他安排，可能无法参加。",
+          "preceding_turn": null,
+          "candidates": [
+            {
+              "text": "초대 고마워요. 이번에는 참석이 어려울 것 같아요.",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "간결한 거절로 명확히 전달하면서도 '어려울 것 같아요'라는 표현을 사용하여 부드럽게 완화합니다. 이는 상대방에게 거절의 이유를 간접적으로 전달하며, 관계적 거리감을 최소화합니다."
+            },
+            {
+              "text": "초대 고마워요. 이번에는 안 될 것 같아요.",
+              "accepted_band_codes": [
+                "too_blunt"
+              ],
+              "note_ko": "'안 될 것 같아요'라는 표현을 사용하여 간결하게 거절하며, 최소한의 완화로 인해 상대방에게 다소 단칼로 들릴 수 있습니다. 이는 관계적 거리감을 약간 증가시킬 수 있습니다."
+            },
+            {
+              "text": "초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "완화 표현과 함께 다음 기회를 언급하여 부드럽게 거절합니다."
+            },
+            {
+              "text": "초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요. 다음에 꼭 갈게요.",
+              "accepted_band_codes": [
+                "over_elaborate"
+              ],
+              "note_ko": "불필요한 세부 설명을 추가하여 거절의 명확성이 흐려집니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서 네 후보는 각각 다른 완화 표현과 설명 수준을 사용하여 거절의 부드러움과 명확성을 조절합니다. 각 후보의 표현 자원과 관계적 효과를 고려하여 적절성을 평가합니다.",
+          "recommended_example": "초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.",
+          "id": 5,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        }
+      ],
+      "production_task": {
+        "mode": "translation",
+        "source_modality": "written",
+        "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+        "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        },
+        "source_text": "谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。",
+        "preceding_turn": null,
+        "vocabulary_hints": [
+          {
+            "source": "邀请",
+            "target": "초대"
+          },
+          {
+            "source": "家庭安排",
+            "target": "가족과의 약속"
+          }
+        ],
+        "reference_alternatives": [
+          {
+            "text": "초대 감사합니다. 이번 주 토요일 저녁에는 가족과의 약속이 있어서 참석이 어려울 것 같습니다. 다음에 기회가 되면 꼭 함께 하고 싶습니다.",
+            "note_ko": "가족과의 약속을 이유로 부드럽게 거절하며, 다음 기회를 언급하여 관계를 유지합니다."
+          }
+        ],
+        "focal_segments": [
+          {
+            "text": "这次周六晚上我已经有家庭安排了，可能无法参加。",
+            "role": "head"
+          }
+        ]
+      }
+    }
+  },
+  "criteria": {
+    "version": "content_review_v2",
+    "rules_version": "mission_rules_v10_natural_scene",
+    "scene_policy": "\n[통역 훈련 장면의 서술]\n상황문은 번역처럼 인물의 실제 관계·사건·핵심 제약만 담은 짧은 한국어 두 문장으로 쓴다.\n나/저는의 훈련 시점 또는 구체적인 역할명(환자·접수 직원·동료·친구)을 사용한다.\n\"학습자 통역사인 당신\", \"한국인 원발화자\", \"중국인 청자\", A/B/C 역할 소개를 학생용 situation_ko·relation_ko에 넣지 않는다.\n통역사가 왜 현장에 있는지 설명하기 위해 인물이나 사건을 추가하지 않는다. 주어진 발화를 듣고 다른 언어로 옮기는 훈련이다.\n내부 A/B 표기는 원문을 말한 사람과 그 말의 상대를 식별하며 P/D/R도 그 관계 기준이다.\n주어진 원문의 의미·의도·화용적 힘은 유지한다. 훈련 시점이 1인칭이어도 자유 발화 과제로 바꾸지 않는다.\n\n[장면의 현실성·개연성 — P/D/R에 앞서 확인]\n적용 범위는 요청·거절·사과·감사·제안·초대·반대·칭찬·불만의 모든 미션이다.\n번역·통역, 한→중·중→한, 모든 수준·도메인에 동일하게 적용한다. 코어·MJT 각 장면·DCT를 모두 확인한다.\n학생이 첫 장면을 읽고 실제로 일어날 법하다고 받아들일 수 있어야 한다.\n① 이 관계에서 이 화행을 이 사람에게 수행할 실제 계기와 이유가 있는가?\n② 발화자·상대가 그 사건에 관여하는 사람인가? 행위·결정·책임·수혜·평가 대상이 실제 인물의 역할과 맞는가?\n③ 개인정보·사적 일정·금전·건강 등 민감한 일을 맡긴다면 신뢰·동의·기존 도움 관계가 장면에 있는가?\n④ 인물·장소·채널·행동·접촉 이력이 서로 맞는가? 평범한 일을 억지로 고부담 사건으로 만들지 않았는가?\n화행별로 확인할 연결:\n- 요청: 상대가 부탁받은 일을 수행·조정할 현실적인 능력과 권한이 있는가?\n- 거절: 실제 제안·초대·요청에 대한 응답인가? 누가 무엇을 거절하는지 앞선 발화와 이어지는가?\n- 사과: 어떤 일에 대한 누구의 책임이며, 사과받는 사람이 그 일의 당사자인가?\n- 감사: 실제 도움·배려·수혜가 있고, 고마움을 전하는 대상이 그 도움을 준 사람인가?\n- 제안: 함께 검토할 용건과 실행 가능성이 있고, 상대가 의견을 내거나 선택할 이유가 있는가?\n- 초대: 행사·활동과 초대 관계가 자연스럽고, 상대에게 실제 참여 가능성과 선택권이 있는가?\n- 반대: 실제로 제시된 의견·계획에 대한 반대이며, 그 논의에 참여할 이유와 근거가 있는가?\n- 칭찬: 관찰 가능한 행동·성과·특성에 근거하며, 그 관계에서 언급할 만한 내용인가?\n- 불만: 구체적인 문제·기대 불일치가 있고, 상대가 문제의 당사자 또는 전달·조정할 적절한 대상인가?\n\"가능할 수도 있다\"는 예외를 지어내거나, 화면 밖 배경을 상상해서 장면을 정당화하지 않는다.\n예: 단순히 자주 마주치는 이웃에게 병원 예약 변경을 부탁하는 장면은 이유·위임 배경이 없으면 부적절하다.\n병원 접수 담당자에게 자신의 예약 변경을 문의하거나, 평소 예약을 도와준 가족에게 이미 동의한 도움을 청하는 장면은 검토할 수 있다.\n특정 관계·직업·국적을 일괄 금지하지 않는다. 실제로 적힌 사실과 해당 행위의 연결로 판단한다.\nP/D/R 조합·시드가 이 기준과 충돌하면 인물을 억지로 끼워 맞추지 말고 충돌을 검토 사유로 남긴다.\n",
+    "mission_design": "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
+    "features": [
+      {
+        "code": "refusal_softening",
+        "version": "1.1",
+        "speech_act": "refusal",
+        "learner_label": "완충과 대안",
+        "operational_definition": "상황에 제시된 요청·제안·초대와 관계에 비춰 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(不行·不可以), 이유·사과·대안(恐怕·可以…但是·下次)은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.",
+        "band_schema": [
+          {
+            "code": "too_blunt",
+            "label_ko": "너무 단칼 (상황에 필요한 배려 부족)"
+          },
+          {
+            "code": "within_band",
+            "label_ko": "알맞음"
+          },
+          {
+            "code": "over_elaborate",
+            "label_ko": "지나치게 장황 (거절이 흐려짐)"
+          }
+        ],
+        "within_band_code": "within_band",
+        "relevant_resources": [
+          "완화 표지 (恐怕·可能)",
+          "이유 제시 (因为…)",
+          "사과·유감 (不好意思·抱歉)",
+          "대안·미래 약속 (下次·改天·要不…)",
+          "부분 수용 후 전환 (可以…但是)"
+        ],
+        "excluded_confounds": [
+          "격식체 어휘 선택 — 공손성 축",
+          "거절의 명제 자체(무엇을 거절하는가)는 불변항",
+          "문장 길이 자체"
+        ],
+        "closing_principle_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다.",
+        "handoff_summary": {
+          "first_impression": "무엇을 거절하는지와 관계를 확인하고 표현의 역할을 살폈습니다.",
+          "correction": "거절의 뜻을 지키며 필요한 배려를 조절하고 없는 약속은 더하지 않았습니다.",
+          "reason": "완충 장치의 수가 아닌 실제 표현과 상황에서 판단 근거를 찾았습니다.",
+          "compare_low": "알맞게 완충한 안과 너무 단칼인 안을 구분했습니다.",
+          "compare_high": "알맞게 완충한 안과 거절이 흐려질 만큼 장황한 안을 구분했습니다."
+        },
+        "counter_rule_note": "\"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(今天不行)도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다.",
+        "operational_definition_zh_ko": "상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.",
+        "relevant_resources_zh_ko": [
+          "유보·완화 표현 (좀 어려울 것 같아요·-기는 힘들 것 같아요·아무래도 -겠는데요)",
+          "사과·유감 (죄송하지만·아쉽지만·미안한데)",
+          "이유 제시 (-아/어서·그날은 선약이 있어서)",
+          "대안·미래 약속 (다음에는 꼭·대신 -면 어떨까요·요일을 바꾸면 어때요)",
+          "부분 수용 후 전환 (그건 좋은데·-는 되는데 -는 어려워요)"
+        ],
+        "excluded_confounds_zh_ko": [
+          "높임 등급·경어 선택 — 공손성 축",
+          "거절의 명제 자체(무엇을 거절하는가)는 불변항",
+          "문장 길이 자체"
+        ],
+        "counter_rule_note_zh_ko": "\"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(\"오늘은 안 되겠어요\")도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다."
+      }
+    ],
+    "scope": "수업에 채택할 현재 정적 콘텐츠 원본. 개별 학습자 실시간 피드백의 전수 감사는 포함하지 않음."
+  }
+}

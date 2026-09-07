@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "data": {
+    "quality_check": {
+      "verdict": "warning",
+      "summary_ko": "모든 문항이 상황에 맞는 거절의 완충과 대안 표현을 적절히 구분하며, 실제로 학습자가 잘못 배우게 되는 결함이 없다.",
+      "findings": [
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[0].note_ko",
+          "evidence_excerpt": "간결한 거절로 명확히 전달하면서도 '어려울 것 같아요'라는 표현을 사용하여 부드럽게 완화합니다. 이는 상대방에게 거절의 이유를 간접적으로 전달하며, 관계적 거리감을 최소화합니다.",
+          "note_ko": "관계적 효과(예: 거리감, 협의 가능성 등)나 인상 차이에 대한 구체적 언급 없이, 단순히 '완화 표현' 사용 여부와 부드러움만 언급하고 있습니다. 다른 후보와의 관계적 인상 차이를 명확히 설명해야 합니다."
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[1].note_ko",
+          "evidence_excerpt": "'안 될 것 같아요'라는 표현을 사용하여 간결하게 거절하며, 최소한의 완화로 인해 상대방에게 다소 단칼로 들릴 수 있습니다. 이는 관계적 거리감을 약간 증가시킬 수 있습니다.",
+          "note_ko": "'관계적 거리감을 약간 증가시킬 수 있습니다'라는 평가는 실제 표현의 관계적 효과(예: 거리감, 부담 귀속 등) 차이를 구체적으로 설명하지 않고, 결국 부드러움/배려의 정도로만 환원됩니다."
+        }
+      ],
+      "mission_content_hash": "af2e6e513cf378c73990cbb4696a0caf07f4842502c15377f1d24033d05cca72",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "checked_at": "2026-09-07T09:19:46.259Z"
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v19_scene_plausibility",
+      "generated_at": "2026-09-07T09:19:46.259Z"
+    }
+  }
+}

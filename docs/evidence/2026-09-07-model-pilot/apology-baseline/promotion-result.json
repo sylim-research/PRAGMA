@@ -1,0 +1,45 @@
+{
+  "ok": false,
+  "attempts": 0,
+  "error": "Bounded topology regeneration 뒤에도 deterministic topology를 통과하지 못했습니다.",
+  "terminal": {
+    "terminalStage": "topology",
+    "itemCandidatePaths": [],
+    "deterministicFailureCodes": [],
+    "criticVerdict": "UNKNOWN",
+    "criticFindingCodes": [],
+    "criticFindings": [],
+    "topology": {
+      "firstPassResult": "fail",
+      "finalResult": "fail",
+      "attempts": 2,
+      "regenerationCount": 1,
+      "findings": [
+        {
+          "attempt": 1,
+          "code": "R28",
+          "path": "y.channel",
+          "message": "Y channel이 spoken 수행 방식과 맞지 않음"
+        },
+        {
+          "attempt": 2,
+          "code": "R27",
+          "path": "c.situation_ko",
+          "message": "ANCHOR와 C situation_ko가 완전히 중복됨"
+        }
+      ]
+    },
+    "initialR27Findings": [],
+    "r27RepairAttempted": false,
+    "postRepairDeterministicResult": "not_attempted",
+    "postRepairDeterministicFindings": [],
+    "attemptNo": 1,
+    "regenerationCount": 1,
+    "operation": "mission_topology_regeneration",
+    "operationResult": "failed",
+    "infrastructureError": false,
+    "providerStatus": "UNKNOWN",
+    "finalOutcome": "terminal_dropout",
+    "stopCode": "topology_deterministic_failure"
+  }
+}

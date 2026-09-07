@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPnahROSCPJC9NkGLgiMMtq0n0dC",
+    "object": "chat.completion",
+    "created": 1788772766,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"operations\":[{\"path\":\"mpj_items[2].corrections[2]\",\"candidate\":{\"text\":\"초대 감사합니다. 개인 사정이 있어서 이번에는 참석이 어려울 것 같습니다. 다음 기회에 꼭 참석하고 싶습니다.\",\"note_ko\":\"거절 의도를 흐리지 않으면서도 다음 기회에 대한 의사를 표현하여 지나치게 장황하게 만듭니다.\"}}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1249,
+      "completion_tokens": 87,
+      "total_tokens": 1336,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_0ea3a61dc5"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPg3N8VYoSneDmQ9ZvvTtn5aDhst",
+    "object": "chat.completion",
+    "created": 1788772299,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"operations\":[{\"path\":\"mpj_items[4].candidates[1]\",\"candidate\":{\"text\":\"请您批准下周的假期。\",\"note_ko\":\"'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.\"}}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1159,
+      "completion_tokens": 76,
+      "total_tokens": 1235,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_0ea3a61dc5"
+  }
+}

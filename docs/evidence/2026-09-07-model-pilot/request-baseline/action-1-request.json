@@ -1,0 +1,32 @@
+{
+  "action": "core",
+  "telemetry": {
+    "generation_run_id": "model-pilot-20260907-request-baseline",
+    "generation_item_key": "ko_zh|request|intermediate|daily|stt_interpreting|equal|formal|low|daily_living|hospital_pharmacy_visit|-|-|0",
+    "invocation_attempt": 1
+  },
+  "core": {
+    "direction": "ko_zh",
+    "speech_act": "request",
+    "speech_act_ko": "요청",
+    "level": "intermediate",
+    "level_ko": "중급",
+    "domain": "daily",
+    "domain_ko": "일상",
+    "industry": null,
+    "func": null,
+    "topic_code": "hospital_pharmacy_visit",
+    "mode": "stt_interpreting",
+    "channel": "facetoface",
+    "channel_ko": "구두(통역)",
+    "pdr": {
+      "p": "equal",
+      "d": "distant",
+      "r": "low"
+    },
+    "source_modality": "spoken",
+    "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다.",
+    "is_response_act": false,
+    "length_hint_ko": "유효 글자 40~60자(공백·문장부호 제외), 종결부호 기준 2~4문장의 짧은 구두 담화 (기억 과부하 없이)"
+  }
+}

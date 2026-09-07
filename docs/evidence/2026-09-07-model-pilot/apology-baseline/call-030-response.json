@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPq7hKhg5CzHvNpGuRvdNrQakQHE",
+    "object": "chat.completion",
+    "created": 1788772923,
+    "model": "gpt-4.1-mini-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"situation_ko\":\"나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.\",\"relation_ko\":\"나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.\",\"source_text\":\"昨天晚上我搬动家具的时候声音太大了，真的很抱歉打扰到你了。以后我会注意，晚上不会再弄出这么大的声音。\",\"preceding_turn\":null,\"brief_note_ko\":\"아래층 이웃에게 밤늦은 가구 소음에 대해 사과한다.\",\"focal_segments\":[{\"text\":\"真的很抱歉打扰到你了\",\"role\":\"head\"},{\"text\":\"以后我会注意，晚上不会再弄出这么大的声音\",\"role\":\"support\"}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5497,
+      "completion_tokens": 203,
+      "total_tokens": 5700,
+      "prompt_tokens_details": {
+        "cached_tokens": 2944,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_ce7d0aa2c3"
+  }
+}

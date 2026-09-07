@@ -1,0 +1,122 @@
+{
+  "action": "mission_topology",
+  "telemetry": {
+    "scenario_id": "67018cb2-ff0f-4e39-bf27-352cf98a7e7b",
+    "generation_run_id": "model-pilot-20260907-apology-baseline",
+    "generation_item_key": "zh_ko|apology|advanced|daily|stt_interpreting|equal|acquaintance|mid|daily_living|neighbor_noise_apology|-|-|0",
+    "invocation_attempt": 1
+  },
+  "mission": {
+    "direction": "zh_ko",
+    "learner_level": "advanced",
+    "speech_act": "apology",
+    "speech_act_ko": "사과",
+    "level_ko": "고급",
+    "level_policy_ko": "고급: 담화 조직·복합 전략. 자원 선택 배열. 원문 3~5문장(통역은 짧은 구두 담화).",
+    "feature": {
+      "code": "apology_accountability_repair",
+      "version": "1.0",
+      "learner_label": "책임 인정과 수리",
+      "operational_definition": "위반·피해에 대한 유감, 화자의 책임 범위, 필요한 수리의 무게를 한국어 산출에서 상황에 맞추는 초점. 사과 표현만 반복하고 책임·영향을 비껴가는가, 사실과 R에 맞게 인정하는가, 또는 실제 책임과 피해를 넘어 과도한 책임·보상·약속을 떠안는가를 본다. 설명·수리·재발 방지 약속은 원문 또는 서버가 허용한 usable_facts에 있을 때만 사용할 수 있다.",
+      "band_schema": [
+        {
+          "code": "under_acknowledged",
+          "label_ko": "부족함 (책임·영향을 충분히 인정하지 않음)"
+        },
+        {
+          "code": "within_band",
+          "label_ko": "알맞음"
+        },
+        {
+          "code": "overextended",
+          "label_ko": "과함 (책임·수리를 실제보다 확대함)"
+        }
+      ],
+      "within_band_code": "within_band",
+      "relevant_resources": [
+        "사과 공식 (미안해요·죄송합니다·사과드립니다)",
+        "책임 인정 (제가 확인을 놓쳤습니다·제 실수였습니다)",
+        "상대 영향 인정 (불편을 드렸습니다·오래 기다리게 했습니다)",
+        "허용된 수리 제안 (바로 처리하겠습니다·제가 비용을 부담하겠습니다)",
+        "허용된 재발 방지 약속 (앞으로는 미리 확인하겠습니다)"
+      ],
+      "excluded_confounds": [
+        "사과 공식의 개수나 문장 길이 자체",
+        "높임 등급·호칭 — 공손성 축",
+        "원문·usable_facts에 없는 이유·보상·새 약속",
+        "설명의 유무를 책임 인정과 자동 등치하는 것"
+      ],
+      "closing_principle_ko": "사과는 세게 말하는 것이 아니라, 실제 책임과 상대가 받은 영향에 맞게 인정하고 필요한 수리를 제시할 때 적절합니다.",
+      "counter_rule_note": "\"사과는 길고 강할수록 좋다\" — 반례: 사소하고 즉시 회복된 실수에는 \"제가 놓쳤네요. 미안해요\"처럼 간결한 책임 인정이 과도한 보상 약속보다 자연스럽다."
+    },
+    "core": {
+      "situation_ko": "나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.",
+      "relation_ko": "나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.",
+      "source_text_ko": "昨天晚上我在搬家具的时候声音有点大，没想到会打扰到你，真的很抱歉。以后我会特别注意，晚上绝对不会再这样做了。如果昨天让你休息不好，真的很对不起。",
+      "preceding_turn_zh": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "source_modality": "spoken",
+      "usable_facts": [],
+      "focal_segments": [
+        {
+          "text": "真的很抱歉",
+          "role": "head"
+        },
+        {
+          "text": "以后我会特别注意，晚上绝对不会再这样做了",
+          "role": "support"
+        },
+        {
+          "text": "如果昨天让你休息不好，真的很对不起",
+          "role": "support"
+        }
+      ]
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "apology",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "apology_accountability_repair",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "error_pattern_hints_ko": [
+      "L2 학습자가 모어 화자보다 장황해지는 경향 — 완화·부연을 과잉 적재 (예: 완화 표현 6겹을 겹쳐 요청의 핵심이 흐려지는 후보)"
+    ],
+    "is_response_act": false
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "index": 0,
+  "cell": {
+    "industry": null,
+    "business_function": null,
+    "count": 1,
+    "pdr_power": "equal",
+    "pdr_distance": "formal",
+    "pdr_burden": "low",
+    "domain": "daily",
+    "speech_act_ui": "request",
+    "level": "intermediate",
+    "mode": "stt_interpreting",
+    "direction": "ko_zh",
+    "theme_code": "daily_living",
+    "topic_code": "hospital_pharmacy_visit",
+    "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다."
+  },
+  "ok": true,
+  "scenarioId": "35ee0360-be86-4660-b933-a4be015eb60b",
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+    "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+    "source_modality": "spoken",
+    "source_text": "안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "distant",
+      "r": "low"
+    },
+    "channel": "facetoface",
+    "context_spec": {
+      "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+      "role_pair": {
+        "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+        "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+      },
+      "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+      "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+      "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+      "interpreter_role_contract": {
+        "source_speaker": "A",
+        "target_addressee": "B",
+        "learner_interpreter": "C",
+        "pdr_relation": "A_to_B"
+      }
+    },
+    "brief_note_ko": "병원 접수 직원에게 진료 예약 변경을 요청하는 상황입니다.",
+    "focal_segments": [
+      {
+        "text": "혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?",
+        "role": "head"
+      },
+      {
+        "text": "일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 40,
+      "max": 60,
+      "actual": 49
+    },
+    "generation": {
+      "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+      "prompt_version": "core_v16_natural_scene_repair",
+      "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+      "generated_at": "2026-09-07T09:10:58.292Z"
+    }
+  },
+  "ruleResult": "pass",
+  "ruleFindings": [],
+  "terminalStage": "core_eligible"
+}

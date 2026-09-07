@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPfpq1kwm4CSVporY2yHT5tH5eXZ",
+    "object": "chat.completion",
+    "created": 1788772285,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"results\": [\n    {\n      \"path\": \"mpj_items[2].corrections[0]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"'如果方便的话' 조건절을 추가하여 요청의 직접성을 완화하고, 상대방에게 선택권을 명확히 남깁니다. 원문의 명제·의도·화행 목적(회의 일정 조정 요청, 상대의 선택권 존중)을 그대로 보존하며, 상황(동료, 친밀하지 않음, 부담 낮음)에 적합한 완화 전략입니다.\"\n    },\n    {\n      \"path\": \"mpj_items[4].candidates[0]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"'如果方便的话' 조건절과 '能...吗' 구조를 사용하여 상사에게 요청의 직접성을 낮추고, 선택권을 충분히 남깁니다. 원문의 명제(휴가 승인 요청), 의도, 화행 목적을 그대로 보존하며, 상하관계·거리·부담에 맞는 적정 완화 전략입니다.\"\n    },\n    {\n      \"path\": \"mpj_items[4].candidates[2]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"'我想请您考虑一下'는 직접적인 승인 요청 대신 고려를 부탁하는 완화된 전략으로, 상대의 선택권을 강조합니다. 원문의 명제(휴가 승인 요청), 의도, 화행 목적을 보존하며, 상사-부하 관계와 부담에 적합한 완화 전략입니다.\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1931,
+      "completion_tokens": 451,
+      "total_tokens": 2382,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_a524043609"
+  }
+}

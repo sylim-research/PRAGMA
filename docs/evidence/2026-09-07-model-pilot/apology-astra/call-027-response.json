@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPqvPlnLoImFQaavbaYXcYSIlZAk",
+    "object": "chat.completion",
+    "created": 1788772973,
+    "model": "gpt-6-astra",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"situation_ko\": \"나는 다음 날 복도에서 아래층 이웃을 만나 어젯밤 늦게 가구를 옮기며 낸 소음을 사과하고, 앞으로 밤에는 옮기지 않겠다고 말한다. 얼굴을 몇 차례 본 어색한 사이이며, 이웃은 내가 낸 소음으로 늦은 시간에 불편을 겪었다.\",\n  \"relation_ko\": \"얼굴을 몇 차례 본 사이인 위층 거주자와 소음 피해를 겪은 아래층 이웃\",\n  \"source_text\": \"昨晚我在家挪家具，时间那么晚了还弄出噪音，打扰到你了，真对不起。这么晚还搬动家具，确实是我考虑不周，没有顾及楼下邻居的感受。以后我不会再在晚上挪家具了。\",\n  \"preceding_turn\": null,\n  \"brief_note_ko\": \"늦은 밤 가구 이동으로 낸 소음을 아래층 이웃에게 사과하고 재발 방지를 약속하는 장면\",\n  \"focal_segments\": [\n    {\n      \"text\": \"真对不起。\",\n      \"role\": \"head\"\n    },\n    {\n      \"text\": \"确实是我考虑不周，没有顾及楼下邻居的感受。\",\n      \"role\": \"support\"\n    },\n    {\n      \"text\": \"以后我不会再在晚上挪家具了。\",\n      \"role\": \"support\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5491,
+      "completion_tokens": 861,
+      "total_tokens": 6352,
+      "prompt_tokens_details": {
+        "cached_tokens": 3733,
+        "cache_write_tokens": 1755,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 512,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

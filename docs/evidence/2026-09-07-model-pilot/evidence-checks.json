@@ -1,0 +1,141 @@
+{
+  "checkedAt": "2026-09-07T09:29:42.452Z",
+  "pairs": [
+    {
+      "case": "request",
+      "sameInitialCorePrompt": true
+    },
+    {
+      "case": "refusal",
+      "sameInitialCorePrompt": true
+    },
+    {
+      "case": "apology",
+      "sameInitialCorePrompt": true
+    }
+  ],
+  "reviewerPairs": [
+    {
+      "case": "request",
+      "sameIndependentReviewPrompt": true,
+      "fableModel": "claude-fable-5-1",
+      "opusModel": "claude-opus-5"
+    },
+    {
+      "case": "refusal",
+      "sameIndependentReviewPrompt": true,
+      "fableModel": "claude-fable-5-1",
+      "opusModel": "claude-opus-5"
+    }
+  ],
+  "reviewers": [
+    {
+      "case": "request",
+      "model": "claude-fable-5-1",
+      "seconds": 106.963,
+      "estimatedUsd": 0.56724,
+      "initialUnblinded": true
+    },
+    {
+      "case": "refusal",
+      "model": "claude-fable-5-1",
+      "seconds": 135.101,
+      "estimatedUsd": 0.6405,
+      "initialUnblinded": false
+    },
+    {
+      "case": "request",
+      "model": "claude-fable-5-1",
+      "seconds": 110.383,
+      "estimatedUsd": 0.52735,
+      "initialUnblinded": false
+    },
+    {
+      "case": "request",
+      "model": "claude-opus-5",
+      "seconds": 70.905,
+      "estimatedUsd": 0.22004,
+      "initialUnblinded": false
+    },
+    {
+      "case": "refusal",
+      "model": "claude-opus-5",
+      "seconds": 89.589,
+      "estimatedUsd": 0.24454,
+      "initialUnblinded": false
+    }
+  ],
+  "coreOperations": [
+    {
+      "case": "request",
+      "route": "baseline",
+      "operation": "core_generate",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    },
+    {
+      "case": "request",
+      "route": "baseline",
+      "operation": "core_repair",
+      "model": "gpt-4.1-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_repair"
+    },
+    {
+      "case": "request",
+      "route": "astra",
+      "operation": "core_generate",
+      "model": "gpt-6-astra",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    },
+    {
+      "case": "refusal",
+      "route": "baseline",
+      "operation": "core_generate",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    },
+    {
+      "case": "refusal",
+      "route": "baseline",
+      "operation": "core_repair",
+      "model": "gpt-4.1-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_repair"
+    },
+    {
+      "case": "refusal",
+      "route": "astra",
+      "operation": "core_generate",
+      "model": "gpt-6-astra",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    },
+    {
+      "case": "apology",
+      "route": "baseline",
+      "operation": "core_generate",
+      "model": "gpt-4.1-mini-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    },
+    {
+      "case": "apology",
+      "route": "baseline",
+      "operation": "core_repair",
+      "model": "gpt-4.1-2025-04-14",
+      "promptVersion": "core_v16_natural_scene_repair"
+    },
+    {
+      "case": "apology",
+      "route": "astra",
+      "operation": "core_generate",
+      "model": "gpt-6-astra",
+      "promptVersion": "core_v16_natural_scene_plausibility"
+    }
+  ],
+  "temporaryFunctionDeleted": true,
+  "sourceCommit": "104b883fbb50635e9fef4a438b60963454cb12b8",
+  "sourceEquivalentMain": "044dc6ba7b49c0ce23cef3fd44b6af1f06a84177",
+  "notes": [
+    "Local Supabase adapter intercepted every scenario save and telemetry write; only HSK dictionary reads used the database.",
+    "Response usage prices exclude cache discounts and tax. Three timed-out calls have unknown usage.",
+    "Provider call integer labels are local to workers; use response IDs or case/route/request-file to identify calls."
+  ]
+}

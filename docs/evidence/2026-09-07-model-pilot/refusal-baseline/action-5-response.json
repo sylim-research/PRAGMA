@@ -1,0 +1,37 @@
+{
+  "status": 200,
+  "data": {
+    "operations": [
+      {
+        "operation": "replace_multi_judge_candidate",
+        "item_index": 4,
+        "candidate_index": 0,
+        "candidate": {
+          "text": "초대 고마워요. 이번에는 참석이 어려울 것 같아요.",
+          "accepted_band_codes": [
+            "within_band"
+          ],
+          "note_ko": "간결한 거절로 명확히 전달하면서도 '어려울 것 같아요'라는 표현을 사용하여 부드럽게 완화합니다. 이는 상대방에게 거절의 이유를 간접적으로 전달하며, 관계적 거리감을 최소화합니다."
+        }
+      },
+      {
+        "operation": "replace_multi_judge_candidate",
+        "item_index": 4,
+        "candidate_index": 1,
+        "candidate": {
+          "text": "초대 고마워요. 이번에는 안 될 것 같아요.",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "note_ko": "'안 될 것 같아요'라는 표현을 사용하여 간결하게 거절하며, 최소한의 완화로 인해 상대방에게 다소 단칼로 들릴 수 있습니다. 이는 관계적 거리감을 약간 증가시킬 수 있습니다."
+        }
+      }
+    ],
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "prompt_version": "mission_item_repair_v12_zhko_bidirectional",
+      "generated_at": "2026-09-07T09:19:41.444Z"
+    }
+  }
+}

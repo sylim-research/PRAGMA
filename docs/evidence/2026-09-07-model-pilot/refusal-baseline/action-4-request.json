@@ -1,0 +1,386 @@
+{
+  "action": "quality_check",
+  "telemetry": {
+    "scenario_id": "38b1e66e-6f23-49d5-8665-c312e593f903",
+    "generation_run_id": "model-pilot-20260907-refusal-baseline",
+    "generation_item_key": "zh_ko|refusal|advanced|daily|translation|equal|acquaintance|mid|relationship_social|invitation_refusal|-|-|0",
+    "invocation_attempt": 1
+  },
+  "quality": {
+    "mission_content": {
+      "schema_version": "mission_v5",
+      "direction": "zh_ko",
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "refusal"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "speech_act": "refusal",
+        "mission_goal": "integrated_speech_act",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "refusal_softening",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ]
+      },
+      "authoring": {
+        "schema_version": "mission_authoring_v1",
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "repair_attempts": 0
+      },
+      "unit": {
+        "target_feature": "refusal_softening",
+        "target_feature_version": "1.1",
+        "learner_label": "완충과 대안",
+        "closing_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다."
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3"
+          ],
+          "evidence_ko": "상사에게 거절할 때 직접적인 표현을 사용하여 강도가 높아지는 것을 관찰할 수 있습니다."
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_refs": [
+            "mpj:1",
+            "dct"
+          ],
+          "evidence_ko": "친구와의 관계에서 부드러운 거절을 통해 관계를 유지하려는 노력을 관찰할 수 있습니다."
+        }
+      ],
+      "mpj_items": [
+        {
+          "type": "scale4",
+          "channel": "messenger",
+          "situation_ko": "친구가 주말에 등산을 가자고 했다. 나는 몸이 안 좋아서 못 간다고 답장을 보낸다.",
+          "relation_ko": "나는 자주 연락하는 친구이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "close",
+            "r": "mid"
+          },
+          "source": "谢谢你的邀请，但我身体不太舒服，可能不能参加。",
+          "preceding_turn": null,
+          "target": "초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.",
+          "highlights": [
+            "몸이 안 좋아서 이번에는 못 갈 것 같아"
+          ],
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "very_appropriate",
+          "explanation_ko": "친구와의 관계에서 몸 상태를 이유로 부드럽게 거절하여 관계를 해치지 않고 상황을 설명합니다.",
+          "recommended_example": "초대 고마워. 그런데 몸이 안 좋아서 이번에는 못 갈 것 같아.",
+          "id": 1,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "judge3",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "explanation_ko": "상사에게 직접적으로 거절하여 부드러움이 부족해 보입니다. 관계를 고려하여 완화 표현을 추가할 필요가 있습니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 2,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "fix_choice",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "corrections": [
+            {
+              "text": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+              "is_valid": true,
+              "note_ko": "완화 표현을 추가하여 부드럽게 거절합니다."
+            },
+            {
+              "text": "초대 감사합니다. 개인 사정으로 참석이 어렵습니다.",
+              "is_valid": false,
+              "note_ko": "직접적 표현으로 여전히 부드러움이 부족합니다."
+            },
+            {
+              "text": "초대 감사합니다. 개인 사정이 있어서 이번에는 참석이 어려울 것 같습니다. 다음 기회에 꼭 참석하고 싶습니다.",
+              "is_valid": false,
+              "note_ko": "거절 의도를 흐리지 않으면서도 다음 기회에 대한 의사를 표현하여 지나치게 장황하게 만듭니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서 직접적인 거절 표현을 완화하여 부드럽게 조정합니다. 관계를 고려하여 완화 표현을 추가합니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 3,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "reason",
+          "channel": "email",
+          "situation_ko": "상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.",
+          "relation_ko": "나는 나의 상사이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "谢谢您的邀请，但我有个人事务，可能无法参加。",
+          "preceding_turn": null,
+          "target": "초대 감사합니다. 하지만 개인 사정으로 참석이 어렵습니다.",
+          "highlights": [
+            "개인 사정으로 참석이 어렵습니다"
+          ],
+          "problem_band_code": "too_blunt",
+          "reasons": [
+            {
+              "id": "r1",
+              "text_ko": "상사에게는 좀 더 공손한 표현이 필요합니다.",
+              "kind": "pragmatic_misconception"
+            },
+            {
+              "id": "r2",
+              "text_ko": "완화 표현이 부족하여 너무 단호하게 들립니다.",
+              "kind": "primary"
+            },
+            {
+              "id": "r3",
+              "text_ko": "문법적으로는 문제가 없습니다.",
+              "kind": "meaning_grammar_context"
+            }
+          ],
+          "accepted_reason_id": "r2",
+          "explanation_ko": "현재 상황에서 완화 표현이 부족하여 거절이 너무 단호하게 들립니다. 부드러운 거절을 위해 완화 표현을 추가할 필요가 있습니다.",
+          "recommended_example": "초대 감사합니다. 개인 사정으로 이번에는 참석이 어려울 것 같습니다.",
+          "id": 4,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        },
+        {
+          "type": "multi_judge",
+          "channel": "messenger",
+          "situation_ko": "이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.",
+          "relation_ko": "나는 가끔 마주치는 이웃이다.",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "source": "谢谢你的邀请，但我有其他安排，可能无法参加。",
+          "preceding_turn": null,
+          "candidates": [
+            {
+              "text": "초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "간결하지만 필요한 완화 표현을 사용하여 부드럽게 거절합니다."
+            },
+            {
+              "text": "초대 고마워요. 이번에는 못 가요.",
+              "accepted_band_codes": [
+                "too_blunt"
+              ],
+              "note_ko": "간결하게 거절하면서도 최소한의 배려를 유지하여 너무 단칼로 들리지 않도록 조정했습니다."
+            },
+            {
+              "text": "초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "완화 표현과 함께 다음 기회를 언급하여 부드럽게 거절합니다."
+            },
+            {
+              "text": "초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요. 다음에 꼭 갈게요.",
+              "accepted_band_codes": [
+                "over_elaborate"
+              ],
+              "note_ko": "불필요한 세부 설명을 추가하여 거절의 명확성이 흐려집니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서 네 후보는 각각 다른 완화 표현과 설명 수준을 사용하여 거절의 부드러움과 명확성을 조절합니다. 각 후보의 표현 자원과 관계적 효과를 고려하여 적절성을 평가합니다.",
+          "recommended_example": "초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.",
+          "id": 5,
+          "item_focus": "refusal_softening",
+          "axis_feature": "refusal_softening"
+        }
+      ],
+      "production_task": {
+        "mode": "translation",
+        "source_modality": "written",
+        "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+        "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        },
+        "source_text": "谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。",
+        "preceding_turn": null,
+        "vocabulary_hints": [
+          {
+            "source": "邀请",
+            "target": "초대"
+          },
+          {
+            "source": "家庭安排",
+            "target": "가족과의 약속"
+          }
+        ],
+        "reference_alternatives": [
+          {
+            "text": "초대 감사합니다. 이번 주 토요일 저녁에는 가족과의 약속이 있어서 참석이 어려울 것 같습니다. 다음에 기회가 되면 꼭 함께 하고 싶습니다.",
+            "note_ko": "가족과의 약속을 이유로 부드럽게 거절하며, 다음 기회를 언급하여 관계를 유지합니다."
+          }
+        ],
+        "focal_segments": [
+          {
+            "text": "这次周六晚上我已经有家庭安排了，可能无法参加。",
+            "role": "head"
+          }
+        ]
+      },
+      "provenance": {
+        "model": "gpt-4o",
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v16_natural_scene",
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "mission_content_hash": "939dff0a3d71a01d896fa2c458ef7478d3dc19611e86d1a15aa6577b1ea8066a",
+        "generated_at": "2026-09-07T09:19:31.509Z",
+        "generation_attempt": 1,
+        "scene_topology": {
+          "version": "mission_scene_topology_evidence_v1",
+          "prompt_version": "mission_scene_topology_v1_constraint_by_construction",
+          "first_pass_result": "pass",
+          "final_result": "pass",
+          "attempts": 1,
+          "regeneration_count": 0,
+          "findings": []
+        },
+        "band_targeting": {
+          "version": "relative_band_targeting_v2_bounded_fallback",
+          "within_regeneration_count": 0,
+          "candidate_regeneration_counts": {
+            "mpj_items[2].corrections[2]": 1,
+            "mpj_items[4].candidates[1]": 1,
+            "mpj_items[4].candidates[3]": 1
+          },
+          "boundary_fallback": {
+            "eligible_paths": [
+              "mpj_items[2].corrections[2]",
+              "mpj_items[4].candidates[1]",
+              "mpj_items[4].candidates[3]"
+            ],
+            "attempted_paths": [
+              "mpj_items[2].corrections[2]",
+              "mpj_items[4].candidates[1]",
+              "mpj_items[4].candidates[3]"
+            ],
+            "succeeded_paths": [
+              "mpj_items[2].corrections[2]",
+              "mpj_items[4].candidates[1]",
+              "mpj_items[4].candidates[3]"
+            ],
+            "situation_unchanged": true,
+            "immutable_candidates_unchanged": true
+          },
+          "within_warnings": []
+        }
+      }
+    },
+    "feature": {
+      "code": "refusal_softening",
+      "learner_label": "완충과 대안",
+      "band_codes": [
+        "too_blunt",
+        "within_band",
+        "over_elaborate"
+      ],
+      "band_schema": [
+        {
+          "code": "too_blunt",
+          "label_ko": "너무 단칼 (상황에 필요한 배려 부족)"
+        },
+        {
+          "code": "within_band",
+          "label_ko": "알맞음"
+        },
+        {
+          "code": "over_elaborate",
+          "label_ko": "지나치게 장황 (거절이 흐려짐)"
+        }
+      ],
+      "within_band_code": "within_band",
+      "operational_definition": "상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.",
+      "excluded_confounds": [
+        "높임 등급·경어 선택 — 공손성 축",
+        "거절의 명제 자체(무엇을 거절하는가)는 불변항",
+        "문장 길이 자체"
+      ],
+      "counter_rule_note": "\"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(\"오늘은 안 되겠어요\")도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다."
+    },
+    "direction": "zh_ko",
+    "speech_act": "refusal"
+  }
+}

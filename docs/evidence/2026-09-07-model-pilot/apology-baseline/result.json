@@ -1,0 +1,157 @@
+{
+  "case": "apology",
+  "title": "조용한 시간에 낸 소음에 이웃에게 사과",
+  "route": "baseline",
+  "core": {
+    "index": 0,
+    "cell": {
+      "industry": null,
+      "business_function": null,
+      "count": 1,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "domain": "daily",
+      "speech_act_ui": "apology",
+      "level": "advanced",
+      "mode": "stt_interpreting",
+      "direction": "zh_ko",
+      "theme_code": "daily_living",
+      "topic_code": "neighbor_noise_apology",
+      "situation_seed_ko": "어젯밤 늦게 가구 위치를 옮기다가 아래층에 소음을 냈다. 다음 날 복도에서 얼굴을 몇 차례 본 아래층 이웃을 만나, 늦은 시간에 시끄럽게 한 일을 사과하고 앞으로 밤에는 가구를 옮기지 않겠다고 말한다. 소음의 책임은 나에게 있다."
+    },
+    "ok": true,
+    "scenarioId": "67018cb2-ff0f-4e39-bf27-352cf98a7e7b",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.",
+      "relation_ko": "나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.",
+      "source_modality": "spoken",
+      "source_text": "昨天晚上我在搬家具的时候声音有点大，没想到会打扰到你，真的很抱歉。以后我会特别注意，晚上绝对不会再这样做了。如果昨天让你休息不好，真的很对不起。",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.neighbor_noise_apology.apology",
+        "role_pair": {
+          "speaker_ko": "자신의 집에서 생활 소음을 낸 아파트·주거 공간의 이웃",
+          "addressee_ko": "그 소음으로 불편을 겪은 동등한 이웃"
+        },
+        "speaker_entitlement": "화자는 자신과 관련된 위반·피해를 인정하고 가능한 수리를 제안할 책임이 있다.",
+        "addressee_obligation": "상대는 피해·불편의 당사자이며 사과를 즉시 수락하거나 용서할 의무는 없다.",
+        "decision_authority": "화자는 가능한 수리를 실행·제안할 수 있고, 상대는 피해 인정과 수용 여부를 판단한다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "아래층 이웃에게 밤늦은 가구 소음에 대해 사과한다.",
+      "focal_segments": [
+        {
+          "text": "真的很抱歉",
+          "role": "head"
+        },
+        {
+          "text": "以后我会特别注意，晚上绝对不会再这样做了",
+          "role": "support"
+        },
+        {
+          "text": "如果昨天让你休息不好，真的很对不起",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 55,
+        "max": 85,
+        "actual": 65
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_repair",
+        "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+        "generated_at": "2026-09-07T09:22:08.579Z"
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 6,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 33,
+        "matched_token_count": 25,
+        "coverage_ratio": 0.7576,
+        "out_of_reference_candidates": [
+          "昨天晚上",
+          "我在",
+          "有点",
+          "没想到",
+          "真的",
+          "不会",
+          "做了",
+          "不好"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "terminalStage": "core_eligible"
+  },
+  "promotion": {
+    "ok": false,
+    "attempts": 0,
+    "error": "Bounded topology regeneration 뒤에도 deterministic topology를 통과하지 못했습니다.",
+    "terminal": {
+      "terminalStage": "topology",
+      "itemCandidatePaths": [],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "UNKNOWN",
+      "criticFindingCodes": [],
+      "criticFindings": [],
+      "topology": {
+        "firstPassResult": "fail",
+        "finalResult": "fail",
+        "attempts": 2,
+        "regenerationCount": 1,
+        "findings": [
+          {
+            "attempt": 1,
+            "code": "R28",
+            "path": "y.channel",
+            "message": "Y channel이 spoken 수행 방식과 맞지 않음"
+          },
+          {
+            "attempt": 2,
+            "code": "R27",
+            "path": "c.situation_ko",
+            "message": "ANCHOR와 C situation_ko가 완전히 중복됨"
+          }
+        ]
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 1,
+      "operation": "mission_topology_regeneration",
+      "operationResult": "failed",
+      "infrastructureError": false,
+      "providerStatus": "UNKNOWN",
+      "finalOutcome": "terminal_dropout",
+      "stopCode": "topology_deterministic_failure"
+    }
+  },
+  "elapsedMs": 13571
+}

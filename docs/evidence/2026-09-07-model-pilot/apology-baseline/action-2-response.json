@@ -1,0 +1,30 @@
+{
+  "status": 200,
+  "data": {
+    "error": "Bounded topology regeneration 뒤에도 deterministic topology를 통과하지 못했습니다.",
+    "stop_code": "topology_deterministic_failure",
+    "topology_evidence": {
+      "version": "mission_scene_topology_evidence_v1",
+      "prompt_version": "mission_scene_topology_v1_constraint_by_construction",
+      "first_pass_result": "fail",
+      "final_result": "fail",
+      "attempts": 2,
+      "regeneration_count": 1,
+      "findings": [
+        {
+          "code": "R28",
+          "path": "y.channel",
+          "message": "Y channel이 spoken 수행 방식과 맞지 않음",
+          "attempt": 1
+        },
+        {
+          "code": "R27",
+          "path": "c.situation_ko",
+          "message": "ANCHOR와 C situation_ko가 완전히 중복됨",
+          "attempt": 2
+        }
+      ]
+    },
+    "provider_status": "UNKNOWN"
+  }
+}

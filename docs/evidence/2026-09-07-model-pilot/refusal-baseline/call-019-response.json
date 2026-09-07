@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPnRpxig1Q533wGuyMoVdBPBCx7a",
+    "object": "chat.completion",
+    "created": 1788772757,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"results\": [\n    {\n      \"path\": \"mpj_items[2].corrections[0]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"중국어 원문의 명제(개인 사정으로 참석이 어렵다), 화행 목적(거절), 발화 의도(정중한 거절)가 모두 보존됨. '어렵습니다'에서 '어려울 것 같습니다'로 완화하여 직접적 거절을 부드럽게 했으나, 거절의 명료성과 대인 배려가 모두 충족되어 상황에 적합함. 과도한 설명이나 불필요한 약속 추가 없이 자연스러운 한국어 담화임.\"\n    },\n    {\n      \"path\": \"mpj_items[4].candidates[0]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"원문의 명제(다른 일정으로 참석 불가), 화행 목적(거절), 발화 의도(정중한 거절)가 그대로 보존됨. '못 갈 것 같아요'는 직접적 거절이지만 완화 표현이 포함되어 있어 상황에 필요한 배려가 충분히 전달됨. 간결하지만 거절과 배려가 모두 드러나며, 불필요한 장황함이나 의미 변형 없음.\"\n    },\n    {\n      \"path\": \"mpj_items[4].candidates[2]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_anchor\": \"within\",\n      \"boundary_crossed\": false,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"원문의 명제, 화행 목적, 발화 의도가 모두 보존됨. '다음에 꼭 갈게요'는 추가적 배려 표현이지만, 실제 상황에서 흔히 쓰이는 자연스러운 완충 전략임. 거절의 명료성이 흐려지지 않고, 과도한 설명이나 불필요한 약속 추가 없이 자연스러운 거절임.\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2069,
+      "completion_tokens": 513,
+      "total_tokens": 2582,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_a524043609"
+  }
+}

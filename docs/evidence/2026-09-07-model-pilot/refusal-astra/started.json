@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-09-07T09:19:33.733Z",
+  "route": "astra",
+  "cell": {
+    "industry": null,
+    "business_function": null,
+    "count": 1,
+    "pdr_power": "equal",
+    "pdr_distance": "acquaintance",
+    "pdr_burden": "mid",
+    "domain": "daily",
+    "speech_act_ui": "refusal",
+    "level": "advanced",
+    "mode": "translation",
+    "direction": "zh_ko",
+    "theme_code": "relationship_social",
+    "topic_code": "invitation_refusal",
+    "situation_seed_ko": "직장에서 몇 차례 함께 일한 동료가 위챗으로 토요일 저녁 모임에 초대했다. 나는 이미 가족과의 약속이 있어 참석하지 못한다고 답장을 보낸다. 초대를 고맙게 받아들이면서 이번에는 참석하지 못한다는 뜻을 분명히 전한다."
+  }
+}

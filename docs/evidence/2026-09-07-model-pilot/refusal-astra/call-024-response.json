@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPnioT6iu7iWEcBbWJzR29rMY2fJ",
+    "object": "chat.completion",
+    "created": 1788772774,
+    "model": "gpt-6-astra",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"situation_ko\": \"나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.\",\n  \"relation_ko\": \"몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료\",\n  \"source_text\": \"谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。\",\n  \"preceding_turn\": \"토요일 저녁에 모임이 있는데, 시간 괜찮으시면 같이 오실래요?\",\n  \"brief_note_ko\": \"아직 어색한 동료의 모임 초대에 고마움을 표하며 가족과의 선약으로 참석을 거절하는 답장\",\n  \"focal_segments\": [\n    {\n      \"text\": \"这次没办法参加了。\",\n      \"role\": \"head\"\n    },\n    {\n      \"text\": \"不过那天晚上我已经和家人有约，时间上确实冲突，\",\n      \"role\": \"support\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4782,
+      "completion_tokens": 1022,
+      "total_tokens": 5804,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 4779,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 684,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

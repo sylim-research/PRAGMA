@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPfzylQJenxieZVzFY9NgjPxhOSa",
+    "object": "chat.completion",
+    "created": 1788772295,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"findings\":[{\"code\":\"feedback_quality_mismatch\",\"severity\":\"warning\",\"where\":\"mpj_items[4].candidates[1].note_ko\",\"evidence_excerpt\":\"'麻烦您'로 직접적이지만 약간의 완화가 있습니다.\",\"note_ko\":\"'麻烦您'가 실제로 요청을 완화하는 구체적 기능(예: 부담의 귀속, 완화의 정도 등)이나 선택권의 남김이 어떻게 실현되는지, 또는 다른 후보와의 관계적 효과 차이를 명확히 연결하지 않고 있음.\"},{\"code\":\"comparison_quality_mismatch\",\"severity\":\"warning\",\"where\":\"mpj_items[4].candidates[0].note_ko\",\"evidence_excerpt\":\"조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.\",\"note_ko\":\"'조건절'과 '麻烦您'의 관계적 인상 차이가 구체적으로 설명되지 않고, 두 note 모두 '부담을 줄이고 선택권을 남긴다'로 환원되어 실제 관계적 효과의 차이가 드러나지 않음.\"}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4068,
+      "completion_tokens": 236,
+      "total_tokens": 4304,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_e017de008c"
+  }
+}

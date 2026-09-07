@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPmtpxQJwjQTkbzF4y00Tzrpq7nq",
+    "object": "chat.completion",
+    "created": 1788772723,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"x\":{\"situation_ko\":\"친구가 주말에 등산을 가자고 했다. 나는 몸이 안 좋아서 못 간다고 답장을 보낸다.\",\"relation_ko\":\"나는 자주 연락하는 친구이다.\",\"channel\":\"messenger\",\"pdr\":{\"p\":\"equal\",\"d\":\"close\",\"r\":\"mid\"}},\"anchor\":{\"situation_ko\":\"상사가 주말에 회사 행사에 참석해 달라고 했다. 나는 개인 사정으로 참석이 어렵다고 답장을 보낸다.\",\"relation_ko\":\"나는 나의 상사이다.\",\"channel\":\"email\",\"pdr\":{\"p\":\"speaker_higher\",\"d\":\"distant\",\"r\":\"high\"}},\"y\":{\"situation_ko\":\"이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.\",\"relation_ko\":\"나는 가끔 마주치는 이웃이다.\",\"channel\":\"messenger\",\"pdr\":{\"p\":\"equal\",\"d\":\"acquaintance\",\"r\":\"low\"}}}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1607,
+      "completion_tokens": 212,
+      "total_tokens": 1819,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_c9a0e786b8"
+  }
+}

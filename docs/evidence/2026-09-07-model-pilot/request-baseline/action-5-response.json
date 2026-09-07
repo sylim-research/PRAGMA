@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "data": {
+    "operations": [
+      {
+        "operation": "replace_multi_judge_candidate",
+        "item_index": 4,
+        "candidate_index": 1,
+        "candidate": {
+          "text": "请您批准下周的假期。",
+          "note_ko": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다."
+        }
+      }
+    ],
+    "candidate_checks": [
+      {
+        "path": "mpj_items[4].candidates[1]",
+        "severity": "pass",
+        "actual_band_code": "too_direct",
+        "direction_from_anchor": "toward_lower",
+        "boundary_crossed": true,
+        "semantic_defect": "none",
+        "note_ko": "'请您批准下周的假期。'는 '请您'로 약간의 공손함을 더했으나, 조건절이나 선택권을 남기는 표현 없이 직접적으로 승인 요청을 전달합니다. 상하관계(상사-부하)와 공식적 맥락에서, 원문의 '승인해 주실 수 있나요?'에 비해 직접성이 높아져 too_direct 대역으로 조정된 것이 맞으며, 의미·의도·화행 기능은 보존되어 있습니다."
+      }
+    ],
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4o",
+      "prompt_version": "mission_candidate_band_v4_zhko_bidirectional",
+      "critic_model": "gpt-4.1",
+      "critic_prompt_version": "quality_candidate_band_v3_zhko_bidirectional",
+      "generated_at": "2026-09-07T09:11:42.617Z"
+    }
+  }
+}

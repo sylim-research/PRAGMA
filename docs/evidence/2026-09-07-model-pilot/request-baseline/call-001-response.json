@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPfIRO3KfScCFg2WrdzKemkkzWKg",
+    "object": "chat.completion",
+    "created": 1788772252,
+    "model": "gpt-4.1-mini-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"situation_ko\":\"저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.\",\"relation_ko\":\"환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.\",\"source_text\":\"안녕하세요, 제가 예약한 진료를 다음 주 화요일로 변경할 수 있을까요? 일정이 갑자기 바뀌어서 원래 예약한 시간에 갈 수 없게 됐습니다. 확인해주시고 가능하면 변경 부탁드립니다.\",\"preceding_turn\":null,\"brief_note_ko\":\"병원 접수 직원에게 진료 예약 변경을 요청하는 상황입니다.\",\"focal_segments\":[{\"text\":\"제가 예약한 진료를 다음 주 화요일로 변경할 수 있을까요?\",\"role\":\"head\"},{\"text\":\"일정이 갑자기 바뀌어서 원래 예약한 시간에 갈 수 없게 됐습니다.\",\"role\":\"support\"}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 5243,
+      "completion_tokens": 219,
+      "total_tokens": 5462,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_a035767cd3"
+  }
+}

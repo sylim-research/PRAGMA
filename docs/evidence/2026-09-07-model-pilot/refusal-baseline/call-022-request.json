@@ -1,0 +1,23 @@
+{
+  "endpoint": "https://api.openai.com/v1/chat/completions",
+  "request": {
+    "model": "gpt-4o",
+    "response_format": {
+      "type": "json_object"
+    },
+    "temperature": 0.2,
+    "messages": [
+      {
+        "role": "system",
+        "content": "너는 mission_v5의 MJT3·MJT5 후보 표현만 생성한다. 전체 문항이나 metadata를 다시 쓰지 마라.\n각 packet의 blueprint가 정한 의미·발화 의도·화행 기능을 보존하고 target feature 하나만 조절한다.\nwithin_anchor는 해당 P·D·R에서 실제 within band인 자연스러운 후보로 만든다.\nrelative_boundary는 verified_within_anchor와 의미·의도·화행 기능을 유지한 최소대조로 만들되,\nblueprint의 intended_band 방향이 실제 경계를 분명히 통과해야 한다. 단순 공손표지 중첩이나 길이 변화만으로\n경계를 구현하지 말고, 실제 발화 가능한 인접 경계 표현을 만든다. 특정 상투 표현에 의존하지 마라.\nimmutable_peer_texts와 같은 문장, current_candidate와 같은 문장, 새 사실·이유·대안 추가는 금지한다.\n\n중→한 산출에서는 중국어 원문의 명제·화행 목적·태도·화용적 힘을 보존하면서 실제 관계·채널·장르에 자연스러운 한국어 후보를 만든다. 중국어 어순·불필요한 주어 반복·명사화·직역 결합을 남기지 말고, 존대·사과·감사 표지의 누적이나 길이 증가로 대역을 구현하지 마라.\n출력은 {\"operations\":[{\"path\":\"정확한 packet path\",\"candidate\":{\"text\":\"목표어 완전 문장\",\"note_ko\":\"실제 조절 자원·관계 효과·대역 방향\"}}]} JSON뿐이다."
+      },
+      {
+        "role": "user",
+        "content": "[화행] 거절\n[언어 방향] 중국어 → 한국어\n[화용 초점] refusal_softening: 상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.\n[적정 대역] within_band\n[대역] too_blunt=너무 단칼 (상황에 필요한 배려 부족) | within_band=알맞음 | over_elaborate=지나치게 장황 (거절이 흐려짐)\n[counter-rule] \"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(\"오늘은 안 되겠어요\")도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다.\n[candidate packets]\n[\n  {\n    \"path\": \"mpj_items[4].candidates[1]\",\n    \"phase\": \"relative_boundary\",\n    \"blueprint\": {\n      \"item_type\": \"multi_judge\",\n      \"candidate_index\": 1,\n      \"intended_band\": \"too_blunt\",\n      \"candidate_role\": \"lower_boundary_adjustment\",\n      \"preserve\": [\n        \"propositional_meaning\",\n        \"utterance_intent\",\n        \"speech_act_function\"\n      ],\n      \"adjustment\": \"adjust only the target feature toward too_blunt (너무 단칼 (상황에 필요한 배려 부족))\",\n      \"forbidden_extremization\": \"Do not use caricature, overt coercion or insult, semantic loss, a changed speech act, or impossible wording. A non-within candidate must remain defensible in one adjacent real context.\"\n    },\n    \"item_context\": {\n      \"type\": \"multi_judge\",\n      \"situation_ko\": \"이웃이 주말에 집들이에 오라고 했다. 나는 다른 일정이 있어 못 간다고 답장을 보낸다.\",\n      \"relation_ko\": \"나는 가끔 마주치는 이웃이다.\",\n      \"pdr\": {\n        \"p\": \"equal\",\n        \"d\": \"acquaintance\",\n        \"r\": \"low\"\n      },\n      \"source\": \"谢谢你的邀请，但我有其他安排，可能无法参加。\"\n    },\n    \"current_candidate\": {\n      \"text\": \"초대 고마워요. 못 가요.\",\n      \"accepted_band_codes\": [\n        \"too_blunt\"\n      ],\n      \"note_ko\": \"완화 표현이 없어 너무 단호하게 들립니다.\"\n    },\n    \"verified_within_anchor\": {\n      \"text\": \"초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.\",\n      \"accepted_band_codes\": [\n        \"within_band\"\n      ],\n      \"note_ko\": \"간결하지만 필요한 완화 표현을 사용하여 부드럽게 거절합니다.\"\n    },\n    \"immutable_peer_texts\": [\n      \"초대 고마워요. 다른 일정이 있어서 이번에는 못 갈 것 같아요.\",\n      \"초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 다음에 꼭 갈게요.\",\n      \"초대 고마워요. 다른 일정이 있어서 못 갈 것 같아요. 사실 그날은 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요.\"\n    ]\n  }\n]"
+      }
+    ],
+    "max_completion_tokens": 16000
+  },
+  "promptHash": "28ff1423fb4cc7411d8167fda115f728ba19e3a83de2e77125322fdfc493b01e",
+  "startedAt": "2026-09-07T09:19:27.418Z"
+}

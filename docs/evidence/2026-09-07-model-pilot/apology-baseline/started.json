@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-09-07T09:22:01.431Z",
+  "route": "baseline",
+  "cell": {
+    "industry": null,
+    "business_function": null,
+    "count": 1,
+    "pdr_power": "equal",
+    "pdr_distance": "acquaintance",
+    "pdr_burden": "mid",
+    "domain": "daily",
+    "speech_act_ui": "apology",
+    "level": "advanced",
+    "mode": "stt_interpreting",
+    "direction": "zh_ko",
+    "theme_code": "daily_living",
+    "topic_code": "neighbor_noise_apology",
+    "situation_seed_ko": "어젯밤 늦게 가구 위치를 옮기다가 아래층에 소음을 냈다. 다음 날 복도에서 얼굴을 몇 차례 본 아래층 이웃을 만나, 늦은 시간에 시끄럽게 한 일을 사과하고 앞으로 밤에는 가구를 옮기지 않겠다고 말한다. 소음의 책임은 나에게 있다."
+  }
+}

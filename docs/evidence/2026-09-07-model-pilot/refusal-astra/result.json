@@ -1,0 +1,136 @@
+{
+  "case": "refusal",
+  "title": "기존 일정 때문에 동료의 주말 모임 초대 거절",
+  "route": "astra",
+  "core": {
+    "index": 0,
+    "cell": {
+      "industry": null,
+      "business_function": null,
+      "count": 1,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "domain": "daily",
+      "speech_act_ui": "refusal",
+      "level": "advanced",
+      "mode": "translation",
+      "direction": "zh_ko",
+      "theme_code": "relationship_social",
+      "topic_code": "invitation_refusal",
+      "situation_seed_ko": "직장에서 몇 차례 함께 일한 동료가 위챗으로 토요일 저녁 모임에 초대했다. 나는 이미 가족과의 약속이 있어 참석하지 못한다고 답장을 보낸다. 초대를 고맙게 받아들이면서 이번에는 참석하지 못한다는 뜻을 분명히 전한다."
+    },
+    "ok": true,
+    "scenarioId": "364e75f2-a6e9-4f48-8c8e-567839ca42fd",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.",
+      "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+      "source_modality": "written",
+      "source_text": "谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。",
+      "preceding_turn": "토요일 저녁에 모임이 있는데, 시간 괜찮으시면 같이 오실래요?",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.invitation_refusal.refusal",
+        "role_pair": {
+          "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+          "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+        },
+        "speaker_entitlement": "화자는 앞선 요청·제안·초대의 수용 여부를 결정할 재량이 있다.",
+        "addressee_obligation": "상대는 거절 대상 행동을 먼저 요청·제안·초대한 사람이며, 거절을 수용할 여지가 있어야 한다.",
+        "decision_authority": "화자가 자신의 참여·수락 여부를 결정하며, 거절 대상과 범위가 분명해야 한다."
+      },
+      "brief_note_ko": "아직 어색한 동료의 모임 초대에 고마움을 표하며 가족과의 선약으로 참석을 거절하는 답장",
+      "focal_segments": [
+        {
+          "text": "这次没办法参加了。",
+          "role": "head"
+        },
+        {
+          "text": "不过那天晚上我已经和家人有约，时间上确实冲突，",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 80,
+        "max": 110,
+        "actual": 92
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_plausibility",
+        "prompt_snapshot_hash": "2a354f99fbfe517a022c94dcd783ee9485c2b931a2b267b6de836fc60e65cc4f",
+        "generated_at": "2026-09-07T09:20:03.166Z"
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 6,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 46,
+        "matched_token_count": 35,
+        "coverage_ratio": 0.7609,
+        "out_of_reference_candidates": [
+          "周六",
+          "你在",
+          "之外",
+          "想到",
+          "那天",
+          "这次",
+          "没",
+          "很遗憾",
+          "不能",
+          "到场",
+          "玩得"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "terminalStage": "core_eligible"
+  },
+  "promotion": {
+    "ok": false,
+    "error": "미션 생성 호출 실패: Pilot transport 502: Signal timed out.",
+    "attempts": 1,
+    "terminal": {
+      "terminalStage": "mission_generation",
+      "itemCandidatePaths": [],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "UNKNOWN",
+      "criticFindingCodes": [],
+      "criticFindings": [],
+      "topology": {
+        "firstPassResult": "pass",
+        "finalResult": "pass",
+        "attempts": 1,
+        "regenerationCount": 0,
+        "findings": []
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 0,
+      "operation": "none",
+      "operationResult": "not_attempted",
+      "infrastructureError": true,
+      "providerStatus": 500,
+      "finalOutcome": "terminal_dropout"
+    }
+  },
+  "elapsedMs": 197922
+}

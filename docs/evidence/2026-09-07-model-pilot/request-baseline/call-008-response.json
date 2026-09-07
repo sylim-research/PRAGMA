@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPfwfH1lsZWzfKrHGUiFxbm5aML6",
+    "object": "chat.completion",
+    "created": 1788772292,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"verdict\": \"fail\",\n  \"summary_ko\": \"multi_judge 후보 중 하나가 실제로는 적정 대역인데 too_direct로 잘못 분류되어 band_mismatch가 발생함.\",\n  \"findings\": [\n    {\n      \"code\": \"band_mismatch\",\n      \"severity\": \"fail\",\n      \"where\": \"mpj_items[4].candidates[1]\",\n      \"evidence_excerpt\": \"麻烦您批准下周的假期。\",\n      \"intended_band_code\": \"too_direct\",\n      \"actual_band_code\": \"within_band\",\n      \"direction_from_within\": \"within\",\n      \"boundary_crossed\": true,\n      \"note_ko\": \"'麻烦您'는 중국어에서 완화된 요청 표현으로, 상사에게 휴가 승인을 요청하는 상황에서 충분히 적정 대역에 해당한다. 실제로는 within_band임에도 too_direct로 잘못 분류되어 학습자가 잘못 배우게 된다.\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 9504,
+      "completion_tokens": 214,
+      "total_tokens": 9718,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_9f5e93355c"
+  }
+}

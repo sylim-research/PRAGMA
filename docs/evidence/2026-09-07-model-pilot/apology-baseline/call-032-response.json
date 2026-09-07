@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPqD1M53GzQNoqBy8zqSMfm51CmM",
+    "object": "chat.completion",
+    "created": 1788772929,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"x\":{\"situation_ko\":\"나는 어제 친구에게 빌린 책을 잃어버렸다. 친구에게 전화해서 사과하고 새 책으로 보상하겠다고 해야 한다.\",\"relation_ko\":\"나는 친구에게 빌린 책을 잃어버린 상황이다.\",\"channel\":\"phone\",\"pdr\":{\"p\":\"equal\",\"d\":\"close\",\"r\":\"mid\"}},\"anchor\":{\"situation_ko\":\"나는 어제 회의에서 실수로 팀 프로젝트 자료를 잘못 발표했다. 팀원들에게 사과하고 수정된 자료를 공유해야 한다.\",\"relation_ko\":\"나는 팀원들과 함께 프로젝트를 진행하는 동료이다.\",\"channel\":\"facetoface\",\"pdr\":{\"p\":\"equal\",\"d\":\"acquaintance\",\"r\":\"mid\"}},\"y\":{\"situation_ko\":\"나는 상사에게 제출한 보고서에 오류가 있었다. 상사에게 이메일로 사과하고 수정본을 보내야 한다.\",\"relation_ko\":\"나는 상사에게 보고서를 제출한 부하 직원이다.\",\"channel\":\"email\",\"pdr\":{\"p\":\"speaker_lower\",\"d\":\"acquaintance\",\"r\":\"mid\"}}}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1815,
+      "completion_tokens": 239,
+      "total_tokens": 2054,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_c9a0e786b8"
+  }
+}

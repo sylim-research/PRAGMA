@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPnha5eGEidrltOtXPyKKoNKJHst",
+    "object": "chat.completion",
+    "created": 1788772773,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"verdict\": \"pass\",\n  \"summary_ko\": \"모든 문항이 상황에 맞는 거절의 완충과 대안 표현을 적절히 구분하며, 실제로 학습자가 잘못 배우게 되는 결함이 없다.\",\n  \"findings\": []\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 9816,
+      "completion_tokens": 64,
+      "total_tokens": 9880,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_50a7da54fb"
+  }
+}

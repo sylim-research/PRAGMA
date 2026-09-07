@@ -1,0 +1,119 @@
+{
+  "p_payload": {
+    "title": "아래층 이웃에게 밤늦은 가구 소음에 대해 사과한다.",
+    "speech_act": "apology",
+    "learner_level": "advanced",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "theme_code": "daily_living",
+    "topic_code": "neighbor_noise_apology",
+    "language_direction": "zh_ko",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.",
+      "relation_ko": "나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.",
+      "source_modality": "spoken",
+      "source_text": "昨天晚上我在搬家具的时候声音有点大，没想到会打扰到你，真的很抱歉。以后我会特别注意，晚上绝对不会再这样做了。如果昨天让你休息不好，真的很对不起。",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.neighbor_noise_apology.apology",
+        "role_pair": {
+          "speaker_ko": "자신의 집에서 생활 소음을 낸 아파트·주거 공간의 이웃",
+          "addressee_ko": "그 소음으로 불편을 겪은 동등한 이웃"
+        },
+        "speaker_entitlement": "화자는 자신과 관련된 위반·피해를 인정하고 가능한 수리를 제안할 책임이 있다.",
+        "addressee_obligation": "상대는 피해·불편의 당사자이며 사과를 즉시 수락하거나 용서할 의무는 없다.",
+        "decision_authority": "화자는 가능한 수리를 실행·제안할 수 있고, 상대는 피해 인정과 수용 여부를 판단한다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "아래층 이웃에게 밤늦은 가구 소음에 대해 사과한다.",
+      "focal_segments": [
+        {
+          "text": "真的很抱歉",
+          "role": "head"
+        },
+        {
+          "text": "以后我会特别注意，晚上绝对不会再这样做了",
+          "role": "support"
+        },
+        {
+          "text": "如果昨天让你休息不好，真的很对不起",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 55,
+        "max": 85,
+        "actual": 65
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_repair",
+        "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+        "generated_at": "2026-09-07T09:22:08.579Z"
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 6,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 33,
+        "matched_token_count": 25,
+        "coverage_ratio": 0.7576,
+        "out_of_reference_candidates": [
+          "昨天晚上",
+          "我在",
+          "有点",
+          "没想到",
+          "真的",
+          "不会",
+          "做了",
+          "不好"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "core_v16_natural_scene_repair",
+      "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+      "generation_attempt": 2,
+      "source_repair_applied": true,
+      "preceding_turn_repair_applied": false,
+      "bilingual_scene_repair_applied": false,
+      "bilingual_scene_canonicalization_applied": false,
+      "situation_seed_canonicalization_applied": false,
+      "bilingual_scene_issue_remaining": false,
+      "learner_scene_repair_applied": false,
+      "length_policy_version": "effective_chars_v2_min_warning",
+      "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+      "generated_at": "2026-09-07T09:22:08.579Z"
+    },
+    "generation_run_id": "model-pilot-20260907-apology-baseline",
+    "generation_item_key": "zh_ko|apology|advanced|daily|stt_interpreting|equal|acquaintance|mid|daily_living|neighbor_noise_apology|-|-|0",
+    "content_hash": "qo4w9p",
+    "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404"
+  }
+}

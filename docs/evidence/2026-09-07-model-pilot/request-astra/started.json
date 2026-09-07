@@ -1,0 +1,20 @@
+{
+  "startedAt": "2026-09-07T09:15:55.100Z",
+  "route": "astra",
+  "cell": {
+    "industry": null,
+    "business_function": null,
+    "count": 1,
+    "pdr_power": "equal",
+    "pdr_distance": "formal",
+    "pdr_burden": "low",
+    "domain": "daily",
+    "speech_act_ui": "request",
+    "level": "intermediate",
+    "mode": "stt_interpreting",
+    "direction": "ko_zh",
+    "theme_code": "daily_living",
+    "topic_code": "hospital_pharmacy_visit",
+    "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다."
+  }
+}

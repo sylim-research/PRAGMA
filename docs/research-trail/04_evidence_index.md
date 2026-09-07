@@ -234,3 +234,14 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 구현·검증: `LearnerCourseLive.tsx`, `LearnerCourseWeek.tsx`, `missionMenuTitle.ts`, 교과목 데이터 투영 및 회귀 검사. 전체 771 tests 통과·9 skip, typecheck, 운영 소스 정책 5 tests, 로컬 PostgreSQL 승인 경계 10 tests, 운영용 build 통과.
 - 브라우저 근거: 로컬 실제 데이터의 주차 전환·키보드 조작·통역 미션 진입·복귀·모바일 배치와 최종 제목 화면. 상세 범위는 `docs/dev-log/2026-09-07-course-accordion.md` 참조.
 - 기능 SHA·main·CI·Railway 배포 및 운영 smoke의 최종 상태는 해당 변경 PR 본문에 연결한다. 학습자 응답 완료 저장·클릭률·학습효과의 검증 자료가 아니다.
+
+## EVD-20260907-02 · 요청·거절·사과 3미션 모델 파일럿
+
+- 관련: DEC-20260907-05 / ITER-20260907-02.
+- 결과·방법: `docs/dev-log/2026-09-07-three-mission-model-pilot.md`.
+- 원본 증거: `docs/evidence/2026-09-07-model-pilot/`의 조건, 원시 요청·응답, 로컬 초안,
+  검수 결과, 사용량 장부, 비교 HTML과 입력 hash 확인. 보관 안내는 해당 README 참조.
+- 실행 소스: `104b883fbb50635e9fef4a438b60963454cb12b8`의 src/supabase.
+  main `044dc6ba7b49c0ce23cef3fd44b6af1f06a84177`의 같은 경로와 동등함을 선행 점검했다.
+- 한계: 응답 확보 40회 약 $2.975는 일반 단가 추산이다. Astra 시간 초과 3회 과금은 미확정이며,
+  완성 미션 품질 비교를 완료한 것으로 해석하지 않는다. 운영 채택·교육효과 근거가 아니다.

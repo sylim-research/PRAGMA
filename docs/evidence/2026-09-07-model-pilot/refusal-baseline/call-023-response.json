@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPne67hLBnYiJfTPrbDRiOpZjFPS",
+    "object": "chat.completion",
+    "created": 1788772770,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"operations\":[{\"path\":\"mpj_items[4].candidates[3]\",\"candidate\":{\"text\":\"초대 고마워요. 다른 일정이 있어서 이번에는 참석이 어려울 것 같아요. 친구도 만나야 하고, 가족 모임도 있어서 시간이 안 될 것 같아요. 다음에 꼭 갈게요.\",\"note_ko\":\"불필요한 세부 설명을 추가하여 거절의 명확성이 흐려집니다.\"}}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1309,
+      "completion_tokens": 95,
+      "total_tokens": 1404,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_0ea3a61dc5"
+  }
+}

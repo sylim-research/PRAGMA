@@ -1,0 +1,144 @@
+{
+  "case": "apology",
+  "title": "조용한 시간에 낸 소음에 이웃에게 사과",
+  "route": "astra",
+  "core": {
+    "index": 0,
+    "cell": {
+      "industry": null,
+      "business_function": null,
+      "count": 1,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "domain": "daily",
+      "speech_act_ui": "apology",
+      "level": "advanced",
+      "mode": "stt_interpreting",
+      "direction": "zh_ko",
+      "theme_code": "daily_living",
+      "topic_code": "neighbor_noise_apology",
+      "situation_seed_ko": "어젯밤 늦게 가구 위치를 옮기다가 아래층에 소음을 냈다. 다음 날 복도에서 얼굴을 몇 차례 본 아래층 이웃을 만나, 늦은 시간에 시끄럽게 한 일을 사과하고 앞으로 밤에는 가구를 옮기지 않겠다고 말한다. 소음의 책임은 나에게 있다."
+    },
+    "ok": true,
+    "scenarioId": "590a7104-10fc-4e5a-9d37-307f4db17f0f",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "나는 다음 날 복도에서 아래층 이웃을 만나 어젯밤 늦게 가구를 옮기며 낸 소음을 사과하고, 앞으로 밤에는 옮기지 않겠다고 말한다. 얼굴을 몇 차례 본 어색한 사이이며, 이웃은 내가 낸 소음으로 늦은 시간에 불편을 겪었다.",
+      "relation_ko": "얼굴을 몇 차례 본 사이인 위층 거주자와 소음 피해를 겪은 아래층 이웃",
+      "source_modality": "spoken",
+      "source_text": "昨晚我在家挪家具，时间那么晚了还弄出噪音，打扰到你了，真对不起。这么晚还搬动家具，确实是我考虑不周，没有顾及楼下邻居的感受。以后我不会再在晚上挪家具了。",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.neighbor_noise_apology.apology",
+        "role_pair": {
+          "speaker_ko": "자신의 집에서 생활 소음을 낸 아파트·주거 공간의 이웃",
+          "addressee_ko": "그 소음으로 불편을 겪은 동등한 이웃"
+        },
+        "speaker_entitlement": "화자는 자신과 관련된 위반·피해를 인정하고 가능한 수리를 제안할 책임이 있다.",
+        "addressee_obligation": "상대는 피해·불편의 당사자이며 사과를 즉시 수락하거나 용서할 의무는 없다.",
+        "decision_authority": "화자는 가능한 수리를 실행·제안할 수 있고, 상대는 피해 인정과 수용 여부를 판단한다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "늦은 밤 가구 이동으로 낸 소음을 아래층 이웃에게 사과하고 재발 방지를 약속하는 장면",
+      "focal_segments": [
+        {
+          "text": "真对不起。",
+          "role": "head"
+        },
+        {
+          "text": "确实是我考虑不周，没有顾及楼下邻居的感受。",
+          "role": "support"
+        },
+        {
+          "text": "以后我不会再在晚上挪家具了。",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 55,
+        "max": 85,
+        "actual": 68
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_plausibility",
+        "prompt_snapshot_hash": "2a354f99fbfe517a022c94dcd783ee9485c2b931a2b267b6de836fc60e65cc4f",
+        "generated_at": "2026-09-07T09:23:16.895Z"
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 6,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 35,
+        "matched_token_count": 26,
+        "coverage_ratio": 0.7429,
+        "out_of_reference_candidates": [
+          "昨晚",
+          "我在",
+          "挪",
+          "弄出",
+          "噪音",
+          "考虑不周",
+          "顾及",
+          "楼下",
+          "我不会"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "terminalStage": "core_eligible"
+  },
+  "promotion": {
+    "ok": false,
+    "error": "미션 생성 호출 실패: Pilot transport 502: Signal timed out.",
+    "attempts": 1,
+    "terminal": {
+      "terminalStage": "mission_generation",
+      "itemCandidatePaths": [],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "UNKNOWN",
+      "criticFindingCodes": [],
+      "criticFindings": [],
+      "topology": {
+        "firstPassResult": "pass",
+        "finalResult": "pass",
+        "attempts": 1,
+        "regenerationCount": 0,
+        "findings": []
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 0,
+      "operation": "none",
+      "operationResult": "not_attempted",
+      "infrastructureError": true,
+      "providerStatus": 500,
+      "finalOutcome": "terminal_dropout"
+    }
+  },
+  "elapsedMs": 193887
+}

@@ -1,0 +1,112 @@
+{
+  "case": "request",
+  "title": "병원 접수 직원에게 예약 변경 문의",
+  "route": "astra",
+  "core": {
+    "index": 0,
+    "cell": {
+      "industry": null,
+      "business_function": null,
+      "count": 1,
+      "pdr_power": "equal",
+      "pdr_distance": "formal",
+      "pdr_burden": "low",
+      "domain": "daily",
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "mode": "stt_interpreting",
+      "direction": "ko_zh",
+      "theme_code": "daily_living",
+      "topic_code": "hospital_pharmacy_visit",
+      "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다."
+    },
+    "ok": true,
+    "scenarioId": "707bf5c8-8018-4ce6-b21b-6e73be7bb0a3",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "나는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 다음 주 화요일로 바꿀 수 있는지 묻는다. 직원은 예약 시스템에서 빈 시간을 확인해 통상적인 예약 변경을 처리할 수 있다.",
+      "relation_ko": "예약 변경을 문의하는 환자와 처음 응대하는 병원 접수 직원",
+      "source_modality": "spoken",
+      "source_text": "개인 일정이 바뀌어서 예약한 시간에 오기 어려워졌어요. 진료 예약을 다음 주 화요일로 바꿀 수 있을까요?",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+        "role_pair": {
+          "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+          "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+        },
+        "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+        "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+        "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "처음 만난 병원 접수 직원에게 다음 주 화요일로 진료 예약 변경 요청",
+      "focal_segments": [
+        {
+          "text": "진료 예약을 다음 주 화요일로 바꿀 수 있을까요?",
+          "role": "head"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 42
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_plausibility",
+        "prompt_snapshot_hash": "2a354f99fbfe517a022c94dcd783ee9485c2b931a2b267b6de836fc60e65cc4f",
+        "generated_at": "2026-09-07T09:16:07.909Z"
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "terminalStage": "core_eligible"
+  },
+  "promotion": {
+    "ok": false,
+    "error": "미션 생성 호출 실패: Pilot transport 502: Signal timed out.",
+    "attempts": 1,
+    "terminal": {
+      "terminalStage": "mission_generation",
+      "itemCandidatePaths": [],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "UNKNOWN",
+      "criticFindingCodes": [],
+      "criticFindings": [],
+      "topology": {
+        "firstPassResult": "pass",
+        "finalResult": "pass",
+        "attempts": 1,
+        "regenerationCount": 0,
+        "findings": []
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 0,
+      "operation": "none",
+      "operationResult": "not_attempted",
+      "infrastructureError": true,
+      "providerStatus": 500,
+      "finalOutcome": "terminal_dropout"
+    }
+  },
+  "elapsedMs": 176779
+}

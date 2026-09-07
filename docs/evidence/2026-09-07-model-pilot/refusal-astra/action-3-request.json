@@ -1,0 +1,170 @@
+{
+  "action": "mission",
+  "telemetry": {
+    "scenario_id": "364e75f2-a6e9-4f48-8c8e-567839ca42fd",
+    "generation_run_id": "model-pilot-20260907-refusal-astra",
+    "generation_item_key": "zh_ko|refusal|advanced|daily|translation|equal|acquaintance|mid|relationship_social|invitation_refusal|-|-|0",
+    "invocation_attempt": 1
+  },
+  "mission": {
+    "direction": "zh_ko",
+    "learner_level": "advanced",
+    "speech_act": "refusal",
+    "speech_act_ko": "거절",
+    "level_ko": "고급",
+    "level_policy_ko": "고급: 담화 조직·복합 전략. 자원 선택 배열. 원문 3~5문장(통역은 짧은 구두 담화).",
+    "feature": {
+      "code": "refusal_softening",
+      "version": "1.1",
+      "learner_label": "완충과 대안",
+      "operational_definition": "상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.",
+      "band_schema": [
+        {
+          "code": "too_blunt",
+          "label_ko": "너무 단칼 (상황에 필요한 배려 부족)"
+        },
+        {
+          "code": "within_band",
+          "label_ko": "알맞음"
+        },
+        {
+          "code": "over_elaborate",
+          "label_ko": "지나치게 장황 (거절이 흐려짐)"
+        }
+      ],
+      "within_band_code": "within_band",
+      "relevant_resources": [
+        "유보·완화 표현 (좀 어려울 것 같아요·-기는 힘들 것 같아요·아무래도 -겠는데요)",
+        "사과·유감 (죄송하지만·아쉽지만·미안한데)",
+        "이유 제시 (-아/어서·그날은 선약이 있어서)",
+        "대안·미래 약속 (다음에는 꼭·대신 -면 어떨까요·요일을 바꾸면 어때요)",
+        "부분 수용 후 전환 (그건 좋은데·-는 되는데 -는 어려워요)"
+      ],
+      "excluded_confounds": [
+        "높임 등급·경어 선택 — 공손성 축",
+        "거절의 명제 자체(무엇을 거절하는가)는 불변항",
+        "문장 길이 자체"
+      ],
+      "closing_principle_ko": "거절은 완충 장치의 수보다 상황에서 하는 역할을 봅니다. 거절의 뜻을 지키며 필요한 배려를 조절하고, 없는 사유나 약속을 덧붙이지 않습니다.",
+      "counter_rule_note": "\"거절은 길수록 공손하다\"의 반례를 설계한다. 일정 제약을 이미 공유하고 즉답을 요청받은 장면에서는 간결한 거절(\"오늘은 안 되겠어요\")도 적절할 수 있다. 길이나 완충량 대신 실제 상황에서 거절과 배려가 전달되는 근거를 제시한다."
+    },
+    "core": {
+      "situation_ko": "나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.",
+      "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+      "source_text_ko": "谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。",
+      "preceding_turn_zh": "토요일 저녁에 모임이 있는데, 시간 괜찮으시면 같이 오실래요?",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "messenger",
+      "source_modality": "written",
+      "usable_facts": [],
+      "focal_segments": [
+        {
+          "text": "这次没办法参加了。",
+          "role": "head"
+        },
+        {
+          "text": "不过那天晚上我已经和家人有约，时间上确实冲突，",
+          "role": "support"
+        }
+      ]
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "refusal",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "refusal_softening",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "error_pattern_hints_ko": [
+      "L2 학습자가 모어 화자보다 장황해지는 경향 — 완화·부연을 과잉 적재 (예: 완화 표현 6겹을 겹쳐 요청의 핵심이 흐려지는 후보)"
+    ],
+    "is_response_act": true,
+    "frozen_topology": {
+      "version": "native_mpj5_scene_topology_v1",
+      "source_modality": "written",
+      "x": {
+        "situation_ko": "나는 평소 친하게 지내는 동료에게서 오늘 저녁 한 시간 동안 발표 연습을 들어 달라는 메신저 요청을 받았다. 그 시간에는 수강 중인 수업이 있어 요청을 거절해야 한다.",
+        "relation_ko": "평소 친하게 지내는 동등한 직급의 동료",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "close",
+          "r": "mid"
+        }
+      },
+      "anchor": {
+        "situation_ko": "나는 사내 행사 준비를 함께 맡은 동료에게서 오늘 오후 안내 데스크를 한 시간 대신 맡아 달라는 메신저 요청을 받았다. 그 시간에는 미리 잡힌 외부 미팅이 있어 요청을 거절해야 한다.",
+        "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 행사 준비 동료",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        }
+      },
+      "y": {
+        "situation_ko": "나는 몇 차례 함께 일한 동료에게서 여분으로 산 머핀 하나를 먹겠느냐는 사내 메신저 메시지를 받았다. 방금 식사를 마쳐 배가 부르므로 머핀을 받지 않겠다고 답하려 한다.",
+        "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "low"
+        }
+      },
+      "c": {
+        "situation_ko": "나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.",
+        "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        }
+      }
+    },
+    "topology_evidence": {
+      "version": "mission_scene_topology_evidence_v1",
+      "prompt_version": "mission_scene_topology_v1_constraint_by_construction",
+      "first_pass_result": "pass",
+      "final_result": "pass",
+      "attempts": 1,
+      "regeneration_count": 0,
+      "findings": []
+    }
+  }
+}

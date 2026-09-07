@@ -1,0 +1,1290 @@
+{
+  "case": "request",
+  "title": "병원 접수 직원에게 예약 변경 문의",
+  "route": "baseline",
+  "core": {
+    "index": 0,
+    "cell": {
+      "industry": null,
+      "business_function": null,
+      "count": 1,
+      "pdr_power": "equal",
+      "pdr_distance": "formal",
+      "pdr_burden": "low",
+      "domain": "daily",
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "mode": "stt_interpreting",
+      "direction": "ko_zh",
+      "theme_code": "daily_living",
+      "topic_code": "hospital_pharmacy_visit",
+      "situation_seed_ko": "나는 병원 접수 창구에서 처음 만난 접수 직원에게 내 진료 예약을 다음 주 화요일로 변경할 수 있는지 문의한다. 개인 일정이 바뀌어 기존 시간에 방문하기 어려우며, 직원은 예약 시스템에서 빈 시간을 확인하고 통상적인 예약 변경을 처리할 수 있다."
+    },
+    "ok": true,
+    "scenarioId": "35ee0360-be86-4660-b933-a4be015eb60b",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+      "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+      "source_modality": "spoken",
+      "source_text": "안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+        "role_pair": {
+          "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+          "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+        },
+        "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+        "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+        "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "병원 접수 직원에게 진료 예약 변경을 요청하는 상황입니다.",
+      "focal_segments": [
+        {
+          "text": "혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?",
+          "role": "head"
+        },
+        {
+          "text": "일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 49
+      },
+      "generation": {
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "prompt_version": "core_v16_natural_scene_repair",
+        "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+        "generated_at": "2026-09-07T09:10:58.292Z"
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "terminalStage": "core_eligible"
+  },
+  "promotion": {
+    "ok": true,
+    "mission": {
+      "schema_version": "mission_v5",
+      "direction": "ko_zh",
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "request"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "speech_act": "request",
+        "mission_goal": "integrated_speech_act",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ]
+      },
+      "authoring": {
+        "schema_version": "mission_authoring_v1",
+        "stage": "ai_repaired",
+        "lineage_status": "pending",
+        "repair_attempts": 1
+      },
+      "unit": {
+        "target_feature": "request_mitigation_optionality",
+        "target_feature_version": "1.1",
+        "learner_label": "완화와 선택권",
+        "closing_ko": "요청은 표현형이나 친밀도만으로 판단하지 않습니다. 원문의 뜻을 지키며 상황에 필요한 명료성과 상대의 선택권을 함께 살핍니다."
+      },
+      "production_task": {
+        "mode": "interpreting",
+        "source_modality": "spoken",
+        "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+        "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "equal",
+          "d": "distant",
+          "r": "low"
+        },
+        "source_text": "안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+        "preceding_turn": null,
+        "replay_limit": 2,
+        "reference_alternatives": [
+          {
+            "text": "您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。",
+            "note_ko": "조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다."
+          }
+        ],
+        "focal_segments": [
+          {
+            "text": "혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?",
+            "role": "head"
+          },
+          {
+            "text": "일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+            "role": "support"
+          }
+        ]
+      },
+      "provenance": {
+        "model": "gpt-4o",
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v16_natural_scene",
+        "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+        "mission_content_hash": "a50bd27904148c68cccdb8f1bbcdd66be58a1e4b575d286ef4282a5c0233a6d6",
+        "generated_at": "2026-09-07T09:11:31.426Z",
+        "generation_attempt": 1
+      },
+      "quality_check": {
+        "verdict": "fail",
+        "summary_ko": "multi_judge 후보 중 하나가 실제로는 적정 대역인데 too_direct로 잘못 분류되어 band_mismatch가 발생함.",
+        "findings": [
+          {
+            "code": "band_mismatch",
+            "severity": "fail",
+            "where": "mpj_items[4].candidates[1]",
+            "evidence_excerpt": "麻烦您批准下周的假期。",
+            "note_ko": "'麻烦您'는 중국어에서 완화된 요청 표현으로, 상사에게 휴가 승인을 요청하는 상황에서 충분히 적정 대역에 해당한다. 실제로는 within_band임에도 too_direct로 잘못 분류되어 학습자가 잘못 배우게 된다."
+          },
+          {
+            "code": "feedback_quality_mismatch",
+            "severity": "warning",
+            "where": "mpj_items[4].candidates[1].note_ko",
+            "evidence_excerpt": "'麻烦您'로 직접적이지만 약간의 완화가 있습니다.",
+            "note_ko": "'麻烦您'가 실제로 요청을 완화하는 구체적 기능(예: 부담의 귀속, 완화의 정도 등)이나 선택권의 남김이 어떻게 실현되는지, 또는 다른 후보와의 관계적 효과 차이를 명확히 연결하지 않고 있음."
+          },
+          {
+            "code": "comparison_quality_mismatch",
+            "severity": "warning",
+            "where": "mpj_items[4].candidates[0].note_ko",
+            "evidence_excerpt": "조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+            "note_ko": "'조건절'과 '麻烦您'의 관계적 인상 차이가 구체적으로 설명되지 않고, 두 note 모두 '부담을 줄이고 선택권을 남긴다'로 환원되어 실제 관계적 효과의 차이가 드러나지 않음."
+          }
+        ],
+        "model": "gpt-4.1",
+        "prompt_version": "quality_v19_scene_plausibility",
+        "checked_at": "2026-09-07T09:11:37.536Z",
+        "mission_content_hash": "522dfad5b3e110bf0c7ee4374a1e3283084a5b053b2878d0344dbcbc8460cd70"
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3"
+          ],
+          "evidence_ko": "MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어 관계적 효과가 달라지는 것을 관찰할 수 있습니다."
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_refs": [
+            "mpj:1",
+            "dct"
+          ],
+          "evidence_ko": "MJT1과 DCT에서 서로 다른 관계 설정에 따라 요청의 완화 정도가 조절되는 것을 볼 수 있습니다."
+        }
+      ],
+      "mpj_items": [
+        {
+          "id": 1,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.",
+          "relation_ko": "친구 사이로 친밀한 관계입니다.",
+          "channel": "facetoface",
+          "pdr": {
+            "p": "equal",
+            "d": "close",
+            "r": "low"
+          },
+          "source": "다음 주에 같이 영화 보러 갈래? 새로 개봉한 영화가 있어서 꼭 보고 싶어.",
+          "preceding_turn": null,
+          "explanation_ko": "친구 사이의 친밀한 관계에서 간단한 제안은 직접적이어도 적절합니다. '好吗'를 사용해 선택권을 남기며 자연스럽게 요청합니다.",
+          "recommended_example": "下周一起去看电影好吗？",
+          "type": "scale4",
+          "target": "下周一起去看电影好吗？有部新上映的电影我很想看。",
+          "highlights": [
+            "下周一起去看电影好吗"
+          ],
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "very_appropriate"
+        },
+        {
+          "id": 2,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "channel": "facetoface",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "explanation_ko": "동료와의 관계에서 직접적인 요청은 부담을 줄 수 있습니다. '能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "type": "judge3",
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "accepted_band_codes": [
+            "too_direct"
+          ]
+        },
+        {
+          "id": 3,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "channel": "facetoface",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "explanation_ko": "현재 상황에서는 직접적인 요청이 부담을 줄 수 있습니다. 수정안은 조건절을 추가하여 완화하고 선택권을 남깁니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "type": "fix_choice",
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "corrections": [
+            {
+              "text": "如果方便的话，下周的会议时间能调整一下吗？",
+              "is_valid": true,
+              "note_ko": "조건절 '如果方便的话'를 추가하여 요청의 부담을 줄이고 선택권을 남깁니다."
+            },
+            {
+              "text": "请您调整下周的会议时间。",
+              "is_valid": false,
+              "note_ko": "'请您调整'로 직접 요청하여 선택권이 줄어듭니다."
+            },
+            {
+              "text": "不知道您是否能考虑调整下周的会议时间。",
+              "is_valid": false,
+              "note_ko": "'不知道您是否能考虑'로 요청이 흐려져 지나치게 우회적입니다."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "channel": "facetoface",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "explanation_ko": "현재 상황에서는 요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다. 조건절을 추가하여 완화할 필요가 있습니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "type": "reason",
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "problem_band_code": "too_direct",
+          "reasons": [
+            {
+              "id": "r1",
+              "text_ko": "문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.",
+              "kind": "pragmatic_misconception"
+            },
+            {
+              "id": "r2",
+              "text_ko": "요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다.",
+              "kind": "primary"
+            },
+            {
+              "id": "r3",
+              "text_ko": "문장 구조상 오류는 없지만, 더 완화된 표현이 필요합니다.",
+              "kind": "meaning_grammar_context"
+            }
+          ],
+          "accepted_reason_id": "r2"
+        },
+        {
+          "id": 5,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.",
+          "relation_ko": "직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.",
+          "channel": "facetoface",
+          "pdr": {
+            "p": "speaker_higher",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 휴가 승인해 주실 수 있나요? 가족 모임이 있어서 꼭 참석해야 합니다.",
+          "preceding_turn": null,
+          "explanation_ko": "현재 상황에서는 상사에게 요청할 때 적절한 완화와 선택권을 남기는 것이 중요합니다. 각 후보는 다른 완화 전략을 사용하여 관계적 효과를 다르게 만듭니다.",
+          "recommended_example": "如果方便的话，下周的假期能批准一下吗？",
+          "type": "multi_judge",
+          "candidates": [
+            {
+              "text": "如果方便的话，下周的假期能批准一下吗？",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다."
+            },
+            {
+              "text": "请您批准下周的假期。",
+              "accepted_band_codes": [
+                "too_direct"
+              ],
+              "note_ko": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다."
+            },
+            {
+              "text": "我想请您考虑一下下周的假期。",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "완화된 표현으로 요청의 부담을 줄이며 선택권을 남깁니다."
+            },
+            {
+              "text": "不知道您是否能批准下周的假期。",
+              "accepted_band_codes": [
+                "too_indirect"
+              ],
+              "note_ko": "'不知道您是否能'로 요청이 흐려져 지나치게 우회적입니다."
+            }
+          ]
+        }
+      ]
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\""
+      }
+    ],
+    "attempts": 1,
+    "quality": {
+      "verdict": "warning",
+      "summary_ko": "후보 재생성 뒤 남은 warning 또는 비대상 finding을 보존했습니다.",
+      "findings": [
+        {
+          "code": "feedback_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[1].note_ko",
+          "evidence_excerpt": "'麻烦您'로 직접적이지만 약간의 완화가 있습니다.",
+          "note_ko": "'麻烦您'가 실제로 요청을 완화하는 구체적 기능(예: 부담의 귀속, 완화의 정도 등)이나 선택권의 남김이 어떻게 실현되는지, 또는 다른 후보와의 관계적 효과 차이를 명확히 연결하지 않고 있음."
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "severity": "warning",
+          "where": "mpj_items[4].candidates[0].note_ko",
+          "evidence_excerpt": "조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+          "note_ko": "'조건절'과 '麻烦您'의 관계적 인상 차이가 구체적으로 설명되지 않고, 두 note 모두 '부담을 줄이고 선택권을 남긴다'로 환원되어 실제 관계적 효과의 차이가 드러나지 않음."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_candidate_band_v3_zhko_bidirectional",
+      "checked_at": "2026-09-07T09:11:42.617Z",
+      "mission_content_hash": "a50bd27904148c68cccdb8f1bbcdd66be58a1e4b575d286ef4282a5c0233a6d6"
+    },
+    "firstPassQualityVerdict": "fail",
+    "repaired": true,
+    "candidateRegenerationCount": 1,
+    "candidateRegenerationMaxPerCandidate": 1,
+    "savedId": "35ee0360-be86-4660-b933-a4be015eb60b",
+    "terminal": {
+      "terminalStage": "eligible",
+      "itemCandidatePaths": [
+        "mpj_items[4].candidates[1]",
+        "mpj_items[4].candidates[0]"
+      ],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "warning",
+      "criticFindingCodes": [
+        {
+          "code": "feedback_quality_mismatch",
+          "path": "mpj_items[4].candidates[1].note_ko"
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "path": "mpj_items[4].candidates[0].note_ko"
+        }
+      ],
+      "criticFindings": [
+        {
+          "code": "feedback_quality_mismatch",
+          "path": "mpj_items[4].candidates[1].note_ko",
+          "severity": "warning",
+          "finding": "'麻烦您'가 실제로 요청을 완화하는 구체적 기능(예: 부담의 귀속, 완화의 정도 등)이나 선택권의 남김이 어떻게 실현되는지, 또는 다른 후보와의 관계적 효과 차이를 명확히 연결하지 않고 있음."
+        },
+        {
+          "code": "comparison_quality_mismatch",
+          "path": "mpj_items[4].candidates[0].note_ko",
+          "severity": "warning",
+          "finding": "'조건절'과 '麻烦您'의 관계적 인상 차이가 구체적으로 설명되지 않고, 두 note 모두 '부담을 줄이고 선택권을 남긴다'로 환원되어 실제 관계적 효과의 차이가 드러나지 않음."
+        }
+      ],
+      "topology": {
+        "firstPassResult": "fail",
+        "finalResult": "pass",
+        "attempts": 2,
+        "regenerationCount": 1,
+        "findings": [
+          {
+            "attempt": 1,
+            "code": "R28",
+            "path": "x.channel",
+            "message": "X channel이 spoken 수행 방식과 맞지 않음"
+          },
+          {
+            "attempt": 1,
+            "code": "R28",
+            "path": "anchor.channel",
+            "message": "ANCHOR channel이 spoken 수행 방식과 맞지 않음"
+          }
+        ]
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 1,
+      "operation": "mission_item_repair_or_candidate_regeneration",
+      "operationResult": "succeeded",
+      "infrastructureError": false,
+      "providerStatus": "UNKNOWN",
+      "finalOutcome": "eligible",
+      "boundaryFallback": {
+        "eligible_paths": [],
+        "attempted_paths": [],
+        "succeeded_paths": [],
+        "situation_unchanged": true,
+        "immutable_candidates_unchanged": true
+      }
+    }
+  },
+  "elapsedMs": 53354,
+  "rules": {
+    "verdict": "warning",
+    "summary_ko": "현재 저장 미션에 기존 구조·형식 규칙 적용",
+    "findings": [
+      {
+        "id": "rule-1",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+        "reason_ko": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+        "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+        "problem_type_ko": "구조·형식",
+        "needs_professor": false,
+        "uncertainty_ko": ""
+      },
+      {
+        "id": "rule-2",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\"",
+        "reason_ko": "source 완전 중복: 문항 2 = 문항 3 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\"",
+        "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+        "problem_type_ko": "구조·형식",
+        "needs_professor": false,
+        "uncertainty_ko": ""
+      },
+      {
+        "id": "rule-3",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\"",
+        "reason_ko": "source 완전 중복: 문항 2 = 문항 4 — \"다음 주 회의 일정 조정해 줄 수 있어? 다…\"",
+        "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+        "problem_type_ko": "구조·형식",
+        "needs_professor": false,
+        "uncertainty_ko": ""
+      },
+      {
+        "id": "rule-4",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\"",
+        "reason_ko": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\"",
+        "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+        "problem_type_ko": "구조·형식",
+        "needs_professor": false,
+        "uncertainty_ko": ""
+      },
+      {
+        "id": "rule-5",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\"",
+        "reason_ko": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"下周的会议时间能调整一下吗?我有其他重要的安排。\"",
+        "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+        "problem_type_ko": "구조·형식",
+        "needs_professor": false,
+        "uncertainty_ko": ""
+      }
+    ]
+  },
+  "fableInitialUnblinded": {
+    "result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(병원 접수 직원에게 본인 예약 변경 요청)은 현실성·개연성과 P/D/R이 타당하나, MPJ 문항에 구조적 결함이 있다. 문항 5의 pdr.p가 관계 서술(상사에게 요청)과 정반대로 speaker_higher로 기재되어 있고, 문항 4의 세 이유가 사실상 같은 내용이어서 정답 변별이 불가능하다. 앵커(문항 2~4)의 '能调整一下吗'를 too_direct로 판정한 근거가 운영 정의(표지 수로 판단하지 않음)와 충돌하고 해설 자체가 자기모순적이다. 문항 1은 요청이 아닌 제안·초대 화행이며, 문항 2 원문의 반말 어미가 '친밀하지 않은 동료' 관계와 맞지 않는다. DCT 참고산출 메모는 실제 문장에 없는 조건절을 언급한다.",
+      "findings": [
+        {
+          "id": "claude-1",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "quote": "speaker_higher",
+          "issue_ko": "문항 5의 pdr.p가 'speaker_higher'인데 situation_ko·relation_ko·explanation_ko는 모두 부하 직원(화자)이 상사(청자)에게 휴가 승인을 요청하는 장면으로 서술한다.",
+          "reason_ko": "P 값이 실제 관계와 반대로 기재되면 학습자에게 제시되는 관계 정보와 판정 근거(상사에게 완화 필요)가 충돌하고, 데이터 기준으로 후보 판정의 정합성을 검증할 수 없다.",
+          "suggestion_ko": "pdr.p를 청자 우위(예: addressee_higher/speaker_lower 등 스키마의 해당 코드)로 수정한다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-2",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/3/reasons",
+          "quote": null,
+          "issue_ko": "세 이유가 모두 '직접성이 높아/선택권을 충분히 남기지 않아 부담을 줄 수 있다·더 완화된 표현이 필요하다'는 동일한 진단을 반복한다. r1(pragmatic_misconception)과 r2(primary)는 내용상 구별되지 않고, r3도 같은 결론을 문법 언급만 덧붙여 반복한다.",
+          "reason_ko": "이유 선택 문항은 오답 이유가 서로 다른 유형의 오판(예: 문법 오류로 오인, 의미 왜곡으로 오인, 격식·호칭 문제로 오인 등)을 대표해야 변별력이 생기는데, 현재는 어느 것을 골라도 같은 말이어서 정답 판정이 임의적이다.",
+          "suggestion_ko": "r1·r3을 각각 다른 유형의 오판(예: 호칭·격식체 문제로 보는 공손성 축 혼동, 의미·문법 오류로 보는 오판)으로 재작성하여 r2와 명확히 구분한다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-3",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/explanation_ko",
+          "quote": "동료와의 관계에서 직접적인 요청은 부담을 줄 수 있습니다. '能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다.",
+          "issue_ko": "'能调整一下吗'는 능원동사 의문형과 一下 완화를 갖춘 표준적 요청인데 too_direct로 판정했고, 해설 스스로 \"선택권을 남기지만 더 완화된 표현이 필요\"라고 써 자기모순이다. 권장안은 단순히 '如果方便的话' 표지를 추가한 것으로, 동등·저부담·거리감 관계에서 표지 수를 근거로 적절성을 바꾼 셈이다.",
+          "reason_ko": "criteria 운영 정의는 '표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다'고 명시하며, 能不能·可以…吗를 적절한 완화 자원으로 인정한다. 저부담(r=low) 상황에서 이 표현을 too_direct로 고정하면 학습자에게 '완화 표지를 더 많이 붙일수록 좋다'는 잘못된 단일 정답을 유도하고, lineage에 명시된 learner_verbosity 위험을 오히려 강화한다. 문항 3·4가 같은 앵커를 공유하므로 영향이 연쇄된다.",
+          "suggestion_ko": "앵커를 실제로 선택권이 부족한 형태(예: 把…调整一下·下周的会议改时间)로 바꾸어 too_direct 판정에 표현 근거를 부여하거나, 현재 target을 유지한다면 상황 서술에 부담을 높이는 구체 근거(상대가 이미 확정·공지한 일정 등)를 추가하고 해설의 모순 문구를 정리한다. 문항 3·4·앵커 recommended_example도 함께 조정한다.",
+          "problem_type_ko": "화용적 적절성·잘못된 단일 정답화",
+          "needs_professor": true,
+          "uncertainty_ko": "저부담 동료 관계에서 '能…一下吗'의 적절성 판단은 교수자의 화용 기준에 따라 달라질 수 있어 최종 판정 확인이 필요하다."
+        },
+        {
+          "id": "claude-4",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/1/source",
+          "quote": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "issue_ko": "원문 '조정해 줄 수 있어? …겹쳐서.'는 반말(해체)인데 relation_ko는 '친밀하지 않은 동료'로 서술한다. 또한 상대 동료가 회의 일정을 조정할 권한·역할(주관자 여부)이 장면에 없다.",
+          "reason_ko": "거리감 있는 동등 관계에서 반말 원문은 학습자가 관계 정보를 읽는 데 혼란을 주고, 원문의 힘과 판정(too_direct)의 근거가 원문 어미 때문인지 표현 때문인지 불분명해진다. 요청 화행의 개연성 기준(상대의 조정 권한)도 확인되지 않는다.",
+          "suggestion_ko": "원문을 '조정해 주실 수 있을까요? …겹쳐서요.' 수준으로 관계에 맞게 고치고, situation_ko에 상대가 회의를 주관·일정을 잡는 동료임을 한 구절로 명시한다. 문항 3·4의 동일 source·situation_ko도 함께 수정한다.",
+          "problem_type_ko": "화용적 적절성·장면 개연성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-5",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/0/situation_ko",
+          "quote": "저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.",
+          "issue_ko": "문항 1은 친구에게 함께 영화 보러 가자는 제안·초대 장면으로, 미션 화행(request)과 다르다.",
+          "reason_ko": "'같이 …갈래?'는 상대에게 행동을 부탁하는 요청이 아니라 공동 활동 제안이므로, request_mitigation_optionality(요청의 직접성과 상대 선택권) 축의 반례로 기능하기 어렵고 학습목표 일관성이 약해진다. counter_rule_note가 예시한 반례(이미 합의한 파일 전달 재확인 등)와도 성격이 다르다.",
+          "suggestion_ko": "친밀·저부담 관계에서 직접형이 적절한 실제 요청 장면(예: 이미 약속한 자료를 보내 달라고 짧게 재확인)으로 교체하거나, 교수자가 제안 장면을 의도적으로 허용한 것인지 확인한다.",
+          "problem_type_ko": "학습목표 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "제안·초대를 요청의 하위 유형으로 폭넓게 다루는 설계 의도가 있을 수 있어 교수자 확인이 필요하다."
+        },
+        {
+          "id": "claude-6",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/text",
+          "quote": "我想请您考虑一下下周的假期。",
+          "issue_ko": "'我想请您考虑一下下周的假期。'는 원문의 '승인해 주실 수 있나요'(승인 요청)를 '휴가를 고려해 달라'로 흐리고, 승인이라는 행동 요청이 명시되지 않는다. 그럼에도 within_band로 판정되었다.",
+          "reason_ko": "운영 정의는 원문의 명제·의도 보존을 전제로 하며, 요청 내용이 불명확해지면 within_band보다 too_indirect에 가깝다. 반면 후보 4 '不知道您是否能批准…'는 상사에게 쓰는 표준적 공손 요청인데 too_indirect로 판정되어 후보 3과 판정이 뒤바뀐 듯 보인다. 문항 3의 '不知道您是否能考虑…'도 같은 판정 기준 문제가 있다.",
+          "suggestion_ko": "후보 3을 승인 요청이 명확한 within 안(예: 下周的假期，您看能批吗？)으로 고치거나 판정을 too_indirect로 조정하고, '不知道您是否能…'의 too_indirect 판정 근거를 재검토한다. 2개 적정·2개 조정 필요 구성은 유지한다.",
+          "problem_type_ko": "의미 보존·판정 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "'不知道您是否能…'의 우회성 정도는 교수자의 중국어 화용 기준 확인이 필요하다."
+        },
+        {
+          "id": "claude-7",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "quote": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.",
+          "issue_ko": "메모에 \"'麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다\"라는 생성 과정 설명이 남아 있고, 후보 문장에 없는 '麻烦您'을 비교 대상으로 언급한다. 또한 이 후보만 가장 짧아 자동 검사(R5)에서 길이 단서 경고가 났다.",
+          "reason_ko": "학습자에게 노출되는 해설에 설계·수정 이력이 노출되면 혼란을 주고, 최단 후보가 곧 오답이라는 길이 단서가 생긴다.",
+          "suggestion_ko": "메모를 '请您+동사 명령형으로 상대의 선택권이 거의 남지 않아 too_direct' 수준으로 정리하고, 후보 2에 사유 절을 덧붙여 길이를 다른 후보와 비슷하게 맞춘다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-8",
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "quote": "조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+          "issue_ko": "메모는 '조건절과 완화 표현을 사용'했다고 하나 참고산출 '您好，可以帮我把预约改到下周二吗？…'에는 조건절이 없다.",
+          "reason_ko": "참고산출과 해설이 불일치하면 학습자가 어떤 자원이 사용되었는지 잘못 배운다. 참고산출 자체는 자연스럽고 원문 의미를 보존하므로 문장 수정은 불필요하다.",
+          "suggestion_ko": "메모를 '可以帮我…吗 능원동사 의문형과 帮我로 부담을 예고하며 선택권을 남긴다' 등 실제 사용 자원에 맞게 고친다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "provider": "anthropic",
+    "model": "claude-fable-5-1",
+    "requested_model": "claude-fable-5-1",
+    "response_id": "msg_011CeopYYQHng3YzQogDy8Tm",
+    "usage": {
+      "input_tokens": 25199,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 6305,
+      "output_tokens_details": {
+        "thinking_tokens": 2218
+      },
+      "service_tier": "standard",
+      "inference_geo": "global"
+    },
+    "checked_at": "2026-09-07T09:13:29.626Z",
+    "prompt_version": "content_review_v2:claude",
+    "output_format_version": "evidence_refs_v2",
+    "raw_result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(병원 접수 직원에게 본인 예약 변경 요청)은 현실성·개연성과 P/D/R이 타당하나, MPJ 문항에 구조적 결함이 있다. 문항 5의 pdr.p가 관계 서술(상사에게 요청)과 정반대로 speaker_higher로 기재되어 있고, 문항 4의 세 이유가 사실상 같은 내용이어서 정답 변별이 불가능하다. 앵커(문항 2~4)의 '能调整一下吗'를 too_direct로 판정한 근거가 운영 정의(표지 수로 판단하지 않음)와 충돌하고 해설 자체가 자기모순적이다. 문항 1은 요청이 아닌 제안·초대 화행이며, 문항 2 원문의 반말 어미가 '친밀하지 않은 동료' 관계와 맞지 않는다. DCT 참고산출 메모는 실제 문장에 없는 조건절을 언급한다.",
+      "findings": [
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "issue_ko": "문항 5의 pdr.p가 'speaker_higher'인데 situation_ko·relation_ko·explanation_ko는 모두 부하 직원(화자)이 상사(청자)에게 휴가 승인을 요청하는 장면으로 서술한다.",
+          "reason_ko": "P 값이 실제 관계와 반대로 기재되면 학습자에게 제시되는 관계 정보와 판정 근거(상사에게 완화 필요)가 충돌하고, 데이터 기준으로 후보 판정의 정합성을 검증할 수 없다.",
+          "suggestion_ko": "pdr.p를 청자 우위(예: addressee_higher/speaker_lower 등 스키마의 해당 코드)로 수정한다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/3/reasons",
+          "issue_ko": "세 이유가 모두 '직접성이 높아/선택권을 충분히 남기지 않아 부담을 줄 수 있다·더 완화된 표현이 필요하다'는 동일한 진단을 반복한다. r1(pragmatic_misconception)과 r2(primary)는 내용상 구별되지 않고, r3도 같은 결론을 문법 언급만 덧붙여 반복한다.",
+          "reason_ko": "이유 선택 문항은 오답 이유가 서로 다른 유형의 오판(예: 문법 오류로 오인, 의미 왜곡으로 오인, 격식·호칭 문제로 오인 등)을 대표해야 변별력이 생기는데, 현재는 어느 것을 골라도 같은 말이어서 정답 판정이 임의적이다.",
+          "suggestion_ko": "r1·r3을 각각 다른 유형의 오판(예: 호칭·격식체 문제로 보는 공손성 축 혼동, 의미·문법 오류로 보는 오판)으로 재작성하여 r2와 명확히 구분한다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/explanation_ko",
+          "issue_ko": "'能调整一下吗'는 능원동사 의문형과 一下 완화를 갖춘 표준적 요청인데 too_direct로 판정했고, 해설 스스로 \"선택권을 남기지만 더 완화된 표현이 필요\"라고 써 자기모순이다. 권장안은 단순히 '如果方便的话' 표지를 추가한 것으로, 동등·저부담·거리감 관계에서 표지 수를 근거로 적절성을 바꾼 셈이다.",
+          "reason_ko": "criteria 운영 정의는 '표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다'고 명시하며, 能不能·可以…吗를 적절한 완화 자원으로 인정한다. 저부담(r=low) 상황에서 이 표현을 too_direct로 고정하면 학습자에게 '완화 표지를 더 많이 붙일수록 좋다'는 잘못된 단일 정답을 유도하고, lineage에 명시된 learner_verbosity 위험을 오히려 강화한다. 문항 3·4가 같은 앵커를 공유하므로 영향이 연쇄된다.",
+          "suggestion_ko": "앵커를 실제로 선택권이 부족한 형태(예: 把…调整一下·下周的会议改时间)로 바꾸어 too_direct 판정에 표현 근거를 부여하거나, 현재 target을 유지한다면 상황 서술에 부담을 높이는 구체 근거(상대가 이미 확정·공지한 일정 등)를 추가하고 해설의 모순 문구를 정리한다. 문항 3·4·앵커 recommended_example도 함께 조정한다.",
+          "problem_type_ko": "화용적 적절성·잘못된 단일 정답화",
+          "needs_professor": true,
+          "uncertainty_ko": "저부담 동료 관계에서 '能…一下吗'의 적절성 판단은 교수자의 화용 기준에 따라 달라질 수 있어 최종 판정 확인이 필요하다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/1/source",
+          "issue_ko": "원문 '조정해 줄 수 있어? …겹쳐서.'는 반말(해체)인데 relation_ko는 '친밀하지 않은 동료'로 서술한다. 또한 상대 동료가 회의 일정을 조정할 권한·역할(주관자 여부)이 장면에 없다.",
+          "reason_ko": "거리감 있는 동등 관계에서 반말 원문은 학습자가 관계 정보를 읽는 데 혼란을 주고, 원문의 힘과 판정(too_direct)의 근거가 원문 어미 때문인지 표현 때문인지 불분명해진다. 요청 화행의 개연성 기준(상대의 조정 권한)도 확인되지 않는다.",
+          "suggestion_ko": "원문을 '조정해 주실 수 있을까요? …겹쳐서요.' 수준으로 관계에 맞게 고치고, situation_ko에 상대가 회의를 주관·일정을 잡는 동료임을 한 구절로 명시한다. 문항 3·4의 동일 source·situation_ko도 함께 수정한다.",
+          "problem_type_ko": "화용적 적절성·장면 개연성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/0/situation_ko",
+          "issue_ko": "문항 1은 친구에게 함께 영화 보러 가자는 제안·초대 장면으로, 미션 화행(request)과 다르다.",
+          "reason_ko": "'같이 …갈래?'는 상대에게 행동을 부탁하는 요청이 아니라 공동 활동 제안이므로, request_mitigation_optionality(요청의 직접성과 상대 선택권) 축의 반례로 기능하기 어렵고 학습목표 일관성이 약해진다. counter_rule_note가 예시한 반례(이미 합의한 파일 전달 재확인 등)와도 성격이 다르다.",
+          "suggestion_ko": "친밀·저부담 관계에서 직접형이 적절한 실제 요청 장면(예: 이미 약속한 자료를 보내 달라고 짧게 재확인)으로 교체하거나, 교수자가 제안 장면을 의도적으로 허용한 것인지 확인한다.",
+          "problem_type_ko": "학습목표 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "제안·초대를 요청의 하위 유형으로 폭넓게 다루는 설계 의도가 있을 수 있어 교수자 확인이 필요하다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/text",
+          "issue_ko": "'我想请您考虑一下下周的假期。'는 원문의 '승인해 주실 수 있나요'(승인 요청)를 '휴가를 고려해 달라'로 흐리고, 승인이라는 행동 요청이 명시되지 않는다. 그럼에도 within_band로 판정되었다.",
+          "reason_ko": "운영 정의는 원문의 명제·의도 보존을 전제로 하며, 요청 내용이 불명확해지면 within_band보다 too_indirect에 가깝다. 반면 후보 4 '不知道您是否能批准…'는 상사에게 쓰는 표준적 공손 요청인데 too_indirect로 판정되어 후보 3과 판정이 뒤바뀐 듯 보인다. 문항 3의 '不知道您是否能考虑…'도 같은 판정 기준 문제가 있다.",
+          "suggestion_ko": "후보 3을 승인 요청이 명확한 within 안(예: 下周的假期，您看能批吗？)으로 고치거나 판정을 too_indirect로 조정하고, '不知道您是否能…'의 too_indirect 판정 근거를 재검토한다. 2개 적정·2개 조정 필요 구성은 유지한다.",
+          "problem_type_ko": "의미 보존·판정 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "'不知道您是否能…'의 우회성 정도는 교수자의 중국어 화용 기준 확인이 필요하다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "issue_ko": "메모에 \"'麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다\"라는 생성 과정 설명이 남아 있고, 후보 문장에 없는 '麻烦您'을 비교 대상으로 언급한다. 또한 이 후보만 가장 짧아 자동 검사(R5)에서 길이 단서 경고가 났다.",
+          "reason_ko": "학습자에게 노출되는 해설에 설계·수정 이력이 노출되면 혼란을 주고, 최단 후보가 곧 오답이라는 길이 단서가 생긴다.",
+          "suggestion_ko": "메모를 '请您+동사 명령형으로 상대의 선택권이 거의 남지 않아 too_direct' 수준으로 정리하고, 후보 2에 사유 절을 덧붙여 길이를 다른 후보와 비슷하게 맞춘다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "issue_ko": "메모는 '조건절과 완화 표현을 사용'했다고 하나 참고산출 '您好，可以帮我把预约改到下周二吗？…'에는 조건절이 없다.",
+          "reason_ko": "참고산출과 해설이 불일치하면 학습자가 어떤 자원이 사용되었는지 잘못 배운다. 참고산출 자체는 자연스럽고 원문 의미를 보존하므로 문장 수정은 불필요하다.",
+          "suggestion_ko": "메모를 '可以帮我…吗 능원동사 의문형과 帮我로 부담을 예고하며 선택권을 남긴다' 등 실제 사용 자원에 맞게 고친다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "input_hash": "e61f76e705d53e575879fe6ae29629346384ad4d026558882241d1e464ae0369",
+    "request_parameters": {
+      "max_tokens": 16000,
+      "effort": "medium",
+      "timeout_ms": 135000
+    }
+  },
+  "fable": {
+    "result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(환자→병원 접수 직원 예약 변경)은 현실적이고 P/D/R과 원문이 잘 맞습니다. 그러나 MJT 쪽에 실제 결함이 여럿 있습니다. MJT1은 요청이 아닌 제안·초대 화행이며, MJT2·3·4가 공유하는 앵커의 한국어 원문이 '친밀하지 않은 동료'에게 반말을 쓰고 '能…一下吗'를 too_direct로 판정한 근거가 기준(표현형만으로 판단하지 않음, 직접적이면 나쁘다는 오류 경계)과 충돌합니다. MJT4의 세 이유가 사실상 같은 내용이어서 변별력이 없고, MJT5는 부하→상사 요청인데 p가 speaker_higher로 잘못 표기되어 있으며 후보 표현(批准一下, 존재하지 않는 麻烦您 비교)에도 문제가 있습니다. DCT 참고산출 메모도 실제 표현과 불일치합니다.",
+      "findings": [
+        {
+          "id": "claude-1",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/0/source",
+          "quote": "다음 주에 같이 영화 보러 갈래? 새로 개봉한 영화가 있어서 꼭 보고 싶어.",
+          "issue_ko": "MJT1의 원문 '다음 주에 같이 영화 보러 갈래?'는 요청(request)이 아니라 제안·초대 화행입니다. explanation_ko도 '간단한 제안'이라고 스스로 서술합니다.",
+          "reason_ko": "미션 학습목표는 request이고 축은 request_mitigation_optionality입니다. 상대에게 행동을 요구하는 요청이 아닌 공동 활동 제안을 요청 완화·선택권의 적절 반례로 쓰면 학습목표 일관성이 깨지고, 학생이 '요청의 직접형이 적절한 경우'를 배울 수 없습니다.",
+          "suggestion_ko": "친밀·저부담 관계에서 상대에게 실제 행동을 부탁하는 요청 장면(예: 이미 합의된 자료를 짧게 재확인하는 요청 등 counter_rule_note 취지)으로 교체하고, 그에 맞게 target·highlights·explanation을 수정하십시오.",
+          "problem_type_ko": "학습목표 일관성·화행 불일치",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-2",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/source",
+          "quote": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "issue_ko": "앵커 원문 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'가 반말(해체)인데 relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'(d=distant)입니다. 같은 원문이 MJT3·MJT4에도 공유됩니다.",
+          "reason_ko": "한국어에서 친밀하지 않은 동료에게 반말로 부탁하는 것은 관계 설정과 어긋나 장면 현실성이 떨어지고, 통역 학습자가 원문의 화용적 힘을 기준으로 중국어 산출을 평가하는 데 혼선을 줍니다.",
+          "suggestion_ko": "원문을 해요체로 수정(예: '다음 주 회의 일정 조정해 주실 수 있어요? 다른 중요한 일정이 겹쳐서요.')하거나 relation_ko·pdr을 원문 어투에 맞게 조정하고 MJT2·3·4에 동일하게 반영하십시오.",
+          "problem_type_ko": "장면·관계 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-3",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/accepted_band_codes",
+          "quote": null,
+          "issue_ko": "'下周的会议时间能调整一下吗？我有其他重要的安排。'를 too_direct로 판정했지만, 능원동사 의문형(能…吗)+一下+사유 제시는 기준의 relevant_resources에 명시된 완화 자원이며 동등·저부담 동료 관계에서 통상 알맞은 표현입니다. explanation_ko도 '선택권을 남기지만'이라고 인정하면서 '더 완화된 표현이 필요'라고만 합니다.",
+          "reason_ko": "criteria는 '표현형·표지 수만으로 적절성을 결정하지 않는다', '직접적이면 나쁘다의 반례를 설계한다'고 명시합니다. 조건절 하나를 더하지 않았다는 이유로 too_direct를 부여하는 것은 표지 수 기준 판정이며 잘못된 단일 정답화입니다. 이 앵커 판정은 MJT3·MJT4의 problem_band_code와 corrections 논리의 전제이므로 파급 범위가 큽니다.",
+          "suggestion_ko": "앵커를 실제로 too_direct인 표현(예: '下周的会议时间调整一下。' 또는 '把下周的会议改到别的时间。')으로 바꾸어 MJT2·3·4에 공유하고, 현재 표현은 within_band 예시로 활용하십시오. 또는 상황에 부담을 높이는 근거(상대가 이미 여러 번 조정했다는 선행 사실 등)를 명시해 too_direct 판정 근거를 상황에서 제시하십시오.",
+          "problem_type_ko": "판정·해설 일관성·잘못된 단일 정답화",
+          "needs_professor": true,
+          "uncertainty_ko": "교수자가 해당 관계에서 조건절 없는 能…吗 형을 경계 사례로 의도적으로 잡았을 가능성이 있어 최종 판정은 교수자 확인이 필요합니다."
+        },
+        {
+          "id": "claude-4",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/3/reasons",
+          "quote": null,
+          "issue_ko": "r1 '선택권을 충분히 남기지 않아 부담을 줄 수 있다', r2(정답) '요청의 직접성이 높아 부담을 줄 수 있다', r3 '더 완화된 표현이 필요하다'가 사실상 동일한 내용입니다.",
+          "reason_ko": "reason 문항은 정답 이유와 오개념·문법맥락 유형의 오답 이유가 구별되어야 진단 기능을 합니다. 세 선택지가 모두 '직접적이어서 부담'이라는 같은 결론을 말하므로 학생이 r2를 고를 근거가 없고, r1의 kind가 pragmatic_misconception이라는 표기와도 내용이 맞지 않습니다.",
+          "suggestion_ko": "r1은 실제 화용 오개념(예: '동료 사이에는 어떤 표현이든 부담이 없으므로 문제가 없다' 또는 '您을 안 써서 문제다' 같은 공손성 축 혼동)으로, r3는 의미·문법 오답(예: '겹쳐서'의 의미가 누락되었기 때문이다)으로 다시 쓰고 r2와 명확히 구분하십시오.",
+          "problem_type_ko": "문항 변별력·판정 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-5",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "quote": "speaker_higher",
+          "issue_ko": "MJT5는 부하 직원이 상사에게 휴가 승인을 요청하는 장면인데 pdr.p가 speaker_higher로 표기되어 있습니다.",
+          "reason_ko": "화자(부하)가 청자(상사)보다 낮은 위치이므로 speaker_lower(또는 상응 코드)여야 합니다. P 라벨 오류는 학생 화면과 판정 근거의 기본 전제를 뒤집습니다.",
+          "suggestion_ko": "pdr.p를 화자가 낮은 위치를 나타내는 코드로 수정하십시오.",
+          "problem_type_ko": "메타데이터·관계 설정 오류",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-6",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "quote": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.",
+          "issue_ko": "후보 2의 메모가 \"'麻烦您'보다 덜 완화되어\"라고 비교하지만 네 후보 어디에도 麻烦您이 등장하지 않습니다.",
+          "reason_ko": "존재하지 않는 표현과 비교하는 해설은 학생에게 혼란을 주고 판정 근거의 설득력을 떨어뜨립니다. 또한 '약간의 공손함을 더하면서도'라는 표현은 공손성 축(您)과 완화·선택권 축을 섞어 설명합니다.",
+          "suggestion_ko": "메모를 '명령형 请您…으로 상대의 선택권을 거의 남기지 않아 too_direct'로 축 초점에 맞게 다시 쓰고 麻烦您 비교를 삭제하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-7",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/0/text",
+          "quote": "如果方便的话，下周的假期能批准一下吗？",
+          "issue_ko": "'如果方便的话，下周的假期能批准一下吗？'에서 批准一下는 어색한 결합이고, 휴가 승인 여부를 '방편하다면(如果方便的话)'으로 조건 짓는 것도 의미상 부자연스럽습니다. 동일 표현이 recommended_example로도 쓰였습니다.",
+          "reason_ko": "승인(批准)은 결정 행위이므로 동작 경감 표지 一下와 잘 어울리지 않으며, 상사의 승인 여부는 '편의'가 아니라 업무 상황에 달린 문제라 조건절이 어색합니다. within_band 대표 예문의 자연성 문제는 학생이 어색한 표현을 정답으로 학습하게 합니다.",
+          "suggestion_ko": "예: '如果安排上允许，下周我想请几天假，可以吗？' 또는 '下周我想请假，您看能不能批准？'처럼 자연스러운 완화형으로 교체하십시오.",
+          "problem_type_ko": "언어 자연성",
+          "needs_professor": true,
+          "uncertainty_ko": "批准一下의 수용 가능성은 화자별 편차가 있어 중국어 원어민 교수자의 확인이 필요합니다."
+        },
+        {
+          "id": "claude-8",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/text",
+          "quote": "我想请您考虑一下下周的假期。",
+          "issue_ko": "'我想请您考虑一下下周的假期。'는 휴가를 '고려해 달라'는 말이어서 승인 요청이라는 원문 의도(승인해 주실 수 있나요)가 흐려지는데 within_band로 판정되었습니다.",
+          "reason_ko": "기준의 too_indirect 정의는 '요청이 흐려짐'입니다. 이 문장은 무엇을 승인해 달라는지 명시하지 않아 후보 4(不知道您是否能批准…)보다 요청 명료성이 오히려 낮을 수 있어 판정 경계가 불안정합니다.",
+          "suggestion_ko": "'我想请您考虑一下，能不能批准我下周的假期？'처럼 요청 내용을 명시하거나 판정을 재검토하십시오.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "경계 사례로 교수자가 의도한 대비일 수 있습니다."
+        },
+        {
+          "id": "claude-9",
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "quote": "조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+          "issue_ko": "메모가 '조건절과 완화 표현을 사용'했다고 하지만 참고산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'에는 조건절이 없습니다.",
+          "reason_ko": "참고산출 해설이 실제 표현과 불일치하면 평가 기준 안내로서 신뢰성이 떨어집니다. 참고산출 자체는 자연스럽고 상황에 알맞습니다.",
+          "suggestion_ko": "메모를 '可以…吗 의문형과 帮我로 선택권을 남기고 사유를 덧붙였습니다' 정도로 실제 표현에 맞게 수정하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-10",
+          "severity": "warning",
+          "where": "/content/mission/diagnostic_dimensions/0/evidence_ko",
+          "quote": "MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어 관계적 효과가 달라지는 것을 관찰할 수 있습니다.",
+          "issue_ko": "'MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어'라고 하지만 두 문항의 target은 동일합니다. 차이는 MJT3의 corrections에만 있습니다.",
+          "reason_ko": "진단 차원 근거 서술이 실제 문항 구조와 맞지 않습니다.",
+          "suggestion_ko": "'MJT2 판정과 MJT3 수정안 비교에서 완화 표지 유무에 따른 관계적 효과를 관찰한다'로 서술을 수정하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "provider": "anthropic",
+    "model": "claude-fable-5-1",
+    "requested_model": "claude-fable-5-1",
+    "response_id": "msg_011CeoqGyLQ3TMK49SHuSnQN",
+    "usage": {
+      "input_tokens": 19595,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 6628,
+      "output_tokens_details": {
+        "thinking_tokens": 2049
+      },
+      "service_tier": "standard",
+      "inference_geo": "global"
+    },
+    "checked_at": "2026-09-07T09:23:08.724Z",
+    "prompt_version": "content_review_v2:claude",
+    "output_format_version": "evidence_refs_v2",
+    "raw_result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(환자→병원 접수 직원 예약 변경)은 현실적이고 P/D/R과 원문이 잘 맞습니다. 그러나 MJT 쪽에 실제 결함이 여럿 있습니다. MJT1은 요청이 아닌 제안·초대 화행이며, MJT2·3·4가 공유하는 앵커의 한국어 원문이 '친밀하지 않은 동료'에게 반말을 쓰고 '能…一下吗'를 too_direct로 판정한 근거가 기준(표현형만으로 판단하지 않음, 직접적이면 나쁘다는 오류 경계)과 충돌합니다. MJT4의 세 이유가 사실상 같은 내용이어서 변별력이 없고, MJT5는 부하→상사 요청인데 p가 speaker_higher로 잘못 표기되어 있으며 후보 표현(批准一下, 존재하지 않는 麻烦您 비교)에도 문제가 있습니다. DCT 참고산출 메모도 실제 표현과 불일치합니다.",
+      "findings": [
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/0/source",
+          "issue_ko": "MJT1의 원문 '다음 주에 같이 영화 보러 갈래?'는 요청(request)이 아니라 제안·초대 화행입니다. explanation_ko도 '간단한 제안'이라고 스스로 서술합니다.",
+          "reason_ko": "미션 학습목표는 request이고 축은 request_mitigation_optionality입니다. 상대에게 행동을 요구하는 요청이 아닌 공동 활동 제안을 요청 완화·선택권의 적절 반례로 쓰면 학습목표 일관성이 깨지고, 학생이 '요청의 직접형이 적절한 경우'를 배울 수 없습니다.",
+          "suggestion_ko": "친밀·저부담 관계에서 상대에게 실제 행동을 부탁하는 요청 장면(예: 이미 합의된 자료를 짧게 재확인하는 요청 등 counter_rule_note 취지)으로 교체하고, 그에 맞게 target·highlights·explanation을 수정하십시오.",
+          "problem_type_ko": "학습목표 일관성·화행 불일치",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/source",
+          "issue_ko": "앵커 원문 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'가 반말(해체)인데 relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'(d=distant)입니다. 같은 원문이 MJT3·MJT4에도 공유됩니다.",
+          "reason_ko": "한국어에서 친밀하지 않은 동료에게 반말로 부탁하는 것은 관계 설정과 어긋나 장면 현실성이 떨어지고, 통역 학습자가 원문의 화용적 힘을 기준으로 중국어 산출을 평가하는 데 혼선을 줍니다.",
+          "suggestion_ko": "원문을 해요체로 수정(예: '다음 주 회의 일정 조정해 주실 수 있어요? 다른 중요한 일정이 겹쳐서요.')하거나 relation_ko·pdr을 원문 어투에 맞게 조정하고 MJT2·3·4에 동일하게 반영하십시오.",
+          "problem_type_ko": "장면·관계 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/accepted_band_codes",
+          "issue_ko": "'下周的会议时间能调整一下吗？我有其他重要的安排。'를 too_direct로 판정했지만, 능원동사 의문형(能…吗)+一下+사유 제시는 기준의 relevant_resources에 명시된 완화 자원이며 동등·저부담 동료 관계에서 통상 알맞은 표현입니다. explanation_ko도 '선택권을 남기지만'이라고 인정하면서 '더 완화된 표현이 필요'라고만 합니다.",
+          "reason_ko": "criteria는 '표현형·표지 수만으로 적절성을 결정하지 않는다', '직접적이면 나쁘다의 반례를 설계한다'고 명시합니다. 조건절 하나를 더하지 않았다는 이유로 too_direct를 부여하는 것은 표지 수 기준 판정이며 잘못된 단일 정답화입니다. 이 앵커 판정은 MJT3·MJT4의 problem_band_code와 corrections 논리의 전제이므로 파급 범위가 큽니다.",
+          "suggestion_ko": "앵커를 실제로 too_direct인 표현(예: '下周的会议时间调整一下。' 또는 '把下周的会议改到别的时间。')으로 바꾸어 MJT2·3·4에 공유하고, 현재 표현은 within_band 예시로 활용하십시오. 또는 상황에 부담을 높이는 근거(상대가 이미 여러 번 조정했다는 선행 사실 등)를 명시해 too_direct 판정 근거를 상황에서 제시하십시오.",
+          "problem_type_ko": "판정·해설 일관성·잘못된 단일 정답화",
+          "needs_professor": true,
+          "uncertainty_ko": "교수자가 해당 관계에서 조건절 없는 能…吗 형을 경계 사례로 의도적으로 잡았을 가능성이 있어 최종 판정은 교수자 확인이 필요합니다."
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/3/reasons",
+          "issue_ko": "r1 '선택권을 충분히 남기지 않아 부담을 줄 수 있다', r2(정답) '요청의 직접성이 높아 부담을 줄 수 있다', r3 '더 완화된 표현이 필요하다'가 사실상 동일한 내용입니다.",
+          "reason_ko": "reason 문항은 정답 이유와 오개념·문법맥락 유형의 오답 이유가 구별되어야 진단 기능을 합니다. 세 선택지가 모두 '직접적이어서 부담'이라는 같은 결론을 말하므로 학생이 r2를 고를 근거가 없고, r1의 kind가 pragmatic_misconception이라는 표기와도 내용이 맞지 않습니다.",
+          "suggestion_ko": "r1은 실제 화용 오개념(예: '동료 사이에는 어떤 표현이든 부담이 없으므로 문제가 없다' 또는 '您을 안 써서 문제다' 같은 공손성 축 혼동)으로, r3는 의미·문법 오답(예: '겹쳐서'의 의미가 누락되었기 때문이다)으로 다시 쓰고 r2와 명확히 구분하십시오.",
+          "problem_type_ko": "문항 변별력·판정 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "issue_ko": "MJT5는 부하 직원이 상사에게 휴가 승인을 요청하는 장면인데 pdr.p가 speaker_higher로 표기되어 있습니다.",
+          "reason_ko": "화자(부하)가 청자(상사)보다 낮은 위치이므로 speaker_lower(또는 상응 코드)여야 합니다. P 라벨 오류는 학생 화면과 판정 근거의 기본 전제를 뒤집습니다.",
+          "suggestion_ko": "pdr.p를 화자가 낮은 위치를 나타내는 코드로 수정하십시오.",
+          "problem_type_ko": "메타데이터·관계 설정 오류",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "issue_ko": "후보 2의 메모가 \"'麻烦您'보다 덜 완화되어\"라고 비교하지만 네 후보 어디에도 麻烦您이 등장하지 않습니다.",
+          "reason_ko": "존재하지 않는 표현과 비교하는 해설은 학생에게 혼란을 주고 판정 근거의 설득력을 떨어뜨립니다. 또한 '약간의 공손함을 더하면서도'라는 표현은 공손성 축(您)과 완화·선택권 축을 섞어 설명합니다.",
+          "suggestion_ko": "메모를 '명령형 请您…으로 상대의 선택권을 거의 남기지 않아 too_direct'로 축 초점에 맞게 다시 쓰고 麻烦您 비교를 삭제하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/0/text",
+          "issue_ko": "'如果方便的话，下周的假期能批准一下吗？'에서 批准一下는 어색한 결합이고, 휴가 승인 여부를 '방편하다면(如果方便的话)'으로 조건 짓는 것도 의미상 부자연스럽습니다. 동일 표현이 recommended_example로도 쓰였습니다.",
+          "reason_ko": "승인(批准)은 결정 행위이므로 동작 경감 표지 一下와 잘 어울리지 않으며, 상사의 승인 여부는 '편의'가 아니라 업무 상황에 달린 문제라 조건절이 어색합니다. within_band 대표 예문의 자연성 문제는 학생이 어색한 표현을 정답으로 학습하게 합니다.",
+          "suggestion_ko": "예: '如果安排上允许，下周我想请几天假，可以吗？' 또는 '下周我想请假，您看能不能批准？'처럼 자연스러운 완화형으로 교체하십시오.",
+          "problem_type_ko": "언어 자연성",
+          "needs_professor": true,
+          "uncertainty_ko": "批准一下의 수용 가능성은 화자별 편차가 있어 중국어 원어민 교수자의 확인이 필요합니다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/text",
+          "issue_ko": "'我想请您考虑一下下周的假期。'는 휴가를 '고려해 달라'는 말이어서 승인 요청이라는 원문 의도(승인해 주실 수 있나요)가 흐려지는데 within_band로 판정되었습니다.",
+          "reason_ko": "기준의 too_indirect 정의는 '요청이 흐려짐'입니다. 이 문장은 무엇을 승인해 달라는지 명시하지 않아 후보 4(不知道您是否能批准…)보다 요청 명료성이 오히려 낮을 수 있어 판정 경계가 불안정합니다.",
+          "suggestion_ko": "'我想请您考虑一下，能不能批准我下周的假期？'처럼 요청 내용을 명시하거나 판정을 재검토하십시오.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "경계 사례로 교수자가 의도한 대비일 수 있습니다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "issue_ko": "메모가 '조건절과 완화 표현을 사용'했다고 하지만 참고산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'에는 조건절이 없습니다.",
+          "reason_ko": "참고산출 해설이 실제 표현과 불일치하면 평가 기준 안내로서 신뢰성이 떨어집니다. 참고산출 자체는 자연스럽고 상황에 알맞습니다.",
+          "suggestion_ko": "메모를 '可以…吗 의문형과 帮我로 선택권을 남기고 사유를 덧붙였습니다' 정도로 실제 표현에 맞게 수정하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/diagnostic_dimensions/0/evidence_ko",
+          "issue_ko": "'MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어'라고 하지만 두 문항의 target은 동일합니다. 차이는 MJT3의 corrections에만 있습니다.",
+          "reason_ko": "진단 차원 근거 서술이 실제 문항 구조와 맞지 않습니다.",
+          "suggestion_ko": "'MJT2 판정과 MJT3 수정안 비교에서 완화 표지 유무에 따른 관계적 효과를 관찰한다'로 서술을 수정하십시오.",
+          "problem_type_ko": "해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "input_hash": "0fab43854c84a89e042bcabeabd5c3318292d9e26afe055f01848f59c0d83967",
+    "request_parameters": {
+      "max_tokens": 16000,
+      "effort": "medium",
+      "timeout_ms": 135000
+    }
+  },
+  "fableBlindReview": true,
+  "opus": {
+    "result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(병원 접수 창구 예약 변경)은 개연성이 충분하고 원문·초점 분절·참고 산출의 의미 보존도 대체로 양호합니다. 그러나 앵커 A(MJT2·3·4)의 판정이 criteria와 충돌하고(能…吗 완화형을 too_direct로 단정), 앵커 원문의 반말이 '친밀하지 않은 동료' 관계와 어긋나며, MJT5의 P 설정이 관계 서술과 정반대이고 후보 해설이 배제 교란 요인(您/请您 공손성 축)과 설계 메타 표현을 노출합니다. MJT1은 요청이 아닌 제안 장면으로 학습목표와 초점이 흔들립니다. 수정 없이 채택하기 어렵습니다.",
+      "findings": [
+        {
+          "id": "claude-1",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/accepted_band_codes/0",
+          "quote": "too_direct",
+          "issue_ko": "MJT2의 정답 밴드가 too_direct인데, 대상 산출은 '下周的会议时间能调整一下吗？我有其他重要的安排。'로 능원동사 의문형(能…一下吗)을 사용해 이미 조정 여지를 남깁니다. 해설도 \"'能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다\"라며 스스로 완화 기능을 인정합니다.",
+          "reason_ko": "criteria의 operational_definition은 표현형·표지 수만으로 적절성을 결정하지 말라고 하며, 能不能·可以…吗를 relevant_resources의 완화 자원으로 명시합니다. 동등·distant·저부담(회의 시간 조정)이라는 상황에서 이 산출은 within_band로 보는 것이 자연스럽고, too_direct 단정은 '표지가 더 많아야 적절하다'는 잘못된 단일 정답화를 학습자에게 심어 줍니다. MJT3·4가 같은 앵커를 공유하므로 오판이 세 문항에 전파됩니다.",
+          "suggestion_ko": "앵커 산출을 within_band로 재판정하거나, too_direct를 유지하려면 앵커 산출 자체를 완화 자원이 없는 직접형(예: 把下周的会议时间调一下)으로 교체하고 MJT2·3·4의 해설·수정안 근거를 그에 맞춰 다시 씁니다. 해설에서 '선택권을 남기지만'과 too_direct 판정이 공존하지 않도록 정리합니다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "동일 앵커를 세 문항이 공유하므로 재판정 범위(판정 변경 vs 산출 교체)는 교수자의 난이도 의도 확인이 필요합니다."
+        },
+        {
+          "id": "claude-2",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "quote": "speaker_higher",
+          "issue_ko": "MJT5의 relation_ko는 '직장 상사와 부하 직원 사이로 상사가 더 높은 위치'이고 화자는 휴가 승인을 요청하는 부하 직원인데, pdr.p가 speaker_higher로 되어 있습니다.",
+          "reason_ko": "화자가 상사보다 낮은 위치이므로 speaker_lower여야 하며, P 라벨이 반대로 설정되면 요청의 부담·완화 정도 판단 근거가 상황 서술과 충돌합니다.",
+          "suggestion_ko": "pdr.p를 speaker_lower로 수정합니다.",
+          "problem_type_ko": "화용적 적절성(관계 메타데이터 불일치)",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-3",
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "quote": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.",
+          "issue_ko": "후보 해설이 \"'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다\"라고 서술합니다.",
+          "reason_ko": "criteria의 excluded_confounds에 '호칭(您 vs 你) — 공손성 축'이 명시되어 있어 공손 표지로 밴드를 설명하면 초점 축이 흐려집니다. 또한 'too_direct 방향으로 조정되었습니다'는 설계 의도를 드러내는 메타 서술로, 학습자에게 판정 근거가 아니라 출제 사정으로 읽힙니다.",
+          "suggestion_ko": "공손 표지 언급을 삭제하고 '승인 여부에 대한 선택 여지를 남기지 않고 지시형으로 요구한다'처럼 요청 명료성·조정 여지 근거로만 서술하며, 설계 메타 문장을 제거합니다.",
+          "problem_type_ko": "판정·해설 일관성(배제 교란 요인 노출)",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-4",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/1/source",
+          "quote": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "issue_ko": "앵커 원문이 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'로 반말인데, relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'입니다.",
+          "reason_ko": "친밀하지 않은 동료에게 반말을 쓰는 발화는 한국어 장면으로 개연성이 낮고, 학습자가 '반말=직접적'이라는 높임 등급 단서로 밴드를 추론하게 되어 초점(완화·선택권)과 공손성 축이 뒤섞입니다.",
+          "suggestion_ko": "원문을 '다음 주 회의 시간 조정해 주실 수 있나요?'류의 해요체/합쇼체로 바꾸거나, 반말을 유지하려면 relation_ko를 친밀한 동료로 조정합니다(MJT2·3·4 공통 반영).",
+          "problem_type_ko": "화용적 적절성 / 언어 자연성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "claude-5",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/0/situation_ko",
+          "quote": "저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.",
+          "issue_ko": "MJT1은 '친구에게 다음 주에 같이 영화 보러 가자고 제안'하는 장면이며 해설도 '간단한 제안'이라고 서술합니다.",
+          "reason_ko": "미션의 learning_goal과 contrast_plan은 speech_act=request인데, 이 문항은 공동 활동 제안(제안/초대)에 가까워 요청의 부담·선택권 축을 관찰하기 어렵고, '직접형도 적절하다'는 반례로서의 근거도 요청 장면에서 오지 않습니다.",
+          "suggestion_ko": "친밀 관계에서의 저부담 요청 장면(예: 이미 합의한 자료를 짧게 재확인하는 요청)으로 교체하거나, 최소한 화자가 상대에게 행동을 부탁하는 형태로 원문·해설을 요청 화행으로 다시 씁니다.",
+          "problem_type_ko": "학습목표 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "교수자가 MJT1을 화행 경계 확장 목적으로 의도했을 가능성이 있어 교체 여부는 확인이 필요합니다."
+        },
+        {
+          "id": "claude-6",
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/accepted_band_codes/0",
+          "quote": "within_band",
+          "issue_ko": "후보 '我想请您考虑一下下周的假期。'가 within_band로 판정되어 있습니다.",
+          "reason_ko": "이 표현은 '휴가를 승인해 달라'는 원발화의 명제·요청 목적(批准)을 '고려해 달라'로 약화시켜, criteria가 요구하는 '원문의 명제·의도·화행 목적 보존'에 미달하고 요청이 흐려지는 쪽(too_indirect)에 가깝습니다.",
+          "suggestion_ko": "'不知道…' 후보와 구별되는 별도의 적정안이 필요하면 '想请您看一下能不能批准我下周的假期'처럼 승인 요청이 분명한 완화형으로 교체하거나, 현재 문안을 유지할 경우 밴드를 재검토합니다.",
+          "problem_type_ko": "의미 보존 / 판정 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "완화 정도의 경계 판단이므로 교수자의 밴드 기준 확인이 유용합니다."
+        },
+        {
+          "id": "claude-7",
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "quote": "조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.",
+          "issue_ko": "참고 산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'의 해설이 '조건절과 완화 표현을 사용하여'라고 설명하지만, 실제 산출에는 조건절(如果…的话류)이 없습니다.",
+          "reason_ko": "해설과 산출이 불일치하여 학습자가 조건절을 필수 요소로 오해할 수 있고, 완화 자원 식별 훈련에 혼선을 줍니다.",
+          "suggestion_ko": "'可以…吗' 의문형 완화와 사유 제시로 선택권을 남긴다는 식으로 실제 사용된 자원에 맞게 note_ko를 수정합니다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "provider": "anthropic",
+    "model": "claude-opus-5",
+    "requested_model": "claude-opus-5",
+    "response_id": "msg_011CeoqV2gQAv98xYuCu6qwo",
+    "usage": {
+      "input_tokens": 19593,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "cache_creation": {
+        "ephemeral_5m_input_tokens": 0,
+        "ephemeral_1h_input_tokens": 0
+      },
+      "output_tokens": 4883,
+      "output_tokens_details": {
+        "thinking_tokens": 1510
+      },
+      "service_tier": "standard",
+      "inference_geo": "global"
+    },
+    "checked_at": "2026-09-07T09:25:14.933Z",
+    "prompt_version": "content_review_v2:claude",
+    "output_format_version": "evidence_refs_v2",
+    "raw_result": {
+      "verdict": "fail",
+      "summary_ko": "코어 장면(병원 접수 창구 예약 변경)은 개연성이 충분하고 원문·초점 분절·참고 산출의 의미 보존도 대체로 양호합니다. 그러나 앵커 A(MJT2·3·4)의 판정이 criteria와 충돌하고(能…吗 완화형을 too_direct로 단정), 앵커 원문의 반말이 '친밀하지 않은 동료' 관계와 어긋나며, MJT5의 P 설정이 관계 서술과 정반대이고 후보 해설이 배제 교란 요인(您/请您 공손성 축)과 설계 메타 표현을 노출합니다. MJT1은 요청이 아닌 제안 장면으로 학습목표와 초점이 흔들립니다. 수정 없이 채택하기 어렵습니다.",
+      "findings": [
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/1/accepted_band_codes/0",
+          "issue_ko": "MJT2의 정답 밴드가 too_direct인데, 대상 산출은 '下周的会议时间能调整一下吗？我有其他重要的安排。'로 능원동사 의문형(能…一下吗)을 사용해 이미 조정 여지를 남깁니다. 해설도 \"'能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다\"라며 스스로 완화 기능을 인정합니다.",
+          "reason_ko": "criteria의 operational_definition은 표현형·표지 수만으로 적절성을 결정하지 말라고 하며, 能不能·可以…吗를 relevant_resources의 완화 자원으로 명시합니다. 동등·distant·저부담(회의 시간 조정)이라는 상황에서 이 산출은 within_band로 보는 것이 자연스럽고, too_direct 단정은 '표지가 더 많아야 적절하다'는 잘못된 단일 정답화를 학습자에게 심어 줍니다. MJT3·4가 같은 앵커를 공유하므로 오판이 세 문항에 전파됩니다.",
+          "suggestion_ko": "앵커 산출을 within_band로 재판정하거나, too_direct를 유지하려면 앵커 산출 자체를 완화 자원이 없는 직접형(예: 把下周的会议时间调一下)으로 교체하고 MJT2·3·4의 해설·수정안 근거를 그에 맞춰 다시 씁니다. 해설에서 '선택권을 남기지만'과 too_direct 판정이 공존하지 않도록 정리합니다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "동일 앵커를 세 문항이 공유하므로 재판정 범위(판정 변경 vs 산출 교체)는 교수자의 난이도 의도 확인이 필요합니다."
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/pdr/p",
+          "issue_ko": "MJT5의 relation_ko는 '직장 상사와 부하 직원 사이로 상사가 더 높은 위치'이고 화자는 휴가 승인을 요청하는 부하 직원인데, pdr.p가 speaker_higher로 되어 있습니다.",
+          "reason_ko": "화자가 상사보다 낮은 위치이므로 speaker_lower여야 하며, P 라벨이 반대로 설정되면 요청의 부담·완화 정도 판단 근거가 상황 서술과 충돌합니다.",
+          "suggestion_ko": "pdr.p를 speaker_lower로 수정합니다.",
+          "problem_type_ko": "화용적 적절성(관계 메타데이터 불일치)",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "fail",
+          "where": "/content/mission/mpj_items/4/candidates/1/note_ko",
+          "issue_ko": "후보 해설이 \"'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다\"라고 서술합니다.",
+          "reason_ko": "criteria의 excluded_confounds에 '호칭(您 vs 你) — 공손성 축'이 명시되어 있어 공손 표지로 밴드를 설명하면 초점 축이 흐려집니다. 또한 'too_direct 방향으로 조정되었습니다'는 설계 의도를 드러내는 메타 서술로, 학습자에게 판정 근거가 아니라 출제 사정으로 읽힙니다.",
+          "suggestion_ko": "공손 표지 언급을 삭제하고 '승인 여부에 대한 선택 여지를 남기지 않고 지시형으로 요구한다'처럼 요청 명료성·조정 여지 근거로만 서술하며, 설계 메타 문장을 제거합니다.",
+          "problem_type_ko": "판정·해설 일관성(배제 교란 요인 노출)",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/1/source",
+          "issue_ko": "앵커 원문이 '다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.'로 반말인데, relation_ko는 '직장 동료 사이로 친밀하지 않은 관계'입니다.",
+          "reason_ko": "친밀하지 않은 동료에게 반말을 쓰는 발화는 한국어 장면으로 개연성이 낮고, 학습자가 '반말=직접적'이라는 높임 등급 단서로 밴드를 추론하게 되어 초점(완화·선택권)과 공손성 축이 뒤섞입니다.",
+          "suggestion_ko": "원문을 '다음 주 회의 시간 조정해 주실 수 있나요?'류의 해요체/합쇼체로 바꾸거나, 반말을 유지하려면 relation_ko를 친밀한 동료로 조정합니다(MJT2·3·4 공통 반영).",
+          "problem_type_ko": "화용적 적절성 / 언어 자연성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/0/situation_ko",
+          "issue_ko": "MJT1은 '친구에게 다음 주에 같이 영화 보러 가자고 제안'하는 장면이며 해설도 '간단한 제안'이라고 서술합니다.",
+          "reason_ko": "미션의 learning_goal과 contrast_plan은 speech_act=request인데, 이 문항은 공동 활동 제안(제안/초대)에 가까워 요청의 부담·선택권 축을 관찰하기 어렵고, '직접형도 적절하다'는 반례로서의 근거도 요청 장면에서 오지 않습니다.",
+          "suggestion_ko": "친밀 관계에서의 저부담 요청 장면(예: 이미 합의한 자료를 짧게 재확인하는 요청)으로 교체하거나, 최소한 화자가 상대에게 행동을 부탁하는 형태로 원문·해설을 요청 화행으로 다시 씁니다.",
+          "problem_type_ko": "학습목표 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "교수자가 MJT1을 화행 경계 확장 목적으로 의도했을 가능성이 있어 교체 여부는 확인이 필요합니다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/mpj_items/4/candidates/2/accepted_band_codes/0",
+          "issue_ko": "후보 '我想请您考虑一下下周的假期。'가 within_band로 판정되어 있습니다.",
+          "reason_ko": "이 표현은 '휴가를 승인해 달라'는 원발화의 명제·요청 목적(批准)을 '고려해 달라'로 약화시켜, criteria가 요구하는 '원문의 명제·의도·화행 목적 보존'에 미달하고 요청이 흐려지는 쪽(too_indirect)에 가깝습니다.",
+          "suggestion_ko": "'不知道…' 후보와 구별되는 별도의 적정안이 필요하면 '想请您看一下能不能批准我下周的假期'처럼 승인 요청이 분명한 완화형으로 교체하거나, 현재 문안을 유지할 경우 밴드를 재검토합니다.",
+          "problem_type_ko": "의미 보존 / 판정 일관성",
+          "needs_professor": true,
+          "uncertainty_ko": "완화 정도의 경계 판단이므로 교수자의 밴드 기준 확인이 유용합니다."
+        },
+        {
+          "severity": "warning",
+          "where": "/content/mission/production_task/reference_alternatives/0/note_ko",
+          "issue_ko": "참고 산출 '您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。'의 해설이 '조건절과 완화 표현을 사용하여'라고 설명하지만, 실제 산출에는 조건절(如果…的话류)이 없습니다.",
+          "reason_ko": "해설과 산출이 불일치하여 학습자가 조건절을 필수 요소로 오해할 수 있고, 완화 자원 식별 훈련에 혼선을 줍니다.",
+          "suggestion_ko": "'可以…吗' 의문형 완화와 사유 제시로 선택권을 남긴다는 식으로 실제 사용된 자원에 맞게 note_ko를 수정합니다.",
+          "problem_type_ko": "판정·해설 일관성",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    },
+    "input_hash": "0fab43854c84a89e042bcabeabd5c3318292d9e26afe055f01848f59c0d83967",
+    "request_parameters": {
+      "max_tokens": 16000,
+      "effort": "medium",
+      "timeout_ms": 135000
+    }
+  }
+}

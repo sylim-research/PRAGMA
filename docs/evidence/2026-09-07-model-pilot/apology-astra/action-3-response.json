@@ -1,0 +1,6 @@
+{
+  "status": 500,
+  "data": {
+    "error": "Pilot transport 502: Signal timed out."
+  }
+}

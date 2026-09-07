@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPg5pzVifxXQ7qBuIWeqqDcZb1m5",
+    "object": "chat.completion",
+    "created": 1788772301,
+    "model": "gpt-4.1-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"results\": [\n    {\n      \"path\": \"mpj_items[4].candidates[1]\",\n      \"severity\": \"pass\",\n      \"actual_band_code\": \"too_direct\",\n      \"direction_from_anchor\": \"toward_lower\",\n      \"boundary_crossed\": true,\n      \"semantic_defect\": \"none\",\n      \"note_ko\": \"'请您批准下周的假期。'는 '请您'로 약간의 공손함을 더했으나, 조건절이나 선택권을 남기는 표현 없이 직접적으로 승인 요청을 전달합니다. 상하관계(상사-부하)와 공식적 맥락에서, 원문의 '승인해 주실 수 있나요?'에 비해 직접성이 높아져 too_direct 대역으로 조정된 것이 맞으며, 의미·의도·화행 기능은 보존되어 있습니다.\"\n    }\n  ]\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1167,
+      "completion_tokens": 192,
+      "total_tokens": 1359,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_a524043609"
+  }
+}

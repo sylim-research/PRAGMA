@@ -1,0 +1,23 @@
+{
+  "endpoint": "https://api.openai.com/v1/chat/completions",
+  "request": {
+    "model": "gpt-4.1",
+    "response_format": {
+      "type": "json_object"
+    },
+    "temperature": 0.1,
+    "messages": [
+      {
+        "role": "system",
+        "content": "너는 MJT3·MJT5 후보 하나의 의미 보존과 화용 대역만 검사한다. 문장을 수정하지 마라.\nwithin_anchor는 해당 P·D·R에서 within인지 판정한다. relative_boundary는 verified_within_anchor 대비\n조정 방향이 보이는지와 intended_band 경계를 실제로 통과했는지를 별도로 판정한다.\n의미·발화 의도·화행 기능이 바뀌면 fail이다. 실제 대역 경계가 불확실하면 fail이 아니라 warning이며\nactual_band_code=\"uncertain\", boundary_crossed=null로 쓴다. 공손표지 개수나 길이만으로 판정하지 마라.\n\n출력은 {\"results\":[{\"path\":\"packet path\",\"severity\":\"pass|warning|fail\",\"actual_band_code\":\"정본 코드 또는 uncertain\",\"direction_from_anchor\":\"within|toward_lower|toward_upper|uncertain\",\"boundary_crossed\":true|false|null,\"semantic_defect\":\"none|meaning_shift|intent_shift|speech_act_shift|unnatural|focus_contamination|uncertain\",\"note_ko\":\"근거\"}]} JSON뿐이다."
+      },
+      {
+        "role": "user",
+        "content": "[화행] 요청\n[언어 방향] 한국어 → 중국어\n[화용 초점] request_mitigation_optionality: 주어진 상황의 관계·권리·의무·부담에 비춰 요청의 직접성과 상대의 선택권이 알맞은지 보는 초점. 능원동사·의문형·조건절(能不能·可以…吗·如果方便的话)과 직접형(把…发过来)은 맥락에 따라 기능이 달라지는 선택적 자원이다. 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 친밀·저부담도 직접형의 자동 정답 조건이 아니다. 실제 표현이 요청을 얼마나 분명히 전달하고 상대에게 어떤 조정 여지를 남기는지 상황 근거와 함께 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 격식체 어휘 선택(尊敬的·恳请)이나 호칭 문제는 이 초점이 아니다 — 그것은 공손성 축이다.\n[대역] too_direct=너무 직접적 (상황에 비해 단정적) | within_band=알맞음 | too_indirect=지나치게 우회적 (요청이 흐려짐)\n[적정 대역] within_band\n[counter-rule] \"직접적이면 나쁘다\"의 반례를 설계한다. 이미 합의한 보고서 전달을 짧게 재확인하는 장면에서는 직접형(把报告发我)도 적절할 수 있다. 친밀·저부담 라벨이 아니라 실제 상황과 표현에서 근거를 제시한다.\n[candidate packets]\n[\n  {\n    \"path\": \"mpj_items[4].candidates[1]\",\n    \"phase\": \"relative_boundary\",\n    \"blueprint\": {\n      \"item_type\": \"multi_judge\",\n      \"candidate_index\": 1,\n      \"intended_band\": \"too_direct\",\n      \"candidate_role\": \"lower_boundary_adjustment\",\n      \"preserve\": [\n        \"propositional_meaning\",\n        \"utterance_intent\",\n        \"speech_act_function\"\n      ],\n      \"adjustment\": \"adjust only the target feature toward too_direct (너무 직접적 (상황에 비해 단정적))\",\n      \"forbidden_extremization\": \"Do not use caricature, overt coercion or insult, semantic loss, a changed speech act, or impossible wording. A non-within candidate must remain defensible in one adjacent real context.\"\n    },\n    \"item_context\": {\n      \"type\": \"multi_judge\",\n      \"situation_ko\": \"저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.\",\n      \"relation_ko\": \"직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.\",\n      \"pdr\": {\n        \"p\": \"speaker_higher\",\n        \"d\": \"distant\",\n        \"r\": \"low\"\n      },\n      \"source\": \"다음 주 휴가 승인해 주실 수 있나요? 가족 모임이 있어서 꼭 참석해야 합니다.\"\n    },\n    \"current_candidate\": {\n      \"text\": \"请您批准下周的假期。\",\n      \"accepted_band_codes\": [\n        \"too_direct\"\n      ],\n      \"note_ko\": \"'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다.\"\n    },\n    \"verified_within_anchor\": {\n      \"text\": \"如果方便的话，下周的假期能批准一下吗？\",\n      \"accepted_band_codes\": [\n        \"within_band\"\n      ],\n      \"note_ko\": \"조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다.\"\n    },\n    \"immutable_peer_texts\": [\n      \"如果方便的话，下周的假期能批准一下吗？\",\n      \"我想请您考虑一下下周的假期。\",\n      \"不知道您是否能批准下周的假期。\"\n    ]\n  }\n]"
+      }
+    ],
+    "max_completion_tokens": 16000
+  },
+  "promptHash": "885415031c460c7a1548fe971051f5685619edcfee243fe9af3cdcef413f3b4f",
+  "startedAt": "2026-09-07T09:11:40.265Z"
+}

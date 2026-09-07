@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPmmdeB4IjUVZas8oYzz6FaOKY3U",
+    "object": "chat.completion",
+    "created": 1788772716,
+    "model": "gpt-4.1-mini-2025-04-14",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"situation_ko\":\"동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.\",\"relation_ko\":\"나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.\",\"source_text\":\"谢谢你的邀请，很高兴收到你的消息。不过这次周六晚上我已经有家庭安排了，可能无法参加。希望下次还有机会一起聚会。\",\"preceding_turn\":\"这个周六晚上大家打算一起聚餐，你有空吗？\",\"brief_note_ko\":\"주말 모임 초대를 거절하는 메시지\",\"focal_segments\":[{\"text\":\"这次周六晚上我已经有家庭安排了，可能无法参加。\",\"role\":\"head\"},{\"text\":\"谢谢你的邀请，很高兴收到你的消息。希望下次还有机会一起聚会。\",\"role\":\"support\"}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 4788,
+      "completion_tokens": 190,
+      "total_tokens": 4978,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_ce7d0aa2c3"
+  }
+}

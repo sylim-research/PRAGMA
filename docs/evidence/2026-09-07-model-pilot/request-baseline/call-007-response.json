@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPfti4ztZTllV1GjKEb4qtSnHk8F",
+    "object": "chat.completion",
+    "created": 1788772289,
+    "model": "gpt-4o-2024-08-06",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\"operations\":[{\"path\":\"mpj_items[2].corrections[1]\",\"candidate\":{\"text\":\"请您调整下周的会议时间。\",\"note_ko\":\"'请您调整'로 직접 요청하여 선택권이 줄어듭니다.\"}},{\"path\":\"mpj_items[2].corrections[2]\",\"candidate\":{\"text\":\"不知道您是否能考虑调整下周的会议时间。\",\"note_ko\":\"'不知道您是否能考虑'로 요청이 흐려져 지나치게 우회적입니다.\"}},{\"path\":\"mpj_items[4].candidates[1]\",\"candidate\":{\"text\":\"麻烦您批准下周的假期。\",\"note_ko\":\"'麻烦您'로 직접적이지만 약간의 완화가 있습니다.\"}},{\"path\":\"mpj_items[4].candidates[3]\",\"candidate\":{\"text\":\"不知道您是否能批准下周的假期。\",\"note_ko\":\"'不知道您是否能'로 요청이 흐려져 지나치게 우회적입니다.\"}}]}",
+          "refusal": null,
+          "annotations": []
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 2675,
+      "completion_tokens": 225,
+      "total_tokens": 2900,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 0,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": "fp_0ea3a61dc5"
+  }
+}

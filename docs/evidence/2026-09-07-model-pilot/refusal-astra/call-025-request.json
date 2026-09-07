@@ -1,0 +1,114 @@
+{
+  "endpoint": "https://api.openai.com/v1/chat/completions",
+  "request": {
+    "model": "gpt-6-astra",
+    "response_format": {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "pragma_mission_scene_topology",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "x",
+            "anchor",
+            "y"
+          ],
+          "properties": {
+            "x": {
+              "$ref": "#/$defs/scene"
+            },
+            "anchor": {
+              "$ref": "#/$defs/scene"
+            },
+            "y": {
+              "$ref": "#/$defs/scene"
+            }
+          },
+          "$defs": {
+            "pdr": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "p",
+                "d",
+                "r"
+              ],
+              "properties": {
+                "p": {
+                  "type": "string",
+                  "enum": [
+                    "speaker_lower",
+                    "equal",
+                    "speaker_higher"
+                  ]
+                },
+                "d": {
+                  "type": "string",
+                  "enum": [
+                    "close",
+                    "acquaintance",
+                    "distant"
+                  ]
+                },
+                "r": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "mid",
+                    "high"
+                  ]
+                }
+              }
+            },
+            "scene": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "situation_ko",
+                "relation_ko",
+                "channel",
+                "pdr"
+              ],
+              "properties": {
+                "situation_ko": {
+                  "type": "string"
+                },
+                "relation_ko": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "messenger",
+                    "facetoface",
+                    "phone"
+                  ]
+                },
+                "pdr": {
+                  "$ref": "#/$defs/pdr"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "당신은 PRAGMA의 frozen mission scene topology 설계기입니다.\n\n[장면의 현실성·개연성 — P/D/R에 앞서 확인]\n적용 범위는 요청·거절·사과·감사·제안·초대·반대·칭찬·불만의 모든 미션이다.\n번역·통역, 한→중·중→한, 모든 수준·도메인에 동일하게 적용한다. 코어·MJT 각 장면·DCT를 모두 확인한다.\n학생이 첫 장면을 읽고 실제로 일어날 법하다고 받아들일 수 있어야 한다.\n① 이 관계에서 이 화행을 이 사람에게 수행할 실제 계기와 이유가 있는가?\n② 발화자·상대가 그 사건에 관여하는 사람인가? 행위·결정·책임·수혜·평가 대상이 실제 인물의 역할과 맞는가?\n③ 개인정보·사적 일정·금전·건강 등 민감한 일을 맡긴다면 신뢰·동의·기존 도움 관계가 장면에 있는가?\n④ 인물·장소·채널·행동·접촉 이력이 서로 맞는가? 평범한 일을 억지로 고부담 사건으로 만들지 않았는가?\n화행별로 확인할 연결:\n- 요청: 상대가 부탁받은 일을 수행·조정할 현실적인 능력과 권한이 있는가?\n- 거절: 실제 제안·초대·요청에 대한 응답인가? 누가 무엇을 거절하는지 앞선 발화와 이어지는가?\n- 사과: 어떤 일에 대한 누구의 책임이며, 사과받는 사람이 그 일의 당사자인가?\n- 감사: 실제 도움·배려·수혜가 있고, 고마움을 전하는 대상이 그 도움을 준 사람인가?\n- 제안: 함께 검토할 용건과 실행 가능성이 있고, 상대가 의견을 내거나 선택할 이유가 있는가?\n- 초대: 행사·활동과 초대 관계가 자연스럽고, 상대에게 실제 참여 가능성과 선택권이 있는가?\n- 반대: 실제로 제시된 의견·계획에 대한 반대이며, 그 논의에 참여할 이유와 근거가 있는가?\n- 칭찬: 관찰 가능한 행동·성과·특성에 근거하며, 그 관계에서 언급할 만한 내용인가?\n- 불만: 구체적인 문제·기대 불일치가 있고, 상대가 문제의 당사자 또는 전달·조정할 적절한 대상인가?\n\"가능할 수도 있다\"는 예외를 지어내거나, 화면 밖 배경을 상상해서 장면을 정당화하지 않는다.\n예: 단순히 자주 마주치는 이웃에게 병원 예약 변경을 부탁하는 장면은 이유·위임 배경이 없으면 부적절하다.\n병원 접수 담당자에게 자신의 예약 변경을 문의하거나, 평소 예약을 도와준 가족에게 이미 동의한 도움을 청하는 장면은 검토할 수 있다.\n특정 관계·직업·국적을 일괄 금지하지 않는다. 실제로 적힌 사실과 해당 행위의 연결로 판단한다.\nP/D/R 조합·시드가 이 기준과 충돌하면 인물을 억지로 끼워 맞추지 말고 충돌을 검토 사유로 남긴다.\n\n\n완전한 미션·문항·후보·정답·해설은 만들지 말고 X/Anchor A/Y 세 장면만 JSON으로 만드세요.\n- X, A, Y situation_ko는 각각 학습자 1인칭으로 상대·구체적 사건·핵심 제약을 담은 한국어 정확히 2문장이며 140자 이내입니다.\n- X/A/Y와 서버가 제시하는 DCT C는 글자까지 완전히 다른 구체적 사건이어야 합니다.\n- Anchor A는 하나만 만듭니다. 이후 서버가 MJT2·3·4에 동일 객체로 복제합니다.\n- Anchor A는 DCT C와 같은 P/D/R입니다. X와 Y는 각각 Anchor에서 정확히 한 축만 바꿉니다.\n- relation_ko는 학습자가 마주한 상대의 역할·관계만 한 줄이고 P/D/R과 일치해야 합니다.\n- channel은 email 또는 messenger만 사용합니다.\n- 화행과 핵심 화용 초점은 유지하되 새 의미 판정 규칙을 만들지 마세요.\n응답은 지정 JSON 하나뿐입니다."
+      },
+      {
+        "role": "user",
+        "content": "[언어 방향] 중국어 → 한국어\n[화행] 거절 (refusal)\n[화용 초점] refusal_softening — 상황에 제시된 요청·제안·초대와 관계에 비춰 한국어 거절의 명료성과 대인 배려를 함께 보는 초점. 직접적 부정(안 돼요·못 해요), 유보(좀 어려울 것 같아요), 사과·유감·이유·대안은 선택적 자원이며 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 완충의 유무나 양 대신 실제 표현이 상황에 필요한 배려를 놓치는지(too_blunt), 알맞은지(within_band), 과한 설명이나 유보로 거절의 전달을 어렵게 하는지(over_elaborate)를 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 거절을 수락으로 바꾸는 것은 대역 차이가 아니라 목적 이탈이다.\n[서버 고정 DCT C — 변경 금지]\n{\n  \"situation_ko\": \"나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.\",\n  \"relation_ko\": \"몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료\",\n  \"channel\": \"messenger\",\n  \"pdr\": {\n    \"p\": \"equal\",\n    \"d\": \"acquaintance\",\n    \"r\": \"mid\"\n  },\n  \"source_modality\": \"written\",\n  \"source_text\": \"谢谢你特意邀请我参加周六晚上的聚会，也很高兴你在工作之外还会想到叫上我。不过那天晚上我已经和家人有约，时间上确实冲突，所以这次没办法参加了。很遗憾这次不能到场和大家聚一聚，希望你们周六晚上玩得开心。\"\n}"
+      }
+    ],
+    "reasoning_effort": "medium",
+    "max_completion_tokens": 16000
+  },
+  "promptHash": "13671bae9ae8b06df7caaa326fad1a65c6f6657583c74069843728d777ee5372",
+  "startedAt": "2026-09-07T09:20:03.585Z"
+}

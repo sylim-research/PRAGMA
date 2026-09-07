@@ -1,0 +1,39 @@
+{
+  "status": 200,
+  "body": {
+    "id": "chatcmpl-ELPoCTQFpyV04CwyyRtsDZYwBrmhT",
+    "object": "chat.completion",
+    "created": 1788772804,
+    "model": "gpt-6-astra",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"x\": {\n    \"situation_ko\": \"나는 평소 친하게 지내는 동료에게서 오늘 저녁 한 시간 동안 발표 연습을 들어 달라는 메신저 요청을 받았다. 그 시간에는 수강 중인 수업이 있어 요청을 거절해야 한다.\",\n    \"relation_ko\": \"평소 친하게 지내는 동등한 직급의 동료\",\n    \"channel\": \"messenger\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"close\",\n      \"r\": \"mid\"\n    }\n  },\n  \"anchor\": {\n    \"situation_ko\": \"나는 사내 행사 준비를 함께 맡은 동료에게서 오늘 오후 안내 데스크를 한 시간 대신 맡아 달라는 메신저 요청을 받았다. 그 시간에는 미리 잡힌 외부 미팅이 있어 요청을 거절해야 한다.\",\n    \"relation_ko\": \"몇 차례 함께 일했지만 아직 어색한 동등한 직급의 행사 준비 동료\",\n    \"channel\": \"messenger\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"acquaintance\",\n      \"r\": \"mid\"\n    }\n  },\n  \"y\": {\n    \"situation_ko\": \"나는 몇 차례 함께 일한 동료에게서 여분으로 산 머핀 하나를 먹겠느냐는 사내 메신저 메시지를 받았다. 방금 식사를 마쳐 배가 부르므로 머핀을 받지 않겠다고 답하려 한다.\",\n    \"relation_ko\": \"몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료\",\n    \"channel\": \"messenger\",\n    \"pdr\": {\n      \"p\": \"equal\",\n      \"d\": \"acquaintance\",\n      \"r\": \"low\"\n    }\n  }\n}",
+          "refusal": null,
+          "annotations": []
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 1672,
+      "completion_tokens": 780,
+      "total_tokens": 2452,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 1669,
+        "audio_tokens": 0
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 358,
+        "audio_tokens": 0,
+        "accepted_prediction_tokens": 0,
+        "rejected_prediction_tokens": 0
+      }
+    },
+    "service_tier": "default",
+    "system_fingerprint": null
+  }
+}

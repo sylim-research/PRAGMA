@@ -1,0 +1,419 @@
+{
+  "content": {
+    "context": {
+      "speech_act": "request",
+      "learner_level": "intermediate",
+      "domain": "daily",
+      "industry_sector": null,
+      "business_function": null,
+      "mode": "stt_interpreting",
+      "source_modality": "spoken",
+      "theme_code": "daily_living",
+      "topic_code": "hospital_pharmacy_visit",
+      "language_direction": "ko_zh",
+      "core_content": {
+        "schema_version": "scenario_core_v3",
+        "direction": "ko_zh",
+        "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+        "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+        "source_modality": "spoken",
+        "source_text": "안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+        "preceding_turn": null,
+        "pdr": {
+          "p": "equal",
+          "d": "distant",
+          "r": "low"
+        },
+        "channel": "facetoface",
+        "context_spec": {
+          "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+          "role_pair": {
+            "speaker_ko": "장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.",
+            "addressee_ko": "장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다."
+          },
+          "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+          "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+          "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+          "interpreter_role_contract": {
+            "source_speaker": "A",
+            "target_addressee": "B",
+            "learner_interpreter": "C",
+            "pdr_relation": "A_to_B"
+          }
+        },
+        "brief_note_ko": "병원 접수 직원에게 진료 예약 변경을 요청하는 상황입니다.",
+        "focal_segments": [
+          {
+            "text": "혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?",
+            "role": "head"
+          },
+          {
+            "text": "일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+            "role": "support"
+          }
+        ],
+        "length_policy": {
+          "version": "effective_chars_v2_min_warning",
+          "unit": "effective_chars",
+          "min": 40,
+          "max": 60,
+          "actual": 49
+        },
+        "generation": {
+          "content_release_id": "pragma_natural_scene_candidate_20260907_01",
+          "prompt_version": "core_v16_natural_scene_repair",
+          "prompt_snapshot_hash": "b9add0e1ac1059d0da2564e0845bdb9be8d4e563a23c80bbcdf6f53dc8659404",
+          "generated_at": "2026-09-07T09:10:58.292Z"
+        }
+      }
+    },
+    "mission": {
+      "schema_version": "mission_v5",
+      "direction": "ko_zh",
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "request"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "speech_act": "request",
+        "mission_goal": "integrated_speech_act",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ]
+      },
+      "unit": {
+        "target_feature": "request_mitigation_optionality",
+        "target_feature_version": "1.1",
+        "learner_label": "완화와 선택권",
+        "closing_ko": "요청은 표현형이나 친밀도만으로 판단하지 않습니다. 원문의 뜻을 지키며 상황에 필요한 명료성과 상대의 선택권을 함께 살핍니다."
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3"
+          ],
+          "evidence_ko": "MJT2와 MJT3에서 요청의 강도를 조절하는 표현이 다르게 사용되어 관계적 효과가 달라지는 것을 관찰할 수 있습니다."
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_refs": [
+            "mpj:1",
+            "dct"
+          ],
+          "evidence_ko": "MJT1과 DCT에서 서로 다른 관계 설정에 따라 요청의 완화 정도가 조절되는 것을 볼 수 있습니다."
+        }
+      ],
+      "mpj_items": [
+        {
+          "type": "scale4",
+          "channel": "facetoface",
+          "situation_ko": "저는 친구에게 다음 주에 같이 영화 보러 가자고 제안합니다. 새로 개봉한 영화가 있어서 꼭 보고 싶습니다.",
+          "relation_ko": "친구 사이로 친밀한 관계입니다.",
+          "pdr": {
+            "p": "equal",
+            "d": "close",
+            "r": "low"
+          },
+          "source": "다음 주에 같이 영화 보러 갈래? 새로 개봉한 영화가 있어서 꼭 보고 싶어.",
+          "preceding_turn": null,
+          "target": "下周一起去看电影好吗？有部新上映的电影我很想看。",
+          "highlights": [
+            "下周一起去看电影好吗"
+          ],
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "very_appropriate",
+          "explanation_ko": "친구 사이의 친밀한 관계에서 간단한 제안은 직접적이어도 적절합니다. '好吗'를 사용해 선택권을 남기며 자연스럽게 요청합니다.",
+          "recommended_example": "下周一起去看电影好吗？",
+          "id": 1,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality"
+        },
+        {
+          "type": "judge3",
+          "channel": "facetoface",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "explanation_ko": "동료와의 관계에서 직접적인 요청은 부담을 줄 수 있습니다. '能调整一下吗'는 선택권을 남기지만, 더 완화된 표현이 필요합니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "id": 2,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality"
+        },
+        {
+          "type": "fix_choice",
+          "channel": "facetoface",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "corrections": [
+            {
+              "text": "如果方便的话，下周的会议时间能调整一下吗？",
+              "is_valid": true,
+              "note_ko": "조건절 '如果方便的话'를 추가하여 요청의 부담을 줄이고 선택권을 남깁니다."
+            },
+            {
+              "text": "请您调整下周的会议时间。",
+              "is_valid": false,
+              "note_ko": "'请您调整'로 직접 요청하여 선택권이 줄어듭니다."
+            },
+            {
+              "text": "不知道您是否能考虑调整下周的会议时间。",
+              "is_valid": false,
+              "note_ko": "'不知道您是否能考虑'로 요청이 흐려져 지나치게 우회적입니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서는 직접적인 요청이 부담을 줄 수 있습니다. 수정안은 조건절을 추가하여 완화하고 선택권을 남깁니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "id": 3,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality"
+        },
+        {
+          "type": "reason",
+          "channel": "facetoface",
+          "situation_ko": "저는 동료에게 다음 주 회의 일정을 조정해 달라고 요청합니다. 다른 중요한 일정이 겹쳐서 참석이 어렵습니다.",
+          "relation_ko": "직장 동료 사이로 친밀하지 않은 관계입니다.",
+          "pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 회의 일정 조정해 줄 수 있어? 다른 중요한 일정이 겹쳐서.",
+          "preceding_turn": null,
+          "target": "下周的会议时间能调整一下吗？我有其他重要的安排。",
+          "highlights": [
+            "下周的会议时间能调整一下吗"
+          ],
+          "problem_band_code": "too_direct",
+          "reasons": [
+            {
+              "id": "r1",
+              "text_ko": "문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.",
+              "kind": "pragmatic_misconception"
+            },
+            {
+              "id": "r2",
+              "text_ko": "요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다.",
+              "kind": "primary"
+            },
+            {
+              "id": "r3",
+              "text_ko": "문장 구조상 오류는 없지만, 더 완화된 표현이 필요합니다.",
+              "kind": "meaning_grammar_context"
+            }
+          ],
+          "accepted_reason_id": "r2",
+          "explanation_ko": "현재 상황에서는 요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다. 조건절을 추가하여 완화할 필요가 있습니다.",
+          "recommended_example": "如果方便的话，下周的会议时间能调整一下吗？",
+          "id": 4,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality"
+        },
+        {
+          "type": "multi_judge",
+          "channel": "facetoface",
+          "situation_ko": "저는 상사에게 다음 주 휴가를 승인해 달라고 요청합니다. 가족 모임이 있어서 꼭 참석해야 합니다.",
+          "relation_ko": "직장 상사와 부하 직원 사이로 상사가 더 높은 위치입니다.",
+          "pdr": {
+            "p": "speaker_higher",
+            "d": "distant",
+            "r": "low"
+          },
+          "source": "다음 주 휴가 승인해 주실 수 있나요? 가족 모임이 있어서 꼭 참석해야 합니다.",
+          "preceding_turn": null,
+          "candidates": [
+            {
+              "text": "如果方便的话，下周的假期能批准一下吗？",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "조건절을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다."
+            },
+            {
+              "text": "请您批准下周的假期。",
+              "accepted_band_codes": [
+                "too_direct"
+              ],
+              "note_ko": "'请您'로 약간의 공손함을 더하면서도 직접적입니다. '麻烦您'보다 덜 완화되어 too_direct 방향으로 조정되었습니다."
+            },
+            {
+              "text": "我想请您考虑一下下周的假期。",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "완화된 표현으로 요청의 부담을 줄이며 선택권을 남깁니다."
+            },
+            {
+              "text": "不知道您是否能批准下周的假期。",
+              "accepted_band_codes": [
+                "too_indirect"
+              ],
+              "note_ko": "'不知道您是否能'로 요청이 흐려져 지나치게 우회적입니다."
+            }
+          ],
+          "explanation_ko": "현재 상황에서는 상사에게 요청할 때 적절한 완화와 선택권을 남기는 것이 중요합니다. 각 후보는 다른 완화 전략을 사용하여 관계적 효과를 다르게 만듭니다.",
+          "recommended_example": "如果方便的话，下周的假期能批准一下吗？",
+          "id": 5,
+          "item_focus": "request_mitigation_optionality",
+          "axis_feature": "request_mitigation_optionality"
+        }
+      ],
+      "production_task": {
+        "mode": "interpreting",
+        "source_modality": "spoken",
+        "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+        "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+        "channel": "facetoface",
+        "pdr": {
+          "p": "equal",
+          "d": "distant",
+          "r": "low"
+        },
+        "source_text": "안녕하세요. 혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요? 일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+        "preceding_turn": null,
+        "replay_limit": 2,
+        "reference_alternatives": [
+          {
+            "text": "您好，可以帮我把预约改到下周二吗？因为我的日程有变，原来的时间不太方便。",
+            "note_ko": "조건절과 완화 표현을 사용하여 요청의 부담을 줄이고 선택권을 남깁니다."
+          }
+        ],
+        "focal_segments": [
+          {
+            "text": "혹시 제 진료 예약을 다음 주 화요일로 바꿔주실 수 있나요?",
+            "role": "head"
+          },
+          {
+            "text": "일정이 변경되어서 기존 시간에 방문이 어렵습니다.",
+            "role": "support"
+          }
+        ]
+      }
+    }
+  },
+  "criteria": {
+    "version": "content_review_v2",
+    "rules_version": "mission_rules_v10_natural_scene",
+    "scene_policy": "\n[통역 훈련 장면의 서술]\n상황문은 번역처럼 인물의 실제 관계·사건·핵심 제약만 담은 짧은 한국어 두 문장으로 쓴다.\n나/저는의 훈련 시점 또는 구체적인 역할명(환자·접수 직원·동료·친구)을 사용한다.\n\"학습자 통역사인 당신\", \"한국인 원발화자\", \"중국인 청자\", A/B/C 역할 소개를 학생용 situation_ko·relation_ko에 넣지 않는다.\n통역사가 왜 현장에 있는지 설명하기 위해 인물이나 사건을 추가하지 않는다. 주어진 발화를 듣고 다른 언어로 옮기는 훈련이다.\n내부 A/B 표기는 원문을 말한 사람과 그 말의 상대를 식별하며 P/D/R도 그 관계 기준이다.\n주어진 원문의 의미·의도·화용적 힘은 유지한다. 훈련 시점이 1인칭이어도 자유 발화 과제로 바꾸지 않는다.\n\n[장면의 현실성·개연성 — P/D/R에 앞서 확인]\n적용 범위는 요청·거절·사과·감사·제안·초대·반대·칭찬·불만의 모든 미션이다.\n번역·통역, 한→중·중→한, 모든 수준·도메인에 동일하게 적용한다. 코어·MJT 각 장면·DCT를 모두 확인한다.\n학생이 첫 장면을 읽고 실제로 일어날 법하다고 받아들일 수 있어야 한다.\n① 이 관계에서 이 화행을 이 사람에게 수행할 실제 계기와 이유가 있는가?\n② 발화자·상대가 그 사건에 관여하는 사람인가? 행위·결정·책임·수혜·평가 대상이 실제 인물의 역할과 맞는가?\n③ 개인정보·사적 일정·금전·건강 등 민감한 일을 맡긴다면 신뢰·동의·기존 도움 관계가 장면에 있는가?\n④ 인물·장소·채널·행동·접촉 이력이 서로 맞는가? 평범한 일을 억지로 고부담 사건으로 만들지 않았는가?\n화행별로 확인할 연결:\n- 요청: 상대가 부탁받은 일을 수행·조정할 현실적인 능력과 권한이 있는가?\n- 거절: 실제 제안·초대·요청에 대한 응답인가? 누가 무엇을 거절하는지 앞선 발화와 이어지는가?\n- 사과: 어떤 일에 대한 누구의 책임이며, 사과받는 사람이 그 일의 당사자인가?\n- 감사: 실제 도움·배려·수혜가 있고, 고마움을 전하는 대상이 그 도움을 준 사람인가?\n- 제안: 함께 검토할 용건과 실행 가능성이 있고, 상대가 의견을 내거나 선택할 이유가 있는가?\n- 초대: 행사·활동과 초대 관계가 자연스럽고, 상대에게 실제 참여 가능성과 선택권이 있는가?\n- 반대: 실제로 제시된 의견·계획에 대한 반대이며, 그 논의에 참여할 이유와 근거가 있는가?\n- 칭찬: 관찰 가능한 행동·성과·특성에 근거하며, 그 관계에서 언급할 만한 내용인가?\n- 불만: 구체적인 문제·기대 불일치가 있고, 상대가 문제의 당사자 또는 전달·조정할 적절한 대상인가?\n\"가능할 수도 있다\"는 예외를 지어내거나, 화면 밖 배경을 상상해서 장면을 정당화하지 않는다.\n예: 단순히 자주 마주치는 이웃에게 병원 예약 변경을 부탁하는 장면은 이유·위임 배경이 없으면 부적절하다.\n병원 접수 담당자에게 자신의 예약 변경을 문의하거나, 평소 예약을 도와준 가족에게 이미 동의한 도움을 청하는 장면은 검토할 수 있다.\n특정 관계·직업·국적을 일괄 금지하지 않는다. 실제로 적힌 사실과 해당 행위의 연결로 판단한다.\nP/D/R 조합·시드가 이 기준과 충돌하면 인물을 억지로 끼워 맞추지 말고 충돌을 검토 사유로 남긴다.\n",
+    "mission_design": "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
+    "features": [
+      {
+        "code": "request_mitigation_optionality",
+        "version": "1.1",
+        "speech_act": "request",
+        "learner_label": "완화와 선택권",
+        "operational_definition": "주어진 상황의 관계·권리·의무·부담에 비춰 요청의 직접성과 상대의 선택권이 알맞은지 보는 초점. 능원동사·의문형·조건절(能不能·可以…吗·如果方便的话)과 직접형(把…发过来)은 맥락에 따라 기능이 달라지는 선택적 자원이다. 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 친밀·저부담도 직접형의 자동 정답 조건이 아니다. 실제 표현이 요청을 얼마나 분명히 전달하고 상대에게 어떤 조정 여지를 남기는지 상황 근거와 함께 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 격식체 어휘 선택(尊敬的·恳请)이나 호칭 문제는 이 초점이 아니다 — 그것은 공손성 축이다.",
+        "band_schema": [
+          {
+            "code": "too_direct",
+            "label_ko": "너무 직접적 (상황에 비해 단정적)"
+          },
+          {
+            "code": "within_band",
+            "label_ko": "알맞음"
+          },
+          {
+            "code": "too_indirect",
+            "label_ko": "지나치게 우회적 (요청이 흐려짐)"
+          }
+        ],
+        "within_band_code": "within_band",
+        "relevant_resources": [
+          "능원동사 완화 (能不能·可以…吗)",
+          "조건절 포석 (如果方便的话·要是可以的话)",
+          "선택권을 남기는 종결 (…行吗·您看方便吗)",
+          "부담 예고 (麻烦您·想请您帮个忙)"
+        ],
+        "excluded_confounds": [
+          "격식체 어휘 선택 (尊敬的·恳请) — 공손성 축",
+          "호칭 (您 vs 你) — 공손성 축",
+          "문장 길이 자체"
+        ],
+        "closing_principle_ko": "요청은 표현형이나 친밀도만으로 판단하지 않습니다. 원문의 뜻을 지키며 상황에 필요한 명료성과 상대의 선택권을 함께 살핍니다.",
+        "handoff_summary": {
+          "first_impression": "관계·권리·의무와 실제 부담에 비춰 요청 표현을 살폈습니다.",
+          "correction": "원문의 뜻을 지키며 요청의 명료성과 상대의 선택권을 조절했습니다.",
+          "reason": "표현형만으로 판단하지 않고 상황에서 요청을 어떻게 받아들일지 살폈습니다.",
+          "compare_low": "상황에 잘 맞는 안과 선택권을 거의 남기지 않은 안을 구분했습니다.",
+          "compare_high": "상황에 잘 맞는 안과 요청이 흐려질 만큼 우회적인 안을 구분했습니다."
+        },
+        "counter_rule_note": "\"직접적이면 나쁘다\"의 반례를 설계한다. 이미 합의한 보고서 전달을 짧게 재확인하는 장면에서는 직접형(把报告发我)도 적절할 수 있다. 친밀·저부담 라벨이 아니라 실제 상황과 표현에서 근거를 제시한다.",
+        "operational_definition_zh_ko": "주어진 상황의 관계·권리·의무·부담에 비춰 한국어 요청의 직접성과 선택권이 알맞은지 보는 초점. 의문형(-아/어 주실 수 있을까요), 조건절(혹시 괜찮으시면), 직접형(-해 주세요·-하세요)은 맥락에 따라 기능이 달라지는 선택적 자원이다. 표현형·표지 수·PDR 라벨만으로 적절성을 결정하지 않는다. 친밀·저부담도 직접형의 자동 정답 조건이 아니다. 실제 표현의 요청 명료성과 조정 여지를 상황 근거와 함께 본다. 원문의 명제·의도·화행 목적을 보존하고, 원문·상황·허용된 사실에 없는 사유·조건·약속을 만들지 않는다. 높임 등급 선택(합쇼체/해요체·-님 호칭)은 이 초점이 아니다 — 공손성 축이다.",
+        "relevant_resources_zh_ko": [
+          "의문형 완화 (-아/어 주실 수 있을까요·-아/어도 될까요·-면 안 될까요)",
+          "조건절 포석 (혹시 괜찮으시면·시간 되시면·바쁘지 않으시면)",
+          "가능성 완충 (혹시·어쩌면·-ㄹ 수 있을지)",
+          "부담 예고 (번거로우시겠지만·부탁 하나 드려도 될까요·죄송한데)"
+        ],
+        "excluded_confounds_zh_ko": [
+          "높임 등급·경어 선택 (합쇼체/해요체·-님/-씨 호칭) — 공손성 축",
+          "문장 길이 자체"
+        ],
+        "counter_rule_note_zh_ko": "\"직접적이면 나쁘다\"의 반례를 설계한다. 이미 합의한 파일 전달을 짧게 재확인하는 장면에서는 직접형(\"그 파일 좀 보내 줘\")도 적절할 수 있다. 친밀·저부담 라벨이 아니라 실제 상황과 표현에서 근거를 제시한다."
+      }
+    ],
+    "scope": "수업에 채택할 현재 정적 콘텐츠 원본. 개별 학습자 실시간 피드백의 전수 감사는 포함하지 않음."
+  }
+}
