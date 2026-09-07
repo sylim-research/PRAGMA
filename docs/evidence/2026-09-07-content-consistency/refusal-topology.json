@@ -1,0 +1,62 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "written",
+    "x": {
+      "situation_ko": "친구가 주말에 등산을 가자고 제안했다. 나는 이미 다른 계획이 있어 참석할 수 없다고 답한다.",
+      "relation_ko": "나는 가끔 만나는 친구이다.",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "close",
+        "r": "mid"
+      }
+    },
+    "anchor": {
+      "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 다른 친구와의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+      "relation_ko": "나는 몇 차례 함께 일한 동료이다.",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    },
+    "y": {
+      "situation_ko": "이웃이 주말에 함께 운동하자고 제안했다. 나는 개인적인 사정으로 참석할 수 없다고 답한다.",
+      "relation_ko": "나는 가끔 마주치는 이웃이다.",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "mid"
+      }
+    },
+    "c": {
+      "situation_ko": "동료가 주말 저녁 모임에 초대했다. 나는 가족과의 약속 때문에 참석하지 못한다고 답장을 보낸다.",
+      "relation_ko": "나는 몇 차례 함께 일한 동료와 일상적으로 연락하는 사이이다.",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "pass",
+    "final_result": "pass",
+    "attempts": 1,
+    "regeneration_count": 0,
+    "findings": []
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T10:02:09.914Z"
+  }
+}

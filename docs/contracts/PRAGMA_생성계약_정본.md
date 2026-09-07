@@ -492,6 +492,12 @@ P·D·R 원시 저장 코드는 학생에게 보여 주지 않는다. 현행 학
 서버는 MJT2가 생성한 Anchor A의 `situation_ko`·`relation_ko`·channel을 MJT3·4에 고정한다.
 따라서 현행 상황 topology는 `X → A → A → A → Y → C`다. X/A/Y/C 사이의 완전 중복은
 결정론적으로 차단하고, 의미적 차이·자연성·대비의 충분성은 AI critic과 교수자 검수가 판정한다.
+장면 구성 응답은 Anchor의 코어 PDR과 X/Y의 한 축 대비 조합만 허용한다. 생성 후 장면은
+그대로 두고 PDR 코드만 덮어쓰는 자동 보정은 하지 않는다. 실패 시 직전 장면과 오류를
+함께 전달하여 기존 한 번의 재시도 안에서 다시 구성한다.
+기존 두 번째 품질검사는 장면·이유 선택지·피드백·의미 보존을 구분하여 확인한다. 과거 검수
+판정과 수리 이력은 새 critic의 콘텐츠 입력에서 제외하며, 후보를 교체한 뒤에는 전체 수정본을
+다시 검수한다. 이유 문구의 문자상 중복은 R4로 차단하고 의미상 중복은 critic이 판정한다.
 
 화행 학습 주차에는 같은 `speech_act`·수준·언어방향의 완전한 MJT5+DCT1 미션 두 건을
 편성한다. 미션 2는 미션 1의 사실상 복제본이 아닌 새로운 상황이어야 한다. 생성과 검수는 각 미션을
@@ -577,7 +583,7 @@ AI 품질점검과 교수자 검수가 담당한다.
 | R1 / R1c | 미션·코어 스키마, 현행 MJT5 순서, 축·대역 코드, theme/topic 구조 | fail |
 | R2 | native `judge3`의 비적정 대역 1개와 DCT 앵커 PDR 일치 | fail |
 | R3 | native FixChoice 3안·권장안 1개(legacy 계약은 별도 호환) | fail |
-| R4 | Reason의 참조 ID·이유 역할·주원인·앵커 PDR | fail(legacy 일부 warning) |
+| R4 | Reason의 참조 ID·이유 역할·주원인·앵커 PDR·중복 이유 문구 | fail(legacy 일부 warning) |
 | R5 | MultiJudge 역할·대역·중복·한 축 대비 및 길이 완전 분리 | 구조 fail·길이 warning; §6.4 우선 |
 | R6 | highlight가 실제 target 부분문자열인지 | fail |
 | R7 | Scale4 응답 구간·극성·참고 판정 | fail/warning |

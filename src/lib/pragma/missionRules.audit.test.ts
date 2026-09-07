@@ -22,6 +22,16 @@ const context: CheckContext = {
 const violationsFor = (mission: unknown, id: string) =>
   checkMission(mission, context).violations.filter((violation) => violation.id === id);
 
+it("rejects duplicate reason wording despite different IDs and punctuation", () => {
+  const mission = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+  const reason = mission.mpj_items[3];
+  if (reason.type !== "reason") throw new Error("Expected reason");
+  reason.reasons[1].text_ko = reason.reasons[0].text_ko + "  !";
+  expect(violationsFor(mission, "R4")).toContainEqual(expect.objectContaining({
+    level: "fail", message: expect.stringContaining("이유 선택지 문구가 중복됨"),
+  }));
+});
+
 describe("mission rule audit regressions", () => {
   it("warns on fully separable R5 length ranges without blocking overlapping ranges", () => {
     const separated = structuredClone(SAMPLE_MISSION_V5_NATIVE);

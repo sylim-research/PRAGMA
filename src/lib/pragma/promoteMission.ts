@@ -566,6 +566,7 @@ export function qualityAfterCandidateRegeneration(
   resolvedPaths: readonly string[],
   checks: readonly CandidateBandCheck[],
   meta: { model: string; promptVersion: string; checkedAt: string; missionContentHash: string },
+  recheckedQuality?: QualityCheck,
 ): QualityCheck {
   const resolved = new Set(resolvedPaths);
   const retained = quality.findings.filter((finding) => {
@@ -582,19 +583,24 @@ export function qualityAfterCandidateRegeneration(
       where: check.path,
       note_ko: `[candidate_boundary_uncertain] ${check.note_ko ?? "대역 경계가 불확실해 교수자 확인이 필요합니다."}`.slice(0, 400),
     }));
-  const findings = [...retained, ...warnings];
+  const findings = [...retained, ...warnings, ...(recheckedQuality?.findings ?? [])]
+    .filter((finding, index, all) => all.findIndex((other) =>
+      other.code === finding.code && other.where === finding.where &&
+      other.severity === finding.severity && other.note_ko === finding.note_ko) === index);
   const verdict = findings.some((finding) => finding.severity === "fail")
     ? "fail" as const
     : findings.length > 0 ? "warning" as const : "pass" as const;
   return {
     verdict,
     summary_ko: verdict === "pass"
-      ? "실패 후보를 within 기준 최소대조로 재생성하고 국소 검사를 통과했습니다."
-      : "후보 재생성 뒤 남은 warning 또는 비대상 finding을 보존했습니다.",
+      ? recheckedQuality
+        ? "후보 재생성과 수정본의 전체 품질점검을 통과했습니다."
+        : "실패 후보를 within 기준 최소대조로 재생성하고 국소 검사를 통과했습니다."
+      : "후보 재생성 뒤 남은 지적과 수정본 재검수 결과를 보존했습니다.",
     findings,
-    model: meta.model,
-    prompt_version: meta.promptVersion,
-    checked_at: meta.checkedAt,
+    model: recheckedQuality?.model ?? meta.model,
+    prompt_version: recheckedQuality?.prompt_version ?? meta.promptVersion,
+    checked_at: recheckedQuality?.checked_at ?? meta.checkedAt,
     mission_content_hash: meta.missionContentHash,
   };
 }
@@ -793,12 +799,24 @@ async function regenerateMissionCandidatesOnce(args: {
     },
   };
   const meta = isRecord(response.meta) ? response.meta : {};
+  // A locally valid replacement can invalidate the unchanged item explanation.
+  // Recheck the completed revision and retain unrelated unresolved findings.
+  const rechecked = await runQualityCheck({
+    missionContent: patched,
+    feature: args.feature,
+    direction: args.direction,
+    speechAct: args.speechAct,
+    scenarioId: args.scenarioId,
+    generationRunId: args.generationRunId,
+    generationItemKey: args.generationItemKey,
+  });
+  if (rechecked.ok === false) return { ok: false, error: rechecked.error };
   const quality = qualityAfterCandidateRegeneration(args.quality, resolvedPaths, checks, {
     model: typeof meta.critic_model === "string" ? meta.critic_model : "candidate_band_critic",
     promptVersion: typeof meta.critic_prompt_version === "string" ? meta.critic_prompt_version : "quality_candidate_band_v3_zhko_bidirectional",
     checkedAt: typeof meta.generated_at === "string" ? meta.generated_at : new Date().toISOString(),
     missionContentHash: contentHash,
-  });
+  }, rechecked.quality);
   // 대상 후보의 국소 검사와 deterministic 검사가 통과했으면 revision은 격리 저장한다.
   // 비대상 기존 fail은 quality에 그대로 남아 후보 은행 적격 승격을 계속 차단한다.
   patched.quality_check = quality;
