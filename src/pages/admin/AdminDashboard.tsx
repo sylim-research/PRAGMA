@@ -157,12 +157,13 @@ const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   professor: "교수자 최종 승인 대기",
 };
 
+// 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
-  rules: "필수 항목·형식 등 명시된 조건 확인",
-  openai: "콘텐츠 내용 검토 · 유효한 기존 결과는 재사용",
-  claude: "선택 시에만 · OpenAI 결과 없이 콘텐츠 검토",
-  adjudication: "선택 시에만 · Claude 검토 의견을 다시 검토",
-  professor: "교수자가 감수한 뒤 수정·보류·승인 결정",
+  rules: "규칙 위반 확인",
+  openai: "내용 검토 · 기존 결과 재사용",
+  claude: "선택 시에만 · 독립 검토",
+  adjudication: "선택 시에만 · Claude 의견 재검토",
+  professor: "감수 뒤 승인·보류·수정 결정",
 };
 
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
@@ -229,7 +230,7 @@ const ReviewPipeline = ({
               </div>
               <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
                 {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 그중 검사 실패 ${rulesFailCount}`}
+                {stage.key === "rules" && rulesFailCount > 0 && ` · 실패 ${rulesFailCount}`}
               </span>
             </Link>
             {stage.step < REVIEW_STAGE_ITEMS.length && (
@@ -512,7 +513,7 @@ const AdminDashboard = () => {
           label="학습 미션"
           value={snapshot?.content.generatedMissionCount ?? null}
           unit="개"
-          description="생성된 미션 전체 · 오른쪽 세 상태로 나뉨"
+          description="생성된 미션 전체 · 오른쪽 셋으로 나뉨"
           error={displayError}
           changed={changedKeys.has("mission")}
         />
@@ -530,7 +531,7 @@ const AdminDashboard = () => {
           label="수정 필요·보류"
           value={snapshot?.content.pendingRevisionCount ?? null}
           unit="개"
-          description="수정하거나 사용 여부를 다시 정할 미션"
+          description="수정 또는 사용 여부 재결정"
           error={displayError}
           changed={changedKeys.has("pending")}
         />
@@ -539,7 +540,7 @@ const AdminDashboard = () => {
           label="교수자 승인 완료"
           value={snapshot?.content.professorFinalizedCount ?? null}
           unit="개"
-          description="수업 사용 후보 · 편성·공개 조건은 별도"
+          description="수업 사용 후보 · 편성·공개는 별도"
           error={displayError}
           changed={changedKeys.has("finalized")}
         />
@@ -581,7 +582,7 @@ const AdminDashboard = () => {
           unit="건"
           description={
             snapshot
-              ? `서로 다른 미션 ${snapshot.assignments.missionCount}개(승인 완료 ${snapshot.assignmentApproval.approvedMissionCount}) · 주차 ${snapshot.assignments.weekCount}개`
+              ? `미션 ${snapshot.assignments.missionCount}개(승인 ${snapshot.assignmentApproval.approvedMissionCount}) · 주차 ${snapshot.assignments.weekCount}개`
               : "교과목 주차에 놓인 미션"
           }
           error={displayError}
@@ -604,7 +605,7 @@ const AdminDashboard = () => {
           label="미션 수행 기록"
           value={snapshot?.learnerRecordCount ?? null}
           unit="건"
-          description="전체 계정 · 전체 기간 누적 · 한 차례 수행 = 1건"
+          description="전체 계정·기간 누적 · 1회 수행 = 1건"
           error={displayError}
           changed={changedKeys.has("records")}
         />
