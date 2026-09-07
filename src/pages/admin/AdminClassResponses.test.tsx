@@ -107,11 +107,11 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-function mount() {
+function mount(entry = "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={["/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1"]}>
+      <MemoryRouter initialEntries={[entry]}>
         <AdminClassResponses />
       </MemoryRouter>
     </QueryClientProvider>,
@@ -119,8 +119,8 @@ function mount() {
 }
 
 describe("실시간 학급 응답", () => {
-  it("실제 기록이 없을 때 예시 데이터를 기본으로 보여 주고 크게 볼 수 있다", async () => {
-    mount();
+  it("미션을 지정하지 않은 일반 진입은 예시를 보여 주고 크게 볼 수 있다", async () => {
+    mount("/admin/class-responses?courseId=course-a&weekNo=2");
     expect(await screen.findByText("응답 12명 · 이견 제기 2건")).toBeVisible();
     expect(screen.getByText("DEMO · 예시 데이터")).toBeVisible();
     expect(screen.getByRole("button", { name: "예시 데이터 보기" })).toHaveAttribute("aria-pressed", "true");
@@ -135,7 +135,7 @@ describe("실시간 학급 응답", () => {
   });
 
   it("실제 데이터를 선택하면 완료 응답을 익명 집계한다", async () => {
-    mount();
+    mount("/admin/class-responses?courseId=course-a&weekNo=2");
     await screen.findByText("응답 12명 · 이견 제기 2건");
     fireEvent.click(screen.getByRole("button", { name: "실제 데이터" }));
     expect(await screen.findByText("응답 2명 · 이견 제기 1건")).toBeVisible();
@@ -147,6 +147,23 @@ describe("실시간 학급 응답", () => {
       "href",
       "/admin/package?courseId=course-a&weekNo=2#weekly-material-detail",
     );
+  });
+
+  it("주차 운영의 미션 링크로 들어오면 해당 미션의 실제 응답을 바로 표시한다", async () => {
+    mount();
+    expect(await screen.findByText("응답 2명 · 이견 제기 1건")).toBeVisible();
+    expect(screen.getByRole("button", { name: "실제 데이터" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByText("DEMO · 예시 데이터")).not.toBeInTheDocument();
+    expect(mocks.logRows).toHaveBeenCalledWith("mission_id", "mission-1");
+    fireEvent.click(screen.getByRole("button", { name: "예시 데이터 보기" }));
+    expect(await screen.findByText("응답 12명 · 이견 제기 2건")).toBeVisible();
+  });
+
+  it("선택 미션의 실제 응답이 없으면 예시로 대체하지 않고 수행 기록 없음을 표시한다", async () => {
+    mocks.logRows.mockResolvedValue({ data: [], error: null });
+    mount();
+    expect(await screen.findByText(/아직 이 주차 미션의 수행 기록이 없습니다/)).toBeVisible();
+    expect(screen.queryByText("DEMO · 예시 데이터")).not.toBeInTheDocument();
   });
 });
 
