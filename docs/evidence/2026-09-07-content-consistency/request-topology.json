@@ -1,0 +1,69 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "spoken",
+    "x": {
+      "situation_ko": "저는 도서관에서 처음 만난 사서에게 책을 반납 기한을 연장할 수 있는지 물어보려 합니다. 아직 책을 다 읽지 못했습니다.",
+      "relation_ko": "도서관 사서와 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "mid"
+      }
+    },
+    "anchor": {
+      "situation_ko": "저는 회사의 IT 지원팀에 처음 연락하여 컴퓨터 문제를 해결할 수 있는지 문의하려고 합니다. 컴퓨터가 갑자기 작동을 멈췄습니다.",
+      "relation_ko": "회사 IT 지원팀과 처음 연락하는 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+      "channel": "phone",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      }
+    },
+    "y": {
+      "situation_ko": "저는 처음 만난 이웃에게 집 앞 주차 공간을 잠시 사용할 수 있는지 물어보려 합니다. 집에 손님이 와서 주차 공간이 필요합니다.",
+      "relation_ko": "처음 만난 이웃과의 관계로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "high"
+      }
+    },
+    "c": {
+      "situation_ko": "저는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 변경하려고 합니다. 개인 일정이 바뀌어서 기존 예약 시간을 지키기 어렵습니다.",
+      "relation_ko": "환자와 병원 접수 직원, 처음 만난 사이로 서로 동등한 위치지만 부담은 낮은 관계입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "fail",
+    "final_result": "pass",
+    "attempts": 2,
+    "regeneration_count": 1,
+    "findings": [
+      {
+        "code": "R27",
+        "path": "c.situation_ko",
+        "message": "ANCHOR와 C situation_ko가 완전히 중복됨",
+        "attempt": 1
+      }
+    ]
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T10:02:00.068Z"
+  }
+}

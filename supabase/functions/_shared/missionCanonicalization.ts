@@ -176,8 +176,9 @@ function situationShapeValid(value: string): boolean {
 
 /**
  * Converts one topology-only model response into the authoritative server plan.
- * PDR and DCT C are copied/canonicalized by the server; the model only supplies
- * the learner-facing X/A/Y scene wording and context labels.
+ * Preserve model-authored X/A/Y PDR until validation. Silently replacing these
+ * codes can leave an incompatible scene (e.g. a supervisor with equal P).
+ * Only DCT C is copied from the authoritative core.
  */
 export function buildNativeMpj5FrozenTopology(
   value: unknown,
@@ -195,9 +196,9 @@ export function buildNativeMpj5FrozenTopology(
   const topology: NativeMpj5FrozenTopology = {
     version: 'native_mpj5_scene_topology_v1',
     source_modality: sourceModality,
-    x: frozenScene(raw.x, canonicalizeContrastPdr(record(record(raw.x).pdr), anchorPdr)),
-    anchor: frozenScene(raw.anchor, { ...anchorPdr }),
-    y: frozenScene(raw.y, canonicalizeContrastPdr(record(record(raw.y).pdr), anchorPdr)),
+    x: frozenScene(raw.x, { ...record(record(raw.x).pdr) }),
+    anchor: frozenScene(raw.anchor, { ...record(record(raw.anchor).pdr) }),
+    y: frozenScene(raw.y, { ...record(record(raw.y).pdr) }),
     c: {
       situation_ko: typeof core.situation_ko === 'string' ? core.situation_ko.trim() : '',
       relation_ko: typeof core.relation_ko === 'string' ? core.relation_ko.trim() : '',
@@ -227,6 +228,15 @@ export function validateNativeMpj5FrozenTopology(
   ] as const
 
   for (const [slot, scene] of scenes) {
+    for (const axis of PDR_AXES) {
+      if (!PDR_VALUES[axis].includes(record(scene.pdr)[axis] as never)) {
+        findings.push({
+          code: 'TOPOLOGY_CONTEXT',
+          path: `${slot}.pdr.${axis}`,
+          message: `${slot.toUpperCase()} PDR 코드가 유효하지 않음: ${axis}`,
+        })
+      }
+    }
     const situation = typeof scene.situation_ko === 'string' ? scene.situation_ko.trim() : ''
     const relation = typeof scene.relation_ko === 'string' ? scene.relation_ko.trim() : ''
     // C is the server-frozen DCT scene. Its two-sentence/140-char shape is an

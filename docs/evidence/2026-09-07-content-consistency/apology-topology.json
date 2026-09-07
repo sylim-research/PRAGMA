@@ -1,0 +1,62 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "spoken",
+    "x": {
+      "situation_ko": "저는 친구의 생일 파티에 늦게 도착했습니다. 친구에게 사과하고 다음에는 시간을 잘 지키겠다고 약속해야 합니다.",
+      "relation_ko": "저는 생일 파티에 늦게 도착한 친구입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "close",
+        "r": "mid"
+      }
+    },
+    "anchor": {
+      "situation_ko": "저는 어제 회의에서 실수로 동료의 발표 자료를 삭제했습니다. 동료에게 사과하고 복구를 돕겠다고 약속해야 합니다.",
+      "relation_ko": "저는 실수로 동료의 발표 자료를 삭제한 동등한 직장 동료입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    },
+    "y": {
+      "situation_ko": "저는 어제 친구의 물건을 실수로 망가뜨렸습니다. 친구에게 사과하고 수리 비용을 부담하겠다고 해야 합니다.",
+      "relation_ko": "저는 친구의 물건을 실수로 망가뜨린 친구입니다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "close",
+        "r": "mid"
+      }
+    },
+    "c": {
+      "situation_ko": "나는 어젯밤에 가구를 옮기면서 아래층 이웃에게 소음을 냈다. 오늘 복도에서 그 이웃을 만나 사과하고 앞으로 밤에는 조심하겠다고 약속해야 한다.",
+      "relation_ko": "나는 아파트 아래층에 사는 동등한 이웃과 어젯밤 소음 문제로 불편을 끼친 사이이다.",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "pass",
+    "final_result": "pass",
+    "attempts": 1,
+    "regeneration_count": 0,
+    "findings": []
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T10:05:58.993Z"
+  }
+}

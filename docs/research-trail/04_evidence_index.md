@@ -234,3 +234,12 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 구현·검증: `LearnerCourseLive.tsx`, `LearnerCourseWeek.tsx`, `missionMenuTitle.ts`, 교과목 데이터 투영 및 회귀 검사. 전체 771 tests 통과·9 skip, typecheck, 운영 소스 정책 5 tests, 로컬 PostgreSQL 승인 경계 10 tests, 운영용 build 통과.
 - 브라우저 근거: 로컬 실제 데이터의 주차 전환·키보드 조작·통역 미션 진입·복귀·모바일 배치와 최종 제목 화면. 상세 범위는 `docs/dev-log/2026-09-07-course-accordion.md` 참조.
 - 기능 SHA·main·CI·Railway 배포 및 운영 smoke의 최종 상태는 해당 변경 PR 본문에 연결한다. 학습자 응답 완료 저장·클릭률·학습효과의 검증 자료가 아니다.
+
+## EVD-20260907-03 · 콘텐츠 정합성 오류 회귀 근거
+
+- 위치: docs/evidence/2026-09-07-content-consistency/.
+- 내용: 로컬 요청·거절 파일럿 초안과 최종 정합성 검수 결과, 요청·거절·사과 장면 구성 결과,
+  실제 제공자 모델·response ID·usage. API 키·로그인 정보·학생 수행 자료는 포함하지 않는다.
+- 용도: DEC-20260907-06 / ITER-20260907-03의 원인 수정·실제 결함 검출 근거.
+- 한계: 전체 미션 품질, 운영 콘텐츠 일괄 수정 또는 학습효과의 근거로 사용하지 않는다.
+

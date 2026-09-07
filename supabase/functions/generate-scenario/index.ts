@@ -1,4 +1,6 @@
+import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
+import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
 import {
   FEEDBACK_MAX_COMPLETION_TOKENS,
   feedbackPayloadIssue,
@@ -1918,7 +1920,7 @@ ${NATURAL_INTERPRETING_SCENE_RULE}`
   const zhKoTranslationContract = !isSpoken && direction === 'zh_ko'
     ? `
 🔴 [중→한 번역 정식 계약]
-- 학습자는 제3자 번역자가 아니라 **자기 발신 상황의 화자**입니다. 모든 situation_ko·relation_ko는 이 1인칭 역할을 유지하고 A/B/C 통역 구조를 만들지 마세요.
+- 학습자는 제3자 번역자가 아니라 **자기 발신 상황의 화자**입니다. situation_ko는 이 1인칭 역할을 유지하고 relation_ko는 상대의 역할·관계를 설명하세요. A/B/C 통역 구조를 만들지 마세요.
 - MPJ1~5와 DCT의 모든 source는 사용자 요청서의 지정 화행을 수행해야 합니다. 원 코어의 화행을 등산 초대 거절 같은 다른 화행·사건으로 바꾸거나, 보조 화행을 중심 목적으로 승격하면 실패입니다.
 - 모든 target·수정안·후보·recommended_example·reference_alternatives는 중국어 원문의 **명제·화행 목적·태도·화용적 힘**을 보존합니다. 한국어에서 형식 조정은 허용하지만 힘을 더 공손하게 개선하거나 다른 관계 태도로 바꾸지 마세요.
 - 목표어는 실제 관계·채널·장르에서 자연스러운 한국어 담화여야 합니다. 중국어 어순·주어 반복·명사화·직역 결합을 남긴 번역투를 피하고, 한국어의 생략·호응·담화 연결을 사용하세요.
@@ -2201,6 +2203,8 @@ ${sceneRules}
 - 모든 문항의 source는 **실제 ${srcL} 발화**(학습자가 옮길 원문 문장)여야 합니다 —
   "~에 대한 감사 인사" 같은 설명문 금지.
 ${pdrPerspectiveRule}
+${SCENE_ROLE_PDR_RULE}
+${REASON_DISCRIMINATION_RULE}
 - 모든 target·교정안·후보는 해당 source의 핵심 명제·발화 의도·화행 목적을 유지합니다.
   MPJ에서는 원문 밖의 새 사실 추가 금지(정형 표현 ${formulaic}는 예외).
 - DCT의 usable_facts는 reference_alternatives에서만 사용할 수 있고, 사실 유무를 정답 단서로 만들지 마세요.
@@ -2297,7 +2301,7 @@ function buildMissionUserPrompt(b: MissionGenBody, nativeMpj5Override?: boolean)
   return parts.join('\n')
 }
 
-const MISSION_TOPOLOGY_PROMPT_VERSION = 'mission_scene_topology_v1_constraint_by_construction'
+const MISSION_TOPOLOGY_PROMPT_VERSION = 'mission_scene_topology_v2_preserve_pdr'
 
 type MissionTopologyAttemptFinding = NativeMpj5TopologyFinding & { attempt: number }
 type MissionTopologyEvidence = {
@@ -2310,50 +2314,11 @@ type MissionTopologyEvidence = {
   findings: MissionTopologyAttemptFinding[]
 }
 
-const MISSION_TOPOLOGY_RESPONSE_FORMAT: OpenAIResponseFormat = {
-  type: 'json_schema',
-  json_schema: {
-    name: 'pragma_mission_scene_topology',
-    strict: true,
-    schema: {
-      type: 'object',
-      additionalProperties: false,
-      required: ['x', 'anchor', 'y'],
-      properties: {
-        x: { $ref: '#/$defs/scene' },
-        anchor: { $ref: '#/$defs/scene' },
-        y: { $ref: '#/$defs/scene' },
-      },
-      $defs: {
-        pdr: {
-          type: 'object',
-          additionalProperties: false,
-          required: ['p', 'd', 'r'],
-          properties: {
-            p: { type: 'string', enum: ['speaker_lower', 'equal', 'speaker_higher'] },
-            d: { type: 'string', enum: ['close', 'acquaintance', 'distant'] },
-            r: { type: 'string', enum: ['low', 'mid', 'high'] },
-          },
-        },
-        scene: {
-          type: 'object',
-          additionalProperties: false,
-          required: ['situation_ko', 'relation_ko', 'channel', 'pdr'],
-          properties: {
-            situation_ko: { type: 'string' },
-            relation_ko: { type: 'string' },
-            channel: { type: 'string', enum: ['email', 'messenger', 'facetoface', 'phone'] },
-            pdr: { $ref: '#/$defs/pdr' },
-          },
-        },
-      },
-    },
-  },
-}
 
 function buildMissionTopologyPrompt(
   b: MissionGenBody,
   findings: readonly MissionTopologyAttemptFinding[] = [],
+  previousPlan?: unknown,
 ): { system: string; user: string } {
   const direction = normDir(b.direction)
   const isSpoken = b.core.source_modality === 'spoken'
@@ -2367,11 +2332,14 @@ function buildMissionTopologyPrompt(
   const system = `당신은 PRAGMA의 frozen mission scene topology 설계기입니다.
 ${SCENE_PLAUSIBILITY_RULE}
 ${isSpoken ? NATURAL_INTERPRETING_SCENE_RULE : ''}
+${SCENE_ROLE_PDR_RULE}
 완전한 미션·문항·후보·정답·해설은 만들지 말고 X/Anchor A/Y 세 장면만 JSON으로 만드세요.
 - X, A, Y situation_ko는 각각 ${situationRule}이며 140자 이내입니다.
 - X/A/Y와 서버가 제시하는 DCT C는 글자까지 완전히 다른 구체적 사건이어야 합니다.
+- Anchor A는 C와 PDR만 공유하는 별도 사건입니다. C를 복사·요약·바꿔 말하지 말고, 다른 용건 또는 다른 잘못·도움·논의 대상으로 바꾸세요. X/Y도 각각 새로운 사건입니다.
 - Anchor A는 하나만 만듭니다. 이후 서버가 MJT2·3·4에 동일 객체로 복제합니다.
 - Anchor A는 DCT C와 같은 P/D/R입니다. X와 Y는 각각 Anchor에서 정확히 한 축만 바꿉니다.
+- PDR 세 코드를 먼저 정하고 그 값에 맞는 관계·사건을 쓰세요. 두 축 변경·대비 없음·Anchor/C 코드 불일치는 자동 보정하지 않고 재생성합니다.
 - relation_ko는 ${relationRule}이고 P/D/R과 일치해야 합니다.
 - channel은 ${channels}만 사용합니다.
 - 화행과 핵심 화용 초점은 유지하되 새 의미 판정 규칙을 만들지 마세요.
@@ -2389,6 +2357,7 @@ ${isSpoken ? NATURAL_INTERPRETING_SCENE_RULE : ''}
       source_modality: b.core.source_modality,
       source_text: b.core.source_text_ko,
     }, null, 2),
+    ...(previousPlan ? ['[직전 실패한 장면 — 중복 지적된 사건을 새 사건으로 교체]', JSON.stringify(previousPlan, null, 2)] : []),
     ...(findings.length > 0
       ? ['[직전 topology deterministic findings — 이 항목만 바로잡아 전체 X/A/Y를 다시 반환]', JSON.stringify(findings, null, 2)]
       : []),
@@ -2406,10 +2375,18 @@ async function generateFrozenMissionTopology(args: {
 > {
   const allFindings: MissionTopologyAttemptFinding[] = []
   let firstPassResult: 'pass' | 'fail' = 'fail'
+  let previousPlan: unknown
   for (let attempt = 1; attempt <= NATIVE_MPJ5_TOPOLOGY_MAX_ATTEMPTS; attempt += 1) {
-    const prompt = buildMissionTopologyPrompt(args.body, allFindings)
+    const prompt = buildMissionTopologyPrompt(args.body, allFindings, previousPlan)
     const response = await callOpenAI(MISSION_PRIMARY_MODEL, args.apiKey, prompt.system, prompt.user, 0.2, {
-      responseFormat: MISSION_TOPOLOGY_RESPONSE_FORMAT,
+      responseFormat: {
+        type: 'json_schema',
+        json_schema: {
+          name: 'pragma_mission_scene_topology',
+          strict: true,
+          schema: missionTopologySchema(args.body.core.pdr, args.body.core.source_modality === 'spoken'),
+        },
+      },
       // Topology is the first stage of mission generation. Keep the existing
       // ledger operation and distinguish this subtype by its prompt version.
       telemetry: args.telemetryFor('mission_generate', true, {
@@ -2450,6 +2427,7 @@ async function generateFrozenMissionTopology(args: {
       continue
     }
     const frozen = buildNativeMpj5FrozenTopology(parsed, args.body.core)
+    previousPlan = parsed
     const attemptFindings = frozen.findings.map((finding) => ({ ...finding, attempt }))
     if (attempt === 1) firstPassResult = attemptFindings.length === 0 ? 'pass' : 'fail'
     allFindings.push(...attemptFindings)
@@ -3917,44 +3895,17 @@ function buildQualityUserPrompt(b: QualityCheckBody): string {
 ${candidateBlueprints ? JSON.stringify(candidateBlueprints, null, 2) : '(전달되지 않음)'}
 
 [심사 대상 mission_content]
-${JSON.stringify(b.mission_content, null, 2)}`
+${JSON.stringify(missionCriticContent(b.mission_content), null, 2)}`
 }
 
-const RELATIONAL_FEEDBACK_AUDIT_PROMPT_VERSION = 'quality_relational_feedback_v3_directional_target'
+const RELATIONAL_FEEDBACK_AUDIT_PROMPT_VERSION = 'quality_consistency_v4_scene_reasons_feedback'
 
 function buildRelationalFeedbackAuditSystemPrompt(direction: Direction): string {
-  const targetLanguage = LANG_KO[DIR_LANGS[direction].tgt]
-  return `너는 PRAGMA native MPJ5의 **피드백 계약만** 감사하는 좁은 품질 심사자다.
-다른 품질 항목은 보지 말고 아래 두 항목을 MPJ1~5 전체에서 끝까지 검사한다.
-
-1. feedback_quality_mismatch
-- explanation_ko와 후보별 note_ko가 현재 상황 단서, **해당 ${targetLanguage} 표현에 실제로 있는 자원 또는
-  그 자원의 구체적 기능**, 관계적 효과, 유지/조정할 한 지점을 연결하는가.
-- 표현의 실제 부분문자열을 인용하거나 현재 표현에 있는 자원을 모호하지 않게 지칭해야 한다.
-- "공손하다", "선택권을 준다", "부적절하다" 같은 일반 평가만으로 끝나거나 여러 화용 차이를
-  한꺼번에 가르치면 warning이다.
-
-2. comparison_quality_mismatch
-- MPJ5의 적정 대역 후보 2개가 실제로 서로 다른 화용 전략을 쓰고, note_ko가 **의미 있게 다른
-  관계적 인상**을 설명하는가.
-- 단순한 어순·의문형 재서술이나 두 note가 모두 결국 "선택권 존중/의견 존중" 하나로 환원되면
-  warning이다. 격식, 거리, 연대감, 협의 가능성, 부담의 귀속, 인식적 입장 가운데 적어도 하나의
-  관계적 차이가 실제 표현에 근거해 구별되어야 한다.
-- 둘 다 적정할 수 있으므로 숨은 우열이나 단일 모범답안을 만들라고 요구하지 마라.
-
-결함을 찾았어도 다음 문항 검사를 중단하지 마라. 고쳐 쓰지는 말고 최대 8개 finding만 반환한다.
-모든 finding은 현재 mission_content에 실제 존재하는 explanation_ko 또는 note_ko 경로를 가리키고,
-evidence_excerpt는 그 경로 값에서 그대로 복사한 짧은 부분문자열이어야 한다.
-경로의 배열 인덱스는 반드시 0부터 시작한다: MPJ1=mpj_items[0], MPJ2=[1], MPJ3=[2],
-MPJ4=[3], MPJ5=mpj_items[4]. mpj_items[5]는 존재하지 않으므로 절대 쓰지 마라.
-
-[출력 — 오직 JSON]
-{"findings":[{"code":"feedback_quality_mismatch"|"comparison_quality_mismatch","severity":"warning","where":"mpj_items[...].explanation_ko 또는 ...note_ko","evidence_excerpt":"현재 값의 실제 부분문자열","note_ko":"누락된 연결 한 가지"}]}
-결함이 없으면 findings는 빈 배열이다.`
+  return buildMissionConsistencyAuditPrompt(LANG_KO[DIR_LANGS[direction].tgt])
 }
 
 function buildRelationalFeedbackAuditUserPrompt(b: QualityCheckBody): string {
-  return `[심사 대상 mission_content]\n${JSON.stringify(b.mission_content, null, 2)}`
+  return buildQualityUserPrompt(b) + "\n[지정 화행] " + (b.speech_act_ko ?? b.speech_act)
 }
 
 function parseOpenAIContent(raw: string): unknown {
@@ -4818,20 +4769,22 @@ Deno.serve(async (req) => {
             buildRelationalFeedbackAuditUserPrompt(b),
             0.1,
             {
-              telemetry: telemetryFor('mission_critic', false, {
+              responseFormat: MISSION_CONSISTENCY_RESPONSE_FORMAT,
+              telemetry: telemetryFor('mission_critic', true, {
                 invocationAttempt: 2,
                 promptVersion: RELATIONAL_FEEDBACK_AUDIT_PROMPT_VERSION,
               }),
             },
           )
-          if (relationalAtt.ok) {
-            const relationalParsed = parseOpenAIContent(relationalAtt.raw) as Record<string, unknown>
-            relationalRawFindings = Array.isArray(relationalParsed.findings)
-              ? relationalParsed.findings
-              : []
+          if (!relationalAtt.ok) throw new Error('Consistency audit provider failed')
+          const relationalParsed = parseOpenAIContent(relationalAtt.raw) as Record<string, unknown>
+          if (MISSION_CONSISTENCY_SECTIONS.some(section => !Array.isArray(relationalParsed[section]))) {
+            throw new Error('Consistency audit section missing')
           }
+          relationalRawFindings = MISSION_CONSISTENCY_SECTIONS.flatMap(section => relationalParsed[section] as unknown[])
         } catch (error) {
-          console.error('[quality_relational_feedback] optional audit failed', (error as Error).message)
+          console.error('[quality_consistency] audit failed', (error as Error).message)
+          return new Response(JSON.stringify({ error: '장면·선택지·해설 정합성 검수를 완료하지 못했습니다.' }), { status: 502, headers: jsonHeaders })
         }
       }
       const rawFindings = [

@@ -691,6 +691,11 @@ export function checkMission(
       }
       case "reason": {
         const ids = new Set(it.reasons.map((r) => r.id));
+        const distinctReasons = new Set(it.reasons.map((r) =>
+          r.text_ko.normalize("NFKC").replace(/[\s\p{P}]/gu, "")));
+        if (distinctReasons.size !== it.reasons.length) {
+          add(v, "R4", "fail", `문항 ${it.id}: 이유 선택지 문구가 중복됨`);
+        }
         if (!ids.has(it.accepted_reason_id)) {
           add(v, "R4", "fail", `문항 ${it.id}: accepted_reason_id가 reasons에 없는 id 참조`);
         }

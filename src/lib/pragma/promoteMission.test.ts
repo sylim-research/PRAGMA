@@ -202,6 +202,30 @@ describe("candidate-level mission repair", () => {
     ]);
   });
 
+  it("keeps a newly detected stale explanation after the candidate itself passes", () => {
+    const freshFinding = {
+      code: "internal_inconsistency", severity: "fail" as const,
+      where: "mpj_items[4].explanation_ko",
+      note_ko: "교체된 후보에 없는 麻烦您을 있다고 설명합니다.",
+    };
+    const rechecked = {
+      verdict: "fail" as const, summary_ko: "해설 모순", findings: [freshFinding],
+      model: "full-critic", prompt_version: "quality-v20", checked_at: "2026-09-07",
+    };
+    const quality = qualityAfterCandidateRegeneration({
+      ...rechecked, verdict: "pass", findings: [],
+    }, ["mpj_items[4].candidates[3]"], [{
+      path: "mpj_items[4].candidates[3]", severity: "pass",
+    }], {
+      model: "candidate-critic", promptVersion: "candidate-v1",
+      checkedAt: "2026-09-07", missionContentHash: "revised-hash",
+    }, rechecked);
+    expect(quality.verdict).toBe("fail");
+    expect(quality.findings).toContainEqual(freshFinding);
+    expect(quality.prompt_version).toBe("quality-v20");
+    expect(quality.mission_content_hash).toBe("revised-hash");
+  });
+
   it("keeps an unrelated critical finding after the targeted candidate is resolved", () => {
     const quality = qualityAfterCandidateRegeneration({
       verdict: "fail",

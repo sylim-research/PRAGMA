@@ -29,7 +29,7 @@ describe('native MPJ5 frozen topology', () => {
       situation_ko: '지도교수에게 연구 계획서를 메일로 보낸다. 이번 주 안에 검토를 정중히 부탁한다.',
       relation_ko: '학생과 지도교수',
       channel: 'email',
-      pdr: { p: 'equal', d: 'close', r: 'high' },
+      pdr: { p: 'speaker_lower', d: 'distant', r: 'mid' },
     },
     y: {
       situation_ko: '회사 대표에게 계약 초안을 메일로 보낸다. 오늘 안에 승인을 매우 정중히 요청한다.',
@@ -39,7 +39,7 @@ describe('native MPJ5 frozen topology', () => {
     },
   }
 
-  it('server-freezes C and Anchor PDR while keeping one-axis X/Y contrasts', () => {
+  it('accepts aligned PDR and freezes C without changing authored X/A/Y codes', () => {
     const built = buildNativeMpj5FrozenTopology(raw, core)
 
     expect(NATIVE_MPJ5_TOPOLOGY_MAX_ATTEMPTS).toBe(2)
@@ -84,6 +84,26 @@ describe('native MPJ5 frozen topology', () => {
 
     const built = buildNativeMpj5FrozenTopology(duplicate, core)
     expect(built.findings).toContainEqual(expect.objectContaining({ code: 'R27', path: 'y.situation_ko' }))
+  })
+
+  it('rejects a conflicting Anchor instead of hiding it with the core PDR', () => {
+    const authoredPdr = { p: 'speaker_higher', d: 'close', r: 'high' }
+    const built = buildNativeMpj5FrozenTopology({
+      ...raw, anchor: { ...raw.anchor, pdr: authoredPdr },
+    }, core)
+    expect(built.topology.anchor.pdr).toEqual(authoredPdr)
+    expect(built.findings).toContainEqual(expect.objectContaining({ code: 'R27', path: 'c.pdr' }))
+  })
+
+  it.each([
+    { ...core.pdr },
+    { ...core.pdr, p: 'equal', r: 'high' },
+    { p: 'invalid', d: 'distant', r: 'mid' },
+    {},
+  ])('rejects invalid contrasts without inventing or dropping axes: %j', (pdr) => {
+    const built = buildNativeMpj5FrozenTopology({ ...raw, x: { ...raw.x, pdr } }, core)
+    expect(built.topology.x.pdr).toEqual(pdr)
+    expect(built.findings.some(f => f.path.startsWith('x.pdr'))).toBe(true)
   })
 
   it('keeps C nonempty and collision hard while leaving its shape to the mission warning', () => {

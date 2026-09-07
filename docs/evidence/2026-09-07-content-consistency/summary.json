@@ -1,0 +1,224 @@
+{
+  "scope": "Regression of existing local pilot errors; no production content writes",
+  "finalAudit": {
+    "summary": [
+      {
+        "case": "request-old-draft-check",
+        "status": 200,
+        "quality": {
+          "verdict": "fail",
+          "summary_ko": "모든 요청 표현이 실제 맥락에 맞는 완화와 선택권 대역을 적절히 구분하고, 오답도 현실적인 경계 사례로 구성되어 있음.",
+          "findings": [
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[4].pdr.p",
+              "evidence_excerpt": "speaker_higher",
+              "note_ko": "상사에게 요청하는 장면인데 pdr.p가 speaker_higher로 설정되어 있음. 실제로는 직원(화자)이 상사에게 요청하므로 speaker_lower가 되어야 함. 관계 설명과 pdr.p가 불일치."
+            },
+            {
+              "code": "primary_reason_ambiguity",
+              "severity": "fail",
+              "where": "mpj_items[3].reasons[0].text_ko",
+              "evidence_excerpt": "문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.",
+              "note_ko": "r1(문법적으로는 문제가 없지만, 선택권을 충분히 남기지 않아 상대방에게 부담을 줄 수 있습니다.)와 r2(요청의 직접성이 높아 상대방에게 부담을 줄 수 있습니다.)가 모두 실제 주원인(직접성/부담)과 실질적으로 같은 뜻을 반복함. 선택권 부족과 직접성 증가는 이 문항에서 같은 진단이므로, 이유 구별이 불충분함."
+            }
+          ],
+          "mission_content_hash": "a50bd27904148c68cccdb8f1bbcdd66be58a1e4b575d286ef4282a5c0233a6d6",
+          "model": "gpt-4.1",
+          "prompt_version": "quality_v20_content_consistency",
+          "checked_at": "2026-09-07T10:05:48.971Z"
+        }
+      },
+      {
+        "case": "refusal-old-draft-check",
+        "status": 200,
+        "quality": {
+          "verdict": "fail",
+          "summary_ko": "모든 문항이 상황과 화용 초점에 맞는 적정 대역 구분과 설명을 제공하며, 결함이 발견되지 않음.",
+          "findings": [
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[1].relation_ko",
+              "evidence_excerpt": "나는 나의 상사이다.",
+              "note_ko": "'나는 나의 상사이다.'라는 관계 설명은 자기 자신이 자기 상사가 되는 모순된 서술이다. 실제 상황은 '상사가 나에게 요청'하는 장면이므로, relation_ko는 '나의 상사' 또는 '상사' 등으로 표현되어야 한다."
+            },
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[2].relation_ko",
+              "evidence_excerpt": "나는 나의 상사이다.",
+              "note_ko": "'나는 나의 상사이다.'라는 관계 설명은 자기 자신이 자기 상사가 되는 모순된 서술이다. 실제 상황은 '상사가 나에게 요청'하는 장면이므로, relation_ko는 '나의 상사' 또는 '상사' 등으로 표현되어야 한다."
+            },
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[3].relation_ko",
+              "evidence_excerpt": "나는 나의 상사이다.",
+              "note_ko": "'나는 나의 상사이다.'라는 관계 설명은 자기 자신이 자기 상사가 되는 모순된 서술이다. 실제 상황은 '상사가 나에게 요청'하는 장면이므로, relation_ko는 '나의 상사' 또는 '상사' 등으로 표현되어야 한다."
+            },
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[3].pdr.p",
+              "evidence_excerpt": "equal",
+              "note_ko": "상사가 나에게 요청하는 장면에서 pdr.p는 speaker_lower(화자 지위가 낮음)이어야 한다. 현재 equal로 설정되어 있어 관계와 맞지 않는다."
+            },
+            {
+              "code": "internal_inconsistency",
+              "severity": "fail",
+              "where": "mpj_items[4].pdr.p",
+              "evidence_excerpt": "equal",
+              "note_ko": "상사가 나에게 요청하는 장면에서 pdr.p는 speaker_lower(화자 지위가 낮음)이어야 한다. 현재 equal로 설정되어 있어 관계와 맞지 않는다."
+            },
+            {
+              "code": "primary_reason_ambiguity",
+              "severity": "fail",
+              "where": "mpj_items[3].reasons[0].text_ko",
+              "evidence_excerpt": "상사에게는 좀 더 공손한 표현이 필요합니다.",
+              "note_ko": "r1(상사에게는 좀 더 공손한 표현이 필요합니다.)와 r2(완화 표현이 부족하여 너무 단호하게 들립니다.)는 실제로 같은 주원인(완화 표현 부족, 공손함 부족)을 다르게 표현한 것으로, 명확히 구별되는 별개의 이유가 아니다."
+            },
+            {
+              "code": "critic_grounding_failure",
+              "severity": "warning",
+              "where": "",
+              "note_ko": "현재 경로의 값과 인용이 일치하지 않습니다: mpj_items[4].relation_ko"
+            }
+          ],
+          "mission_content_hash": "af2e6e513cf378c73990cbb4696a0caf07f4842502c15377f1d24033d05cca72",
+          "model": "gpt-4.1",
+          "prompt_version": "quality_v20_content_consistency",
+          "checked_at": "2026-09-07T10:05:55.963Z"
+        }
+      },
+      {
+        "case": "apology-topology",
+        "status": 200,
+        "stopCode": null,
+        "evidence": {
+          "version": "mission_scene_topology_evidence_v1",
+          "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+          "first_pass_result": "pass",
+          "final_result": "pass",
+          "attempts": 1,
+          "regeneration_count": 0,
+          "findings": []
+        }
+      }
+    ],
+    "events": [
+      {
+        "case": "request-old-draft-check",
+        "model": "gpt-4.1-2025-04-14",
+        "responseId": "chatcmpl-ELQWKSDmwZtleDweC8xcrKjsdM32B",
+        "usage": {
+          "prompt_tokens": 9070,
+          "completion_tokens": 63,
+          "total_tokens": 9133,
+          "prompt_tokens_details": {
+            "cached_tokens": 8832,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "elapsedMs": 6513,
+        "status": 200
+      },
+      {
+        "case": "request-old-draft-check",
+        "model": "gpt-4.1-2025-04-14",
+        "responseId": "chatcmpl-ELQWREKLHhZr659bQ6P7QlioV5aN8",
+        "usage": {
+          "prompt_tokens": 6258,
+          "completion_tokens": 275,
+          "total_tokens": 6533,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "elapsedMs": 3000,
+        "status": 200
+      },
+      {
+        "case": "refusal-old-draft-check",
+        "model": "gpt-4.1-2025-04-14",
+        "responseId": "chatcmpl-ELQWUVeAyBBGyTzIFyFmbfi72iVi3",
+        "usage": {
+          "prompt_tokens": 9329,
+          "completion_tokens": 57,
+          "total_tokens": 9386,
+          "prompt_tokens_details": {
+            "cached_tokens": 9088,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "elapsedMs": 1766,
+        "status": 200
+      },
+      {
+        "case": "refusal-old-draft-check",
+        "model": "gpt-4.1-2025-04-14",
+        "responseId": "chatcmpl-ELQWV3tAOzCcCQ2eVgGSbnkZ1Iejb",
+        "usage": {
+          "prompt_tokens": 6260,
+          "completion_tokens": 705,
+          "total_tokens": 6965,
+          "prompt_tokens_details": {
+            "cached_tokens": 0,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "elapsedMs": 5210,
+        "status": 200
+      },
+      {
+        "case": "apology-topology",
+        "model": "gpt-4o-2024-08-06",
+        "responseId": "chatcmpl-ELQWab94oVabn9hCNN8jiX375M5ev",
+        "usage": {
+          "prompt_tokens": 2750,
+          "completion_tokens": 265,
+          "total_tokens": 3015,
+          "prompt_tokens_details": {
+            "cached_tokens": 2560,
+            "audio_tokens": 0
+          },
+          "completion_tokens_details": {
+            "reasoning_tokens": 0,
+            "audio_tokens": 0,
+            "accepted_prediction_tokens": 0,
+            "rejected_prediction_tokens": 0
+          }
+        },
+        "elapsedMs": 3017,
+        "status": 200
+      }
+    ]
+  },
+  "limitation": "Known extra false positive: refusal MJT5 neighbor P was read as supervisor; human review remains required. Topology success is not full mission success."
+}
