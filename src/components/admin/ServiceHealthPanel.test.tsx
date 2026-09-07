@@ -63,6 +63,24 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(screen.queryByText(/확인할 수 없습니다/)).not.toBeInTheDocument();
   });
 
+  it("점검 경로가 없을 때는 빨간불 대신 회색 「직접 확인」과 콘솔 링크를 보여 준다", async () => {
+    mocks.run.mockResolvedValueOnce({
+      checkedAt: "2026-09-07T12:04:00.000Z",
+      statuses: [
+        { id: "elevenlabs", tone: "ok", summary: "정상" },
+        { id: "openai", tone: "manual", summary: "자동 점검을 쓸 수 없습니다", link: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/x" } },
+        { id: "anthropic", tone: "manual", summary: "자동 점검을 쓸 수 없습니다", link: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/x" } },
+        { id: "supabase", tone: "ok", summary: "정상" },
+        { id: "app", tone: "ok", summary: "정상" },
+      ],
+    });
+    render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));
+    expect(await screen.findAllByRole("img", { name: "직접 확인" })).toHaveLength(2);
+    expect(screen.queryByRole("img", { name: "실패" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /OpenAI 콘솔에서 확인/ })).toHaveAttribute("href", "https://platform.openai.com/x");
+  });
+
   it("설정된 모델명을 각 줄에 보여 준다", async () => {
     render(<ServiceHealthPanel />);
     fireEvent.click(screen.getByRole("button", { name: "지금 점검" }));

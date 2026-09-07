@@ -15,7 +15,9 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
 export type ServiceId = "elevenlabs" | "openai" | "anthropic" | "supabase" | "app";
-export type ServiceTone = "ok" | "warn" | "fail" | "idle";
+// manual = 우리 쪽 자동 점검 경로가 없어 판정을 못 한 상태. 서비스가 죽었다는 뜻이 아니므로
+// 빨간불을 켜지 않고, 사람이 직접 볼 수 있는 콘솔 링크를 준다.
+export type ServiceTone = "ok" | "warn" | "fail" | "manual" | "idle";
 
 export type ServiceStatus = {
   id: ServiceId;
@@ -25,6 +27,8 @@ export type ServiceStatus = {
   /** 잔량 등 부가 정보. 없으면 생략. */
   detail?: string;
   latencyMs?: number | null;
+  /** 자동 판정을 못 했을 때 사람이 직접 확인할 곳. */
+  link?: { label: string; href: string };
 };
 
 export type ServiceHealthReport = { checkedAt: string; statuses: ServiceStatus[] };
@@ -141,6 +145,11 @@ type ProviderHealth = {
 
 const KEY_NAME: Record<ProviderHealth["provider"], string> = { openai: "OPENAI_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
 
+export const PROVIDER_CONSOLE: Record<ProviderHealth["provider"], { label: string; href: string }> = {
+  openai: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/settings/organization/billing/overview" },
+  anthropic: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/dashboard" },
+};
+
 const providerStatus = (health: ProviderHealth): ServiceStatus => {
   const { provider: id, latencyMs } = health;
   // 설정된 모델은 상태와 무관하게 보여 준다 — 키가 죽어 있을 때도 「무엇을 부르려 했는가」는 유효한 정보다.
@@ -160,6 +169,15 @@ const bothFail = (summary: string): ServiceStatus[] => [
   { id: "anthropic", tone: "fail", summary },
 ];
 
+/**
+ * 점검 함수 자체에 닿지 못했을 때. 제공자의 상태는 우리가 모르는 것이지 나쁜 것이 아니다 —
+ * 실패로 칠하지 않고 직접 볼 곳을 준다(예: service-health 배포 전).
+ */
+const bothManual = (summary: string): ServiceStatus[] =>
+  (["openai", "anthropic"] as const).map((id) => ({
+    id, tone: "manual" as const, summary, link: PROVIDER_CONSOLE[id],
+  }));
+
 export async function fetchProviderStatuses(token: string, deps: Deps = {}): Promise<ServiceStatus[]> {
   const fetcher = deps.fetcher ?? fetch;
   try {
@@ -168,8 +186,10 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
       headers: authHeaders(token),
       signal: timeoutSignal(20_000),
     });
+    // 권한 문제는 우리가 고칠 수 있는 실제 문제다 — 이것만 빨간불.
     if (response.status === 401 || response.status === 403) return bothFail("관리자 로그인을 확인해 주세요");
-    if (!response.ok) return bothFail(`점검에 실패했습니다 (${response.status})`);
+    // 그 밖의 응답(미배포 404 포함)은 「제공자가 죽었다」가 아니라 「우리가 못 물어봤다」이다.
+    if (!response.ok) return bothManual("자동 점검을 쓸 수 없습니다");
     const payload = (await response.json()) as { providers?: ProviderHealth[] };
     const providers = Array.isArray(payload.providers) ? payload.providers : [];
     const byId = new Map(providers.map((health) => [health.provider, providerStatus(health)]));
@@ -177,7 +197,7 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
       (id) => byId.get(id) ?? { id, tone: "fail", summary: "점검 결과가 없습니다" },
     );
   } catch {
-    return bothFail("응답이 없습니다");
+    return bothManual("자동 점검을 쓸 수 없습니다");
   }
 }
 

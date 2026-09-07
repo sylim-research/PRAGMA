@@ -102,10 +102,28 @@ describe("fetchProviderStatuses", () => {
     expect(anthropic.summary).toBe("응답이 없습니다");
   });
 
-  it("함수 자체가 안 뜨면 두 줄 모두 실패다", async () => {
+  it("점검 함수에 닿지 못하면 제공자를 실패로 칠하지 않고 콘솔 링크를 준다", async () => {
     const fetcher = vi.fn().mockRejectedValue(new Error("down"));
     const statuses = await fetchProviderStatuses("t", { fetcher });
+    expect(statuses.every((s) => s.tone === "manual")).toBe(true);
+    expect(statuses.every((s) => s.tone !== "fail")).toBe(true);
+    expect(statuses[0].link?.href).toContain("platform.openai.com");
+    expect(statuses[1].link?.href).toContain("platform.claude.com");
+  });
+
+  it("함수가 아직 배포되지 않았을 때(404)도 같은 처리다 — 제공자 상태를 우리가 모를 뿐이다", async () => {
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse({ error: "not found" }, 404));
+    const statuses = await fetchProviderStatuses("t", { fetcher });
+    expect(statuses.map((s) => s.tone)).toEqual(["manual", "manual"]);
+    expect(statuses[0].summary).toBe("자동 점검을 쓸 수 없습니다");
+    expect(statuses[0].link?.label).toContain("OpenAI 콘솔");
+  });
+
+  it("관리자 권한 문제는 우리가 고칠 실제 문제이므로 실패로 남긴다", async () => {
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse({ error: "forbidden" }, 403));
+    const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(statuses.every((s) => s.tone === "fail")).toBe(true);
+    expect(statuses[0].summary).toContain("관리자 로그인");
   });
 });
 

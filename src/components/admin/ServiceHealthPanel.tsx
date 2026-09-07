@@ -26,6 +26,8 @@ const TONE: Record<ServiceTone, { label: string; dot: string; text: string }> = 
   ok: { label: "정상", dot: "bg-emerald-500", text: "text-emerald-900" },
   warn: { label: "주의", dot: "bg-amber-500", text: "text-amber-900" },
   fail: { label: "실패", dot: "bg-rose-500", text: "text-rose-900" },
+  // 점검 경로가 없는 것은 서비스 이상이 아니다 — 빨간불을 켜지 않는다.
+  manual: { label: "직접 확인", dot: "bg-slate-400", text: "text-muted-foreground" },
   idle: { label: "미점검", dot: "bg-slate-300", text: "text-muted-foreground" },
 };
 
@@ -64,7 +66,17 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
             )}
           </span>
         </div>
-        {!pending && status.detail && <p className="mt-0.5 text-xs text-muted-foreground">{status.detail}</p>}
+        {!pending && (status.detail || status.link) && (
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {status.detail}
+            {status.detail && status.link && " · "}
+            {status.link && (
+              <a className="underline underline-offset-2" href={status.link.href} target="_blank" rel="noreferrer">
+                {status.link.label} ↗
+              </a>
+            )}
+          </p>
+        )}
       </div>
     </li>
   );
