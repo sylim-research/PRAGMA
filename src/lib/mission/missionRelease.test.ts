@@ -28,4 +28,13 @@ describe("mission learner release state", () => {
     })).toBe(false);
     expect(isCurrentMissionReleasedForLearner({ mission_status: "reviewed" })).toBe(false);
   });
+
+  it("keeps the published September course generation runnable without promoting drafts", () => {
+    const content_release_id = "pragma_zhko_bidirectional_candidate_20260904_02";
+    expect(isCurrentMissionReleasedForLearner({ mission_status: "reviewed", content_release_id })).toBe(true);
+    expect(isCurrentMissionReleasedForLearner({ mission_status: "released", content_release_id })).toBe(true);
+    expect(isCurrentMissionReleasedForLearner({ mission_status: "generated", content_release_id })).toBe(false);
+    expect(isCurrentMissionReleasedForLearner({ mission_status: "generated", content_release_id: CURRENT_CONTENT_RELEASE_ID })).toBe(false);
+    expect(isCurrentMissionReleasedForLearner({ mission_status: "reviewed", content_release_id: "unknown_future_release" })).toBe(false);
+  });
 });
