@@ -67,8 +67,8 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
       </header>
 
       <div className={`flex gap-6 pl-5 pr-8 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
-        <aside className="hidden w-[256px] shrink-0 md:block print:hidden">
-          <nav className="-mt-1 flex flex-col pl-3 pr-1">
+        <aside className="hidden w-[285px] shrink-0 md:block print:hidden">
+          <nav className="-mt-1 flex flex-col pl-6 pr-1">
             <Link
               to={ADMIN_DASHBOARD_ITEM.to}
               className={standaloneClasses(pathname === ADMIN_DASHBOARD_ITEM.to)}
