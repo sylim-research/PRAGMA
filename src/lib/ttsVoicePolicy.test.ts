@@ -14,9 +14,9 @@ describe('language-specific designed TTS voices', () => {
     ['ko', 'beginner', 0.9],
     ['ko', 'intermediate', 0.9],
     ['ko', 'advanced', 0.9],
-    ['zh', 'beginner', 0.9],
-    ['zh', 'intermediate', 0.9],
-    ['zh', 'advanced', 0.9],
+    ['zh', 'beginner', 0.8],
+    ['zh', 'intermediate', 0.8],
+    ['zh', 'advanced', 0.8],
   ] as const)('uses the chosen %s voice at %s pace', async (lang, level, speed) => {
     const request = vi.fn().mockResolvedValue(audio());
     const result = await synthesizeTts('sample', lang, { elevenlabs: 'test', openai: 'test' }, request, level);
@@ -30,7 +30,7 @@ describe('language-specific designed TTS voices', () => {
     expect(await synthesizeTts('中文', 'zh', { openai: 'test' }, request)).toMatchObject({
       ok: true, provider: 'openai', model: 'gpt-4o-mini-tts', voice: 'shimmer', fallbackUsed: true,
     });
-    expect(body(request)).toMatchObject({ speed: 0.9, instructions: expect.stringContaining('Mandarin') });
+    expect(body(request)).toMatchObject({ speed: 0.8, instructions: expect.stringContaining('Mandarin') });
   });
   it('falls back to the same language on ElevenLabs failure without trying the other designed voice', async () => {
     const request = vi.fn().mockResolvedValueOnce(failure(429)).mockResolvedValueOnce(audio());
