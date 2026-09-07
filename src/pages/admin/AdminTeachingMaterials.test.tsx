@@ -69,10 +69,11 @@ describe("교과목·주차 수업자료 연결", () => {
   it("수업자료 버튼은 선택 주차의 상세를 열고 같은 링크 재클릭에도 이동한다", async () => {
     mount();
     await screen.findByText("2주차 목표");
-    const detail = screen.getByText("이 주차 수업자료 검수·확정").closest("details")!;
-    expect(detail).not.toHaveAttribute("open");
-    fireEvent.click(screen.getAllByRole("link", { name: "수업자료" })[1]);
+    expect(screen.getByText("이 주차 수업자료 검수·확정").closest("details")).not.toHaveAttribute("open");
+    const week3Row = screen.getByRole("button", { name: "3주차 · 요청" }).closest("article")!;
+    fireEvent.click(within(week3Row).getByRole("link", { name: "수업자료" }));
     await screen.findByText("3주차 목표");
+    const detail = screen.getByText("이 주차 수업자료 검수·확정").closest("details")!;
     await waitFor(() => expect(detail).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
     expect(detail).toHaveFocus();
@@ -80,7 +81,7 @@ describe("교과목·주차 수업자료 연결", () => {
     fireEvent.click(screen.getByText("이 주차 수업자료 검수·확정"));
     await waitFor(() => expect(detail).not.toHaveAttribute("open"));
     mocks.scrollIntoView.mockClear();
-    fireEvent.click(screen.getAllByRole("link", { name: "수업자료" })[1]);
+    fireEvent.click(within(week3Row).getByRole("link", { name: "수업자료" }));
     await waitFor(() => expect(detail).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
   });
