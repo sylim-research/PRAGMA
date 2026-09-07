@@ -44,8 +44,8 @@ const CONSOLES = [
   { label: "Anthropic 콘솔", href: "https://platform.claude.com/dashboard" },
 ];
 
-/** 접힌 줄에서 쓰는 우선순위 — 가장 나쁜 상태 하나가 전체를 대표한다. */
-const SEVERITY: ServiceTone[] = ["fail", "warn", "manual", "idle", "ok"];
+const NAMES = (statuses: ServiceStatus[], tone: ServiceTone) =>
+  statuses.filter((status) => status.tone === tone).map((status) => SERVICE_META[status.id].name);
 
 const formatStamp = (iso: string) => {
   const date = new Date(iso);
@@ -56,13 +56,28 @@ const formatStamp = (iso: string) => {
   return `${date.getFullYear()}. ${date.getMonth() + 1}. ${date.getDate()}. ${meridiem} ${hour12}:${String(date.getMinutes()).padStart(2, "0")}`;
 };
 
-/** 접힌 줄의 요약: 무엇이 몇 건인지와 어느 서비스인지까지 적는다. */
+/**
+ * 접힌 줄의 요약.
+ *
+ * 🔑 「모르는 것」이 「나쁜 것」을 뜻하지 않게 한다. 점검 경로가 없어 판정하지 못한 항목(manual)은
+ * 불을 깎지 않는다 — 확인된 문제(fail·warn)가 없으면 초록이다. 대신 문구에는 어느 서비스를 직접
+ * 봐야 하는지 남겨 숨기지는 않는다. 실제 문제가 있으면 접혀 있어도 색과 이름으로 드러난다.
+ */
 const summarizeStatuses = (statuses: ServiceStatus[]) => {
-  const worst = SEVERITY.find((tone) => statuses.some((status) => status.tone === tone)) ?? "idle";
-  if (worst === "ok") return { tone: worst, text: `${statuses.length}개 서비스 모두 정상` };
-  if (worst === "idle") return { tone: worst, text: "아직 점검하지 않았습니다" };
-  const names = statuses.filter((status) => status.tone === worst).map((status) => SERVICE_META[status.id].name);
-  return { tone: worst, text: `${TONE[worst].label} ${names.length}건 · ${names.join(" · ")}` };
+  const failed = NAMES(statuses, "fail");
+  if (failed.length > 0) return { tone: "fail" as const, text: `실패 ${failed.length}건 · ${failed.join(" · ")}` };
+
+  const warned = NAMES(statuses, "warn");
+  if (warned.length > 0) return { tone: "warn" as const, text: `주의 ${warned.length}건 · ${warned.join(" · ")}` };
+
+  const ok = NAMES(statuses, "ok");
+  if (ok.length === 0) return { tone: "idle" as const, text: "아직 점검하지 않았습니다" };
+
+  const manual = NAMES(statuses, "manual");
+  if (manual.length > 0) {
+    return { tone: "ok" as const, text: `${ok.length}개 정상 · ${manual.join("·")} 직접 확인` };
+  }
+  return { tone: "ok" as const, text: `${statuses.length}개 서비스 모두 정상` };
 };
 
 const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolean }) => {
@@ -108,11 +123,10 @@ export const ServiceHealthPanel = () => {
   const [statuses, setStatuses] = useState<ServiceStatus[]>(stored?.statuses ?? IDLE_STATUSES);
   const [checkedAt, setCheckedAt] = useState<string | null>(stored?.checkedAt ?? null);
   const [pending, setPending] = useState(false);
-  // null = 아직 손대지 않음(상태에 따라 자동으로 결정). 한 번 누르면 그 선택을 따른다.
-  const [opened, setOpened] = useState<boolean | null>(null);
+  // 기본은 접어 둔다 — 첫 화면의 주인공은 아래 콘텐츠 수치다. 문제는 접힌 줄의 색과 이름으로 드러난다.
+  const [open, setOpen] = useState(false);
 
   const summary = useMemo(() => summarizeStatuses(statuses), [statuses]);
-  const open = opened ?? summary.tone !== "ok";
 
   const runCheck = async () => {
     setPending(true);
@@ -146,6 +160,7 @@ export const ServiceHealthPanel = () => {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-2">
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
+          data-testid="summary-dot"
           aria-hidden="true"
         />
         <h2 id="service-health-title" className="text-sm font-semibold text-[#1B2A36]">
@@ -163,9 +178,9 @@ export const ServiceHealthPanel = () => {
             className="h-7 px-2 text-xs text-muted-foreground"
             aria-expanded={open}
             aria-controls="service-health-list"
-            onClick={() => setOpened(!open)}
+            onClick={() => setOpen(!open)}
           >
-            {open ? "접기" : "자세히"}
+            {open ? "접기" : "펼쳐 보기"}
             <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} aria-hidden="true" />
           </Button>
           <Button size="sm" variant="outline" className="h-7" onClick={runCheck} disabled={pending}>

@@ -48,6 +48,7 @@ describe("외부 서비스 연동 점검 패널", () => {
     render(<ServiceHealthPanel />);
     await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/마지막 점검/)).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(screen.queryAllByRole("img", { name: "미점검" })).toHaveLength(0);
   });
 
@@ -56,10 +57,11 @@ describe("외부 서비스 연동 점검 패널", () => {
     render(<ServiceHealthPanel />);
     expect(screen.getByText("5개 서비스 모두 정상")).toBeVisible();
     expect(screen.queryByTestId("service-openai")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /자세히/ })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("button", { name: /펼쳐 보기/ })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByTestId("summary-dot")).toHaveClass("bg-emerald-500");
   });
 
-  it("정상이 아닌 항목이 있으면 스스로 펼쳐 어느 서비스인지 알린다", () => {
+  it("점검하지 못한 항목이 있어도 확인된 문제가 없으면 초록으로 두고 어디를 볼지 적는다", () => {
     storeAgeMs(60_000, [
       ...ALL_OK.slice(0, 1),
       { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://x" } },
@@ -67,22 +69,38 @@ describe("외부 서비스 연동 점검 패널", () => {
       ...ALL_OK.slice(3),
     ]);
     render(<ServiceHealthPanel />);
-    expect(screen.getByText("직접 확인 2건 · OpenAI · Anthropic")).toBeVisible();
-    expect(screen.getByTestId("service-openai")).toBeVisible();
-    expect(screen.getByRole("button", { name: /접기/ })).toHaveAttribute("aria-expanded", "true");
+    // 「모르는 것」이 「나쁜 것」이 되지 않는다 — 살아 있음을 초록으로 보여 준다.
+    expect(screen.getByText("3개 정상 · OpenAI·Anthropic 직접 확인")).toBeVisible();
+    expect(screen.getByTestId("summary-dot")).toHaveClass("bg-emerald-500");
   });
 
-  it("접힌 상태에서도 눌러서 펼칠 수 있다", () => {
+  it("확인된 문제가 있으면 접혀 있어도 색과 이름으로 드러난다", () => {
+    storeAgeMs(60_000, [
+      { id: "elevenlabs", tone: "warn", summary: "잔량 20% 이하" },
+      { id: "openai", tone: "fail", summary: "OPENAI_API_KEY가 등록되지 않았습니다" },
+      ...ALL_OK.slice(2),
+    ]);
+    render(<ServiceHealthPanel />);
+    expect(screen.getByText("실패 1건 · OpenAI")).toBeVisible();
+    expect(screen.getByTestId("summary-dot")).toHaveClass("bg-rose-500");
+    // 기본은 접힘 — 첫 화면의 주인공은 아래 콘텐츠 수치다.
+    expect(screen.queryByTestId("service-openai")).not.toBeInTheDocument();
+  });
+
+  it("접힌 상태에서 눌러서 펼치고 다시 접을 수 있다", () => {
     storeAgeMs(60_000, ALL_OK);
     render(<ServiceHealthPanel />);
-    fireEvent.click(screen.getByRole("button", { name: /자세히/ }));
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(screen.getByTestId("service-openai")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: /접기/ }));
+    expect(screen.queryByTestId("service-openai")).not.toBeInTheDocument();
   });
 
   it("최근 결과가 보관돼 있으면 그것을 먼저 보여 주고 다시 부르지 않는다", () => {
     storeAgeMs(60_000, [{ id: "elevenlabs", tone: "warn", summary: "잔량 50% 이하", detail: "잔량 9,008 / 10,000자 (90.1%)" }]);
     render(<ServiceHealthPanel />);
     expect(mocks.run).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(screen.getByText("잔량 9,008 / 10,000자 (90.1%)")).toBeVisible();
     expect(screen.getByText(/마지막 점검/)).toBeVisible();
   });
@@ -91,6 +109,7 @@ describe("외부 서비스 연동 점검 패널", () => {
     storeAgeMs(STALE_AFTER_MS + 60_000, [{ id: "elevenlabs", tone: "warn", summary: "옛 상태", detail: "옛 결과" }]);
     render(<ServiceHealthPanel />);
     await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(await screen.findByText(/잔량 9,558/)).toBeVisible();
   });
 
@@ -109,6 +128,7 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(screen.getByRole("button", { name: "점검 중…" })).toBeDisabled();
 
     await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(await screen.findByText("잔량 9,558 / 10,000자 (95.6%) · free")).toBeVisible();
     expect(screen.getByText("ANTHROPIC_API_KEY가 등록되지 않았습니다")).toBeVisible();
     expect(screen.getAllByRole("img", { name: "정상" })).toHaveLength(4);
@@ -119,6 +139,7 @@ describe("외부 서비스 연동 점검 패널", () => {
 
   it("잔액 안내는 행마다 반복하지 않고 목록 아래 한 줄로만 둔다", async () => {
     render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     await screen.findByTestId("service-openai");
     expect(screen.getByText(/선불 잔액은 콘솔의 자동 충전으로 관리합니다/)).toBeVisible();
     expect(screen.getByRole("link", { name: "OpenAI 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
@@ -139,6 +160,7 @@ describe("외부 서비스 연동 점검 패널", () => {
       ],
     });
     render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(await screen.findAllByRole("img", { name: "직접 확인" })).toHaveLength(2);
     expect(screen.queryByRole("img", { name: "실패" })).not.toBeInTheDocument();
     expect(screen.queryByText(/자동 점검을 쓸 수 없습니다/)).not.toBeInTheDocument();
@@ -147,6 +169,7 @@ describe("외부 서비스 연동 점검 패널", () => {
 
   it("설정된 모델명을 각 줄에 보여 준다", async () => {
     render(<ServiceHealthPanel />);
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(await screen.findByText("gpt-4o · gpt-4.1 · gpt-4o-transcribe")).toBeVisible();
     expect(screen.getByText("claude-opus-5")).toBeVisible();
   });
@@ -155,6 +178,7 @@ describe("외부 서비스 연동 점검 패널", () => {
     mocks.run.mockRejectedValueOnce(new Error("boom"));
     render(<ServiceHealthPanel />);
     await waitFor(() => expect(screen.getByRole("button", { name: "지금 점검" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: /펼쳐 보기/ }));
     expect(screen.getAllByText(/점검을 실행하지 못했습니다/)).toHaveLength(5);
     expect(screen.getAllByRole("img", { name: "실패" })).toHaveLength(5);
   });
