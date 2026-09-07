@@ -6,7 +6,7 @@ import { buildReviewPrompt, instructionalMission, materializeReviewEvidence, nex
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
-import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
+import { CURRENT_CONTENT_RELEASE_ID, CURRENT_MISSION_QUALITY_PROMPT_VERSION } from "../../../supabase/functions/_shared/contentRelease";
 
 const snapshot = { content: { source: "请您参加活动。" }, criteria: { version: "test" } };
 const finding = { severity: "warning", where: "/content/source", quote: "请您参加活动。", issue_ko: "지적", reason_ko: "이유", suggestion_ko: "제안",
@@ -26,7 +26,7 @@ afterEach(() => vi.unstubAllGlobals());
 describe("current content five-stage review", () => {
   it("reuses matching generation evidence and makes additional models opt-in", () => {
     const hash = "a".repeat(64);
-    const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: "quality_v19_scene_plausibility",
+    const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION,
       checked_at: "2026-09-06T00:00:00Z", mission_content_hash: hash };
     const evidence = reusableGenerationQuality({ provenance: {mission_content_hash: hash}, quality_check: quality });
     expect(evidence).not.toBeNull();

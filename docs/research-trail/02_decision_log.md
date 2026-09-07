@@ -3716,4 +3716,3 @@ Railway 배포 및 인증 관리자 읽기 smoke를 확인했다. 실제 콘텐�
   따라서 허용 조합은 구조로 제한하고 장면 의미는 critic·교수자 검수로 판단한다.
 - 경계: 기존 학습설계·모델·운영 데이터는 유지한다. AI critic 오탐이 관찰되어 자동 확정하지 않는다.
 - 근거: docs/dev-log/2026-09-07-content-consistency-fix.md.
-
