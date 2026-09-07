@@ -1,3 +1,4 @@
+import { invokeAstraMission, type GenerationJob } from './backgroundGenerationApi';
 // 코어 → 미션 승격 (관리자 UI 배선). 골든 테스트 경로를 앱으로 옮긴 것.
 //   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(R1~R24)
 //   → 전체 초안 1회 → R27 국소 결함/critic 지목 문항만 1회 수리 → 유효 초안 격리 저장.
@@ -232,6 +233,9 @@ export type PromoteStage =
   | { phase: "saving" };
 
 export interface PromoteOptions {
+  generationModel?: "existing" | "astra";
+  generationJobId?: string;
+  onGenerationJob?: (job: GenerationJob) => void;
   onProgress?: (stage: PromoteStage) => void;
 }
 
@@ -937,7 +941,7 @@ export async function promoteCore(
   };
   let frozenTopologyEvidence: PromotionTerminalEvidence["topology"] = null;
   const currentNative = normCore?.focal_segments?.some((segment) => segment.role === "head") ?? false;
-  if (currentNative) {
+  if (currentNative && options.generationModel !== "astra") {
     const topologyCall = await supabase.functions.invoke("generate-scenario", {
       body: { action: "mission_topology", telemetry, mission: missionRequest },
     });
@@ -985,11 +989,10 @@ export async function promoteCore(
     missionRequest.frozen_topology = frozenTopology;
     missionRequest.topology_evidence = topologyResponse.topology_evidence;
   }
-  const { data, error } = await invokeMissionWithBackoff({
-    action: "mission",
-    telemetry,
-    mission: missionRequest,
-  });
+  const generationBody = { action: "mission", telemetry, mission: missionRequest };
+  const { data, error } = options.generationModel === "astra"
+    ? await invokeAstraMission(generationBody, { onJob: options.onGenerationJob, resumeJobId: options.generationJobId })
+    : await invokeMissionWithBackoff(generationBody);
   if (error) {
     const msg = (error as { message?: string })?.message ?? String(error);
     const providerStatus = providerStatusFromError(error);
@@ -1007,6 +1010,10 @@ export async function promoteCore(
     };
   }
   const generationResponse = isRecord(data) ? data : {};
+  if (options.generationModel === "astra" && isRecord(generationResponse.mission_content)) {
+    const provenance = generationResponse.mission_content.provenance;
+    if (isRecord(provenance)) frozenTopologyEvidence = topologyEvidence(provenance.scene_topology);
+  }
   if (typeof generationResponse.stop_code === "string") {
     const candidateResults = Array.isArray(generationResponse.candidate_results)
       ? generationResponse.candidate_results.filter(isRecord)

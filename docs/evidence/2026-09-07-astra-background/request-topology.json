@@ -1,0 +1,62 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "spoken",
+    "x": {
+      "situation_ko": "나는 친한 친구에게 지난 주말 함께 찍은 사진 한 장을 보내 달라고 부탁한다. 사진은 친구 휴대전화에 있고, 우리는 카페에서 각자 휴대전화를 보고 있다.",
+      "relation_ko": "지난 주말 나와 함께 나들이한 친한 친구",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "close",
+        "r": "low",
+        "p": "equal"
+      }
+    },
+    "anchor": {
+      "situation_ko": "나는 문구점에서 처음 만난 직원에게 방금 산 공책의 종이 영수증을 출력해 달라고 부탁한다. 직원은 계산대에서 해당 결제 내역을 바로 확인하고 영수증을 출력할 수 있다.",
+      "relation_ko": "문구점에서 처음 만난 계산 담당 직원",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "distant",
+        "r": "low",
+        "p": "equal"
+      }
+    },
+    "y": {
+      "situation_ko": "나는 발표 연습 모임에서 처음 만난 참가자에게 내 발표를 듣고 의견을 달라고 부탁한다. 서로 연습을 돕는 모임이지만, 지금은 20분 휴식 시간이라 발표와 피드백에 15분을 쓰면 상대가 쉴 시간이 줄어든다.",
+      "relation_ko": "발표 연습 모임에서 처음 만난 동등한 참가자",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "distant",
+        "r": "mid",
+        "p": "equal"
+      }
+    },
+    "c": {
+      "situation_ko": "나는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 다음 주 화요일로 바꿀 수 있는지 묻는다. 직원은 예약 시스템에서 빈 시간을 확인해 통상적인 예약 변경을 처리할 수 있다.",
+      "relation_ko": "예약 변경을 문의하는 환자와 처음 응대하는 병원 접수 직원",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "pass",
+    "final_result": "pass",
+    "attempts": 1,
+    "regeneration_count": 0,
+    "findings": []
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:30:21.740Z"
+  }
+}

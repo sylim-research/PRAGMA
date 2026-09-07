@@ -1,0 +1,62 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "written",
+    "x": {
+      "situation_ko": "나는 팀장에게 다음 주 월요일 오전 신입사원 교육을 대신 진행해 달라는 메시지를 받았다. 그 시간에는 자격시험 응시로 이미 휴가를 승인받아 교육을 맡을 수 없다고 답하려 한다.",
+      "relation_ko": "업무로는 교류하지만 사적으로는 가깝지 않은 나의 팀장",
+      "channel": "messenger",
+      "pdr": {
+        "d": "acquaintance",
+        "r": "mid",
+        "p": "speaker_lower"
+      }
+    },
+    "anchor": {
+      "situation_ko": "나는 몇 차례 협업한 동료에게 오늘 오후까지 열 쪽짜리 보고서를 검토해 달라는 메시지를 받았다. 내 보고서도 오늘 마감이라 검토할 시간을 낼 수 없어 부탁을 거절하려 한다.",
+      "relation_ko": "몇 차례 협업했지만 사적으로는 가깝지 않은 동등한 직급의 동료",
+      "channel": "messenger",
+      "pdr": {
+        "d": "acquaintance",
+        "r": "mid",
+        "p": "equal"
+      }
+    },
+    "y": {
+      "situation_ko": "나는 친한 동료에게 노트북이 고장 났다며 이번 주말 동안 내 개인 노트북을 빌려 달라는 메시지를 받았다. 주말 내내 그 노트북으로 온라인 수업을 들어야 해서 빌려주지 못한다고 답하려 한다.",
+      "relation_ko": "평소 사적인 고민도 나누는 친한 동등한 직급의 동료",
+      "channel": "messenger",
+      "pdr": {
+        "d": "close",
+        "r": "mid",
+        "p": "equal"
+      }
+    },
+    "c": {
+      "situation_ko": "나는 몇 차례 함께 일했지만 아직 어색한 동료가 위챗으로 보낸 토요일 저녁 모임 초대에 거절 답장을 쓴다. 그날 저녁에는 이미 가족과 약속이 있어 모임에 참석할 수 없다.",
+      "relation_ko": "몇 차례 함께 일했지만 아직 어색한 동등한 직급의 동료",
+      "channel": "messenger",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "pass",
+    "final_result": "pass",
+    "attempts": 1,
+    "regeneration_count": 0,
+    "findings": []
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:57:43.280Z"
+  }
+}

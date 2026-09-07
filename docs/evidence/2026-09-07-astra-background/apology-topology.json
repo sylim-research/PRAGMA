@@ -1,0 +1,62 @@
+{
+  "frozen_topology": {
+    "version": "native_mpj5_scene_topology_v1",
+    "source_modality": "spoken",
+    "x": {
+      "situation_ko": "나는 친한 친구에게 빌린 소설책에 커피를 쏟아 여러 장을 읽기 어렵게 만들었다. 친구를 만나 내 부주의를 사과하고 같은 책으로 바꿔 주겠다고 말한다.",
+      "relation_ko": "오랫동안 가깝게 지낸 대등한 친구",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "close",
+        "r": "mid",
+        "p": "equal"
+      }
+    },
+    "anchor": {
+      "situation_ko": "나는 동급 동료의 발표 자료를 수정하다가 도표를 잘못 지워, 동료가 복구에 30분을 쓰게 했다. 자료가 복구된 뒤 동료를 만나 내 실수로 추가 작업을 하게 한 점을 사과한다.",
+      "relation_ko": "가끔 함께 일하는 동급 동료",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "acquaintance",
+        "r": "mid",
+        "p": "equal"
+      }
+    },
+    "y": {
+      "situation_ko": "나는 동급 동료의 펜을 내 것으로 착각해 회의실 자리에서 가져왔고, 동료는 펜을 잠깐 찾았다. 곧 착각을 알아차린 나는 펜을 돌려주며 잘못 가져간 일을 사과한다.",
+      "relation_ko": "가끔 인사를 나누는 동급 동료",
+      "channel": "facetoface",
+      "pdr": {
+        "d": "acquaintance",
+        "r": "low",
+        "p": "equal"
+      }
+    },
+    "c": {
+      "situation_ko": "나는 다음 날 복도에서 아래층 이웃을 만나 어젯밤 늦게 가구를 옮기며 낸 소음을 사과하고, 앞으로 밤에는 옮기지 않겠다고 말한다. 얼굴을 몇 차례 본 어색한 사이이며, 이웃은 내가 낸 소음으로 늦은 시간에 불편을 겪었다.",
+      "relation_ko": "얼굴을 몇 차례 본 사이인 위층 거주자와 소음 피해를 겪은 아래층 이웃",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      }
+    }
+  },
+  "topology_evidence": {
+    "version": "mission_scene_topology_evidence_v1",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "first_pass_result": "pass",
+    "final_result": "pass",
+    "attempts": 1,
+    "regeneration_count": 0,
+    "findings": []
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:56:27.478Z"
+  }
+}

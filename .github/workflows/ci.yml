@@ -48,6 +48,9 @@ jobs:
       - name: Check content approval boundary (local PostgreSQL)
         run: npm run review:db-test
 
+      - name: Check generation job access and leases (local PostgreSQL)
+        run: node --test scripts/generation-jobs-db.test.mjs
+
       - name: Build production bundle
         run: npm run build
 

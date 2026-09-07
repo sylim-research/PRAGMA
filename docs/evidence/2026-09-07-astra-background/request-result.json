@@ -1,0 +1,339 @@
+{
+  "mission_content": {
+    "schema_version": "mission_v5",
+    "direction": "ko_zh",
+    "learning_goal": {
+      "kind": "speech_act",
+      "speech_act": "request"
+    },
+    "contrast_plan": {
+      "version": "contrast_plan_v1",
+      "speech_act": "request",
+      "mission_goal": "integrated_speech_act",
+      "item_slots": [
+        {
+          "item_id": 1,
+          "item_type": "scale4",
+          "item_focus": "request_mitigation_optionality",
+          "intended_band_profile": "appropriate_counterexample"
+        },
+        {
+          "item_id": 2,
+          "item_type": "judge3",
+          "item_focus": "request_mitigation_optionality",
+          "intended_band_profile": "anchor_non_within"
+        },
+        {
+          "item_id": 3,
+          "item_type": "fix_choice",
+          "item_focus": "request_mitigation_optionality",
+          "intended_band_profile": "anchor_non_within_then_repair"
+        },
+        {
+          "item_id": 4,
+          "item_type": "reason",
+          "item_focus": "request_mitigation_optionality",
+          "intended_band_profile": "anchor_non_within_primary_reason"
+        },
+        {
+          "item_id": 5,
+          "item_type": "multi_judge",
+          "item_focus": "request_mitigation_optionality",
+          "intended_band_profile": "within_2_adjustment_needed_2"
+        }
+      ]
+    },
+    "authoring": {
+      "schema_version": "mission_authoring_v1",
+      "stage": "ai_draft",
+      "lineage_status": "pending",
+      "repair_attempts": 0
+    },
+    "unit": {
+      "target_feature": "request_mitigation_optionality",
+      "target_feature_version": "1.1",
+      "learner_label": "완화와 선택권",
+      "closing_ko": "요청은 표현형이나 친밀도만으로 판단하지 않습니다. 원문의 뜻을 지키며 상황에 필요한 명료성과 상대의 선택권을 함께 살핍니다."
+    },
+    "diagnostic_dimensions": [
+      {
+        "code": "force_calibration",
+        "evidence_refs": [
+          "mpj:1",
+          "mpj:2",
+          "mpj:3"
+        ],
+        "evidence_ko": "사진 전송과 영수증 출력에서 같은 把 직접형이 수행하는 기능을 비교하고, 초면의 서비스 요청에서는 수행 가능성을 묻는 형태로 강도를 조정한다."
+      },
+      {
+        "code": "burden_optionality",
+        "evidence_refs": [
+          "mpj:5",
+          "dct"
+        ],
+        "evidence_ko": "휴식 시간을 사용하는 부탁에서는 상대의 시간 사용 선택권을, 예약 변경에서는 직원이 시스템을 확인하고 가능 여부를 답할 여지를 관찰한다."
+      },
+      {
+        "code": "supportive_move_fit",
+        "evidence_refs": [
+          "mpj:5",
+          "dct"
+        ],
+        "evidence_ko": "발표와 피드백에 필요한 시간의 예고 및 예약 변경이 필요한 이유를 요청과 연결하되, 원문에 없는 사유나 대안을 덧붙이지 않는지 관찰한다."
+      }
+    ],
+    "mpj_items": [
+      {
+        "type": "scale4",
+        "channel": "facetoface",
+        "situation_ko": "나는 친한 친구에게 지난 주말 함께 찍은 사진 한 장을 보내 달라고 부탁한다. 사진은 친구 휴대전화에 있고, 우리는 카페에서 각자 휴대전화를 보고 있다.",
+        "relation_ko": "지난 주말 나와 함께 나들이한 친한 친구",
+        "pdr": {
+          "d": "close",
+          "r": "low",
+          "p": "equal"
+        },
+        "source": "지난 주말 같이 찍은 사진 한 장 갖고 싶어. 그 사진 나한테 보내 줘.",
+        "preceding_turn": null,
+        "target": "我想要一张咱们上周末一起拍的照片。把那张照片发给我。",
+        "highlights": [
+          "把那张照片发给我"
+        ],
+        "accepted_scale_codes": [
+          "very_appropriate",
+          "somewhat_appropriate"
+        ],
+        "reference_scale_code": "very_appropriate",
+        "explanation_ko": "친한 친구와 함께 찍은 사진을 요청하고, 둘 다 휴대전화를 보고 있어 전송을 부탁할 계기와 수행 여건이 분명합니다. ‘把那张照片发给我’는 원하는 행동을 짧게 밝히면서도 즉시 해야 한다거나 거절할 수 없다는 뜻을 덧붙이지 않아, 이 장면에서는 자연스러운 부탁이 됩니다. 친하다는 이유만이 아니라 공유한 사진과 현재 행동의 연결을 근거로 이 직접형을 유지할 수 있습니다.",
+        "recommended_example": "我想要一张咱们上周末一起拍的照片。把那张照片发给我。",
+        "id": 1,
+        "item_focus": "request_mitigation_optionality",
+        "axis_feature": "request_mitigation_optionality"
+      },
+      {
+        "type": "judge3",
+        "channel": "facetoface",
+        "situation_ko": "나는 문구점에서 처음 만난 직원에게 방금 산 공책의 종이 영수증을 출력해 달라고 부탁한다. 직원은 계산대에서 해당 결제 내역을 바로 확인하고 영수증을 출력할 수 있다.",
+        "relation_ko": "문구점에서 처음 만난 계산 담당 직원",
+        "pdr": {
+          "d": "distant",
+          "r": "low",
+          "p": "equal"
+        },
+        "source": "방금 산 공책 영수증이 필요해요. 종이 영수증을 출력해 주세요.",
+        "preceding_turn": null,
+        "target": "我需要刚买的本子的收据。把纸质收据打印出来。",
+        "highlights": [
+          "把纸质收据打印出来"
+        ],
+        "accepted_band_codes": [
+          "too_direct"
+        ],
+        "explanation_ko": "첫 장면의 ‘把…’ 직접형 요청을 유지하고 지위와 부담도 같지만, 관계 거리는 친한 친구에서 처음 만난 직원으로 바뀌었습니다. 영수증 출력은 정당하게 요청할 수 있는 통상 업무이지만, ‘把纸质收据打印出来’는 직원에게 처리 행동을 바로 지시하는 방식이라 첫 대면에서 다소 단정적으로 들립니다. 요청 내용을 유지하면서 ‘能不能帮我…’로 처리 가능성을 답할 여지를 주면 알맞습니다.",
+        "recommended_example": "我需要刚买的本子的收据。能不能帮我打印一张纸质收据？",
+        "id": 2,
+        "item_focus": "request_mitigation_optionality",
+        "axis_feature": "request_mitigation_optionality"
+      },
+      {
+        "type": "fix_choice",
+        "channel": "facetoface",
+        "situation_ko": "나는 문구점에서 처음 만난 직원에게 방금 산 공책의 종이 영수증을 출력해 달라고 부탁한다. 직원은 계산대에서 해당 결제 내역을 바로 확인하고 영수증을 출력할 수 있다.",
+        "relation_ko": "문구점에서 처음 만난 계산 담당 직원",
+        "pdr": {
+          "d": "distant",
+          "r": "low",
+          "p": "equal"
+        },
+        "source": "방금 산 공책 영수증이 필요해요. 종이 영수증을 출력해 주세요.",
+        "preceding_turn": null,
+        "target": "我需要刚买的本子的收据。把纸质收据打印出来。",
+        "highlights": [
+          "把纸质收据打印出来"
+        ],
+        "accepted_band_codes": [
+          "too_direct"
+        ],
+        "corrections": [
+          {
+            "text": "我需要刚买的本子的收据。能不能帮我打印一张纸质收据？",
+            "is_valid": true,
+            "note_ko": "처음 만난 직원에게 통상 업무를 부탁하므로 ‘能不能帮我’로 출력 요청을 분명히 하면서 처리 가능성을 답할 여지를 주는 방식을 유지합니다."
+          },
+          {
+            "text": "我需要刚买的本子的收据。你给我打印一张纸质收据。",
+            "is_valid": false,
+            "note_ko": "‘能不能帮我’를 ‘你给我’ 직접형으로 바꾸어 가능 여부 확인을 수행 지시로 전환했습니다. 통상적인 저부담 업무라도 처음 만난 직원에게 처리 행동을 일방적으로 지정하므로 too_direct 방향으로 경계를 넘습니다."
+          },
+          {
+            "text": "我需要刚买的本子的收据。要是你能帮我打印一张纸质收据就好了。",
+            "is_valid": false,
+            "note_ko": "출력 가능성을 묻는 의문형을 ‘要是…就好了’의 소망형으로 바꾸었습니다. 새로운 상황 조건을 붙이지 않고 동일한 출력 행동을 희망으로 제시하여, 바로 처리할 수 있는 업무에서 실제 수행 요청을 상대가 추론하게 하므로 too_indirect 방향입니다."
+          }
+        ],
+        "explanation_ko": "직원에게 영수증 출력을 요청할 근거는 충분하지만, 처음 대면하는 관계에서는 처리 행동을 일방적으로 지정하지 않는 편이 알맞습니다. ‘把…打印出来’를 ‘能不能帮我打印…’로 바꾸면 요청을 분명히 유지하면서도 직원이 응답할 여지를 줍니다. 반대로 ‘这个请求合不合适’까지 물으면 통상적인 출력을 특별히 허락받아야 할 부탁처럼 만들어, 실제 처리보다 부탁의 허용 여부에 초점이 옮겨 갑니다.",
+        "recommended_example": "我需要刚买的本子的收据。能不能帮我打印一张纸质收据？",
+        "id": 3,
+        "item_focus": "request_mitigation_optionality",
+        "axis_feature": "request_mitigation_optionality"
+      },
+      {
+        "type": "reason",
+        "channel": "facetoface",
+        "situation_ko": "나는 문구점에서 처음 만난 직원에게 방금 산 공책의 종이 영수증을 출력해 달라고 부탁한다. 직원은 계산대에서 해당 결제 내역을 바로 확인하고 영수증을 출력할 수 있다.",
+        "relation_ko": "문구점에서 처음 만난 계산 담당 직원",
+        "pdr": {
+          "d": "distant",
+          "r": "low",
+          "p": "equal"
+        },
+        "source": "방금 산 공책 영수증이 필요해요. 종이 영수증을 출력해 주세요.",
+        "preceding_turn": null,
+        "target": "我需要刚买的本子的收据。把纸质收据打印出来。",
+        "highlights": [
+          "把纸质收据打印出来"
+        ],
+        "problem_band_code": "too_direct",
+        "reasons": [
+          {
+            "id": "r3",
+            "text_ko": "‘把纸质收据打印出来’가 첫 대면의 직원에게 처리 행동을 바로 지정해, 통상적인 부탁을 다소 단정적인 지시로 전달한다.",
+            "kind": "primary"
+          },
+          {
+            "id": "r1",
+            "text_ko": "‘把纸质收据’가 특정 영수증을 가리키므로, 아직 출력하지 않은 종이 영수증이 이미 존재한다고 잘못 전제한다.",
+            "kind": "meaning_grammar_context"
+          },
+          {
+            "id": "r2",
+            "text_ko": "‘我需要’로 개인의 필요를 먼저 말해, 직원에게 영수증이 필요한 사유의 타당성까지 판단하도록 요구한다.",
+            "kind": "pragmatic_misconception"
+          }
+        ],
+        "accepted_reason_id": "r3",
+        "explanation_ko": "문제는 첫 대면의 직원에게 ‘把纸质收据打印出来’로 행동을 바로 지정해 요청을 지시처럼 전달하는 데 있습니다. ‘我需要’는 원문의 필요를 설명할 뿐 사유 심사를 요구하지 않으며, ‘把…打印出来’도 출력 전의 내용을 대상으로 자연스럽게 쓸 수 있어 의미·문법 오류가 아닙니다. 출력 요청은 유지하고 ‘能不能帮我…’로 상대의 응답 여지를 확보하면 됩니다.",
+        "recommended_example": "我需要刚买的本子的收据。能不能帮我打印一张纸质收据？",
+        "id": 4,
+        "item_focus": "request_mitigation_optionality",
+        "axis_feature": "request_mitigation_optionality"
+      },
+      {
+        "type": "multi_judge",
+        "channel": "facetoface",
+        "situation_ko": "나는 발표 연습 모임에서 처음 만난 참가자에게 내 발표를 듣고 의견을 달라고 부탁한다. 서로 연습을 돕는 모임이지만, 지금은 20분 휴식 시간이라 발표와 피드백에 15분을 쓰면 상대가 쉴 시간이 줄어든다.",
+        "relation_ko": "발표 연습 모임에서 처음 만난 동등한 참가자",
+        "pdr": {
+          "d": "distant",
+          "r": "mid",
+          "p": "equal"
+        },
+        "source": "쉬는 시간에 제 발표를 듣고 의견을 좀 주실 수 있을까요? 발표와 피드백을 합쳐 15분 정도 걸려요.",
+        "preceding_turn": null,
+        "candidates": [
+          {
+            "text": "休息时间能不能听听我的演讲，给点意见？演讲加反馈大概要十五分钟。",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "휴식의 대부분을 쓰는 부탁에서 ‘能不能’가 수행 가능성을 직접 묻고 15분을 알려 시간 선택권을 주므로, 짧고 명확한 확인 방식을 유지합니다."
+          },
+          {
+            "text": "休息时间听听我的演讲，给点意见。演讲加反馈大概要十五分钟。",
+            "accepted_band_codes": [
+              "too_direct"
+            ],
+            "note_ko": "앵커의 ‘能不能’만 제거해 참여 가능성을 묻던 요청을 직접적인 행동 요구로 바꾸었습니다. ‘听听’의 완화는 남지만, 합의 없이 처음 만난 참가자의 휴식 20분 중 15분을 쓰도록 요구하므로 too_direct 방향으로 경계를 넘습니다."
+          },
+          {
+            "text": "想麻烦你休息时间听听我的演讲，给点意见，你看方便吗？演讲加反馈大概要十五分钟。",
+            "accepted_band_codes": [
+              "within_band"
+            ],
+            "note_ko": "휴식을 줄이는 부탁임을 ‘想麻烦你’로 인정하고 ‘你看方便吗’로 상대의 사정을 판단 기준에 놓아 배려를 드러내므로, 부담 예고와 편의 확인의 조합을 유지합니다."
+          },
+          {
+            "text": "想麻烦你休息时间听听我的演讲，给点意见，只是不知道该不该向你开这个口。演讲加反馈大概要十五分钟。",
+            "accepted_band_codes": [
+              "too_indirect"
+            ],
+            "note_ko": "앵커의 ‘你看方便吗’를 ‘不知道该不该向你开这个口’로 바꾸어 실제 참여 가능성 대신 부탁을 꺼내도 되는지를 응답 초점으로 삼았습니다. 발표·피드백과 15분 부담은 유지하지만, 상호 연습 모임에서 필요한 시간 수락 판단보다 요청 자체에 대한 안심을 유도하므로 too_indirect 방향입니다."
+          }
+        ],
+        "explanation_ko": "앵커와 지위·관계 거리는 같지만, 이번에는 휴식 20분 중 15분을 사용하는 부탁이라 부담이 낮음에서 중간으로 바뀌었습니다. ‘能不能’는 가능 여부를 간결하게 확인하고 ‘想麻烦你…你看方便吗’는 부담을 인정하며 상대 사정을 존중하므로 둘 다 유지할 수 있습니다. ‘就…再…’는 행동 순서를 정하기보다 수행 여부를 묻도록 바꾸고, ‘这样提合不合适’는 부탁을 꺼낼 자격보다 실제로 시간을 쓸 수 있는지에 초점을 맞추도록 조정합니다.",
+        "recommended_example": "想麻烦你休息时间听听我的演讲，给点意见，你看方便吗？演讲加反馈大概要十五分钟。",
+        "id": 5,
+        "item_focus": "request_mitigation_optionality",
+        "axis_feature": "request_mitigation_optionality"
+      }
+    ],
+    "production_task": {
+      "mode": "interpreting",
+      "source_modality": "spoken",
+      "situation_ko": "나는 병원 접수 창구에서 처음 만난 직원에게 진료 예약을 다음 주 화요일로 바꿀 수 있는지 묻는다. 직원은 예약 시스템에서 빈 시간을 확인해 통상적인 예약 변경을 처리할 수 있다.",
+      "relation_ko": "예약 변경을 문의하는 환자와 처음 응대하는 병원 접수 직원",
+      "channel": "facetoface",
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      },
+      "source_text": "개인 일정이 바뀌어서 예약한 시간에 오기 어려워졌어요. 진료 예약을 다음 주 화요일로 바꿀 수 있을까요?",
+      "preceding_turn": null,
+      "replay_limit": 2,
+      "reference_alternatives": [
+        {
+          "text": "我的个人安排变了，原来预约的时间很难过来。能不能把我的就诊预约改到下周二？",
+          "note_ko": "일정 변경과 기존 시간에 방문하기 어려워진 사정을 모두 전달하고, ‘能不能’로 화요일 변경 가능성을 물어 직원이 예약 시스템을 확인하고 답할 여지를 줍니다."
+        },
+        {
+          "text": "我的个人安排变了，原来预约的时间很难过来。想麻烦你把我的就诊预约改到下周二，你看方便吗？",
+          "note_ko": "원문의 사정 설명과 변경 요청을 모두 유지하면서, ‘想麻烦你’로 도움을 청하고 ‘你看方便吗’로 처리 가능 여부를 상대에게 확인하는 전략입니다."
+        }
+      ],
+      "focal_segments": [
+        {
+          "text": "진료 예약을 다음 주 화요일로 바꿀 수 있을까요?",
+          "role": "head"
+        }
+      ]
+    },
+    "provenance": {
+      "model": "gpt-6-astra",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+      "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+      "mission_content_hash": "62e5371e869101884359c51d3254a5d314553bf801fa5bf6dc8bf2d3d29919d7",
+      "generated_at": "2026-09-07T11:30:22.717Z",
+      "generation_attempt": 1,
+      "scene_topology": {
+        "version": "mission_scene_topology_evidence_v1",
+        "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+        "first_pass_result": "pass",
+        "final_result": "pass",
+        "attempts": 1,
+        "regeneration_count": 0,
+        "findings": []
+      },
+      "band_targeting": {
+        "version": "relative_band_targeting_v2_bounded_fallback",
+        "within_regeneration_count": 0,
+        "candidate_regeneration_counts": {},
+        "boundary_fallback": {
+          "eligible_paths": [],
+          "attempted_paths": [],
+          "succeeded_paths": [],
+          "situation_unchanged": true,
+          "immutable_candidates_unchanged": true
+        },
+        "within_warnings": []
+      }
+    }
+  },
+  "meta": {
+    "provider": "openai",
+    "model": "gpt-6-astra",
+    "prompt_version": "mission_v5_mpj5_minidiscourse_v17_content_consistency",
+    "content_release_id": "pragma_content_consistency_candidate_20260907_02",
+    "generated_at": "2026-09-07T11:30:22.717Z"
+  }
+}
