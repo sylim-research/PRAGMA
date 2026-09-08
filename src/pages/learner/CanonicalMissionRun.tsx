@@ -751,11 +751,11 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                       ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-1 ring-[#15202B]"
                       : "border-[#D8D4C8] bg-white";
                   return (
-                    <button key={correction.id} type="button" disabled={answered} aria-pressed={picked} onClick={() => setCorrectionId(correction.id)} className={`${optionBase} ${state} disabled:cursor-default`}>
-                      <span className="flex items-start justify-between gap-3">
-                        <span className={`${targetFont} text-[16.5px] font-normal leading-7`}>{correction.text}</span>
+                    <button key={correction.id} type="button" disabled={answered} aria-pressed={picked} onClick={() => setCorrectionId(correction.id)} className={`${optionBase} min-w-0 [overflow-wrap:anywhere] ${state} disabled:cursor-default`}>
+                      <span className="flex flex-col items-start gap-1.5 sm:flex-row sm:justify-between sm:gap-3">
+                        <span className={`${targetFont} min-w-0 max-w-full break-normal text-[16.5px] font-normal leading-7`}>{correction.text}</span>
                         {answered && (
-                          <span className="flex shrink-0 flex-wrap justify-end gap-1.5">
+                          <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
                             {picked && <span className="rounded-full border border-[#15202B] bg-white px-2 py-0.5 text-[10px] font-black text-[#15202B]">내 선택</span>}
                             {correction.valid && <span className="rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[10px] font-black text-[#245E44]">권장 수정안</span>}
                           </span>
@@ -1759,7 +1759,7 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
             <span className="pt-0.5 text-sm font-black tabular-nums text-[#B49A23]">{String(index + 1).padStart(2, "0")}</span>
             <div className="min-w-0">
               <p className="text-[11px] font-black tracking-[0.06em] text-[#7A8493]">{point.label}</p>
-              <p className="mt-1 truncate text-[16px] font-semibold leading-7 text-[#263444] sm:text-[16.5px]">
+              <p className="mt-1 break-keep text-[16px] font-semibold leading-7 text-[#263444] [overflow-wrap:anywhere] sm:text-[16.5px]">
                 <HighlightedText text={point.text} highlights={point.highlights} target />
               </p>
             </div>

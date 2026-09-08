@@ -315,7 +315,7 @@ const LearnerRecords = () => {
             </div>
             <span className="text-[12.5px] font-medium text-muted-foreground">{actsCovered.size}/9 화행 수행</span>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-3" aria-label="화행별 학습 이력">
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="화행별 학습 이력">
             {ACTS.map((act) => {
               const count = records.filter((record) => record.speechAct === act).length;
               const week = actWeek(act, course);

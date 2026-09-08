@@ -114,7 +114,7 @@ export function buildWeeklyMaterialsHtml(material: WeeklyCourseMaterial): string
 *{box-sizing:border-box}body{margin:0;background:#f8f6ee;color:#15202b;font-family:system-ui,sans-serif;line-height:1.65}
 main{max-width:1100px;margin:auto;padding:28px}.material-heading{background:#fad338;padding:22px 30px;border-radius:14px}
 h1{margin:8px 0;font-size:30px}h2{font-size:30px;margin-top:0}.material-section{margin-top:20px;background:white;border:1px solid #e5dfd0;border-radius:14px;padding:32px;font-size:23px;min-height:42vh}
-.material-section p,.material-section li{font-size:23px;line-height:1.8}.material-section li{margin:12px 0}[hidden]{display:none!important}
+.weekly-material{overflow-wrap:anywhere}.material-section p,.material-section li{font-size:23px;line-height:1.8}.material-section li{margin:12px 0}[hidden]{display:none!important}
 nav{position:sticky;top:0;z-index:1;background:#f8f6ee;display:flex;align-items:center;justify-content:flex-end;gap:12px;margin:0 0 16px;padding:8px 0}button{font:inherit;padding:8px 18px;border:1px solid #bbb;border-radius:8px;background:white}button:disabled{opacity:.4}footer{font-size:12px;color:#657178}
 @media print{body{background:white}main{padding:0}nav,footer{display:none}.material-section,.material-section[hidden]{display:block!important;min-height:0;break-inside:avoid;padding:18px}.material-section p,.material-section li{font-size:12px}h2{font-size:18px}}
 </style></head><body><main>

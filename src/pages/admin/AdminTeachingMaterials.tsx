@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { WeeklyMaterialDocument } from "@/components/curriculum/WeeklyMaterialDocument";
@@ -27,6 +27,10 @@ import { DEFENSE_COURSE_IDS } from "@/lib/pragma/scenarioTopics";
 import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import { getApprovedWeeklyMaterial } from "@/lib/pragma/contentReviewApi";
 import { supabase } from "@/integrations/supabase/client";
+import { TeachingGeneratorPanel } from "@/components/admin/TeachingGeneratorPanel";
+import { getTeachingState } from "@/lib/curriculum/teachingGenerationApi";
+import { applyTeachingDraft } from "@/lib/curriculum/teachingGeneration";
+import { teachingKind } from "../../../supabase/functions/_shared/teachingMaterial";
 
 type MaterialReviewState = "approved" | "pending" | "unavailable";
 
@@ -49,6 +53,7 @@ const StatusChip = ({ children, tone = "neutral" }: {
 ].join(" ")}>{children}</span>;
 
 const AdminTeachingMaterials = () => {
+  const queryClient = useQueryClient();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
   const courseId = params.get("courseId") ?? "";
@@ -87,7 +92,14 @@ const AdminTeachingMaterials = () => {
   const week = requestedWeek !== null
     ? course?.weeks.find((item) => item.week_no === Number(requestedWeek))
     : course?.weeks[0];
-  const material = course && week ? buildWeeklyCourseMaterial(course.outline, week) : null;
+  const generationKey = ["teaching-generated-material", courseId, week?.week_no];
+  const generated = useQuery({ queryKey: generationKey,
+    enabled: Boolean(course && week && teachingKind(week.week_no, week.type)),
+    queryFn: () => getTeachingState(courseId, week!.week_no), retry: false,
+  });
+  const draft = generated.data?.current ? generated.data.draft : null;
+  const baseMaterial = course && week ? buildWeeklyCourseMaterial(course.outline, week) : null;
+  const material = baseMaterial && draft ? applyTeachingDraft(baseMaterial, draft) : baseMaterial;
   const missionIds = week?.scenarios.map((scenario) => scenario.scenario_id) ?? [];
   const allMissionIds = course?.weeks.flatMap((item) => item.scenarios.map((scenario) => scenario.scenario_id)) ?? [];
 
@@ -322,9 +334,17 @@ const AdminTeachingMaterials = () => {
         </div>
       </section>}
       {course && week && material && <>
+        {!projectorOpen && <TeachingGeneratorPanel key={`${courseId}-${week.week_no}`} course={course} week={week}
+          state={generated.data} loading={generated.isPending} loadError={generated.isError}
+          onReload={() => { void generated.refetch(); }} onReview={openMaterialDetail}
+          onSaved={(state) => {
+            queryClient.setQueryData(generationKey, state);
+            void queryClient.invalidateQueries({ queryKey: ["content-review", "weekly_material", courseId, week.week_no] });
+            void queryClient.invalidateQueries({ queryKey: ["teaching-weekly-review-states", courseId] });
+          }} />}
         {!projectorOpen && <details ref={materialDetailRef} id="weekly-material-detail" tabIndex={-1} open={reviewOpen} onToggle={(event) => setReviewOpen(event.currentTarget.open)} className="scroll-mt-5 rounded-xl border bg-white p-4">
           <summary className="cursor-pointer font-semibold">이 주차 수업자료 승인</summary>
-          {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}`} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}
+          {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}-${draft?.revision ?? 0}`} refreshKey={String(draft?.revision ?? 0)} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}
         </details>}
         {!projectorOpen && <p className="text-xs text-muted-foreground">아래는 현재 편성의 교수자 미리보기입니다. 학생 유인물은 이 주차 자료의 최종 승인 후 공개되며, 내용이나 편성이 바뀌면 다시 확인하고 승인해야 합니다.</p>}
         <div className="flex flex-wrap items-center gap-2">
@@ -336,7 +356,7 @@ const AdminTeachingMaterials = () => {
         {notesOpen && !projectorOpen ? <>
           {missionNotes.isFetching && missionIds.length > 0 && <p role="status">미션 해설을 불러오는 중…</p>}
           {missionNotes.isError && <p role="alert">미션 해설을 불러오지 못했습니다. 공통 수업자료는 계속 사용할 수 있습니다.</p>}
-          <WeeklyInstructorNotes week={week} direction={course.outline.language_direction} missions={missionNotes.data ?? []} />
+          <WeeklyInstructorNotes week={week} direction={course.outline.language_direction} missions={missionNotes.data ?? []} generatedNotes={draft?.content.instructor_notes} />
         </> : !projectorOpen && <WeeklyMaterialDocument material={material} />}
         {!projectorOpen && <section className="rounded-xl border bg-white p-4">
           <h2 className="font-semibold">연결된 실습</h2>

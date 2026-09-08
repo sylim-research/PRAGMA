@@ -9,10 +9,11 @@ export interface WeeklyMissionNotes {
 }
 
 /** 관리자 페이지에서만 가져온다. 공용 자료 모델·프로젝터·HTML은 이 컴포넌트를 사용하지 않는다. */
-export function WeeklyInstructorNotes({ week, direction, missions }: {
+export function WeeklyInstructorNotes({ week, direction, missions, generatedNotes = [] }: {
   week: LearnerCourseWeek;
   direction: string;
   missions: WeeklyMissionNotes[];
+  generatedNotes?: Array<{ title: string; body: string }>;
 }) {
   const { features, procedure, missionCases = [] } = weeklyInstructorContent(week, direction);
   return <section aria-label="교수자 전용 메모" className="space-y-4 rounded-xl border border-[#DBD3BD] bg-[#FFFCF2] p-5">
@@ -20,6 +21,9 @@ export function WeeklyInstructorNotes({ week, direction, missions }: {
       <h2 className="text-lg font-bold">교수자 전용 메모</h2>
       <p className="mt-1 text-xs text-muted-foreground">공용 화면·유인물·HTML에 포함되지 않습니다. 기존 검토 기준과 배정 미션의 해설을 참고합니다.</p>
     </div>
+    {generatedNotes.map((note, index) => <div key={index} className="rounded-lg border bg-white p-4 [overflow-wrap:anywhere]">
+      <h3 className="font-semibold">{note.title}</h3><p className="mt-2 whitespace-pre-wrap text-sm leading-7">{note.body}</p>
+    </div>)}
     {features.map((feature) => <div key={feature.code} className="rounded-lg border bg-white p-4">
       <h3 className="font-semibold">{feature.label}</h3>
       <p className="mt-2 text-sm leading-6">{feature.note}</p>
