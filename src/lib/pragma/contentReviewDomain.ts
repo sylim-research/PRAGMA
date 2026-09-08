@@ -4,6 +4,9 @@ import { DEFAULT_FEATURE_BY_ACT, FEATURE_CODES_BY_ACT, getTargetFeature } from "
 import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourseProjection";
 import { buildWeeklyCourseMaterial } from "@/lib/curriculum/weeklyMaterials";
 import { weeklyInstructorContent } from "@/lib/curriculum/weeklyInstructorContent";
+import { applyTeachingDraft } from "@/lib/curriculum/teachingGeneration";
+import { teachingKind } from "../../../supabase/functions/_shared/teachingMaterial";
+export { prepareTeachingMaterial } from "@/lib/curriculum/teachingGeneration";
 import { weekRole } from "@/lib/curriculum/template";
 import { weeklyOpeningContext } from "@/lib/curriculum/weeklyOpeningContext";
 import { coreDirection } from "./coreSchema";
@@ -12,7 +15,7 @@ import { CONTENT_REVIEW_VERSION, instructionalMission, type ReviewFinding, type 
 import { NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../../../supabase/functions/_shared/learnerScene";
 
 // This entry is bundled for Edge from the same rule/catalog/material functions
-// as the app. No browser client, auth state, or second content generator.
+// as the app. No browser client, auth state, or model invocation.
 export function buildContentReviewDomain(kind: string, source: Record<string, any>) {
   const findings: ReviewFinding[] = [];
   const add = (issue: string) => findings.push({ id: `rule-${findings.length + 1}`, severity: "fail", where: "", quote: null,
@@ -53,13 +56,29 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     act = week.speech_act;
     const expected = act || weekRole(week.week_no) === "contextualization" ? 2 : 0;
     if (expected && week.scenarios.length !== expected) add(`완전한 공개 미션 ${expected}개를 편성한 뒤 주차 자료를 검수하세요.`);
-    if (!expected && week.scenarios.length === 0) add("이 주차는 현재 계획 미리보기입니다. 완성된 학습자료로 승인하지 않습니다.");
+    const draft = source.teaching_draft;
+    const kind = teachingKind(week.week_no, week.type);
+    let publicMaterial = buildWeeklyCourseMaterial(course.outline, week);
+    let validDraft = false;
+    if (draft) {
+      try {
+        if (!kind || kind !== draft.kind || draft.week_no !== week.week_no || draft.outline_id !== course.outline.id
+          || source.teaching_current !== true) throw new Error("초안의 주차·근거가 현재 편성과 다릅니다.");
+        publicMaterial = applyTeachingDraft(publicMaterial, draft);
+        validDraft = true;
+      } catch { add("생성 자료의 구성·주차·근거가 변경되었습니다. 현재 자료를 다시 준비하고 검토하세요."); }
+    }
+    if (!expected && week.scenarios.length === 0 && !validDraft) add("이 주차는 현재 계획 미리보기입니다. 완성된 학습자료로 승인하지 않습니다.");
     if (week.scenarios.length !== source.assignments.length) add("편성 중 미공개·누락 또는 수행모드가 다른 미션이 있습니다.");
     dependencies = week.scenarios.map((scenario) => scenario.scenario_id);
+    if (validDraft) dependencies = [...new Set([...dependencies, ...(source.teaching_references ?? []).map((row: any) => row.scenario_id)])];
     content = {
       weekly_learning_contract: WEEKLY_LEARNING_CONTRACT,
-      public_material: buildWeeklyCourseMaterial(course.outline, week),
-      instructor_only: weeklyInstructorContent(week, course.outline.language_direction),
+      public_material: publicMaterial,
+      instructor_only: { ...weeklyInstructorContent(week, course.outline.language_direction),
+        ...(validDraft ? { generated_notes: draft.content.instructor_notes, source_materials: draft.sources,
+          generation: { model: draft.provenance.model, prompt_version: draft.provenance.prompt_version,
+            response_id: draft.provenance.response_id, input_hash: draft.provenance.input_hash, edited: Boolean(draft.provenance.edited) } } : {}) },
       reused_mission_explanations: dependencies.map((id) => ({ scenario_id: id,
         policy: "MJT·DCT 해설은 해당 미션 검수 원본을 재사용. 주차 승인 시 연결 미션의 현재 버전 승인도 확인." })),
     };
