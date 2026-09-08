@@ -53,13 +53,13 @@ async function mission(status = 'generated') {
     VALUES ($1, 1, 'generated', $2, $3)`, [id, content, adminId]);
   return { id, content };
 }
-async function review(targetId, kind = 'mission', openaiFail = false) {
-  const sourceHash = await scalar("select content_review_source_internal($1, $2, $3)->>'source_hash'", [kind, targetId, kind === 'mission' ? 0 : 5]);
+async function review(targetId, kind = 'mission', openaiFail = false, weekNo = 5) {
+  const sourceHash = await scalar("select content_review_source_internal($1, $2, $3)->>'source_hash'", [kind, targetId, kind === 'mission' ? 0 : weekNo]);
   const snapshot = { content: { public_material: { title: 'approved public handout', sections: [], missions: [] }, instructor_only: 'PRIVATE NOTES' } };
   const id = await scalar(`INSERT INTO content_review_runs
     (kind, target_id, week_no, source_hash, content_hash, criteria_version, snapshot, rules, openai_review, claude_review, adjudication, professor_decisions, created_by)
     VALUES ($1, $2, $3, $4, $5, 'content_review_v2', $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
-  [kind, targetId, kind === 'mission' ? 0 : 5, sourceHash, hash, snapshot, pass,
+  [kind, targetId, kind === 'mission' ? 0 : weekNo, sourceHash, hash, snapshot, pass,
     model('openai', openaiFail ? { verdict: 'fail', findings: [{ ...finding, id: 'openai-1', severity: 'fail' }] } : pass),
     model('claude', { verdict: 'warning', findings: [finding] }),
     model('adjudication', { decisions: [{ finding_id: finding.id, decision: 'reject', rationale_ko: rationale }] }),
@@ -90,7 +90,7 @@ before(async () => {
     CREATE POLICY admin_scenarios ON scenarios TO authenticated USING (is_admin()) WITH CHECK (is_admin());
     GRANT ALL ON scenarios TO authenticated, service_role;
     CREATE TABLE curriculum_outlines (id uuid PRIMARY KEY, title text, status text);
-    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, PRIMARY KEY (outline_id, week_no));
+    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, type text DEFAULT 'regular', PRIMARY KEY (outline_id, week_no));
     CREATE TABLE curriculum_week_scenarios (outline_id uuid REFERENCES curriculum_outlines(id), week_no int,
       scenario_id uuid REFERENCES scenarios(scenario_id), position int, slot_role text);
     GRANT SELECT ON curriculum_outlines, curriculum_weeks, curriculum_week_scenarios TO authenticated;`);
@@ -107,8 +107,73 @@ before(async () => {
   }
   await db.exec(await sqlFile('20260905150000_instructor_review_experience.sql'));
   await db.exec(await sqlFile('20260906100000_focused_content_review.sql'));
+  await db.exec(await sqlFile('20260908210000_weekly_teaching_materials.sql'));
 });
 after(async () => { await db.close(); });
+
+async function teachingFixture(weekNo = 7) {
+  const m = await mission(); const r = await review(m.id); await finalize(m, r);
+  const courseId = randomUUID();
+  await db.query("insert into curriculum_outlines values ($1,'teaching fixture','published')", [courseId]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title) values ($1,2,'요청'),($1,$2,'메타화용 토론')", [courseId,weekNo]);
+  await db.query("insert into curriculum_week_scenarios values ($1,2,$2,0,'required')", [courseId,m.id]);
+  const config = { missionIds: [m.id], extraText: '', extraRef: '' };
+  const context = () => admin(() => scalar('select get_teaching_material_context($1,$2,$3)',[courseId,weekNo,config]));
+  const source = await context();
+  const content = { sections: ['review','comparison','discussion','reflection'].map((key) => ({ key,title:key,paragraphs:['public'],items:[],source_ids:['M1'] })),
+    instructor_notes: [{ title:'teacher',body:'PRIVATE_TEACHING_NOTE',source_ids:['M1'] }] };
+  const save = (expectedRevision, sourceHash = source.source_hash) => asRole('service_role', () => scalar(
+    'select save_teaching_material($1,$2,$3,$4,$5,$6,$7,$8,$9)',
+    [courseId,weekNo,expectedRevision,sourceHash,config,[{ id:'M1',label:'근거',text:'PRIVATE_SOURCE' }],content,
+      { prompt_version:'weekly_teaching_v1',response_id:'fixture',model:'fixture',input_hash:hash },adminId]));
+  return { m, courseId, weekNo, config, context, source, save };
+}
+
+test('teaching sources are course/week bounded and drafts are admin-only, append-only, revision checked', async () => {
+  const f = await teachingFixture();
+  const before = await scalar("select content_review_source_internal('weekly_material',$1,$2)",[f.courseId,f.weekNo]);
+  const base = await scalar("select content_review_base_source_internal('weekly_material',$1,$2)",[f.courseId,f.weekNo]);
+  assert.deepEqual(before,base);
+  await learner(() => assert.rejects(scalar('select get_teaching_material_context($1,$2,$3)',[f.courseId,f.weekNo,f.config]),/Admin required/));
+  await learner(() => assert.rejects(scalar('select get_teaching_material_state($1,$2)',[f.courseId,f.weekNo]),/Admin required/));
+  const first = await f.save(0); assert.equal(first.revision,1);
+  await assert.rejects(f.save(0),/Draft changed/);
+  await asRole('service_role', () => assert.rejects(db.query('delete from weekly_teaching_materials where id=$1',[first.id]),/permission denied/));
+  await learner(async () => {
+    assert.equal(await scalar('select count(*) from weekly_teaching_materials'),0);
+    await assert.rejects(db.query('insert into weekly_teaching_materials default values'),/permission denied/);
+  });
+  const unrelated = await mission();
+  const other = await admin(() => scalar('select get_teaching_material_context($1,$2,$3)',[f.courseId,f.weekNo,{...f.config,missionIds:[unrelated.id]}]));
+  assert.deepEqual(other.references,[]);
+  await db.query("insert into curriculum_week_scenarios values ($1,9,$2,0,'required')",[f.courseId,unrelated.id]);
+  const future = await admin(() => scalar('select get_teaching_material_context($1,$2,$3)',[f.courseId,7,{...f.config,missionIds:[unrelated.id]}]));
+  assert.deepEqual(future.references,[]);
+  await assert.rejects(admin(() => scalar('select get_teaching_material_context($1,15,$2)',[f.courseId,f.config])),/Course week not found|Only lesson/);
+});
+
+test('new teaching revisions invalidate approval; public RPC never returns teacher notes or sources', async () => {
+  const f = await teachingFixture(); await f.save(0);
+  const w = await review(f.courseId,'weekly_material',false,f.weekNo);
+  const read = () => learner(() => scalar('select get_approved_weekly_material($1,$2)',[f.courseId,f.weekNo]));
+  assert.equal(await read(),null);
+  await approve(w);
+  assert.deepEqual((await read()).material,w.snapshot.content.public_material);
+  assert.ok(!JSON.stringify(await read()).includes('PRIVATE'));
+  await f.save(1);
+  assert.equal(await read(),null);
+  assert.notEqual(await scalar('select approved_at from content_review_runs where id=$1',[w.id]),null);
+});
+
+test('changed prior-week source prevents saving and marks the existing discussion draft stale', async () => {
+  const f = await teachingFixture(14); await f.save(0);
+  await db.query('delete from curriculum_week_scenarios where outline_id=$1 and scenario_id=$2',[f.courseId,f.m.id]);
+  await assert.rejects(f.save(1),/Source changed/);
+  const state = await admin(() => scalar('select get_teaching_material_state($1,$2)',[f.courseId,f.weekNo]));
+  assert.equal(state.current,false); assert.equal(state.draft.revision,1);
+  const w = await review(f.courseId,'weekly_material',false,f.weekNo);
+  await assert.rejects(approve(w),/Teaching source changed/);
+});
 
 const experience = (status = 'checked') => ({ version: 'instructor_experience_v1', active_seconds: 45,
   decisions: ['scene','mjt-0','mjt-1','mjt-2','mjt-3','mjt-4','recap','dct'].map((section, index) => ({ section, status: index === 0 ? status : 'checked', note: '' })) });
@@ -197,7 +262,7 @@ test('missing/duplicate model output, unsettled professor decisions and stale co
 test('weekly approval requires current mission QA and exposes only the public approved snapshot', async () => {
   const m = await mission(); const r = await review(m.id); const courseId = randomUUID();
   await db.query("insert into curriculum_outlines values ($1, 'fixture course', 'published')", [courseId]);
-  await db.query("insert into curriculum_weeks values ($1, 5, 'fixture week')", [courseId]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title) values ($1, 5, 'fixture week')", [courseId]);
   await db.query("insert into curriculum_week_scenarios values ($1, 5, $2, 1, 'required')", [courseId, m.id]);
   const beforeMissionApproval = await review(courseId, 'weekly_material');
   await assert.rejects(approve(beforeMissionApproval), /each assigned mission first/);

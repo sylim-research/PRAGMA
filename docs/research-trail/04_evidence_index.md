@@ -285,3 +285,14 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 근거: 실제 측정된 360·390px 학습자 화면과 1280px 교수자 화면의 DOM 치수·스크린샷 관찰·선택 및 이동 조작. MJT3 수정안의 28px·108px 가로 넘침, 산출 전 요약의 판단 근거 말줄임, 학습 기록 카드의 과도한 글자 줄바꿈을 재현했다. 상세 재현 단계와 코드 위치는 dev-log에 기록했다.
 - 한계: 앱 수정·배포·새 학습 수행 저장 없이 실시한 대표 화면 점검이다. 로컬 preview·합성 전사 확인을 실제 휴대폰의 키보드·녹음·음성 인식·저장 종단 검증으로 해석하지 않는다. 모바일 대응 완료·전체 라우트 전수 검사·사용성 또는 학습효과의 증거가 아니다.
 - 후속 보완: 사용자 승인 뒤 세 표시 결함을 수정했다. `docs/dev-log/2026-09-08-responsive-fixes.md`에 로컬 360·390·1280px 수정안·요약 검증, 360·390px 2열/768·1280px 3열 기록 카드, typecheck·기존 26 tests 통과를 기록했다. 로컬 검증 범위이며 운영 반영·실제 휴대폰 종단 확인을 뜻하지 않는다.
+
+## EVD-20260908-06 · 교수자 자료 생성·수정·승인 연결의 로컬 검증
+
+- DEC-20260908-03. 위치: `docs/dev-log/2026-09-08-teaching-materials-discussion.md`와 해당 문서의 최초 커밋.
+- 재실행 근거: `src/lib/curriculum/teachingGeneration.test.ts`, `src/components/admin/TeachingGeneratorPanel.test.tsx`,
+  `scripts/teaching-materials-edge.test.mjs`, `scripts/content-review-db.test.mjs`. 모델 출력은 모의 데이터,
+  DB 검사는 실제 migration을 적용하는 격리 PostgreSQL이다. 기존 승인 해시 보존과 변경 시 재승인을 대조한다.
+- 화면: `C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-08_교수자자료_로컬/`의 `smoke.json`과 PNG 9장.
+  360·390·1280px × 2·7·14주에서 확인→생성→수정, 긴 출처 표시와 공용 필드 분리를 확인했다.
+- 한계: 실제 모델 내용 품질·운영 저장/배포·교수자 감수·12주 콘텐츠 완성·수업 참여나 학습효과의 증거가 아니다.
+  DB/RLS 변경의 독립 검토 및 운영 생성·승인·학생 유인물 종단은 후속 확인 대상이다.
