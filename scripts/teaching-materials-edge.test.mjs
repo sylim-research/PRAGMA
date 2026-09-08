@@ -103,3 +103,26 @@ test('save-time conflict preserves existing state after a single model call', as
   assert.equal(response.status, 400); assert.match(response.body.error, /근거 자료가 변경/);
   assert.equal(fetches.length, 1); assert.equal(state.draft, null);
 });
+
+test('lesson generation uses its assigned pair and preserves both source references', async () => {
+  const secondId = '20000000-0000-4000-8000-000000000002';
+  context.base.week = { ...context.base.week, week_no: 2, speech_act: 'request' };
+  context.references = [context.references[0], { ...context.references[0], scenario_id: secondId, mode: 'stt_interpreting' }];
+  context.base.scenarios = context.references;
+  context.base.assignments = context.references.map((row, index) => ({ outline_id: courseId, week_no: 2, scenario_id: row.scenario_id, order_index: index, assignment_role: 'required' }));
+  const body = { ...input('preview'), weekNo: 2, config: { ...config, missionIds: [missionId,secondId] } };
+  const preview = await call(body); assert.equal(preview.status, 200);
+  const lesson = structuredClone(content);
+  lesson.sections.forEach((section, index) => { section.key = ['concept','comparison','practice','faq'][index]; section.source_ids = ['M1','M2']; });
+  modelResult.choices[0].message.content = JSON.stringify(lesson);
+  const generated = await call({ ...body, action: 'generate', inputHash: preview.body.inputHash });
+  assert.equal(generated.status, 200); assert.equal(saves[0].p_sources.length, 2);
+  assert.deepEqual(saves[0].p_config.missionIds, [missionId,secondId]);
+});
+
+test('oversized extra source fields fail before any paid call or save', async () => {
+  for (const extra of [{ extraText: 'a'.repeat(12001), extraRef: 'reference' }, { extraText: 'source', extraRef: 'a'.repeat(501) }]) {
+    assert.equal((await call({ ...input('preview'), config: { ...config, ...extra } })).status, 400);
+  }
+  assert.equal(fetches.length, 0); assert.equal(saves.length, 0);
+});
