@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ vi.mock("@/lib/mission/classResponseRelease", () => ({
   releaseClassResponses: vi.fn(),
 }));
 vi.mock("@/components/AdminShell", () => ({
-  AdminShell: ({ children }: { children: React.ReactNode }) => <main>{children}</main>,
+  AdminShell: ({ children, title, description }: { children: React.ReactNode; title: string; description: string }) => <main><h1>{title}</h1><p>{description}</p>{children}</main>,
 }));
 
 const outline = {
@@ -118,31 +118,51 @@ function mount(entry = "/admin/class-responses?courseId=course-a&weekNo=2&missio
   );
 }
 
-describe("실시간 학급 응답", () => {
+async function expectCounts(learners: number, dissents: number) {
+  await waitFor(() => {
+    expect(screen.getByText("집계 학습자").parentElement).toHaveTextContent(`${learners}명`);
+    expect(screen.getByText("이견 제기").parentElement).toHaveTextContent(`${dissents}건`);
+  });
+}
+
+describe("학급 응답 현황", () => {
   it("미션을 지정하지 않은 일반 진입은 예시를 보여 주고 크게 볼 수 있다", async () => {
     mount("/admin/class-responses?courseId=course-a&weekNo=2");
-    expect(await screen.findByText("응답 12명 · 이견 제기 2건")).toBeVisible();
+    await expectCounts(12, 2);
+    expect(screen.getByRole("heading", { name: "학급 응답 현황" })).toBeVisible();
+    expect(screen.getByText("저장된 미션 응답을 확인하고, 수업 토론에 활용할 수 있습니다.")).toBeVisible();
     expect(screen.getByText("DEMO · 예시 데이터")).toBeVisible();
     expect(screen.getByRole("button", { name: "예시 데이터 보기" })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
-    expect(screen.getByRole("combobox", { name: "응답 주차" })).toHaveValue("2");
-    expect(screen.getByRole("combobox", { name: "응답 미션" })).toHaveValue("mission-1");
+    expect(screen.queryByRole("combobox", { name: "응답 교과목" })).not.toBeInTheDocument();
     expect(mocks.releaseState).not.toHaveBeenCalled();
     expect(mocks.from).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "판단 4 · 이유 찾기" }));
+    expect(screen.getByRole("region", { name: "판단 4 · 이유 찾기" })).toHaveTextContent("최초 적절성 판단");
     fireEvent.click(screen.getByRole("button", { name: "크게 보기" }));
     expect(screen.getByRole("dialog", { name: "학급 응답 크게 보기" })).toBeVisible();
-    expect(screen.getByText("가장 많이 선택된 응답이 정답을 의미하지는 않습니다.")).toBeVisible();
+    const dialog = within(screen.getByRole("dialog"));
+    expect(dialog.getByRole("button", { name: "판단 4 · 이유 찾기" })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(dialog.getByRole("button", { name: "판단 5 · 여러 초안 비교" }));
+    expect(dialog.getByRole("region", { name: "판단 5 · 여러 초안 비교" })).toHaveTextContent("BEST로 고른 초안");
+    expect(dialog.getByText(/가장 많이 선택된 응답이 정답을 의미하지는 않습니다/)).toBeVisible();
+    fireEvent.click(dialog.getByRole("button", { name: "닫기" }));
+    expect(screen.getByRole("button", { name: "판단 5 · 여러 초안 비교" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("실제 데이터를 선택하면 완료 응답을 익명 집계한다", async () => {
     mount("/admin/class-responses?courseId=course-a&weekNo=2");
-    await screen.findByText("응답 12명 · 이견 제기 2건");
+    await expectCounts(12, 2);
+    fireEvent.click(screen.getByRole("button", { name: "판단 5 · 여러 초안 비교" }));
     fireEvent.click(screen.getByRole("button", { name: "실제 데이터" }));
-    expect(await screen.findByText("응답 2명 · 이견 제기 1건")).toBeVisible();
+    await expectCounts(2, 1);
+    expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
+    expect(screen.getByRole("combobox", { name: "응답 주차" })).toHaveValue("2");
+    expect(screen.getByRole("combobox", { name: "응답 미션" })).toHaveValue("mission-1");
+    expect(screen.getByRole("button", { name: "판단 1 · 첫인상 판단" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/private-learner/)).not.toBeInTheDocument();
     expect(screen.queryByText(/private dissent/)).not.toBeInTheDocument();
     expect(screen.getByLabelText("응답 공개 단계")).toHaveTextContent("1 · 응답 수집");
-    expect(screen.getByText("이견 1건")).toBeVisible();
+    expect(screen.getByText(/응답이 충분하지 않아도 주차 수업자료로 수업을 진행할 수 있습니다/)).toBeVisible();
     expect(screen.getByRole("link", { name: "주차 운영으로 돌아가기 →" })).toHaveAttribute(
       "href",
       "/admin/package?courseId=course-a&weekNo=2#weekly-material-detail",
@@ -151,12 +171,12 @@ describe("실시간 학급 응답", () => {
 
   it("주차 운영의 미션 링크로 들어오면 해당 미션의 실제 응답을 바로 표시한다", async () => {
     mount();
-    expect(await screen.findByText("응답 2명 · 이견 제기 1건")).toBeVisible();
+    await expectCounts(2, 1);
     expect(screen.getByRole("button", { name: "실제 데이터" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText("DEMO · 예시 데이터")).not.toBeInTheDocument();
     expect(mocks.logRows).toHaveBeenCalledWith("mission_id", "mission-1");
     fireEvent.click(screen.getByRole("button", { name: "예시 데이터 보기" }));
-    expect(await screen.findByText("응답 12명 · 이견 제기 2건")).toBeVisible();
+    await expectCounts(12, 2);
   });
 
   it("선택 미션의 실제 응답이 없으면 예시로 대체하지 않고 수행 기록 없음을 표시한다", async () => {
