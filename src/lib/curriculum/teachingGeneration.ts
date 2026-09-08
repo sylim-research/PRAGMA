@@ -9,12 +9,16 @@ import { buildTeachingPrompt, teachingKind, validateTeachingContent,
 /** Database-supplied context only; no learner answers are requested or sent to a model. */
 export function prepareTeachingMaterial(context: Record<string, any>, config: TeachingConfig) {
   const base = context.base;
+  // Saved scenarios keep the release in core_content.generation, as the Composer does.
+  const releasedSource = (row: any) => ({ ...row,
+    content_release_id: row.core_content?.generation?.content_release_id ?? row.content_release_id,
+  });
   const kind = teachingKind(base.week.week_no, base.week.type);
   if (!kind) throw new Error("이 주차는 수업자료·토론 생성 대상이 아닙니다.");
   if (!Array.isArray(config.missionIds) || !config.missionIds.length || config.missionIds.length > 6
     || new Set(config.missionIds).size !== config.missionIds.length
     || context.references.length !== config.missionIds.length) throw new Error("해당 학습 범위의 승인된 편성 미션을 선택해 주세요.");
-  if (context.references.some((row: any) => !isCurrentMissionReleasedForLearner(row) || !row.mission_content
+  if (context.references.some((row: any) => !isCurrentMissionReleasedForLearner(releasedSource(row)) || !row.mission_content
     || coreDirection(row.core_content) !== base.outline.language_direction || row.learner_level !== base.outline.level)) {
     throw new Error("근거 미션의 승인·수준·언어방향을 확인해 주세요.");
   }
@@ -23,7 +27,7 @@ export function prepareTeachingMaterial(context: Record<string, any>, config: Te
     || (config.extraText.trim().length > 0) !== (config.extraRef.trim().length > 0)) {
     throw new Error("추가 원자료는 본문과 출처를 함께 입력해 주세요. 본문 한도는 12,000자입니다.");
   }
-  const cores = base.scenarios.map((row: any) => ({ ...row, direction: coreDirection(row.core_content),
+  const cores = base.scenarios.map((row: any) => ({ ...releasedSource(row), direction: coreDirection(row.core_content),
     situation_ko: row.core_content?.situation_ko ?? "", source_text_ko: row.core_content?.source_text_ko ?? row.core_content?.source_text ?? "" }));
   const course = assembleLearnerCourse({ outline: base.outline, weeks: [base.week], assignments: base.assignments, cores });
   const week = course.weeks[0];

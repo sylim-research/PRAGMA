@@ -54,6 +54,15 @@ describe("GOLD 수업자료·메타화용 토론", () => {
     expect(prepared.prompt.user).toContain(`2~${weekNo - 1}주차`);
     expect(prepared.prompt.system).toContain("기록이 없어도 제시 사례로 참여");
   });
+  it.each([CURRENT_CONTENT_RELEASE_ID, "pragma_zhko_bidirectional_candidate_20260904_02"])("reads the saved core release %s for both source and assigned pair eligibility", (releaseId) => {
+    const rows = references().map(row => ({ ...row, content_release_id: null,
+      core_content: { ...row.core_content, generation: { content_release_id: releaseId } } }));
+    const context = { base: { ...base(), scenarios: rows }, references: rows };
+    expect(prepareTeachingMaterial(context, config).material.missions).toHaveLength(2);
+    expect(prepareTeachingMaterial({ base: base(7), references: rows }, config).kind).toBe("discussion");
+    rows[0].core_content.generation.content_release_id = "pre_lock";
+    expect(() => prepareTeachingMaterial(context, config)).toThrow("근거 미션의 승인");
+  });
   it("requires source attribution, rejects oversized input and never cuts selected text", () => {
     expect(() => prepareTeachingMaterial({ base: base(), references: references() }, { ...config, extraText: "본문" })).toThrow("출처");
     expect(() => buildTeachingPrompt("lesson", {}, [{ id: "S1", label: "큰 자료", text: "a".repeat(100001) }])).toThrow("임의로 자르지");
