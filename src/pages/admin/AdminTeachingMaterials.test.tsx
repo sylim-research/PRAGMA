@@ -197,10 +197,10 @@ describe("교과목·주차 수업자료 연결", () => {
     expect(screen.getByRole("combobox", { name: "수업자료 교과목" })).toHaveValue("");
   });
 
-  it("선택 주차 상세 하단에 실시간 학급 응답 카드를 중복 표시하지 않는다", async () => {
+  it("선택 주차 상세 하단에 학급 응답 현황 카드를 중복 표시하지 않는다", async () => {
     mount();
     await screen.findByText("2주차 목표");
-    expect(screen.queryByRole("heading", { name: "실시간 학급 응답" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "학급 응답 현황" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "응답 보드 열기 →" })).not.toBeInTheDocument();
   });
 

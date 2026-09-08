@@ -4,7 +4,7 @@ import { Maximize2, RefreshCw, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { AdminShell } from "@/components/AdminShell";
-import { ClassResponsePatterns } from "@/components/admin/ClassResponsePatterns";
+import { ClassResponseDashboard } from "@/components/admin/ClassResponseDashboard";
 import { Button } from "@/components/ui/button";
 import { getCurriculumOutline, listCurriculumOutlines } from "@/lib/curriculum/api";
 import { listCoreScenarios, listWeekAssignments } from "@/lib/curriculum/composer";
@@ -30,6 +30,7 @@ const AdminClassResponses = () => {
   const [params, setParams] = useSearchParams();
   const [demo, setDemo] = useState(() => !(params.get("courseId") && params.get("missionId")));
   const [projector, setProjector] = useState(false);
+  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
   const projectorRef = useRef<HTMLDivElement>(null);
   const courseId = params.get("courseId") ?? "";
 
@@ -149,12 +150,12 @@ const AdminClassResponses = () => {
   };
 
   return <AdminShell
-    title="실시간 학급 응답"
-    description="개별 판단을 익명 학급 분포로 비교하고 수업 토론으로 연결합니다."
+    title="학급 응답 현황"
+    description="저장된 미션 응답을 확인하고, 수업 토론에 활용할 수 있습니다."
   >
     <div className="max-w-[1120px] space-y-5">
       <section className="rounded-xl border bg-white p-4">
-        <div className="grid gap-4 md:grid-cols-3">
+        {!demo && <div className="mb-4 grid gap-4 md:grid-cols-3">
           <label className="text-sm font-semibold">교과목
             <select
               aria-label="응답 교과목"
@@ -192,11 +193,11 @@ const AdminClassResponses = () => {
               </option>)}
             </select>
           </label>
-        </div>
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        </div>}
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant={!demo ? "default" : "outline"} aria-pressed={!demo} onClick={() => setDemo(false)}>실제 데이터</Button>
           <Button size="sm" variant={demo ? "default" : "outline"} aria-pressed={demo} onClick={() => setDemo(true)}>예시 데이터 보기</Button>
-          {!demo && <span className="ml-1 text-xs text-muted-foreground">5초마다 자동 갱신</span>}
+          {!demo && releaseStatus === "collecting" && <span className="ml-1 text-xs text-muted-foreground">저장된 응답 · 5초마다 갱신</span>}
           {courseId && week && <Button size="sm" variant="ghost" className="ml-auto" asChild>
             <Link to={`/admin/package?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}#weekly-material-detail`}>
               주차 운영으로 돌아가기 →
@@ -205,34 +206,25 @@ const AdminClassResponses = () => {
         </div>
       </section>
 
-      <section className={`rounded-xl border p-4 ${demo ? "border-[#D8B84A] bg-[#FFF9E5]" : "bg-white"}`}>
+      <section className="rounded-2xl border border-[#E5E3DB] bg-[#FAFAF7] p-4 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${demo ? "bg-[#FAD338] text-[#15202B]" : "bg-[#EEF1F4] text-[#344150]"}`}>
               {demo ? "DEMO · 예시 데이터" : "실제 완료 응답"}
             </span>
-            <h2 className="mt-3 text-lg font-black text-[#15202B]">우리 반은 어떻게 판단했을까?</h2>
+            <h2 className="mt-3 break-keep text-2xl font-black tracking-tight text-[#15202B] sm:text-3xl">우리 반은 어떻게 판단했을까?</h2>
             <p className="mt-1 text-sm text-muted-foreground">
               {demo
-                ? "실제 학습자 수행 기록이 아닌 코드 내 고정 예시입니다."
+                ? `${DEMO_CLASS_RESPONSE_PATTERN.learners}명의 미션 응답을 가정한 예시입니다. 실제 학습자 수행 기록이 아닙니다.`
                 : selectedMission
                   ? missionSituationSummary(selectedMission.situation_ko)
                   : "교과목·주차·미션을 선택해 주세요."}
             </p>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {!demo && <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
+            {!demo && <div className="mt-3 flex flex-wrap gap-1.5">
+              <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
                 {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
-              </span>}
-              {visiblePattern && <>
-                <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">응답 {visiblePattern.learners}명</span>
-                <span className={[
-                  "rounded-full border px-2.5 py-1 text-[11px] font-semibold",
-                  visiblePattern.dissents > 0
-                    ? "border-amber-200 bg-amber-50 text-amber-800"
-                    : "border-slate-200 bg-slate-50 text-slate-700",
-                ].join(" ")}>이견 {visiblePattern.dissents}건</span>
-              </>}
-            </div>
+              </span>
+            </div>}
           </div>
           <div className="flex gap-2">
             {!demo && <Button
@@ -264,7 +256,16 @@ const AdminClassResponses = () => {
         {!demo && patternQuery.isPending && missionId && <p role="status" className="mt-5 text-sm">응답 분포를 불러오는 중…</p>}
         {!demo && patternQuery.isError && <p role="alert" className="mt-5 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
         {!demo && !missionId && <p className="mt-5 text-sm text-muted-foreground">이 주차에 편성된 미션이 없습니다.</p>}
-        {visiblePattern && <div className="mt-5"><ClassResponsePatterns patterns={[visiblePattern]} /></div>}
+        {visiblePattern && <div className="mt-6"><ClassResponseDashboard
+          pattern={visiblePattern}
+          selectedItemId={selectedItemId}
+          onSelectItem={setSelectedItemId}
+        /></div>}
+
+        {!demo && visiblePattern && visiblePattern.learners < 5 && <div className="mt-5 rounded-xl border border-[#E5DFC9] bg-[#FFFDF4] p-4 text-sm leading-relaxed text-[#5F573D]">
+          <p>학습자에게 분포를 공개하려면 5명 이상의 응답이 필요합니다. 응답이 충분하지 않아도 주차 수업자료로 수업을 진행할 수 있습니다.</p>
+          {courseId && week && <Link className="mt-2 inline-block font-bold underline underline-offset-4" to={`/admin/package?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}#weekly-material-detail`}>주차 수업자료 열기 →</Link>}
+        </div>}
 
         {!demo && missionId && <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
           <div>
@@ -315,20 +316,19 @@ const AdminClassResponses = () => {
       aria-modal="true"
       aria-label="학급 응답 크게 보기"
       tabIndex={-1}
-      className="fixed inset-0 z-[110] overflow-y-auto bg-[#F8F6EE] p-6 sm:p-10"
+      className="fixed inset-0 z-[110] overflow-y-auto bg-[#F8F6EE] p-4 sm:p-6"
     >
       <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex items-start justify-between gap-4">
+        <div className="mb-4 flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-bold text-[#B8860B]">{demo ? "DEMO · 예시 데이터" : "익명 학급 집계"}</p>
-            <h1 className="mt-1 text-3xl font-black text-[#15202B]">우리 반은 어떻게 판단했을까?</h1>
-            <p className="mt-2 text-base text-muted-foreground">가장 많이 선택된 응답이 정답을 의미하지는 않습니다.</p>
+            <h1 className="mt-1 break-keep text-3xl font-black text-[#15202B]">우리 반은 어떻게 판단했을까?</h1>
           </div>
           <Button variant="outline" onClick={() => setProjector(false)}>
             <X className="mr-2 h-4 w-4" />닫기
           </Button>
         </div>
-        <ClassResponsePatterns patterns={[visiblePattern]} projector />
+        <ClassResponseDashboard pattern={visiblePattern} selectedItemId={selectedItemId} onSelectItem={setSelectedItemId} projector />
       </div>
     </div>}
   </AdminShell>;
