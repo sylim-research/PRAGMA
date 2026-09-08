@@ -1,4 +1,5 @@
 import { invokeAstraMission, type GenerationJob } from './backgroundGenerationApi';
+import { applyCandidateFeedback } from '../../../supabase/functions/_shared/missionCandidateFeedback';
 // 코어 → 미션 승격 (관리자 UI 배선). 골든 테스트 경로를 앱으로 옮긴 것.
 //   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(R1~R24)
 //   → 전체 초안 1회 → R27 국소 결함/critic 지목 문항만 1회 수리 → 유효 초안 격리 저장.
@@ -436,6 +437,7 @@ export type MissionRepairOperation =
   | { operation: "replace_item_block"; item_index: number; item: Record<string, unknown> }
   | { operation: "replace_fix_choice_candidate"; item_index: number; candidate_index: number; candidate: Record<string, unknown> }
   | { operation: "replace_multi_judge_candidate"; item_index: number; candidate_index: number; candidate: Record<string, unknown> }
+  | { operation: "replace_item_feedback"; item_index: number; explanation_ko: string; recommended_example: string }
   | { operation: "replace_reference_alternatives"; reference_alternatives: unknown[] }
   | { operation: "replace_diagnostic_dimensions"; diagnostic_dimensions: unknown[] };
 
@@ -515,6 +517,10 @@ export function applyMissionRepairOperations(
         };
         items[operation.item_index] = { ...item, [collection]: candidates };
       }
+    } else if (operation.operation === "replace_item_feedback") {
+      const item = isRecord(items[operation.item_index]) ? items[operation.item_index] as Record<string, unknown> : null;
+      if (item) items[operation.item_index] = { ...item, explanation_ko: operation.explanation_ko,
+        recommended_example: operation.recommended_example };
     } else if (operation.operation === "replace_reference_alternatives") {
       productionTask.reference_alternatives = operation.reference_alternatives;
     } else if (operation.operation === "replace_diagnostic_dimensions") {
@@ -770,6 +776,15 @@ async function regenerateMissionCandidatesOnce(args: {
   if (rawOperations.length === 0) return { ok: false, error: "후보 재생성 결과가 없습니다." };
   const operations = rawOperations.filter(isRecord) as MissionRepairOperation[];
   const patched = applyMissionRepairOperations(args.missionContent, operations);
+  const changedIndexes = [...new Set(operations.filter(operation =>
+    operation.operation === "replace_fix_choice_candidate" || operation.operation === "replace_multi_judge_candidate")
+    .map(operation => operation.item_index))];
+  try {
+    applyCandidateFeedback(patched.mpj_items as unknown[], changedIndexes,
+      operations.filter(operation => operation.operation === "replace_item_feedback"), args.feature.within_band_code);
+  } catch (error) {
+    return { ok: false, error: `후보와 해설을 함께 갱신하지 못했습니다: ${(error as Error).message}` };
+  }
   const provenance = isRecord(patched.provenance) ? patched.provenance : {};
   const contentHash = await contentHashForDraft(patched);
   patched.provenance = { ...provenance, mission_content_hash: contentHash };

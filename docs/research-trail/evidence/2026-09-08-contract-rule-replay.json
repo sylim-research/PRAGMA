@@ -1,0 +1,560 @@
+{
+  "observedAt": "2026-09-08T04:59:59.654Z",
+  "baselineCommit": "8bc53880",
+  "count": 54,
+  "sourceSnapshotSha256": "9ea23327d867040f6bca8d89e44f256d089418b5be8815c35292b7491d348e85",
+  "sourceObjectsUnchanged": true,
+  "reviewSnapshotHashesChanged": 54,
+  "rulesVersion": "mission_rules_v11_persisted_contract",
+  "failureCounts": {
+    "before": {
+      "R5": 54,
+      "R27": 54
+    },
+    "after": {}
+  },
+  "remainingFailMissions": 0,
+  "results": [
+    {
+      "scenarioId": "043c3b60-e962-4a59-a76b-df73ecad2719",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "0dc6829b-c881-4b0e-b752-b912fd7160d0",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "16cada4f-e1b3-4f1f-95de-e059ac4c540e",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "1868271d-6422-429e-a86d-1017e676597b",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "1fea5ef8-ce47-440e-b621-a20d71f9cdf5",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "2287cd04-63fb-4a20-93d1-809817813397",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "2439d061-8785-4c39-ba10-86574f18f873",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "27575f80-d115-4d0b-9807-6dafcd6430a5",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "28d87b8e-ac97-4749-a4a5-3581f8c833df",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "2f898edd-aabf-4d63-849a-99a1f9cb3925",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "3345e555-4e3b-497a-a36f-ee41005f71ce",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "35a5e1a4-150a-413b-93c7-0258464e0efd",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "37a90ef6-ee78-4363-82ad-d35da9ca7b8f",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "3926454b-9958-47ff-a822-b5e293890a6c",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "3a5fc056-6051-4372-a72c-9dee04e8de6e",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "3ad21afe-0675-40b8-85d8-fce0982e293e",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "3bfec949-4ed9-47c5-9101-fc579eb17338",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "432ec4e7-93de-46dc-88ee-71a3a54e2932",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "4c750a60-ad1c-4106-9feb-ce2b2c0a99a6",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "509589aa-0e64-4dd1-be6d-538c714bb008",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "66d4ae27-5f6e-4733-a7ee-ee8f8b4d2aa3",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "68706ae3-30a7-45b6-aeff-e535d50d7313",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "68ec12d5-f4dc-4cbb-9378-b4dc533c8bcb",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "6b674da6-f545-43cb-8cda-ad5f27711450",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "6bfa4982-ce99-4ca5-b34e-36922979dc25",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "70aada0b-8bd4-45a4-b5af-98090775da5d",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "724267d2-d7ec-416a-9a61-caba29b49dd7",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "76028b74-9e04-476e-ae7e-396cdad7423e",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "7e2e8765-bffb-4ccf-a240-54a67378642f",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "7f9bae9c-13ab-40c4-9a43-63f2f58ffafe",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "809c7ccb-b416-4d91-bc7d-304daaea4df8",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "82ad389f-843f-4410-ab2e-72d1c47ce54d",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "83fd3cdf-d3b3-4ab0-b808-9117cb0ae2b8",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "8be464ce-263c-4068-ab77-caf19ccdadbb",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "a4a5f793-e0b3-4547-b137-498422a76533",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "aaaa6149-e1af-46a0-a4a3-437cf3f17833",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "b04d4d34-b47f-4cc6-9438-4417e3cbdbda",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "b240af5b-fda2-4978-a8ce-7a64fa8395a1",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "b7cb5073-5e3e-4f6c-a332-a2efe448d1b7",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "b85547c1-95b9-48e8-af04-2e7461ca3dee",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "b89d0612-1ae3-4a40-8444-7c3030fdbec0",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "c771fd52-287a-49b3-8203-2341913deb01",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "d1971b67-3e52-45d3-9366-a991482054c1",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "d502e0fc-4868-490b-a166-7331f4f37b5f",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "d55bf22b-7801-4bbe-afc0-5fbe0299d508",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "d79406d7-1ae9-4e35-938a-1faf71d63170",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "e5be499f-7dea-465d-9884-e9a3487d275d",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "ea0976f1-14dc-46e5-ab10-bb39de00aa65",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "ed03b044-883c-4849-8808-2f7a5bfa339c",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "f35d2cc5-77dc-4895-a4ef-fe3c082c4dfd",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "f4b0ac1d-b3e9-4fc1-9bf3-a049aaf92fa5",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "f8de3f59-cd86-4636-b516-a8ead78ac0ac",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "f8f26b2f-1be9-4653-92cb-43bc420f86ce",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    },
+    {
+      "scenarioId": "fbb3e621-1a1e-4836-afb4-6351f23d157a",
+      "promptVersion": "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+      "contractVersion": "contrast_plan_v1",
+      "before": [
+        "R5",
+        "R27"
+      ],
+      "after": []
+    }
+  ],
+  "scope": "Live scenario SELECT only; compare old/new local rule bundles. No LLM calls, database edits, approvals, assignments or learner data. Rule compatibility is not content approval."
+}

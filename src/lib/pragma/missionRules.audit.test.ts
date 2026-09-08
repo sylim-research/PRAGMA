@@ -111,27 +111,33 @@ describe("mission rule audit regressions", () => {
   });
 
   it("enforces the native R27 X-A-A-A-Y-C topology without rejecting Anchor A sharing", () => {
-    expect(violationsFor(SAMPLE_MISSION_V5_NATIVE, "R27")).toEqual([]);
+    const saved = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    saved.contrast_plan = {
+      version: "contrast_plan_v1", speech_act: "request", mission_goal: "integrated_speech_act",
+      item_slots: saved.mpj_items.map(item => ({ item_id: item.id, item_type: item.type,
+        item_focus: item.axis_feature, intended_band_profile: "saved" })),
+    };
+    expect(violationsFor(saved, "R27")).toEqual([]);
 
-    const splitAnchor = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const splitAnchor = structuredClone(saved);
     splitAnchor.mpj_items[2].situation_ko = "다른 Anchor 사건을 새로 만들었다. 이 문장은 두 번째 설명이다.";
     expect(violationsFor(splitAnchor, "R27")).toEqual(expect.arrayContaining([
       expect.objectContaining({ level: "fail", message: expect.stringContaining("[slot:MJT3]") }),
     ]));
 
-    const copiedX = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const copiedX = structuredClone(saved);
     copiedX.mpj_items[0].situation_ko = copiedX.mpj_items[1].situation_ko;
     expect(violationsFor(copiedX, "R27")).toEqual(expect.arrayContaining([
       expect.objectContaining({ level: "fail", message: expect.stringContaining("[slot:MJT1]") }),
     ]));
 
-    const copiedY = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const copiedY = structuredClone(saved);
     copiedY.mpj_items[4].situation_ko = copiedY.mpj_items[0].situation_ko;
     expect(violationsFor(copiedY, "R27")).toEqual(expect.arrayContaining([
       expect.objectContaining({ level: "fail", message: expect.stringContaining("[slot:MJT5]") }),
     ]));
 
-    const copiedDct = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const copiedDct = structuredClone(saved);
     copiedDct.production_task.situation_ko = copiedDct.mpj_items[1].situation_ko;
     expect(violationsFor(copiedDct, "R27")).toEqual(expect.arrayContaining([
       expect.objectContaining({ level: "fail", message: expect.stringContaining("[slot:DCT]") }),

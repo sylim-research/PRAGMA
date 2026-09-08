@@ -9,7 +9,7 @@
 
 > 상태: 현재 정본. **이 문서는 구조·불변조건·승인 게이트만 담는다.**
 > 식별 규칙: 날짜 없는 이 경로만 현행이며, 날짜 판본은 `history/`의 역사 자료다.
-> 대외 과업명은 **MJT(Metapragmatic Judgement Task)**·**DCT(Discourse Completion Task)**다.
+> 대외 과업명은 **MJT(Metapragmatic Judgement Task)**·**DCT형 통번역 산출 과제**다(DCT: Discourse Completion Task).
 > 코드·DB·JSON의 기존 `mpj_*` 식별자는 내부 호환 이름으로 유지한다.
 > 테스트 수·Edge 버전·해시·배포 상태 같은 날짜 종속 사실은
 > `docs/research-trail/04_evidence_index.md`와 관련 dev-log가 정본이며, 여기에 적지 않는다.
@@ -59,7 +59,7 @@ AI는 초안을 만들고 교수자가 교육용 공개 여부를 결정한다. 
 | 배치 | `/admin/batch` | 계획 감사, smoke, 승인된 배치 실행 |
 | 라이브러리 | `/admin/library` | 화행·수준·통번역 모드별 코어 탐색 (`/admin/browser`는 리다이렉트) |
 | 미션 조립 | `/admin/assembly` | 코어→Full Mission 승격의 정식 작업대 (2026-07-30 분리 신설) |
-| 콘텐츠 검수·확정 | `/admin/review` | 현재 버전의 규칙 검사 → OpenAI 품질 점검 → Claude 독립 검토 → OpenAI 지적별 판정 → 교수자 최종 확정. 기존 미션 편집기를 재사용 |
+| 콘텐츠 검수·확정 | `/admin/review` | 규칙 검사·일치하는 저장 품질점검 재사용 → 중대·불확실 쟁점의 교수자 판단 → 최종 확정. 추가 모델 검토는 선택형이며 기존 미션 편집기를 재사용 |
 | 과거 검토 기록·구 주소 | `/admin/research-qa/final-review` | 과거 정식 생성 검토 이력 읽기 전용. `/admin/cross-vendor`·`/admin/research-qa/releases`는 `/admin/review`로 연결 |
 | 생성 계약·프롬프트 | `/admin/prompt-harness` | 규칙 기반 검사·프롬프트 통제 기반 검토·교수자 검수·승인의 역할과 증거 지위 대조 |
 | 강좌 편성 | `/admin/composer` | 강좌 설정, 15주 수업 계획, 네 축 자동 편성 정책, 주차별 미션 배정·수업자료 연결 (`/admin/curriculum`은 이 화면으로 리다이렉트) |
@@ -275,8 +275,9 @@ mission_v5 교수자 검수에는 다음을 추가한다.
 - FixChoice가 별도 사건의 최초 판단을 잠근 뒤 권장안 1개와 일부 조정이 필요한 경계안 2개를
   제시하며, 세 표현이 문법·의미 오류가 아닌 화용적 선택으로 변별되는가
 - Reason의 주원인이 하나이며(이유 3개 = 주원인·화용 오개념·의미/문법/맥락 각 1, R4) 다른 두 이유가 동등하게 방어되지 않는가. 동시에 두 오답이 황당한 문법 주장이나 무관한 절대 규칙으로 너무 쉽게 제거되지는 않는가
-- MultiJudge가 `BEST 1·적정 대역 중간 1·비적정 경계 중간 1·WORST 1`의 네 후보이며,
-  유일하게 방어 가능한 BEST/WORST와 서로 다른 중간 근거를 가지는가. 후보 길이·형식이 정답 단서가 아닌가
+- 현행 `contrast_plan_v1`의 MultiJudge가 적정 2·조정 필요 2의 네 후보와 각 표현에 맞는 근거를
+  가지는가. BEST/WORST 선택 이름 때문에 같은 범주 안의 유일한 순위를 요구하지 않는가.
+  후보 길이·형식이 정답 단서가 아닌가. 후보 교체 뒤 해설·참고 표현·인용도 최종 문장과 일치하는가
 - 현행 native MJT5와 DCT의 `preceding_turn`이 null이고, 응답 화행에 필요한 선행 사건이
   `situation_ko`에 자연스럽게 요약돼 self-contained한가
 - P·D·R이 140자 이내의 정확히 두 문장 상황문에서 자연스럽게 확인되며, 풀어 쓴 학습자용
@@ -305,7 +306,7 @@ mission_v5 교수자 검수에는 다음을 추가한다.
 - 과거 버전 스모크 행을 현행 버전으로 변환하거나 reviewed로 승격하지 않는다.
 - 프롬프트 버전별 배포·스모크 상태는 `docs/research-trail/04_evidence_index.md`와 관련 dev-log가 정본이다.
 
-### 6.4 현재 콘텐츠 버전의 5단계 검수 (2026-08-27 사용자 결정)
+### 6.4 현재 콘텐츠 버전의 집중 검수와 선택적 독립 검토
 
 기본 절차는 **규칙 검사 → 저장된 품질점검 연결 → 교수자 최종 확정**이다. 승인 정책은
 `focused_v1`이며, 의미·화용 검수 기준과 선택적 모델 프롬프트는 `content_review_v2`를 유지한다.

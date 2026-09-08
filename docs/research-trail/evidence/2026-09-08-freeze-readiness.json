@@ -1,0 +1,180 @@
+{
+  "observedAt": "2026-09-08T04:10:22.797Z",
+  "baselineAt": "2026-09-06T08:28:43.741Z",
+  "release": "pragma_zhko_bidirectional_candidate_20260904_02",
+  "courses": [
+    {
+      "id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+      "title": "AI 한중 화용 통번역",
+      "status": "published",
+      "level": "intermediate",
+      "language_direction": "ko_zh",
+      "course_mode": "mixed",
+      "plannedSlots": 18,
+      "storedCandidates": 18,
+      "fullMissions": 18,
+      "translation": 9,
+      "interpreting": 9,
+      "reviewedCandidates": 18,
+      "currentApprovedReviews": 0,
+      "currentPriorityMissions": 0,
+      "currentRulesFail": 18,
+      "changedSinceBaseline": 18,
+      "assignmentRows": 20,
+      "candidatesAssignedToPlannedSlot": 18,
+      "regularWeeksWithBothModes": 9,
+      "allAssignedWeeks": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "assignedTranslation": 10,
+      "assignedInterpreting": 10,
+      "uniqueAssignedMissions": 20,
+      "requiredRegularWeeks": 9,
+      "week13": [
+        {
+          "id": "819b6d75-401b-4b61-b611-1cfbb1a81ea4",
+          "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+          "week_no": 13,
+          "type": "regular",
+          "speech_act": "request",
+          "scenario_slots": 2,
+          "review_released": false
+        }
+      ],
+      "approvedWeeklyReviewRows": 0
+    },
+    {
+      "id": "a10c5b2e-7c5a-4f0c-9f4a-6d61cf6b8e21",
+      "title": "AI 한중 비즈니스 통번역",
+      "status": "published",
+      "level": "advanced",
+      "language_direction": "ko_zh",
+      "course_mode": "mixed",
+      "plannedSlots": 18,
+      "storedCandidates": 18,
+      "fullMissions": 18,
+      "translation": 9,
+      "interpreting": 9,
+      "reviewedCandidates": 18,
+      "currentApprovedReviews": 0,
+      "currentPriorityMissions": 0,
+      "currentRulesFail": 18,
+      "changedSinceBaseline": 18,
+      "assignmentRows": 20,
+      "candidatesAssignedToPlannedSlot": 18,
+      "regularWeeksWithBothModes": 9,
+      "allAssignedWeeks": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "assignedTranslation": 10,
+      "assignedInterpreting": 10,
+      "uniqueAssignedMissions": 20,
+      "requiredRegularWeeks": 9,
+      "week13": [
+        {
+          "id": "6d6f3423-9bbb-415f-be5f-3bc2c90df043",
+          "outline_id": "a10c5b2e-7c5a-4f0c-9f4a-6d61cf6b8e21",
+          "week_no": 13,
+          "type": "regular",
+          "speech_act": "request",
+          "scenario_slots": 2,
+          "review_released": false
+        }
+      ],
+      "approvedWeeklyReviewRows": 0
+    },
+    {
+      "id": "c3f9a2d7-6e84-4f61-a953-2b7d9c0e4a12",
+      "title": "AI 중한 실전 통번역",
+      "status": "published",
+      "level": "intermediate",
+      "language_direction": "zh_ko",
+      "course_mode": "mixed",
+      "plannedSlots": 18,
+      "storedCandidates": 18,
+      "fullMissions": 18,
+      "translation": 9,
+      "interpreting": 9,
+      "reviewedCandidates": 18,
+      "currentApprovedReviews": 0,
+      "currentPriorityMissions": 0,
+      "currentRulesFail": 18,
+      "changedSinceBaseline": 18,
+      "assignmentRows": 20,
+      "candidatesAssignedToPlannedSlot": 18,
+      "regularWeeksWithBothModes": 9,
+      "allAssignedWeeks": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "assignedTranslation": 10,
+      "assignedInterpreting": 10,
+      "uniqueAssignedMissions": 20,
+      "requiredRegularWeeks": 9,
+      "week13": [
+        {
+          "id": "d1bea614-10f7-433c-8820-d23e85f350e8",
+          "outline_id": "c3f9a2d7-6e84-4f61-a953-2b7d9c0e4a12",
+          "week_no": 13,
+          "type": "regular",
+          "speech_act": "request",
+          "scenario_slots": 2,
+          "review_released": false
+        }
+      ],
+      "approvedWeeklyReviewRows": 0
+    }
+  ],
+  "totalAssignments": 60,
+  "uniqueAssignedMissions": 60,
+  "fullAssignedMissions": 60,
+  "releaseRows": 88,
+  "releaseFullMissions": 70,
+  "candidateMissionPromptVersions": [
+    "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock"
+  ],
+  "failureCodesByMission": {
+    "R5": 54,
+    "R27": 54
+  },
+  "totalCurrentReviews": 0,
+  "currentStages": {
+    "rules": 54
+  },
+  "currentModels": {
+    "openai": "gpt-4.1",
+    "claude": "claude-opus-5"
+  },
+  "qualityReusable": 0,
+  "baselinePriorityMissions": 11,
+  "note": "Read-only DB queries and content-review inspect. No model calls, content edits, approvals, assignments, learner data, or deployments.",
+  "currentGeneratorRelease": "pragma_content_consistency_candidate_20260907_02",
+  "releaseScopeNote": "release/releaseRows/releaseFullMissions refer to the September 6 course candidate cohort, not the current generator release or all database content.",
+  "countDefinitions": "fullMissions means five MJT items plus production_task exist; it does not mean the current rules or professor approval pass. stt_interpreting is the scenario mode. Zero currentPriorityMissions with no currentRun does not mean no unresolved quality issue."
+}

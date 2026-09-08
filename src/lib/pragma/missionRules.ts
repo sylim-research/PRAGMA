@@ -517,8 +517,9 @@ export function checkMission(
   const feature = getTargetFeature(m.unit.target_feature);
 
   const isNativeV5 = m.schema_version === "mission_v5" && m.mpj_items.length === 5;
-  const isCurrentNativeV5 = isNativeV5 &&
-    m.provenance?.prompt_version === CURRENT_MISSION_PROMPT_VERSIONS[0];
+  // contrast_plan_v1 is a persisted instructional contract, unlike the moving
+  // current prompt. Saved v15/v16 missions keep their shared Anchor and bands.
+  const isCurrentNativeV5 = isNativeV5 && m.contrast_plan?.version === "contrast_plan_v1";
   // v8 already generated two acceptable alternatives (9b1b967). Advancing the
   // current prompt must not reinterpret those saved candidates as BEST/WORST.
   const usesBandPairComparison = isNativeV5 && (isCurrentNativeV5 ||
@@ -534,7 +535,7 @@ export function checkMission(
   ) {
     add(v, "R1", "fail", "현행 mission_v5 생성계약은 독립 맥락 대비 문항을 포함한 MJT5여야 함");
   }
-  if (isCurrentNativeV5) {
+  if (isCurrentNativeV5 || (isNativeV5 && m.provenance?.prompt_version === CURRENT_MISSION_PROMPT_VERSIONS[0])) {
     if (m.learning_goal?.kind !== "speech_act" || m.learning_goal.speech_act !== ctx.speech_act) {
       add(v, "R15", "fail", "현행 미션의 학습목표는 요청된 speech_act로 명시되어야 함");
     }

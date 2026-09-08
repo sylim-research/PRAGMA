@@ -378,6 +378,13 @@ describe("mission_v4 MPJ4 + DCT contract", () => {
 describe("mission_v5 native MPJ5 contract", () => {
   const nativeFixture = () => ({
     ...SAMPLE_MISSION_V5_NATIVE,
+    learning_goal: { kind: "speech_act" as const, speech_act: "request" as const },
+    contrast_plan: {
+      version: "contrast_plan_v1" as const, speech_act: "request" as const,
+      mission_goal: "integrated_speech_act" as const,
+      item_slots: SAMPLE_MISSION_V5_NATIVE.mpj_items.map(item => ({ item_id: item.id, item_type: item.type,
+        item_focus: item.axis_feature, intended_band_profile: "saved" })),
+    },
     provenance: {
       ...SAMPLE_MISSION_V5_NATIVE.provenance!,
       prompt_version: CURRENT_MISSION_PROMPT_VERSIONS[0],
@@ -427,7 +434,7 @@ describe("mission_v5 native MPJ5 contract", () => {
   });
 
   it("accepts four band-pair candidates without legacy roles and omits current native preceding turns", () => {
-    const current = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const current = structuredClone(nativeFixture());
     current.provenance!.prompt_version = CURRENT_MISSION_PROMPT_VERSIONS[0];
     const currentMulti = current.mpj_items[4];
     if (currentMulti.type !== "multi_judge") throw new Error("Expected multi_judge");
@@ -477,8 +484,35 @@ describe("mission_v5 native MPJ5 contract", () => {
     )).toBe(true);
   });
 
+  it.each([
+    "mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+    "mission_v5_mpj5_minidiscourse_v16_natural_scene",
+    "another_prompt_with_the_same_saved_contract",
+  ])("preserves saved bands and shared Anchor independently of prompt %s", (promptVersion) => {
+    const saved = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    saved.provenance!.prompt_version = promptVersion;
+    saved.learning_goal = { kind: "speech_act", speech_act: "request" };
+    saved.contrast_plan = {
+      version: "contrast_plan_v1", speech_act: "request", mission_goal: "integrated_speech_act",
+      item_slots: saved.mpj_items.map(item => ({ item_id: item.id, item_type: item.type,
+        item_focus: item.axis_feature, intended_band_profile: "saved" })),
+    };
+    const multi = saved.mpj_items[4];
+    if (multi.type !== "multi_judge") throw new Error("Expected multi_judge");
+    multi.candidates.forEach(candidate => { delete candidate.comparison_role; });
+    const before = structuredClone(saved);
+    const failures = () => checkMission(saved, context).violations.filter(v =>
+      v.level === "fail" && (v.id === "R5" || v.id === "R27"));
+    expect(failures()).toEqual([]);
+    expect(saved).toEqual(before);
+    saved.mpj_items[2].situation_ko = saved.mpj_items[0].situation_ko;
+    expect(failures().some(v => v.id === "R27" && v.message.includes("Anchor A"))).toBe(true);
+    multi.candidates.forEach(c => { c.accepted_band_codes = ["too_direct"]; });
+    expect(failures().some(v => v.id === "R5")).toBe(true);
+  });
+
   it("requires concise two-sentence scenes and one recommended repair in the current native flow", () => {
-    const current = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const current = structuredClone(nativeFixture());
     current.provenance!.prompt_version = CURRENT_MISSION_PROMPT_VERSIONS[0];
     expect(checkMission(current, context).violations.filter(
       (item) => item.level === "fail" && (item.id === "R3" || item.id === "R27"),
@@ -507,7 +541,7 @@ describe("mission_v5 native MPJ5 contract", () => {
 
   it("requires two acceptable and two adjustment-needed candidates without duplicates", () => {
     for (const acceptableCount of [1, 3]) {
-      const current = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+      const current = structuredClone(nativeFixture());
       current.provenance!.prompt_version = CURRENT_MISSION_PROMPT_VERSIONS[0];
       const multi = current.mpj_items[4];
       if (multi.type !== "multi_judge") throw new Error("Expected multi_judge");
@@ -522,7 +556,7 @@ describe("mission_v5 native MPJ5 contract", () => {
       )).toBe(true);
     }
 
-    const duplicate = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    const duplicate = structuredClone(nativeFixture());
     duplicate.provenance!.prompt_version = CURRENT_MISSION_PROMPT_VERSIONS[0];
     const duplicateMulti = duplicate.mpj_items[4];
     if (duplicateMulti.type !== "multi_judge") throw new Error("Expected multi_judge");
