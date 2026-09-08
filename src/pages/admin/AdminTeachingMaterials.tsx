@@ -273,7 +273,7 @@ const AdminTeachingMaterials = () => {
             const issue = !missionsReady
               ? `미션 ${expected - assigned}개 미배정`
               : materialState === "pending"
-                ? "수업자료 검수 대기"
+                ? "수업자료 승인 대기"
                 : course.outline.status !== "published"
                   ? "강좌 비공개"
                   : null;
@@ -294,7 +294,7 @@ const AdminTeachingMaterials = () => {
                   {expected > 0 ? `미션 ${assigned}/${expected}` : "수업 안내"}
                 </StatusChip>
                 <StatusChip tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
-                  {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 검수 대기" : "자료 상태 확인 중"}
+                  {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 승인 대기" : "자료 상태 확인 중"}
                 </StatusChip>
                 <StatusChip tone={course.outline.status === "published" && missionsReady ? "good" : "attention"}>
                   {course.outline.status === "published" && missionsReady ? "학습자 공개" : "공개 준비 중"}
@@ -323,10 +323,10 @@ const AdminTeachingMaterials = () => {
       </section>}
       {course && week && material && <>
         {!projectorOpen && <details ref={materialDetailRef} id="weekly-material-detail" tabIndex={-1} open={reviewOpen} onToggle={(event) => setReviewOpen(event.currentTarget.open)} className="scroll-mt-5 rounded-xl border bg-white p-4">
-          <summary className="cursor-pointer font-semibold">이 주차 수업자료 검수·확정</summary>
+          <summary className="cursor-pointer font-semibold">이 주차 수업자료 승인</summary>
           {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}`} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}
         </details>}
-        {!projectorOpen && <p className="text-xs text-muted-foreground">아래는 현재 편성의 교수자 미리보기입니다. 학생 유인물은 이 주차 검수·확정 후 공개되며, 내용이나 편성이 바뀌면 재검수가 필요합니다.</p>}
+        {!projectorOpen && <p className="text-xs text-muted-foreground">아래는 현재 편성의 교수자 미리보기입니다. 학생 유인물은 이 주차 자료의 최종 승인 후 공개되며, 내용이나 편성이 바뀌면 다시 확인하고 승인해야 합니다.</p>}
         <div className="flex flex-wrap items-center gap-2">
           <Button ref={projectorButtonRef} onClick={() => { setNotesOpen(false); setActiveSection(0); setProjectorOpen(true); }}>프로젝터 화면</Button>
           <Button variant="outline" onClick={exportHtml}>HTML</Button>

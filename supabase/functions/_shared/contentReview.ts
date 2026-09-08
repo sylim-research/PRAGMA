@@ -7,10 +7,10 @@ export const CONTENT_REVIEW_VERSION = "content_review_v2";
 export const CONTENT_APPROVAL_POLICY = "focused_v1";
 export const CONTENT_REVIEW_STEPS = [
   { key: "rules", label: "규칙 검사" },
-  { key: "openai", label: "OpenAI 품질 점검" },
-  { key: "claude", label: "Claude 독립 검토" },
-  { key: "adjudication", label: "OpenAI 지적별 판정" },
-  { key: "professor", label: "교수자 최종 확정" },
+  { key: "openai", label: "AI 검토" },
+  { key: "claude", label: "AI 독립 검토" },
+  { key: "adjudication", label: "AI 재검토" },
+  { key: "professor", label: "교수자 최종 승인" },
 ] as const;
 export type ReviewStage = "rules" | "openai" | "claude" | "adjudication";
 export type ReviewTarget = { kind: "mission" | "weekly_material"; targetId: string; weekNo?: number };
@@ -115,7 +115,7 @@ export function effectiveReviewSteps(run: ContentReviewRun | null) {
   if (run && run.approval_policy !== CONTENT_APPROVAL_POLICY) return [...CONTENT_REVIEW_STEPS];
   return CONTENT_REVIEW_STEPS.filter(s => s.key === "claude" ? run?.independent_review_requested
     : s.key === "adjudication" ? run?.independent_review_requested && (!run.claude_review || run.claude_review.result.findings.length > 0 || run.adjudication)
-    : true).map(s => s.key === "openai" ? { ...s, label: "품질 점검" } : s);
+    : true);
 }
 
 export function canonicalReviewJson(value: unknown): string {

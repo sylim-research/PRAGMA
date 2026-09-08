@@ -196,7 +196,7 @@ const AdminCorpus = () => {
   return (
     <AdminShell
       title="HSK 3.0 어휘 코퍼스"
-      description="PRAGMA 수준에 맞는 HSK 누적 어휘 범위로 생성된 중국어를 대조하고, 확인이 필요한 단어를 교수자 검수로 연결합니다."
+      description="PRAGMA 수준에 맞는 HSK 누적 어휘 범위로 생성된 중국어를 대조하고, 확인이 필요한 단어를 교수자 감수로 연결합니다."
     >
       <div className="mx-auto max-w-[1060px] space-y-4">
         <DatasetOverview
@@ -273,10 +273,10 @@ function OperationsSection({
       ? "최신 점검 대상에는 점검할 중국어가 없습니다."
       : "아직 표시할 최근 점검이 없습니다.";
   const emptyDescription = lookupFailed || audit?.status === "unavailable"
-    ? "콘텐츠 검수·확정에서 원본과 검수 상태를 확인할 수 있습니다."
+    ? "콘텐츠 승인에서 원본과 승인 상태를 확인할 수 있습니다."
     : "다음 콘텐츠 생성부터 수준·점검 단어·확인 대상이 이곳에 기록됩니다.";
   const reviewHref = "/admin/review";
-  const reviewLabel = "콘텐츠 검수·확정 열기";
+  const reviewLabel = "콘텐츠 승인 열기";
 
   return (
     <section className="overflow-hidden rounded-xl border border-[#CFC9BC] bg-white shadow-[0_10px_30px_rgba(21,32,43,0.05)]" aria-labelledby="lexical-audit-title">
@@ -342,7 +342,7 @@ function OperationsSection({
                   <p className="text-[24px] font-semibold leading-none tabular-nums">
                     {fmt(audit.candidates.length)}<span className="ml-0.5 text-[11px] font-normal">개</span>
                   </p>
-                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">교수자 검수 후보</p>
+                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">교수자 감수 후보</p>
                 </div>
               </div>
               <p className="mt-2 text-[11px] leading-4 text-[#716B61]">
@@ -354,8 +354,8 @@ function OperationsSection({
           <div className="mt-3 flex flex-col gap-3 rounded-lg bg-[#FFF8D8] px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-[12px] leading-5 text-[#5F5A50]">
               <strong className="font-semibold text-[#3F3A32]">{fmt(audit.matchedTokenCount ?? 0)}개는 목록 조회에서 확인된 단어입니다.</strong>{" "}
-              나머지 {fmt(audit.candidates.length)}개는 실패가 아니라 교수자 검수 후보입니다. 고유명사·전문용어·분절 결과일 수
-              있어 문맥과 학습 목적을 함께 검수합니다.
+              나머지 {fmt(audit.candidates.length)}개는 실패가 아니라 교수자 감수 후보입니다. 고유명사·전문용어·분절 결과일 수
+              있어 문맥과 학습 목적을 함께 살펴봅니다.
             </p>
             <Link
               to={reviewHref}
@@ -397,7 +397,7 @@ function AuditMethodSection() {
             규칙 기반 검사
           </p>
           <span className="rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-900">
-            실제 콘텐츠·검수 연동
+            실제 콘텐츠·감수 연결
           </span>
           <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-900">
             비차단
@@ -431,7 +431,7 @@ function AuditMethodSection() {
           </li>
           <li className="rounded-lg border border-[#E5DEC9] bg-white p-3">
             <span className="text-[10.5px] font-semibold text-[#8A7621]">03 · 기록·연결</span>
-            <p className="mt-1 font-semibold text-[#26333B]">확인 수 + 교수자 검수 후보</p>
+            <p className="mt-1 font-semibold text-[#26333B]">확인 수 + 교수자 감수 후보</p>
             <p className="mt-1 leading-relaxed text-[#716B61]">
               결과와 정책 버전을 콘텐츠에 저장하고 3단계 자동 점검·경고 검토로 연결합니다.
             </p>
@@ -442,7 +442,7 @@ function AuditMethodSection() {
           <div className="rounded-lg bg-emerald-50 px-3 py-3 text-[12px] text-emerald-950">
             <p className="font-semibold">이 검사가 확인하는 것</p>
             <p className="mt-1 leading-relaxed">
-              추출 어휘 수, HSK 누적 참고 범위에서 확인된 수, 교수자 검수 후보 수를 같은 규칙으로
+              추출 어휘 수, HSK 누적 참고 범위에서 확인된 수, 교수자 감수 후보 수를 같은 규칙으로
               계산합니다.
             </p>
           </div>
@@ -469,7 +469,7 @@ function AuditMethodSection() {
               전체 품질관리 구조 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
             <Link to="/admin/review" className="inline-flex items-center gap-1 text-[#6D5C1F] hover:text-[#15202B]">
-              콘텐츠 검수·확정 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+              콘텐츠 승인 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
             </Link>
           </div>
         </div>

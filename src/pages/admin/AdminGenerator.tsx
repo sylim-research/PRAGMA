@@ -805,7 +805,7 @@ const AdminGenerator = () => {
   const tagNote =
     sourceMode === "ai"
       ? "선택한 화행 · P·D·R 등은 새 원문의 생성 조건으로 사용됩니다."
-      : "선택한 화행 · P·D·R 등은 이미 존재하는 원문을 분류·검수하는 태그로 사용됩니다.";
+      : "선택한 화행 · P·D·R 등은 이미 존재하는 원문을 분류·점검하는 태그로 사용됩니다.";
 
 
   // NOTE (1b-①): 이전 dummy 경로는 rollback 대비 buildScenario()로 남겨둠.
@@ -1132,7 +1132,7 @@ const AdminGenerator = () => {
               </span>
             </div>
             <p className="mt-1.5 text-[10.5px] text-[#7A4A0A]/80">
-              참고용 파생 지표 · 검수 보조 · 이론적 정답 아님 (입력값·저장값 아님)
+              참고용 파생 지표 · 교수자 감수 참고 · 이론적 정답 아님 (입력값·저장값 아님)
             </p>
           </div>
 
@@ -1405,7 +1405,7 @@ const AdminGenerator = () => {
 
           <p className="rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2.5 text-[11px] leading-relaxed text-[#5B5446]">
             생성 흐름: 위에서 <b>상황 개요 생성 → 개요 선택 → 시나리오 생성</b>. 생성된 시나리오는
-            검수 대기(draft)로 저장돼 batch·편성과 같은 뱅크에 들어갑니다.
+            교수자 감수 대기(draft)로 저장돼 batch·편성과 같은 뱅크에 들어갑니다.
           </p>
 
         </section>
@@ -1417,11 +1417,11 @@ const AdminGenerator = () => {
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[12.5px] font-medium text-[#065F46]">
-                ✓ 시나리오가 검수 대기 상태로 저장되었습니다.
+                ✓ 시나리오가 교수자 감수 대기 상태로 저장되었습니다.
               </p>
               <p className="mt-1 text-[11.5px] text-[#065F46]/85">
                 scenario_id: <code className="font-mono">{savedScenarioId}</code>
-                &nbsp;/&nbsp; 검수: needs_review &nbsp;/&nbsp; 용도: archived_only
+                &nbsp;/&nbsp; 승인 상태: needs_review &nbsp;/&nbsp; 용도: archived_only
               </p>
               <Link
                 to="/admin/library"
@@ -1665,7 +1665,7 @@ const AdminGenerator = () => {
 
                 <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                   <span className="text-[11px] text-muted-foreground">
-                    ℹ 저장 시 scenarios / scenario_candidates / scenario_feedback 에 단일 트랜잭션으로 INSERT 됩니다. (검수 상태: needs_review)
+                    ℹ 저장 시 scenarios / scenario_candidates / scenario_feedback 에 단일 트랜잭션으로 INSERT 됩니다. (승인 상태: needs_review)
                   </span>
                 </div>
 

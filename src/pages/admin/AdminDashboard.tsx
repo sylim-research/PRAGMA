@@ -151,9 +151,9 @@ const SummaryMetric = ({
 // (논문 4.3.3: OpenAI 1차 검토 → Claude 별도 검토 → OpenAI가 Claude 의견을 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   rules: "규칙 기반 검사 대기",
-  openai: "OpenAI 1차 검토 대기",
-  claude: "Claude 독립 검토 대기",
-  adjudication: "OpenAI 2차 검토 대기",
+  openai: "AI 검토 대기",
+  claude: "AI 독립 검토 대기",
+  adjudication: "AI 재검토 대기",
   professor: "교수자 최종 승인 대기",
 };
 
@@ -162,7 +162,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: "규칙 위반 확인",
   openai: "내용 검토 · 기존 결과 재사용",
   claude: "선택 시에만 · 독립 검토",
-  adjudication: "선택 시에만 · Claude 의견 재검토",
+  adjudication: "선택 시에만 · 독립 검토 의견 재검토",
   professor: "감수 뒤 승인·보류·수정 결정",
 };
 
@@ -356,7 +356,7 @@ const AdminDashboard = () => {
           .eq("content_format", "scenario_core_v1")
           .order("scenario_id", { ascending: true })
           .range(from, to)),
-        fetchAllDashboardRows<DashboardReviewRunRow>("검수 이력", (from, to) => db
+        fetchAllDashboardRows<DashboardReviewRunRow>("점검·승인 이력", (from, to) => db
           .from("content_review_runs")
           .select("target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id")
           .eq("kind", "mission")

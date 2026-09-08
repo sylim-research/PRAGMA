@@ -75,7 +75,7 @@ const CATEGORY_TO_GROUP: Record<string, (typeof GROUP_ORDER)[number]> = {
 
 const GROUP_LABEL: Record<(typeof GROUP_ORDER)[number], string> = {
   generation: "① 시나리오 생성",
-  review: "② 품질 검수",
+  review: "② AI 검토",
   report: "③ 수행 리포트",
   golden_fta: "④ 기준 자료",
 };
@@ -84,7 +84,7 @@ const GROUP_DESCRIPTION: Record<(typeof GROUP_ORDER)[number], string> = {
   generation: "AI가 상황 시나리오·번역 후보를 만들 때 지켜야 할 규칙",
   review: "생성된 결과를 학습자에게보내기 전에 점검하는 기준",
   report: "학습자의 수행 기록을 분석해 강약점·다음 학습을 정리하는 틀",
-  golden_fta: "생성·검수의 기준이 되는 모범 사례와 이론적 설계 근거",
+  golden_fta: "생성·점검의 기준이 되는 모범 사례와 이론적 설계 근거",
 };
 
 const CARD_ORDER: Record<string, number> = {
@@ -116,7 +116,7 @@ const CARD_DISPLAY: Record<
       "직접성 차이로 여러 후보를 만들어 학습자가 화용 차이를 판단하게 함",
   },
   reviewer_checklist_block: {
-    title: "검수 점검표",
+    title: "콘텐츠 점검표",
     subtitle: "생성 결과가 기준을 지켰는지 항목별로 점검",
   },
   report_schema_block: {
@@ -165,7 +165,7 @@ function HarnessOverview() {
         </h2>
         <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
           품질 점검 자동화는 규칙 기반 검사와 프롬프트 통제 기반 검토를 함께 사용합니다. 두 방식은
-          조정 후보와 근거를 제공하며, 콘텐츠 공개 여부는 교수자가 검수·승인합니다.
+          조정 후보와 근거를 제공하며, 교수자가 콘텐츠를 감수한 뒤 수업 사용·공개 자격을 최종 승인합니다.
         </p>
       </div>
 
@@ -199,13 +199,13 @@ function HarnessOverview() {
             <span className="text-[11px] font-semibold text-[#6D675D]">운영 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[14px] font-bold">교수자 검수·승인</h3>
+          <h3 className="mt-2 text-[14px] font-bold">교수자 최종 승인</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
             자동 검사 근거를 보고 더 쉽게 또는 더 도전적으로 조정할지와 학습자 공개 여부를
             결정합니다.
           </p>
           <Link to="/admin/review" className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#5F5A50] hover:text-[#15202B]">
-            통합 검수·승인 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            콘텐츠 승인 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
       </div>
@@ -553,7 +553,7 @@ const AdminPromptHarness = () => {
   return (
     <AdminShell
       title="생성 계약·프롬프트"
-      description="생성 계약과 버전이 관리되는 프롬프트, 자동 점검 규칙, 교수자 검수·승인의 관계를 확인합니다."
+      description="생성 계약과 버전이 관리되는 프롬프트, 자동 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
       <HarnessOverview />
 
@@ -603,7 +603,7 @@ const AdminPromptHarness = () => {
           </Button>
         </div>
         <p className="mt-1 text-[12.5px] text-muted-foreground">
-          별도 DB 테이블(<code>prompt_templates</code>)입니다. <b>생성·검수 파이프라인은 이 테이블을
+          별도 DB 테이블(<code>prompt_templates</code>)입니다. <b>생성·점검 파이프라인은 이 테이블을
           조회하지 않습니다</b> — 위 「프롬프트·지문 관리」가 실제로 쓰이는 지시문입니다. 아래 항목은
           2026-07-06에 만든 문서 틀이며 마감 후 정리 후보입니다. 코드 프롬프트의 DB 이관
           계획이나 v2 구현 상태를 뜻하지 않습니다.

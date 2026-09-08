@@ -54,7 +54,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
 
   return (
     <AdminShell
-      title="교수자 최종 검수·공개"
+      title="교수자 최종 승인"
       description="자동 품질 점검 결과와 학습 미션을 확인하고, 교수자가 수업 사용과 학습자 공개를 최종 결정합니다."
     >
       <ResearchWorkflowGuide current="release" />
@@ -62,10 +62,10 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
       <section className="rounded-xl border border-[#D9D4C8] bg-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold tracking-wide text-[#756F64]">교수자 검수 대기열</p>
+            <p className="text-xs font-semibold tracking-wide text-[#756F64]">교수자 감수 대기열</p>
             <h2 className="mt-1 text-lg font-semibold">자동 점검은 후보를 찾고, 최종 결정은 교수자가 합니다</h2>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-              검수 대기 미션을 열어 내용과 자동 점검 결과를 확인하세요. 교수자 검토 완료 상태로 승인된 미션만 주차별 수업 편성에서 사용할 수 있습니다.
+              감수 대기 미션을 열어 내용과 자동 점검 결과를 확인하세요. 교수자가 최종 승인한 미션만 주차별 수업 편성에서 사용할 수 있습니다.
             </p>
           </div>
           <Badge className="bg-[#15202B] text-white">교수자 최종 결정</Badge>
@@ -75,7 +75,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
           <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
             <div className="flex items-center gap-2 text-amber-900">
               <ClipboardCheck className="h-4 w-4" aria-hidden />
-              <span className="text-sm font-semibold">검수 대기</span>
+              <span className="text-sm font-semibold">감수 대기</span>
             </div>
             <p className="mt-2 text-2xl font-semibold tabular-nums">{counts.pending ?? "—"}건</p>
           </div>
@@ -90,7 +90,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Link to="/admin/assembly" className="inline-flex items-center gap-2 rounded-md bg-[#15202B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#263747]">
-            미션 검수·승인 열기 <ArrowRight className="h-4 w-4" aria-hidden />
+            학습 미션 조립 열기 <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <Link to="/admin/composer" className="inline-flex items-center gap-2 rounded-md border border-[#D9D4C8] bg-white px-4 py-2 text-sm font-semibold transition hover:bg-[#F7F4EC]">
             주차별 수업 편성 <ArrowRight className="h-4 w-4" aria-hidden />

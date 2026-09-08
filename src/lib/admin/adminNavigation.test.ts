@@ -21,6 +21,9 @@ const REQUIRED_ENTRY_PATHS = [
 describe("admin navigation reachability", () => {
   it("keeps every restored operations/research entry in the shared navigation source", () => {
     expect(ADMIN_PRIORITY_LINKS.map((item) => item.to)).toEqual(REQUIRED_ENTRY_PATHS);
+    for (const item of ADMIN_PRIORITY_LINKS) {
+      expect(item).toBe(ADMIN_NAV_GROUPS.flatMap(group => group.items).find(candidate => candidate.to === item.to));
+    }
     const allPaths = ADMIN_NAV_GROUPS.flatMap((group) => group.items).map((item) => item.to);
     expect(new Set(allPaths).size).toBe(allPaths.length);
     expect(allPaths).not.toContain("/admin/question-designer");

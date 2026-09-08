@@ -1398,7 +1398,7 @@ async function fetchGeneratedMissionContent(scenarioId: string): Promise<Record<
     .eq("scenario_id", scenarioId)
     .single();
   if (error || data?.mission_status !== "generated" || !isRecord(data.mission_content)) {
-    throw new Error(error?.message ?? "검수 대기 미션을 찾지 못했습니다.");
+    throw new Error(error?.message ?? "감수 대기 미션을 찾지 못했습니다.");
   }
   return data.mission_content as Record<string, unknown>;
 }
@@ -1646,7 +1646,7 @@ export async function reviewMission(
   approval?: { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string },
 ): Promise<{ ok: boolean; mission?: MissionRuntime; error?: string }> {
   try {
-    if (!approval) return { ok: false, error: "현재 버전의 콘텐츠 검수에서 교수자 승인을 진행하세요." };
+    if (!approval) return { ok: false, error: "콘텐츠 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
     const current = await fetchGeneratedMissionContent(core.scenario_id);
     const featureCode = DEFAULT_FEATURE_BY_ACT[core.speech_act];
     const feature = featureCode ? getTargetFeature(featureCode) : undefined;
