@@ -71,16 +71,16 @@ describe("교과목·주차 수업자료 연결", () => {
     await screen.findByText("2주차 목표");
     expect(screen.queryByRole("region", { name: "주차 도입 수업" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "도입 수업 화면 열기" })).not.toBeInTheDocument();
-    expect(screen.getByText("이 주차 수업자료 검수·확정").closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByText("이 주차 수업자료 승인").closest("details")).not.toHaveAttribute("open");
     const week3Row = screen.getByRole("button", { name: "3주차 · 요청" }).closest("article")!;
     fireEvent.click(within(week3Row).getByRole("link", { name: "수업자료" }));
     await screen.findByText("3주차 목표");
-    const detail = screen.getByText("이 주차 수업자료 검수·확정").closest("details")!;
+    const detail = screen.getByText("이 주차 수업자료 승인").closest("details")!;
     await waitFor(() => expect(detail).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
     expect(detail).toHaveFocus();
 
-    fireEvent.click(screen.getByText("이 주차 수업자료 검수·확정"));
+    fireEvent.click(screen.getByText("이 주차 수업자료 승인"));
     await waitFor(() => expect(detail).not.toHaveAttribute("open"));
     mocks.scrollIntoView.mockClear();
     fireEvent.click(within(week3Row).getByRole("link", { name: "수업자료" }));
@@ -90,7 +90,7 @@ describe("교과목·주차 수업자료 연결", () => {
 
   it("외부 상세 링크도 비동기 자료 조회 후 열고 이동한다", async () => {
     mountAt("/admin/package?courseId=course-a&weekNo=2#weekly-material-detail");
-    const summary = await screen.findByText("이 주차 수업자료 검수·확정");
+    const summary = await screen.findByText("이 주차 수업자료 승인");
     await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
   });
@@ -152,7 +152,7 @@ describe("교과목·주차 수업자료 연결", () => {
     const notes = await screen.findByRole("region", { name: "교수자 전용 메모" });
     await waitFor(() => expect(notes.textContent).toContain(guide.dct.alternatives[0].text));
     expect(mocks.missionRows).toHaveBeenCalledWith("scenario_id", ["mission-1"]);
-    fireEvent.click(screen.getByText("이 주차 수업자료 검수·확정"));
+    fireEvent.click(screen.getByText("이 주차 수업자료 승인"));
     await screen.findByText(/PRIVATE_REVIEW_SENTINEL/);
 
     fireEvent.click(screen.getByRole("button", { name: "프로젝터 화면" }));
