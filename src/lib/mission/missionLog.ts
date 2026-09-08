@@ -63,7 +63,7 @@ export async function listCompletedMissionIds(
  * 미션 완료 로그를 저장한다. 실제 세션이 없으면(데모 스텁) 저장하지 않고
  * reason:'no_auth'를 돌려준다(호출측이 화면에 "데모 — 미저장"을 표시).
  */
-export async function saveMissionAttempt(input: SaveAttemptInput): Promise<SaveAttemptResult> {
+export async function saveMissionAttempt(input: SaveAttemptInput, logId?: string): Promise<SaveAttemptResult> {
   // 실제 auth 세션 확인 — RLS(auth_user_id = auth.uid()) 충족 여부.
   const { data: sessionData } = await supabase.auth.getSession();
   const authUserId = sessionData.session?.user?.id;
@@ -86,9 +86,23 @@ export async function saveMissionAttempt(input: SaveAttemptInput): Promise<SaveA
 
   const { data, error } = await supabase
     .from("learner_mission_logs")
-    .insert(row)
+    // 같은 완료 화면의 재시도는 같은 PK를 사용한다. 응답이 유실돼도 중복 insert하지 않는다.
+    .insert({ ...row, ...(logId ? { id: logId } : {}) })
     .select("id")
     .maybeSingle();
+  if (error?.code === "23505" && logId) {
+    // 다른 unique 제약 위반을 성공으로 바꾸지 않고, 이번 요청의 본인 행만 확인한다.
+    const { data: existing, error: lookupError } = await supabase
+      .from("learner_mission_logs")
+      .select("id")
+      .eq("id", logId)
+      .eq("auth_user_id", authUserId)
+      .eq("mission_id", row.mission_id)
+      .eq("first_response", row.first_response)
+      .eq("revised_response", row.revised_response)
+      .maybeSingle();
+    if (!lookupError && existing?.id) return { ok: true, id: existing.id };
+  }
   if (error || !data?.id) {
     return { ok: false, reason: "error", message: error?.message ?? "저장 실패" };
   }

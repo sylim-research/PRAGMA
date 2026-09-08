@@ -34,7 +34,7 @@ import {
   UnsupportedCanonicalMissionRuntimeError,
 } from "@/lib/mission/canonicalMissionRuntime";
 import { requestFeedback } from "@/lib/mission/missionFeedback";
-import { saveMissionAttempt, type MpjResponseTrace } from "@/lib/mission/missionLog";
+import { saveMissionAttempt, type MpjResponseTrace, type SaveAttemptInput } from "@/lib/mission/missionLog";
 import { learnerChoiceMapFromTraces } from "@/lib/mission/classResponsePatterns";
 import {
   appendMissionEvent,
@@ -1891,7 +1891,7 @@ export function CompletionRecord({ label, response, alternatives = [] }: {
               <div className="mt-2 flex flex-wrap gap-2">
                 {evaluation.highlights.map((highlight) => <span key={highlight} className={`${targetFont} rounded-md bg-[#FFF5C8] px-2.5 py-1.5 text-[15px] underline decoration-[#C9A90E] decoration-2 underline-offset-4`}>{highlight}</span>)}
               </div>
-            ) : <p className="mt-2 text-sm">표현의 문제가 아니라 원문의 핵심 내용이 빠졌습니다.</p>}
+            ) : <p className="mt-2 text-sm">다시 살펴본 기준: {needsAttention.map((criterion) => criterion.label).join(" · ")}</p>}
             <p className="mt-3 text-xs font-black text-[#725B12]">왜 고쳤나요?</p>
             <p className="mt-1 break-keep text-sm leading-6 text-[#4F5A6B]">{evaluation.feedback}</p>
           </div>
@@ -1944,8 +1944,9 @@ function DissentSummary({ dissent }: { dissent?: DissentResponse }) {
   );
 }
 
-export function CompletionActions({ onRestart, runtime = false, saveState = "idle" }: {
+export function CompletionActions({ onRestart, onRetrySave, runtime = false, saveState = "idle" }: {
   onRestart: () => void;
+  onRetrySave?: () => void;
   runtime?: boolean;
   saveState?: "idle" | "saving" | "saved" | "error";
 }) {
@@ -1954,12 +1955,15 @@ export function CompletionActions({ onRestart, runtime = false, saveState = "idl
   const returnPath = returnCourseId && Number.isInteger(returnWeekNo)
     ? `/learner/course/${encodeURIComponent(returnCourseId)}/week/${returnWeekNo}`
     : null;
+  const saving = runtime && saveState === "saving";
   return (
     <section className={`${panel} p-4 sm:p-5`}>
       <div className={`grid gap-2 ${returnPath ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {returnPath && (
           <Link
             to={returnPath}
+            aria-disabled={saving || undefined}
+            onClick={(event) => { if (saving) event.preventDefault(); }}
             className="flex h-12 items-center justify-center rounded-md bg-[#F3D248] px-4 text-center text-sm font-bold text-[#15202B] transition hover:bg-[#F7DF73] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
           >
             이번 주 학습으로 돌아가기
@@ -1967,20 +1971,25 @@ export function CompletionActions({ onRestart, runtime = false, saveState = "idl
         )}
         <Link
           to="/learner/records#correction-notes"
+          aria-disabled={saving || undefined}
+          onClick={(event) => { if (saving) event.preventDefault(); }}
           className="flex h-12 items-center justify-center rounded-md bg-[#15202B] px-4 text-sm font-bold text-white transition hover:bg-[#263547] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
         >
           나의 학습 기록 보기
         </Link>
-        <Button variant="outline" className="h-12 w-full" onClick={onRestart}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
+        <Button variant="outline" className="h-12 w-full" onClick={onRestart} disabled={saving}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
       </div>
-      <p className="mt-3 break-keep text-[11px] leading-5 text-[#6A7485]">
+      {runtime && saveState === "error" && onRetrySave && (
+        <Button className="mt-3" onClick={onRetrySave}>학습 기록 저장 다시 시도</Button>
+      )}
+      <p role={saveState === "error" ? "alert" : "status"} className="mt-3 break-keep text-[11px] leading-5 text-[#6A7485]">
         {runtime
           ? saveState === "saving"
             ? "학습 기록을 저장하고 있습니다."
             : saveState === "saved"
               ? "학습 기록에 저장되었습니다."
               : saveState === "error"
-                ? "화면은 완료됐지만 학습 기록 저장에 실패했습니다. 다시 시도하려면 미션을 다시 완료해 주세요."
+                ? "학습 기록을 저장하지 못했습니다. 답안은 이 화면에 남아 있으니, 화면을 떠나기 전에 저장을 다시 시도해 주세요."
                 : "학습 기록 저장을 준비하고 있습니다."
           : "현재 미리보기의 답안과 의견은 DB에 저장되지 않습니다."}
       </p>
@@ -2197,6 +2206,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const [mpjRecapOpen, setMpjRecapOpen] = useState(false);
   const [renderNonce, setRenderNonce] = useState(0);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const pendingSaveRef = useRef<{ input: SaveAttemptInput; logId: string } | null>(null);
+  const savingRef = useRef(false);
   const startedAtRef = useRef(new Date().toISOString());
   const attemptStorageKey = runtime
     ? `pragma:mission-attempt:${runtime.scenario_id}:${courseContext?.assignmentId ?? "direct"}`
@@ -2330,6 +2341,25 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const persistPendingAttempt = async () => {
+    const pending = pendingSaveRef.current;
+    if (!pending || savingRef.current) return;
+    savingRef.current = true;
+    setSaveState("saving");
+    try {
+      const result = await saveMissionAttempt(pending.input, pending.logId);
+      setSaveState(result.ok ? "saved" : "error");
+      if (result.ok) {
+        pendingSaveRef.current = null;
+        emitMissionEvent("mission_completed", { mission_log_id: result.id });
+      }
+    } catch {
+      setSaveState("error");
+    } finally {
+      savingRef.current = false;
+    }
+  };
+
   const finishQuest = (response: QuestResponse | DctResponse) => {
     const nextResponses = quest.kind === "dct_feedback"
       ? { ...responses, [quest.id]: response, [quest.dctId]: response }
@@ -2359,8 +2389,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             final_decision: finalResponse.reflected ? "revised_response" : "retained_first_response",
           });
         }
-        setSaveState("saving");
-        void saveMissionAttempt({
+        const saveInput: SaveAttemptInput = {
           mission: runtime.mission,
           scenarioId: runtime.scenario_id,
           speechAct: runtime.speech_act,
@@ -2385,12 +2414,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 },
               }
             : {}),
-        })
-          .then((result) => {
-            setSaveState(result.ok ? "saved" : "error");
-            if (result.ok) emitMissionEvent("mission_completed", { mission_log_id: result.id });
-          })
-          .catch(() => setSaveState("error"));
+        };
+        pendingSaveRef.current = { input: saveInput, logId: crypto.randomUUID() };
+        void persistPendingAttempt();
       }
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -2407,6 +2433,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   };
 
   const restart = () => {
+    if (savingRef.current) return;
+    pendingSaveRef.current = null;
     setSceneIntroStep(startAtDct ? null : 0);
     setMpjRecapOpen(false);
     setQuestIndex(startAtDct ? dctQuestIndex : 0);
@@ -2527,7 +2555,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 learnerChoices={peerChoices}
               />
             )}
-            <CompletionActions onRestart={restart} runtime={Boolean(runtime) && !demoMode} saveState={saveState} />
+            <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState} />
           </div>
         ) : (
           <div className="space-y-5">
