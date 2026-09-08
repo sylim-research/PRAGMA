@@ -60,6 +60,11 @@ describe("GOLD 수업자료·메타화용 토론", () => {
     const context = { base: { ...base(), scenarios: rows }, references: rows };
     expect(prepareTeachingMaterial(context, config).material.missions).toHaveLength(2);
     expect(prepareTeachingMaterial({ base: base(7), references: rows }, config).kind).toBe("discussion");
+    const reviewed = buildContentReviewDomain("weekly_material", { ...context.base,
+      teaching_draft: draft(), teaching_current: true, teaching_references: rows });
+    expect(reviewed.rules.verdict).toBe("pass");
+    expect(reviewed.dependencies).toEqual(["t", "i"]);
+    expect((reviewed.snapshot.content.public_material as any).missions).toHaveLength(2);
     rows[0].core_content.generation.content_release_id = "pre_lock";
     expect(() => prepareTeachingMaterial(context, config)).toThrow("근거 미션의 승인");
   });
