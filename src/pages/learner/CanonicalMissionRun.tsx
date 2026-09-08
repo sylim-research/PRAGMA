@@ -2510,23 +2510,6 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         />
       )}
       <div className="mx-auto max-w-3xl">
-        {demoMode && (
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E3D08F] bg-[#FFF8E1] px-4 py-2.5 text-xs text-[#6B5518]">
-            <div role="status">
-              <p className="font-black">디펜스 대표 미션 시연</p>
-              <p className="mt-1 font-semibold">실제 미션 실행 · 수행 기록 저장 안 됨</p>
-            </div>
-            {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
-              <div>
-                <Button variant="outline" size="sm" onClick={() => {
-                  setDevAutofillQuestId(quest.id);
-                  setRenderNonce(current => current + 1);
-                }}>데모 답안 채워넣기</Button>
-                <p className="mt-1">현재 문항의 예시를 채웁니다. 확인·제출은 직접 눌러 주세요.</p>
-              </div>
-            )}
-          </div>
-        )}
         {sceneIntroStep !== null ? (
           <div className="space-y-5">
             <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} />
@@ -2594,6 +2577,23 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               devDraft={demoMode && quest.kind === "dct" ? quest.referenceAnswer : DEV_PREVIEW_COPY[devPreset].a}
               demoFillRequest={demoMode && devAutofillQuestId === quest.id ? renderNonce : 0}
             />
+          </div>
+        )}
+        {demoMode && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs text-[#6B5518]">
+            <p className="flex flex-wrap items-center gap-x-2" role="status">
+              <span className="font-black">디펜스 대표 미션 시연</span>
+              <span>수행 기록 저장 안 됨</span>
+            </p>
+            {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => {
+                  setDevAutofillQuestId(quest.id);
+                  setRenderNonce(current => current + 1);
+                }}>데모 답안 채워넣기</Button>
+                <span>확인·제출은 직접 눌러 주세요.</span>
+              </div>
+            )}
           </div>
         )}
       </div>
