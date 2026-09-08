@@ -63,7 +63,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     let validDraft = false;
     if (draft) {
       try {
-        if (!kind || kind !== draft.kind || draft.week_no !== week.week_no || draft.outline_id !== course.outline.id
+        if (!kind || (draft.source_config.workflow === "source" ? draft.source_config.outputKind : kind) !== draft.kind || draft.week_no !== week.week_no || draft.outline_id !== course.outline.id
           || source.teaching_current !== true) throw new Error("초안의 주차·근거가 현재 편성과 다릅니다.");
         publicMaterial = applyTeachingDraft(publicMaterial, draft);
         validDraft = true;

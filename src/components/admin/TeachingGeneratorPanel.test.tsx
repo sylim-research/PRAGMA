@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TeachingGeneratorPanel } from "./TeachingGeneratorPanel";
+import { MemoryRouter } from "react-router-dom";
 import type { LearnerCourse, LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 const mocks = vi.hoisted(() => ({ request: vi.fn() }));
 vi.mock("@/lib/curriculum/teachingGenerationApi", () => ({ teachingRequest: mocks.request }));
@@ -16,7 +17,7 @@ const preview = { system: "시스템 프롬프트", user: "원문", inputHash: "
 const onSaved = vi.fn();
 function mount(weekNo = 7, overrides: Record<string, unknown> = {}) {
   return render(<TeachingGeneratorPanel course={course} week={week(weekNo)} state={{ draft: null,current:true }} loading={false} loadError={false}
-    onSaved={onSaved} onReload={vi.fn()} onReview={vi.fn()} {...overrides} />);
+    onSaved={onSaved} onReload={vi.fn()} onReview={vi.fn()} {...overrides} />, { wrapper: MemoryRouter });
 }
 beforeEach(() => { vi.clearAllMocks(); mocks.request.mockResolvedValue(preview); });
 afterEach(cleanup);

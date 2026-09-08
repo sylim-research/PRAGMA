@@ -43,6 +43,7 @@ describe("admin navigation reachability", () => {
       expect(app, `missing route ${path}`).toContain(`path="${path}"`);
     }
     expect(app).toContain('path="/admin/review"');
+    expect(app).toContain('path="/admin/teaching-generator" element={<RequireAdmin><AdminTeachingStudio />');
     expect(app).toContain('const AdminExport = lazy(() => import("./pages/admin/AdminExport.tsx"))');
     expect(app).toContain('const AdminDataBackup = lazy(() => import("./pages/admin/AdminDataBackup.tsx"))');
     expect(app).toContain('path="/admin/export" element={<RequireAdmin><AdminExport />');
@@ -81,6 +82,7 @@ describe("admin navigation reachability", () => {
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
     expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
+    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/teaching-generator");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
     expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
     expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");

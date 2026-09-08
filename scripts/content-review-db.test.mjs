@@ -90,7 +90,7 @@ before(async () => {
     CREATE POLICY admin_scenarios ON scenarios TO authenticated USING (is_admin()) WITH CHECK (is_admin());
     GRANT ALL ON scenarios TO authenticated, service_role;
     CREATE TABLE curriculum_outlines (id uuid PRIMARY KEY, title text, status text);
-    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, type text DEFAULT 'regular', PRIMARY KEY (outline_id, week_no));
+    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, type text DEFAULT 'regular', speech_act text, can_do jsonb, PRIMARY KEY (outline_id, week_no));
     CREATE TABLE curriculum_week_scenarios (outline_id uuid REFERENCES curriculum_outlines(id), week_no int,
       scenario_id uuid REFERENCES scenarios(scenario_id), position int, slot_role text);
     GRANT SELECT ON curriculum_outlines, curriculum_weeks, curriculum_week_scenarios TO authenticated;`);
@@ -108,8 +108,35 @@ before(async () => {
   await db.exec(await sqlFile('20260905150000_instructor_review_experience.sql'));
   await db.exec(await sqlFile('20260906100000_focused_content_review.sql'));
   await db.exec(await sqlFile('20260908210000_weekly_teaching_materials.sql'));
+  await db.exec(await sqlFile('20260909010000_source_teaching_studio.sql'));
 });
 after(async () => { await db.close(); });
+
+test('source-only drafts persist without assigned missions; source and curriculum changes invalidate their revision', async () => {
+  const id=randomUUID();
+  await db.query("insert into curriculum_outlines values ($1,'source fixture','published')",[id]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title,speech_act,can_do) values ($1,2,'요청','request','[\"요청 근거\"]'),($1,7,'토론',null,'[\"근거 비교\"]')",[id]);
+  const config={workflow:'source',missionIds:[],extraText:'',extraRef:'',outputKind:'discussion',focus:'선택권',activityMode:'pair',
+    sources:[{id:'S1',label:'자료',ref:'검증 출처',kind:'text',text:'PRIVATE_SOURCE 본문',confirmed:true,
+      extraction:{method:'manual_text',detail:'직접 입력',extractedCharacters:17,warnings:[]}}]};
+  const context=await admin(()=>scalar('select get_teaching_material_context($1,2,$2)',[id,config]));
+  assert.equal(context.references.length,0);assert.equal(context.base.scope_weeks[0].speech_act,'request');
+  const content={sections:['review','comparison','discussion','reflection'].map(key=>({key,title:key,paragraphs:['public'],items:[],source_ids:['S1'],evidence:[{source_id:'S1',quote:'본문'}]})),
+    instructor_notes:[{title:'teacher',body:'PRIVATE_NOTES',source_ids:['S1']}]};
+  const save=(revision,sourceHash=context.source_hash)=>asRole('service_role',()=>scalar('select save_teaching_material($1,2,$2,$3,$4,$5,$6,$7,$8)',
+    [id,revision,sourceHash,config,config.sources,content,{prompt_version:'source_teaching_v2',response_id:'fixture',model:'fixture',input_hash:hash},adminId]));
+  const draft=await save(0);assert.equal(draft.kind,'discussion');assert.equal(draft.revision,1);
+  assert.equal((await admin(()=>scalar('select get_teaching_material_state($1,2)',[id]))).current,true);
+  await learner(async()=>{assert.equal(await scalar('select count(*) from weekly_teaching_materials where outline_id=$1',[id]),0);
+    await assert.rejects(scalar('select get_teaching_material_state($1,2)',[id]),/Admin required/);});
+  await assert.rejects(save(0),/Draft changed/);
+  config.sources[0].text+=' 변경';await assert.rejects(save(1),/Source changed/);config.sources[0].text='PRIVATE_SOURCE 본문';
+  const discussion=await admin(()=>scalar('select get_teaching_material_context($1,7,$2)',[id,config]));
+  await db.query("update curriculum_weeks set can_do='[\"수정한 목표\"]' where outline_id=$1 and week_no=2",[id]);
+  assert.equal((await admin(()=>scalar('select get_teaching_material_state($1,2)',[id]))).current,false);
+  assert.notEqual((await admin(()=>scalar('select get_teaching_material_context($1,7,$2)',[id,config]))).source_hash,discussion.source_hash);
+  config.sources[0].confirmed=false;await assert.rejects(admin(()=>scalar('select get_teaching_material_context($1,2,$2)',[id,config])),/Confirm source/);
+});
 
 async function teachingFixture(weekNo = 7, count = 1) {
   const m = await mission(); const r = await review(m.id); await finalize(m, r);

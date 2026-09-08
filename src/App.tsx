@@ -21,6 +21,7 @@ const AdminGenerator = lazy(() => import("./pages/admin/AdminGenerator.tsx"));
 const AdminAuthentic = lazy(() => import("./pages/admin/AdminAuthentic.tsx"));
 const AdminAssembly = lazy(() => import("./pages/admin/AdminAssembly.tsx"));
 const AdminTeachingMaterials = lazy(() => import("./pages/admin/AdminTeachingMaterials.tsx"));
+const AdminTeachingStudio = lazy(() => import("./pages/admin/AdminTeachingStudio.tsx"));
 const AdminClassResponses = lazy(() => import("./pages/admin/AdminClassResponses.tsx"));
 const AdminBatch = lazy(() => import("./pages/admin/AdminBatch.tsx"));
 const AdminBrowser = lazy(() => import("./pages/admin/AdminBrowser.tsx"));
@@ -295,6 +296,7 @@ const App = () => (
           <Route path="/admin/research-qa/releases" element={<RequireAdmin><Navigate to="/admin/review" replace /></RequireAdmin>} />
           <Route path="/admin/research-qa/improvements" element={<RequireAdmin><Navigate to="/admin/review" replace /></RequireAdmin>} />
           <Route path="/admin/package" element={<RequireAdmin><AdminTeachingMaterials /></RequireAdmin>} />
+          <Route path="/admin/teaching-generator" element={<RequireAdmin><AdminTeachingStudio /></RequireAdmin>} />
           <Route path="/admin/class-responses" element={<RequireAdmin><AdminClassResponses /></RequireAdmin>} />
           {/* /admin/course-ops 제거(2026-08-05) — 메뉴에 없고 어디서도 링크되지 않는 고아
               라우트였다. 교과목 운영은 9월 실증 사안으로 백로그에 있다(AdminShell 주석 참조). */}
