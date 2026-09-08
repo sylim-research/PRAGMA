@@ -54,7 +54,7 @@ export function prepareTeachingMaterial(context: Record<string, any>, config: Te
   const prompt = buildTeachingPrompt(kind, { course: material.courseTitle, level: base.outline.level,
     direction: base.outline.language_direction, week: material.weekNo, title: material.title,
     goals: material.sections.find((section) => section.id === "goals"),
-    scope: defaultKind === "discussion" ? `2~${week.week_no - 1}주차 누적 학습` : sourceWorkflow ? "현재 주차 화행" : "현재 주차의 편성 미션 2개",
+    scope: defaultKind === "discussion" ? `2~${week.week_no - 1}주차 ${sourceWorkflow ? "화행 계획(실제 수행 기록 아님)" : "누적 학습"}` : sourceWorkflow ? "현재 주차 화행" : "현재 주차의 편성 미션 2개",
     ...(sourceWorkflow ? { speech_acts: speechActs, planned_goals: week.can_do, scope_weeks: scopeWeeks,
       focus: config.focus, activityMode: config.activityMode } : {}),
   }, sources, sourceWorkflow);

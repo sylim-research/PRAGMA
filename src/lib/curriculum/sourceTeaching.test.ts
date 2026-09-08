@@ -23,7 +23,11 @@ describe("소스 기반 교수자 저작",()=>{
     expect(()=>prepareTeachingMaterial({...context,base:{...context.base,week:{...context.base.week,speech_act:null}}},config)).toThrow("화행");
   });
   it("can author either output in a speech-act week; cumulative weeks use the saved prior acts",()=>{
-    expect(prepareTeachingMaterial(context,{...config,outputKind:"discussion"}).kind).toBe("discussion");
+    const sourceDiscussion=prepareTeachingMaterial(context,{...config,outputKind:"discussion"});
+    expect(sourceDiscussion.kind).toBe("discussion");
+    expect(sourceDiscussion.prompt.system).toContain("comparison: 선택한 소스의 표현·상황 비교");
+    expect(sourceDiscussion.prompt.system).not.toContain("comparison: 선택한 이전 미션");
+    expect(sourceDiscussion.prompt.system).toContain("주차 계획은 실제 수업·수행 기록이 아니다");
     const discussion={...context,base:{...context.base,week:{...context.base.week,week_no:7,speech_act:null},scope_weeks:[{week_no:2,speech_act:"request",can_do:["요청 근거"]},{week_no:3,speech_act:"refusal",can_do:["거절 근거"]}]}};
     expect(JSON.parse(prepareTeachingMaterial(discussion,{...config,outputKind:"discussion"}).prompt.user).context.speech_acts).toEqual(["request","refusal"]);
   });
