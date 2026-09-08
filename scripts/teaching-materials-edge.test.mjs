@@ -52,7 +52,7 @@ beforeEach(() => {
     outline: { id: courseId, title: '테스트 교과목', level: 'intermediate', language_direction: 'ko_zh', course_mode: 'mixed' },
     week: { week_no: 7, type: 'regular', title: '중간 메타화용 토론', can_do: ['판단 근거를 설명한다.'] }, assignments: [], scenarios: [],
   }, references: [{ scenario_id: missionId, week_no: 2, learner_level: 'intermediate', mission_status: 'reviewed', mode: 'translation',
-    speech_act: 'request', content_release_id: releaseId, core_content: { direction: 'ko_zh', source_text: '파일을 보내 주세요.' },
+    speech_act: 'request', content_release_id: null, core_content: { direction: 'ko_zh', source_text: '파일을 보내 주세요.', generation: { content_release_id: releaseId } },
     mission_content: { schema_version: 'mission_v5', mpj_items: [] } }] };
   modelResult = { id: 'response-fixture', model: 'model-fixture', choices: [{ finish_reason: 'stop', message: { content: JSON.stringify(content) } }] };
   globalThis.fetch = async (url, request) => {

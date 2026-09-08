@@ -46,6 +46,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     content = { context: { ...context, core_content: instructionalMission(row.core_content ?? {}) }, mission: instructionalMission(raw ?? {}) };
   } else {
     const cores = source.scenarios.map((row: any) => ({ ...row,
+      content_release_id: row.core_content?.generation?.content_release_id ?? row.content_release_id,
       direction: coreDirection(row.core_content),
       situation_ko: row.core_content?.situation_ko ?? "",
       source_text_ko: row.core_content?.source_text_ko ?? row.core_content?.source_text ?? "",
