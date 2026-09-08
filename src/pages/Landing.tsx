@@ -152,12 +152,15 @@ const Landing = () => {
         )}
       </main>
 
-      {/* 연구 산출물임을 로그인 전에 밝혀 둔다 — 심사에서 바로 가리킬 수 있는 한 줄. */}
-      <footer className="mx-auto w-full max-w-3xl px-6 pb-7">
-        <p className="break-keep border-t border-[#E6E1D2] pt-4 text-center text-[12.5px] leading-relaxed text-[#7C8794]">
-          PRAGMA는 「AI 기반 한·중 통번역 학습 워크플로우 개발 연구」를 위해 설계·개발된
-          수업 연계형 연구 플랫폼입니다.
-        </p>
+      <footer className="mx-auto w-full max-w-3xl px-6 pb-6">
+        <div className="space-y-1 border-t border-[#E6E1D2] pt-3 text-center leading-relaxed">
+          <p className="break-keep text-[12.5px] text-[#5C6A7A]">
+            <strong className="font-semibold text-[#3E4C57]">PRAGMA · AI 기반 한·중 통번역 학습</strong>
+            {" | "}
+            <span className="inline-block">한국외국어대학교 중어중문학과 · 임소영</span>
+          </p>
+          <p className="text-[11px] text-[#6B7280]">© 2026 임소영. All rights reserved.</p>
+        </div>
       </footer>
     </div>
   );
