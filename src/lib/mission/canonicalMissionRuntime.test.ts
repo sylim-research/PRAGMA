@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { SAMPLE_MISSION_V5, SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import type { RunnableMission } from "@/lib/mission/missionDb";
 import { adaptRunnableMissionToCanonical, compactLearnerScenario } from "@/lib/mission/canonicalMissionRuntime";
+import { comparisonCandidateLabel } from "./canonicalMissionPreview";
 
 function runnable(): RunnableMission {
   return {
@@ -199,6 +200,10 @@ describe("canonical mission runtime bridge", () => {
     expect(comparison.prompt).toContain("알맞은 표현 1개와 조정이 필요한 표현 1개");
     expect(comparison.candidates.filter((candidate) => candidate.role === "best")).toHaveLength(2);
     expect(comparison.candidates.filter((candidate) => candidate.role === "worst")).toHaveLength(2);
+    expect(comparison.comparisonMode).toBe("band_pair");
+    expect(comparisonCandidateLabel(comparison, "best")).toBe("상황에 적절한 표현");
+    expect(comparisonCandidateLabel(comparison, "worst")).toBe("조정이 필요한 표현");
+    expect(comparisonCandidateLabel({ ...comparison, comparisonMode: "ranked" }, "best")).toBe("BEST · 가장 적절");
   });
 
   it("projects historical learner scenes to two concise, non-meta sentences", () => {

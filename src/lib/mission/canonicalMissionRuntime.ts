@@ -384,6 +384,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     return {
       ...common(4, multiJudge),
       kind: "best_worst",
+      comparisonMode: usesBandPairContract ? "band_pair" : "ranked",
       prompt: usesBandPairContract
         ? "이 상황에 알맞은 표현 1개와 조정이 필요한 표현 1개를 고르세요."
         : "가장 적절한 번역과 가장 부적절한 번역을 하나씩 고르세요.",

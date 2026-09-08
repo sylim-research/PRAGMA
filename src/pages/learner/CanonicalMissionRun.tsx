@@ -16,6 +16,7 @@ import { PeerResponsesPanel } from "@/components/learner/PeerResponsesPanel";
 import { InterpretingConsole } from "@/components/mission/InterpretingConsole";
 import {
   CANONICAL_MISSION_PREVIEW,
+  comparisonCandidateLabel,
   type BestWorstQuest,
   type ChoiceOption,
   type DctFeedbackQuest,
@@ -876,11 +877,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
           {order.map((candidate) => {
             const bestPicked = best === candidate.id;
             const worstPicked = worst === candidate.id;
-            const role = candidate.role === "best"
-              ? "BEST · 가장 적절"
-              : candidate.role === "worst"
-                ? "WORST · 가장 덜 적절"
-                : "가능한 표현";
+            const role = comparisonCandidateLabel(quest, candidate.role);
             const isBestRole = candidate.role === "best";
             const isWorstRole = candidate.role === "worst";
             const answeredStyle = isBestRole
@@ -1791,7 +1788,7 @@ function responseLabel(quest: MissionQuest, response: QuestResponse) {
 
 function questFeedback(quest: MissionQuest) {
   if (quest.kind === "scale" || quest.kind === "fix_choice" || quest.kind === "reason") return quest.feedback;
-  if (quest.kind === "best_worst") return quest.candidates.map((item) => `${item.role === "best" ? "BEST · 가장 적절" : item.role === "worst" ? "WORST · 가장 덜 적절" : "가능한 표현"} · ${item.note}`).join("\n");
+  if (quest.kind === "best_worst") return quest.candidates.map((item) => `${comparisonCandidateLabel(quest, item.role)} · ${item.note}`).join("\n");
   return "";
 }
 

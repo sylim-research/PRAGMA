@@ -86,6 +86,7 @@ export interface ReasonQuest extends QuestBase {
 
 export interface BestWorstQuest extends QuestBase {
   kind: "best_worst";
+  comparisonMode?: "band_pair" | "ranked";
   prompt: string;
   candidates: Array<{
     id: string;
@@ -96,6 +97,13 @@ export interface BestWorstQuest extends QuestBase {
   bestId: string;
   worstId: string;
   feedback: string;
+}
+
+export function comparisonCandidateLabel(quest: BestWorstQuest, role: "best" | "middle" | "worst") {
+  if (quest.comparisonMode === "band_pair") {
+    return role === "best" ? "상황에 적절한 표현" : role === "worst" ? "조정이 필요한 표현" : "가능한 표현";
+  }
+  return role === "best" ? "BEST · 가장 적절" : role === "worst" ? "WORST · 가장 덜 적절" : "가능한 표현";
 }
 
 export interface DctQuest extends QuestBase {

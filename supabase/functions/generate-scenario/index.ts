@@ -1,4 +1,5 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
+import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
 import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
@@ -2765,6 +2766,33 @@ ${JSON.stringify(packets, null, 2)}`
     : { ok: false, error: `candidate 검사 결과 누락: ${results.length}/${args.references.length}` }
 }
 
+async function refreshCandidateFeedback(args: {
+  apiKey: string; before: unknown[]; items: unknown[]; feature: FeatureForGen;
+  telemetryFor: TelemetryFactory;
+}): Promise<{ ok: true; items: unknown[]; updates: CandidateFeedbackUpdate[] } | { ok: false; error: string }> {
+  const packets = candidateFeedbackPackets(args.before, args.items)
+  if (packets.length === 0) return { ok: true, items: args.items, updates: [] }
+  const system = `수정이 끝난 MJT3·MJT5의 최종 후보를 보고 해설과 참고 표현만 갱신한다.
+원문·장면·PDR·후보·is_valid·accepted_band_codes와 정답은 바꾸지 않는다. 이전 후보는 근거가 아니다.
+explanation_ko는 2~3문장으로 현재 상황 단서 → 최종 표현 자원·기능 → 관계 효과 → 유지/조정할 지점을 연결한다.
+인용은 final_item.source·target·corrections.text·candidates.text에 실제로 있는 표현만 사용한다.
+recommended_example은 fix_choice의 is_valid=true 후보 또는 multi_judge의 적정 대역 후보의 text를 그대로 복사한다.
+multi_judge의 적정 후보 2개 사이에 숨은 우열을 만들지 않는다. 대상 문항마다 정확히 1개를 반환한다.
+출력 JSON: {"items":[{"item_index":0,"explanation_ko":"최종 후보에 맞춘 해설","recommended_example":"최종 권장/적정 후보 원문"}]}`
+  const att = await callOpenAI(missionModel(), args.apiKey, system,
+    JSON.stringify({ within_band: args.feature.within_band_code, packets }), 0.2, {
+      telemetry: args.telemetryFor('mission_repair', true, { invocationAttempt: 1,
+        promptVersion: CANDIDATE_FEEDBACK_PROMPT_VERSION }),
+    })
+  if (!att.ok) return { ok: false, error: '최종 후보 해설 갱신 호출 실패. 이전 해설로 완료하지 않습니다.' }
+  try {
+    const parsed = parseOpenAIContent(att.raw) as Record<string, unknown>
+    return { ok: true, ...applyCandidateFeedback(args.items, packets.map(p => p.item_index), parsed.items, args.feature.within_band_code) }
+  } catch (error) {
+    return { ok: false, error: `최종 후보 해설 갱신 실패: ${(error as Error).message}` }
+  }
+}
+
 async function realizeRelativeBandCandidates(args: {
   apiKey: string
   items: unknown[]
@@ -2912,6 +2940,9 @@ async function realizeRelativeBandCandidates(args: {
   }
   boundaryFallback.situation_unchanged = situationSnapshot ===
     JSON.stringify(items.map((value) => recordCandidate(value)?.situation_ko ?? null))
+  const refreshed = await refreshCandidateFeedback({ ...args, before: args.items, items })
+  if (!refreshed.ok) return { ok: false, stop_code: 'candidate_feedback_refresh_failed', error: refreshed.error }
+  items = refreshed.items
   return {
     ok: true,
     items,
@@ -4447,7 +4478,11 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           candidate_checks: checked.results,
         }), { status: 200, headers: jsonHeaders })
       }
-      const operations = generated.operations.map((operation) => {
+      const refreshed = await refreshCandidateFeedback({ apiKey, before: missionItems, items: replacedItems,
+        feature: b.feature, telemetryFor })
+      if (!refreshed.ok) return new Response(JSON.stringify({ operations: [],
+        error: refreshed.error, stop_code: 'candidate_feedback_refresh_failed' }), { status: 200, headers: jsonHeaders })
+      const operations: Record<string, unknown>[] = generated.operations.map((operation) => {
         const reference = missionCandidateReferenceForPath(operation.path)!
         return {
           operation: reference.item_type === 'fix_choice'
@@ -4458,6 +4493,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           candidate: operation.candidate,
         }
       })
+      operations.push(...refreshed.updates.map(update => ({ operation: 'replace_item_feedback', ...update })))
       return new Response(JSON.stringify({
         operations,
         candidate_checks: checked.results,
