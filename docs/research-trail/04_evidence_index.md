@@ -306,8 +306,8 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 ## EVD-20260909-01 · 소스 기반 교수자 저작 검증
 
 - DEC-20260909-01. `docs/dev-log/2026-09-09-source-teaching-studio.md`에 구현·검증·운영 적용 경계를 기록했다.
-- 재실행: `scripts/manual-checks/source-teaching-smoke.mjs`, `src/lib/curriculum/sourceTeaching.test.ts`,
-  `scripts/teaching-sources-edge.test.mjs`와 기존 생성·승인 검사. 실제 PDF 본문 추출, 소스 확인·인용 대조,
+- 재실행: `scripts/manual-checks/source-teaching-smoke.mjs`, `src/lib/curriculum/sourceTeaching.test.ts`와
+  기존 생성·승인 검사. 실제 PDF 본문 추출, 소스 확인·인용 대조,
   미션 없는 초안, 수정·복원과 기존 승인 경계를 확인한다.
 - 합성 입력·대체 HTTP와 격리 PostgreSQL 검증이다. 실제 모델의 내용 품질이나 교수자 감수·수업 효과를 입증하지 않는다.
   DB·Edge·프런트 운영 적용과 실제 생성 검증은 위 dev-log의 후속 상태를 따른다.

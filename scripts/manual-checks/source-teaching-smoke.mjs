@@ -84,16 +84,15 @@ try {
     expect(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth), `overflow ${width}`).toBe(true);
     if (width === 390) await page.screenshot({path:`${output}/mobile.png`,fullPage:true});
   }
-  await page.getByRole('button',{name:'YouTube',exact:true}).click();
-  await page.getByLabel('영상·쇼츠 주소').fill('https://www.youtube.com/shorts/abcdefghijk');
-  await page.getByRole('button',{name:'자막·전사문 입력'}).click();
+  await page.getByRole('button',{name:'텍스트·전사문',exact:true}).click();
+  await page.getByRole('button',{name:'텍스트 소스 추가'}).click();
   await expect(previewButton).toBeDisabled();
-  await expect(page.getByLabel('출처 · 저자·연도·쪽수 또는 주소')).toHaveValue('https://www.youtube.com/watch?v=abcdefghijk');
+  await page.getByLabel('출처 · 저자·연도·쪽수 또는 주소').fill('영상 전사문 검증 출처');
   await sourceText.fill('확인한 자막을 직접 입력한 검증 자료입니다.');
   await page.getByRole('button',{name:'원문·출처 확인 완료'}).click();
   await expect(previewButton).toBeEnabled();
   expect(errors).toEqual([]);
-  const result={status:'PASS',data:'Synthetic sources and in-memory API; real PDF text extraction',checks:['source confirmation gate','actual PDF extraction','no mission required','preview invalidation','generate/edit/reload','saved source restoration','package link','390/768/1280 responsive widths','manual YouTube transcript'],requests:requests.map(r=>r.action)};
+  const result={status:'PASS',data:'Synthetic sources and in-memory API; real PDF text extraction',checks:['source confirmation gate','actual PDF extraction','no mission required','preview invalidation','generate/edit/reload','saved source restoration','package link','390/768/1280 responsive widths','text transcript with attribution'],requests:requests.map(r=>r.action)};
   await writeFile(`${output}/result.json`,JSON.stringify(result,null,2)); console.log(JSON.stringify(result));
 } catch(error) {
   await page.screenshot({path:`${output}/failure.png`,fullPage:true});

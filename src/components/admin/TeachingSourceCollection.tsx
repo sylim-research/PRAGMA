@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { FileText, Image, Mic, Youtube, Type, Plus, Trash2, CheckCircle2 } from "lucide-react";
+import { FileText, Type, Plus, Trash2, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { extractTeachingPdf, extractTeachingSource, teachingYoutubeUrl } from "@/lib/curriculum/teachingSourceApi";
+import { extractTeachingPdf } from "@/lib/curriculum/teachingSourceApi";
 import type { TeachingInputKind, TeachingInputSource } from "../../../supabase/functions/_shared/teachingMaterial";
 
-const kinds = [{ id: "pdf", label: "PDF", Icon: FileText }, { id: "youtube", label: "YouTube", Icon: Youtube },
-  { id: "image", label: "이미지", Icon: Image }, { id: "audio", label: "음성", Icon: Mic }, { id: "text", label: "텍스트", Icon: Type }] as const;
+const kinds = [{ id: "pdf", label: "PDF", Icon: FileText }, { id: "text", label: "텍스트·전사문", Icon: Type }] as const;
 const field = "mt-1 w-full min-w-0 rounded-lg border bg-white p-2.5 text-sm leading-6";
 const emptySource = (kind: TeachingInputKind, label: string, ref = ""): TeachingInputSource => ({ id: `S${crypto.randomUUID().slice(0,8)}`,
-  kind, label, ref, text: "", confirmed: false, extraction: { method: kind === "youtube" ? "manual_transcript" : "manual_text", detail: "직접 입력", extractedCharacters: 0, warnings: [] } });
+  kind, label, ref, text: "", confirmed: false, extraction: { method: "manual_text", detail: "직접 입력", extractedCharacters: 0, warnings: [] } });
 
 export function TeachingSourceCollection({ sources, selected, onChange, onSelected, disabled, onBusy }: {
   sources: TeachingInputSource[]; selected: string[]; onChange: (sources: TeachingInputSource[]) => void;
   onSelected: (ids: string[]) => void; disabled: boolean; onBusy: (busy: boolean) => void;
 }) {
   const [kind, setKind] = useState<TeachingInputKind>("pdf");
-  const [url, setUrl] = useState(""); const [open, setOpen] = useState<string | null>(null);
+  const [open, setOpen] = useState<string | null>(null);
   const [busy, setBusy] = useState(false); const [error, setError] = useState("");
   const update = (id: string, change: Partial<TeachingInputSource>) => onChange(sources.map(s => s.id === id ? { ...s, ...change } : s));
   const add = (source: TeachingInputSource) => { onChange([...sources, source]); onSelected([...selected, source.id]); setOpen(source.id); };
@@ -25,21 +24,12 @@ export function TeachingSourceCollection({ sources, selected, onChange, onSelect
     for (const file of files) {
       try {
         const base = emptySource(kind, file.name, file.name);
-        if ((kind === "image" && file.size > 8*1024*1024) || (kind === "audio" && file.size > 10*1024*1024)) throw new Error("이미지는 8MB, 음성은 10MB까지입니다.");
-        const result = kind === "pdf" ? await extractTeachingPdf(file) : await extractTeachingSource(kind as "image" | "audio", file);
+        const result = await extractTeachingPdf(file);
         added.push({ ...base, ...result });
       } catch (cause) { failures.push(`${file.name}: ${cause instanceof Error ? cause.message : "추출 실패"}`); }
     }
     if (added.length) { onChange([...sources, ...added]); onSelected([...selected, ...added.map(s => s.id)]); setOpen(added[0].id); }
     setError(failures.join("\n")); setBusy(false); onBusy(false);
-  };
-  const addYoutube = () => {
-    setError("");
-    try {
-      const ref = teachingYoutubeUrl(url); const source = emptySource("youtube", "YouTube 자료", ref);
-      source.extraction.warnings = ["확인한 자막·전사문을 직접 입력합니다. 링크만으로 영상 내용이 분석되지는 않습니다."];
-      add(source); setUrl("");
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "자막을 가져오지 못했습니다."); }
   };
   const locked = disabled || busy;
   return <section aria-label="근거 소스" className="min-w-0 rounded-2xl border bg-white p-4 sm:p-5">
@@ -47,20 +37,17 @@ export function TeachingSourceCollection({ sources, selected, onChange, onSelect
     <p className="mt-1 text-sm leading-6 text-muted-foreground">수업에 사용할 원문을 넣고, 추출 내용과 출처를 확인하세요.</p>
     <fieldset disabled={locked} className="mt-4 min-w-0">
       <legend className="sr-only">소스 추가</legend>
-      <div className="grid grid-cols-5 gap-1">{kinds.map(({ id, label, Icon }) => <button key={id} type="button" aria-pressed={kind === id}
+      <div className="grid grid-cols-2 gap-2">{kinds.map(({ id, label, Icon }) => <button key={id} type="button" aria-pressed={kind === id}
         onClick={() => { setKind(id); setError(""); }} className={`flex min-w-0 flex-col items-center gap-1.5 rounded-lg border px-1 py-3 text-xs font-semibold ${kind === id ? "border-[#D3BC50] bg-[#FFF5CD]" : "border-transparent bg-[#F5F6F7] hover:bg-[#EBEEF0]"}`}>
         <Icon size={18} aria-hidden="true" />{label}</button>)}</div>
       <div className="mt-3 rounded-xl border border-dashed bg-[#FAFAF8] p-3">
-        {kind === "text" ? <Button variant="outline" disabled={sources.length >= 6} onClick={() => add(emptySource("text", "새 텍스트 자료"))}><Plus size={15} className="mr-2" />텍스트 소스 추가</Button>
-          : kind === "youtube" ? <div><label className="text-sm font-semibold">영상·쇼츠 주소<input className={field} value={url} onChange={e => setUrl(e.target.value)} placeholder="https://www.youtube.com/watch?v=…" /></label>
-            <div className="mt-2"><Button size="sm" disabled={sources.length >= 6 || !url.trim()} onClick={addYoutube}>자막·전사문 입력</Button></div>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">영상 주소를 출처로 남기고 확인한 자막을 직접 넣습니다. 링크만으로 영상을 읽지는 않습니다.</p></div>
-          : <label className="block text-sm font-semibold">{kind === "pdf" ? "논문·교재 PDF 선택" : kind === "image" ? "캡처 이미지 선택 · 문자 인식" : "음성 파일 선택 · 자동 전사"}
+        {kind === "text" ? <div><Button variant="outline" disabled={sources.length >= 6} onClick={() => add(emptySource("text", "새 텍스트 자료"))}><Plus size={15} className="mr-2" />텍스트 소스 추가</Button>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">직접 입력한 원문이나 확인한 영상·음성 전사문을 출처와 함께 넣으세요. 링크만으로 내용을 읽지는 않습니다.</p></div>
+          : <label className="block text-sm font-semibold">논문·교재 PDF 선택
             <input aria-label={`${kind} 파일`} type="file" multiple disabled={sources.length >= 6} className="mt-3 block w-full min-w-0 text-xs file:mr-2 file:rounded-md file:border-0 file:bg-[#EAE6D6] file:px-3 file:py-2"
-              accept={kind === "pdf" ? "application/pdf,.pdf" : kind === "image" ? "image/png,image/jpeg,image/webp" : ".mp3,.mp4,.m4a,.wav,.webm,.ogg"}
+              accept="application/pdf,.pdf"
               onChange={e => { const files = Array.from(e.target.files ?? []); e.target.value = ""; void importFiles(files); }} />
-            <span className="mt-2 block text-xs font-normal leading-5 text-muted-foreground">{kind === "pdf" ? "20MB·100쪽까지. PDF는 브라우저에서 읽습니다. 스캔본은 이미지로 올려 주세요."
-              : kind === "image" ? "8MB까지. 선택한 이미지를 AI에 보내 글자를 추출합니다." : "10MB까지. 선택한 음성을 AI에 보내 전사합니다."}</span></label>}
+            <span className="mt-2 block text-xs font-normal leading-5 text-muted-foreground">20MB·100쪽까지. PDF는 브라우저에서 읽습니다. 스캔본은 확인한 본문을 텍스트로 넣어 주세요.</span></label>}
       </div>
     </fieldset>
     {busy && <p role="status" className="mt-3 text-sm">원문을 읽고 있습니다…</p>}

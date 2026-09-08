@@ -49,7 +49,7 @@ jobs:
         run: npm run review:db-test
 
       - name: Check teaching generator handler (isolated services)
-        run: node --test scripts/teaching-materials-edge.test.mjs scripts/teaching-sources-edge.test.mjs
+        run: node --test scripts/teaching-materials-edge.test.mjs
 
       - name: Check generation job access and leases (local PostgreSQL)
         run: node --test scripts/generation-jobs-db.test.mjs

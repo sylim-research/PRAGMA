@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { after, before, test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
+import { buildContentReviewDomain } from '../supabase/functions/content-review/domain.generated.mjs';
 
 const adminId = '10000000-0000-4000-8000-000000000001';
 const learnerId = '10000000-0000-4000-8000-000000000002';
@@ -71,6 +72,7 @@ const payload = (m, r, extra = {}) => ({ mission_content: finalized(m.content), 
 const finalize = (m, r, extra = {}) => admin(() => scalar('select finalize_reviewed_mission($1, $2)', [m.id, payload(m, r, extra)]));
 const approve = (r, override = null) => admin(() => scalar('select approve_content_review($1, $2, $3, $4)', [r.id, hash, rationale, override]));
 let legacy;
+let preUpgradeTeaching;
 
 before(async () => {
   await db.exec(`CREATE SCHEMA extensions; CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
@@ -108,9 +110,20 @@ before(async () => {
   await db.exec(await sqlFile('20260905150000_instructor_review_experience.sql'));
   await db.exec(await sqlFile('20260906100000_focused_content_review.sql'));
   await db.exec(await sqlFile('20260908210000_weekly_teaching_materials.sql'));
+  const existing = await teachingFixture();
+  const existingDraft = await existing.save(0);
+  preUpgradeTeaching = { courseId:existing.courseId, weekNo:existing.weekNo, draft:existingDraft,
+    reviewSource:await scalar("select content_review_source_internal('weekly_material',$1,$2)",[existing.courseId,existing.weekNo]) };
   await db.exec(await sqlFile('20260909010000_source_teaching_studio.sql'));
 });
 after(async () => { await db.close(); });
+
+test('v2 migration preserves the existing v1 draft, current state and review hash', async () => {
+  const {courseId,weekNo,draft,reviewSource}=preUpgradeTeaching;
+  const current=await admin(()=>scalar('select get_teaching_material_state($1,$2)',[courseId,weekNo]));
+  assert.equal(current.current,true);assert.deepEqual(current.draft,draft);
+  assert.deepEqual(await scalar("select content_review_source_internal('weekly_material',$1,$2)",[courseId,weekNo]),reviewSource);
+});
 
 test('source-only drafts persist without assigned missions; source and curriculum changes invalidate their revision', async () => {
   const id=randomUUID();
@@ -127,6 +140,13 @@ test('source-only drafts persist without assigned missions; source and curriculu
     [id,revision,sourceHash,config,config.sources,content,{prompt_version:'source_teaching_v2',response_id:'fixture',model:'fixture',input_hash:hash},adminId]));
   const draft=await save(0);assert.equal(draft.kind,'discussion');assert.equal(draft.revision,1);
   assert.equal((await admin(()=>scalar('select get_teaching_material_state($1,2)',[id]))).current,true);
+  const checked=buildContentReviewDomain('weekly_material',{...context.base,teaching_draft:draft,teaching_current:true,teaching_references:[]});
+  assert.equal(checked.rules.verdict,'fail');
+  assert.ok(checked.rules.findings.some(f=>f.issue_ko.includes('미션 2개')));
+  const blockedReview=await review(id,'weekly_material',false,2);
+  await db.query('update content_review_runs set rules=$2 where id=$1',[blockedReview.id,checked.rules]);
+  await assert.rejects(approve(blockedReview),/required quality evidence/);
+  assert.equal(await learner(()=>scalar('select get_approved_weekly_material($1,2)',[id])),null);
   await learner(async()=>{assert.equal(await scalar('select count(*) from weekly_teaching_materials where outline_id=$1',[id]),0);
     await assert.rejects(scalar('select get_teaching_material_state($1,2)',[id]),/Admin required/);});
   await assert.rejects(save(0),/Draft changed/);

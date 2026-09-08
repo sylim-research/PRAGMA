@@ -20,7 +20,7 @@ BEGIN
       OR length(trim(COALESCE(v_source->>'label',''))) NOT BETWEEN 1 AND 160
       OR length(trim(COALESCE(v_source->>'ref',''))) NOT BETWEEN 1 AND 500
       OR COALESCE(v_source->>'id','') !~ '^S[a-zA-Z0-9]{1,12}$'
-      OR COALESCE(v_source->>'kind','') NOT IN ('text','pdf','image','audio','youtube')
+      OR COALESCE(v_source->>'kind','') NOT IN ('text','pdf')
       THEN RAISE EXCEPTION 'Confirm source text and attribution'; END IF;
   END LOOP;
   IF (SELECT sum(length(s->>'text')) > 60000 OR count(DISTINCT s->>'id') <> count(*) FROM jsonb_array_elements(v_sources) s)

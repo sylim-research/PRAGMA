@@ -19,7 +19,7 @@ export interface TeachingContent {
   instructor_notes: Array<{ title: string; body: string; source_ids: string[] }>;
 }
 export interface TeachingSource { id: string; label: string; text: string }
-export type TeachingInputKind = "text" | "pdf" | "image" | "audio" | "youtube";
+export type TeachingInputKind = "text" | "pdf";
 export interface TeachingInputSource extends TeachingSource {
   kind: TeachingInputKind;
   ref: string;
@@ -42,7 +42,7 @@ export function validateTeachingSources(config: TeachingConfig): TeachingInputSo
   for (const source of sources) {
     if (!source || !/^S[a-zA-Z0-9]{1,12}$/.test(source.id) || !text(source.label, 160)
       || !text(source.ref, 500) || !text(source.text, 60000) || source.confirmed !== true
-      || !["text", "pdf", "image", "audio", "youtube"].includes(source.kind)
+      || !["text", "pdf"].includes(source.kind)
       || !object(source.extraction) || !text(source.extraction.method, 60)
       || typeof source.extraction.detail !== "string" || source.extraction.detail.length > 500
       || !Number.isInteger(source.extraction.extractedCharacters) || source.extraction.extractedCharacters < 0

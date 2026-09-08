@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import { prepareTeachingMaterial, applyTeachingDraft } from "./teachingGeneration";
 import { validateTeachingSources, validateTeachingEvidence, validateTeachingContent, TEACHING_SECTION_KEYS,
   type TeachingConfig, type TeachingDraft, type TeachingContent } from "../../../supabase/functions/_shared/teachingMaterial";
-import { teachingYoutubeUrl } from "../../../supabase/functions/_shared/teachingSourceInput";
 
 const config: TeachingConfig = { workflow:"source",missionIds:[],extraText:"",extraRef:"",outputKind:"lesson",focus:"선택권을 비교",activityMode:"pair",
   sources:[{id:"S1",label:"요청 자료",ref:"수업용 검증 텍스트",text:"요청은 상대방의 선택권을 남길 수 있습니다.",kind:"text",confirmed:true,
@@ -43,11 +42,5 @@ describe("소스 기반 교수자 저작",()=>{
     const output=JSON.stringify(applyTeachingDraft(prepareTeachingMaterial(context,config).material,draft));
     expect(output).not.toContain("PRIVATE_TEACHER");expect(output).not.toContain('"extraction"');
     expect(output).toContain("활용 근거: 요청 자료");
-  });
-  it("allows canonical YouTube video/short links and rejects arbitrary hosts and credentials",()=>{
-    const canonical="https://www.youtube.com/watch?v=abcdefghijk";
-    expect(teachingYoutubeUrl("https://youtu.be/abcdefghijk?t=20")).toBe(canonical);
-    expect(teachingYoutubeUrl("https://www.youtube.com/shorts/abcdefghijk")).toBe(canonical);
-    for(const value of ["https://youtube.com.evil.test/watch?v=abcdefghijk","http://127.0.0.1/","https://user:password@youtube.com/watch?v=abcdefghijk","file:///tmp/test","https://youtube.com/watch?v=no"]) expect(()=>teachingYoutubeUrl(value)).toThrow();
   });
 });
