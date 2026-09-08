@@ -153,8 +153,8 @@ const AdminClassResponses = () => {
     title="학급 응답 현황"
     description="저장된 미션 응답을 확인하고, 수업 토론에 활용할 수 있습니다."
   >
-    <div className="max-w-[1120px] space-y-5">
-      <section className="rounded-xl border bg-white p-4">
+    <div className="max-w-[1120px] space-y-3">
+      <section className={demo ? "" : "rounded-xl border bg-white p-3"}>
         {!demo && <div className="mb-4 grid gap-4 md:grid-cols-3">
           <label className="text-sm font-semibold">교과목
             <select
@@ -206,14 +206,16 @@ const AdminClassResponses = () => {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#E5E3DB] bg-[#FAFAF7] p-4 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
+      <section className="rounded-2xl border border-[#E5E3DB] bg-[#FAFAF7] p-3 sm:p-4">
+        <div className="flex flex-wrap items-start justify-between gap-2">
           <div>
-            <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${demo ? "bg-[#FAD338] text-[#15202B]" : "bg-[#EEF1F4] text-[#344150]"}`}>
-              {demo ? "DEMO · 예시 데이터" : "실제 완료 응답"}
-            </span>
-            <h2 className="mt-3 break-keep text-2xl font-black tracking-tight text-[#15202B] sm:text-3xl">우리 반은 어떻게 판단했을까?</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="break-keep text-lg font-bold text-[#15202B]">우리 반은 어떻게 판단했을까?</h2>
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${demo ? "bg-[#FAD338] text-[#15202B]" : "bg-[#EEF1F4] text-[#344150]"}`}>
+                {demo ? "DEMO · 예시 데이터" : "실제 완료 응답"}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">
               {demo
                 ? `${DEMO_CLASS_RESPONSE_PATTERN.learners}명의 미션 응답을 가정한 예시입니다. 실제 학습자 수행 기록이 아닙니다.`
                 : selectedMission
@@ -256,7 +258,7 @@ const AdminClassResponses = () => {
         {!demo && patternQuery.isPending && missionId && <p role="status" className="mt-5 text-sm">응답 분포를 불러오는 중…</p>}
         {!demo && patternQuery.isError && <p role="alert" className="mt-5 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
         {!demo && !missionId && <p className="mt-5 text-sm text-muted-foreground">이 주차에 편성된 미션이 없습니다.</p>}
-        {visiblePattern && <div className="mt-6"><ClassResponseDashboard
+        {visiblePattern && <div className="mt-3"><ClassResponseDashboard
           pattern={visiblePattern}
           selectedItemId={selectedItemId}
           onSelectItem={setSelectedItemId}
