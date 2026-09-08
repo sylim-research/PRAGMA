@@ -1301,6 +1301,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
           targetLanguage={mission.targetLanguage}
           learnerLevel={mission.supportLevel}
           replayLimit={quest.replayLimit}
+          demoTranscript={devAutofill ? devDraft : undefined}
           onSubmit={(transcript) => onDone({ first: transcript, revised: transcript, reflected: false })}
         />
       </QuestScaffold>
@@ -1395,13 +1396,14 @@ function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: st
   );
 }
 
-export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange, devMode = false, devAutofill = false }: {
+export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange, devMode = false, devAutofill = false, demoFillRequest = 0 }: {
   quest: DctFeedbackQuest;
   response?: DctResponse;
   onDone: (response: DctResponse) => void;
   onRevisionStateChange?: (open: boolean) => void;
   devMode?: boolean;
   devAutofill?: boolean;
+  demoFillRequest?: number;
 }) {
   const runtime = useRuntimeMission();
   const mission = useCanonicalMission();
@@ -1416,6 +1418,13 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const [revisionOpen, setRevisionOpen] = useState(devAutofill);
   const [dissent, setDissent] = useState<DissentResponse | undefined>(response?.dissent);
   const revisionRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!demoFillRequest) return;
+    const example = quest.feedback.alternatives.find(item => normalize(item.text) !== normalize(first))?.text
+      ?? quest.referenceAnswer;
+    setRevised(example);
+    setRevisionOpen(true);
+  }, [demoFillRequest, first, quest]);
   useEffect(() => {
     let cancelled = false;
     setReady(false);
@@ -1680,7 +1689,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   );
 }
 
-function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMode = false, devAutofill = false, devDraft = "", revealAnswers = false }: {
+function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMode = false, devAutofill = false, devDraft = "", revealAnswers = false, demoFillRequest = 0 }: {
   quest: MissionQuest;
   responses: Record<string, QuestResponse | DctResponse>;
   onDone: (response: QuestResponse | DctResponse) => void;
@@ -1689,12 +1698,13 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
   devAutofill?: boolean;
   devDraft?: string;
   revealAnswers?: boolean;
+  demoFillRequest?: number;
 }) {
   if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "best_worst") return <BestWorstView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
-  if (quest.kind === "dct_feedback") return <DctFeedbackView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} onRevisionStateChange={onRevisionStateChange} devMode={devMode} devAutofill={devAutofill} />;
+  if (quest.kind === "dct_feedback") return <DctFeedbackView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} onRevisionStateChange={onRevisionStateChange} devMode={devMode} devAutofill={devAutofill} demoFillRequest={demoFillRequest} />;
   return <DctDraftView quest={quest} onDone={onDone} devMode={devMode} devAutofill={devAutofill} devDraft={devDraft} />;
 }
 
@@ -2501,9 +2511,20 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       )}
       <div className="mx-auto max-w-3xl">
         {demoMode && (
-          <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-[#E3D08F] bg-[#FFF8E1] px-4 py-2.5 text-xs text-[#6B5518]" role="status">
-            <span className="font-black">디펜스 대표 미션 시연</span>
-            <span className="text-right font-semibold">실제 미션 실행 · 수행 기록 저장 안 됨</span>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E3D08F] bg-[#FFF8E1] px-4 py-2.5 text-xs text-[#6B5518]">
+            <div role="status">
+              <p className="font-black">디펜스 대표 미션 시연</p>
+              <p className="mt-1 font-semibold">실제 미션 실행 · 수행 기록 저장 안 됨</p>
+            </div>
+            {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
+              <div>
+                <Button variant="outline" size="sm" onClick={() => {
+                  setDevAutofillQuestId(quest.id);
+                  setRenderNonce(current => current + 1);
+                }}>데모 답안 채워넣기</Button>
+                <p className="mt-1">현재 문항의 예시를 채웁니다. 확인·제출은 직접 눌러 주세요.</p>
+              </div>
+            )}
           </div>
         )}
         {sceneIntroStep !== null ? (
@@ -2563,14 +2584,15 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               </div>
             )}
             <QuestRenderer
-              key={`${quest.id}-${renderNonce}`}
+              key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}
               responses={responses}
               onDone={finishQuest}
               onRevisionStateChange={setFeedbackRevisionOpen}
               devMode={isDevPreview}
               devAutofill={devAutofillQuestId === quest.id}
-              devDraft={DEV_PREVIEW_COPY[devPreset].a}
+              devDraft={demoMode && quest.kind === "dct" ? quest.referenceAnswer : DEV_PREVIEW_COPY[devPreset].a}
+              demoFillRequest={demoMode && devAutofillQuestId === quest.id ? renderNonce : 0}
             />
           </div>
         )}

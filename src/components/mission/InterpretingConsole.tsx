@@ -15,6 +15,7 @@ export function InterpretingConsole({
   targetLanguage,
   learnerLevel = "intermediate",
   replayLimit = 2,
+  demoTranscript,
   onSubmit,
 }: {
   sourceText: string;
@@ -22,6 +23,8 @@ export function InterpretingConsole({
   targetLanguage: LanguageSpec;
   learnerLevel?: TtsLevel;
   replayLimit?: number;
+  /** 데모에서만 명시적으로 채운 예시. 녹음·전사 API는 호출하지 않는다. */
+  demoTranscript?: string;
   onSubmit: (transcript: string) => void;
 }) {
   const maxPlays = Math.max(1, replayLimit);
@@ -31,9 +34,9 @@ export function InterpretingConsole({
   const [recording, setRecording] = useState(false);
   const [recorded, setRecorded] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
-  const [transcript, setTranscript] = useState("");
+  const [transcript, setTranscript] = useState(demoTranscript ?? "");
   const [confirmed, setConfirmed] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(demoTranscript ? "시연용 전사 예시입니다. 실제 녹음한 내용이 아닙니다." : null);
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const sourceAudioRef = useRef<HTMLAudioElement | null>(null);
   const sourceAudioUrlRef = useRef<string | null>(null);
