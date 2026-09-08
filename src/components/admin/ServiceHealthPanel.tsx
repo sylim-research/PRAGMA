@@ -24,7 +24,7 @@ import {
 
 const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
   elevenlabs: { name: "ElevenLabs", role: "음성 합성" },
-  openai: { name: "OpenAI", role: "생성·검수·STT" },
+  openai: { name: "OpenAI", role: "생성·AI 검토·STT" },
   anthropic: { name: "Anthropic", role: "콘텐츠 검토" },
   supabase: { name: "Supabase", role: "로그인·데이터" },
   app: { name: "앱 배포", role: "화면 제공" },

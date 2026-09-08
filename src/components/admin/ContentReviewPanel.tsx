@@ -10,7 +10,7 @@ import { reviewTargetKey, startReviewPreparation, useReviewPreparationQueue } fr
 import { CONTENT_APPROVAL_POLICY, effectiveReviewSteps, primaryReviewResult, generationQualityResult, professorReviewFindings, PROFESSOR_DECISION_LABELS, nextReviewStage, professorDecisionsComplete,
   type InstructorExperience, type ModelReview, type ProfessorFindingDecision, type ReviewResult, type ReviewTarget } from "../../../supabase/functions/_shared/contentReview";
 
-const verdictLabel = { pass: "지적 없음", warning: "확인 필요", fail: "수정 검토 필요" };
+const verdictLabel = { pass: "보고된 문제 항목 없음", warning: "확인 필요", fail: "수정 검토 필요" };
 const decisionLabel = { accept: "수용", refine: "보완", reject: "기각" };
 type ProfessorDecisionDraft = { decision: ProfessorFindingDecision["decision"] | ""; rationale_ko: string };
 
@@ -107,13 +107,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         const result = await contentReviewRequest(target, next, state);
         queryClient.setQueryData(key, result);
       }
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "검수 처리 실패"); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "콘텐츠 승인 처리 실패"); }
     finally { setBusy(false); }
   };
-  return <section aria-label="콘텐츠 검수" className="my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm">
+  return <section aria-label="콘텐츠 승인" className="my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm">
     <div className="flex flex-wrap items-start justify-between gap-2">
-      <div><h3 className="font-bold">현재 버전 검수</h3>
-        <p className="mt-1 text-xs text-muted-foreground">{target.kind === "mission" ? "코어·MJT5·DCT1 전체" : "편성 후 공통 수업자료·교수자 고유 메모"} · 수정하면 새 버전을 검수합니다.</p>
+      <div><h3 className="font-bold">현재 버전 콘텐츠 확인</h3>
+        <p className="mt-1 text-xs text-muted-foreground">{target.kind === "mission" ? "코어·MJT5·DCT1 전체" : "편성 후 공통 수업자료·교수자 고유 메모"} · 수정하면 새 버전의 콘텐츠를 확인합니다.</p>
       </div>
       <Button size="sm" variant="outline" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>
     </div>
@@ -124,26 +124,26 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <span className="mt-1 block">{!state ? "확인 중" : index === 0 && blocked ? "오류 · 수정 필요" : index < stepIndex ? "실행 완료" : index === stepIndex ? "현재 단계" : "미실행"}</span>
       </li>)}
     </ol>
-    {query.isPending && <p role="status">저장된 콘텐츠와 검수 이력을 확인하는 중…</p>}
+    {query.isPending && <p role="status">저장된 콘텐츠와 승인 이력을 확인하는 중…</p>}
     {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
     {state && <>
       {experiential && target.kind === "mission" && <InstructorReviewExperience key={`${target.targetId}-${state.contentHash}-${state.sourceHash}`}
         inspection={state} onSave={saveExperience} onReady={setExperienceReady} disabled={busy || approvalDisabled} />}
       {next !== "approved" && next !== "professor" && <div className="rounded-lg border bg-[#FCFBF6] p-3">
         <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
-          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>자동 품질점검 준비</Button>
+          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>기본 점검 준비</Button>
         <p className="mt-2 text-xs text-muted-foreground">현재 콘텐츠의 저장된 품질점검을 먼저 연결합니다. 재사용 가능한 결과가 없을 때만 기본 AI 점검을 1회 호출합니다. 추가 모델 검토는 선택한 경우에만 실행합니다.</p>
       </div>}
       <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사는 무료, AI 단계는 각각 유료 호출 1회입니다. 성공한 단계는 재호출하지 않습니다.</p>
-      {!run && <p className="rounded-lg bg-amber-50 p-3">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 아래 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 검수 연결 기록은 아직 없습니다." : "이 버전은 아직 검수하지 않았습니다. 규칙 검사부터 시작하세요."}</p>}
+      {!run && <p className="rounded-lg bg-amber-50 p-3">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 아래 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검·승인 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다. 규칙 검사부터 시작하세요."}</p>}
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
-        {primary && <ReviewFindings title={run.openai_review ? "AI 품질 점검" : "생성 품질점검 재사용 · 추가 호출 없음"} result={primary} metadata={run.openai_review ?? undefined} />}
-        {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 품질점검" result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && <ReviewFindings title="저장된 Claude 검토" result={run.claude_review.result} metadata={run.claude_review} />}
+        {primary && <ReviewFindings title={run.openai_review ? "AI 검토" : "저장된 AI 검토 재사용 · 추가 호출 없음"} result={primary} metadata={run.openai_review ?? undefined} />}
+        {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 AI 검토" result={generationQualityResult(run.generation_quality)} />}
+        {run.claude_review && <ReviewFindings title="저장된 AI 독립 검토" result={run.claude_review.result} metadata={run.claude_review} />}
         {findings.length > 0 && <details open={!experiential || undefined} className="space-y-3 rounded-lg border p-3">
-          <summary className="cursor-pointer font-semibold">교수자 판단이 필요한 지적 ({findings.length}건)</summary>
-          <p>중대 지적과 맥락 판단이 필요한 항목을 확인하세요. 일반 경고와 이전 검토 전문은 위에 보존됩니다.</p>
+          <summary className="cursor-pointer font-semibold">교수자 판단이 필요한 문제 항목 ({findings.length}건)</summary>
+          <p>중대 문제 항목과 맥락 판단이 필요한 항목을 확인하세요. 일반 경고와 이전 검토 전문은 위에 보존됩니다.</p>
           
           
           {findings.map((finding) => {
@@ -151,17 +151,17 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
             return <div key={finding.id} className="grid gap-3 rounded border p-3 lg:grid-cols-3">
-              <div><strong>{finding.id.startsWith("claude-") ? "Claude" : finding.id.startsWith("generation-") ? "생성 품질점검" : "OpenAI"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
+              <div><strong>{finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
                 <p className="mt-1 text-xs">유형: {finding.problem_type_ko} · {verdictLabel[finding.severity]}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
                 {finding.uncertainty_ko && <p className="mt-1 text-xs">불확실성: {finding.uncertainty_ko}</p>}
                 {finding.quote && <blockquote className="my-2 border-l-2 pl-2">{finding.quote}</blockquote>}
                 <p className="text-xs">제안: {finding.suggestion_ko}</p><code className="break-all text-[10px]">{finding.where}</code></div>
               <div className="rounded bg-[#F8F7F3] p-3">{decision ? <>
-                <strong>OpenAI · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                <strong>AI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                 <p className="mt-1">{decision.rationale_ko}</p>
                 {decision.proposed_change_ko && <p className="mt-2 text-xs">제안: {decision.proposed_change_ko}</p>}
                 {decision.evidence_quote && <blockquote className="mt-2 border-l-2 pl-2">{decision.evidence_quote}</blockquote>}
-              </> : focused ? "추가 모델 판정 없음 · 교수자가 직접 판단할 수 있습니다." : "OpenAI 지적별 판정 전"}</div>
+              </> : focused ? "추가 AI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "AI 재검토 전"}</div>
               <div className="space-y-2 rounded bg-amber-50 p-3">
                 {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}</strong><p>{saved?.rationale_ko}</p></>
                   : focused || run.adjudication ? <>
@@ -172,28 +172,28 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                       {Object.entries(PROFESSOR_DECISION_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
                     </select>
                     <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft?.rationale_ko ?? ""} disabled={busy}
-                      onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 지적에 대한 결정과 이유를 10자 이상 기록하세요." />
-                  </> : <p>OpenAI 지적별 판정 후 교수자 결정을 기록합니다.</p>}
+                      onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
+                  </> : <p>AI 재검토 후 교수자 결정을 기록합니다.</p>}
               </div>
             </div>;
           })}
           {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-          <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 Claude 지적도 보존합니다. OpenAI 지적별 판정에는 1차 점검 결과를 제공하지 않습니다.</p>
+          <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 독립 AI 검토 의견도 보존합니다. AI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
           {next === "professor" && findings.length > 0 && <>
             <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
               || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장 · 무료</Button>
-            <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : professorDecisionsComplete(findings, run.professor_decisions) ? "교수자 판단이 현재 버전에 저장되어 있습니다." : "모든 지적의 결정과 근거를 입력한 뒤 저장하세요."}</p>
-            <p className="text-xs">판단 저장은 승인이 아닙니다. ‘수정 필요’·‘판단 보류’가 남으면 최종 확정할 수 없습니다. 수정한 콘텐츠는 새 버전의 규칙·품질점검을 연결합니다. 추가 모델 전수 검토를 반복하지 않습니다.</p>
+            <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : professorDecisionsComplete(findings, run.professor_decisions) ? "교수자 판단이 현재 버전에 저장되어 있습니다." : "모든 문제 항목의 결정과 근거를 입력한 뒤 저장하세요."}</p>
+            <p className="text-xs">판단 저장은 승인이 아닙니다. ‘수정 필요’·‘판단 보류’가 남으면 최종 승인할 수 없습니다. 수정한 콘텐츠는 새 버전의 규칙·품질점검을 연결합니다. 추가 모델 전수 검토를 반복하지 않습니다.</p>
           </>}
         </details>}
       </>}
       {state.dependencies.length > 0 && <div className="rounded-lg border p-3"><h4 className="font-semibold">재사용 미션 해설</h4>
-        <p className="mt-1 text-xs">주차 자료 승인 전 연결 미션의 현재 버전 검수도 완료해야 합니다. 같은 해설을 출력 형식별로 중복 검토하지 않습니다.</p>
-        <ul className="mt-2 space-y-1">{state.dependencies.map((item, index) => <li key={item.id}><Link className="underline" to={`/admin/review?scenarioId=${item.id}`}>미션 {index + 1} 검수</Link> · {item.approved ? "현재 버전 승인" : "검수 필요"}</li>)}</ul>
+        <p className="mt-1 text-xs">주차 자료 승인 전 연결 미션의 현재 버전 승인도 완료해야 합니다. 같은 해설을 출력 형식별로 중복 검토하지 않습니다.</p>
+        <ul className="mt-2 space-y-1">{state.dependencies.map((item, index) => <li key={item.id}><Link className="underline" to={`/admin/review?scenarioId=${item.id}`}>미션 {index + 1} 승인 확인</Link> · {item.approved ? "현재 버전 승인" : "승인 필요"}</li>)}</ul>
       </div>}
-      {blocked && <p className="text-red-800">규칙 오류를 수정·저장해야 AI 검수를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
+      {blocked && <p className="text-red-800">규칙 오류를 수정·저장해야 AI 검토를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error} 재시도에는 비용이 다시 발생할 수 있습니다.</p>}
-      {locked && <p role="status">{run?.running_stage} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
+      {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 검토"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && <div className="rounded-lg border p-3">
         <p className="text-xs">판단이 엇갈리는 사례에 한해 독립 모델 검토를 추가할 수 있습니다. 교수자 직접 판단도 가능합니다.</p>
         <Button variant="outline" size="sm" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
@@ -203,36 +203,36 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         }}>추가 모델 검토 선택</Button>
       </div>}
       {next === "professor" && <div className="space-y-2 border-t pt-3">
-        <h4 className="font-semibold">교수자 최종 확정</h4>
-        <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 지적·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
-        {!decisionsClear && <p className="text-amber-800">지적별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 확정할 수 있습니다.</p>}
-        {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 확정할 수 있습니다.</p>}
+        <h4 className="font-semibold">교수자 최종 승인</h4>
+        <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
+        {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
+        {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다.</p>}
         {onApprove && <p className="text-xs text-muted-foreground">미션 승인 시 기존 근거 귀속·최종화 API가 추가 실행됩니다.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
-          <p className="font-semibold">OpenAI 1차 점검에 중대 지적이 있습니다.</p>
-          <p className="text-xs">Claude의 지적 유무와 별개입니다. 수정이 필요하면 원본을 수정하고 다시 검수하세요. 수정 없이 사용할 때만 그 근거를 남깁니다.</p>
-          <Textarea aria-label="OpenAI 중대 지적 사용 근거" value={openaiFailOverride}
+          <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
+          <p className="text-xs">독립 AI 검토의 문제 항목 유무와 별개입니다. 수정이 필요하면 원본을 수정하고 다시 점검하세요. 수정 없이 사용할 때만 그 근거를 남깁니다.</p>
+          <Textarea aria-label="AI 검토의 중대 문제 항목 사용 근거" value={openaiFailOverride}
             onChange={(event) => { setOpenaiFailOverride(event.target.value); setOpenaiFailConfirmed(false); setConfirmed(false); }}
-            placeholder="중대 지적을 검토하고도 현재 내용을 사용할 수 있는 근거를 10자 이상 기록하세요." />
+            placeholder="중대 문제 항목을 검토하고도 현재 내용을 사용할 수 있는 근거를 10자 이상 기록하세요." />
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
-            onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />OpenAI 중대 지적을 검토했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
+            onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" value={note} onChange={(event) => setNote(event.target.value)} placeholder="수업 사용 적합성과 남은 지적에 대한 교수자 판단을 10자 이상 기록하세요." />
+        <Textarea aria-label="교수자 승인 근거" value={note} onChange={(event) => setNote(event.target.value)} placeholder="수업 사용 적합성과 남은 문제 항목에 대한 교수자 판단을 10자 이상 기록하세요." />
         <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
       {next !== "approved" && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
         || (next === "professor" && (!ready || !confirmed || note.trim().length < 10))} onClick={() => void runNext()}>
-        {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작 · 무료" : next === "professor" ? "교수자 승인·확정" : `${steps[stepIndex].label} 실행 · 유료`}
+        {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작 · 무료" : next === "professor" ? "교수자 최종 승인" : `${steps[stepIndex].label} 실행 · 유료`}
       </Button>}
-      {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 검토 모델이 설정되지 않았습니다. 운영 환경의 CLAUDE_AUDIT_MODEL을 먼저 설정해야 합니다.</p>}
+      {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 AI 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
-        {run?.openai_fail_override && <p className="mt-2">OpenAI 중대 지적 사용 근거: {run.openai_fail_override}</p>}
+        {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
-      <details><summary className="cursor-pointer text-xs">검수 대상 원본·이력</summary>
-        <p className="my-2 text-xs">현재 정적 콘텐츠 원본을 검수합니다. 개별 학습자 실시간 피드백을 전수 검토했다는 뜻은 아닙니다.</p>
+      <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
+        <p className="my-2 text-xs">현재 정적 콘텐츠 원본을 확인합니다. 개별 학습자 실시간 피드백을 전수 검토했다는 뜻은 아닙니다.</p>
         <pre className="max-h-72 overflow-auto rounded bg-[#F7F7F5] p-3 text-[11px]">{JSON.stringify(state.snapshot, null, 2)}</pre>
-        <ul className="mt-2 space-y-1 text-xs">{state.history.map((item) => <li key={item.id}>{item.created_at} · {item.content_hash.slice(0, 12)} · {item.approved_at ? "당시 승인" : "검수 이력"}</li>)}</ul>
+        <ul className="mt-2 space-y-1 text-xs">{state.history.map((item) => <li key={item.id}>{item.created_at} · {item.content_hash.slice(0, 12)} · {item.approved_at ? "당시 승인" : "점검·승인 이력"}</li>)}</ul>
       </details>
     </>}
     {error && <p role="alert" className="text-red-800">{error}</p>}

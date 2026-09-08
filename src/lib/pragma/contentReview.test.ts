@@ -2,7 +2,7 @@ import { webcrypto } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { buildContentReviewDomain } from "./contentReviewDomain";
-import { buildReviewPrompt, instructionalMission, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
+import { buildReviewPrompt, effectiveReviewSteps, instructionalMission, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
@@ -38,6 +38,13 @@ describe("current content five-stage review", () => {
     expect(nextReviewStage({...focused, independent_review_requested: true})).toBe("claude");
     expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review})).toBe("adjudication");
     expect(nextReviewStage({...focused, generation_quality: null})).toBe("openai");
+    expect(effectiveReviewSteps(focused)).toEqual([
+      { key: "rules", label: "규칙 검사" },
+      { key: "openai", label: "AI 검토" },
+      { key: "professor", label: "교수자 최종 승인" },
+    ]);
+    expect(effectiveReviewSteps({...focused, independent_review_requested: true, claude_review: run().claude_review})
+      .map(step => step.key)).toEqual(["rules", "openai", "claude", "adjudication", "professor"]);
   });
   it("keeps critical and uncertain findings from both models for human decisions", () => {
     const original = run();

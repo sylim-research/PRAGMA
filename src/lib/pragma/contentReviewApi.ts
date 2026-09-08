@@ -8,13 +8,13 @@ export async function contentReviewRequest(target: ReviewTarget, action = "inspe
   const version = expectedVersion ? { contentHash: expectedVersion.contentHash, sourceHash: expectedVersion.sourceHash } : undefined;
   const { data, error } = await supabase.functions.invoke("content-review", { body: { target, action, ...(version ? { expectedVersion: version } : {}) } });
   if (error) {
-    let message = "검수 서비스를 사용할 수 없습니다. 관리자 로그인과 content-review Edge·DB 배포 상태를 확인하세요.";
+    let message = "콘텐츠 승인 서비스를 사용할 수 없습니다. 관리자 로그인과 서비스 연결 상태를 확인해 주세요.";
     if (error.context instanceof Response) {
       try { message = (await error.context.json())?.error || message; } catch { /* transport error */ }
     }
     throw new Error(message);
   }
-  if (data?.error || !data?.contentHash) throw new Error(data?.error ?? "검수 응답이 올바르지 않습니다.");
+  if (data?.error || !data?.contentHash) throw new Error(data?.error ?? "콘텐츠 승인 서비스의 응답이 올바르지 않습니다.");
   return data as ReviewInspection;
 }
 export async function approveContentReview(approval: ContentReviewApproval): Promise<void> {

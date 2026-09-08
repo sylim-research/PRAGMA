@@ -306,7 +306,7 @@ const AdminGoldCalibration = () => {
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link to="/admin/review" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> 수업 콘텐츠 검수·확정으로 이동
+          <ArrowLeft className="h-4 w-4" /> 콘텐츠 승인으로 이동
         </Link>
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">파일럿 판정 기록 {resolvedCount}/{BOOTSTRAP_SEED_GOLD_CASE_COUNT}</Badge>
@@ -321,8 +321,8 @@ const AdminGoldCalibration = () => {
         <div className="flex gap-3">
           <Info className="mt-0.5 h-5 w-5 shrink-0" />
           <div>
-            <p className="font-semibold">현재 수업 콘텐츠의 콘텐츠 검수·승인과 별개인 연구용 파일럿입니다.</p>
-            <p className="mt-1">0/{BOOTSTRAP_SEED_GOLD_CASE_COUNT}은 파일럿 예시에 대한 판정 기록이 없다는 뜻이며, 수업 준비율이나 미검수 수업 콘텐츠 수가 아닙니다. 지금 모두 평가할 필요는 없습니다.</p>
+            <p className="font-semibold">수업 콘텐츠를 감수하고 최종 승인하는 절차와 별개인 연구용 파일럿입니다.</p>
+            <p className="mt-1">0/{BOOTSTRAP_SEED_GOLD_CASE_COUNT}은 파일럿 예시에 대한 판정 기록이 없다는 뜻이며, 수업 준비율이나 미승인 수업 콘텐츠 수가 아닙니다. 지금 모두 평가할 필요는 없습니다.</p>
           </div>
         </div>
         <details className="mt-3 border-t border-[#E5CF72] pt-3">
@@ -330,7 +330,7 @@ const AdminGoldCalibration = () => {
           <ul className="mt-2 list-disc space-y-2 pl-5">
             <li>현재 화면은 미리 정한 기준안을 공개하지 않으며, 그 기준안과 일치하는 판단만 승인할 수 있습니다. 다른 판단은 ‘수정 필요’나 ‘기각’으로 기록할 수 있지만, 예시 자체를 수정해 확정하는 편집 기능은 없습니다.</li>
             <li>{FINAL_GOLD_POPULATION_COUNT}개는 기존 연구 프로토콜의 9화행 × {FINAL_GOLD_CASES_PER_SPEECH_ACT}개 설정값입니다. 현재 {BOOTSTRAP_SEED_GOLD_CASE_COUNT}개와는 별개이며, 지금 수업 운영을 위해 채워야 하는 수나 대표성·타당성을 보장하는 기준이 아닙니다.</li>
-            <li>기존 예시·판정 기록과 과거 연구배치·외부 표본 추출의 참조는 보존합니다. 이 기록을 현재 수업 콘텐츠의 검수 완료나 학습자 공개 승인으로 사용하지 않습니다.</li>
+            <li>기존 예시·판정 기록과 과거 연구배치·외부 표본 추출의 참조는 보존합니다. 이 기록을 현재 수업 콘텐츠의 감수 완료나 학습자 공개 승인으로 사용하지 않습니다.</li>
           </ul>
         </details>
       </section>

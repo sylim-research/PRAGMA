@@ -81,7 +81,7 @@ interface CoreRow {
 type AssemblyState = "core_only" | "generated" | "reviewed" | "failed";
 const STATE_KO: Record<AssemblyState, string> = {
   core_only: "시나리오만 (조립 대기)",
-  generated: "미션 생성됨 (검수 대기)",
+  generated: "미션 생성됨 (감수 대기)",
   reviewed: "검토 완료",
   failed: "이번 조립 실패",
 };
@@ -122,7 +122,7 @@ const progressLabel = (stage: PromoteStage) => {
   if (stage.phase === "preparing") return "조립 조건 확인";
   if (stage.phase === "generating") return `미션 생성 · ${stage.attempt}/${stage.maxAttempts}차`;
   if (stage.phase === "checking") return `규칙 검사 · ${stage.attempt}/${stage.maxAttempts}차`;
-  if (stage.phase === "quality") return "AI 품질 점검";
+  if (stage.phase === "quality") return "AI 검토";
   if (stage.phase === "saving") return "유효 초안 격리 저장";
   if (stage.phase === "repairing") return "지목 문항 1회 수리";
   return "수리본 재검사";
@@ -256,7 +256,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         generationModel: resumeAstra ? "astra" : generationModel,
         generationJobId,
         onGenerationJob: (job) => setRowMsg(m => ({ ...m, [r.scenario_id]: job.status === "completed"
-          ? "Astra 생성 완료 · 품질 점검 시작" : "Astra 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
+          ? "Astra 생성 완료 · AI 검토 시작" : "Astra 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
         onProgress: (stage) =>
           setAssemblyProgress((current) =>
             current?.id === r.scenario_id ? { ...current, stage } : current,
@@ -288,7 +288,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         if (res.quality?.verdict === "fail") {
           toast.warning("유효 초안을 저장했습니다. 남은 결함은 교수자가 문항 단위로 수정하거나 근거를 남겨 승인할 수 있습니다.");
         } else {
-          toast.success("미션 조립 완료 — 검수 대기(generated)");
+          toast.success("미션 조립 완료 — 교수자 감수 대기");
         }
       } else {
         const failViolations = (res.violations ?? []).filter((v) => v.level === "fail");
@@ -417,8 +417,8 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
 
   return (
     <AdminShell
-      title={reviewMode ? "콘텐츠 검수·확정" : "학습 미션 조립"}
-      description={reviewMode ? "수업에 사용할 콘텐츠의 현재 버전을 검수하고 교수자가 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 검수 가능한 학습 미션으로 저장합니다."}
+      title={reviewMode ? "콘텐츠 승인" : "학습 미션 조립"}
+      description={reviewMode ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
     >
       <div className="max-w-[1080px]">
       {!reviewMode && <>
@@ -427,21 +427,22 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="rounded-lg border bg-white px-3 py-2">
             <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
           </select>
-          <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 기존 품질 점검을 진행합니다.</span>
+          <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 AI 검토를 진행합니다.</span>
         </label>
         <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
           onResume={async (id, jobId) => {
             const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
             if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 검수 화면에서 확인해 주세요."); return; }
+            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 콘텐츠 승인 화면에서 확인해 주세요."); return; }
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
       {reviewMode && <section className="mb-4 space-y-3 rounded-xl border bg-white p-4 text-sm">
-        <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) => step.label).join(" → ")}</p>
-        <p>미션은 편성 전에, 주차 수업자료는 미션 편성 후에 검수합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
+        <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) =>
+          `${step.key === "claude" || step.key === "adjudication" ? "(선택) " : ""}${step.label}`).join(" → ")}</p>
+        <p>교수자는 미션을 편성 전에 감수하고 승인하며, 주차 수업자료는 미션 편성 후에 확인하고 승인합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
         <div className="flex flex-wrap gap-3">
-          <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 검수 →</Link>
+          <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 승인 →</Link>
           <Link className="text-muted-foreground underline" to="/admin/research-qa/final-review">과거 정식 생성 검토 기록</Link>
           {searchParams.get("scenarioId") && <Link className="underline" to="/admin/review">전체 미션 목록</Link>}
         </div>
@@ -502,16 +503,23 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             </div>
           </div>
 
-          <div className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
-            <h3 className="text-[13px] font-bold text-[#3D464D]">생성 기준</h3>
+          <details className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
+            <summary className="cursor-pointer text-[13px] font-bold text-[#3D464D]">고급 필터 (연구자용)
+              {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">필터 적용 중</span>}
+            </summary>
             <p className="mt-0.5 text-[11px] text-[#737069]">같은 생성 조건의 시나리오만 조립</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <CompactSel label="생성 run" value={fRun} onChange={setFRun}
-                opts={[["all", "전체"], ...runIds.map((id) => [id, id.length > 18 ? `${id.slice(0, 18)}…` : id] as [string, string])]} />
+                opts={[["all", "전체"], ...runIds.map((id) => {
+                  const label = id.length > 24 ? `${id.slice(0, 12)}…${id.slice(-8)}` : id;
+                  const duplicate = runIds.some(other => other !== id &&
+                    (other.length > 24 ? `${other.slice(0, 12)}…${other.slice(-8)}` : other) === label);
+                  return [id, duplicate ? id : label] as [string, string];
+                })]} />
               <CompactSel label="프롬프트 계열" value={fHash} onChange={setFHash}
                 opts={[["all", "전체"], ...hashes.map((h) => [h, h === "null" ? "legacy·없음" : `${h.slice(0, 10)}…`] as [string, string])]} />
             </div>
-          </div>
+          </details>
         </div>
       </section>
 
@@ -526,7 +534,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         <section className="mt-4 space-y-2">
           {reviewMode && <div className="space-y-2 rounded-xl border border-[#D8D3C4] bg-white p-4">
             <div className="flex flex-wrap items-center gap-3">
-              <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 검수 대기 미션 선택</Button>
+              <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 감수 대기 미션 선택</Button>
               <Button size="sm" variant="ghost" disabled={reviewQueue.active || !reviewSelection.size} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>
               <Button disabled={reviewQueue.active || !reviewSelection.size || Boolean(busy)} onClick={() => void startReviewPreparation(
                 filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
@@ -538,7 +546,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           </div>}
           <div className="flex items-baseline justify-between px-1">
             <div>
-              <h3 className="text-[15px] font-bold text-[#202B33]">{reviewMode ? "미션 검수 대기열" : "조립 큐"}</h3>
+              <h3 className="text-[15px] font-bold text-[#202B33]">{reviewMode ? "미션 감수 대기열" : "조립 큐"}</h3>
               <p className="mt-0.5 text-[11.5px] text-muted-foreground">선택한 조건의 시나리오 {filtered.length}개</p>
             </div>
             {filtered.length > LIST_CAP && !showAll && (

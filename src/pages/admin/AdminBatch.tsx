@@ -700,7 +700,7 @@ const AdminBatch = () => {
             </Button>
           </div>
           <p className="mt-1.5 max-w-[42rem] text-[11.5px] text-muted-foreground">
-            중단된 배치는 현재 ID로 미완료 셀만 재개합니다. 검수 탈락 셀을 교체할 때만 새 ID로
+            중단된 배치는 현재 ID로 미완료 셀만 재개합니다. 점검에서 탈락한 셀을 교체할 때만 새 ID로
             생성합니다. 두 방식 모두 시나리오 생성 프롬프트와 해당 해시는 바뀌지 않습니다.
           </p>
           {selectedPlan.indexes.length > 0 && !selectedPlan.invalid && (
@@ -728,7 +728,7 @@ const AdminBatch = () => {
         )}
 
         <p className="mt-4 text-[12.5px] text-muted-foreground">
-          생성물은 <b>검수 대기</b>(needs_review · archived_only)로 저장됩니다. 승인 화면을 거쳐야
+          생성물은 <b>교수자 감수 대기</b>(needs_review · archived_only)로 저장됩니다. 승인 화면을 거쳐야
           학습자에게 노출됩니다.
         </p>
 

@@ -24,8 +24,8 @@ const STEPS: Array<{
   },
   {
     id: "release",
-    short: "교수자 최종 검수·공개",
-    title: "교수자 최종 검수와 학습자 공개",
+    short: "교수자 최종 승인",
+    title: "교수자 최종 승인과 학습자 공개",
     purpose: "자동 점검 결과를 확인한 교수자가 수업 사용 여부와 학습자 공개를 최종 결정합니다.",
     owner: "교수자",
     done: "수업에서 사용할 승인 학습 콘텐츠",
@@ -47,7 +47,7 @@ export const ResearchWorkflowGuide = ({ current }: { current: ResearchStep | "ov
           <p className="text-xs font-semibold tracking-wide text-[#756F64]">학습 콘텐츠 품질관리 2단계</p>
           <h2 className="mt-1 text-lg font-semibold">{active ? `현재 ${activeIndex + 1}단계 · ${active.title}` : "자동 점검부터 교수자 공개 결정까지"}</h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
-            {active?.purpose ?? "자동 품질 점검으로 오류 후보를 찾고, 교수자가 최종 검수한 학습 콘텐츠만 수업에 사용합니다."}
+            {active?.purpose ?? "자동 품질 점검으로 오류 후보를 찾고, 교수자가 감수한 뒤 최종 승인한 학습 콘텐츠만 수업에 사용합니다."}
           </p>
         </div>
         {active && (

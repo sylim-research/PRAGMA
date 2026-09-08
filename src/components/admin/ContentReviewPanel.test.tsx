@@ -56,7 +56,7 @@ describe("professor finding decisions", () => {
     inspection.run!.adjudication = null;
     inspection.models.claude = null;
     showPanel();
-    const approve = await screen.findByRole("button", { name: "교수자 승인·확정" });
+    const approve = await screen.findByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
     fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
@@ -69,31 +69,31 @@ describe("professor finding decisions", () => {
   it.each(["revision_required", "defer"] as const)("preserves rejected Claude findings and saves %s without approval", async (decision) => {
     showPanel();
     await enterDecision(decision);
-    expect(screen.getByText("Claude · 초대의 선택권 확인")).toBeInTheDocument();
-    expect(screen.getByText(/OpenAI · 기각/)).toBeInTheDocument();
+    expect(screen.getByText("AI 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.getByText(/AI 재검토 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
-    expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
     expect(mocks.save).toHaveBeenCalledWith("review-1", "hash-current", [{ finding_id: "claude-1", decision, rationale_ko: rationale }]);
     fireEvent.click(screen.getByRole("checkbox"));
-    expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
   });
 
   it("requires saved clear decisions and then locks the approved decision", async () => {
     showPanel();
     await enterDecision("no_change");
-    expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
     expect(screen.getByRole("checkbox")).not.toBeChecked();
     fireEvent.click(screen.getByRole("checkbox"));
-    fireEvent.click(screen.getByRole("button", { name: "교수자 승인·확정" }));
+    fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     await screen.findByText("교수자 · 수정 없이 사용 가능");
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    expect(screen.getByText("Claude · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.getByText("AI 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
   });
 
   it("does not carry professor decisions into changed content", async () => {
@@ -106,7 +106,7 @@ describe("professor finding decisions", () => {
     await screen.findByText(/내용 또는 기준이 달라져 재검토가 필요합니다/);
     expect(screen.getByRole("button", { name: "규칙 검사 시작 · 무료" })).toBeEnabled();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "교수자 승인·확정" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "교수자 최종 승인" })).not.toBeInTheDocument();
     expect(mocks.save).not.toHaveBeenCalled();
     expect(mocks.approve).not.toHaveBeenCalled();
   });
@@ -117,14 +117,18 @@ describe("professor finding decisions", () => {
     inspection.run!.adjudication!.result.decisions = [];
     showPanel();
     fireEvent.change(await screen.findByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
+    // Display labels change, while historical model output remains verbatim.
+    expect(screen.getByText("중대 지적")).toBeInTheDocument();
+    expect(screen.getByText("지적 없음")).toBeInTheDocument();
+    expect(screen.getAllByText(/보고된 문제 항목 없음/).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
-    expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
-    fireEvent.change(screen.getByRole("textbox", { name: "OpenAI 중대 지적 사용 근거" }), { target: { value: rationale } });
-    expect(screen.getByRole("button", { name: "교수자 승인·확정" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("checkbox", { name: /OpenAI 중대 지적을 검토했으며/ }));
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
+    fireEvent.change(screen.getByRole("textbox", { name: "AI 검토의 중대 문제 항목 사용 근거" }), { target: { value: rationale } });
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("checkbox", { name: /AI 검토의 중대 문제 항목을 확인했으며/ }));
     fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
-    fireEvent.click(screen.getByRole("button", { name: "교수자 승인·확정" }));
+    fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
-    expect(await screen.findByText(`OpenAI 중대 지적 사용 근거: ${rationale}`)).toBeVisible();
+    expect(await screen.findByText(`AI 검토의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
   });
 });

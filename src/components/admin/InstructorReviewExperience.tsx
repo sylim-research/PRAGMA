@@ -90,12 +90,12 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           {error && <p role="alert" className="text-xs text-red-800">{error}</p>}
           {(current?.status === "revision_required" || current?.status === "defer") && <p className="text-xs text-amber-800">현재 미션의 최종 승인을 보류합니다. 아래 원본 수정 도구에서 수정하거나, 판단을 재검토하고 확인으로 바꾸세요.</p>}
         </div>
-        <details className="rounded-xl border bg-white p-3"><summary className="cursor-pointer text-sm font-semibold">이 부분의 AI·규칙 지적 {findings.length}건</summary>
-          {!findings.length && <p className="mt-2 text-xs">현재 저장된 지적이 없습니다. AI 검토 완료 여부는 단계별 결과에서 확인하세요.</p>}
+        <details className="rounded-xl border bg-white p-3"><summary className="cursor-pointer text-sm font-semibold">이 부분의 AI·규칙 문제 항목 {findings.length}건</summary>
+          {!findings.length && <p className="mt-2 text-xs">현재 저장된 문제 항목이 없습니다. AI 검토 완료 여부는 단계별 결과에서 확인하세요.</p>}
           {findings.map((finding) => {
             const adjudication = finding.provider === "Claude" ? inspection.run?.adjudication?.result.decisions.find((entry) => entry.finding_id === finding.id) : null;
             return <div key={`${finding.provider}-${finding.id}`} className="mt-3 space-y-1 border-t pt-2 text-xs">
-              <p className="font-bold">{finding.provider} · {finding.issue_ko}</p><p>{finding.reason_ko}</p>
+              <p className="font-bold">{finding.provider === "Claude" ? "AI 독립 검토" : finding.provider === "OpenAI" ? "AI 검토" : "규칙 검사"} · {finding.issue_ko}</p><p>{finding.reason_ko}</p>
               {finding.quote && <blockquote className="border-l-2 pl-2">{finding.quote}</blockquote>}<p>제안: {finding.suggestion_ko}</p>
               {adjudication && <p>재검토: {adjudication.rationale_ko}</p>}
             </div>;

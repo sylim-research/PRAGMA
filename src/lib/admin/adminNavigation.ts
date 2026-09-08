@@ -34,7 +34,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
       { to: "/admin/assembly", label: "학습 미션 조립" },
       {
         to: "/admin/review",
-        label: "콘텐츠 검수·확정",
+        label: "콘텐츠 승인",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
     ],
@@ -45,7 +45,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
       { to: "/admin/composer", label: "15주 수업 편성·강의계획서" },
       { to: "/admin/package", label: "주차별 수업 운영·교실 화면" },
       { to: "/admin/class-responses", label: "실시간 학급 응답" },
-      { to: "/admin/learners", label: "학습자 승인·관리" },
+      { to: "/admin/learners", label: "학습자 관리" },
       { to: "/admin/data-backup", label: "수업 데이터 백업·복원" },
     ],
   },
@@ -58,19 +58,19 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   },
 ] as const;
 
-const PRIORITY_LABELS = [
-  "콘텐츠 검수·확정",
-  "주차별 수업 운영·교실 화면",
-  "학습자 승인·관리",
-  "수업 데이터 백업·복원",
-  "학습 수행 기록",
-  "연구 데이터 내보내기",
+const PRIORITY_PATHS = [
+  "/admin/review",
+  "/admin/package",
+  "/admin/learners",
+  "/admin/data-backup",
+  "/admin/decision-traces",
+  "/admin/export",
 ] as const;
 
 const ALL_ADMIN_NAV_ITEMS = ADMIN_NAV_GROUPS.flatMap((group) => group.items);
-export const ADMIN_PRIORITY_LINKS = PRIORITY_LABELS.map((label) => {
-  const item = ALL_ADMIN_NAV_ITEMS.find((candidate) => candidate.label === label);
-  if (!item) throw new Error(`Missing required admin navigation item: ${label}`);
+export const ADMIN_PRIORITY_LINKS = PRIORITY_PATHS.map((path) => {
+  const item = ALL_ADMIN_NAV_ITEMS.find((candidate) => candidate.to === path);
+  if (!item) throw new Error(`Missing required admin navigation item: ${path}`);
   return item;
 });
 
