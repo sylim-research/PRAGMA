@@ -44,7 +44,7 @@ export interface ItemChoiceGroup {
 export interface ItemPattern {
   itemId: number;
   title: string;
-  /** 학습자에게 보였던 대상 표현(짧은 미리보기). multi_judge는 null. */
+  /** 학습자에게 보였던 대상 표현. multi_judge는 null. */
   targetPreview: string | null;
   groups: ItemChoiceGroup[];
 }
@@ -123,9 +123,6 @@ export function parseJudgmentEnvelope(raw: unknown): { responses: TraceLike[]; d
     : [];
   return { responses, dissent: Boolean(value.learner_dissent) };
 }
-
-const truncate = (text: string, max = 42) =>
-  text.length > max ? `${text.slice(0, max)}…` : text;
 
 function bandLabels(mission: MissionRuntime | null): Map<string, string> {
   const labels = new Map<string, string>();
@@ -219,7 +216,7 @@ export function aggregateMissionResponses(
           tally(
             groupOf(itemId, itemType, "고른 수정안"),
             String(index),
-            text ? `수정안 ${index + 1} · ${truncate(text)}` : `수정안 ${index + 1}`,
+            text ? `수정안 ${index + 1} · ${text}` : `수정안 ${index + 1}`,
           );
         }
       }
@@ -227,12 +224,12 @@ export function aggregateMissionResponses(
         const reasons = Array.isArray(meta?.reasons) ? (meta.reasons as Array<{ id?: unknown; text_ko?: unknown }>) : [];
         const reason = reasons.find((candidate) => candidate.id === trace.reason_id);
         const text = typeof reason?.text_ko === "string" ? reason.text_ko : null;
-        tally(groupOf(itemId, itemType, "고른 이유"), trace.reason_id, text ? truncate(text, 60) : trace.reason_id);
+        tally(groupOf(itemId, itemType, "고른 이유"), trace.reason_id, text || trace.reason_id);
       }
       const candidates = Array.isArray(meta?.candidates) ? (meta.candidates as Array<{ text?: unknown }>) : [];
       const candidateLabel = (index: number) => {
         const text = typeof candidates[index]?.text === "string" ? (candidates[index].text as string) : null;
-        return text ? `초안 ${index + 1} · ${truncate(text, 30)}` : `초안 ${index + 1}`;
+        return text ? `초안 ${index + 1} · ${text}` : `초안 ${index + 1}`;
       };
       if (typeof trace.best_candidate_index === "number") {
         tally(groupOf(itemId, itemType, "BEST로 고른 초안"), String(trace.best_candidate_index), candidateLabel(trace.best_candidate_index));
@@ -251,7 +248,7 @@ export function aggregateMissionResponses(
       return {
         itemId,
         title: `판단 ${itemId} · ${ITEM_TITLES[itemType] ?? itemType}`,
-        targetPreview: target ? truncate(target, 60) : null,
+        targetPreview: target,
         groups: [...groups.entries()]
           .map(([heading, counts]) => toGroup(heading, counts))
           .filter((group): group is ItemChoiceGroup => group !== null),
@@ -301,17 +298,17 @@ export function missionPatternFromCounts({
       const index = Number(row.choice_key);
       const corrections = Array.isArray(meta?.corrections) ? meta.corrections as Array<{ text?: unknown }> : [];
       const text = typeof corrections[index]?.text === "string" ? corrections[index].text as string : null;
-      return text ? `수정안 ${index + 1} · ${truncate(text)}` : `수정안 ${index + 1}`;
+      return text ? `수정안 ${index + 1} · ${text}` : `수정안 ${index + 1}`;
     }
     if (row.axis === "reason") {
       const reasons = Array.isArray(meta?.reasons) ? meta.reasons as Array<{ id?: unknown; text_ko?: unknown }> : [];
       const reason = reasons.find((candidate) => candidate.id === row.choice_key);
-      return typeof reason?.text_ko === "string" ? truncate(reason.text_ko, 60) : row.choice_key;
+      return typeof reason?.text_ko === "string" ? reason.text_ko : row.choice_key;
     }
     const index = Number(row.choice_key);
     const candidates = Array.isArray(meta?.candidates) ? meta.candidates as Array<{ text?: unknown }> : [];
     const text = typeof candidates[index]?.text === "string" ? candidates[index].text as string : null;
-    return text ? `초안 ${index + 1} · ${truncate(text, 30)}` : `초안 ${index + 1}`;
+    return text ? `초안 ${index + 1} · ${text}` : `초안 ${index + 1}`;
   };
 
   const itemIds = [...new Set(counts.map((row) => row.item_id))].sort((a, b) => a - b);
@@ -331,7 +328,7 @@ export function missionPatternFromCounts({
     return {
       itemId,
       title: `판단 ${itemId} · ${ITEM_TITLES[itemType] ?? itemType}`,
-      targetPreview: target ? truncate(target, 60) : null,
+      targetPreview: target,
       groups,
     };
   });

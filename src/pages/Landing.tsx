@@ -153,14 +153,13 @@ const Landing = () => {
       </main>
 
       <footer className="mx-auto w-full max-w-3xl px-6 pb-6">
-        <div className="space-y-1 border-t border-[#E6E1D2] pt-3 text-center leading-relaxed">
-          <p className="break-keep text-[12.5px] text-[#5C6A7A]">
-            <strong className="font-semibold text-[#3E4C57]">PRAGMA · AI 기반 한·중 통번역 학습</strong>
-            {" | "}
-            <span className="inline-block">한국외국어대학교 중어중문학과 · 임소영</span>
-          </p>
-          <p className="text-[11px] text-[#6B7280]">© 2026 임소영. All rights reserved.</p>
-        </div>
+        <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
+          <strong className="font-semibold text-[#3E4C57]">PRAGMA · AI 기반 한·중 통번역 학습</strong>
+          {" | "}
+          <span className="inline-block">한국외국어대학교 중어중문학과 · 임소영</span>
+          {" | "}
+          <span className="inline-block text-[11px] text-[#6B7280]">© 2026 임소영. All rights reserved.</span>
+        </p>
       </footer>
     </div>
   );
