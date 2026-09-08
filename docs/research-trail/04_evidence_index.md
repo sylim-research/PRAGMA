@@ -299,3 +299,6 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 후속 통합: main `5886310b` 기반 `c8b13ffa`에서 typecheck·전체 865 tests/9 skip·production build 통과.
   외부 코드 전송의 자동 승인 검토에서 push/PR·Claude 검토 호출이 거부되어 운영 반영은 대기 중이다.
   상세 범위는 같은 dev-log의 배포 준비 후속 절을 따른다.
+- 이후 사용자가 두 전송을 명시 승인하여 [PR #114](https://github.com/sylim-research/PRAGMA/pull/114)를 생성했다.
+  Claude의 독립 검토 3개 검증 권고를 테스트로 보완하고 실제 SQL 15·Edge 7건이 통과했다.
+  검토 원문은 위 로컬 증거 폴더 `claude-independent-review.md`, 수용·기각 판단은 같은 dev-log에 남겼다.

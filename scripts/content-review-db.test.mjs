@@ -111,16 +111,20 @@ before(async () => {
 });
 after(async () => { await db.close(); });
 
-async function teachingFixture(weekNo = 7) {
+async function teachingFixture(weekNo = 7, count = 1) {
   const m = await mission(); const r = await review(m.id); await finalize(m, r);
+  const missions = [m];
+  for (let i = 1; i < count; i++) { const next = await mission(); await finalize(next, await review(next.id)); missions.push(next); }
   const courseId = randomUUID();
   await db.query("insert into curriculum_outlines values ($1,'teaching fixture','published')", [courseId]);
   await db.query("insert into curriculum_weeks(outline_id,week_no,title) values ($1,2,'요청'),($1,$2,'메타화용 토론')", [courseId,weekNo]);
-  await db.query("insert into curriculum_week_scenarios values ($1,2,$2,0,'required')", [courseId,m.id]);
-  const config = { missionIds: [m.id], extraText: '', extraRef: '' };
+  for (const [index, item] of missions.entries()) await db.query("insert into curriculum_week_scenarios values ($1,$2,$3,$4,'required')",
+    [courseId, [7,14].includes(weekNo) ? 2 : weekNo, item.id, index]);
+  const config = { missionIds: missions.map(item => item.id), extraText: '', extraRef: '' };
   const context = () => admin(() => scalar('select get_teaching_material_context($1,$2,$3)',[courseId,weekNo,config]));
   const source = await context();
-  const content = { sections: ['review','comparison','discussion','reflection'].map((key) => ({ key,title:key,paragraphs:['public'],items:[],source_ids:['M1'] })),
+  const keys = [7,14].includes(weekNo) ? ['review','comparison','discussion','reflection'] : ['concept','comparison','practice','faq'];
+  const content = { sections: keys.map((key) => ({ key,title:key,paragraphs:['public'],items:[],source_ids:['M1'] })),
     instructor_notes: [{ title:'teacher',body:'PRIVATE_TEACHING_NOTE',source_ids:['M1'] }] };
   const save = (expectedRevision, sourceHash = source.source_hash) => asRole('service_role', () => scalar(
     'select save_teaching_material($1,$2,$3,$4,$5,$6,$7,$8,$9)',
@@ -173,6 +177,30 @@ test('changed prior-week source prevents saving and marks the existing discussio
   assert.equal(state.current,false); assert.equal(state.draft.revision,1);
   const w = await review(f.courseId,'weekly_material',false,f.weekNo);
   await assert.rejects(approve(w),/Teaching source changed/);
+});
+
+test('lesson pair can be approved and edited revisions require a fresh approval', async () => {
+  const f = await teachingFixture(5, 2);
+  assert.equal(f.source.references.length, 2);
+  assert.equal((await f.save(0)).kind, 'lesson');
+  const read = () => learner(() => scalar('select get_approved_weekly_material($1,$2)', [f.courseId,f.weekNo]));
+  const first = await review(f.courseId,'weekly_material',false,f.weekNo); await approve(first);
+  assert.ok(await read()); assert.ok(!JSON.stringify(await read()).includes('PRIVATE'));
+  await f.save(1); assert.equal(await read(), null);
+  const second = await review(f.courseId,'weekly_material',false,f.weekNo); await approve(second);
+  assert.equal((await read()).reviewId, second.id);
+});
+
+test('six discussion sources persist while duplicate IDs and oversized source fields are rejected', async () => {
+  const f = await teachingFixture(7, 6);
+  assert.equal(f.source.references.length, 6); await f.save(0);
+  f.config.missionIds[5] = f.config.missionIds[0];
+  const duplicate = await f.context();
+  await assert.rejects(f.save(1, duplicate.source_hash), /Choose current assigned reviewed missions/);
+  f.config.extraText = 'a'.repeat(12000); f.config.extraRef = 'b'.repeat(500);
+  await f.context();
+  f.config.extraText += 'a'; await assert.rejects(f.context(), /Invalid source selection/);
+  f.config.extraText = 'a'; f.config.extraRef += 'b'; await assert.rejects(f.context(), /Invalid source selection/);
 });
 
 const experience = (status = 'checked') => ({ version: 'instructor_experience_v1', active_seconds: 45,
