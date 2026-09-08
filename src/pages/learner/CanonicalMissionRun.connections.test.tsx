@@ -10,6 +10,45 @@ import { CompletionActions, CompletionRecord, DctFeedbackView, MissionDissentPan
 afterEach(() => vi.useRealTimers());
 
 describe("CanonicalMissionRun completion connections", () => {
+  it("preserves the actual feedback category when no phrase is highlighted", () => {
+    render(<CompletionRecord label="번역 실습" response={{
+      first: "请帮我收一下快递。", revised: "您方便帮我收一下快递吗？", reflected: true,
+      evaluation: {
+        available: true, highlights: [], feedback: "원문의 선택 여지를 다시 살펴보세요.",
+        headline: "선택 여지 확인", body: "가능 여부를 묻는 표현을 검토하세요.",
+        example: "您方便帮我收一下快递吗？", takeaway: "상대의 선택 여지 확인",
+        criteria: [
+          { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "핵심 내용 유지" },
+          { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "문법 안정" },
+          { key: "pragmatics", label: "화용 적절성", question: "", level: "recommend", body: "선택 여지 확인" },
+        ],
+      },
+    }} />);
+    expect(screen.getByText("다시 살펴본 기준: 화용 적절성")).toBeInTheDocument();
+    expect(screen.queryByText(/원문의 핵심 내용이 빠졌습니다/)).not.toBeInTheDocument();
+  });
+
+  it("offers save-only retry after failure and prevents navigation while saving", () => {
+    const onRestart = vi.fn();
+    const onRetrySave = vi.fn();
+    const view = render(<MemoryRouter><CompletionActions runtime saveState="error" onRestart={onRestart} onRetrySave={onRetrySave} /></MemoryRouter>);
+    expect(screen.getByRole("alert")).toHaveTextContent("답안은 이 화면에 남아");
+    fireEvent.click(screen.getByRole("button", { name: "학습 기록 저장 다시 시도" }));
+    expect(onRetrySave).toHaveBeenCalledTimes(1);
+    expect(onRestart).not.toHaveBeenCalled();
+
+    view.rerender(<MemoryRouter><CompletionActions runtime saveState="saving" onRestart={onRestart} onRetrySave={onRetrySave} /></MemoryRouter>);
+    expect(screen.queryByRole("button", { name: "학습 기록 저장 다시 시도" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "처음부터 다시 보기" })).toBeDisabled();
+    const recordsLink = screen.getByRole("link", { name: "나의 학습 기록 보기" });
+    expect(recordsLink).toHaveAttribute("aria-disabled", "true");
+    expect(fireEvent.click(recordsLink)).toBe(false);
+
+    view.rerender(<MemoryRouter><CompletionActions runtime saveState="saved" onRestart={onRestart} onRetrySave={onRetrySave} /></MemoryRouter>);
+    expect(screen.getByRole("status")).toHaveTextContent("학습 기록에 저장되었습니다.");
+    expect(screen.getByRole("link", { name: "나의 학습 기록 보기" })).not.toHaveAttribute("aria-disabled");
+  });
+
   it("collects a learner challenge while preserving the AI reference judgment", () => {
     const onSubmit = vi.fn();
     render(<MissionDissentPanel onSubmit={onSubmit} />);

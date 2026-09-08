@@ -1,10 +1,14 @@
 // @vitest-environment jsdom
 
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SAMPLE_MISSION_V5, SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
+import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
+import { requestFeedback } from "@/lib/mission/missionFeedback";
+import { saveMissionAttempt } from "@/lib/mission/missionLog";
+import { appendMissionEvent } from "@/lib/mission/missionEvents";
 
 const scenarioId = "86d738b0-1891-4bfe-9b12-f8643ebbb45f";
 const { fetchMissionByScenario } = vi.hoisted(() => ({
@@ -18,8 +22,14 @@ vi.mock("@/lib/mission/missionDb", async (importOriginal) => {
 
 vi.mock("@/lib/mission/missionFeedback", () => ({ requestFeedback: vi.fn() }));
 vi.mock("@/lib/mission/missionLog", () => ({ saveMissionAttempt: vi.fn() }));
+vi.mock("@/lib/mission/missionEvents", async (importOriginal) => ({
+  ...await importOriginal<typeof import("@/lib/mission/missionEvents")>(),
+  appendMissionEvent: vi.fn().mockResolvedValue({ ok: true, id: "event" }),
+}));
+vi.mock("@/components/learner/PeerResponsesPanel", () => ({ PeerResponsesPanel: () => null }));
 
 import CanonicalMissionRun, {
+  CanonicalMissionRunner,
   buildRuntimeMpjTraces,
   feedbackNeedsRevision,
   primaryFeedbackCriterion,
@@ -28,6 +38,7 @@ import CanonicalMissionRun, {
 
 describe("CanonicalMissionRun live CTA route", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     window.scrollTo = vi.fn();
     window.history.replaceState({}, "", "/");
     fetchMissionByScenario.mockResolvedValue({
@@ -39,6 +50,48 @@ describe("CanonicalMissionRun live CTA route", () => {
       direction: "ko_zh",
       mission: SAMPLE_MISSION_V5,
     });
+  });
+
+  it.each(["error", "rejection"])("retries a %s without repeating the mission, feedback, or completion event", async (failure) => {
+    const runtime = {
+      scenario_id: scenarioId, speech_act: "request" as const, learner_level: "intermediate" as const,
+      mission_status: "reviewed", release_gate_mode: "legacy_reviewed" as const,
+      direction: "ko_zh" as const, mission: SAMPLE_MISSION_V5_NATIVE,
+    };
+    const courseContext = {
+      courseId: "915fec24-cc38-4b00-a2a0-c3628abcd3f7", weekNo: 2,
+      assignmentId: "1b7b468e-d47b-46ab-ba16-642ad8be5bc5",
+    };
+    // Seed earlier judgments through the existing development helper; exercise the real DCT/save UI.
+    window.history.replaceState({}, "", "/?step=A-DCT");
+    vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
+    const save = vi.mocked(saveMissionAttempt);
+    if (failure === "error") save.mockResolvedValueOnce({ ok: false, reason: "error" });
+    else save.mockRejectedValueOnce(new Error("connection lost"));
+    let finishSave!: (result: { ok: true; id: string }) => void;
+    save.mockImplementationOnce(() => new Promise((resolve) => { finishSave = resolve; }));
+    render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} courseContext={courseContext} isDevPreview /></MemoryRouter>);
+    const first = "请问方便把报告的原文件再发给我吗？";
+    fireEvent.change(screen.getByPlaceholderText("중국어 번역을 작성하세요."), { target: { value: first } });
+    fireEvent.click(screen.getByRole("button", { name: "번역 제출하기" }));
+    fireEvent.click(await screen.findByRole("button", { name: "이 번역으로 확정하기" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("학습 기록을 저장하지 못했습니다");
+    expect(save).toHaveBeenCalledTimes(1);
+    const [originalInput, originalId] = save.mock.calls[0];
+    expect(originalInput).toMatchObject({ firstResponse: first, revisedResponse: first, courseContext });
+    expect(originalInput.mpjResponses).toHaveLength(5);
+    expect(originalId).toMatch(/^[0-9a-f-]{36}$/);
+    expect(vi.mocked(appendMissionEvent).mock.calls.filter(([event]) => event.eventType === "mission_completed")).toHaveLength(0);
+    fireEvent.click(screen.getByRole("button", { name: "학습 기록 저장 다시 시도" }));
+    expect(screen.getByRole("button", { name: "처음부터 다시 보기" })).toBeDisabled();
+    expect(save).toHaveBeenCalledTimes(2);
+    expect(save.mock.calls[1][0]).toBe(originalInput);
+    expect(save.mock.calls[1][1]).toBe(originalId);
+    await act(async () => finishSave({ ok: true, id: originalId! }));
+    await waitFor(() => expect(screen.getByText("학습 기록에 저장되었습니다.")).toBeInTheDocument());
+    expect(requestFeedback).toHaveBeenCalledTimes(1);
+    expect(vi.mocked(appendMissionEvent).mock.calls.filter(([event]) => event.eventType === "mission_completed")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: "나의 학습 기록 보기" })).toHaveAttribute("href", "/learner/records#correction-notes");
   });
 
   it("shows the live scenario intro before entering the five-judgment screen", async () => {
