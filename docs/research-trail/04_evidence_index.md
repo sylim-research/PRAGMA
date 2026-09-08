@@ -302,3 +302,12 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 이후 사용자가 두 전송을 명시 승인하여 [PR #114](https://github.com/sylim-research/PRAGMA/pull/114)를 생성했다.
   Claude의 독립 검토 3개 검증 권고를 테스트로 보완하고 실제 SQL 15·Edge 7건이 통과했다.
   검토 원문은 위 로컬 증거 폴더 `claude-independent-review.md`, 수용·기각 판단은 같은 dev-log에 남겼다.
+
+## EVD-20260909-01 · 소스 기반 교수자 저작 검증
+
+- DEC-20260909-01. `docs/dev-log/2026-09-09-source-teaching-studio.md`에 구현·검증·운영 적용 경계를 기록했다.
+- 재실행: `scripts/manual-checks/source-teaching-smoke.mjs`, `src/lib/curriculum/sourceTeaching.test.ts`와
+  기존 생성·승인 검사. 실제 PDF 본문 추출, 소스 확인·인용 대조,
+  미션 없는 초안, 수정·복원과 기존 승인 경계를 확인한다.
+- 합성 입력·대체 HTTP와 격리 PostgreSQL 검증이다. 실제 모델의 내용 품질이나 교수자 감수·수업 효과를 입증하지 않는다.
+  DB·Edge·프런트 운영 적용과 실제 생성 검증은 위 dev-log의 후속 상태를 따른다.

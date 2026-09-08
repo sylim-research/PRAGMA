@@ -6,6 +6,7 @@ import { readFile } from 'node:fs/promises';
 import { after, before, test } from 'node:test';
 import { PGlite } from '@electric-sql/pglite';
 import { pgcrypto } from '@electric-sql/pglite/contrib/pgcrypto';
+import { buildContentReviewDomain } from '../supabase/functions/content-review/domain.generated.mjs';
 
 const adminId = '10000000-0000-4000-8000-000000000001';
 const learnerId = '10000000-0000-4000-8000-000000000002';
@@ -71,6 +72,7 @@ const payload = (m, r, extra = {}) => ({ mission_content: finalized(m.content), 
 const finalize = (m, r, extra = {}) => admin(() => scalar('select finalize_reviewed_mission($1, $2)', [m.id, payload(m, r, extra)]));
 const approve = (r, override = null) => admin(() => scalar('select approve_content_review($1, $2, $3, $4)', [r.id, hash, rationale, override]));
 let legacy;
+let preUpgradeTeaching;
 
 before(async () => {
   await db.exec(`CREATE SCHEMA extensions; CREATE EXTENSION pgcrypto WITH SCHEMA extensions;
@@ -90,7 +92,7 @@ before(async () => {
     CREATE POLICY admin_scenarios ON scenarios TO authenticated USING (is_admin()) WITH CHECK (is_admin());
     GRANT ALL ON scenarios TO authenticated, service_role;
     CREATE TABLE curriculum_outlines (id uuid PRIMARY KEY, title text, status text);
-    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, type text DEFAULT 'regular', PRIMARY KEY (outline_id, week_no));
+    CREATE TABLE curriculum_weeks (outline_id uuid REFERENCES curriculum_outlines(id), week_no int, title text, type text DEFAULT 'regular', speech_act text, can_do jsonb, PRIMARY KEY (outline_id, week_no));
     CREATE TABLE curriculum_week_scenarios (outline_id uuid REFERENCES curriculum_outlines(id), week_no int,
       scenario_id uuid REFERENCES scenarios(scenario_id), position int, slot_role text);
     GRANT SELECT ON curriculum_outlines, curriculum_weeks, curriculum_week_scenarios TO authenticated;`);
@@ -108,8 +110,53 @@ before(async () => {
   await db.exec(await sqlFile('20260905150000_instructor_review_experience.sql'));
   await db.exec(await sqlFile('20260906100000_focused_content_review.sql'));
   await db.exec(await sqlFile('20260908210000_weekly_teaching_materials.sql'));
+  const existing = await teachingFixture();
+  const existingDraft = await existing.save(0);
+  preUpgradeTeaching = { courseId:existing.courseId, weekNo:existing.weekNo, draft:existingDraft,
+    reviewSource:await scalar("select content_review_source_internal('weekly_material',$1,$2)",[existing.courseId,existing.weekNo]) };
+  await db.exec(await sqlFile('20260909010000_source_teaching_studio.sql'));
 });
 after(async () => { await db.close(); });
+
+test('v2 migration preserves the existing v1 draft, current state and review hash', async () => {
+  const {courseId,weekNo,draft,reviewSource}=preUpgradeTeaching;
+  const current=await admin(()=>scalar('select get_teaching_material_state($1,$2)',[courseId,weekNo]));
+  assert.equal(current.current,true);assert.deepEqual(current.draft,draft);
+  assert.deepEqual(await scalar("select content_review_source_internal('weekly_material',$1,$2)",[courseId,weekNo]),reviewSource);
+});
+
+test('source-only drafts persist without assigned missions; source and curriculum changes invalidate their revision', async () => {
+  const id=randomUUID();
+  await db.query("insert into curriculum_outlines values ($1,'source fixture','published')",[id]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title,speech_act,can_do) values ($1,2,'요청','request','[\"요청 근거\"]'),($1,7,'토론',null,'[\"근거 비교\"]')",[id]);
+  const config={workflow:'source',missionIds:[],extraText:'',extraRef:'',outputKind:'discussion',focus:'선택권',activityMode:'pair',
+    sources:[{id:'S1',label:'자료',ref:'검증 출처',kind:'text',text:'PRIVATE_SOURCE 본문',confirmed:true,
+      extraction:{method:'manual_text',detail:'직접 입력',extractedCharacters:17,warnings:[]}}]};
+  const context=await admin(()=>scalar('select get_teaching_material_context($1,2,$2)',[id,config]));
+  assert.equal(context.references.length,0);assert.equal(context.base.scope_weeks[0].speech_act,'request');
+  const content={sections:['review','comparison','discussion','reflection'].map(key=>({key,title:key,paragraphs:['public'],items:[],source_ids:['S1'],evidence:[{source_id:'S1',quote:'본문'}]})),
+    instructor_notes:[{title:'teacher',body:'PRIVATE_NOTES',source_ids:['S1']}]};
+  const save=(revision,sourceHash=context.source_hash)=>asRole('service_role',()=>scalar('select save_teaching_material($1,2,$2,$3,$4,$5,$6,$7,$8)',
+    [id,revision,sourceHash,config,config.sources,content,{prompt_version:'source_teaching_v2',response_id:'fixture',model:'fixture',input_hash:hash},adminId]));
+  const draft=await save(0);assert.equal(draft.kind,'discussion');assert.equal(draft.revision,1);
+  assert.equal((await admin(()=>scalar('select get_teaching_material_state($1,2)',[id]))).current,true);
+  const checked=buildContentReviewDomain('weekly_material',{...context.base,teaching_draft:draft,teaching_current:true,teaching_references:[]});
+  assert.equal(checked.rules.verdict,'fail');
+  assert.ok(checked.rules.findings.some(f=>f.issue_ko.includes('미션 2개')));
+  const blockedReview=await review(id,'weekly_material',false,2);
+  await db.query('update content_review_runs set rules=$2 where id=$1',[blockedReview.id,checked.rules]);
+  await assert.rejects(approve(blockedReview),/required quality evidence/);
+  assert.equal(await learner(()=>scalar('select get_approved_weekly_material($1,2)',[id])),null);
+  await learner(async()=>{assert.equal(await scalar('select count(*) from weekly_teaching_materials where outline_id=$1',[id]),0);
+    await assert.rejects(scalar('select get_teaching_material_state($1,2)',[id]),/Admin required/);});
+  await assert.rejects(save(0),/Draft changed/);
+  config.sources[0].text+=' 변경';await assert.rejects(save(1),/Source changed/);config.sources[0].text='PRIVATE_SOURCE 본문';
+  const discussion=await admin(()=>scalar('select get_teaching_material_context($1,7,$2)',[id,config]));
+  await db.query("update curriculum_weeks set can_do='[\"수정한 목표\"]' where outline_id=$1 and week_no=2",[id]);
+  assert.equal((await admin(()=>scalar('select get_teaching_material_state($1,2)',[id]))).current,false);
+  assert.notEqual((await admin(()=>scalar('select get_teaching_material_context($1,7,$2)',[id,config]))).source_hash,discussion.source_hash);
+  config.sources[0].confirmed=false;await assert.rejects(admin(()=>scalar('select get_teaching_material_context($1,2,$2)',[id,config])),/Confirm source/);
+});
 
 async function teachingFixture(weekNo = 7, count = 1) {
   const m = await mission(); const r = await review(m.id); await finalize(m, r);

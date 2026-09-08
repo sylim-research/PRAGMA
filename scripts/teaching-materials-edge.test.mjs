@@ -126,3 +126,20 @@ test('oversized extra source fields fail before any paid call or save', async ()
   }
   assert.equal(fetches.length, 0); assert.equal(saves.length, 0);
 });
+
+test('source-only generation binds week goals and exact quotations before saving', async () => {
+  context.references=[];context.base.week={...context.base.week,week_no:2,speech_act:'request'};
+  const config={workflow:'source',missionIds:[],extraText:'',extraRef:'',outputKind:'discussion',focus:'선택권',activityMode:'pair',
+    sources:[{id:'S1',label:'원자료',ref:'수업 검증 본문',kind:'text',text:'요청에서 상대방의 선택권을 확인합니다.',confirmed:true,
+      extraction:{method:'manual_text',detail:'직접 입력',extractedCharacters:25,warnings:[]}}]};
+  const body={...input('preview'),weekNo:2,config};
+  const preview=await call(body);assert.equal(preview.status,200);assert.equal(preview.body.promptVersion,'source_teaching_v2');
+  assert.deepEqual(JSON.parse(preview.body.user).context.speech_acts,['request']);
+  const result=structuredClone(content);result.sections.forEach(s=>{s.source_ids=['S1'];s.evidence=[{source_id:'S1',quote:'상대방의 선택권'}];});result.instructor_notes[0].source_ids=['S1'];
+  modelResult.choices[0].message.content=JSON.stringify(result);
+  const generated=await call({...body,action:'generate',inputHash:preview.body.inputHash});
+  assert.equal(generated.status,200);assert.equal(saves.length,1);assert.equal(saves[0].p_provenance.prompt_version,'source_teaching_v2');
+  const forged=structuredClone(result);forged.sections[0].evidence[0].quote='원문에 없는 인용';
+  assert.equal((await call({...body,action:'edit',expectedRevision:1,content:forged})).status,400);assert.equal(saves.length,1);
+  assert.equal((await call({...body,config:{...config,sources:[{...config.sources[0],confirmed:false}]},expectedRevision:1})).status,400);
+});

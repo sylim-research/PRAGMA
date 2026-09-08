@@ -3,7 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { prepareTeachingMaterial } from "../content-review/domain.generated.mjs";
 import { reviewHash } from "../_shared/contentReview.ts";
 import { buildOpenAIChatRequest, OPENAI_MODEL_ROUTES } from "../_shared/openaiRequestContract.ts";
-import { TEACHING_PROMPT_VERSION, teachingResponseFormat, validateTeachingContent, type TeachingConfig } from "../_shared/teachingMaterial.ts";
+import { TEACHING_PROMPT_VERSION, SOURCE_TEACHING_PROMPT_VERSION, teachingResponseFormat, validateTeachingContent, validateTeachingEvidence, type TeachingConfig } from "../_shared/teachingMaterial.ts";
 
 const headers = { ...corsHeaders, "Content-Type": "application/json", "Cache-Control": "no-store" };
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers });
@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const { data: admin, error: roleError } = await userDb.rpc("is_admin");
     if (roleError || admin !== true) return json({ error: "관리자만 자료를 생성할 수 있습니다." }, 403);
     const raw = await req.text();
-    if (raw.length > 100_000) return json({ error: "요청 한도를 초과했습니다." }, 413);
+    if (raw.length > 180_000) return json({ error: "요청 한도를 초과했습니다." }, 413);
     const body = JSON.parse(raw);
     const { action, courseId, weekNo, expectedRevision = 0 } = body;
     if (!["preview", "generate", "edit"].includes(action) || !uuid.test(courseId)
@@ -49,12 +49,14 @@ Deno.serve(async (req) => {
     }
     const context = await rpc("get_teaching_material_context", { p_outline_id: courseId, p_week_no: weekNo, p_config: config });
     const prepared = prepareTeachingMaterial(context, config);
+    const grounded = config.workflow === "source";
+    const promptVersion = grounded ? SOURCE_TEACHING_PROMPT_VERSION : TEACHING_PROMPT_VERSION;
     const model = OPENAI_MODEL_ROUTES.mission.primary;
     const request = buildOpenAIChatRequest({ model, ...prepared.prompt, temperature: 0.4, maxCompletionTokens: 7000,
-      responseFormat: teachingResponseFormat(prepared.kind, prepared.sources.map((source: { id: string }) => source.id)) });
-    const inputHash = await reviewHash({ version: TEACHING_PROMPT_VERSION, sourceHash: context.source_hash, request });
+      responseFormat: teachingResponseFormat(prepared.kind, prepared.sources.map((source: { id: string }) => source.id), grounded) });
+    const inputHash = await reviewHash({ version: promptVersion, sourceHash: context.source_hash, request });
     if (action === "preview") return json({ ...prepared.prompt, inputHash, sourceHash: context.source_hash,
-      model, promptVersion: TEACHING_PROMPT_VERSION, characters: prepared.prompt.system.length + prepared.prompt.user.length,
+      model, promptVersion, characters: prepared.prompt.system.length + prepared.prompt.user.length,
       sources: prepared.sources.map(({ id, label, text }: { id: string; label: string; text: string }) => ({ id, label, characters: text.length })) });
     let content; let provenance;
     if (action === "edit") {
@@ -76,8 +78,9 @@ Deno.serve(async (req) => {
         return json({ error: "완전한 자료를 받지 못해 저장하지 않았습니다. 근거 범위를 확인해 주세요." }, 502);
       }
       content = validateTeachingContent(JSON.parse(choice.message.content), prepared.kind, prepared.sources.map((source: { id: string }) => source.id));
-      provenance = { model: result.model ?? model, prompt_version: TEACHING_PROMPT_VERSION, response_id: result.id, input_hash: inputHash, request };
+      provenance = { model: result.model ?? model, prompt_version: promptVersion, response_id: result.id, input_hash: inputHash, request };
     }
+    if (grounded) validateTeachingEvidence(content, prepared.sources);
     const draft = await rpc("save_teaching_material", { p_outline_id: courseId, p_week_no: weekNo,
       p_expected_revision: expectedRevision, p_source_hash: context.source_hash, p_config: config,
       p_sources: prepared.sources, p_content: content, p_provenance: provenance, p_actor: user.user.id });

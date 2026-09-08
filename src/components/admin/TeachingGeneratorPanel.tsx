@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import type { LearnerCourse, LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 import { teachingRequest, type TeachingPreview, type TeachingState } from "@/lib/curriculum/teachingGenerationApi";
@@ -33,6 +34,11 @@ export function TeachingGeneratorPanel({ course, week, state, loading, loadError
     }
   }, [state?.draft, state?.current, choices]);
   if (!kind) return null;
+  if (state?.draft?.source_config.workflow === "source") return <section className="rounded-xl border bg-[#FFFCF2] p-4 text-sm leading-6">
+    <h2 className="font-bold">소스 기반 수업자료 · 버전 {state.draft.revision}</h2>
+    <p>원자료·생성 조건·초안 편집은 수업자료·토론 생성 화면에서 확인합니다.</p>
+    <Link className="font-semibold underline" to={`/admin/teaching-generator?courseId=${encodeURIComponent(course.outline.id)}&weekNo=${week.week_no}`}>생성 화면 열기 →</Link>
+  </section>;
   const invalidate = () => { setPreview(null); setError(""); };
   const request = async (action: "preview" | "generate" | "edit") => {
     setBusy(true); setError("");
@@ -56,6 +62,7 @@ export function TeachingGeneratorPanel({ course, week, state, loading, loadError
   return <section aria-label="수업자료 생성" className="min-w-0 space-y-4 rounded-xl border border-[#DBD3BD] bg-[#FFFCF2] p-4 sm:p-5">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
+        <Link className="mb-2 inline-block text-sm font-semibold underline" to={`/admin/teaching-generator?courseId=${encodeURIComponent(course.outline.id)}&weekNo=${week.week_no}`}>PDF·영상·이미지 등 소스로 자료 만들기 →</Link>
         <h2 className="text-lg font-bold">{kind === "discussion" ? `${week.week_no}주차 메타화용 토론 준비` : "이 주차 수업자료 보강"}</h2>
         <p className="mt-1 text-sm leading-6 text-muted-foreground">{kind === "discussion"
           ? `2~${week.week_no - 1}주차에서 다룬 미션을 골라 비교 사례·토론 질문·성찰 활동을 준비합니다.`
