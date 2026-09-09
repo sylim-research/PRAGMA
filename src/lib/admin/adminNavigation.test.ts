@@ -39,8 +39,12 @@ describe("admin navigation reachability", () => {
       "/admin/authentic",
       "/admin/generator",
       "/admin/batch",
-      "/admin/library",
     ]);
+    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·품질 관리");
+    expect(production?.items.map((item) => item.to)).toEqual([
+      "/admin/assembly", "/admin/ai-review", "/admin/review", "/admin/library",
+    ]);
+    expect(adminMobileNavValue("/admin/library")).toBe("/admin/library");
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.at(-1)?.to).toBe("/admin/data-backup");
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
@@ -122,6 +126,7 @@ describe("admin navigation reachability", () => {
       "/admin/assembly",
       "/admin/ai-review",
       "/admin/review",
+      "/admin/library",
     ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);

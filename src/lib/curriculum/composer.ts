@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Domain, GenMode, LanguageDirection, LearnerLevel, SpeechActUI } from "@/lib/pragma/enums";
 import { coreDirection } from "@/lib/pragma/coreSchema";
 import { weeklyOpeningContext } from "./weeklyOpeningContext";
+import { fetchAllPages } from "@/lib/pragma/paginatedRows";
 import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
 import {
   assertCurrentWeeklyMissionPairShapes,
@@ -72,25 +73,19 @@ export interface WeekAssignment {
 }
 
 /**
- * 모든 코어를 한 번에 조회(클라이언트 필터). AdminBrowser·AdminAssembly와 동일 전략.
- *
- * ⚠️ 상한을 명시하지 않으면 PostgREST 기본 상한(1000)이 조용히 적용된다. 2026-07-31
- * 시점 코어가 1299건이고 정렬이 `created_at DESC`라 정본 배치 일부가 편성기에서
- * 사라졌다 — 같은 결함을 라이브러리·조립 큐에서 먼저 고쳤는데 이 데이터 레이어만
- * 누락됐다. 형제 화면과 같은 4000으로 맞춘다.
+ * 라이브러리에서 넘긴 오래된 미션도 찾도록 코어를 페이지별로 모두 읽는다.
+ * limit만 늘려서는 서버 응답 상한을 넘길 수 없다.
  */
-export const CORE_ROW_CAP = 4000;
-
 export async function listCoreScenarios(): Promise<ComposerCore[]> {
-  const { data, error } = await releaseDb
+  const data = await fetchAllPages<Record<string, any>>(async (from, to) => await releaseDb
     .from("scenarios")
     .select(
       "scenario_id, speech_act, learner_level, domain, mode, theme_code, topic_code, mission_status, release_gate_mode, target_feature, scenario_p, scenario_d, scenario_r, source_modality, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
     )
     .eq("content_format", "scenario_core_v1")
     .order("created_at", { ascending: false })
-    .limit(CORE_ROW_CAP);
-  if (error) throw new Error(`시나리오 코어 조회 실패: ${error.message}`);
+    .order("scenario_id")
+    .range(from, to), 500);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (data ?? []).map((r: Record<string, any>) => {
     const content =

@@ -226,11 +226,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         .from("scenarios")
         .select(CORE_ROW_SELECT)
         .eq("content_format", "scenario_core_v1")
-        .neq("review_status", "revise_required")
         .order("created_at", { ascending: false })
         .limit(ROW_CAP);
       if (reviewMode) request = request.in("mission_status", ["generated", "reviewed", "released"]);
       if (searchParams.get("scenarioId")) request = request.eq("scenario_id", searchParams.get("scenarioId"));
+      else request = request.neq("review_status", "revise_required");
       const timeout = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error("조회 시간이 15초를 초과했습니다.")), QUERY_TIMEOUT_MS);
       });

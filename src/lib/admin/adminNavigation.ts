@@ -44,7 +44,6 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
       { to: "/admin/authentic", label: "실제 자료 활용 분석" },
       { to: "/admin/generator", label: "시나리오 생성" },
       { to: "/admin/batch", label: "시나리오 배치 생성" },
-      { to: "/admin/library", label: "시나리오 라이브러리" },
     ],
   },
   {
@@ -59,6 +58,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
         label: "교수자 최종 승인",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
+      { to: "/admin/library", label: "학습 미션 라이브러리" },
     ],
   },
   {

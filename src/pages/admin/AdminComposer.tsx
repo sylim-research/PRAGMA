@@ -104,8 +104,13 @@ const AdminComposer = () => {
   // 선택된 커리큘럼은 URL(?outline=)에 보관 → 새로고침해도 유지되고 저장분이 다시 뜬다.
   const [searchParams, setSearchParams] = useSearchParams();
   const outlineId = searchParams.get("outline") ?? "";
-  const setOutlineId = (id: string) =>
-    setSearchParams(id ? { outline: id } : {}, { replace: true });
+  const libraryScenarioId = searchParams.get("scenarioId");
+  const setOutlineId = (id: string) => setSearchParams((current) => {
+    const next = new URLSearchParams(current);
+    if (id) next.set("outline", id);
+    else next.delete("outline");
+    return next;
+  }, { replace: true });
 
   const [outline, setOutline] = useState<CurriculumOutlineRow | null>(null);
   const [weeks, setWeeks] = useState<CurriculumWeekRow[]>([]);
@@ -171,6 +176,16 @@ const AdminComposer = () => {
     for (const c of cores) m[c.scenario_id] = c;
     return m;
   }, [cores]);
+  const libraryMission = libraryScenarioId ? coreById[libraryScenarioId] : null;
+  const libraryMissionAssigned = libraryScenarioId && Object.values(assign)
+    .some((items) => items.some((item) => item.scenario_id === libraryScenarioId));
+  const libraryTargetWeeks = libraryMission && outline?.id === outlineId && !loadingOutline && loadedAssignments !== null
+    ? weeks.filter((week) => week.type === "regular" && week.speech_act
+      && filterManualCandidates([libraryMission], {
+        act: week.speech_act as SpeechActUI, level, direction, themes, assignments: assign,
+        expectedModes: expectedMissionModesForWeek({ courseMode }, week.week_no), weekNo: week.week_no, coreById,
+      }).length > 0)
+    : [];
 
   // ── 초기 로드: 커리큘럼 목록 + 코어 전건 ──
   useEffect(() => {
@@ -672,6 +687,27 @@ const AdminComposer = () => {
       compact
     >
       <div className="w-full max-w-[960px]">
+      {libraryScenarioId && <section aria-label="라이브러리에서 선택한 미션" className="mb-4 rounded-xl border border-[#D6BC40] bg-[#FFFBEA] p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-[15px] font-semibold">라이브러리에서 선택한 미션</h2>
+          <Link to="/admin/library" className="text-[12px] underline">라이브러리로 돌아가기</Link>
+        </div>
+        {loading ? <p className="mt-2 text-sm">미션 확인 중…</p> : !libraryMission ? (
+          <p role="alert" className="mt-2 text-sm">선택한 미션을 불러오지 못했습니다. 라이브러리에서 다시 확인해 주세요.</p>
+        ) : <>
+          <p className="mt-2 text-[13px] leading-6">{libraryMission.situation_ko}</p>
+          <p className="mt-1 text-[12px] text-muted-foreground">{SPEECH_ACT_UI[libraryMission.speech_act]} · {LEVEL[libraryMission.learner_level]} · {DIRECTION_LABEL[libraryMission.direction]} · {MODE_LABEL[libraryMission.mode]}</p>
+          {!outlineId ? <p className="mt-3 text-[13px]">아래에서 교과목을 선택하면 이 미션을 추가할 수 있는 주차가 나타납니다.</p>
+            : loadingOutline || loadedAssignments === null ? <p className="mt-3 text-[13px]">교과목 편성 확인 중…</p>
+            : libraryMissionAssigned ? <p role="status" className="mt-3 text-[13px]">현재 교과목 편성에 포함되어 있습니다. 변경한 편성은 ‘편성 저장’으로 확정해 주세요.</p>
+            : libraryTargetWeeks.length === 0 ? <p role="status" className="mt-3 text-[13px]">현재 교과목 조건과 남은 자리에 맞는 주차가 없습니다. 수준·방향·주제·화행과 기존 편성을 확인해 주세요.</p>
+            : <div className="mt-3 flex flex-wrap items-center gap-2">
+              {libraryTargetWeeks.map((week) => <Button key={week.id} size="sm" variant="outline" disabled={saving}
+                onClick={() => addItem(week.week_no, libraryMission)}>{week.week_no}주차에 추가</Button>)}
+              <span className="text-[12px] text-muted-foreground">추가한 뒤 ‘편성 저장’을 눌러 확정합니다.</span>
+            </div>}
+        </>}
+      </section>}
       <section
         aria-label="교과목 설계 흐름"
         className="relative mb-3 overflow-hidden rounded-xl border border-[#D8D3C6] bg-white shadow-[0_6px_18px_rgba(21,32,43,0.07)]"

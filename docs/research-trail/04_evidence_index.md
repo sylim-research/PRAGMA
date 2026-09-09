@@ -4,6 +4,17 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260910-01 · 관리자 개편 인계·현행 문서 동기화
+
+- 기준: 원격 main `4bd78421432476a4e6199923deb2099cdc13f8d5` (PR #124).
+  작업공간·최종 결정·재현 명령과 한계는 `docs/dev-log/2026-09-10-admin-takeover.md`를 따른다.
+- `src/lib/admin/adminNavigation.ts`, `AdminAssembly.tsx`, `AdminAuthentic.tsx`,
+  `AdminGenerator.tsx`와 관리자 정본 §2·§3.1을 대조해 기존 개편의 문서 누락을 보완했다.
+- 타입 검사·기존 관리자 표적 6파일 37 tests·운영용 빌드가 통과했다.
+  Node 24와 CI 가짜 Supabase 환경값을 사용했으며 운영 관리자 브라우저·DB·전체 종단 검증이 아니다.
+- 후보의 `used` 표시가 생성기 전달 시점이고 실제 시나리오 ID 연결 호출이 없는 점은 코드 관측이다.
+  운영 데이터의 오류 건수나 사용자 피해를 확인한 결과는 아니다. 새 설계 결정·UI·DB·배포 변경 없음.
+
 ## EVD-20260909-03 · 품질 경고의 교수자 승인 연결 회귀 증거
 
 - 기록: `docs/dev-log/2026-09-09-quality-signal-review-flow.md`.
@@ -13,6 +24,16 @@
   로컬 브라우저에서 코어/R32 경고별 판단·보류 차단·합성 승인을 확인했다.
   독립 검토의 P2 과거 승인 호환성을 수용하고 `scripts/content-review-edge.test.mjs` 2개로 재검증했다.
 - 경계: 합성 테스트와 실제 운영 배포·교수자의 내용 타당성 판단을 구분한다. 배포 SHA·CI·읽기 smoke는 PR에 기록한다.
+
+## EVD-20260910-02 · 미션 중심 라이브러리와 수업 편성 인계
+
+- 결정: DEC-20260910-01. 구현·검증 범위와 최초 커밋은 `docs/dev-log/2026-09-10-mission-library.md`에서 추적한다.
+- 재실행: `src/pages/admin/AdminBrowser.test.tsx`, `src/lib/admin/adminNavigation.test.ts`,
+  `scripts/manual-checks/mission-library-smoke.mjs`. 전체 901 tests 통과·9 skip, 타입·운영용 빌드 통과.
+- 합성 API·실제 로컬 브라우저로 1,000행 이후 조회, 현행 편성 조건, 미션 ID 유지,
+  수업 조건별 주차 추가·명시적 저장·재조회와 오류 표시를 확인했다.
+- 화면·결과: `.worktrees/admin-takeover-2026-09-10/.tmp/mission-library-smoke/`의 PNG 3장과 `result.json`.
+  재실행 스크립트는 Git에 보존하며 임시 화면·로그는 로컬 증거다. 운영 수치·학습효과·배포 완료 증거가 아니다.
 
 ## ID 규칙
 
