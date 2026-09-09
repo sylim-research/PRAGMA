@@ -625,7 +625,7 @@ const AdminComposer = () => {
         description={
           structureEditor === "new"
             ? "새 교과목의 최소 정보만 정하면 표준 15주 강의 계획을 자동으로 준비합니다."
-            : "필요한 주차 계획만 수정하고 저장하면 AI 편성 화면으로 돌아갑니다."
+            : "필요한 주차 계획만 수정하고 저장하면 편성 화면으로 돌아갑니다."
         }
       >
         <section className="rounded-xl border border-[#D7E3DC] bg-[#F8FCF9] p-5">
@@ -708,42 +708,6 @@ const AdminComposer = () => {
             </div>}
         </>}
       </section>}
-      <section
-        aria-label="교과목 설계 흐름"
-        className="relative mb-3 overflow-hidden rounded-xl border border-[#D8D3C6] bg-white shadow-[0_6px_18px_rgba(21,32,43,0.07)]"
-      >
-        <div aria-hidden="true" className="absolute inset-x-0 top-0 h-1 bg-[#15202B]" />
-        <div className="grid divide-y divide-[#EAE4D2] pt-1 md:grid-cols-3 md:divide-x md:divide-y-0">
-          {[
-            {
-              step: "1",
-              title: "교과목 설정",
-              copy: "교과목명·수준·언어방향 설정",
-            },
-            {
-              step: "2",
-              title: "AI 자동 편성",
-              copy: "주제·강좌 수행모드 기반 미션 배정",
-            },
-            {
-              step: "3",
-              title: "주차별 조정",
-              copy: "필요한 주차의 미션 추가·제거",
-            },
-          ].map(({ step, title, copy }) => (
-            <div key={step} className="flex items-start gap-2.5 px-4 py-3">
-              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#15202B] text-[11px] font-semibold text-white">
-                {step}
-              </span>
-              <div className="min-w-0">
-                <span className="text-[15px] font-semibold leading-tight text-[#15202B]">{title}</span>
-                <p className="mt-0.5 text-[11.5px] leading-snug text-muted-foreground">{copy}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* ── 상단 컨트롤 ── */}
       <section>
         {error && (
@@ -754,7 +718,7 @@ const AdminComposer = () => {
 
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#E2DED2] bg-white p-3 text-[13px] shadow-[0_4px_14px_rgba(21,32,43,0.04)]">
           <span className="shrink-0 rounded-full bg-[#EEF2F1] px-3 py-1.5 font-semibold text-[#365F58]">
-            1 · 교과목
+            교과목
           </span>
           <select
             aria-label="교과목 선택"
@@ -783,6 +747,9 @@ const AdminComposer = () => {
           )}
           <Button className="h-9" variant="outline" onClick={() => setStructureEditor("new")}>
             새 교과목
+          </Button>
+          <Button className="h-9" variant="ghost" asChild>
+            <Link to={outlineId ? `/admin/data-backup?courseId=${encodeURIComponent(outlineId)}` : "/admin/data-backup"}>백업·복원</Link>
           </Button>
           <Button
             className="h-9"
@@ -868,30 +835,32 @@ const AdminComposer = () => {
           </div>
         </div>
 
-        <div className="mt-3 overflow-hidden rounded-xl border border-[#CFC9B9] bg-white shadow-[0_10px_26px_rgba(21,32,43,0.09)]">
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-[#1E2F3A] px-4 py-3 text-white">
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#FAD338]">
-                    핵심 자동화
-                  </span>
-                  {axesDirty && (
-                    <Badge className="border-0 bg-[#FAD338] font-normal text-[#15202B] hover:bg-[#FAD338]">
-                      저장 전 변경
-                    </Badge>
-                  )}
-                </div>
-                <h2 className="mt-0.5 text-[18px] font-semibold leading-tight">2 · AI 자동 편성</h2>
-              </div>
+        <div className="mt-3 rounded-xl border border-[#E2DED2] bg-white">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+            <div>
               <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-[15px] font-semibold">미션 편성</h2>
+                {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
+              </div>
+              <p className="mt-1 text-[12px] text-muted-foreground">
+                {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
+              </p>
+            </div>
+            <Button variant="outline" onClick={() => autoFill(false)} disabled={!outline || loadingOutline}>
+              미션 자동 채우기
+            </Button>
+          </div>
+          <details className="border-t border-[#EAE4D2]">
+            <summary className="cursor-pointer px-4 py-3 text-[13px] font-semibold">편성 조건 조정</summary>
+            <div className="space-y-3 px-4 pb-4 text-[13px]">
                 <label className="flex items-center gap-2">
-                  <span className="whitespace-nowrap text-[11.5px] font-semibold text-[#F1EFE8]">
+                  <span className="whitespace-nowrap text-[11.5px] font-semibold text-muted-foreground">
                     프리셋 · 빠른 시작
                   </span>
                   <select
                     value={presetCode}
                     onChange={(event) => applyPreset(event.target.value)}
-                    className="h-9 min-w-[210px] rounded-md border border-white/20 bg-white px-2 text-[15px] text-[#15202B]"
+                    className="h-9 min-w-[210px] rounded-md border border-border bg-white px-2 text-[15px] text-[#15202B]"
                   >
                     <option value="">— 직접 설정 —</option>
                     {COURSE_PRESETS.map((item) => (
@@ -901,17 +870,6 @@ const AdminComposer = () => {
                     ))}
                   </select>
                 </label>
-                <Button
-                  className="h-9 bg-[#FAD338] text-[14px] font-semibold text-[#15202B] hover:bg-[#EAC42E]"
-                  onClick={() => (outline ? autoFill(false) : setStructureEditor("new"))}
-                  disabled={loadingOutline}
-                >
-                  {outline ? "AI 자동 채우기" : "AI 편성 시작"}
-                </Button>
-              </div>
-            </div>
-
-            <div className="px-4 py-3.5 text-[13px]">
             <div className="grid max-w-[900px] gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,210px)_minmax(180px,210px)_minmax(300px,420px)]">
               <label className="rounded-lg border border-[#E2DED2] bg-[#FAF9F5] p-3">
                 <span className="flex items-center gap-2 font-semibold text-[#15202B]">
@@ -1029,6 +987,9 @@ const AdminComposer = () => {
               </span>
             </div>
 
+
+            </div>
+          </details>
             {autoFillShortages.length > 0 && (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
                 <span>
@@ -1042,8 +1003,8 @@ const AdminComposer = () => {
                 )}
               </div>
             )}
-            </div>
-          </div>
+
+        </div>
 
         {/* 선택한 프리셋이 학기 전체에서 무엇을 반복시키는지 교수자에게 설명한다. */}
         {preset && (
@@ -1065,9 +1026,9 @@ const AdminComposer = () => {
         <>
           <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2 border-l-4 border-[#FAD338] pl-3">
             <div>
-              <h2 className="text-[18px] font-semibold">3 · 주차별 미션 조정</h2>
+              <h2 className="text-[18px] font-semibold">주차별 미션 조정</h2>
               <p className="mt-0.5 text-[11.5px] text-muted-foreground">
-                AI 편성 결과를 확인하고, 필요한 주차에서 미션을 추가하거나 제거하세요.
+                편성 결과를 확인하고, 필요한 주차에서 미션을 추가하거나 제거하세요.
               </p>
             </div>
             <span className="text-[12px] text-muted-foreground">

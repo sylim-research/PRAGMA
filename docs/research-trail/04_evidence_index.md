@@ -35,6 +35,22 @@
 - 화면·결과: `.worktrees/admin-takeover-2026-09-10/.tmp/mission-library-smoke/`의 PNG 3장과 `result.json`.
   재실행 스크립트는 Git에 보존하며 임시 화면·로그는 로컬 증거다. 운영 수치·학습효과·배포 완료 증거가 아니다.
 
+## EVD-20260910-03 · 수업 운영 메뉴 통합과 상세 진입 연결
+
+- DEC-20260910-02. `docs/dev-log/2026-09-10-operations-menu-simplification.md`와 최초 커밋에서 추적한다.
+- 관련 기존 3파일 21 tests·타입 검사 통과. `adminNavigation.test.ts`, `AdminTeachingMaterials.test.tsx`,
+  `TeachingGeneratorPanel.test.tsx`로 메뉴·모바일 상위 항목·주차/미션 링크와 기존 자료 생성 흐름을 확인했다.
+- localhost 브라우저의 메뉴·진입 확인과 `.tmp/operations-navigation-desktop.png`는 로컬 증거다.
+  별도 브라우저에는 관리자 세션이 없어 실제 교과목 인계 종단은 완료하지 않았다. 운영 데이터 쓰기·배포 없음.
+
+## EVD-20260910-04 · 라운지 제외·자동 채우기 경량화와 문헌 저작 보존
+
+- DEC-20260910-03. 구현·범위·한계는 `docs/dev-log/2026-09-10-research-scope-focus.md` 및 해당 변경 커밋에서 추적한다.
+- 관련 8파일 49 tests·타입·운영용 빌드 통과. 경로·메뉴·자동 배정 규칙·미션/소스 기반 자료·분석 보관 검사를 재사용했다.
+- localhost에서 과거 라운지 3경로, 두 학습자 탭, 접이식 편성 조건과 PC·390px 표시를 확인했다.
+  `.tmp/composer-simplified-desktop.png`, `.tmp/research-scope-build.log`는 로컬 근거다.
+- 문헌 저작의 코드·프롬프트·DB를 보존한 작업이다. 실제 문헌의 내용 타당성·학습효과·운영 배포를 검증한 결과가 아니다.
+
 ## ID 규칙
 
 - 증거 ID는 `EVD-YYYYMMDD-NN` 형식을 사용한다.

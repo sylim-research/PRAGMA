@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Check, ShieldCheck, Upload } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -112,8 +113,9 @@ const PreviewRow = ({ label, value }: { label: string; value: string }) => (
 );
 
 const Page = () => {
+  const [params] = useSearchParams();
   const [courses, setCourses] = useState<CourseSummary[]>([]);
-  const [selectedId, setSelectedId] = useState("");
+  const [selectedId, setSelectedId] = useState(() => params.get("courseId") ?? "");
   const [loadingCourses, setLoadingCourses] = useState(true);
   const [backingUp, setBackingUp] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -158,7 +160,7 @@ const Page = () => {
       .then((rows) => {
         if (cancelled) return;
         setCourses(rows);
-        setSelectedId((current) => current || (rows[0]?.id ?? ""));
+        setSelectedId((current) => current ? (rows.some((row) => row.id === current) ? current : "") : (rows[0]?.id ?? ""));
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -314,6 +316,9 @@ const Page = () => {
       title="수업 데이터 백업·복원"
       description="현재 수업 구성을 백업 파일로 저장하고, 필요할 때 백업 시점의 구성으로 복원할 수 있습니다."
     >
+      <Button className="mb-4" variant="ghost" asChild>
+        <Link to={selectedId ? `/admin/composer?outline=${encodeURIComponent(selectedId)}` : "/admin/composer"}>수업 편성으로 돌아가기 →</Link>
+      </Button>
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
         {/* 기본 흐름 = 교과목 선택 → 백업. 그래서 이쪽이 주(主)다. */}
