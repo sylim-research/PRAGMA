@@ -25,6 +25,16 @@
   독립 검토의 P2 과거 승인 호환성을 수용하고 `scripts/content-review-edge.test.mjs` 2개로 재검증했다.
 - 경계: 합성 테스트와 실제 운영 배포·교수자의 내용 타당성 판단을 구분한다. 배포 SHA·CI·읽기 smoke는 PR에 기록한다.
 
+## EVD-20260910-02 · 미션 중심 라이브러리와 수업 편성 인계
+
+- 결정: DEC-20260910-01. 구현·검증 범위와 최초 커밋은 `docs/dev-log/2026-09-10-mission-library.md`에서 추적한다.
+- 재실행: `src/pages/admin/AdminBrowser.test.tsx`, `src/lib/admin/adminNavigation.test.ts`,
+  `scripts/manual-checks/mission-library-smoke.mjs`. 전체 901 tests 통과·9 skip, 타입·운영용 빌드 통과.
+- 합성 API·실제 로컬 브라우저로 1,000행 이후 조회, 현행 편성 조건, 미션 ID 유지,
+  수업 조건별 주차 추가·명시적 저장·재조회와 오류 표시를 확인했다.
+- 화면·결과: `.worktrees/admin-takeover-2026-09-10/.tmp/mission-library-smoke/`의 PNG 3장과 `result.json`.
+  재실행 스크립트는 Git에 보존하며 임시 화면·로그는 로컬 증거다. 운영 수치·학습효과·배포 완료 증거가 아니다.
+
 ## ID 규칙
 
 - 증거 ID는 `EVD-YYYYMMDD-NN` 형식을 사용한다.
