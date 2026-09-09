@@ -281,6 +281,8 @@ const App = () => (
           <Route path="/admin/curriculum" element={<Navigate to="/admin/composer" replace />} />
           <Route path="/admin/composer" element={<RequireAdmin><AdminComposer /></RequireAdmin>} />
           <Route path="/admin/prompt-harness" element={<RequireAdmin><AdminPromptHarness /></RequireAdmin>} />
+          {/* 같은 미션 목록을 목적별로 나눠 본다. AI 화면에는 승인 기능이 없다. */}
+          <Route path="/admin/ai-review" element={<RequireAdmin><AdminAssembly key="ai-review" reviewMode aiReview /></RequireAdmin>} />
           <Route path="/admin/review" element={<RequireAdmin><AdminAssembly key="review" reviewMode /></RequireAdmin>} />
           <Route path="/admin/cross-vendor" element={<RequireAdmin><Navigate to="/admin/review" replace /></RequireAdmin>} />
           <Route path="/admin/learners" element={<RequireAdmin><AdminLearners /></RequireAdmin>} />

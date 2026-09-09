@@ -16,23 +16,34 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
 };
 
 // 관리자 메뉴·모바일 선택기·대시보드 바로가기가 함께 쓰는 단일 정본이다.
+//
+// 그룹은 콘텐츠가 지나는 순서를 따른다: 재료와 그 기준 → 학습 미션 → 품질 관리 →
+// 수업 운영 → 기록. 시나리오는 상황문과 원문만 가진 재료이고 학습 콘텐츠가 아니므로
+// 미션과 같은 층에 두지 않는다. 품질 관리는 AI 검토와 교수자의 결정을 갈라 놓는다 —
+// AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만 일어난다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
-    header: "1. 학습 콘텐츠 설계 기준",
+    header: "1. 생성 기준·시나리오 재료",
     items: [
-      { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
       { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
+      { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
+      { to: "/admin/authentic", label: "원자료 분석·미션 재료" },
+      { to: "/admin/generator", label: "시나리오 생성" },
+      { to: "/admin/batch", label: "시나리오 배치 생성" },
+      { to: "/admin/library", label: "시나리오 라이브러리" },
     ],
   },
   {
-    header: "2. 학습 콘텐츠 제작",
+    // 「미션 설계 기준」은 아직 화면이 없다. 만들기 전에는 죽은 항목을 두지 않는다.
+    header: "2. 학습 미션",
     items: [
-      { to: "/admin/authentic", label: "원자료 분석·미션 재료" },
-      { to: "/admin/teaching-generator", label: "수업자료·토론 생성" },
-      { to: "/admin/generator", label: "시나리오 개별 생성" },
-      { to: "/admin/batch", label: "시나리오 배치 생성" },
-      { to: "/admin/library", label: "시나리오 라이브러리" },
       { to: "/admin/assembly", label: "학습 미션 조립" },
+    ],
+  },
+  {
+    header: "3. 콘텐츠 품질 관리",
+    items: [
+      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
       {
         to: "/admin/review",
         label: "교수자 최종 승인",
@@ -41,9 +52,10 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     ],
   },
   {
-    header: "3. 수업 운영",
+    header: "4. 수업 운영",
     items: [
       { to: "/admin/composer", label: "15주 수업 편성·강의계획서" },
+      { to: "/admin/teaching-generator", label: "수업자료·토론 생성" },
       { to: "/admin/package", label: "주차별 수업 운영·교실 화면" },
       { to: "/admin/class-responses", label: "학급 응답 현황" },
       { to: "/admin/learners", label: "학습자 관리" },
@@ -51,7 +63,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     ],
   },
   {
-    header: "4. 학습 결과·연구 자료",
+    header: "5. 학습 기록·연구 자료",
     items: [
       { to: "/admin/decision-traces", label: "학습 수행 기록" },
       { to: "/admin/export", label: "연구 데이터 내보내기" },

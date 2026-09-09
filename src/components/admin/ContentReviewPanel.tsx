@@ -14,10 +14,15 @@ const verdictLabel = { pass: "보고된 문제 항목 없음", warning: "확인 
 const decisionLabel = { accept: "수용", refine: "보완", reject: "기각" };
 type ProfessorDecisionDraft = { decision: ProfessorFindingDecision["decision"] | ""; rationale_ko: string };
 
-export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false }: {
+export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref }: {
   target: ReviewTarget; onApprove?: (approval: ContentReviewApproval) => Promise<void>;
   approvalDisabled?: boolean; refreshKey?: string; historicalApproval?: boolean;
   experiential?: boolean;
+  /**
+   * 승인이 이 화면의 일이 아닐 때 넘긴다. 자동 점검과 AI 검토까지만 실행하고,
+   * 교수자 감수·최종 승인 자리에는 그 화면으로 가는 인계 링크를 둔다.
+   */
+  handoffHref?: string;
 }) {
   const queryClient = useQueryClient();
   const key = ["content-review", target.kind, target.targetId, target.weekNo ?? 0, refreshKey];
@@ -131,8 +136,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         inspection={state} onSave={saveExperience} onReady={setExperienceReady} disabled={busy || approvalDisabled} />}
       {next !== "approved" && next !== "professor" && <div className="rounded-lg border bg-[#FCFBF6] p-3">
         <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
-          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>기본 점검 준비</Button>
-        <p className="mt-2 text-xs text-muted-foreground">현재 콘텐츠의 저장된 품질점검을 먼저 연결합니다. 재사용 가능한 결과가 없을 때만 기본 AI 점검을 1회 호출합니다. 추가 모델 검토는 선택한 경우에만 실행합니다.</p>
+          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>감수 자료 준비</Button>
+        <p className="mt-2 text-xs text-muted-foreground">현재 콘텐츠와 기준에 맞는 저장 결과를 재사용하며, 없을 때만 유료 AI 검토를 1회 실행합니다. 추가 모델 검토는 선택한 경우에만 실행합니다.</p>
       </div>}
       <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사는 무료, AI 단계는 각각 유료 호출 1회입니다. 성공한 단계는 재호출하지 않습니다.</p>
       {!run && <p className="rounded-lg bg-amber-50 p-3">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 아래 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검·승인 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다. 규칙 검사부터 시작하세요."}</p>}
@@ -202,7 +207,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
         }}>추가 모델 검토 선택</Button>
       </div>}
-      {next === "professor" && <div className="space-y-2 border-t pt-3">
+      {next === "professor" && !handoffHref && <div className="space-y-2 border-t pt-3">
         <h4 className="font-semibold">교수자 최종 승인</h4>
         <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
@@ -221,13 +226,27 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
-      {next !== "approved" && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
+      {next !== "approved" && !(handoffHref && next === "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
         || (next === "professor" && (!ready || !confirmed || note.trim().length < 10))} onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작 · 무료" : next === "professor" ? "교수자 최종 승인" : `${steps[stepIndex].label} 실행 · 유료`}
       </Button>}
+      {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
+          단계와 무관하게 넘어갈 수 있고, 넘어가는 것만으로 승인 상태가 바뀌지 않는다. */}
+      {handoffHref && <div className="rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
+        <p>{next === "approved"
+          ? "이 버전은 교수자 승인을 마쳤습니다. 승인 내용은 「교수자 최종 승인」 화면에서 확인합니다."
+          : next === "professor"
+            ? "이 버전에 필요한 자동 점검과 AI 검토가 끝났습니다. AI 검토 의견은 교수자가 판단할 자료이며 콘텐츠를 승인하지 않습니다."
+            : "감수와 최종 승인은 이 화면의 일이 아닙니다. 남은 점검을 여기서 마치거나, 지금 상태 그대로 교수자 화면에서 열어 확인할 수 있습니다."}</p>
+        <Link to={handoffHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인 화면에서 열기 →</Link>
+      </div>}
       {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 AI 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
-      {next === "approved" && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
+      {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
+        {/* 승인·편성·노출은 서로 다른 사건이다. 노출 여부는 이 화면이 판정하지 않으므로 조건만 안내한다. */}
+        <p className="mt-2 border-t border-emerald-200 pt-2 text-xs text-emerald-900">
+          교수자 승인은 수업 사용·학습자 공개 <b>자격</b>을 부여합니다. 실제 노출에는 주차 편성과 공개 강좌의 접근 조건이 더 필요합니다.
+        </p>
       </div>}
       <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
         <p className="my-2 text-xs">현재 정적 콘텐츠 원본을 확인합니다. 개별 학습자 실시간 피드백을 전수 검토했다는 뜻은 아닙니다.</p>
