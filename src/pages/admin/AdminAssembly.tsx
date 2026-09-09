@@ -176,7 +176,11 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   const initAct = searchParams.get("act");
   const initLevel = searchParams.get("level");
 
-  const [fState, setFState] = useState<"all" | AssemblyState>(reviewMode && !searchParams.get("scenarioId") ? "generated" : "all");
+  // 각 화면이 맡은 일부터 띄운다 — 조립은 아직 미션이 없는 코어, 감수는 감수 대기 미션.
+  // 상태가 하나로 걸러져 있으면 행의 상태 배지도 함께 사라진다(모든 행이 같은 값이므로).
+  const [fState, setFState] = useState<"all" | AssemblyState>(
+    searchParams.get("scenarioId") ? "all" : reviewMode ? "generated" : "core_only",
+  );
   const [fAct, setFAct] = useState<"all" | SpeechActUI>(
     ACTS.includes(initAct as SpeechActUI) ? (initAct as SpeechActUI) : "all",
   );
@@ -663,16 +667,6 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                         <Button size="sm" variant="ghost" onClick={() => togglePreview(r)}>
                           {openId === r.scenario_id ? "미션 접기 ▴" : reviewMode ? "학생 화면으로 감수하기 ▾" : "미션 보기 ▾"}
                         </Button>
-                        </>
-                      )}
-                      {st === "reviewed" && (
-                        <>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to="/admin/composer">15주 편성에 사용</Link>
-                          </Button>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to="/admin/package">교과목·주차 수업자료</Link>
-                          </Button>
                         </>
                       )}
                       {!isAssembling && rowMsg[r.scenario_id] && (
