@@ -4,6 +4,17 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260910-01 · 관리자 개편 인계·현행 문서 동기화
+
+- 기준: 원격 main `4bd78421432476a4e6199923deb2099cdc13f8d5` (PR #124).
+  작업공간·최종 결정·재현 명령과 한계는 `docs/dev-log/2026-09-10-admin-takeover.md`를 따른다.
+- `src/lib/admin/adminNavigation.ts`, `AdminAssembly.tsx`, `AdminAuthentic.tsx`,
+  `AdminGenerator.tsx`와 관리자 정본 §2·§3.1을 대조해 기존 개편의 문서 누락을 보완했다.
+- 타입 검사·기존 관리자 표적 6파일 37 tests·운영용 빌드가 통과했다.
+  Node 24와 CI 가짜 Supabase 환경값을 사용했으며 운영 관리자 브라우저·DB·전체 종단 검증이 아니다.
+- 후보의 `used` 표시가 생성기 전달 시점이고 실제 시나리오 ID 연결 호출이 없는 점은 코드 관측이다.
+  운영 데이터의 오류 건수나 사용자 피해를 확인한 결과는 아니다. 새 설계 결정·UI·DB·배포 변경 없음.
+
 ## EVD-20260909-03 · 품질 경고의 교수자 승인 연결 회귀 증거
 
 - 기록: `docs/dev-log/2026-09-09-quality-signal-review-flow.md`.
