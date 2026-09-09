@@ -97,7 +97,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-4 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
+  <div className="mb-2 mt-3 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -126,7 +126,7 @@ const SummaryMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
       changed ? "border-[#D6B84A] bg-[#FFFBE8] ring-2 ring-[#F4D85E]/30" : "border-border",
     ].join(" ")}
@@ -192,7 +192,7 @@ const ReviewPipeline = ({
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 xl:gap-8">
+  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
       {REVIEW_STAGE_ITEMS.map((stage) => {
         const value = review?.[stage.key] ?? null;
         const active = dominant === stage.key;
@@ -202,7 +202,7 @@ const ReviewPipeline = ({
             <Link
               to="/admin/review"
               className={[
-                "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+                "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
                 "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 active ? "border-[#D6B84A] bg-[#FFFBE8]" : "border-border",
                 stage.optional ? "border-dashed" : "",
@@ -263,7 +263,7 @@ const OperationMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[86px] flex-col rounded-lg border bg-card p-3 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#789184] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-border",
     ].join(" ")}
@@ -494,7 +494,7 @@ const AdminDashboard = () => {
       {/* 이 화면이 먼저 답할 것은 「지금 무엇을 처리해야 하는가」다. 교수자를 기다리는 일이
           하나뿐이므로 그것만 크게 두고, 나머지 집계는 한 줄로, 세부는 접어 둔다.
           숫자·상태·조회는 그대로다 — 자리와 크기만 바꾼다. */}
-      <section className="mt-4 rounded-xl border border-[#D9D4C8] bg-white p-5">
+      <section className="mt-3 rounded-xl border border-[#D9D4C8] bg-white px-5 py-4">
         <p className="text-[13px] font-medium text-[#5D6970]">교수자 감수·승인 대기</p>
         <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
           <p className="flex items-end gap-2">
@@ -502,7 +502,7 @@ const AdminDashboard = () => {
               <span aria-label="불러오는 중" className="h-12 w-24 rounded bg-muted motion-safe:animate-pulse" />
             ) : (
               <>
-                <span className="text-[44px] font-bold leading-none tabular-nums text-[#15202B]">
+                <span className="text-[38px] font-bold leading-none tabular-nums text-[#15202B]">
                   {displayError ? "—" : snapshot?.content.reviewTargetCount}
                 </span>
                 <span className="pb-1 text-[15px] text-[#5D6970]">개</span>
@@ -517,20 +517,6 @@ const AdminDashboard = () => {
           미션을 감수한 뒤 승인 여부를 결정합니다. 이 화면에서 승인하지 않습니다.
         </p>
       </section>
-
-      {/* 나머지 두 질문 — 미션을 어디서 만들고, 승인한 것을 어디서 수업에 넣는가. */}
-      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-        {[
-          { to: "/admin/assembly", label: "학습 미션 조립" },
-          { to: "/admin/ai-review", label: "자동 점검·AI 검토" },
-          { to: "/admin/composer", label: "15주 수업 편성" },
-        ].map((item) => (
-          <Link key={item.to} to={item.to}
-            className="rounded-lg border border-[#E2DED2] bg-white px-4 py-3 text-[14px] font-semibold text-[#233542] hover:border-[#C9B54E]">
-            {item.label} →
-          </Link>
-        ))}
-      </div>
 
       {/* 총량은 맥락이지 할 일이 아니다 — 카드가 아니라 한 줄로 둔다. */}
       <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[13px] text-[#5D6970]">
@@ -555,7 +541,7 @@ const AdminDashboard = () => {
       />
 
       <PanelHeader title="수업 운영·학습 수행 현황" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
@@ -606,7 +592,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
-      <div className="mt-4">
+      <div className="mt-3">
         <ServiceHealthPanel />
       </div>
 
