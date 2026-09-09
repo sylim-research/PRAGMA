@@ -1,0 +1,2901 @@
+{
+  "auditDate": "2026-09-09",
+  "scope": "Read-only local source audit; no live database, paid model, publication or production deployment verification",
+  "root": "C:\\Users\\cnkr\\Documents\\Projects\\l2-pragmatic-translator\\.worktrees\\admin-declutter-2026-09-09",
+  "node": "v24.18.0",
+  "refs": [
+    {
+      "ref": "b4265d17",
+      "sha": "b4265d172f2ead2a95ffafc4e112c540e0eac326",
+      "validatorLfSha256": "16ddee8c62d57ec57a056bd09073bb41ca03d0a6c16ef41990e12535e09589c0"
+    },
+    {
+      "ref": "HEAD",
+      "sha": "72cb39bf4365da48a78fb71807edf24ade949dc0",
+      "validatorLfSha256": "16ddee8c62d57ec57a056bd09073bb41ca03d0a6c16ef41990e12535e09589c0"
+    },
+    {
+      "ref": "origin/main",
+      "sha": "6ec00b07e5a689349b3240e302d4f245a85ab4c8",
+      "validatorLfSha256": "16ddee8c62d57ec57a056bd09073bb41ca03d0a6c16ef41990e12535e09589c0"
+    }
+  ],
+  "static": {
+    "root": "C:\\Users\\cnkr\\Documents\\Projects\\l2-pragmatic-translator\\.worktrees\\admin-declutter-2026-09-09",
+    "sha256": "73c09ae288dfe648e4485bc1b5a0bed2682435b223572ff9cc5845be8acc665d",
+    "totalAddSites": 127,
+    "activeIds": [
+      "R1",
+      "R1c",
+      "R2",
+      "R3",
+      "R4",
+      "R5",
+      "R6",
+      "R7",
+      "R8",
+      "R9",
+      "R10",
+      "R11",
+      "R12",
+      "R13",
+      "R14",
+      "R15",
+      "R16",
+      "R17",
+      "R18",
+      "R19",
+      "R20",
+      "R21",
+      "R23",
+      "R24",
+      "R25",
+      "R26",
+      "R27",
+      "R28",
+      "R29",
+      "R30",
+      "R31",
+      "R32",
+      "R33"
+    ],
+    "inventory": [
+      {
+        "id": "R1",
+        "sites": 7,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R1c",
+        "sites": 5,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore"
+        ]
+      },
+      {
+        "id": "R2",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R3",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R4",
+        "sites": 7,
+        "levels": [
+          "fail",
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R5",
+        "sites": 13,
+        "levels": [
+          "fail",
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R6",
+        "sites": 1,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R7",
+        "sites": 4,
+        "levels": [
+          "fail",
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R8",
+        "sites": 5,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore",
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R9",
+        "sites": 2,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore",
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R10",
+        "sites": 8,
+        "levels": [
+          "fail",
+          "warning"
+        ],
+        "stages": [
+          "checkCore",
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R11",
+        "sites": 2,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R12",
+        "sites": 2,
+        "levels": [
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R13",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R14",
+        "sites": 2,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R15",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R16",
+        "sites": 6,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore",
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R17",
+        "sites": 1,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore"
+        ]
+      },
+      {
+        "id": "R18",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R19",
+        "sites": 1,
+        "levels": [
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R20",
+        "sites": 3,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R21",
+        "sites": 2,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R23",
+        "sites": 5,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R24",
+        "sites": 1,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R25",
+        "sites": 2,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore"
+        ]
+      },
+      {
+        "id": "R26",
+        "sites": 1,
+        "levels": [
+          "warning"
+        ],
+        "stages": [
+          "checkCore"
+        ]
+      },
+      {
+        "id": "R27",
+        "sites": 11,
+        "levels": [
+          "fail",
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R28",
+        "sites": 1,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R29",
+        "sites": 9,
+        "levels": [
+          "warning",
+          "fail"
+        ],
+        "stages": [
+          "checkCore",
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R30",
+        "sites": 1,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkCore"
+        ]
+      },
+      {
+        "id": "R31",
+        "sites": 5,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R32",
+        "sites": 1,
+        "levels": [
+          "warning"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      },
+      {
+        "id": "R33",
+        "sites": 4,
+        "levels": [
+          "fail"
+        ],
+        "stages": [
+          "checkMission"
+        ]
+      }
+    ],
+    "reachable": {
+      "core": [
+        "R1c",
+        "R8",
+        "R9",
+        "R10",
+        "R16",
+        "R17",
+        "R25",
+        "R26",
+        "R29",
+        "R30"
+      ],
+      "mission": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R11",
+        "R12",
+        "R13",
+        "R14",
+        "R15",
+        "R16",
+        "R18",
+        "R19",
+        "R20",
+        "R21",
+        "R23",
+        "R24",
+        "R27",
+        "R28",
+        "R29",
+        "R31",
+        "R32",
+        "R33"
+      ]
+    },
+    "calls": [
+      {
+        "line": 198,
+        "owner": "checkSourceLang",
+        "id": "R10",
+        "level": "fail",
+        "message": "`${label}: ${LANG_KO[lang]} 원문이 아님`"
+      },
+      {
+        "line": 205,
+        "owner": "checkTargetLangHard",
+        "id": "R10",
+        "level": "fail",
+        "message": "`${label}: ${LANG_KO[lang]}가 아님`"
+      },
+      {
+        "line": 215,
+        "owner": "checkTargetLangSoft",
+        "id": "R10",
+        "level": "fail",
+        "message": "`문항 ${id}: 후보 \"${t.slice(0, 20)}\"에 한글 혼입`"
+      },
+      {
+        "line": 217,
+        "owner": "checkTargetLangSoft",
+        "id": "R10",
+        "level": "warning",
+        "message": "`문항 ${id}: 후보 \"${t.slice(0, 20)}\"에 중국어가 확인되지 않음`"
+      },
+      {
+        "line": 220,
+        "owner": "checkTargetLangSoft",
+        "id": "R10",
+        "level": "warning",
+        "message": "`문항 ${id}: 후보 \"${t.slice(0, 20)}\"에 한국어 없음`"
+      },
+      {
+        "line": 221,
+        "owner": "checkTargetLangSoft",
+        "id": "R10",
+        "level": "warning",
+        "message": "`문항 ${id}: 후보 \"${t.slice(0, 20)}\"에 한자 혼입(한국어 산출)`"
+      },
+      {
+        "line": 231,
+        "owner": "checkPrecedingLang",
+        "id": "R10",
+        "level": "fail",
+        "message": "`${label}: 선행 발화가 ${LANG_KO[lang]}가 아님`"
+      },
+      {
+        "line": 237,
+        "owner": "checkDirectionMatch",
+        "id": "R10",
+        "level": "fail",
+        "message": "`데이터 방향(${dataDir}) ≠ 요청 방향(${ctx.direction})`"
+      },
+      {
+        "line": 259,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "warning",
+        "message": "`${label}: 미니 담화는 종결부호 기준 ${CORE_SOURCE_SENTENCE_MIN}~${CORE_SOURCE_SENTENCE_MAX}문장 권장(실측 ${sentenceCount}문장)`",
+        "evidence": "{\r\n        subrule: \"sentence_count\",\r\n        actual: sentenceCount,\r\n        threshold: { min: CORE_SOURCE_SENTENCE_MIN, max: CORE_SOURCE_SENTENCE_MAX },\r\n        modality: ctx.mode,\r\n        direction: ctx.direction,\r\n      }"
+      },
+      {
+        "line": 276,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "warning",
+        "message": "`${label}: ${CORE_LENGTH_POLICY_VERSION} 기준 권장 최소 유효 글자 ${range.min}자 미만(공백·문장부호 제외 실측 ${effectiveChars}자)`",
+        "evidence": "{\r\n        subrule: \"minimum_length\",\r\n        actual: effectiveChars,\r\n        threshold: range.min,\r\n        modality: ctx.mode,\r\n        direction: ctx.direction,\r\n        context: { min: range.min, max: range.max, policy_version: CORE_LENGTH_POLICY_VERSION },\r\n      }"
+      },
+      {
+        "line": 292,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "fail",
+        "message": "`${label}: ${CORE_LENGTH_POLICY_VERSION} 기준 최대 유효 글자 ${range.max}자 초과(공백·문장부호 제외 실측 ${effectiveChars}자)`",
+        "evidence": "{\r\n        subrule: \"maximum_length\",\r\n        actual: effectiveChars,\r\n        threshold: range.max,\r\n        modality: ctx.mode,\r\n        direction: ctx.direction,\r\n        context: { min: range.min, max: range.max, policy_version: CORE_LENGTH_POLICY_VERSION },\r\n      }"
+      },
+      {
+        "line": 309,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "fail",
+        "message": "`${label}: focal_segments가 없음(화용 집중 구간 미지정)`",
+        "evidence": "{\r\n      subrule: \"focal_head\",\r\n      actual: 0,\r\n      threshold: 1,\r\n      modality: ctx.mode,\r\n      direction: ctx.direction,\r\n    }"
+      },
+      {
+        "line": 320,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "fail",
+        "message": "`${label}: focal_segments의 head는 정확히 1개여야 함(실제 ${heads.length}개)`",
+        "evidence": "{\r\n      subrule: \"focal_head\",\r\n      actual: heads.length,\r\n      threshold: 1,\r\n      modality: ctx.mode,\r\n      direction: ctx.direction,\r\n    }"
+      },
+      {
+        "line": 330,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "fail",
+        "message": "`${label}: support 구간은 최대 2개(실제 ${supportCount}개)`",
+        "evidence": "{\r\n      subrule: \"support_count\",\r\n      actual: supportCount,\r\n      threshold: 2,\r\n      modality: ctx.mode,\r\n      direction: ctx.direction,\r\n    }"
+      },
+      {
+        "line": 340,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "fail",
+        "message": "`${label}: focal segment가 원문의 부분문자열이 아님 — \"${seg.text.slice(0, 30)}\"`",
+        "evidence": "{\r\n        subrule: \"substring\",\r\n        actual: seg.text,\r\n        threshold: \"source_text includes focal segment\",\r\n        modality: ctx.mode,\r\n        direction: ctx.direction,\r\n      }"
+      },
+      {
+        "line": 352,
+        "owner": "checkFocalDiscourse",
+        "id": "R29",
+        "level": "warning",
+        "message": "`${label}: focal segment 중복 — \"${seg.text.slice(0, 30)}\"`",
+        "evidence": "{\r\n        subrule: \"duplicate_segment\",\r\n        actual: seg.text,\r\n        threshold: \"unique focal segments\",\r\n        modality: ctx.mode,\r\n        direction: ctx.direction,\r\n      }"
+      },
+      {
+        "line": 371,
+        "owner": "checkCore",
+        "id": "R1c",
+        "level": "fail",
+        "message": "`코어 스키마 위반: ${parsed.error.issues[0]?.message ?? \"형식 오류\"}`"
+      },
+      {
+        "line": 377,
+        "owner": "checkCore",
+        "id": "R25",
+        "level": "fail",
+        "message": "\"신규 코어에 서버 주입 context_spec이 없음\""
+      },
+      {
+        "line": 388,
+        "owner": "checkCore",
+        "id": "R25",
+        "level": "fail",
+        "message": "\"신규 통역 코어의 context_spec에 A/B/C 및 P·D·R=A↔B 역할 계약이 없음\""
+      },
+      {
+        "line": 393,
+        "owner": "checkCore",
+        "id": "R1c",
+        "level": "fail",
+        "message": "`theme '${ctx.theme_code}'는 domain '${ctx.domain}'를 허용하지 않음`"
+      },
+      {
+        "line": 398,
+        "owner": "checkCore",
+        "id": "R1c",
+        "level": "fail",
+        "message": "`topic_code '${ctx.topic_code}'가 카탈로그에 없음`"
+      },
+      {
+        "line": 401,
+        "owner": "checkCore",
+        "id": "R1c",
+        "level": "fail",
+        "message": "`topic '${ctx.topic_code}'의 theme(${topic.themeCode}) ≠ 행 theme(${ctx.theme_code})`"
+      },
+      {
+        "line": 404,
+        "owner": "checkCore",
+        "id": "R1c",
+        "level": "fail",
+        "message": "`topic '${ctx.topic_code}'는 domain '${ctx.domain}'를 허용하지 않음`"
+      },
+      {
+        "line": 429,
+        "owner": "checkCoreCommon",
+        "id": "R8",
+        "level": "fail",
+        "message": "`${ctx.speech_act}는 인접쌍 둘째 짝 — preceding_turn 필수`"
+      },
+      {
+        "line": 436,
+        "owner": "checkCoreCommon",
+        "id": "R16",
+        "level": "fail",
+        "message": "\"통역(stt_interpreting)은 source_modality='spoken'이어야 함\""
+      },
+      {
+        "line": 439,
+        "owner": "checkCoreCommon",
+        "id": "R16",
+        "level": "fail",
+        "message": "\"번역은 source_modality='written'이어야 함\""
+      },
+      {
+        "line": 447,
+        "owner": "checkCoreCommon",
+        "id": "R16",
+        "level": "fail",
+        "message": "`번역 셀인데 situation_ko가 구두 수행을 명시함: \"${situation.slice(0, 60)}\"`"
+      },
+      {
+        "line": 454,
+        "owner": "checkCoreCommon",
+        "id": "R16",
+        "level": "fail",
+        "message": "`통역 셀인데 situation_ko가 서면 수행을 명시함: \"${situation.slice(0, 60)}\"`"
+      },
+      {
+        "line": 459,
+        "owner": "checkCoreCommon",
+        "id": "R30",
+        "level": "fail",
+        "message": "`학생용 situation_ko에 답안 평가 기준이 노출됨: ${learnerSceneIssue.message}`"
+      },
+      {
+        "line": 463,
+        "owner": "checkCoreCommon",
+        "id": "R17",
+        "level": "fail",
+        "message": "`industry는 domain='work'에서만 (현재 ${ctx.domain})`"
+      },
+      {
+        "line": 476,
+        "owner": "checkCoreCommon",
+        "id": "R26",
+        "level": "warning",
+        "message": "`지정 산업 '${ctx.industry}'을 보여 주는 구체적 업무·대상·어휘가 없음`",
+        "evidence": "{\r\n          subrule: \"industry_lexical_evidence\",\r\n          actual: 0,\r\n          threshold: 1,\r\n          modality: ctx.mode,\r\n          direction: ctx.direction,\r\n          context: { industry: ctx.industry },\r\n        }"
+      },
+      {
+        "line": 495,
+        "owner": "checkCoreCommon",
+        "id": "R9",
+        "level": "fail",
+        "message": "`국가 단위 일반화 표현: \"${field.slice(0, 30)}…\"`"
+      },
+      {
+        "line": 511,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "`스키마 위반: ${parsed.error.issues[0]?.path?.join(\".\")} ${parsed.error.issues[0]?.message ?? \"\"}`"
+      },
+      {
+        "line": 536,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "\"현행 mission_v5 생성계약은 독립 맥락 대비 문항을 포함한 MJT5여야 함\""
+      },
+      {
+        "line": 540,
+        "owner": "checkMission",
+        "id": "R15",
+        "level": "fail",
+        "message": "\"현행 미션의 학습목표는 요청된 speech_act로 명시되어야 함\""
+      },
+      {
+        "line": 547,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "\"현행 미션에는 화행 목표 기반 contrast_plan_v1이 필요함\""
+      },
+      {
+        "line": 560,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "`문항 ${item.id}: contrast plan 슬롯과 실제 문항이 다름`"
+      },
+      {
+        "line": 576,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "`유형 순서 위반: ${typesInOrder.join(\"→\")}`"
+      },
+      {
+        "line": 579,
+        "owner": "checkMission",
+        "id": "R13",
+        "level": "fail",
+        "message": "`target_feature '${m.unit.target_feature}'가 카탈로그에 없음`"
+      },
+      {
+        "line": 587,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "`문항 ${it.id}: item_focus와 호환 axis_feature가 다름`"
+      },
+      {
+        "line": 590,
+        "owner": "checkMission",
+        "id": "R13",
+        "level": "fail",
+        "message": "`문항 ${it.id}: item_focus '${itemFocus}'가 카탈로그에 없음`"
+      },
+      {
+        "line": 592,
+        "owner": "checkMission",
+        "id": "R15",
+        "level": "fail",
+        "message": "`문항 ${it.id}: item_focus가 요청 화행(${ctx.speech_act})과 다름`"
+      },
+      {
+        "line": 600,
+        "owner": "checkMission",
+        "id": "R1",
+        "level": "fail",
+        "message": "`문항 ${it.id}: band code '${c}'가 '${itemFeature.code}' band_schema에 없음`"
+      },
+      {
+        "line": 615,
+        "owner": "checkMission",
+        "id": "R7",
+        "level": "fail",
+        "message": "`문항 ${it.id}: scale4 accepted가 연속 구간이 아님 (${it.accepted_scale_codes.join(\",\")})`"
+      },
+      {
+        "line": 629,
+        "owner": "checkMission",
+        "id": "R7",
+        "level": "fail",
+        "message": "`문항 ${it.id}: v4 Scale4 accepted는 같은 적절성 방향의 정확히 두 응답이어야 함`"
+      },
+      {
+        "line": 632,
+        "owner": "checkMission",
+        "id": "R7",
+        "level": "fail",
+        "message": "`문항 ${it.id}: reference_scale_code가 accepted 방향에 포함되지 않음`"
+      },
+      {
+        "line": 635,
+        "owner": "checkMission",
+        "id": "R7",
+        "level": "warning",
+        "message": "`문항 ${it.id}: 첫인상 문항이 적절한 반례가 아님 — \"직접적이면 항상 나쁨\" 편향 차단 여부를 눈검사`"
+      },
+      {
+        "line": 644,
+        "owner": "checkMission",
+        "id": "R2",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 네이티브 MJT5 맥락 대비 판단은 비적정 대역 1개여야 함`"
+      },
+      {
+        "line": 647,
+        "owner": "checkMission",
+        "id": "R2",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 네이티브 MJT5 맥락 대비 판단은 DCT와 같은 앵커 PDR이어야 함`"
+      },
+      {
+        "line": 651,
+        "owner": "checkMission",
+        "id": "R2",
+        "level": "fail",
+        "message": "`문항 ${it.id}: legacy judge3 accepted에 within_band(${withinCode}) 없음 — 반례 문항 규칙`"
+      },
+      {
+        "line": 661,
+        "owner": "checkMission",
+        "id": "R3",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 native fix_choice는 수정안 3개·권장안 1개여야 함`"
+      },
+      {
+        "line": 663,
+        "owner": "checkMission",
+        "id": "R3",
+        "level": "fail",
+        "message": "`문항 ${it.id}: fix_choice valid=${validCount} (정확히 2여야 함)`"
+      },
+      {
+        "line": 667,
+        "owner": "checkMission",
+        "id": "R18",
+        "level": "fail",
+        "message": "`문항 ${it.id}: fix_choice accepted에 적정 대역 포함 — 부적절 계열이어야 함`"
+      },
+      {
+        "line": 670,
+        "owner": "checkMission",
+        "id": "R3",
+        "level": "fail",
+        "message": "`문항 ${it.id}: v4 판단+교정은 DCT와 같은 앵커 PDR이어야 함`"
+      },
+      {
+        "line": 680,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: accepted_reason_ids가 reasons에 없는 id 참조`"
+      },
+      {
+        "line": 684,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "warning",
+        "message": "`문항 ${it.id}: reason_conf pdr이 production_task와 다른 조건대(난이도 브리지 권장)`"
+      },
+      {
+        "line": 688,
+        "owner": "checkMission",
+        "id": "R18",
+        "level": "fail",
+        "message": "`문항 ${it.id}: reason_conf accepted에 적정 대역 포함 — 부적절 계열이어야 함`"
+      },
+      {
+        "line": 698,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 이유 선택지 문구가 중복됨`"
+      },
+      {
+        "line": 701,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: accepted_reason_id가 reasons에 없는 id 참조`"
+      },
+      {
+        "line": 707,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 이유 역할은 주원인·화용 오개념·의미/문법/맥락 오답이 각 1개여야 함`"
+      },
+      {
+        "line": 710,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: accepted_reason_id는 primary 이유여야 함`"
+      },
+      {
+        "line": 713,
+        "owner": "checkMission",
+        "id": "R18",
+        "level": "fail",
+        "message": "`문항 ${it.id}: reason problem_band_code가 적정 대역임`"
+      },
+      {
+        "line": 716,
+        "owner": "checkMission",
+        "id": "R4",
+        "level": "fail",
+        "message": "`문항 ${it.id}: v4 이유 문항은 DCT와 같은 앵커 PDR이어야 함`"
+      },
+      {
+        "line": 734,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 MultiJudge는 4후보·적정 2·조정 필요 2여야 함`"
+      },
+      {
+        "line": 739,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 여러 초안 비교의 후보 문장이 중복됨`"
+      },
+      {
+        "line": 742,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 MultiJudge는 앵커 PDR에서 한 축만 바꾼 대비 상황이어야 함`"
+      },
+      {
+        "line": 756,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 MultiJudge는 4후보·BEST 1·중간 2·WORST 1이어야 함`"
+      },
+      {
+        "line": 763,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: BEST 후보는 적정 대역이어야 함`"
+      },
+      {
+        "line": 766,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: WORST 후보는 비적정 대역이어야 함`"
+      },
+      {
+        "line": 769,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 MultiJudge는 앵커 PDR에서 한 축만 바꾼 대비 상황이어야 함`"
+      },
+      {
+        "line": 786,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: v4 MultiJudge는 과소 2·적정 2·과잉 1이어야 함`"
+      },
+      {
+        "line": 789,
+        "owner": "checkMission",
+        "id": "R5",
+        "level": "fail",
+        "message": "`문항 ${it.id}: v4 MultiJudge는 앵커 PDR에서 한 축만 바꾼 대비 상황이어야 함`"
+      },
+      {
+        "line": 801,
+        "owner": "checkMission",
+        "id": "R11",
+        "level": "fail",
+        "message": "`reference_alternatives는 1~2개 (현재 ${altCount})`"
+      },
+      {
+        "line": 805,
+        "owner": "checkMission",
+        "id": "R11",
+        "level": "fail",
+        "message": "`문항 ${it.id}: recommended_example 없음`"
+      },
+      {
+        "line": 816,
+        "owner": "checkMission",
+        "id": "R13",
+        "level": "fail",
+        "message": "`target_feature_version(${m.unit.target_feature_version}) ≠ 카탈로그(${feature.version})`"
+      },
+      {
+        "line": 819,
+        "owner": "checkMission",
+        "id": "R14",
+        "level": "fail",
+        "message": "`learner_label이 카탈로그 값과 다름 (AI 생성 의심)`"
+      },
+      {
+        "line": 822,
+        "owner": "checkMission",
+        "id": "R14",
+        "level": "fail",
+        "message": "`closing_ko가 카탈로그 값과 다름 (AI 생성 의심)`"
+      },
+      {
+        "line": 826,
+        "owner": "checkMission",
+        "id": "R15",
+        "level": "fail",
+        "message": "`카탈로그 화행(${feature.speech_act}) ≠ 요청 화행(${ctx.speech_act})`"
+      },
+      {
+        "line": 847,
+        "owner": "checkMission",
+        "id": "R8",
+        "level": "fail",
+        "message": "`문항 ${it.id}: ${isV4Contract ? \"legacy v4 관계 맥락\" : ctx.speech_act}은 preceding_turn 필수`"
+      },
+      {
+        "line": 859,
+        "owner": "checkMission",
+        "id": "R8",
+        "level": "fail",
+        "message": "`문항 ${it.id}: native MJT5는 preceding_turn을 생성하지 않음`"
+      },
+      {
+        "line": 863,
+        "owner": "checkMission",
+        "id": "R8",
+        "level": "fail",
+        "message": "\"production_task: native MJT5는 preceding_turn을 사용하지 않음\""
+      },
+      {
+        "line": 868,
+        "owner": "checkMission",
+        "id": "R8",
+        "level": "fail",
+        "message": "\"production_task: 거절·응답류는 preceding_turn 필수\""
+      },
+      {
+        "line": 874,
+        "owner": "checkMission",
+        "id": "R16",
+        "level": "fail",
+        "message": "\"통역 셀인데 production_task.mode ≠ interpreting\""
+      },
+      {
+        "line": 877,
+        "owner": "checkMission",
+        "id": "R16",
+        "level": "fail",
+        "message": "\"interpreting인데 source_modality ≠ spoken\""
+      },
+      {
+        "line": 911,
+        "owner": "checkMission",
+        "id": "R29",
+        "level": "warning",
+        "message": "`reference_alternatives가 담화 전체를 옮기지 않은 것으로 보임(원문 ${srcLen}자 대비 ${altLen}자): \"${alt.text.slice(0, 24)}\"`"
+      },
+      {
+        "line": 935,
+        "owner": "checkMission",
+        "id": "R31",
+        "level": "fail",
+        "message": "`${issue.target_path ? `${issue.target_path}: ` : \"\"}${issue.message}`"
+      },
+      {
+        "line": 942,
+        "owner": "checkMission",
+        "id": "R31",
+        "level": "fail",
+        "message": "\"mission_v5 item_lineage는 교수자 최종 검수 전 pending 상태여야 함\""
+      },
+      {
+        "line": 945,
+        "owner": "checkMission",
+        "id": "R31",
+        "level": "fail",
+        "message": "\"item_lineage.coverage_summary 누락\""
+      },
+      {
+        "line": 947,
+        "owner": "checkMission",
+        "id": "R31",
+        "level": "fail",
+        "message": "`model_unattributed 비율 20% 초과 (${coverage.unattributed_count}/${coverage.total_count})`"
+      },
+      {
+        "line": 949,
+        "owner": "checkMission",
+        "id": "R32",
+        "level": "warning",
+        "message": "`교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개`"
+      },
+      {
+        "line": 967,
+        "owner": "checkMission",
+        "id": "R31",
+        "level": "fail",
+        "message": "\"item_lineage attribution provenance가 mission_v5 생성계약과 다름\""
+      },
+      {
+        "line": 986,
+        "owner": "checkMission",
+        "id": "R33",
+        "level": "fail",
+        "message": "\"현행 mission_v5는 서로 다른 진단차원을 2~6개 포함해야 함\""
+      },
+      {
+        "line": 989,
+        "owner": "checkMission",
+        "id": "R33",
+        "level": "fail",
+        "message": "\"diagnostic_dimensions.code는 허용 코드의 중복 없는 집합이어야 함\""
+      },
+      {
+        "line": 1002,
+        "owner": "checkMission",
+        "id": "R33",
+        "level": "fail",
+        "message": "`${dimension.code}: 근거 위치·설명 계약 위반`"
+      },
+      {
+        "line": 1006,
+        "owner": "checkMission",
+        "id": "R33",
+        "level": "fail",
+        "message": "\"복수 진단차원은 MJT/DCT 중 최소 두 위치에 실제 근거를 가져야 함\""
+      },
+      {
+        "line": 1012,
+        "owner": "checkMission",
+        "id": "R24",
+        "level": "fail",
+        "message": "`unit.target_feature(${m.unit.target_feature}) ≠ 계획 초점(${ctx.planned_target_feature})`"
+      },
+      {
+        "line": 1027,
+        "owner": "checkProvenance",
+        "id": "R20",
+        "level": "fail",
+        "message": "\"mission_content.provenance 객체가 없음\""
+      },
+      {
+        "line": 1037,
+        "owner": "checkProvenance",
+        "id": "R20",
+        "level": "fail",
+        "message": "`provenance.${label} 누락`"
+      },
+      {
+        "line": 1040,
+        "owner": "checkProvenance",
+        "id": "R20",
+        "level": "fail",
+        "message": "\"provenance.generation_attempt는 1 이상 정수\""
+      },
+      {
+        "line": 1081,
+        "owner": "checkTargetHighlights",
+        "id": "R6",
+        "level": "fail",
+        "message": "`문항 ${id}: highlight \"${h}\"가 target에 없음`"
+      },
+      {
+        "line": 1125,
+        "owner": "checkMultiJudgeLength",
+        "id": "R5",
+        "level": "warning",
+        "message": "`문항 ${id}: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨` +\r\n            ` (${separation}; ${candidateLengths}). 재생성 시 각 후보의 초점 자원과 대역은 유지하고,` +\r\n            ` 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요`"
+      },
+      {
+        "line": 1144,
+        "owner": "checkMultiJudgeLength",
+        "id": "R5",
+        "level": "warning",
+        "message": "`문항 ${id}: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)`"
+      },
+      {
+        "line": 1151,
+        "owner": "checkMultiJudgeLength",
+        "id": "R5",
+        "level": "warning",
+        "message": "`문항 ${id}: 과소안이 전부 최단 — 길이 단서 가능(눈검사)`"
+      },
+      {
+        "line": 1156,
+        "owner": "checkMultiJudgeLength",
+        "id": "R5",
+        "level": "warning",
+        "message": "`문항 ${id}: 최장/최단 길이 비율 ${(maxLen / minLen).toFixed(1)} > 3`"
+      },
+      {
+        "line": 1193,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"문항 3: [slot:MJT3] Anchor A situation_ko가 MJT2와 동일하지 않음\""
+      },
+      {
+        "line": 1196,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"문항 4: [slot:MJT4] Anchor A situation_ko가 MJT2와 동일하지 않음\""
+      },
+      {
+        "line": 1199,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"문항 1: [slot:MJT1] Contrast X situation_ko가 Anchor A와 완전히 중복됨\""
+      },
+      {
+        "line": 1202,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"문항 5: [slot:MJT5] Contrast Y situation_ko가 X 또는 A와 완전히 중복됨\""
+      },
+      {
+        "line": 1205,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"production_task: [slot:DCT] New Event C situation_ko가 X/A/Y 상황을 완전히 복제함\""
+      },
+      {
+        "line": 1208,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "\"문항 1: [slot:MJT1] Contrast X는 Anchor PDR에서 정확히 한 축만 달라야 함\""
+      },
+      {
+        "line": 1219,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "`v4 MJT 문항 ${indexes.join(\"·\")}의 situation_ko가 완전히 중복됨: ` +\r\n          `\"${situation.slice(0, 90)}${situation.length > 90 ? \"…\" : \"\"}\". ` +\r\n          \"앵커 PDR은 유지하되 인물의 구체적 용건·대상·사건을 서로 다르게 다시 만드세요\""
+      },
+      {
+        "line": 1230,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "`v4 MJT 문항 ${index + 1}의 situation_ko가 DCT 상황을 그대로 복제함: ` +\r\n          `\"${situation.slice(0, 90)}${situation.length > 90 ? \"…\" : \"\"}\". ` +\r\n          \"같은 앵커 PDR을 유지하면서도 DCT와 다른 인물의 구체적 용건·대상·사건으로 다시 만드세요\""
+      },
+      {
+        "line": 1243,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "fail",
+        "message": "`문항 ${it.id}: 현행 learner situation은 140자 이내의 정확히 2문장이어야 함`"
+      },
+      {
+        "line": 1245,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "warning",
+        "message": "`문항 ${it.id}: 상황문이 짧아 P/D/R 근거가 충분히 보이지 않을 수 있음`"
+      },
+      {
+        "line": 1252,
+        "owner": "checkV4ContextPlan",
+        "id": "R28",
+        "level": "fail",
+        "message": "`문항 ${it.id}: channel(${it.channel})이 ${m.production_task.mode} 수행 방식과 맞지 않음`"
+      },
+      {
+        "line": 1258,
+        "owner": "checkV4ContextPlan",
+        "id": "R27",
+        "level": "warning",
+        "message": "\"production_task: learner situation이 권장 형식(140자 이내의 정확히 2문장)을 벗어남\"",
+        "evidence": "{\r\n        subrule: \"dct_scene_shape\",\r\n        actual: { sentence_count: productionMarks, chars: production.length },\r\n        threshold: { sentence_count: 2, max_chars: 140 },\r\n        modality: m.production_task.mode,\r\n        direction: m.direction,\r\n      }"
+      },
+      {
+        "line": 1281,
+        "owner": "checkSetDistribution",
+        "id": "R12",
+        "level": "warning",
+        "message": "`세트 accepted 분포가 전부 동일 방향(${[...dirs].join(\",\")}) — 정답 예측 가능`"
+      },
+      {
+        "line": 1286,
+        "owner": "checkSetDistribution",
+        "id": "R12",
+        "level": "warning",
+        "message": "`세트에 within_band 정답 문항이 없음 — \"부적절이 정답\" 편향 위험`"
+      },
+      {
+        "line": 1300,
+        "owner": "checkNationalization",
+        "id": "R9",
+        "level": "fail",
+        "message": "`국가 단위 일반화: \"${f.slice(0, 30)}…\"`"
+      },
+      {
+        "line": 1317,
+        "owner": "checkGroup",
+        "id": "R19",
+        "level": "warning",
+        "message": "`${label} 완전 중복: ${firstWhere} = ${value.where} — \"${text.slice(0, 24)}${text.length > 24 ? \"…\" : \"\"}\"`"
+      },
+      {
+        "line": 1359,
+        "owner": "checkRecommendedConsistency",
+        "id": "R21",
+        "level": "fail",
+        "message": "`문항 ${it.id}: recommended_example가 부적절 target과 동일`"
+      },
+      {
+        "line": 1365,
+        "owner": "checkRecommendedConsistency",
+        "id": "R21",
+        "level": "fail",
+        "message": "`문항 ${it.id}: recommended_example가 invalid 교정안과 동일`"
+      },
+      {
+        "line": 1374,
+        "owner": "checkInheritance",
+        "id": "R23",
+        "level": "fail",
+        "message": "\"production_task.source_text가 코어를 계승하지 않음\""
+      },
+      {
+        "line": 1378,
+        "owner": "checkInheritance",
+        "id": "R23",
+        "level": "fail",
+        "message": "\"production_task.pdr가 코어를 계승하지 않음\""
+      },
+      {
+        "line": 1381,
+        "owner": "checkInheritance",
+        "id": "R23",
+        "level": "fail",
+        "message": "`production_task.source_modality(${pt.source_modality}) ≠ 코어(${core.source_modality})`"
+      },
+      {
+        "line": 1384,
+        "owner": "checkInheritance",
+        "id": "R23",
+        "level": "fail",
+        "message": "`미션 방향(${m.direction}) ≠ 코어 방향(${core.direction})`"
+      },
+      {
+        "line": 1392,
+        "owner": "checkInheritance",
+        "id": "R23",
+        "level": "fail",
+        "message": "\"production_task.usable_facts가 코어의 서버 승인 사실 목록을 계승하지 않음\""
+      }
+    ]
+  },
+  "validation": {
+    "files": 13,
+    "total": 151,
+    "passed": 151,
+    "failed": 0,
+    "skipped": 0,
+    "filesDetail": [
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/bidirectional.test.ts",
+        "status": "passed",
+        "count": 7,
+        "assertions": [
+          {
+            "title": "0-l ① v1 core → v2 정규화 필드 매핑 + direction=ko_zh",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ② v1 mission → v2 정규화 MPJ·production_task 중립 필드 매핑",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ③ ko_zh R10 한국어 원문 + 중국어 산출 = 언어 실패 없음",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ③ ko_zh R10 코어도 통과",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ④ zh_ko R10 중국어 원문 + 한국어 산출 = zh_ko 방향에서 언어 실패 없음",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ⑤ 방향 불일치 fail ko_zh 데이터에 zh_ko 요청 → R10 fail",
+            "status": "passed"
+          },
+          {
+            "title": "0-l ⑤ 방향 불일치 fail zh_ko 데이터에 ko_zh 요청 → R10 fail",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/contentReview.test.ts",
+        "status": "passed",
+        "count": 19,
+        "assertions": [
+          {
+            "title": "current content five-stage review reuses matching generation evidence and makes additional models opt-in",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review keeps critical and uncertain findings from both models for human decisions",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review keeps Claude independent and excludes OpenAI's first judgment from adjudication",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review requires exactly one reasoned disposition per Claude finding, including rejection",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review rejects invented evidence and inconsistent pass verdicts",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review allows recorded revision or defer but requires every finding cleared for approval",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review hashes instructional changes but not finalization metadata or object key order",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review does not infer professor approval from model completion",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review covers raw MPJ5, DCT and core while stripping prior critic findings",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review versions the corrected rules in the snapshot without replacing earlier review hashes",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review blocks incomplete weeks and reviews shared original plus unique private notes",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review hashes the selected refusal teaching case in private review content without exposing it publicly",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review 중한 통번역 주차의 두 모드를 검토하고 이전 계약 해시와 구분한다",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review excludes the retired opening from weekly review while preserving material and assignment checks",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review saves successful provider metadata and never silently retries truncation or refusal",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review records the bounded Opus request and accepts text alongside thinking blocks",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review copies exact evidence without rewriting model findings or accepting nonexistent paths",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review reports a connection timeout without retrying the provider",
+            "status": "passed"
+          },
+          {
+            "title": "current content five-stage review reports a body timeout without retrying the provider",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/contentReviewApi.test.ts",
+        "status": "passed",
+        "count": 1,
+        "assertions": [
+          {
+            "title": "sends only version hashes when passed a complete inspection snapshot",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/coreBatchRun.test.ts",
+        "status": "passed",
+        "count": 5,
+        "assertions": [
+          {
+            "title": "core batch resume 모든 연구 축과 반복 index로 안정적인 item key를 만든다",
+            "status": "passed"
+          },
+          {
+            "title": "core batch resume 같은 run ID의 저장 완료 항목은 AI 호출 없이 완료로 처리한다",
+            "status": "passed"
+          },
+          {
+            "title": "core batch resume 부분 재생성에서도 원래 계획 index로 item key와 결과 번호를 유지한다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 bounded semantic adjudication lexical warning 때만 industry 축을 호출하고 semantic fail은 저장하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 bounded semantic adjudication industry pass이면 lexical warning을 보존하고 저장한다",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/coreSourceRepair.test.ts",
+        "status": "passed",
+        "count": 30,
+        "assertions": [
+          {
+            "title": "core source discourse boundary 중국어 쉼표만 이어진 장문은 한 문장으로 판정한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 중국어 종결부호로 나뉜 2~4문장은 통과한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 공백·문장부호를 제외한 유효 글자 수를 센다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 통역 입문 범위를 벗어난 장문은 글자 수 교정 대상으로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 교정 요청은 기존 사실 보존과 중국어 문장 경계를 함께 고정한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 길이 교정문이 기존 focal segment를 보존하면 기존 표지를 안전하게 재사용한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 중→한 응답 화행의 중국어 선행 발화를 한국어 오류로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 한→중 응답 화행의 한국어 선행 발화를 중국어 오류로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 응답 화행의 빈 선행 발화만 필수 오류로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 선행 발화 전용 교정은 source_text를 고정하고 target 언어를 명시한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 통역 이유가 드러나지 않는 단일언어 장면을 교정 대상으로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 학습자가 원발화자와 통역사를 겸하는 실제 실패 문형을 차단한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 세 역할이 명시되면 '두 사람 사이' 같은 고정 문구 없이도 통과한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 학습자 C를 가리키는 2인칭 '당신' 통역 문장을 계약상 유효하게 본다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 통역 첫 문장을 방향별 A/B/C 역할·언어 계약으로 결정론적으로 고정한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary v55의 C=멘토 합체 역할 문장을 서버 역할 문장으로 교체한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary v55의 학습자 A 결속을 situation·relation 모두 원발화자 A로 정규화한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary v55 무저장 재카나리 18건을 새 역할 정규화에 재생하면 R16 역할 오류가 남지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 학습자 A/B 결속은 relation_ko에만 남아도 역할 중첩으로 차단한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary A/B인 학생 뒤에 통역 단어가 있다는 이유만으로 C가 있다고 오인하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 부분 블라인드 패킷의 역할 중첩·A 1인칭 사례를 새 계약으로 구분한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 통역사가 원발화를 듣는 정상 논항은 차단하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary '직접'은 역할에 따라 hard fail·warning·허용으로 나눈다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 학생용 상황문의 정답 방향 노출을 별도 오류로 잡는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 번역 장면에는 이중언어 통역 참여자 검사를 적용하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 여러 교정 중 통과한 source_text만 원본에 합성한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 길이가 아직 실패해도 통과한 이중언어 장면은 독립적으로 합성한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 평가 기준 제거 repair만 통과해도 situation_ko를 독립 합성한다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 평가 기준 repair가 통역 역할을 다시 합치면 정규화 후에도 남는 오류를 채택하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "core source discourse boundary 원문 교정은 head가 없는 focal_segments를 채택하지 않는다",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/hskLexicalAudit.edge.test.ts",
+        "status": "passed",
+        "count": 6,
+        "assertions": [
+          {
+            "title": "HSK 3.0 lexical reference policy maps PRAGMA levels to cumulative lexical ceilings without claiming equivalence",
+            "status": "passed"
+          },
+          {
+            "title": "HSK 3.0 lexical reference policy extracts distinct Chinese word-like tokens",
+            "status": "passed"
+          },
+          {
+            "title": "HSK 3.0 lexical reference policy collects Chinese target fields for ko_zh missions",
+            "status": "passed"
+          },
+          {
+            "title": "HSK 3.0 lexical reference policy collects only Chinese source fields for zh_ko missions",
+            "status": "passed"
+          },
+          {
+            "title": "HSK 3.0 lexical reference policy returns a non-blocking audit with review candidates",
+            "status": "passed"
+          },
+          {
+            "title": "HSK 3.0 lexical reference policy does not fail generation when the reference lookup is unavailable",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/itemLineage.test.ts",
+        "status": "passed",
+        "count": 5,
+        "assertions": [
+          {
+            "title": "item-level realization lineage covers all 19 target, correction, candidate, recommendation, and reference paths",
+            "status": "passed"
+          },
+          {
+            "title": "item-level realization lineage rejects a missing target path and a cross-act rule instead of treating claims as verified",
+            "status": "passed"
+          },
+          {
+            "title": "item-level realization lineage does not attach the ko→zh pack outside the audited direction",
+            "status": "passed"
+          },
+          {
+            "title": "item-level realization lineage preserves pending lineage without claiming that mission v5 already hard-gates attribution",
+            "status": "passed"
+          },
+          {
+            "title": "item-level realization lineage hard-gates current covered mission_v5 while preserving legacy v5 readability",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/miniDiscourse.test.ts",
+        "status": "passed",
+        "count": 19,
+        "assertions": [
+          {
+            "title": "countSentences 종결 부호로 문장을 센다",
+            "status": "passed"
+          },
+          {
+            "title": "coreLengthHintKo — 생성 안내는 R29 글자 수 정책에서 파생된다 수준·모드별로 다른 유효 글자 범위를 안내한다",
+            "status": "passed"
+          },
+          {
+            "title": "coreLengthHintKo — 생성 안내는 R29 글자 수 정책에서 파생된다 통역 안내에는 기억 부담 경계가 붙는다",
+            "status": "passed"
+          },
+          {
+            "title": "coreLengthHintKo — 생성 안내는 R29 글자 수 정책에서 파생된다 공백·문장부호를 제외해 원문 부담을 센다",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments 정상 미니 담화 코어는 R29 위반이 없다",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments 글자 수 하한보다 짧은 한 문장 원문은 minimum warning",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments 글자 수 상한을 넘으면 maximum hard fail",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments 원문에 없는 구간은 fail",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments head가 2개면 fail",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments head가 없으면 fail",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments 글자 수 범위 안에서 문장 수만 벗어나면 warning",
+            "status": "passed"
+          },
+          {
+            "title": "R29 focal segments legacy 단문 코어(v2)는 R29 면제 — focal_segments 부재",
+            "status": "passed"
+          },
+          {
+            "title": "normalizeCore — v3 상위집합 정규화 v2는 focal_segments 없이 v3로 승격된다",
+            "status": "passed"
+          },
+          {
+            "title": "normalizeCore — v3 상위집합 정규화 v3는 focal_segments를 보존한다",
+            "status": "passed"
+          },
+          {
+            "title": "normalizeCore — v3 상위집합 정규화 길이 정책 스냅샷은 정규화하되 콘텐츠 동일성 hash 입력에서는 제외한다",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5는 v4 계약 검사를 그대로 통과한다 정상 v5 미션에는 fail 위반이 없다",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5는 v4 계약 검사를 그대로 통과한다 유형 순서를 흐트러뜨리면 v5도 R1 fail이다 — 검사 면제가 아니다",
+            "status": "passed"
+          },
+          {
+            "title": "R29 reference_alternatives 담화 커버리지 (2026-07-30 실화면 회귀) 중심 화행만 옮긴 참고안은 warning으로 잡힌다",
+            "status": "passed"
+          },
+          {
+            "title": "R29 reference_alternatives 담화 커버리지 (2026-07-30 실화면 회귀) 담화 전체를 옮긴 참고안은 warning이 없다",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.audit.test.ts",
+        "status": "passed",
+        "count": 9,
+        "assertions": [
+          {
+            "title": "rejects duplicate reason wording despite different IDs and punctuation",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions warns on fully separable R5 length ranges without blocking overlapping ranges",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions rejects a Chinese target that contains Hangul instead of accepting one Han character",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions warns when MPJ source events or judgment candidates are exactly reused",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions enforces the native R27 X-A-A-A-Y-C topology without rejecting Anchor A sharing",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions fails when a recommended repair repeats an explicitly invalid correction",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions keeps the superseded R22 number retired instead of silently reusing it",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions directly exercises the older deterministic guards that remain active",
+            "status": "passed"
+          },
+          {
+            "title": "mission rule audit regressions keeps industry metadata out of non-work cores through R17",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.industry.test.ts",
+        "status": "passed",
+        "count": 7,
+        "assertions": [
+          {
+            "title": "R26 업무 분야의 구체적 실현 범용 회사·프로젝트 표현만 있는 교육·연구 셀은 lexical warning을 낸다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 연구 대상과 논문 심사 일정이 드러나는 교육·연구 셀은 허용한다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 범용 사내 행사만 있는 관광·MICE 셀은 lexical warning을 낸다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 컨벤션 방문객과 전시회 일정이 드러나는 관광·MICE 셀은 허용한다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 엔터테인먼트·미디어 셀에서 드라마 서사 구조는 산업 단서로 인정한다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 엔터테인먼트·미디어 셀에서 예능 시놉시스·출연자는 산업 단서로 인정한다",
+            "status": "passed"
+          },
+          {
+            "title": "R26 업무 분야의 구체적 실현 범용 기획 표현만 있는 엔터테인먼트·미디어 셀은 warning을 유지한다",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.mode.test.ts",
+        "status": "passed",
+        "count": 16,
+        "assertions": [
+          {
+            "title": "R16 명시적 수행 모드 모순 번역 셀에서 글을 부정하고 직접 말한다고 하면 저장 전 차단한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 이메일로 작성해 보낸다고 하면 저장 전 차단한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 번역 셀의 즉시 반응 기대와 통역 셀의 직접 대화는 각각 허용한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 보조사가 낀 부정",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 부정어가 멀리 있는 경우",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 어간이 줄어든 부정",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 지+ㄴ 축약 부정",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 번역 셀에서 '직접 수행'은 구두 수행 명시가 아니다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 셀에서 서면을 부정하는 표현은 오탐이 아니다 진짜 서면 장면은 그대로 차단한다 — 활용형이 바뀌어도",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 장면의 이중언어 참여자 통역사 소개 없이 자연스러운 1인칭 훈련 장면을 허용한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 장면의 이중언어 참여자 원발화자·학습자 통역사·청자의 세 역할이 분리된 장면은 통과한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 장면의 이중언어 참여자 역할 명사가 분리되면 '두 사람 사이'라는 고정 문구를 요구하지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 장면의 이중언어 참여자 역할 소개 생략과 직접 대화에 기계적인 역할 경고를 붙이지 않는다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 통역 장면의 이중언어 참여자 신규 통역 코어는 구조화된 A/B/C·PDR 역할 계약도 필요하다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 R30 학생용 평가 기준 비노출 정중성·부담 완화 방향을 상황문에 알려 주면 저장 전 차단한다",
+            "status": "passed"
+          },
+          {
+            "title": "R16 명시적 수행 모드 모순 R30 학생용 평가 기준 비노출 관찰 가능한 상대·용건만 제시한 상황문은 통과한다",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionSchema.test.ts",
+        "status": "passed",
+        "count": 26,
+        "assertions": [
+          {
+            "title": "mission_v3 MPJ4 contract accepts the four-item order and keeps legacy MPJ5 readable",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v3 MPJ4 contract rejects multi_judge and a fifth item in mission_v3",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v3 MPJ4 contract applies the new R1 order without weakening legacy checks",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract keeps the local learner preview on the validated v4 contract",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract accepts Scale4 → Judge3+FixChoice → Reason → MultiJudge and preserves older versions",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract passes deterministic v4 structure rules",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract rejects repeated Judge3/ReasonConf, four-candidate MultiJudge, and missing context",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract fails ambiguous primary reasons and an uncontrolled PDR contrast",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract returns actionable R27 retry details for duplicated MPJ and DCT situations",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract returns candidate bands, lengths, and a focus-preserving R5 retry instruction",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v4 MPJ4 + DCT contract accepts Scale4 by polarity but requires one reference degree inside that polarity",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract accepts native MPJ5 while keeping legacy mission_v5 MPJ4 readable",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract passes native order, anchor, and band rules",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract keeps catalog 1.0 records readable without silently approving them against 1.1",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract accepts four band-pair candidates without legacy roles and omits current native preceding turns",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract keeps the four-role check for historical native MPJ5",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract keeps the v8 band-pair contract after the current prompt advances",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract preserves saved bands and shared Anchor independently of prompt mission_v5_mpj5_minidiscourse_v15_zhko_bidirectional_lock",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract preserves saved bands and shared Anchor independently of prompt mission_v5_mpj5_minidiscourse_v16_natural_scene",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract preserves saved bands and shared Anchor independently of prompt another_prompt_with_the_same_saved_contract",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract requires concise two-sentence scenes and one recommended repair in the current native flow",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract requires two acceptable and two adjustment-needed candidates without duplicates",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract rejects a native judge outside the anchor or assigned to within_band",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract does not allow the current native prompt version on a legacy four-item payload",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract requires grounded multidimensional coverage only for the current native prompt",
+            "status": "passed"
+          },
+          {
+            "title": "mission_v5 native MPJ5 contract rejects duplicate dimension codes and evidence concentrated in one location",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "file": "C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionUsableFacts.test.ts",
+        "status": "passed",
+        "count": 1,
+        "assertions": [
+          {
+            "title": "0-w usable_facts inheritance accepts an exact core list and rejects mission-side drift",
+            "status": "passed"
+          }
+        ]
+      }
+    ],
+    "bundle": {
+      "command": "node scripts/build-content-review-domain.mjs --check",
+      "result": "verified",
+      "characters": 300876
+    }
+  },
+  "syntheticProbes": {
+    "currentPrompt": "mission_v5_mpj5_minidiscourse_v18_candidate_feedback",
+    "baseline": {
+      "core": [],
+      "mission": [
+        {
+          "id": "R5",
+          "level": "warning",
+          "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+        },
+        {
+          "id": "R5",
+          "level": "warning",
+          "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+        },
+        {
+          "id": "R19",
+          "level": "warning",
+          "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+        },
+        {
+          "id": "R19",
+          "level": "warning",
+          "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+        }
+      ]
+    },
+    "cases": [
+      {
+        "name": "baseline_core",
+        "type": "core",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "pass",
+        "focus": [],
+        "allViolations": []
+      },
+      {
+        "name": "baseline_mission",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R9_negated_quote",
+        "type": "core",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R9",
+            "level": "fail",
+            "message": "국가 단위 일반화 표현: \"중국인은 모두 같다는 일반화는 피해야 한다. 동료에게 …\""
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R9",
+            "level": "fail",
+            "message": "국가 단위 일반화 표현: \"중국인은 모두 같다는 일반화는 피해야 한다. 동료에게 …\""
+          }
+        ],
+        "changedExample": "중국인은 모두 같다는 일반화는 피해야 한다. 동료에게 일정을 알리는 글을 보낸다."
+      },
+      {
+        "name": "R9_group_paraphrase",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ],
+        "changedExample": "한국 사람은 누구나 무조건 간접 표현만 선호한다."
+      },
+      {
+        "name": "R9_mission_scene_gap",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ],
+        "changedExample": "중국인들은 항상 간접 표현을 좋아한다. 동료에게 일정을 알리는 글을 보낸다."
+      },
+      {
+        "name": "R30_physical_intensity",
+        "type": "core",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R30",
+            "level": "fail",
+            "message": "학생용 situation_ko에 답안 평가 기준이 노출됨: 학생용 situation_ko에 정중성·완화·선택권·강도 같은 답안 평가 기준을 노출하면 안 됩니다."
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R30",
+            "level": "fail",
+            "message": "학생용 situation_ko에 답안 평가 기준이 노출됨: 학생용 situation_ko에 정중성·완화·선택권·강도 같은 답안 평가 기준을 노출하면 안 됩니다."
+          }
+        ],
+        "changedExample": "담당자는 촬영 현장에서 조명의 강도를 조절한다. 동료에게 일정표를 메일로 보낸다."
+      },
+      {
+        "name": "R30_polite_paraphrase",
+        "type": "core",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "pass",
+        "focus": [],
+        "allViolations": [],
+        "changedExample": "동료에게 정중히 요청해야 한다. 메신저로 일정 변경을 알린다."
+      },
+      {
+        "name": "R30_mission_scene_gap",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ],
+        "changedExample": "동료에게 정중하게 요청한다. 메신저로 일정 변경을 알린다."
+      },
+      {
+        "name": "R8_response_core_null",
+        "type": "core",
+        "context": {
+          "speech_act": "refusal",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R8",
+            "level": "fail",
+            "message": "refusal는 인접쌍 둘째 짝 — preceding_turn 필수"
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R8",
+            "level": "fail",
+            "message": "refusal는 인접쌍 둘째 짝 — preceding_turn 필수"
+          }
+        ]
+      },
+      {
+        "name": "R16_core_payload_modality_mismatch",
+        "type": "core",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "pass",
+        "focus": [],
+        "allViolations": []
+      },
+      {
+        "name": "R16_mission_translation_context_interpreting_payload",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R10_reference_wrong_target_language",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R29",
+            "level": "warning",
+            "message": "reference_alternatives가 담화 전체를 옮기지 않은 것으로 보임(원문 98자 대비 40자): \"일정을 검토해 주셔서 감사드립니다. 다음 회\""
+          }
+        ]
+      },
+      {
+        "name": "R20_fabricated_content_hash",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R31_missing_current_finalized_lineage",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R31",
+            "level": "fail",
+            "message": "검증 범위 미션에 item_lineage가 없음"
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R31",
+            "level": "fail",
+            "message": "검증 범위 미션에 item_lineage가 없음"
+          }
+        ]
+      },
+      {
+        "name": "R31_missing_historical_finalized_lineage",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R33_missing_current_dimensions",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R33",
+            "level": "fail",
+            "message": "현행 mission_v5는 서로 다른 진단차원을 2~6개 포함해야 함"
+          },
+          {
+            "id": "R33",
+            "level": "fail",
+            "message": "복수 진단차원은 MJT/DCT 중 최소 두 위치에 실제 근거를 가져야 함"
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R33",
+            "level": "fail",
+            "message": "현행 mission_v5는 서로 다른 진단차원을 2~6개 포함해야 함"
+          },
+          {
+            "id": "R33",
+            "level": "fail",
+            "message": "복수 진단차원은 MJT/DCT 중 최소 두 위치에 실제 근거를 가져야 함"
+          }
+        ]
+      },
+      {
+        "name": "R33_missing_historical_dimensions",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R33_noninformative_evidence",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ]
+      },
+      {
+        "name": "R11_shadowed_by_schema",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R1",
+            "level": "fail",
+            "message": "스키마 위반: production_task.reference_alternatives Array must contain at least 1 element(s)"
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R1",
+            "level": "fail",
+            "message": "스키마 위반: production_task.reference_alternatives Array must contain at least 1 element(s)"
+          }
+        ]
+      },
+      {
+        "name": "R23_invalid_core_silently_skipped",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "warning",
+        "focus": [],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ],
+        "coreInput": {
+          "schema_version": "invalid"
+        }
+      },
+      {
+        "name": "R27_decimal_sentence_count",
+        "type": "mission",
+        "context": {
+          "speech_act": "request",
+          "level": "intermediate",
+          "domain": "work",
+          "theme_code": "career_workplace",
+          "topic_code": "schedule_change",
+          "mode": "translation",
+          "source_modality": "written",
+          "direction": "ko_zh"
+        },
+        "result": "fail",
+        "focus": [
+          {
+            "id": "R27",
+            "level": "fail",
+            "message": "문항 1: 현행 learner situation은 140자 이내의 정확히 2문장이어야 함"
+          }
+        ],
+        "allViolations": [
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R5",
+            "level": "warning",
+            "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+          },
+          {
+            "id": "R27",
+            "level": "fail",
+            "message": "문항 1: 현행 learner situation은 140자 이내의 정확히 2문장이어야 함"
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\""
+          },
+          {
+            "id": "R19",
+            "level": "warning",
+            "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\""
+          }
+        ],
+        "changedExample": "담당자는 3.5시간 뒤에 회의를 연다. 동료에게 일정표를 메일로 보낸다."
+      }
+    ],
+    "qualityReviewR30": {
+      "findings": [],
+      "all": [
+        {
+          "id": "rule-1",
+          "severity": "warning",
+          "where": "",
+          "quote": null,
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "reason_ko": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+          "problem_type_ko": "구조·형식",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "rule-2",
+          "severity": "warning",
+          "where": "",
+          "quote": null,
+          "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "reason_ko": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+          "problem_type_ko": "구조·형식",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "rule-3",
+          "severity": "warning",
+          "where": "",
+          "quote": null,
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\"",
+          "reason_ko": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把报告的原文件再发给我。\"",
+          "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+          "problem_type_ko": "구조·형식",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        },
+        {
+          "id": "rule-4",
+          "severity": "warning",
+          "where": "",
+          "quote": null,
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\"",
+          "reason_ko": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把报告的原文件再发给我。\"",
+          "suggestion_ko": "기존 생성계약의 해당 규칙을 확인하세요.",
+          "problem_type_ko": "구조·형식",
+          "needs_professor": false,
+          "uncertainty_ko": ""
+        }
+      ]
+    }
+  },
+  "interpretation": "A missing target Rule ID is a statement about rule coverage, not proof of semantic acceptability or approval bypass. All complete outputs are retained in cases. Test pass counts are not precision/recall estimates."
+}
