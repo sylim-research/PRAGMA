@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { BatchPlanItems } from "@/components/admin/BatchPlanItems";
 import { Badge } from "@/components/ui/badge";
@@ -19,13 +18,9 @@ import {
 } from "@/lib/pragma/enums";
 import {
   DEFAULT_QUOTA,
-  FULL_BATCH_QUOTA_495,
-  ZH_KO_VALIDATION_ACTS,
-  ZH_KO_VALIDATION_DELIVERY_CELLS,
   auditTopicCompatibility,
   auditTopicCoverage,
   buildBatchPlan,
-  buildZhKoValidationPlan,
   interpretingCount,
   summarizePlan,
   type BatchQuota,
@@ -98,7 +93,6 @@ const parseSelectedPlanIndexes = (raw: string, total: number) => {
 
 const AdminBatch = () => {
   const [quota, setQuota] = useState<BatchQuota>(DEFAULT_QUOTA);
-  // 언어 방향(0-l·89) — zh_ko는 고정 9화행·30셀 혼합 파일럿으로 전환.
   const [direction, setDirection] = useState<LanguageDirection>("ko_zh");
   const [running, setRunning] = useState(false);
   const [preparing, setPreparing] = useState(false);
@@ -130,58 +124,25 @@ const AdminBatch = () => {
     if (busy || direction === d) return;
     resetExecutionDisplay();
     setDirection(d);
-    if (d === "ko_zh") setQuota(DEFAULT_QUOTA);
     setCoreRunId(getOrCreateCoreRunId(d));
     setResumeRunId("");
   };
 
-  const targetActs = direction === "zh_ko" ? ZH_KO_VALIDATION_ACTS : undefined;
-  const targetActCount = targetActs?.length ?? Object.keys(SPEECH_ACT_UI).length;
-  const topicCoverage = useMemo(() => auditTopicCoverage(targetActs), [targetActs]);
-  const topicCompatibility = useMemo(
-    () => auditTopicCompatibility(targetActs),
-    [targetActs],
-  );
+  const targetActCount = Object.keys(SPEECH_ACT_UI).length;
+  const topicCoverage = useMemo(() => auditTopicCoverage(), []);
+  const topicCompatibility = useMemo(() => auditTopicCompatibility(), []);
   const plan = useMemo(
-    () =>
-      topicCoverage.missing.length === 0 && topicCompatibility.length === 0
-        ? direction === "zh_ko"
-          ? buildZhKoValidationPlan()
-          : buildBatchPlan(quota, direction)
-        : [],
-    [
-      quota,
-      direction,
-      topicCoverage.missing.length,
-      topicCompatibility.length,
-    ],
+    () => topicCoverage.missing.length === 0 && topicCompatibility.length === 0
+      ? buildBatchPlan(quota, direction)
+      : [],
+    [quota, direction, topicCoverage.missing.length, topicCompatibility.length],
   );
-  // zh_ko는 핵심 3화행 18셀 + 확장 6화행 중급 12셀의 명시 커버리지만 감사한다.
-  const summary = useMemo(
-    () => summarizePlan(
-      plan,
-      targetActs,
-      direction === "zh_ko" ? ZH_KO_VALIDATION_DELIVERY_CELLS : undefined,
-    ),
-    [direction, plan, targetActs],
-  );
+  const summary = useMemo(() => summarizePlan(plan), [plan]);
   const selectedPlan = useMemo(
     () => parseSelectedPlanIndexes(selectedCellNumbers, plan.length),
     [selectedCellNumbers, plan.length],
   );
-  const isLargeKoZhBatch = direction === "ko_zh" && summary.total >= 400;
-  const isApprovedFullBatch =
-    direction === "ko_zh" &&
-    summary.total === 495 &&
-    summary.emptyActPdrCells.length === 0 &&
-    summary.minActPdrCount >= 2 &&
-    summary.emptyActLevelModeCells.length === 0 &&
-    summary.minActLevelModeCount >= 3;
-  const fullBatchBlocked = isLargeKoZhBatch && !isApprovedFullBatch;
-  const deliveryCellCount = direction === "zh_ko"
-    ? ZH_KO_VALIDATION_DELIVERY_CELLS.length
-    : LEVEL_ORDER.filter(level => quota.perLevel[level] > 0).length * targetActCount * 2;
-
+  const deliveryCellCount = LEVEL_ORDER.filter(level => quota.perLevel[level] > 0).length * targetActCount * 2;
   const selectPlanIndexes = (indexes: number[]) =>
     setSelectedCellNumbers([...new Set(indexes)].sort((a, b) => a - b).map(index => index + 1).join(", "));
 
@@ -200,21 +161,9 @@ const AdminBatch = () => {
   const loadDefaultPreset = () => {
     if (busy) return;
     resetExecutionDisplay();
-    setDirection("ko_zh");
     setQuota(DEFAULT_QUOTA);
-    setCoreRunId(getOrCreateCoreRunId("ko_zh"));
+    setCoreRunId(getOrCreateCoreRunId(direction));
     setResumeRunId("");
-  };
-
-  const loadFullBatchPreset = () => {
-    if (busy) return;
-    resetExecutionDisplay();
-    setResumeRunId("");
-    setDirection("ko_zh");
-    setQuota(FULL_BATCH_QUOTA_495);
-    const next = createCoreRunId("ko_zh");
-    persistCoreRunId("ko_zh", next);
-    setCoreRunId(next);
   };
 
   const executeBatch = async (cells: BatchCell[], runMode: "current" | "fresh", itemIndexes?: readonly number[]) => {
@@ -266,13 +215,7 @@ const AdminBatch = () => {
     }
   };
 
-  const start = () => {
-    if (fullBatchBlocked) {
-      toast.error("400건 이상 본배치는 495건 프리셋과 구인·전달 분포 조건을 모두 충족해야 합니다.");
-      return;
-    }
-    return executeBatch(plan, "current");
-  };
+  const start = () => executeBatch(plan, "current");
 
   const startSelected = (runMode: "current" | "fresh") => {
     if (selectedPlan.invalid || selectedPlan.indexes.length === 0) {
@@ -359,14 +302,6 @@ const AdminBatch = () => {
     <AdminShell title="시나리오 배치 생성"
       description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
       <div className="space-y-5">
-        <section aria-label="AI 콘텐츠 제작 흐름" className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border bg-[#FAF8F2] px-5 py-3 text-sm">
-          <span className="font-bold">AI 콘텐츠 제작 자동화</span>
-          <span>생성 계획</span><span aria-hidden="true">→</span><span>AI 생성·자동 점검</span>
-          <span aria-hidden="true">→</span><span>저장·결과 확인</span><span aria-hidden="true">→</span>
-          <Link className="font-semibold underline underline-offset-4" to="/admin/assembly">학습 미션 조립</Link>
-          <a href="#batch-execution" className="ml-auto font-semibold underline underline-offset-4">생성 실행으로 ↓</a>
-        </section>
-
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_310px]">
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-5">
@@ -379,23 +314,18 @@ const AdminBatch = () => {
                   <p className="mb-2 text-xs font-semibold text-muted-foreground">언어 방향</p>
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
-                    <Button size="sm" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한 · 30건 검증</Button>
+                    <Button size="sm" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
                   </div>
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold text-muted-foreground">생성 계획 불러오기</p>
                   <div className="flex flex-wrap gap-2">
                     <Button size="sm" variant="outline" disabled={busy} onClick={loadDefaultPreset}>기본 72건</Button>
-                    <Button size="sm" variant="outline" disabled={busy} onClick={loadFullBatchPreset}>495건 본배치</Button>
                   </div>
                 </div>
               </div>
 
-              {direction === "zh_ko" ? <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg bg-[#FAF8F2] p-4"><h3 className="text-sm font-semibold">핵심 3화행 · 18건</h3><p className="mt-2 text-xs leading-5 text-muted-foreground">요청·거절·감사 × 3수준 × 번역·통역</p></div>
-                <div className="rounded-lg bg-[#FAF8F2] p-4"><h3 className="text-sm font-semibold">확장 6화행 · 12건</h3><p className="mt-2 text-xs leading-5 text-muted-foreground">사과·제안·초대·반대·칭찬·불만 × 중급 × 번역·통역</p></div>
-                <p className="text-xs text-muted-foreground sm:col-span-2">중→한의 고정 검증 계획입니다. 검증 결과 확인 후 확대 여부를 결정합니다.</p>
-              </div> : <>
+              <>
                 <div className="mt-5 border-t pt-4">
                   <h3 className="text-sm font-semibold">수준별 생성 수량</h3>
                   <p className="mt-1 text-xs leading-5 text-muted-foreground">입력값은 화행당 번역 건수입니다. 화행 {targetActCount}개에 적용하고 통역 건수를 더해 총량을 계산합니다.</p>
@@ -422,7 +352,7 @@ const AdminBatch = () => {
                   </div>
                   <p className="min-w-0 flex-1 basis-48 text-xs leading-5 text-muted-foreground">화행당 번역 건수 × 배율을 반올림합니다. 번역을 생성하는 수준은 통역도 최소 1건을 만듭니다. 배율 0.3은 전체 중 통역 30%를 뜻하지 않습니다.</p>
                 </div>
-              </>}
+              </>
             </section>
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-5">
@@ -446,9 +376,6 @@ const AdminBatch = () => {
                 <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
                   description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
               </div>
-              {fullBatchBlocked ? <p role="alert" className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs leading-5 text-red-900">현재 계획은 본배치 실행 조건을 충족하지 않습니다. 400건 이상은 495건 프리셋과 구인 조합당 2건 이상·전달 조합당 3건 이상 조건을 확인합니다.</p>
-                : isApprovedFullBatch ? <p className="mt-3 rounded-lg bg-emerald-50 p-3 text-xs leading-5 text-emerald-900">495건 본배치의 분포 조건을 충족했습니다. 생성 결과는 자동 점검 후 저장되며, 콘텐츠 최종 승인은 별도로 진행합니다.</p>
-                : <p className="mt-3 text-xs leading-5 text-muted-foreground">{direction === "zh_ko" ? "30건 검증 계획의 전달 조합을 확인합니다." : "현재 규모의 생성 계획입니다. 495건 본배치는 구인 243조합과 전달 54조합 전체의 최소 건수 조건을 별도로 확인합니다."}</p>}
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">비어 있는 전달 조합: {summary.emptyActLevelModeCells.join(", ")}</p>}
 
               <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
@@ -474,7 +401,7 @@ const AdminBatch = () => {
               <code className="mt-2 block break-all text-xs">{coreRunId}</code>
               <p className="mt-2 text-xs leading-5 text-muted-foreground">같은 ID로 다시 실행하면 저장 완료 항목은 AI 호출 없이 건너뜁니다.</p>
             </div>
-            <Button className="mt-4 w-full" onClick={start} disabled={busy || plan.length === 0 || fullBatchBlocked}>
+            <Button className="mt-4 w-full" onClick={start} disabled={busy || plan.length === 0}>
               {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
             </Button>
             {running && <Button className="mt-2 w-full" variant="outline" onClick={stop}>생성 중단</Button>}
