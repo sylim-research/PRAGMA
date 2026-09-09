@@ -480,7 +480,7 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="운영 대시보드"
-      description="콘텐츠 제작·승인 상태와 수업 편성, 학습 기록을 확인합니다."
+      description="학습 미션을 만들고, 감수한 콘텐츠를 수업에 편성합니다."
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -491,78 +491,77 @@ const AdminDashboard = () => {
       {/* 연동이 끊겨 있으면 아래 지표를 보기 전에 알아야 한다 — 스크롤 없이 보이는 자리에 둔다.
           평소에는 한 줄로 접혀 있고, 정상이 아닌 항목이 있으면 스스로 펼쳐진다.
           이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
-      <ServiceHealthPanel />
+      {/* 이 화면이 먼저 답할 것은 「지금 무엇을 처리해야 하는가」다. 교수자를 기다리는 일이
+          하나뿐이므로 그것만 크게 두고, 나머지 집계는 한 줄로, 세부는 접어 둔다.
+          숫자·상태·조회는 그대로다 — 자리와 크기만 바꾼다. */}
+      <section className="mt-4 rounded-xl border border-[#D9D4C8] bg-white p-5">
+        <p className="text-[13px] font-medium text-[#5D6970]">교수자 감수·승인 대기</p>
+        <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
+          <p className="flex items-end gap-2">
+            {snapshot?.content.reviewTargetCount == null && !displayError ? (
+              <span aria-label="불러오는 중" className="h-12 w-24 rounded bg-muted motion-safe:animate-pulse" />
+            ) : (
+              <>
+                <span className="text-[44px] font-bold leading-none tabular-nums text-[#15202B]">
+                  {displayError ? "—" : snapshot?.content.reviewTargetCount}
+                </span>
+                <span className="pb-1 text-[15px] text-[#5D6970]">개</span>
+              </>
+            )}
+          </p>
+          <Button asChild size="lg">
+            <Link to="/admin/review">감수·승인 화면 열기 →</Link>
+          </Button>
+        </div>
+        <p className="mt-2 text-[13px] text-[#5D6970]">
+          미션을 감수한 뒤 승인 여부를 결정합니다. 이 화면에서 승인하지 않습니다.
+        </p>
+      </section>
 
-      <PanelHeader
-        title="콘텐츠 제작 현황"
-        action={<LiveDatabaseStatus delayed={Boolean(dashboardError)} />}
-      />
-      {/* 위계: 재료(보유량) → 학습 미션(총수) → 그 총수를 나누는 세 상태(대기·수정 보류·승인).
-          재료와 미션은 같은 표의 같은 행이다 — 미션이 붙은 재료가 곧 학습 미션이다. */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        <SummaryMetric
-          to="/admin/library"
-          label="미션 재료"
-          value={snapshot?.content.coreCount ?? null}
-          unit="개"
-          description={snapshot ? `시나리오 코어 · 그중 학습 미션 생성 ${snapshot.content.generatedMissionCount}` : "시나리오 코어 · 상황과 출발텍스트 자료"}
-          error={displayError}
-          changed={changedKeys.has("core")}
-        />
-        <SummaryMetric
-          to="/admin/assembly"
-          label="학습 미션"
-          value={snapshot?.content.generatedMissionCount ?? null}
-          unit="개"
-          description="생성된 미션 전체 · 오른쪽 셋으로 나뉨"
-          error={displayError}
-          changed={changedKeys.has("mission")}
-        />
-        <SummaryMetric
-          to="/admin/review"
-          label="검토·승인 대기"
-          value={snapshot?.content.reviewTargetCount ?? null}
-          unit="개"
-          description="다음 처리 단계는 아래 절에"
-          error={displayError}
-          changed={changedKeys.has("reviewTarget")}
-        />
-        <SummaryMetric
-          to="/admin/review"
-          label="수정 필요·보류"
-          value={snapshot?.content.pendingRevisionCount ?? null}
-          unit="개"
-          description="수정 또는 사용 여부 재결정"
-          error={displayError}
-          changed={changedKeys.has("pending")}
-        />
-        <SummaryMetric
-          to="/admin/review"
-          label="교수자 승인 완료"
-          value={snapshot?.content.professorFinalizedCount ?? null}
-          unit="개"
-          description="수업 사용 후보 · 편성·공개는 별도"
-          error={displayError}
-          changed={changedKeys.has("finalized")}
-        />
+      {/* 나머지 두 질문 — 미션을 어디서 만들고, 승인한 것을 어디서 수업에 넣는가. */}
+      <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
+        {[
+          { to: "/admin/assembly", label: "학습 미션 조립" },
+          { to: "/admin/ai-review", label: "자동 점검·AI 검토" },
+          { to: "/admin/composer", label: "15주 수업 편성" },
+        ].map((item) => (
+          <Link key={item.to} to={item.to}
+            className="rounded-lg border border-[#E2DED2] bg-white px-4 py-3 text-[14px] font-semibold text-[#233542] hover:border-[#C9B54E]">
+            {item.label} →
+          </Link>
+        ))}
       </div>
 
-      {/* 위 「검토·승인 대기」를 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가.
-          「검수」 단독 표기는 용어대장이 막는다 — 규칙은 검사하고, AI는 검토하고, 교수자가 승인한다. */}
-      <PanelHeader
-        title={snapshot ? `검토·승인 대기 ${snapshot.content.reviewTargetCount}개 — 다음 처리 단계` : "검토·승인 대기 — 다음 처리 단계"}
-        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다."
-      />
-      <ReviewPipeline
-        review={snapshot?.review ?? null}
-        dominant={dominantReviewStage}
-        rulesFailCount={snapshot?.rulesFailCount ?? 0}
-        error={displayError}
-        changedKeys={changedKeys}
-      />
+      {/* 총량은 맥락이지 할 일이 아니다 — 카드가 아니라 한 줄로 둔다. */}
+      <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[13px] text-[#5D6970]">
+        <span>학습 미션 <b className="tabular-nums text-[#15202B]">{snapshot?.content.generatedMissionCount ?? "—"}</b></span>
+        <span>감수·승인 대기 <b className="tabular-nums text-[#15202B]">{snapshot?.content.reviewTargetCount ?? "—"}</b></span>
+        <span>수정 필요·보류 <b className="tabular-nums text-[#15202B]">{snapshot?.content.pendingRevisionCount ?? "—"}</b></span>
+        <span>교수자 승인 완료 <b className="tabular-nums text-[#15202B]">{snapshot?.content.professorFinalizedCount ?? "—"}</b></span>
+        <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
+      </p>
 
-      <PanelHeader title="수업 운영·학습 수행 현황" />
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {/* 파이프라인 단계별 현황은 매일 볼 것이 아니라 필요할 때 볼 것이다. 지우지 않고 접는다. */}
+      <details className="mt-4 rounded-xl border border-[#E2DED2] bg-white p-4">
+        <summary className="cursor-pointer text-[14px] font-bold text-[#233542]">
+          품질 관리 단계별 현황
+          {snapshot && <span className="ml-2 text-[12px] font-normal text-muted-foreground">감수·승인 대기 {snapshot.content.reviewTargetCount}개를 다음 처리 단계별로 나눔</span>}
+        </summary>
+        <p className="mt-1 text-[12px] text-muted-foreground">각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다.</p>
+        <div className="mt-3">
+          <ReviewPipeline
+            review={snapshot?.review ?? null}
+            dominant={dominantReviewStage}
+            rulesFailCount={snapshot?.rulesFailCount ?? 0}
+            error={displayError}
+            changedKeys={changedKeys}
+          />
+        </div>
+      </details>
+
+      <details className="mt-3 rounded-xl border border-[#E2DED2] bg-white p-4">
+        <summary className="cursor-pointer text-[14px] font-bold text-[#233542]">수업 운영·학습 수행 현황</summary>
+      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
@@ -610,6 +609,12 @@ const AdminDashboard = () => {
           error={displayError}
           changed={changedKeys.has("records")}
         />
+      </div>
+      </details>
+
+      {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
+      <div className="mt-4">
+        <ServiceHealthPanel />
       </div>
 
       {/* 내 프로필을 미완료로 되돌리는 시험용 조작이라 운영 화면에서는 감춘다. */}
