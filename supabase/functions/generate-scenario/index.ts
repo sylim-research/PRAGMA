@@ -1559,7 +1559,6 @@ const MISSION_DIAGNOSTIC_EVIDENCE_REFS = [
 ] as const
 
 const ITEM_LINEAGE_MAX_BATCH_SIZE = 5
-const ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO = 0.2
 const ITEM_LINEAGE_MAX_COMPLETION_TOKENS = 5000
 
 function uniqueStrings(value: unknown): string[] {
@@ -1870,13 +1869,8 @@ async function attributeMissionItemLineage(
       attributed_at: new Date().toISOString(),
     },
   )
-  const summary = itemLineage.coverage_summary as { total_count: number; unattributed_count: number }
-  if (summary.unattributed_count / summary.total_count > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO) {
-    return {
-      ok: false,
-      detail: `model_unattributed 비율이 ${ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO * 100}%를 초과함 (${summary.unattributed_count}/${summary.total_count})`,
-    }
-  }
+  // Missing attribution is a professor-review signal, not a structural failure.
+  // content-review checks this artifact before human decisions and approval.
   return { ok: true, itemLineage }
 }
 

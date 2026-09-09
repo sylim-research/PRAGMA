@@ -143,7 +143,7 @@ describe("current content five-stage review", () => {
       core_content: {}, mission_content: SAMPLE_MISSION_V5_NATIVE,
     } });
     const { rules_version, ...previousCriteria } = domain.snapshot.criteria;
-    expect(rules_version).toBe("mission_rules_v12_signal_warnings");
+    expect(rules_version).toBe("mission_rules_v13_professor_signal_flow");
     expect(await reviewHash(domain.snapshot)).not.toBe(await reviewHash({
       ...domain.snapshot, criteria: previousCriteria,
     }));

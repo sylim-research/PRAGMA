@@ -1,4 +1,4 @@
-import { checkMission, type CheckContext } from "./missionRules";
+import { checkCore, checkMission, type CheckContext } from "./missionRules";
 import { normalizeMission } from "./missionSchema";
 import { DEFAULT_FEATURE_BY_ACT, FEATURE_CODES_BY_ACT, getTargetFeature } from "./targetFeatures";
 import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourseProjection";
@@ -10,6 +10,8 @@ export { prepareTeachingMaterial } from "@/lib/curriculum/teachingGeneration";
 import { weekRole } from "@/lib/curriculum/template";
 import { weeklyOpeningContext } from "@/lib/curriculum/weeklyOpeningContext";
 import { coreDirection } from "./coreSchema";
+import { buildMissionLineageScope } from "./missionLineage";
+import { LEVEL } from "./enums";
 import { WEEKLY_LEARNING_CONTRACT } from "@/lib/curriculum/courseModePolicy";
 import { CONTENT_REVIEW_VERSION, instructionalMission, type ReviewFinding, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../../../supabase/functions/_shared/learnerScene";
@@ -39,11 +41,20 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
       // fail = 구조·계약 위반(수정 후 재검사). warning = 자동 규칙이 확정할 수 없는 신호이므로
       // 교수자 확인 대상으로 넘긴다 — 이전에는 전부 needs_professor=false로 소실됐다(2026-09-09).
       const checked = checkMission(raw, context, row.core_content);
-      checked.violations.forEach((violation, index) => {
+      // Core warnings are not persisted with save_generated_core. Recompute them from
+      // the current saved core; do not impose new-generation context_spec on legacy data.
+      const coreWarnings = row.core_content
+        ? checkCore(row.core_content, context).violations.filter((violation) => violation.level === "warning")
+        : [];
+      const violations = [
+        ...checked.violations.map((violation, index) => ({ violation, id: `rule-${index + 1}`, where: "" })),
+        ...coreWarnings.map((violation, index) => ({ violation, id: `rule-core-${index + 1}`, where: "/content/context/core_content" })),
+      ];
+      violations.forEach(({ violation, id, where }) => {
         const subrule = violation.evidence?.subrule;
         const isSignal = violation.level === "warning";
-        findings.push({ id: `rule-${index + 1}`, severity: violation.level,
-          where: "", quote: null, issue_ko: `${violation.id}${subrule ? `/${subrule}` : ""}: ${violation.message}`, reason_ko: violation.message,
+        findings.push({ id, severity: violation.level,
+          where, quote: null, issue_ko: `${violation.id}${subrule ? `/${subrule}` : ""}: ${violation.message}`, reason_ko: violation.message,
           suggestion_ko: isSignal ? "자동 규칙의 신호입니다. 실제 위반인지 교수자가 판단하고 필요하면 수정하세요." : "기존 생성계약의 해당 규칙을 확인하세요.",
           problem_type_ko: isSignal ? "교수자 확인 신호" : "구조·형식", needs_professor: isSignal,
           uncertainty_ko: isSignal ? "정규식·집계 기반 신호이며 의미 판단이 아닙니다." : "" });
@@ -95,7 +106,8 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   const featureCodes = act ? FEATURE_CODES_BY_ACT[act as keyof typeof FEATURE_CODES_BY_ACT] ?? [] : [];
   const snapshot = { content, criteria: { version: CONTENT_REVIEW_VERSION,
     // Rule corrections get a new content hash without replacing prior runs.
-    rules_version: "mission_rules_v12_signal_warnings",
+    rules_version: "mission_rules_v13_professor_signal_flow",
+    ...(kind === "mission" ? { finalization: "mission_finalization_v1" } : {}),
     scene_policy: NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE,
     mission_design: "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
     features: featureCodes.map((code) => getTargetFeature(code)).filter(Boolean),
@@ -104,4 +116,18 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   const rules: ReviewResult = { verdict: findings.some((f) => f.severity === "fail") ? "fail" : findings.length ? "warning" : "pass",
     summary_ko: kind === "mission" ? "현재 저장 미션에 기존 구조·형식 규칙 적용" : "현재 주차 편성·자료 구성 검사", findings };
   return { snapshot, rules, dependencies };
+}
+
+/** Data-only request shared with Edge. No browser client or model call here. */
+export function missionFinalizationInput(row: Record<string, any>) {
+  const featureCode = DEFAULT_FEATURE_BY_ACT[row.speech_act];
+  if (!featureCode || !getTargetFeature(featureCode)) throw new Error("문항 판정 초점을 확인할 수 없습니다.");
+  const direction = coreDirection(row.core_content) === "zh_ko" || row.language_direction === "zh_ko" ? "zh_ko" : "ko_zh";
+  return {
+    mission_content: row.mission_content,
+    feature: { lineage_scope: buildMissionLineageScope({ direction, speechAct: row.speech_act, targetFeature: featureCode }) },
+    direction,
+    learner_level: row.learner_level,
+    level_ko: LEVEL[row.learner_level as keyof typeof LEVEL],
+  };
 }

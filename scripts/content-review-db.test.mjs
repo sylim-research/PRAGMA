@@ -115,6 +115,7 @@ before(async () => {
   preUpgradeTeaching = { courseId:existing.courseId, weekNo:existing.weekNo, draft:existingDraft,
     reviewSource:await scalar("select content_review_source_internal('weekly_material',$1,$2)",[existing.courseId,existing.weekNo]) };
   await db.exec(await sqlFile('20260909010000_source_teaching_studio.sql'));
+  await db.exec(await sqlFile('20260909230000_quality_signal_review_flow.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -399,4 +400,49 @@ test('requesting independent review makes that evidence required, while stale so
   await db.query('update content_review_runs set claude_review=$2 where id=$1',[r.id,model('claude',pass)]);
   await db.query(`update scenarios set core_content='{"situation_ko":"changed"}' where scenario_id=$1`,[m.id]);
   await assert.rejects(finalize(m,r),/Content changed/);
+});
+
+test('signal flow requires prepared evidence and reasoned decisions, then approves that exact artifact', async () => {
+  const {m,r}=await focusedReview();
+  const signals=[
+    {id:'rule-core-1',severity:'warning',needs_professor:true,issue_ko:'R9/nationalization_cue: 합성 신호'},
+    {id:'rule-2',severity:'warning',needs_professor:true,issue_ko:'R32/unattributed_over_reference_ratio: 합성 100% 미귀속'},
+  ];
+  await db.query("update content_review_runs set snapshot=jsonb_set(snapshot,'{criteria}',$2),rules=$3 where id=$1",
+    [r.id,{finalization:'mission_finalization_v1'},{verdict:'warning',findings:signals}]);
+  await assert.rejects(finalize(m,r),/Prepare final review evidence/);
+  await assert.rejects(approve(r),/Prepare final review evidence/);
+  const prepared=finalized(m.content);
+  prepared.item_lineage={coverage_summary:{total_count:5,claimed_count:0,unattributed_count:5}};
+  await modelRoleSetPrepared(r.id,prepared);
+  assert.deepEqual((await scalar('select content_review_required_findings(r) from content_review_runs r where id=$1',[r.id])).map(f=>f.id),signals.map(f=>f.id));
+  const decisions=signals.map(f=>({finding_id:f.id,decision:'no_change',rationale_ko:rationale}));
+  const save=items=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[r.id,hash,items]));
+  await assert.rejects(save(decisions.slice(1)),/Record every professor decision/);
+  await save([{...decisions[0],decision:'defer'},decisions[1]]);
+  await assert.rejects(finalize(m,r,{mission_content:prepared}),/Record every professor decision/);
+  await save(decisions);
+  await assert.rejects(finalize(m,r),/exact professor-reviewed artifact/);
+  await assert.rejects(modelRoleSetPrepared(r.id,{...prepared,hsk_lexical_audit:{changed:true}}),/Prepared review evidence is immutable/);
+  assert.equal(await finalize(m,r,{mission_content:prepared}),m.id);
+  // The RPC appends the professor's disposition metadata, without regenerating content or attribution.
+  assert.deepEqual(await scalar('select mission_content from scenarios where scenario_id=$1',[m.id]),
+    {...prepared,authoring:{...prepared.authoring,professor_issue_overrides:[]}});
+  assert.ok(await scalar('select approved_at from content_review_runs where id=$1',[r.id]));
+  await assert.rejects(modelRoleSetPrepared(r.id,prepared),/Approved review evidence is immutable/);
+});
+
+async function modelRoleSetPrepared(id,prepared) {
+  return asRole('service_role',()=>db.query('update content_review_runs set prepared_finalization=$2 where id=$1',[id,prepared]));
+}
+
+test('prepared signal evidence is stale after a source edit and cannot be replaced by an admin client',async()=>{
+  const {m,r}=await focusedReview();
+  await db.query("update content_review_runs set snapshot=jsonb_set(snapshot,'{criteria}',$2) where id=$1",
+    [r.id,{finalization:'mission_finalization_v1'}]);
+  const prepared=finalized(m.content);
+  await assert.rejects(admin(()=>db.query('update content_review_runs set prepared_finalization=$2 where id=$1',[r.id,prepared])),/permission denied/);
+  await modelRoleSetPrepared(r.id,prepared);
+  await db.query("update scenarios set core_content=core_content || '{\"situation_ko\":\"수정된 원본\"}'::jsonb where scenario_id=$1",[m.id]);
+  await assert.rejects(finalize(m,r,{mission_content:prepared}),/Content changed/);
 });

@@ -27,7 +27,7 @@ export const PACK_RELEASE_MANIFEST_DRAFT: PackReleaseManifestDraft = {
   "artifact_hash": "18cce236df6fcf9acc417e826302ace3cb7177bc804d6099f9a589b9e587ac00",
   "prompt_snapshot_hash": "c3335f1ac7d41891e5cf332f721d92255a57023a0c33cd7d3a8e626e618da618",
   "evidence_snapshot_hash": "f21bacee1e0a89e2a305d225547b8ab41c8bc988dc073ef051827e16b3400c18",
-  "source_commit_ref": "8bc53880e316a24d358835734b6e7a331b56aa76",
+  "source_commit_ref": "de634e69d11973dd5cd1255b62b01d4d8f2ada6a",
   "git_dirty": true,
   "source_paths": [
     "src/lib/pragma/realizationPack.ts",

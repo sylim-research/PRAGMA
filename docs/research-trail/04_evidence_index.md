@@ -4,6 +4,15 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260909-03 · 품질 경고의 교수자 승인 연결 회귀 증거
+
+- 기록: `docs/dev-log/2026-09-09-quality-signal-review-flow.md`.
+- 재현: `src/lib/pragma/qualitySignalFlow.test.ts`, `src/lib/pragma/itemLineage.edge.test.ts`,
+  `scripts/content-review-db.test.mjs`, migration `20260909230000_quality_signal_review_flow.sql`.
+- 결과: Vitest 896 통과·9 제외, 승인 DB 19 통과, 별도 CI 17 통과, 타입·운영 빌드 통과.
+  로컬 브라우저에서 코어/R32 경고별 판단·보류 차단·합성 승인을 확인했다.
+- 경계: 합성 테스트와 실제 운영 배포·교수자의 내용 타당성 판단을 구분한다. 배포 SHA·CI·읽기 smoke는 PR에 기록한다.
+
 ## ID 규칙
 
 - 증거 ID는 `EVD-YYYYMMDD-NN` 형식을 사용한다.
