@@ -424,7 +424,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
 
   return (
     <AdminShell
-      title={reviewMode ? "콘텐츠 승인" : "학습 미션 조립"}
+      title={reviewMode ? "교수자 최종 감수" : "학습 미션 조립"}
       description={reviewMode ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
     >
       <div className="max-w-[1080px]">
@@ -440,7 +440,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           onResume={async (id, jobId) => {
             const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
             if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 콘텐츠 승인 화면에서 확인해 주세요."); return; }
+            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 교수자 최종 감수 화면에서 확인해 주세요."); return; }
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
