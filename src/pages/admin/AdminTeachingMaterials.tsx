@@ -34,17 +34,26 @@ import { teachingKind } from "../../../supabase/functions/_shared/teachingMateri
 
 type MaterialReviewState = "approved" | "pending" | "unavailable";
 
+function operationWeekLabel(week: Parameters<typeof weekActivityLabel>[0]) {
+  if (week.type === "orientation") return `${week.week_no}주차 오리엔테이션`;
+  if (week.type === "midterm") return `${week.week_no}주차 중간고사`;
+  if (week.type === "final") return `${week.week_no}주차 기말고사`;
+  return `${week.week_no}주차 · ${weekActivityLabel(week)}`;
+}
+
 function assignedMissionPath(courseId: string, weekNo: number, scenarioId: string, assignmentId?: string) {
   if (!assignmentId) return `/learner/course/${encodeURIComponent(courseId)}/week/${weekNo}`;
   const query = new URLSearchParams({ courseId, weekNo: String(weekNo), assignmentId });
   return `/learner/practice/${scenarioId}?${query}`;
 }
 
-const StatusChip = ({ children, tone = "neutral" }: {
+const StatusChip = ({ children, tone = "neutral", className = "" }: {
   children: React.ReactNode;
   tone?: "good" | "attention" | "neutral";
+  className?: string;
 }) => <span className={[
-  "rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+  className,
   tone === "good"
     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
     : tone === "attention"
@@ -244,7 +253,7 @@ const AdminTeachingMaterials = () => {
           <label className="text-sm font-semibold">주차
             <select aria-label="수업자료 주차" value={week?.week_no ?? ""} disabled={!course} onChange={(event) => setParams({ courseId, weekNo: event.target.value })} className="mt-2 h-10 w-full rounded-md border bg-white px-3 font-normal">
               {!week && <option value="">주차 선택</option>}
-              {course?.weeks.map((item) => <option key={item.week_no} value={item.week_no}>{item.week_no}주차 · {weekActivityLabel(item)}</option>)}
+              {course?.weeks.map((item) => <option key={item.week_no} value={item.week_no}>{operationWeekLabel(item)}</option>)}
             </select>
           </label>
         </div>
@@ -298,7 +307,7 @@ const AdminTeachingMaterials = () => {
                   ? "강좌 비공개"
                   : null;
             return <article key={item.week_no} className={[
-              "grid gap-3 px-3 py-3 md:grid-cols-[minmax(180px,1fr)_minmax(320px,2fr)_auto] md:items-center",
+              "grid gap-3 px-3 py-3 xl:grid-cols-[minmax(160px,1fr)_minmax(284px,1.4fr)_230px] xl:items-center",
               selected ? "bg-[#FFFBEA]" : "bg-white",
             ].join(" ")}>
               <div>
@@ -306,17 +315,17 @@ const AdminTeachingMaterials = () => {
                   type="button"
                   onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
                   className="text-left text-sm font-black text-[#15202B] hover:underline"
-                >{item.week_no}주차 · {weekActivityLabel(item)}</button>
+                >{operationWeekLabel(item)}</button>
                 {issue && <p className="mt-1 text-[11px] font-semibold text-amber-800">확인 · {issue}</p>}
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                <StatusChip tone={missionsReady ? "good" : "attention"}>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <StatusChip className="min-w-[4.5rem]" tone={missionsReady ? "good" : "attention"}>
                   {expected > 0 ? `미션 ${assigned}/${expected}` : "수업 안내"}
                 </StatusChip>
-                <StatusChip tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
+                <StatusChip className="min-w-[7rem]" tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
                   {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 승인 대기" : "자료 상태 확인 중"}
                 </StatusChip>
-                <StatusChip tone={course.outline.status === "published" && missionsReady ? "good" : "attention"}>
+                <StatusChip className="min-w-[5.5rem]" tone={course.outline.status === "published" && missionsReady ? "good" : "attention"}>
                   {course.outline.status === "published" && missionsReady ? "학습자 공개" : "공개 준비 중"}
                 </StatusChip>
                 {operation && operation.participants > 0 && <StatusChip>
@@ -324,7 +333,7 @@ const AdminTeachingMaterials = () => {
                 </StatusChip>}
                 {operation && operation.dissents > 0 && <StatusChip tone="attention">이견 {operation.dissents}건</StatusChip>}
               </div>
-              <div className="flex flex-wrap gap-1.5 md:justify-end">
+              <div className="flex flex-wrap gap-1.5 xl:justify-end">
                 <Button size="sm" variant="outline" asChild>
                   <Link onClick={openMaterialDetail} to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
                 </Button>
