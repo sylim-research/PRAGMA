@@ -1,10 +1,13 @@
 // 「실제 자료 활용」 (Authentic Source Import) — /admin/authentic 전용 본체.
 // 관리자가 실제 중국어/한국어 자료(이미지 또는 문구)를 입력하면 edge function
 // generate-scenario(action:"authentic_analyze")가 분석해 '활용 후보'를 제안한다.
-// 후보를 고르면 onApply가 페이로드를 받아 /admin/generator로 넘긴다(2026-07-30:
-// 생성기 내부 접이식 패널에서 독립 화면으로 승격 — 세로 스크롤 3화면 분량이던
-// 워크플로우를 좌 입력 / 우 분석·후보의 2단으로 재배치. 생성 로직은 복제하지 않고
-// "자료 해석·후보 선택"만 여기서 한다).
+// 생성 로직은 복제하지 않고 "자료 해석·후보 선택"만 여기서 한다.
+//
+// 호스트(AdminAuthentic)가 세 가지를 받는다: 분석이 끝나면 onAnalyzed로 통째로 받아
+// 보관하고, 후보를 고르면 onApply로 생성기에 넘기고, onLoungeSeed로 라운지 문항의
+// 씨앗을 받는다. 2026-09-09: 잠시 생성기 안 접이식 패널로 흡수했다가 되돌렸다 —
+// 분석 결과가 저장되지 않고 사라지는 것이 문제였고, 그건 화면 위치가 아니라
+// 보관함이 없어서였다.
 //
 // 이 패널은 원자료(실제 문구)와 AI가 새로 구성한 내용을 화면에서 분리해 보여준다.
 // 업로드 이미지는 분석에만 쓰이고 저장/학습자 노출하지 않는다(전송 후 폐기) —
@@ -214,13 +217,35 @@ const CONFIDENCE_KO: Record<string, { label: string; tone: string }> = {
   text_input: { label: "직접 입력 문구", tone: "bg-[#EAE4D2] text-[#5B5446]" },
 };
 
-/** /admin/authentic → /admin/generator 후보 전달용 sessionStorage 키.
- *  긴 원문·provenance를 URL 파라미터로 나르면 길이 제한·인코딩 문제가 생기므로
- *  same-origin sessionStorage로 넘기고, 생성기가 1회 소비 후 지운다. */
-export const AUTHENTIC_HANDOFF_KEY = "pragma:authentic-apply";
+/** 분석이 끝났을 때 호스트가 통째로 보관할 수 있게 넘기는 꾸러미.
+ *  후보는 화면에 보이는 순서 그대로다 — onApply·onLoungeSeed의 index와 같은 순서. */
+export interface AuthenticAnalyzed {
+  source_type: "image" | "text";
+  source_ref: string | null;
+  source_original: string;
+  extraction_confidence: string | null;
+  scene_ko: string | null;
+  linguistic_features_ko: string | null;
+  recommendation_reason_ko: string | null;
+  recommended_uses: string[];
+  connectable_speech_acts: string[];
+  candidates: {
+    usage_type: UsageType;
+    label_ko: string | null;
+    source_text: string | null;
+    preceding_turn: string | null;
+    situation_seed_ko: string | null;
+    source_usage_note_ko: string | null;
+    ai_adaptation_note_ko: string | null;
+    conditions: Omit<AuthenticApply, "provenance" | "source_text">;
+    expression: Record<string, unknown> | null;
+  }[];
+}
 
 interface Props {
-  onApply: (a: AuthenticApply) => void;
+  onApply: (a: AuthenticApply, index: number) => void;
+  /** 분석 성공 직후 1회. 호스트가 보관함에 저장한다(고르지 않은 후보도 남기려고). */
+  onAnalyzed?: (a: AuthenticAnalyzed) => void;
 }
 
 // YouTube 자막 탭 제거(2026-08-05): supadata 연동이 배포 환경에 없어 동작하지 않았고,
@@ -228,7 +253,7 @@ interface Props {
 // provenance `authentic_youtube`는 읽기 위해 스키마·라벨에 그대로 남긴다.
 type InputTab = "image" | "text";
 
-const AuthenticImportPanel = ({ onApply }: Props) => {
+const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
   const [inputTab, setInputTab] = useState<InputTab>("image");
   const [imgLarge, setImgLarge] = useState(false);
   const [text, setText] = useState("");
@@ -303,7 +328,35 @@ const AuthenticImportPanel = ({ onApply }: Props) => {
       if (!data?.analysis) throw new Error(data?.error ?? "분석 결과가 비어 있습니다.");
       const a = data.analysis as RawAnalysis;
       setAnalysis(a);
-      setEditedOriginal((a.source_original ?? useText ?? "").trim());
+      const original = (a.source_original ?? useText ?? "").trim();
+      setEditedOriginal(original);
+      // 고르지 않은 후보까지 남기려면 여기서 통째로 넘겨야 한다 — 카드를 눌러야만
+      // 저장하면 눌리지 않은 후보는 그대로 사라진다.
+      onAnalyzed?.({
+        source_type: inputOrigin === "authentic_image" ? "image" : "text",
+        source_ref: sourceRef.trim() || null,
+        source_original: original,
+        extraction_confidence: a.extraction_confidence ?? null,
+        scene_ko: a.scene_ko ?? null,
+        linguistic_features_ko: a.linguistic_features_ko ?? null,
+        recommendation_reason_ko: a.recommendation_reason_ko ?? null,
+        recommended_uses: a.recommended_uses ?? [],
+        connectable_speech_acts: a.connectable_speech_acts ?? [],
+        candidates: (a.candidates ?? []).map((c) => {
+          const { source_text, ...conditions } = normalizeApply(c);
+          return {
+            usage_type: conditions.usage_type,
+            label_ko: c.label_ko ?? null,
+            source_text: source_text || null,
+            preceding_turn: c.preceding_turn ?? null,
+            situation_seed_ko: c.situation_seed_ko ?? null,
+            source_usage_note_ko: c.source_usage_note_ko ?? null,
+            ai_adaptation_note_ko: c.ai_adaptation_note_ko ?? null,
+            conditions,
+            expression: (c.expression ?? null) as Record<string, unknown> | null,
+          };
+        }),
+      });
     } catch (e) {
       setError((e as Error).message ?? "분석에 실패했습니다.");
     } finally {
@@ -325,7 +378,7 @@ const AuthenticImportPanel = ({ onApply }: Props) => {
         ai_adapted: original.length > 0 && base.source_text.trim() !== original,
         // anonymized는 수집 UI가 아직 없어 미설정으로 둔다(스키마 optional).
       },
-    });
+    }, i);
     setAppliedIdx(i);
   };
 

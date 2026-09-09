@@ -28,6 +28,19 @@ describe("admin navigation reachability", () => {
     expect(new Set(allPaths).size).toBe(allPaths.length);
     expect(allPaths).not.toContain("/admin/question-designer");
     expect(allPaths).not.toContain("/admin/research-qa/calibration");
+    // 생성 기준(생성기가 소비하는 제약)과 학습 미션 재료(시나리오)는 다른 그룹이다.
+    const criteria = ADMIN_NAV_GROUPS.find((group) => group.header === "1. 생성 기준");
+    expect(criteria?.items.map((item) => item.to)).toEqual([
+      "/admin/prompt-harness",
+      "/admin/corpus",
+    ]);
+    const material = ADMIN_NAV_GROUPS.find((group) => group.header === "2. 학습 미션 재료");
+    expect(material?.items.map((item) => item.to)).toEqual([
+      "/admin/authentic",
+      "/admin/generator",
+      "/admin/batch",
+      "/admin/library",
+    ]);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.at(-1)?.to).toBe("/admin/data-backup");
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
@@ -102,13 +115,19 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/review")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/releases")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/calibration")).toBe("");
-    const quality = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 콘텐츠 품질 관리");
-    expect(quality?.items.map((item) => item.to)).toEqual(["/admin/ai-review", "/admin/review"]);
+    const production = ADMIN_NAV_GROUPS.find(
+      (group) => group.header === "3. 학습 미션 제작·품질 관리",
+    );
+    expect(production?.items.map((item) => item.to)).toEqual([
+      "/admin/assembly",
+      "/admin/ai-review",
+      "/admin/review",
+    ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
-    // 원자료 분석은 생성 화면 안으로 흡수했다 — 옛 주소는 선택기에 잡히지 않는다.
-    expect(adminMobileNavValue("/admin/authentic")).toBe("");
+    // 원자료 분석은 보관함을 갖춘 별도 화면이다(2026-09-09 오후).
+    expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
     expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/teaching-generator");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
     expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
