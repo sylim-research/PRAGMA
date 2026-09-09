@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ContentReviewPanel } from "./ContentReviewPanel";
@@ -23,12 +24,18 @@ export function ProfessorMissionWorkbench({
   busy,
   onSave,
   onReview,
+  approvalHref,
 }: {
   scenarioId: string;
   mission: MissionRuntime;
   busy: boolean;
   onSave: (edits: ProfessorMissionEdits) => Promise<void>;
   onReview: (overrides: ProfessorIssueOverride[], approval: ContentReviewApproval) => Promise<void>;
+  /**
+   * 승인이 이 화면의 일이 아닐 때 넘긴다. 점검·승인 패널 대신 교수자 최종 감수로 가는
+   * 링크를 보여 준다 — 미션을 만드는 자리와 승인하는 자리를 가른다.
+   */
+  approvalHref?: string;
 }) {
   const initialItems = useMemo(
     () => mission.mpj_items.map((item) => JSON.stringify(item, null, 2)),
@@ -146,10 +153,21 @@ export function ProfessorMissionWorkbench({
           </Button>
         </div>
       </details>
-      <ContentReviewPanel experiential target={{ kind: "mission", targetId: scenarioId }}
-        refreshKey={mission.provenance?.mission_content_hash ?? "draft"}
-        approvalDisabled={busy || !canReview || dirty}
-        onApprove={(approval) => onReview(overrides, approval)} />
+      {approvalHref ? (
+        <div className="mt-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
+          <p className="text-[#3F4E57]">
+            이 화면은 미션을 만들고 고치는 자리입니다. 규칙 검사·AI 검토와 교수자 최종 승인은 감수 화면에서 진행합니다.
+          </p>
+          <Link to={approvalHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
+            교수자 최종 감수에서 열기 →
+          </Link>
+        </div>
+      ) : (
+        <ContentReviewPanel experiential target={{ kind: "mission", targetId: scenarioId }}
+          refreshKey={mission.provenance?.mission_content_hash ?? "draft"}
+          approvalDisabled={busy || !canReview || dirty}
+          onApprove={(approval) => onReview(overrides, approval)} />
+      )}
     </section>
   );
 }

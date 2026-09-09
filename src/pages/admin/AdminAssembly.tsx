@@ -716,6 +716,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                           busy={busy === r.scenario_id}
                           onSave={(edits) => onSaveEdits(r, edits)}
                           onReview={(overrides, approval) => onReview(r, overrides, approval)}
+                          approvalHref={reviewMode ? undefined : `/admin/review?scenarioId=${r.scenario_id}`}
                         />
                       )}
                       {reviewMode && st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
