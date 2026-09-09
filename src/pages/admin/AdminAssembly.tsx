@@ -222,11 +222,12 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
     return [...set];
   }, [rows]);
 
-  const filtered = useMemo(
+  // 상태를 뺀 나머지 필터. 상태 칩의 건수는 이 결과에서 세야 상태를 바꾸기 전에
+  // 각 상태가 몇 건인지 보인다.
+  const matchedExceptState = useMemo(
     () =>
       rows.filter(
         (r) =>
-          (fState === "all" || stateOf(r) === fState) &&
           (fAct === "all" || r.speech_act === fAct) &&
           (fLevel === "all" || r.learner_level === fLevel) &&
           (fMode === "all" || r.mode === fMode) &&
@@ -234,15 +235,19 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           (fRun === "all" || r.generation_run_id === fRun) &&
           (fHash === "all" || (r.prompt_snapshot_hash ?? "null") === fHash),
       ),
-    [rows, fState, fAct, fLevel, fMode, fDirection, fRun, fHash, stateOf],
+    [rows, fAct, fLevel, fMode, fDirection, fRun, fHash],
   );
 
-  // 계기판 — 필터 적용 결과 기준, 상호 배타.
+  const filtered = useMemo(
+    () => matchedExceptState.filter((r) => fState === "all" || stateOf(r) === fState),
+    [matchedExceptState, fState, stateOf],
+  );
+
   const dash = useMemo(() => {
     const d: Record<AssemblyState, number> = { core_only: 0, generated: 0, reviewed: 0, failed: 0 };
-    for (const r of filtered) d[stateOf(r)] += 1;
+    for (const r of matchedExceptState) d[stateOf(r)] += 1;
     return d;
-  }, [filtered, stateOf]);
+  }, [matchedExceptState, stateOf]);
 
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
@@ -439,50 +444,12 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
-      {/* 감수 대기열에 먼저 닿도록 절차 설명은 기본으로 접어 둔다. 내용은 그대로 두고
-          펼침 여부만 바꾼다 — 파이프라인 단계와 권한 구분은 이 화면의 설계 근거다. */}
-      {reviewMode && <>
-        {searchParams.get("scenarioId") && (
-          <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
-        )}
-        <details className="mb-4 rounded-xl border bg-white p-4 text-sm">
-          <summary className="cursor-pointer font-semibold">이 화면의 절차와 권한</summary>
-          <div className="mt-3 space-y-3">
-            <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) =>
-              `${step.key === "claude" || step.key === "adjudication" ? "(선택) " : ""}${step.label}`).join(" → ")}</p>
-            <p>교수자는 미션을 편성 전에 감수하고 승인하며, 주차 수업자료는 미션 편성 후에 확인하고 승인합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
-            <div className="flex flex-wrap gap-3">
-              <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 승인 →</Link>
-              <Link className="text-muted-foreground underline" to="/admin/research-qa/final-review">과거 정식 생성 검토 기록</Link>
-            </div>
-          </div>
-        </details>
-      </>}
-      {/* ── 변환 계기판 — 상호 배타 4상태 ── */}
+      {reviewMode && searchParams.get("scenarioId") && (
+        <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
+      )}
+      {/* 교수자가 필요한 미션을 바로 찾아 검토·승인하는 화면이므로 필터를 맨 위에 펼쳐 둔다.
+          상태는 계기판 카드가 아니라 필터의 한 축으로 둔다 — 카드가 유일한 상태 필터였다. */}
       <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          {(reviewMode ? ["generated", "reviewed"] as AssemblyState[] : Object.keys(STATE_KO) as AssemblyState[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFState((prev) => (prev === s ? "all" : s))}
-              className={[
-                "relative overflow-hidden rounded-lg border px-4 pb-3 pt-4 text-left transition-colors",
-                STATE_CARD_TONE[s],
-                fState === s
-                  ? "ring-1 ring-[#233542]"
-                  : "hover:brightness-[0.985]",
-              ].join(" ")}
-            >
-              <span className="absolute inset-x-0 top-0 h-1 bg-[#18232D]" />
-              <div className="text-[22px] font-bold tabular-nums text-[#182229]">{dash[s]}</div>
-              <div className="mt-0.5 text-[12px] font-medium text-[#46515A]">{STATE_KO[s]}</div>
-            </button>
-          ))}
-        </div>
-        <p className="mt-2.5 text-[11px] text-muted-foreground">
-          카드를 선택하면 해당 상태만 표시합니다. 「이번 조립 실패」는 현재 작업 중 발생한 결과입니다.
-        </p>
         {rows.length >= ROW_CAP && (
           <p className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
             ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 아래 숫자를
@@ -490,24 +457,42 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           </p>
         )}
 
+        {/* 상태는 처리 순서를 정하는 첫 축이라 다른 필터보다 앞에 둔다. 건수를 함께 보여
+            계기판 카드가 알려주던 현황을 잃지 않는다. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[12px] font-bold text-[#233542]">상태</span>
+          {(["all", ...(reviewMode ? ["generated", "reviewed"] : Object.keys(STATE_KO))] as Array<"all" | AssemblyState>).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFState(s)}
+              aria-pressed={fState === s}
+              className={[
+                "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
+                fState === s
+                  ? "border-[#233542] bg-[#233542] font-semibold text-white"
+                  : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
+              ].join(" ")}
+            >
+              {s === "all" ? "전체" : STATE_KO[s]}
+              <span className="ml-1.5 tabular-nums opacity-80">{s === "all" ? matchedExceptState.length : dash[s]}</span>
+            </button>
+          ))}
+        </div>
+
         {/* ── 학습설계 축과 생성 기준은 역할이 다르므로 시각적으로 분리한다. ── */}
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
-          {/* 조립은 4축으로 재료를 고르는 것이 본 동선이라 펼쳐 두고, 승인은 대기 상태부터
-              처리하는 동선이라 접어 둔다. 필터가 걸려 있으면 접혀 있어도 알 수 있게 표시한다. */}
-          <details open={!reviewMode}
+        <div className="mt-3 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
+          {/* 필요한 미션을 바로 찾는 것이 두 화면 모두의 첫 동작이라 펼쳐 둔다. */}
+          <details open
             className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
-            {/* summary에 display:flex를 주면 펼침 표시가 사라진다 — 안쪽에서만 배치한다. */}
+            {/* summary에 display:flex를 주면 펼침 표시가 사라지므로 배지는 띄워서 배치한다. */}
             <summary className="mb-3 cursor-pointer">
-              <span className="ml-1 inline-flex w-[calc(100%-1rem)] items-baseline justify-between gap-3 align-top">
-                <span>
-                  <span className="text-[13px] font-bold text-[#233542]">학습설계 4축</span>
-                  {axisFilterActive && <span className="ml-2 text-[11px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
-                  <span className="mt-0.5 block text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</span>
-                </span>
-                <span className="rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
-                  PRAGMA 편성 기준
-                </span>
+              <span className="float-right rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
+                PRAGMA 편성 기준
               </span>
+              <span className="ml-1 text-[13px] font-bold text-[#233542]">학습설계 4축</span>
+              {axisFilterActive && <span className="ml-2 text-[11px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
+              <span className="ml-1 mt-0.5 block text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</span>
             </summary>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
@@ -521,7 +506,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             </div>
           </details>
 
-          <details className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
+          <details open className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
             <summary className="cursor-pointer text-[13px] font-bold text-[#3D464D]">고급 필터 (연구자용)
               {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">필터 적용 중</span>}
             </summary>
