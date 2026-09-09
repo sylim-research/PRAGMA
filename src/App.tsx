@@ -18,6 +18,7 @@ const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 const AdminCorpus = lazy(() => import("./pages/admin/AdminCorpus.tsx"));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard.tsx"));
 const AdminGenerator = lazy(() => import("./pages/admin/AdminGenerator.tsx"));
+const AdminAuthentic = lazy(() => import("./pages/admin/AdminAuthentic.tsx"));
 const AdminAssembly = lazy(() => import("./pages/admin/AdminAssembly.tsx"));
 const AdminTeachingMaterials = lazy(() => import("./pages/admin/AdminTeachingMaterials.tsx"));
 const AdminTeachingStudio = lazy(() => import("./pages/admin/AdminTeachingStudio.tsx"));
@@ -269,8 +270,9 @@ const App = () => (
               개별 생성(/admin/generator)의 실제자료 가져오기에 통합돼 있어 중복 화면 삭제. */}
           <Route path="/admin/youtube-sources" element={<Navigate to="/admin/generator" replace />} />
           <Route path="/admin/generator" element={<RequireAdmin><AdminGenerator /></RequireAdmin>} />
-          {/* 원자료 분석은 시나리오 생성 화면 안으로 흡수했다(2026-09-09). 옛 주소는 그리로 보낸다. */}
-          <Route path="/admin/authentic" element={<Navigate to="/admin/generator" replace />} />
+          {/* 실제 자료 활용 분석 — 분석 결과를 보관함에 남긴다(2026-09-09). 오전에 생성기
+              안으로 흡수했다가, 보관되지 않고 사라지는 문제가 화면 위치와 무관해 되돌렸다. */}
+          <Route path="/admin/authentic" element={<RequireAdmin><AdminAuthentic /></RequireAdmin>} />
           <Route path="/admin/batch" element={<RequireAdmin><AdminBatch /></RequireAdmin>} />
           <Route path="/admin/library" element={<RequireAdmin><AdminBrowser /></RequireAdmin>} />
           {/* 학습 미션 조립(2026-07-30 신설) — 코어→미션 변환의 정식 작업대 */}

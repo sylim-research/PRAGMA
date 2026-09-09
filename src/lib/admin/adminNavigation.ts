@@ -41,6 +41,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     header: "2. 학습 미션 재료",
     items: [
+      { to: "/admin/authentic", label: "실제 자료 활용 분석" },
       { to: "/admin/generator", label: "시나리오 생성" },
       { to: "/admin/batch", label: "시나리오 배치 생성" },
       { to: "/admin/library", label: "시나리오 라이브러리" },

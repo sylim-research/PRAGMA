@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { addDraftScenario } from "@/lib/scenarioDrafts";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
-import AuthenticImportPanel, { type AuthenticApply } from "./AuthenticImportPanel";
+import { type AuthenticApply } from "./AuthenticImportPanel";
+import { getStoredCandidate, storedCandidateToApply } from "@/lib/admin/authenticStore";
 import {
   Select,
   SelectContent,
@@ -421,6 +422,7 @@ const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
 
 const AdminGenerator = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const gridPrefill = parseGeneratorPrefill(searchParams);
   const initialForm = formWithGridPrefill(gridPrefill);
   const [form, setForm] = useState<FormState>(initialForm);
@@ -562,6 +564,28 @@ const AdminGenerator = () => {
     setSavedScenarioId(null);
     setSaveError(null);
   };
+
+  // 「실제 자료 활용 분석」에서 넘어온 후보를 받는다. 보관된 후보는 id로 읽고(새로고침
+  // 해도 살아 있다), 보관 전 후보는 라우터 state로 온다. 옛 sessionStorage 왕복은
+  // 되살리지 않는다 — 저장되지 않는 경로가 다시 생기기 때문이다.
+  const candidateId = searchParams.get("candidateId");
+  const handedOver = (location.state as { authenticApply?: AuthenticApply } | null)?.authenticApply;
+  useEffect(() => {
+    if (handedOver) {
+      applyAuthentic(handedOver);
+      return;
+    }
+    if (!candidateId) return;
+    let alive = true;
+    void getStoredCandidate(candidateId).then((found) => {
+      if (alive && found) applyAuthentic(storedCandidateToApply(found.candidate, found.analysis));
+    });
+    return () => {
+      alive = false;
+    };
+    // applyAuthentic은 매 렌더 새로 만들어지므로 의존성에 넣지 않는다(1회 주입).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidateId, handedOver]);
 
   // Shared request body for single-shot / outline / final calls.
   const baseGenBody = () => ({
@@ -980,20 +1004,16 @@ const AdminGenerator = () => {
         </div>
       )}
 
-      {/* 실제 자료에서 시작하는 것은 이 화면이 하는 일의 한 갈래다(2026-09-09 흡수).
-          별도 화면으로 갔다가 세션 저장소를 거쳐 돌아오던 왕복을 없애고, 고른 후보가
-          그 자리에서 아래 생성 조건에 바로 들어간다. 평소에는 접혀 있다. */}
-      <details className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-3">
-        <summary className="cursor-pointer text-[13px] font-semibold text-[#7A4A0A]">
-          실제 자료에서 시작하기
-          <span className="ml-2 text-[12px] font-normal">
-            쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 활용 후보를 제안하고, 고르면 아래 조건이 채워집니다.
-          </span>
-        </summary>
-        <div className="mt-3">
-          <AuthenticImportPanel onApply={applyAuthentic} />
-        </div>
-      </details>
+      {/* 실제 자료에서 시작하는 일은 「실제 자료 활용 분석」이 한다. 여기에 접이식으로
+          두었던 적이 있으나(2026-09-09 오전), 분석 결과가 저장되지 않고 사라지는 문제가
+          화면 위치와는 무관해 다시 분리했다. 이 화면은 넘어온 후보를 받기만 한다. */}
+      <p className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-2.5 text-[12.5px] text-[#7A4A0A]">
+        실제 자료(쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면{" "}
+        <Link to="/admin/authentic" className="font-semibold underline">
+          실제 자료 활용 분석
+        </Link>
+        에서 분석하고 후보를 이 화면으로 넘기세요.
+      </p>
       {/* 적용된 원문이 보이지 않으면 무엇이 반영됐는지 알 수 없다 —
           manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
       {authenticProv && manualSourceText.trim() && (

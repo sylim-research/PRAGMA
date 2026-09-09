@@ -36,6 +36,7 @@ describe("admin navigation reachability", () => {
     ]);
     const material = ADMIN_NAV_GROUPS.find((group) => group.header === "2. 학습 미션 재료");
     expect(material?.items.map((item) => item.to)).toEqual([
+      "/admin/authentic",
       "/admin/generator",
       "/admin/batch",
       "/admin/library",
@@ -125,8 +126,8 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
-    // 원자료 분석은 생성 화면 안으로 흡수했다 — 옛 주소는 선택기에 잡히지 않는다.
-    expect(adminMobileNavValue("/admin/authentic")).toBe("");
+    // 원자료 분석은 보관함을 갖춘 별도 화면이다(2026-09-09 오후).
+    expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
     expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/teaching-generator");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
     expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
