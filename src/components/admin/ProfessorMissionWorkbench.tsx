@@ -32,7 +32,7 @@ export function ProfessorMissionWorkbench({
   onSave: (edits: ProfessorMissionEdits) => Promise<void>;
   onReview: (overrides: ProfessorIssueOverride[], approval: ContentReviewApproval) => Promise<void>;
   /**
-   * 승인이 이 화면의 일이 아닐 때 넘긴다. 점검·승인 패널 대신 교수자 최종 감수로 가는
+   * 승인이 이 화면의 일이 아닐 때 넘긴다. 점검·승인 패널 대신 교수자 최종 승인로 가는
    * 링크를 보여 준다 — 미션을 만드는 자리와 승인하는 자리를 가른다.
    */
   approvalHref?: string;
@@ -94,9 +94,10 @@ export function ProfessorMissionWorkbench({
     <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h4 className="font-semibold text-[#233542]">교수자 체험 감수</h4>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">
-            학생에게 제시할 화면과 참고 판정을 확인하고, 필요한 부분에 수정 요청을 남기세요.
+          <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수</h4>
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
+            학생에게 제시할 화면과 참고 판정을 확인하고, 수정·유지·보류를 판단합니다.
+            수정한 내용은 저장해야 하며, <b>수정 저장은 최종 승인이 아닙니다.</b>
           </p>
         </div>
       </div>
@@ -153,13 +154,23 @@ export function ProfessorMissionWorkbench({
           </Button>
         </div>
       </details>
+      {!approvalHref && (
+        <div className="mt-4 border-t border-[#E3E6E7] pt-3">
+          <h4 className="text-[14px] font-bold text-[#233542]">② 최종 승인</h4>
+          <p className="mt-0.5 text-[12px] text-muted-foreground">
+            감수를 마친 <b>이 버전</b>에 수업 사용·학습자 공개 자격을 부여하는 결정입니다.
+            내용을 다시 고치면 새 버전이 되어 점검과 승인을 다시 거칩니다.
+          </p>
+        </div>
+      )}
       {approvalHref ? (
         <div className="mt-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
           <p className="text-[#3F4E57]">
-            이 화면은 미션을 만들고 고치는 자리입니다. 규칙 검사·AI 검토와 교수자 최종 승인은 감수 화면에서 진행합니다.
+            이 화면은 미션을 만들고 고치는 자리입니다. 자동 품질 점검과 AI 검토를 거쳐 교수자가 콘텐츠를
+            감수한 뒤 최종 승인하는 일은 「교수자 최종 승인」 화면에서 진행합니다.
           </p>
           <Link to={approvalHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
-            교수자 최종 감수에서 열기 →
+            교수자 최종 승인 화면에서 열기 →
           </Link>
         </div>
       ) : (

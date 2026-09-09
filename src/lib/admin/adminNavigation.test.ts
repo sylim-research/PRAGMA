@@ -28,13 +28,38 @@ describe("admin navigation reachability", () => {
     expect(new Set(allPaths).size).toBe(allPaths.length);
     expect(allPaths).not.toContain("/admin/question-designer");
     expect(allPaths).not.toContain("/admin/research-qa/calibration");
-    const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 수업 운영");
+    const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.at(-1)?.to).toBe("/admin/data-backup");
-    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 학습 결과·연구 자료");
+    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
     expect(research?.items.map((item) => item.to)).toEqual([
       "/admin/decision-traces",
       "/admin/export",
     ]);
+  });
+
+  it("keeps approving out of the AI review screen", () => {
+    // AI 검토와 교수자 최종 승인은 같은 미션 목록을 보되 권한이 다르다. 화면을 나눈 뒤에도
+    // AI 쪽에 승인 경로가 생기지 않아야 하고, 같은 미션으로 건너갈 길이 있어야 한다.
+    const app = readFileSync(resolve(process.cwd(), "src/App.tsx"), "utf8");
+    expect(app).toContain('path="/admin/ai-review"');
+    expect(app).toContain("reviewMode aiReview");
+
+    const panel = readFileSync(
+      resolve(process.cwd(), "src/components/admin/ContentReviewPanel.tsx"),
+      "utf8",
+    );
+    // handoffHref가 주어지면 승인 절과 승인 버튼이 렌더되지 않는다.
+    expect(panel).toContain('next === "professor" && !handoffHref');
+    expect(panel).toContain('!(handoffHref && next === "professor")');
+    expect(panel).toContain("교수자 최종 승인 화면에서 열기");
+
+    const assembly = readFileSync(
+      resolve(process.cwd(), "src/pages/admin/AdminAssembly.tsx"),
+      "utf8",
+    );
+    expect(assembly).toContain("handoffHref={`/admin/review?scenarioId=${r.scenario_id}`}");
+    // 조립 화면도 승인을 넘긴다.
+    expect(assembly).toContain("approvalHref={reviewMode ? undefined :");
   });
 
   it("keeps a route or compatibility route for every restored entry", () => {
@@ -77,8 +102,9 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/review")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/releases")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/calibration")).toBe("");
-    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "2. 학습 콘텐츠 제작");
-    expect(production?.items.at(-1)?.to).toBe("/admin/review");
+    const quality = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 콘텐츠 품질 관리");
+    expect(quality?.items.map((item) => item.to)).toEqual(["/admin/ai-review", "/admin/review"]);
+    expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
     expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");

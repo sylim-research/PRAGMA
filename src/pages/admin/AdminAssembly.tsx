@@ -165,7 +165,15 @@ const progressLabel = (stage: PromoteStage) => {
   return "수리본 재검사";
 };
 
-const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
+/**
+ * 한 컴포넌트가 세 화면을 그린다. 목록·필터 기계장치가 같기 때문이며, 화면마다 다른 것은
+ * 조회 범위와 그 자리에서 할 수 있는 일이다.
+ *   reviewMode=false      → 학습 미션 조립 (코어를 미션으로 만든다)
+ *   reviewMode + aiReview → 자동 품질 점검·AI 검토 (판단 자료를 준비한다. 승인 기능 없음)
+ *   reviewMode            → 교수자 최종 승인 (감수하고 승인한다)
+ * 목록 데이터를 나누지 않는다 — 같은 미션과 검토 이력을 공유하고 상태별 보기만 다르다.
+ */
+const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: boolean; aiReview?: boolean }) => {
   const [searchParams] = useSearchParams();
   const [rows, setRows] = useState<CoreRow[]>([]);
   const [generationModel, setGenerationModel] = useState<"existing" | "astra">("existing");
@@ -176,7 +184,11 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   const initAct = searchParams.get("act");
   const initLevel = searchParams.get("level");
 
-  const [fState, setFState] = useState<"all" | AssemblyState>(reviewMode && !searchParams.get("scenarioId") ? "generated" : "all");
+  // 각 화면이 맡은 일부터 띄운다 — 조립은 아직 미션이 없는 코어, 감수는 감수 대기 미션.
+  // 상태가 하나로 걸러져 있으면 행의 상태 배지도 함께 사라진다(모든 행이 같은 값이므로).
+  const [fState, setFState] = useState<"all" | AssemblyState>(
+    searchParams.get("scenarioId") ? "all" : reviewMode ? "generated" : "core_only",
+  );
   const [fAct, setFAct] = useState<"all" | SpeechActUI>(
     ACTS.includes(initAct as SpeechActUI) ? (initAct as SpeechActUI) : "all",
   );
@@ -461,8 +473,12 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
 
   return (
     <AdminShell
-      title={reviewMode ? "교수자 최종 감수" : "학습 미션 조립"}
-      description={reviewMode ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
+      title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 조립"}
+      description={aiReview
+        ? "규칙 기반 자동 점검과 AI 검토로 교수자가 판단할 자료를 준비합니다. 이 화면에는 승인 기능이 없습니다."
+        : reviewMode
+          ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요."
+          : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
     >
       <div className="max-w-[1080px]">
       {!reviewMode && <>
@@ -477,7 +493,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           onResume={async (id, jobId) => {
             const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
             if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 교수자 최종 감수 화면에서 확인해 주세요."); return; }
+            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 교수자 최종 승인 화면에서 확인해 주세요."); return; }
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
@@ -572,7 +588,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         <section className="mt-4 space-y-2">
           {/* 일괄 AI 검토는 쓸 때만 필요하다. 행을 하나라도 고른 뒤에 한 줄로 나타난다.
               진행 상황은 AdminShell 상단의 ReviewPreparationStatus가 따로 보여 준다. */}
-          {reviewMode && reviewSelection.size > 0 && (
+          {aiReview && reviewSelection.size > 0 && (
             <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#D8D3C4] bg-white px-4 py-2.5">
               <span className="text-[14px] font-semibold text-[#202B33]">{reviewSelection.size}건 선택됨</span>
               <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 미션 모두 선택</Button>
@@ -581,7 +597,8 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                 filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
                   target: { kind: "mission" as const, targetId: row.scenario_id },
                   label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
-                })))}>{reviewSelection.size}건 AI 검토 · 유료</Button>
+                })))}>{reviewSelection.size}건 감수 자료 준비</Button>
+              <p className="w-full text-[12px] text-muted-foreground">저장된 결과를 재사용하며, 없을 때만 유료 AI 검토를 실행합니다.</p>
             </div>
           )}
           <ul className="space-y-2">
@@ -654,25 +671,15 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                       )}
                       {(st === "generated" || st === "reviewed") && (
                         <>
-                        {reviewMode && st === "generated" && <label className="mr-2 flex items-center gap-2 text-[13px]">
-                          <input type="checkbox" aria-label={`AI 검토 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
+                        {aiReview && st === "generated" && <label className="mr-2 flex items-center gap-2 text-[13px]">
+                          <input type="checkbox" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
                             checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
                               const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
-                            })} />AI 검토 선택
+                            })} />선택
                         </label>}
                         <Button size="sm" variant="ghost" onClick={() => togglePreview(r)}>
-                          {openId === r.scenario_id ? "미션 접기 ▴" : reviewMode ? "학생 화면으로 감수하기 ▾" : "미션 보기 ▾"}
+                          {openId === r.scenario_id ? "미션 접기 ▴" : aiReview ? "점검·검토 결과 보기 ▾" : reviewMode ? "학생 화면으로 감수하기 ▾" : "미션 보기 ▾"}
                         </Button>
-                        </>
-                      )}
-                      {st === "reviewed" && (
-                        <>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to="/admin/composer">15주 편성에 사용</Link>
-                          </Button>
-                          <Button size="sm" variant="outline" asChild>
-                            <Link to="/admin/package">교과목·주차 수업자료</Link>
-                          </Button>
                         </>
                       )}
                       {!isAssembling && rowMsg[r.scenario_id] && (
@@ -708,7 +715,11 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                         mission={preview[r.scenario_id].mission}
                         warnings={preview[r.scenario_id].warnings}
                       />}
-                      {st === "generated" && (
+                      {aiReview && (st === "generated" || st === "reviewed") && (
+                        <ContentReviewPanel target={{ kind: "mission", targetId: r.scenario_id }}
+                          handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+                      )}
+                      {!aiReview && st === "generated" && (
                         <ProfessorMissionWorkbench
                           scenarioId={r.scenario_id}
                           key={`${preview[r.scenario_id].mission.provenance?.mission_content_hash ?? "draft"}-${preview[r.scenario_id].mission.quality_check?.verdict ?? "none"}`}
@@ -719,7 +730,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                           approvalHref={reviewMode ? undefined : `/admin/review?scenarioId=${r.scenario_id}`}
                         />
                       )}
-                      {reviewMode && st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
+                      {reviewMode && !aiReview && st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
                     </>
                   )}
                 </li>

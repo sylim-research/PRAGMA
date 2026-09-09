@@ -1393,12 +1393,6 @@ const AdminGenerator = () => {
                     )}
                   </div>
                 ))}
-                <Link
-                  to="/admin/library"
-                  className="mt-1 inline-flex items-center gap-1 rounded-md border border-[#6EE7B7] bg-white px-2.5 py-1 text-[11.5px] font-medium text-[#065F46] hover:bg-[#ECFDF5]"
-                >
-                  시나리오 라이브러리에서 확인 →
-                </Link>
               </div>
             )}
           </div>
@@ -1423,12 +1417,6 @@ const AdminGenerator = () => {
                 scenario_id: <code className="font-mono">{savedScenarioId}</code>
                 &nbsp;/&nbsp; 승인 상태: needs_review &nbsp;/&nbsp; 용도: archived_only
               </p>
-              <Link
-                to="/admin/library"
-                className="mt-2 inline-flex items-center gap-1 rounded-md border border-[#6EE7B7] bg-white px-2.5 py-1 text-[11.5px] font-medium text-[#065F46] hover:bg-[#ECFDF5]"
-              >
-                시나리오 라이브러리에서 확인 →
-              </Link>
             </div>
           )}
           {saveError && (
@@ -1514,12 +1502,6 @@ const AdminGenerator = () => {
                     )}
                   </div>
                 ))}
-                <Link
-                  to="/admin/library"
-                  className="inline-flex items-center gap-1 rounded-md border border-[#6EE7B7] bg-white px-2.5 py-1 text-[11.5px] font-medium text-[#065F46] hover:bg-[#ECFDF5]"
-                >
-                  시나리오 라이브러리에서 확인 →
-                </Link>
               </div>
             )}
 

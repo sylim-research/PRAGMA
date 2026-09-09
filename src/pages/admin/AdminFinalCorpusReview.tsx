@@ -115,10 +115,10 @@ const AdminFinalCorpusReview = ({ preview = false }: { preview?: boolean }) => {
     setSelectedId(visible[index].scenario_id);
   };
 
-  return <AdminShell title="과거 정식 생성 검토 기록" description="기존 정식 생성 작업의 검토 이력을 읽는 화면입니다. 현재 콘텐츠의 감수와 최종 승인은 교수자 최종 감수 화면에서 진행합니다.">
+  return <AdminShell title="과거 정식 생성 검토 기록" description="기존 정식 생성 작업의 검토 이력을 읽는 화면입니다. 교수자가 현재 콘텐츠를 감수한 뒤 최종 승인하는 일은 「교수자 최종 승인」 화면에서 진행합니다.">
     <div className="space-y-5">
-      <Link className="inline-block font-semibold underline" to="/admin/review">교수자 최종 감수로 이동 →</Link>
-      <div className="flex flex-wrap items-center justify-between gap-3"><Button asChild variant="ghost" size="sm"><Link to="/admin/dashboard"><ArrowLeft className="mr-1 h-4 w-4" />운영 대시보드</Link></Button><Badge className="bg-slate-900 text-white">과거 기록 · 읽기 전용</Badge></div>
+      <Link className="inline-block font-semibold underline" to="/admin/review">교수자 최종 승인로 이동 →</Link>
+      <div className="flex flex-wrap items-center justify-between gap-3"><Button asChild variant="ghost" size="sm"><Link to="/admin/dashboard"><ArrowLeft className="mr-1 h-4 w-4" />PRAGMA 운영 워크플로우</Link></Button><Badge className="bg-slate-900 text-white">과거 기록 · 읽기 전용</Badge></div>
 
       <section className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950">
         <strong>이력 범위:</strong> 과거 정식 생성 작업에 연결된 자동 점검과 연구자 검토 기록입니다. 전체 운영 콘텐츠의 점검률이나 현재 콘텐츠 승인 완료율이 아닙니다.

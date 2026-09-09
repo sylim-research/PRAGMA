@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,7 +26,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowRight, ChevronDown, ChevronRight, Lock, Pencil, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { PROMPT_SNAPSHOT, type PromptSnapshotEntry } from "@/lib/pragma/promptSnapshot.generated";
 
 type PromptTemplate = {
@@ -180,9 +179,6 @@ function HarnessOverview() {
             같은 입력에는 같은 결과를 냅니다. HSK 어휘 참고 범위 점검과 R1–R29 규칙이
             여기에 속합니다.
           </p>
-          <Link to="/admin/corpus" className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#6D5C1F] hover:text-[#15202B]">
-            HSK 기준·최근 결과 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
         </div>
         <div className="rounded-lg border border-[#D8E0E5] bg-[#F7FAFB] p-3">
           <div className="flex items-center justify-between gap-2">
@@ -204,9 +200,6 @@ function HarnessOverview() {
             자동 검사 근거를 보고 더 쉽게 또는 더 도전적으로 조정할지와 학습자 공개 여부를
             결정합니다.
           </p>
-          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#5F5A50] hover:text-[#15202B]">
-            교수자 최종 감수 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
         </div>
       </div>
     </section>

@@ -4,7 +4,7 @@
 // 생성 로직은 복제하지 않는다 — 후보 선택 시 페이로드를 sessionStorage로 넘기고
 // /admin/generator가 기존 applyAuthentic 경로로 소비한다.
 
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import AuthenticImportPanel, {
   AUTHENTIC_HANDOFF_KEY,
@@ -46,7 +46,6 @@ const AdminAuthentic = () => {
         </span>
       </div>
       <div className="mt-4">
-        <p className="mb-4 rounded-lg border bg-white p-3 text-sm">소스로 수업 설명·활동·FAQ·토론자료를 만들려면 <Link className="font-semibold underline" to="/admin/teaching-generator">수업자료·토론 생성 →</Link></p>
         <AuthenticImportPanel onApply={handleApply} />
       </div>
     </AdminShell>
