@@ -414,6 +414,8 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   };
 
   const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
+  // 접혀 있어도 4축 필터가 걸려 있는지 알 수 있어야 한다.
+  const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
 
   return (
     <AdminShell
@@ -437,16 +439,25 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
-      {reviewMode && <section className="mb-4 space-y-3 rounded-xl border bg-white p-4 text-sm">
-        <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) =>
-          `${step.key === "claude" || step.key === "adjudication" ? "(선택) " : ""}${step.label}`).join(" → ")}</p>
-        <p>교수자는 미션을 편성 전에 감수하고 승인하며, 주차 수업자료는 미션 편성 후에 확인하고 승인합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
-        <div className="flex flex-wrap gap-3">
-          <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 승인 →</Link>
-          <Link className="text-muted-foreground underline" to="/admin/research-qa/final-review">과거 정식 생성 검토 기록</Link>
-          {searchParams.get("scenarioId") && <Link className="underline" to="/admin/review">전체 미션 목록</Link>}
-        </div>
-      </section>}
+      {/* 감수 대기열에 먼저 닿도록 절차 설명은 기본으로 접어 둔다. 내용은 그대로 두고
+          펼침 여부만 바꾼다 — 파이프라인 단계와 권한 구분은 이 화면의 설계 근거다. */}
+      {reviewMode && <>
+        {searchParams.get("scenarioId") && (
+          <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
+        )}
+        <details className="mb-4 rounded-xl border bg-white p-4 text-sm">
+          <summary className="cursor-pointer font-semibold">이 화면의 절차와 권한</summary>
+          <div className="mt-3 space-y-3">
+            <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) =>
+              `${step.key === "claude" || step.key === "adjudication" ? "(선택) " : ""}${step.label}`).join(" → ")}</p>
+            <p>교수자는 미션을 편성 전에 감수하고 승인하며, 주차 수업자료는 미션 편성 후에 확인하고 승인합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
+            <div className="flex flex-wrap gap-3">
+              <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 승인 →</Link>
+              <Link className="text-muted-foreground underline" to="/admin/research-qa/final-review">과거 정식 생성 검토 기록</Link>
+            </div>
+          </div>
+        </details>
+      </>}
       {/* ── 변환 계기판 — 상호 배타 4상태 ── */}
       <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
         <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
@@ -481,16 +492,23 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
 
         {/* ── 학습설계 축과 생성 기준은 역할이 다르므로 시각적으로 분리한다. ── */}
         <div className="mt-4 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
-          <div className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-              <div>
-                <h3 className="text-[13px] font-bold text-[#233542]">학습설계 4축</h3>
-                <p className="mt-0.5 text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</p>
-              </div>
-              <span className="rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
-                PRAGMA 편성 기준
+          {/* 조립은 4축으로 재료를 고르는 것이 본 동선이라 펼쳐 두고, 승인은 대기 상태부터
+              처리하는 동선이라 접어 둔다. 필터가 걸려 있으면 접혀 있어도 알 수 있게 표시한다. */}
+          <details open={!reviewMode}
+            className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
+            {/* summary에 display:flex를 주면 펼침 표시가 사라진다 — 안쪽에서만 배치한다. */}
+            <summary className="mb-3 cursor-pointer">
+              <span className="ml-1 inline-flex w-[calc(100%-1rem)] items-baseline justify-between gap-3 align-top">
+                <span>
+                  <span className="text-[13px] font-bold text-[#233542]">학습설계 4축</span>
+                  {axisFilterActive && <span className="ml-2 text-[11px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
+                  <span className="mt-0.5 block text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</span>
+                </span>
+                <span className="rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
+                  PRAGMA 편성 기준
+                </span>
               </span>
-            </div>
+            </summary>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
                 opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
@@ -501,7 +519,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
               <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
             </div>
-          </div>
+          </details>
 
           <details className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
             <summary className="cursor-pointer text-[13px] font-bold text-[#3D464D]">고급 필터 (연구자용)
@@ -547,7 +565,10 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           <div className="flex items-baseline justify-between px-1">
             <div>
               <h3 className="text-[15px] font-bold text-[#202B33]">{reviewMode ? "미션 감수 대기열" : "조립 큐"}</h3>
-              <p className="mt-0.5 text-[11.5px] text-muted-foreground">선택한 조건의 시나리오 {filtered.length}개</p>
+              <p className="mt-0.5 text-[11.5px] text-muted-foreground">
+                선택한 조건의 시나리오 {filtered.length}개
+                {filtered.length > visible.length && ` · 지금 ${visible.length}개 표시`}
+              </p>
             </div>
             {filtered.length > LIST_CAP && !showAll && (
               <span className="text-[12px] text-muted-foreground">처음 {LIST_CAP}개 표시</span>
@@ -673,9 +694,10 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
               );
             })}
           </ul>
-          {filtered.length > LIST_CAP && !showAll && (
-            <Button variant="outline" className="w-full" onClick={() => setShowAll(true)}>
-              전체 {filtered.length}개 모두 표시
+          {/* 한 번 펼치면 되돌릴 수 없어 목록이 계속 길게 남던 문제를 고친다. */}
+          {filtered.length > LIST_CAP && (
+            <Button variant="outline" className="w-full" onClick={() => setShowAll((prev) => !prev)}>
+              {showAll ? `처음 ${LIST_CAP}개만 보기` : `전체 ${filtered.length}개 모두 표시`}
             </Button>
           )}
           {filtered.length === 0 && (

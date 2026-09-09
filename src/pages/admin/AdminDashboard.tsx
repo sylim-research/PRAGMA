@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { IS_DEV } from "@/lib/auth/useProfile";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DASHBOARD_ROW_CAP,
@@ -611,7 +612,8 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {isAdmin && (
+      {/* 내 프로필을 미완료로 되돌리는 시험용 조작이라 운영 화면에서는 감춘다. */}
+      {isAdmin && IS_DEV && (
         <div className="mt-4 flex justify-end">
           <AlertDialog>
             <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-muted-foreground" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
