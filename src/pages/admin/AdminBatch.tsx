@@ -304,55 +304,42 @@ const AdminBatch = () => {
       <div className="space-y-5">
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_310px]">
           <div className="min-w-0 space-y-5">
-            <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 id="batch-config-heading" className="text-lg font-bold">1. 생성 조건</h2>
-                <Badge variant="secondary">상황·원문·태그 생성</Badge>
-              </div>
-              <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
-                <div>
-                  <p className="mb-2 text-xs font-semibold text-muted-foreground">언어 방향</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
-                    <Button size="sm" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
-                  </div>
+            <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <h2 id="batch-config-heading" className="shrink-0 text-lg font-bold">1. 생성 조건</h2>
+                <div role="group" aria-label="언어 방향" className="order-last flex w-full gap-1.5 sm:order-none sm:w-auto">
+                  <Button size="sm" className="h-8 px-3" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
+                  <Button size="sm" className="h-8 px-3" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
                 </div>
-                <div>
-                  <p className="mb-2 text-xs font-semibold text-muted-foreground">생성 계획 불러오기</p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" disabled={busy} onClick={loadDefaultPreset}>기본 72건</Button>
-                  </div>
-                </div>
+                <Button size="sm" variant="outline" className="ml-auto h-8 shrink-0 px-3" title="기본 수량으로 되돌리기" disabled={busy} onClick={loadDefaultPreset}>기본 72건</Button>
               </div>
 
-              <>
-                <div className="mt-5 border-t pt-4">
-                  <h3 className="text-sm font-semibold">수준별 생성 수량</h3>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">입력값은 화행당 번역 건수입니다. 화행 {targetActCount}개에 적용하고 통역 건수를 더해 총량을 계산합니다.</p>
-                  <div className="mt-3 grid gap-3 sm:grid-cols-3">{LEVEL_ORDER.map(level => {
-                    const translation = quota.perLevel[level];
-                    const interpreting = interpretingCount(translation, quota.interpretingRatio);
-                    return <div key={level} className="rounded-lg border bg-[#FAF8F2] p-3">
-                      <Label htmlFor={"batch-quota-" + level} className="text-sm font-semibold">{LEVEL[level]} · 화행당 번역</Label>
-                      <div className="mt-2 flex items-center gap-2">
-                        <Input id={"batch-quota-" + level} type="number" min={0} max={30} step={1} value={translation}
-                          disabled={busy} onChange={event => setLevelQuota(level, Number(event.target.value))} className="h-9 bg-white" />
-                        <span className="text-xs">건</span>
-                      </div>
-                      <p className="mt-3 text-sm font-bold">총 {targetActCount * (translation + interpreting)}건</p>
-                      <p className="mt-1 text-xs text-muted-foreground">번역 {targetActCount * translation} · 통역 {targetActCount * interpreting}</p>
-                    </div>;
-                  })}</div>
+              <p className="mt-3 text-xs text-muted-foreground">수준별 화행당 번역 건수 · {targetActCount}개 화행에 적용</p>
+              <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg bg-[#FAF8F2] p-3 sm:grid-cols-4">
+                {LEVEL_ORDER.map(level => {
+                  const translation = quota.perLevel[level];
+                  const interpreting = interpretingCount(translation, quota.interpretingRatio);
+                  return <div key={level} className="min-w-0">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-1">
+                      <Label htmlFor={"batch-quota-" + level} className="text-xs font-semibold">{LEVEL[level]}<span className="sr-only"> · 화행당 번역</span></Label>
+                      <span className="text-xs font-semibold tabular-nums">총 {targetActCount * (translation + interpreting)}건</span>
+                    </div>
+                    <div className="mt-1.5 flex items-center gap-1.5">
+                      <Input id={"batch-quota-" + level} type="number" min={0} max={30} step={1} value={translation}
+                        disabled={busy} onChange={event => setLevelQuota(level, Number(event.target.value))} className="h-8 min-w-0 bg-white" />
+                      <span className="text-xs text-muted-foreground">건</span>
+                    </div>
+                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {targetActCount * translation} · 통역 {targetActCount * interpreting}</p>
+                  </div>;
+                })}
+                <div className="min-w-0">
+                  <Label htmlFor="batch-interpreting-ratio" className="block text-xs font-semibold leading-4">통역 생성 배율</Label>
+                  <Input id="batch-interpreting-ratio" type="number" min={0} max={1} step={0.1} value={quota.interpretingRatio}
+                    disabled={busy} onChange={event => setInterpretingRatio(Number(event.target.value))} className="mt-1.5 h-8 bg-white" />
+                  <p className="mt-1 text-xs text-muted-foreground">화행당 번역 건수 기준</p>
                 </div>
-                <div className="mt-4 flex flex-wrap items-start gap-3 rounded-lg border p-3">
-                  <div className="w-32 shrink-0">
-                    <Label htmlFor="batch-interpreting-ratio" className="text-xs font-semibold">통역 생성 배율</Label>
-                    <Input id="batch-interpreting-ratio" type="number" min={0} max={1} step={0.1} value={quota.interpretingRatio}
-                      disabled={busy} onChange={event => setInterpretingRatio(Number(event.target.value))} className="mt-2 h-9" />
-                  </div>
-                  <p className="min-w-0 flex-1 basis-48 text-xs leading-5 text-muted-foreground">화행당 번역 건수 × 배율을 반올림합니다. 번역을 생성하는 수준은 통역도 최소 1건을 만듭니다. 배율 0.3은 전체 중 통역 30%를 뜻하지 않습니다.</p>
-                </div>
-              </>
+              </div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 = 화행당 번역 × 배율(반올림, 번역이 있으면 최소 1건). 배율은 전체 통역 비중과 다릅니다.</p>
             </section>
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-5">
