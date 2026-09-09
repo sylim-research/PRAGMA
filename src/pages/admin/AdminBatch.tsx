@@ -514,11 +514,6 @@ const AdminBatch = () => {
                 <Button size="sm" variant="outline" onClick={startFreshCoreRun} disabled={busy}>새 배치 ID</Button>
               </div>
             </div>
-            <p className="mt-5 border-t pt-4 text-xs leading-5 text-muted-foreground">생성물은 내부 검토 대기로 저장됩니다. 이후 미션 조립·검토·최종 승인을 거쳐 수업에 편성합니다.</p>
-            <div className="mt-2 flex flex-wrap gap-3 text-xs font-semibold">
-              <Link className="underline underline-offset-4" to="/admin/library?view=materials">시나리오 재료 보기</Link>
-              <Link className="underline underline-offset-4" to="/admin/assembly">미션 조립으로</Link>
-            </div>
           </aside>
         </div>
 
