@@ -4,6 +4,16 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260910-05 · AI 배치 제작의 계획·실행·재개 연결
+
+- DEC-20260910-04. 범위와 환경 재실행 사유는 `docs/dev-log/2026-09-10-batch-generation-workspace.md`에서 추적한다.
+- 재실행: `src/pages/admin/AdminBatch.test.tsx` 및 기존 `batchPlan.test.ts`, `coreBatchRun.test.ts`,
+  `adminBatchPreflight.test.ts`. 4파일 30 tests 통과. 선택한 항목의 원래 계획 번호와 재개 ID·저장 목록 전달,
+  실행 준비 중 중복 요청 방지, 중단과 오류 복구, AI 비평 기능 유지가 포함된다.
+- 브라우저: `scripts/manual-checks/batch-generation-workspace-smoke.mjs`.
+  `.tmp/batch-generation-workspace/`의 PC·중한·모바일 화면 및 `result.json`에 계획 수량·선택·반응형 근거를 남긴다.
+- 합성 호출과 로컬 UI 검증이다. 실제 AI 대량 생성·운영 DB 쓰기·교수자 검수·학습효과의 증거가 아니다.
+
 ## EVD-20260910-01 · 관리자 개편 인계·현행 문서 동기화
 
 - 기준: 원격 main `4bd78421432476a4e6199923deb2099cdc13f8d5` (PR #124).
