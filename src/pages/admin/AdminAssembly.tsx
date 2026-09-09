@@ -222,11 +222,12 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
     return [...set];
   }, [rows]);
 
-  const filtered = useMemo(
+  // 상태를 뺀 나머지 필터. 상태 칩의 건수는 이 결과에서 세야 상태를 바꾸기 전에
+  // 각 상태가 몇 건인지 보인다.
+  const matchedExceptState = useMemo(
     () =>
       rows.filter(
         (r) =>
-          (fState === "all" || stateOf(r) === fState) &&
           (fAct === "all" || r.speech_act === fAct) &&
           (fLevel === "all" || r.learner_level === fLevel) &&
           (fMode === "all" || r.mode === fMode) &&
@@ -234,15 +235,19 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           (fRun === "all" || r.generation_run_id === fRun) &&
           (fHash === "all" || (r.prompt_snapshot_hash ?? "null") === fHash),
       ),
-    [rows, fState, fAct, fLevel, fMode, fDirection, fRun, fHash, stateOf],
+    [rows, fAct, fLevel, fMode, fDirection, fRun, fHash],
   );
 
-  // 계기판 — 필터 적용 결과 기준, 상호 배타.
+  const filtered = useMemo(
+    () => matchedExceptState.filter((r) => fState === "all" || stateOf(r) === fState),
+    [matchedExceptState, fState, stateOf],
+  );
+
   const dash = useMemo(() => {
     const d: Record<AssemblyState, number> = { core_only: 0, generated: 0, reviewed: 0, failed: 0 };
-    for (const r of filtered) d[stateOf(r)] += 1;
+    for (const r of matchedExceptState) d[stateOf(r)] += 1;
     return d;
-  }, [filtered, stateOf]);
+  }, [matchedExceptState, stateOf]);
 
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
@@ -414,10 +419,12 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
   };
 
   const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
+  // 접혀 있어도 4축 필터가 걸려 있는지 알 수 있어야 한다.
+  const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
 
   return (
     <AdminShell
-      title={reviewMode ? "콘텐츠 승인" : "학습 미션 조립"}
+      title={reviewMode ? "교수자 최종 감수" : "학습 미션 조립"}
       description={reviewMode ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요." : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
     >
       <div className="max-w-[1080px]">
@@ -433,45 +440,16 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           onResume={async (id, jobId) => {
             const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
             if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 콘텐츠 승인 화면에서 확인해 주세요."); return; }
+            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 교수자 최종 감수 화면에서 확인해 주세요."); return; }
             setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
           }} />
       </>}
-      {reviewMode && <section className="mb-4 space-y-3 rounded-xl border bg-white p-4 text-sm">
-        <p className="font-semibold">{CONTENT_REVIEW_STEPS.map((step) =>
-          `${step.key === "claude" || step.key === "adjudication" ? "(선택) " : ""}${step.label}`).join(" → ")}</p>
-        <p>교수자는 미션을 편성 전에 감수하고 승인하며, 주차 수업자료는 미션 편성 후에 확인하고 승인합니다. AI는 오류 후보와 근거를 제시하며 콘텐츠를 자동 수정하거나 승인하지 않습니다.</p>
-        <div className="flex flex-wrap gap-3">
-          <Link className="underline" to="/admin/package?review=1">편성 후 주차 자료 승인 →</Link>
-          <Link className="text-muted-foreground underline" to="/admin/research-qa/final-review">과거 정식 생성 검토 기록</Link>
-          {searchParams.get("scenarioId") && <Link className="underline" to="/admin/review">전체 미션 목록</Link>}
-        </div>
-      </section>}
-      {/* ── 변환 계기판 — 상호 배타 4상태 ── */}
+      {reviewMode && searchParams.get("scenarioId") && (
+        <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
+      )}
+      {/* 교수자가 필요한 미션을 바로 찾아 검토·승인하는 화면이므로 필터를 맨 위에 펼쳐 둔다.
+          상태는 계기판 카드가 아니라 필터의 한 축으로 둔다 — 카드가 유일한 상태 필터였다. */}
       <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
-        <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
-          {(reviewMode ? ["generated", "reviewed"] as AssemblyState[] : Object.keys(STATE_KO) as AssemblyState[]).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFState((prev) => (prev === s ? "all" : s))}
-              className={[
-                "relative overflow-hidden rounded-lg border px-4 pb-3 pt-4 text-left transition-colors",
-                STATE_CARD_TONE[s],
-                fState === s
-                  ? "ring-1 ring-[#233542]"
-                  : "hover:brightness-[0.985]",
-              ].join(" ")}
-            >
-              <span className="absolute inset-x-0 top-0 h-1 bg-[#18232D]" />
-              <div className="text-[22px] font-bold tabular-nums text-[#182229]">{dash[s]}</div>
-              <div className="mt-0.5 text-[12px] font-medium text-[#46515A]">{STATE_KO[s]}</div>
-            </button>
-          ))}
-        </div>
-        <p className="mt-2.5 text-[11px] text-muted-foreground">
-          카드를 선택하면 해당 상태만 표시합니다. 「이번 조립 실패」는 현재 작업 중 발생한 결과입니다.
-        </p>
         {rows.length >= ROW_CAP && (
           <p className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
             ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 아래 숫자를
@@ -479,18 +457,43 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           </p>
         )}
 
+        {/* 상태는 처리 순서를 정하는 첫 축이라 다른 필터보다 앞에 둔다. 건수를 함께 보여
+            계기판 카드가 알려주던 현황을 잃지 않는다. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-[12px] font-bold text-[#233542]">상태</span>
+          {(["all", ...(reviewMode ? ["generated", "reviewed"] : Object.keys(STATE_KO))] as Array<"all" | AssemblyState>).map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => setFState(s)}
+              aria-pressed={fState === s}
+              className={[
+                "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
+                fState === s
+                  ? "border-[#233542] bg-[#233542] font-semibold text-white"
+                  : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
+              ].join(" ")}
+            >
+              {s === "all" ? "전체" : STATE_KO[s]}
+              <span className="ml-1.5 tabular-nums opacity-80">{s === "all" ? matchedExceptState.length : dash[s]}</span>
+            </button>
+          ))}
+        </div>
+
         {/* ── 학습설계 축과 생성 기준은 역할이 다르므로 시각적으로 분리한다. ── */}
-        <div className="mt-4 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
-          <div className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-              <div>
-                <h3 className="text-[13px] font-bold text-[#233542]">학습설계 4축</h3>
-                <p className="mt-0.5 text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</p>
-              </div>
-              <span className="rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
+        <div className="mt-3 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
+          {/* 필요한 미션을 바로 찾는 것이 두 화면 모두의 첫 동작이라 펼쳐 둔다. */}
+          <details open
+            className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
+            {/* summary에 display:flex를 주면 펼침 표시가 사라지므로 배지는 띄워서 배치한다. */}
+            <summary className="mb-3 cursor-pointer">
+              <span className="float-right rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
                 PRAGMA 편성 기준
               </span>
-            </div>
+              <span className="ml-1 text-[13px] font-bold text-[#233542]">학습설계 4축</span>
+              {axisFilterActive && <span className="ml-2 text-[11px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
+              <span className="ml-1 mt-0.5 block text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</span>
+            </summary>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
                 opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
@@ -501,9 +504,9 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
               <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
             </div>
-          </div>
+          </details>
 
-          <details className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
+          <details open className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
             <summary className="cursor-pointer text-[13px] font-bold text-[#3D464D]">고급 필터 (연구자용)
               {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">필터 적용 중</span>}
             </summary>
@@ -547,7 +550,10 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
           <div className="flex items-baseline justify-between px-1">
             <div>
               <h3 className="text-[15px] font-bold text-[#202B33]">{reviewMode ? "미션 감수 대기열" : "조립 큐"}</h3>
-              <p className="mt-0.5 text-[11.5px] text-muted-foreground">선택한 조건의 시나리오 {filtered.length}개</p>
+              <p className="mt-0.5 text-[11.5px] text-muted-foreground">
+                선택한 조건의 시나리오 {filtered.length}개
+                {filtered.length > visible.length && ` · 지금 ${visible.length}개 표시`}
+              </p>
             </div>
             {filtered.length > LIST_CAP && !showAll && (
               <span className="text-[12px] text-muted-foreground">처음 {LIST_CAP}개 표시</span>
@@ -673,9 +679,10 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
               );
             })}
           </ul>
-          {filtered.length > LIST_CAP && !showAll && (
-            <Button variant="outline" className="w-full" onClick={() => setShowAll(true)}>
-              전체 {filtered.length}개 모두 표시
+          {/* 한 번 펼치면 되돌릴 수 없어 목록이 계속 길게 남던 문제를 고친다. */}
+          {filtered.length > LIST_CAP && (
+            <Button variant="outline" className="w-full" onClick={() => setShowAll((prev) => !prev)}>
+              {showAll ? `처음 ${LIST_CAP}개만 보기` : `전체 ${filtered.length}개 모두 표시`}
             </Button>
           )}
           {filtered.length === 0 && (

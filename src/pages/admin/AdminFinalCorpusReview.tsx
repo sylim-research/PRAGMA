@@ -115,9 +115,9 @@ const AdminFinalCorpusReview = ({ preview = false }: { preview?: boolean }) => {
     setSelectedId(visible[index].scenario_id);
   };
 
-  return <AdminShell title="과거 정식 생성 검토 기록" description="기존 정식 생성 작업의 검토 이력을 읽는 화면입니다. 현재 콘텐츠의 감수와 최종 승인은 콘텐츠 승인 화면에서 진행합니다.">
+  return <AdminShell title="과거 정식 생성 검토 기록" description="기존 정식 생성 작업의 검토 이력을 읽는 화면입니다. 현재 콘텐츠의 감수와 최종 승인은 교수자 최종 감수 화면에서 진행합니다.">
     <div className="space-y-5">
-      <Link className="inline-block font-semibold underline" to="/admin/review">콘텐츠 승인으로 이동 →</Link>
+      <Link className="inline-block font-semibold underline" to="/admin/review">교수자 최종 감수로 이동 →</Link>
       <div className="flex flex-wrap items-center justify-between gap-3"><Button asChild variant="ghost" size="sm"><Link to="/admin/dashboard"><ArrowLeft className="mr-1 h-4 w-4" />운영 대시보드</Link></Button><Badge className="bg-slate-900 text-white">과거 기록 · 읽기 전용</Badge></div>
 
       <section className="rounded-xl border border-sky-200 bg-sky-50 p-4 text-sm leading-6 text-sky-950">

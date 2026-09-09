@@ -306,7 +306,7 @@ const AdminGoldCalibration = () => {
     >
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <Link to="/admin/review" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="h-4 w-4" /> 콘텐츠 승인으로 이동
+          <ArrowLeft className="h-4 w-4" /> 교수자 최종 감수로 이동
         </Link>
         <div className="flex flex-wrap gap-2">
           <Badge variant="outline">파일럿 판정 기록 {resolvedCount}/{BOOTSTRAP_SEED_GOLD_CASE_COUNT}</Badge>

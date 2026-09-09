@@ -205,7 +205,7 @@ function HarnessOverview() {
             결정합니다.
           </p>
           <Link to="/admin/review" className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-semibold text-[#5F5A50] hover:text-[#15202B]">
-            콘텐츠 승인 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
+            교수자 최종 감수 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
           </Link>
         </div>
       </div>
