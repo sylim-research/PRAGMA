@@ -126,7 +126,7 @@ const SummaryMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
       changed ? "border-[#D6B84A] bg-[#FFFBE8] ring-2 ring-[#F4D85E]/30" : "border-border",
     ].join(" ")}
@@ -202,7 +202,7 @@ const ReviewPipeline = ({
             <Link
               to="/admin/review"
               className={[
-                "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+                "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
                 "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 active ? "border-[#D6B84A] bg-[#FFFBE8]" : "border-border",
                 stage.optional ? "border-dashed" : "",
@@ -263,7 +263,7 @@ const OperationMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[74px] flex-col rounded-lg border bg-card px-3 py-2.5 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
+      "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
       "motion-safe:transition-all motion-safe:duration-200 hover:border-[#789184] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-border",
     ].join(" ")}
@@ -491,41 +491,54 @@ const AdminDashboard = () => {
       {/* 연동이 끊겨 있으면 아래 지표를 보기 전에 알아야 한다 — 스크롤 없이 보이는 자리에 둔다.
           평소에는 한 줄로 접혀 있고, 정상이 아닌 항목이 있으면 스스로 펼쳐진다.
           이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
-      {/* 이 화면이 먼저 답할 것은 「지금 무엇을 처리해야 하는가」다. 교수자를 기다리는 일이
-          하나뿐이므로 그것만 크게 두고, 나머지 집계는 한 줄로, 세부는 접어 둔다.
-          숫자·상태·조회는 그대로다 — 자리와 크기만 바꾼다. */}
-      <section className="mt-3 rounded-xl border border-[#D9D4C8] bg-white px-5 py-4">
-        <p className="text-[13px] font-medium text-[#5D6970]">교수자 감수·승인 대기</p>
-        <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
-          <p className="flex items-end gap-2">
-            {snapshot?.content.reviewTargetCount == null && !displayError ? (
-              <span aria-label="불러오는 중" className="h-12 w-24 rounded bg-muted motion-safe:animate-pulse" />
-            ) : (
-              <>
-                <span className="text-[38px] font-bold leading-none tabular-nums text-[#15202B]">
-                  {displayError ? "—" : snapshot?.content.reviewTargetCount}
-                </span>
-                <span className="pb-1 text-[15px] text-[#5D6970]">개</span>
-              </>
-            )}
-          </p>
-          <Button asChild size="lg">
-            <Link to="/admin/review">감수·승인 화면 열기 →</Link>
-          </Button>
+      {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
+          구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
+          숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
+      <section className="mt-3 overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
+        <div className="flex items-center justify-between gap-3 border-b border-[#EDE9DE] px-4 py-2">
+          <h2 className="text-[13.5px] font-bold text-[#233542]">PRAGMA 운영 워크플로우</h2>
+          <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
         </div>
-        <p className="mt-2 text-[13px] text-[#5D6970]">
-          미션을 감수한 뒤 승인 여부를 결정합니다. 이 화면에서 승인하지 않습니다.
-        </p>
+        <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
+            { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
+            { to: "/admin/ai-review", stage: "품질 관리", screen: "자동 점검·AI 검토", value: snapshot?.content.reviewTargetCount },
+            { to: "/admin/review", stage: "교수자 결정", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
+            { to: "/admin/composer", stage: "수업 편성", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
+            { to: "/admin/decision-traces", stage: "학습 수행", screen: "수행 기록", value: snapshot?.learnerRecordCount },
+          ].map((step, index) => (
+            <li key={step.to} className={index > 0 ? "border-t border-[#EDE9DE] sm:border-t-0 sm:border-l" : ""}>
+              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
+                <span className="text-[12.5px] font-semibold text-[#5D6970]">{step.stage}</span>
+                {step.value == null && !displayError ? (
+                  <span aria-label="불러오는 중" className="mt-1.5 h-7 w-14 rounded bg-muted motion-safe:animate-pulse" />
+                ) : (
+                  <span className="mt-1 text-[24px] font-bold leading-none tabular-nums text-[#15202B]">
+                    {displayError ? "—" : step.value}
+                  </span>
+                )}
+                <span className="mt-auto pt-1.5 text-[12px] text-[#8A9299]">{step.screen} →</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      {/* 총량은 맥락이지 할 일이 아니다 — 카드가 아니라 한 줄로 둔다. */}
-      <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[13px] text-[#5D6970]">
-        <span>학습 미션 <b className="tabular-nums text-[#15202B]">{snapshot?.content.generatedMissionCount ?? "—"}</b></span>
-        <span>감수·승인 대기 <b className="tabular-nums text-[#15202B]">{snapshot?.content.reviewTargetCount ?? "—"}</b></span>
-        <span>수정 필요·보류 <b className="tabular-nums text-[#15202B]">{snapshot?.content.pendingRevisionCount ?? "—"}</b></span>
-        <span>교수자 승인 완료 <b className="tabular-nums text-[#15202B]">{snapshot?.content.professorFinalizedCount ?? "—"}</b></span>
-        <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
-      </p>
+      {/* 위 줄이 흐름 전체라면, 이것은 그중 지금 사람을 기다리는 한 칸이다.
+          227(감수·승인 대기)의 대부분은 아직 기계 검사 전이므로 교수자의 할 일이 아니다. */}
+      <section className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#D6BE42] bg-[#FFFCF0] px-4 py-3">
+        <div>
+          <p className="text-[14px] font-bold text-[#15202B]">
+            교수자 최종 승인 대기{" "}
+            <span className="tabular-nums">{snapshot?.review?.professor ?? "—"}</span>개
+          </p>
+          <p className="mt-0.5 text-[12.5px] text-[#5D6970]">
+            감수를 마친 뒤 승인 여부를 결정합니다. 이 화면에서 승인하지 않습니다.
+          </p>
+        </div>
+        <Button asChild><Link to="/admin/review">확인하기 →</Link></Button>
+      </section>
 
       {/* 위 「감수·승인 대기」를 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
       <PanelHeader
