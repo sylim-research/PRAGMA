@@ -187,7 +187,7 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
               )}
             </div>
           </div>
-          <div className="mt-6 print:mt-0">{children}</div>
+          <div className={`${description ? "mt-5" : "mt-3"} print:mt-0`}>{children}</div>
         </main>
       </div>
     </div>

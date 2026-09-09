@@ -480,7 +480,6 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="운영 대시보드"
-      description="학습 미션을 만들고, 감수한 콘텐츠를 수업에 편성합니다."
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -494,8 +493,8 @@ const AdminDashboard = () => {
       {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
           구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
           숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
-      <section className="mt-3 overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
-        <div className="flex items-center justify-between gap-3 border-b border-[#EDE9DE] px-4 py-2">
+      <section className="overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
+        <div className="flex items-center justify-between gap-3 border-b border-[#EDE9DE] px-4 py-1.5">
           <h2 className="text-[13.5px] font-bold text-[#233542]">PRAGMA 운영 워크플로우</h2>
           <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
         </div>
@@ -509,16 +508,16 @@ const AdminDashboard = () => {
             { to: "/admin/decision-traces", stage: "학습 수행", screen: "수행 기록", value: snapshot?.learnerRecordCount },
           ].map((step, index) => (
             <li key={step.to} className={index > 0 ? "border-t border-[#EDE9DE] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
+              <Link to={step.to} className="flex h-full flex-col px-4 py-2 hover:bg-[#FBFAF6]">
                 <span className="text-[12.5px] font-semibold text-[#5D6970]">{step.stage}</span>
                 {step.value == null && !displayError ? (
                   <span aria-label="불러오는 중" className="mt-1.5 h-7 w-14 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="mt-1 text-[24px] font-bold leading-none tabular-nums text-[#15202B]">
+                  <span className="mt-0.5 text-[23px] font-bold leading-none tabular-nums text-[#15202B]">
                     {displayError ? "—" : step.value}
                   </span>
                 )}
-                <span className="mt-auto pt-1.5 text-[12px] text-[#8A9299]">{step.screen} →</span>
+                <span className="mt-auto pt-1 text-[12px] text-[#8A9299]">{step.screen} →</span>
               </Link>
             </li>
           ))}
