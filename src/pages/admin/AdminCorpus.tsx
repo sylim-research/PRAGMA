@@ -465,12 +465,6 @@ function AuditMethodSection() {
             </p>
           </div>
           <div className="flex flex-wrap gap-x-4 gap-y-2 text-[12px] font-semibold">
-            <Link to="/admin/prompt-harness" className="inline-flex items-center gap-1 text-[#6D5C1F] hover:text-[#15202B]">
-              전체 품질관리 구조 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
-            <Link to="/admin/review" className="inline-flex items-center gap-1 text-[#6D5C1F] hover:text-[#15202B]">
-              교수자 최종 감수 <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
           </div>
         </div>
       </div>
