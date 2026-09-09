@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { addDraftScenario } from "@/lib/scenarioDrafts";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
-import { AUTHENTIC_HANDOFF_KEY, type AuthenticApply } from "./AuthenticImportPanel";
+import AuthenticImportPanel, { type AuthenticApply } from "./AuthenticImportPanel";
 import {
   Select,
   SelectContent,
@@ -37,6 +37,7 @@ import {
 } from "@/lib/pragma/enums";
 import { checkCore, coreLengthHintKo, type CheckContext } from "@/lib/pragma/missionRules";
 import { createCoreGenerationRunId } from "@/lib/pragma/coreGenerationRun";
+import { checkIndustrySemanticFit } from "@/lib/pragma/coreBatchRun";
 import {
   PDR_POWER_ENUM_TO_JSON,
   PDR_DISTANCE_ENUM_TO_JSON,
@@ -562,23 +563,6 @@ const AdminGenerator = () => {
     setSaveError(null);
   };
 
-  // /admin/authentic에서 고른 후보를 1회 소비한다(2026-07-30 화면 분리).
-  // sessionStorage라 새로고침·뒤로가기로 재적용되지 않게 읽는 즉시 지운다.
-  useEffect(() => {
-    if (searchParams.get("from") !== "authentic") return;
-    try {
-      const raw = sessionStorage.getItem(AUTHENTIC_HANDOFF_KEY);
-      if (raw) {
-        const a = JSON.parse(raw) as AuthenticApply;
-        if (a?.source_text && a?.provenance?.source_type) applyAuthentic(a);
-      }
-    } catch {
-      // 손상된 페이로드는 조용히 버린다 — 생성기는 빈 상태로 정상 동작.
-    }
-    sessionStorage.removeItem(AUTHENTIC_HANDOFF_KEY);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- 마운트 1회 소비
-  }, []);
-
   // Shared request body for single-shot / outline / final calls.
   const baseGenBody = () => ({
     // True 9-value act (2026-07-19 fix): DB enum extended to 9; the old 9→2
@@ -749,6 +733,40 @@ const AdminGenerator = () => {
           setCoreResults([...results]);
           continue;
         }
+        const itemKey = `${form.speech_act_ui}|${form.level}|${form.domain}|${topicCode}|${i}`;
+
+        // R26 warning 후속 — 배치(coreBatchRun)와 같은 정책: industry AI 검토 1회, fail·호출 실패면 저장하지 않는다.
+        const r26Warning = ruleResult.violations.find((v) => v.id === "R26" && v.level === "warning");
+        if (r26Warning) {
+          const checked = await checkIndustrySemanticFit(
+            {
+              direction: form.language_direction,
+              speech_act_ui: form.speech_act_ui,
+              level: form.level,
+              domain: form.domain,
+              industry: form.domain === "work" ? form.industry : null,
+              mode,
+              pdr_power: form.pdr_power,
+              pdr_distance: form.pdr_distance,
+              pdr_burden: form.pdr_burden,
+              topic_code: topicCode,
+              situation_seed_ko: seed,
+            },
+            core,
+            runId,
+            itemKey,
+          );
+          if ("error" in checked) {
+            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 호출 실패(저장 안 함): ${checked.error}` });
+            setCoreResults([...results]);
+            continue;
+          }
+          if (checked.result.verdict === "fail") {
+            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 실패(저장 안 함): ${checked.result.reason}` });
+            setCoreResults([...results]);
+            continue;
+          }
+        }
 
         core.channel = legacyChannelOf(mode);
         // content_hash는 provenance를 **포함하지 않는다** — 내용이 같은 코어는 출처가
@@ -774,7 +792,7 @@ const AdminGenerator = () => {
           auto_check_result: ruleResult.result === "warning" ? "warning" : "pass",
           meta,
           generation_run_id: runId,
-          generation_item_key: `${form.speech_act_ui}|${form.level}|${form.domain}|${topicCode}|${i}`,
+          generation_item_key: itemKey,
           content_hash: contentHash,
           // 배치와 같은 규칙 — 엣지가 계산한 프롬프트 지문을 그대로 저장(재계산 금지).
           prompt_snapshot_hash: (meta as { prompt_snapshot_hash?: string } | null)?.prompt_snapshot_hash ?? null,
@@ -962,28 +980,29 @@ const AdminGenerator = () => {
         </div>
       )}
 
-      {/* 실제 자료 워크플로우는 /admin/authentic로 분리(2026-07-30) — 여기선 입구만 안내 */}
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-3">
-        <p className="text-[12.5px] text-[#7A4A0A]">
-          🎬 <b>실제 자료(쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면</b> — AI가 분석해
-          활용 후보를 제안하고, 고르면 이 화면이 그 조건으로 채워집니다.
+      {/* 실제 자료에서 시작하는 것은 이 화면이 하는 일의 한 갈래다(2026-09-09 흡수).
+          별도 화면으로 갔다가 세션 저장소를 거쳐 돌아오던 왕복을 없애고, 고른 후보가
+          그 자리에서 아래 생성 조건에 바로 들어간다. 평소에는 접혀 있다. */}
+      <details className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-3">
+        <summary className="cursor-pointer text-[13px] font-semibold text-[#7A4A0A]">
+          실제 자료에서 시작하기
+          <span className="ml-2 text-[12px] font-normal">
+            쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 활용 후보를 제안하고, 고르면 아래 조건이 채워집니다.
+          </span>
+        </summary>
+        <div className="mt-3">
+          <AuthenticImportPanel onApply={applyAuthentic} />
+        </div>
+      </details>
+      {/* 적용된 원문이 보이지 않으면 무엇이 반영됐는지 알 수 없다 —
+          manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
+      {authenticProv && manualSourceText.trim() && (
+        <p className="mt-2 rounded-md border border-[#6EE7B7] bg-[#ECFDF5] px-3 py-2 text-[12px] leading-relaxed text-[#065F46]">
+          ✓ 실제 자료 후보가 적용되었습니다 · 원문 「{manualSourceText.slice(0, 60)}
+          {manualSourceText.length > 60 ? "…" : ""}」 — 생성 시 이 원문과 출처(
+          {authenticProv.source_ref ?? "출처 미입력"})가 함께 저장됩니다.
         </p>
-        <Link
-          to="/admin/authentic"
-          className="shrink-0 rounded-md border border-[#BA7517] bg-white px-3 py-1.5 text-[12.5px] font-semibold text-[#7A4A0A] hover:bg-[#FBEFD9]"
-        >
-          실제 자료 활용 화면 열기 →
-        </Link>
-        {/* 화면 분리 후 넘어온 원문이 보이지 않으면 무엇이 적용됐는지 알 수 없다 —
-            manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
-        {authenticProv && manualSourceText.trim() && (
-          <p className="w-full rounded-md border border-[#6EE7B7] bg-[#ECFDF5] px-3 py-2 text-[12px] leading-relaxed text-[#065F46]">
-            ✓ 실제 자료 후보가 적용되었습니다 · 원문 「{manualSourceText.slice(0, 60)}
-            {manualSourceText.length > 60 ? "…" : ""}」 — 생성 시 이 원문과 출처(
-            {authenticProv.source_ref ?? "출처 미입력"})가 함께 저장됩니다.
-          </p>
-        )}
-      </div>
+      )}
 
       {/* 2-col layout */}
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-5">

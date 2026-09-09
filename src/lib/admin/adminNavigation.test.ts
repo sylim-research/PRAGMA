@@ -107,7 +107,8 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
-    expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
+    // 원자료 분석은 생성 화면 안으로 흡수했다 — 옛 주소는 선택기에 잡히지 않는다.
+    expect(adminMobileNavValue("/admin/authentic")).toBe("");
     expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/teaching-generator");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
     expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");

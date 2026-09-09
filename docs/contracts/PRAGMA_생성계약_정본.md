@@ -359,7 +359,7 @@ AI 비평의 `pass`는 사람 검수나 내용 타당화를 대체하지 않는�
 ### 5.4 현재 콘텐츠 버전의 집중 검수와 선택적 독립 검토
 
 
-기본 절차는 **규칙 검사 → 저장된 품질점검 연결 → 교수자 최종 확정**이다. 승인 정책은
+기본 절차는 **규칙 검사 → 저장된 품질점검 연결 → 미션 최종 검수 자료 준비 → 교수자 최종 확정**이다. 승인 정책은
 `focused_v1`이며, 의미·화용 검수 기준과 선택적 모델 프롬프트는 `content_review_v2`를 유지한다.
 
 - 현재 미션의 생성 품질점검과 provenance의 콘텐츠 hash가 일치하고 결과가 완전하면 재사용한다.
@@ -370,6 +370,11 @@ AI 비평의 `pass`는 사람 검수나 내용 타당화를 대체하지 않는�
 - 교수자는 중대 지적(`fail`)과 `needs_professor` 쟁점에 수정 필요·수정 없이 사용 가능·보류 및 근거를
   저장한다. 이미 교수자 판단이 저장된 항목도 계속 확인한다. 일반 경고는 전문을 보존하고 전체
   수업 사용 판단에 포함하되 모든 경고에 별도 결정을 요구하지 않는다.
+- 자동 규칙의 warning은 `needs_professor=true`인 확인 신호로 남긴다. 저장 코어의 경고도 현재
+  코어에서 재계산해 포함하며, 화면과 DB가 같은 필수 판단 목록을 사용한다.
+- 미션의 문항별 귀속·HSK·해시는 교수자 판단 전에 최종 검수 자료로 한 번 준비하고 구조 검사를
+  다시 수행한다. 미귀속 20% 초과는 R32 확인 신호이며 비율만으로 차단하지 않는다. 승인 시
+  새 모델 결과로 바꾸지 않고 교수자가 확인한 자료를 그대로 사용한다. 원본 변경 시 새 검수가 필요하다.
 - 수정 필요·보류는 승인을 막는다. 전체 사용 근거와 명시적 교수자 확인이 필요하며 AI는 승인하거나
   학생에게 공개하지 않는다. 생성 critic의 중대 지적을 수정 없이 채택할 때 필요한 기존 개별 override는 유지한다.
 - 미션은 편성 전, 주차 자료는 편성 후 검수한다. 주차 승인에는 현재 편성 미션의 승인이 필요하다.
@@ -591,14 +596,14 @@ AI 품질점검과 교수자 검수가 담당한다.
 | R6 | highlight가 실제 target 부분문자열인지 | fail |
 | R7 | Scale4 응답 구간·극성·참고 판정 | fail/warning |
 | R8 | native MJT5의 self-contained 장면(`preceding_turn=null`), legacy 응답형 인접쌍 | fail |
-| R9 | 해설·note의 명시적 국가 단위 일반화 패턴 | fail; 의미 일반화 전수 판정은 아님 |
+| R9 | 코어 상황·관계와 미션 해설·note의 국가 단위 일반화 의심 패턴 | warning; 부정·인용·장소 맥락의 실제 위반 여부는 교수자 판단 |
 | R10 | direction·source/target/선행발화 언어 | 명백한 혼입 fail·불확실한 후보 warning |
 | R11 | 참고 산출안 1–2개·문항별 권장안 존재 | fail; 현행 스키마가 대부분 먼저 R1로 거부 |
 | R12 | 한 방향으로 예측 가능한 accepted 분포 | warning |
 | R13 | target feature 코드·version | fail |
 | R14 | 학습자 라벨·마무리 원칙의 카탈로그 복사 | fail |
 | R15 | target feature의 화행과 요청 화행 일치 | fail; domain/theme은 R1c가 담당 |
-| R16 | 번역/통역 modality와 명시적 서면·구두 장면 모순 | fail |
+| R16 | 요청·실제 payload의 mode/modality와 서면·구두 장면 신호 | 구조 불일치 fail; 장면 정규식은 warning |
 | R17 | 산업 메타데이터는 work 도메인에서만 허용 | fail |
 | R18 | 교정·이유 문제 문장이 비적정 대역인지 | fail |
 | R19 | 한 미션 안의 MJT source·판정 후보 완전 중복 | warning; 배치 중복은 별도 hash/저장 계층 소관 |
@@ -608,13 +613,13 @@ AI 품질점검과 교수자 검수가 담당한다.
 | R23 | 코어의 source·PDR·modality·direction·`usable_facts` 계승 | fail; DCT 장면은 새 사건이며 channel은 계승축 아님 |
 | R24 | 계획 target feature와 생성 feature 일치 | fail |
 | R25 | 신규 코어 `context_spec`, 통역 A/B/C·PDR 역할 계약 | fail |
-| R26 | work 산업 라벨을 뒷받침하는 최소 분야 단서 | fail; 의미 품질의 최종 판정은 아님 |
+| R26 | work 산업 라벨을 뒷받침하는 제한된 어휘 단서 | warning; 배치·개별 코어 생성은 miss 시 industry AI 검토 1회, 의미 fail/호출 실패는 저장 중단 |
 | R27 | 현행 `X→A→A→A→Y→C` 상황 topology, X/A/Y/C 완전 중복, 학습자 장면 2문장·140자 이하 | topology·MJT 형식 fail, DCT 형식 warning |
 | R28 | 번역은 email/messenger, 통역은 face-to-face/phone | fail |
 | R29 | DCT 유효 글자 범위·focal segment·담화 전체 참고안 경고 | fail/warning; 길이 범위는 §2026-08-02 파일럿 |
-| R30 | 학생용 장면의 정답 평가 방향 노출 | fail |
-| R31 | 적용 범위 mission_v5의 item lineage 구조·scope·provenance·미귀속 상한 | fail; covered pack에만 적용 |
-| R32 | 허용 상한 이하 `model_unattributed` claim | warning |
+| R30 | 코어 상황문의 정형 평가 단서 신호 | warning; 공개 정보의 타당성은 교수자 판단, 미션 장면 전체 검사는 아님 |
+| R31 | 적용 범위 mission_v5의 item lineage 구조·scope·provenance | 구조 fail; covered pack 조건, 미귀속 비율 자체는 차단하지 않음 |
+| R32 | `model_unattributed` claim과 20% 참조 상한 초과 | warning; 최종 귀속 결과를 교수자가 확인한 뒤 승인 |
 | R33 | 현행 native MJT5의 복수 진단차원·근거 위치 구조 | fail; 선언의 의미 타당성은 AI/사람 검수 |
 
 ## 7. 평가와 피드백 경계

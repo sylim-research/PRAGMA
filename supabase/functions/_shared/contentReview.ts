@@ -10,9 +10,10 @@ export const CONTENT_REVIEW_STEPS = [
   { key: "openai", label: "AI 검토" },
   { key: "claude", label: "AI 독립 검토" },
   { key: "adjudication", label: "AI 재검토" },
+  { key: "finalization", label: "최종 검수 자료" },
   { key: "professor", label: "교수자 최종 승인" },
 ] as const;
-export type ReviewStage = "rules" | "openai" | "claude" | "adjudication";
+export type ReviewStage = "rules" | "openai" | "claude" | "adjudication" | "finalization";
 export type ReviewTarget = { kind: "mission" | "weekly_material"; targetId: string; weekNo?: number };
 export type ReviewFinding = {
   id: string; severity: "warning" | "fail"; where: string; quote: string | null;
@@ -47,6 +48,7 @@ export type ContentReviewRun = {
   id: string; kind: ReviewTarget["kind"]; target_id: string; week_no: number;
   source_hash: string; content_hash: string; criteria_version: string;
   snapshot: Record<string, unknown>; rules: ReviewResult;
+  prepared_finalization?: Record<string, unknown> | null;
   approval_policy?: "multimodel_v2" | "focused_v1";
   generation_quality?: GenerationQualityEvidence | null;
   independent_review_requested?: boolean;
@@ -105,17 +107,24 @@ export function primaryReviewResult(run: ContentReviewRun): ReviewResult | null 
 }
 export function professorReviewFindings(run: ContentReviewRun | null): ReviewFinding[] {
   if (!run) return [];
-  if (run.approval_policy !== CONTENT_APPROVAL_POLICY) return run.claude_review?.result.findings ?? [];
+  const ruleSignals = (run.rules?.findings ?? []).filter(f => f.needs_professor);
+  if (run.approval_policy !== CONTENT_APPROVAL_POLICY) return [...ruleSignals, ...(run.claude_review?.result.findings ?? [])];
   const primary = primaryReviewResult(run)?.findings ?? [];
   const generation = run.openai_review && run.generation_quality ? generationQualityResult(run.generation_quality).findings : [];
-  return [...primary, ...generation, ...(run.claude_review?.result.findings ?? [])]
+  return [...ruleSignals, ...primary, ...generation, ...(run.claude_review?.result.findings ?? [])]
     .filter(f => f.severity === "fail" || f.needs_professor || run.professor_decisions.some(d => d.finding_id === f.id));
 }
 export function effectiveReviewSteps(run: ContentReviewRun | null) {
-  if (run && run.approval_policy !== CONTENT_APPROVAL_POLICY) return [...CONTENT_REVIEW_STEPS];
-  return CONTENT_REVIEW_STEPS.filter(s => s.key === "claude" ? run?.independent_review_requested
+  const steps = CONTENT_REVIEW_STEPS.filter(s => s.key !== "finalization" || requiresReviewFinalization(run));
+  if (run && run.approval_policy !== CONTENT_APPROVAL_POLICY) return steps;
+  return steps.filter(s => s.key === "claude" ? run?.independent_review_requested
     : s.key === "adjudication" ? run?.independent_review_requested && (!run.claude_review || run.claude_review.result.findings.length > 0 || run.adjudication)
     : true);
+}
+
+export function requiresReviewFinalization(run: ContentReviewRun | null): boolean {
+  const criteria = run?.snapshot?.criteria as Record<string, unknown> | undefined;
+  return run?.kind === "mission" && criteria?.finalization === "mission_finalization_v1";
 }
 
 export function canonicalReviewJson(value: unknown): string {
@@ -140,12 +149,12 @@ export function nextReviewStage(run: ContentReviewRun | null): ReviewStage | "pr
     if (!run.openai_review && !run.generation_quality) return "openai";
     if (run.independent_review_requested && !run.claude_review) return "claude";
     if (run.independent_review_requested && run.claude_review?.result.findings.length && !run.adjudication) return "adjudication";
-    return "professor";
+    return requiresReviewFinalization(run) && !run.prepared_finalization ? "finalization" : "professor";
   }
   if (!run.openai_review) return "openai";
   if (!run.claude_review) return "claude";
   if (!run.adjudication) return "adjudication";
-  return "professor";
+  return requiresReviewFinalization(run) && !run.prepared_finalization ? "finalization" : "professor";
 }
 
 // Evidence paths are JSON Pointers into the exact saved snapshot, never a model's

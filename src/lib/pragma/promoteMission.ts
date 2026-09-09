@@ -1,7 +1,7 @@
 import { invokeAstraMission, type GenerationJob } from './backgroundGenerationApi';
 import { applyCandidateFeedback } from '../../../supabase/functions/_shared/missionCandidateFeedback';
 // 코어 → 미션 승격 (관리자 UI 배선). 골든 테스트 경로를 앱으로 옮긴 것.
-//   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(R1~R24)
+//   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(현행 R1~R33, R22 retired)
 //   → 전체 초안 1회 → R27 국소 결함/critic 지목 문항만 1회 수리 → 유효 초안 격리 저장.
 // review_mission RPC = generated → reviewed(학습자 실행 게이트, 계약 0-b·17).
 //
@@ -1639,7 +1639,7 @@ export interface ProfessorIssueOverride {
   rationale_ko: string;
 }
 
-/** generated → reviewed. 현재 콘텐츠를 동결한 뒤 lineage·HSK·hash를 새로 산출한다. */
+/** generated → reviewed. 교수자가 확인한 최종 검수 자료를 그대로 승인한다. */
 export async function reviewMission(
   core: PromotableCore,
   issueOverrides: ProfessorIssueOverride[] = [],
@@ -1647,39 +1647,15 @@ export async function reviewMission(
 ): Promise<{ ok: boolean; mission?: MissionRuntime; error?: string }> {
   try {
     if (!approval) return { ok: false, error: "교수자 최종 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
-    const current = await fetchGeneratedMissionContent(core.scenario_id);
-    const featureCode = DEFAULT_FEATURE_BY_ACT[core.speech_act];
-    const feature = featureCode ? getTargetFeature(featureCode) : undefined;
-    if (!feature) return { ok: false, error: "문항 판정 초점 카탈로그를 찾지 못했습니다." };
-    const direction: LanguageDirection =
-      coreDirection(core.core_content) === "zh_ko" || core.language_direction === "zh_ko" ? "zh_ko" : "ko_zh";
-    const lineageScope = buildMissionLineageScope({
-      direction,
-      speechAct: core.speech_act,
-      targetFeature: feature.code,
-    });
-    const { data, error: finalizeError } = await supabase.functions.invoke("generate-scenario", {
-      body: {
-        action: "finalize_mission",
-        telemetry: {
-          scenario_id: core.scenario_id,
-          generation_run_id: core.generation_run_id ?? null,
-          generation_item_key: core.generation_item_key ?? null,
-          invocation_attempt: 1,
-        },
-        finalize_mission: {
-          mission_content: current,
-          feature: featureForGen(feature, direction, lineageScope),
-          direction,
-          learner_level: core.learner_level,
-          level_ko: LEVEL[core.learner_level],
-        },
-      },
-    });
-    if (finalizeError) {
-      return { ok: false, error: `최종 근거·HSK 산출 실패: ${(finalizeError as { message?: string }).message ?? String(finalizeError)}` };
+    // The service prepares and checks attribution before professor decisions.
+    // Never make another model call after the professor has reviewed the findings.
+    const { data, error: preparedError } = await (supabase as any).from("content_review_runs")
+      .select("prepared_finalization").eq("id", approval.reviewId).eq("kind", "mission")
+      .eq("target_id", core.scenario_id).eq("content_hash", approval.contentHash).maybeSingle();
+    if (preparedError || !data?.prepared_finalization) {
+      return { ok: false, error: "최종 검수 자료를 먼저 준비하고 교수자 판단을 저장해 주세요." };
     }
-    const finalized = (data as { mission_content?: unknown })?.mission_content;
+    const finalized = data.prepared_finalization;
     const parsed = normalizeMission(finalized);
     if (!parsed.ok || !parsed.data || !isRecord(finalized)) {
       return { ok: false, error: "최종화된 미션이 스키마를 통과하지 못했습니다." };

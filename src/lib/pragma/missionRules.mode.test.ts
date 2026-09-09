@@ -28,30 +28,44 @@ const r16Fails = (core: unknown, context: CheckContext) =>
     (violation) => violation.id === "R16" && violation.level === "fail",
   );
 
-const r30Fails = (core: unknown, context: CheckContext) =>
-  checkCore(core, context).violations.filter(
-    (violation) => violation.id === "R30" && violation.level === "fail",
-  );
-
 const r16Warnings = (core: unknown, context: CheckContext) =>
   checkCore(core, context).violations.filter(
     (violation) => violation.id === "R16" && violation.level === "warning",
   );
 
-describe("R16 명시적 수행 모드 모순", () => {
-  it("번역 셀에서 글을 부정하고 직접 말한다고 하면 저장 전 차단한다", () => {
+const r16Any = (core: unknown, context: CheckContext) =>
+  checkCore(core, context).violations.filter((violation) => violation.id === "R16");
+
+const r30Warnings = (core: unknown, context: CheckContext) =>
+  checkCore(core, context).violations.filter(
+    (violation) => violation.id === "R30" && violation.level === "warning",
+  );
+
+const r30Fails = (core: unknown, context: CheckContext) =>
+  checkCore(core, context).violations.filter(
+    (violation) => violation.id === "R30" && violation.level === "fail",
+  );
+
+describe("R16 수행 모드 — 구조 검사는 fail, 장면 서술 추정은 warning", () => {
+  // 2026-09-09 감사: 정규식으로 장면을 추정하는 검사는 의미 판단이 아니므로 저장을 막지 않고
+  // 교수자 확인 신호(warning, subrule scene_modality_cue)로 남긴다.
+  it("번역 셀에서 글을 부정하고 직접 말한다고 하면 경고로 남기고 저장은 막지 않는다", () => {
     const core = {
       ...baseCore,
       situation_ko:
         "발표를 마친 뒤 상대를 칭찬한다. 글로 남기지 않고 직접 말하는 상황이다.",
     };
 
-    expect(r16Fails(core, baseContext).map((item) => item.message)).toContainEqual(
+    const warnings = r16Warnings(core, baseContext);
+    expect(warnings.map((item) => item.message)).toContainEqual(
       expect.stringContaining("구두 수행을 명시"),
     );
+    expect(warnings.every((item) => item.evidence?.subrule === "scene_modality_cue")).toBe(true);
+    expect(r16Fails(core, baseContext)).toEqual([]);
+    expect(checkCore(core, baseContext).ok).toBe(true);
   });
 
-  it("통역 셀에서 이메일로 작성해 보낸다고 하면 저장 전 차단한다", () => {
+  it("통역 셀에서 이메일로 작성해 보낸다고 하면 경고로 남기고 저장은 막지 않는다", () => {
     const core = {
       ...baseCore,
       situation_ko: "담당자에게 일정 변경 요청을 이메일로 작성해 보내는 상황이다.",
@@ -64,9 +78,24 @@ describe("R16 명시적 수행 모드 모순", () => {
       source_modality: "spoken",
     };
 
-    expect(r16Fails(core, context).map((item) => item.message)).toContainEqual(
+    expect(r16Warnings(core, context).map((item) => item.message)).toContainEqual(
       expect.stringContaining("서면 수행을 명시"),
     );
+    expect(r16Fails(core, context)).toEqual([]);
+  });
+
+  it("요청 조건끼리 어긋나면 구조 fail(mode_modality_mismatch)이다", () => {
+    const context: CheckContext = { ...baseContext, mode: "stt_interpreting", source_modality: "written" };
+    const fails = r16Fails({ ...baseCore, source_modality: "written" }, context);
+    expect(fails.map((item) => item.evidence?.subrule)).toContain("mode_modality_mismatch");
+  });
+
+  // 2026-09-09 감사에서 확인된 공백: 요청 조건끼리는 맞는데 저장된 코어 payload가 다르면 통과했다.
+  it("코어 payload의 source_modality가 요청 조건과 다르면 구조 fail(payload_modality_mismatch)이다", () => {
+    const core = { ...baseCore, source_modality: "spoken" };
+    const fails = r16Fails(core, baseContext);
+    expect(fails.map((item) => item.evidence?.subrule)).toContain("payload_modality_mismatch");
+    expect(checkCore(core, baseContext).ok).toBe(false);
   });
 
   it("번역 셀의 즉시 반응 기대와 통역 셀의 직접 대화는 각각 허용한다", () => {
@@ -102,15 +131,16 @@ describe("R16 명시적 수행 모드 모순", () => {
       source_modality: "spoken",
     };
 
-    expect(r16Fails(written, baseContext)).toEqual([]);
-    expect(r16Fails(writtenNotice, baseContext)).toEqual([]);
-    expect(r16Fails(writtenBecauseSpeakingIsAwkward, baseContext)).toEqual([]);
-    expect(r16Fails(writtenWithoutImmediateResponse, baseContext)).toEqual([]);
-    expect(r16Fails(spoken, spokenContext)).toEqual([]);
+    expect(r16Any(written, baseContext)).toEqual([]);
+    expect(r16Any(writtenNotice, baseContext)).toEqual([]);
+    expect(r16Any(writtenBecauseSpeakingIsAwkward, baseContext)).toEqual([]);
+    expect(r16Any(writtenWithoutImmediateResponse, baseContext)).toEqual([]);
+    expect(r16Any(spoken, spokenContext)).toEqual([]);
   });
 
   // 2026-07-31 495 본배치 회귀: 통역 셀 4건이 "기록으로 남기지는 않습니다"류 부정
   // 표현에서 오탐으로 버려졌다. 부정은 보조사·거리·어간 축약을 함께 처리해야 한다.
+  // 지금은 warning이라 버려지지 않지만, 오탐 경고도 교수자 부담이므로 회귀를 그대로 지킨다.
   describe("통역 셀에서 서면을 부정하는 표현은 오탐이 아니다", () => {
     const spokenContext: CheckContext = {
       ...baseContext,
@@ -130,7 +160,7 @@ describe("R16 명시적 수행 모드 모순", () => {
       ["어간이 줄어든 부정", "직접 감사의 말을 전하는 장면이다. 이 감사는 구두로 전달되어 기록으로 남지 않으며, 후배가 자발적으로 도운 상황이다."],
       ["지+ㄴ 축약 부정", "학생들이 모여 직접 말로 의견을 나누는 자리입니다. 제안 내용은 기록으로 남기진 않지만 모두가 함께 결정할 사안입니다."],
     ])("%s", (_label, situation) => {
-      expect(r16Fails(spokenCore(situation), spokenContext)).toEqual([]);
+      expect(r16Any(spokenCore(situation), spokenContext)).toEqual([]);
     });
 
     // `직접`이 발화가 아닌 동사를 수식하는데 구두 장면으로 오인해 번역 셀을 버렸다.
@@ -140,15 +170,15 @@ describe("R16 명시적 수행 모드 모순", () => {
         situation_ko:
           "조별 과제 진행 상황을 점검하기 위해 조장이 조원에게 메시지를 작성한다. 상대가 직접 수행할 수 있는 과제 관련 행동을 요청하며, 조원은 이 요청을 검토하고 선택할 수 있다. 글로 남기는 공식적인 요청이다.",
       };
-      expect(r16Fails(core, baseContext)).toEqual([]);
+      expect(r16Any(core, baseContext)).toEqual([]);
     });
 
-    it("진짜 서면 장면은 그대로 차단한다 — 활용형이 바뀌어도", () => {
+    it("진짜 서면 장면은 경고로 남긴다 — 활용형이 바뀌어도", () => {
       expect(
-        r16Fails(spokenCore("사내 메신저로 참여를 부탁하는 메시지를 작성한다."), spokenContext),
+        r16Warnings(spokenCore("사내 메신저로 참여를 부탁하는 메시지를 작성한다."), spokenContext),
       ).not.toEqual([]);
       expect(
-        r16Fails(spokenCore("이 초대는 기록으로 남기며, 팀장의 참여 여부를 존중한다."), spokenContext),
+        r16Warnings(spokenCore("이 초대는 기록으로 남기며, 팀장의 참여 여부를 존중한다."), spokenContext),
       ).not.toEqual([]);
     });
   });
@@ -167,12 +197,12 @@ describe("R16 명시적 수행 모드 모순", () => {
     });
 
     it("통역사 소개 없이 자연스러운 1인칭 훈련 장면을 허용한다", () => {
-      expect(r16Fails(spokenCore("나는 접수 직원에게 예약 변경을 문의합니다. 진료 시간과 회의가 겹칩니다."), spokenContext)).toEqual([]);
+      expect(r16Any(spokenCore("나는 접수 직원에게 예약 변경을 문의합니다. 진료 시간과 회의가 겹칩니다."), spokenContext)).toEqual([]);
     });
 
     it("원발화자·학습자 통역사·청자의 세 역할이 분리된 장면은 통과한다", () => {
       expect(
-        r16Fails(
+        r16Any(
           spokenCore(
             "한국어 원발화자와 중국어 청자가 예산을 논의하며, 학습자는 두 사람 사이에서 순차통역한다.",
           ),
@@ -183,7 +213,7 @@ describe("R16 명시적 수행 모드 모순", () => {
 
     it("역할 명사가 분리되면 '두 사람 사이'라는 고정 문구를 요구하지 않는다", () => {
       expect(
-        r16Fails(
+        r16Any(
           spokenCore(
             "한국어 원발화자인 담당자가 중국인 직원에게 감사하고, 학습자는 이 대화를 통역하는 통역사 역할을 맡는다.",
           ),
@@ -238,14 +268,16 @@ describe("R16 명시적 수행 모드 모순", () => {
     });
   });
 
-  describe("R30 학생용 평가 기준 비노출", () => {
-    it("정중성·부담 완화 방향을 상황문에 알려 주면 저장 전 차단한다", () => {
+  describe("R30 학생용 평가 단서 — warning(교수자 확인)", () => {
+    it("정중성·부담 완화 방향을 상황문에 알려 주면 경고로 남기고 저장은 막지 않는다", () => {
       const core = {
         ...baseCore,
         situation_ko:
           "처음 만난 협력 기관 담당자를 발표회에 부담을 주지 않으면서도 정중하게 초대한다.",
       };
-      expect(r30Fails(core, baseContext)).not.toEqual([]);
+      expect(r30Warnings(core, baseContext)).not.toEqual([]);
+      expect(r30Fails(core, baseContext)).toEqual([]);
+      expect(checkCore(core, baseContext).ok).toBe(true);
     });
 
     it("관찰 가능한 상대·용건만 제시한 상황문은 통과한다", () => {
@@ -253,7 +285,18 @@ describe("R16 명시적 수행 모드 모순", () => {
         ...baseCore,
         situation_ko: "처음 만난 협력 기관 담당자를 금요일 발표회와 점심 모임에 초대한다.",
       };
+      expect(checkCore(core, baseContext).violations.filter((item) => item.id === "R30")).toEqual([]);
+    });
+
+    // 2026-09-09 감사 반례: 물리적 '강도'를 화용 평가 단서로 오인한다. 정규식은 그대로이므로
+    // 경고는 남지만(알려진 오탐), 정상 코어를 더는 버리지 않는다는 것을 고정한다.
+    it("알려진 오탐('조명의 강도를 조절한다')은 경고일 뿐 저장을 막지 않는다", () => {
+      const core = {
+        ...baseCore,
+        situation_ko: "담당자는 촬영 현장에서 조명의 강도를 조절한다. 동료에게 일정표를 메일로 보낸다.",
+      };
       expect(r30Fails(core, baseContext)).toEqual([]);
+      expect(checkCore(core, baseContext).ok).toBe(true);
     });
   });
 });

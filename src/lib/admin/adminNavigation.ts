@@ -27,7 +27,6 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     items: [
       { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
       { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
-      { to: "/admin/authentic", label: "원자료 분석·미션 재료" },
       { to: "/admin/generator", label: "시나리오 생성" },
       { to: "/admin/batch", label: "시나리오 배치 생성" },
       { to: "/admin/library", label: "시나리오 라이브러리" },

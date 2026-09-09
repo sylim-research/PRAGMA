@@ -119,7 +119,7 @@ describe("moat migration/runtime contracts", () => {
     expect(MISSION_AUTHORING_PIPELINE_SQL).toContain("lineage_status' IS DISTINCT FROM 'pending'");
     expect(MISSION_AUTHORING_PIPELINE_SQL).toContain("lineage_status' IS DISTINCT FROM 'complete'");
     expect(MISSION_AUTHORING_PIPELINE_SQL).toContain("Every unresolved critical AI issue requires a professor override rationale");
-    expect(PROMOTE_TS).toContain('action: "finalize_mission"');
+    expect(PROMOTE_TS).toContain('prepared_finalization');
   });
 
   it("moves the current native gate to the streamlined four-candidate contract", () => {

@@ -1,0 +1,112 @@
+{
+  "commit": "62206a5b2f7de8f5b75907b8e2301b71a6b24c0b",
+  "generatedAt": "2026-09-09T12:54:18.532Z",
+  "node": "v24.18.0",
+  "coreSignalLoss": [
+    {
+      "id": "R9",
+      "scene": "중국인은 모두 같다는 일반화는 피해야 한다. 동료에게 일정을 알리는 글을 보낸다.",
+      "coreWarnings": [
+        {
+          "id": "R9",
+          "level": "warning",
+          "message": "국가 단위 일반화로 읽힐 수 있는 표현 — 교수자 확인: \"중국인은 모두 같다는 일반화는 피해야 한다. 동료에게 …\"",
+          "evidence": {
+            "subrule": "nationalization_cue",
+            "direction": "ko_zh"
+          }
+        }
+      ],
+      "reviewFindings": [],
+      "reviewVerdict": "warning"
+    },
+    {
+      "id": "R30",
+      "scene": "담당자는 촬영 현장에서 조명의 강도를 조절한다. 동료에게 일정표를 메일로 보낸다.",
+      "coreWarnings": [
+        {
+          "id": "R30",
+          "level": "warning",
+          "message": "학생용 situation_ko에 평가 기준으로 읽힐 수 있는 표현 — 교수자 확인: 학생용 situation_ko에 정중성·완화·선택권·강도 같은 답안 평가 기준을 노출하면 안 됩니다.",
+          "evidence": {
+            "subrule": "learner_scene_evaluation_cue",
+            "modality": "translation",
+            "direction": "ko_zh"
+          }
+        }
+      ],
+      "reviewFindings": [],
+      "reviewVerdict": "warning"
+    },
+    {
+      "id": "R16",
+      "scene": "발표를 마친 뒤 상대를 칭찬한다. 글로 남기지 않고 직접 말하는 상황이다.",
+      "coreWarnings": [
+        {
+          "id": "R16",
+          "level": "warning",
+          "message": "번역 셀인데 situation_ko가 구두 수행을 명시한 것으로 보임 — 교수자 확인: \"발표를 마친 뒤 상대를 칭찬한다. 글로 남기지 않고 직접 말하는 상황이다.\"",
+          "evidence": {
+            "subrule": "scene_modality_cue",
+            "modality": "translation",
+            "direction": "ko_zh"
+          }
+        }
+      ],
+      "reviewFindings": [],
+      "reviewVerdict": "warning"
+    }
+  ],
+  "ruleWarningNotRequired": {
+    "emitted": [
+      {
+        "id": "rule-3",
+        "severity": "warning",
+        "where": "",
+        "quote": null,
+        "issue_ko": "R9/nationalization_cue: 국가 단위 일반화로 읽힐 수 있는 표현 — 교수자 확인: \"중국인들은 항상 간접 표현을 좋아한다.…\"",
+        "reason_ko": "국가 단위 일반화로 읽힐 수 있는 표현 — 교수자 확인: \"중국인들은 항상 간접 표현을 좋아한다.…\"",
+        "suggestion_ko": "자동 규칙의 신호입니다. 실제 위반인지 교수자가 판단하고 필요하면 수정하세요.",
+        "problem_type_ko": "교수자 확인 신호",
+        "needs_professor": true,
+        "uncertainty_ko": "정규식·집계 기반 신호이며 의미 판단이 아닙니다."
+      }
+    ],
+    "professorFindings": [],
+    "emptyDecisionsAccepted": true,
+    "sqlRequiredFindings": []
+  },
+  "edgeRatioResults": [
+    {
+      "unattributed": 1,
+      "total": 5,
+      "output": {
+        "ok": true,
+        "itemLineage": {
+          "coverage_summary": {
+            "total_count": 5,
+            "claimed_count": 4,
+            "unattributed_count": 1
+          }
+        }
+      }
+    },
+    {
+      "unattributed": 2,
+      "total": 5,
+      "output": {
+        "ok": false,
+        "detail": "model_unattributed 비율이 20%를 초과함 (2/5)"
+      }
+    },
+    {
+      "unattributed": 5,
+      "total": 5,
+      "output": {
+        "ok": false,
+        "detail": "model_unattributed 비율이 20%를 초과함 (5/5)"
+      }
+    }
+  ],
+  "limitations": "Local pure-function and isolated SQL helper reproduction; external attribution dependencies stubbed; no paid APIs, production DB or browser used."
+}

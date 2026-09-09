@@ -114,8 +114,15 @@ function statusOf(error: unknown): number | "UNKNOWN" {
  * R26 lexical miss에만 기존 core-quality industry 축을 1회 사용한다.
  * 다른 14개 축은 이번 production gate로 승격하지 않는다.
  */
-async function checkIndustrySemanticFit(
-  cell: BatchCell,
+/** R26 warning 후속 — core quality critic의 industry 축 1회. 배치·개별 생성이 같은 정책을 쓴다(2026-09-09). */
+export type IndustryCriticCell = Pick<
+  BatchCell,
+  | "direction" | "speech_act_ui" | "level" | "domain" | "industry" | "mode"
+  | "pdr_power" | "pdr_distance" | "pdr_burden" | "topic_code" | "situation_seed_ko"
+>;
+
+export async function checkIndustrySemanticFit(
+  cell: IndustryCriticCell,
   core: Record<string, unknown>,
   runId: string,
   itemKey: string,

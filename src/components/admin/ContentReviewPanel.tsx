@@ -137,9 +137,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {next !== "approved" && next !== "professor" && <div className="rounded-lg border bg-[#FCFBF6] p-3">
         <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
           onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>감수 자료 준비</Button>
-        <p className="mt-2 text-xs text-muted-foreground">현재 콘텐츠와 기준에 맞는 저장 결과를 재사용하며, 없을 때만 유료 AI 검토를 1회 실행합니다. 추가 모델 검토는 선택한 경우에만 실행합니다.</p>
+        <p className="mt-2 text-xs text-muted-foreground">현재 콘텐츠와 기준에 맞는 저장 결과를 재사용합니다. 없는 AI 검토와 최종 검수 자료를 준비할 때 비용이 발생하며, 추가 모델 검토는 선택한 경우에만 실행합니다.</p>
       </div>}
-      <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사는 무료, AI 단계는 각각 유료 호출 1회입니다. 성공한 단계는 재호출하지 않습니다.</p>
+      <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사는 무료입니다. 미션의 최종 검수 자료에는 문항별 근거 생성 비용이 추가되며, 준비된 결과는 승인할 때 그대로 사용합니다.</p>
       {!run && <p className="rounded-lg bg-amber-50 p-3">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 아래 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검·승인 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다. 규칙 검사부터 시작하세요."}</p>}
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
@@ -156,7 +156,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
             return <div key={finding.id} className="grid gap-3 rounded border p-3 lg:grid-cols-3">
-              <div><strong>{finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
+              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
                 <p className="mt-1 text-xs">유형: {finding.problem_type_ko} · {verdictLabel[finding.severity]}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
                 {finding.uncertainty_ko && <p className="mt-1 text-xs">불확실성: {finding.uncertainty_ko}</p>}
                 {finding.quote && <blockquote className="my-2 border-l-2 pl-2">{finding.quote}</blockquote>}
@@ -212,7 +212,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다.</p>}
-        {onApprove && <p className="text-xs text-muted-foreground">미션 승인 시 기존 근거 귀속·최종화 API가 추가 실행됩니다.</p>}
+        {onApprove && <p className="text-xs text-muted-foreground">미션 승인은 미리 준비한 최종 검수 자료를 그대로 저장합니다.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
           <p className="text-xs">독립 AI 검토의 문제 항목 유무와 별개입니다. 수정이 필요하면 원본을 수정하고 다시 점검하세요. 수정 없이 사용할 때만 그 근거를 남깁니다.</p>

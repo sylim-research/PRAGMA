@@ -4,6 +4,16 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260909-03 · 품질 경고의 교수자 승인 연결 회귀 증거
+
+- 기록: `docs/dev-log/2026-09-09-quality-signal-review-flow.md`.
+- 재현: `src/lib/pragma/qualitySignalFlow.test.ts`, `src/lib/pragma/itemLineage.edge.test.ts`,
+  `scripts/content-review-db.test.mjs`, migration `20260909230000_quality_signal_review_flow.sql`.
+- 결과: Vitest 896 통과·9 제외, 승인 DB 19 통과, 별도 CI 19 통과, 타입·운영 빌드 통과.
+  로컬 브라우저에서 코어/R32 경고별 판단·보류 차단·합성 승인을 확인했다.
+  독립 검토의 P2 과거 승인 호환성을 수용하고 `scripts/content-review-edge.test.mjs` 2개로 재검증했다.
+- 경계: 합성 테스트와 실제 운영 배포·교수자의 내용 타당성 판단을 구분한다. 배포 SHA·CI·읽기 smoke는 PR에 기록한다.
+
 ## ID 규칙
 
 - 증거 ID는 `EVD-YYYYMMDD-NN` 형식을 사용한다.
@@ -314,3 +324,30 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 후속: PR #117 → main `920c53e8`·CI·같은 SHA Railway 배포를 확인했다. 실제 모델로 합성 사례 기반
   두 종류의 미승인 초안 저장 및 운영 PC·모바일 표시를 확인했다. 토론 내용의 학습 이력 과장을 발견해
   소스용 절 지시를 보정했다. 원문 인용 검사를 내용 타당성 검사와 구별해야 한다는 운영 증거다.
+
+## EVD-20260909-02 · R1~R33 규칙 독립 감사
+
+- 대상: admin-absorb-2026-09-09 / HEAD 72cb39bf4365da48a78fb71807edf24ade949dc0의 작업 파일.
+  기본 루트와 다른 validator 계열임을 먼저 확인하고, 사용자 지정 인벤토리가 있는 작업트리의 코드·정본·호출 경로를 대조했다.
+- 보고서/dev-log: `docs/dev-log/2026-09-09-quality-rules-codex-independent-audit.md`.
+  현행 33 ID(R1c 포함), retired R22, 정적 add 127곳을 AST로 확인했다. 기존 인벤토리의 122곳은
+  정수 R ID만 센 122곳과 일치하고 R1c 호출 5곳이 별도로 있다. fail-only 23·warning-only 4·혼합 6 ID다.
+- 증거: `docs/research-trail/evidence/2026-09-09-quality-rules-codex-evidence.json`,
+  `docs/research-trail/evidence/2026-09-09-quality-rules-codex-probes.mjs`.
+  기존 13개 테스트 파일 151개 통과, 합성 입력 21건(기준선 2건 포함)·품질관리 진입점 1건,
+  Edge 검사 번들의 원본 일치를 확인했다. 실행 환경은 Node v24.18.0이다.
+- R9 부정문·R30 물리적 강도의 오탐, 미션 상황문 검사 공백, R16 payload 불일치 누락,
+  현재/과거 계약별 R31/R33 적용 차이 등은 로컬 반례다. 실제 corpus 오류율·승인 우회·학습효과를
+  입증한 결과가 아니다. 운영 DB·유료 모델·배포·전체 학습자 E2E는 실행하지 않았다.
+- 판정은 보완 수용이며 변경 권고는 미채택 상태다. 앱 코드·UI·DB·프롬프트·정본 설계·승인 상태를
+  변경하지 않았으므로 DEC/ITER/TRC를 새 설계 결정으로 추가하지 않았다.
+- 후속 Fable 감사 판정: `docs/dev-log/2026-09-09-quality-rules-fable-adjudication.md`. 종합 보완.
+  R31 바깥 적용 조건, R20의 Edge/SQL 책임 구분, R4/R10 강도와 R23 계승의 한계를 재대조했다.
+  R27 강도 차이의 기존 근거는 8월 25일 mission-rule-audit 및 8월 30일 rule-design-diet 기록에서
+  확인했다. validator 해시가 같아 위 테스트·반례를 재사용했으며 새 실행 수로 중복 집계하지 않았다.
+- 구현 커밋 62206a5b 후속 감수: `docs/dev-log/2026-09-09-quality-rules-62206a5b-code-review.md`.
+  보완 후 수용·배포 보류 권고. 코어 warning 전달 누락, 규칙 warning의 필수 교수자 판단·SQL 목록
+  누락, 서버 귀속 20% 차단 잔존을 로컬 합성 입력·실제 함수·격리 SQL helper로 재현했다.
+  증거는 `docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.mjs`와 같은 이름의 JSON이다.
+  독립 typecheck·관련 9파일 95 tests·Edge 번들 일치가 통과했지만 위 통합 누락을 덮지 못했다.
+  전체 882 tests·운영 DB·실제 모델·배포를 새로 검증한 결과가 아니다. 앱 코드·정본·승인 상태 변경 없음.

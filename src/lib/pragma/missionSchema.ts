@@ -211,7 +211,7 @@ export const MissionV1Schema = z.object({
 export type MissionV1 = z.infer<typeof MissionV1Schema>;
 
 // strict:false 환경 — 판별 union narrowing이 안 되므로 평평한 결과로 돌려준다.
-/** 클라이언트 미션 검사 진입점(R1 스키마). 결정론 규칙 R2~R23은 missionRules.ts. */
+/** 클라이언트 미션 검사 진입점(R1 스키마). 결정론 규칙 R2~R33(R22 retired)은 missionRules.ts. */
 export function parseMission(input: unknown): {
   ok: boolean;
   data?: MissionV1;
