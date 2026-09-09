@@ -3,6 +3,9 @@ export type AdminNavItem = {
   label: string;
   pending?: boolean;
   activePaths?: readonly string[];
+  // 그룹 안을 눈으로만 가르는 작은 라벨이다. 클릭 대상이 아니고, 같은 값이 이어지는
+  // 동안은 한 번만 그린다.
+  section?: string;
 };
 
 export type AdminNavGroup = {
@@ -17,35 +20,47 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
 
 // 관리자 메뉴·모바일 선택기·대시보드 바로가기가 함께 쓰는 단일 정본이다.
 //
-// 그룹은 콘텐츠가 지나는 순서를 따른다: 재료와 그 기준 → 학습 미션 → 품질 관리 →
-// 수업 운영 → 기록. 시나리오는 상황문과 원문만 가진 재료이고 학습 콘텐츠가 아니므로
-// 미션과 같은 층에 두지 않는다. 품질 관리는 AI 검토와 교수자의 결정을 갈라 놓는다 —
-// AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만 일어난다.
+// 그룹은 콘텐츠가 지나는 순서를 따른다: 생성 기준 → 미션 재료 → 미션 제작·품질 관리 →
+// 수업 운영 → 기록.
+//
+// 1번과 3번 머리의 「기준」이 겹쳐 보이므로 가르는 규칙을 적어 둔다. 1번은 생성기가
+// 소비하는 제약이고(프롬프트 계약이 생성에 들어가고 HSK가 어휘 상한을 건다), 3번의
+// 「미션 설계 기준」은 사람이 읽는 구조라 아무것도 소비하지 않는다.
+//
+// 시나리오는 상황문과 원문만 가진 재료이고 학습 콘텐츠가 아니므로 미션과 같은 층에
+// 두지 않는다 — 그룹명 「학습 미션 재료」가 그 지위를 이름으로 말한다.
+//
+// 3번은 같은 미션의 연속된 생애다. 다만 section 라벨로 제작과 품질 관리를 눈으로
+// 갈라, 조립과 승인이 같은 층으로 읽히지 않게 한다. 품질 관리 안에서도 AI 검토와
+// 교수자의 결정은 갈라 놓는다 — AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만
+// 일어난다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
-    header: "1. 생성 기준·시나리오 재료",
+    header: "1. 생성 기준",
     items: [
       { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
       { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
+    ],
+  },
+  {
+    header: "2. 학습 미션 재료",
+    items: [
       { to: "/admin/generator", label: "시나리오 생성" },
       { to: "/admin/batch", label: "시나리오 배치 생성" },
       { to: "/admin/library", label: "시나리오 라이브러리" },
     ],
   },
   {
-    // 「미션 설계 기준」은 아직 화면이 없다. 만들기 전에는 죽은 항목을 두지 않는다.
-    header: "2. 학습 미션",
+    // 「미션 설계 기준」 화면은 아직 없다. 만들기 전에는 죽은 항목을 두지 않고,
+    // 생기면 [제작] 맨 앞에 붙인다.
+    header: "3. 학습 미션 제작·품질 관리",
     items: [
-      { to: "/admin/assembly", label: "학습 미션 조립" },
-    ],
-  },
-  {
-    header: "3. 콘텐츠 품질 관리",
-    items: [
-      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
+      { to: "/admin/assembly", label: "학습 미션 조립", section: "제작" },
+      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토", section: "품질 관리" },
       {
         to: "/admin/review",
         label: "교수자 최종 승인",
+        section: "품질 관리",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
     ],

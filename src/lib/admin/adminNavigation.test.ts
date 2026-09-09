@@ -28,6 +28,18 @@ describe("admin navigation reachability", () => {
     expect(new Set(allPaths).size).toBe(allPaths.length);
     expect(allPaths).not.toContain("/admin/question-designer");
     expect(allPaths).not.toContain("/admin/research-qa/calibration");
+    // 생성 기준(생성기가 소비하는 제약)과 학습 미션 재료(시나리오)는 다른 그룹이다.
+    const criteria = ADMIN_NAV_GROUPS.find((group) => group.header === "1. 생성 기준");
+    expect(criteria?.items.map((item) => item.to)).toEqual([
+      "/admin/prompt-harness",
+      "/admin/corpus",
+    ]);
+    const material = ADMIN_NAV_GROUPS.find((group) => group.header === "2. 학습 미션 재료");
+    expect(material?.items.map((item) => item.to)).toEqual([
+      "/admin/generator",
+      "/admin/batch",
+      "/admin/library",
+    ]);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.at(-1)?.to).toBe("/admin/data-backup");
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
@@ -102,8 +114,20 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/review")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/releases")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/calibration")).toBe("");
-    const quality = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 콘텐츠 품질 관리");
-    expect(quality?.items.map((item) => item.to)).toEqual(["/admin/ai-review", "/admin/review"]);
+    const production = ADMIN_NAV_GROUPS.find(
+      (group) => group.header === "3. 학습 미션 제작·품질 관리",
+    );
+    expect(production?.items.map((item) => item.to)).toEqual([
+      "/admin/assembly",
+      "/admin/ai-review",
+      "/admin/review",
+    ]);
+    // 한 그룹이 됐어도 제작과 품질 관리의 경계는 section 라벨로 남는다.
+    expect(production?.items.map((item) => item.section)).toEqual([
+      "제작",
+      "품질 관리",
+      "품질 관리",
+    ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
