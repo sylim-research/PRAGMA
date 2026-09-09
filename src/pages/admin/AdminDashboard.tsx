@@ -541,27 +541,21 @@ const AdminDashboard = () => {
         <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
       </p>
 
-      {/* 파이프라인 단계별 현황은 매일 볼 것이 아니라 필요할 때 볼 것이다. 지우지 않고 접는다. */}
-      <details className="mt-4 rounded-xl border border-[#E2DED2] bg-white p-4">
-        <summary className="cursor-pointer text-[14px] font-bold text-[#233542]">
-          품질 관리 단계별 현황
-          {snapshot && <span className="ml-2 text-[12px] font-normal text-muted-foreground">감수·승인 대기 {snapshot.content.reviewTargetCount}개를 다음 처리 단계별로 나눔</span>}
-        </summary>
-        <p className="mt-1 text-[12px] text-muted-foreground">각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다.</p>
-        <div className="mt-3">
-          <ReviewPipeline
-            review={snapshot?.review ?? null}
-            dominant={dominantReviewStage}
-            rulesFailCount={snapshot?.rulesFailCount ?? 0}
-            error={displayError}
-            changedKeys={changedKeys}
-          />
-        </div>
-      </details>
+      {/* 위 「감수·승인 대기」를 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
+      <PanelHeader
+        title={snapshot ? `품질 관리 단계별 현황 — 감수·승인 대기 ${snapshot.content.reviewTargetCount}개` : "품질 관리 단계별 현황"}
+        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다."
+      />
+      <ReviewPipeline
+        review={snapshot?.review ?? null}
+        dominant={dominantReviewStage}
+        rulesFailCount={snapshot?.rulesFailCount ?? 0}
+        error={displayError}
+        changedKeys={changedKeys}
+      />
 
-      <details className="mt-3 rounded-xl border border-[#E2DED2] bg-white p-4">
-        <summary className="cursor-pointer text-[14px] font-bold text-[#233542]">수업 운영·학습 수행 현황</summary>
-      <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <PanelHeader title="수업 운영·학습 수행 현황" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
@@ -610,7 +604,6 @@ const AdminDashboard = () => {
           changed={changedKeys.has("records")}
         />
       </div>
-      </details>
 
       {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
       <div className="mt-4">
