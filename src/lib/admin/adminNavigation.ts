@@ -12,7 +12,7 @@ export type AdminNavGroup = {
 
 export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
   to: "/admin/dashboard",
-  label: "운영 대시보드",
+  label: "PRAGMA 운영 워크플로우",
 };
 
 // 관리자 메뉴·모바일 선택기·대시보드 바로가기가 함께 쓰는 단일 정본이다.

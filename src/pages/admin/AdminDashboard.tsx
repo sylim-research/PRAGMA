@@ -479,7 +479,7 @@ const AdminDashboard = () => {
 
   return (
     <AdminShell
-      title="운영 대시보드"
+      title="PRAGMA 운영 워크플로우"
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -493,11 +493,8 @@ const AdminDashboard = () => {
       {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
           구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
           숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
+      <div className="mb-2 flex justify-end"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
       <section className="overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
-        <div className="flex items-center justify-between gap-3 border-b border-[#EDE9DE] px-4 py-1.5">
-          <h2 className="text-[13.5px] font-bold text-[#233542]">PRAGMA 운영 워크플로우</h2>
-          <LiveDatabaseStatus delayed={Boolean(dashboardError)} />
-        </div>
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
             { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
