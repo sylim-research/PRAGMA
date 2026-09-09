@@ -170,9 +170,19 @@ describe("mission rule audit regressions", () => {
     scale.highlights = ["target에 없는 강조"];
     expect(violationsFor(badHighlight, "R6").some((item) => item.level === "fail")).toBe(true);
 
+    // R9는 2026-09-09부터 교수자 확인 신호(warning)다 — 정규식이 부정문·인용을 가르지 못한다.
     const nationalized = structuredClone(SAMPLE_MISSION_V5_NATIVE);
     nationalized.mpj_items[0].explanation_ko = "중국인들은 일반적으로 이렇게 요청을 받아들인다.";
-    expect(violationsFor(nationalized, "R9").some((item) => item.level === "fail")).toBe(true);
+    const nationalizedFindings = violationsFor(nationalized, "R9");
+    expect(nationalizedFindings.some((item) => item.level === "warning")).toBe(true);
+    expect(nationalizedFindings.some((item) => item.level === "fail")).toBe(false);
+
+    // 일반화를 *부정*하는 문장도 같은 정규식에 걸린다 — 그래서 fail일 수 없다.
+    const antiGeneralization = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    antiGeneralization.mpj_items[0].explanation_ko = "중국인은 모두 같다는 일반화는 피해야 한다.";
+    const antiFindings = violationsFor(antiGeneralization, "R9");
+    expect(antiFindings.length).toBeGreaterThan(0);
+    expect(antiFindings.every((item) => item.level === "warning")).toBe(true);
 
     const oneSided = structuredClone(SAMPLE_MISSION_V5_NATIVE);
     const oneSidedMulti = oneSided.mpj_items[4];

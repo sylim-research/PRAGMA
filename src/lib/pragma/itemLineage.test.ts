@@ -248,5 +248,26 @@ describe("item-level realization lineage", () => {
     expect(withUnattributed.some(
       (violation) => violation.id === "R32" && violation.level === "warning",
     )).toBe(true);
+
+    // 2026-09-09 연구자 결정: 참조 상한(20%) 초과도 구조 모순이 아니므로 R31 fail이 아니라
+    // R32 warning(subrule unattributed_over_reference_ratio)으로 교수자 확인에 넘긴다.
+    current.item_lineage.claims = current.item_lineage.claims.map((claim) => ({
+      ...claim,
+      attribution_status: "model_unattributed",
+      rule_ids: [],
+      risk_ids: [],
+      evidence_ids: [],
+    }));
+    current.item_lineage.coverage_summary = {
+      total_count: paths.length,
+      claimed_count: 0,
+      unattributed_count: paths.length,
+    };
+    const overRatio = checkMission(current, context).violations;
+    expect(overRatio.filter((violation) => violation.id === "R31")).toEqual([]);
+    expect(overRatio.some(
+      (violation) => violation.id === "R32" && violation.level === "warning" &&
+        violation.evidence?.subrule === "unattributed_over_reference_ratio",
+    )).toBe(true);
   });
 });

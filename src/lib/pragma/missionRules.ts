@@ -1,11 +1,14 @@
-// 규칙검사 R1~R33 — 결정론·API 0회. R22는 비차단 HSK lexical audit로 대체되어
-// retired 상태이고, 나머지 규칙만 이 파일에서 판정한다.
+// 규칙검사 R1~R33 — 결정론. 이 파일의 함수 자체는 외부 API를 부르지 않는다(호출자가
+// R26 warning 등에 붙이는 AI 후속은 별도 경로). R22는 비차단 HSK lexical audit로
+// 대체되어 retired 상태이고, 나머지 규칙만 이 파일에서 판정한다.
 //
 // 순수 함수. 코드가 검사할 수 있는 것은 필드·선택지 수·중복·길이 편차·형식·
 // 코드값 정합뿐이다(관리자구조md §3-①). 의미 보존·자연성·화행 구현은 검사 불가 →
-// AI 점검·인간 검수의 몫.
+// AI 점검·인간 검수의 몫. 자연어 정규식으로 의미를 *추정*하는 검사(R9·R30·R16의
+// 장면 서술부)는 2026-09-09부터 warning = 교수자 확인 신호이며 저장을 막지 않는다.
 //
-// 코어 서브셋 = R1c·R8·R9·R10·R15·R16·R17·R19·R25·R26.
+// 코어 서브셋 = R1c·R8·R9·R10·R16·R17·R25·R26·R30(+R29는 focal_segments가 있을 때).
+// 사람용 분류·요약은 qualityRuleCatalog.ts에 두고, 실행 사실(강도·적용 조건)은 여기가 정본이다.
 //
 // 양방향(0-l·84): 입력은 v1 또는 v2 JSON 모두 허용 — normalizeCore/normalizeMission이
 // v2 형태(중립 필드명 + direction)로 통일한 뒤 검사한다. R10은 데이터의 direction으로
@@ -93,6 +96,20 @@ export interface RuleResult {
  * R22의 수준·HSK 휴리스틱은 2026-08-09부터 별도 비차단 lexical audit가 담당한다.
  */
 export const RETIRED_MISSION_RULE_IDS = ["R22"] as const;
+export type RetiredRuleId = (typeof RETIRED_MISSION_RULE_IDS)[number];
+
+/**
+ * 현행 실행 규칙 ID. add()가 이 유니온만 받으므로 오타·미등록 ID는 컴파일이 막고,
+ * qualityRuleCatalog의 Record<RuleId, …>는 설명 누락을 컴파일이 막는다.
+ * R1c는 R1과 다른 violation.id(코어 스키마·카탈로그)다. 저장된 과거 violations JSON과의
+ * 호환을 위해 RuleViolation.id 자체는 string으로 둔다.
+ */
+export const ACTIVE_RULE_IDS = [
+  "R1", "R1c", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "R10",
+  "R11", "R12", "R13", "R14", "R15", "R16", "R17", "R18", "R19", "R20", "R21",
+  "R23", "R24", "R25", "R26", "R27", "R28", "R29", "R30", "R31", "R32", "R33",
+] as const;
+export type RuleId = (typeof ACTIVE_RULE_IDS)[number];
 
 /** 검사 맥락 — 요청한 셀 조건과 카탈로그. */
 export interface CheckContext {
@@ -117,16 +134,19 @@ const HANGUL = /[가-힣ᄀ-ᇿ㄰-㆏]/;
 const CJK = /[一-鿿㐀-䶿]/;
 const hasHangul = (s: string) => HANGUL.test(s);
 const hasCjk = (s: string) => CJK.test(s);
-/** 중국어 문장에 한글이 섞이지 않았는가(고유명사 예외는 관대하게 — 한글 '단어'만 잡음). */
+/** 중국어 문장에 한글이 섞이지 않았는가 — 한글이 한 글자라도 있으면 false(고유명사 예외 없음). */
 const looksChinese = (s: string) => hasCjk(s) && !HANGUL.test(s);
 const looksKorean = (s: string) => hasHangul(s);
 
-// 국가 단위 일반화 패턴(R9) — 해설·note 필드 한정. 중국·한국 양방향 공통(0-l·85).
+// 국가 단위 일반화 *의심* 패턴(R9) — 해설·note 필드 한정. 중국·한국 양방향 공통(0-l·85).
+// 문자열 신호일 뿐 부정문("…일반화는 피해야 한다")·인용·장소 부사구("한국에서는 설에 쉰다")를
+// 가르지 못하므로 warning(교수자 확인)으로만 남긴다(2026-09-09 감사).
 const NATIONALIZE =
   /(중국인(들)?은|중국에서는|중국\s*문화에서는|중국어\s*화자는|일반적으로\s*중국|한국인(들)?은|한국에서는|한국\s*문화에서는|한국어\s*화자는|일반적으로\s*한국)/;
 
-// R16의 구조값(mode↔source_modality)은 서버가 채우므로 서로 맞는 값만으로도 통과할 수 있다.
-// 아래는 situation_ko가 그 구조값과 정면으로 반대되는 수행 장면을 *명시*한 경우만 잡는다.
+// R16의 구조값(mode↔source_modality, ctx↔코어 payload)은 fail이다. 아래 정규식은
+// situation_ko가 그 구조값과 정면으로 반대되는 수행 장면을 *명시*한 경우를 잡는 서술
+// 추정이라 warning(subrule scene_modality_cue)으로만 남긴다(2026-09-09 감사).
 // 담화체·격식 추정은 하지 않는다. 즉시 반응 여부만으로도 판정하지 않는다.
 // 2026-07-31: 495 본배치에서 통역 셀 4건이 오탐으로 버려져 부정 표현 처리를 넓혔다.
 // ①"남기지는 않습니다"처럼 보조사가 끼는 경우 ②"남기려는 목적은 아닙니다"처럼 부정어가
@@ -182,7 +202,7 @@ const explicitlyRequiresSpokenScene = (situation: string) =>
 
 const add = (
   v: RuleViolation[],
-  id: string,
+  id: RuleId,
   level: RuleLevel,
   message: string,
   evidence?: RuleFindingEvidence,
@@ -205,20 +225,23 @@ function checkTargetLangHard(v: RuleViolation[], dir: LanguageDirection, text: s
   if (!ok) add(v, "R10", "fail", `${label}: ${LANG_KO[lang]}가 아님`);
 }
 
-/** 후보·교정 목록이 방향의 target 언어인가 — warning(한국어 산출의 한자 혼입 포함, 0-l·85). */
-function checkTargetLangSoft(v: RuleViolation[], dir: LanguageDirection, id: number, texts: string[]) {
+/**
+ * 후보·교정·참고 산출 목록이 방향의 target 언어인가(0-l·85).
+ * 중국어 산출의 한글 혼입은 fail, 그 밖의 문자 범위 추정은 warning.
+ */
+function checkTargetLangSoft(v: RuleViolation[], dir: LanguageDirection, label: string, texts: string[]) {
   const lang = DIRECTION_LANGS[dir].target;
   for (const t of texts) {
     if (!t) continue;
     if (lang === "zh") {
       if (hasHangul(t)) {
-        add(v, "R10", "fail", `문항 ${id}: 후보 "${t.slice(0, 20)}"에 한글 혼입`);
+        add(v, "R10", "fail", `${label}: "${t.slice(0, 20)}"에 한글 혼입`);
       } else if (!hasCjk(t)) {
-        add(v, "R10", "warning", `문항 ${id}: 후보 "${t.slice(0, 20)}"에 중국어가 확인되지 않음`);
+        add(v, "R10", "warning", `${label}: "${t.slice(0, 20)}"에 중국어가 확인되지 않음`);
       }
     } else {
-      if (!hasHangul(t)) add(v, "R10", "warning", `문항 ${id}: 후보 "${t.slice(0, 20)}"에 한국어 없음`);
-      else if (hasCjk(t)) add(v, "R10", "warning", `문항 ${id}: 후보 "${t.slice(0, 20)}"에 한자 혼입(한국어 산출)`);
+      if (!hasHangul(t)) add(v, "R10", "warning", `${label}: "${t.slice(0, 20)}"에 한국어 없음`);
+      else if (hasCjk(t)) add(v, "R10", "warning", `${label}: "${t.slice(0, 20)}"에 한자 혼입(한국어 산출)`);
     }
   }
 }
@@ -414,12 +437,14 @@ export function checkCore(coreInput: unknown, ctx: CheckContext): RuleResult {
   return finalize(v);
 }
 
-// 코어·미션 production_task 공통 서브셋(R8·R9·R10·R16·R17)
+// 코어 전용 서브셋(R8·R9·R10·R16·R17·R26·R30). checkMission은 이 함수를 호출하지 않는다 —
+// 미션 상황문의 R9·R30은 checkMission 쪽 검사가 따로 맡는다(R30은 미션 미적용, 2026-09-09 감사).
 function checkCoreCommon(
   v: RuleViolation[],
   core: Pick<ScenarioCoreRuntime, "direction" | "source_text" | "preceding_turn"> & {
     situation_ko?: string;
     relation_ko?: string;
+    source_modality?: string;
   },
   ctx: CheckContext,
 ) {
@@ -431,32 +456,54 @@ function checkCoreCommon(
   // R10 source·선행발화 방향 언어
   checkSourceLang(v, dir, core.source_text, "source_text");
   checkPrecedingLang(v, dir, core.preceding_turn, "코어");
-  // R16 mode↔source_modality
+  // R16 ① 구조: 요청 조건끼리(mode↔source_modality) — fail
+  const modeEvidence = { subrule: "mode_modality_mismatch", modality: ctx.mode, direction: ctx.direction };
   if (ctx.mode === "stt_interpreting" && ctx.source_modality !== "spoken") {
-    add(v, "R16", "fail", "통역(stt_interpreting)은 source_modality='spoken'이어야 함");
+    add(v, "R16", "fail", "통역(stt_interpreting)은 source_modality='spoken'이어야 함", modeEvidence);
   }
   if (ctx.mode === "translation" && ctx.source_modality !== "written") {
-    add(v, "R16", "fail", "번역은 source_modality='written'이어야 함");
+    add(v, "R16", "fail", "번역은 source_modality='written'이어야 함", modeEvidence);
   }
+  // R16 ② 구조: 실제 코어 payload의 source_modality가 요청 조건과 같은가 — fail.
+  // 요청 조건끼리만 맞고 저장 내용이 다른 경우를 놓치던 공백(2026-09-09 감사).
+  if (core.source_modality && core.source_modality !== ctx.source_modality) {
+    add(
+      v,
+      "R16",
+      "fail",
+      `코어 source_modality(${core.source_modality}) ≠ 요청 조건(${ctx.source_modality})`,
+      { subrule: "payload_modality_mismatch", actual: core.source_modality, threshold: ctx.source_modality, modality: ctx.mode },
+    );
+  }
+  // R16 ③ 서술 추정: situation_ko가 반대 수행 장면을 명시 — warning(교수자 확인)
   const situation = core.situation_ko?.trim() ?? "";
+  const sceneEvidence = { subrule: "scene_modality_cue", modality: ctx.mode, direction: ctx.direction };
   if (
     ctx.mode === "translation" &&
     (EXPLICIT_NOT_WRITTEN_SCENE.test(situation) ||
       explicitlyRequiresSpokenScene(situation))
   ) {
-    add(v, "R16", "fail", `번역 셀인데 situation_ko가 구두 수행을 명시함: "${situation.slice(0, 60)}"`);
+    add(v, "R16", "warning", `번역 셀인데 situation_ko가 구두 수행을 명시한 것으로 보임 — 교수자 확인: "${situation.slice(0, 60)}"`, sceneEvidence);
   }
   if (
     ctx.mode === "stt_interpreting" &&
     EXPLICIT_WRITTEN_SCENE.test(situation) &&
     !EXPLICIT_NOT_WRITTEN_SCENE.test(situation)
   ) {
-    add(v, "R16", "fail", `통역 셀인데 situation_ko가 서면 수행을 명시함: "${situation.slice(0, 60)}"`);
+    add(v, "R16", "warning", `통역 셀인데 situation_ko가 서면 수행을 명시한 것으로 보임 — 교수자 확인: "${situation.slice(0, 60)}"`, sceneEvidence);
   }
-  // R16 checks the performance medium. Interpreter role scaffolding is not learner scene content.
+  // R30 — 코어 situation_ko의 정형 평가 단서(정중·완화·선택권·강도류 조합). 정규식 신호라
+  // "조명의 강도를 조절한다" 같은 다의어를 가르지 못하므로 warning(교수자 확인).
+  // 서버 생성 단계의 1회 자동 수리(coreSourceRepair)는 그대로 둔다.
   const learnerSceneIssue = coreLearnerSceneIssue(situation);
   if (learnerSceneIssue) {
-    add(v, "R30", "fail", `학생용 situation_ko에 답안 평가 기준이 노출됨: ${learnerSceneIssue.message}`);
+    add(
+      v,
+      "R30",
+      "warning",
+      `학생용 situation_ko에 평가 기준으로 읽힐 수 있는 표현 — 교수자 확인: ${learnerSceneIssue.message}`,
+      { subrule: "learner_scene_evaluation_cue", modality: ctx.mode, direction: ctx.direction },
+    );
   }
   // R17 산업은 work에서만
   if (ctx.industry && ctx.domain !== "work") {
@@ -489,10 +536,13 @@ function checkCoreCommon(
       );
     }
   }
-  // R9 국가 단위 일반화 (해설/note 성격 필드)
+  // R9 국가 단위 일반화 의심 표현 (상황·관계 서술) — warning(교수자 확인)
   for (const field of [core.situation_ko, core.relation_ko]) {
     if (field && NATIONALIZE.test(field)) {
-      add(v, "R9", "fail", `국가 단위 일반화 표현: "${field.slice(0, 30)}…"`);
+      add(v, "R9", "warning", `국가 단위 일반화로 읽힐 수 있는 표현 — 교수자 확인: "${field.slice(0, 30)}…"`, {
+        subrule: "nationalization_cue",
+        direction: ctx.direction,
+      });
     }
   }
 }
@@ -669,7 +719,7 @@ export function checkMission(
         if (isV4Contract && !samePdrBand(it.pdr, m.production_task.pdr)) {
           add(v, "R3", "fail", `문항 ${it.id}: v4 판단+교정은 DCT와 같은 앵커 PDR이어야 함`);
         }
-        checkTargetLangSoft(v, dir, it.id, it.corrections.map((c) => c.text));
+        checkTargetLangSoft(v, dir, `문항 ${it.id} 후보`, it.corrections.map((c) => c.text));
         checkTargetHighlights(v, it.id, it.target, it.highlights);
         break;
       }
@@ -789,7 +839,7 @@ export function checkMission(
             add(v, "R5", "fail", `문항 ${it.id}: v4 MultiJudge는 앵커 PDR에서 한 축만 바꾼 대비 상황이어야 함`);
           }
         }
-        checkTargetLangSoft(v, dir, it.id, it.candidates.map((c) => c.text));
+        checkTargetLangSoft(v, dir, `문항 ${it.id} 후보`, it.candidates.map((c) => c.text));
         break;
       }
     }
@@ -816,10 +866,10 @@ export function checkMission(
       add(v, "R13", "fail", `target_feature_version(${m.unit.target_feature_version}) ≠ 카탈로그(${feature.version})`);
     }
     if (m.unit.learner_label !== feature.learner_label) {
-      add(v, "R14", "fail", `learner_label이 카탈로그 값과 다름 (AI 생성 의심)`);
+      add(v, "R14", "fail", `learner_label이 카탈로그 고정 문구와 다름`);
     }
     if (m.unit.closing_ko !== feature.closing_principle_ko) {
-      add(v, "R14", "fail", `closing_ko가 카탈로그 값과 다름 (AI 생성 의심)`);
+      add(v, "R14", "fail", `closing_ko가 카탈로그 고정 문구와 다름`);
     }
     // R15 카탈로그의 speech_act와 요청 화행 일치
     if (feature.speech_act !== ctx.speech_act) {
@@ -837,8 +887,18 @@ export function checkMission(
       checkTargetLangHard(v, dir, it.target, `문항 ${it.id} target`);
     }
     checkPrecedingLang(v, dir, it.preceding_turn, `문항 ${it.id}`);
+    // 참고 산출(권장안)도 target 언어여야 한다 — 2026-09-09 감사에서 확인된 필드 공백.
+    if (it.recommended_example) {
+      checkTargetLangSoft(v, dir, `문항 ${it.id} recommended_example`, [it.recommended_example]);
+    }
   }
   checkSourceLang(v, dir, m.production_task.source_text, "production_task.source_text");
+  checkTargetLangSoft(
+    v,
+    dir,
+    "production_task.reference_alternatives",
+    m.production_task.reference_alternatives.map((alt) => alt.text),
+  );
 
   // ── R8 native MPJ5는 self-contained scenario, legacy 응답형은 preceding_turn ──
   if (!isNativeV5 && ((isV4Contract && !isNativeV5) || isResponseAct(ctx.speech_act))) {
@@ -869,18 +929,25 @@ export function checkMission(
     }
   }
 
-  // ── R16 mode↔source_modality ──
+  // ── R16 구조: 요청 mode ↔ production_task.mode(양방향) ↔ source_modality ──
+  const missionModeEvidence = { subrule: "mode_modality_mismatch", modality: m.production_task.mode, direction: dir };
   if (ctx.mode === "stt_interpreting" && m.production_task.mode !== "interpreting") {
-    add(v, "R16", "fail", "통역 셀인데 production_task.mode ≠ interpreting");
+    add(v, "R16", "fail", "통역 셀인데 production_task.mode ≠ interpreting", missionModeEvidence);
+  }
+  if (ctx.mode === "translation" && m.production_task.mode !== "translation") {
+    add(v, "R16", "fail", "번역 셀인데 production_task.mode ≠ translation", missionModeEvidence);
   }
   if (m.production_task.mode === "interpreting" && m.production_task.source_modality !== "spoken") {
-    add(v, "R16", "fail", "interpreting인데 source_modality ≠ spoken");
+    add(v, "R16", "fail", "interpreting인데 source_modality ≠ spoken", missionModeEvidence);
+  }
+  if (m.production_task.mode === "translation" && m.production_task.source_modality !== "written") {
+    add(v, "R16", "fail", "translation인데 source_modality ≠ written", missionModeEvidence);
   }
 
   // ── R19 세트 내 source/candidate 완전 중복(warning) ──
   checkInternalDuplicates(v, m);
 
-  // ── R21 recommended_example가 해당 문항 판정과 모순되지 않음(warning) ──
+  // ── R21 recommended_example가 해당 문항 판정과 모순되지 않음(fail, 2026-08-25 상향) ──
   checkRecommendedConsistency(v, m, withinCode);
 
   // ── R20 mission_content.provenance 존재·필수값(v1.5 0-h·56) ──
@@ -943,10 +1010,24 @@ export function checkMission(
       }
       if (!coverage) {
         add(v, "R31", "fail", "item_lineage.coverage_summary 누락");
-      } else if (coverage.unattributed_count / coverage.total_count > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO) {
-        add(v, "R31", "fail", `model_unattributed 비율 20% 초과 (${coverage.unattributed_count}/${coverage.total_count})`);
       } else if (coverage.unattributed_count > 0) {
-        add(v, "R32", "warning", `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개`);
+        // 미귀속 비율은 구조 모순이 아니라 교수자 확인 우선순위 신호다. 20% 상한의
+        // 경험적 근거가 확인되기 전까지 비율 초과도 차단하지 않는다(2026-09-09 연구자 결정).
+        const ratio = coverage.total_count > 0 ? coverage.unattributed_count / coverage.total_count : 0;
+        const overReference = ratio > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO;
+        add(
+          v,
+          "R32",
+          "warning",
+          `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개` +
+            (overReference ? ` — 참조 상한 ${Math.round(ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO * 100)}% 초과 (${coverage.unattributed_count}/${coverage.total_count})` : ""),
+          {
+            subrule: overReference ? "unattributed_over_reference_ratio" : "unattributed_present",
+            actual: ratio,
+            threshold: ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO,
+            direction: dir,
+          },
+        );
       }
       if (
         !attribution ||
@@ -1280,7 +1361,8 @@ function checkSetDistribution(v: RuleViolation[], m: MissionRuntime, withinCode:
   if (dirs.size <= 1 && dirs.size > 0) {
     add(v, "R12", "warning", `세트 accepted 분포가 전부 동일 방향(${[...dirs].join(",")}) — 정답 예측 가능`);
   }
-  // within_band 정답 문항 ≥1 (거짓 규칙 차단) — judge3가 R2로 보장하지만 세트 차원 재확인
+  // within_band 정답 문항 ≥1 (거짓 규칙 차단) — 세트 차원 재확인. 현행 native judge3는
+  // R2가 *비적정* 1개를 강제하므로 within 보장은 multi_judge 등 다른 문항에서 온다.
   const hasWithin = m.mpj_items.some((it) => collectBandCodes(it).includes(withinCode));
   if (!hasWithin) {
     add(v, "R12", "warning", `세트에 within_band 정답 문항이 없음 — "부적절이 정답" 편향 위험`);
@@ -1297,7 +1379,10 @@ function checkNationalization(v: RuleViolation[], m: MissionRuntime) {
   }
   for (const f of fields) {
     if (NATIONALIZE.test(f)) {
-      add(v, "R9", "fail", `국가 단위 일반화: "${f.slice(0, 30)}…"`);
+      add(v, "R9", "warning", `국가 단위 일반화로 읽힐 수 있는 표현 — 교수자 확인: "${f.slice(0, 30)}…"`, {
+        subrule: "nationalization_cue",
+        direction: m.direction,
+      });
     }
   }
 }
@@ -1403,7 +1488,10 @@ function finalize(v: RuleViolation[]): RuleResult {
   };
 }
 
-/** 카탈로그 자체 무결성(부팅 시 1회 — R13/R14가 참조하는 값이 존재하는지). */
+/**
+ * 카탈로그 자체 무결성(R13/R14가 참조하는 값이 존재하는지).
+ * 앱 부팅 경로에서 호출되지 않는다(2026-09-09 확인) — 테스트·스크립트용 점검 함수다.
+ */
 export function assertCatalogIntegrity(): string[] {
   const problems: string[] = [];
   for (const [code, f] of Object.entries(TARGET_FEATURES)) {

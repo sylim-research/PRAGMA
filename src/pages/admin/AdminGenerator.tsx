@@ -37,6 +37,7 @@ import {
 } from "@/lib/pragma/enums";
 import { checkCore, coreLengthHintKo, type CheckContext } from "@/lib/pragma/missionRules";
 import { createCoreGenerationRunId } from "@/lib/pragma/coreGenerationRun";
+import { checkIndustrySemanticFit } from "@/lib/pragma/coreBatchRun";
 import {
   PDR_POWER_ENUM_TO_JSON,
   PDR_DISTANCE_ENUM_TO_JSON,
@@ -732,6 +733,40 @@ const AdminGenerator = () => {
           setCoreResults([...results]);
           continue;
         }
+        const itemKey = `${form.speech_act_ui}|${form.level}|${form.domain}|${topicCode}|${i}`;
+
+        // R26 warning 후속 — 배치(coreBatchRun)와 같은 정책: industry AI 검토 1회, fail·호출 실패면 저장하지 않는다.
+        const r26Warning = ruleResult.violations.find((v) => v.id === "R26" && v.level === "warning");
+        if (r26Warning) {
+          const checked = await checkIndustrySemanticFit(
+            {
+              direction: form.language_direction,
+              speech_act_ui: form.speech_act_ui,
+              level: form.level,
+              domain: form.domain,
+              industry: form.domain === "work" ? form.industry : null,
+              mode,
+              pdr_power: form.pdr_power,
+              pdr_distance: form.pdr_distance,
+              pdr_burden: form.pdr_burden,
+              topic_code: topicCode,
+              situation_seed_ko: seed,
+            },
+            core,
+            runId,
+            itemKey,
+          );
+          if ("error" in checked) {
+            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 호출 실패(저장 안 함): ${checked.error}` });
+            setCoreResults([...results]);
+            continue;
+          }
+          if (checked.result.verdict === "fail") {
+            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 실패(저장 안 함): ${checked.result.reason}` });
+            setCoreResults([...results]);
+            continue;
+          }
+        }
 
         core.channel = legacyChannelOf(mode);
         // content_hash는 provenance를 **포함하지 않는다** — 내용이 같은 코어는 출처가
@@ -757,7 +792,7 @@ const AdminGenerator = () => {
           auto_check_result: ruleResult.result === "warning" ? "warning" : "pass",
           meta,
           generation_run_id: runId,
-          generation_item_key: `${form.speech_act_ui}|${form.level}|${form.domain}|${topicCode}|${i}`,
+          generation_item_key: itemKey,
           content_hash: contentHash,
           // 배치와 같은 규칙 — 엣지가 계산한 프롬프트 지문을 그대로 저장(재계산 금지).
           prompt_snapshot_hash: (meta as { prompt_snapshot_hash?: string } | null)?.prompt_snapshot_hash ?? null,

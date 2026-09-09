@@ -1,7 +1,7 @@
 import { invokeAstraMission, type GenerationJob } from './backgroundGenerationApi';
 import { applyCandidateFeedback } from '../../../supabase/functions/_shared/missionCandidateFeedback';
 // 코어 → 미션 승격 (관리자 UI 배선). 골든 테스트 경로를 앱으로 옮긴 것.
-//   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(R1~R24)
+//   엣지함수 action:'mission'(게이트1·provenance 반영본) → checkMission(현행 R1~R33, R22 retired)
 //   → 전체 초안 1회 → R27 국소 결함/critic 지목 문항만 1회 수리 → 유효 초안 격리 저장.
 // review_mission RPC = generated → reviewed(학습자 실행 게이트, 계약 0-b·17).
 //

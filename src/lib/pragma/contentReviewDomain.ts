@@ -36,10 +36,18 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
         industry: row.industry_sector, mode: row.mode, source_modality: row.source_modality,
         planned_target_feature: DEFAULT_FEATURE_BY_ACT[row.speech_act], direction: row.core_content?.direction ?? "ko_zh" };
       // Run the existing rules on the saved raw content, including provenance.
+      // fail = 구조·계약 위반(수정 후 재검사). warning = 자동 규칙이 확정할 수 없는 신호이므로
+      // 교수자 확인 대상으로 넘긴다 — 이전에는 전부 needs_professor=false로 소실됐다(2026-09-09).
       const checked = checkMission(raw, context, row.core_content);
-      checked.violations.forEach((violation, index) => findings.push({ id: `rule-${index + 1}`, severity: violation.level,
-        where: "", quote: null, issue_ko: `${violation.id}: ${violation.message}`, reason_ko: violation.message,
-        suggestion_ko: "기존 생성계약의 해당 규칙을 확인하세요.", problem_type_ko: "구조·형식", needs_professor: false, uncertainty_ko: "" }));
+      checked.violations.forEach((violation, index) => {
+        const subrule = violation.evidence?.subrule;
+        const isSignal = violation.level === "warning";
+        findings.push({ id: `rule-${index + 1}`, severity: violation.level,
+          where: "", quote: null, issue_ko: `${violation.id}${subrule ? `/${subrule}` : ""}: ${violation.message}`, reason_ko: violation.message,
+          suggestion_ko: isSignal ? "자동 규칙의 신호입니다. 실제 위반인지 교수자가 판단하고 필요하면 수정하세요." : "기존 생성계약의 해당 규칙을 확인하세요.",
+          problem_type_ko: isSignal ? "교수자 확인 신호" : "구조·형식", needs_professor: isSignal,
+          uncertainty_ko: isSignal ? "정규식·집계 기반 신호이며 의미 판단이 아닙니다." : "" });
+      });
       if (parsed.data.mpj_items.length !== 5) add("현재 채택 기준은 네이티브 MJT5+DCT1입니다. 과거 4문항 미션은 기록으로 보존합니다.");
     }
     const { mission_content: _mission, ...context } = row;
@@ -87,7 +95,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   const featureCodes = act ? FEATURE_CODES_BY_ACT[act as keyof typeof FEATURE_CODES_BY_ACT] ?? [] : [];
   const snapshot = { content, criteria: { version: CONTENT_REVIEW_VERSION,
     // Rule corrections get a new content hash without replacing prior runs.
-    rules_version: "mission_rules_v11_persisted_contract",
+    rules_version: "mission_rules_v12_signal_warnings",
     scene_policy: NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE,
     mission_design: "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
     features: featureCodes.map((code) => getTargetFeature(code)).filter(Boolean),
