@@ -273,10 +273,10 @@ function OperationsSection({
       ? "최신 점검 대상에는 점검할 중국어가 없습니다."
       : "아직 표시할 최근 점검이 없습니다.";
   const emptyDescription = lookupFailed || audit?.status === "unavailable"
-    ? "교수자 최종 감수 화면에서 원본과 승인 상태를 확인할 수 있습니다."
+    ? "교수자 최종 승인 화면에서 원본과 승인 상태를 확인할 수 있습니다."
     : "다음 콘텐츠 생성부터 수준·점검 단어·확인 대상이 이곳에 기록됩니다.";
   const reviewHref = "/admin/review";
-  const reviewLabel = "교수자 최종 감수 열기";
+  const reviewLabel = "교수자 최종 승인 열기";
 
   return (
     <section className="overflow-hidden rounded-xl border border-[#CFC9BC] bg-white shadow-[0_10px_30px_rgba(21,32,43,0.05)]" aria-labelledby="lexical-audit-title">

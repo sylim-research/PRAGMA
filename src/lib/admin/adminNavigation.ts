@@ -35,7 +35,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
       { to: "/admin/assembly", label: "학습 미션 조립" },
       {
         to: "/admin/review",
-        label: "교수자 최종 감수",
+        label: "교수자 최종 승인",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
     ],

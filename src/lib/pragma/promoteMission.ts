@@ -1646,7 +1646,7 @@ export async function reviewMission(
   approval?: { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string },
 ): Promise<{ ok: boolean; mission?: MissionRuntime; error?: string }> {
   try {
-    if (!approval) return { ok: false, error: "교수자 최종 감수 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
+    if (!approval) return { ok: false, error: "교수자 최종 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
     const current = await fetchGeneratedMissionContent(core.scenario_id);
     const featureCode = DEFAULT_FEATURE_BY_ACT[core.speech_act];
     const feature = featureCode ? getTargetFeature(featureCode) : undefined;
