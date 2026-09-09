@@ -69,6 +69,8 @@ interface CoreRow {
   generation_item_key: string | null;
   prompt_snapshot_hash: string | null;
   core_content: {
+    /** 명사구 한 줄 요약. 학습자 메뉴 제목과 같은 필드이며 목록에서 미션을 판별하는 이름으로 쓴다. */
+    brief_note_ko?: string;
     situation_ko?: string;
     relation_ko?: string;
     source_text?: string;
@@ -98,10 +100,45 @@ const STATE_CARD_TONE: Record<AssemblyState, string> = {
   failed: "border-[#E2D5D2] bg-[#F3ECEA]",
 };
 
+// ── 목록 배지 색 ──
+// 네 축을 눈으로 갈라 읽기 위한 것이지 장식이 아니다. 축마다 다른 방식으로 구분한다:
+// 화행 9개는 서로 다른 색면, 언어방향 2개는 대비되는 색면, 수준 3개는 같은 계열의
+// 농도(입문→고급), 모드 2개는 테두리형. 같은 축 안에서만 색을 비교하면 된다.
+// 화행 9개 — 크림 바탕에 얹히는 저채도 색면. 색은 구분을 위한 것이므로 서로 다른 색상을
+// 쓰되 채도를 낮춰 화면의 크림·네이비 톤을 깨지 않는다. 글자는 같은 색상의 짙은 값을 쓴다.
+const ACT_TONE: Record<SpeechActUI, string> = {
+  request: "bg-[#E3EAF1] text-[#3B566E]",
+  refusal: "bg-[#F0E2DF] text-[#774843]",
+  apology: "bg-[#F2E8D6] text-[#775F33]",
+  thanks: "bg-[#E3EBE3] text-[#46604A]",
+  proposal: "bg-[#E8E5EF] text-[#554F76]",
+  agreement: "bg-[#EFE3E8] text-[#71485A]",
+  opposition: "bg-[#E3E6E9] text-[#48535D]",
+  compliment: "bg-[#DEEAE9] text-[#3D615E]",
+  complaint: "bg-[#F1E4DB] text-[#79523F]",
+};
+// 언어방향 2개 — 브랜드 색 한 쌍(금·네이비)을 옅게 쓴다. 서로 반대편에 있어 한눈에 갈린다.
+const DIRECTION_TONE: Record<LanguageDirection, string> = {
+  ko_zh: "border-[#DFCC92] bg-[#F6EDD0] text-[#6B551A]",
+  zh_ko: "border-[#BDCAD5] bg-[#E7ECF1] text-[#38495B]",
+};
+// 수준 3개 — 순서가 있는 축이라 색상을 바꾸지 않고 같은 계열의 농도만 올린다.
+const LEVEL_TONE: Record<LearnerLevel, string> = {
+  beginner_intermediate: "border-[#DCDDD8] bg-[#F6F6F3] text-[#6E7370]",
+  intermediate: "border-[#C6C8C1] bg-[#EAEBE6] text-[#535853]",
+  advanced: "border-[#A9ADA4] bg-[#DCDED7] text-[#383C38]",
+};
+// 모드 2개 — 색면 대신 테두리형으로 두어 위 세 축과 층이 갈린다.
+const MODE_TONE: Record<GenMode, string> = {
+  translation: "border-[#D5D8D3] bg-white text-[#5A625E]",
+  stt_interpreting: "border-[#C3C0D2] bg-[#F1F0F6] text-[#5A5378]",
+};
+
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 const QUERY_TIMEOUT_MS = 15_000;
-const LIST_CAP = 50;
+// 대기열은 훑는 자리가 아니라 고르는 자리다. 한 화면 분량만 먼저 보여 준다.
+const LIST_CAP = 20;
 // 조회 상한. 495 배치를 두 번 돌리면 코어가 1000을 넘어 상한에 조용히 잘린다
 // (2026-07-31 실측 1299건) — 상한에 닿으면 화면에 알린다.
 const ROW_CAP = 4000;
@@ -447,9 +484,9 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
       {reviewMode && searchParams.get("scenarioId") && (
         <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
       )}
-      {/* 교수자가 필요한 미션을 바로 찾아 검토·승인하는 화면이므로 필터를 맨 위에 펼쳐 둔다.
+      {/* 이 화면이 무엇을 하는 자리인지 맨 위에 두고, 필터를 그 바로 아래·목록 바로 위에 둔다.
           상태는 계기판 카드가 아니라 필터의 한 축으로 둔다 — 카드가 유일한 상태 필터였다. */}
-      <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
+      <section className="rounded-xl border border-[#E2DED2] bg-white p-3.5">
         {rows.length >= ROW_CAP && (
           <p className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
             ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 아래 숫자를
@@ -460,7 +497,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         {/* 상태는 처리 순서를 정하는 첫 축이라 다른 필터보다 앞에 둔다. 건수를 함께 보여
             계기판 카드가 알려주던 현황을 잃지 않는다. */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[12px] font-bold text-[#233542]">상태</span>
+          <span className="text-[13.5px] font-bold text-[#233542]">상태</span>
           {(["all", ...(reviewMode ? ["generated", "reviewed"] : Object.keys(STATE_KO))] as Array<"all" | AssemblyState>).map((s) => (
             <button
               key={s}
@@ -468,7 +505,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
               onClick={() => setFState(s)}
               aria-pressed={fState === s}
               className={[
-                "rounded-full border px-3 py-1.5 text-[12px] transition-colors",
+                "rounded-full border px-3.5 py-1.5 text-[13.5px] transition-colors",
                 fState === s
                   ? "border-[#233542] bg-[#233542] font-semibold text-white"
                   : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
@@ -481,18 +518,17 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         </div>
 
         {/* ── 학습설계 축과 생성 기준은 역할이 다르므로 시각적으로 분리한다. ── */}
-        <div className="mt-3 grid gap-3 lg:grid-cols-[1.45fr_1fr]">
+        <div className="mt-2.5 grid gap-2.5 lg:grid-cols-[1.45fr_1fr]">
           {/* 필요한 미션을 바로 찾는 것이 두 화면 모두의 첫 동작이라 펼쳐 둔다. */}
           <details open
-            className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3.5 pt-3">
+            className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3 pt-2">
             {/* summary에 display:flex를 주면 펼침 표시가 사라지므로 배지는 띄워서 배치한다. */}
-            <summary className="mb-3 cursor-pointer">
-              <span className="float-right rounded-full bg-[#E7ECEE] px-2 py-1 text-[10.5px] font-semibold text-[#53656F]">
+            <summary className="mb-2 cursor-pointer">
+              <span className="float-right rounded-full bg-[#E7ECEE] px-2.5 py-1 text-[12px] font-semibold text-[#53656F]">
                 PRAGMA 편성 기준
               </span>
-              <span className="ml-1 text-[13px] font-bold text-[#233542]">학습설계 4축</span>
-              {axisFilterActive && <span className="ml-2 text-[11px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
-              <span className="ml-1 mt-0.5 block text-[11px] text-[#6B7780]">화행 · 수준 · 모드 · 언어방향</span>
+              <span className="ml-1 text-[14.5px] font-bold text-[#233542]">학습설계 4축</span>
+              {axisFilterActive && <span className="ml-2 text-[12.5px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
             </summary>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
@@ -506,11 +542,10 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
             </div>
           </details>
 
-          <details open className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3.5 pt-3">
-            <summary className="cursor-pointer text-[13px] font-bold text-[#3D464D]">고급 필터 (연구자용)
+          <details open className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3 pt-2">
+            <summary className="cursor-pointer text-[14.5px] font-bold text-[#3D464D]">고급 필터 (연구자용)
               {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">필터 적용 중</span>}
             </summary>
-            <p className="mt-0.5 text-[11px] text-[#737069]">같은 생성 조건의 시나리오만 조립</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
               <CompactSel label="생성 run" value={fRun} onChange={setFRun}
                 opts={[["all", "전체"], ...runIds.map((id) => {
@@ -535,30 +570,20 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
         </div>
       ) : (
         <section className="mt-4 space-y-2">
-          {reviewMode && <div className="space-y-2 rounded-xl border border-[#D8D3C4] bg-white p-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 감수 대기 미션 선택</Button>
-              <Button size="sm" variant="ghost" disabled={reviewQueue.active || !reviewSelection.size} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>
-              <Button disabled={reviewQueue.active || !reviewSelection.size || Boolean(busy)} onClick={() => void startReviewPreparation(
+          {/* 일괄 AI 검토는 쓸 때만 필요하다. 행을 하나라도 고른 뒤에 한 줄로 나타난다.
+              진행 상황은 AdminShell 상단의 ReviewPreparationStatus가 따로 보여 준다. */}
+          {reviewMode && reviewSelection.size > 0 && (
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#D8D3C4] bg-white px-4 py-2.5">
+              <span className="text-[14px] font-semibold text-[#202B33]">{reviewSelection.size}건 선택됨</span>
+              <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 미션 모두 선택</Button>
+              <Button size="sm" variant="ghost" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>
+              <Button size="sm" disabled={reviewQueue.active || Boolean(busy)} onClick={() => void startReviewPreparation(
                 filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
                   target: { kind: "mission" as const, targetId: row.scenario_id },
                   label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
-                })))}>선택 {reviewSelection.size}건 AI 검토 · 유료</Button>
+                })))}>{reviewSelection.size}건 AI 검토 · 유료</Button>
             </div>
-            <p className="text-xs text-muted-foreground">선택한 미션의 규칙검사와 저장된 생성 품질점검을 연결합니다. 재사용 결과가 없을 때만 기본 AI 점검을 호출하며, 추가 모델 검토는 선택 사항입니다. 교수자 승인은 별도로 진행합니다.</p>
-          </div>}
-          <div className="flex items-baseline justify-between px-1">
-            <div>
-              <h3 className="text-[15px] font-bold text-[#202B33]">{reviewMode ? "미션 감수 대기열" : "조립 큐"}</h3>
-              <p className="mt-0.5 text-[11.5px] text-muted-foreground">
-                선택한 조건의 시나리오 {filtered.length}개
-                {filtered.length > visible.length && ` · 지금 ${visible.length}개 표시`}
-              </p>
-            </div>
-            {filtered.length > LIST_CAP && !showAll && (
-              <span className="text-[12px] text-muted-foreground">처음 {LIST_CAP}개 표시</span>
-            )}
-          </div>
+          )}
           <ul className="space-y-2">
             {visible.map((r) => {
               const st = stateOf(r);
@@ -571,37 +596,40 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                 r.theme_code ? THEME_LABEL[r.theme_code] : null,
               ].filter(Boolean) as string[];
               return (
-                <li key={r.scenario_id} className="rounded-lg border border-[#E7E2D7] bg-[#FBFAF6] px-5 py-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className={["rounded-md border px-2 py-0.5 text-[11px]", STATE_TONE[st]].join(" ")}>
-                      {STATE_KO[st]}
+                <li key={r.scenario_id} className="rounded-lg border border-[#E7E2D7] bg-[#FBFAF6] px-4 py-3">
+                  {/* 대기열은 어느 미션을 감수할지 「고르는」 자리다. 판별에 필요한 만큼만 한 줄로
+                      보이고, 상황 전문·맥락은 행을 펼쳤을 때 본다. */}
+                  <div className="flex items-center gap-3">
+                    {/* 상태가 하나로 걸러져 있으면 모든 행이 같은 값이라 배지가 정보를 주지 않는다.
+                        「전체」로 볼 때만 상태를 표시한다. */}
+                    {fState === "all" && (
+                      <span className={["shrink-0 rounded-md border px-2 py-0.5 text-[11px]", STATE_TONE[st]].join(" ")}>
+                        {STATE_KO[st]}
+                      </span>
+                    )}
+                    <span className="hidden shrink-0 items-center gap-1 sm:inline-flex">
+                      <span className={["w-[3.5rem] rounded-md px-2 py-1 text-center text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
+                        {SPEECH_ACT_UI[r.speech_act]}
+                      </span>
+                      <span className={["rounded-md border px-2 py-1 text-[13px] font-bold", DIRECTION_TONE[coreDirection(r.core_content)]].join(" ")}>
+                        {DIRECTION_LABEL[coreDirection(r.core_content)]}
+                      </span>
+                      <span className={["rounded-md border px-2 py-1 text-[12.5px] font-semibold", LEVEL_TONE[r.learner_level]].join(" ")}>
+                        {LEVEL[r.learner_level]}
+                      </span>
+                      <span className={["rounded-md border px-2 py-1 text-[12.5px] font-semibold", MODE_TONE[r.mode === "stt_interpreting" ? "stt_interpreting" : "translation"]].join(" ")}>
+                        {r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
+                      </span>
                     </span>
-                    <AxisBadge label="화행" value={SPEECH_ACT_UI[r.speech_act]} />
-                    <AxisBadge label="수준" value={LEVEL[r.learner_level]} />
-                    <AxisBadge label="모드" value={r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation} />
-                    <AxisBadge label="방향" value={DIRECTION_LABEL[coreDirection(r.core_content)]} />
-                  </div>
-                  {/* 읽기 폭과 행간을 확보해 태그와 본문이 한 덩어리로 붙어 보이지 않게 한다. */}
-                  <p className="mt-3 line-clamp-2 max-w-[54rem] text-[13.5px] font-medium leading-[1.75] text-[#202B33]">
-                    {r.core_content?.situation_ko ?? "—"}
-                  </p>
-                  {contextLabels.length > 0 && (
-                    <p className="mt-2 text-[11.5px] text-[#758087]">
-                      <span className="font-semibold text-[#5D6970]">맥락</span>
-                      <span className="mx-1.5 text-[#B2B8BB]">·</span>
-                      {contextLabels.join(" · ")}
+                    {/* 목록은 미션을 「고르는」 자리라 명사구 요약을 제목으로 쓴다. 상황 전문은 펼쳤을 때 본다. */}
+                    <p
+                      className="min-w-0 flex-1 truncate text-[15px] font-medium text-[#202B33]"
+                      title={[r.core_content?.situation_ko, contextLabels.length ? `맥락 · ${contextLabels.join(" · ")}` : null]
+                        .filter(Boolean).join("\n\n")}
+                    >
+                      {r.core_content?.brief_note_ko?.trim() || r.core_content?.situation_ko || "—"}
                     </p>
-                  )}
-                  {failures[r.scenario_id] && st === "failed" && (
-                    <p className="mt-2.5 rounded-md border border-[#E5CFCC] bg-[#F7EFEE] px-3 py-2 text-[12px] leading-relaxed text-[#7B453F]">
-                      {failures[r.scenario_id]}
-                    </p>
-                  )}
-                  <div className={[
-                    "mt-3 grid items-center gap-3 border-t border-[#ECE8DE] pt-3",
-                    isAssembling ? "sm:grid-cols-[auto_minmax(0,1fr)]" : "sm:grid-cols-1",
-                  ].join(" ")}>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       {(st === "core_only" || st === "failed") &&
                         (DEFAULT_FEATURE_BY_ACT[r.speech_act] ? (
                           <Button size="sm" disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
@@ -626,7 +654,7 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                       )}
                       {(st === "generated" || st === "reviewed") && (
                         <>
-                        {reviewMode && st === "generated" && <label className="mr-2 flex items-center gap-2 text-xs">
+                        {reviewMode && st === "generated" && <label className="mr-2 flex items-center gap-2 text-[13px]">
                           <input type="checkbox" aria-label={`AI 검토 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
                             checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
                               const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
@@ -651,11 +679,29 @@ const AdminAssembly = ({ reviewMode = false }: { reviewMode?: boolean }) => {
                         <span className="text-[11.5px] text-muted-foreground">{rowMsg[r.scenario_id]}</span>
                       )}
                     </div>
-                    {isAssembling && rowMsg[r.scenario_id] && <p className="mt-2 text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
-                    {isAssembling && assemblyProgress && (
-                      <AssemblyProgressView stage={assemblyProgress.stage} />
-                    )}
                   </div>
+                  {failures[r.scenario_id] && st === "failed" && (
+                    <p className="mt-2 rounded-md border border-[#E5CFCC] bg-[#F7EFEE] px-3 py-2 text-[12px] leading-relaxed text-[#7B453F]">
+                      {failures[r.scenario_id]}
+                    </p>
+                  )}
+                  {isAssembling && rowMsg[r.scenario_id] && <p className="mt-2 text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
+                  {isAssembling && assemblyProgress && <AssemblyProgressView stage={assemblyProgress.stage} />}
+                  {/* 제목으로 접어 둔 상황 전문과 맥락은 펼치면 그대로 보인다. */}
+                  {openId === r.scenario_id && (
+                    <div className="mt-2.5 border-t border-[#ECE8DE] pt-2.5">
+                      <p className="max-w-[54rem] text-[14.5px] leading-[1.8] text-[#202B33]">
+                        {r.core_content?.situation_ko ?? "—"}
+                      </p>
+                      {contextLabels.length > 0 && (
+                        <p className="mt-2 text-[12.5px] text-[#758087]">
+                          <span className="font-semibold text-[#5D6970]">맥락</span>
+                          <span className="mx-1.5 text-[#B2B8BB]">·</span>
+                          {contextLabels.join(" · ")}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {openId === r.scenario_id && preview[r.scenario_id] && (
                     <>
                       {!reviewMode && <MissionPreview
@@ -711,7 +757,7 @@ const SelectField = ({
   <select
     value={value}
     onChange={(e) => onChange(e.target.value)}
-    className={`h-8 w-full min-w-0 rounded-md border border-[#D9D7CF] bg-white px-2 text-[12px] text-[#26333B] focus:outline-none focus:ring-2 focus:ring-[#526B78]/20 ${className}`}
+    className={`h-9 w-full min-w-0 rounded-md border border-[#D9D7CF] bg-white px-2 text-[13.5px] text-[#26333B] focus:outline-none focus:ring-2 focus:ring-[#526B78]/20 ${className}`}
   >
     {opts.map(([v, l]) => (
       <option key={v} value={v}>{l}</option>
@@ -733,8 +779,8 @@ const AxisSel = ({
   opts: [string, string][];
 }) => (
   <label className="rounded-md border border-[#E1E5E6] bg-white p-2">
-    <span className="mb-1.5 flex items-center gap-1.5 text-[11px] font-semibold text-[#34444D]">
-      <span className="flex size-4 items-center justify-center rounded-full bg-[#E7ECEE] text-[9px] text-[#53656F]">{index}</span>
+    <span className="mb-1.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-[#34444D]">
+      <span className="flex size-4.5 items-center justify-center rounded-full bg-[#E7ECEE] text-[10.5px] text-[#53656F]">{index}</span>
       {label}
     </span>
     <SelectField value={value} onChange={onChange} opts={opts} />
@@ -753,16 +799,9 @@ const CompactSel = ({
   opts: [string, string][];
 }) => (
   <label>
-    <span className="mb-1 block text-[10.5px] font-medium text-[#696D6C]">{label}</span>
+    <span className="mb-1 block text-[12px] font-medium text-[#696D6C]">{label}</span>
     <SelectField value={value} onChange={onChange} opts={opts} />
   </label>
-);
-
-const AxisBadge = ({ label, value }: { label: string; value: string }) => (
-  <span className="inline-flex overflow-hidden rounded-md border border-[#D8E0E2] bg-white text-[10.5px]">
-    <span className="bg-[#E7ECEE] px-1.5 py-0.5 font-semibold text-[#53656F]">{label}</span>
-    <span className="px-1.5 py-0.5 font-medium text-[#26343C]">{value}</span>
-  </span>
 );
 
 const AssemblyProgressView = ({
