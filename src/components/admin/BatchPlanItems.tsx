@@ -35,8 +35,8 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
     </div>
     <div className="mt-4 max-w-full overflow-x-auto">
       <table className="w-full min-w-[540px] text-left text-xs">
-        <thead className="border-y bg-[#FAF8F2] text-muted-foreground">
-          <tr><th className="p-2">선택</th><th className="p-2">번호</th><th className="p-2">화행·수준</th><th className="p-2">과업·도메인</th><th className="p-2">장면 시드</th></tr>
+        <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
+          <tr><th className="w-10 px-2 py-2">선택</th><th className="w-10 px-2 py-2">번호</th><th className="w-20 px-2 py-2">화행·수준</th><th className="w-24 px-2 py-2">과업·도메인</th><th className="px-2 py-2">장면 시드</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
           const cell = plan[index];

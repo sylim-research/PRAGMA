@@ -4,6 +4,7 @@ import {
   auditTopicCoverage,
   buildBatchPlan,
   buildZhKoValidationPlan,
+  productionModeCounts,
   FULL_BATCH_QUOTA_495,
   PDR_CONSTRUCT_CELLS,
   summarizePlan,
@@ -14,11 +15,22 @@ import {
 } from "@/lib/pragma/batchPlan";
 import {
   getScenarioTopic,
+  isThemeDomainValid,
+  SCENARIO_TOPICS,
+  THEME_CODES,
   topicSupportsContext,
   type ScenarioTopic,
 } from "@/lib/pragma/scenarioTopics";
 
 describe("topic coverage audit", () => {
+  it("excludes retired travel metadata from new production while preserving stored-topic validation", () => {
+    expect(THEME_CODES).not.toContain("travel_mobility");
+    expect(SCENARIO_TOPICS.some(topic => topic.code === "hotel_request")).toBe(false);
+    expect(buildBatchPlan().some(cell => cell.theme_code === ("travel_mobility" as string))).toBe(false);
+    expect(getScenarioTopic("hotel_request")?.themeCode).toBe("travel_mobility");
+    expect(isThemeDomainValid("travel_mobility", "daily")).toBe(true);
+    expect(isThemeDomainValid("travel_mobility", "work")).toBe(false);
+  });
   it("has no blocking speech-act/domain gaps after the approved work seeds", () => {
     const audit = auditTopicCoverage();
 
@@ -95,6 +107,30 @@ describe("topic coverage audit", () => {
     expect(neighborApology?.situationSeedKo).toContain("화자 본인의 집");
     expect(feedbackOpposition?.allowedSpeechActs).toEqual(["opposition"]);
     expect(contentCompliment?.allowedSpeechActs).toEqual(["compliment"]);
+  });
+});
+
+describe("absolute production counts", () => {
+  it("preserves exact totals including an uneven split and either single mode", () => {
+    const counts = {
+      beginner_intermediate: productionModeCounts(18, 0),
+      intermediate: productionModeCounts(10, 30),
+      advanced: productionModeCounts(18, 100),
+    };
+    const plan = buildBatchPlan({
+      perLevel: { beginner_intermediate: 0, intermediate: 0, advanced: 0 },
+      interpretingRatio: 0,
+      perLevelModeCounts: counts,
+    });
+    expect(plan).toHaveLength(46);
+    expect(plan.filter(cell => cell.level === "beginner_intermediate" && cell.mode === "translation")).toHaveLength(18);
+    expect(plan.filter(cell => cell.level === "beginner_intermediate" && cell.mode === "stt_interpreting")).toHaveLength(0);
+    expect(plan.filter(cell => cell.level === "intermediate" && cell.mode === "translation")).toHaveLength(7);
+    expect(plan.filter(cell => cell.level === "intermediate" && cell.mode === "stt_interpreting")).toHaveLength(3);
+    expect(plan.filter(cell => cell.level === "advanced" && cell.mode === "stt_interpreting")).toHaveLength(18);
+    expect(plan.filter(cell => cell.level === "advanced" && cell.mode === "translation")).toHaveLength(0);
+    expect(productionModeCounts(3, 50)).toEqual({ translation: 1, stt_interpreting: 2 });
+    expect(productionModeCounts(0, 100)).toEqual({ translation: 0, stt_interpreting: 0 });
   });
 });
 

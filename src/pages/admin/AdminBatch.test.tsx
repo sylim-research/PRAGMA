@@ -16,7 +16,18 @@ vi.mock("@/lib/pragma/coreQualityAudit", () => ({
 }));
 vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn(), info: vi.fn() } }));
 
-const mount = () => render(<MemoryRouter><AdminBatch /></MemoryRouter>);
+const setNumber = (name: string, value: number) => fireEvent.change(screen.getByLabelText(name), { target: { value: String(value) } });
+const enterExample = () => {
+  for (const [level, total, percent] of [["입문", 18, 50], ["중급", 36, 25], ["고급", 18, 50]] as const) {
+    setNumber(level + " · 총 생성 건수", total);
+    setNumber(level + " · 통역 비율", percent);
+  }
+};
+const mount = (withExample = true) => {
+  const result = render(<MemoryRouter><AdminBatch /></MemoryRouter>);
+  if (withExample) enterExample();
+  return result;
+};
 const start = () => screen.getByRole("button", { name: "전체 72건 생성 시작" });
 beforeEach(() => {
   vi.resetAllMocks();
@@ -29,14 +40,16 @@ afterEach(cleanup);
 
 describe("배치 생성 작업 화면", () => {
   it("과거 프리셋 없이 양방향 모두 입력한 수량으로 계획하고 방향 변경 시 선택을 초기화한다", async () => {
-    mount();
-    expect(screen.queryByRole("button", { name: /495건 본배치|30건 검증/ })).not.toBeInTheDocument();
+    mount(false);
+    expect(screen.queryByRole("button", { name: /기본 72건|495건 본배치|30건 검증/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "전체 0건 생성 시작" })).toBeDisabled();
+    enterExample();
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "중→한" }));
     expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("");
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
-    fireEvent.change(screen.getByLabelText("중급 · 화행당 번역"), { target: { value: "4" } });
+    setNumber("중급 · 총 생성 건수", 45);
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("81건");
     fireEvent.click(screen.getByRole("button", { name: "전체 81건 생성 시작" }));
     await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
@@ -45,17 +58,32 @@ describe("배치 생성 작업 화면", () => {
     expect(mocks.run.mock.calls[0][1].runId).toMatch(/^core_zh_ko_/);
     await waitFor(() => expect(screen.getByRole("button", { name: "한→중" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "한→중" }));
-    expect(screen.getByLabelText("중급 · 화행당 번역")).toHaveValue(4);
+    expect(screen.getByLabelText("중급 · 총 생성 건수")).toHaveValue(45);
   });
 
   it("일반 제작 수량을 과거의 정확히 495건 조건에 묶지 않는다", () => {
     mount();
-    fireEvent.change(screen.getByLabelText("입문 · 화행당 번역"), { target: { value: "14" } });
-    fireEvent.change(screen.getByLabelText("중급 · 화행당 번역"), { target: { value: "15" } });
-    fireEvent.change(screen.getByLabelText("고급 · 화행당 번역"), { target: { value: "14" } });
+    setNumber("입문 · 총 생성 건수", 168);
+    setNumber("중급 · 총 생성 건수", 168);
+    setNumber("고급 · 총 생성 건수", 168);
     expect(screen.getByRole("button", { name: "전체 504건 생성 시작" })).toBeEnabled();
     expect(screen.queryByText(/495/)).not.toBeInTheDocument();
     expect(mocks.run).not.toHaveBeenCalled();
+  });
+
+  it("수준별 0·25·100%로 지정한 절대 수량을 실제 실행기에 전달한다", async () => {
+    mount();
+    setNumber("입문 · 통역 비율", 0);
+    setNumber("고급 · 통역 비율", 100);
+    fireEvent.click(start());
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
+    const cells = mocks.run.mock.calls[0][0] as Array<{ level: string; mode: string; theme_code: string }>;
+    expect(cells).toHaveLength(72);
+    expect(cells.filter(cell => cell.level === "beginner_intermediate").every(cell => cell.mode === "translation")).toBe(true);
+    expect(cells.filter(cell => cell.level === "advanced").every(cell => cell.mode === "stt_interpreting")).toBe(true);
+    expect(cells.filter(cell => cell.level === "intermediate" && cell.mode === "stt_interpreting")).toHaveLength(9);
+    expect(cells.some(cell => cell.theme_code === "travel_mobility")).toBe(false);
+    await waitFor(() => expect(start()).toBeEnabled());
   });
 
   it("여러 페이지의 선택을 원래 계획 번호와 같은 재개 ID·저장 목록으로 전달한다", async () => {
@@ -84,7 +112,8 @@ describe("배치 생성 작업 화면", () => {
     fireEvent.click(button);
     fireEvent.click(button);
     expect(mocks.preflight).toHaveBeenCalledOnce();
-    expect(screen.getByLabelText("중급 · 화행당 번역")).toBeDisabled();
+    expect(screen.getByLabelText("중급 · 총 생성 건수")).toBeDisabled();
+    expect(screen.getByLabelText("입문 · 통역 비율")).toBeDisabled();
     expect(screen.getByRole("button", { name: "중→한" })).toBeDisabled();
     await act(async () => finish({ ok: false, message: "관리자 세션 확인 필요" }));
     expect(screen.getByRole("alert")).toHaveTextContent("관리자 세션 확인 필요");

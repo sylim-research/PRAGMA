@@ -21,7 +21,6 @@ const COURSE_TOPIC_LABEL: Record<ThemeCode, string> = {
   career_workplace: "취업·직장",
   commerce_customer: "거래·고객응대",
   digital_content: "콘텐츠·SNS",
-  travel_mobility: "여행·이동",
 };
 const COURSE_DIRECTION: Record<LanguageDirection, string> = {
   ko_zh: "한국어 → 중국어",

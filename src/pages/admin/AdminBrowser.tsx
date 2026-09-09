@@ -395,7 +395,7 @@ const AdminBrowser = () => {
                       <Badge variant="secondary" className="font-normal">
                         {r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
                       </Badge>
-                      {r.theme_code && (
+                      {r.theme_code && THEME_LABEL[r.theme_code] && (
                         <Badge variant="secondary" className="font-normal">{THEME_LABEL[r.theme_code]}</Badge>
                       )}
                       <Badge variant="secondary" className="font-normal">{DIRECTION_LABEL[coreDirection(r.core_content)]}</Badge>

@@ -17,14 +17,13 @@ import {
   type LearnerLevel,
 } from "@/lib/pragma/enums";
 import {
-  DEFAULT_QUOTA,
   auditTopicCompatibility,
   auditTopicCoverage,
   buildBatchPlan,
-  interpretingCount,
+  productionModeCounts,
   summarizePlan,
-  type BatchQuota,
   type BatchCell,
+  type DeliveryCoverageCell,
 } from "@/lib/pragma/batchPlan";
 import { preflightAdminBatch } from "@/lib/pragma/adminBatchPreflight";
 import {
@@ -55,6 +54,8 @@ import { toast } from "sonner";
 // 최종 접근 제어는 다른 /admin/* 화면과 동일하게 DB(RLS·is_admin)가 맡는다.
 
 const LEVEL_ORDER: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
+const EMPTY_LEVEL_COUNTS = { beginner_intermediate: 0, intermediate: 0, advanced: 0 };
+type ProductionSetting = { total: number; interpretingPercent: number };
 const coreRunStorageKey = (direction: LanguageDirection) =>
   `pragma:admin-core-batch-run:${direction}`;
 
@@ -92,7 +93,11 @@ const parseSelectedPlanIndexes = (raw: string, total: number) => {
 };
 
 const AdminBatch = () => {
-  const [quota, setQuota] = useState<BatchQuota>(DEFAULT_QUOTA);
+  const [settings, setSettings] = useState<Record<LearnerLevel, ProductionSetting>>({
+    beginner_intermediate: { total: 0, interpretingPercent: 0 },
+    intermediate: { total: 0, interpretingPercent: 0 },
+    advanced: { total: 0, interpretingPercent: 0 },
+  });
   const [direction, setDirection] = useState<LanguageDirection>("ko_zh");
   const [running, setRunning] = useState(false);
   const [preparing, setPreparing] = useState(false);
@@ -131,39 +136,38 @@ const AdminBatch = () => {
   const targetActCount = Object.keys(SPEECH_ACT_UI).length;
   const topicCoverage = useMemo(() => auditTopicCoverage(), []);
   const topicCompatibility = useMemo(() => auditTopicCompatibility(), []);
+  const modeCounts = useMemo(() => Object.fromEntries(LEVEL_ORDER.map(level => [
+    level, productionModeCounts(settings[level].total, settings[level].interpretingPercent),
+  ])) as Record<LearnerLevel, ReturnType<typeof productionModeCounts>>, [settings]);
   const plan = useMemo(
     () => topicCoverage.missing.length === 0 && topicCompatibility.length === 0
-      ? buildBatchPlan(quota, direction)
+      ? buildBatchPlan({ perLevel: EMPTY_LEVEL_COUNTS, interpretingRatio: 0, perLevelModeCounts: modeCounts }, direction)
       : [],
-    [quota, direction, topicCoverage.missing.length, topicCompatibility.length],
+    [modeCounts, direction, topicCoverage.missing.length, topicCompatibility.length],
   );
-  const summary = useMemo(() => summarizePlan(plan), [plan]);
+  const deliveryCells = useMemo(() => LEVEL_ORDER.flatMap(level =>
+    (Object.keys(modeCounts[level]) as Array<BatchCell["mode"]>)
+      .filter(mode => modeCounts[level][mode] > 0)
+      .flatMap(mode => Object.keys(SPEECH_ACT_UI).map(speechAct => ({
+        speechAct, level, mode,
+      } as DeliveryCoverageCell))),
+  ), [modeCounts]);
+  const summary = useMemo(() => summarizePlan(plan, undefined, deliveryCells), [plan, deliveryCells]);
   const selectedPlan = useMemo(
     () => parseSelectedPlanIndexes(selectedCellNumbers, plan.length),
     [selectedCellNumbers, plan.length],
   );
-  const deliveryCellCount = LEVEL_ORDER.filter(level => quota.perLevel[level] > 0).length * targetActCount * 2;
+  const deliveryCellCount = deliveryCells.length;
   const selectPlanIndexes = (indexes: number[]) =>
     setSelectedCellNumbers([...new Set(indexes)].sort((a, b) => a - b).map(index => index + 1).join(", "));
 
-  const setLevelQuota = (level: LearnerLevel, value: number) => {
+  const setProductionSetting = (level: LearnerLevel, field: keyof ProductionSetting, value: number) => {
     if (busy || !Number.isFinite(value)) return;
     resetExecutionDisplay();
-    setQuota(q => ({ ...q, perLevel: { ...q.perLevel, [level]: Math.min(30, Math.max(0, Math.floor(value))) } }));
-  };
-
-  const setInterpretingRatio = (value: number) => {
-    if (busy || !Number.isFinite(value)) return;
-    resetExecutionDisplay();
-    setQuota(q => ({ ...q, interpretingRatio: Math.min(1, Math.max(0, value)) }));
-  };
-
-  const loadDefaultPreset = () => {
-    if (busy) return;
-    resetExecutionDisplay();
-    setQuota(DEFAULT_QUOTA);
-    setCoreRunId(getOrCreateCoreRunId(direction));
-    setResumeRunId("");
+    const next = Math.max(0, Math.floor(value));
+    setSettings(previous => ({ ...previous, [level]: {
+      ...previous[level], [field]: field === "interpretingPercent" ? Math.min(100, next) : next,
+    } }));
   };
 
   const executeBatch = async (cells: BatchCell[], runMode: "current" | "fresh", itemIndexes?: readonly number[]) => {
@@ -311,35 +315,34 @@ const AdminBatch = () => {
                   <Button size="sm" className="h-8 px-3" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
                   <Button size="sm" className="h-8 px-3" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
                 </div>
-                <Button size="sm" variant="outline" className="ml-auto h-8 shrink-0 px-3" title="기본 수량으로 되돌리기" disabled={busy} onClick={loadDefaultPreset}>기본 72건</Button>
               </div>
 
-              <p className="mt-3 text-xs text-muted-foreground">수준별 화행당 번역 건수 · {targetActCount}개 화행에 적용</p>
-              <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg bg-[#FAF8F2] p-3 sm:grid-cols-4">
+              <p className="mt-3 text-xs text-muted-foreground">수준별 총 생성 건수와 그중 통역 비율을 설정합니다.</p>
+              <div className="mt-2 grid gap-3 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
-                  const translation = quota.perLevel[level];
-                  const interpreting = interpretingCount(translation, quota.interpretingRatio);
-                  return <div key={level} className="min-w-0">
-                    <div className="flex flex-wrap items-baseline justify-between gap-x-1">
-                      <Label htmlFor={"batch-quota-" + level} className="text-xs font-semibold">{LEVEL[level]}<span className="sr-only"> · 화행당 번역</span></Label>
-                      <span className="text-xs font-semibold tabular-nums">총 {targetActCount * (translation + interpreting)}건</span>
+                  const counts = modeCounts[level];
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className="min-w-0 rounded-lg bg-[#FAF8F2] p-3">
+                    <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
+                      <span className="text-sm">{LEVEL[level]}</span>
+                      <span className="text-xl tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
+                    </p>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div className="min-w-0">
+                        <Label htmlFor={"batch-total-" + level} className="text-xs">생성 건수</Label>
+                        <Input id={"batch-total-" + level} aria-label={LEVEL[level] + " · 총 생성 건수"} type="number" min={0} step={1} value={settings[level].total}
+                          disabled={busy} onChange={event => setProductionSetting(level, "total", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
+                      </div>
+                      <div className="min-w-0">
+                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-xs">통역(%)</Label>
+                        <Input id={"batch-percent-" + level} aria-label={LEVEL[level] + " · 통역 비율"} type="number" min={0} max={100} step={1} value={settings[level].interpretingPercent}
+                          disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
+                      </div>
                     </div>
-                    <div className="mt-1.5 flex items-center gap-1.5">
-                      <Input id={"batch-quota-" + level} type="number" min={0} max={30} step={1} value={translation}
-                        disabled={busy} onChange={event => setLevelQuota(level, Number(event.target.value))} className="h-8 min-w-0 bg-white" />
-                      <span className="text-xs text-muted-foreground">건</span>
-                    </div>
-                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {targetActCount * translation} · 통역 {targetActCount * interpreting}</p>
+                    <p className="mt-1.5 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
-                <div className="min-w-0">
-                  <Label htmlFor="batch-interpreting-ratio" className="block text-xs font-semibold leading-4">통역 생성 배율</Label>
-                  <Input id="batch-interpreting-ratio" type="number" min={0} max={1} step={0.1} value={quota.interpretingRatio}
-                    disabled={busy} onChange={event => setInterpretingRatio(Number(event.target.value))} className="mt-1.5 h-8 bg-white" />
-                  <p className="mt-1 text-xs text-muted-foreground">화행당 번역 건수 기준</p>
-                </div>
               </div>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 = 화행당 번역 × 배율(반올림, 번역이 있으면 최소 1건). 배율은 전체 통역 비중과 다릅니다.</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 건수는 반올림하고 나머지는 번역으로 만듭니다. {targetActCount}개 화행에 균등 배분하며, 교과목의 미션 구성은 수업 편성에서 따로 정합니다.</p>
             </section>
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-5">
@@ -359,7 +362,7 @@ const AdminBatch = () => {
 
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description={"화행 × 생성 대상 수준 × 번역·통역 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
+                  description={"선택한 수준·과업의 화행 조합 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
                 <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
                   description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
               </div>

@@ -3,7 +3,7 @@
 //
 // 왜 domain과 별개인가:
 // - domain(일상/학업/직장) = 교육 편성·소재 층. P·D·R과 같은 화용 구인축이 아니다.
-// - theme_code(8종) = 교강사·학생이 보는 "강좌 이름표"(초급 여행 중국어 등). domain을
+// - theme_code(7종) = 콘텐츠 검색·편성용 소재 영역(대학생활·학업 등). domain을
 //   대체하지 않는 교차 축이다. theme↔domain 허용 매핑을 코드로 못박아 모순 생성을 막는다.
 // - topic_code = Dai 2023 기반 장면 시드의 형식화. 배치 생성이 시드에서 상황을 뽑으므로
 //   "생성 입력이 곧 태그"(태깅 비용 0).
@@ -21,12 +21,12 @@ import type {
   SpeechActUI,
 } from "@/lib/pragma/enums";
 import type { CourseMode } from "@/lib/curriculum/courseModePolicy";
+import { LEGACY_SCENARIO_TOPICS } from "@/lib/pragma/scenarioTopicsLegacy";
 
-// ── theme_code (8종 통제값) ───────────────────────────────────────────
+// ── theme_code (현행 제작·선택용 7종 통제값) ──────────────────────────
 export const THEME_CODES = [
   "campus_study",
   "daily_living",
-  "travel_mobility",
   "relationship_social",
   "career_workplace",
   "commerce_customer",
@@ -38,7 +38,6 @@ export type ThemeCode = (typeof THEME_CODES)[number];
 export const THEME_LABEL: Record<ThemeCode, string> = {
   campus_study: "대학생활·학업",
   daily_living: "일상생활",
-  travel_mobility: "여행·이동",
   relationship_social: "친구·대인관계",
   career_workplace: "취업·직장",
   commerce_customer: "상거래·고객응대",
@@ -50,7 +49,6 @@ export const THEME_LABEL: Record<ThemeCode, string> = {
 export const THEME_ALLOWED_DOMAINS: Record<ThemeCode, Domain[]> = {
   campus_study: ["school"],
   daily_living: ["daily"],
-  travel_mobility: ["daily"],
   relationship_social: ["daily"],
   career_workplace: ["work"],
   commerce_customer: ["daily", "work"], // 고객 입장=일상 / 응대 직원=직장
@@ -94,7 +92,7 @@ export interface TopicContext {
  * topic 카탈로그의 전역 허용값으로 고정하지 않는다.
  */
 export function topicSupportsContext(
-  topic: ScenarioTopic,
+  topic: Pick<ScenarioTopic, "allowedDomains" | "allowedSpeechActs" | "allowedPowers" | "allowedDistances" | "allowedModes">,
   context: TopicContext,
 ): boolean {
   return (
@@ -216,34 +214,6 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     allowedDomains: ["daily"],
     allowedSpeechActs: ["agreement", "refusal"],
     situationSeedKo: "동호회 모임에 초대하거나 초대를 정중히 거절하는 상황",
-  },
-
-  // ── travel_mobility (daily) ──
-  {
-    code: "hotel_request",
-    labelKo: "숙소 요청·문제 해결",
-    themeCode: "travel_mobility",
-    allowedDomains: ["daily"],
-    allowedSpeechActs: ["request", "complaint"],
-    situationSeedKo: "호텔·숙소에 방 변경이나 문제 해결을 요청하는 상황",
-  },
-  {
-    code: "direction_help",
-    labelKo: "길·교통 도움 요청",
-    themeCode: "travel_mobility",
-    allowedDomains: ["daily"],
-    allowedSpeechActs: ["request", "thanks"],
-    allowedPowers: ["equal"],
-    allowedDistances: ["formal"],
-    situationSeedKo: "낯선 사람에게 길·교통편을 묻고 도움에 감사하는 상황",
-  },
-  {
-    code: "booking_change",
-    labelKo: "예약 변경·취소",
-    themeCode: "travel_mobility",
-    allowedDomains: ["daily"],
-    allowedSpeechActs: ["request", "apology"],
-    situationSeedKo: "식당·투어 예약을 변경하거나 취소를 알리며 양해를 구하는 상황",
   },
 
   // ── relationship_social (daily) ──
@@ -491,11 +461,13 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
 ];
 
 // ── 조회 헬퍼 ─────────────────────────────────────────────────────────
-const TOPIC_BY_CODE: Record<string, ScenarioTopic> = Object.fromEntries(
-  SCENARIO_TOPICS.map((t) => [t.code, t]),
+type StoredScenarioTopic = ScenarioTopic | (typeof LEGACY_SCENARIO_TOPICS)[number];
+const TOPIC_BY_CODE: Record<string, StoredScenarioTopic> = Object.fromEntries(
+  [...SCENARIO_TOPICS, ...LEGACY_SCENARIO_TOPICS].map((t) => [t.code, t]),
 );
 
-export function getScenarioTopic(code: string): ScenarioTopic | undefined {
+/** 저장된 자료의 원래 메타데이터 검사에 사용한다. 신규 선택 목록에는 과거 시드를 넣지 않는다. */
+export function getScenarioTopic(code: string): StoredScenarioTopic | undefined {
   return TOPIC_BY_CODE[code];
 }
 
@@ -504,8 +476,9 @@ export function topicsForTheme(theme: ThemeCode): ScenarioTopic[] {
 }
 
 /** theme↔domain 허용 매핑 검사(R1c). */
-export function isThemeDomainValid(theme: ThemeCode, domain: Domain): boolean {
-  return THEME_ALLOWED_DOMAINS[theme]?.includes(domain) ?? false;
+export function isThemeDomainValid(theme: string, domain: Domain): boolean {
+  if (theme === "travel_mobility") return domain === "daily";
+  return THEME_ALLOWED_DOMAINS[theme as ThemeCode]?.includes(domain) ?? false;
 }
 
 /** 배치 전 최소 요건(0-c·25): theme당 topic ≥3. */
@@ -526,7 +499,7 @@ export interface CoursePreset {
   /** 화행 배분 가중치(합 임의 — 비율로 정규화). 비우면 균등 */
   speech_act_distribution?: Partial<Record<SpeechActUI, number>>;
   course_mode: CourseMode;
-  /** OT·중간·기말을 제외한 실제 학습 12주 중 통역 주차 수. */
+  /** 과거 DB의 주수 필드와 호환용. 현행 통번역형의 주차별 모드를 결정하지 않는다. */
   target_interpreting_week_count: number;
   /**
    * 반복 원칙 1문장 — 편성표에 노출(0-g·47, RQ2 증명 장치).
@@ -552,7 +525,7 @@ export const COURSE_PRESETS: CoursePreset[] = [
     course_mode: "mixed",
     target_interpreting_week_count: 6,
     repetition_principle:
-      "일상·학업 맥락의 화용 판단을 전반부 번역에서 익히고 후반부 통역 상황에 다시 적용한다.",
+      "각 화행 학습 주차에 일상·학업 맥락의 서로 다른 상황으로 번역 미션과 통역 미션을 하나씩 수행한다.",
   },
   {
     outline_id: "a10c5b2e-7c5a-4f0c-9f4a-6d61cf6b8e21",
@@ -565,7 +538,7 @@ export const COURSE_PRESETS: CoursePreset[] = [
     course_mode: "mixed",
     target_interpreting_week_count: 6,
     repetition_principle:
-      "직장·고객·플랫폼 맥락의 화용 판단을 전반부 번역에서 익히고 후반부 통역 상황에 다시 적용한다.",
+      "각 화행 학습 주차에 직장·고객·플랫폼 맥락의 서로 다른 상황으로 번역 미션과 통역 미션을 하나씩 수행한다.",
   },
   {
     outline_id: "c3f9a2d7-6e84-4f61-a953-2b7d9c0e4a12",
@@ -584,7 +557,7 @@ export const COURSE_PRESETS: CoursePreset[] = [
     course_mode: "mixed",
     target_interpreting_week_count: 3,
     repetition_principle:
-      "여러 생활 영역의 중국어 원문을 한국어 독자와 상황에 맞게 조정하고 후반부 통역 상황에 다시 적용한다.",
+      "각 화행 학습 주차에 서로 다른 중국어 상황·원문으로 한국어 번역 미션과 통역 미션을 하나씩 수행한다.",
   },
 ];
 

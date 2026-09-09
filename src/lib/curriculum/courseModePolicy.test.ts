@@ -10,7 +10,7 @@ import {
 
 describe("강좌 수행 모드 정책", () => {
   it("교과목은 주수 대신 수행 유형을 표시한다", () => {
-    expect(courseModeSummary({ courseMode: "mixed", interpretingWeekCount: 3 })).toBe("통번역");
+    expect(courseModeSummary({ courseMode: "mixed", interpretingWeekCount: 3 })).toBe("통번역 반반");
     expect(courseModeSummary({ courseMode: "translation" })).toBe("번역");
     expect(courseModeSummary({ courseMode: "interpreting" })).toBe("통역");
   });
