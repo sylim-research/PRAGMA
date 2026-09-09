@@ -53,9 +53,10 @@ Deno.serve(async (req) => {
       if (current.error || history.error) throw new Error("검수 저장소를 사용할 수 없습니다. content-review 마이그레이션·Edge 배포 상태를 확인해 주세요.");
       const dependencies = await Promise.all(domain.dependencies.map(async (id: string) => {
         const dependency = await sourceFor("mission", id);
-        const hash = await reviewHash(buildContentReviewDomain("mission", dependency.source).snapshot);
+        // Match SQL readiness: unchanged source keeps its historical approval even
+        // when a newer rule catalog changes the computed review content hash.
         const { data, error } = await db.from("content_review_runs").select("id").eq("kind", "mission").eq("target_id", id)
-          .eq("source_hash", dependency.source_hash).eq("content_hash", hash).eq("criteria_version", CONTENT_REVIEW_VERSION).not("approved_at", "is", null).limit(1);
+          .eq("source_hash", dependency.source_hash).eq("criteria_version", CONTENT_REVIEW_VERSION).not("approved_at", "is", null).limit(1);
         if (error) throw new Error("연결된 미션의 검수 기록 조회 실패");
         return { id, approved: Boolean(data?.length) };
       }));

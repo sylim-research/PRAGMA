@@ -36,4 +36,3 @@ describe("actual Edge attribution coordinator",()=>{
     expect(await run({},{},"",()=>({}))).toMatchObject({ok:false,detail:expect.stringContaining("provider failure")});
   });
 });
-
