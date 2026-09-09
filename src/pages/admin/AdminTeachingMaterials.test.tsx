@@ -92,6 +92,8 @@ describe("교과목·주차 수업자료 연결", () => {
   it("외부 상세 링크도 비동기 자료 조회 후 열고 이동한다", async () => {
     mountAt("/admin/package?courseId=course-a&weekNo=2#weekly-material-detail");
     const summary = await screen.findByText("이 주차 수업자료 승인");
+    expect(screen.getByRole("link", { name: "수업자료·토론 만들기" })).toHaveAttribute("href", "/admin/teaching-generator?courseId=course-a&weekNo=2");
+    expect(screen.getByRole("link", { name: "학급 응답 확인" })).toHaveAttribute("href", "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1");
     await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
   });

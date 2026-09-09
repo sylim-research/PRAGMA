@@ -784,6 +784,9 @@ const AdminComposer = () => {
           <Button className="h-9" variant="outline" onClick={() => setStructureEditor("new")}>
             새 교과목
           </Button>
+          <Button className="h-9" variant="ghost" asChild>
+            <Link to={outlineId ? `/admin/data-backup?courseId=${encodeURIComponent(outlineId)}` : "/admin/data-backup"}>백업·복원</Link>
+          </Button>
           <Button
             className="h-9"
             variant="outline"

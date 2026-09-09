@@ -66,6 +66,7 @@ export default function AdminTeachingStudio() {
   };
   const packagePath = `/admin/package?courseId=${encodeURIComponent(courseId)}&weekNo=${weekNo}#weekly-material-detail`;
   return <AdminShell title="수업자료·토론 생성" description="선택한 소스에서 근거를 확인하고, 이번 주차의 화행에 맞는 수업 콘텐츠를 만듭니다.">
+    <Button className="mb-4" variant="ghost" asChild><Link to={courseId ? `/admin/package?courseId=${encodeURIComponent(courseId)}&weekNo=${weekNo}` : "/admin/package"}>주차 운영으로 돌아가기 →</Link></Button>
     <div className="mb-5 flex flex-wrap items-center gap-2 rounded-xl bg-[#F4F0DF] px-4 py-3 text-sm font-medium">
       <span>소스 확인</span><ArrowRight size={14} /><span>화행·생성 조건</span><ArrowRight size={14} /><span>초안 생성·편집</span><ArrowRight size={14} /><span>주차 검토·수업 활용</span>
     </div>
@@ -85,7 +86,7 @@ export default function AdminTeachingStudio() {
               <p className="font-bold">학습 화행 · {acts.join(" · ") || "주차 편성에서 화행 선택 필요"}</p>
               {course && <p className="text-xs text-muted-foreground">{LEVEL[course.outline.level as LearnerLevel]} · {course.outline.language_direction === "ko_zh" ? "한국어 → 중국어" : "중국어 → 한국어"}</p>}
               {week?.can_do.map(goal => <p key={goal} className="mt-1">{goal}</p>)}
-              <Link className="mt-1 inline-block text-xs underline" to={`/admin/composer?courseId=${encodeURIComponent(courseId)}`}>주차 계획 확인</Link>
+              <Link className="mt-1 inline-block text-xs underline" to={`/admin/composer?outline=${encodeURIComponent(courseId)}`}>주차 계획 확인</Link>
             </div>
             <div className="grid grid-cols-2 gap-3">{([{ kind: "lesson", title: "수업자료", detail: "설명 · 비교 · 활동 · FAQ", Icon: BookOpen },
               { kind: "discussion", title: "토론자료", detail: "사례 · 질문 · 근거 · 성찰", Icon: MessagesSquare }] as const).map(({kind,title,detail,Icon}) =>

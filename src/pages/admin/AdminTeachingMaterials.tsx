@@ -231,7 +231,7 @@ const AdminTeachingMaterials = () => {
     URL.revokeObjectURL(url);
   };
 
-  return <AdminShell title="주차별 수업 운영·교실 화면" description="15주 준비 상태를 확인하고, 선택한 주차의 수업자료·미션·학급 응답으로 바로 이동합니다.">
+  return <AdminShell title="주차별 수업 운영" description="교과목과 주차를 선택해 자료를 준비하고, 교실 화면과 학급 응답을 확인합니다.">
     <div className="max-w-[1080px] space-y-5">
       <section className="rounded-xl border bg-white p-4">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -249,6 +249,14 @@ const AdminTeachingMaterials = () => {
           </label>
         </div>
         <p className="mt-3 text-xs text-muted-foreground">선택한 주차의 학습목표와 수업자료를 확인하고, 편성된 번역·통역 미션으로 이동합니다.</p>
+        {course && week && <div className="mt-3 flex flex-wrap gap-2" aria-label="선택 주차 작업">
+          {teachingKind(week.week_no, week.type) && <Button variant="outline" asChild>
+            <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
+          </Button>}
+          {week.scenarios[0] && <Button variant="outline" asChild>
+            <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학급 응답 확인</Link>
+          </Button>}
+        </div>}
       </section>
       {outlines.isError && <p role="alert">교과목 목록을 불러오지 못했습니다.</p>}
       {outlines.isSuccess && outlines.data.length === 0 && <p className="text-sm">조회 가능한 교과목이 없습니다. 관리자 로그인과 <Link className="underline" to="/admin/composer">저장된 교과목</Link>을 확인해 주세요.</p>}

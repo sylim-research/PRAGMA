@@ -11,9 +11,9 @@ import {
 
 const REQUIRED_ENTRY_PATHS = [
   "/admin/review",
+  "/admin/composer",
   "/admin/package",
   "/admin/learners",
-  "/admin/data-backup",
   "/admin/decision-traces",
   "/admin/export",
 ] as const;
@@ -46,7 +46,9 @@ describe("admin navigation reachability", () => {
     ]);
     expect(adminMobileNavValue("/admin/library")).toBe("/admin/library");
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
-    expect(operations?.items.at(-1)?.to).toBe("/admin/data-backup");
+    expect(operations?.items.map((item) => item.to)).toEqual([
+      "/admin/composer", "/admin/package", "/admin/learners",
+    ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
     expect(research?.items.map((item) => item.to)).toEqual([
       "/admin/decision-traces",
@@ -133,9 +135,10 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
     // 원자료 분석은 보관함을 갖춘 별도 화면이다(2026-09-09 오후).
     expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
-    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/teaching-generator");
+    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/package");
+    expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/package");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
-    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
+    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/composer");
     expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");
     expect(adminMobileNavValue("/admin/export")).toBe("/admin/export");
   });
