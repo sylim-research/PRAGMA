@@ -1,17 +1,15 @@
-import { BookOpen, Compass, History } from "lucide-react";
+import { BookOpen, History } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-// 학습자 최상위 공간 — 필수 학습(수업) · 회고(기록) · 부가 탐색(라운지).
+// 학습자 최상위 공간 — 필수 학습(수업) · 회고(기록).
 //
 // 홈 탭은 없앴다(2026-08-01). 수업 화면이 「이번 학습」 CTA와 9화행 지도를 갖게 되면서
 // 홈에 남은 것이 다른 탭으로 가는 우회 링크뿐이었고, 홈의 이월 조언은 이번 주 화행과
 // 무관한 지난 화행을 나란히 보여 오히려 오해를 만들었다. 이월은 관련 미션 직전에서
 // 회수한다(latestFocusCarryOver는 그 용도로 남겨 둔다).
-// 라운지는 점수·진행률·수행 기록과 분리된 정적 선택 활동만 제공한다.
 const TABS = [
   { to: "/learner/course", label: "수업", icon: BookOpen },
   { to: "/learner/records", label: "기록", icon: History },
-  { to: "/learner/lounge", label: "라운지", icon: Compass },
 ];
 
 export const LearnerBottomNav = () => (

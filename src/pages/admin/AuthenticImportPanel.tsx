@@ -3,9 +3,8 @@
 // generate-scenario(action:"authentic_analyze")가 분석해 '활용 후보'를 제안한다.
 // 생성 로직은 복제하지 않고 "자료 해석·후보 선택"만 여기서 한다.
 //
-// 호스트(AdminAuthentic)가 세 가지를 받는다: 분석이 끝나면 onAnalyzed로 통째로 받아
-// 보관하고, 후보를 고르면 onApply로 생성기에 넘기고, onLoungeSeed로 라운지 문항의
-// 씨앗을 받는다. 2026-09-09: 잠시 생성기 안 접이식 패널로 흡수했다가 되돌렸다 —
+// 호스트(AdminAuthentic)는 분석 결과를 onAnalyzed로 받아 보관하고,
+// 후보를 고르면 onApply로 생성기에 넘긴다. 2026-09-09: 잠시 생성기 안 접이식 패널로 흡수했다가 되돌렸다 —
 // 분석 결과가 저장되지 않고 사라지는 것이 문제였고, 그건 화면 위치가 아니라
 // 보관함이 없어서였다.
 //
@@ -49,14 +48,13 @@ type UsageType =
   | "expression_resource"
   | "unsuitable";
 
-// 2026-07-30 워딩 수렴: "씨앗"은 관리자에게 낯선 은유라 폐기. 표현 자원은 완성
-// 용도(라운지)가 보이게 표시한다 — 내부 타입명(expression_resource)은 불변.
+// 표현 자원은 참고 후보로 보관한다 — 내부 타입명(expression_resource)은 불변.
 const USAGE_KO: Record<UsageType, string> = {
   scenario_seed: "시나리오",
   preceding_turn: "선행 발화",
   translation_source: "번역 출발문",
   response_task: "후속 반응 과제",
-  expression_resource: "라운지 표현 후보",
+  expression_resource: "참고 표현 후보",
   unsuitable: "미션 부적합",
 };
 const USAGE_TONE: Record<UsageType, string> = {
@@ -76,12 +74,12 @@ const GENERATABLE: UsageType[] = [
 ];
 
 // 후보를 유형별 섹션으로 묶는다(2026-07-30 수렴안) — 원자료가 어떤 콘텐츠 갈래로
-// 나뉘는지(시나리오/선행 발화/출발문/라운지) 화면 구조 자체가 말하게 한다.
+// 나뉘는지(시나리오/선행 발화/출발문/참고 표현) 화면 구조 자체가 말하게 한다.
 const CANDIDATE_SECTIONS: { title: string; types: UsageType[] }[] = [
   { title: "시나리오", types: ["scenario_seed"] },
   { title: "선행 발화", types: ["preceding_turn"] },
   { title: "번역 출발문·반응 과제", types: ["translation_source", "response_task"] },
-  { title: "라운지 표현 후보", types: ["expression_resource"] },
+  { title: "참고 표현 후보", types: ["expression_resource"] },
   { title: "미션 부적합 — 참고만", types: ["unsuitable"] },
 ];
 
@@ -218,7 +216,7 @@ const CONFIDENCE_KO: Record<string, { label: string; tone: string }> = {
 };
 
 /** 분석이 끝났을 때 호스트가 통째로 보관할 수 있게 넘기는 꾸러미.
- *  후보는 화면에 보이는 순서 그대로다 — onApply·onLoungeSeed의 index와 같은 순서. */
+ *  후보는 화면에 보이는 순서 그대로다 — onApply의 index와 같은 순서. */
 export interface AuthenticAnalyzed {
   source_type: "image" | "text";
   source_ref: string | null;

@@ -48,8 +48,6 @@ const WeekDetail = lazy(() => import("./pages/learner/WeekDetail.tsx"));
 const IntroArc = lazy(() => import("./pages/learner/IntroArc.tsx"));
 const WeeklyLearningNote = lazy(() => import("./pages/learner/WeeklyLearningNote.tsx"));
 const LearnerRecords = lazy(() => import("./pages/learner/LearnerRecords.tsx"));
-const LoungeHub = lazy(() => import("./pages/learner/LoungeHub.tsx"));
-const LoungeModulePage = lazy(() => import("./pages/learner/LoungeModulePage.tsx"));
 const StrategyMap = lazy(() => import("./pages/learner/StrategyMap.tsx"));
 const PrototypeMissionV2 = lazy(() => import("./pages/learner/PrototypeMissionV2.tsx"));
 const LegacyMissionRun = lazy(() => import("./pages/learner/LegacyMissionRun.tsx"));
@@ -117,12 +115,8 @@ const App = () => (
           />
           {/* 홈은 폐지 — 학습자 착지 화면은 수업이다(2026-08-01). 옛 링크·북마크는 그대로 잇는다. */}
           <Route path="/learner/home" element={<Navigate to="/learner/course" replace />} />
-          {/* 선택형 정적 라운지 — 강좌·주차·수행 기록과 연결하지 않는다. */}
-          <Route path="/learner/lounge" element={<RequireApproved><LoungeHub /></RequireApproved>} />
-          <Route path="/learner/lounge/decoder" element={<Navigate to="/learner/lounge/decode" replace />} />
-          <Route path="/learner/lounge/theater" element={<Navigate to="/learner/lounge" replace />} />
-          <Route path="/learner/lounge/meme" element={<Navigate to="/learner/lounge" replace />} />
-          <Route path="/learner/lounge/:module" element={<RequireApproved><LoungeModulePage /></RequireApproved>} />
+          {/* 라운지는 논문 버전에서 제외하며 과거 북마크는 수업으로 연결한다. */}
+          <Route path="/learner/lounge/*" element={<Navigate to="/learner/course" replace />} />
           {/* 게시 교과목 → 15주 학습계획 → 주차별 독립 학습 미션 2개. */}
           <Route path="/learner/course" element={<RequireApproved><LearnerCourseList /></RequireApproved>} />
           <Route path="/learner/course/:courseId" element={<RequireApproved><LearnerCourseLive /></RequireApproved>} />

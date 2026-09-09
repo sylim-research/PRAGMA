@@ -2,7 +2,7 @@
 //
 // 위 절은 AuthenticImportPanel이 그대로 한다(분석·후보 제안). 이 화면이 더하는 것은
 // 「버리지 않는 것」이다: 분석이 끝나면 후보 전부를 보관함에 남기고, 고르지 않은 후보도
-// 나중에 열어 시나리오나 라운지 문항으로 쓸 수 있게 한다.
+// 나중에 열어 시나리오 재료나 참고 표현으로 확인할 수 있게 한다.
 //
 // 보관함 테이블이 아직 원격에 없으면(마이그레이션 미적용) 저장만 조용히 접히고 분석과
 // 생성기 전달은 그대로 된다 — 그때는 라우터 state로 후보를 넘긴다.
@@ -32,7 +32,7 @@ const USAGE_LABEL: Record<string, string> = {
   preceding_turn: "선행 발화",
   translation_source: "번역 출발문",
   response_task: "응답 과제",
-  expression_resource: "라운지 표현 후보",
+  expression_resource: "참고 표현 후보",
   unsuitable: "부적합",
 };
 

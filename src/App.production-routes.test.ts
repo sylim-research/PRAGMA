@@ -8,16 +8,12 @@ const appSource = readFileSync(
 );
 
 describe("production route invariants", () => {
-  it("keeps the approved learner lounge active", () => {
+  it("redirects retired lounge links to the core course workflow", () => {
     expect(appSource).toContain(
-      '<Route path="/learner/lounge" element={<RequireApproved><LoungeHub /></RequireApproved>} />',
+      '<Route path="/learner/lounge/*" element={<Navigate to="/learner/course" replace />} />',
     );
-    expect(appSource).toContain(
-      '<Route path="/learner/lounge/:module" element={<RequireApproved><LoungeModulePage /></RequireApproved>} />',
-    );
-    expect(appSource).not.toContain(
-      '<Route path="/learner/lounge" element={<Navigate to="/learner/course"',
-    );
+    expect(appSource).not.toContain("LoungeHub");
+    expect(appSource).not.toContain("LoungeModulePage");
   });
 
   it("keeps the approved backup and research export routes active", () => {
