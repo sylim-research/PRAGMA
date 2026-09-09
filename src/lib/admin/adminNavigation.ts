@@ -3,9 +3,6 @@ export type AdminNavItem = {
   label: string;
   pending?: boolean;
   activePaths?: readonly string[];
-  // 그룹 안을 눈으로만 가르는 작은 라벨이다. 클릭 대상이 아니고, 같은 값이 이어지는
-  // 동안은 한 번만 그린다.
-  section?: string;
 };
 
 export type AdminNavGroup = {
@@ -30,10 +27,9 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
 // 시나리오는 상황문과 원문만 가진 재료이고 학습 콘텐츠가 아니므로 미션과 같은 층에
 // 두지 않는다 — 그룹명 「학습 미션 재료」가 그 지위를 이름으로 말한다.
 //
-// 3번은 같은 미션의 연속된 생애다. 다만 section 라벨로 제작과 품질 관리를 눈으로
-// 갈라, 조립과 승인이 같은 층으로 읽히지 않게 한다. 품질 관리 안에서도 AI 검토와
-// 교수자의 결정은 갈라 놓는다 — AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만
-// 일어난다.
+// 3번은 같은 미션의 연속된 생애다 — 조립에서 자동 점검·AI 검토를 거쳐 교수자 승인으로
+// 간다. 항목 순서가 그 순서다. 그 안에서 AI 검토와 교수자의 결정은 갈라 놓는다 —
+// AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만 일어난다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     header: "1. 생성 기준",
@@ -52,15 +48,14 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   },
   {
     // 「미션 설계 기준」 화면은 아직 없다. 만들기 전에는 죽은 항목을 두지 않고,
-    // 생기면 [제작] 맨 앞에 붙인다.
+    // 생기면 맨 앞에 붙인다.
     header: "3. 학습 미션 제작·품질 관리",
     items: [
-      { to: "/admin/assembly", label: "학습 미션 조립", section: "제작" },
-      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토", section: "품질 관리" },
+      { to: "/admin/assembly", label: "학습 미션 조립" },
+      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
       {
         to: "/admin/review",
         label: "교수자 최종 승인",
-        section: "품질 관리",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
     ],

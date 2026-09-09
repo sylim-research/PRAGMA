@@ -121,38 +121,20 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
                       groupActive ? "border-[#D6BC40]" : "border-[#e5e1d8]",
                     ].join(" ")}
                   >
-                    {group.items.map((item, itemIndex) => {
-                      // section은 클릭 대상이 아니라 눈으로만 가르는 라벨이다. 같은 값이
-                      // 이어지는 동안은 처음 한 번만 그린다.
-                      const showSection =
-                        !!item.section && item.section !== group.items[itemIndex - 1]?.section;
-                      return (
-                        <div key={item.to} className="flex flex-col">
-                          {showSection && (
-                            <span
-                              aria-hidden
-                              className={[
-                                "px-3 pb-[2px] text-[10.5px] font-semibold uppercase tracking-wide text-[#8a857c]",
-                                itemIndex === 0 ? "pt-[1px]" : "pt-2",
-                              ].join(" ")}
-                            >
-                              {item.section}
-                            </span>
-                          )}
-                          <Link
-                            to={item.to}
-                            className={itemClasses(adminNavItemIsActive(item, pathname))}
-                          >
-                            {item.label}
-                            {item.pending && (
-                              <span className="ml-1.5 rounded-full bg-[#EDE9DD] px-1.5 py-[1px] align-middle text-[10px] font-normal text-[#8a857c]">
-                                준비 중
-                              </span>
-                            )}
-                          </Link>
-                        </div>
-                      );
-                    })}
+                    {group.items.map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className={itemClasses(adminNavItemIsActive(item, pathname))}
+                      >
+                        {item.label}
+                        {item.pending && (
+                          <span className="ml-1.5 rounded-full bg-[#EDE9DD] px-1.5 py-[1px] align-middle text-[10px] font-normal text-[#8a857c]">
+                            준비 중
+                          </span>
+                        )}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               );

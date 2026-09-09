@@ -122,12 +122,6 @@ describe("admin navigation reachability", () => {
       "/admin/ai-review",
       "/admin/review",
     ]);
-    // 한 그룹이 됐어도 제작과 품질 관리의 경계는 section 라벨로 남는다.
-    expect(production?.items.map((item) => item.section)).toEqual([
-      "제작",
-      "품질 관리",
-      "품질 관리",
-    ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
     expect(ADMIN_NAV_GROUPS.some((group) => group.header.includes("품질관리"))).toBe(false);
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
