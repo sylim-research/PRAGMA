@@ -493,7 +493,7 @@ const AdminDashboard = () => {
       {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
           구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
           숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
-      <div className="mb-2 flex justify-end"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
+      <div className="mb-2"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
       <section className="overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
