@@ -1895,6 +1895,7 @@ MPJ ${itemCount}문항을 만듭니다. 학습 흐름은 ${learningFlow}입니�
 Scale4는 종합 첫인상을 4점으로 받고 적절/부적절 방향만 채점합니다.${nativeJudgeIntro}
 ${fixChoiceFlow}
 Reason 문항은 표현이 부적절하다는 전제에서 가장 큰 이유 하나를 바로 고르게 하며, 별도의 대역 판단이나 확신도는 묻지 않습니다.
+Reason의 세 선택지는 모두 원문·상황·target에 비추어 사실로 성립해야 합니다. 정답은 핵심 화용 이유이고, 오답은 사실이지만 명백히 부차적이거나 다른 판단 차원을 짚는 선택지입니다. target은 의미·문법이 온전하므로 오답이 오역·의미 오류·없는 사실을 주장해서는 안 되며, 정답과 비슷한 강도로 핵심 이유가 될 수 있는 오답도 만들지 않습니다.
 각 MPJ 문항에서 후보를 가르는 직접 채점축은 위 item_focus band 하나뿐입니다(한 문항 안의 다른 축 동시 변화 금지).
 그러나 미션 전체의 학습목표는 특정 feature 하나가 아니라 해당 화행의 통합 수행입니다.
 ${nativeMpj5 ? `따라서 diagnostic_dimensions에는 미션 전체에서 실제로 관찰되는 서로 다른 진단차원 2~6개와 근거 위치를 남깁니다.
@@ -1961,9 +1962,9 @@ ${diagnosticShape}
       "highlights": ["target의 실제 부분문자열"],
       "problem_band_code": "부적절 band 정확히 1개 — 생성·QA용 키이며 학습자에게 다시 판단시키지 않음",
       "reasons": [
-        {"id":"r1","text_ko":"실제 문장 속 단서를 근거로 한 그럴듯하지만 주원인은 아닌 화용 해석","kind":"pragmatic_misconception"},
+        {"id":"r1","text_ko":"target에 실제로 있는 표현을 근거로, 사실로 성립하지만 핵심 원인은 아닌 화용 요인(어조·부담 인식·관계 거리 등)","kind":"pragmatic_misconception"},
         {"id":"r2","text_ko":"주된 target-feature 원인","kind":"primary"},
-        {"id":"r3","text_ko":"target의 실제 요소를 근거로 한 그럴듯하지만 주원인은 아닌 의미·문법·맥락 해석","kind":"meaning_grammar_context"}
+        {"id":"r3","text_ko":"target에 실제로 있는 표현·구조를 근거로, 사실로 성립하지만 핵심 원인은 아닌 다른 판단 차원의 관찰(그 장면에서 실제로 성립할 때만: 정보 순서·지시 명시성·어휘 격 등. 길이는 쓰지 않는다)","kind":"meaning_grammar_context"}
       ],
       "accepted_reason_id": "r2",
       "explanation_ko": "${nativeMpj5 ? '2~3문장: 현재 상황 단서 → target의 실제 문제 표현·기능 → 관계적 효과 → 주원인에 맞춘 조정 한 지점(의미·문법 문제와 구분)' : '가장 큰 원인과 부차적 맥락을 구분한 해설'}",
@@ -2614,21 +2615,29 @@ async function refreshCandidateFeedback(args: {
 원문·장면·PDR·후보·is_valid·accepted_band_codes와 정답은 바꾸지 않는다. 이전 후보는 근거가 아니다.
 explanation_ko는 2~3문장으로 현재 상황 단서 → 최종 표현 자원·기능 → 관계 효과 → 유지/조정할 지점을 연결한다.
 인용은 final_item.source·target·corrections.text·candidates.text에 실제로 있는 표현만 사용한다.
+인용을 줄임표(…)로 줄이거나 요약·의역으로 바꾸지 않는다. 부적정 후보를 언급할 때도 그 문장의 실제 부분만 글자 그대로 인용한다.
 recommended_example은 fix_choice의 is_valid=true 후보 또는 multi_judge의 적정 대역 후보의 text를 그대로 복사한다.
 multi_judge의 적정 후보 2개 사이에 숨은 우열을 만들지 않는다. 대상 문항마다 정확히 1개를 반환한다.
 출력 JSON: {"items":[{"item_index":0,"explanation_ko":"최종 후보에 맞춘 해설","recommended_example":"최종 권장/적정 후보 원문"}]}`
-  const att = await callOpenAI(missionModel(), args.apiKey, system,
-    JSON.stringify({ within_band: args.feature.within_band_code, packets }), 0.2, {
-      telemetry: args.telemetryFor('mission_repair', true, { invocationAttempt: 1,
+  // The validator is the contract; a quote that is not verbatim gets one bounded retry with the
+  // validator's own message, instead of discarding the whole generated mission on the first miss.
+  let lastError = ''
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    const request: Record<string, unknown> = { within_band: args.feature.within_band_code, packets }
+    if (attempt > 1) request.previous_attempt_rejected = `${lastError} 따옴표 안 문자열은 final_item의 원문·후보에 글자 그대로 있어야 한다.`
+    const att = await callOpenAI(missionModel(), args.apiKey, system, JSON.stringify(request), 0.2, {
+      telemetry: args.telemetryFor('mission_repair', true, { invocationAttempt: attempt,
         promptVersion: CANDIDATE_FEEDBACK_PROMPT_VERSION }),
     })
-  if (!att.ok) return { ok: false, error: '최종 후보 해설 갱신 호출 실패. 이전 해설로 완료하지 않습니다.' }
-  try {
-    const parsed = parseOpenAIContent(att.raw) as Record<string, unknown>
-    return { ok: true, ...applyCandidateFeedback(args.items, packets.map(p => p.item_index), parsed.items, args.feature.within_band_code) }
-  } catch (error) {
-    return { ok: false, error: `최종 후보 해설 갱신 실패: ${(error as Error).message}` }
+    if (!att.ok) return { ok: false, error: '최종 후보 해설 갱신 호출 실패. 이전 해설로 완료하지 않습니다.' }
+    try {
+      const parsed = parseOpenAIContent(att.raw) as Record<string, unknown>
+      return { ok: true, ...applyCandidateFeedback(args.items, packets.map(p => p.item_index), parsed.items, args.feature.within_band_code) }
+    } catch (error) {
+      lastError = (error as Error).message
+    }
   }
+  return { ok: false, error: `최종 후보 해설 갱신 실패: ${lastError}` }
 }
 
 async function realizeRelativeBandCandidates(args: {
@@ -3374,7 +3383,10 @@ ${zhKoTranslationAudit}
    ※ 기록 목적·즉시 반응 여부·권리/선택권/완화 전략 같은 내부 평가 기준을 학생용 장면에
    설명하라고 요구하지 마라. 매체 이름 라벨도 필수 조건이 아니다.
 ⑨ primary_reason_ambiguity — reason의 accepted_reason_id가 실제로 유일한 **가장 큰 이유**인가.
-   다른 선택지도 같은 정도로 방어 가능하거나, primary가 target feature가 아닌 의미·문법 문제라면 fail이다.
+   primary가 target feature가 아닌 의미·문법 문제라면 fail이다. 오답은 세 갈래로 판정한다:
+   ⓐ 전제가 원문·상황·target에 비추어 사실이 아니면(원문 오독, 없는 사실, target에 없는 의미 오류 주장) fail.
+   ⓑ 사실이고 명백히 부차적이거나 다른 판단 차원이면 pass.
+   ⓒ 사실이고 정답과 비슷한 강도로 핵심 이유가 될 수 있으면 fail(경합이 분명할 때) 또는 warning(경합 가능성이 있을 때). 문항이 「가장 큰 이유」를 고르게 하므로 경합하는 오답은 문항 자체를 모호하게 만든다.
 ⑩ context_plan_mismatch — scale4는 소박한 규칙을 깨는 적절한 대비 장면이고,
    ${contextPlan}이다. native MPJ5의 scale4↔judge3는 화행·item_focus·핵심 실현 전략을 유지하면서
    P/D/R 중 정확히 한 축만 달라져 적절성 방향이 바뀌어야 하며, multi_judge는 P/D/R 한 축만

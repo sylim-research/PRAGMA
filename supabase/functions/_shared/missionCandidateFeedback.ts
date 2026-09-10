@@ -1,5 +1,6 @@
 /** Candidate changes and their instructional feedback form one revision. */
-export const CANDIDATE_FEEDBACK_PROMPT_VERSION = 'candidate_feedback_v1_final_text';
+// v2: quotes must be verbatim (no ellipsis/paraphrase); one bounded retry carries the validator message.
+export const CANDIDATE_FEEDBACK_PROMPT_VERSION = 'candidate_feedback_v2_verbatim_quotes';
 export type CandidateFeedbackUpdate = { item_index: number; explanation_ko: string; recommended_example: string };
 const record = (value: unknown): Record<string, any> | null =>
   value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, any> : null;
