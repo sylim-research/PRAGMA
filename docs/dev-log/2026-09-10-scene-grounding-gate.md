@@ -96,3 +96,4 @@
 - 검증: typecheck·Vitest 142파일 920 통과·운영 빌드 통과. 빌드가 갱신한 생성 파일 2개는 **커밋 지문·시각만 달라지고 내용 해시(artifact/prompt/evidence/edge_source/core_surface)는 동일**해 되돌렸다.
 - PR: https://github.com/sylim-research/PRAGMA/pull/134
 - 남은 것: 필수 CI 통과 → 병합 → Railway 배포 확인 → 관리자 화면에서 목록 257줄·상태 필터 눈확인(관리자 로그인이 필요해 연구자 몫).
+- 병합·배포 완료: PR #134 필수 CI 통과(3분 16초) → main `ef56282e` → Railway deployment `6366552770` **success**. 운영 번들이 `index-CsfDT1pA.js`에서 `index-BAuIvB1W.js`로 교체됐고, 배포된 `AdminBrowser-CCTYYQkg.js`에 `archived_at` 조건과 보관 안내 문구가 들어 있음을 원격에서 확인했다. 관리자 로그인이 필요한 화면 눈확인은 연구자 몫이다.
