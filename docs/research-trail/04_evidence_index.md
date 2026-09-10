@@ -454,3 +454,4 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 의미 검사 결과가 진행 조건으로 작동함을 검증한다. 모델의 실제 판정 정확도·전체 미션 승인·최종 콘텐츠 LOCK 증거와 구분한다. 신규 생성 및 운영 후속은 dev-log에서 별도 확인한다.
 - 실제 1차 생성 원본 7건 및 SHA-256: `docs/research-trail/evidence/2026-09-10-scene-grounding-pilot-1/index.json`. 부적합 입력 3건 중 2건 차단·초면 오판 1건 누락, 신규 코어 4건 자동 통과·직접 검토 0건 채택이다. 통과율 일반화나 내용 타당도 확보의 증거로 쓰지 않는다. 이 반례를 근거로 관찰 PDR 대조와 상황·실제 대사 구분을 보완했다.
 - 실제 2차 확인 원본 9건과 미검증 코드 patch 및 SHA-256: `docs/research-trail/evidence/2026-09-10-scene-grounding-confirmation-2/index.json`. 부적합 3건 모두 차단, 기존 대사형 상황문은 critic이 2회 오판, 새 코어 4건은 장면 서술 개선까지 관찰했다. 전체 미션 품질 승인 근거가 아니다. 사용량에 따른 작업 인계와 미배포 초안 상태는 `docs/dev-log/2026-09-10-fable-handoff-scene-grounding.md`에 기록했다.
+- 후속 제한 검증: 같은 evidence 디렉터리의 `unfinished-format-probe.json`과 재현 스크립트. 종결어미 강제 helper는 정상 서술 오탐·평서형 직접 대사 누락으로 기각했으며 앱의 미커밋 변경을 철회했다. 보관 patch는 채택된 구현이 아니다. 기존 의미 게이트와 실제 콘텐츠 미검수 상태는 그대로다.

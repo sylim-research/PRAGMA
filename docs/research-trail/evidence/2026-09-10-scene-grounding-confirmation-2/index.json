@@ -7,7 +7,7 @@
   "new_cores_generated": 4,
   "whole_missions_reviewed": 0,
   "scene_regression": "old dialogue scene incorrectly passed both with and without prior generation verdict",
-  "patch_status": "unfinished and untested; not deployed",
+  "patch_status": "rejected after local diagnostic; source changes withdrawn; not deployed",
   "files": [
     {
       "file": "dialogue-as-scene-no-prior-verdict.json",
@@ -36,6 +36,14 @@
     {
       "file": "pilot-reverse-opposition-core.json",
       "sha256": "a3bdc37822113d1cdb7031398602ac439780b377de61b7612f3431ad558f88a9"
+    },
+    {
+      "file": "probe-unfinished-format.mjs",
+      "sha256": "f799026520171cc95a886b554399e99b5a95e596062195c1f573d34ae8411a28"
+    },
+    {
+      "file": "unfinished-format-probe.json",
+      "sha256": "9ea3e55d67f11fdfe688ac9f30b0e18c4787a0462912e5cc3452b363428f61cb"
     },
     {
       "file": "unfinished-scene-format.patch",
