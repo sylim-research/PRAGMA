@@ -87,3 +87,21 @@
 2. `applyCandidateFeedback`가 던진 오류 메시지를 붙여 **한 번만 재호출**한다(현재는 첫 실패에서 `candidate_feedback_refresh_failed`로 종료). 두 번째도 실패하면 지금처럼 실패한다.
 - 검증기 자체는 손대지 않는다(줄임표 허용은 지어낸 인용을 통과시킬 수 있다).
 - 영향: 미션 생성 경로 한 함수. 미션 프롬프트 버전(`candidate_feedback_v1_final_text`)은 갱신한다.
+
+## 7. 연구자 판정(보완 수용)과 반영 · 2026-09-11
+
+- **검사 ⑨ 문구 정정**: 「같은 정도로 방어 가능한 오답을 fail하지 않는다」는 내 문장은 기각됐다 — 가장 큰 이유를 고르는 문항에서 경합하는 오답은 문항을 모호하게 만든다. 반영한 3단 기준: ⓐ 허위 전제 → fail ⓑ 사실이고 명백히 부차적/다른 차원 → pass ⓒ 사실이고 정답과 비슷한 강도 → fail(경합 분명) 또는 warning(경합 가능).
+- **r3 예시 정정**: 「문장 길이」 제거(PRAGMA는 길이를 적절성 단서로 쓰지 않도록 통제해 왔다). 정보 순서·지시 명시성·어휘 격은 「그 장면에서 실제로 성립할 때만」으로 한정. 생성 규칙에도 「정답과 비슷한 강도의 오답을 만들지 않는다」를 넣었다.
+- **역할 파싱 명료화**(w6-1): `SCENE_GROUNDING_RULE`에 「화자는 source_text를 말하는 사람이다. 상대가 먼저 부탁·제안·초대를 했더라도 그 선행 발화자는 화자가 아니라 상대다」를 넣었다. 새 교육 규칙이 아니라 사전 검토·critic의 역할 해석 지시다.
+- **13주차 microfix 구현**: 해설 갱신 프롬프트에 「줄임표·요약·의역 인용 금지, 실제 부분만 글자 그대로」 1줄, 검증 실패 시 검증기 메시지를 붙여 **1회만 재호출**. 검증기는 그대로. 프롬프트 버전 `candidate_feedback_v2_verbatim_quotes`.
+- **검토 화면**: `MissionPreview`·`ContentReviewPanel`에서 판정·findings를 먼저, 자유서술 요약은 「요약(보조)」로 뒤에 표시.
+- **국소 수정의 원칙**: DB를 직접 덮어쓰지 않는다. 기존 경로(품질 검사 → 수리 → `save_generated_mission_revision`)로 새 content hash·revision을 만들고 현행 검사와 lineage를 다시 통과시킨다. 실행은 계약 배포 뒤.
+- **검증**: 스냅샷 재생성, typecheck, Vitest 920, 스크립트 테스트 16/16 통과.
+
+### Supabase Edge 배포 guard 공백 — 발견과 최소 조치
+
+PR #135 조사에서 확인된 사실: 이 브랜치의 엣지 코드가 Supabase production에 배포돼 있는데 main에는 아직 없다. Railway는 main에서만 배포되지만 `npx supabase functions deploy`는 어느 커밋에서든 실행된다. 오늘 내가 두 번 그렇게 배포했다.
+
+최소 guard(이 PR에 포함, `scripts/deploy-edge-function.mjs`, `npm run edge:deploy -- <fn>`): ①supabase/·src/에 미커밋 변경이 있으면 거부 ②`origin/main`을 fetch한 뒤 HEAD가 main lineage에 포함되지 않으면 거부 ③`--allow-unmerged "<사유 10자+>"`로만 우회하되 경고를 출력하고 사유를 dev-log에 남긴다. 후속 제안 = GitHub Actions에서 main 병합 시 자동 배포로 옮기면 우회 자체가 없어진다(별도 승인 사안). `AGENTS.md`의 배포 절에 「엣지 함수도 main lineage에서만 배포」 한 줄을 넣는 것을 제안한다(정본 수정이라 연구자 승인 후).
+
+**이번 배치의 배포 순서**: 위 guard 원칙을 스스로 지키기 위해, 이 커밋들은 **PR #135가 main에 병합된 뒤** main에서 배포한다. 그 전에는 w6-1 재시도·Reason 재감사·재생성을 실행하지 않는다.
