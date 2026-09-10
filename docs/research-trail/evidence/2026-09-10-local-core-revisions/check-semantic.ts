@@ -23,8 +23,12 @@ const { error } = await supabase.auth.signInWithPassword({
 });
 if (error) throw new Error(error.message);
 try {
-  for (const key of ['w9-1', 'w2-0', 'pilot-reverse-opposition']) {
-    const draftFile = `${key}-draft.json`;
+  // Optional argv: draft file basenames (e.g. pilot-reverse-opposition-draft-v2.json). Default = the three v1 drafts.
+  const draftFiles = process.argv.slice(2).length
+    ? process.argv.slice(2)
+    : ['w9-1-draft.json', 'w2-0-draft.json', 'pilot-reverse-opposition-draft.json'];
+  for (const draftFile of draftFiles) {
+    const key = draftFile.replace(/-draft(-v\d+)?\.json$/, (_m, v) => v ?? '');
     const raw = readFileSync(resolve(here, draftFile), 'utf8');
     const digest = createHash('sha256').update(raw).digest('hex');
     const out = resolve(here, `${key}-semantic.json`);

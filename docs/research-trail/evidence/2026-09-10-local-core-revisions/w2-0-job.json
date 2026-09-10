@@ -1,0 +1,392 @@
+{
+  "id": "c0938111-15a0-44c1-a9b3-1040062ba1de",
+  "status": "completed",
+  "model": "gpt-6-astra",
+  "error": null,
+  "can_resume": false,
+  "created_at": "2026-09-10T05:23:10.205006+00:00",
+  "updated_at": "2026-09-10T05:26:20.39+00:00",
+  "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+  "label": "나는 오늘 오후 집을 비워 택배를 받을 수 없다. 반년간 인사만 나눈 같은 층 이웃에게 메신저로 상자를 잠시 맡아 달라고 부탁하려 한다.",
+  "completed_steps": 5,
+  "provider_responses": [
+    {
+      "id": "resp_0de0e9f4369ddcb1006aa23ebf815887d0bac08a47a72cddf5",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0169448450de636e006aa23edbec2487d0a0d8292c2e9f2982",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0a72ad4b159735a5006aa23f471f5487d0a42eea924154468a",
+      "model": "gpt-4.1",
+      "state": "completed"
+    },
+    {
+      "id": "resp_06dd3ad5f6e94fc6006aa23f5157f487d090f47a034b9d2f44",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0c1ef13b72d3e5ca006aa23f6b2c9c87d0a2e51129520fd75f",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    }
+  ],
+  "result": {
+    "meta": {
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "generated_at": "2026-09-10T05:26:20.390Z",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+      "content_release_id": "pragma_scene_grounding_candidate_20260910_03"
+    },
+    "mission_content": {
+      "unit": {
+        "closing_ko": "요청은 표현형이나 친밀도만으로 판단하지 않습니다. 원문의 뜻을 지키며 상황에 필요한 명료성과 상대의 선택권을 함께 살핍니다.",
+        "learner_label": "완화와 선택권",
+        "target_feature": "request_mitigation_optionality",
+        "target_feature_version": "1.1"
+      },
+      "authoring": {
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "schema_version": "mission_authoring_v1",
+        "repair_attempts": 0
+      },
+      "direction": "ko_zh",
+      "mpj_items": [
+        {
+          "id": 1,
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "scale4",
+          "source": "내일 우리 집에서 보드게임 하기로 했잖아. 네가 가진 작은 카드 게임도 가져와.",
+          "target": "明天我们说好在我家玩桌游。你就把那个小卡牌游戏也带来吧。",
+          "channel": "messenger",
+          "highlights": [
+            "你就把那个小卡牌游戏也带来吧"
+          ],
+          "item_focus": "request_mitigation_optionality",
+          "relation_ko": "매주 사적으로 만나는 동등한 관계의 친한 친구",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "나는 매주 사적으로 만나는 친한 친구와 내일 우리 집에서 보드게임을 하기로 했다. 친구가 가진 주머니 크기의 카드 게임도 함께 하려고 메신저로 내일 가져와 달라고 부탁하려 한다.",
+          "explanation_ko": "이미 함께 놀기로 한 친구에게 주머니 크기의 게임을 가져오라는 요청이므로, ‘你就把…也带来吧’는 공동 활동에 필요한 준비를 분명하게 전달합니다. 다음 동료 장면과 권한 관계·부담 수준은 같고 교류의 친밀도만 달라지며, 여기서는 지속적인 사적 교류와 공유된 놀이 계획이 직접적인 부탁을 뒷받침하므로 이 간결한 요청 방식을 유지할 수 있습니다.",
+          "preceding_turn": null,
+          "recommended_example": "明天我们说好在我家玩桌游。你就把那个小卡牌游戏也带来吧。",
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "somewhat_appropriate"
+        },
+        {
+          "id": 2,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "judge3",
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "channel": "messenger",
+          "highlights": [
+            "你就把那个链接再发我一次吧"
+          ],
+          "item_focus": "request_mitigation_optionality",
+          "relation_ko": "몇 차례 자료를 주고받은 같은 직급 동료",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "나는 같은 직급 동료와 몇 차례 자료를 주고받았는데, 지난번에 받은 회의실 예약 안내 링크를 잃어버렸다. 그 링크를 저장해 둔 동료에게 메신저로 링크 하나를 다시 보내 달라고 부탁하려 한다.",
+          "explanation_ko": "첫 장면의 ‘你就把…吧’라는 직접적인 요청 방식과 동등한 권한·낮은 부담은 유지되지만, 상대가 친한 친구에서 몇 차례 교류한 동료로 바뀌었습니다. ‘吧’가 어조를 누그러뜨려도 ‘你就把…’는 재전송을 상대가 할 일로 정하는 느낌을 주므로, 아직 수락하지 않은 도움에 대해서는 ‘能不能’으로 수행 가능성을 묻도록 조정하는 편이 알맞습니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "recommended_example": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？"
+        },
+        {
+          "id": 3,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "fix_choice",
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "channel": "messenger",
+          "highlights": [
+            "你就把那个链接再发我一次吧"
+          ],
+          "item_focus": "request_mitigation_optionality",
+          "corrections": [
+            {
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？",
+              "note_ko": "몇 차례 교류한 동료에게 ‘能不能’으로 재전송 가능성을 직접 물어 응답 여지를 남기므로, 요청 내용을 분명히 하면서 이 정도의 조절을 유지합니다.",
+              "is_valid": true
+            },
+            {
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你得把那个链接再发我一次。",
+              "note_ko": "‘能不能’을 의무를 부여하는 ‘得’로 바꾸어 재전송을 상대가 해야 할 일로 단정합니다. 이미 합의한 전달을 재확인하는 장면과 달리, 아직 수락하지 않은 동료에게 자신의 링크 분실에 따른 재전송 의무를 부과하므로 too_direct입니다.",
+              "is_valid": false
+            },
+            {
+              "text": "我把之前收到的会议室预约说明链接弄丢了。不知道请你把那个链接再发我一次，会不会不太合适？",
+              "note_ko": "재전송 가능성을 묻는 대신 ‘会不会不太合适’로 부탁 자체의 적절성을 묻습니다. 재전송 요청은 유지되지만, 저장된 링크 하나를 받는 장면에서 상대가 수행 여부보다 부탁해도 괜찮다는 안심부터 제공하도록 응답 초점을 돌려 too_indirect로 이동합니다.",
+              "is_valid": false
+            }
+          ],
+          "relation_ko": "몇 차례 자료를 주고받은 같은 직급 동료",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "나는 같은 직급 동료와 몇 차례 자료를 주고받았는데, 지난번에 받은 회의실 예약 안내 링크를 잃어버렸다. 그 링크를 저장해 둔 동료에게 메신저로 링크 하나를 다시 보내 달라고 부탁하려 한다.",
+          "explanation_ko": "몇 차례 자료를 주고받은 같은 직급 동료에게 저장된 링크 하나를 다시 부탁하는 상황이므로, 요청은 분명히 하되 수행을 당연시하지 않는 조절이 필요합니다. ‘你就把那个链接再发我一次吧’를 ‘你能不能把那个链接再发我一次？’로 바꾸면 재전송 가능성을 물어 상대에게 응답 여지를 남기므로, 동료 관계에 맞는 이 정도의 조절을 유지합니다. ‘得’로 의무를 부과하거나 ‘会不会不太合适’로 부탁 자체에 대한 안심을 구하는 방향은 피합니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "recommended_example": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？"
+        },
+        {
+          "id": 4,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "reason",
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "channel": "messenger",
+          "reasons": [
+            {
+              "id": "r1",
+              "kind": "pragmatic_misconception",
+              "text_ko": "끝의 ‘吧’가 요청을 가벼운 제안처럼 만들어, 링크를 실제로 보내 달라는 뜻이 충분히 전달되지 않기 때문이다."
+            },
+            {
+              "id": "r2",
+              "kind": "meaning_grammar_context",
+              "text_ko": "‘再发我一次’가 링크 재전송이 아니라 회의실 예약을 다시 처리해 달라는 뜻으로 읽혀, 동료에게 다른 일을 부탁하기 때문이다."
+            },
+            {
+              "id": "r3",
+              "kind": "primary",
+              "text_ko": "‘吧’로 어조를 누그러뜨리기는 했지만, ‘你就把…’가 아직 수락하지 않은 동료의 재전송 행동을 정해 주는 방식으로 들리기 때문이다."
+            }
+          ],
+          "highlights": [
+            "你就把那个链接再发我一次吧"
+          ],
+          "item_focus": "request_mitigation_optionality",
+          "relation_ko": "몇 차례 자료를 주고받은 같은 직급 동료",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "나는 같은 직급 동료와 몇 차례 자료를 주고받았는데, 지난번에 받은 회의실 예약 안내 링크를 잃어버렸다. 그 링크를 저장해 둔 동료에게 메신저로 링크 하나를 다시 보내 달라고 부탁하려 한다.",
+          "explanation_ko": "몇 차례 자료를 주고받은 동료에게 새로 재전송을 부탁하는 장면에서, ‘你就把…吧’는 요청을 알아듣기 어렵게 하기보다 상대의 행동을 미리 정하는 쪽으로 작용합니다. ‘那个链接’과 ‘再发我一次’는 재전송이라는 원뜻을 정확히 전달하므로, 의미나 문법이 아니라 ‘能不能’ 등으로 수락 여부를 묻는 방식만 조정하면 됩니다.",
+          "preceding_turn": null,
+          "problem_band_code": "too_direct",
+          "accepted_reason_id": "r3",
+          "recommended_example": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？"
+        },
+        {
+          "id": 5,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "multi_judge",
+          "source": "이 발표 자료는 내일 제출해야 합니다. 검토에는 약 40분이 걸립니다. 오늘 안에 끝까지 검토해 주실 수 있을까요?",
+          "channel": "messenger",
+          "candidates": [
+            {
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。你能今天内帮我审阅完吗？",
+              "note_ko": "담당 외 검토에 40분이 필요한 상황에서 ‘能…吗’로 당일 완료 가능성을 바로 물어, 동료가 시간 여건을 판단해 응답할 수 있으므로 이 간결한 방식을 유지합니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。你今天内帮我审阅完。",
+              "note_ko": "앵커의 ‘能…吗’를 제거해 당일 완료 가능성을 묻는 요청을 수행 지시로 바꿉니다. 동료의 담당 업무가 아닌 40분짜리 검토를 사전 수락 없이 오늘 끝낼 일로 정하므로, 단순히 직접형이라는 이유가 아니라 업무 배정 권한과 합의가 없다는 점에서 too_direct입니다.",
+              "accepted_band_codes": [
+                "too_direct"
+              ]
+            },
+            {
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。想请你帮我审阅完，你看今天内方便吗？",
+              "note_ko": "40분짜리 도움을 새로 청하면서 ‘想请你’로 요청 의도를 밝히고 ‘你看今天内方便吗’로 일정 판단을 동료에게 맡기므로, 부담을 인정하는 협의형 요청으로 유지할 수 있습니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。想请你今天内帮我审阅完，但不知道这事该不该向你开口。",
+              "note_ko": "‘想请你’와 당일 검토 완료라는 요청 내용은 유지하되, 일정 판단을 묻던 부분을 ‘该不该向你开口’라는 요청 제기 자체에 대한 망설임으로 바꿉니다. 부담을 인정하며 수행 가능성을 협의하는 수준을 넘어, 상대가 수락 여부를 답해야 하는지 부탁을 꺼내도 된다고 안심시켜야 하는지 흐려져 too_indirect입니다.",
+              "accepted_band_codes": [
+                "too_indirect"
+              ]
+            }
+          ],
+          "item_focus": "request_mitigation_optionality",
+          "relation_ko": "몇 차례 협업한 같은 직급 동료",
+          "axis_feature": "request_mitigation_optionality",
+          "situation_ko": "나는 몇 차례 협업한 같은 직급 동료에게 내일 제출할 발표 자료를 오늘 안에 검토해 달라고 메신저로 부탁하려 한다. 자료 검토에는 약 40분이 걸리며, 이는 동료의 담당 업무가 아니다.",
+          "explanation_ko": "몇 차례 협업한 같은 직급 동료에게 담당 업무가 아닌 40분짜리 검토를 오늘 안에 부탁하므로, 기한과 부담을 알리고 상대가 시간 여건을 판단하도록 해야 합니다. ‘你能今天内帮我审阅完吗？’는 완료 가능성을 직접 묻고, ‘想请你帮我审阅完，你看今天内方便吗？’는 요청 의도를 밝힌 뒤 일정의 편의성을 물어, 두 표현 모두 동료의 선택권을 보장하는 적정한 요청으로 유지할 수 있습니다. 수행을 확정하는 ‘你今天内帮我审阅完。’이나 요청 제기 자체에 대한 안심을 요구하는 ‘该不该向你开口’ 대신, 검토 가능 여부에 응답 초점을 두는 조절을 유지합니다.",
+          "preceding_turn": null,
+          "recommended_example": "这份演示材料明天要交，审阅大约需要四十分钟。你能今天内帮我审阅完吗？"
+        }
+      ],
+      "provenance": {
+        "model": "gpt-6-astra",
+        "generated_at": "2026-09-10T05:26:20.390Z",
+        "band_targeting": {
+          "version": "relative_band_targeting_v2_bounded_fallback",
+          "within_warnings": [],
+          "boundary_fallback": {
+            "eligible_paths": [],
+            "attempted_paths": [],
+            "succeeded_paths": [],
+            "situation_unchanged": true,
+            "immutable_candidates_unchanged": true
+          },
+          "within_regeneration_count": 0,
+          "candidate_regeneration_counts": {}
+        },
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+        "scene_topology": {
+          "version": "mission_scene_topology_evidence_v1",
+          "attempts": 1,
+          "findings": [],
+          "final_result": "pass",
+          "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+          "first_pass_result": "pass",
+          "regeneration_count": 0
+        },
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "generation_attempt": 1,
+        "mission_content_hash": "3e47f16a0780ae415360bace3a5e45ea918efdb6de356c16a53b266146b91534"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "request_mitigation_optionality",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ],
+        "speech_act": "request",
+        "mission_goal": "integrated_speech_act"
+      },
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "request"
+      },
+      "schema_version": "mission_v5",
+      "production_task": {
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "low"
+        },
+        "mode": "translation",
+        "channel": "messenger",
+        "relation_ko": "같은 층 이웃, 몇 번 인사한 사이",
+        "source_text": "오늘 오후에는 집에 없어 택배를 직접 받기 어렵습니다. 작은 상자를 대신 받아 댁 현관 안에 잠시 두어 주실 수 있을까요? 저녁 여섯 시에 찾아가겠습니다.",
+        "situation_ko": "나는 오늘 오후 집을 비워 택배를 받을 수 없다. 반년간 인사만 나눈 같은 층 이웃에게 메신저로 상자를 잠시 맡아 달라고 부탁하려 한다.",
+        "focal_segments": [
+          {
+            "role": "head",
+            "text": "작은 상자를 대신 받아 댁 현관 안에 잠시 두어 주실 수 있을까요?"
+          },
+          {
+            "role": "support",
+            "text": "저녁 여섯 시에 찾아가겠습니다."
+          }
+        ],
+        "preceding_turn": null,
+        "source_modality": "written",
+        "vocabulary_hints": [
+          {
+            "source": "택배",
+            "target": "快递"
+          },
+          {
+            "source": "현관 안",
+            "target": "家里进门的地方"
+          }
+        ],
+        "reference_alternatives": [
+          {
+            "text": "今天下午我不在家，没法亲自收快递。你能不能帮我收一下那个小箱子，暂时放在你家进门的地方？我晚上六点来取。",
+            "note_ko": "부재 이유와 작은 상자의 수령·실내 보관·여섯 시 회수 계획을 모두 전달하며, ‘能不能’으로 이웃이 부탁의 수락 여부에 답할 수 있게 합니다."
+          },
+          {
+            "text": "今天下午我不在家，没法亲自收快递。想请你帮我收一下那个小箱子，暂时放在你家进门的地方，你看方便吗？我晚上六点来取。",
+            "note_ko": "원문의 이유와 부탁 범위, 회수 시간을 빠짐없이 옮기고, ‘想请你’로 요청을 명시한 뒤 ‘你看方便吗’로 이웃의 사정에 따른 판단을 구합니다."
+          }
+        ]
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_ko": "친구에게 물건을 가져오라는 요청과 동료에게 링크를 재전송해 달라는 요청에서 ‘你就把…吧’의 단정성이 달리 작용하며, 수정안에서는 가능 여부를 묻는 방식으로 강도를 조절한다.",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:2",
+            "mpj:3"
+          ]
+        },
+        {
+          "code": "burden_optionality",
+          "evidence_ko": "담당 업무가 아닌 40분짜리 검토 요청에서는 당일 수행 가능성을 확인하고, 이웃에게 택배 수령을 부탁하는 산출에서는 구체적인 보관 범위와 회수 시간을 전달하면서 수락 여부를 묻는다.",
+          "evidence_refs": [
+            "mpj:5",
+            "dct"
+          ]
+        },
+        {
+          "code": "supportive_move_fit",
+          "evidence_ko": "링크 분실, 발표 자료의 제출 시점과 검토 소요 시간, 택배를 직접 받기 어려운 이유와 회수 계획이 각각 요청의 필요성과 범위를 설명한다.",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:5",
+            "dct"
+          ]
+        }
+      ]
+    }
+  }
+}

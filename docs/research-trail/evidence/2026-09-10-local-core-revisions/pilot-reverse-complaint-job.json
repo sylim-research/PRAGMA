@@ -1,0 +1,377 @@
+{
+  "id": "b746adaf-edcf-4f99-be32-3211a33a120a",
+  "status": "completed",
+  "model": "gpt-6-astra",
+  "error": null,
+  "can_resume": false,
+  "created_at": "2026-09-10T05:43:31.936871+00:00",
+  "updated_at": "2026-09-10T05:46:25.923+00:00",
+  "scenario_id": "e4f36052-88a8-45cd-a33b-1a96f9d2ed5c",
+  "label": "나는 이번 학기 조별 과제를 함께하는 동급생과 둘이 회의 중이다. 상대가 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 말하려 한다.",
+  "completed_steps": 5,
+  "provider_responses": [
+    {
+      "id": "resp_07a33858c9a936b4006aa24385a57087d0977f8d40cb612ccc",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_02f4afa4f971592b006aa243a236ec87d0a16df4b7c135fca8",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0a08917f33071995006aa243f6c32c87d0a1c213fda064236a",
+      "model": "gpt-4.1",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0e77ffd690c57f5f006aa243ffb80087d0b1279e12e433dfbf",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_00c7cf46c3b581e6006aa24420fc0887d0a8fb68555daf96e0",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    }
+  ],
+  "result": {
+    "meta": {
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "generated_at": "2026-09-10T05:46:25.922Z",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+      "content_release_id": "pragma_scene_grounding_candidate_20260910_03"
+    },
+    "mission_content": {
+      "unit": {
+        "closing_ko": "불만은 세게 말하는 것이 아니라, 무엇이 어떤 영향을 주었고 상대가 어디까지 책임지는지를 사실에 맞게 밝혀야 해결 가능한 문제 제기가 됩니다.",
+        "learner_label": "문제 명료화와 책임 범위",
+        "target_feature": "complaint_problem_accountability",
+        "target_feature_version": "1.0"
+      },
+      "authoring": {
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "schema_version": "mission_authoring_v1",
+        "repair_attempts": 0
+      },
+      "direction": "zh_ko",
+      "mpj_items": [
+        {
+          "id": 1,
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "scale4",
+          "source": "你把票的日期订错了，我换票等了五分钟。真够折腾的。",
+          "target": "네가 표 날짜를 잘못 고른 덕분에 내가 아주 고생했네. 표 바꾸느라 5분 기다렸어.",
+          "channel": "facetoface",
+          "highlights": [
+            "표 날짜를 잘못 고른 덕분에",
+            "아주 고생했네",
+            "5분 기다렸어"
+          ],
+          "item_focus": "complaint_problem_accountability",
+          "relation_ko": "몇 년째 매주 만나 함께 여가를 보내는 친한 친구",
+          "axis_feature": "complaint_problem_accountability",
+          "situation_ko": "나는 몇 년째 매주 만나는 친한 친구와 영화를 보러 왔다. 내 표까지 맡아 예매한 친구가 날짜를 잘못 골라 추가 비용 없이 표를 바꾸느라 5분을 기다렸고, 그 불편을 친구에게 말하려 한다.",
+          "explanation_ko": "몇 년째 매주 만나는 친구 사이이고, 실제 불편은 표를 바꾸며 기다린 5분입니다. '덕분에 내가 아주 고생했네'는 이 관계에서 가벼운 타박으로 받아들일 여지가 있고, 날짜 착오와 기다린 시간을 직접 밝혀 불만의 대상을 알 수 있습니다. 무조건 모호하게 돌리기보다 구체적인 문제와 시간을 유지할 수 있습니다.",
+          "preceding_turn": null,
+          "recommended_example": "네가 표 날짜를 잘못 골라서 좀 불편했어. 표 바꾸느라 5분 기다렸어.",
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "somewhat_appropriate"
+        },
+        {
+          "id": 2,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "judge3",
+          "source": "您把饮料洒在桌上就走了，我吃饭前擦了两分钟。真有点麻烦。",
+          "target": "식탁에 음료 흘리고 그냥 가신 덕분에 제가 아주 고생했네요. 밥 먹기 전에 2분 닦았어요.",
+          "channel": "facetoface",
+          "highlights": [
+            "그냥 가신 덕분에 제가 아주 고생했네요"
+          ],
+          "item_focus": "complaint_problem_accountability",
+          "relation_ko": "몇 차례 함께 일한 같은 직급의 동료",
+          "axis_feature": "complaint_problem_accountability",
+          "situation_ko": "나는 몇 차례 함께 일한 같은 직급의 동료와 휴게실에서 이야기하고 있다. 동료가 공용 식탁에 음료를 흘린 채 자리를 떠나 내가 식사 전에 2분간 닦아야 했던 불편을 말하려 한다.",
+          "explanation_ko": "첫 장면의 '덕분에 아주 고생했다'라는 타박은 유지되지만, 동등한 관계와 낮은 피해 수준은 그대로인 채 친한 친구에서 몇 차례 일한 동료로 거리만 달라졌습니다. 이 관계에서는 해당 표현이 2분간 닦은 불편보다 상대의 잘못을 크게 부각하는 빈정거림으로 들리기 쉽습니다. 음료를 흘리고 떠난 사실은 유지하고, 평가는 '좀 불편했어요'로 한정하는 편이 알맞습니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "over_attributed"
+          ],
+          "recommended_example": "식탁에 음료를 흘리고 그냥 가셔서 제가 밥 먹기 전에 2분 닦았어요. 좀 불편했어요."
+        },
+        {
+          "id": 3,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "fix_choice",
+          "source": "您把饮料洒在桌上就走了，我吃饭前擦了两分钟。真有点麻烦。",
+          "target": "식탁에 음료 흘리고 그냥 가신 덕분에 제가 아주 고생했네요. 밥 먹기 전에 2분 닦았어요.",
+          "channel": "facetoface",
+          "highlights": [
+            "그냥 가신 덕분에 제가 아주 고생했네요"
+          ],
+          "item_focus": "complaint_problem_accountability",
+          "corrections": [
+            {
+              "text": "식탁에 음료를 흘리고 그냥 가셔서 제가 밥 먹기 전에 2분 닦았어요. 좀 불편했어요.",
+              "note_ko": "2분간 닦은 사건에서 '음료를 흘리고 그냥 가셔서'가 책임과 영향을 연결하므로, 동료에게 문제를 분명히 알리면서 '좀 불편했어요'로 평가 범위를 유지할 수 있습니다.",
+              "is_valid": true
+            },
+            {
+              "text": "그렇게 두고 가셔서 제가 밥 먹기 전에 2분 닦았어요. 좀 불편했어요.",
+              "note_ko": "앵커의 '식탁에 음료를 흘리고'를 지시 표현 '그렇게'로 바꿨다. 닦은 시간과 불편은 유지하지만 무엇을 어떤 상태로 두고 갔는지는 공유 맥락에 맡겨, 동료가 문제 행동을 특정하기 어려운 부족함 대역으로 낮췄다.",
+              "is_valid": false
+            },
+            {
+              "text": "식탁에 음료를 흘리고 그냥 가셔서 제가 밥 먹기 전에 2분 닦았어요. 제게 뒤처리를 떠넘기신 거죠.",
+              "note_ko": "사건과 소요 시간은 유지하고 불편 평가를 '뒤처리를 떠넘기신 거죠'로 바꿨다. 단순히 자리를 떠난 사실을 상대가 처리 부담을 전가한 행동으로 단정해, 확인된 책임 범위를 넘어서는 과함 대역으로 높였다.",
+              "is_valid": false
+            }
+          ],
+          "relation_ko": "몇 차례 함께 일한 같은 직급의 동료",
+          "axis_feature": "complaint_problem_accountability",
+          "situation_ko": "나는 몇 차례 함께 일한 같은 직급의 동료와 휴게실에서 이야기하고 있다. 동료가 공용 식탁에 음료를 흘린 채 자리를 떠나 내가 식사 전에 2분간 닦아야 했던 불편을 말하려 한다.",
+          "explanation_ko": "몇 차례 함께 일한 동급 동료에게 식사 전 2분간 식탁을 닦은 불편을 알리는 상황이므로, 문제 행동과 실제 영향을 구체적으로 연결하는 것이 중요합니다. '식탁에 음료를 흘리고 그냥 가셔서'로 책임을 밝히고 '좀 불편했어요'로 평가를 한정하면 동료에게 문제를 분명히 전달하면서 불필요한 관계 긴장을 줄일 수 있습니다. 행동과 소요 시간은 유지하되, '그냥 가신 덕분에 제가 아주 고생했네요'의 반어와 과장된 평가는 실제 불편 수준으로 조정합니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "over_attributed"
+          ],
+          "recommended_example": "식탁에 음료를 흘리고 그냥 가셔서 제가 밥 먹기 전에 2분 닦았어요. 좀 불편했어요."
+        },
+        {
+          "id": 4,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "reason",
+          "source": "您把饮料洒在桌上就走了，我吃饭前擦了两分钟。真有点麻烦。",
+          "target": "식탁에 음료 흘리고 그냥 가신 덕분에 제가 아주 고생했네요. 밥 먹기 전에 2분 닦았어요.",
+          "channel": "facetoface",
+          "reasons": [
+            {
+              "id": "r3",
+              "kind": "meaning_grammar_context",
+              "text_ko": "'덕분에'가 감사의 뜻이어서, 불편했다는 원문의 뜻이 고마웠다는 뜻으로 바뀌기 때문이다."
+            },
+            {
+              "id": "r1",
+              "kind": "pragmatic_misconception",
+              "text_ko": "'2분 닦았어요'처럼 걸린 시간을 말하면, 동료에게도 그만큼 일을 해 달라는 요구가 되기 때문이다."
+            },
+            {
+              "id": "r2",
+              "kind": "primary",
+              "text_ko": "'덕분에 제가 아주 고생했네요'가 몇 차례 일한 동료의 작은 잘못을 지나치게 크게 타박하기 때문이다."
+            }
+          ],
+          "highlights": [
+            "그냥 가신 덕분에 제가 아주 고생했네요"
+          ],
+          "item_focus": "complaint_problem_accountability",
+          "relation_ko": "몇 차례 함께 일한 같은 직급의 동료",
+          "axis_feature": "complaint_problem_accountability",
+          "situation_ko": "나는 몇 차례 함께 일한 같은 직급의 동료와 휴게실에서 이야기하고 있다. 동료가 공용 식탁에 음료를 흘린 채 자리를 떠나 내가 식사 전에 2분간 닦아야 했던 불편을 말하려 한다.",
+          "explanation_ko": "몇 차례 일한 동료에게 2분간 닦은 불편을 말하는 장면입니다. '덕분에 제가 아주 고생했네요'는 여기서 감사가 아니라 빈정거리는 타박으로 기능하며, 확인된 불편보다 상대의 잘못을 크게 부각합니다. 시간 표현이나 문법을 바꾸기보다 이 평가를 '좀 불편했어요'로 조정해야 합니다.",
+          "preceding_turn": null,
+          "problem_band_code": "over_attributed",
+          "accepted_reason_id": "r2",
+          "recommended_example": "식탁에 음료를 흘리고 그냥 가셔서 제가 밥 먹기 전에 2분 닦았어요. 좀 불편했어요."
+        },
+        {
+          "id": 5,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "multi_judge",
+          "source": "您把负责商品的数量输错了，我重写库存报告花了三个小时，其他工作也推迟了。这给我添了麻烦。",
+          "channel": "facetoface",
+          "candidates": [
+            {
+              "text": "담당 품목 수량을 잘못 입력하셔서 재고 보고서를 3시간 동안 다시 썼어요. 다른 일도 미뤄서 불편했어요.",
+              "note_ko": "3시간 재작업과 다른 업무 지연이 생긴 상황에서 '잘못 입력하셔서'로 원인을 연결하면 동료가 책임 범위를 바로 알 수 있으므로, 사실 중심의 설명을 유지할 수 있습니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "담당하신 게 그렇게 돼서 제가 그걸 다시 쓰는 데 3시간이 들었어요. 다른 일도 미뤄서 불편했어요.",
+              "note_ko": "수량 입력 오류와 재고 보고서를 '담당하신 게 그렇게 돼서', '그걸'로 지시했다. 재작성 시간과 업무 지연은 유지하지만 오류 내용과 재작성 대상, 상대의 책임 연결을 공유 맥락에 맡겨 부족함 대역으로 낮췄다.",
+              "accepted_band_codes": [
+                "under_specified"
+              ]
+            },
+            {
+              "text": "저는 재고 보고서를 3시간 동안 다시 쓰고 다른 일도 미뤄서 곤란했어요. 담당 품목 수량을 잘못 입력하신 게 원인이에요.",
+              "note_ko": "실제 업무 지연을 '저는…곤란했어요'로 먼저 말하면 개인이 겪은 영향을 전달하며, 뒤의 '원인이에요'가 책임을 해당 입력 오류로 한정하므로 이 영향 중심 전략도 유지할 수 있습니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "저는 재고 보고서를 3시간 동안 다시 쓰고 다른 일도 미뤄서 업무 전체가 틀어졌어요. 담당 품목 수량을 잘못 입력하신 게 원인이에요.",
+              "note_ko": "영향을 먼저 말하고 입력 오류를 원인으로 밝히는 구조는 유지했다. '곤란했어요'를 '업무 전체가 틀어졌어요'로 바꿔, 확인된 재작업과 일부 업무 지연을 업무 전반의 차질로 확대하는 과함 대역으로 높였다.",
+              "accepted_band_codes": [
+                "over_attributed"
+              ]
+            }
+          ],
+          "item_focus": "complaint_problem_accountability",
+          "relation_ko": "몇 차례 함께 재고를 점검한 같은 직급의 동료",
+          "axis_feature": "complaint_problem_accountability",
+          "situation_ko": "나는 몇 차례 함께 재고를 점검한 같은 직급의 동료와 사무실에서 이야기하고 있다. 동료가 담당 품목의 수량을 잘못 입력해 내가 재고 보고서를 3시간 동안 다시 작성하고 다른 업무를 미룬 문제를 말하려 한다.",
+          "explanation_ko": "동급 동료의 수량 입력 오류로 재고 보고서를 3시간 동안 다시 쓰고 다른 업무도 미룬 상황이므로, 오류와 업무 영향을 모두 명확히 전달해야 합니다. '잘못 입력하셔서'로 원인을 먼저 연결하는 방식과 '곤란했어요'로 영향을 먼저 말한 뒤 '원인이에요'로 책임을 한정하는 방식은 모두 사실에 근거해 문제를 알리면서 동료 관계를 유지하는 데 적정합니다. 두 방식 모두 구체적인 오류와 확인된 영향을 유지하되, '담당하신 게 그렇게 돼서'처럼 원인을 흐리거나 '업무 전체가 틀어졌어요'처럼 피해 범위를 확대하지 않도록 합니다.",
+          "preceding_turn": null,
+          "recommended_example": "저는 재고 보고서를 3시간 동안 다시 쓰고 다른 일도 미뤄서 곤란했어요. 담당 품목 수량을 잘못 입력하신 게 원인이에요."
+        }
+      ],
+      "provenance": {
+        "model": "gpt-6-astra",
+        "generated_at": "2026-09-10T05:46:25.922Z",
+        "band_targeting": {
+          "version": "relative_band_targeting_v2_bounded_fallback",
+          "within_warnings": [],
+          "boundary_fallback": {
+            "eligible_paths": [],
+            "attempted_paths": [],
+            "succeeded_paths": [],
+            "situation_unchanged": true,
+            "immutable_candidates_unchanged": true
+          },
+          "within_regeneration_count": 0,
+          "candidate_regeneration_counts": {}
+        },
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+        "scene_topology": {
+          "version": "mission_scene_topology_evidence_v1",
+          "attempts": 1,
+          "findings": [],
+          "final_result": "pass",
+          "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+          "first_pass_result": "pass",
+          "regeneration_count": 0
+        },
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "generation_attempt": 1,
+        "mission_content_hash": "f06266422471b5f9ce16f75eee5998e3d1b02929778aba9799042573b8d2beb4"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "complaint_problem_accountability",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "complaint_problem_accountability",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "complaint_problem_accountability",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "complaint_problem_accountability",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "complaint_problem_accountability",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ],
+        "speech_act": "complaint",
+        "mission_goal": "integrated_speech_act"
+      },
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "complaint"
+      },
+      "schema_version": "mission_v5",
+      "production_task": {
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "low"
+        },
+        "mode": "interpreting",
+        "channel": "facetoface",
+        "relation_ko": "같은 조의 동급생·아는 사이",
+        "source_text": "你上次说会提前发图表，但其实发晚了。我们合并资料的时候因此耽误了十分钟，这让我觉得有点不太方便。",
+        "replay_limit": 2,
+        "situation_ko": "나는 이번 학기 조별 과제를 함께하는 동급생과 둘이 회의 중이다. 상대가 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 말하려 한다.",
+        "focal_segments": [
+          {
+            "role": "head",
+            "text": "我们合并资料的时候因此耽误了十分钟"
+          },
+          {
+            "role": "support",
+            "text": "这让我觉得有点不太方便"
+          }
+        ],
+        "preceding_turn": null,
+        "source_modality": "spoken",
+        "reference_alternatives": [
+          {
+            "text": "지난번에는 도표를 미리 보내겠다고 했는데, 실제로는 늦게 보냈어요. 그래서 자료를 합칠 때 10분이 지체돼서 좀 불편했어요.",
+            "note_ko": "약속과 실제 발송의 차이를 먼저 밝히고, 자료 합치기에 생긴 10분 지연과 불편을 연결하는 사실 중심 전략입니다."
+          },
+          {
+            "text": "저는 자료를 합칠 때 10분이 지체돼서 좀 불편했어요. 지난번에 도표를 미리 보내겠다고 했는데 실제로는 늦게 보내서 그렇게 됐어요.",
+            "note_ko": "자신이 겪은 불편을 먼저 말한 뒤, 미리 보내겠다는 약속과 실제 지연을 원인으로 밝히는 영향 중심 전략입니다."
+          }
+        ]
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "illocutionary_clarity",
+          "evidence_ko": "문제를 구체적으로 지칭하고 그로 인한 영향을 연결하는 표현과, 문제를 지시어로만 가리키는 표현을 비교한다. DCT에서는 도표 발송 지연과 자료 합치기 지연의 연결을 유지한다.",
+          "evidence_refs": [
+            "mpj:3",
+            "mpj:5",
+            "dct"
+          ]
+        },
+        {
+          "code": "force_calibration",
+          "evidence_ko": "친한 친구에게 하는 가벼운 타박과 아는 동료에게 하는 책임 강조를 대비하고, 실제 업무 지연과 업무 전체를 부정적으로 평가하는 표현을 구별한다.",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:2",
+            "mpj:5"
+          ]
+        }
+      ]
+    }
+  }
+}

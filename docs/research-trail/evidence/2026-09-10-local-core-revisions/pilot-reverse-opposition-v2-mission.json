@@ -1,0 +1,779 @@
+{
+  "at": "2026-09-10T05:43:30.701Z",
+  "key": "pilot-reverse-opposition-v2",
+  "scenarioId": "d9f1deb3-337d-4e6e-93f4-ac86b7939760",
+  "result": {
+    "ok": true,
+    "mission": {
+      "schema_version": "mission_v5",
+      "direction": "zh_ko",
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "opposition"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "speech_act": "opposition",
+        "mission_goal": "integrated_speech_act",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ]
+      },
+      "authoring": {
+        "schema_version": "mission_authoring_v1",
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "repair_attempts": 0
+      },
+      "unit": {
+        "target_feature": "opposition_stance_mitigation",
+        "target_feature_version": "1.0",
+        "learner_label": "이견 명료성과 관계 조정",
+        "closing_ko": "반대는 관계를 공격하지 않으면서도 무엇에 어느 범위까지 동의하지 않는지 알아볼 수 있어야 합니다. 완화는 이견을 숨기는 장치가 아닙니다."
+      },
+      "production_task": {
+        "mode": "translation",
+        "source_modality": "written",
+        "situation_ko": "나는 한 학기 동안 함께 공부한 조원과 단체 메신저에서 조별 과제 설문 문항에 대해 논의하고 있다. 상대가 통학 시간 질문을 빼자고 제안해, 나는 그 제안에 반대하려 한다.",
+        "relation_ko": "한 학기 동안 함께 공부한 동급생",
+        "channel": "messenger",
+        "pdr": {
+          "p": "equal",
+          "d": "acquaintance",
+          "r": "mid"
+        },
+        "source_text": "关于通勤时间这一项，我的看法有点不一样，我觉得还是需要保留。我们这次研究关注的就是通勤时间对课堂参与的影响，如果把这一项删掉，后面就很难分析两者之间的关系了。这一点大家再考虑一下，好吗？",
+        "preceding_turn": null,
+        "vocabulary_hints": [
+          {
+            "source": "通勤时间",
+            "target": "통학 시간"
+          },
+          {
+            "source": "课堂参与",
+            "target": "수업 참여"
+          }
+        ],
+        "reference_alternatives": [
+          {
+            "text": "통학 시간 문항에 대해서는 생각이 조금 다릅니다. 저는 이 문항을 그대로 둘 필요가 있다고 생각합니다. 이번 연구는 통학 시간이 수업 참여에 미치는 영향을 살펴보는 것이어서, 이 문항을 빼면 나중에 둘 사이의 관계를 분석하기 어려워집니다. 이 점은 다 같이 한번 더 생각해 보면 어떨까요?",
+            "note_ko": "조별 설문을 논의하는 상황에서 '생각이 조금 다릅니다'로 이견을 밝히고 유지 입장, 연구 목적과 삭제의 영향, 공동 재검토 질문을 모두 연결한 산출안입니다."
+          },
+          {
+            "text": "제가 조금 다르게 생각하는 건 통학 시간 문항을 빼자는 부분입니다. 이번 연구에서 살펴보려는 것이 바로 통학 시간이 수업 참여에 미치는 영향이므로, 저는 이 문항을 남겨 두어야 한다고 생각합니다. 이 문항을 삭제하면 나중에 두 요소의 관계를 분석하기 어려워집니다. 이 부분은 여러분도 한번 더 생각해 보시면 어떨까요?",
+            "note_ko": "이견을 문항 삭제에 한정한 뒤 연구 목적을 유지 입장과 연결했습니다. 원문의 분석상 어려움과 모두에게 재검토를 청하는 마무리도 빠짐없이 옮겼습니다."
+          }
+        ],
+        "focal_segments": [
+          {
+            "text": "我的看法有点不一样，我觉得还是需要保留。",
+            "role": "head"
+          },
+          {
+            "text": "这一点大家再考虑一下，好吗？",
+            "role": "support"
+          }
+        ]
+      },
+      "provenance": {
+        "model": "gpt-6-astra",
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "mission_content_hash": "9bdf15ba86ef18d39bea9a64c0727cf1715090963474dedcfd180471ab45d2c3",
+        "generated_at": "2026-09-10T05:43:26.122Z",
+        "generation_attempt": 1
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "illocutionary_clarity",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3",
+            "mpj:4",
+            "dct"
+          ],
+          "evidence_ko": "변경안에 대한 이견과 유지하려는 대상을 연결하는지, 유보 표현이 겹쳐 반대를 단순한 참고 의견처럼 만드는지 관찰한다."
+        },
+        {
+          "code": "supportive_move_fit",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:3",
+            "mpj:5",
+            "dct"
+          ],
+          "evidence_ko": "색상 선호, 프로그램 사용 연습의 상실, 가격 설명에 따른 판매 지연, 연구 변수 간 관계 분석이라는 원문 근거가 각각 반대의 범위를 뒷받침하는 방식을 관찰한다."
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:5"
+          ],
+          "evidence_ko": "동료 간 사소한 서식 논의에서 개인 선호를 제시하는 방식과 친한 공동 운영자에게 판단을 공유하거나 이견의 범위를 한정하는 방식의 관계적 효과를 관찰한다."
+        }
+      ],
+      "mpj_items": [
+        {
+          "id": 1,
+          "item_focus": "opposition_stance_mitigation",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 지난달부터 회의록을 함께 작성해 온 같은 직급의 동료와 회의록 서식을 논의하고 있다. 동료가 내용은 그대로 두고 제목만 파란색으로 바꾸자고 했지만, 나는 검은색이 더 보기 좋아 이 변경에 반대하려 한다.",
+          "relation_ko": "지난달부터 회의록을 함께 작성해 온 같은 직급의 동료",
+          "channel": "messenger",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "source": "关于把标题改成蓝色，我有一点不同的想法。我觉得还是用黑色比较好，看着更舒服。这是我的个人看法。大家再考虑一下，好吗？",
+          "preceding_turn": null,
+          "explanation_ko": "내용에 영향이 없는 제목 색상 논의에서는 '검은색이 더 보기 좋아서'라는 개인 선호만으로도 이견의 방향이 드러납니다. '조금 다른 생각이 없는 건 아닙니다'와 개인적 판단이라는 한정은 동료의 취향을 틀렸다고 하지 않으면서 다른 선택을 제시하므로, 먼저 동의하지 않아도 적절합니다. 표현은 다소 우회적이지만 검은색을 선호한다는 연결은 유지할 만합니다.",
+          "recommended_example": "제목을 파란색으로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 검은색이 더 보기 좋아서 그대로 쓰는 게 낫지 않을까 싶기도 합니다. 제 개인적인 생각은 그렇다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "type": "scale4",
+          "target": "제목을 파란색으로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 검은색이 더 보기 좋아서 그대로 쓰는 게 낫지 않을까 싶기도 합니다. 제 개인적인 생각은 그렇다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "highlights": [
+            "조금 다른 생각이 없는 건 아닙니다",
+            "검은색이 더 보기 좋아서",
+            "제 개인적인 생각은 그렇다는 말씀입니다"
+          ],
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "somewhat_appropriate"
+        },
+        {
+          "id": 2,
+          "item_focus": "opposition_stance_mitigation",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "channel": "messenger",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "preceding_turn": null,
+          "explanation_ko": "첫 장면의 우회적 이견 제시와 개인 의견으로 한정하는 전략은 유지되지만, P와 D는 그대로인 채 R이 낮은 색상 선택에서 보통 수준의 교육 구성 결정으로 바뀌었습니다. 연습 시간이 없어진다는 근거는 분명히 있으나, '필요가 있지 않을까 싶기도'와 '그냥 이런 생각도'가 겹쳐 실습 유지가 필요한 입장인지 참고 의견인지 흐려집니다. 근거는 유지하고 실습을 남겨야 한다는 입장에 붙은 중첩된 유보를 조정해야 합니다.",
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+          "type": "judge3",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "highlights": [
+            "조금 다른 생각이 없는 건 아닙니다",
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "accepted_band_codes": [
+            "too_obscured"
+          ]
+        },
+        {
+          "id": 3,
+          "item_focus": "opposition_stance_mitigation",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "channel": "messenger",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "preceding_turn": null,
+          "explanation_ko": "같은 직급의 동료와 교육 진행안을 정하는 상황에서는 참가자의 연습 시간 확보를 근거로 실습 유지 입장을 분명히 전달해야 합니다. 최종 권장 후보의 '생각이 조금 다릅니다'와 '필요가 있다고 생각합니다'는 개인 판단의 형식으로 반대를 명확히 하고, '이 점을 한번 더 생각해 보면 어떨까요?'는 동료가 함께 재검토할 여지를 남깁니다. 연습 시간 상실이라는 근거와 재검토 질문은 유지하되, 원문의 '필요가 있지 않을까 싶기도 합니다'와 '그냥 이런 생각도 있다는 말씀입니다'처럼 입장을 거듭 약화하는 표현은 조정하는 것이 적절합니다.",
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+          "type": "fix_choice",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "highlights": [
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "corrections": [
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "is_valid": true,
+              "note_ko": "동료와 교육안을 정하는 상황에서 '필요가 있다고 생각합니다'는 개인 판단의 형식을 유지하면서 실습 유지 입장을 확정하므로, 근거와 재검토 질문을 함께 유지할 수 있습니다."
+            },
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 건 분명히 잘못된 방향입니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "is_valid": false,
+              "note_ko": "앵커의 개인적 이견 표명을 '분명히 잘못된 방향'이라는 확정적 평가로 바꿨습니다. 실습 유지 입장과 근거·재검토 요청은 보존하지만, 동등한 동료의 제안을 근거 제시 전에 오답으로 규정하여 대립적 대역으로 이동합니다."
+            },
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 데에는 조금 마음에 걸리는 부분이 있습니다. 이 20분을 실습으로 남겨 둘 필요가 있는지도 생각해 볼 만합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 참고 정도로 말씀드리는 겁니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "is_valid": false,
+              "note_ko": "이견을 막연한 걸림으로, 실습 유지의 필요성을 검토할 질문으로 바꾸고 자신의 입장을 참고 의견으로 한정했습니다. 연습 시간 상실이라는 근거와 재검토 요청은 남지만, 변경에 반대하는지 고려 사항만 제시하는지 흐려져 지나치게 흐림 대역으로 이동합니다."
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "item_focus": "opposition_stance_mitigation",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "channel": "messenger",
+          "pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "preceding_turn": null,
+          "explanation_ko": "동료와 실습 유지 여부를 정하는 상황에서 '필요가 있지 않을까 싶기도'와 '그냥 이런 생각도'는 자신의 입장을 거듭 유보하여 상대가 이를 참고 의견으로만 처리하게 할 수 있습니다. '그렇지 않으면'은 바로 앞의 실습 유지와 정상적으로 연결되고 마지막 질문도 재검토를 청하므로, 의미 오류나 철회 압박이 주원인은 아닙니다. 이유와 질문을 바꾸기보다 실습 유지 입장을 분명하게 진술해야 합니다.",
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+          "type": "reason",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "highlights": [
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "problem_band_code": "too_obscured",
+          "reasons": [
+            {
+              "id": "r1",
+              "text_ko": "'한번 더 생각해 보면 어떨까요?'가 동료에게 자기 입장을 철회하라고 요구하는 기능을 하므로, 마지막 질문이 반대보다 압박을 앞세우기 때문이다.",
+              "kind": "pragmatic_misconception"
+            },
+            {
+              "id": "r2",
+              "text_ko": "'그렇지 않으면'이 실습 20분의 변경이 아니라 교육 전체의 취소를 가리켜, 연습 시간이 없어진다는 이유가 원문보다 넓어지기 때문이다.",
+              "kind": "meaning_grammar_context"
+            },
+            {
+              "id": "r3",
+              "text_ko": "'필요가 있지 않을까 싶기도'에 이어 '그냥 이런 생각도'로 물러서서, 근거는 제시하면서도 실습 유지를 요구하는 이견을 단순한 참고 의견처럼 만들기 때문이다.",
+              "kind": "primary"
+            }
+          ],
+          "accepted_reason_id": "r3"
+        },
+        {
+          "id": 5,
+          "item_focus": "opposition_stance_mitigation",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 몇 년째 사적으로 자주 만나는 친한 친구와 공동 운영할 동네 장터 부스의 판매 방식을 논의하고 있다. 친구가 가격표 없이 말로만 가격을 안내하자고 했지만, 나는 매번 가격을 설명하느라 판매가 지연될 것 같아 반대하려 한다.",
+          "relation_ko": "몇 년째 사적으로 자주 만나며 친하게 지내는 동등한 부스 공동 운영자",
+          "channel": "messenger",
+          "pdr": {
+            "p": "equal",
+            "d": "close",
+            "r": "mid"
+          },
+          "source": "关于不放价签、只用嘴说价格，我有不同的看法。我觉得还是需要放价签。每次都解释价格，卖东西恐怕会慢下来。这一点我们再想想，好吗？",
+          "preceding_turn": null,
+          "explanation_ko": "친한 친구이자 동등한 공동 운영자와 판매 방식을 논의하므로, 판매 지연 우려를 근거로 가격표 없는 방식에 반대한다는 입장을 분명히 밝힐 수 있습니다. '반대야'로 직접 입장을 밝히는 후보와 '내가 다르게 생각하는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야'로 이견의 범위를 한정하는 후보는 모두 근거와 공동 재검토 요청을 연결해 협력 관계를 유지하는 적정한 방식입니다. 두 방식 모두 유지할 수 있으며, 제안을 일축하는 '말이 안 돼'나 필요성을 가능성 수준의 참고 의견으로 낮추는 표현으로 바꾸지 않는 것이 중요합니다.",
+          "recommended_example": "가격표 없이 말로만 안내하는 데에는 반대야. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?",
+          "type": "multi_judge",
+          "candidates": [
+            {
+              "text": "가격표 없이 말로만 안내하는 데에는 반대야. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "친한 공동 운영자에게 '반대야'로 입장을 밝히고 판매 지연의 근거를 붙이면 사람과 방안을 구분한 직접 논의가 되므로, 선동의 없이도 이 구성을 유지할 수 있습니다."
+            },
+            {
+              "text": "가격표 없이 말로만 안내하자는 건 말이 안 돼. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?",
+              "accepted_band_codes": [
+                "too_confrontational"
+              ],
+              "note_ko": "앵커의 직접적인 입장 표명인 '반대야'를 제안 자체의 합리성을 일축하는 '말이 안 돼'로 바꿨습니다. 가격표의 필요성과 판매 지연 우려는 그대로지만, 친한 공동 운영자 사이에서도 이견 설명보다 상대 제안에 대한 단정적 기각이 앞서 대립적 대역으로 이동합니다."
+            },
+            {
+              "text": "내가 다르게 생각하는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야. 매번 가격을 설명하다 보면 판매가 늦어질 것 같아서, 나는 가격표를 두는 게 필요하다고 봐. 이 부분은 우리 같이 한번 더 생각해 보면 어떨까?",
+              "accepted_band_codes": [
+                "within_band"
+              ],
+              "note_ko": "친구와 공동 운영안을 논의할 때 '다르게 생각하는 건 … 부분'으로 범위를 한정하고 판단 근거를 연결하면 계획 전체를 부정하는 인상을 피하므로, 이 범위 한정 전략을 유지할 수 있습니다."
+            },
+            {
+              "text": "내가 조금 마음에 걸리는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야. 매번 가격을 설명하다 보면 판매가 늦어질 것 같아서, 가격표를 두는 게 필요할 수도 있다는 생각을 참고로 얘기하는 거야. 이 부분은 우리 같이 한번 더 생각해 보면 어떨까?",
+              "accepted_band_codes": [
+                "too_obscured"
+              ],
+              "note_ko": "앵커의 명시적 이견을 우려 표명으로 낮추고, 가격표가 필요하다는 판단을 가능성 수준의 참고 의견으로 바꿨습니다. 이견의 대상과 판매 지연 근거·재검토 요청은 보존하면서도 실제로 가격표 없는 방식에 반대하는지는 불분명해져 지나치게 흐림 대역으로 이동합니다."
+            }
+          ]
+        }
+      ]
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"关于把二十分钟的实操全部改成讲解,我有一些不同的…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"关于把二十分钟的实操全部改成讲解,我有一些不同的…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"실습 20분을 모두 강의로 바꾸는 건 조금 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"실습 20분을 모두 강의로 바꾸는 건 조금 …\""
+      }
+    ],
+    "attempts": 1,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 후보가 실제로 쓸 법하며, 대역·피드백·관계·화행 초점이 일관되고, 주요 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-10T05:43:30.100Z",
+      "mission_content_hash": "9bdf15ba86ef18d39bea9a64c0727cf1715090963474dedcfd180471ab45d2c3"
+    },
+    "firstPassQualityVerdict": "pass",
+    "repaired": false,
+    "candidateRegenerationCount": 0,
+    "candidateRegenerationMaxPerCandidate": 0,
+    "savedId": "d9f1deb3-337d-4e6e-93f4-ac86b7939760",
+    "terminal": {
+      "terminalStage": "eligible",
+      "itemCandidatePaths": [],
+      "deterministicFailureCodes": [],
+      "criticVerdict": "pass",
+      "criticFindingCodes": [],
+      "criticFindings": [],
+      "topology": {
+        "firstPassResult": "pass",
+        "finalResult": "pass",
+        "attempts": 1,
+        "regenerationCount": 0,
+        "findings": []
+      },
+      "initialR27Findings": [],
+      "r27RepairAttempted": false,
+      "postRepairDeterministicResult": "not_attempted",
+      "postRepairDeterministicFindings": [],
+      "attemptNo": 1,
+      "regenerationCount": 0,
+      "operation": "none",
+      "operationResult": "not_attempted",
+      "infrastructureError": false,
+      "providerStatus": "UNKNOWN",
+      "finalOutcome": "eligible",
+      "boundaryFallback": {
+        "eligible_paths": [],
+        "attempted_paths": [],
+        "succeeded_paths": [],
+        "situation_unchanged": true,
+        "immutable_candidates_unchanged": true
+      }
+    }
+  },
+  "stored": {
+    "mission_content": {
+      "unit": {
+        "closing_ko": "반대는 관계를 공격하지 않으면서도 무엇에 어느 범위까지 동의하지 않는지 알아볼 수 있어야 합니다. 완화는 이견을 숨기는 장치가 아닙니다.",
+        "learner_label": "이견 명료성과 관계 조정",
+        "target_feature": "opposition_stance_mitigation",
+        "target_feature_version": "1.0"
+      },
+      "authoring": {
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "schema_version": "mission_authoring_v1",
+        "repair_attempts": 0
+      },
+      "direction": "zh_ko",
+      "mpj_items": [
+        {
+          "id": 1,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "scale4",
+          "source": "关于把标题改成蓝色，我有一点不同的想法。我觉得还是用黑色比较好，看着更舒服。这是我的个人看法。大家再考虑一下，好吗？",
+          "target": "제목을 파란색으로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 검은색이 더 보기 좋아서 그대로 쓰는 게 낫지 않을까 싶기도 합니다. 제 개인적인 생각은 그렇다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "channel": "messenger",
+          "highlights": [
+            "조금 다른 생각이 없는 건 아닙니다",
+            "검은색이 더 보기 좋아서",
+            "제 개인적인 생각은 그렇다는 말씀입니다"
+          ],
+          "item_focus": "opposition_stance_mitigation",
+          "relation_ko": "지난달부터 회의록을 함께 작성해 온 같은 직급의 동료",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 지난달부터 회의록을 함께 작성해 온 같은 직급의 동료와 회의록 서식을 논의하고 있다. 동료가 내용은 그대로 두고 제목만 파란색으로 바꾸자고 했지만, 나는 검은색이 더 보기 좋아 이 변경에 반대하려 한다.",
+          "explanation_ko": "내용에 영향이 없는 제목 색상 논의에서는 '검은색이 더 보기 좋아서'라는 개인 선호만으로도 이견의 방향이 드러납니다. '조금 다른 생각이 없는 건 아닙니다'와 개인적 판단이라는 한정은 동료의 취향을 틀렸다고 하지 않으면서 다른 선택을 제시하므로, 먼저 동의하지 않아도 적절합니다. 표현은 다소 우회적이지만 검은색을 선호한다는 연결은 유지할 만합니다.",
+          "preceding_turn": null,
+          "recommended_example": "제목을 파란색으로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 검은색이 더 보기 좋아서 그대로 쓰는 게 낫지 않을까 싶기도 합니다. 제 개인적인 생각은 그렇다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "somewhat_appropriate"
+        },
+        {
+          "id": 2,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "judge3",
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "channel": "messenger",
+          "highlights": [
+            "조금 다른 생각이 없는 건 아닙니다",
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "item_focus": "opposition_stance_mitigation",
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "explanation_ko": "첫 장면의 우회적 이견 제시와 개인 의견으로 한정하는 전략은 유지되지만, P와 D는 그대로인 채 R이 낮은 색상 선택에서 보통 수준의 교육 구성 결정으로 바뀌었습니다. 연습 시간이 없어진다는 근거는 분명히 있으나, '필요가 있지 않을까 싶기도'와 '그냥 이런 생각도'가 겹쳐 실습 유지가 필요한 입장인지 참고 의견인지 흐려집니다. 근거는 유지하고 실습을 남겨야 한다는 입장에 붙은 중첩된 유보를 조정해야 합니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?"
+        },
+        {
+          "id": 3,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "fix_choice",
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "channel": "messenger",
+          "highlights": [
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "item_focus": "opposition_stance_mitigation",
+          "corrections": [
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "note_ko": "동료와 교육안을 정하는 상황에서 '필요가 있다고 생각합니다'는 개인 판단의 형식을 유지하면서 실습 유지 입장을 확정하므로, 근거와 재검토 질문을 함께 유지할 수 있습니다.",
+              "is_valid": true
+            },
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 건 분명히 잘못된 방향입니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "note_ko": "앵커의 개인적 이견 표명을 '분명히 잘못된 방향'이라는 확정적 평가로 바꿨습니다. 실습 유지 입장과 근거·재검토 요청은 보존하지만, 동등한 동료의 제안을 근거 제시 전에 오답으로 규정하여 대립적 대역으로 이동합니다.",
+              "is_valid": false
+            },
+            {
+              "text": "실습 20분을 모두 강의로 바꾸는 데에는 조금 마음에 걸리는 부분이 있습니다. 이 20분을 실습으로 남겨 둘 필요가 있는지도 생각해 볼 만합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 참고 정도로 말씀드리는 겁니다. 이 점을 한번 더 생각해 보면 어떨까요?",
+              "note_ko": "이견을 막연한 걸림으로, 실습 유지의 필요성을 검토할 질문으로 바꾸고 자신의 입장을 참고 의견으로 한정했습니다. 연습 시간 상실이라는 근거와 재검토 요청은 남지만, 변경에 반대하는지 고려 사항만 제시하는지 흐려져 지나치게 흐림 대역으로 이동합니다.",
+              "is_valid": false
+            }
+          ],
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "explanation_ko": "같은 직급의 동료와 교육 진행안을 정하는 상황에서는 참가자의 연습 시간 확보를 근거로 실습 유지 입장을 분명히 전달해야 합니다. 최종 권장 후보의 '생각이 조금 다릅니다'와 '필요가 있다고 생각합니다'는 개인 판단의 형식으로 반대를 명확히 하고, '이 점을 한번 더 생각해 보면 어떨까요?'는 동료가 함께 재검토할 여지를 남깁니다. 연습 시간 상실이라는 근거와 재검토 질문은 유지하되, 원문의 '필요가 있지 않을까 싶기도 합니다'와 '그냥 이런 생각도 있다는 말씀입니다'처럼 입장을 거듭 약화하는 표현은 조정하는 것이 적절합니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?"
+        },
+        {
+          "id": 4,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "reason",
+          "source": "关于把二十分钟的实操全部改成讲解，我有一些不同的想法。我觉得还是需要保留这二十分钟的实操，不然参加者就没有练习使用程序的时间了。这是我的看法。大家再考虑一下，好吗？",
+          "target": "실습 20분을 모두 강의로 바꾸는 건 조금 다른 생각이 없는 건 아닙니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있지 않을까 싶기도 합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 그냥 이런 생각도 있다는 말씀입니다. 한번 더 생각해 보면 어떨까요?",
+          "channel": "messenger",
+          "reasons": [
+            {
+              "id": "r1",
+              "kind": "pragmatic_misconception",
+              "text_ko": "'한번 더 생각해 보면 어떨까요?'가 동료에게 자기 입장을 철회하라고 요구하는 기능을 하므로, 마지막 질문이 반대보다 압박을 앞세우기 때문이다."
+            },
+            {
+              "id": "r2",
+              "kind": "meaning_grammar_context",
+              "text_ko": "'그렇지 않으면'이 실습 20분의 변경이 아니라 교육 전체의 취소를 가리켜, 연습 시간이 없어진다는 이유가 원문보다 넓어지기 때문이다."
+            },
+            {
+              "id": "r3",
+              "kind": "primary",
+              "text_ko": "'필요가 있지 않을까 싶기도'에 이어 '그냥 이런 생각도'로 물러서서, 근거는 제시하면서도 실습 유지를 요구하는 이견을 단순한 참고 의견처럼 만들기 때문이다."
+            }
+          ],
+          "highlights": [
+            "필요가 있지 않을까 싶기도 합니다",
+            "그냥 이런 생각도 있다는 말씀입니다"
+          ],
+          "item_focus": "opposition_stance_mitigation",
+          "relation_ko": "석 달간 사내 교육을 함께 준비한 같은 직급의 동료",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 석 달간 사내 교육을 함께 준비한 같은 직급의 동료와 교육 진행안을 논의하고 있다. 동료가 실습 20분을 모두 강의로 바꾸자고 했지만, 나는 참가자의 프로그램 사용 연습이 사라져 그 변경에 반대하려 한다.",
+          "explanation_ko": "동료와 실습 유지 여부를 정하는 상황에서 '필요가 있지 않을까 싶기도'와 '그냥 이런 생각도'는 자신의 입장을 거듭 유보하여 상대가 이를 참고 의견으로만 처리하게 할 수 있습니다. '그렇지 않으면'은 바로 앞의 실습 유지와 정상적으로 연결되고 마지막 질문도 재검토를 청하므로, 의미 오류나 철회 압박이 주원인은 아닙니다. 이유와 질문을 바꾸기보다 실습 유지 입장을 분명하게 진술해야 합니다.",
+          "preceding_turn": null,
+          "problem_band_code": "too_obscured",
+          "accepted_reason_id": "r3",
+          "recommended_example": "실습 20분을 모두 강의로 바꾸는 데에는 생각이 조금 다릅니다. 저는 이 20분을 실습으로 남겨 둘 필요가 있다고 생각합니다. 그렇지 않으면 참가자들이 프로그램 사용을 연습할 시간이 없어집니다. 제 생각은 이렇습니다. 이 점을 한번 더 생각해 보면 어떨까요?"
+        },
+        {
+          "id": 5,
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "type": "multi_judge",
+          "source": "关于不放价签、只用嘴说价格，我有不同的看法。我觉得还是需要放价签。每次都解释价格，卖东西恐怕会慢下来。这一点我们再想想，好吗？",
+          "channel": "messenger",
+          "candidates": [
+            {
+              "text": "가격표 없이 말로만 안내하는 데에는 반대야. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?",
+              "note_ko": "친한 공동 운영자에게 '반대야'로 입장을 밝히고 판매 지연의 근거를 붙이면 사람과 방안을 구분한 직접 논의가 되므로, 선동의 없이도 이 구성을 유지할 수 있습니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "가격표 없이 말로만 안내하자는 건 말이 안 돼. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?",
+              "note_ko": "앵커의 직접적인 입장 표명인 '반대야'를 제안 자체의 합리성을 일축하는 '말이 안 돼'로 바꿨습니다. 가격표의 필요성과 판매 지연 우려는 그대로지만, 친한 공동 운영자 사이에서도 이견 설명보다 상대 제안에 대한 단정적 기각이 앞서 대립적 대역으로 이동합니다.",
+              "accepted_band_codes": [
+                "too_confrontational"
+              ]
+            },
+            {
+              "text": "내가 다르게 생각하는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야. 매번 가격을 설명하다 보면 판매가 늦어질 것 같아서, 나는 가격표를 두는 게 필요하다고 봐. 이 부분은 우리 같이 한번 더 생각해 보면 어떨까?",
+              "note_ko": "친구와 공동 운영안을 논의할 때 '다르게 생각하는 건 … 부분'으로 범위를 한정하고 판단 근거를 연결하면 계획 전체를 부정하는 인상을 피하므로, 이 범위 한정 전략을 유지할 수 있습니다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "내가 조금 마음에 걸리는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야. 매번 가격을 설명하다 보면 판매가 늦어질 것 같아서, 가격표를 두는 게 필요할 수도 있다는 생각을 참고로 얘기하는 거야. 이 부분은 우리 같이 한번 더 생각해 보면 어떨까?",
+              "note_ko": "앵커의 명시적 이견을 우려 표명으로 낮추고, 가격표가 필요하다는 판단을 가능성 수준의 참고 의견으로 바꿨습니다. 이견의 대상과 판매 지연 근거·재검토 요청은 보존하면서도 실제로 가격표 없는 방식에 반대하는지는 불분명해져 지나치게 흐림 대역으로 이동합니다.",
+              "accepted_band_codes": [
+                "too_obscured"
+              ]
+            }
+          ],
+          "item_focus": "opposition_stance_mitigation",
+          "relation_ko": "몇 년째 사적으로 자주 만나며 친하게 지내는 동등한 부스 공동 운영자",
+          "axis_feature": "opposition_stance_mitigation",
+          "situation_ko": "나는 몇 년째 사적으로 자주 만나는 친한 친구와 공동 운영할 동네 장터 부스의 판매 방식을 논의하고 있다. 친구가 가격표 없이 말로만 가격을 안내하자고 했지만, 나는 매번 가격을 설명하느라 판매가 지연될 것 같아 반대하려 한다.",
+          "explanation_ko": "친한 친구이자 동등한 공동 운영자와 판매 방식을 논의하므로, 판매 지연 우려를 근거로 가격표 없는 방식에 반대한다는 입장을 분명히 밝힐 수 있습니다. '반대야'로 직접 입장을 밝히는 후보와 '내가 다르게 생각하는 건 가격표를 안 두고 말로만 가격을 안내하자는 부분이야'로 이견의 범위를 한정하는 후보는 모두 근거와 공동 재검토 요청을 연결해 협력 관계를 유지하는 적정한 방식입니다. 두 방식 모두 유지할 수 있으며, 제안을 일축하는 '말이 안 돼'나 필요성을 가능성 수준의 참고 의견으로 낮추는 표현으로 바꾸지 않는 것이 중요합니다.",
+          "preceding_turn": null,
+          "recommended_example": "가격표 없이 말로만 안내하는 데에는 반대야. 가격표는 필요하다고 생각해. 매번 가격을 설명하면 판매가 늦어질 것 같거든. 이 점은 우리 다시 생각해 볼까?"
+        }
+      ],
+      "provenance": {
+        "model": "gpt-6-astra",
+        "generated_at": "2026-09-10T05:43:26.122Z",
+        "band_targeting": {
+          "version": "relative_band_targeting_v2_bounded_fallback",
+          "within_warnings": [],
+          "boundary_fallback": {
+            "eligible_paths": [],
+            "attempted_paths": [],
+            "succeeded_paths": [],
+            "situation_unchanged": true,
+            "immutable_candidates_unchanged": true
+          },
+          "within_regeneration_count": 0,
+          "candidate_regeneration_counts": {}
+        },
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+        "scene_topology": {
+          "version": "mission_scene_topology_evidence_v1",
+          "attempts": 1,
+          "findings": [],
+          "final_result": "pass",
+          "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+          "first_pass_result": "pass",
+          "regeneration_count": 0
+        },
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "generation_attempt": 1,
+        "mission_content_hash": "9bdf15ba86ef18d39bea9a64c0727cf1715090963474dedcfd180471ab45d2c3"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "opposition_stance_mitigation",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ],
+        "speech_act": "opposition",
+        "mission_goal": "integrated_speech_act"
+      },
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "opposition"
+      },
+      "quality_check": {
+        "model": "gpt-4.1",
+        "verdict": "pass",
+        "findings": [],
+        "checked_at": "2026-09-10T05:43:30.100Z",
+        "summary_ko": "모든 후보가 실제로 쓸 법하며, 대역·피드백·관계·화행 초점이 일관되고, 주요 결함이 없다.",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "mission_content_hash": "9bdf15ba86ef18d39bea9a64c0727cf1715090963474dedcfd180471ab45d2c3"
+      },
+      "schema_version": "mission_v5",
+      "production_task": {
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "mid"
+        },
+        "mode": "translation",
+        "channel": "messenger",
+        "relation_ko": "한 학기 동안 함께 공부한 동급생",
+        "source_text": "关于通勤时间这一项，我的看法有点不一样，我觉得还是需要保留。我们这次研究关注的就是通勤时间对课堂参与的影响，如果把这一项删掉，后面就很难分析两者之间的关系了。这一点大家再考虑一下，好吗？",
+        "situation_ko": "나는 한 학기 동안 함께 공부한 조원과 단체 메신저에서 조별 과제 설문 문항에 대해 논의하고 있다. 상대가 통학 시간 질문을 빼자고 제안해, 나는 그 제안에 반대하려 한다.",
+        "focal_segments": [
+          {
+            "role": "head",
+            "text": "我的看法有点不一样，我觉得还是需要保留。"
+          },
+          {
+            "role": "support",
+            "text": "这一点大家再考虑一下，好吗？"
+          }
+        ],
+        "preceding_turn": null,
+        "source_modality": "written",
+        "vocabulary_hints": [
+          {
+            "source": "通勤时间",
+            "target": "통학 시간"
+          },
+          {
+            "source": "课堂参与",
+            "target": "수업 참여"
+          }
+        ],
+        "reference_alternatives": [
+          {
+            "text": "통학 시간 문항에 대해서는 생각이 조금 다릅니다. 저는 이 문항을 그대로 둘 필요가 있다고 생각합니다. 이번 연구는 통학 시간이 수업 참여에 미치는 영향을 살펴보는 것이어서, 이 문항을 빼면 나중에 둘 사이의 관계를 분석하기 어려워집니다. 이 점은 다 같이 한번 더 생각해 보면 어떨까요?",
+            "note_ko": "조별 설문을 논의하는 상황에서 '생각이 조금 다릅니다'로 이견을 밝히고 유지 입장, 연구 목적과 삭제의 영향, 공동 재검토 질문을 모두 연결한 산출안입니다."
+          },
+          {
+            "text": "제가 조금 다르게 생각하는 건 통학 시간 문항을 빼자는 부분입니다. 이번 연구에서 살펴보려는 것이 바로 통학 시간이 수업 참여에 미치는 영향이므로, 저는 이 문항을 남겨 두어야 한다고 생각합니다. 이 문항을 삭제하면 나중에 두 요소의 관계를 분석하기 어려워집니다. 이 부분은 여러분도 한번 더 생각해 보시면 어떨까요?",
+            "note_ko": "이견을 문항 삭제에 한정한 뒤 연구 목적을 유지 입장과 연결했습니다. 원문의 분석상 어려움과 모두에게 재검토를 청하는 마무리도 빠짐없이 옮겼습니다."
+          }
+        ]
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "illocutionary_clarity",
+          "evidence_ko": "변경안에 대한 이견과 유지하려는 대상을 연결하는지, 유보 표현이 겹쳐 반대를 단순한 참고 의견처럼 만드는지 관찰한다.",
+          "evidence_refs": [
+            "mpj:2",
+            "mpj:3",
+            "mpj:4",
+            "dct"
+          ]
+        },
+        {
+          "code": "supportive_move_fit",
+          "evidence_ko": "색상 선호, 프로그램 사용 연습의 상실, 가격 설명에 따른 판매 지연, 연구 변수 간 관계 분석이라는 원문 근거가 각각 반대의 범위를 뒷받침하는 방식을 관찰한다.",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:3",
+            "mpj:5",
+            "dct"
+          ]
+        },
+        {
+          "code": "relational_calibration",
+          "evidence_ko": "동료 간 사소한 서식 논의에서 개인 선호를 제시하는 방식과 친한 공동 운영자에게 판단을 공유하거나 이견의 범위를 한정하는 방식의 관계적 효과를 관찰한다.",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:5"
+          ]
+        }
+      ]
+    },
+    "mission_status": "generated"
+  },
+  "scope": "Automated promotion only; not instructor approval, not released, not assigned."
+}

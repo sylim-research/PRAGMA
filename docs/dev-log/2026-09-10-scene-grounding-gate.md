@@ -58,3 +58,14 @@
 - 판정: 의미 검사 보완책으로 이 종결어미 강제안을 채택하지 않는다. 두 앱 파일의 미배포 변경을 철회해 e6892dc6과 diff가 없음을 확인했다. 이미 배포된 사건/PDR 게이트와 프롬프트는 유지한다.
 - 재현 스크립트와 결과: `docs/research-trail/evidence/2026-09-10-scene-grounding-confirmation-2/probe-unfinished-format.mjs`, `unfinished-format-probe.json`. 스크립트는 보관 patch를 적용한 당시 코드에 대한 진단용이며 제품 회귀 테스트가 아니다. 새 유료 생성·교과목 교체·배포는 하지 않았다.
 - 철회 후 기존 sceneGrounding.test.ts 1파일 4 tests 통과. 전체 테스트·배포를 재실행한 결과는 아니다. 인계 단계의 추가 UI·프롬프트·계약 변경 없음.
+
+## FABLE 인수 후 실행 · 2026-09-10
+
+작업 소유권을 넘겨받았다. 앱 코드는 e6892dc6과 동일하며 이 절의 변경은 evidence·기록과 DB의 draft 행 추가뿐이다.
+
+- 반대 코어 v1(48자)은 고급 번역 원문으로 채택하지 않았다. 시드 범위 안에서 이견 서두·근거·단체 대상 재고 요청을 더한 v2(유효 85자, 권장 80~110)를 만들어 스키마·규칙 검사를 경고 없이 통과시켰다. v1은 이력으로 보존한다. 재현: `prepare-opposition-v2.ts`.
+- 사과·요청·반대 v2 세 후보를 배포된 `core_quality_check`(gpt-4.1, core_quality_v11)로 검사했다. 세 건 모두 16축 pass이며 각 축의 reason이 사건·관계·부담 근거를 실제로 서술함을 직접 확인했다. 결과 파일 `*-semantic.json`에 후보 SHA-256을 고정했다.
+- 세 후보를 기존 `save_generated_core` RPC로 **새 draft 행**(needs_review·archived_only)으로 저장했다. 원본 행 3개는 수정하지 않았고, 새 행의 `generation.local_revision`이 원본 scenario ID·초안 파일·SHA-256·편집 시각을 가리킨다. 원본 generation 메타데이터(프롬프트 버전·scene_plan)는 원본 행의 기원 기록으로만 남는다. 원본 draft 3행은 관리자 대기열에 남아 있으므로 정리 여부는 연구자 결정이다.
+- 기존 편성 참조 실측: learner_mission_logs 2건은 **모두 2주차 position 0(assignment 1b7b468e, 시나리오 f8de3f59)** 한 행에 귀속된다. events 0건. 학습자·프로필 행은 조회하지 않았다.
+- 전체 미션 승격 4건(새 행 3개 + 불만 원본, `promoteCore` astra): 사과·반대 v2·불만 자동 품질(quality_v22) pass, 요청 fail(문항 4 reason 오답 r1과 정답 r3가 같은 조사 「吧」에 초점 → 「주원인 모호」, 수리 후보 재통과 실패). 직접 검수 결과 네 미션 모두 문항 간 대비축(D 또는 R)이 한 번에 하나씩 바뀌고 정답·해설·수정안·DCT 참고안이 단원 초점과 일치해 교수자 검토에 올릴 수 있다고 판정했다. 요청의 AI fail은 설계상 정당한 오개념 보기에 대한 과잉 판정으로 보아 재생성하지 않고 연구자 override 여부에 맡긴다. 유보 사항은 evidence README 표에 적었다. 모두 `generated` 상태이며 승인·공개·편성은 없다.
+- 교체 경로 판정: `saveWeekAssignments`의 stale 삭제는 이 한 행에서 실패한다. `learner_mission_logs.assignment_id`는 ON DELETE SET NULL이지만 course-context CHECK와 `trg_validate_learner_mission_log_course_context`가 UPDATE OF assignment_id에서 예외를 던지므로 삭제문 전체가 롤백된다. upsert가 먼저 실행되므로 실패 시 해당 주차는 4행이 되고 학습자 투영은 모드 정원 초과로 그 주차를 비운다. 따라서 교체는 이 함수를 그대로 쓰지 않는다. 선택지와 권고는 인계 문서에 적었다.

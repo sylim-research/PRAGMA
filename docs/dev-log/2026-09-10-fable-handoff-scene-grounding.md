@@ -1,5 +1,7 @@
 # FABLE 작업 인수인계 · 사건 근거와 생성 게이트 · 2026-09-10
 
+> **🟢 FABLE 인수 실행 결과(2026-09-10, 이 블록이 아래 인계 시점 기록보다 우선):** 작업 소유권을 넘겨받아 실행했다. ①반대 코어를 시드 안에서 v2(85자)로 재작성 ②사과·요청·반대 v2 의미 검사 3/3 pass ③세 후보를 `save_generated_core`로 **새 draft 행 3개**(170e4b66·4eac0623·d9f1deb3)로 저장, 원본 3행 보존 ④새 행 3개+불만 원본(e4f36052)을 전체 MJT5+DCT1로 승격 — **사과·반대 v2·불만 자동 품질 pass, 요청 fail**(문항 4 오답 「주원인 모호」, 내 판정은 정당한 오개념 보기 → 연구자 override 권고, 재생성 안 함) ⑤네 미션 직접 검수 = 전부 교수자 검토 가능(유보 사항은 README 표) ⑥교체 경로 실측 = 2주차 pos 0 편성 1행에 로그 2건 귀속, `saveWeekAssignments` 삭제는 롤백 → 맨 아래 HIGH-RISK GATE. **교수자 승인·공개·편성·배포 0건, 앱 코드 e6892dc6 그대로.** 정본 = `docs/research-trail/evidence/2026-09-10-local-core-revisions/README.md`. 아래 「최신 중단 사유」·「미커밋 코드」 서술은 인계 시점 기록이다.
+
 > **최신 중단 사유:** 세 로컬 수정 후보의 실제 의미 검사를 위해 `docs/research-trail/evidence/2026-09-10-local-core-revisions/check-semantic.ts`를 준비했다. 실행 명령은 수정 코어를 Supabase 외부 의미 검사에 보내는 구체적 승인이 부족하다는 자동 승인 검토로 프로세스 시작 전 거절됐다. 실제 전송/의미 검사/새 결과는 없다. README에 재개 범위를 기록했다. 승인 없이 우회 호출하지 않는다.
 
 > **최신 실행 후보:** 사과·요청·반대 수정안을 `docs/research-trail/evidence/2026-09-10-local-core-revisions/`에 실제 로컬 JSON으로 작성했다. 스키마 3/3 통과, 규칙은 사과·요청 pass/반대 최소 분량 warning이다. README와 checks.json을 먼저 읽는다. 세 후보의 새 의미 검사와 전체 미션 검수는 아직이며 DB에 적용하지 않았다. 아래의 "편집안은 문서에만 있음"은 이전 시점 기록이다.
@@ -118,3 +120,27 @@ Spencer-Oatey 이론은 해석의 보조 관점으로 유지한다. 권리·의�
 - 바뀐 수치: 두 PR 필수 CI 통과, 2차 부적합 입력 3/3 보류, 신규 4코어 생성·전체 미션 검수 0개. 새 미커밋 게이트 테스트 없음.
 - 바뀐 화면: 인계 단계의 UI 수정 없음. 교과목 내용은 그대로다. 최종 콘텐츠 교체 후 해당 미션 캡처를 다시 확보해야 한다.
 - 바뀐 프롬프트·계약: 후보 _03까지 main 반영. 미완성 형식 제약은 미배포. 최종 검수/편성 후 프롬프트·콘텐츠 동결본을 발행해야 하며 지금은 동결 완료가 아니다.
+
+## FABLE 인수 후 판정 · 교과목 교체 경로 (2026-09-10)
+
+실측: 기존 편성 20행 중 learner_mission_logs가 참조하는 행은 **2주차 position 0(assignment `1b7b468e-d47b-46ab-ba16-642ad8be5bc5`, 시나리오 `f8de3f59-cd86-4636-b516-a8ead78ac0ac`) 하나**이며 로그 2건이 모두 여기에 귀속된다. events는 0건. 나머지 19행은 참조가 없어 통상 교체가 가능하다.
+
+왜 `saveWeekAssignments`를 그대로 못 쓰는가: stale 삭제가 이 한 행에 닿으면 `ON DELETE SET NULL`이 로그 행을 UPDATE하고, `learner_mission_logs_course_context_complete` CHECK와 `trg_validate_learner_mission_log_course_context`가 예외를 던져 삭제문이 롤백된다. upsert가 먼저 실행되므로 실패 시 2주차는 옛 2행+새 2행이 되고 학습자 투영은 모드 정원 초과로 2주차 미션을 전부 숨긴다.
+
+학습자 노출 경로 실측: 학습자는 `DEFENSE_COURSE_IDS`(코드 고정 3개 outline ID) 안의 published outline만 본다. 주차 안에서는 `isReviewedMission`(mission_status reviewed/released + release ID 허용 목록 `_03`·`20260910_01`·`20260904_02`)인 편성만 남긴 뒤 모드 정원을 검사한다. `curriculum_week_scenarios`에 보관·대체 표시 컬럼은 없고 `slot_role`은 자유 text(기본 'primary')다.
+
+```text
+HIGH-RISK GATE
+- 결정이 필요한 사항: 2주차 옛 편성 1행(로그 2건 귀속)을 어떻게 보존하며 교체할 것인가
+- 확인된 사실: 위 실측. 로그 2건의 주체·시각은 조회하지 않았다(연구자 본인 시연 기록일 가능성은 확인 필요)
+- 선택지와 각 위험:
+  A. 그 1행을 남기고 옛 시나리오 f8de3f59의 mission_status를 검수 밖 상태로 바꿔 학습자 투영에서 제외 → 코드·migration 없음. 위험: 승인된 미션의 상태 변경, 관리자 편성 화면에 2주차 3행이 남아 A/B 계약 검사(`pair_item_count`)가 다음 저장을 막는다
+  B. `slot_role='superseded'` 표시 + 학습자 투영·A/B 검사가 그 행을 무시하도록 코드 수정 → migration 없음, PR·배포 1회. 위험: 학습자 콘텐츠 선택 로직 변경(UI 게이트 대상), 새 관례가 코드에만 있다
+  C. `curriculum_week_scenarios.archived_at` 추가 migration + 투영 필터 → 가장 정직한 모델. 위험: migration push·배포 승인 게이트, 심사 전 스키마 변경
+  D. 로그 2건을 삭제하고 통상 교체 → 가장 단순. 위험: 학습 기록 삭제(합의 범위 4항 위반이 될 수 있음). 시연 기록이면 연구자가 판단
+- Claude 권고안: 먼저 로그 2건이 연구자 시연 기록인지 확인한다(연구자만 판단 가능). 시연 기록이면 D, 보존해야 하면 B(코드 소량·되돌리기 쉬움·migration 없음)
+- 영향받는 파일·데이터: src/lib/curriculum/composer.ts(saveWeekAssignments), learnerCourseProjection.ts, weeklyMissionPair.ts, curriculum_week_scenarios 1행, learner_mission_logs 2행
+- GPT 교차검증 권장: No (데이터 손상 위험은 실측으로 닫혔고, 남은 것은 연구자의 기록 보존 판단)
+```
+
+어느 쪽이든 20개 교체 후보가 검수될 때까지 편성은 바꾸지 않는다. 지금까지 교체 가능한 검수 미션은 아래 절의 4개뿐이다.

@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T04:47:47.543Z",
+  "run_id": "scene_grounding_local_revision_review_20260910",
+  "draft_file": "w2-0-draft.json",
+  "draft_sha256": "f38c22a56ab7d5464d418e56f2b623701a31f9dbf19b18901da52204276c9733",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "이웃에게 택배를 대신 받아 잠시 보관해 달라고 메신저로 요청하는 장면이 기대 조건과 일치한다.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "택배 상자를 대신 받아 잠시 보관해 달라는 요청이 명확히 드러난다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동등한 이웃 관계에서 권한 차이가 드러나지 않는다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "반년간 인사만 나눈 같은 층 이웃으로, acquaintance에 해당한다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "잠시 상자를 받아 현관에 두는 정도로 부담이 낮다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "일상 생활에서 이웃 간 부탁에 해당한다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "산업 배경이 없으므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "메신저를 통한 서면 요청으로, 번역(서면) 상황에 맞다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자에게 요청 사유가 있고, 상대에게 선택권이 있으며, 직접 수행 권한이 있다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자(A)는 택배를 부탁하는 입주민, 상대(B)는 같은 층 이웃으로 일관된다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "이웃이 직접 택배를 받아줄 권한이 있다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 이웃에게 부탁하는 핵심 사건이 유지된다."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 pass."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대의 역할이 모든 필드에서 일관된다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text의 사건, 행위자, 대상이 모두 일치한다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 실제 발화나 번역이 포함되지 않았다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "이웃에게 택배를 부탁하는 상황이 현실적으로 자연스럽다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T04:47:47.692Z",
+        "core_content_hash": "1f53ba976efb79590cf0d72268d284a62d2254d77b4a8530368025ab3e1a9944"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

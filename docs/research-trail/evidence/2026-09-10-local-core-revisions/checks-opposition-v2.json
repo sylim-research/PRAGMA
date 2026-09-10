@@ -1,0 +1,21 @@
+{
+  "scope": "Offline schema and deterministic rules only; not semantic approval",
+  "checks": [
+    {
+      "key": "pilot-reverse-opposition-v2",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 80,
+        "max": 110,
+        "actual": 85
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    }
+  ]
+}
