@@ -6,7 +6,7 @@ import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
 import { MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
-import { isReinforcementWeek, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
+import { isReinforcementWeek, weekActivityLabel } from "@/lib/curriculum/weekGuidance";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { expectedMissionModesForWeek, remainingMissionModes, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
@@ -96,7 +96,10 @@ const LearnerCourseLive = () => {
               {weeks.map((week) => {
                 const expanded = openWeek === week.week_no;
                 const title = weekHeading(week);
-                const centralQuestion = weekCentralQuestion(week);
+                const savedGoal = week.can_do[0];
+                const goal = week.speech_act === "request" && (!savedGoal || savedGoal === "부탁을 부드럽고 분명하게 말하기")
+                  ? `원문의 요청 의도를 유지하면서 상황과 상대에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
+                  : savedGoal;
                 const weekPath = `/learner/course/${courseId}/week/${week.week_no}`;
                 const modes = week.expected_mission_modes ?? expectedMissionModesForWeek({
                   courseMode: course.outline.course_mode as CourseMode,
@@ -125,7 +128,7 @@ const LearnerCourseLive = () => {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className={`block break-keep leading-5 ${expanded ? "text-[17px] font-semibold" : "text-[14px] font-medium"}`}>{title}</span>
-                          {expanded && week.can_do[0] && <span className="mt-1 block break-keep text-[12px] font-normal leading-[18px] text-[#68757F]">{week.can_do[0]}</span>}
+                          {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습목표 · {goal}</span>}
                         </span>
                         <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#969E9E]"}`} />
                       </button>
@@ -133,15 +136,12 @@ const LearnerCourseLive = () => {
                     <div id={panelId} role="region" aria-labelledby={headingId} hidden={!expanded}>
                       {expanded && (
                         <div className="bg-[#FCFAF5] px-4 pb-4 pt-3 sm:px-5">
-                          <div className="flex items-baseline justify-between gap-3">
-                            {centralQuestion ? <h4 className="text-[11px] font-medium text-[#8A7847]">중심 질문</h4> : <span />}
-                            <Link to={`${weekPath}/note`} className="inline-flex shrink-0 items-center gap-1 rounded text-[12px] text-[#68757F] underline-offset-4 hover:text-[#15202B] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]">강의 유인물 <ArrowRight aria-hidden="true" className="h-3 w-3" /></Link>
-                          </div>
-                          {centralQuestion && <p className="mt-1 break-keep text-[12.5px] leading-5 text-[#52606A]">{centralQuestion}</p>}
-
                           {modes.length > 0 ? (
-                            <section aria-label="이번 주 학습 미션" className="mt-3.5">
+                            <section aria-label="이번 주 학습 미션">
                               <h4 className="mb-2 text-[13px] font-semibold text-[#34434F]">이번 주 학습 미션 {modes.length}개</h4>
+                              {week.speech_act && <p className="mb-3 break-keep text-[13px] leading-5 text-[#52606A]">
+                                같은 {SPEECH_ACT_UI[week.speech_act]} 화행을 서로 다른 상황에서 {modes.includes("translation") && modes.includes("stt_interpreting") ? "번역과 통역으로" : modes.includes("translation") ? "번역으로" : "통역으로"} 연습합니다. 미션 1부터 차례로 진행하세요.
+                              </p>}
                               <ul className="grid gap-2.5 sm:grid-cols-2">
                                 {missions.map((scenario, index) => {
                                   const label = missionMenuTitle(scenario.brief_note_ko);
@@ -153,7 +153,7 @@ const LearnerCourseLive = () => {
                                       <Link
                                         to={missionPath}
                                         aria-label={`${modeLabel} 미션 시작${label ? ": " + label : ""}`}
-                                        className="group flex flex-1 flex-col rounded-t-lg p-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+                                        className="group flex flex-1 flex-col rounded-lg p-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
                                       >
                                         <span className="text-[11px] font-medium text-[#967B3E]">미션 {index + 1} · {modeLabel}</span>
                                         <h5 className="mb-3 mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]">{label ?? `${modeLabel} 학습 미션`}</h5>
@@ -161,15 +161,6 @@ const LearnerCourseLive = () => {
                                           {modeLabel} 미션 시작 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                         </span>
                                       </Link>
-                                      {scenario.mode === "stt_interpreting" && (
-                                        <Link
-                                          to={`${missionPath}&start=dct`}
-                                          aria-label={`통역 DCT 바로가기${label ? ": " + label : ""}`}
-                                          className="mx-3.5 mb-3.5 inline-flex min-h-9 items-center justify-center gap-1.5 rounded-md border border-[#C9B46C] bg-[#FFF9E7] px-3 py-2 text-[12px] font-semibold text-[#6F5819] hover:bg-[#FFF2C8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
-                                        >
-                                          통역 DCT 바로가기 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5" />
-                                        </Link>
-                                      )}
                                     </li>
                                   );
                                 })}
@@ -184,6 +175,9 @@ const LearnerCourseLive = () => {
                           ) : (
                             <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#68757F]">{activityCopy(week)}</p>
                           )}
+                          <div className="mt-4 border-t border-[#EAE5DB] pt-3">
+                            <Link to={`${weekPath}/note`} className="inline-flex items-center gap-1 rounded text-[13px] text-[#52606A] underline-offset-4 hover:text-[#15202B] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]">이번 주 수업자료 <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
+                          </div>
                         </div>
                       )}
                     </div>
