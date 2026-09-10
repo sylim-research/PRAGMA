@@ -6,7 +6,7 @@ export function WeeklyMaterialDocument({ material, activeSection }: {
   activeSection?: number;
 }) {
   return (
-    <article className="weekly-material min-w-0 space-y-5 [overflow-wrap:anywhere]" aria-label={`${material.weekNo}주차 강의 유인물`}>
+    <article className="weekly-material min-w-0 space-y-5 [overflow-wrap:anywhere]" aria-label={`${material.weekNo}주차 수업자료`}>
       <header className="material-heading rounded-xl bg-[#FAD338] px-6 py-5 text-[#15202B] print:rounded-none">
         <p className="text-xs font-semibold">{material.courseTitle} · {material.weekNo}주차</p>
         <h1 className="mt-2 text-2xl font-bold">{material.title}</h1>
