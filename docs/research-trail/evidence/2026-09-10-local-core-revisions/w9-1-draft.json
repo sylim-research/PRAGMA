@@ -1,0 +1,79 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Codex",
+  "original_scenario_id": "48854f5c-678f-4b46-a127-0aea54536b54",
+  "original_artifact": "../2026-09-10-scene-grounding-confirmation-2/w9-1-core.json",
+  "original_sha256": "874f2eb5089ed5bb34f75f390e44cb7c3605f70e670bf24d2ae5415cd0c6493e",
+  "review_required": "Fresh semantic check of edited content, instructor review, then whole MJT5+DCT1 review. No approval or DB write performed.",
+  "plan": {
+    "key": "w9-1",
+    "week": 9,
+    "position": 1,
+    "replaces": "432ec4e7-93de-46dc-88ee-71a3a54e2932",
+    "cell": {
+      "speech_act_ui": "apology",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "relationship_social",
+      "topic_code": "apology_lateness",
+      "situation_seed_ko": "동호회에서 세 번 만난 회원과 카페에서 만나기로 했는데 내가 약속 시간을 잘못 기억해 십 분 늦었다. 상대는 카페 안에서 기다렸고, 도착한 나는 기다리게 한 일에 대해 직접 사과한다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "나는 동호회에서 세 번 만난 회원과 카페에서 만나기로 했으나 약속 시간을 착각해 십 분 늦게 도착했다. 상대는 카페에서 기다리고 있었고, 나는 기다리게 한 일에 대해 직접 사과하려 한다.",
+    "relation_ko": "동호회 회원, 몇 번 만난 아는 사이",
+    "source_modality": "spoken",
+    "source_text": "제가 약속 시간을 잘못 기억해서 십 분이나 늦었네요. 기다리게 해서 정말 죄송합니다. 앞으로는 이런 일 없도록 더 주의할게요.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "channel": "facetoface",
+    "context_spec": {
+      "standard_situation_code": "daily.apology_lateness.apology",
+      "role_pair": {
+        "speaker_ko": "동호회 회원(지각한 사람)",
+        "addressee_ko": "동호회 회원(기다린 사람)"
+      },
+      "speaker_entitlement": "실제 사건에서 확인된 화자의 잘못·피해에 한해 책임과 가능한 수리를 검토한다. 사과 화행이라는 이유로 잘못을 만들어 내지 않는다.",
+      "addressee_obligation": "상대가 실제 피해·불편의 당사자인지 먼저 확인한다. 사과를 즉시 수락하거나 용서할 의무를 전제하지 않는다.",
+      "decision_authority": "화자는 가능한 수리를 실행·제안할 수 있고, 상대는 피해 인정과 수용 여부를 판단한다.",
+      "interpreter_role_contract": {
+        "source_speaker": "A",
+        "target_addressee": "B",
+        "learner_interpreter": "C",
+        "pdr_relation": "A_to_B"
+      }
+    },
+    "brief_note_ko": "동호회 회원이 약속 시간 착각으로 늦은 것에 대해 사과한다.",
+    "focal_segments": [
+      {
+        "text": "기다리게 해서 정말 죄송합니다.",
+        "role": "head"
+      },
+      {
+        "text": "앞으로는 이런 일 없도록 더 주의할게요.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 40,
+      "max": 60,
+      "actual": 50
+    }
+  }
+}

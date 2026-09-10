@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T04:47:38.407Z",
+  "run_id": "scene_grounding_local_revision_review_20260910",
+  "draft_file": "w9-1-draft.json",
+  "draft_sha256": "ca9b0479b244396c67f42f2fe4cce3c981d963b1997d9d96885d8990e40e6c8a",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "동호회 회원이 약속 시간 착각으로 십 분 늦은 것에 대해 상대에게 직접 사과하는 장면이 기대 조건과 일치한다.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "화자가 자신의 지각에 대해 직접 사과하고 재발 방지를 약속한다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 동등한 관계로, 실제 상황과 P=equal이 일치한다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "세 번 만난 동호회 회원으로 acquaintance(몇 번 만난 아는 사이)에 부합한다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "10분 지각에 대한 사과로, 상대의 피해가 크지 않아 low에 해당한다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "동호회 모임 및 약속 지각은 일상 도메인에 해당한다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 없으므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "카페에서 직접 만나 구두로 사과하는 상황으로, 통역(구두) 장면에 부합한다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자의 잘못과 상대의 피해가 실제로 드러나 있고, 역할·권한 설명과 일치한다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "지각한 사람(A)이 기다린 사람(B)에게 사과하며, 책임자·피해자 지시가 일관된다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "화자가 사과 및 재발 방지 약속을 하고, 상대가 수용 여부를 판단할 수 있다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원, 약속 지각, 카페, 직접 사과 등 시드의 핵심 사건과 소재가 모두 구현되어 있다."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 pass."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "지각한 동호회 회원이 화자, 기다린 회원이 상대자로 일관된다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text 모두 약속 지각 및 사과 사건이 일치한다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황문에 실제 발화나 번역, 내부 평가 기준이 드러나지 않는다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 약속 지각 및 사과 상황이 자연스럽고 현실적이다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T04:47:38.558Z",
+        "core_content_hash": "b7aa113ce0575a25b72b947c32cab2f3548c9fc1bcfbee37a5228f41328c8c3c"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "scope": "Offline schema and deterministic rules only; not semantic approval",
+  "checks": [
+    {
+      "key": "w9-1",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 50
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "w2-0",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 60
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "pilot-reverse-opposition",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 80,
+        "max": 110,
+        "actual": 48
+      },
+      "rules": {
+        "ok": true,
+        "result": "warning",
+        "violations": [
+          {
+            "id": "R29",
+            "level": "warning",
+            "message": "코어 source_text: effective_chars_v2_min_warning 기준 권장 최소 유효 글자 80자 미만(공백·문장부호 제외 실측 48자)",
+            "evidence": {
+              "subrule": "minimum_length",
+              "actual": 48,
+              "threshold": 80,
+              "modality": "translation",
+              "direction": "zh_ko",
+              "context": {
+                "min": 80,
+                "max": 110,
+                "policy_version": "effective_chars_v2_min_warning"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

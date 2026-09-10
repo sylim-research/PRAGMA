@@ -1,0 +1,376 @@
+{
+  "id": "258f8f83-5fda-4813-9cbb-b17dd3654787",
+  "status": "completed",
+  "model": "gpt-6-astra",
+  "error": null,
+  "can_resume": false,
+  "created_at": "2026-09-10T05:19:49.498923+00:00",
+  "updated_at": "2026-09-10T05:23:04.615+00:00",
+  "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+  "label": "나는 동호회에서 세 번 만난 회원과 카페에서 만나기로 했으나 약속 시간을 착각해 십 분 늦게 도착했다. 상대는 카페에서 기다리고 있었고, 나는 기다리게 한 일에 대해 직접 사과하려 한다.",
+  "completed_steps": 5,
+  "provider_responses": [
+    {
+      "id": "resp_0ce0dd7394dd083d006aa23df7729887d0a152b08370fb9faa",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_096e1c2062ccbce3006aa23e16ba2887d0971fc3b7726a2058",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0b5252962fa6ccd1006aa23e815f9887d0921f6e4868d5dee0",
+      "model": "gpt-4.1",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0d57e2286627ee0e006aa23e8ae35087d0a33e2bceece41088",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    },
+    {
+      "id": "resp_0d16f33a312fc241006aa23ea6811487d090a0fee4b8d5c972",
+      "model": "gpt-6-astra",
+      "state": "completed"
+    }
+  ],
+  "result": {
+    "meta": {
+      "model": "gpt-6-astra",
+      "provider": "openai",
+      "generated_at": "2026-09-10T05:23:04.614Z",
+      "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+      "content_release_id": "pragma_scene_grounding_candidate_20260910_03"
+    },
+    "mission_content": {
+      "unit": {
+        "closing_ko": "사과는 세게 말하는 것이 아니라, 실제 책임과 상대가 받은 영향에 맞게 인정하고 필요한 수리를 제시할 때 적절합니다.",
+        "learner_label": "책임 인정과 수리",
+        "target_feature": "apology_accountability_repair",
+        "target_feature_version": "1.0"
+      },
+      "authoring": {
+        "stage": "ai_draft",
+        "lineage_status": "pending",
+        "schema_version": "mission_authoring_v1",
+        "repair_attempts": 0
+      },
+      "direction": "ko_zh",
+      "mpj_items": [
+        {
+          "id": 1,
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "scale4",
+          "source": "설거지하다가 내가 컵을 깨뜨렸네. 내가 조심하지 못했어, 미안해. 앞으로는 더 조심할게.",
+          "target": "洗碗时，我把杯子打碎了。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "channel": "facetoface",
+          "highlights": [
+            "是我的一点小失误",
+            "不好意思啊"
+          ],
+          "item_focus": "apology_accountability_repair",
+          "relation_ko": "몇 년째 매주 사적으로 만나며 친하게 지내는 친구",
+          "axis_feature": "apology_accountability_repair",
+          "situation_ko": "나는 몇 년째 매주 만나는 친한 친구의 집에서 설거지를 하다가 친구가 쓰는 저렴한 유리컵 하나를 깨뜨렸다. 다친 사람은 없으며, 옆에 있는 친구에게 컵을 깨뜨린 일에 대해 사과하려 한다.",
+          "explanation_ko": "오래 친하게 지낸 친구 사이이고 다친 사람 없이 저렴한 컵 하나가 깨진 상황이다. ‘是我的一点小失误’는 자신의 실수임을 밝히면서 사건을 무겁게 키우지 않아, 이 관계에서는 일상적인 사과로 받아들일 수 있다. 강한 자책을 더하기보다 자신의 행위 인정과 원문에 있는 주의 약속을 유지한다.",
+          "preceding_turn": null,
+          "recommended_example": "洗碗时，我把杯子打碎了。是我不够小心，不好意思啊。以后我会更小心的。",
+          "accepted_scale_codes": [
+            "very_appropriate",
+            "somewhat_appropriate"
+          ],
+          "reference_scale_code": "somewhat_appropriate"
+        },
+        {
+          "id": 2,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "judge3",
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "channel": "facetoface",
+          "highlights": [
+            "是我的一点小失误"
+          ],
+          "item_focus": "apology_accountability_repair",
+          "relation_ko": "독서 모임에서 여러 번 이야기를 나눈 동등한 회원",
+          "axis_feature": "apology_accountability_repair",
+          "situation_ko": "나는 독서 모임에서 여러 번 교류한 회원에게 빌린 책의 책장을 넘기다 모서리를 조금 찢었다. 글자는 손상되지 않았으며, 책을 돌려주면서 훼손한 일에 대해 회원에게 사과하려 한다.",
+          "explanation_ko": "첫 장면과 마찬가지로 동등한 관계의 낮은 피해 상황이며, ‘一点小失误’로 자신의 실수를 작게 규정하는 전략도 유지되지만 친한 친구에서 몇 번 교류한 지인으로 거리만 달라졌다. 자기 소유가 아닌 빌린 책을 돌려주는 자리에서 이 표현은 책임을 인정하면서도 잘못의 무게를 화자가 먼저 낮춰 잡는 인상을 준다. 피해가 작다는 사실은 ‘弄破了一点’로 유지하고, 자기 평가만 ‘是我不够小心’으로 조정한다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "recommended_example": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。"
+        },
+        {
+          "id": 3,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "fix_choice",
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "channel": "facetoface",
+          "highlights": [
+            "是我的一点小失误"
+          ],
+          "item_focus": "apology_accountability_repair",
+          "corrections": [
+            {
+              "text": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。",
+              "note_ko": "지인의 책을 조금 훼손한 상황에서 ‘是我不够小心’는 해당 행동에 책임을 한정해 인정하므로, 잘못을 축소하거나 인격 전체로 확대하지 않는 표현을 유지한다.",
+              "is_valid": true
+            },
+            {
+              "text": "翻页时，我把书页的边角弄破了一点。也就是我的一点小疏忽，不好意思啊。以后我会更小心的。",
+              "note_ko": "행위·사과·주의 약속은 유지하고 책임 평가만 ‘也就是……一点小疏忽’로 바꿨다. 책 주인에게 훼손을 인정하면서도 그 무게를 화자가 먼저 축소하므로, 구체적인 부주의 인정에서 부족함 대역으로 내려간다.",
+              "is_valid": false
+            },
+            {
+              "text": "翻页时，我把书页的边角弄破了一点。是我太不懂得尊重别人的东西了，不好意思啊。以后我会更小心的。",
+              "note_ko": "‘不够小心’를 ‘太不懂得尊重别人的东西’로 바꿔 이번 행동의 부주의를 타인의 물건을 존중하지 못하는 태도 문제로 확대했다. 작은 모서리 훼손에 도덕적 자기비난을 얹어 상대에게 사과를 더 무겁게 받아들이게 하는 과함 대역이다.",
+              "is_valid": false
+            }
+          ],
+          "relation_ko": "독서 모임에서 여러 번 이야기를 나눈 동등한 회원",
+          "axis_feature": "apology_accountability_repair",
+          "situation_ko": "나는 독서 모임에서 여러 번 교류한 회원에게 빌린 책의 책장을 넘기다 모서리를 조금 찢었다. 글자는 손상되지 않았으며, 책을 돌려주면서 훼손한 일에 대해 회원에게 사과하려 한다.",
+          "explanation_ko": "여러 번 교류한 동등한 회원의 책 모서리를 조금 찢었고 글자는 손상되지 않은 상황에서는, 피해를 축소하지 않으면서 이번 행동의 부주의를 인정하는 것이 적절합니다. ‘是我不够小心’는 책임을 구체적인 행동에 한정하고 사과와 주의 약속을 연결해 상대의 물건을 신중히 대하겠다는 인상을 주므로 유지하되, ‘也就是我的一点小疏忽’처럼 잘못을 가볍게 규정하거나 ‘是我太不懂得尊重别人的东西了’처럼 태도 전반의 문제로 확대하지 않도록 합니다.",
+          "preceding_turn": null,
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "recommended_example": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。"
+        },
+        {
+          "id": 4,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "type": "reason",
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "channel": "facetoface",
+          "reasons": [
+            {
+              "id": "r3",
+              "kind": "primary",
+              "text_ko": "‘一点小失误’는 자기 실수임을 인정하면서도 지인의 물건을 훼손한 잘못을 화자가 먼저 가볍게 규정하기 때문이다."
+            },
+            {
+              "id": "r1",
+              "kind": "pragmatic_misconception",
+              "text_ko": "‘以后我会更小心的’라는 약속이 상대에게 지금 바로 용서해 달라는 요구로 작용해 응답을 압박하기 때문이다."
+            },
+            {
+              "id": "r2",
+              "kind": "meaning_grammar_context",
+              "text_ko": "‘以后我会更小心的’는 같은 책을 다시 빌리겠다는 약속이므로, 아직 합의하지 않은 재대출을 전제하기 때문이다."
+            }
+          ],
+          "highlights": [
+            "是我的一点小失误"
+          ],
+          "item_focus": "apology_accountability_repair",
+          "relation_ko": "독서 모임에서 여러 번 이야기를 나눈 동등한 회원",
+          "axis_feature": "apology_accountability_repair",
+          "situation_ko": "나는 독서 모임에서 여러 번 교류한 회원에게 빌린 책의 책장을 넘기다 모서리를 조금 찢었다. 글자는 손상되지 않았으며, 책을 돌려주면서 훼손한 일에 대해 회원에게 사과하려 한다.",
+          "explanation_ko": "몇 번 교류한 지인에게 훼손한 책을 돌려주면서 ‘一点小失误’라고 하면, 자신의 행위를 인정해도 잘못의 무게를 먼저 낮춘다는 인상을 줄 수 있다. 주원인은 이 책임 평가이며, ‘以后我会更小心的’는 원문에 있는 주의 약속이지 즉각적인 용서 요구나 재대출 약속이 아니다. ‘一点小失误’를 ‘是我不够小心’으로 바꾸어 책임 인정의 범위를 맞춘다.",
+          "preceding_turn": null,
+          "problem_band_code": "under_acknowledged",
+          "accepted_reason_id": "r3",
+          "recommended_example": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。"
+        },
+        {
+          "id": 5,
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "type": "multi_judge",
+          "source": "제가 조심하지 못해서 카메라를 떨어뜨려 렌즈를 깨뜨렸어요. 제 잘못으로 한 달 동안 카메라를 못 쓰시게 돼서 정말 죄송해요. 수리비 150만 원은 제가 부담할게요.",
+          "channel": "facetoface",
+          "candidates": [
+            {
+              "text": "我不小心把相机摔了，摔坏了镜头。是我的错，让你一个月用不了相机，真的对不起。150万韩元的维修费我来出。",
+              "note_ko": "고액 수리와 한 달의 사용 중단에 ‘是我的错’로 책임을 명시하고 비용 부담을 연결해 책임을 맡는 인상을 주므로, 원문 범위의 인정과 수리를 유지한다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "我不小心把相机摔了，摔坏了镜头。这只是个小失误，让你一个月用不了相机，真的对不起。150万韩元的维修费我来出。",
+              "note_ko": "‘是我的错’만 ‘这只是个小失误’로 바꾸고 파손·한 달 사용 중단·수리비 부담은 유지했다. ‘只是’와 ‘小失误’가 고액 파손의 책임을 작은 실수로 한정해, 피해를 말하고도 그 무게를 충분히 인정하지 않는 부족함 대역으로 이동한다.",
+              "accepted_band_codes": [
+                "under_acknowledged"
+              ]
+            },
+            {
+              "text": "我不小心把相机摔了，摔坏了镜头，让你一个月都用不了，真是给你添麻烦了。真的对不起，150万韩元的维修费我来出。",
+              "note_ko": "한 달간 사용하지 못하는 상황에서 ‘真是给你添麻烦了’는 상대가 겪는 불편을 전면에 두어 피해를 이해한다는 인상을 주므로, 행위 인정과 허용된 수리를 함께 유지한다.",
+              "accepted_band_codes": [
+                "within_band"
+              ]
+            },
+            {
+              "text": "我不小心把相机摔了，摔坏了镜头，让你一个月都用不了，我真是个靠不住的人。真的对不起，150万韩元的维修费我来出。",
+              "note_ko": "피해 평가인 ‘真是给你添麻烦了’를 인격 평가인 ‘我真是个靠不住的人’으로 바꿨다. 파손과 수리 책임은 그대로지만 한 번의 부주의를 사람 전체의 신뢰성 결함으로 확대해, 구체적인 피해 인정에서 과함 대역으로 넘어간다.",
+              "accepted_band_codes": [
+                "overextended"
+              ]
+            }
+          ],
+          "item_focus": "apology_accountability_repair",
+          "relation_ko": "사진 동호회에서 몇 차례 함께 촬영한 동등한 회원",
+          "axis_feature": "apology_accountability_repair",
+          "situation_ko": "나는 몇 차례 함께 촬영한 동호회 회원에게 빌린 카메라를 떨어뜨려 렌즈를 깨뜨렸다. 수리점에서 수리비가 150만 원이고 한 달간 사용이 불가능하다고 안내받아, 회원을 만나 파손한 일에 대해 사과하려 한다.",
+          "explanation_ko": "몇 차례 함께 촬영한 동등한 회원의 카메라를 파손해 수리비 150만 원과 한 달간의 사용 중단이 발생했으므로, 책임과 상대의 불편을 충분히 인정해야 합니다. ‘是我的错’로 책임을 명시하는 방식과 ‘真是给你添麻烦了’로 피해자의 불편을 드러내는 방식은 모두 행위 인정·사과·수리비 부담과 연결되어 책임을 맡고 피해를 이해한다는 인상을 주는 적정한 표현입니다. 두 방식 모두 유지할 수 있으며, ‘这只是个小失误’로 피해의 무게를 축소하거나 ‘我真是个靠不住的人’으로 인격 전체를 비난하는 방향은 피해야 합니다.",
+          "preceding_turn": null,
+          "recommended_example": "我不小心把相机摔了，摔坏了镜头。是我的错，让你一个月用不了相机，真的对不起。150万韩元的维修费我来出。"
+        }
+      ],
+      "provenance": {
+        "model": "gpt-6-astra",
+        "generated_at": "2026-09-10T05:23:04.614Z",
+        "band_targeting": {
+          "version": "relative_band_targeting_v2_bounded_fallback",
+          "within_warnings": [],
+          "boundary_fallback": {
+            "eligible_paths": [],
+            "attempted_paths": [],
+            "succeeded_paths": [],
+            "situation_unchanged": true,
+            "immutable_candidates_unchanged": true
+          },
+          "within_regeneration_count": 0,
+          "candidate_regeneration_counts": {}
+        },
+        "prompt_version": "mission_v5_mpj5_minidiscourse_v20_observed_pdr_scene",
+        "scene_topology": {
+          "version": "mission_scene_topology_evidence_v1",
+          "attempts": 1,
+          "findings": [],
+          "final_result": "pass",
+          "prompt_version": "mission_scene_topology_v2_preserve_pdr",
+          "first_pass_result": "pass",
+          "regeneration_count": 0
+        },
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "generation_attempt": 1,
+        "mission_content_hash": "a834efa1b5765c617cb64c156cc54dc216b0d33b7d4452c5f768a6561d18c32e"
+      },
+      "contrast_plan": {
+        "version": "contrast_plan_v1",
+        "item_slots": [
+          {
+            "item_id": 1,
+            "item_type": "scale4",
+            "item_focus": "apology_accountability_repair",
+            "intended_band_profile": "appropriate_counterexample"
+          },
+          {
+            "item_id": 2,
+            "item_type": "judge3",
+            "item_focus": "apology_accountability_repair",
+            "intended_band_profile": "anchor_non_within"
+          },
+          {
+            "item_id": 3,
+            "item_type": "fix_choice",
+            "item_focus": "apology_accountability_repair",
+            "intended_band_profile": "anchor_non_within_then_repair"
+          },
+          {
+            "item_id": 4,
+            "item_type": "reason",
+            "item_focus": "apology_accountability_repair",
+            "intended_band_profile": "anchor_non_within_primary_reason"
+          },
+          {
+            "item_id": 5,
+            "item_type": "multi_judge",
+            "item_focus": "apology_accountability_repair",
+            "intended_band_profile": "within_2_adjustment_needed_2"
+          }
+        ],
+        "speech_act": "apology",
+        "mission_goal": "integrated_speech_act"
+      },
+      "learning_goal": {
+        "kind": "speech_act",
+        "speech_act": "apology"
+      },
+      "schema_version": "mission_v5",
+      "production_task": {
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "low"
+        },
+        "mode": "interpreting",
+        "channel": "facetoface",
+        "relation_ko": "동호회 회원, 몇 번 만난 아는 사이",
+        "source_text": "제가 약속 시간을 잘못 기억해서 십 분이나 늦었네요. 기다리게 해서 정말 죄송합니다. 앞으로는 이런 일 없도록 더 주의할게요.",
+        "replay_limit": 2,
+        "situation_ko": "나는 동호회에서 세 번 만난 회원과 카페에서 만나기로 했으나 약속 시간을 착각해 십 분 늦게 도착했다. 상대는 카페에서 기다리고 있었고, 나는 기다리게 한 일에 대해 직접 사과하려 한다.",
+        "focal_segments": [
+          {
+            "role": "head",
+            "text": "기다리게 해서 정말 죄송합니다."
+          },
+          {
+            "role": "support",
+            "text": "앞으로는 이런 일 없도록 더 주의할게요."
+          }
+        ],
+        "preceding_turn": null,
+        "source_modality": "spoken",
+        "reference_alternatives": [
+          {
+            "text": "我把约好的时间记错了，迟到了整整十分钟。让你等了这么久，真的对不起。以后我会更注意，不让这种事再发生。",
+            "note_ko": "시간을 잘못 기억한 책임과 십 분 지각을 밝히고, 기다림에 대한 사과와 원문에 있는 재발 방지 약속까지 모두 옮긴 안이다."
+          },
+          {
+            "text": "我记错了约好的时间，晚到了十分钟。真是不好意思，让你久等了。以后我会更仔细，避免再出这样的事。",
+            "note_ko": "사과 뒤에 기다림의 영향을 짚는 순서로 구성했다. 원문의 이유·지각 시간·사과·주의 약속을 모두 유지하면서 새로운 보상은 덧붙이지 않았다."
+          }
+        ]
+      },
+      "diagnostic_dimensions": [
+        {
+          "code": "force_calibration",
+          "evidence_ko": "친구의 저렴한 컵 파손, 지인에게 빌린 책의 경미한 훼손, 고액 수리가 필요한 카메라 파손에서 잘못을 작게 규정하거나 심각하게 평가하는 표현의 강도를 비교한다.",
+          "evidence_refs": [
+            "mpj:1",
+            "mpj:2",
+            "mpj:5"
+          ]
+        },
+        {
+          "code": "supportive_move_fit",
+          "evidence_ko": "원문에 있는 주의 약속과 수리비 부담을 사과에 결합하되, 보조 발화가 현재의 책임·영향 인정을 대신하지 않도록 구성하는지를 관찰한다.",
+          "evidence_refs": [
+            "mpj:3",
+            "mpj:5",
+            "dct"
+          ]
+        }
+      ]
+    }
+  }
+}

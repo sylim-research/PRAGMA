@@ -1,0 +1,73 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Codex",
+  "original_scenario_id": "9e5e1bd9-cf65-4cb4-ae87-8df47c8e0b30",
+  "original_artifact": "../2026-09-10-scene-grounding-confirmation-2/w2-0-core.json",
+  "original_sha256": "47e52002fd63bf3bffc78102e58105e0e49787b14b8bea8b7035f3dcf2d5c25e",
+  "review_required": "Fresh semantic check of edited content, instructor review, then whole MJT5+DCT1 review. No approval or DB write performed.",
+  "plan": {
+    "key": "w2-0",
+    "week": 2,
+    "position": 0,
+    "replaces": "f8de3f59-cd86-4636-b516-a8ead78ac0ac",
+    "cell": {
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "daily_living",
+      "topic_code": "borrow_favor",
+      "situation_seed_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 같은 층 이웃에게 메신저로 수령을 부탁하려 한다. 반년 동안 인사를 나눴고, 작은 상자를 이웃집 현관 안에 잠시 보관해 주면 내가 저녁 여섯 시에 찾아갈 예정이다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "나는 오늘 오후 집을 비워 택배를 받을 수 없다. 반년간 인사만 나눈 같은 층 이웃에게 메신저로 상자를 잠시 맡아 달라고 부탁하려 한다.",
+    "relation_ko": "같은 층 이웃, 몇 번 인사한 사이",
+    "source_modality": "written",
+    "source_text": "오늘 오후에는 집에 없어 택배를 직접 받기 어렵습니다. 작은 상자를 대신 받아 댁 현관 안에 잠시 두어 주실 수 있을까요? 저녁 여섯 시에 찾아가겠습니다.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "channel": "messenger",
+    "context_spec": {
+      "standard_situation_code": "daily.borrow_favor.request",
+      "role_pair": {
+        "speaker_ko": "택배를 부탁하는 입주민",
+        "addressee_ko": "같은 층 이웃"
+      },
+      "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+      "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+      "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다."
+    },
+    "brief_note_ko": "같은 층 이웃에게 택배 상자 잠시 맡아 달라고 부탁한다.",
+    "focal_segments": [
+      {
+        "text": "작은 상자를 대신 받아 댁 현관 안에 잠시 두어 주실 수 있을까요?",
+        "role": "head"
+      },
+      {
+        "text": "저녁 여섯 시에 찾아가겠습니다.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 60,
+      "max": 85,
+      "actual": 60
+    }
+  }
+}

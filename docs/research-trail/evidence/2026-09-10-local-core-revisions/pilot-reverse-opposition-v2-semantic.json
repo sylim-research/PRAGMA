@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T04:47:53.601Z",
+  "run_id": "scene_grounding_local_revision_review_20260910",
+  "draft_file": "pilot-reverse-opposition-draft-v2.json",
+  "draft_sha256": "67f8f723b20dc4c65e89c9bee7a3e8467f718acec142667bc113a0ec661a416f",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "조별 과제 설문에서 통학 시간 문항을 빼자는 제안에 대해 동등한 조원이 반대 의견을 제시하는 장면이 적절히 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "source_text는 상대의 제안(통학 시간 문항 삭제)에 대해 자신의 의견이 다르다고 밝히고, 해당 문항을 유지해야 한다는 근거를 제시하며 반대 의사를 분명히 표현하고 있다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제 조원 간 동등한 관계로, 실제로 서로 의견을 제시하고 논의할 권한이 동등하게 주어진 상황이다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "한 학기 동안 함께 공부한 조원으로, acquaintance(아는 사이)에 해당한다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제 설문 문항에 대한 의견 반대는 중간 정도의 부담(middle burden)에 해당하며, 실제로도 그 정도의 부담이 드러난다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "학업(조별 과제) 상황으로, 지정 도메인과 일치한다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황이므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "단체 메신저를 통한 서면 메시지로, 번역(서면) 모드에 부합한다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자는 의견을 제시할 자격이 있고, 상대는 제안자이며, 공동 논의로 결정할 수 있는 사안임이 명확하다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자(A)는 자신의 의견을, 상대(B)는 제안(문항 삭제)을 했으며, 반대의 대상과 책임자가 일관되게 지시된다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "설문 문항 유지/삭제는 조원들이 공동으로 논의·결정할 수 있는 사안이다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제 설문, 통학 시간 문항, 동급생 조원, 반대 의견 등 시드의 핵심 사건과 소재가 모두 유지된다."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "preceding_turn에서 상대가 통학 시간 문항 삭제를 제안했고, source_text는 바로 그 제안에 대해 반대 의견을 제시한다."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "source_text의 화자와 상대가 모두 조별 과제 조원으로 일관되며, 역할이 뒤바뀌지 않았다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text 모두 조별 과제 설문 문항(통학 시간) 삭제 제안과 그에 대한 반대 의견이라는 동일한 핵심 사건을 다룬다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 실제 발화나 번역문이 들어 있지 않고, 학생이 장면을 이해하는 데 필요한 정보만 제공된다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제에서 설문 문항에 대해 의견을 나누고, 한 조원이 제안에 반대하는 것은 충분히 현실적이고 자연스럽다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T04:47:53.745Z",
+        "core_content_hash": "343ed333ce913ca1589dd832a8c25576e3ac2a85943cc3ad9c4d42d9b8841ba0"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

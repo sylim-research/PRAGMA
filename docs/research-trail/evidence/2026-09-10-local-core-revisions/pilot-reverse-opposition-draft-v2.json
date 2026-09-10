@@ -1,0 +1,74 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE) on Codex draft v1",
+  "original_scenario_id": "6ff643a6-a3a5-4034-95c5-e55b3bb8ddc2",
+  "original_artifact": "../2026-09-10-scene-grounding-confirmation-2/pilot-reverse-opposition-core.json",
+  "original_sha256": "a3bdc37822113d1cdb7031398602ac439780b377de61b7612f3431ad558f88a9",
+  "review_required": "Fresh semantic check of edited content, instructor review, then whole MJT5+DCT1 review. No approval or DB write performed.",
+  "plan": {
+    "key": "pilot-reverse-opposition",
+    "cell": {
+      "speech_act_ui": "opposition",
+      "level": "advanced",
+      "domain": "school",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "theme_code": "campus_study",
+      "topic_code": "school_viewpoint_opposition",
+      "situation_seed_ko": "한 학기 동안 함께 공부한 동급생이 조별 과제 설문에서 통학 시간 질문을 빼자고 단체 메신저에 제안했다. 통학 시간이 수업 참여에 미치는 영향을 조사하는 과제여서 나는 그 질문을 빼는 데 반대한다.",
+      "direction": "zh_ko",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "zh_ko",
+    "situation_ko": "나는 한 학기 동안 함께 공부한 조원과 단체 메신저에서 조별 과제 설문 문항에 대해 논의하고 있다. 상대가 통학 시간 질문을 빼자고 제안해, 나는 그 제안에 반대하려 한다.",
+    "relation_ko": "한 학기 동안 함께 공부한 동급생",
+    "source_modality": "written",
+    "source_text": "关于通勤时间这一项，我的看法有点不一样，我觉得还是需要保留。我们这次研究关注的就是通勤时间对课堂参与的影响，如果把这一项删掉，后面就很难分析两者之间的关系了。这一点大家再考虑一下，好吗？",
+    "preceding_turn": "통학 시간 질문은 빼는 게 어떨까요?",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "mid"
+    },
+    "channel": "messenger",
+    "context_spec": {
+      "standard_situation_code": "school.school_viewpoint_opposition.opposition",
+      "role_pair": {
+        "speaker_ko": "조별 과제 조원",
+        "addressee_ko": "조별 과제 조원"
+      },
+      "speaker_entitlement": "화자는 자신이 관련된 의견·평가·방안에 이견을 밝힐 정당한 참여 자격이 있다.",
+      "addressee_obligation": "상대는 이견 대상 의견·평가·방안을 제시한 사람이며 반대 의견을 검토할 수 있다.",
+      "decision_authority": "이견 대상 사안은 상대 또는 공동 논의의 결정 범위 안에 있다."
+    },
+    "brief_note_ko": "조별 과제 설문에서 통학 시간 질문 제외 제안에 반대하는 메시지",
+    "focal_segments": [
+      {
+        "text": "我的看法有点不一样，我觉得还是需要保留。",
+        "role": "head"
+      },
+      {
+        "text": "这一点大家再考虑一下，好吗？",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 80,
+      "max": 110,
+      "actual": 85
+    }
+  },
+  "revision": 2,
+  "revision_basis": "pilot-reverse-opposition-draft.json",
+  "revision_basis_sha256": "f6a469dd8bd652674085916a25f3922af1ebd470fdb93b909a6374d7faf38669",
+  "revision_reason": "v1 source was 48 effective chars against the advanced translation range 80-110 (R29 warning). v2 adds a disagreement preface, seed-bound reasoning, and a group-addressed reconsideration request; no facts beyond the seed."
+}

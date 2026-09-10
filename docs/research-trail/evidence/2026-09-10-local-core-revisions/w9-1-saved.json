@@ -1,0 +1,186 @@
+{
+  "at": "2026-09-10T04:51:59.123Z",
+  "key": "w9-1",
+  "draft_file": "w9-1-draft.json",
+  "draft_sha256": "ca9b0479b244396c67f42f2fe4cce3c981d963b1997d9d96885d8990e40e6c8a",
+  "original_scenario_id": "48854f5c-678f-4b46-a127-0aea54536b54",
+  "new_scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "동호회 회원이 약속 시간 착각으로 늦은 것에 대해 사과한다.",
+    "speech_act": "apology",
+    "learner_level": "intermediate",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "theme_code": "relationship_social",
+    "topic_code": "apology_lateness",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "나는 동호회에서 세 번 만난 회원과 카페에서 만나기로 했으나 약속 시간을 착각해 십 분 늦게 도착했다. 상대는 카페에서 기다리고 있었고, 나는 기다리게 한 일에 대해 직접 사과하려 한다.",
+      "relation_ko": "동호회 회원, 몇 번 만난 아는 사이",
+      "source_modality": "spoken",
+      "source_text": "제가 약속 시간을 잘못 기억해서 십 분이나 늦었네요. 기다리게 해서 정말 죄송합니다. 앞으로는 이런 일 없도록 더 주의할게요.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.apology_lateness.apology",
+        "role_pair": {
+          "speaker_ko": "동호회 회원(지각한 사람)",
+          "addressee_ko": "동호회 회원(기다린 사람)"
+        },
+        "speaker_entitlement": "실제 사건에서 확인된 화자의 잘못·피해에 한해 책임과 가능한 수리를 검토한다. 사과 화행이라는 이유로 잘못을 만들어 내지 않는다.",
+        "addressee_obligation": "상대가 실제 피해·불편의 당사자인지 먼저 확인한다. 사과를 즉시 수락하거나 용서할 의무를 전제하지 않는다.",
+        "decision_authority": "화자는 가능한 수리를 실행·제안할 수 있고, 상대는 피해 인정과 수용 여부를 판단한다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "동호회 회원이 약속 시간 착각으로 늦은 것에 대해 사과한다.",
+      "focal_segments": [
+        {
+          "text": "기다리게 해서 정말 죄송합니다.",
+          "role": "head"
+        },
+        {
+          "text": "앞으로는 이런 일 없도록 더 주의할게요.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 50
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_repair",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T04:09:47.928Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "화자는 동호회에서 세 번 만난 회원(아는 사이)과 카페에서 만나기로 했으나, 약속 시간을 착각해 십 분 늦었고, 상대는 카페 안에서 기다렸다. 화자는 상대에게 직접 사과하려 한다. 실제 권한은 동등하며, 이전에 몇 번 만난 아는 사이이고, 십 분 지각에 대한 사과는 부담이 크지 않아 R이 낮다.",
+          "scene_ko": "나는 동호회에서 세 번 만난 회원과 카페에서 만나기로 했으나 약속 시간을 착각해 십 분 늦게 도착했다. 상대는 카페에서 기다리고 있었고, 나는 기다리게 한 일에 대해 직접 사과하려 한다.",
+          "relation_ko": "동호회 회원, 몇 번 만난 아는 사이",
+          "speaker_role_ko": "동호회 회원(지각한 사람)",
+          "addressee_role_ko": "동호회 회원(기다린 사람)",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "p_evidence_ko": "동호회 회원끼리 실제 권한 차이가 없다.",
+          "d_evidence_ko": "세 번 만난 동호회 회원으로, 이전에 교류한 아는 사이다.",
+          "r_evidence_ko": "십 분 지각에 대한 사과로, 피해와 부담이 크지 않다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "동호회 회원이 약속 시간 착각으로 십 분 늦은 것에 대해 상대에게 직접 사과하는 장면이 기대 조건과 일치한다.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "화자가 자신의 지각에 대해 직접 사과하고 재발 방지를 약속한다."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 동등한 관계로, 실제 상황과 P=equal이 일치한다."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "세 번 만난 동호회 회원으로 acquaintance(몇 번 만난 아는 사이)에 부합한다."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "10분 지각에 대한 사과로, 상대의 피해가 크지 않아 low에 해당한다."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "동호회 모임 및 약속 지각은 일상 도메인에 해당한다."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 없으므로 pass."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "카페에서 직접 만나 구두로 사과하는 상황으로, 통역(구두) 장면에 부합한다."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자의 잘못과 상대의 피해가 실제로 드러나 있고, 역할·권한 설명과 일치한다."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "지각한 사람(A)이 기다린 사람(B)에게 사과하며, 책임자·피해자 지시가 일관된다."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "화자가 사과 및 재발 방지 약속을 하고, 상대가 수용 여부를 판단할 수 있다."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원, 약속 지각, 카페, 직접 사과 등 시드의 핵심 사건과 소재가 모두 구현되어 있다."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 pass."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "지각한 동호회 회원이 화자, 기다린 회원이 상대자로 일관된다."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 약속 지각 및 사과 사건이 일치한다."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문에 실제 발화나 번역, 내부 평가 기준이 드러나지 않는다."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 약속 지각 및 사과 상황이 자연스럽고 현실적이다."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T04:47:38.558Z",
+          "core_content_hash": "b7aa113ce0575a25b72b947c32cab2f3548c9fc1bcfbee37a5228f41328c8c3c"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "48854f5c-678f-4b46-a127-0aea54536b54",
+          "draft_file": "w9-1-draft.json",
+          "draft_sha256": "ca9b0479b244396c67f42f2fe4cce3c981d963b1997d9d96885d8990e40e6c8a",
+          "author": "Codex",
+          "edited_at": "2026-09-10T04:47:38.407Z",
+          "semantic_run_id": "scene_grounding_local_revision_review_20260910",
+          "note": "Human-edited core content; the original generation prompt/scene_plan above describe the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "core_v18_observed_pdr_scene_repair"
+    },
+    "generation_run_id": "scene_grounding_confirm_20260910",
+    "generation_item_key": "edited:w9-1",
+    "content_hash": "nlhvbw",
+    "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d"
+  }
+}
