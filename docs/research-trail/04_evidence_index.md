@@ -452,3 +452,4 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - DEC-20260910-09, docs/dev-log/2026-09-10-scene-grounding-gate.md 및 해당 구현 Git 이력.
 - 실제 Edge handler 모의 제공자: scripts/scene-grounding-edge.test.mjs. 공유 규칙·검사 재사용·조사 보존: src/lib/pragma/sceneGrounding.test.ts, coreBatchRun.test.ts, src/lib/mission/learnerScene.test.ts.
 - 의미 검사 결과가 진행 조건으로 작동함을 검증한다. 모델의 실제 판정 정확도·전체 미션 승인·최종 콘텐츠 LOCK 증거와 구분한다. 신규 생성 및 운영 후속은 dev-log에서 별도 확인한다.
+- 실제 1차 생성 원본 7건 및 SHA-256: `docs/research-trail/evidence/2026-09-10-scene-grounding-pilot-1/index.json`. 부적합 입력 3건 중 2건 차단·초면 오판 1건 누락, 신규 코어 4건 자동 통과·직접 검토 0건 채택이다. 통과율 일반화나 내용 타당도 확보의 증거로 쓰지 않는다. 이 반례를 근거로 관찰 PDR 대조와 상황·실제 대사 구분을 보완했다.

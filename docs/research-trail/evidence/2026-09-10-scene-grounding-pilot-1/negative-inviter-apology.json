@@ -1,0 +1,29 @@
+{
+  "at": "2026-09-10T03:47:41.301Z",
+  "input": {
+    "key": "inviter-apology",
+    "speech_act": "apology",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "mid"
+    },
+    "seed": "나는 몇 번 인사한 이웃을 식사에 초대했고 이웃은 개인 일정 때문에 거절했다. 나는 다른 잘못이나 피해를 주지 않았지만, 이웃이 거절했다는 이유로 내가 사과하려 한다."
+  },
+  "data": {
+    "error": "이웃이 초대를 정중하게 거절했을 뿐, 실제 잘못이나 피해가 발생하지 않았으므로 사과할 만한 사건이 성립하지 않는다. 단순히 초대를 거절당한 사실만으로 사과 의무나 상황이 발생하지 않는다.",
+    "stop_code": "CORE_PREFLIGHT_HOLD",
+    "scene_plan": {
+      "feasible": false,
+      "reason_ko": "이웃이 초대를 정중하게 거절했을 뿐, 실제 잘못이나 피해가 발생하지 않았으므로 사과할 만한 사건이 성립하지 않는다. 단순히 초대를 거절당한 사실만으로 사과 의무나 상황이 발생하지 않는다.",
+      "scene_ko": "",
+      "relation_ko": "",
+      "speaker_role_ko": "",
+      "addressee_role_ko": "",
+      "p_evidence_ko": "",
+      "d_evidence_ko": "",
+      "r_evidence_ko": ""
+    }
+  },
+  "error": null
+}

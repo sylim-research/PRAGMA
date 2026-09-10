@@ -32,7 +32,9 @@ describe('grounded scene gate', () => {
   });
   it('rejects incomplete preflight plans instead of inferring mid burden or repairing role markers', () => {
     const plan = { feasible: true, reason_ko: '일정 착오가 실제 피해를 초래했습니다.', scene_ko: '저는 이웃에게 모임 시간을 잘못 알려 주었습니다. 이웃은 한 시간 기다렸고 저는 메시지로 사과합니다.', relation_ko: '몇 차례 인사한 이웃', speaker_role_ko: '시간을 잘못 알린 이웃', addressee_role_ko: '기다린 이웃', p_evidence_ko: '서로 이웃', d_evidence_ko: '몇 차례 인사', r_evidence_ko: '한 시간 기다림' };
+    Object.assign(plan, { observed_pdr: { p: 'equal', d: 'acquaintance', r: 'mid' } });
     expect(readCoreScenePlan(plan)).toEqual(plan);
+    expect(readCoreScenePlan(plan, { p: 'equal', d: 'formal', r: 'mid' })?.feasible).toBe(false);
     expect(readCoreScenePlan({ ...plan, r_evidence_ko: '' })).toBeNull();
     expect(readCoreScenePlan({ ...plan, scene_ko: 'A는 조장이고 B는 조원입니다. 과제를 합니다.' })).toBeNull();
     expect(readCoreScenePlan({ feasible: false, reason_ko: '상대가 거절했다는 사실만으로 화자의 잘못은 성립하지 않습니다.' })?.feasible).toBe(false);

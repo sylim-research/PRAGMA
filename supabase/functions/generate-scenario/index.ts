@@ -3444,6 +3444,9 @@ function buildCoreQualitySystemPrompt(direction: Direction): string {
 다른 모델이 만든 코어 1건을 기대 조건과 대조해 판정한다. 자료를 고쳐 쓰거나 더 좋은
 표현을 제안하지 말고, 각 축의 판정과 관찰 근거만 JSON으로 반환한다.
 
+상황 설명 자리에 실제 발화나 source_text의 한국어 번역이 들어 있으면 learner_scene fail이다.
+예: "늦어서 미안해요", "받아 주실 수 있을까요?"는 원문에 들어갈 대사이지 상황 설명이 아니다.
+
 [판정 원칙]
 - pass: 코어가 기대 조건을 분명히 구현한다.
 - warning: 정보가 부족하거나 두 해석이 가능해 준수 여부를 확정하기 어렵다.
@@ -3846,13 +3849,13 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           domain: coreDomainCode(b), industry: b.industry ?? null, level: b.level_ko,
           mode: coreLengthMode(b), topic_code: b.topic_code, situation_seed_ko: b.situation_seed_ko,
         }), 0.2, {
-          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v1', promptSnapshotHash }),
+          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v2', promptSnapshotHash }),
         })
       if (!preflight.ok) {
         return new Response(JSON.stringify({ error: '장면 사전 검토 호출 실패', stop_code: 'CORE_PREFLIGHT_UNAVAILABLE' }), { status: 502, headers: jsonHeaders })
       }
       let scenePlan
-      try { scenePlan = readCoreScenePlan(parseOpenAIContent(preflight.raw)) } catch { scenePlan = null }
+      try { scenePlan = readCoreScenePlan(parseOpenAIContent(preflight.raw), b.pdr) } catch { scenePlan = null }
       if (!scenePlan?.feasible) {
         return new Response(JSON.stringify({
           error: scenePlan?.reason_ko ?? '장면 사전 검토의 사실 근거 또는 형식이 불완전합니다.',
@@ -3866,6 +3869,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const requestBody: CoreGenBody = { ...b, situation_seed_ko: scenePlan.scene_ko, context_spec: contextSpec }
       const sys = buildCoreSystemPrompt(coreDir)
       const usr = buildCoreUserPrompt(requestBody) + '\n[사전 확인한 장면 — 사실·인물 유지]\n' + JSON.stringify(scenePlan)
+        + '\n[원 사건 시드 — 장면을 압축하며 생략한 사실도 임의로 바꾸지 않음]\n' + b.situation_seed_ko
+        + '\n원문은 이 사건의 말이다. 시간·소유자·행위자·수령 장소를 바꾸거나 없는 피해·변명·약속을 추가하지 않는다. 길이를 채우려고 사과·안심·거절 가능 안내를 반복하지 않는다.'
       let model = PRIMARY_MODEL
       const att = await callOpenAI(PRIMARY_MODEL, apiKey, sys, usr, CORE_TEMPERATURE, {
         responseFormat: CORE_STRUCTURED_RESPONSE_FORMAT,

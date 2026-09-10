@@ -1,0 +1,255 @@
+{
+  "at": "2026-09-10T03:47:55.164Z",
+  "input": {
+    "key": "buddy-distance",
+    "speech_act": "proposal",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "seed": "같은 학년 버디와 오늘 처음 만났고 그 전에 연락하거나 서로 교류한 적이 전혀 없다. 지금 학식당에 함께 가 보자고 제안하려 한다."
+  },
+  "data": {
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "오늘 처음 만난 버디에게 학식당에 같이 가 보자고 제안한다. 서로 연락하거나 교류한 적은 없다.",
+      "relation_ko": "같은 학년 버디·처음 만난 사이",
+      "source_modality": "written",
+      "source_text": "안녕하세요. 오늘 처음 뵙게 되었는데, 혹시 점심시간에 학식당에 같이 가 보실 생각 있으신가요? 부담스러우시다면 언제든 편하게 말씀해 주세요. 저는 괜찮으니 너무 신경 쓰지 않으셔도 됩니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "context_spec": {
+        "standard_situation_code": "school.general.proposal",
+        "role_pair": {
+          "speaker_ko": "학생",
+          "addressee_ko": "학생"
+        },
+        "speaker_entitlement": "화자는 미래 행동 방안을 제안할 참여 권한은 있지만 단독 결정권을 전제하지 않는다.",
+        "addressee_obligation": "상대는 제안을 검토할 수 있지만 수락할 의무는 없다.",
+        "decision_authority": "제안된 행동은 상대 또는 공동의 결정 대상이며 화자가 이미 확정한 지시가 아니다."
+      },
+      "brief_note_ko": "처음 만난 버디에게 점심 제안하는 글",
+      "focal_segments": [
+        {
+          "text": "혹시 점심시간에 학식당에 같이 가 보실 생각 있으신가요?",
+          "role": "head"
+        },
+        {
+          "text": "부담스러우시다면 언제든 편하게 말씀해 주세요.",
+          "role": "support"
+        },
+        {
+          "text": "저는 괜찮으니 너무 신경 쓰지 않으셔도 됩니다.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 77
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_02",
+        "prompt_version": "core_v17_grounded_scene_repair",
+        "prompt_snapshot_hash": "ac09f0deccc1b76c436c65906e9e9197ef7356d6bbd79aec06b11c94ffad5a5b",
+        "generated_at": "2026-09-10T03:47:51.590Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동등한 학년의 버디가 오늘 처음 만나 가벼운 제안을 하는 평범한 장면이 가능하다.",
+          "scene_ko": "오늘 처음 만난 버디에게 학식당에 같이 가 보자고 제안한다. 서로 연락하거나 교류한 적은 없다.",
+          "relation_ko": "같은 학년 버디·처음 만난 사이",
+          "speaker_role_ko": "학생",
+          "addressee_role_ko": "학생",
+          "p_evidence_ko": "동등한 학년의 버디로 특별한 권한이나 위계가 없다.",
+          "d_evidence_ko": "오늘 처음 만나고 이전에 교류한 적이 없다.",
+          "r_evidence_ko": "학식당에 함께 가자는 제안은 부담이 적고 거절해도 큰 영향이 없다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "처음 만난 같은 학년 버디에게 학식당에 같이 가자고 제안하는 서면 장면을 적절히 구현함.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "점심시간에 학식당에 같이 가자고 제안하는 내용이 명확히 드러남."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동등한 지위의 학생들(같은 학년 버디) 사이로 설정됨."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "오늘 처음 만난 사이로, acquaintance(아는 사이) 조건에 부합함."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "점심 식사 제안은 부담이 낮은 일상적 제안임."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "대학 내 학생들 사이의 학업 관련 일상 상황임."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 학업 도메인임."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "서면(글)로 제안하는 상황이 자연스럽게 구현됨."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대 모두 학생, 제안 권한과 결정 구조가 기대 조건과 일치함."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대, 제안의 대상(함께 식사)이 일관되게 지시됨."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "제안에 대한 결정권이 상대 또는 공동에 있음이 드러남."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "같은 학년 버디, 처음 만남, 학식당 제안 등 시드의 핵심 요소가 모두 반영됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대 모두 학생으로, 역할이 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text의 사건, 행위자, 대상이 정확히 일치함."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문에 답 방향이나 내부 평가 기준, 통역사 역할 소개가 없음."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "처음 만난 버디에게 점심 제안하는 상황이 자연스럽고 현실적임."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v10_grounded_scene_gate",
+          "checked_at": "2026-09-10T03:47:55.288Z",
+          "core_content_hash": "592d3cc1cda28bd2a46844df50e1a26dc3bceabab9b9ff2bdd7f7bf4ac2a954c"
+        }
+      }
+    },
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "core_v17_grounded_scene_repair",
+      "content_release_id": "pragma_scene_grounding_candidate_20260910_02",
+      "generation_attempt": 2,
+      "scene_plan": {
+        "feasible": true,
+        "reason_ko": "동등한 학년의 버디가 오늘 처음 만나 가벼운 제안을 하는 평범한 장면이 가능하다.",
+        "scene_ko": "오늘 처음 만난 버디에게 학식당에 같이 가 보자고 제안한다. 서로 연락하거나 교류한 적은 없다.",
+        "relation_ko": "같은 학년 버디·처음 만난 사이",
+        "speaker_role_ko": "학생",
+        "addressee_role_ko": "학생",
+        "p_evidence_ko": "동등한 학년의 버디로 특별한 권한이나 위계가 없다.",
+        "d_evidence_ko": "오늘 처음 만나고 이전에 교류한 적이 없다.",
+        "r_evidence_ko": "학식당에 함께 가자는 제안은 부담이 적고 거절해도 큰 영향이 없다."
+      },
+      "core_quality_check": {
+        "verdict": "pass",
+        "summary_ko": "처음 만난 같은 학년 버디에게 학식당에 같이 가자고 제안하는 서면 장면을 적절히 구현함.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "점심시간에 학식당에 같이 가자고 제안하는 내용이 명확히 드러남."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동등한 지위의 학생들(같은 학년 버디) 사이로 설정됨."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "오늘 처음 만난 사이로, acquaintance(아는 사이) 조건에 부합함."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "점심 식사 제안은 부담이 낮은 일상적 제안임."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "대학 내 학생들 사이의 학업 관련 일상 상황임."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 요구되지 않는 학업 도메인임."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "서면(글)로 제안하는 상황이 자연스럽게 구현됨."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대 모두 학생, 제안 권한과 결정 구조가 기대 조건과 일치함."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대, 제안의 대상(함께 식사)이 일관되게 지시됨."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "제안에 대한 결정권이 상대 또는 공동에 있음이 드러남."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "같은 학년 버디, 처음 만남, 학식당 제안 등 시드의 핵심 요소가 모두 반영됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대 모두 학생으로, 역할이 일관됨."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text의 사건, 행위자, 대상이 정확히 일치함."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황문에 답 방향이나 내부 평가 기준, 통역사 역할 소개가 없음."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "처음 만난 버디에게 점심 제안하는 상황이 자연스럽고 현실적임."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v10_grounded_scene_gate",
+        "checked_at": "2026-09-10T03:47:55.288Z",
+        "core_content_hash": "592d3cc1cda28bd2a46844df50e1a26dc3bceabab9b9ff2bdd7f7bf4ac2a954c"
+      },
+      "source_repair_applied": true,
+      "preceding_turn_repair_applied": false,
+      "bilingual_scene_repair_applied": false,
+      "bilingual_scene_canonicalization_applied": true,
+      "situation_seed_canonicalization_applied": true,
+      "bilingual_scene_issue_remaining": false,
+      "learner_scene_repair_applied": false,
+      "length_policy_version": "effective_chars_v2_min_warning",
+      "prompt_snapshot_hash": "ac09f0deccc1b76c436c65906e9e9197ef7356d6bbd79aec06b11c94ffad5a5b",
+      "generated_at": "2026-09-10T03:47:51.590Z"
+    }
+  },
+  "error": null
+}

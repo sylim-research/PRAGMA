@@ -1,0 +1,264 @@
+{
+  "at": "2026-09-10T03:49:12.709Z",
+  "plan": {
+    "key": "w2-0",
+    "week": 2,
+    "position": 0,
+    "replaces": "f8de3f59-cd86-4636-b516-a8ead78ac0ac",
+    "cell": {
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "daily_living",
+      "topic_code": "borrow_favor",
+      "situation_seed_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 같은 층 이웃에게 메신저로 수령을 부탁하려 한다. 반년 동안 인사를 나눴고, 작은 상자 하나를 받아 현관 안에 두면 저녁 여섯 시에 찾아갈 수 있다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "result": {
+    "index": 0,
+    "cell": {
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "daily_living",
+      "topic_code": "borrow_favor",
+      "situation_seed_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 같은 층 이웃에게 메신저로 수령을 부탁하려 한다. 반년 동안 인사를 나눴고, 작은 상자 하나를 받아 현관 안에 두면 저녁 여섯 시에 찾아갈 수 있다.",
+      "direction": "ko_zh",
+      "count": 1
+    },
+    "ok": true,
+    "scenarioId": "38def5cd-b46a-4947-9df2-f7bdcb2ef72d",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "오늘 오후에 택배가 올 예정인데 집을 비워서 받을 수가 없습니다. 혹시 작은 상자 하나만 받아서 현관 안에 두어 주실 수 있을까요?",
+      "relation_ko": "같은 층 이웃·반년간 인사만 나눈 사이",
+      "source_modality": "written",
+      "source_text": "오늘 오후에 택배가 도착할 예정인데, 제가 오후 내내 집을 비워야 해서 직접 받을 수가 없습니다. 혹시 번거롭지 않으시다면 작은 상자 하나만 받아서 제 현관 안에 잠깐 두어 주실 수 있을까요? 부탁드려 죄송합니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.borrow_favor.request",
+        "role_pair": {
+          "speaker_ko": "택배를 부탁하는 입주민",
+          "addressee_ko": "같은 층 이웃"
+        },
+        "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+        "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+        "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다."
+      },
+      "brief_note_ko": "같은 층 이웃에게 택배 수령을 부탁하는 메시지",
+      "focal_segments": [
+        {
+          "text": "혹시 번거롭지 않으시다면 작은 상자 하나만 받아서 제 현관 안에 잠깐 두어 주실 수 있을까요?",
+          "role": "head"
+        },
+        {
+          "text": "부탁드려 죄송합니다.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 84
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_02",
+        "prompt_version": "core_v17_grounded_scene_repair",
+        "prompt_snapshot_hash": "ac09f0deccc1b76c436c65906e9e9197ef7356d6bbd79aec06b11c94ffad5a5b",
+        "generated_at": "2026-09-10T03:49:08.179Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "같은 층 이웃에게 메신저로 택배 수령을 부탁하는 상황은 일상적이며, 반년간 인사를 나눈 사이로 친분이 약간 있으나 부담이 크지 않은 작은 부탁이므로 모든 조건을 충족한다.",
+          "scene_ko": "오늘 오후에 택배가 올 예정인데 집을 비워서 받을 수가 없습니다. 혹시 작은 상자 하나만 받아서 현관 안에 두어 주실 수 있을까요?",
+          "relation_ko": "같은 층 이웃·반년간 인사만 나눈 사이",
+          "speaker_role_ko": "택배를 부탁하는 입주민",
+          "addressee_role_ko": "같은 층 이웃",
+          "p_evidence_ko": "이웃끼리 특별한 권한 없이 평등한 관계이며, 부탁을 들어줄 의무나 우위가 없다.",
+          "d_evidence_ko": "반년간 인사를 나눈 정도로, 얼굴을 알고 가볍게 아는 사이임.",
+          "r_evidence_ko": "작은 상자 하나를 잠깐 받아주는 정도로, 시간과 노력이 거의 들지 않는 낮은 부담의 부탁임."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "같은 층 이웃에게 택배 수령을 메신저로 부탁하는 일상적 요청 장면이 충실히 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "택배 수령을 부탁하는 명확한 요청 화행이 드러남."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "같은 층 이웃 사이로, 지위가 동등하게 설정됨."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "반년간 인사만 나눈 사이로, acquaintance(알던 사이) 조건에 부합."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "작은 상자 하나를 받아 현관에 두는 정도로, 부담이 낮음."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "일상생활 내 이웃 간 부탁으로 일상 도메인에 해당."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "산업 배경이 요구되지 않는 일상 장면임."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "메신저를 통한 서면 요청으로, 번역(서면) 모드에 부합."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "역할, 권리, 의무 등 context_spec 조건이 모두 반영됨."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "화자(A): 택배를 부탁하는 입주민, 상대(B): 같은 층 이웃, 문제 책임자 및 요청 대상이 일치함."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "이웃이 직접 택배를 받아줄 권한과 선택권이 있음."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 이웃에게 부탁하는 핵심 사건이 그대로 구현됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대의 역할이 모든 필드에서 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text의 사건, 행위자, 대상이 모두 일치함."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문이 답의 방향이나 내부 평가 기준을 노출하지 않음."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "반년간 인사만 나눈 이웃에게 택배 수령을 부탁하는 상황이 현실적으로 개연성 있음."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v10_grounded_scene_gate",
+          "checked_at": "2026-09-10T03:49:12.142Z",
+          "core_content_hash": "86d66c6805f9061dc00ae271fe477389117167e4f31223dc469ddc29fc0a5841"
+        }
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "industryCritic": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "같은 층 이웃에게 택배 수령을 메신저로 부탁하는 일상적 요청 장면이 충실히 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "택배 수령을 부탁하는 명확한 요청 화행이 드러남."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "같은 층 이웃 사이로, 지위가 동등하게 설정됨."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "반년간 인사만 나눈 사이로, acquaintance(알던 사이) 조건에 부합."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "작은 상자 하나를 받아 현관에 두는 정도로, 부담이 낮음."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "일상생활 내 이웃 간 부탁으로 일상 도메인에 해당."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "산업 배경이 요구되지 않는 일상 장면임."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "메신저를 통한 서면 요청으로, 번역(서면) 모드에 부합."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "역할, 권리, 의무 등 context_spec 조건이 모두 반영됨."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자(A): 택배를 부탁하는 입주민, 상대(B): 같은 층 이웃, 문제 책임자 및 요청 대상이 일치함."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "이웃이 직접 택배를 받아줄 권한과 선택권이 있음."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "오늘 오후 집을 비워 택배를 받을 수 없어 이웃에게 부탁하는 핵심 사건이 그대로 구현됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대의 역할이 모든 필드에서 일관됨."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text의 사건, 행위자, 대상이 모두 일치함."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황문이 답의 방향이나 내부 평가 기준을 노출하지 않음."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "반년간 인사만 나눈 이웃에게 택배 수령을 부탁하는 상황이 현실적으로 개연성 있음."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v10_grounded_scene_gate",
+        "checked_at": "2026-09-10T03:49:12.142Z",
+        "core_content_hash": "86d66c6805f9061dc00ae271fe477389117167e4f31223dc469ddc29fc0a5841"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v10_grounded_scene_gate"
+    },
+    "terminalStage": "core_eligible"
+  }
+}

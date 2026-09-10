@@ -1,0 +1,39 @@
+{
+  "release": "pragma_scene_grounding_candidate_20260910_02",
+  "main": "6d1252f096d5e254314562f6b0722e3f053c2af3",
+  "negativeBlocked": 2,
+  "negativeMissed": 1,
+  "coreAutoPass": 4,
+  "coreManualAccepted": 0,
+  "decision": "Four cores held: dialogue substituted for scene descriptions. No mission promotion or publication.",
+  "files": [
+    {
+      "file": "negative-buddy-distance.json",
+      "sha256": "60c5dc6f4b79990c7c212dc423063e9efb015b2fbfa2133ab2d2ed205ebc6c52"
+    },
+    {
+      "file": "negative-inviter-apology.json",
+      "sha256": "e09550749580869f91f05847f21a7f654dbdc92230c347736a887bf752e6610e"
+    },
+    {
+      "file": "negative-leader-power.json",
+      "sha256": "f7aec0eace6e7cafbce4ce01e5ab1c8d7d04c88a4b94cbfb6c526c4592d561a5"
+    },
+    {
+      "file": "pilot-reverse-complaint-core.json",
+      "sha256": "55cebb1eebed609ee79ab9120cafcfb110c7ef1d3a74d7d1bdcf06b60c669ada"
+    },
+    {
+      "file": "pilot-reverse-opposition-core.json",
+      "sha256": "9fd025bcff2058a79a7b040e962b77aeefeaf521162bd079cb3a342c89e09142"
+    },
+    {
+      "file": "w2-0-core.json",
+      "sha256": "2ad184e2a2e516879f16e4588bf8d0411d1a00dcab7f0c60ed40fdf3c39ea7d0"
+    },
+    {
+      "file": "w9-1-core.json",
+      "sha256": "435eaa3af56480c9a69bd84f13b608033347fe222ad3b401a8353c868fd307a1"
+    }
+  ]
+}

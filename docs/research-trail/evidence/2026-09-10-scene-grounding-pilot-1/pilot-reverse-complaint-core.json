@@ -1,0 +1,287 @@
+{
+  "at": "2026-09-10T03:49:48.131Z",
+  "plan": {
+    "key": "pilot-reverse-complaint",
+    "cell": {
+      "speech_act_ui": "complaint",
+      "level": "beginner_intermediate",
+      "domain": "school",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "campus_study",
+      "topic_code": "group_work_coordination",
+      "situation_seed_ko": "이번 학기 함께 과제하는 동급생이 회의 전에 보내기로 한 도표 한 개를 깜빡해 자료 합치기가 십 분 늦어졌다. 지금 둘만 있는 회의 자리에서 나는 그 일로 불편했던 점을 말한다.",
+      "direction": "zh_ko",
+      "count": 1
+    }
+  },
+  "result": {
+    "index": 21,
+    "cell": {
+      "speech_act_ui": "complaint",
+      "level": "beginner_intermediate",
+      "domain": "school",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "campus_study",
+      "topic_code": "group_work_coordination",
+      "situation_seed_ko": "이번 학기 함께 과제하는 동급생이 회의 전에 보내기로 한 도표 한 개를 깜빡해 자료 합치기가 십 분 늦어졌다. 지금 둘만 있는 회의 자리에서 나는 그 일로 불편했던 점을 말한다.",
+      "direction": "zh_ko",
+      "count": 1
+    },
+    "ok": true,
+    "scenarioId": "1287f8da-bb2a-45eb-a52d-782e5a7f5c73",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "아까 도표를 늦게 받아서 자료 합치는 데 시간이 좀 더 걸렸어. 다음에는 회의 전에 꼭 보내줬으면 좋겠어.",
+      "relation_ko": "동급생·과제 파트너",
+      "source_modality": "spoken",
+      "source_text": "你刚才发的图表晚了一点，我合并资料的时候花了更多时间。希望以后能在开会前发给我。",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "school.group_work_coordination.complaint",
+        "role_pair": {
+          "speaker_ko": "동급생",
+          "addressee_ko": "동급생"
+        },
+        "speaker_entitlement": "화자는 자신이 겪은 문제·피해 또는 대표할 권한이 있는 문제를 제기할 자격이 있다.",
+        "addressee_obligation": "상대는 문제에 일정한 책임이 있거나 설명·수리·전달을 할 실질적 권한이 있어야 한다.",
+        "decision_authority": "상대가 직접 수리하거나 적절한 책임자에게 전달할 권한을 가진다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "동급생에게 자료 전달 지연에 대한 불만을 말한다.",
+      "focal_segments": [
+        {
+          "text": "你刚才发的图表晚了一点，我合并资料的时候花了更多时间。",
+          "role": "head"
+        },
+        {
+          "text": "希望以后能在开会前发给我。",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 30,
+        "max": 45,
+        "actual": 37
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_02",
+        "prompt_version": "core_v17_grounded_scene_gate",
+        "prompt_snapshot_hash": "ac09f0deccc1b76c436c65906e9e9197ef7356d6bbd79aec06b11c94ffad5a5b",
+        "generated_at": "2026-09-10T03:49:43.060Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동급생과 둘이 있는 회의에서 자료 전달 지연으로 불편했던 점을 말하는 것은 낮은 강도의 불만 표현이 가능하며, 권한·관계·요구 수준이 모두 조건에 부합한다.",
+          "scene_ko": "아까 도표를 늦게 받아서 자료 합치는 데 시간이 좀 더 걸렸어. 다음에는 회의 전에 꼭 보내줬으면 좋겠어.",
+          "relation_ko": "동급생·과제 파트너",
+          "speaker_role_ko": "동급생",
+          "addressee_role_ko": "동급생",
+          "p_evidence_ko": "둘 다 동급생으로 과제 파트너이며, 서로에게 지시·평가 권한이 없다.",
+          "d_evidence_ko": "이번 학기 함께 과제를 하는 사이로, 서로 알고 지내는 동급생이다.",
+          "r_evidence_ko": "도표 전달 지연으로 자료 합치기가 십 분 늦어진 불편을 말하는 낮은 강도의 불만이다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "동급생에게 도표 전달 지연으로 자료 합치기가 늦어진 점에 대해 불만을 말하는 학업 상황이 정확히 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "source_text에서 도표를 늦게 받아 합치는 데 시간이 더 걸렸다고 불편을 표현하며, 다음에는 미리 보내달라고 요청하여 불만 화행을 명확히 수행함."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동급생 간의 관계로, 실제로 지위가 동등함."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "동급생이자 과제 파트너로, 서로 알고 지내는 사이(acquaintance)임이 명확함."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "불만의 내용이 도표 전달 지연으로 인한 약간의 시간 지연에 대한 것으로, 부담이 낮음."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "대학 과제 협업 상황으로 학업 도메인에 해당함."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황임."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "구두(face-to-face) 상황에서 실제로 말할 법한 자연스러운 구어체임."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자가 문제를 제기할 자격이 있고, 상대가 책임이 있으며, 직접 조정할 권한이 있음이 상황에 드러남."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "도표를 늦게 보낸 사람과 불만을 제기하는 사람이 모두 동급생으로 일관됨."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "상대가 다음부터 도표를 미리 보내는 등 직접 조정할 수 있는 권한이 있음."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "과제 파트너가 도표를 늦게 보내 자료 합치기가 늦어진 상황이 그대로 구현됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "source_text의 화자와 상대가 모두 동급생으로, 역할이 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황문과 source_text 모두 도표 지연, 자료 합치기 지연, 불만 제기, 다음 행동 요청 등 핵심 사건이 일치함."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문이 답의 방향이나 내부 평가 기준을 노출하지 않고, 실제 장면만 설명함."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "동급생 과제 협업에서 자료 전달 지연에 대해 불만을 말하는 상황이 현실적으로 개연성이 높음."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v10_grounded_scene_gate",
+          "checked_at": "2026-09-10T03:49:48.024Z",
+          "core_content_hash": "e7b196233b722ad67a0cf4f0e4a40760cbab0dd63f655f671b06217e85a320d7"
+        }
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 4,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 22,
+        "matched_token_count": 17,
+        "coverage_ratio": 0.7727,
+        "out_of_reference_candidates": [
+          "图表",
+          "一点",
+          "合并",
+          "花了",
+          "更多"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "industryCritic": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "동급생에게 도표 전달 지연으로 자료 합치기가 늦어진 점에 대해 불만을 말하는 학업 상황이 정확히 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "source_text에서 도표를 늦게 받아 합치는 데 시간이 더 걸렸다고 불편을 표현하며, 다음에는 미리 보내달라고 요청하여 불만 화행을 명확히 수행함."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동급생 간의 관계로, 실제로 지위가 동등함."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "동급생이자 과제 파트너로, 서로 알고 지내는 사이(acquaintance)임이 명확함."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "불만의 내용이 도표 전달 지연으로 인한 약간의 시간 지연에 대한 것으로, 부담이 낮음."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "대학 과제 협업 상황으로 학업 도메인에 해당함."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황임."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "구두(face-to-face) 상황에서 실제로 말할 법한 자연스러운 구어체임."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자가 문제를 제기할 자격이 있고, 상대가 책임이 있으며, 직접 조정할 권한이 있음이 상황에 드러남."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "도표를 늦게 보낸 사람과 불만을 제기하는 사람이 모두 동급생으로 일관됨."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "상대가 다음부터 도표를 미리 보내는 등 직접 조정할 수 있는 권한이 있음."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "과제 파트너가 도표를 늦게 보내 자료 합치기가 늦어진 상황이 그대로 구현됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "source_text의 화자와 상대가 모두 동급생으로, 역할이 일관됨."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황문과 source_text 모두 도표 지연, 자료 합치기 지연, 불만 제기, 다음 행동 요청 등 핵심 사건이 일치함."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황문이 답의 방향이나 내부 평가 기준을 노출하지 않고, 실제 장면만 설명함."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "동급생 과제 협업에서 자료 전달 지연에 대해 불만을 말하는 상황이 현실적으로 개연성이 높음."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v10_grounded_scene_gate",
+        "checked_at": "2026-09-10T03:49:48.024Z",
+        "core_content_hash": "e7b196233b722ad67a0cf4f0e4a40760cbab0dd63f655f671b06217e85a320d7"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v10_grounded_scene_gate"
+    },
+    "terminalStage": "core_eligible"
+  }
+}
