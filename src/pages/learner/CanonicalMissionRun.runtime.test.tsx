@@ -195,33 +195,43 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(fetchMissionByScenario).toHaveBeenCalledWith(scenarioId);
   });
 
-  it("opens an interpreting DCT directly and labels the skipped judgments", async () => {
-    const interpretingMission = structuredClone(SAMPLE_MISSION_V5);
-    interpretingMission.production_task.mode = "interpreting";
+  it.each([
+    ["translation", "start=dct"], ["interpreting", "start=dct"],
+    ["translation", "step=A-DCT"], ["interpreting", "step=A-DCT"],
+  ] as const)("keeps the live %s intro when the URL contains %s", async (mode, query) => {
+    const mission = structuredClone(SAMPLE_MISSION_V5);
+    mission.production_task.mode = mode;
     fetchMissionByScenario.mockResolvedValueOnce({
-      scenario_id: scenarioId,
-      speech_act: "request",
-      learner_level: "intermediate",
-      mission_status: "reviewed",
-      release_gate_mode: "legacy_reviewed",
-      direction: "ko_zh",
-      mission: interpretingMission,
+      scenario_id: scenarioId, speech_act: "request", learner_level: "intermediate",
+      mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh", mission,
     });
-
-    window.history.replaceState({}, "", "/?start=dct");
+    window.history.replaceState({}, "", `/?${query}`);
     render(
-      <MemoryRouter initialEntries={[`/learner/practice/${scenarioId}?start=dct`]}>
-        <Routes>
-          <Route path="/learner/practice/:scenarioId" element={<CanonicalMissionRun />} />
-        </Routes>
+      <MemoryRouter initialEntries={[`/learner/practice/${scenarioId}?${query}`]}>
+        <Routes><Route path="/learner/practice/:scenarioId" element={<CanonicalMissionRun />} /></Routes>
       </MemoryRouter>,
     );
-
-    expect(await screen.findByText("통역 수행 콘솔")).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("앞의 표현 판단 활동은 수행 기록에 포함되지 않습니다.");
-    expect(screen.queryByRole("heading", { name: "상황에 맞는 표현 판단하기" })).not.toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: mission.production_task.situation_ko })).toBeInTheDocument();
+    expect(screen.queryByText("통역 수행 콘솔")).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("중국어 번역을 작성하세요.")).not.toBeInTheDocument();
+    expect(appendMissionEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: "mission_session_opened", taskMode: mode, payload: { entry_mode: "full_mission" },
+    }));
+    fireEvent.click(screen.getByRole("button", { name: /장면 속 단서 보기/ }));
+    fireEvent.click(screen.getByRole("button", { name: /내가 할 일 확인/ }));
+    fireEvent.click(screen.getByRole("button", { name: /5개 장면으로 감 잡기/ }));
+    expect(screen.getByRole("heading", { name: "상황에 맞는 표현 판단하기" })).toBeInTheDocument();
+    expect(saveMissionAttempt).not.toHaveBeenCalled();
   });
 
+  it("keeps DCT step navigation in the development preview without saving learner records", () => {
+    window.history.replaceState({}, "", "/?preview=v5&step=A-DCT");
+    render(<MemoryRouter><CanonicalMissionRun /></MemoryRouter>);
+    expect(screen.getByPlaceholderText("중국어 번역을 작성하세요.")).toBeInTheDocument();
+    expect(fetchMissionByScenario).not.toHaveBeenCalled();
+    expect(saveMissionAttempt).not.toHaveBeenCalled();
+    expect(appendMissionEvent).not.toHaveBeenCalled();
+  });
   it("does not render a native MPJ5 preceding-turn card even for a response act", async () => {
     const mission = JSON.parse(
       JSON.stringify(SAMPLE_MISSION_V5_NATIVE)

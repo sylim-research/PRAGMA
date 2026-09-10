@@ -2198,12 +2198,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const sceneIntroConfig = isDevPreview && requestedMission === "B"
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
-  const startAtDct = Boolean(runtime)
-    && mission.activityMode === "interpreting"
-    && new URLSearchParams(window.location.search).get("start") === "dct";
-  const dctQuestIndex = Math.max(0, mission.quests.findIndex((item) => item.kind === "dct"));
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(startAtDct ? null : 0);
-  const [questIndex, setQuestIndex] = useState(startAtDct ? dctQuestIndex : 0);
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(0);
+  const [questIndex, setQuestIndex] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
@@ -2257,7 +2253,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       speechAct: runtime.speech_act,
       direction: runtime.direction,
       taskMode: runtime.mission.production_task.mode === "interpreting" ? "interpreting" : "translation",
-      payload: { entry_mode: startAtDct ? "dct_shortcut" : "full_mission" },
+      payload: { entry_mode: "full_mission" },
       courseContext: courseContext ?? undefined,
     });
   }, [attemptId, courseContext, demoMode, runtime]);
@@ -2408,7 +2404,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           revisedResponse: finalResponse.revised,
           ...(finalResponse.runtimeFeedback ? { feedback: finalResponse.runtimeFeedback } : {}),
           startedAtIso: startedAtRef.current,
-          mpjResponses: startAtDct ? [] : buildRuntimeMpjTraces(runtime, nextResponses),
+          mpjResponses: buildRuntimeMpjTraces(runtime, nextResponses),
           ...(finalResponse.dissent
             ? {
                 contextJudgment: {
@@ -2442,9 +2438,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const restart = () => {
     if (savingRef.current) return;
     pendingSaveRef.current = null;
-    setSceneIntroStep(startAtDct ? null : 0);
+    setSceneIntroStep(0);
     setMpjRecapOpen(false);
-    setQuestIndex(startAtDct ? dctQuestIndex : 0);
+    setQuestIndex(0);
     setCompleted(false);
     setReviewIndex(null);
     setResponses({});
@@ -2561,11 +2557,6 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         ) : (
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} />
-            {startAtDct && quest.kind === "dct" && (
-              <div className="rounded-xl border border-[#E3D08F] bg-[#FFF8E1] px-4 py-2.5 text-xs font-semibold text-[#6B5518]" role="status">
-                수업용 DCT 바로가기 · 앞의 표현 판단 활동은 수행 기록에 포함되지 않습니다.
-              </div>
-            )}
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}

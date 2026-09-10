@@ -4,6 +4,14 @@
 - 생성일: 2026-07-29
 - 목적: 논문 근거로 활용할 수 있는 Git 이력, 릴리스, 테스트 결과, 화면 기록과 정본 문서의 실제 위치를 연결한다.
 
+## EVD-20260910-06 · 학습자 주차 안내와 개발 전용 DCT 진입
+
+- DEC-20260910-07. 구현·검증·환경과 한계: `docs/dev-log/2026-09-10-learner-week-entry.md`.
+- 재실행: `LearnerCourseLive.test.tsx`, `CanonicalMissionRun.runtime.test.tsx`, `WeeklyLearningNote.test.tsx`의
+  25개 검사. 모의 API로 번역·통역 URL 우회 방지와 개발 미리보기의 미저장을 확인한다.
+- 로컬 Vite의 1280·390px 화면에서 카드 정렬·세로 배치·중심 질문과 바로가기 제거를 확인했다.
+  이 증거는 운영 배포·실제 학습자의 완료 저장·음성 수행·교육 효과 검증을 뜻하지 않는다.
+
 ## EVD-20260910-05 · AI 배치 제작의 계획·실행·재개 연결
 
 - DEC-20260910-04. 범위와 환경 재실행 사유는 `docs/dev-log/2026-09-10-batch-generation-workspace.md`에서 추적한다.
