@@ -1,11 +1,11 @@
 -- PRAGMA generated-content refresh inventory (READ ONLY)
--- Current candidate: pragma_candidate_feedback_candidate_20260908_01
+-- Current candidate: pragma_learner_feedback_candidate_20260910_01
 --
 -- Supabase SQL Editor에서 실행한다. 결과 한 행은 삭제 대상과 보존/분리할 참조를
 -- 함께 보여 준다. 이 파일에는 쓰기 문장을 넣지 않는다.
 
 WITH settings AS (
-  SELECT 'pragma_candidate_feedback_candidate_20260908_01'::text AS current_release_id
+  SELECT 'pragma_learner_feedback_candidate_20260910_01'::text AS current_release_id
 ),
 generated_scenarios AS (
   SELECT

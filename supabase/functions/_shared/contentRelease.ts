@@ -6,7 +6,7 @@
  * 새 학습설계 또는 생성 기준을 시험할 때는 기존 ID를 덮어쓰지 말고 새 ID를 만든다.
  */
 export const CURRENT_CONTENT_RELEASE = {
-  id: "pragma_candidate_feedback_candidate_20260908_01",
+  id: "pragma_learner_feedback_candidate_20260910_01",
   lifecycle: "candidate",
   corePromptVersions: [
     "core_v16_natural_scene_plausibility",
@@ -18,8 +18,8 @@ export const CURRENT_CONTENT_RELEASE = {
   ],
   itemLineagePromptVersion: "item_lineage_attribution_v4_mission_v5_mpj5",
   feedbackPromptVersions: [
-    "feedback_v1_minidiscourse_v5_zhko_bidirectional",
-    "feedback_v1_feature_general_v2",
+    "feedback_v1_minidiscourse_v6_concise",
+    "feedback_v1_feature_general_v3_concise",
   ],
   qualityPromptVersions: {
     core: "core_quality_v9_scene_plausibility",

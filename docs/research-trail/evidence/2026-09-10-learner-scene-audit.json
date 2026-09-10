@@ -1,0 +1,1668 @@
+{
+  "at": "2026-09-10T01:25:13.645Z",
+  "courseId": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+  "source": "live read-only",
+  "count": 20,
+  "missions": [
+    {
+      "id": "14dcf93e-6504-44c1-b8f6-90ef64e19bd2",
+      "title": "교수님께 논문 개요 면담 요청 이메일을 작성한다.",
+      "speechAct": "request",
+      "updatedAt": "2026-09-06T13:38:17.081817+00:00",
+      "weeks": [
+        13
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "대학원생인 제가 수업에서 알고 지내는 교수님께 논문 관련 자료를 이메일로 보내달라고 요청했습니다. 교수님께서 자료를 보내주실 수 있는지 여쭤봤습니다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다.",
+          "source": "교수님, 논문 자료를 보내주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "대학원생인 제가 수업에서 알고 지내는 교수님께 논문 개요에 대해 다음 주 면담 시간을 잡아 달라고 요청했습니다. 교수님 일정에 맞출 수 있다고 말씀드렸습니다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다.",
+          "source": "교수님, 다음 주에 면담 시간을 잡아 주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "대학원생인 제가 수업에서 알고 지내는 교수님께 논문 개요에 대해 다음 주 면담 시간을 잡아 달라고 요청했습니다. 교수님 일정에 맞출 수 있다고 말씀드렸습니다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다.",
+          "source": "교수님, 다음 주에 면담 시간을 잡아 주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "대학원생인 제가 수업에서 알고 지내는 교수님께 논문 개요에 대해 다음 주 면담 시간을 잡아 달라고 요청했습니다. 교수님 일정에 맞출 수 있다고 말씀드렸습니다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다.",
+          "source": "교수님, 다음 주에 면담 시간을 잡아 주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "대학원생인 제가 수업에서 알고 지내는 교수님께 논문 개요를 검토해 달라고 이메일로 요청했습니다. 교수님께서 검토 가능하신지 여쭤봤습니다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다.",
+          "source": "교수님, 논문 개요를 검토해 주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "대학원생이 수업에서 알고 지내는 교수에게 논문 개요에 관해 다음 주 면담 시간을 잡아 달라고 이메일로 요청한다. 교수의 일정에 맞출 수 있으며 면담 승인을 아직 받지 않았다.",
+          "relation": "저는 대학원생이고, 교수님과는 수업을 통해 알고 지내는 사이입니다. 교수님의 일정에 따라 면담 시간을 조율해야 하므로 부담이 중간 정도입니다.",
+          "source": "안녕하세요 교수님, 다음 주에 논문 개요에 대해 면담할 수 있는 시간을 부탁드리고자 연락드립니다. 교수님 일정에 맞출 수 있으니 편하신 시간 알려주시면 감사하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "1fea5ef8-ce47-440e-b621-a20d71f9cdf5",
+      "title": "조장의 발표 시간 연장 제안에 학생이 반대 의견을 제시함",
+      "speechAct": "opposition",
+      "updatedAt": "2026-09-06T13:26:57.193412+00:00",
+      "weeks": [
+        11
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C는 A와 B 사이에서 통역을 맡았다. A는 B의 제안이 전체 과제 효율을 떨어뜨릴 것이라며 반대 의견을 제시하려 한다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C는 A와 B 사이에서 통역을 맡았다. A는 B의 제안이 전체 과제 효율을 떨어뜨릴 것이라며 반대 의견을 제시한다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C는 A와 B 사이에서 통역을 맡았다. A는 B의 제안이 전체 과제 효율을 떨어뜨릴 것이라며 반대 의견을 제시한다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C는 A와 B 사이에서 통역을 맡았다. A는 B의 제안이 전체 과제 효율을 떨어뜨릴 것이라며 반대 의견을 제시한다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C는 A와 B 사이에서 통역을 맡았다. A는 B의 제안이 전체 과제 효율을 떨어뜨릴 것이라며 반대 의견을 제시했다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 수업 조별과제에서 조장인 B가 제안한 방법에 대해 반대 의견을 말하려 합니다. B의 제안은 단순히 발표 시간을 늘리는 것이었고, A는 그 방안이 전체 과제 효율을 떨어뜨릴 것이라고 생각합니다.",
+          "relation": "A는 조별과제에 참여한 학생이고 B는 조장으로, 서로 알고 지내지만 다소 어색한 사이다.",
+          "source": "조장님, 발표 시간을 늘리는 게 꼭 좋은 방법은 아닌 것 같아요. 그러면 다른 팀원들이 준비할 시간이 부족해질 수도 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "2287cd04-63fb-4a20-93d1-809817813397",
+      "title": "조장인 A가 조원 B에게 과제 준비 문제를 불만스럽게 말함.",
+      "speechAct": "complaint",
+      "updatedAt": "2026-09-06T13:26:57.481908+00:00",
+      "weeks": [
+        12
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 상사이고 B는 직원이며, 프로젝트 진행 중 문제를 해결해야 합니다.",
+          "relation": "A는 상사로서 B 직원에게 프로젝트 진행 상황을 점검하고 문제를 제기합니다.",
+          "source": "프로젝트 마감일이 다가오는데, 아직 자료 준비가 안 된 것 같아 걱정돼요. 이번 주 안에 꼭 마무리해야 하니까 더 신경 써 주세요.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 선배이고 B는 후배이며, 팀 과제 진행 중 문제를 해결해야 합니다.",
+          "relation": "A는 선배로서 B 후배에게 과제 진행 상황을 점검하고 문제를 제기합니다.",
+          "source": "조별 과제 제출 기한이 코앞인데, 아직 자료 준비가 안 된 것 같아 걱정돼요. 이번 주 안에 꼭 마무리해야 하니까 더 신경 써 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 선배이고 B는 후배이며, 팀 과제 진행 중 문제를 해결해야 합니다.",
+          "relation": "A는 선배로서 B 후배에게 과제 진행 상황을 점검하고 문제를 제기합니다.",
+          "source": "조별 과제 제출 기한이 코앞인데, 아직 자료 준비가 안 된 것 같아 걱정돼요. 이번 주 안에 꼭 마무리해야 하니까 더 신경 써 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 선배이고 B는 후배이며, 팀 과제 진행 중 문제를 해결해야 합니다.",
+          "relation": "A는 선배로서 B 후배에게 과제 진행 상황을 점검하고 문제를 제기합니다.",
+          "source": "조별 과제 제출 기한이 코앞인데, 아직 자료 준비가 안 된 것 같아 걱정돼요. 이번 주 안에 꼭 마무리해야 하니까 더 신경 써 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 고객이고 B는 서비스 담당자이며, 서비스 이용 중 문제를 해결해야 합니다.",
+          "relation": "A는 고객으로서 B 서비스 담당자에게 서비스 문제를 제기합니다.",
+          "source": "서비스 이용 중 문제가 발생했는데, 아직 해결이 안 돼서 불편해요. 이번 주 안에 꼭 해결해 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 조장이고 B는 조원이며, 조별 과제 진행 중 문제를 해결해야 합니다.",
+          "relation": "A는 조장으로서 B 조원에게 과제 진행 상황을 점검하고 문제를 제기합니다.",
+          "source": "조별 과제 제출 기한이 코앞인데, 아직 자료 준비가 안 된 것 같아 걱정돼요. 이번 주 안에 꼭 마무리해야 하니까 더 신경 써 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "27575f80-d115-4d0b-9807-6dafcd6430a5",
+      "title": "조별 과제 도움에 대한 선배의 감사 표현",
+      "speechAct": "thanks",
+      "updatedAt": "2026-09-06T13:26:48.525526+00:00",
+      "weeks": [
+        3
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 동료 연구원이고 B는 실험 데이터를 정리해 준 것에 대해 감사를 표현하려 한다.",
+          "relation": "동료 연구원이 실험 데이터를 정리해 준 동료에게 감사를 전하는 관계입니다.",
+          "source": "네가 실험 데이터 정리해줘서 정말 고마워. 덕분에 일이 훨씬 수월했어.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 상사이고 B는 프로젝트 보고서를 작성해 준 것에 대해 감사를 표현하려 한다.",
+          "relation": "상사가 프로젝트 보고서를 작성해 준 부하 직원에게 감사를 전하는 관계입니다.",
+          "source": "네가 프로젝트 보고서 작성해줘서 정말 고마워. 덕분에 일이 훨씬 수월했어.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 상사이고 B는 프로젝트 보고서를 작성해 준 것에 대해 감사를 표현하려 한다.",
+          "relation": "상사가 프로젝트 보고서를 작성해 준 부하 직원에게 감사를 전하는 관계입니다.",
+          "source": "네가 프로젝트 보고서 작성해줘서 정말 고마워. 덕분에 일이 훨씬 수월했어.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 상사이고 B는 프로젝트 보고서를 작성해 준 것에 대해 감사를 표현하려 한다.",
+          "relation": "상사가 프로젝트 보고서를 작성해 준 부하 직원에게 감사를 전하는 관계입니다.",
+          "source": "네가 프로젝트 보고서 작성해줘서 정말 고마워. 덕분에 일이 훨씬 수월했어.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 교수이고 B는 연구 발표 준비를 도와준 것에 대해 감사를 표현하려 한다.",
+          "relation": "교수가 연구 발표 준비를 도와준 학생에게 감사를 전하는 관계입니다.",
+          "source": "네가 연구 발표 준비 도와줘서 정말 고마워. 덕분에 일이 훨씬 수월했어.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 조별 과제의 선배 멘토이고 B는 후배 학생으로, B가 도와준 부분에 대해 감사를 표현하려 합니다.",
+          "relation": "친밀한 선배 멘토가 조별 과제에서 도움을 준 후배 학생에게 감사를 전하는 관계입니다.",
+          "source": "네가 지난번에 자료 정리해준 덕분에 과제가 훨씬 수월했어. 정말 고마워. 앞으로도 이렇게 서로 도우면서 잘 해보자.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "28d87b8e-ac97-4749-a4a5-3581f8c833df",
+      "title": "병원 예약 변경을 부탁하는 공손한 요청",
+      "speechAct": "request",
+      "updatedAt": "2026-09-06T13:26:41.79789+00:00",
+      "weeks": [
+        2
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "A는 자주 만나는 이웃 B에게 병원 예약을 다음 주 화요일로 바꿔달라고 요청하려고 한다. B는 예약 변경을 위해 병원에 직접 연락해야 한다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "A는 자주 만나는 이웃 B에게 병원 예약을 다음 주 화요일로 바꿔달라고 요청하려고 한다. B는 예약 변경을 위해 시간을 내고 병원에 연락해야 한다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "A는 자주 만나는 이웃 B에게 병원 예약을 다음 주 화요일로 바꿔달라고 요청하려고 한다. B는 예약 변경을 위해 시간을 내고 병원에 연락해야 한다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "A는 자주 만나는 이웃 B에게 병원 예약을 다음 주 화요일로 바꿔달라고 요청하려고 한다. B는 예약 변경을 위해 시간을 내고 병원에 연락해야 한다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "A는 자주 만나는 이웃 B에게 병원 예약을 다음 주 화요일로 바꿔달라고 요청하려고 한다. B는 예약 변경을 위해 시간을 내고 병원에 직접 방문해야 한다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 자주 만나는 이웃 B에게 병원 예약 시간을 바꿔달라고 요청하려고 합니다. 두 사람은 서로 알고 있지만 어색한 사이이며, B가 예약 변경을 위해 시간을 내고 병원에 연락하는 수고를 감수해야 합니다.",
+          "relation": "일상 공간에서 서로 아는 이웃 사이로, 병원 예약 변경을 요청하는 상황입니다.",
+          "source": "혹시 병원 예약을 다음 주 화요일로 바꿔주실 수 있나요? 번거롭게 해드려 죄송하지만 꼭 부탁드리고 싶어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "2f898edd-aabf-4d63-849a-99a1f9cb3925",
+      "title": "모임 운영자에게 도움에 대해 정중히 감사를 전하는 메시지",
+      "speechAct": "thanks",
+      "updatedAt": "2026-09-06T13:26:41.362072+00:00",
+      "weeks": [
+        3
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 회사의 신입사원으로서 팀장님께 프로젝트 관련 도움에 대한 감사를 전하려고 합니다. 팀장님은 저보다 지위가 높고, 프로젝트 성공에 기여하셨습니다.",
+          "relation": "저는 회사의 신입사원이고, 상대는 팀장님으로서 저보다 지위가 높고 제가 도움을 받았습니다.",
+          "source": "팀장님, 프로젝트 성공에 큰 도움을 주셔서 감사합니다. 덕분에 많은 것을 배울 수 있었습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 동아리의 부원으로서 회장님께 행사 준비에 대한 감사를 전하려고 합니다. 회장님은 저보다 지위가 높고, 행사 준비에 큰 도움을 주셨습니다.",
+          "relation": "저는 동아리의 부원이고, 상대는 회장님으로서 저보다 지위가 높고 제가 도움을 받았습니다.",
+          "source": "회장님, 행사 준비에 도움을 주셔서 감사합니다. 덕분에 행사가 잘 마무리되었습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 동아리의 부원으로서 회장님께 행사 준비에 대한 감사를 전하려고 합니다. 회장님은 저보다 지위가 높고, 행사 준비에 큰 도움을 주셨습니다.",
+          "relation": "저는 동아리의 부원이고, 상대는 회장님으로서 저보다 지위가 높고 제가 도움을 받았습니다.",
+          "source": "회장님, 행사 준비에 도움을 주셔서 감사합니다. 덕분에 행사가 잘 마무리되었습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 동아리의 부원으로서 회장님께 행사 준비에 대한 감사를 전하려고 합니다. 회장님은 저보다 지위가 높고, 행사 준비에 큰 도움을 주셨습니다.",
+          "relation": "저는 동아리의 부원이고, 상대는 회장님으로서 저보다 지위가 높고 제가 도움을 받았습니다.",
+          "source": "회장님, 행사 준비에 도움을 주셔서 감사합니다. 덕분에 행사가 잘 마무리되었습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 대학의 동기에게 시험 공부에 대한 감사를 전하려고 합니다. 상대는 저와 같은 지위이며, 공부 자료를 공유해 주었습니다.",
+          "relation": "저는 대학의 동기이고, 상대는 저와 같은 지위이며 제가 도움을 받았습니다.",
+          "source": "시험 공부에 도움을 주셔서 감사합니다. 덕분에 좋은 결과를 얻을 수 있었습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 모임의 후배로서 운영자이신 선배님께 도움에 대한 감사를 전하려고 합니다. 상대는 저보다 지위가 높고, 모임 준비에 실질적인 도움을 주셨습니다.",
+          "relation": "저는 모임의 후배이고, 상대는 그 모임의 운영자이자 선배로서 저보다 지위가 높고 제가 도움을 받았습니다.",
+          "source": "선배님, 지난번 모임 준비에 큰 도움을 주셔서 진심으로 감사드립니다. 덕분에 행사가 원활하게 진행될 수 있었습니다. 앞으로도 많은 가르침 부탁드립니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "35a5e1a4-150a-413b-93c7-0258464e0efd",
+      "title": "이웃에게 식사 초대 거절에 대한 사과를 전하는 메시지",
+      "speechAct": "apology",
+      "updatedAt": "2026-09-06T13:26:50.716761+00:00",
+      "weeks": [
+        9
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 회사 동료에게 프로젝트 지연에 대해 사과의 메시지를 보냈습니다. 상대는 제 책임을 묻고 있습니다.",
+          "relation": "회사 동료로, 업무상 동등한 위치에서 사과하는 관계입니다.",
+          "source": "프로젝트가 늦어져서 죄송합니다. 제 실수로 인해 불편을 끼쳐드려 죄송합니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 친구에게 약속을 어긴 것에 대해 사과의 메시지를 보냈습니다. 상대는 실망감을 표현하고 있습니다.",
+          "relation": "친구로, 친밀한 관계에서 사과하는 사이입니다.",
+          "source": "약속을 지키지 못해 미안해. 다음에는 꼭 지킬게.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 친구에게 약속을 어긴 것에 대해 사과의 메시지를 보냈습니다. 상대는 실망감을 표현하고 있습니다.",
+          "relation": "친구로, 친밀한 관계에서 사과하는 사이입니다.",
+          "source": "약속을 지키지 못해 미안해. 다음에는 꼭 지킬게.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 친구에게 약속을 어긴 것에 대해 사과의 메시지를 보냈습니다. 상대는 실망감을 표현하고 있습니다.",
+          "relation": "친구로, 친밀한 관계에서 사과하는 사이입니다.",
+          "source": "약속을 지키지 못해 미안해. 다음에는 꼭 지킬게.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 상사에게 보고서 오류에 대해 사과의 이메일을 보냈습니다. 상대는 제 실수를 지적하고 있습니다.",
+          "relation": "직장 상사로, 상하 관계에서 사과하는 사이입니다.",
+          "source": "보고서에 오류가 있어 죄송합니다. 다음에는 더 주의하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 몇 차례 마주친 이웃에게 식사 모임 초대를 했습니다. 상대가 거절하는데, 그로 인해 불편을 끼쳐 사과하는 글을 씁니다.",
+          "relation": "서로 아는 이웃 관계로, 어색하지만 동등한 위치에서 정중하게 사과하는 사이입니다.",
+          "source": "지난번 모임에 초대했을 때 불편을 드려 정말 죄송합니다. 생각보다 준비가 미흡해 불편을 끼친 점 깊이 반성하고 있습니다. 앞으로는 이런 일이 없도록 신경 쓰겠습니다. 다시 한번 사과의 말씀을 전합니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "3a5fc056-6051-4372-a72c-9dee04e8de6e",
+      "title": "동호회 모임 초대를 정중히 거절하는 메시지",
+      "speechAct": "refusal",
+      "updatedAt": "2026-09-06T13:26:52.515239+00:00",
+      "weeks": [
+        6
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 친구에게 주말 영화 관람 제안을 거절하는 메시지를 보냅니다. 친구는 저와 동갑이고, 우리는 서로 편한 관계입니다.",
+          "relation": "저는 친구와 동갑으로서 영화 관람 제안을 정중히 거절합니다.",
+          "source": "주말에 영화 보러 가자는 제안을 받았습니다. 하지만 저는 그날 다른 약속이 있어서 갈 수 없습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 직장 상사에게 회식 초대를 거절하는 이메일을 보냅니다. 상사는 저보다 직급이 높고, 저는 부담을 느끼는 관계입니다.",
+          "relation": "저는 직장 부하 직원이고 상대는 상사로서 회식 초대를 정중히 거절합니다.",
+          "source": "상사가 회식에 초대했습니다. 하지만 저는 개인적인 사정으로 참석할 수 없습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 직장 상사에게 회식 초대를 거절하는 이메일을 보냅니다. 상사는 저보다 직급이 높고, 저는 부담을 느끼는 관계입니다.",
+          "relation": "저는 직장 부하 직원이고 상대는 상사로서 회식 초대를 정중히 거절합니다.",
+          "source": "상사가 회식에 초대했습니다. 하지만 저는 개인적인 사정으로 참석할 수 없습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 직장 상사에게 회식 초대를 거절하는 이메일을 보냅니다. 상사는 저보다 직급이 높고, 저는 부담을 느끼는 관계입니다.",
+          "relation": "저는 직장 부하 직원이고 상대는 상사로서 회식 초대를 정중히 거절합니다.",
+          "source": "상사가 회식에 초대했습니다. 하지만 저는 개인적인 사정으로 참석할 수 없습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 거래처 담당자에게 회의 일정 변경 요청을 거절하는 이메일을 보냅니다. 상대는 저와 비즈니스 관계로, 공식적인 관계입니다.",
+          "relation": "저는 거래처 담당자와 비즈니스 관계로서 일정 변경 요청을 정중히 거절합니다.",
+          "source": "거래처 담당자가 회의 일정을 변경해 달라고 요청했습니다. 하지만 저는 그 일정에 다른 중요한 약속이 있습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 동호회 운영자에게 다음 모임 초대를 거절하는 메시지를 보냅니다. 상대는 저보다 선배이고, 저는 후배로서 부담을 느끼는 관계입니다.",
+          "relation": "저는 동호회 후배 회원이고 상대는 운영자 선배로서 모임 참여에 대해 정중히 거절합니다.",
+          "source": "안녕하세요, 초대해 주셔서 정말 감사합니다. 이번 모임에는 개인적인 사정이 있어서 참석이 어렵게 되었습니다. 불편을 드려 죄송하고, 다음에는 꼭 함께하고 싶습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "432ec4e7-93de-46dc-88ee-71a3a54e2932",
+      "title": "모임 식사 초대 거절에 대한 선배의 사과",
+      "speechAct": "apology",
+      "updatedAt": "2026-09-06T13:26:53.269314+00:00",
+      "weeks": [
+        9
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 직장 상사이고 B는 부하 직원이며, A가 B의 실수로 인한 프로젝트 지연에 대해 사과를 전해야 합니다.",
+          "relation": "A는 직장 상사이고 B는 부하 직원으로, 공식적인 업무 관계입니다.",
+          "source": "프로젝트 지연에 대해 정말 죄송합니다. 이번 일로 불편을 끼쳐서 송구스럽습니다. 다음에는 더 신경 쓰겠습니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 알고 지내는 모임 운영자·선배이고 B는 그 모임의 참여자·후배이며, A가 모임 준비 부족으로 사과를 전해야 합니다.",
+          "relation": "A는 모임 운영자이자 선배이고 B는 참여자이자 후배로, 어색한 지인 관계입니다.",
+          "source": "모임 준비가 부족해서 죄송합니다. 불편을 드려 송구스럽습니다. 다음에는 더 잘 준비하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 알고 지내는 모임 운영자·선배이고 B는 그 모임의 참여자·후배이며, A가 모임 준비 부족으로 사과를 전해야 합니다.",
+          "relation": "A는 모임 운영자이자 선배이고 B는 참여자이자 후배로, 어색한 지인 관계입니다.",
+          "source": "모임 준비가 부족해서 죄송합니다. 불편을 드려 송구스럽습니다. 다음에는 더 잘 준비하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 알고 지내는 모임 운영자·선배이고 B는 그 모임의 참여자·후배이며, A가 모임 준비 부족으로 사과를 전해야 합니다.",
+          "relation": "A는 모임 운영자이자 선배이고 B는 참여자이자 후배로, 어색한 지인 관계입니다.",
+          "source": "모임 준비가 부족해서 죄송합니다. 불편을 드려 송구스럽습니다. 다음에는 더 잘 준비하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 친구이고 B는 친구이며, A가 B의 생일 파티에 늦어서 사과를 전해야 합니다.",
+          "relation": "A와 B는 친구로, 친밀한 관계입니다.",
+          "source": "생일 파티에 늦어서 미안해. 기다리게 해서 정말 미안해. 다음에는 더 신경 쓸게.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 알고 지내는 모임 운영자·선배이고 B는 그 모임의 참여자·후배이며, B가 모임 식사 초대를 거절해 A가 사과를 전해야 합니다.",
+          "relation": "A는 모임 운영자이자 선배이고 B는 참여자이자 후배로, 어색한 지인 관계입니다.",
+          "source": "초대에 응하지 못해 정말 죄송합니다. 이번 일로 불편을 끼쳐서 송구스럽습니다. 다음 모임에서는 더 신경 쓰겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "68ec12d5-f4dc-4cbb-9378-b4dc533c8bcb",
+      "title": "모임 참여자의 선물에 감사하며 칭찬하는 메시지",
+      "speechAct": "compliment",
+      "updatedAt": "2026-09-06T13:26:44.115723+00:00",
+      "weeks": [
+        4
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 친구로서 오랜만에 만난 친구에게 칭찬의 메시지를 보냅니다. 우리는 서로 자주 연락하지 않습니다.",
+          "relation": "친구인 제가 오랜만에 만난 친구를 칭찬하는 관계입니다.",
+          "source": "오랜만에 만나서 반가웠어. 너의 새로운 프로젝트가 정말 인상 깊었어.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 상사로서 부하 직원에게 칭찬의 메시지를 보냅니다. 우리는 업무상으로만 가끔 대화합니다.",
+          "relation": "상사인 제가 부하 직원을 칭찬하는 관계입니다.",
+          "source": "최근 프로젝트에서 정말 잘했어. 너의 노력 덕분에 팀이 큰 성과를 거두었어.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 상사로서 부하 직원에게 칭찬의 메시지를 보냅니다. 우리는 업무상으로만 가끔 대화합니다.",
+          "relation": "상사인 제가 부하 직원을 칭찬하는 관계입니다.",
+          "source": "최근 프로젝트에서 정말 잘했어. 너의 노력 덕분에 팀이 큰 성과를 거두었어.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 상사로서 부하 직원에게 칭찬의 메시지를 보냅니다. 우리는 업무상으로만 가끔 대화합니다.",
+          "relation": "상사인 제가 부하 직원을 칭찬하는 관계입니다.",
+          "source": "최근 프로젝트에서 정말 잘했어. 너의 노력 덕분에 팀이 큰 성과를 거두었어.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 상사로서 부하 직원에게 칭찬의 메시지를 보냅니다. 우리는 업무 외에도 자주 대화합니다.",
+          "relation": "상사인 제가 부하 직원을 칭찬하는 관계입니다.",
+          "source": "최근 프로젝트에서 정말 잘했어. 너의 노력 덕분에 팀이 큰 성과를 거두었어.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 모임 운영자로서 참여자인 후배에게 감사와 칭찬의 메시지를 작성합니다. 상대와는 평소에 자주 연락하지 않는 사이입니다.",
+          "relation": "모임 운영자인 제가 모임 참여자인 후배를 격려하고 칭찬하는 관계입니다.",
+          "source": "최근에 보내주신 선물 정말 감동했습니다. 모임에 대한 세심한 배려와 노력에 늘 감사드리며, 앞으로도 좋은 모습 기대하겠습니다. 덕분에 모임 분위기가 한층 더 좋아졌습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "7f9bae9c-13ab-40c4-9a43-63f2f58ffafe",
+      "title": "생활 소음에 대한 불만과 조치 요청 메시지",
+      "speechAct": "complaint",
+      "updatedAt": "2026-09-06T13:26:57.097775+00:00",
+      "weeks": [
+        12
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 회사 동료에게 프로젝트 진행 상황에 대한 불만을 제기합니다. 상대는 프로젝트의 주요 책임자입니다.",
+          "relation": "회사 동료인 프로젝트 책임자에게 불만을 제기하는 관계입니다.",
+          "source": "프로젝트 진행이 너무 느려서 걱정입니다. 이 문제를 해결하기 위해 더 빠른 진행을 부탁드립니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 고객 서비스 담당자에게 최근 구매한 제품의 결함에 대해 불만을 제기합니다. 상대는 문제 해결 권한이 있습니다.",
+          "relation": "고객 서비스 담당자에게 제품 결함에 대해 불만을 제기하는 관계입니다.",
+          "source": "최근 구매한 제품에 결함이 있어 매우 실망했습니다. 이 문제를 즉시 해결해 주시기 바랍니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 고객 서비스 담당자에게 최근 구매한 제품의 결함에 대해 불만을 제기합니다. 상대는 문제 해결 권한이 있습니다.",
+          "relation": "고객 서비스 담당자에게 제품 결함에 대해 불만을 제기하는 관계입니다.",
+          "source": "최근 구매한 제품에 결함이 있어 매우 실망했습니다. 이 문제를 즉시 해결해 주시기 바랍니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 고객 서비스 담당자에게 최근 구매한 제품의 결함에 대해 불만을 제기합니다. 상대는 문제 해결 권한이 있습니다.",
+          "relation": "고객 서비스 담당자에게 제품 결함에 대해 불만을 제기하는 관계입니다.",
+          "source": "최근 구매한 제품에 결함이 있어 매우 실망했습니다. 이 문제를 즉시 해결해 주시기 바랍니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 상사에게 팀 프로젝트의 비효율적인 진행 방식에 대해 불만을 제기합니다. 상대는 팀의 최종 결정권자입니다.",
+          "relation": "상사에게 팀 프로젝트 진행 방식에 대해 불만을 제기하는 관계입니다.",
+          "source": "팀 프로젝트의 진행 방식이 비효율적이라고 생각합니다. 개선이 필요합니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 아파트 관리사무소장으로서 처음 만나는 옆집 이웃에게 생활 소음 문제를 알리고 조치를 요청합니다. 상대는 소음을 줄일 수 있는데, 이를 위한 협조를 부탁하는 부담이 있습니다.",
+          "relation": "관리사무소장인 저는 처음 만나는 옆집 입주자에게 생활 소음 문제를 알리고 조치를 요청하는 관계입니다.",
+          "source": "최근에 옆집에서 나는 생활 소음이 너무 커서 주민들이 많이 불편해하고 있습니다. 이 문제를 해결하기 위해 소음을 줄여 주실 것을 정중히 부탁드립니다. 가능한 빠른 시일 내에 조치를 취해 주시면 감사하겠습니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "83fd3cdf-d3b3-4ab0-b808-9117cb0ae2b8",
+      "title": "과제 역할 부탁에 대한 친근한 선배의 거절 발화",
+      "speechAct": "refusal",
+      "updatedAt": "2026-09-06T13:26:52.735039+00:00",
+      "weeks": [
+        6
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 B의 친구로, B의 여행 동행 제안을 거절해야 한다.",
+          "relation": "친구인 A와 B 사이의 관계입니다.",
+          "source": "너가 이번 여행에 같이 가자고 했지만, 이번에는 어려울 것 같아. 다음에 같이 가자.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 B의 상사로, B의 프로젝트 협업 요청을 거절해야 한다.",
+          "relation": "상사인 A와 부하 직원인 B 사이의 관계입니다.",
+          "source": "너가 이번 프로젝트에서 함께 하자고 했지만, 이번에는 도와줄 수가 없어서 미안해.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 B의 상사로, B의 프로젝트 협업 요청을 거절해야 한다.",
+          "relation": "상사인 A와 부하 직원인 B 사이의 관계입니다.",
+          "source": "너가 이번 프로젝트에서 함께 하자고 했지만, 이번에는 도와줄 수가 없어서 미안해.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 B의 상사로, B의 프로젝트 협업 요청을 거절해야 한다.",
+          "relation": "상사인 A와 부하 직원인 B 사이의 관계입니다.",
+          "source": "너가 이번 프로젝트에서 함께 하자고 했지만, 이번에는 도와줄 수가 없어서 미안해.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았다. A는 B의 상사로, B의 출장 동행 요청을 거절해야 한다.",
+          "relation": "상사인 A와 부하 직원인 B 사이의 관계입니다.",
+          "source": "너가 이번 출장에 같이 가자고 했지만, 이번에는 도와줄 수가 없어서 미안해.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 친밀한 선배 멘토이고 B는 가까운 후배 멘티로, A가 B의 과제 역할 부탁을 거절해야 합니다.",
+          "relation": "선배 멘토인 A와 후배 멘티인 B 사이의 친근한 관계입니다.",
+          "source": "너가 이번 과제에서 그 역할을 맡아주길 부탁했지만, 이번에는 도와줄 수가 없어서 미안해. 다른 방법을 함께 찾아보자.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "aaaa6149-e1af-46a0-a4a3-437cf3f17833",
+      "title": "조별 과제 발표에서 상대의 자료 준비와 설명 능력을 칭찬하는 구두 담화.",
+      "speechAct": "compliment",
+      "updatedAt": "2026-09-06T13:26:43.82042+00:00",
+      "weeks": [
+        4
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B의 연구 결과를 칭찬하려고 합니다.",
+          "relation": "A는 B의 연구 결과를 칭찬하려고 합니다. A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B의 발표 자료 디자인을 칭찬하려고 합니다.",
+          "relation": "A는 B의 발표 자료 디자인을 칭찬하려고 합니다. A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B의 발표 자료 디자인을 칭찬하려고 합니다.",
+          "relation": "A는 B의 발표 자료 디자인을 칭찬하려고 합니다. A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B의 발표 자료 디자인을 칭찬하려고 합니다.",
+          "relation": "A는 B의 발표 자료 디자인을 칭찬하려고 합니다. A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B의 발표 태도를 칭찬하려고 합니다.",
+          "relation": "A는 B의 발표 태도를 칭찬하려고 합니다. A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A와 B는 같은 수업 조원으로, A는 B의 발표 내용 일부를 구체적으로 칭찬하려고 합니다.",
+          "relation": "A와 B는 같은 수업 조원으로 서로 알고 지내지만 어색한 사이입니다.",
+          "source": "발표 때 자료 정리가 정말 체계적이었어요. 특히 도표를 잘 활용해서 이해하기 쉬웠습니다. 덕분에 내용이 훨씬 명확하게 전달됐어요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "b89d0612-1ae3-4a40-8444-7c3030fdbec0",
+      "title": "버디 첫 만남과 활동 일정 조율 제안",
+      "speechAct": "proposal",
+      "updatedAt": "2026-09-06T13:26:54.792522+00:00",
+      "weeks": [
+        10
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C는 A와 B의 첫 만남에서 A의 제안을 통역하고 있다. A는 B에게 주말에 함께 박물관에 가자고 제안했다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "주말에 박물관에 가는 게 어떨까요? 아니면 다른 좋은 아이디어가 있으신가요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C는 A와 B의 첫 만남에서 A의 제안을 통역하고 있다. A는 B에게 이번 주 금요일에 만나자고 제안했다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "이번 주 금요일에 만나는 게 어떨까요? 만약 그날 어렵다면 다음 주 월요일도 괜찮습니다. 일정이 어떻게 되세요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C는 A와 B의 첫 만남에서 A의 제안을 통역하고 있다. A는 B에게 이번 주 금요일에 만나자고 제안했다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "이번 주 금요일에 만나는 게 어떨까요? 만약 그날 어렵다면 다음 주 월요일도 괜찮습니다. 일정이 어떻게 되세요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C는 A와 B의 첫 만남에서 A의 제안을 통역하고 있다. A는 B에게 이번 주 금요일에 만나자고 제안했다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "이번 주 금요일에 만나는 게 어떨까요? 만약 그날 어렵다면 다음 주 월요일도 괜찮습니다. 일정이 어떻게 되세요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C는 A와 B의 첫 만남에서 A의 제안을 통역하고 있다. A는 B에게 다음 주에 영화 보러 가자고 제안했다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "다음 주에 영화 보러 가는 게 어때요? 아니면 다른 좋은 아이디어가 있으신가요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 교환·유학 프로그램에서 배정받은 버디이고 B는 프로그램이 공식 배정한 동등한 지위의 버디로 서로 첫 만남과 활동 일정을 조율해야 합니다.",
+          "relation": "A와 B는 교환·유학 프로그램에서 배정받은 동등한 지위의 버디로 서로 처음 만나는 사이입니다.",
+          "source": "이번 주 금요일에 만나는 게 어떨까요? 만약 그날 어렵다면 다음 주 월요일도 괜찮습니다. 일정이 어떻게 되세요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "b8b499db-9015-4aa3-a65b-135402828ead",
+      "title": "조별 발표 리허설 일정 변경 요청",
+      "speechAct": "request",
+      "updatedAt": "2026-09-06T13:30:59.440446+00:00",
+      "weeks": [
+        13
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B에게 과제 제출 기한을 연장할 수 있는지 문의합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "과제 제출 기한을 연장할 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B에게 발표 리허설 일정을 조정할 수 있는지 문의합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "발표 리허설 일정을 조정할 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B에게 발표 리허설 일정을 조정할 수 있는지 문의합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "발표 리허설 일정을 조정할 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B에게 발표 리허설 일정을 조정할 수 있는지 문의합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "발표 리허설 일정을 조정할 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "학습자 통역사 C는 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B에게 발표 자료를 이메일로 보내줄 수 있는지 요청합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "발표 자료를 이메일로 보내줄 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. 두 사람은 같은 수업 조별과제 동등한 학생이며, A가 B에게 발표 리허설 일정을 조정할 수 있는지 구두로 문의합니다.",
+          "relation": "두 사람은 같은 수업 조별과제에서 알지만 약간 어색한 동급생 사이입니다.",
+          "source": "이번 주 목요일 오후로 조별 발표 리허설 일정을 바꿀 수 있을까요? 가능한 시간을 알려주시면 감사하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "d502e0fc-4868-490b-a166-7331f4f37b5f",
+      "title": "조장의 계획에 대해 의견 반대하는 학생의 메시지",
+      "speechAct": "opposition",
+      "updatedAt": "2026-09-06T13:26:55.562751+00:00",
+      "weeks": [
+        11
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "팀장님이 제안한 프로젝트 방향에 대해 다른 의견을 제시하고 싶습니다. 팀장님은 프로젝트의 최종 결정권자입니다.",
+          "relation": "저는 팀원이고 상대는 팀장으로, 공식적인 권한 차이가 큽니다.",
+          "source": "팀장님께서 제안하신 방향은 이해하지만, 이 방향이 모든 팀원의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 좀 더 다양한 의견을 수렴하는 방안을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "친구가 제안한 여행 계획에 대해 다른 의견을 제시하고 싶습니다. 우리는 서로의 의견을 존중하는 사이입니다.",
+          "relation": "저는 친구와 동등한 관계입니다.",
+          "source": "친구가 제안한 여행 계획은 이해하지만, 모든 사람의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 다른 방법을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "친구가 제안한 여행 계획에 대해 다른 의견을 제시하고 싶습니다. 우리는 서로의 의견을 존중하는 사이입니다.",
+          "relation": "저는 친구와 동등한 관계입니다.",
+          "source": "친구가 제안한 여행 계획은 이해하지만, 모든 사람의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 다른 방법을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "친구가 제안한 여행 계획에 대해 다른 의견을 제시하고 싶습니다. 우리는 서로의 의견을 존중하는 사이입니다.",
+          "relation": "저는 친구와 동등한 관계입니다.",
+          "source": "친구가 제안한 여행 계획은 이해하지만, 모든 사람의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 다른 방법을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "후배가 제안한 연구 방향에 대해 다른 의견을 제시하고 싶습니다. 저는 연구의 책임자로서 방향을 조정할 필요가 있습니다.",
+          "relation": "저는 책임자이고 상대는 후배로, 공식적인 권한 차이가 있습니다.",
+          "source": "후배가 제안한 연구 방향은 이해하지만, 모든 팀원의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 다른 방법을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 조별과제에서 조장의 의견에 반대하는 입장을 전달하려고 합니다. 상대는 조장으로서 의견에 대해 신중히 검토할 의무가 있습니다.",
+          "relation": "저는 조원이고 상대는 조장으로, 친분은 있으나 공식적인 권한 차이가 있습니다.",
+          "source": "조장님께서 제안하신 계획은 이해하지만, 모든 구성원의 의견을 충분히 반영하지 않았다고 생각합니다. 따라서 저는 이 방법보다는 좀 더 다양한 의견을 수렴하는 방안을 고려해야 한다고 봅니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        }
+      ]
+    },
+    {
+      "id": "d79406d7-1ae9-4e35-938a-1faf71d63170",
+      "title": "동호회 모임 초대 메시지 작성",
+      "speechAct": "agreement",
+      "updatedAt": "2026-09-06T13:26:46.675166+00:00",
+      "weeks": [
+        5
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "저는 회사 동료에게 주말 워크숍에 초대하는 이메일을 보냅니다. 참석 여부를 자유롭게 결정할 수 있도록 안내합니다.",
+          "relation": "저와 상대는 직장 동료로, 업무상 자주 대화하는 사이입니다.",
+          "source": "안녕하세요. 이번 주말에 회사 워크숍이 있습니다. 시간이 되신다면 참석하시면 좋겠습니다. 부담 없이 결정하세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "저는 친구에게 주말에 열리는 영화 상영회에 초대하는 메시지를 보냅니다. 참석 여부는 자유롭게 결정할 수 있습니다.",
+          "relation": "저와 상대는 친구로, 서로 편하게 대화하는 사이입니다.",
+          "source": "안녕! 이번 주말에 영화 상영회가 있어. 꼭 참석해 줘.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "저는 친구에게 주말에 열리는 영화 상영회에 초대하는 메시지를 보냅니다. 참석 여부는 자유롭게 결정할 수 있습니다.",
+          "relation": "저와 상대는 친구로, 서로 편하게 대화하는 사이입니다.",
+          "source": "안녕! 이번 주말에 영화 상영회가 있어. 꼭 참석해 줘.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "저는 친구에게 주말에 열리는 영화 상영회에 초대하는 메시지를 보냅니다. 참석 여부는 자유롭게 결정할 수 있습니다.",
+          "relation": "저와 상대는 친구로, 서로 편하게 대화하는 사이입니다.",
+          "source": "안녕! 이번 주말에 영화 상영회가 있어. 꼭 참석해 줘.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "저는 후배에게 다음 주말에 있을 캠핑에 초대하는 메시지를 보냅니다. 참석 여부는 자유롭게 결정할 수 있습니다.",
+          "relation": "저와 상대는 선후배 관계로, 제가 선배입니다.",
+          "source": "안녕! 다음 주말에 캠핑이 있어. 참석해 줘.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 동호회에서 자주 마주치는 지인에게 다음 모임에 초대하는 메시지를 작성합니다. 상대가 부담없이 결정할 수 있도록 정중한 표현을 사용해야 합니다.",
+          "relation": "저와 상대는 동등한 지인 관계로, 서로를 알고 있으나 아직 어색한 사이입니다.",
+          "source": "안녕하세요. 다음 주 토요일 오후에 동호회에서 소규모 모임이 예정되어 있습니다. 혹시 시간 괜찮으시면 함께 참석하셔도 좋을 것 같아 이렇게 연락드립니다. 부담 갖지 마시고 편하게 생각해 주세요.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": "evaluation_criteria"
+        }
+      ]
+    },
+    {
+      "id": "f8de3f59-cd86-4636-b516-a8ead78ac0ac",
+      "title": "이웃에게 택배 수령을 부탁하는 글 메시지",
+      "speechAct": "request",
+      "updatedAt": "2026-09-06T13:26:41.883743+00:00",
+      "weeks": [
+        2
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "동급생이 공유하기로 한 발표 자료가 필요해 이메일로 요청한다. 새 자료 제작이 아니라 보유한 파일 전송을 부탁하는 상황이다.",
+          "relation": "나는 같은 수업을 듣는 동급생에게 부탁한다. 개인적으로 친하지는 않다.",
+          "source": "수업 발표 자료를 이메일로 보내주실 수 있나요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "결석한 수업의 필기가 필요하다. 동급생은 개인 필기를 공유하기로 약속한 적이 없고, 사진을 찍어 보내는 추가 수고가 든다.",
+          "relation": "나는 몇 차례 대화한 동급생에게 개인 필기를 부탁한다.",
+          "source": "괜찮으면 오늘 수업 필기를 사진으로 찍어서 보내줄 수 있어요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "결석한 수업의 필기가 필요하다. 동급생은 개인 필기를 공유하기로 약속한 적이 없고, 사진을 찍어 보내는 추가 수고가 든다.",
+          "relation": "나는 몇 차례 대화한 동급생에게 개인 필기를 부탁한다.",
+          "source": "괜찮으면 오늘 수업 필기를 사진으로 찍어서 보내줄 수 있어요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "결석한 수업의 필기가 필요하다. 동급생은 개인 필기를 공유하기로 약속한 적이 없고, 사진을 찍어 보내는 추가 수고가 든다.",
+          "relation": "나는 몇 차례 대화한 동급생에게 개인 필기를 부탁한다.",
+          "source": "괜찮으면 오늘 수업 필기를 사진으로 찍어서 보내줄 수 있어요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "자기소개서에 대한 간단한 의견을 이번 주 안에 받을 수 있는지 이메일로 부탁한다. 지도교수는 아직 검토를 맡기로 하지 않았다.",
+          "relation": "나는 유학 준비생이고 상대는 상담을 몇 차례 해 준 지도교수다.",
+          "source": "이번 주 안에 자기소개서에 짧게 의견을 주실 수 있을까요?",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "저는 아파트 단지 내에서 자주 마주치는 이웃에게 작은 부탁을 하려 합니다. 요청을 검토하는 데 부담이 크지 않도록 배려하며 글로 전달합니다.",
+          "relation": "저는 아파트 단지 내에서 몇 차례 마주친 지인 이웃에게 부탁을 드리는 상황입니다.",
+          "source": "안녕하세요, 다름이 아니라 이번 주말에 제가 급히 외출해야 해서 혹시 집 앞에 있는 제 택배를 대신 받아주실 수 있을까요? 번거로우시겠지만 가능하시면 정말 감사하겠습니다.",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": "evaluation_criteria"
+        }
+      ]
+    },
+    {
+      "id": "f8f26b2f-1be9-4653-92cb-43bc420f86ce",
+      "title": "조별 과제 진행 방법을 제안하는 친근한 글",
+      "speechAct": "proposal",
+      "updatedAt": "2026-09-06T13:26:55.000986+00:00",
+      "weeks": [
+        10
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "상사가 주관하는 프로젝트 회의에서 새로운 아이디어를 제안한다. 상사의 결정권을 존중하며 의견을 제시해야 한다.",
+          "relation": "나는 프로젝트 팀의 일원이고, 상사는 나보다 높은 직급이다.",
+          "source": "새로운 아이디어를 제안하고 싶습니다. 상사님의 의견을 듣고 싶습니다.",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_lower",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "팀원들과의 회의에서 프로젝트 진행 방안을 제안한다. 모두가 이해할 수 있도록 명확하게 설명해야 한다.",
+          "relation": "나는 프로젝트 팀의 일원이고, 팀원들과 동등한 입장이다.",
+          "source": "우리 프로젝트의 다음 단계를 정해야 합니다. 제 생각에는 우리가 다음 주까지 각자의 역할을 정리해서 공유하는 게 좋을 것 같습니다.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "팀원들과의 회의에서 프로젝트 진행 방안을 제안한다. 모두가 이해할 수 있도록 명확하게 설명해야 한다.",
+          "relation": "나는 프로젝트 팀의 일원이고, 팀원들과 동등한 입장이다.",
+          "source": "우리 프로젝트의 다음 단계를 정해야 합니다. 제 생각에는 우리가 다음 주까지 각자의 역할을 정리해서 공유하는 게 좋을 것 같습니다.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "팀원들과의 회의에서 프로젝트 진행 방안을 제안한다. 모두가 이해할 수 있도록 명확하게 설명해야 한다.",
+          "relation": "나는 프로젝트 팀의 일원이고, 팀원들과 동등한 입장이다.",
+          "source": "우리 프로젝트의 다음 단계를 정해야 합니다. 제 생각에는 우리가 다음 주까지 각자의 역할을 정리해서 공유하는 게 좋을 것 같습니다.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "친구와의 여행 계획을 세우며 일정을 제안한다. 친구가 선택할 수 있도록 여러 옵션을 제시해야 한다.",
+          "relation": "나는 친구와 여행을 계획하는 중이다.",
+          "source": "여행 일정을 정해야 해. 주말에 출발하는 게 좋을까, 아니면 평일에 출발하는 게 좋을까?",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "조별 과제를 같이 하는 친구에게 앞으로 진행 방법을 제안하는 글을 쓴다. 상대가 부담 없이 검토할 수 있도록 간단하게 표현해야 한다.",
+          "relation": "나는 조별 과제를 함께 하는 친한 친구이고, 서로 동등한 입장에서 의견을 나눈다.",
+          "source": "이번 주 내로 각자 맡은 부분을 정리해서 공유하는 게 어떨까? 그렇게 하면 다음 모임 때 더 효율적으로 의견을 모을 수 있을 것 같아. 혹시 다른 좋은 방법이 있으면 알려줘.",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "reviewSignal": "evaluation_criteria"
+        }
+      ]
+    },
+    {
+      "id": "fbb3e621-1a1e-4836-afb4-6351f23d157a",
+      "title": "모임 초대 및 장소 변경 제안에 대한 의견 묻기",
+      "speechAct": "agreement",
+      "updatedAt": "2026-09-06T13:26:46.449813+00:00",
+      "weeks": [
+        5
+      ],
+      "scenes": [
+        {
+          "path": "mpj_items.0",
+          "situation": "통역사 C는 공개 강연 행사장에서 한국어 화자 A의 말을 중국어 청자 B에게 전달한다. A는 다음 토요일 강연 참석 가능 여부를 직접 묻는다.",
+          "relation": "초청 업무를 맡은 학생 A가 처음 만난 외부 강사 B를 초대한다. A에게 참여를 지시할 권한은 없다.",
+          "source": "이번 토요일 공개 강연에 오실 수 있을까요? 일정이 괜찮으시면 알려 주세요.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.1",
+          "situation": "통역사 C는 한국어 화자 A와 중국어 청자 B의 대면 대화를 통역한다. A는 요리 교류 모임에 B를 초대하고 장소 변경 의견도 묻는다.",
+          "relation": "신규 자원봉사자 A가 처음 만난 지역 행사 책임자 B를 초대한다. B는 참석을 약속하지 않았다.",
+          "source": "이번 주말 요리 교류 모임에 오실 수 있을까요? 장소를 카페에서 주민 공동 주방으로 바꾸고 싶은데 의견을 듣고 싶습니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.2",
+          "situation": "통역사 C는 한국어 화자 A와 중국어 청자 B의 대면 대화를 통역한다. A는 요리 교류 모임에 B를 초대하고 장소 변경 의견도 묻는다.",
+          "relation": "신규 자원봉사자 A가 처음 만난 지역 행사 책임자 B를 초대한다. B는 참석을 약속하지 않았다.",
+          "source": "이번 주말 요리 교류 모임에 오실 수 있을까요? 장소를 카페에서 주민 공동 주방으로 바꾸고 싶은데 의견을 듣고 싶습니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.3",
+          "situation": "통역사 C는 한국어 화자 A와 중국어 청자 B의 대면 대화를 통역한다. A는 요리 교류 모임에 B를 초대하고 장소 변경 의견도 묻는다.",
+          "relation": "신규 자원봉사자 A가 처음 만난 지역 행사 책임자 B를 초대한다. B는 참석을 약속하지 않았다.",
+          "source": "이번 주말 요리 교류 모임에 오실 수 있을까요? 장소를 카페에서 주민 공동 주방으로 바꾸고 싶은데 의견을 듣고 싶습니다.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "mpj_items.4",
+          "situation": "통역사 C는 한국어 화자 A가 중국어 청자 B에게 전화로 동네 사진전 참석을 요청하는 말을 전달한다. B가 일정을 따로 확보해야 하는 초대다.",
+          "relation": "신규 전시 자원봉사자 A가 처음 연락하는 지역 문화시설 책임자 B를 초대한다. 참석 약속은 없다.",
+          "source": "다음 주말 동네 사진전에 오실 수 있을까요? 일정이 괜찮으신지 알려 주세요.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "high"
+          },
+          "reviewSignal": null
+        },
+        {
+          "path": "production_task",
+          "situation": "학습자 통역사 C인 당신은 한국어 원발화자 A와 중국어 청자 B 사이에서 통역을 맡았습니다. A는 B를 이번 주말 모임에 초대하려 하지만, 장소 변경에 대해 의견을 묻고 있습니다.",
+          "relation": "화자 A는 처음 만나는 행사 주최자 B에게 예의 바르게 초대하며, B가 참여 여부와 장소 변경에 대해 선택할 권한이 있습니다.",
+          "source": "이번 주말에 우리 모임에 오실 수 있을까요? 장소를 카페에서 공원으로 바꾸는 게 어떨지 의견을 듣고 싶습니다. 편하신지 알려 주세요.",
+          "pdr": {
+            "d": "distant",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "reviewSignal": null
+        }
+      ]
+    }
+  ]
+}

@@ -528,7 +528,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       {
         ...common(1, contrast),
         kind: "scale",
-        prompt: "앞 장면과 비교했을 때 이 표현은 상황에 맞나요?",
+        prompt: "이 표현은 이 상황에 맞나요?",
         target: contrast.target,
         options: bandOptions,
         referenceAnswer: assertBand(contrast.accepted_band_codes[0], bandOptions),
@@ -604,7 +604,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       {
         ...common(1, fixChoice),
         kind: "scale",
-        prompt: "앞 장면과 비교했을 때 이 표현은 상황에 맞나요?",
+        prompt: "이 표현은 이 상황에 맞나요?",
         target: fixChoice.target,
         options: bandOptions,
         referenceAnswer: referenceJudgment,

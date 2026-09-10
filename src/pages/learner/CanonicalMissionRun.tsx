@@ -102,113 +102,35 @@ const optionGrid = "mt-3 grid gap-1.5";
 const actionButton = "w-full disabled:bg-[#E9E7E0] disabled:text-[#98A0AC] disabled:opacity-100";
 const optionBase = "w-full rounded-xl border px-4 py-2 text-left text-[15px] break-keep transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1";
 
-type SceneIntroSlide = {
-  eyebrow: string;
-  title: string;
-  body?: string;
-  action: string;
-  tone: "navy" | "yellow" | "green";
-};
-
 type SceneIntroConfig = {
   missionLabel: string;
   previewOnly?: boolean;
-  slides: readonly SceneIntroSlide[];
-};
-
-const MISSION_A_SCENE_INTRO: SceneIntroConfig = {
-  missionLabel: "미션 1",
-  slides: [
-    {
-      eyebrow: "01 · 오늘의 장면",
-      title: "다음 주 화요일 면접에 참석하기 어려워, 아직 만난 적 없는 인턴십 담당자에게 같은 주 다른 날로 조정을 요청해야 합니다.",
-      action: "장면 속 단서 보기",
-      tone: "navy",
-    },
-    {
-      eyebrow: "02 · 장면 속 단서",
-      title: "그런데, 이런 조건이 있습니다",
-      body: "아직 만난 적 없는 인턴십 담당자에게 처음 보내는 이메일이고, 이미 정해진 면접 일정의 변경을 요청합니다.",
-      action: "내가 할 일 확인",
-      tone: "yellow",
-    },
-    {
-      eyebrow: "03 · 당신의 선택",
-      title: "어떤 중국어 요청이 이 장면에 어울릴까요?",
-      body: "먼저 다섯 장면의 번역안을 비교하며 판단 기준을 찾아봅니다. 그다음 이 장면으로 돌아와 직접 번역합니다.",
-      action: "5개 장면으로 감 잡기",
-      tone: "green",
-    },
-  ],
-};
-
-const MISSION_B_SCENE_INTRO: SceneIntroConfig = {
-  missionLabel: "미션 2",
-  previewOnly: true,
-  slides: [
-    {
-      eyebrow: "01 · 새로운 장면",
-      title: "같이 프로젝트를 하는 친한 동급생에게 오늘 저녁 온라인 회의를 30분 늦춰 달라고 요청해야 합니다.",
-      action: "장면 속 단서 보기",
-      tone: "navy",
-    },
-    {
-      eyebrow: "02 · 새 장면의 단서",
-      title: "이 장면에는 이런 조건이 있습니다",
-      body: "이미 친한 동급생에게 메신저로 연락하며, 약속 자체를 바꾸는 대신 시작 시간을 30분 조정해 달라고 부탁합니다.",
-      action: "이번 장면에서 할 일 확인",
-      tone: "yellow",
-    },
-    {
-      eyebrow: "03 · 이번 장면에서의 선택",
-      title: "이번 장면에는 어떤 중국어 요청이 어울릴까요?",
-      body: "이 장면의 상대와 채널, 부탁의 크기를 살펴보고 어울리는 표현을 선택합니다.",
-      action: "도입 다시 보기",
-      tone: "green",
-    },
-  ],
+  context: MissionContext;
+  outputName: string;
 };
 
 function buildSceneIntroConfig(mission: CanonicalMissionViewModel): SceneIntroConfig {
-  if (!mission.scenarioId) return MISSION_A_SCENE_INTRO;
-
   const production = mission.quests.find((quest): quest is DctQuest => quest.kind === "dct");
-  const context = production?.context ?? mission.quests[0]?.context;
-  const situation = context?.situation ?? "이번 미션의 상황을 확인하고 알맞은 표현을 선택합니다.";
-  const contextFacts = context
-    ? [
-        `상대·관계는 ${context.relation}입니다.`,
-        `채널은 ${context.channel}이고, 부담은 ${context.pdr.r}입니다.`,
-      ].join(" ")
-    : "상대와 관계, 채널, 부탁의 크기를 차례로 확인합니다.";
-  const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
-
   return {
     missionLabel: mission.metaLabel ?? "이번 미션",
-    slides: [
-      {
-        eyebrow: "01 · 오늘의 장면",
-        title: situation,
-        action: "장면 속 단서 보기",
-        tone: "navy",
-      },
-      {
-        eyebrow: "02 · 장면 속 단서",
-        title: "그런데, 이런 조건이 있습니다",
-        body: contextFacts,
-        action: "내가 할 일 확인",
-        tone: "yellow",
-      },
-      {
-        eyebrow: "03 · 당신의 선택",
-        title: `어떤 ${mission.targetLanguage.label} ${mission.speechAct} 표현이 이 장면에 어울릴까요?`,
-        body: `먼저 다섯 장면의 ${outputName}안을 비교하며 판단 기준을 찾아봅니다. 그다음 이 장면으로 돌아와 직접 ${outputName}합니다.`,
-        action: "5개 장면으로 감 잡기",
-        tone: "green",
-      },
-    ],
+    context: production?.context ?? mission.quests[0].context,
+    outputName: mission.activityMode === "interpreting" ? "통역" : "번역",
   };
 }
+
+const MISSION_A_SCENE_INTRO = buildSceneIntroConfig(CANONICAL_MISSION_PREVIEW);
+const MISSION_B_SCENE_INTRO: SceneIntroConfig = {
+  ...MISSION_A_SCENE_INTRO,
+  missionLabel: "미션 2",
+  previewOnly: true,
+  context: {
+    ...MISSION_A_SCENE_INTRO.context,
+    situation: "같이 프로젝트를 하는 친한 동급생에게 오늘 저녁 온라인 회의를 30분 늦춰 달라고 요청합니다.",
+    relation: "같이 프로젝트를 하는 친한 동급생",
+    channel: "위챗",
+    pdr: { p: "동등", d: "친한 사이", r: "부담 낮음" },
+  },
+};
 
 const SCENE_INTRO_STEP_IDS = ["scene-1", "scene-2", "scene-3"] as const;
 
@@ -259,7 +181,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
   A1: "다음: 상황에 맞는지 판단하기",
   A2: "다음: 판단하고 고쳐 보기",
   A3: "다음: 부적절한 이유 찾기",
-  A4: "다음: BEST·WORST 고르기",
+  A4: "다음: 표현 비교하기",
 };
 
 function nextActionLabel(quest: MissionQuest) {
@@ -276,129 +198,37 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
   );
 }
 
-function SceneIntroFlow({ config, step, onNext, onPrevious, onSelect }: {
-  config: SceneIntroConfig;
-  step: number;
-  onNext: () => void;
-  onPrevious: () => void;
-  onSelect: (step: number) => void;
-}) {
-  const slide = config.slides[step];
-  const isLast = step === config.slides.length - 1;
-  const toneClass = slide.tone === "navy"
-    ? "bg-[#1B2733] text-[#F7F3E8]"
-    : slide.tone === "yellow"
-      ? "bg-[#F5C842] text-[#15202B]"
-      : "bg-[#E8EFE7] text-[#15202B]";
-  const ghostClass = slide.tone === "navy"
-    ? "text-white/[0.045]"
-    : slide.tone === "yellow"
-      ? "text-[#15202B]/[0.055]"
-      : "text-[#2E6C58]/[0.06]";
-  const eyebrowClass = slide.tone === "navy"
-    ? "text-[#F5C842]"
-    : slide.tone === "yellow"
-      ? "text-[#6B5500]"
-      : "text-[#2E6C58]";
-
+function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
   return (
-    <div className="mx-auto w-full max-w-[720px] pt-1">
-      <section
-        className="rounded-[28px] border border-[#DED8C8] bg-[#F9F6EC] p-2.5 shadow-[0_18px_48px_rgba(21,32,43,0.13)] sm:p-3"
-        aria-label={`${config.missionLabel} 장면 도입 ${step + 1}/${config.slides.length}`}
-      >
-        <div
-          key={step}
-          className={`relative flex min-h-[320px] flex-col overflow-hidden rounded-[21px] px-6 py-6 sm:min-h-[350px] sm:px-9 sm:py-8 ${toneClass}`}
-          aria-live="polite"
-        >
-          <span
-            aria-hidden="true"
-            className={`pointer-events-none absolute -right-2 -top-10 select-none text-[136px] font-black leading-none tracking-[-0.08em] sm:text-[170px] ${ghostClass}`}
-          >
-            0{step + 1}
-          </span>
-
-          <div className="relative z-10 flex h-full flex-1 flex-col">
-            <p className={`text-[11px] font-bold tracking-[0.16em] ${eyebrowClass}`}>
-              {slide.eyebrow}
-            </p>
-
-            {slide.tone === "navy" ? (
-              <h1
-                style={{ textWrap: "balance" }}
-                className="mt-auto max-w-[590px] break-keep pb-1 text-[21px] font-semibold leading-[1.42] tracking-[-0.03em] text-[#F7F3E8] sm:text-[24px]"
-              >
-                {slide.title}
-              </h1>
-            ) : (
-              <div className="my-auto max-w-[590px]">
-                <h1
-                  style={{ textWrap: "balance" }}
-                  className={`break-keep font-bold leading-[1.35] tracking-[-0.03em] text-[#15202B] ${slide.tone === "green" ? "text-[25px] sm:text-[31px]" : "text-[22px] sm:text-[27px]"}`}
-                >
-                  {slide.title}
-                </h1>
-                {slide.body && (
-                  <p className={`mt-5 max-w-[570px] break-keep font-medium tracking-[-0.012em] ${slide.tone === "green" ? "text-[14px] leading-[1.7] text-[#53615A] sm:text-[15px]" : "text-[15px] leading-[1.75] text-[#3E3A2D] sm:text-[16px]"}`}>
-                    {slide.body}
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex min-h-[58px] items-center justify-between gap-3 px-2 pt-2.5 sm:px-3">
-          <div className="flex items-center gap-2" aria-label={`카드 ${step + 1} / ${config.slides.length}`}>
-            {config.slides.map((item, index) => (
-              <button
-                key={item.eyebrow}
-                type="button"
-                aria-label={`${index + 1}번 카드 보기`}
-                aria-current={step === index ? "step" : undefined}
-                onClick={() => onSelect(index)}
-                className={`h-2 rounded-full transition-all ${step === index ? "w-7 bg-[#15202B]" : "w-2 bg-[#C9C1AD] hover:bg-[#8F8776]"}`}
-              />
-            ))}
-            <span className="ml-1 hidden text-[11px] font-semibold tabular-nums text-[#777063] sm:inline">
-              {step + 1} / {config.slides.length}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            {step > 0 && (
-              <button
-                type="button"
-                aria-label="이전 카드"
-                onClick={onPrevious}
-                className="whitespace-nowrap rounded-full px-2.5 py-2 text-[12px] font-semibold text-[#6D675C] hover:bg-[#EEE9DC] hover:text-[#15202B] sm:px-3 sm:text-[12.5px]"
-              >
-                <span aria-hidden="true" className="sm:hidden">←</span>
-                <span className="hidden sm:inline">이전</span>
-              </button>
-            )}
-            <Button
-              type="button"
-              onClick={onNext}
-              className={`h-auto whitespace-nowrap rounded-full px-4 py-2.5 text-[13px] font-semibold tracking-[-0.015em] shadow-none transition-transform hover:-translate-y-0.5 active:translate-y-0 motion-reduce:transform-none sm:px-6 sm:text-[13.5px] ${slide.tone === "navy" ? "bg-[#F5C842] text-[#15202B] hover:bg-[#FCE07A]" : "bg-[#15202B] text-white hover:bg-[#273849]"}`}
-            >
-              {slide.action} <span aria-hidden="true">→</span>
-            </Button>
-          </div>
-        </div>
-        {isLast && (
-          <span className="sr-only">
-            {config.previewOnly ? "미션 2 장면 도입 검토용 화면입니다." : "다음 화면부터 표현 판단 1/5가 시작됩니다."}
-          </span>
-        )}
-      </section>
-    </div>
+    <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
+      <div className="bg-[#15202B] px-5 py-5 text-white sm:px-6">
+        <p className="text-xs font-bold text-[#F3D248]">{config.missionLabel}</p>
+        <h1 className="mt-2 text-xl font-black">표현을 판단하고, 직접 {config.outputName}해 봅니다</h1>
+      </div>
+      <div className="space-y-5 p-5 sm:p-6">
+        <ol className="grid gap-3 sm:grid-cols-2">
+          <li className="rounded-xl bg-[#F8F6EE] p-4">
+            <h2 className="font-bold">1. 표현 판단 연습</h2>
+            <p className="mt-1 text-sm leading-6 text-[#596579]">여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다.</p>
+          </li>
+          <li className="rounded-xl bg-[#F8F6EE] p-4">
+            <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
+            <p className="mt-1 text-sm leading-6 text-[#596579]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
+          </li>
+        </ol>
+        <ContextCard context={config.context} title={`직접 ${config.outputName}할 상황`} />
+        <dl className="grid gap-3 text-sm sm:grid-cols-[1fr_auto]">
+          <div><dt className="text-xs font-bold text-[#697386]">상대·관계</dt><dd className="mt-1 leading-6">{config.context.relation}</dd></div>
+          <div><dt className="text-xs font-bold text-[#697386]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
+        </dl>
+        <Button className="h-12 w-full" onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "표현 판단 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+      </div>
+    </section>
   );
 }
 
 function escaped(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\function RichLine(");
 }
 
 function HighlightedText({ text, highlights = [], target = false }: {
@@ -447,14 +277,15 @@ function SentenceLines({ text, highlights = [] }: { text: string; highlights?: s
   );
 }
 
-function ContextCard({ context, headerRight }: {
+function ContextCard({ context, headerRight, title = "상황" }: {
   context: MissionContext;
   headerRight?: React.ReactNode;
+  title?: string;
 }) {
   return (
     <section className="rounded-xl border border-[#E2DED4] bg-[#F4F2EC] px-4 py-3 sm:px-5">
       <div className="flex min-h-6 items-center justify-between gap-3">
-        <p className="text-xs font-bold text-[#5D6980]">상황</p>
+        <p className="text-xs font-bold text-[#5D6980]">{title}</p>
         {headerRight}
       </div>
       <h2 className="mt-1.5 break-keep text-[17px] font-bold leading-7 text-[#101B2B]">
@@ -468,9 +299,9 @@ function ContextCard({ context, headerRight }: {
       )}
       <div className="mt-2 flex flex-wrap gap-1.5">
         {[
-          ["P", context.pdr.p],
-          ["D", context.pdr.d],
-          ["R", context.pdr.r],
+          ["상대적 지위", context.pdr.p],
+          ["친숙도", context.pdr.d],
+          ["부담", context.pdr.r.replace(/^부담\s*/, "")],
         ].map(([label, value]) => (
           <span key={label} className="rounded-full border border-[#D3D8E1] bg-white px-2.5 py-1 text-xs font-bold text-[#4D5A70]">
             {label} · {value}
@@ -864,14 +695,9 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
       <section className={taskPanelBody}>
         <p className="mb-1 text-[11px] font-black text-[#6B7280]">지금 할 일</p>
         <h3 className="text-base font-bold">{quest.prompt}</h3>
-        {!answered && (
-          <p className="mt-2 text-xs font-black text-[#687387]" aria-live="polite">
-            {best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "BEST 선택 완료 · WORST를 골라주세요" : worst ? "WORST 선택 완료 · BEST를 골라주세요" : "BEST와 WORST를 하나씩 골라주세요"}
-          </p>
-        )}
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg bg-[#15202B] px-2.5 text-xs font-black text-white">{mission.targetLanguage.badge}</span>
-          <span className="text-sm font-bold text-[#5D6980]">산출 후보</span>
+          <span className="text-sm font-bold text-[#5D6980]">비교할 표현</span>
         </div>
         <div className="mt-2 grid gap-2">
           {order.map((candidate) => {
@@ -895,8 +721,8 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
                       <span className={`rounded px-2 py-1 text-[11px] font-black ${isBestRole ? "bg-[#DCEFE4] text-[#245E44]" : isWorstRole ? "bg-[#F4D8D5] text-[#8B3531]" : "bg-[#EEECE6]"}`}>{role}</span>
-                      {bestPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 BEST</span>}
-                      {worstPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 WORST</span>}
+                      {bestPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 선택 · 적절</span>}
+                      {worstPicked && <span className="rounded bg-[#15202B] px-2 py-1 text-[11px] font-black text-white">내 선택 · 조정 필요</span>}
                     </div>
                   </div>
                 ) : (
@@ -904,8 +730,8 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <p className={`${targetFont} min-w-0 text-[17px] leading-7`}>{candidate.text}</p>
                     <div className="flex shrink-0 gap-2">
-                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>BEST</button>
-                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>WORST</button>
+                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>적절한 표현</button>
+                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>조정할 표현</button>
                     </div>
                   </div>
                 )}
@@ -914,11 +740,11 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
           })}
         </div>
       </section>
-      <ActionBar hint={!answered ? (best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "BEST 선택 완료 · WORST를 골라주세요" : worst ? "WORST 선택 완료 · BEST를 골라주세요" : "BEST와 WORST를 하나씩 골라주세요") : undefined}>
+      <ActionBar hint={!answered ? (best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "적절한 표현 선택 완료 · 조정할 표현을 골라주세요" : worst ? "조정할 표현 선택 완료 · 적절한 표현을 골라주세요" : undefined) : undefined}>
         {!answered ? (
           <Button className={`h-12 ${actionButton}`} disabled={!best || !worst || best === worst} onClick={() => setAnswered(true)}>두 표현 확인하기</Button>
         ) : (
-          <Button className="h-12 w-full" onClick={() => onDone({ best, worst })}>다음: 직접 산출 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className="h-12 w-full" onClick={() => onDone({ best, worst })}>다음: 직접 옮겨 보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -980,8 +806,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <div className="flex items-center gap-4">
           <span className="inline-flex h-9 min-w-12 items-center justify-center rounded-lg bg-[#15202B] px-3 text-sm font-black text-white">{mission.targetLanguage.badge}</span>
           <div>
-            <p className="text-[11px] font-bold text-[#697386]">{mission.targetLanguage.label} 번역안</p>
-            <p className="mt-0.5 text-sm font-bold">{quest.prompt}</p>
+            <label htmlFor={`${quest.id}-draft`} className="text-sm font-bold">다음 {mission.sourceLanguage.label} 원문을 상황에 맞게 {mission.targetLanguage.label}로 옮겨 보세요.</label>
           </div>
         </div>
         <Textarea
@@ -990,7 +815,6 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           onChange={(event) => onChange(event.target.value)}
           rows={sourceAlignedRows(quest.source)}
           className={`${targetFont} mt-3 resize-y bg-white text-[16.5px] leading-8`}
-          placeholder={`${mission.targetLanguage.label} 번역을 작성하세요.`}
         />
         <VocabularyHints quest={quest} />
       </div>
@@ -1185,7 +1009,7 @@ function evaluationFromRuntimeFeedback(
     body: primary.body,
     highlights: grammarNote?.anchor_text ? [grammarNote.anchor_text] : [],
     feedback: primary.body,
-    action,
+    action: action && action !== primary.body ? action : undefined,
     example: feedback.blocks.alternatives[0]?.text ?? quest.referenceAnswer,
     takeaway: runtime.mission.unit.closing_ko,
   };
@@ -1213,6 +1037,20 @@ function unavailableRuntimeEvaluation(
     example: quest.referenceAnswer,
     takeaway: "판정이 불가능했던 수행은 점수로 해석하지 않습니다.",
   };
+}
+
+/** Display only: preserve complete diagnostic text in the response and disclosure. */
+function feedbackSentences(value: string): string[] {
+  return [...new Set((value.match(/[^.!?。！？]+[.!?。！？]?/gu) ?? [value]).map((part) => part.trim()).filter(Boolean))];
+}
+
+function conciseFeedback(value: string): string {
+  return feedbackSentences(value).slice(0, 2).join(" ");
+}
+
+function FeedbackRemainder({ text }: { text: string }) {
+  const rest = feedbackSentences(text).slice(2).join(" ");
+  return rest ? <details className="mt-3 text-sm leading-6"><summary className="cursor-pointer text-xs font-bold">설명 더 보기</summary><p className="mt-2">{rest}</p></details> : null;
 }
 
 export function feedbackNeedsRevision(
@@ -1310,7 +1148,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   return (
     <QuestScaffold quest={quest}>
       <DctDraftCard quest={quest} value={draft} onChange={setDraft} />
-      <ActionBar hint={devMode ? undefined : validation.hint}>
+      <ActionBar hint={devMode || !draft.trim() ? undefined : validation.hint}>
         <Button className={`h-12 ${actionButton}`} disabled={!canSubmit} onClick={() => onDone({ first: draft.trim(), revised: draft.trim(), reflected: false })}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </ActionBar>
     </QuestScaffold>
@@ -1373,9 +1211,9 @@ function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: st
           <span className="shrink-0 text-xs font-bold text-[#6A7485]"><span className="group-open:hidden">펼치기</span><span className="hidden group-open:inline">접기</span></span>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">P · {quest.context.pdr.p}</span>
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">D · {quest.context.pdr.d}</span>
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">R · {quest.context.pdr.r}</span>
+          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">상대적 지위 · {quest.context.pdr.p}</span>
+          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">친숙도 · {quest.context.pdr.d}</span>
+          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">부담 · {quest.context.pdr.r.replace(/^부담\s*/, "")}</span>
         </div>
       </summary>
       <div className="space-y-3 border-t border-[#E2DED4] px-4 py-4 sm:px-5">
@@ -1472,9 +1310,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const overallBadge = feedbackUnavailable
     ? "판정 보류"
     : `${primaryCriterion.label} · ${FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}`;
-  const overallBody = feedbackUnavailable || needsChange
-    ? evaluation.feedback
-    : "원문의 의미와 의도를 유지하면서, 관계와 상황에도 맞는 표현을 사용했습니다.";
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = devMode || (revisionValidation.valid && (!needsChange || reflected));
   const canRetainWithDissent = Boolean(dissent);
@@ -1501,10 +1336,10 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
         <p className="text-xs font-bold text-[#776727]">{progressLabel(quest)}</p>
         <h1 className="mt-1 text-xl font-black">{outputName} 피드백</h1>
       </div>
-      <StudentAnswerCard text={first} highlights={ready ? evaluation.highlights : []} />
+      {!revisionOpen && <StudentAnswerCard text={first} highlights={ready ? evaluation.highlights : []} />}
       {!ready ? <FeedbackLoading /> : (
         <>
-          <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
+          {!revisionOpen && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
             <div className={`p-5 sm:p-6 ${feedbackUnavailable || needsChange ? "bg-[#FFFCF0]" : "bg-[#F7FBF8]"}`}>
               <div className="flex items-start justify-between gap-4">
                 <div className="flex min-w-0 items-start gap-3">
@@ -1516,7 +1351,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 </div>
                 <span className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black ${feedbackUnavailable ? "bg-[#EEECE6] text-[#596579]" : needsChange ? FEEDBACK_LEVEL_STYLE[primaryCriterion.level] : FEEDBACK_LEVEL_STYLE.very_good}`}>{overallBadge}</span>
               </div>
-              <p className="mt-4 text-sm leading-6 text-[#4F5B6E]">{overallBody}</p>
             </div>
 
             <div className="border-t border-[#E6E1D6] p-4 sm:p-5">
@@ -1525,12 +1359,13 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   <h3 className="text-xs font-black text-[#4F5B6E]">먼저 확인할 한 가지 · {primaryCriterion.label}</h3>
                   <span className={`rounded-full px-2 py-1 text-[10px] font-black ${FEEDBACK_LEVEL_STYLE[primaryCriterion.level]}`}>{FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</span>
                 </div>
-                <p className="mt-4 text-sm font-black leading-6">{primaryCriterion.body}</p>
+                <p className="mt-3 text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
+                <FeedbackRemainder text={primaryCriterion.body} />
               </article>
             </div>
 
             <p className="border-t border-[#EEEAE1] px-5 py-3 text-[11px] leading-5 text-[#6D7788]">AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다.</p>
-          </section>
+          </section>}
 
           <MissionDissentPanel onSubmit={setDissent} />
 
@@ -1546,8 +1381,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 </div>
                 {needsChange && (
                   <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
-                    <p className="text-sm font-black leading-6">{primaryCriterion.body}</p>
-                    {evaluation.action && <p className="mt-1 text-sm leading-6 text-[#566175]"><RichLine text={evaluation.action} /></p>}
+                    <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
+                    <FeedbackRemainder text={primaryCriterion.body} />
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
@@ -1601,6 +1436,7 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
           </p>
         </div>
       )}
+      {quest.id === "A1" && <p className="px-1 text-sm leading-6 text-[#596579]">먼저 여러 상황에서 표현을 판단합니다. 다섯 문항을 마치면 새로운 상황에서 직접 옮겨 봅니다.</p>}
       <ContextCard context={quest.context} />
       {quest.kind !== "dct" && <LanguagePair source={quest.source} target={target} targetHighlights={targetHighlights} />}
       {children}
@@ -1609,12 +1445,12 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
 }
 
 const PROGRESS_LABELS: Record<string, string> = {
-  A1: "첫인상 판단",
-  A2: "맥락 대비 판단",
+  A1: "표현 살펴보기",
+  A2: "상황에 맞는지 판단하기",
   A3: "판단하고 고쳐보기",
   A4: "이유 찾기",
   A5: "여러 초안 비교",
-  "A-DCT": "내 산출 작성",
+  "A-DCT": "직접 옮겨 보기",
   "A-FEEDBACK": "피드백 확인",
 };
 
@@ -1622,7 +1458,7 @@ function progressLabel(quest: MissionQuest) {
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
 
-const MACRO_PROGRESS = ["장면 이해", "표현 판단", "직접 산출", "피드백", "다듬기"] as const;
+const MACRO_PROGRESS = ["미션 안내", "표현 판단", "직접 옮기기", "피드백", "다듬기"] as const;
 
 function macroProgressIndex(activeIndex: number, completed: boolean | undefined, revisionOpen: boolean, sceneIntroStep: number | null) {
   if (completed) return MACRO_PROGRESS.length;
@@ -1648,7 +1484,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
       : reviewIndex !== null
       ? { phase: "기록 검토", activity: progressLabel(quests[reviewIndex]) }
       : sceneIntroStep !== null
-        ? { phase: "장면 이해", activity: sceneIntroConfig.slides[sceneIntroStep].eyebrow.replace(/^\d+ · /, "") }
+        ? { phase: "미션 안내", activity: sceneIntroConfig.missionLabel }
       : mpjRecapOpen
         ? { phase: "직접 산출", activity: "산출 전 정리" }
       : activeIndex <= 4
@@ -1661,7 +1497,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
       <div className="flex items-center gap-3 sm:gap-4">
-        <ol className="grid min-w-0 flex-1 grid-cols-5" aria-label="장면 이해, 표현 판단, 직접 산출, 피드백, 다듬기">
+        <ol className="grid min-w-0 flex-1 grid-cols-5" aria-label={MACRO_PROGRESS.join(", ")}>
           {MACRO_PROGRESS.map((label, index) => {
             const done = Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
@@ -1680,7 +1516,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
         </ol>
         <div className="hidden min-w-[7.5rem] border-l border-[#DDD8CC] pl-3 text-right sm:block">
           <p className="text-[13px] font-black text-[#15202B]">{detail.activity}</p>
-          <p className="mt-0.5 text-[10px] font-bold text-[#8A919D]">{detail.phase}</p>
+          {activeIndex <= 4 && sceneIntroStep === null && !completed && <p className="mt-0.5 text-xs text-[#697386]">{activeIndex + 1}/5</p>}
         </div>
       </div>
       <p className="mt-1.5 truncate text-right text-[11px] font-bold text-[#747E8C] sm:hidden">{detail.activity}</p>
@@ -1714,14 +1550,12 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
 export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }: {
   mission: CanonicalMissionViewModel; section: string; revealAnswers: boolean; onNext: () => void;
 }) {
-  const [sceneStep, setSceneStep] = useState(0);
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
   const quest = section === "dct" ? mission.quests.find((item) => item.kind === "dct")
     : section.startsWith("mjt-") ? mission.quests[Number(section.slice(4))] : undefined;
   return <RuntimeMissionContext.Provider value={null}><CanonicalMissionContext.Provider value={mission}>
     <div className="space-y-5">
-      {section === "scene" ? <SceneIntroFlow config={buildSceneIntroConfig(mission)} step={sceneStep}
-        onNext={() => sceneStep < 2 ? setSceneStep(sceneStep + 1) : onNext()} onPrevious={() => setSceneStep(Math.max(0, sceneStep - 1))} onSelect={setSceneStep} />
+      {section === "scene" ? <SceneIntroFlow config={buildSceneIntroConfig(mission)} onNext={onNext} />
         : section === "recap" ? <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={onNext} />
         : quest && quest.kind !== "dct_feedback" ? <>
           <QuestRenderer key={`${quest.id}-${revealAnswers}`} quest={quest} responses={responses} revealAnswers={revealAnswers}
@@ -1769,7 +1603,7 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
 
       <div className="mt-5 flex justify-end">
         <Button type="button" className="h-11 px-5 font-black" onClick={onContinue}>
-          직접 산출해 보기 <ChevronRight className="ml-1 h-4 w-4" />
+          직접 옮겨 보기 <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
     </section>
@@ -1791,7 +1625,7 @@ function responseLabel(quest: MissionQuest, response: QuestResponse) {
   if (quest.kind === "best_worst") {
     const best = quest.candidates.find((item) => item.id === response.best)?.text;
     const worst = quest.candidates.find((item) => item.id === response.worst)?.text;
-    return `내 BEST · ${best ?? "-"}\n내 WORST · ${worst ?? "-"}`;
+    return `내 선택 · 적절 · ${best ?? "-"}\n내 선택 · 조정 필요 · ${worst ?? "-"}`;
   }
   return "";
 }
@@ -1833,6 +1667,7 @@ function CompletedQuestReview({ quest, response }: {
           <h1 className="mt-1 text-xl font-black">{quest.title}</h1>
         </div>
       </div>
+      {quest.id === "A1" && <p className="px-1 text-sm leading-6 text-[#596579]">먼저 여러 상황에서 표현을 판단합니다. 다섯 문항을 마치면 새로운 상황에서 직접 옮겨 봅니다.</p>}
       <ContextCard context={quest.context} />
       <LanguagePair
         source={quest.source}
@@ -1878,58 +1713,40 @@ export function CompletionRecord({ label, response, alternatives = [] }: {
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   const evaluation = response.evaluation;
-  const needsAttention = evaluation?.criteria.filter((criterion) => criterion.level !== "very_good") ?? [];
-  const retainedAgainstFeedback = Boolean(response.dissent && !response.reflected && needsAttention.length > 0);
+  const primary = evaluation ? primaryFeedbackCriterion(evaluation.criteria) : null;
   return (
-    <article className={`${panel} overflow-hidden`}>
-      <div className="border-b border-[#E3DFD4] bg-[#F8F6EF] px-5 py-4">
-        <p className="text-xs font-black text-[#6B5518]">{label}</p>
+    <article className={`${panel} space-y-5 p-5 sm:p-6`}>
+      <p className="text-xs font-bold text-[#6B5518]">{label}</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <section className="rounded-xl border border-[#E5E1D8] bg-[#FAF9F5] p-4">
+          <h2 className="text-sm font-bold">처음 작성한 {outputName}</h2>
+          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
+        </section>
+        <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
+          <h2 className="text-sm font-bold">내가 확정한 최종안</h2>
+          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.reflected ? response.revised : response.first}</p>
+          {!response.reflected && <p className="mt-2 text-xs text-[#697386]">처음 작성한 답안을 유지했습니다.</p>}
+        </section>
       </div>
-      <div className="space-y-5 p-5">
-        {/* 수정 전 = 중립 박스, 수정 후 = 강조 박스. 두 덩어리로 묶어야 전·후가 한눈에 대비된다. */}
-        <div className="rounded-xl border border-[#E5E1D8] bg-[#FAF9F5] p-4">
-          <p className="text-[11px] font-bold text-[#7A8495]">내가 실제로 한 {mission.targetLanguage.label} {outputName}</p>
-          <p className={`${targetFont} mt-2 text-[17px] leading-8`}><HighlightedText text={response.first} highlights={evaluation?.highlights} target /></p>
+      <section className="rounded-xl border-l-4 border-[#E0C43C] bg-[#FFFCED] p-4">
+        <h2 className="text-sm font-bold">기억할 한 가지</h2>
+        <p className="mt-2 text-sm leading-6">{evaluation?.takeaway ?? "원문의 뜻을 유지하면서, 상대와 상황에 맞는 표현인지 확인해 보세요."}</p>
+      </section>
+      {evaluation && primary && <details className="border-t border-[#E5E1D8] pt-4">
+        <summary className="cursor-pointer text-sm font-bold">최초안에 대한 AI 피드백 보기</summary>
+        <div className="mt-3 space-y-2 text-sm leading-6">
+          <p className="font-bold">다시 살펴본 기준: {primary.label}</p>
+          <p>{primary.body}</p>
+          <p className="text-xs text-[#697386]">처음 제출한 답안에 대한 참고 의견입니다. 최종안을 다시 평가한 결과는 아닙니다.</p>
         </div>
-        {evaluation && needsAttention.length > 0 ? (
-          <div className="rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] p-4">
-            <p className="text-xs font-black text-[#725B12]">수정이 필요했던 부분</p>
-            {evaluation.highlights.length > 0 ? (
-              <div className="mt-2 flex flex-wrap gap-2">
-                {evaluation.highlights.map((highlight) => <span key={highlight} className={`${targetFont} rounded-md bg-[#FFF5C8] px-2.5 py-1.5 text-[15px] underline decoration-[#C9A90E] decoration-2 underline-offset-4`}>{highlight}</span>)}
-              </div>
-            ) : <p className="mt-2 text-sm">다시 살펴본 기준: {needsAttention.map((criterion) => criterion.label).join(" · ")}</p>}
-            <p className="mt-3 text-xs font-black text-[#725B12]">왜 고쳤나요?</p>
-            <p className="mt-1 break-keep text-sm leading-6 text-[#4F5A6B]">{evaluation.feedback}</p>
-          </div>
-        ) : evaluation ? (
-          <div className="rounded-xl border border-[#BFD9CC] bg-[#F2F8F4] p-4">
-            <p className="text-xs font-black text-[#286247]">잘한 점</p>
-            <p className="mt-2 break-keep text-sm leading-6">{evaluation.feedback}</p>
-          </div>
-        ) : null}
-        {response.reflected ? (
-          <div className="rounded-xl border-2 border-[#9CC7B0] bg-[#F4FAF6] p-4 shadow-sm">
-            <p className="flex items-center gap-1.5 text-xs font-black text-[#245E44]"><Check className="h-3.5 w-3.5" />피드백을 반영한 최종 {outputName}</p>
-            <p className={`${targetFont} mt-2 text-[17px] leading-8`}>{response.revised}</p>
-          </div>
-        ) : (
-          <p className="flex items-center gap-1.5 text-xs font-bold text-[#286247]"><Check className="h-3.5 w-3.5" />{retainedAgainstFeedback ? `AI 참고 판정과 다르게 보고 첫 ${outputName}을 최종안으로 유지했습니다.` : `첫 ${outputName}을 최종안으로 확정했습니다.`}</p>
-        )}
-        {alternatives.length > 0 && (
-          <div className="border-t border-[#E5E1D8] pt-5">
-            <p className="text-xs font-black text-[#596579]">수정 완료 후 보는 참고 표현</p>
-            <div className="mt-3 space-y-3">
-              {alternatives.map((alternative) => (
-                <div key={alternative.text} className="rounded-xl bg-[#F8F7F2] p-4">
-                  <p className={`${targetFont} text-[16px] leading-7`}>{alternative.text}</p>
-                  <p className="mt-1.5 text-xs leading-5 text-[#667185]">{alternative.note}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
+      </details>}
+      {alternatives.length > 0 && <details className="border-t border-[#E5E1D8] pt-4">
+        <summary className="cursor-pointer text-sm font-bold">참고 표현 보기</summary>
+        <div className="mt-3 space-y-3">{alternatives.map((alternative) => <div key={alternative.text} className="rounded-xl bg-[#F8F7F2] p-4">
+          <p className={`${targetFont} text-[16px] leading-7`}>{alternative.text}</p>
+          <p className="mt-1.5 text-xs leading-5 text-[#667185]">{alternative.note}</p>
+        </div>)}</div>
+      </details>}
     </article>
   );
 }
@@ -2004,30 +1821,7 @@ export function CompletionActions({ onRestart, onRetrySave, runtime = false, sav
   );
 }
 
-function SessionPatternSummary({ responses }: { responses: Array<DctResponse | undefined> }) {
-  const mission = useCanonicalMission();
-  const evaluations = responses
-    .filter((response): response is DctResponse => Boolean(
-      response?.evaluation
-      && response.evaluation.available !== false
-      && isMeaningfulDraft(response.first, mission.targetLanguage.label, mission.activityMode === "interpreting" ? "통역" : "번역"),
-    ))
-    .map((response) => response.evaluation as DctEvaluation);
-  if (evaluations.length === 0) return null;
-  const primaryCriteria = evaluations.map((evaluation) => primaryFeedbackCriterion(evaluation.criteria));
-  const primary = primaryCriteria.find((criterion) => criterion.level !== "very_good") ?? primaryCriteria[0];
-  if (!primary) return null;
-  return (
-    <section className={`${panel} p-5 sm:p-6`}>
-      <h2 className="text-base font-black">이번 미션의 원포인트 피드백</h2>
-      <p className="mt-1 break-keep text-xs leading-5 text-[#6A7485]">세 기준은 내부 기록에 보존하고, 학습 화면에는 우선순위가 가장 높은 한 항목만 제시합니다.</p>
-      <article className="mt-4 rounded-xl bg-[#F7F6F1] p-4">
-        <p className="text-xs font-black text-[#596579]">{primary.label}</p>
-        <p className="mt-2 break-keep text-sm font-black">{primary.body}</p>
-      </article>
-    </section>
-  );
-}
+
 
 function DevPreviewToolbar({
   sceneIntroConfig,
@@ -2077,7 +1871,7 @@ function DevPreviewToolbar({
             className="mt-1 h-9 w-full rounded-lg border border-white/20 bg-white px-3 font-bold text-[#15202B]"
           >
             <option value="" disabled>화면 선택</option>
-            {sceneIntroConfig.slides.map((slide, index) => <option key={slide.eyebrow} value={SCENE_INTRO_STEP_IDS[index]}>장면 {index + 1}. {slide.eyebrow.replace(/^\d+ · /, "")}</option>)}
+            <option value="scene-1">미션 안내</option>
             {CANONICAL_MISSION_PREVIEW.quests.map((quest, index) => <option key={quest.id} value={quest.id}>{index + 1}. {progressLabel(quest)}</option>)}
             <option value="recap">MJT5 뒤 5 POINT LESSON</option>
             <option value="summary">최종 summary</option>
@@ -2269,7 +2063,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const jumpToDevPreview = (step: string, preset = devPreset) => {
     const sceneStepIndex = SCENE_INTRO_STEP_IDS.indexOf(step as typeof SCENE_INTRO_STEP_IDS[number]);
     if (sceneStepIndex >= 0) {
-      setSceneIntroStep(sceneStepIndex);
+      setSceneIntroStep(0);
       setMpjRecapOpen(false);
       setResponses({});
       setReviewIndex(null);
@@ -2320,27 +2114,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   }, []);
 
   const advanceSceneIntro = () => {
-    if (sceneIntroStep === null) return;
-    const hasExplicitSceneStep = new URLSearchParams(window.location.search).has("step");
-    if (sceneIntroStep < sceneIntroConfig.slides.length - 1) {
-      const nextStep = sceneIntroStep + 1;
-      setSceneIntroStep(nextStep);
-      if (isDevPreview && hasExplicitSceneStep) updateDevPreviewUrl(SCENE_INTRO_STEP_IDS[nextStep]);
-    } else if (sceneIntroConfig.previewOnly) {
-      setSceneIntroStep(0);
-      if (isDevPreview && hasExplicitSceneStep) updateDevPreviewUrl(SCENE_INTRO_STEP_IDS[0]);
-    } else {
-      setSceneIntroStep(null);
-      if (isDevPreview && hasExplicitSceneStep) updateDevPreviewUrl("A1");
-    }
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const selectSceneIntro = (nextStep: number) => {
-    const boundedStep = Math.max(0, Math.min(sceneIntroConfig.slides.length - 1, nextStep));
-    const hasExplicitSceneStep = new URLSearchParams(window.location.search).has("step");
-    setSceneIntroStep(boundedStep);
-    if (isDevPreview && hasExplicitSceneStep) updateDevPreviewUrl(SCENE_INTRO_STEP_IDS[boundedStep]);
+    if (sceneIntroConfig.previewOnly) return;
+    setSceneIntroStep(null);
+    if (isDevPreview) updateDevPreviewUrl("A1");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -2511,10 +2287,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} />
             <SceneIntroFlow
               config={sceneIntroConfig}
-              step={sceneIntroStep}
               onNext={advanceSceneIntro}
-              onPrevious={() => selectSceneIntro(sceneIntroStep - 1)}
-              onSelect={selectSceneIntro}
             />
           </div>
         ) : mpjRecapOpen ? (
@@ -2533,7 +2306,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
-              <h1 className="mt-2 text-2xl font-black">이번 미션에서 완성한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
+              <h1 className="mt-2 text-2xl font-black">이번 미션에서 확정한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
             </section>
             <div className="space-y-4">
               <CompletionRecord
@@ -2543,14 +2316,14 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               />
             </div>
             <DissentSummary dissent={aDct?.dissent} />
-            <SessionPatternSummary responses={[aDct]} />
             {runtime && !demoMode && (
+              <details className={`${panel} p-5`}><summary className="cursor-pointer text-sm font-bold">익명 학급 응답 보기</summary><div className="mt-4">
               <PeerResponsesPanel
                 courseId={peerCourseId}
                 missionId={runtime.scenario_id}
                 enabled={saveState === "saved"}
                 learnerChoices={peerChoices}
-              />
+              /></div></details>
             )}
             <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState} />
           </div>

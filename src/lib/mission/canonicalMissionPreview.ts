@@ -103,7 +103,7 @@ export function comparisonCandidateLabel(quest: BestWorstQuest, role: "best" | "
   if (quest.comparisonMode === "band_pair") {
     return role === "best" ? "상황에 적절한 표현" : role === "worst" ? "조정이 필요한 표현" : "가능한 표현";
   }
-  return role === "best" ? "BEST · 가장 적절" : role === "worst" ? "WORST · 가장 덜 적절" : "가능한 표현";
+  return role === "best" ? "가장 적절한 표현" : role === "worst" ? "가장 조정이 필요한 표현" : "가능한 표현";
 }
 
 export interface DctQuest extends QuestBase {
@@ -230,7 +230,7 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
     },
     {
       questId: "A5",
-      label: "BEST·WORST",
+      label: "표현 비교",
       text: "적정안 「能帮忙吗」 → 가능 여부를 물어 부담을 낮춤",
       highlights: ["能帮忙吗"],
     },
@@ -350,8 +350,8 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
     {
       id: "A5",
       module: "A",
-      shortLabel: "BEST·WORST",
-      title: "BEST와 WORST 고르기",
+      shortLabel: "표현 비교",
+      title: "적절한 표현과 조정할 표현 고르기",
       kind: "best_worst",
       context: {
         situation: "이번 학기에 처음 같은 조가 된 팀 프로젝트 조원에게 자료 정리를 맡아 달라고 부탁합니다.",
@@ -361,7 +361,7 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
         pdr: { p: "동등", d: "아는 사이", r: "부담 보통" },
       },
       source: "이번 자료 정리는 네가 맡아줄 수 있어? 내가 발표 준비를 해야 해서.",
-      prompt: "이 상황에서 가장 적절한 표현(BEST)과 가장 덜 적절한 표현(WORST)을 하나씩 고르세요.",
+      prompt: "이 상황에서 가장 적절한 표현과 가장 조정이 필요한 표현을 하나씩 고르세요.",
       candidates: [
         { id: "a5-under", text: "这次资料你来整理吧，我还要准备报告。", role: "worst", note: "이유와 吧는 있지만 상대가 맡을 수 있는지 묻지 않아 조정이 필요합니다." },
         { id: "a5-best", text: "这次资料整理你能帮忙吗？我还要准备报告。", role: "best", note: "간결하게 가능 여부를 묻고 원문의 이유도 유지한 적정 대역 표현입니다." },

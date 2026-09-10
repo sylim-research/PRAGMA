@@ -26,6 +26,23 @@ describe("CanonicalMissionRun completion connections", () => {
     }} />);
     expect(screen.getByText("다시 살펴본 기준: 화용 적절성")).toBeInTheDocument();
     expect(screen.queryByText(/원문의 핵심 내용이 빠졌습니다/)).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "내가 확정한 최종안" })).toBeVisible();
+    expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
+    expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();
+    expect(screen.getByText("다시 살펴본 기준: 화용 적절성").closest("details")).not.toHaveAttribute("open");
+  });
+
+  it("shows the priority feedback once on each action screen", () => {
+    vi.useFakeTimers();
+    Element.prototype.scrollIntoView = vi.fn();
+    const quest = CANONICAL_MISSION_PREVIEW.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback")!;
+    render(<DctFeedbackView quest={quest} response={{ first: "你必须改时间。", revised: "你必须改时间。", reflected: false }} onDone={vi.fn()} />);
+    act(() => vi.advanceTimersByTime(1300));
+    const point = screen.getByRole("heading", { name: /먼저 확인할 한 가지/ }).closest("article")!.querySelector("p")!.textContent!;
+    expect(screen.getAllByText(point)).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    expect(screen.getAllByText(point)).toHaveLength(1);
+    expect(screen.queryByRole("heading", { name: /먼저 확인할 한 가지/ })).not.toBeInTheDocument();
   });
 
   it("offers save-only retry after failure and prevents navigation while saving", () => {

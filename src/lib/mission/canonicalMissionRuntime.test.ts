@@ -203,7 +203,7 @@ describe("canonical mission runtime bridge", () => {
     expect(comparison.comparisonMode).toBe("band_pair");
     expect(comparisonCandidateLabel(comparison, "best")).toBe("상황에 적절한 표현");
     expect(comparisonCandidateLabel(comparison, "worst")).toBe("조정이 필요한 표현");
-    expect(comparisonCandidateLabel({ ...comparison, comparisonMode: "ranked" }, "best")).toBe("BEST · 가장 적절");
+    expect(comparisonCandidateLabel({ ...comparison, comparisonMode: "ranked" }, "best")).toBe("가장 적절한 표현");
   });
 
   it("projects historical learner scenes to two concise, non-meta sentences", () => {
