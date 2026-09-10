@@ -2,10 +2,12 @@
 export const SCENE_GROUNDING_RULE = `
 [사건과 P·D·R의 사실 근거]
 코드 뜻을 일상 영어의 느슨한 뜻으로 재해석하지 않는다.
-P: speaker_lower=화자보다 상대에게 실제 권한이 있음, equal=해당 관계에서 동등,
-speaker_higher=상대보다 화자에게 실제 권한이 있음.
+P의 이름은 화자를 기준으로 읽는다. speaker_lower=화자가 상대보다 낮다(권한은 상대에게 있다),
+equal=해당 관계에서 동등, speaker_higher=화자가 상대보다 높다(권한은 화자에게 있다).
+상대가 더 높은 사건은 speaker_higher가 아니라 speaker_lower다.
 D: distant=이전 상호작용이 없는 초면, acquaintance=이전에 실제 교류한 아는 사이,
 close=지속적인 사적 교류가 있는 친한 사이. 지금 소개받았다는 이유로 초면을 acquaintance로 세지 않는다.
+distant는 초면에만 쓴다. 교류 이력이 있으면 사적 친분이 없거나 격식을 차리는 사이여도 acquaintance다.
 R: low=낮음, mid=보통, high=높음. 뜻은 아래의 화행별 사건 근거로 확인한다.
 화행명·직함·PDR 값은 사건이 실제로 성립한다는 증거가 아니다. 누가 누구에게 무엇을 했고,
 왜 지금 이 말을 하는지 먼저 확인한다. 책임·수혜·거절·초대의 행위자를 필드 사이에서 바꾸지 않는다.

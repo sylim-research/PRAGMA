@@ -25,10 +25,10 @@ export const PACK_RELEASE_MANIFEST_DRAFT: PackReleaseManifestDraft = {
     "thanks"
   ],
   "artifact_hash": "18cce236df6fcf9acc417e826302ace3cb7177bc804d6099f9a589b9e587ac00",
-  "prompt_snapshot_hash": "44e213b5912ad52a7e98dd3c6e58c624aade5ab14ccf6f402c79708f7eefca7a",
+  "prompt_snapshot_hash": "049475c42371b29bc7a2ec3d149410ad6d6cb99a86239d2eb5fc2c42438d2a55",
   "evidence_snapshot_hash": "f21bacee1e0a89e2a305d225547b8ab41c8bc988dc073ef051827e16b3400c18",
-  "source_commit_ref": "624781e4750375d93937794b7ad45c9c07742d07",
-  "git_dirty": true,
+  "source_commit_ref": "dc0530070e405ca0bb2d890cc4e4572f59dc2bb9",
+  "git_dirty": false,
   "source_paths": [
     "src/lib/pragma/realizationPack.ts",
     "supabase/functions/generate-scenario/index.ts",

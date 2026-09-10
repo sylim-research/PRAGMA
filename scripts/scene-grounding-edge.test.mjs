@@ -72,11 +72,12 @@ test('semantic contradiction blocks a fully generated core even when overall ver
 });
 
 test('a feasible summary cannot override observed first-contact distance', async () => {
-  const result = await invoke([{ ...plan, observed_pdr: { ...plan.observed_pdr, d: 'formal' } }]);
+  // First contact is the JSON code `distant` (row enum `formal`); the preflight compares JSON codes.
+  const result = await invoke([{ ...plan, observed_pdr: { ...plan.observed_pdr, d: 'distant' } }]);
   assert.equal(result.calls, 1);
   assert.equal(result.data.stop_code, 'CORE_PREFLIGHT_HOLD');
   assert.equal(result.data.core_content, undefined);
-  assert.match(result.data.error, /d=formal/);
+  assert.match(result.data.error, /d=distant/);
 });
 test('only a complete semantic pass returns the frozen scene with content-bound review evidence', async () => {
   const result = await invoke([plan, draft, pass()]);
