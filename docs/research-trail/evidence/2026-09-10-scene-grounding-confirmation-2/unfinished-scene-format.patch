@@ -1,0 +1,62 @@
+diff --git a/src/lib/pragma/coreBatchRun.ts b/src/lib/pragma/coreBatchRun.ts
+index a121e193..184e91ba 100644
+--- a/src/lib/pragma/coreBatchRun.ts
++++ b/src/lib/pragma/coreBatchRun.ts
+@@ -25,7 +25,7 @@ import {
+ } from "@/lib/pragma/missionRules";
+ import type { BatchCell } from "@/lib/pragma/batchPlan";
+ import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
+-import { coreSemanticGate, coreSemanticContent } from '../../../supabase/functions/_shared/sceneGrounding';
++import { coreSemanticGate, coreSemanticContent, sceneDescriptionIssue } from '../../../supabase/functions/_shared/sceneGrounding';
+ import { CURRENT_CORE_QUALITY_PROMPT_VERSION } from '../../../supabase/functions/_shared/contentRelease';
+ 
+ const RESPONSE_ACTS = new Set(["refusal", "opposition"]);
+@@ -131,6 +131,9 @@ export async function checkCoreSemanticFit(
+   | { ok: false; error: string; providerStatus: number | "UNKNOWN" }
+ > {
+   const generation = core.generation as { semantic_check?: Record<string, unknown> } | undefined;
++  const descriptionIssue = sceneDescriptionIssue(core.situation_ko);
++  if (descriptionIssue) return { ok: true, result: { verdict: 'fail', reason: descriptionIssue,
++    issues: ['learner_scene'] } };
+   const previous = generation?.semantic_check;
+   const scope = { direction: cell.direction, speech_act: cell.speech_act_ui, level: cell.level, domain: cell.domain,
+     industry: cell.industry, mode: cell.mode, topic_code: cell.topic_code,
+diff --git a/supabase/functions/_shared/sceneGrounding.ts b/supabase/functions/_shared/sceneGrounding.ts
+index f8ba7ab1..c7c2b2df 100644
+--- a/supabase/functions/_shared/sceneGrounding.ts
++++ b/supabase/functions/_shared/sceneGrounding.ts
+@@ -28,6 +28,7 @@ R 근거가 없으면 보통으로 추정하지 않는다. 공손 표지의 누
+ 학생에게 배려·정중·완화·선택권 같은 정답 방향을 지시하지 않는다.
+ 조사·호응·인물 지시·중복은 최종 문장 그대로 검사한다. 화면 밖 배경으로 결함을 정당화하지 않는다.
+ 상황문은 누가 어떤 사건을 겪고 누구에게 말하려는지 설명하는 안내문이다. 화자가 상대에게 하는 대사나 원문의 한국어 번역을 상황문으로 쓰지 않는다.
++상황문의 종결은 서술형 "~다/~합니다"로 통일한다. 상대에게 질문하거나 감사·사과하는 직접 발화는 원문에만 쓴다.
+ `;
+ 
+ export const CORE_SCENE_PREFLIGHT_PROMPT = `통번역 학습 원문을 만들기 전에 사건 시드의 실현 가능성을 확인한다.
+@@ -62,6 +63,17 @@ export interface CoreScenePlan {
+   observed_pdr: { p: string; d: string; r: string };
+ }
+ 
++/** Checks the published scene format; never rewrites Korean or claims semantic validity. */
++export function sceneDescriptionIssue(value: unknown): string | null {
++  if (typeof value !== 'string' || !value.trim()) return '상황 설명이 없습니다.';
++  const sentences = value.trim().split(/(?<=[.!?。！？])\s*/u).filter(Boolean);
++  if (sentences.some(sentence => !/다[.。]$/u.test(sentence)
++    || /(?:죄송합니다|미안합니다|감사합니다|고맙습니다|부탁드립니다)[.。]$/u.test(sentence))) {
++    return '상황은 ~다/~합니다로 끝나는 사건 설명으로 작성해야 합니다. 상대에게 하는 대사·질문은 원문에 둡니다.';
++  }
++  return null;
++}
++
+ export function readCoreScenePlan(value: unknown, expectedPdr?: { p: string; d: string; r: string }): CoreScenePlan | null {
+   if (!value || typeof value !== 'object') return null;
+   const plan = value as CoreScenePlan;
+@@ -77,6 +89,8 @@ export function readCoreScenePlan(value: unknown, expectedPdr?: { p: string; d:
+   if (keys.some(key => typeof plan[key] !== 'string' || !plan[key].trim())) return null;
+   if (plan.scene_ko.length > 140 || (plan.scene_ko.match(/[.!?。！？]/g) ?? []).length !== 2) return null;
+   if (/(?<![A-Za-z])[ABC](?![A-Za-z])/.test(plan.scene_ko + ' ' + plan.relation_ko)) return null;
++  const descriptionIssue = sceneDescriptionIssue(plan.scene_ko);
++  if (descriptionIssue) return { ...plan, feasible: false, reason_ko: descriptionIssue };
+   return plan;
+ }
+ 

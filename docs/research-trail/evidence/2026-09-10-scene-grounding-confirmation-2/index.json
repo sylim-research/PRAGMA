@@ -1,0 +1,53 @@
+{
+  "recorded_at": "2026-09-10T13:18:17.6739162+09:00",
+  "implementation_head": "e6892dc63b2ab21510c78c26c84677338a5c8eeb",
+  "run_id": "scene_grounding_confirm_20260910",
+  "negative_cases_blocked": 3,
+  "negative_cases_total": 3,
+  "new_cores_generated": 4,
+  "whole_missions_reviewed": 0,
+  "scene_regression": "old dialogue scene incorrectly passed both with and without prior generation verdict",
+  "patch_status": "unfinished and untested; not deployed",
+  "files": [
+    {
+      "file": "dialogue-as-scene-no-prior-verdict.json",
+      "sha256": "9072e5cc3cf1f6f29821980921934864ac4a6e2871e3525807f5b1b35fc6c4c5"
+    },
+    {
+      "file": "dialogue-as-scene-regression.json",
+      "sha256": "ca0bce947baa91d476fc3763ec873f95293a759b997b87cfad4ceb9cd82c047b"
+    },
+    {
+      "file": "negative-buddy-distance.json",
+      "sha256": "3c7dba1449c966f56880d2f45cd72d98f05715616ef3cb2f164b90c9da04df7f"
+    },
+    {
+      "file": "negative-inviter-apology.json",
+      "sha256": "cc9c1e63371cf42d51225bc70cb64afb7bd58608fa8eeb456b6084451c471be9"
+    },
+    {
+      "file": "negative-leader-power.json",
+      "sha256": "6699883c7dc5a0a2d3bcae6fae478a1583f1a151f3625d89e4383f88e6233974"
+    },
+    {
+      "file": "pilot-reverse-complaint-core.json",
+      "sha256": "889c5bad7cd2a11385965d24bae74d2d03b17c5812187ec020ce3e1052357ec7"
+    },
+    {
+      "file": "pilot-reverse-opposition-core.json",
+      "sha256": "a3bdc37822113d1cdb7031398602ac439780b377de61b7612f3431ad558f88a9"
+    },
+    {
+      "file": "unfinished-scene-format.patch",
+      "sha256": "da5f7a69fbb349638d6ccc3a8db0fe0651af5d48c61fdecb5f3416e075d0b19a"
+    },
+    {
+      "file": "w2-0-core.json",
+      "sha256": "47e52002fd63bf3bffc78102e58105e0e49787b14b8bea8b7035f3dcf2d5c25e"
+    },
+    {
+      "file": "w9-1-core.json",
+      "sha256": "874f2eb5089ed5bb34f75f390e44cb7c3605f70e670bf24d2ae5415cd0c6493e"
+    }
+  ]
+}

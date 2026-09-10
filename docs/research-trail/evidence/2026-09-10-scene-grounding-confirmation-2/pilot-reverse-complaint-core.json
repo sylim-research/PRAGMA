@@ -1,0 +1,294 @@
+{
+  "at": "2026-09-10T04:10:20.529Z",
+  "plan": {
+    "key": "pilot-reverse-complaint",
+    "cell": {
+      "speech_act_ui": "complaint",
+      "level": "beginner_intermediate",
+      "domain": "school",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "campus_study",
+      "topic_code": "group_work_coordination",
+      "situation_seed_ko": "이번 학기 함께 과제하는 동급생이 회의 전에 보내기로 한 도표 한 개를 깜빡해 자료 합치기가 십 분 늦어졌다. 지금 둘만 있는 회의 자리에서 나는 그 일로 불편했던 점을 말한다.",
+      "direction": "zh_ko",
+      "count": 1
+    }
+  },
+  "result": {
+    "index": 21,
+    "cell": {
+      "speech_act_ui": "complaint",
+      "level": "beginner_intermediate",
+      "domain": "school",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "campus_study",
+      "topic_code": "group_work_coordination",
+      "situation_seed_ko": "이번 학기 함께 과제하는 동급생이 회의 전에 보내기로 한 도표 한 개를 깜빡해 자료 합치기가 십 분 늦어졌다. 지금 둘만 있는 회의 자리에서 나는 그 일로 불편했던 점을 말한다.",
+      "direction": "zh_ko",
+      "count": 1
+    },
+    "ok": true,
+    "scenarioId": "e4f36052-88a8-45cd-a33b-1a96f9d2ed5c",
+    "coreContent": {
+      "schema_version": "scenario_core_v3",
+      "direction": "zh_ko",
+      "situation_ko": "나는 이번 학기 조별 과제를 함께하는 동급생과 둘이 회의 중이다. 상대가 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 말하려 한다.",
+      "relation_ko": "같은 조의 동급생·아는 사이",
+      "source_modality": "spoken",
+      "source_text": "你上次说会提前发图表，但其实发晚了。我们合并资料的时候因此耽误了十分钟，这让我觉得有点不太方便。",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "school.group_work_coordination.complaint",
+        "role_pair": {
+          "speaker_ko": "과제 조원",
+          "addressee_ko": "과제 조원"
+        },
+        "speaker_entitlement": "화자는 자신이 겪은 문제·피해 또는 대표할 권한이 있는 문제를 제기할 자격이 있다.",
+        "addressee_obligation": "상대는 문제에 일정한 책임이 있거나 설명·수리·전달을 할 실질적 권한이 있어야 한다.",
+        "decision_authority": "상대가 직접 수리하거나 적절한 책임자에게 전달할 권한을 가진다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "조별 과제에서 도표 늦게 받아 불편함 호소",
+      "focal_segments": [
+        {
+          "text": "我们合并资料的时候因此耽误了十分钟",
+          "role": "head"
+        },
+        {
+          "text": "这让我觉得有点不太方便",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 30,
+        "max": 45,
+        "actual": 44
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_repair",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T04:10:14.676Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동급생과의 과제 협업 중 자료 전달 지연에 대해 불편함을 표현하는 상황은 PDR 조건과 충돌하지 않는다.",
+          "scene_ko": "나는 이번 학기 조별 과제를 함께하는 동급생과 둘이 회의 중이다. 상대가 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 말하려 한다.",
+          "relation_ko": "같은 조의 동급생·아는 사이",
+          "speaker_role_ko": "과제 조원",
+          "addressee_role_ko": "과제 조원",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "p_evidence_ko": "둘 다 조원으로 실제 권한이 동등하다.",
+          "d_evidence_ko": "같은 조로 몇 번 교류한 아는 사이다.",
+          "r_evidence_ko": "자료 합치기 지연이 크지 않고, 불편함을 가볍게 표현한다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "조별 과제 중 동급생이 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 표현하는 장면이 기대 조건에 맞게 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "source_text는 도표를 늦게 보내 합치기가 지연되어 불편했다는 점을 직접적으로 언급하며 불만을 표현하고 있다."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "상황과 relation_ko 모두 동급생(조원) 사이로, 실제 권한이 동등하다."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "같은 조의 동급생으로, 이전에 교류가 있었던 아는 사이(acquaintance)임이 명확하다."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "불만의 내용이 10분 지연 및 약간의 불편함으로, 실제 부담이 낮은(low) 상황이다."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "대학 조별 과제 상황으로 학업 도메인에 해당한다."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황이므로 pass."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "통역(구두) 상황으로, 실제 회의 중 구두로 말할 법한 내용이다."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자는 피해를 겪은 당사자이고, 상대는 책임이 있는 조원으로 역할·권한이 기대와 일치한다."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "A(화자)는 피해를 겪은 조원, B(상대)는 도표를 늦게 보낸 조원으로 모든 필드에서 일관된다."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "상대가 도표를 보내는 책임자이자 문제의 당사자이므로 적절하다."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "조별 과제, 도표 지연, 합치기 지연 등 시드의 핵심 사건과 목적이 모두 유지됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 pass."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "source_text의 화자와 상대가 모두 조원(A→B)으로 일관된다."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황문과 source_text 모두 도표 지연, 합치기 지연, 불편함 호소라는 동일한 사건을 다룬다."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명에 실제 발화나 번역문이 들어 있지 않고, 장면 안내로만 구성되어 있다."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "조별 과제 중 자료 지연에 대해 불편함을 말하는 것은 실제로 충분히 있을 법한 자연스러운 상황이다."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T04:10:20.423Z",
+          "core_content_hash": "2e86e6ad3716c704cff10b80db2112a992c48077345ee7a3a637e1d904ec473e"
+        }
+      },
+      "hsk_lexical_audit": {
+        "policy_version": "hsk3_lexical_reference_v1",
+        "source_id": "hsk30_syllabus_2025_11_effective_2026_07",
+        "direction": "zh_ko",
+        "scope": "zh_source_core",
+        "reference_ceiling": 4,
+        "non_blocking": true,
+        "status": "complete",
+        "distinct_token_count": 26,
+        "matched_token_count": 19,
+        "coverage_ratio": 0.7308,
+        "out_of_reference_candidates": [
+          "上次",
+          "图表",
+          "合并",
+          "耽误",
+          "十分钟",
+          "有点",
+          "不太"
+        ],
+        "note": "Candidate review only: unmatched tokens may be proper nouns, terms, segmentation units, or vocabulary above/outside the reference dataset."
+      }
+    },
+    "ruleResult": "pass",
+    "ruleFindings": [],
+    "industryCritic": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "조별 과제 중 동급생이 도표를 늦게 보내 자료 합치기가 지연된 점에 대해 불편함을 표현하는 장면이 기대 조건에 맞게 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "source_text는 도표를 늦게 보내 합치기가 지연되어 불편했다는 점을 직접적으로 언급하며 불만을 표현하고 있다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "상황과 relation_ko 모두 동급생(조원) 사이로, 실제 권한이 동등하다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "같은 조의 동급생으로, 이전에 교류가 있었던 아는 사이(acquaintance)임이 명확하다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "불만의 내용이 10분 지연 및 약간의 불편함으로, 실제 부담이 낮은(low) 상황이다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "대학 조별 과제 상황으로 학업 도메인에 해당한다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황이므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "통역(구두) 상황으로, 실제 회의 중 구두로 말할 법한 내용이다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자는 피해를 겪은 당사자이고, 상대는 책임이 있는 조원으로 역할·권한이 기대와 일치한다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "A(화자)는 피해를 겪은 조원, B(상대)는 도표를 늦게 보낸 조원으로 모든 필드에서 일관된다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "상대가 도표를 보내는 책임자이자 문제의 당사자이므로 적절하다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제, 도표 지연, 합치기 지연 등 시드의 핵심 사건과 목적이 모두 유지됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 pass."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "source_text의 화자와 상대가 모두 조원(A→B)으로 일관된다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황문과 source_text 모두 도표 지연, 합치기 지연, 불편함 호소라는 동일한 사건을 다룬다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 실제 발화나 번역문이 들어 있지 않고, 장면 안내로만 구성되어 있다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "조별 과제 중 자료 지연에 대해 불편함을 말하는 것은 실제로 충분히 있을 법한 자연스러운 상황이다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T04:10:20.423Z",
+        "core_content_hash": "2e86e6ad3716c704cff10b80db2112a992c48077345ee7a3a637e1d904ec473e"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    },
+    "terminalStage": "core_eligible"
+  }
+}

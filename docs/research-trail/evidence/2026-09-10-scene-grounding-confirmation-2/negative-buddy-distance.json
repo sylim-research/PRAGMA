@@ -1,0 +1,30 @@
+{
+  "at": "2026-09-10T04:05:10.008Z",
+  "input": {
+    "key": "buddy-distance",
+    "speech_act": "proposal",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "seed": "같은 학년 버디와 오늘 처음 만났고 그 전에 연락하거나 서로 교류한 적이 전혀 없다. 지금 학식당에 함께 가 보자고 제안하려 한다."
+  },
+  "data": {
+    "error": "scene_ko에 따르면 오늘 처음 만난 사이라 acquaintance가 아니라 formal이어야 한다. 지정 D(acquaintance)와 사건 D(formal)가 충돌한다.",
+    "stop_code": "CORE_PREFLIGHT_HOLD",
+    "scene_plan": {
+      "feasible": false,
+      "reason_ko": "scene_ko에 따르면 오늘 처음 만난 사이라 acquaintance가 아니라 formal이어야 한다. 지정 D(acquaintance)와 사건 D(formal)가 충돌한다.",
+      "scene_ko": "",
+      "relation_ko": "",
+      "speaker_role_ko": "",
+      "addressee_role_ko": "",
+      "observed_pdr": {},
+      "p_evidence_ko": "",
+      "d_evidence_ko": "",
+      "r_evidence_ko": ""
+    }
+  },
+  "error": null
+}
