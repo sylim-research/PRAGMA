@@ -283,8 +283,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     allowedSpeechActs: ["proposal", "opposition"],
     situationSeedKo: "직장 관계의 상대에게 협업 방식이나 업무 개선을 제안하는 상황",
   },
-  // 시드 작성 규칙: P·D 관계와 수행 매체를 고정하지 않는다. 셀 축이 시드보다 우선하며,
-  // 번역·통역 어느 모드에서도 같은 소재를 관계·장면에 맞게 재구성할 수 있어야 한다.
+  // 범용 시드는 P·D 관계와 수행 매체를 미리 고정하지 않는다.
+  // 구체적인 사건·권한·교류 이력이 지정되면 그 사실을 우선 보존하고, 셀과 충돌할 때는 보류한다.
   {
     code: "work_support_thanks",
     labelKo: "업무 도움 감사",
