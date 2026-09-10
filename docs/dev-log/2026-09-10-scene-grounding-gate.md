@@ -80,3 +80,11 @@
 - 불변조건 「archived_at IS NOT NULL ⇒ 현행 제작·검토·편성 후보와 활성 집계에서 제외」를 코드 11곳에 적용: AdminBrowser 목록, AdminAssembly 조립/AI검토/최종승인 목록(직접 링크 scenarioId는 예외), AdminDashboard 집계, AdminFinalApproval 대기·완료 수, AdminCorpus 코퍼스 통계, composer.listCoreScenarios(편성 후보·학습자 투영), missionDb.listRunnableMissions, lockCandidateAudit, missionBatchRun.loadLockMissionBatchCores, coreBatchRun.loadExistingCoreRunItems. 미적용(의도): AdminPromptHarness 사용 프롬프트 이력, AdminFinalCorpusReview(run 단위), id 지정 조회·RPC, 학습자 RLS.
 - 검증: typecheck 통과, Vitest 142파일 920 통과(worktree에 `.env`가 없어 CI placeholder 환경변수로 실행). 로컬 커밋만, 푸시·PR·배포·보관 UPDATE 미실행.
 - 다음: ①migration push ②`.tmp/scene-grounding/archive-unreferenced.sql`로 1,503행 보관(수정 전 원본 draft 코어 3행 포함, 새 미션 4건은 이력 참조로 유지) ③라이브러리 필터 전체/현재/보관(UI 브리프 승인 후) ④PR·CI·배포.
+
+### 보관 실행 결과 (운영 DB, 2026-09-10)
+
+- migration `20260910120000_scenario_archive_state.sql` 원격 적용 완료(`db push`, 이 한 건만 미적용 상태였음). `archived_at timestamptz`·`archive_note text` 존재 확인.
+- 보관 UPDATE 실행: **1,503행** archived_at 설정, archive_note = `unreferenced_before_scene_grounding_replacement_20260910`.
+- 실행 후 실측: 현행 257 / 보관 1,503. 현행 257행은 **전부 미션 보유**(reviewed·released 75). 편성된 행 중 보관된 것 **0건**. 새 미션 4건 현행 유지, 수정 전 원본 draft 코어 3행은 미참조라 보관됨.
+- ⚠️ 배포 전이라 운영 화면은 아직 `archived_at`을 읽지 않는다. 관리자 목록은 여전히 1,726줄로 보이며, 청소 효과는 PR 병합·배포 후에 나타난다. 학습자 화면은 편성 행이 모두 현행이라 영향 없음.
+- 실행 명령 함정: `db push`·`db query`는 **worktree 안에서** 실행해야 한다(세션 기본 폴더 OneDrive에서 실행하면 project ref를 찾지 못한다). PowerShell 사용.
