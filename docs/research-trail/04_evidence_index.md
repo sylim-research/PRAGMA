@@ -456,3 +456,4 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 실제 2차 확인 원본 9건과 미검증 코드 patch 및 SHA-256: `docs/research-trail/evidence/2026-09-10-scene-grounding-confirmation-2/index.json`. 부적합 3건 모두 차단, 기존 대사형 상황문은 critic이 2회 오판, 새 코어 4건은 장면 서술 개선까지 관찰했다. 전체 미션 품질 승인 근거가 아니다. 사용량에 따른 작업 인계와 미배포 초안 상태는 `docs/dev-log/2026-09-10-fable-handoff-scene-grounding.md`에 기록했다.
 - 후속 제한 검증: 같은 evidence 디렉터리의 `unfinished-format-probe.json`과 재현 스크립트. 종결어미 강제 helper는 정상 서술 오탐·평서형 직접 대사 누락으로 기각했으며 앱의 미커밋 변경을 철회했다. 보관 patch는 채택된 구현이 아니다. 기존 의미 게이트와 실제 콘텐츠 미검수 상태는 그대로다.
 - 잔여 1%에서 2차 코어 4개의 사건·PDR·원문·focal_segments 직접 대조: `docs/dev-log/2026-09-10-confirmation-core-review.md`. 사과의 명시 수행절/중심 구간 분류, 요청 축약, 반대 지시어·시드 밖 선행 이유를 구별해 판정했다. 국소 편집안은 미적용이며 전체 미션 생성·승인·교체는 하지 않았다.
+- 그 후 사과·요청·반대의 실제 로컬 JSON 수정 후보와 재현 스크립트·검사 결과: `docs/research-trail/evidence/2026-09-10-local-core-revisions/README.md`. 스키마 3/3 통과, 규칙 pass 2건·분량 warning 1건. 기존 검토 메타데이터를 제거한 미승인 후보이며 의미/전체 미션 검수와 DB 적용은 남아 있다.
