@@ -54,6 +54,11 @@ import { toast } from "sonner";
 // 최종 접근 제어는 다른 /admin/* 화면과 동일하게 DB(RLS·is_admin)가 맡는다.
 
 const LEVEL_ORDER: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
+const LEVEL_CARD_CLASS: Record<LearnerLevel, string> = {
+  beginner_intermediate: "bg-[#EDF4FA]",
+  intermediate: "bg-[#EEF5F0]",
+  advanced: "bg-[#EDF3F4]",
+};
 const EMPTY_LEVEL_COUNTS = { beginner_intermediate: 0, intermediate: 0, advanced: 0 };
 type ProductionSetting = { total: number; interpretingPercent: number };
 const coreRunStorageKey = (direction: LanguageDirection) =>
@@ -318,15 +323,15 @@ const AdminBatch = () => {
               </div>
 
               <p className="mt-3 text-xs text-muted-foreground">수준별 총 생성 건수와 그중 통역 비율을 설정합니다.</p>
-              <div className="mt-2 grid gap-3 sm:grid-cols-3">
+              <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
                   const counts = modeCounts[level];
-                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className="min-w-0 rounded-lg bg-[#FAF8F2] p-3">
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 " + LEVEL_CARD_CLASS[level]}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
                       <span className="text-sm">{LEVEL[level]}</span>
-                      <span className="text-xl tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
+                      <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
                     </p>
-                    <div className="mt-2 grid grid-cols-2 gap-2">
+                    <div className="mt-1.5 grid grid-cols-2 gap-2">
                       <div className="min-w-0">
                         <Label htmlFor={"batch-total-" + level} className="text-xs">생성 건수</Label>
                         <Input id={"batch-total-" + level} aria-label={LEVEL[level] + " · 총 생성 건수"} type="number" min={0} step={1} value={settings[level].total}
@@ -338,41 +343,41 @@ const AdminBatch = () => {
                           disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                     </div>
-                    <p className="mt-1.5 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
+                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
               </div>
               <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 건수는 반올림하고 나머지는 번역으로 만듭니다. {targetActCount}개 화행에 균등 배분하며, 교과목의 미션 구성은 수업 편성에서 따로 정합니다.</p>
             </section>
 
-            <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-5">
+            <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="text-lg font-bold">2. 생성 계획·분포</h2>
                 <span className="text-xs text-muted-foreground">아래 수치는 생성 예정 건수입니다.</span>
               </div>
-              <div className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
+              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
-                <PlanMetric label="통역" value={summary.interpreting} />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
+                <PlanMetric label="통역" value={summary.interpreting} className="bg-[#EEF5F0]" />
+                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" className="bg-[#EDF3F4]" />
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
               {topicCoverage.wildcardOnly.length > 0 && <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">화행 중립 시드를 사용하는 조건: {topicCoverage.wildcardOnly.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 생성 결과에서 화행 적합성을 확인해 주세요.</p>}
 
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
                   description={"선택한 수준·과업의 화행 조합 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
-                <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
                   description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
               </div>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">비어 있는 전달 조합: {summary.emptyActLevelModeCells.join(", ")}</p>}
 
-              <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
-                <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
+                <Dist title="도메인별" className="bg-[#EEF5F0]" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist title="직장 도메인 · 산업별" className="bg-[#EEF5F0]" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
               </div>
               <div className="mt-4">
                 <h3 className="text-sm font-semibold">화행별</h3>
@@ -533,23 +538,23 @@ const AdminBatch = () => {
   );
 };
 
-const PlanMetric = ({ label, value, unit = "건", primary = false }: { label: string; value: number; unit?: string; primary?: boolean }) =>
-  <div className={"rounded-lg p-3 " + (primary ? "bg-[#15202B] text-white" : "bg-[#FAF8F2]")}>
-    <p className="text-xs">{label}</p><p className="mt-2 text-2xl font-bold tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
+const PlanMetric = ({ label, value, unit = "건", primary = false, className = "bg-[#EDF4FA]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+  <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
+    <p className="text-xs">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
   </div>;
 
-const CoverageCard = ({ title, filled, total, description }: { title: string; filled: number; total: number; description: string }) =>
-  <div className="rounded-lg border p-3">
+const CoverageCard = ({ title, filled, total, description, className = "border-[#D6E2EB] bg-[#F6F9FC]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
+  <div className={"rounded-lg border px-3 py-2 " + className}>
     <div className="flex flex-wrap items-center justify-between gap-2 text-xs"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
-    <Progress className="mt-3 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
-    <p className="mt-2 text-xs leading-5 text-muted-foreground">{description}</p>
+    <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
+    <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
   </div>;
 
 
-const Dist = ({ title, rows }: { title: string; rows: [string, number][] }) => (
-  <div className="rounded-lg bg-[#FAF8F2] px-4 py-3">
+const Dist = ({ title, rows, className = "bg-[#EDF4FA]" }: { title: string; rows: [string, number][]; className?: string }) => (
+  <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[12.5px] font-semibold">{title}</div>
-    <ul className="mt-2 space-y-1">
+    <ul className="mt-1.5 space-y-0.5">
       {rows.map(([label, n]) => (
         <li key={label} className="flex items-baseline justify-between gap-3 text-[12.5px]">
           <span className="text-muted-foreground">{label}</span>
