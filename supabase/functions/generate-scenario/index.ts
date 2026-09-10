@@ -4046,7 +4046,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const semanticCheck = {
         ...rawQuality, model: CRITIC_PRIMARY_MODEL, prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
         checked_at: new Date().toISOString(), core_content_hash: await sha256Hex(coreSemanticContent(core_content, {
-          speech_act: coreSpeechActCode(b), level: coreLengthLevel(b), domain: coreDomainCode(b),
+          direction: coreDir, speech_act: coreSpeechActCode(b), level: coreLengthLevel(b), domain: coreDomainCode(b),
           industry: b.industry, mode: coreLengthMode(b), topic_code: b.topic_code, pdr: b.pdr,
         })),
       }

@@ -65,6 +65,7 @@ export const CORE_SEMANTIC_AXES = [
 
 /** Hash only the actual material being reviewed, never the review's own verdict. */
 export interface CoreSemanticScope {
+  direction: string;
   speech_act: string;
   level: string;
   domain: string;
@@ -90,7 +91,7 @@ export function coreSemanticContent(core: Record<string, unknown>, scope?: CoreS
     context_spec: core.context_spec ?? null,
     focal_segments: core.focal_segments ?? [], usable_facts: core.usable_facts ?? [],
     scope: scope ? {
-      speech_act: scope.speech_act, level: scope.level, domain: scope.domain,
+      direction: scope.direction, speech_act: scope.speech_act, level: scope.level, domain: scope.domain,
       industry: scope.industry ?? null, mode: scope.mode, topic_code: scope.topic_code ?? null,
       pdr: { p: scope.pdr?.p, d: scope.pdr?.d, r: scope.pdr?.r },
     } : null,

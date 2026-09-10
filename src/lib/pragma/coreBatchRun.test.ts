@@ -205,7 +205,7 @@ describe('semantic review reuse', () => {
     const c = cell();
     const material = { direction: c.direction, situation_ko: '검토한 장면', source_text: '검토한 원문',
       pdr: { p: 'equal', d: 'acquaintance', r: 'mid' } };
-    const scope = { speech_act: c.speech_act_ui, level: c.level, domain: c.domain,
+    const scope = { direction: c.direction, speech_act: c.speech_act_ui, level: c.level, domain: c.domain,
       industry: c.industry, mode: c.mode, topic_code: c.topic_code, pdr: material.pdr };
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(coreSemanticContent(material, scope)));
     const hash = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
@@ -219,6 +219,7 @@ describe('semantic review reuse', () => {
     await checkCoreSemanticFit(c, { ...reviewed, source_text: '바뀐 원문' }, 'run', 'item');
     await checkCoreSemanticFit({ ...c, speech_act_ui: 'apology' }, reviewed, 'run', 'item');
     await checkCoreSemanticFit({ ...c, pdr_power: 'higher' }, reviewed, 'run', 'item');
-    expect(supabaseMocks.invoke).toHaveBeenCalledTimes(3);
+    await checkCoreSemanticFit({ ...c, direction: 'zh_ko' }, reviewed, 'run', 'item');
+    expect(supabaseMocks.invoke).toHaveBeenCalledTimes(4);
   });
 });

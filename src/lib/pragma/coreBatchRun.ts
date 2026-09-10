@@ -132,7 +132,7 @@ export async function checkCoreSemanticFit(
 > {
   const generation = core.generation as { semantic_check?: Record<string, unknown> } | undefined;
   const previous = generation?.semantic_check;
-  const scope = { speech_act: cell.speech_act_ui, level: cell.level, domain: cell.domain,
+  const scope = { direction: cell.direction, speech_act: cell.speech_act_ui, level: cell.level, domain: cell.domain,
     industry: cell.industry, mode: cell.mode, topic_code: cell.topic_code,
     pdr: { p: PDR_POWER_ENUM_TO_JSON[cell.pdr_power], d: PDR_DISTANCE_ENUM_TO_JSON[cell.pdr_distance], r: cell.pdr_burden } };
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(coreSemanticContent(core, scope)));
