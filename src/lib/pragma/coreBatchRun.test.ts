@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
+import { CORE_SEMANTIC_AXES, coreSemanticContent } from '../../../supabase/functions/_shared/sceneGrounding';
+import { CURRENT_CORE_QUALITY_PROMPT_VERSION } from '../../../supabase/functions/_shared/contentRelease';
 import {
   coreGenerationItemKey,
   runCoreBatch,
   runCoreCell,
+  checkCoreSemanticFit,
 } from "@/lib/pragma/coreBatchRun";
 
 const supabaseMocks = vi.hoisted(() => ({
@@ -123,7 +126,11 @@ describe("core batch resume", () => {
   });
 });
 
-describe("R26 bounded semantic adjudication", () => {
+describe("full core semantic gate", () => {
+  const fullCheck = (overrides: Record<string, unknown> = {}) => ({
+    verdict: 'pass', model: 'critic', prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
+    axes: { ...Object.fromEntries(CORE_SEMANTIC_AXES.map(axis => [axis, { verdict: 'pass', reason_ko: '실제 사실에 근거함' }])), ...overrides },
+  });
   const genericCore = {
     schema_version: "scenario_core_v1",
     situation_ko: "팀원이 회사 일정 변경을 담당자에게 메신저 글로 요청한다.",
@@ -148,16 +155,12 @@ describe("R26 bounded semantic adjudication", () => {
     supabaseMocks.rpc.mockReset();
   });
 
-  it("lexical warning 때만 industry 축을 호출하고 semantic fail은 저장하지 않는다", async () => {
+  it("industry 이외 P 의미 실패도 저장하지 않는다", async () => {
     supabaseMocks.invoke
       .mockResolvedValueOnce({ data: { core_content: genericCore, meta: {} }, error: null })
       .mockResolvedValueOnce({
         data: {
-          core_quality_check: {
-            axes: { industry: { verdict: "fail", reason_ko: "지정 산업의 구체적 업무가 없다." } },
-            model: "critic",
-            prompt_version: "core_quality",
-          },
+          core_quality_check: fullCheck({ power: { verdict: 'fail', reason_ko: '직함 외에 권한 근거가 없다.' } }),
         },
         error: null,
       });
@@ -169,20 +172,18 @@ describe("R26 bounded semantic adjudication", () => {
     expect(result).toMatchObject({
       ok: false,
       terminalStage: "core_semantic_critic",
-      semanticFailureCodes: ["R26_INDUSTRY_SEMANTIC"],
-      stopCode: "CORE_INDUSTRY_CRITIC_FAIL",
-      industryCritic: { verdict: "fail" },
+      semanticFailureCodes: ["power"],
+      stopCode: "CORE_SEMANTIC_HOLD",
+      industryCritic: { verdict: "warning" },
     });
   });
 
-  it("industry pass이면 lexical warning을 보존하고 저장한다", async () => {
+  it("전체 의미 pass이면 lexical warning을 보존하고 저장한다", async () => {
     supabaseMocks.invoke
       .mockResolvedValueOnce({ data: { core_content: genericCore, meta: {} }, error: null })
       .mockResolvedValueOnce({
         data: {
-          core_quality_check: {
-            axes: { industry: { verdict: "pass", reason_ko: "업무 대상과 행위로 산업이 드러난다." } },
-          },
+          core_quality_check: fullCheck(),
         },
         error: null,
       });
@@ -194,5 +195,30 @@ describe("R26 bounded semantic adjudication", () => {
     expect(result.ok).toBe(true);
     expect(result.ruleFindings).toContainEqual(expect.objectContaining({ id: "R26", level: "warning" }));
     expect(result.industryCritic?.verdict).toBe("pass");
+  });
+});
+
+
+describe('semantic review reuse', () => {
+  it('reuses matching evidence but rechecks changed content, act and expected PDR', async () => {
+    supabaseMocks.invoke.mockReset();
+    const c = cell();
+    const material = { direction: c.direction, situation_ko: '검토한 장면', source_text: '검토한 원문',
+      pdr: { p: 'equal', d: 'acquaintance', r: 'mid' } };
+    const scope = { speech_act: c.speech_act_ui, level: c.level, domain: c.domain,
+      industry: c.industry, mode: c.mode, topic_code: c.topic_code, pdr: material.pdr };
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(coreSemanticContent(material, scope)));
+    const hash = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+    const check = { verdict: 'pass', prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
+      axes: Object.fromEntries(CORE_SEMANTIC_AXES.map(axis => [axis, { verdict: 'pass', reason_ko: '명시된 사실' }])),
+      core_content_hash: hash };
+    const reviewed = { ...material, generation: { semantic_check: check } };
+    expect((await checkCoreSemanticFit(c, reviewed, 'run', 'item')).ok).toBe(true);
+    expect(supabaseMocks.invoke).not.toHaveBeenCalled();
+    supabaseMocks.invoke.mockResolvedValue({ error: null, data: { core_quality_check: check } });
+    await checkCoreSemanticFit(c, { ...reviewed, source_text: '바뀐 원문' }, 'run', 'item');
+    await checkCoreSemanticFit({ ...c, speech_act_ui: 'apology' }, reviewed, 'run', 'item');
+    await checkCoreSemanticFit({ ...c, pdr_power: 'higher' }, reviewed, 'run', 'item');
+    expect(supabaseMocks.invoke).toHaveBeenCalledTimes(3);
   });
 });

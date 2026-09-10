@@ -35,7 +35,7 @@ const EXPOSE = `
   buildCoreSystemPrompt, buildCoreUserPrompt, corePromptSnapshotHash, CORE_PROBE_BASE,
   buildCoreSourceRepairPrompt, buildCoreOutputRepairPrompt,
   buildMissionSystemPrompt, buildMissionUserPrompt, buildItemLineageSystemPrompt, buildFeedbackSystemPrompt, buildQualitySystemPrompt,
-  buildCoreQualitySystemPrompt,
+  buildCoreQualitySystemPrompt, CORE_SCENE_PREFLIGHT_PROMPT,
   buildAuthenticSystemPrompt,
   PRIMARY_MODEL, FALLBACK_MODEL, CORE_TEMPERATURE, CORE_RESPONSE_FORMAT,
   CORE_LENGTH_POLICY_VERSION, CORE_LENGTH_RANGES,
@@ -125,6 +125,8 @@ const probeMissionBody = (direction, sourceModality, isResponseAct) => ({
 const entry = (key, label, group, note, text) => ({ key, label, group, note, sha256: sha(text), text });
 
 const prompts = [
+  entry("core.scene_preflight.system", "장면 사전 검토 · 지시문", "core",
+    "원문 작성 전 사건과 지정 PDR의 실현 가능성을 확인한다.", S.CORE_SCENE_PREFLIGHT_PROMPT),
   entry("legacy.individual.system.zh_ko", "개별 생성 · 지시문 (중→한 번역)", "legacy",
     "기존 개별 생성 경로도 요청 언어방향과 자기 발신 번역 역할을 따른다.",
     S.buildSystemPrompt(3, "work", "zh_ko")),

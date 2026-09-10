@@ -28,7 +28,8 @@ import {
   type MissionRuntime,
   type QualityCheck,
 } from "@/lib/pragma/missionSchema";
-import { normalizeCore, coreDirection } from "@/lib/pragma/coreSchema";
+import { normalizeCore, coreDirection, PDR_POWER_JSON_TO_ENUM, PDR_DISTANCE_JSON_TO_ENUM } from "@/lib/pragma/coreSchema";
+import { checkCoreSemanticFit } from './coreBatchRun';
 import {
   SPEECH_ACT_UI,
   LEVEL,
@@ -875,6 +876,19 @@ export async function promoteCore(
   // (라운드2 엣지가 방향·중립 이름을 읽도록 갱신되면 함께 재조정한다.)
   const nc = normalizeCore(core.core_content ?? {});
   const normCore = nc.ok ? nc.data : undefined;
+  if (!normCore) return { ok: false, error: '코어를 읽을 수 없어 미션 생성을 중단합니다.' };
+  const grounded = await checkCoreSemanticFit({
+    direction, speech_act_ui: core.speech_act, level: core.learner_level,
+    domain: core.domain ?? 'daily', industry: (core.industry_sector ?? null) as Parameters<typeof checkCoreSemanticFit>[0]['industry'],
+    mode: core.mode ?? 'translation', topic_code: core.topic_code ?? '',
+    situation_seed_ko: normCore.situation_ko,
+    pdr_power: PDR_POWER_JSON_TO_ENUM[normCore.pdr.p],
+    pdr_distance: PDR_DISTANCE_JSON_TO_ENUM[normCore.pdr.d], pdr_burden: normCore.pdr.r,
+  }, core.core_content!, core.generation_run_id ?? '', core.generation_item_key ?? core.scenario_id);
+  if ('error' in grounded || grounded.result.verdict !== 'pass') {
+    return { ok: false, error: '코어 의미 검토 후 생성할 수 있습니다: ' + ('error' in grounded ? grounded.error : grounded.result.reason),
+      terminal: promotionTerminal({ terminalStage: 'preparing', finalOutcome: 'terminal_dropout' }) };
+  }
   const missionCore = {
     situation_ko: normCore?.situation_ko,
     relation_ko: normCore?.relation_ko,

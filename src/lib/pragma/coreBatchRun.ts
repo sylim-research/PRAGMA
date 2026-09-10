@@ -25,6 +25,8 @@ import {
 } from "@/lib/pragma/missionRules";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
 import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
+import { coreSemanticGate, coreSemanticContent } from '../../../supabase/functions/_shared/sceneGrounding';
+import { CURRENT_CORE_QUALITY_PROMPT_VERSION } from '../../../supabase/functions/_shared/contentRelease';
 
 const RESPONSE_ACTS = new Set(["refusal", "opposition"]);
 
@@ -33,6 +35,8 @@ export interface CoreIndustryCriticResult {
   reason: string;
   model?: string;
   promptVersion?: string;
+  issues?: string[];
+  check?: Record<string, unknown>;
 }
 
 export interface CoreCellResult {
@@ -110,18 +114,14 @@ function statusOf(error: unknown): number | "UNKNOWN" {
   return typeof status === "number" ? status : "UNKNOWN";
 }
 
-/**
- * R26 lexical miss에만 기존 core-quality industry 축을 1회 사용한다.
- * 다른 14개 축은 이번 production gate로 승격하지 않는다.
- */
-/** R26 warning 후속 — core quality critic의 industry 축 1회. 배치·개별 생성이 같은 정책을 쓴다(2026-09-09). */
+/** 배치·개별 생성·승격이 같은 완전 코어 의미 검사를 사용한다. */
 export type IndustryCriticCell = Pick<
   BatchCell,
   | "direction" | "speech_act_ui" | "level" | "domain" | "industry" | "mode"
   | "pdr_power" | "pdr_distance" | "pdr_burden" | "topic_code" | "situation_seed_ko"
 >;
 
-export async function checkIndustrySemanticFit(
+export async function checkCoreSemanticFit(
   cell: IndustryCriticCell,
   core: Record<string, unknown>,
   runId: string,
@@ -130,6 +130,18 @@ export async function checkIndustrySemanticFit(
   | { ok: true; result: CoreIndustryCriticResult }
   | { ok: false; error: string; providerStatus: number | "UNKNOWN" }
 > {
+  const generation = core.generation as { semantic_check?: Record<string, unknown> } | undefined;
+  const previous = generation?.semantic_check;
+  const scope = { speech_act: cell.speech_act_ui, level: cell.level, domain: cell.domain,
+    industry: cell.industry, mode: cell.mode, topic_code: cell.topic_code,
+    pdr: { p: PDR_POWER_ENUM_TO_JSON[cell.pdr_power], d: PDR_DISTANCE_ENUM_TO_JSON[cell.pdr_distance], r: cell.pdr_burden } };
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(coreSemanticContent(core, scope)));
+  const contentHash = Array.from(new Uint8Array(digest), b => b.toString(16).padStart(2, '0')).join('');
+  if (previous?.prompt_version === CURRENT_CORE_QUALITY_PROMPT_VERSION && previous.core_content_hash === contentHash) {
+    const gate = coreSemanticGate(previous);
+    return { ok: true, result: { verdict: gate.ok ? 'pass' : 'warning', reason: gate.reason,
+      issues: gate.issues, check: previous, model: String(previous.model ?? ''), promptVersion: String(previous.prompt_version) } };
+  }
   const { data, error } = await supabase.functions.invoke("generate-scenario", {
     body: {
       action: "core_quality_check",
@@ -162,20 +174,20 @@ export async function checkIndustrySemanticFit(
     },
   });
   if (error) {
-    return { ok: false, error: error.message ?? "industry critic 호출 실패", providerStatus: statusOf(error) };
+    return { ok: false, error: error.message ?? "코어 의미 검토 호출 실패", providerStatus: statusOf(error) };
   }
   const check = data?.core_quality_check as Record<string, unknown> | undefined;
-  const axes = check?.axes as Record<string, unknown> | undefined;
-  const industry = axes?.industry as Record<string, unknown> | undefined;
-  const verdict = industry?.verdict;
-  if (verdict !== "pass" && verdict !== "warning" && verdict !== "fail") {
-    return { ok: false, error: data?.error ?? "industry critic 응답 축 누락", providerStatus: "UNKNOWN" };
+  if (!check || check.prompt_version !== CURRENT_CORE_QUALITY_PROMPT_VERSION) {
+    return { ok: false, error: data?.error ?? "현행 코어 의미 검토 결과 없음", providerStatus: "UNKNOWN" };
   }
+  const gate = coreSemanticGate(check);
   return {
     ok: true,
     result: {
-      verdict,
-      reason: typeof industry.reason_ko === "string" ? industry.reason_ko.slice(0, 500) : "판정 근거 누락",
+      verdict: gate.ok ? 'pass' : check.verdict === 'fail' ? 'fail' : 'warning',
+      reason: gate.reason,
+      issues: gate.issues,
+      check: { ...check, core_content_hash: contentHash },
       model: typeof check?.model === "string" ? check.model : undefined,
       promptVersion: typeof check?.prompt_version === "string" ? check.prompt_version : undefined,
     },
@@ -292,7 +304,17 @@ export async function runCoreCell(
       },
     });
     if (error) throw error;
-    if (!data?.core_content) throw new Error(data?.error ?? "빈 응답");
+    if (!data?.core_content) {
+      const check = data?.core_quality_check as Record<string, unknown> | undefined;
+      const gate = check ? coreSemanticGate(check) : undefined;
+      return {
+        index, cell, ok: false, coreContent: data?.core_draft,
+        terminalStage: check ? 'core_semantic_critic' : 'core_generation',
+        stopCode: data?.stop_code, semanticFailureCodes: gate?.issues,
+        error: data?.error ?? '빈 응답',
+        ...(check ? { industryCritic: { verdict: 'warning' as const, reason: gate?.reason ?? '', check } } : {}),
+      };
+    }
 
     const core = data.core_content as Record<string, unknown> & {
       channel?: string;
@@ -319,13 +341,10 @@ export async function runCoreCell(
       };
     }
 
-    const r26Warning = ruleResult.violations.find(
-      (finding) => finding.id === "R26" && finding.level === "warning",
-    );
     let industryCritic: CoreIndustryCriticResult | undefined;
-    if (r26Warning) {
+    {
       terminalStage = "core_semantic_critic";
-      const checked = await checkIndustrySemanticFit(cell, core, opts.runId, itemKey);
+      const checked = await checkCoreSemanticFit(cell, core, opts.runId, itemKey);
       if ("error" in checked) {
         return {
           index,
@@ -338,12 +357,12 @@ export async function runCoreCell(
           industryCritic: { verdict: "UNKNOWN", reason: checked.error },
           infrastructureError: true,
           providerStatus: checked.providerStatus,
-          stopCode: "CORE_INDUSTRY_CRITIC_INFRASTRUCTURE",
+          stopCode: "CORE_SEMANTIC_UNAVAILABLE",
           error: checked.error,
         };
       }
       industryCritic = checked.result;
-      if (industryCritic.verdict === "fail") {
+      if (industryCritic.verdict !== "pass") {
         return {
           index,
           cell,
@@ -352,10 +371,10 @@ export async function runCoreCell(
           ruleResult: "warning",
           ruleFindings: ruleResult.violations,
           terminalStage,
-          semanticFailureCodes: ["R26_INDUSTRY_SEMANTIC"],
+          semanticFailureCodes: industryCritic.issues,
           industryCritic,
-          stopCode: "CORE_INDUSTRY_CRITIC_FAIL",
-          error: "core industry semantic critic 실패(저장 안 함)",
+          stopCode: "CORE_SEMANTIC_HOLD",
+          error: "코어 의미 검토 보류: " + industryCritic.reason,
         };
       }
     }

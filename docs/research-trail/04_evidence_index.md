@@ -446,3 +446,9 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
   증거는 `docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.mjs`와 같은 이름의 JSON이다.
   독립 typecheck·관련 9파일 95 tests·Edge 번들 일치가 통과했지만 위 통합 누락을 덮지 못했다.
   전체 882 tests·운영 DB·실제 모델·배포를 새로 검증한 결과가 아니다. 앱 코드·정본·승인 상태 변경 없음.
+
+## EVD-20260910-10 · 사건 근거 확인과 의미 게이트 구현
+
+- DEC-20260910-09, docs/dev-log/2026-09-10-scene-grounding-gate.md 및 해당 구현 Git 이력.
+- 실제 Edge handler 모의 제공자: scripts/scene-grounding-edge.test.mjs. 공유 규칙·검사 재사용·조사 보존: src/lib/pragma/sceneGrounding.test.ts, coreBatchRun.test.ts, src/lib/mission/learnerScene.test.ts.
+- 의미 검사 결과가 진행 조건으로 작동함을 검증한다. 모델의 실제 판정 정확도·전체 미션 승인·최종 콘텐츠 LOCK 증거와 구분한다. 신규 생성 및 운영 후속은 dev-log에서 별도 확인한다.

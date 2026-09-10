@@ -2,6 +2,7 @@ import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, Generatio
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
+import { CORE_SCENE_PREFLIGHT_PROMPT, readCoreScenePlan, coreSemanticGate, coreSemanticContent } from '../_shared/sceneGrounding.ts'
 import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
 import {
   FEEDBACK_MAX_COMPLETION_TOKENS,
@@ -16,7 +17,6 @@ import {
   coreSourceIssue,
   mergeValidatedCoreRepair,
 } from '../_shared/coreSourceRepair.ts'
-import { canonicalizeCoreSituationFromSeed } from '../_shared/coreSituationCanonicalization.ts'
 import {
   CORE_LENGTH_POLICY_VERSION,
   CORE_LENGTH_RANGES,
@@ -287,7 +287,7 @@ interface QualityCheckBody {
 
 // ── 코어 축 준수 비평 파일럿 ─────────────────────────────────────────────
 // 정적 checkCore가 검증하지 못하는 화행·P/D/R·domain·mode 의미 준수를 별도 모델로
-// 감사한다. 생성 저장 게이트가 아니며, 18건 파일럿 정확도 통과 전 500 전수 적용 금지.
+// 감사한다. 신규 생성 및 기존 코어의 미션 확장에서는 전 축 근거가 있는 pass만 진행한다.
 interface CoreQualityCheckBody {
   core_content: unknown
   direction?: string
@@ -795,182 +795,10 @@ interface CoreGenBody {
   context_spec?: CoreContextSpec
 }
 
-type RolePair = CoreContextSpec['role_pair']
-
-const ROLE_PAIRS: Record<string, Record<string, RolePair>> = {
-  daily: {
-    'equal|close': {
-      speaker_ko: '가까운 일상 관계의 화자',
-      addressee_ko: '가까운 친구·동거인·가족 등 동등한 상대',
-    },
-    'equal|acquaintance': {
-      speaker_ko: '일상 공간이나 모임의 구성원',
-      addressee_ko: '몇 차례 마주쳐 서로 아는 이웃·모임 구성원',
-    },
-    'equal|distant': {
-      speaker_ko: '일반 이용자 또는 처음 온 참여자',
-      addressee_ko: '그 자리에서 처음 만난 동등한 상대',
-    },
-    'speaker_lower|close': {
-      speaker_ko: '친밀한 관계에서 결정권이 상대적으로 적은 후배·돌봄 대상',
-      addressee_ko: '가깝지만 해당 일의 결정권이 더 큰 선배·보호자',
-    },
-    'speaker_lower|acquaintance': {
-      speaker_ko: '알고 지내는 모임 참여자·후배',
-      addressee_ko: '그 모임의 운영자·선배 등 결정권이 더 큰 상대',
-    },
-    'speaker_lower|distant': {
-      speaker_ko: '일반 이용자 또는 처음 온 참여자',
-      addressee_ko: '처음 상대하는 시설·행사·서비스의 결정권자',
-    },
-    'speaker_higher|close': {
-      speaker_ko: '친밀한 관계에서 결정권이 더 큰 선배·보호자',
-      addressee_ko: '가까운 후배·돌봄 대상',
-    },
-    'speaker_higher|acquaintance': {
-      speaker_ko: '알고 지내는 모임 운영자·선배',
-      addressee_ko: '그 모임의 참여자·후배',
-    },
-    'speaker_higher|distant': {
-      speaker_ko: '행사·시설의 책임자 또는 결정권자',
-      addressee_ko: '처음 상대하는 참여자·이용자',
-    },
-  },
-  school: {
-    'equal|close': {
-      speaker_ko: '가까운 동기·친구인 학생',
-      addressee_ko: '가까운 동기·친구인 학생',
-    },
-    'equal|acquaintance': {
-      speaker_ko: '수업·조별과제에서 알고 지내는 학생',
-      addressee_ko: '같은 수업·조의 동등한 학생',
-    },
-    'equal|distant': {
-      speaker_ko: '학교 구성원인 학생',
-      addressee_ko: '처음 만난 다른 수업·학과의 동등한 학생',
-    },
-    'speaker_lower|close': {
-      speaker_ko: '가까운 후배·멘티인 학생',
-      addressee_ko: '친밀하게 지도하는 선배·멘토',
-    },
-    'speaker_lower|acquaintance': {
-      speaker_ko: '수업을 듣거나 지도를 받는 학생',
-      addressee_ko: '알고 지내는 교수·조교·조장·공식 멘토 등 해당 일의 권한이 더 큰 상대',
-    },
-    'speaker_lower|distant': {
-      speaker_ko: '처음 문의하는 학생',
-      addressee_ko: '처음 상대하는 교수·조교·학사 담당자',
-    },
-    'speaker_higher|close': {
-      speaker_ko: '친밀하게 지도하는 선배·멘토',
-      addressee_ko: '가까운 후배·멘티인 학생',
-    },
-    'speaker_higher|acquaintance': {
-      speaker_ko: '조장·튜터·조교 등 해당 일의 권한을 가진 학교 구성원',
-      addressee_ko: '알고 지내는 조원·학생·후배',
-    },
-    'speaker_higher|distant': {
-      speaker_ko: '수업·프로그램의 책임자 또는 담당자',
-      addressee_ko: '처음 상대하는 학생·참여자',
-    },
-  },
-  work: {
-    'equal|close': {
-      speaker_ko: '가깝게 협업해 온 동료',
-      addressee_ko: '가깝게 협업해 온 동등한 동료',
-    },
-    'equal|acquaintance': {
-      speaker_ko: '업무상 알고 지내는 담당자',
-      addressee_ko: '동등한 직급의 동료·파트너 담당자',
-    },
-    'equal|distant': {
-      speaker_ko: '업무 담당자',
-      addressee_ko: '처음 협업하는 동등한 직급의 상대 담당자',
-    },
-    'speaker_lower|close': {
-      speaker_ko: '오랫동안 함께 일한 후배 직원·실무자',
-      addressee_ko: '가깝지만 결정권이 더 큰 팀장·선배',
-    },
-    'speaker_lower|acquaintance': {
-      speaker_ko: '업무를 수행하는 실무자·후배 직원',
-      addressee_ko: '알고 지내는 상사·고객 책임자·선배 담당자',
-    },
-    'speaker_lower|distant': {
-      speaker_ko: '업무 실무자',
-      addressee_ko: '처음 상대하는 고객·거래처의 결정권자',
-    },
-    'speaker_higher|close': {
-      speaker_ko: '가깝게 일해 온 팀장·선배·책임자',
-      addressee_ko: '가까운 팀원·후배 직원',
-    },
-    'speaker_higher|acquaintance': {
-      speaker_ko: '팀장·프로젝트 책임자·고객측 결정권자',
-      addressee_ko: '알고 지내는 팀원·실무 담당자',
-    },
-    'speaker_higher|distant': {
-      speaker_ko: '해당 업무의 책임자·발주측 결정권자',
-      addressee_ko: '처음 상대하는 신규 직원·외부 실무 담당자',
-    },
-  },
-}
-
-// 범용 P×D 역할 예시가 구체 topic의 인물을 덮어쓰지 않도록, 관계·장소 명사가
-// 곧 topic 정체성인 셀은 서버가 topic×P×D 역할 쌍을 우선 주입한다.
-const TOPIC_ROLE_PAIRS: Record<string, Record<string, RolePair>> = {
-  neighbor_noise: {
-    'equal|acquaintance': {
-      speaker_ko: '몇 차례 마주쳐 알고 지내는 아파트·주거 공간의 이웃',
-      addressee_ko: '생활 소음을 내고 있어 이를 줄여 달라는 요청·불만을 받는 동등한 이웃',
-    },
-  },
-  neighbor_noise_apology: {
-    'equal|acquaintance': {
-      speaker_ko: '자신의 집에서 생활 소음을 낸 아파트·주거 공간의 이웃',
-      addressee_ko: '그 소음으로 불편을 겪은 동등한 이웃',
-    },
-  },
-  hotel_request: {
-    'speaker_lower|acquaintance': {
-      speaker_ko: '숙박 시설을 이용하며 방 문제를 겪는 일반 투숙객',
-      addressee_ko: '방 변경·문제 해결 권한이 더 큰 호텔·숙소 관리자',
-    },
-    'equal|acquaintance': {
-      speaker_ko: '숙박 시설을 이용하며 방 문제를 겪는 투숙객',
-      addressee_ko: '방 변경 요청을 접수·처리하는 호텔·숙소 담당자',
-    },
-  },
-  host_family_thanks: {
-    'speaker_lower|acquaintance': {
-      speaker_ko: '유학·교류 생활 중 숙소와 생활 적응 도움을 받은 학생·참가자',
-      addressee_ko: '숙소·생활 도움을 제공한 연장자 호스트 가족 구성원 또는 공식 현지 버디',
-    },
-    'equal|acquaintance': {
-      speaker_ko: '유학·교류 생활 중 숙소와 생활 적응 도움을 받은 학생·참가자',
-      addressee_ko: '동등한 관계에서 생활 적응을 도운 호스트 가족 구성원 또는 공식 현지 버디',
-    },
-  },
-  buddy_program_arrangement: {
-    'equal|acquaintance': {
-      speaker_ko: '교환·유학 프로그램에서 버디를 배정받은 학생',
-      addressee_ko: '프로그램이 공식 배정한 동등한 지위의 버디(도우미 학생)',
-    },
-  },
-  comment_feedback_disagreement: {
-    'equal|acquaintance': {
-      speaker_ko: '콘텐츠를 함께 검토하는 온라인 커뮤니티 참여자·창작자',
-      addressee_ko: '해당 콘텐츠에 평가·제안을 제시한 동등한 참여자·창작자',
-    },
-    'speaker_lower|acquaintance': {
-      speaker_ko: '콘텐츠 모임·커뮤니티의 후배 참여자·창작자',
-      addressee_ko: '해당 콘텐츠에 평가·제안을 제시한 운영자·선배 창작자',
-    },
-  },
-}
-
 const SPEAKER_ENTITLEMENT: Record<string, string> = {
   request: '화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.',
   refusal: '화자는 앞선 요청·제안·초대의 수용 여부를 결정할 재량이 있다.',
-  apology: '화자는 자신과 관련된 위반·피해를 인정하고 가능한 수리를 제안할 책임이 있다.',
+  apology: '실제 사건에서 확인된 화자의 잘못·피해에 한해 책임과 가능한 수리를 검토한다. 사과 화행이라는 이유로 잘못을 만들어 내지 않는다.',
   thanks: '화자는 자신이 받은 도움·호의와 상대의 기여를 구체적으로 인정할 위치에 있다.',
   proposal: '화자는 미래 행동 방안을 제안할 참여 권한은 있지만 단독 결정권을 전제하지 않는다.',
   agreement: '화자는 상대를 공동 활동에 초대할 수 있지만 참여를 강제할 권리는 없다.',
@@ -982,7 +810,7 @@ const SPEAKER_ENTITLEMENT: Record<string, string> = {
 const ADDRESSEE_OBLIGATION: Record<string, string> = {
   request: '상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.',
   refusal: '상대는 거절 대상 행동을 먼저 요청·제안·초대한 사람이며, 거절을 수용할 여지가 있어야 한다.',
-  apology: '상대는 피해·불편의 당사자이며 사과를 즉시 수락하거나 용서할 의무는 없다.',
+  apology: '상대가 실제 피해·불편의 당사자인지 먼저 확인한다. 사과를 즉시 수락하거나 용서할 의무를 전제하지 않는다.',
   thanks: '상대는 도움·호의의 제공자이며 감사에 응답하거나 추가 행동을 할 의무는 없다.',
   proposal: '상대는 제안을 검토할 수 있지만 수락할 의무는 없다.',
   agreement: '상대는 초대받은 활동의 참여 여부를 선택할 권리가 있다.',
@@ -1032,8 +860,7 @@ function coreLengthMode(b: CoreGenBody): CoreLengthMode {
 function buildCoreContextSpec(b: CoreGenBody): CoreContextSpec {
   const domain = coreDomainCode(b)
   const act = coreSpeechActCode(b)
-  const key = `${b.pdr.p}|${b.pdr.d}`
-  const rolePair = TOPIC_ROLE_PAIRS[b.topic_code ?? '']?.[key] ?? {
+  const rolePair = {
     speaker_ko: '장면 시드의 실제 용건을 말할 이유가 있는 인물. 지정 P·D 조건을 따른다.',
     addressee_ko: '장면 시드의 실제 용건을 받거나 처리할 수 있는 인물. 지정 P·D 조건을 따른다.',
   }
@@ -1114,7 +941,7 @@ ${zhKoDirectionContract}
 **자연스러운 서술 안에서** 다음 사실만 드러나게 쓴다.
   ① 원문 화자 A가 상대 B에게 무엇을 하려는지
   ② 두 사람이 어느 정도 알고 지낸 사이인지
-  ③ 상대가 실제로 감수할 비용·수고·조정 범위가 무엇인지
+  ③ 해당 화행에서 실제로 문제가 되는 노력·피해·이해관계·민감성이 무엇인지
   ④ 앞선 대화가 실제로 진행 중이면 그 사실(preceding_turn도 함께 채운다)
 직접 말하는지 글로 보내는지는 자연스러운 행동 서술로만 드러내고, "기록으로 남기는
 목적", "즉각적인 반응을 요구하지 않는다"처럼 매체 속성을 연구 설명처럼 풀어 쓰지 않는다.
@@ -1128,8 +955,8 @@ ${zhKoDirectionContract}
 - source_text는 반드시 ${srcL}. 지정된 화행·관계·부담에 맞는 자연스러운 발화.
 - situation_ko·relation_ko·brief_note_ko는 방향과 무관하게 항상 한국어(학습자 UI 언어).
 - [생성 요청]의 화행·도메인·P/D/R·수행 모드는 변경할 수 없는 필수 조건이다.
-- [context_spec]의 역할 쌍·권리·의무·결정 권한은 서버가 정한 필수 조건이다.
-  이를 바꾸거나, 권한 없는 상대가 결정을 내리게 하거나, 선택 가능한 요청을 지시로 바꾸지 않는다.
+- [context_spec]은 실제 사건에 적용할 기대를 확인하는 보조 지시다. 권리·의무 문구 자체는 사건의 사실이 아니다.
+  확인된 역할·사건을 바꾸거나, 없는 책임·피해·권한을 추가하거나, 선택 가능한 요청을 지시로 바꾸지 않는다.
   역할 쌍에 든 "친구·선배·담당자" 같은 말은 P/D를 설명하는 범주 예시이지 topic의 인물을
   교체할 허가가 아니다. 실제 인물 명칭은 topic_code·장면 시드에 맞게 구체화한다.
 - 화자 A와 상대 B를 먼저 고정하고 situation_ko·relation_ko·preceding_turn·source_text
@@ -1207,7 +1034,7 @@ function buildCoreUserPrompt(b: CoreGenBody): string {
   const contextSpec = b.context_spec ?? buildCoreContextSpec(b)
   parts.push(
     '',
-    '[context_spec — 서버 고정 조건]',
+    '[context_spec — 사건에 근거해 해석할 보조 지시]',
     `- 표준상황 코드: ${contextSpec.standard_situation_code}`,
     `- 역할 쌍: 화자=${contextSpec.role_pair.speaker_ko} / 상대=${contextSpec.role_pair.addressee_ko}`,
     `- 화자의 정당한 권리·책임: ${contextSpec.speaker_entitlement}`,
@@ -1378,8 +1205,15 @@ async function corePromptSnapshotHash(): Promise<string> {
     ),
   )
   coreSnapshotHashCache = await sha256Hex(canonicalJson({
-    v: 9,
+    v: 10,
     scope: 'core_generation',
+    scene_preflight_prompt: CORE_SCENE_PREFLIGHT_PROMPT,
+    scene_preflight_model: CRITIC_PRIMARY_MODEL,
+    scene_preflight_temperature: 0.2,
+    semantic_gate_prompts: directions.map(buildCoreQualitySystemPrompt),
+    semantic_gate_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
+    semantic_gate_model: CRITIC_PRIMARY_MODEL,
+    semantic_gate_temperature: 0.1,
     action: 'core',
     model: PRIMARY_MODEL,
     repair_model: CRITIC_PRIMARY_MODEL,
@@ -1450,8 +1284,6 @@ async function corePromptSnapshotHash(): Promise<string> {
       pdr_r_ko: PDR_R_KO,
       industry_ko: INDUSTRY_KO,
       function_ko: FUNCTION_KO,
-      role_pairs: ROLE_PAIRS,
-      topic_role_pairs: TOPIC_ROLE_PAIRS,
       speaker_entitlement: SPEAKER_ENTITLEMENT,
       addressee_obligation: ADDRESSEE_OBLIGATION,
       decision_authority: DECISION_AUTHORITY,
@@ -3607,15 +3439,15 @@ function buildCoreQualitySystemPrompt(direction: Direction): string {
 - 취향·문체 선호·지역/세대 변이를 fail로 세지 않는다. 확신이 없으면 warning이다.
 - P와 D는 공손 표지의 많고 적음으로 추정하지 말고 situation_ko·relation_ko의 실제
   역할과 관계로 판정한다. 특정 직접성 수준을 상위자/하위자 관계의 정답으로 가정하지 않는다.
-- R은 발화 길이가 아니라 요청·행위가 상대에게 주는 실제 부담으로 판정한다.
+- R은 발화 길이가 아니라 해당 화행의 사실 근거로 판정한다. 요청의 비용 기준을 모든 화행에 복제하지 않는다.
 ${zhKoTranslationAudit}
 - 장면 시드와 topic_code는 핵심 사건·행위자·상호작용 목적을 묶는 필수 소재다. P/D에 맞춘
   최소 역할 조정은 허용하지만, host family를 선배로 바꾸는 식의 관계·사건 교체는
   topic_seed fail이다. 시드의 명사 한 개만 장식처럼 남긴 경우도 pass가 아니다.
   topic_code에 host_family, hotel, neighbor처럼 사람이 읽을 수 있는 관계·장소 단서가 있으면
   그 의미도 기대 조건으로 사용한다.
-- context_spec은 역할·권리·의무의 기대 조건이다. 단어를 그대로 복사했는지가 아니라 실제
-  상황과 relation_ko가 그 구조를 구현하는지 판정한다. 결정 권한은 별도 축에서 더 엄격히 본다.
+- context_spec은 보조적인 역할·기대 지시이며 사실의 증명이 아니다. 실제 상황의 근거를 대조한다.
+  화행명만으로 책임·피해·권한을 전제했으면 context_spec 또는 scene_plausibility 결함이다.
 - situation_ko는 학습자에게 보이는 장면이다. 내부 권리·의무나 정답에 포함할 표현 자원을
   평가 기준처럼 설명하거나, 기록 목적·즉시 반응 여부를 연구 설명처럼 서술하면 learner_scene을
   fail로 두고 관찰 가능한 상대·용건·접촉 이력·실제 부담만 남기도록 지적한다.
@@ -3994,14 +3826,35 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         return new Response(JSON.stringify({ error: 'core body required' }), { status: 400, headers: jsonHeaders })
       }
       const coreDir = normDir(b.direction)
-      // 역할·권리·의무는 모델이 추측하지 않고 서버가 셀 조건에서 결정한다.
-      // 클라이언트가 context_spec을 보내더라도 사용하지 않는다.
-      const contextSpec = buildCoreContextSpec(b)
-      const requestBody: CoreGenBody = { ...b, context_spec: contextSpec }
-      const sys = buildCoreSystemPrompt(coreDir)
-      const usr = buildCoreUserPrompt(requestBody)
-      let model = PRIMARY_MODEL
       const promptSnapshotHash = await corePromptSnapshotHash()
+      // Establish a feasible event before drafting source text. No title-to-power lookup.
+      const preflight = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey, CORE_SCENE_PREFLIGHT_PROMPT,
+        JSON.stringify({
+          speech_act: coreSpeechActCode(b), pdr: b.pdr, direction: coreDir,
+          domain: coreDomainCode(b), industry: b.industry ?? null, level: b.level_ko,
+          mode: coreLengthMode(b), topic_code: b.topic_code, situation_seed_ko: b.situation_seed_ko,
+        }), 0.2, {
+          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v1', promptSnapshotHash }),
+        })
+      if (!preflight.ok) {
+        return new Response(JSON.stringify({ error: '장면 사전 검토 호출 실패', stop_code: 'CORE_PREFLIGHT_UNAVAILABLE' }), { status: 502, headers: jsonHeaders })
+      }
+      let scenePlan
+      try { scenePlan = readCoreScenePlan(parseOpenAIContent(preflight.raw)) } catch { scenePlan = null }
+      if (!scenePlan?.feasible) {
+        return new Response(JSON.stringify({
+          error: scenePlan?.reason_ko ?? '장면 사전 검토의 사실 근거 또는 형식이 불완전합니다.',
+          stop_code: 'CORE_PREFLIGHT_HOLD', scene_plan: scenePlan,
+        }), { status: 200, headers: jsonHeaders })
+      }
+      const contextSpec = {
+        ...buildCoreContextSpec(b),
+        role_pair: { speaker_ko: scenePlan.speaker_role_ko, addressee_ko: scenePlan.addressee_role_ko },
+      }
+      const requestBody: CoreGenBody = { ...b, situation_seed_ko: scenePlan.scene_ko, context_spec: contextSpec }
+      const sys = buildCoreSystemPrompt(coreDir)
+      const usr = buildCoreUserPrompt(requestBody) + '\n[사전 확인한 장면 — 사실·인물 유지]\n' + JSON.stringify(scenePlan)
+      let model = PRIMARY_MODEL
       const att = await callOpenAI(PRIMARY_MODEL, apiKey, sys, usr, CORE_TEMPERATURE, {
         responseFormat: CORE_STRUCTURED_RESPONSE_FORMAT,
         telemetry: telemetryFor('core_generate', true, {
@@ -4023,14 +3876,11 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const lengthMode = coreLengthMode(b)
       const lengthRange = coreLengthRange(lengthLevel, lengthMode)
       const lengthHintKo = coreLengthHintKo(lengthLevel, lengthMode)
-      const interpreterSceneRequired = b.source_modality === 'spoken'
       const originalSituation = String(gen.situation_ko ?? '')
       const originalRelation = String(gen.relation_ko ?? '')
-      const canonicalSituation = { value: naturalLearnerScene(originalSituation), applied: naturalLearnerScene(originalSituation) !== originalSituation }
-      const canonicalRelation = { value: naturalLearnerScene(originalRelation), applied: naturalLearnerScene(originalRelation) !== originalRelation }
-      const seedSituation = interpreterSceneRequired
-        ? { value: canonicalSituation.value, applied: false }
-        : canonicalizeCoreSituationFromSeed(b.situation_seed_ko, canonicalSituation.value)
+      const canonicalSituation = { value: scenePlan.scene_ko, applied: scenePlan.scene_ko !== originalSituation }
+      const canonicalRelation = { value: scenePlan.relation_ko, applied: scenePlan.relation_ko !== originalRelation }
+      const seedSituation = canonicalSituation
       const bilingualSceneCanonicalizationApplied = canonicalSituation.applied || canonicalRelation.applied
       const situationSeedCanonicalizationApplied = seedSituation.applied
       if (bilingualSceneCanonicalizationApplied || situationSeedCanonicalizationApplied) {
@@ -4116,6 +3966,9 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       }
       // 구조 필드는 서버가 조립(셀과 어긋나지 않게). 자유 텍스트만 모델 값 사용.
       // v2 중립 스키마(계약 0-l·83) — source_text/preceding_turn + direction.
+      // Repair may change source wording, but cannot silently replace the agreed event.
+      gen.situation_ko = scenePlan.scene_ko
+      gen.relation_ko = scenePlan.relation_ko
       // 모델이 구 키(source_text_ko 등)로 답해도 관대하게 받는다(폴백).
       const sourceText = String(gen.source_text ?? gen.source_text_ko ?? '')
       // focal_segments — 모델이 원문에서 복사해야 하는 값이라 서버가 정합만 보정한다.
@@ -4174,15 +4027,47 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         },
         ...(hskLexicalAudit ? { hsk_lexical_audit: hskLexicalAudit } : {}),
       }
+      const qualityInput: CoreQualityCheckBody = {
+        core_content, direction: coreDir, speech_act: coreSpeechActCode(b),
+        level: b.level_ko, domain: coreDomainCode(b), industry: b.industry,
+        mode: coreLengthMode(b), pdr: b.pdr, topic_code: b.topic_code,
+        situation_seed_ko: b.situation_seed_ko, is_response_act: b.is_response_act,
+        expected_context_spec: contextSpec,
+      }
+      const critic = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey,
+        buildCoreQualitySystemPrompt(coreDir), buildCoreQualityUserPrompt(qualityInput), 0.1, {
+          telemetry: telemetryFor('core_critic', true, { promptVersion: CURRENT_CORE_QUALITY_PROMPT_VERSION, promptSnapshotHash }),
+        })
+      let rawQuality: Record<string, unknown> | null = null
+      if (critic.ok) {
+        try { rawQuality = parseOpenAIContent(critic.raw) as Record<string, unknown> } catch { /* fail closed below */ }
+      }
+      const semanticGate = coreSemanticGate(rawQuality)
+      const semanticCheck = {
+        ...rawQuality, model: CRITIC_PRIMARY_MODEL, prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
+        checked_at: new Date().toISOString(), core_content_hash: await sha256Hex(coreSemanticContent(core_content, {
+          speech_act: coreSpeechActCode(b), level: coreLengthLevel(b), domain: coreDomainCode(b),
+          industry: b.industry, mode: coreLengthMode(b), topic_code: b.topic_code, pdr: b.pdr,
+        })),
+      }
+      if (!semanticGate.ok) {
+        return new Response(JSON.stringify({
+          error: '코어 의미 검토 보류: ' + semanticGate.reason,
+          stop_code: critic.ok ? 'CORE_SEMANTIC_HOLD' : 'CORE_SEMANTIC_UNAVAILABLE',
+          core_draft: core_content, scene_plan: scenePlan, core_quality_check: semanticCheck,
+        }), { status: 200, headers: jsonHeaders })
+      }
       return new Response(
         JSON.stringify({
-          core_content,
+          core_content: { ...core_content, generation: { ...core_content.generation, scene_plan: scenePlan, semantic_check: semanticCheck } },
           meta: {
             provider: PROVIDER,
             model,
             prompt_version: corePromptVersion,
             content_release_id: CURRENT_CONTENT_RELEASE_ID,
             generation_attempt: coreRepairAttempted ? 2 : 1,
+            scene_plan: scenePlan,
+            core_quality_check: semanticCheck,
             source_repair_applied: sourceRepairApplied,
             preceding_turn_repair_applied: precedingTurnRepairApplied,
             bilingual_scene_repair_applied: bilingualSceneRepairApplied,
@@ -4730,7 +4615,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         const raw = rawAxes[code] && typeof rawAxes[code] === 'object'
           ? rawAxes[code] as Record<string, unknown>
           : {}
-        const verdict = raw.verdict === 'fail' || raw.verdict === 'warning' || raw.verdict === 'pass'
+        const verdict = typeof raw.reason_ko === 'string' && raw.reason_ko.trim() &&
+          (raw.verdict === 'fail' || raw.verdict === 'warning' || raw.verdict === 'pass')
           ? raw.verdict
           : 'warning'
         const reason = typeof raw.reason_ko === 'string' && raw.reason_ko.trim()
@@ -4745,7 +4631,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const RANK: Record<string, number> = { pass: 0, warning: 1, fail: 2 }
       const claimed = typeof parsed.verdict === 'string' && parsed.verdict in RANK
         ? parsed.verdict
-        : 'pass'
+        : 'warning'
       const verdict = RANK[claimed] > RANK[derived] ? claimed : derived
       const checkedAt = new Date().toISOString()
       return new Response(
