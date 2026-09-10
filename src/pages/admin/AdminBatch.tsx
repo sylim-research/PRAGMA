@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
+import { BatchPlanItems } from "@/components/admin/BatchPlanItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,17 +17,13 @@ import {
   type LearnerLevel,
 } from "@/lib/pragma/enums";
 import {
-  DEFAULT_QUOTA,
-  FULL_BATCH_QUOTA_495,
-  ZH_KO_VALIDATION_ACTS,
-  ZH_KO_VALIDATION_DELIVERY_CELLS,
   auditTopicCompatibility,
   auditTopicCoverage,
   buildBatchPlan,
-  buildZhKoValidationPlan,
-  interpretingCount,
+  productionModeCounts,
   summarizePlan,
-  type BatchQuota,
+  type BatchCell,
+  type DeliveryCoverageCell,
 } from "@/lib/pragma/batchPlan";
 import { preflightAdminBatch } from "@/lib/pragma/adminBatchPreflight";
 import {
@@ -50,15 +47,20 @@ import { toast } from "sonner";
 
 // 배치 생성 — 셀 목록을 순회하며 기존 생성기를 반복 호출한다.
 //
-// 이 화면의 핵심은 '실행'이 아니라 **실행 전 분포 검산**이다.
-// 화행 × 수준만 채우면 개수는 늘어도 도메인·산업·통역이 한쪽으로 쏠리고,
-// 교강사가 "직장 · 무역" 필터를 눌렀을 때 0건이 나온다.
-// 그래서 계획을 먼저 보여주고, 무엇이 몇 개 생기는지 눈으로 확인한 뒤 돌린다.
+// 생성 계획·분포 확인부터 AI 생성·점검·저장·재개까지 한 작업 흐름으로 제공한다.
+// 연구 구인 분포와 교육용 전달 분포는 별도로 확인한다.
 //
 // AI 호출 전에는 관리자 세션을 선행 검사해 비용 낭비를 막는다.
 // 최종 접근 제어는 다른 /admin/* 화면과 동일하게 DB(RLS·is_admin)가 맡는다.
 
 const LEVEL_ORDER: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
+const LEVEL_CARD_CLASS: Record<LearnerLevel, string> = {
+  beginner_intermediate: "bg-[#EDF4FA]",
+  intermediate: "bg-[#EEF5F0]",
+  advanced: "bg-[#EDF3F4]",
+};
+const EMPTY_LEVEL_COUNTS = { beginner_intermediate: 0, intermediate: 0, advanced: 0 };
+type ProductionSetting = { total: number; interpretingPercent: number };
 const coreRunStorageKey = (direction: LanguageDirection) =>
   `pragma:admin-core-batch-run:${direction}`;
 
@@ -96,10 +98,15 @@ const parseSelectedPlanIndexes = (raw: string, total: number) => {
 };
 
 const AdminBatch = () => {
-  const [quota, setQuota] = useState<BatchQuota>(DEFAULT_QUOTA);
-  // 언어 방향(0-l·89) — zh_ko는 고정 9화행·30셀 혼합 파일럿으로 전환.
+  const [settings, setSettings] = useState<Record<LearnerLevel, ProductionSetting>>({
+    beginner_intermediate: { total: 0, interpretingPercent: 0 },
+    intermediate: { total: 0, interpretingPercent: 0 },
+    advanced: { total: 0, interpretingPercent: 0 },
+  });
   const [direction, setDirection] = useState<LanguageDirection>("ko_zh");
   const [running, setRunning] = useState(false);
+  const [preparing, setPreparing] = useState(false);
+  const [executionError, setExecutionError] = useState("");
   const [results, setResults] = useState<CoreCellResult[]>([]);
   const [done, setDone] = useState(0);
   const [auditRunning, setAuditRunning] = useState(false);
@@ -110,170 +117,127 @@ const AdminBatch = () => {
   const [selectedCellNumbers, setSelectedCellNumbers] = useState("");
   const [activeTotal, setActiveTotal] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
+  const actionRef = useRef(false);
+  const busy = running || preparing || auditRunning;
+
+  const resetExecutionDisplay = () => {
+    setResults([]);
+    setDone(0);
+    setActiveTotal(0);
+    setAuditResults([]);
+    setAuditDone(0);
+    setExecutionError("");
+    setSelectedCellNumbers("");
+  };
 
   const switchDirection = (d: LanguageDirection) => {
-    if (running) return;
+    if (busy || direction === d) return;
+    resetExecutionDisplay();
     setDirection(d);
-    if (d === "ko_zh") setQuota(DEFAULT_QUOTA);
     setCoreRunId(getOrCreateCoreRunId(d));
     setResumeRunId("");
   };
 
-  const targetActs = direction === "zh_ko" ? ZH_KO_VALIDATION_ACTS : undefined;
-  const targetActCount = targetActs?.length ?? Object.keys(SPEECH_ACT_UI).length;
-  const topicCoverage = useMemo(() => auditTopicCoverage(targetActs), [targetActs]);
-  const topicCompatibility = useMemo(
-    () => auditTopicCompatibility(targetActs),
-    [targetActs],
-  );
+  const targetActCount = Object.keys(SPEECH_ACT_UI).length;
+  const topicCoverage = useMemo(() => auditTopicCoverage(), []);
+  const topicCompatibility = useMemo(() => auditTopicCompatibility(), []);
+  const modeCounts = useMemo(() => Object.fromEntries(LEVEL_ORDER.map(level => [
+    level, productionModeCounts(settings[level].total, settings[level].interpretingPercent),
+  ])) as Record<LearnerLevel, ReturnType<typeof productionModeCounts>>, [settings]);
   const plan = useMemo(
-    () =>
-      topicCoverage.missing.length === 0 && topicCompatibility.length === 0
-        ? direction === "zh_ko"
-          ? buildZhKoValidationPlan()
-          : buildBatchPlan(quota, direction)
-        : [],
-    [
-      quota,
-      direction,
-      topicCoverage.missing.length,
-      topicCompatibility.length,
-    ],
+    () => topicCoverage.missing.length === 0 && topicCompatibility.length === 0
+      ? buildBatchPlan({ perLevel: EMPTY_LEVEL_COUNTS, interpretingRatio: 0, perLevelModeCounts: modeCounts }, direction)
+      : [],
+    [modeCounts, direction, topicCoverage.missing.length, topicCompatibility.length],
   );
-  // zh_ko는 핵심 3화행 18셀 + 확장 6화행 중급 12셀의 명시 커버리지만 감사한다.
-  const summary = useMemo(
-    () => summarizePlan(
-      plan,
-      targetActs,
-      direction === "zh_ko" ? ZH_KO_VALIDATION_DELIVERY_CELLS : undefined,
-    ),
-    [direction, plan, targetActs],
-  );
+  const deliveryCells = useMemo(() => LEVEL_ORDER.flatMap(level =>
+    (Object.keys(modeCounts[level]) as Array<BatchCell["mode"]>)
+      .filter(mode => modeCounts[level][mode] > 0)
+      .flatMap(mode => Object.keys(SPEECH_ACT_UI).map(speechAct => ({
+        speechAct, level, mode,
+      } as DeliveryCoverageCell))),
+  ), [modeCounts]);
+  const summary = useMemo(() => summarizePlan(plan, undefined, deliveryCells), [plan, deliveryCells]);
   const selectedPlan = useMemo(
     () => parseSelectedPlanIndexes(selectedCellNumbers, plan.length),
     [selectedCellNumbers, plan.length],
   );
-  const isLargeKoZhBatch = direction === "ko_zh" && summary.total >= 400;
-  const isApprovedFullBatch =
-    direction === "ko_zh" &&
-    summary.total === 495 &&
-    summary.emptyActPdrCells.length === 0 &&
-    summary.minActPdrCount >= 2 &&
-    summary.emptyActLevelModeCells.length === 0 &&
-    summary.minActLevelModeCount >= 3;
-  const fullBatchBlocked = isLargeKoZhBatch && !isApprovedFullBatch;
+  const deliveryCellCount = deliveryCells.length;
+  const selectPlanIndexes = (indexes: number[]) =>
+    setSelectedCellNumbers([...new Set(indexes)].sort((a, b) => a - b).map(index => index + 1).join(", "));
 
-  const setLevelQuota = (level: LearnerLevel, value: number) =>
-    setQuota((q) => ({ ...q, perLevel: { ...q.perLevel, [level]: Math.max(0, value) } }));
-
-  const loadFullBatchPreset = () => {
-    if (running) return;
-    setDirection("ko_zh");
-    setQuota(FULL_BATCH_QUOTA_495);
-    const next = createCoreRunId("ko_zh");
-    persistCoreRunId("ko_zh", next);
-    setCoreRunId(next);
+  const setProductionSetting = (level: LearnerLevel, field: keyof ProductionSetting, value: number) => {
+    if (busy || !Number.isFinite(value)) return;
+    resetExecutionDisplay();
+    const next = Math.max(0, Math.floor(value));
+    setSettings(previous => ({ ...previous, [level]: {
+      ...previous[level], [field]: field === "interpretingPercent" ? Math.min(100, next) : next,
+    } }));
   };
 
-  const start = async () => {
-    if (fullBatchBlocked) {
-      toast.error("400건 이상 본배치는 승인된 495 프리셋과 243·54셀 게이트를 모두 충족해야 합니다.");
-      return;
-    }
-    const preflight = await preflightAdminBatch();
-    if ("message" in preflight) {
-      toast.error(preflight.message);
-      return;
-    }
-
-    let existingItems: Awaited<ReturnType<typeof loadExistingCoreRunItems>>;
+  const executeBatch = async (cells: BatchCell[], runMode: "current" | "fresh", itemIndexes?: readonly number[]) => {
+    if (actionRef.current || busy || !cells.length) return;
+    actionRef.current = true;
+    setPreparing(true);
+    setExecutionError("");
     try {
-      existingItems = await loadExistingCoreRunItems(coreRunId);
-    } catch {
-      toast.error("기존 배치 진행 상태를 읽지 못했습니다. 다시 로그인한 뒤 실행해 주세요.");
-      return;
-    }
-    if (existingItems.size > 0) {
-      toast.info(`같은 배치 ID로 저장된 ${existingItems.size}건은 AI 호출 없이 건너뜁니다.`);
-    }
-
-    setRunning(true);
-    setResults([]);
-    setDone(0);
-    setActiveTotal(plan.length);
-    setAuditResults([]);
-    setAuditDone(0);
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-    const onProgress = (d: number, _total: number, last: CoreCellResult) => {
-      setDone(d);
-      setResults((prev) => [...prev, last]);
-    };
-    const out = await runCoreBatch(plan, {
-      runId: coreRunId,
-      existingItems,
-      concurrency: 3,
-      signal: ctrl.signal,
-      onProgress,
-    });
-    setResults(out);
-    setRunning(false);
-    abortRef.current = null;
-  };
-
-  const startSelected = async (runMode: "current" | "fresh") => {
-    if (selectedPlan.invalid || selectedPlan.indexes.length === 0) {
-      toast.error("현재 계획 안의 셀 번호를 쉼표로 입력해 주세요.");
-      return;
-    }
-    const preflight = await preflightAdminBatch();
-    if ("message" in preflight) {
-      toast.error(preflight.message);
-      return;
-    }
-
-    const selectedCells = selectedPlan.indexes.map((index) => plan[index]);
-    const targetRunId = runMode === "current" ? coreRunId : createCoreRunId(direction);
-    let existingItems: Awaited<ReturnType<typeof loadExistingCoreRunItems>> | undefined;
-    if (runMode === "current") {
-      try {
-        existingItems = await loadExistingCoreRunItems(targetRunId);
-      } catch {
-        toast.error("기존 배치 진행 상태를 읽지 못했습니다. 다시 로그인한 뒤 실행해 주세요.");
+      const preflight = await preflightAdminBatch();
+      if ("message" in preflight) {
+        setExecutionError(preflight.message);
+        toast.error(preflight.message);
         return;
       }
-    } else {
-      persistCoreRunId(direction, targetRunId);
-      setCoreRunId(targetRunId);
+      const targetRunId = runMode === "current" ? coreRunId : createCoreRunId(direction);
+      const existingItems = runMode === "current" ? await loadExistingCoreRunItems(targetRunId) : undefined;
+      if (runMode === "fresh") {
+        persistCoreRunId(direction, targetRunId);
+        setCoreRunId(targetRunId);
+      }
+      setResults([]);
+      setDone(0);
+      setActiveTotal(cells.length);
+      setAuditResults([]);
+      setAuditDone(0);
+      setPreparing(false);
+      setRunning(true);
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
+      const out = await runCoreBatch(cells, {
+        runId: targetRunId, itemIndexes, existingItems,
+        concurrency: 3, signal: ctrl.signal,
+        onProgress: (count, _total, last) => {
+          setDone(count);
+          setResults(previous => [...previous, last]);
+        },
+      });
+      setResults(out);
+      setDone(out.length);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "배치 실행 상태를 확인하지 못했습니다. 연결과 관리자 세션을 확인한 뒤 같은 ID로 재개해 주세요.";
+      setExecutionError(message);
+      toast.error(message);
+    } finally {
+      setPreparing(false);
+      setRunning(false);
+      abortRef.current = null;
+      actionRef.current = false;
     }
-    setRunning(true);
-    setResults([]);
-    setDone(0);
-    setActiveTotal(selectedCells.length);
-    setAuditResults([]);
-    setAuditDone(0);
-    const ctrl = new AbortController();
-    abortRef.current = ctrl;
-    const out = await runCoreBatch(selectedCells, {
-      runId: targetRunId,
-      itemIndexes: selectedPlan.indexes,
-      existingItems,
-      concurrency: 3,
-      signal: ctrl.signal,
-      onProgress: (count, _total, last) => {
-        setDone(count);
-        setResults((previous) => [...previous, last]);
-      },
-    });
-    setResults(out);
-    setRunning(false);
-    abortRef.current = null;
+  };
+
+  const start = () => executeBatch(plan, "current");
+
+  const startSelected = (runMode: "current" | "fresh") => {
+    if (selectedPlan.invalid || selectedPlan.indexes.length === 0) {
+      toast.error("현재 계획 안의 항목 번호를 쉼표로 입력해 주세요.");
+      return;
+    }
+    return executeBatch(selectedPlan.indexes.map(index => plan[index]), runMode, selectedPlan.indexes);
   };
 
   const stop = () => abortRef.current?.abort();
 
   const startFreshCoreRun = () => {
-    if (running) return;
+    if (busy) return;
     if (
       results.length > 0
       && !window.confirm("새 배치 ID를 만들면 다음 실행은 기존 저장분을 건너뛰지 않습니다. 계속할까요?")
@@ -283,15 +247,12 @@ const AdminBatch = () => {
     const next = createCoreRunId(direction);
     persistCoreRunId(direction, next);
     setCoreRunId(next);
-    setResults([]);
-    setDone(0);
-    setAuditResults([]);
-    setAuditDone(0);
+    resetExecutionDisplay();
     toast.success("새 배치 ID를 만들었습니다.");
   };
 
   const loadCoreRunId = () => {
-    if (running) return;
+    if (busy) return;
     const next = resumeRunId.trim();
     if (!isCoreRunIdForDirection(next, direction)) {
       toast.error(`${DIRECTION_LABEL[direction]} 방향의 시나리오 배치 ID를 입력해 주세요.`);
@@ -300,11 +261,7 @@ const AdminBatch = () => {
     persistCoreRunId(direction, next);
     setCoreRunId(next);
     setResumeRunId("");
-    setResults([]);
-    setDone(0);
-    setActiveTotal(0);
-    setAuditResults([]);
-    setAuditDone(0);
+    resetExecutionDisplay();
     toast.success("기존 배치 ID를 불러왔습니다.");
   };
 
@@ -325,440 +282,174 @@ const AdminBatch = () => {
   const auditErrors = auditResults.filter((result) => !result.ok).length;
 
   const startCoreAudit = async () => {
-    if (auditRunning || auditableCoreResults.length === 0) return;
+    if (actionRef.current || busy || auditableCoreResults.length === 0) return;
+    actionRef.current = true;
     setAuditRunning(true);
     setAuditResults([]);
     setAuditDone(0);
-    const out = await runCoreQualityPilot(auditableCoreResults, {
-      concurrency: 2,
-      onProgress: (count, _total, last) => {
-        setAuditDone(count);
-        setAuditResults((previous) => [...previous, last]);
-      },
-    });
-    setAuditResults(out);
-    setAuditRunning(false);
+    setExecutionError("");
+    try {
+      const out = await runCoreQualityPilot(auditableCoreResults, {
+        concurrency: 2,
+        onProgress: (count, _total, last) => {
+          setAuditDone(count);
+          setAuditResults(previous => [...previous, last]);
+        },
+      });
+      setAuditResults(out);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "AI 비평 결과를 불러오지 못했습니다.";
+      setExecutionError(message);
+      toast.error(message);
+    } finally {
+      setAuditRunning(false);
+      actionRef.current = false;
+    }
   };
 
   return (
-    <AdminShell
-      title="시나리오 배치 생성"
-      description="정해진 조건 조합에 따라 AI 생성 학습 콘텐츠의 상황과 원문을 여러 건 만들고 내부 확인 대기 상태로 저장합니다."
-    >
-      {/* ── 생성 설정 (코어·방향·할당량 압축) ── */}
-      <section className="rounded-xl border border-[#EAE4D2] bg-white p-4">
-        <div className="flex flex-wrap items-start gap-x-8 gap-y-3">
-          <div>
-            <div className="text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-              생성 방식
-            </div>
-            <div className="mt-1.5">
-              <Badge variant="secondary" className="px-2.5 py-1 font-semibold">
-                시나리오 · v1.4
-              </Badge>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[11.5px] font-semibold uppercase tracking-wide text-muted-foreground">
-              언어 방향
-            </div>
-            <div className="mt-1.5 flex gap-1.5">
-              <Button
-                size="sm"
-                variant={direction === "ko_zh" ? "default" : "outline"}
-                onClick={() => switchDirection("ko_zh")}
-                disabled={running}
-              >
-                {DIRECTION_LABEL.ko_zh}
-              </Button>
-              <Button
-                size="sm"
-                variant={direction === "zh_ko" ? "default" : "outline"}
-                onClick={() => switchDirection("zh_ko")}
-                disabled={running}
-              >
-                {DIRECTION_LABEL.zh_ko} · 9화행 검증
-              </Button>
-            </div>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={loadFullBatchPreset}
-            disabled={running}
-          >
-            495 본배치 프리셋
-          </Button>
-        </div>
-
-        <p className="mt-2.5 max-w-[42rem] text-[12px] text-muted-foreground">
-          상황·원문·태그를 생성해 학습 미션의 재료를 준비합니다.{" "}
-          {direction === "zh_ko"
-            ? "중→한은 핵심 3화행 18셀과 확장 6화행 중급 12셀을 합친 30셀 혼합 파일럿을 우선 검증합니다."
-            : "본 배치는 연구 구인 243셀(화행×P×D×R)과 전달 커버리지 54셀(화행×수준×모드)을 별도로 검산합니다."}
-        </p>
-
-        <div className="mt-3 border-t border-[#EAE4D2] pt-3">
-          {direction === "zh_ko" ? (
-            <div className="grid gap-2 text-[12px] sm:grid-cols-2">
-              <div className="rounded-lg bg-[#FAF8F2] px-4 py-3">
-                <div className="font-semibold">핵심 3화행 · 18셀</div>
-                <p className="mt-1 text-muted-foreground">
-                  요청·거절·감사 × 3수준 × 번역/통역
-                </p>
-              </div>
-              <div className="rounded-lg bg-[#FAF8F2] px-4 py-3">
-                <div className="font-semibold">확장 6화행 · 12셀</div>
-                <p className="mt-1 text-muted-foreground">
-                  사과·제안·동의·반대·칭찬·불만 × 중급 × 번역/통역
-                </p>
-              </div>
-              <p className="sm:col-span-2 text-[11px] text-muted-foreground">
-                고정 파일럿입니다. 인간 눈검사 전에는 54셀이나 본배치로 자동 확대하지 않습니다.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap items-end gap-x-6 gap-y-2">
-              {LEVEL_ORDER.map((lv) => (
-                <div key={lv} className="w-[104px]">
-                  <Label className="text-[11.5px] text-muted-foreground">{LEVEL[lv]}</Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={30}
-                    value={quota.perLevel[lv]}
-                    disabled={running}
-                    onChange={(e) => setLevelQuota(lv, Number(e.target.value))}
-                    className="mt-1 h-8 text-[13px]"
-                  />
-                  <p className="mt-1 text-[10.5px] text-muted-foreground">
-                    →{" "}
-                    {targetActCount * (quota.perLevel[lv] + interpretingCount(quota.perLevel[lv], quota.interpretingRatio))}
-                    개
-                  </p>
+    <AdminShell title="시나리오 배치 생성"
+      description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
+      <div className="space-y-5">
+        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_310px]">
+          <div className="min-w-0 space-y-5">
+            <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <h2 id="batch-config-heading" className="shrink-0 text-lg font-bold">1. 생성 조건</h2>
+                <div role="group" aria-label="언어 방향" className="order-last flex w-full gap-1.5 sm:order-none sm:w-auto">
+                  <Button size="sm" className="h-8 px-3" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
+                  <Button size="sm" className="h-8 px-3" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
                 </div>
-              ))}
-              <div className="w-[104px]">
-                <Label className="text-[11.5px] text-muted-foreground">통역 비율</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={1}
-                  step={0.1}
-                  value={quota.interpretingRatio}
-                  disabled={running}
-                  onChange={(e) =>
-                    setQuota((q) => ({ ...q, interpretingRatio: Number(e.target.value) }))
-                  }
-                  className="mt-1 h-8 text-[13px]"
-                />
-                <p className="mt-1 text-[10.5px] text-muted-foreground">
-                  번역 건수 대비 통역 생성 비율
-                </p>
+              </div>
+
+              <p className="mt-3 text-xs text-muted-foreground">수준별 총 생성 건수와 그중 통역 비율을 설정합니다.</p>
+              <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
+                {LEVEL_ORDER.map(level => {
+                  const counts = modeCounts[level];
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 " + LEVEL_CARD_CLASS[level]}>
+                    <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
+                      <span className="text-sm">{LEVEL[level]}</span>
+                      <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
+                    </p>
+                    <div className="mt-1.5 grid grid-cols-2 gap-2">
+                      <div className="min-w-0">
+                        <Label htmlFor={"batch-total-" + level} className="text-xs">생성 건수</Label>
+                        <Input id={"batch-total-" + level} aria-label={LEVEL[level] + " · 총 생성 건수"} type="number" min={0} step={1} value={settings[level].total}
+                          disabled={busy} onChange={event => setProductionSetting(level, "total", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
+                      </div>
+                      <div className="min-w-0">
+                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-xs">통역(%)</Label>
+                        <Input id={"batch-percent-" + level} aria-label={LEVEL[level] + " · 통역 비율"} type="number" min={0} max={100} step={1} value={settings[level].interpretingPercent}
+                          disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
+                      </div>
+                    </div>
+                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
+                  </div>;
+                })}
+              </div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 건수는 반올림하고 나머지는 번역으로 만듭니다. {targetActCount}개 화행에 균등 배분하며, 교과목의 미션 구성은 수업 편성에서 따로 정합니다.</p>
+            </section>
+
+            <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <h2 id="batch-plan-heading" className="text-lg font-bold">2. 생성 계획·분포</h2>
+                <span className="text-xs text-muted-foreground">아래 수치는 생성 예정 건수입니다.</span>
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+                <PlanMetric label="총 생성 예정" value={summary.total} primary />
+                <PlanMetric label="번역" value={summary.translation} />
+                <PlanMetric label="통역" value={summary.interpreting} className="bg-[#EEF5F0]" />
+                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" className="bg-[#EDF3F4]" />
+              </div>
+              {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
+              {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
+              {topicCoverage.wildcardOnly.length > 0 && <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">화행 중립 시드를 사용하는 조건: {topicCoverage.wildcardOnly.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 생성 결과에서 화행 적합성을 확인해 주세요.</p>}
+
+              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
+                <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
+                  description={"선택한 수준·과업의 화행 조합 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
+                <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                  description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
+              </div>
+              {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">비어 있는 전달 조합: {summary.emptyActLevelModeCells.join(", ")}</p>}
+
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
+                <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
+                <Dist title="도메인별" className="bg-[#EEF5F0]" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
+                <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist title="직장 도메인 · 산업별" className="bg-[#EEF5F0]" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+              </div>
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold">화행별</h3>
+                <div className="mt-2 flex flex-wrap gap-2">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
+                  <Badge key={key} variant="outline" className="gap-2 py-1 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+              </div>
+            </section>
+            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
+          </div>
+
+          <aside id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5 xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
+            <h2 id="batch-execution-heading" className="text-lg font-bold">3. 생성 실행</h2>
+            <p className="mt-2 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
+            <div className="mt-4 rounded-lg bg-[#FAF8F2] p-3">
+              <p className="text-xs font-semibold">현재 배치 ID</p>
+              <code className="mt-2 block break-all text-xs">{coreRunId}</code>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">같은 ID로 다시 실행하면 저장 완료 항목은 AI 호출 없이 건너뜁니다.</p>
+            </div>
+            <Button className="mt-4 w-full" onClick={start} disabled={busy || plan.length === 0}>
+              {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
+            </Button>
+            {running && <Button className="mt-2 w-full" variant="outline" onClick={stop}>생성 중단</Button>}
+            {executionError && <p role="alert" className="mt-3 text-xs leading-5 text-red-800">{executionError}</p>}
+            {activeTotal > 0 && <div className="mt-4" aria-live="polite">
+              <div className="mb-2 flex justify-between text-xs"><span>{running ? "생성·저장 진행" : done < activeTotal ? "중단된 실행" : "실행 완료"}</span><span>{done} / {activeTotal}</span></div>
+              <Progress value={(done / Math.max(1, activeTotal)) * 100} aria-label="배치 생성 진행률" />
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-muted-foreground">새로 저장</dt><dd className="mt-1 font-bold">{okCount - reusedCount}건</dd></div>
+                <div><dt className="text-muted-foreground">기존 저장 재사용</dt><dd className="mt-1 font-bold">{reusedCount}건</dd></div>
+                <div><dt className="text-muted-foreground">경고 포함</dt><dd className="mt-1 font-bold">{warnCount}건</dd></div>
+                <div><dt className="text-muted-foreground">실패</dt><dd className="mt-1 font-bold">{failCount}건</dd></div>
+              </dl>
+            </div>}
+
+            <div className="mt-5 border-t pt-4">
+              <h3 className="text-sm font-semibold">선택 항목 생성·재개</h3>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">생성 항목 목록에서 고르거나 번호를 입력하세요.</p>
+              <Label htmlFor="selected-core-cells" className="mt-3 block text-xs">선택 항목 번호</Label>
+              <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="mt-2"
+                onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
+              {selectedPlan.invalid && <p role="alert" className="mt-2 text-xs text-red-800">1–{plan.length} 사이의 정수 번호를 쉼표로 구분해 주세요.</p>}
+              <Button className="mt-3 w-full" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
+                onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 현재 ID 재개</Button>
+              <Button className="mt-2 w-full" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
+                onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새 ID로 생성</Button>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">중단된 항목은 현재 ID로 재개합니다. 저장된 항목을 다시 만들 때는 새 ID를 사용합니다.</p>
+            </div>
+
+            <div className="mt-5 border-t pt-4">
+              <h3 className="text-sm font-semibold">배치 불러오기·새로 시작</h3>
+              <Label htmlFor="resume-core-run-id" className="mt-3 block text-xs">기존 배치 ID</Label>
+              <Input id="resume-core-run-id" value={resumeRunId} disabled={busy} className="mt-2 min-w-0 font-mono text-xs"
+                onChange={event => setResumeRunId(event.target.value)} placeholder={"core_" + direction + "_…"} />
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={loadCoreRunId} disabled={busy || !resumeRunId.trim()}>불러오기</Button>
+                <Button size="sm" variant="outline" onClick={startFreshCoreRun} disabled={busy}>새 배치 ID</Button>
               </div>
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* ── 실행 전 분포 검산 ── */}
-      <section className="mt-4 rounded-xl border border-[#EAE4D2] bg-white p-5">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="text-[15px] font-bold">이대로 실행하면 생기는 것</h3>
-          <span className="text-[20px] font-bold">{summary.total}개</span>
+          </aside>
         </div>
 
-        {topicCoverage.missing.length > 0 && (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[12.5px] text-red-900">
-            ⛔ 화행·도메인 일치 topic이 없어 실행을 차단했습니다:{" "}
-            {topicCoverage.missing
-              .map(({ speechAct, domain }) => `${SPEECH_ACT_UI[speechAct]}×${DOMAIN[domain]}`)
-              .join(", ")}
-          </p>
-        )}
-        {topicCoverage.wildcardOnly.length > 0 && (
-          <p className="mt-3 rounded-lg bg-amber-50 px-4 py-3 text-[12.5px] text-amber-900">
-            ⚠️ 명시 topic 없이 화행 중립 시드에만 의존하는 비블로커 조합:{" "}
-            {topicCoverage.wildcardOnly
-              .map(({ speechAct, domain }) => `${SPEECH_ACT_UI[speechAct]}×${DOMAIN[domain]}`)
-              .join(", ")}
-          </p>
-        )}
-        {topicCompatibility.length > 0 && (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[12.5px] text-red-900">
-            ⛔ P·D·모드와 호환되는 topic이 없는 조합 {topicCompatibility.length}개가 있어 실행을
-            차단했습니다. topic 카탈로그의 역할·매체 제약을 먼저 조정해야 합니다.
-          </p>
-        )}
-        {fullBatchBlocked && (
-          <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[12.5px] text-red-900">
-            ⛔ 400건 이상 실행은 승인된 495건 계획만 허용합니다. 495 프리셋을 불러오고
-            243 구인셀과 54 전달셀이 모두 채워지는지 확인하십시오.
-          </p>
-        )}
-        {isApprovedFullBatch && (
-          <p className="mt-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-[12.5px] text-emerald-900">
-            ✅ 승인된 495 본배치 계획입니다. 243 구인셀과 54 전달셀 게이트를 모두 충족합니다.
-          </p>
-        )}
-
-        {/* 2열이면 박스 하나가 600px가 되어 「입문」과 「18」 사이가
-            한참 벌어진다 — 눈이 라벨과 수치를 잇지 못한다. 4열로 좁혀 라벨과
-            수치를 붙인다. */}
-        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Dist title="수준별" rows={LEVEL_ORDER.map((l) => [LEVEL[l], summary.byLevel[l] ?? 0])} />
-          <Dist
-            title="주제 · 도메인별"
-            rows={Object.entries(DOMAIN).map(([k, label]) => [label, summary.byDomain[k] ?? 0])}
-          />
-          <Dist
-            title="주제 · 산업별 (직장 도메인 안에서)"
-            rows={Object.entries(INDUSTRY).map(([k, label]) => [label, summary.byIndustry[k] ?? 0])}
-          />
-          <Dist
-            title="과업 유형"
-            rows={[
-              [MODE_LABEL.translation, summary.translation],
-              [MODE_LABEL.stt_interpreting, summary.interpreting],
-            ]}
-          />
-        </div>
-
-        <div className="mt-4 rounded-lg bg-[#FAF8F2] px-4 py-3">
-          <div className="text-[12.5px] font-semibold">시나리오 테마별 (theme) — 프리셋 선반이 비지 않게</div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {Object.entries(THEME_LABEL).map(([k, label]) => (
-              <Badge key={k} variant="secondary" className="font-normal">
-                {label} {summary.byTheme[k] ?? 0}
-              </Badge>
-            ))}
+        {failures.length > 0 && <section aria-label="배치 생성 실패" className="rounded-xl border border-red-200 bg-red-50 p-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-bold text-red-900">실패 {failures.length}건 · 조건과 사유</h2>
+            <Button size="sm" variant="outline" disabled={busy} onClick={() => selectPlanIndexes(failures.map(result => result.index))}>실패 항목 선택</Button>
           </div>
-        </div>
-
-        <div className="mt-4 rounded-lg bg-[#FAF8F2] px-4 py-3">
-          <div className="text-[12.5px] font-semibold">화행별</div>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {Object.entries(SPEECH_ACT_UI).map(([k, label]) => (
-              <Badge key={k} variant="secondary" className="font-normal">
-                {label} {summary.bySpeechAct[k] ?? 0}
-              </Badge>
-            ))}
-          </div>
-        </div>
-
-        {(() => {
-          const cellUnitLabel = direction === "zh_ko" ? "30셀(9화행 혼합 검증)" : "54셀";
-          return summary.emptyActLevelModeCells.length > 0 ? (
-            <p className="mt-3 rounded-lg bg-amber-50 px-4 py-3 text-[12.5px] text-amber-900">
-              ⚠️ 화행 × 수준 × 모드 {cellUnitLabel}(생성 수준 한정) 중 <b>{summary.emptyActLevelModeCells.length}셀이 빕니다</b>:{" "}
-              {summary.emptyActLevelModeCells.join(", ")}
-            </p>
-          ) : (
-            <p className="mt-3 rounded-lg bg-emerald-50 px-4 py-3 text-[12.5px] text-emerald-900">
-              ✅ {cellUnitLabel}(생성 수준 한정)이 모두 채워집니다 · 셀당 최소 {summary.minActLevelModeCount}개
-              {direction === "ko_zh" && summary.minActLevelModeCount < 3 && (
-                <span className="text-amber-800">
-                  {" "}— 500 본 배치는 셀당 ≥3 권장(현재 {summary.underMinCells.length}셀이 3 미만)
-                </span>
-              )}
-            </p>
-          );
-        })()}
-
-        {summary.emptyActPdrCells.length > 0 ? (
-          <p className="mt-3 rounded-lg bg-amber-50 px-4 py-3 text-[12.5px] text-amber-900">
-            ⚠️ 연구 구인 행렬 {targetActCount * 27}셀(화행 × P × D × R) 중{" "}
-            <b>{summary.emptyActPdrCells.length}셀이 빕니다.</b>{" "}
-            소규모 스모크에서는 허용되지만 495건 본 배치에서는 0이어야 합니다.
-          </p>
-        ) : (
-          <p className="mt-3 rounded-lg bg-emerald-50 px-4 py-3 text-[12.5px] text-emerald-900">
-            ✅ 연구 구인 행렬 {targetActCount * 27}셀이 모두 채워집니다 · 셀당 최소{" "}
-            {summary.minActPdrCount}개
-          </p>
-        )}
-      </section>
-
-      {/* ── 실행 ── */}
-      <section className="mt-4 rounded-xl border border-[#EAE4D2] bg-white p-5">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#FAF8F2] px-3 py-2.5">
-          <div className="min-w-0 text-[12px] text-muted-foreground">
-            배치 ID{" "}
-            <code className="break-all font-mono text-[11.5px] text-foreground">
-              {coreRunId}
-            </code>
-            <span className="ml-2">중단 후 같은 ID로 다시 실행하면 저장 완료 항목을 건너뜁니다.</span>
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={startFreshCoreRun}
-            disabled={running}
-          >
-            새 배치 ID
-          </Button>
-        </div>
-        {/* flex-1이면 배치 ID 입력이 1093px까지 늘어난다(실측 사용률 8%).
-            내용(core_ko_zh_1785458303114)에 맞춰 고정한다. */}
-        <div className="mb-4 flex flex-wrap items-end gap-2">
-          <div className="w-[280px]">
-            <Label htmlFor="resume-core-run-id" className="text-[11.5px] text-muted-foreground">
-              기존 배치 ID 불러오기
-            </Label>
-            <Input
-              id="resume-core-run-id"
-              value={resumeRunId}
-              onChange={(event) => setResumeRunId(event.target.value)}
-              placeholder={`core_${direction}_…`}
-              disabled={running}
-              className="mt-1 h-8 font-mono text-[12px]"
-            />
-          </div>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={loadCoreRunId}
-            disabled={running || resumeRunId.trim().length === 0}
-          >
-            불러오기
-          </Button>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Button
-            onClick={start}
-            disabled={
-              running ||
-              summary.total === 0 ||
-              topicCoverage.missing.length > 0 ||
-              topicCompatibility.length > 0 ||
-              fullBatchBlocked
-            }
-          >
-            {running ? "생성 중…" : `${summary.total}개 생성 시작`}
-          </Button>
-          {running && (
-            <Button variant="outline" onClick={stop}>
-              중단
-            </Button>
-          )}
-          {results.length > 0 && (
-            <span className="text-[13px] text-muted-foreground">
-              성공 {okCount}
-              {reusedCount > 0 ? ` (기존 ${reusedCount}건 건너뜀)` : ""}
-              {warnCount > 0 ? ` (경고 ${warnCount})` : ""} · 실패 {failCount}
-            </span>
-          )}
-        </div>
-
-        <div className="mt-4 border-t border-[#EAE4D2] pt-4">
-          <div className="flex flex-wrap items-end gap-2">
-            {/* 「13, 14, 17」 정도를 넣는 칸이다 — flex-1이면 852px까지 늘어난다. */}
-            <div className="w-[260px]">
-              <Label htmlFor="selected-core-cells" className="text-[11.5px] text-muted-foreground">
-                선택 셀 실행 · 현재 계획의 셀 번호
-              </Label>
-              <Input
-                id="selected-core-cells"
-                value={selectedCellNumbers}
-                onChange={(event) => setSelectedCellNumbers(event.target.value)}
-                placeholder="예: 13, 14, 17"
-                disabled={running}
-                className="mt-1 h-8 text-[13px]"
-              />
-            </div>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => startSelected("current")}
-              disabled={
-                running ||
-                selectedPlan.invalid ||
-                selectedPlan.indexes.length === 0 ||
-                plan.length === 0
-              }
-            >
-              선택 {selectedPlan.indexes.length}셀 · 현재 ID 재개
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              onClick={() => startSelected("fresh")}
-              disabled={
-                running ||
-                selectedPlan.invalid ||
-                selectedPlan.indexes.length === 0 ||
-                plan.length === 0
-              }
-            >
-              선택 {selectedPlan.indexes.length}셀 · 새 ID로 생성
-            </Button>
-          </div>
-          <p className="mt-1.5 max-w-[42rem] text-[11.5px] text-muted-foreground">
-            중단된 배치는 현재 ID로 미완료 셀만 재개합니다. 점검에서 탈락한 셀을 교체할 때만 새 ID로
-            생성합니다. 두 방식 모두 시나리오 생성 프롬프트와 해당 해시는 바뀌지 않습니다.
-          </p>
-          {selectedPlan.indexes.length > 0 && !selectedPlan.invalid && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {selectedPlan.indexes.map((index) => {
-                const cell = plan[index];
-                return (
-                  <Badge key={index} variant="secondary" className="font-normal">
-                    #{index + 1} {SPEECH_ACT_UI[cell.speech_act_ui]} · {LEVEL[cell.level]} ·{" "}
-                    {MODE_LABEL[cell.mode]}
-                  </Badge>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {(running || results.length > 0) && (
-          <div className="mt-4">
-            <Progress value={(done / Math.max(1, activeTotal)) * 100} />
-            <p className="mt-1.5 text-[12.5px] text-muted-foreground">
-              {done} / {activeTotal}
-            </p>
-          </div>
-        )}
-
-        <p className="mt-4 text-[12.5px] text-muted-foreground">
-          생성물은 <b>교수자 감수 대기</b>(needs_review · archived_only)로 저장됩니다. 승인 화면을 거쳐야
-          학습자에게 노출됩니다.
-        </p>
-
-        {failures.length > 0 && (
-          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
-            <div className="text-[13px] font-semibold text-red-900">
-              실패 {failures.length}건 — 조건과 사유
-            </div>
-            <ul className="mt-2 space-y-1 text-[12px] text-red-900">
-              {failures.slice(0, 20).map((f) => (
-                <li key={f.index}>
-                  {SPEECH_ACT_UI[f.cell.speech_act_ui]} · {LEVEL[f.cell.level]} ·{" "}
-                  {DOMAIN[f.cell.domain]} — {f.ruleFailFirst ?? f.error}
-                  {typeof f.coreContent?.situation_ko === "string" && (
-                    <span className="mt-0.5 block pl-3 text-[11px] text-red-800">
-                      생성 상황 · {f.coreContent.situation_ko}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {failures.length > 20 && (
-              <p className="mt-2 text-[12px] text-red-900">
-                …외 {failures.length - 20}건 (같은 사유일 가능성이 높습니다)
-              </p>
-            )}
-          </div>
-        )}
-
-        {auditableCoreResults.length > 0 && !running && (
+          <ul className="mt-3 max-h-80 space-y-2 overflow-auto text-xs leading-5 text-red-900">{failures.map(result =>
+            <li key={result.index}>#{result.index + 1} {SPEECH_ACT_UI[result.cell.speech_act_ui]} · {LEVEL[result.cell.level]} · {DOMAIN[result.cell.domain]} — {result.ruleFailFirst ?? result.error}
+              {typeof result.coreContent?.situation_ko === "string" && <p className="mt-1">생성 상황 · {result.coreContent.situation_ko}</p>}
+            </li>)}</ul>
+        </section>}
+        {auditableCoreResults.length > 0 && !running && !preparing && (
           <div className="mt-4 rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -771,7 +462,7 @@ const AdminBatch = () => {
               <Button
                 variant="outline"
                 onClick={startCoreAudit}
-                disabled={auditRunning}
+                disabled={busy}
               >
                 {auditRunning
                   ? `비평 중 ${auditDone}/${auditableCoreResults.length}`
@@ -842,17 +533,30 @@ const AdminBatch = () => {
             )}
           </div>
         )}
-      </section>
+      </div>
     </AdminShell>
   );
 };
 
-const Dist = ({ title, rows }: { title: string; rows: [string, number][] }) => (
-  <div className="rounded-lg bg-[#FAF8F2] px-4 py-3">
+const PlanMetric = ({ label, value, unit = "건", primary = false, className = "bg-[#EDF4FA]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+  <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
+    <p className="text-xs">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
+  </div>;
+
+const CoverageCard = ({ title, filled, total, description, className = "border-[#D6E2EB] bg-[#F6F9FC]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
+  <div className={"rounded-lg border px-3 py-2 " + className}>
+    <div className="flex flex-wrap items-center justify-between gap-2 text-xs"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
+    <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
+    <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+  </div>;
+
+
+const Dist = ({ title, rows, className = "bg-[#EDF4FA]" }: { title: string; rows: [string, number][]; className?: string }) => (
+  <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[12.5px] font-semibold">{title}</div>
-    <ul className="mt-2 space-y-1">
+    <ul className="mt-1.5 space-y-0.5">
       {rows.map(([label, n]) => (
-        <li key={label} className="flex items-baseline justify-between text-[12.5px]">
+        <li key={label} className="flex items-baseline justify-between gap-3 text-[12.5px]">
           <span className="text-muted-foreground">{label}</span>
           <span className={n === 0 ? "font-semibold text-amber-700" : "font-semibold"}>{n}</span>
         </li>

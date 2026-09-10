@@ -1,6 +1,6 @@
 import type { GenMode } from "@/lib/pragma/enums";
 
-export const COURSE_MODES = ["translation", "interpreting", "mixed"] as const;
+export const COURSE_MODES = ["translation", "mixed", "interpreting"] as const;
 export type CourseMode = (typeof COURSE_MODES)[number];
 
 /** 9개 목표 화행을 직접 학습하는 주차. */
@@ -68,7 +68,7 @@ export function missionModesSummary(modes: readonly GenMode[]): string {
 export const COURSE_MODE_LABEL: Record<CourseMode, string> = {
   translation: "번역",
   interpreting: "통역",
-  mixed: "통번역",
+  mixed: "통번역 반반",
 };
 
 export function courseModeSummary(policy: CourseModePolicy): string {

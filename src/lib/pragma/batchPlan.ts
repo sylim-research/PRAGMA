@@ -6,9 +6,8 @@
 // **필터가 존재하는 것과 눌렀을 때 콘텐츠가 나오는 것은 별개다.**
 // 따라서 분포를 결과에 맡기지 않고 계획 단계에서 할당량으로 못박는다.
 //
-// 편성 단위 = 9과목 (수준 3 × 도메인 3). 과목 하나가 15주 중 12 일반주를 쓰고
-// 주당 3개면 36개가 이상적이나, 7/26 시연 목표는 중급 3과목을 두텁게 하고
-// 입문·고급은 구조가 도는 것만 보이는 배분이다.
+// 일반 제작은 수준별 절대 수량·통역 비중을 사용하며 교과목의 주차 편성과는 별개다.
+// 아래 과거 화행당 quota 상수는 기존 스크립트의 호출 호환용이다.
 
 import {
   type Domain,
@@ -72,7 +71,7 @@ export interface BatchCell {
  * ★ 테마 균형(계약 §7-0 "theme 배분 — 프리셋 선반이 비지 않게 보장"의 코드 이행):
  * 후보 풀에서 **지금까지 가장 적게 뽑힌 테마**의 topic을 우선 고른다. 이게 없으면 school
  * 도메인 topic 다수가 campus_study라 학교 셀이 campus로 쏠리고(관측: campus 23 vs 유학 1),
- * daily의 travel_mobility·international이 굶는다. 동률·같은 테마 내 topic 변주는 seq로 회전(결정론).
+ * daily의 다른 테마가 소외된다. 동률·같은 테마 내 topic 변주는 seq로 회전(결정론).
  */
 function selectTopic(
   act: SpeechActUI,
@@ -130,11 +129,21 @@ export interface BatchQuota {
    * 커버리지(perLevel≥1인 수준). 500 본 배치는 셀당 ≥3을 목표로 값을 올린다(summarizePlan이 검산).
    */
   interpretingRatio: number;
+  /** 일반 제작용 수준별 절대 수량. 지정하면 과거 화행당 번역·배율 설정보다 우선한다. */
+  perLevelModeCounts?: Record<LearnerLevel, { translation: number; stt_interpreting: number }>;
+}
+
+/** 총량 중 통역 비중(0~100%). 반올림 뒤 나머지를 번역에 배정해 총량을 보존한다. */
+export function productionModeCounts(total: number, interpretingPercent: number) {
+  const count = Number.isFinite(total) ? Math.max(0, Math.floor(total)) : 0;
+  const percent = Number.isFinite(interpretingPercent) ? Math.min(100, Math.max(0, interpretingPercent)) : 0;
+  const interpreting = Math.round(count * percent / 100);
+  return { translation: count - interpreting, stt_interpreting: interpreting };
 }
 
 /**
- * 기본 할당량 — 데모 스케일.
- * 중급이 9월 실증 코호트이자 시연 주력이라 두텁게 잡는다.
+ * 과거 데모 할당량 — 현재 관리자 제작 화면의 초기값으로 사용하지 않는다.
+ * 당시 중급을 9월 실증 코호트·시연 주력으로 두텁게 설정했다.
  * 중국어 어휘 참고 상한은 별도 policy에서 HSK 1–5급 누적으로 관리한다.
  * 입문·고급은 "필터가 작동한다"를 보이는 최소치.
  * 500 본 배치는 이 값을 올려 54셀 셀당 ≥3을 채운다.
@@ -369,16 +378,18 @@ export function buildBatchPlan(
   const topicCount: Record<string, number> = {}; // topic 반복 방지 커서(0-k·81⑥)
 
   for (const level of LEVELS) {
+    const requested = quota.perLevelModeCounts?.[level];
     const nTrans = quota.perLevel[level];
-    if (nTrans <= 0) continue;
+    if (requested ? requested.translation + requested.stt_interpreting <= 0 : nTrans <= 0) continue;
     const nInterp = interpretingCount(nTrans, quota.interpretingRatio);
 
-    for (const speech_act_ui of acts) {
-      // task_mode = 1차 쿼터 축(0-h·57, channel 폐기 2026-07-25). 각 (화행×수준)에서
-      // 번역·통역을 각각 보장 생성한다. 도메인·theme·산업·P/D/R = 2차 회전(seq 커서).
+    for (const [actPosition, speech_act_ui] of acts.entries()) {
+      // 일반 제작은 모드별 절대 수량을 화행에 가능한 균등하게 분배한다.
+      // 과거 quota 호출은 화행당 수량을 유지한다. 도메인·theme·산업·P/D/R은 2차 회전이다.
+      const perAct = (count: number) => Math.floor(count / acts.length) + (actPosition < count % acts.length ? 1 : 0);
       const modeSlots: { mode: GenMode; count: number }[] = [
-        { mode: "translation", count: nTrans },
-        { mode: "stt_interpreting", count: nInterp },
+        { mode: "translation", count: requested ? perAct(requested.translation) : nTrans },
+        { mode: "stt_interpreting", count: requested ? perAct(requested.stt_interpreting) : nInterp },
       ];
       for (const slot of modeSlots) {
         for (let i = 0; i < slot.count; i += 1) {
