@@ -1,5 +1,15 @@
 # PRAGMA 연구 증거 색인
 
+## EVD-20260910-08 · 구버전 사과 미션의 사건·책임 불일치와 재생성 판단
+
+- 조사 보고: `docs/dev-log/2026-09-10-apology-plausibility-audit.md`. 읽기 전용 조사이며 재생성 결정 전 단계다.
+- 운영 사과 미션 2건·검수 이력과 오프라인 재실행 결과:
+  `C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-10_사과개연성/`의
+  `live-apology-evidence.json`, `structural-replay.json`.
+- 재실행 스크립트: `scripts/manual-checks/apology-plausibility-replay.ts`.
+  실제 사건·행위자 오류가 있는 두 코어가 결정론 검사 pass라는 사실을 확인했다.
+  최신 AI 검수 성능·전체 콘텐츠 오류율·학습효과 또는 새 콘텐츠 품질을 입증하지 않는다.
+
 ## EVD-20260910-07 · 미션 안내·피드백 표시와 상황문 신호 점검
 
 - DEC-20260910-08. 변경·판정·검증 범위: `docs/dev-log/2026-09-10-learner-mission-clarity.md`.
