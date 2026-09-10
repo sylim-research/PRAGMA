@@ -1,5 +1,15 @@
 # PRAGMA 연구 증거 색인
 
+## EVD-20260910-09 · 장면·PDR 생성 경로와 조사 파손 감사
+
+- 보고: `docs/dev-log/2026-09-10-scene-pdr-pipeline-audit.md`. 조건 선지정, 역할/시드,
+  LLM 출력 후처리, 코어 의미 감사의 실행 공백, 후속 미션 검수 및 표시 경로를 대조했다.
+- 재실행: `scripts/manual-checks/scene-pdr-pipeline-audit.mjs`와
+  `evidence/2026-09-10-scene-pdr-pipeline-replay.json`. 기존 20미션 스냅숏의 DCT 20개를
+  선별 검토하고, 실제 렌더러에서 조사 파손 반례 4개 및 시드 형식 계승 반례 1개를 실행했다.
+- 20미션의 MJT 후보·정답·피드백 전수 승인, 새 모델 검출 성능 또는 전체 콘텐츠 오류율이 아니다.
+  감사 스크립트·기록만 추가했으며 앱·프롬프트·DB·승인·운영 배포는 변경하지 않았다.
+
 ## EVD-20260910-08 · 구버전 사과 미션의 사건·책임 불일치와 재생성 판단
 
 - 조사 보고: `docs/dev-log/2026-09-10-apology-plausibility-audit.md`. 읽기 전용 조사이며 재생성 결정 전 단계다.
