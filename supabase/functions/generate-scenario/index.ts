@@ -987,8 +987,8 @@ ${SCENE_PLAUSIBILITY_RULE}
   역할과 학습자와의 관계를, 통역 셀은 원발화자 A와 청자 B의 역할·관계를 한 줄로 자연스럽게
   합친다. 통역 셀의 relation_ko에 학습자 C와 A/B의 관계를 P·D·R 근거처럼 쓰지 않는다.
 - relation_ko와 상황 속 실제 역할은 지정된 P와 D를 정확히 구현해야 한다.
-- 장면 시드의 인물 관계가 지정된 P·D와 충돌하면, 시드의 소재(상황·사건)는 유지하되
-  인물 관계를 P·D에 맞게 재설정한다. 연구 축이 시드보다 우선한다.
+- 장면 시드가 일반 주제이면 구체적인 사건을 정할 수 있다. 이미 명시된 인물 관계·접촉 이력·권한이
+  지정된 P·D와 충돌하면 인물을 바꿔 맞추지 않는다. 사실 모순은 검수에서 보류할 대상이다.
 - 응답 화행은 preceding_turn과 source_text가 자연스러운 인접쌍을 이루어야 하며,
   선행발화가 이미 source_text와 같은 거절·제안을 수행해서는 안 된다.
 - 반대(opposition)는 B의 preceding_turn에 명시된 하나의 명제 P에 대해 A의 source_text가
@@ -3444,6 +3444,9 @@ function buildCoreQualitySystemPrompt(direction: Direction): string {
 다른 모델이 만든 코어 1건을 기대 조건과 대조해 판정한다. 자료를 고쳐 쓰거나 더 좋은
 표현을 제안하지 말고, 각 축의 판정과 관찰 근거만 JSON으로 반환한다.
 
+상황 설명 자리에 실제 발화나 source_text의 한국어 번역이 들어 있으면 learner_scene fail이다.
+예: "늦어서 미안해요", "받아 주실 수 있을까요?"는 원문에 들어갈 대사이지 상황 설명이 아니다.
+
 [판정 원칙]
 - pass: 코어가 기대 조건을 분명히 구현한다.
 - warning: 정보가 부족하거나 두 해석이 가능해 준수 여부를 확정하기 어렵다.
@@ -3453,8 +3456,8 @@ function buildCoreQualitySystemPrompt(direction: Direction): string {
   역할과 관계로 판정한다. 특정 직접성 수준을 상위자/하위자 관계의 정답으로 가정하지 않는다.
 - R은 발화 길이가 아니라 해당 화행의 사실 근거로 판정한다. 요청의 비용 기준을 모든 화행에 복제하지 않는다.
 ${zhKoTranslationAudit}
-- 장면 시드와 topic_code는 핵심 사건·행위자·상호작용 목적을 묶는 필수 소재다. P/D에 맞춘
-  최소 역할 조정은 허용하지만, host family를 선배로 바꾸는 식의 관계·사건 교체는
+- 장면 시드와 topic_code는 핵심 사건·행위자·상호작용 목적을 묶는 필수 소재다. 일반 주제의
+  구체화는 허용하지만 이미 명시된 권한·접촉 이력을 바꾸거나 host family를 선배로 바꾸는 관계·사건 교체는
   topic_seed fail이다. 시드의 명사 한 개만 장식처럼 남긴 경우도 pass가 아니다.
   topic_code에 host_family, hotel, neighbor처럼 사람이 읽을 수 있는 관계·장소 단서가 있으면
   그 의미도 기대 조건으로 사용한다.
@@ -3846,13 +3849,13 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           domain: coreDomainCode(b), industry: b.industry ?? null, level: b.level_ko,
           mode: coreLengthMode(b), topic_code: b.topic_code, situation_seed_ko: b.situation_seed_ko,
         }), 0.2, {
-          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v1', promptSnapshotHash }),
+          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v2', promptSnapshotHash }),
         })
       if (!preflight.ok) {
         return new Response(JSON.stringify({ error: '장면 사전 검토 호출 실패', stop_code: 'CORE_PREFLIGHT_UNAVAILABLE' }), { status: 502, headers: jsonHeaders })
       }
       let scenePlan
-      try { scenePlan = readCoreScenePlan(parseOpenAIContent(preflight.raw)) } catch { scenePlan = null }
+      try { scenePlan = readCoreScenePlan(parseOpenAIContent(preflight.raw), b.pdr) } catch { scenePlan = null }
       if (!scenePlan?.feasible) {
         return new Response(JSON.stringify({
           error: scenePlan?.reason_ko ?? '장면 사전 검토의 사실 근거 또는 형식이 불완전합니다.',
@@ -3866,6 +3869,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const requestBody: CoreGenBody = { ...b, situation_seed_ko: scenePlan.scene_ko, context_spec: contextSpec }
       const sys = buildCoreSystemPrompt(coreDir)
       const usr = buildCoreUserPrompt(requestBody) + '\n[사전 확인한 장면 — 사실·인물 유지]\n' + JSON.stringify(scenePlan)
+        + '\n[원 사건 시드 — 장면을 압축하며 생략한 사실도 임의로 바꾸지 않음]\n' + b.situation_seed_ko
+        + '\n원문은 이 사건의 말이다. 시간·소유자·행위자·수령 장소를 바꾸거나 없는 피해·변명·약속을 추가하지 않는다. 길이를 채우려고 사과·안심·거절 가능 안내를 반복하지 않는다.'
       let model = PRIMARY_MODEL
       const att = await callOpenAI(PRIMARY_MODEL, apiKey, sys, usr, CORE_TEMPERATURE, {
         responseFormat: CORE_STRUCTURED_RESPONSE_FORMAT,

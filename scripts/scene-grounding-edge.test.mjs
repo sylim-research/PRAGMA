@@ -12,6 +12,7 @@ const pass = () => ({ verdict: 'pass', axes: Object.fromEntries(axes.map(axis =>
   [axis, { verdict: 'pass', reason_ko: '명시된 사건의 사실과 일치함' }])) });
 const plan = {
   feasible: true, reason_ko: '기존 파일을 보내 달라는 동료 간 요청이다.',
+  observed_pdr: { p: 'equal', d: 'acquaintance', r: 'low' },
   scene_ko: '같은 수업을 듣는 동급생에게 발표 파일을 이메일로 보내 달라고 요청합니다. 한 학기 동안 함께 공부했고, 이미 공유하기로 한 파일을 보내면 됩니다.',
   relation_ko: '한 학기 동안 함께 공부한 동급생', speaker_role_ko: '자료가 필요한 학생',
   addressee_role_ko: '파일을 가진 동급생', p_evidence_ko: '동급생으로 평가·지시 권한이 없다.',
@@ -68,6 +69,14 @@ test('semantic contradiction blocks a fully generated core even when overall ver
   assert.equal(result.data.stop_code, 'CORE_SEMANTIC_HOLD');
   assert.equal(result.data.core_content, undefined);
   assert.equal(result.data.core_draft.source_text, source);
+});
+
+test('a feasible summary cannot override observed first-contact distance', async () => {
+  const result = await invoke([{ ...plan, observed_pdr: { ...plan.observed_pdr, d: 'formal' } }]);
+  assert.equal(result.calls, 1);
+  assert.equal(result.data.stop_code, 'CORE_PREFLIGHT_HOLD');
+  assert.equal(result.data.core_content, undefined);
+  assert.match(result.data.error, /d=formal/);
 });
 test('only a complete semantic pass returns the frozen scene with content-bound review evidence', async () => {
   const result = await invoke([plan, draft, pass()]);
