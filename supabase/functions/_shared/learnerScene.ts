@@ -1,28 +1,19 @@
-/** Historical role scaffolding is presentation metadata, not part of the event. */
+import { SCENE_GROUNDING_RULE } from './sceneGrounding.ts';
+
+/** Remove only the known legacy introduction. Never infer nouns or rewrite particles.
+ * Legacy A/B labels remain readable until reviewed replacement content is assigned.
+ * New scenes must be authored naturally before storage, not repaired while rendering.
+ */
 export function naturalLearnerScene(text: string): string {
   return text
     .replace(/(?:학습자\s*통역사\s*C인\s*)?당신은\s*(?:한국어|중국어)\s*원발화자\s*A와\s*(?:한국어|중국어)\s*청자\s*B\s*사이에서\s*통역을\s*맡았습니다\.[\s]*/gu, '')
-    .replace(/(?:한국어|중국어|한국인|중국인)\s*(?:원발화자|화자)\s*A/gu, 'A')
-    .replace(/(?:한국어|중국어|한국인|중국인)\s*청자\s*B/gu, 'B')
-    .replace(/원발화자\s*A/gu, 'A')
-    .replace(/청자\s*B/gu, 'B')
-    .replace(/([가-힣]+)\s+[AB](은|는|이|가|을|를|와|과)(?=[^A-Za-z]|$)/gu, (_, noun: string, particle: string) => {
-      const consonant = (noun.charCodeAt(noun.length - 1) - 0xac00) % 28 !== 0;
-      const pairs: Record<string, string[]> = { 은: ['은', '는'], 는: ['은', '는'], 이: ['이', '가'], 가: ['이', '가'], 을: ['을', '를'], 를: ['을', '를'], 와: ['과', '와'], 과: ['과', '와'] };
-      return noun + pairs[particle][consonant ? 0 : 1];
-    })
-    .replace(/([가-힣])\s+[AB](?=에게|의|도|[, .]|$)/gu, '$1')
-    .replace(/(?<![A-Za-z])A는/gu, '나는')
-    .replace(/(?<![A-Za-z])A가/gu, '내가')
-    .replace(/(?<![A-Za-z])A의/gu, '내')
-    .replace(/(?<![A-Za-z])A(?=에게|와|를|도|[ ,.]|$)/gu, '나')
-    .replace(/(?<![A-Za-z])B(?![A-Za-z])/gu, '상대')
     .replace(/\s+/gu, ' ')
     .trim();
 }
 
 /** Used by generation and semantic review; this is not a keyword-based pass gate. */
 export const SCENE_PLAUSIBILITY_RULE = `
+${SCENE_GROUNDING_RULE}
 [장면의 현실성·개연성 — P/D/R에 앞서 확인]
 적용 범위는 요청·거절·사과·감사·제안·초대·반대·칭찬·불만의 모든 미션이다.
 번역·통역, 한→중·중→한, 모든 수준·도메인에 동일하게 적용한다. 코어·MJT 각 장면·DCT를 모두 확인한다.

@@ -38,7 +38,7 @@ import {
 } from "@/lib/pragma/enums";
 import { checkCore, coreLengthHintKo, type CheckContext } from "@/lib/pragma/missionRules";
 import { createCoreGenerationRunId } from "@/lib/pragma/coreGenerationRun";
-import { checkIndustrySemanticFit } from "@/lib/pragma/coreBatchRun";
+import { checkCoreSemanticFit } from "@/lib/pragma/coreBatchRun";
 import {
   PDR_POWER_ENUM_TO_JSON,
   PDR_DISTANCE_ENUM_TO_JSON,
@@ -759,10 +759,9 @@ const AdminGenerator = () => {
         }
         const itemKey = `${form.speech_act_ui}|${form.level}|${form.domain}|${topicCode}|${i}`;
 
-        // R26 warning 후속 — 배치(coreBatchRun)와 같은 정책: industry AI 검토 1회, fail·호출 실패면 저장하지 않는다.
-        const r26Warning = ruleResult.violations.find((v) => v.id === "R26" && v.level === "warning");
-        if (r26Warning) {
-          const checked = await checkIndustrySemanticFit(
+        // Reuse the server's matching full semantic review; an old Edge response must not bypass it.
+        {
+          const checked = await checkCoreSemanticFit(
             {
               direction: form.language_direction,
               speech_act_ui: form.speech_act_ui,
@@ -781,12 +780,12 @@ const AdminGenerator = () => {
             itemKey,
           );
           if ("error" in checked) {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 호출 실패(저장 안 함): ${checked.error}` });
+            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 실패: ${checked.error}` });
             setCoreResults([...results]);
             continue;
           }
-          if (checked.result.verdict === "fail") {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `industry AI 검토 실패(저장 안 함): ${checked.result.reason}` });
+          if (checked.result.verdict !== "pass") {
+            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 보류: ${checked.result.reason}` });
             setCoreResults([...results]);
             continue;
           }

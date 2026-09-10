@@ -283,7 +283,7 @@ describe("prompt snapshot integrity", () => {
     const written = prompt("core.user.written");
     const critic = prompt("core_quality.system");
 
-    expect(system.text).toContain("[context_spec]의 역할 쌍·권리·의무·결정 권한");
+    expect(system.text).toContain("[context_spec]은 실제 사건에 적용할 기대를 확인하는 보조 지시다.");
     expect(system.text).toContain("화자 A와 상대 B");
     expect(system.text).toContain("주어진 원문의 의미·의도·화용적 힘은 유지");
     expect(system.text).toContain("서로 다른 종류의 구체적 단서");
@@ -295,7 +295,7 @@ describe("prompt snapshot integrity", () => {
     expect(written.text).toContain("산업 배경");
     expect(written.text).toContain("직무 기능: PROBE_FUNCTION");
     expect(written.text).toContain("직무 실현:");
-    expect(written.text).toContain("[context_spec — 서버 고정 조건]");
+    expect(written.text).toContain("[context_spec — 사건에 근거해 해석할 보조 지시]");
     expect(written.text).toContain("행위자 고정: A=화자");
     expect(critic.text).toContain("industry");
     expect(critic.text).toContain("context_spec");
@@ -318,7 +318,7 @@ describe("prompt snapshot integrity", () => {
     expect(prompt("core.user.source_repair").text).toContain("유효 글자 수를 반드시");
     expect(prompt("core.user.source_repair").text).toContain("인물·관계·상황·사실·화행 목적은 그대로 보존");
     expect(critic.text).toContain("국소적 두 턴만 본다");
-    expect(CURRENT_CORE_PROMPT_VERSIONS).toContain("core_v16_natural_scene_plausibility");
+    expect(CURRENT_CORE_PROMPT_VERSIONS).toContain("core_v17_grounded_scene_gate");
   });
   it("locks propositional supportive moves to server-authorized facts", () => {
     const mission = prompt("mission.system");

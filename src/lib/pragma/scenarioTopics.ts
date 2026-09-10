@@ -222,7 +222,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     labelKo: "초대 거절",
     themeCode: "relationship_social",
     allowedDomains: ["daily"],
-    allowedSpeechActs: ["refusal", "apology"],
+    allowedSpeechActs: ["refusal"],
     situationSeedKo: "일상 관계의 상대가 한 식사·행사 초대를 거절하는 상황",
   },
   {
@@ -426,8 +426,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     allowedDomains: ["school", "daily"],
     allowedSpeechActs: ["request", "proposal", "thanks"],
     allowedPowers: ["equal"],
-    allowedDistances: ["acquaintance"],
-    situationSeedKo: "배정된 버디(도우미 학생)와 첫 연락·만남 약속·활동 일정을 조율하는 상황",
+    allowedDistances: ["formal", "acquaintance"],
+    situationSeedKo: "배정된 버디(도우미 학생)와 만남 약속·활동 일정을 조율하는 상황. 처음 연락하는지 이미 교류했는지 지정 D에 맞는 실제 접촉 이력을 구체화한다.",
   },
   {
     code: "exchange_housing_assignment",

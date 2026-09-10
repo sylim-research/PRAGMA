@@ -1,5 +1,25 @@
 # PRAGMA 연구 증거 색인
 
+## EVD-20260910-09 · 장면·PDR 생성 경로와 조사 파손 감사
+
+- 보고: `docs/dev-log/2026-09-10-scene-pdr-pipeline-audit.md`. 조건 선지정, 역할/시드,
+  LLM 출력 후처리, 코어 의미 감사의 실행 공백, 후속 미션 검수 및 표시 경로를 대조했다.
+- 재실행: `scripts/manual-checks/scene-pdr-pipeline-audit.mjs`와
+  `evidence/2026-09-10-scene-pdr-pipeline-replay.json`. 기존 20미션 스냅숏의 DCT 20개를
+  선별 검토하고, 실제 렌더러에서 조사 파손 반례 4개 및 시드 형식 계승 반례 1개를 실행했다.
+- 20미션의 MJT 후보·정답·피드백 전수 승인, 새 모델 검출 성능 또는 전체 콘텐츠 오류율이 아니다.
+  감사 스크립트·기록만 추가했으며 앱·프롬프트·DB·승인·운영 배포는 변경하지 않았다.
+
+## EVD-20260910-08 · 구버전 사과 미션의 사건·책임 불일치와 재생성 판단
+
+- 조사 보고: `docs/dev-log/2026-09-10-apology-plausibility-audit.md`. 읽기 전용 조사이며 재생성 결정 전 단계다.
+- 운영 사과 미션 2건·검수 이력과 오프라인 재실행 결과:
+  `C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-10_사과개연성/`의
+  `live-apology-evidence.json`, `structural-replay.json`.
+- 재실행 스크립트: `scripts/manual-checks/apology-plausibility-replay.ts`.
+  실제 사건·행위자 오류가 있는 두 코어가 결정론 검사 pass라는 사실을 확인했다.
+  최신 AI 검수 성능·전체 콘텐츠 오류율·학습효과 또는 새 콘텐츠 품질을 입증하지 않는다.
+
 ## EVD-20260910-07 · 미션 안내·피드백 표시와 상황문 신호 점검
 
 - DEC-20260910-08. 변경·판정·검증 범위: `docs/dev-log/2026-09-10-learner-mission-clarity.md`.
@@ -426,3 +446,9 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
   증거는 `docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.mjs`와 같은 이름의 JSON이다.
   독립 typecheck·관련 9파일 95 tests·Edge 번들 일치가 통과했지만 위 통합 누락을 덮지 못했다.
   전체 882 tests·운영 DB·실제 모델·배포를 새로 검증한 결과가 아니다. 앱 코드·정본·승인 상태 변경 없음.
+
+## EVD-20260910-10 · 사건 근거 확인과 의미 게이트 구현
+
+- DEC-20260910-09, docs/dev-log/2026-09-10-scene-grounding-gate.md 및 해당 구현 Git 이력.
+- 실제 Edge handler 모의 제공자: scripts/scene-grounding-edge.test.mjs. 공유 규칙·검사 재사용·조사 보존: src/lib/pragma/sceneGrounding.test.ts, coreBatchRun.test.ts, src/lib/mission/learnerScene.test.ts.
+- 의미 검사 결과가 진행 조건으로 작동함을 검증한다. 모델의 실제 판정 정확도·전체 미션 승인·최종 콘텐츠 LOCK 증거와 구분한다. 신규 생성 및 운영 후속은 dev-log에서 별도 확인한다.

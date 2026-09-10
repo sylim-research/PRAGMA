@@ -26,6 +26,7 @@ export function isCurrentMissionReleasedForLearner(
 ): boolean {
   return isMissionReleasedForLearner(state) && (
     state?.content_release_id === CURRENT_CONTENT_RELEASE_ID
+    || state?.content_release_id === "pragma_learner_feedback_candidate_20260910_01"
     || state?.content_release_id === "pragma_zhko_bidirectional_candidate_20260904_02"
   );
 }
