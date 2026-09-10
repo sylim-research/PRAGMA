@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T14:44:21.036Z",
+  "run_id": "scene_grounding_course_20260910",
+  "draft_file": "w5-0-draft.json",
+  "draft_sha256": "811e959cf72c79381e57ec714ff0693bc4e1fc933b34a7b3bc7e880bd417b9b5",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "동호회에서 몇 번 만난 회원에게 산책을 함께하자고 메신저로 초대하는 일상적이고 부담 낮은 장면이 잘 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "source_text가 산책에 초대하는 의도를 분명히 드러내고 있음."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 동등한 지위가 상황과 source_text 모두에서 드러남."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "세 번 만난 회원으로, 아는 사이(acquaintance)에 해당함."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "30분 산책, 참가비·준비물 없음, 부담 없이 오라는 언급 등 실제 부담이 낮음."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "동호회 활동 및 산책 초대는 일상 도메인에 해당함."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 없으므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "메신저를 통한 서면 초대 메시지로, 서면 번역 상황에 부합함."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대 모두 동호회 회원, 초대와 선택권 등 context_spec과 일치함."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자(A)가 상대(B)에게 초대, 산책 주체·참여자·상대 모두 일관됨."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "참여 여부를 상대가 결정함을 명확히 하고 있음."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원, 산책, 초대, 메신저 등 시드의 핵심 요소가 모두 반영됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 pass."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 초대 상황으로, 역할이 일관됨."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황문과 source_text 모두 산책 초대, 참여자, 장소, 시간 등 핵심 사건이 일치함."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 발화나 번역문, 내부 평가 기준이 드러나지 않음."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 메신저로 산책 초대는 현실적으로 자연스러운 장면임."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T14:44:21.026Z",
+        "core_content_hash": "92d96b97b63ac350175eff646bb92f85a06b68ab1bdff96c81f7c43334ed56c3"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

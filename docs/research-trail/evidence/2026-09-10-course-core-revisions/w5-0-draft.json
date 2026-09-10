@@ -1,0 +1,74 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE)",
+  "original_scenario_id": "e76e918a-eec5-4f85-8bcd-e40f3c6c1b2e",
+  "original_artifact": ".tmp/scene-grounding/scene_grounding_course_20260910/w5-0-core.json",
+  "original_sha256": "5b66d9cffbdbf0da3f041989167286f5a47bdfb8ec4287a2330a65a361940417",
+  "revision_reason": "situation_ko put the invitation in the past (\"초대했다\") although the learner still has to produce it.",
+  "review_required": "Fresh semantic check of edited content, then promotion and whole-mission review. No approval or DB write performed.",
+  "plan": {
+    "key": "w5-0",
+    "week": 5,
+    "position": 0,
+    "replaces": "d79406d7-1ae9-4e35-938a-1faf71d63170",
+    "cell": {
+      "speech_act_ui": "agreement",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "daily_living",
+      "topic_code": "club_meetup_invite",
+      "situation_seed_ko": "동호회에서 세 번 만나 대화한 회원에게 이번 토요일 오후 근처 공원에서 삼십 분 산책을 함께하자고 메신저로 초대한다. 참가비나 준비물은 없고 다른 회원 두 명도 함께 걷기로 했다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "나는 동호회에서 세 번 만난 회원에게 이번 토요일 오후 근처 공원에서 삼십 분 산책을 하자고 메신저로 초대하려 한다. 다른 회원 두 명도 함께 걷기로 했다.",
+    "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+    "source_modality": "written",
+    "source_text": "이번 토요일 오후에 근처 공원에서 삼십 분 정도 산책을 하려고 합니다. 함께 걷기로 한 다른 회원 두 명도 있는데, 시간 괜찮으시면 같이 하시겠어요? 부담 없이 편하게 오세요!",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "channel": "messenger",
+    "context_spec": {
+      "standard_situation_code": "daily.club_meetup_invite.agreement",
+      "role_pair": {
+        "speaker_ko": "동호회 회원",
+        "addressee_ko": "동호회 회원"
+      },
+      "speaker_entitlement": "화자는 상대를 공동 활동에 초대할 수 있지만 참여를 강제할 권리는 없다.",
+      "addressee_obligation": "상대는 초대받은 활동의 참여 여부를 선택할 권리가 있다.",
+      "decision_authority": "최종 참여 여부는 초대받은 상대가 결정한다."
+    },
+    "brief_note_ko": "동호회 회원에게 토요일 산책 초대 메시지",
+    "focal_segments": [
+      {
+        "text": "시간 괜찮으시면 같이 하시겠어요?",
+        "role": "head"
+      },
+      {
+        "text": "부담 없이 편하게 오세요!",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 60,
+      "max": 85,
+      "actual": 68
+    }
+  }
+}

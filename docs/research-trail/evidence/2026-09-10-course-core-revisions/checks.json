@@ -1,0 +1,85 @@
+{
+  "scope": "Offline schema and deterministic rules only; not semantic approval",
+  "checks": [
+    {
+      "key": "w2-1",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 52
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "w3-0",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 67
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "w4-0",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 60
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "w5-0",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 68
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    },
+    {
+      "key": "w11-1",
+      "schema_ok": true,
+      "length": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 48
+      },
+      "rules": {
+        "ok": true,
+        "result": "pass",
+        "violations": []
+      }
+    }
+  ]
+}

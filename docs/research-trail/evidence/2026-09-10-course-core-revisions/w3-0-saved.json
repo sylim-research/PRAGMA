@@ -1,0 +1,180 @@
+{
+  "at": "2026-09-10T14:44:52.861Z",
+  "key": "w3-0",
+  "draft_file": "w3-0-draft.json",
+  "draft_sha256": "d0b2e519b0c43bae5484fa19a8825c7ed01ac3dcaa71675bb43b1f0180915d3c",
+  "original_scenario_id": "47945549-421f-4ad5-89b6-3864954ae290",
+  "new_scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "동호회 회원에게 이삿짐 도움에 감사 인사를 전하는 메시지",
+    "speech_act": "thanks",
+    "learner_level": "intermediate",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "translation",
+    "source_modality": "written",
+    "theme_code": "relationship_social",
+    "topic_code": "favor_thanks",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "동호회에서 몇 번 만난 회원이 주말에 내 이삿짐 상자 네 개를 삼십 분 동안 함께 옮겨 주었다. 나는 그 회원에게 메신저로 고마움을 전하려 한다.",
+      "relation_ko": "동호회 회원·몇 번 만난 아는 사이",
+      "source_modality": "written",
+      "source_text": "지난 주말에 제 이삿짐을 함께 옮겨 주셔서 정말 감사드립니다. 덕분에 생각보다 일이 훨씬 빨리 끝났어요. 바쁘셨을 텐데도 시간 내 주셔서 진심으로 고마운 마음입니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.favor_thanks.thanks",
+        "role_pair": {
+          "speaker_ko": "이삿짐을 옮긴 도움을 받은 사람",
+          "addressee_ko": "이삿짐 옮김을 도와준 동호회 회원"
+        },
+        "speaker_entitlement": "화자는 자신이 받은 도움·호의와 상대의 기여를 구체적으로 인정할 위치에 있다.",
+        "addressee_obligation": "상대는 도움·호의의 제공자이며 감사에 응답하거나 추가 행동을 할 의무는 없다.",
+        "decision_authority": "별도의 의사결정은 요구하지 않으며, 감사 대상인 기여가 실제로 존재해야 한다."
+      },
+      "brief_note_ko": "동호회 회원에게 이삿짐 도움에 감사 인사를 전하는 메시지",
+      "focal_segments": [
+        {
+          "text": "지난 주말에 제 이삿짐을 함께 옮겨 주셔서 정말 감사드립니다.",
+          "role": "head"
+        },
+        {
+          "text": "바쁘셨을 텐데도 시간 내 주셔서 진심으로 고마운 마음입니다.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 67
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_repair",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T07:42:19.395Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동호회 회원이 이삿짐을 옮기는 데 30분간 도와주었고, 화자가 메신저로 감사 인사를 전하는 상황은 지정된 PDR 조건과 일치한다.",
+          "scene_ko": "나는 동호회에서 몇 번 만난 회원이 주말에 내 이삿짐을 30분간 함께 옮겨 주는 도움을 받았다. 이 일에 대해 그 회원에게 메신저로 고마움을 전하려 한다.",
+          "relation_ko": "동호회 회원·몇 번 만난 아는 사이",
+          "speaker_role_ko": "이삿짐을 옮긴 도움을 받은 사람",
+          "addressee_role_ko": "이삿짐 옮김을 도와준 동호회 회원",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "p_evidence_ko": "동호회 회원 사이로 실제 권한 차이가 없다.",
+          "d_evidence_ko": "몇 번 만난 동호회 회원으로 이전에 교류한 적이 있는 아는 사이다.",
+          "r_evidence_ko": "이삿짐 네 개를 30분간 옮기는 도움은 시간과 노력이 들어간 중간 정도의 수고에 해당한다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "동호회 회원이 이삿짐을 도와준 것에 대해 메신저로 감사 인사를 전하는 상황이 기대 조건과 일치한다.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "이삿짐을 도와준 회원에게 감사의 뜻을 전하는 내용이 명확히 드러난다."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 동등한 지위로, 상하 관계가 드러나지 않는다."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "동호회에서 몇 번 만난 아는 사이로 acquaintance에 부합한다."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "이삿짐 네 개를 삼십 분간 옮겨준 도움은 중간 정도의 부담에 해당한다."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "일상적 상황(동호회, 이삿짐 도움, 메신저)이다."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "산업 배경이 없는 일상 상황으로 기대와 일치한다."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "메신저로 보내는 서면 메시지로, 번역(서면) 상황에 맞다."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자는 도움을 받은 사람, 상대는 도움을 준 회원으로 역할이 정확히 맞다."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "화자(A)는 도움을 받은 사람, 상대(B)는 도움을 준 사람으로 모든 필드에서 일관된다."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "감사 인사로 별도의 의사결정이나 승인 권한이 필요하지 않다."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원, 이삿짐 도움, 메신저로 감사 인사라는 시드가 그대로 구현되어 있다."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대의 역할이 모든 필드에서 일관되게 유지된다."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 이삿짐 도움과 감사 인사라는 핵심 사건이 일치한다."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명에 실제 발화나 번역문이 들어 있지 않고, 장면 안내로만 구성되어 있다."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원이 이삿짐을 도와주고, 이후 메신저로 감사 인사를 전하는 상황이 자연스럽고 현실적이다."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T14:44:04.164Z",
+          "core_content_hash": "419bf39adc008169773c3e106e531f4ac0b36ca8cf885369bd9e09c0742bba37"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "47945549-421f-4ad5-89b6-3864954ae290",
+          "draft_file": "w3-0-draft.json",
+          "draft_sha256": "d0b2e519b0c43bae5484fa19a8825c7ed01ac3dcaa71675bb43b1f0180915d3c",
+          "author": "Claude (FABLE)",
+          "edited_at": "2026-09-10T14:44:04.172Z",
+          "reason": "situation_ko broke subject agreement (\"나는 … 회원이 … 도움을 받았다\"). Split into the helper's act and the speaker's intent; restore the seed's four boxes.",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1",
+      "prompt_version": "core_v18_observed_pdr_scene_repair"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w3-0",
+    "content_hash": "1eyigwv",
+    "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d"
+  }
+}

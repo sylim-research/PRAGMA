@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T14:43:56.439Z",
+  "run_id": "scene_grounding_course_20260910",
+  "draft_file": "w2-1-draft.json",
+  "draft_sha256": "37290351c200c1ed046d34912b88acaf0ad5cf601c540ceb131f4c83fdeeb168",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "병원 접수 직원에게 예약 변경을 문의하는 요청 상황이 기대 조건에 맞게 구현됨.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "예약 변경 가능 여부를 직접 문의하는 요청 화행이 명확히 드러남."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "환자와 접수 직원 사이에 특별한 상하 관계 없이 동등하게 설정됨."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "처음 방문한 병원, 초면 관계로 distant에 부합함."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "예약 변경은 안내문에 가능하다고 명시되어 있고, 준비나 비용 부담이 없어 low에 해당함."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "병원 방문 및 예약 변경은 일상 도메인에 해당함."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 요구되지 않는 일상 상황임."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "구두로 접수 창구에서 문의하는 실제 말하기 상황임."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "환자가 요청하고, 접수 직원이 검토 및 승인 권한을 가진다는 맥락이 잘 반영됨."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "예약 변경을 요청하는 사람(환자)과 요청을 받는 사람(접수 직원)이 일관됨."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "접수 직원이 예약 변경을 직접 처리하거나 승인할 권한이 있음."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "병원 접수 직원에게 예약 변경을 문의하는 핵심 시드가 그대로 구현됨."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "화자(A: 환자)와 상대(B: 접수 직원)의 역할이 일관됨."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text 모두 예약 변경 문의라는 동일한 사건을 다룸."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 답변 방향이나 내부 평가 기준, 실제 발화가 노출되지 않음."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "병원 안내문, 예약 변경 가능성, 접수 직원의 역할 등 현실적으로 자연스러운 연결임."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T14:43:56.320Z",
+        "core_content_hash": "af89c8f2be2976d3976737d2b41c31bdc60828d4384f0d4f965ce5dabbe30952"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

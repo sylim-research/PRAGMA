@@ -1,0 +1,74 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE)",
+  "original_scenario_id": "47945549-421f-4ad5-89b6-3864954ae290",
+  "original_artifact": ".tmp/scene-grounding/scene_grounding_course_20260910/w3-0-core.json",
+  "original_sha256": "9fabf3efd6920df8b20bbdbcd40c277d9c980e5356fdcd24444da3742958d846",
+  "revision_reason": "situation_ko broke subject agreement (\"나는 … 회원이 … 도움을 받았다\"). Split into the helper's act and the speaker's intent; restore the seed's four boxes.",
+  "review_required": "Fresh semantic check of edited content, then promotion and whole-mission review. No approval or DB write performed.",
+  "plan": {
+    "key": "w3-0",
+    "week": 3,
+    "position": 0,
+    "replaces": "2f898edd-aabf-4d63-849a-99a1f9cb3925",
+    "cell": {
+      "speech_act_ui": "thanks",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "theme_code": "relationship_social",
+      "topic_code": "favor_thanks",
+      "situation_seed_ko": "동호회에서 몇 번 함께 활동한 회원이 주말에 삼십 분 동안 내 이삿짐 상자 네 개를 함께 옮겨 주었다. 도움을 받은 뒤 그 회원에게 메신저로 고마움을 전한다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "동호회에서 몇 번 만난 회원이 주말에 내 이삿짐 상자 네 개를 삼십 분 동안 함께 옮겨 주었다. 나는 그 회원에게 메신저로 고마움을 전하려 한다.",
+    "relation_ko": "동호회 회원·몇 번 만난 아는 사이",
+    "source_modality": "written",
+    "source_text": "지난 주말에 제 이삿짐을 함께 옮겨 주셔서 정말 감사드립니다. 덕분에 생각보다 일이 훨씬 빨리 끝났어요. 바쁘셨을 텐데도 시간 내 주셔서 진심으로 고마운 마음입니다.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "mid"
+    },
+    "channel": "messenger",
+    "context_spec": {
+      "standard_situation_code": "daily.favor_thanks.thanks",
+      "role_pair": {
+        "speaker_ko": "이삿짐을 옮긴 도움을 받은 사람",
+        "addressee_ko": "이삿짐 옮김을 도와준 동호회 회원"
+      },
+      "speaker_entitlement": "화자는 자신이 받은 도움·호의와 상대의 기여를 구체적으로 인정할 위치에 있다.",
+      "addressee_obligation": "상대는 도움·호의의 제공자이며 감사에 응답하거나 추가 행동을 할 의무는 없다.",
+      "decision_authority": "별도의 의사결정은 요구하지 않으며, 감사 대상인 기여가 실제로 존재해야 한다."
+    },
+    "brief_note_ko": "동호회 회원에게 이삿짐 도움에 감사 인사를 전하는 메시지",
+    "focal_segments": [
+      {
+        "text": "지난 주말에 제 이삿짐을 함께 옮겨 주셔서 정말 감사드립니다.",
+        "role": "head"
+      },
+      {
+        "text": "바쁘셨을 텐데도 시간 내 주셔서 진심으로 고마운 마음입니다.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 60,
+      "max": 85,
+      "actual": 67
+    }
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "at": "2026-09-10T14:44:54.180Z",
+  "key": "w11-1",
+  "draft_file": "w11-1-draft.json",
+  "draft_sha256": "b591fa2793008efb3de28d3861aa7c80074ed98a3b54529824c5f11a3ffd4ea3",
+  "original_scenario_id": "c146e831-556d-4a60-93b1-c605d42a5b19",
+  "new_scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "조장의 발표 시간 연장 제안에 조원이 전체 제한 시간 이유로 반대함",
+    "speech_act": "opposition",
+    "learner_level": "intermediate",
+    "domain": "school",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "theme_code": "campus_study",
+    "topic_code": "school_viewpoint_opposition",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "이번 학기 내내 함께 과제를 해 온 조장이 리허설에서 발표 시간을 십 분 늘리자고 제안했다. 조장은 일정만 관리하고 평가 권한은 없으며, 나는 전체 발표 제한을 이유로 그 제안에 반대하려 한다.",
+      "relation_ko": "과제 조장과 조원, 함께 과제한 아는 사이",
+      "source_modality": "spoken",
+      "source_text": "발표 시간을 늘리는 건 전체 제한 시간이 있기 때문에 쉽지 않아 보입니다. 저는 그 제한을 지키는 게 중요하다고 생각해요.",
+      "preceding_turn": "我觉得在彩排时延长十分钟的时间会比较好，这样大家可以更充分地准备。",
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "school.school_viewpoint_opposition.opposition",
+        "role_pair": {
+          "speaker_ko": "과제 조원",
+          "addressee_ko": "과제 조장"
+        },
+        "speaker_entitlement": "화자는 자신이 관련된 의견·평가·방안에 이견을 밝힐 정당한 참여 자격이 있다.",
+        "addressee_obligation": "상대는 이견 대상 의견·평가·방안을 제시한 사람이며 반대 의견을 검토할 수 있다.",
+        "decision_authority": "이견 대상 사안은 상대 또는 공동 논의의 결정 범위 안에 있다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "조장의 발표 시간 연장 제안에 조원이 전체 제한 시간 이유로 반대함",
+      "focal_segments": [
+        {
+          "text": "발표 시간을 늘리는 건 전체 제한 시간이 있기 때문에 쉽지 않아 보입니다.",
+          "role": "head"
+        },
+        {
+          "text": "저는 그 제한을 지키는 게 중요하다고 생각해요.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 48
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_gate",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T08:13:20.260Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "조장이 일정만 관리하고 평가 권한이 없으며, 조원과 조장 모두 교수에게 평가받는 동등한 위치다. 조장은 이전부터 함께 과제한 acquaintance이고, 발표 시간 조정은 일정과 규정에 영향을 주는 중간 정도의 이견이다.",
+          "scene_ko": "나는 이번 학기 내내 함께 과제를 해 온 조장이 리허설에서 발표 시간을 십 분 늘리자고 제안한 상황을 겪었다. 조장은 일정만 관리하고 평가 권한은 없으며, 나는 전체 발표 제한을 이유로 그 제안에 반대하려 한다.",
+          "relation_ko": "과제 조장과 조원, 함께 과제한 아는 사이",
+          "speaker_role_ko": "과제 조원",
+          "addressee_role_ko": "과제 조장",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "p_evidence_ko": "조장은 일정만 관리하고 평가 권한이 없으며, 조원과 동등한 위치다.",
+          "d_evidence_ko": "이번 학기 내내 함께 과제를 해 온 사이로, acquaintance에 해당한다.",
+          "r_evidence_ko": "발표 시간 조정은 전체 일정과 규정에 영향을 주는 중간 정도의 이견이다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "조장이 발표 시간 연장을 제안하자 조원이 전체 제한 시간 때문에 반대 의견을 밝히는 장면이 적절히 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "source_text가 조장의 제안에 대해 제한 시간 문제를 근거로 반대 의견을 명확히 밝힘."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "조장과 조원은 평가 권한 없이 일정만 관리하는 동등한 위치로, equal 관계가 유지됨."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "함께 과제한 아는 사이로 acquaintance에 부합함."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "반대 의견을 밝히는 상황이 중간 정도의 부담(med)으로 적절하게 설정됨."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "학업 과제와 발표 관련 논의로 학업 도메인에 해당함."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황임."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "구두 통역 상황에 맞는 자연스러운 구어체 발화임."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대의 역할, 권리, 의무가 context_spec과 일치함."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "A(조원)가 B(조장)의 제안에 반대하며, 책임자·행위 대상 지시가 일관됨."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "발표 시간 조정은 조장 또는 조원 모두 논의할 수 있는 사안임."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "조장이 발표 시간 연장을 제안하고 조원이 반대하는 핵심 사건이 유지됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "preceding_turn이 발표 시간 연장 제안이고, source_text가 그에 대한 직접적 반대임."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "조원(A)이 조장(B)에게 반대 의견을 밝히는 구조가 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 동일한 사건과 행위자를 다룸."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문에 실제 발화나 번역, 내부 평가 기준이 노출되지 않음."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "조장이 일정만 관리하고, 조원이 제한 시간 문제로 반대하는 상황이 현실적으로 개연성 있음."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T14:44:27.217Z",
+          "core_content_hash": "3478b833487d0f4103cbd02318741cede51938dc56bb6ad0f86d671688928c5d"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "c146e831-556d-4a60-93b1-c605d42a5b19",
+          "draft_file": "w11-1-draft.json",
+          "draft_sha256": "b591fa2793008efb3de28d3861aa7c80074ed98a3b54529824c5f11a3ffd4ea3",
+          "author": "Claude (FABLE)",
+          "edited_at": "2026-09-10T14:44:27.255Z",
+          "reason": "situation_ko read unnaturally in Korean (\"제안한 상황을 겪었다\").",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "prompt_version": "core_v18_observed_pdr_scene_gate"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w11-1",
+    "content_hash": "4j8hvc",
+    "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d"
+  }
+}

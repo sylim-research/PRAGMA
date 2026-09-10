@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T14:44:04.172Z",
+  "run_id": "scene_grounding_course_20260910",
+  "draft_file": "w3-0-draft.json",
+  "draft_sha256": "d0b2e519b0c43bae5484fa19a8825c7ed01ac3dcaa71675bb43b1f0180915d3c",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "동호회 회원이 이삿짐을 도와준 것에 대해 메신저로 감사 인사를 전하는 상황이 기대 조건과 일치한다.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "이삿짐을 도와준 회원에게 감사의 뜻을 전하는 내용이 명확히 드러난다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 동등한 지위로, 상하 관계가 드러나지 않는다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "동호회에서 몇 번 만난 아는 사이로 acquaintance에 부합한다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "이삿짐 네 개를 삼십 분간 옮겨준 도움은 중간 정도의 부담에 해당한다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "일상적 상황(동호회, 이삿짐 도움, 메신저)이다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "산업 배경이 없는 일상 상황으로 기대와 일치한다."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "메신저로 보내는 서면 메시지로, 번역(서면) 상황에 맞다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자는 도움을 받은 사람, 상대는 도움을 준 회원으로 역할이 정확히 맞다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "화자(A)는 도움을 받은 사람, 상대(B)는 도움을 준 사람으로 모든 필드에서 일관된다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "감사 인사로 별도의 의사결정이나 승인 권한이 필요하지 않다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원, 이삿짐 도움, 메신저로 감사 인사라는 시드가 그대로 구현되어 있다."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "화자와 상대의 역할이 모든 필드에서 일관되게 유지된다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text 모두 이삿짐 도움과 감사 인사라는 핵심 사건이 일치한다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 실제 발화나 번역문이 들어 있지 않고, 장면 안내로만 구성되어 있다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원이 이삿짐을 도와주고, 이후 메신저로 감사 인사를 전하는 상황이 자연스럽고 현실적이다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T14:44:04.164Z",
+        "core_content_hash": "419bf39adc008169773c3e106e531f4ac0b36ca8cf885369bd9e09c0742bba37"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}
