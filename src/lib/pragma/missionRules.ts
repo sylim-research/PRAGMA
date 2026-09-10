@@ -438,7 +438,7 @@ export function checkCore(coreInput: unknown, ctx: CheckContext): RuleResult {
 }
 
 // 코어 전용 서브셋(R8·R9·R10·R16·R17·R26·R30). checkMission은 이 함수를 호출하지 않는다 —
-// 미션 상황문의 R9·R30은 checkMission 쪽 검사가 따로 맡는다(R30은 미션 미적용, 2026-09-09 감사).
+// 미션 상황문의 R9·R30은 checkMission 쪽 검사가 따로 맡는다.
 function checkCoreCommon(
   v: RuleViolation[],
   core: Pick<ScenarioCoreRuntime, "direction" | "source_text" | "preceding_turn"> & {
@@ -565,6 +565,19 @@ export function checkMission(
   const dir = m.direction;
   checkDirectionMatch(v, dir, ctx);
   const feature = getTargetFeature(m.unit.target_feature);
+
+  // Existing R30 is a review signal, not a keyword ban or a content rewrite.
+  const scenes = [
+    ...m.mpj_items.map((item, index) => ({ label: `MJT ${index + 1}`, text: item.situation_ko })),
+    { label: "DCT", text: m.production_task.situation_ko },
+  ];
+  for (const scene of scenes) {
+    if (coreLearnerSceneIssue(scene.text)) {
+      add(v, "R30", "warning", `${scene.label} 상황문에 답안 평가 방향으로 읽힐 수 있는 표현 — 교수자 확인: ${scene.text}`, {
+        subrule: "learner_scene_evaluation_cue", modality: ctx.mode, direction: ctx.direction,
+      });
+    }
+  }
 
   const isNativeV5 = m.schema_version === "mission_v5" && m.mpj_items.length === 5;
   // contrast_plan_v1 is a persisted instructional contract, unlike the moving

@@ -198,8 +198,8 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R30: {
     category: "일반화·사전 정보 노출 위험",
     nature: "signal",
-    summary_ko: "코어 situation_ko에서 정중·완화·선택권·강도류 평가 단서의 정형 조합을 찾는다(warning). 미션 상황문은 검사하지 않으며, 학습자 화면의 공개 시점 통제와는 별개다.",
-    applicability_ko: "코어 situation_ko만 대상이다.",
+    summary_ko: "코어·MJT·DCT situation_ko에서 정중·완화·선택권·강도류 평가 단서의 정형 조합을 찾는다(warning). 단어 금지나 자동 삭제 규칙이 아니며 교수자가 맥락을 확인한다.",
+    applicability_ko: "코어 및 저장 계약으로 읽은 미션의 각 MJT·DCT situation_ko가 대상이다.",
   },
   R31: {
     category: "생성 기록·계승·근거 귀속",
