@@ -70,3 +70,13 @@
 - 전체 미션 승격 4건(새 행 3개 + 불만 원본, `promoteCore` astra): 사과·반대 v2·불만 자동 품질(quality_v22) pass, 요청 fail(문항 4 reason 오답 r1과 정답 r3가 같은 조사 「吧」에 초점 → 「주원인 모호」, 수리 후보 재통과 실패). 직접 검수 결과 네 미션 모두 문항 간 대비축(D 또는 R)이 한 번에 하나씩 바뀌고 정답·해설·수정안·DCT 참고안이 단원 초점과 일치해 교수자 검토에 올릴 수 있다고 판정했다. 요청의 AI fail은 설계상 정당한 오개념 보기에 대한 과잉 판정으로 보아 재생성하지 않고 연구자 override 여부에 맡긴다. 유보 사항은 evidence README 표에 적었다. 모두 `generated` 상태이며 승인·공개·편성은 없다.
 - 교체 경로 판정: `saveWeekAssignments`의 stale 삭제는 이 한 행에서 실패한다. `learner_mission_logs.assignment_id`는 ON DELETE SET NULL이지만 course-context CHECK와 `trg_validate_learner_mission_log_course_context`가 UPDATE OF assignment_id에서 예외를 던지므로 삭제문 전체가 롤백된다. upsert가 먼저 실행되므로 실패 시 해당 주차는 4행이 되고 학습자 투영은 모드 정원 초과로 그 주차를 비운다. 따라서 교체는 이 함수를 그대로 쓰지 않는다. 선택지와 권고는 인계 문서에 적었다.
 - 연구자 결정(같은 날): 요청 미션의 AI fail은 설계 의도대로라 override로 승인 예정. 2주차 편성에 귀속된 로그 2건은 본인 시연 기록이라 삭제 승인 → 백업 후 CLI로 id 지정 삭제, 잔여 0. 교체 게이트는 삭제 경로(D)로 종결됐고 코드·migration 변경은 없다.
+
+## 구 콘텐츠 정리 결정과 보관 상태 구현 · 2026-09-10
+
+- 실측: scenarios 1,760행(관리자 목록 노출 1,726). 편성·학습 기록·미션 이력 어디에도 참조되지 않는 행 1,503(코어 1,469 + legacy 34), 참조되는 행 257(편성 67·로그 11·이력 244의 합집합).
+- 연구자 결정(GPT 교차검토 반영): **삭제하지 않고 보관(B)**. 순서 = 전량 덤프 → 보관 상태 적용 → 모든 현행 후보 쿼리에서 보관 제외 → 교과목 교체 후 추가 보관. 삭제 여부는 논문 기준본·개발 증거 확정 뒤 별도 판단. 용어는 「보관 콘텐츠」(실패작으로 부르지 않음). 새 「보관함」 메뉴는 만들지 않고 목록 필터 전체/현재/보관으로 처리.
+- 전량 덤프 완료: `Documents/Projects/l2-pragmatic-translator-archive/2026-09-10-scenario-archive-restore-point/`(scenarios 1,760행 13.2MB + 편성 67·이력 414·로그 링크 63, MANIFEST.json에 SHA-256). 저장소 밖, 학습자 응답 payload 미포함.
+- 보관 표시 칸 판정: `usage_assignment`는 연구 자료·학습자 노출 축(coursework_published/experiment_locked/archived_only(기본)/excluded)이고 1,723행이 기본값이라 재사용 불가 → 새 컬럼 `scenarios.archived_at timestamptz` + `archive_note text`(migration `20260910120000_scenario_archive_state.sql`, 되돌림 = NULL 갱신). **migration push는 미실행(승인 대기).**
+- 불변조건 「archived_at IS NOT NULL ⇒ 현행 제작·검토·편성 후보와 활성 집계에서 제외」를 코드 11곳에 적용: AdminBrowser 목록, AdminAssembly 조립/AI검토/최종승인 목록(직접 링크 scenarioId는 예외), AdminDashboard 집계, AdminFinalApproval 대기·완료 수, AdminCorpus 코퍼스 통계, composer.listCoreScenarios(편성 후보·학습자 투영), missionDb.listRunnableMissions, lockCandidateAudit, missionBatchRun.loadLockMissionBatchCores, coreBatchRun.loadExistingCoreRunItems. 미적용(의도): AdminPromptHarness 사용 프롬프트 이력, AdminFinalCorpusReview(run 단위), id 지정 조회·RPC, 학습자 RLS.
+- 검증: typecheck 통과, Vitest 142파일 920 통과(worktree에 `.env`가 없어 CI placeholder 환경변수로 실행). 로컬 커밋만, 푸시·PR·배포·보관 UPDATE 미실행.
+- 다음: ①migration push ②`.tmp/scene-grounding/archive-unreferenced.sql`로 1,503행 보관(수정 전 원본 draft 코어 3행 포함, 새 미션 4건은 이력 참조로 유지) ③라이브러리 필터 전체/현재/보관(UI 브리프 승인 후) ④PR·CI·배포.
