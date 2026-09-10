@@ -46,6 +46,8 @@
 
 w2-0 처리 선택지: ① 교수자 최종 승인 화면의 AI fail override로 승인(내 권고), ② `supersedeMissionForRework` → `promoteCore` 재생성(유료 1회, 결과 보장 없음). 이번 세션에서는 재생성하지 않았다.
 
+**연구자 판정(2026-09-10):** w2-0의 문항 4 오답 구성은 문제가 없고 오히려 의도한 설계라고 확인했다 → 재생성하지 않고 교수자 최종 승인 화면에서 override로 처리한다. 2주차 편성 1행에 붙어 있던 학습 로그 2건(2026-09-08·09-10, 서로 다른 계정)은 연구자 본인의 시연 기록이라 삭제를 승인했다 → 로컬 미추적 백업(`.tmp/scene-grounding/deleted-own-logs-backup.json`) 후 Supabase CLI `db query`로 id 지정 삭제, 재확인 결과 해당 편성의 logs 0·events 0. RLS는 authenticated에 DELETE 권한이 없어 admin 세션의 `.delete()`는 0건이었다(오류 없이 무시됨). 이제 기존 편성 20행 중 학습 기록이 참조하는 행은 없으며 `saveWeekAssignments`의 통상 경로로 교체할 수 있다.
+
 ## 의미 검사 실행 준비와 차단 (인수 전 기록)
 
 `check-semantic.ts`는 세 후보를 기존 `checkCoreSemanticFit`으로 검사하고 후보 SHA-256과 결과를 별도 JSON에 보존하도록 준비했다. 시나리오 저장/승인/승격 코드는 없다. 기존 파일이 있으면 덮어쓰지 않는다.
