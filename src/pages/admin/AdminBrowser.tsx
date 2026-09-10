@@ -141,6 +141,8 @@ const AdminBrowser = () => {
           "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
         )
         .eq("content_format", "scenario_core_v1")
+        // 보관(archived_at) 행은 현행 제작·검토·편성 대상이 아니므로 기본 목록에서 뺀다.
+        .is("archived_at", null)
         .order("created_at", { ascending: false })
         .order("scenario_id")
         .range(from, to)

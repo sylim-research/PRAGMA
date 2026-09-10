@@ -130,10 +130,12 @@ const AdminCorpus = () => {
         supabase
           .from("scenarios")
           .select("created_at, title, learner_level, mode, language_direction, speech_act, speech_act_text, mission_content")
-          .not("mission_content", "is", null),
+          .not("mission_content", "is", null)
+          .is("archived_at", null),
         supabase
           .from("scenarios")
           .select("created_at, title, learner_level, mode, language_direction, speech_act, speech_act_text, core_content")
+          .is("archived_at", null)
           .order("created_at", { ascending: false })
           .limit(40),
       ]);

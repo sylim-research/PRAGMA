@@ -356,6 +356,7 @@ const AdminDashboard = () => {
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
           .eq("content_format", "scenario_core_v1")
+          .is("archived_at", null)
           .order("scenario_id", { ascending: true })
           .range(from, to)),
         fetchAllDashboardRows<DashboardReviewRunRow>("점검·승인 이력", (from, to) => db

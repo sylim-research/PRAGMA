@@ -107,6 +107,7 @@ export async function listRunnableMissions(): Promise<MissionListItem[]> {
     .from("scenarios")
     .select("scenario_id, speech_act, learner_level, mission_status, release_gate_mode, core_content, mission_content")
     .in("mission_status", statuses)
+    .is("archived_at", null)
     .order("mission_reviewed_at", { ascending: false, nullsFirst: false });
   if (error) throw new Error(`미션 목록 조회 실패: ${error.message}`);
   return ((data ?? []) as any[])

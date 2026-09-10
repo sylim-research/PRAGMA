@@ -16,10 +16,13 @@ type ApprovalCounts = {
 const db = supabase as unknown as {
   from: (table: string) => {
     select: (columns: string, options: { count: "exact"; head: true }) => {
-      eq: (column: string, value: string) => Promise<{
-        count: number | null;
-        error: { message?: string } | null;
-      }>;
+      eq: (column: string, value: string) => {
+        // 보관(archived_at) 미션은 승인 대기·완료 집계에서 제외한다.
+        is: (column: string, value: null) => Promise<{
+          count: number | null;
+          error: { message?: string } | null;
+        }>;
+      };
     };
   };
 };
@@ -38,8 +41,8 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
     let active = true;
     void (async () => {
       const [pending, approved] = await Promise.all([
-        db.from("scenarios").select("scenario_id", { count: "exact", head: true }).eq("mission_status", "generated"),
-        db.from("scenarios").select("scenario_id", { count: "exact", head: true }).eq("mission_status", "reviewed"),
+        db.from("scenarios").select("scenario_id", { count: "exact", head: true }).eq("mission_status", "generated").is("archived_at", null),
+        db.from("scenarios").select("scenario_id", { count: "exact", head: true }).eq("mission_status", "reviewed").is("archived_at", null),
       ]);
       if (!active) return;
       setCounts({

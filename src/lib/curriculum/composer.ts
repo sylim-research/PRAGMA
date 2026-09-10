@@ -83,6 +83,8 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
       "scenario_id, speech_act, learner_level, domain, mode, theme_code, topic_code, mission_status, release_gate_mode, target_feature, scenario_p, scenario_d, scenario_r, source_modality, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
     )
     .eq("content_format", "scenario_core_v1")
+    // 보관(archived_at) 코어는 편성 후보·학습자 투영 대상이 아니다.
+    .is("archived_at", null)
     .order("created_at", { ascending: false })
     .order("scenario_id")
     .range(from, to), 500);

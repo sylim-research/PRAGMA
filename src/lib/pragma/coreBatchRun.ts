@@ -236,7 +236,8 @@ export async function loadExistingCoreRunItems(
     .from("scenarios")
     .select("scenario_id, generation_item_key, core_content")
     .eq("generation_run_id", runId)
-    .not("generation_item_key", "is", null);
+    .not("generation_item_key", "is", null)
+    .is("archived_at", null);
 
   if (error) throw error;
 

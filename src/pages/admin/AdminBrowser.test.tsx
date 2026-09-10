@@ -11,7 +11,7 @@ vi.mock("@/lib/mission/missionDb", () => ({ fetchMissionForReview: mocks.preview
 vi.mock("@/integrations/supabase/client", () => ({ supabase: { from: (table: string) => {
   let from = 0, to = 499;
   const builder = {
-    select: () => builder, eq: () => builder, order: () => builder, abortSignal: () => builder,
+    select: () => builder, eq: () => builder, is: () => builder, order: () => builder, abortSignal: () => builder,
     range: (start: number, end: number) => { from = start; to = end; return builder; },
     then: (resolve) => {
       if (table === "scenarios") mocks.ranges.push(from);
