@@ -230,7 +230,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         .limit(ROW_CAP);
       if (reviewMode) request = request.in("mission_status", ["generated", "reviewed", "released"]);
       if (searchParams.get("scenarioId")) request = request.eq("scenario_id", searchParams.get("scenarioId"));
-      else request = request.neq("review_status", "revise_required");
+      // 보관(archived_at) 행은 조립·검토·승인 후보가 아니다. 직접 링크(scenarioId)로 여는 경우만 예외.
+      else request = request.neq("review_status", "revise_required").is("archived_at", null);
       const timeout = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error("조회 시간이 15초를 초과했습니다.")), QUERY_TIMEOUT_MS);
       });

@@ -1447,6 +1447,8 @@ export type Database = {
       scenarios: {
         Row: {
           approval_basis: string | null
+          archive_note: string | null
+          archived_at: string | null
           auto_check_result:
             | Database["public"]["Enums"]["auto_check_result"]
             | null
@@ -1497,6 +1499,8 @@ export type Database = {
         }
         Insert: {
           approval_basis?: string | null
+          archive_note?: string | null
+          archived_at?: string | null
           auto_check_result?:
             | Database["public"]["Enums"]["auto_check_result"]
             | null
@@ -1547,6 +1551,8 @@ export type Database = {
         }
         Update: {
           approval_basis?: string | null
+          archive_note?: string | null
+          archived_at?: string | null
           auto_check_result?:
             | Database["public"]["Enums"]["auto_check_result"]
             | null

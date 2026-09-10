@@ -43,6 +43,9 @@ interface CoreRow {
   scenario_r: string | null;
   review_status: string | null;
   mission_status: string | null;
+  /** 보관 시각. 값이 있으면 현행 제작·검토·편성 대상이 아니다(삭제 아님). */
+  archived_at: string | null;
+  archive_note: string | null;
   mission_schema_version: string | null;
   mission_mpj_items: unknown;
   generation_run_id: string | null;
@@ -81,6 +84,17 @@ const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 30;
+/**
+ * 보관 상태 축. 기본은 현재 콘텐츠만 본다 — 보관분은 제작·검토·편성 대상이 아니다.
+ * 별도 「보관함」 메뉴를 만들지 않고 이 필터 한 축으로만 다시 볼 수 있게 한다(2026-09-10 연구자 결정).
+ */
+const ARCHIVE_VIEWS = ["current", "archived", "all"] as const;
+type ArchiveView = (typeof ARCHIVE_VIEWS)[number];
+const ARCHIVE_VIEW_LABEL: Record<ArchiveView, string> = {
+  current: "현재",
+  archived: "보관",
+  all: "전체",
+};
 // JSON 경로 별칭 조회는 생성된 Supabase 타입의 재귀 추론 한계를 넘는다.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const libraryDb = supabase as unknown as { from: (table: string) => any };
@@ -105,6 +119,7 @@ const AdminBrowser = () => {
   const [fTheme, setFTheme] = useState<"all" | ThemeCode>("all");
   const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
   const [fSource, setFSource] = useState<"all" | "ai" | "authentic">("all");
+  const [fArchive, setFArchive] = useState<ArchiveView>("current");
   const [sel, setSel] = useState<{ act: SpeechActUI; level: LearnerLevel } | null>(null);
   // 눈검사 미리보기 — scenario_id → {mission, warnings}. openId = 펼친 행.
   const [preview, setPreview] = useState<Record<string, { mission: MissionRuntime; warnings: string[] }>>({});
@@ -135,12 +150,16 @@ const AdminBrowser = () => {
     const timeoutId = setTimeout(() => controller.abort(), CORE_QUERY_TIMEOUT_MS);
     try {
       const data = await fetchAllPages(async (from, to) => {
-        const result = await libraryDb
+        let request = libraryDb
         .from("scenarios")
         .select(
-          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
+          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, archived_at, archive_note, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
         )
-        .eq("content_format", "scenario_core_v1")
+        .eq("content_format", "scenario_core_v1");
+        // 보관(archived_at) 행은 기본적으로 제외한다. 보관분은 이 축을 바꿔야만 보인다.
+        if (fArchive === "current") request = request.is("archived_at", null);
+        else if (fArchive === "archived") request = request.not("archived_at", "is", null);
+        const result = await request
         .order("created_at", { ascending: false })
         .order("scenario_id")
         .range(from, to)
@@ -158,7 +177,7 @@ const AdminBrowser = () => {
       if (timeoutId) clearTimeout(timeoutId);
       setLoading(false);
     }
-  }, []);
+  }, [fArchive]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -220,7 +239,8 @@ const AdminBrowser = () => {
     fDomain !== "all" ||
     fTheme !== "all" ||
     fDirection !== "all" ||
-    fSource !== "all";
+    fSource !== "all" ||
+    fArchive !== "current";
   const maxCellCount = Math.max(0, ...Object.values(counts).map((count) => count.total));
 
   return (
@@ -271,9 +291,16 @@ const AdminBrowser = () => {
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[126px]" label="생성 소스" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
+              <Filter className="w-full sm:w-[96px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
+                opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">편성 가능 미션은 현재 편성 기준을 충족한 MJT5+DCT1입니다. 실제 배정은 교과목·주차 조건에 따라 선택합니다.</p>
+          {fArchive !== "current" && (
+            <p className="mt-1.5 text-[12px] text-[#7A6418]" role="status">
+              보관 콘텐츠는 지난 세대의 자료로 남겨 둔 것입니다. 제작·검토·편성 대상이 아니며 삭제된 것도 아닙니다.
+            </p>
+          )}
         </section>
 
       {loading ? (
@@ -380,6 +407,12 @@ const AdminBrowser = () => {
                       <Badge variant="secondary" className={libraryMissionIsReady(r) ? "bg-emerald-50 text-emerald-800" : "bg-[#EDE9DD] text-[#625A49]"}>
                         {libraryMissionLabel(r)}
                       </Badge>
+                      {r.archived_at && (
+                        <Badge variant="secondary" className="bg-[#F0EEE7] font-normal text-[#6C747A]"
+                          title={r.archive_note ?? undefined}>
+                          보관
+                        </Badge>
+                      )}
                       {libraryHasMission(r) && <span className="text-[11.5px] text-muted-foreground">
                         {assignmentError ? "편성 현황 확인 실패" : assignments === null ? "편성 현황 확인 중…" : assignments[r.scenario_id] ? `${assignments[r.scenario_id]}곳에 편성됨` : "미편성"}
                       </span>}

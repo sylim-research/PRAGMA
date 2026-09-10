@@ -212,6 +212,7 @@ export async function loadLockCandidateRows(runId?: string): Promise<LockCandida
     .from("scenarios")
     .select("scenario_id, speech_act, learner_level, domain, mode, source_modality, theme_code, topic_code, industry_sector, language_direction, mission_status, core_content, mission_content")
     .in("mission_status", ["generated", "reviewed", "released"])
+    .is("archived_at", null)
     .order("created_at", { ascending: true })
     .limit(4000);
   if (runId) query = query.eq("generation_run_id", runId);
