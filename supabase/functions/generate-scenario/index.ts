@@ -3845,7 +3845,10 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       // Establish a feasible event before drafting source text. No title-to-power lookup.
       const preflight = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey, CORE_SCENE_PREFLIGHT_PROMPT,
         JSON.stringify({
-          speech_act: coreSpeechActCode(b), pdr: b.pdr, direction: coreDir,
+          // 코드만 보내면 사전 검토가 일상 영어 뜻으로 읽는다(agreement를 '동의'로 오해해 초대 시드를 보류).
+          // 생성 프롬프트가 쓰는 것과 같은 우리 화행 이름을 함께 보낸다.
+          speech_act: coreSpeechActCode(b), speech_act_ko: SPEECH_ACT_KO[coreSpeechActCode(b)],
+          pdr: b.pdr, direction: coreDir,
           domain: coreDomainCode(b), industry: b.industry ?? null, level: b.level_ko,
           mode: coreLengthMode(b), topic_code: b.topic_code, situation_seed_ko: b.situation_seed_ko,
         }), 0.2, {
