@@ -132,7 +132,7 @@ describe("교과목·주차 수업자료 연결", () => {
     mission.production_task.reference_alternatives[0].text = example.referenceText;
     mocks.missionRows.mockResolvedValue({ data: [{ scenario_id: example.scenarioId, speech_act: "refusal", mission_status: "reviewed", mission_content: mission }], error: null });
     mount(6);
-    expect(within(await screen.findByRole("article", { name: "6주차 강의 유인물" })).getByText(example.situationKo)).toBeVisible();
+    expect(within(await screen.findByRole("article", { name: "6주차 수업자료" })).getByText(example.situationKo)).toBeVisible();
     expect(mocks.from).not.toHaveBeenCalled();
     expect(screen.queryByText(example.title)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "교수자 전용 메모" }));

@@ -49,3 +49,6 @@
   운영용 빌드를 확인한 뒤 main에 병합하고 GitHub 연결 Railway production 배포를 따른다.
 - 기능 SHA의 main 포함, PR/main CI, Railway 배포 SHA와 공개 운영 자산 확인 결과는 배포 PR 본문에 기록한다.
   운영 DB·콘텐츠 승인·학습 수행 데이터·Edge 함수에는 변경이 없다.
+- 첫 PR CI는 901 passed·1 failed·9 skipped였다. 공유 수업자료 컴포넌트의 접근성 명칭이 바뀌어
+  `AdminTeachingMaterials.test.tsx`가 이전 `6주차 강의 유인물`을 찾지 못했다. 기존 검사의 기대 이름만
+  `6주차 수업자료`로 수정했다. 제품 코드는 추가 변경하지 않고 필수 CI를 재실행한다.
