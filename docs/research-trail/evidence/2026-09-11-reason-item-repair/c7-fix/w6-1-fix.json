@@ -1,0 +1,96 @@
+{
+  "at": "2026-09-11T13:25:56.275Z",
+  "key": "w6-1",
+  "origin_scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
+  "new_scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+  "mode": "core",
+  "changes": [
+    {
+      "path": "core.situation_ko",
+      "before": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다.",
+      "after": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 내일 점심 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다."
+    },
+    {
+      "path": "production_task.situation_ko",
+      "before": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다.",
+      "after": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 내일 점심 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다."
+    },
+    {
+      "path": "mpj_items[3].explanation_ko",
+      "before": "현재 상대는 실제 업무 배정권이 있고 거절 이후 다른 담당자를 정해야 하는 팀장입니다. ‘不行’과 ‘你还是找别人做吧’의 결합이 조정에 필요한 배려를 충분히 전달하지 못하는 것이 주원인이며, 마감 이유 자체가 잘못되거나 ‘再接’이 업무를 반납했다는 뜻인 것은 아닙니다. 이유와 불가 결론은 유지하고, 다른 담당자 제안을 완충된 권고로 바꾸는 것이 적절합니다.",
+      "after": "현재 상대는 실제 업무 배정권이 있고 거절 이후 다른 담당자를 정해야 하는 팀장입니다. ‘不行’과 ‘你还是找别人做吧’의 결합이 조정에 필요한 배려를 충분히 전달하지 못하는 것이 주원인이며, ‘你’·‘吧’의 말투나 결론을 이유보다 앞에 둔 순서는 부차적인 관찰이지 주원인이 아닙니다. 이유와 불가 결론은 유지하고, 다른 담당자 제안을 완충된 권고로 바꾸는 것이 적절합니다."
+    }
+  ],
+  "semantic": {
+    "verdict": "pass",
+    "issues": []
+  },
+  "transplant": {
+    "saved": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+    "lineage_meta": {
+      "realization_pack_id": "pragma_ko_zh_request_refusal_thanks_v1",
+      "realization_pack_version": "1.2.0",
+      "coverage_status": "covered",
+      "rule_scope_ids": [
+        "RR-KOZH-REF-HEDGE",
+        "RR-KOZH-REF-REASON",
+        "RR-KOZH-REF-REGRET",
+        "RR-KOZH-REF-ALTERNATIVE",
+        "RR-KOZH-REF-PARTIAL-ACCEPTANCE"
+      ],
+      "risk_scope_ids": [
+        "direct_negation_fronting",
+        "learner_verbosity",
+        "hanja_interference"
+      ],
+      "evidence_scope_ids": [
+        "EV-WU-ROEVER-2021-REFUSAL",
+        "EV-TAGUCHI-LI-2020-L2-VERBOSITY",
+        "EV-DESIGN-KO-ZH-CORE-PACK-V1",
+        "EV-OBS-KO-ZH-HANJA-INTERFERENCE"
+      ]
+    }
+  },
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\""
+      }
+    ],
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 구성되어 있으며, 오도할 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T13:25:55.818Z",
+      "mission_content_hash": "e03f91ec9a9566c2bf2418ccb6908039c321897247e0e7c4b1dd77f2ab532724"
+    },
+    "reason_findings": 0
+  },
+  "scope": "Core-level fix as a new draft core row + mission transplant + revision; origin row and its review runs preserved; not instructor approval."
+}

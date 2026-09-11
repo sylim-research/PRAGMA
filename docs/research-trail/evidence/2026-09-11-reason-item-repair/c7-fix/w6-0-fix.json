@@ -1,0 +1,60 @@
+{
+  "at": "2026-09-11T13:25:28.196Z",
+  "key": "w6-0",
+  "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+  "mode": "mission",
+  "changes": [
+    {
+      "path": "mpj_items[3].reasons[r3].text_ko",
+      "before": "첫머리의 단독 ‘不行’이 뒤의 사유와 범위보다 먼저 들려, 내일 한 시간에 한정된 거절이 아니라 강한 거절로 받아들여질 수 있기 때문이다.",
+      "after": "‘明天没办法…那一小时班’으로 날짜와 범위가 문장 끝에 와서, 무엇을 거절하는지가 끝에서야 드러나기 때문이다."
+    }
+  ],
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"안 됩니다. 그 시간에 외부 교육이 있어서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"안 됩니다. 그 시간에 외부 교육이 있어서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行。我那时有外部培训,明天没办法替你在服务台值…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行。我那时有外部培训,明天没办法替你在服务台值…\""
+      }
+    ],
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 후보가 실제 상황과 화용 초점에 맞는 경계 사례로 구성되어 있고, 대역·피드백·장면 설명도 일관되게 적절하다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T13:25:27.673Z",
+      "mission_content_hash": "345516de7501d0aa741f29dc7abd9851241b15d582cc10398acf51eb0311cb5e"
+    },
+    "reason_findings": 0
+  },
+  "scope": "Mission-level local fix through reviseMissionDraft; not instructor approval."
+}

@@ -1,0 +1,28 @@
+const memory = new Map<string, string>();
+Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: { getItem: (k: string) => memory.get(k) ?? null, setItem: (k: string, v: string) => memory.set(k, v), removeItem: (k: string) => memory.delete(k), clear: () => memory.clear(), key: (i: number) => [...memory.keys()][i] ?? null, get length() { return memory.size; } } });
+const { supabase } = await import('C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-takeover-2026-09-10/src/integrations/supabase/client');
+const { readFileSync, writeFileSync } = await import('node:fs');
+const manifest = JSON.parse(readFileSync(process.argv[2] ?? 'docs/research-trail/evidence/2026-09-11-reason-item-repair/v3-manifest.json', 'utf8'));
+const ids: string[] = manifest.rows.map((r: any) => r.scenario_id); const keyOf = new Map(manifest.rows.map((r: any) => [r.scenario_id, r.key]));
+const OLD = '700f0bdd-54f7-4192-80e4-07dcd262e2de';
+const { error } = await supabase.auth.signInWithPassword({ email: process.env.PRAGMA_BATCH_ADMIN_EMAIL!, password: process.env.PRAGMA_BATCH_ADMIN_PASSWORD! });
+if (error) throw new Error(error.message);
+try {
+  const db = supabase as unknown as { from: (t: string) => any };
+  const all = await db.from('content_review_runs').select('id, target_id, criteria_version, content_hash, rules, generation_quality, openai_review, claude_review, adjudication, prepared_finalization, approved_at, independent_review_requested, last_error, running_stage, created_at').eq('kind', 'mission').in('target_id', [...ids, OLD]).order('created_at');
+  if (all.error) throw new Error(all.error.message);
+  const rows = all.data ?? [];
+  const v3 = rows.filter((r: any) => r.criteria_version === 'content_review_v3');
+  const v2 = rows.filter((r: any) => r.criteria_version === 'content_review_v2');
+  const summary = v3.map((r: any) => ({ key: keyOf.get(r.target_id), target: r.target_id.slice(0, 8), hash: r.content_hash.slice(0, 8), rules: r.rules?.verdict, gq: r.generation_quality?.quality_check?.verdict ?? null, openai_review: Boolean(r.openai_review), claude: r.claude_review ? (r.claude_review.result?.findings?.length ?? 0) : null, adj: r.adjudication ? { n: r.adjudication.result?.decisions?.length ?? 0, src: r.adjudication.primary_review_source ?? null } : null, fin: Boolean(r.prepared_finalization), fin_coverage: r.prepared_finalization?.authoring?.item_lineage_coverage ?? (r.prepared_finalization?.item_lineage ? 'covered' : null), approved: Boolean(r.approved_at), err: r.last_error, stage: r.running_stage, created_at: r.created_at }));
+  const count = (f: (x: any) => boolean) => summary.filter(f).length;
+  console.log(JSON.stringify({ v3_rows: v3.length, v3_distinct_targets: new Set(v3.map((r: any) => r.target_id)).size, v2_rows_preserved: v2.length, v2_targets: new Set(v2.map((r: any) => r.target_id)).size,
+    rules_pass: count(s => s.rules !== 'fail'), finalization: count(s => s.fin && s.rules !== 'fail'), claude_done: count(s => s.claude !== null), adjudication_done: count(s => s.adj !== null), professor_ready: count(s => s.fin && s.rules !== 'fail' && !s.err && !s.stage && (s.claude === null || s.adj !== null)), approved: count(s => s.approved),
+    w61_v3_target: summary.find(s => s.key === 'w6-1')?.target, old_700f0bdd_has_v3: v3.some((r: any) => r.target_id === OLD), old_700f0bdd_v2_rows: v2.filter((r: any) => r.target_id === OLD).length, openai_review_any: count(s => s.openai_review), not_covered: count(s => s.fin_coverage === 'not_covered'), covered: count(s => s.fin_coverage === 'covered') }));
+  for (const s of summary) console.log(JSON.stringify(s));
+  const sc = await db.from('scenarios').select('scenario_id, mission_status, archived_at, updated_at').eq('scenario_id', OLD).single();
+  console.log('old 700f0bdd scenario:', JSON.stringify(sc.data));
+  const findings = v3.filter((r: any) => r.claude_review).map((r: any) => ({ key: keyOf.get(r.target_id), run_id: r.id, content_hash: r.content_hash, claude: { model: r.claude_review.model, verdict: r.claude_review.result?.verdict, findings: r.claude_review.result?.findings ?? [] }, adjudication: r.adjudication ? { model: r.adjudication.model, primary_review_source: r.adjudication.primary_review_source ?? null, primary_review_ref: r.adjudication.primary_review_ref ?? null, decisions: r.adjudication.result?.decisions ?? [] } : null }));
+  writeFileSync((process.argv[3] ?? 'docs/research-trail/evidence/2026-09-11-reason-item-repair/v3-content-review-runs-20260911.json'), JSON.stringify({ at: new Date().toISOString(), criteria_version: 'content_review_v3', summary, v2_rows_preserved: v2.map((r: any) => ({ key: keyOf.get(r.target_id) ?? (r.target_id === OLD ? 'w6-1(old)' : null), target: r.target_id, content_hash: r.content_hash, created_at: r.created_at, rules: r.rules?.verdict, fin: Boolean(r.prepared_finalization), last_error: r.last_error })), claude_and_adjudication: findings }, null, 2) + '\n');
+  for (const f of findings) { const tally: Record<string, number> = {}; for (const d of f.adjudication?.decisions ?? []) tally[d.decision] = (tally[d.decision] ?? 0) + 1; console.log(`## ${f.key} claude=${f.claude.verdict} n=${f.claude.findings.length} adj=${JSON.stringify(tally)} src=${f.adjudication?.primary_review_source}`); for (const x of f.claude.findings) { const d = (f.adjudication?.decisions ?? []).find((y: any) => y.finding_id === x.id); console.log(`  [${x.severity}] ${x.id} @${x.where}${x.needs_professor ? ' · 교수자 확인' : ''} ${(x.issue_ko ?? '').slice(0, 150)} → ${d ? d.decision + (d.needs_professor ? '(교수자 확인)' : '') : '-'}`); } }
+} finally { await supabase.auth.signOut({ scope: 'local' }); }

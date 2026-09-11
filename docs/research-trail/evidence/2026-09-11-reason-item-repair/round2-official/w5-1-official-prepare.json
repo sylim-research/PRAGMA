@@ -1,0 +1,47 @@
+{
+  "at": "2026-09-11T12:02:46.469Z",
+  "key": "w5-1",
+  "scenario_id": "793a1576-55c4-4790-9791-621685a9b3bb",
+  "mode": "prepare",
+  "status": "ready",
+  "message": "AI 검토 완료 · 교수자 판단 대기",
+  "stages_run": [
+    "adjudication",
+    "finalization"
+  ],
+  "contentHash": "df5ac4a78c2da2247aa08a0f83c6b5b78ebc977c2e7231cb926984dea9f33708",
+  "run": {
+    "id": "4724c627-6f65-4679-a0cc-131c7ee403cf",
+    "content_hash": "df5ac4a78c2da2247aa08a0f83c6b5b78ebc977c2e7231cb926984dea9f33708",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "fail",
+    "openai_review": null,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "warning",
+      "findings": 1,
+      "model": "claude-opus-5"
+    },
+    "adjudication": {
+      "decisions": 1,
+      "model": "gpt-4.1-2025-04-14"
+    },
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": null,
+    "approved_at": null,
+    "next_stage": "professor",
+    "steps": [
+      "rules",
+      "openai",
+      "claude",
+      "adjudication",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}

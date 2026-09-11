@@ -1,0 +1,41 @@
+{
+  "at": "2026-09-11T13:00:32.816Z",
+  "key": "w12-0",
+  "scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+  "contentHash": "85e9093fb9e44154ece01f86f758c37527473431dbf7b8e95be7080e40df9178",
+  "sourceHash": "ddb1f3b1f85dc7171d769ab6f34b77b1cd861bf6eb85152563c19ef2d6b4d4aa",
+  "run": {
+    "id": "635c956b-94e3-490c-83a2-afddd835ec90",
+    "content_hash": "85e9093fb9e44154ece01f86f758c37527473431dbf7b8e95be7080e40df9178",
+    "criteria_version": "content_review_v3",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "fail",
+    "openai_review": null,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "fail",
+      "findings": 3,
+      "model": "claude-opus-5"
+    },
+    "adjudication": {
+      "decisions": 3,
+      "model": "gpt-4.1-2025-04-14"
+    },
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": null,
+    "approved_at": null,
+    "next_stage": "professor",
+    "steps": [
+      "rules",
+      "openai",
+      "claude",
+      "adjudication",
+      "finalization",
+      "professor"
+    ]
+  },
+  "history": 2
+}

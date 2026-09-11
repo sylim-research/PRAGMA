@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-11T12:08:33.971Z",
+  "key": "w4-0",
+  "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+  "contentHash": "3c3c2068611d43602d8d576fcd71357aed9c6d2a0295b671a5d5ffce3497e8c0",
+  "sourceHash": "504d19e909f70e8a939999ceff2ebe63602ce2effd28987b59dd971cb107b482",
+  "run": {
+    "id": "9ec7892b-bf34-4503-9e81-a335e8cc5af1",
+    "content_hash": "3c3c2068611d43602d8d576fcd71357aed9c6d2a0295b671a5d5ffce3497e8c0",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "fail",
+    "generation_quality": true,
+    "generation_quality_verdict": "pass",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
+    "approved_at": null,
+    "next_stage": "finalization",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "history": 1
+}
