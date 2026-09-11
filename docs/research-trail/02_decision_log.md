@@ -3610,6 +3610,15 @@ Railway 배포 및 인증 관리자 읽기 smoke를 확인했다. 실제 콘텐�
   연결)과 DEC-20260830-13의 「교과목용 reviewed mission·대표 세트 전수 3단 검수」 요구를 이 정책이 대체한다.
   과거 승인 행의 `multimodel_v2` 증거는 보존한다. 현행 canonical workflow 문구는 DEC-20260830-13의 대체 항목과 같다.
 
+## DEC-20260911-01 · 공식 검수 기준 v3 — 새 검수 버전으로 실패 자료를 우회, 불변성 유지
+
+- 날짜: 2026-09-11 · 상태: 연구자 승인((c)안).
+- 문제: 동결 교과목 20건의 첫 공식 검수(`content_review_v2`)에서 7건의 최종 검수 자료가 결함(pack 범위 밖 귀속·reason 경로) 상태로 저장돼 규칙 fail이 됐다. `guard_prepared_content_review` 트리거가 저장된 자료·규칙·snapshot을 불변으로 만들어 재준비가 불가능하다.
+- 대안: (a) 트리거 완화 migration (b) 미승인 7행 삭제 (c) `CONTENT_REVIEW_VERSION` v3로 새 검수 버전 생성.
+- 결정: (c). 기준이 실제로 바뀌었고(PR #139: not_covered 명시, reason 경로 정렬), 설계가 요구하는 「새 검수 버전」이며, 기존 mission 검수 승인이 0건이라 부작용이 없다. v2 행과 1차 실패 기록은 삭제·수정하지 않는다. 재준비 게이트 완화(PR #139의 4번)는 되돌린다.
+- v3 대상 manifest: `docs/research-trail/evidence/2026-09-11-reason-item-repair/v3-manifest.json` — w6-1은 수정 코어의 새 행 09bc6c81, 옛 행 700f0bdd는 제외·보존(보관은 별도 승인).
+- 근거: `docs/dev-log/2026-09-11-reason-item-contract-and-reaudit.md` 16–17절.
+
 ## DEC-20260906-05 · 주차별 미션 메뉴와 직접 시작
 
 - 문제: 사용자는 완료 0/2와 반복 설명보다 두 미션의 구체적인 상황을 먼저 보고 선택할 수 있는 화면을 요청했다.
