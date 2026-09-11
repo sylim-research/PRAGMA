@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-11T12:08:49.906Z",
+  "key": "w13-0",
+  "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+  "contentHash": "d0dac66b108661c128e46711e671d8180b140e5ea12f77c83b9d8352e5496e71",
+  "sourceHash": "92e655f645ea334c20700522511413c852a89fb970f7fc2db8c1b9bcdc67d51f",
+  "run": {
+    "id": "b92cdd83-504d-4392-8198-a3d21a886767",
+    "content_hash": "d0dac66b108661c128e46711e671d8180b140e5ea12f77c83b9d8352e5496e71",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "pass",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": null,
+    "approved_at": null,
+    "next_stage": "professor",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "history": 1
+}

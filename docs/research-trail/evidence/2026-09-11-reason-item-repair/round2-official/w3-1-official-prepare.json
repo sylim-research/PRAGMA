@@ -1,0 +1,37 @@
+{
+  "at": "2026-09-11T12:02:12.348Z",
+  "key": "w3-1",
+  "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+  "mode": "prepare",
+  "status": "held",
+  "message": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
+  "stages_run": [
+    "finalization"
+  ],
+  "contentHash": "7cee9da7c21bd8569f760402ea02a4b12474b0bf9315938faa78d255a57c9031",
+  "run": {
+    "id": "3539219c-b798-4c9d-b3be-f309790f44a2",
+    "content_hash": "7cee9da7c21bd8569f760402ea02a4b12474b0bf9315938faa78d255a57c9031",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "fail",
+    "generation_quality": true,
+    "generation_quality_verdict": "pass",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
+    "approved_at": null,
+    "next_stage": "finalization",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}

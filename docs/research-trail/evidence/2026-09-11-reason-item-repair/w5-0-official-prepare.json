@@ -1,34 +1,27 @@
 {
-  "at": "2026-09-11T12:02:34.624Z",
+  "at": "2026-09-11T12:43:55.789Z",
   "key": "w5-0",
   "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
   "mode": "prepare",
   "status": "ready",
   "message": "AI 검토 완료 · 교수자 판단 대기",
   "stages_run": [
-    "adjudication",
+    "rules",
     "finalization"
   ],
-  "contentHash": "4c2adb9e2855f0f4971f36b625d5589d42d55bc69dec3d47e21bfc7b1584d2cf",
+  "contentHash": "f872d5f9e7c760407ee0d92918e1537f8cbdafb79ceddb798a8080bb613c34bb",
   "run": {
-    "id": "1d7da50a-408e-45ee-be5c-db3cac5a4f10",
-    "content_hash": "4c2adb9e2855f0f4971f36b625d5589d42d55bc69dec3d47e21bfc7b1584d2cf",
-    "criteria_version": "content_review_v2",
+    "id": "6d6b93b4-6a51-4bb5-aa92-bcb8a7cd1ed9",
+    "content_hash": "f872d5f9e7c760407ee0d92918e1537f8cbdafb79ceddb798a8080bb613c34bb",
+    "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,
     "generation_quality_verdict": "fail",
     "openai_review": null,
-    "independent_review_requested": true,
-    "claude_review": {
-      "verdict": "warning",
-      "findings": 2,
-      "model": "claude-opus-5"
-    },
-    "adjudication": {
-      "decisions": 2,
-      "model": "gpt-4.1-2025-04-14"
-    },
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
     "prepared_finalization": true,
     "running_stage": null,
     "last_error": null,
@@ -37,8 +30,6 @@
     "steps": [
       "rules",
       "openai",
-      "claude",
-      "adjudication",
       "finalization",
       "professor"
     ]

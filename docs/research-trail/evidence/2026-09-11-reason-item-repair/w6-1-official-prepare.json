@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T12:03:07.130Z",
+  "at": "2026-09-11T12:44:22.905Z",
   "key": "w6-1",
   "scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
   "mode": "prepare",
@@ -9,11 +9,11 @@
     "rules",
     "finalization"
   ],
-  "contentHash": "d560f4192a5a5bf1a9957269acd8d43135719f27a45e8f5e02b81fe339bc0fd3",
+  "contentHash": "1477d271c8aabb70a6e870efdae873322e5a992cbb6cd23ad5778f6cabda5aae",
   "run": {
-    "id": "d9f44325-9764-4a4f-b964-2153dd9be157",
-    "content_hash": "d560f4192a5a5bf1a9957269acd8d43135719f27a45e8f5e02b81fe339bc0fd3",
-    "criteria_version": "content_review_v2",
+    "id": "62b457ff-3509-4607-9462-36c3973bdcad",
+    "content_hash": "1477d271c8aabb70a6e870efdae873322e5a992cbb6cd23ad5778f6cabda5aae",
+    "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,

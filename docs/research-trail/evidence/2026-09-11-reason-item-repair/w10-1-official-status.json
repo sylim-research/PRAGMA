@@ -1,15 +1,15 @@
 {
-  "at": "2026-09-11T12:08:44.348Z",
+  "at": "2026-09-11T13:00:29.263Z",
   "key": "w10-1",
   "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
-  "contentHash": "44b53a56f49acb4c3f221358e6d35e5eb828a214c88bc9ff6dbdf69157e92505",
+  "contentHash": "1d80ad9a4c005114fea9db7e1a09f24d6134eec0c0366d74ff12703b86b5f78a",
   "sourceHash": "dcf0acc1bafda7be759b1013001fcd99e23f53574c1253068f8d7fa731ac6b54",
   "run": {
-    "id": "83951e99-f915-42fe-a8f3-e8ee9073b929",
-    "content_hash": "44b53a56f49acb4c3f221358e6d35e5eb828a214c88bc9ff6dbdf69157e92505",
-    "criteria_version": "content_review_v2",
+    "id": "cffe6a4a-2d81-4e58-993d-e939f8af1ec5",
+    "content_hash": "1d80ad9a4c005114fea9db7e1a09f24d6134eec0c0366d74ff12703b86b5f78a",
+    "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
-    "rules_verdict": "fail",
+    "rules_verdict": "warning",
     "generation_quality": true,
     "generation_quality_verdict": "pass",
     "openai_review": null,
@@ -18,9 +18,9 @@
     "adjudication": null,
     "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",
@@ -28,5 +28,5 @@
       "professor"
     ]
   },
-  "history": 1
+  "history": 2
 }

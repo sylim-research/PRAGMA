@@ -1,13 +1,13 @@
 {
-  "at": "2026-09-11T12:08:50.980Z",
+  "at": "2026-09-11T13:00:36.718Z",
   "key": "w13-1",
   "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
-  "contentHash": "2bf34ca7b4998579b7b233d64c80ceeb05848c0f35dfeeb954fa05fe06594aa9",
+  "contentHash": "234d67eee174450919b4622f9633c328d972a40c7576f45f85a9513c8178cb7b",
   "sourceHash": "5f3a7d827bb01632d4d6dfaf33cd9393711ab282ceb02984ce1eb3f45f511976",
   "run": {
-    "id": "153d5909-c063-4bd2-af80-2cc79c9dab07",
-    "content_hash": "2bf34ca7b4998579b7b233d64c80ceeb05848c0f35dfeeb954fa05fe06594aa9",
-    "criteria_version": "content_review_v2",
+    "id": "67726f4c-1130-4057-845d-dee6b30ea129",
+    "content_hash": "234d67eee174450919b4622f9633c328d972a40c7576f45f85a9513c8178cb7b",
+    "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,
@@ -37,5 +37,5 @@
       "professor"
     ]
   },
-  "history": 1
+  "history": 2
 }
