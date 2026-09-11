@@ -357,3 +357,24 @@ r2와 r3는 같은 단어 ‘不行’을 근거로 들지만 주장하는 결�
 
 - 그대로 승인 14: pass 13(w2-0·w2-1·w3-0·w3-1·w4-0·w4-1·w9-0·w9-1·w10-1·w11-0·w11-1·w12-1·w13-0) + warning w6-1.
 - override 동반 승인 6(건별 사유, 일괄 금지): w5-0(1) · w5-1(2, 그중 r1은 수정 여부 연구자 판단) · w10-0(2) · w12-0(2) · w13-1(2) · w6-0(1). override는 `finalize_reviewed_mission`의 `issue_overrides`(index·code·where·사유)로 기록되며 critic 결과는 그대로 보존된다.
+
+## 13. 콘텐츠 동결 선언 · 교수자 최종 검수 단계 전환 · 2026-09-11
+
+- **마지막 콘텐츠 수정 = w5-1 r1**(연구자 문안 「‘有空的话’로 상대의 일정 가능성을 먼저 열어 두고 뒤에서 초대한다」, 이유 형식을 위해 「…하기 때문이다」만 붙임). `human-replacements-round7.json` → `w5-1-apply-r7.json`, revision 경로, 새 hash `9274cc7f`, lineage 4판. 재검사 결과 **fail**(2 finding): r3 「부차적 사실이나 세트 안에서 혼동될 수 있다」, r1 「‘有空的话’는 오히려 적정 초대의 바람직한 요소」. 둘 다 override 대상. 이로써 **20칸 콘텐츠 동결**(`status-20cells-20260911-frozen.json`: pass 13 · warning 1 · fail 6). Reason 계약·생성기·critic 프롬프트는 이후 수정하지 않는다.
+- **교수자 최종 검수 화면(현행, 변경 없음)**: `/admin/review` → `ProfessorMissionWorkbench`. fail finding마다 사유 입력란(10자 이상)이 있고 전부 채워야 승인 버튼이 열린다. 승인은 `reviewMission` → `finalize_reviewed_mission(issue_overrides)`로 저장되며, RPC가 `quality_check` 교체를 거부하므로 AI critic 결과는 원본 그대로 남는다. finding이 없는 미션은 사유 없이 승인된다 — 별도 「compact view」는 없지만 채울 것이 없어 한 화면·한 번의 승인이다. w6-0은 사유란에 「화용 경계」 취지를 적으면 되고 UI 표지는 필요 없다. 새 UI를 만들지 않는다(UI 게이트).
+- **편성 가능 여부(실측)**: 편성 조건 `isReviewedMission` = mission_status reviewed/released **and** `core_content.generation.content_release_id`가 현행 release. 20행 전부 release `_03`·`legacy_reviewed`·`generated`·`needs_review`. 따라서 **교수자 승인으로 reviewed가 되는 순간 20건 모두 편성 후보**가 된다. 교과목 `915fec24`(published, 20행)의 편성 행에 붙은 학습 기록 0건(2026-09-10 삭제 후 유지) → `saveWeekAssignments` 통상 경로로 교체 가능. 교체 뒤 구 미션 20건 보관은 별도 승인.
+
+### 교수자가 override 사유를 적어야 할 finding(정확한 목록, 10개)
+
+| key | where | 저장본 오답 | critic note 요지 |
+|---|---|---|---|
+| w5-0 | mpj_items[3].reasons[0] (r1) | ‘…吧！’ 느낌표·吧의 가벼운 권유 어조 | 「오답으로는 허용되나 다소 애매」 |
+| w5-1 | mpj_items[3].reasons[0] (r3) | 공연 정보 두 문장 뒤에 초대 | 「부차적 사실이나 세트 안에서 혼동될 수 있음」 |
+| w5-1 | mpj_items[3].reasons[1] (r1) | ‘有空的话’로 일정 가능성을 먼저 열어 둠 | 「오히려 적정 초대의 바람직한 요소」 |
+| w10-0 | mpj_items[3].reasons[0] (r1) | ‘虽然…’로 부담을 먼저 인정 | 「사실 기반 부차적 요인이므로 허용」 |
+| w10-0 | mpj_items[3].reasons[2] (r2) | 조건 설명이 제안보다 먼저 | 「무관한 판단 차원의 관찰이므로 허용」 |
+| w12-0 | mpj_items[3].reasons[0] (r3) | 세 피해를 한 문장에 나열 | 「부차적 판단… 타당성 약함」 |
+| w12-0 | mpj_items[3].reasons[2] (r1) | ‘这让我很不方便’ 개인 불편 표현 | 「핵심 원인과 다르므로 혼동 위험」 |
+| w13-1 | mpj_items[3].reasons[0] (r3) | 검토 내용이 부탁 문장 뒤에 | 「별개 차원… 허용」 |
+| w13-1 | mpj_items[3].reasons[1] (r1) | ‘一下’가 부담을 작게 전함 | 「부차적이므로 허용」 |
+| w6-0 | mpj_items[3].reasons[0] (r3) | 첫머리 단독 ‘不行’의 첫인상 강도 | 「r2와 같은 不行 근거」 — 화용 경계, 12절 사유 |

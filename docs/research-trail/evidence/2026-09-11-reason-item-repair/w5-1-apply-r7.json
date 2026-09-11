@@ -1,0 +1,154 @@
+{
+  "at": "2026-09-11T09:36:48.440Z",
+  "key": "w5-1",
+  "scenario_id": "793a1576-55c4-4790-9791-621685a9b3bb",
+  "outcome": "revised",
+  "replaced": [
+    "r1"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "팀장님, 이번 토요일에 회사 근처 공연장에서 제가 출연하는 합창 공연이 있어요. 공연은 90분이고 입장료는 없어요. 시간 괜찮으시면 들으러 오실래요?",
+    "target": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。有空的话，来听听吧，那就说定了。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘这周六…举行’과 ‘演出一个半小时，免费入场’으로 공연 정보를 두 문장에 걸쳐 먼저 제시하고 초대 표현은 마지막에 와서, 초대인지 공연 안내인지가 끝 문장에서야 드러나기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "'有空的话'라고 조건을 붙여 팀장에게 참석을 바라는 마음이 약하게 들리므로, 초대의 진정성을 보여 줄 권유가 더 필요하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "'有空的话'로 일정 조건을 두었지만, '那就说定了'가 아직 받지 않은 수락을 이미 성립한 약속처럼 처리하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "有空的话",
+      "那就说定了"
+    ],
+    "item_focus": "invitation_choice_commitment",
+    "relation_ko": "반년간 정기적으로 업무를 보고해 온, 내 업무 배정과 평가를 맡는 팀장",
+    "axis_feature": "invitation_choice_commitment",
+    "situation_ko": "나는 반년간 업무를 보고해 온 팀장에게 내가 출연하는 합창 공연의 관객으로 와 달라고 초대하려 한다. 내 업무 배정과 평가를 맡는 팀장이며, 공연은 토요일 회사 근처 공연장에서 90분간 열리고 입장료는 없다.",
+    "explanation_ko": "팀장은 주말 90분 공연에 참석하겠다는 답을 아직 하지 않았습니다. '那就说定了'는 '有空的话'라는 조건이 있어도 참석을 합의된 일로 마무리하므로, 문제의 핵심은 권유 횟수나 '来听听'의 의미가 아니라 수락의 선취입니다. 이 마무리를 '愿意来听听吗？'처럼 답을 기다리는 질문으로 바꾸어야 합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_pressuring",
+    "accepted_reason_id": "r2",
+    "recommended_example": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。您要是有时间，愿意来听听吗？"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "팀장님, 이번 토요일에 회사 근처 공연장에서 제가 출연하는 합창 공연이 있어요. 공연은 90분이고 입장료는 없어요. 시간 괜찮으시면 들으러 오실래요?",
+    "target": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。有空的话，来听听吧，那就说定了。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘这周六…举行’과 ‘演出一个半小时，免费入场’으로 공연 정보를 두 문장에 걸쳐 먼저 제시하고 초대 표현은 마지막에 와서, 초대인지 공연 안내인지가 끝 문장에서야 드러나기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘有空的话’로 상대의 일정 가능성을 먼저 열어 두고 뒤에서 초대하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "'有空的话'로 일정 조건을 두었지만, '那就说定了'가 아직 받지 않은 수락을 이미 성립한 약속처럼 처리하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "有空的话",
+      "那就说定了"
+    ],
+    "item_focus": "invitation_choice_commitment",
+    "relation_ko": "반년간 정기적으로 업무를 보고해 온, 내 업무 배정과 평가를 맡는 팀장",
+    "axis_feature": "invitation_choice_commitment",
+    "situation_ko": "나는 반년간 업무를 보고해 온 팀장에게 내가 출연하는 합창 공연의 관객으로 와 달라고 초대하려 한다. 내 업무 배정과 평가를 맡는 팀장이며, 공연은 토요일 회사 근처 공연장에서 90분간 열리고 입장료는 없다.",
+    "explanation_ko": "팀장은 주말 90분 공연에 참석하겠다는 답을 아직 하지 않았습니다. '那就说定了'는 '有空的话'라는 조건이 있어도 참석을 합의된 일로 마무리하므로, 문제의 핵심은 권유 횟수나 '来听听'의 의미가 아니라 수락의 선취입니다. 이 마무리를 '愿意来听听吗？'처럼 답을 기다리는 질문으로 바꾸어야 합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_pressuring",
+    "accepted_reason_id": "r2",
+    "recommended_example": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。您要是有时间，愿意来听听吗？"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 초대 표현이 실제 상황과 화용 초점에 맞게 조정되어 있고, 오답도 현실적 경계 사례로 구성되어 있음.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "‘这周六…举行’과 ‘演出一个半小时，免费入场’으로 공연 정보를 두 문장에 걸쳐 먼저 제시하고 초대 표현은 마지막에 와서, 초대인지 공연 안내인지가 끝 문장에서야 드러나기 때문이다.",
+          "note_ko": "이 선택지는 초대 표현의 위치와 정보 제시 순서를 문제 삼고 있으나, 이는 실제 문제(수락의 선취, 즉 '那就说定了'로 상대의 답 없이 약속을 확정하는 것)와 무관하다. 초대가 마지막에 오더라도 초대 의도와 약속 성립 방식이 명확하면 문제가 되지 않으므로, 이 선택지는 주원인과 무관한 설명이 아니라, 실제로는 핵심 원인과 다른 판단 차원의 부차적 사실로 볼 수 있으나, 선택지 세트 내에서 주원인과 혼동될 수 있는 정도로 제시되어 primary_reason_ambiguity에 해당한다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[1]",
+          "evidence_excerpt": "‘有空的话’로 상대의 일정 가능성을 먼저 열어 두고 뒤에서 초대하기 때문이다.",
+          "note_ko": "이 선택지는 '有空的话'로 조건을 두고 초대하는 점을 문제 삼으나, 이는 실제로는 초대에서 선택권을 남기는 전략으로, 문제의 핵심(수락의 선취, 즉 '那就说定了'로 상대의 답 없이 약속을 확정하는 것)과 다르다. 실제로는 오히려 적정 초대에서 바람직한 요소이므로, 주원인과 혼동될 수 있는 설명으로 primary_reason_ambiguity에 해당한다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T09:36:47.686Z",
+      "mission_content_hash": "9274cc7f745edb1c5e158d38e1a36bc5a02fcc89c0ab23b1f171c94e74e8c6b4"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=51자, 후보 2[too_pressuring]=55자, 후보 3[within_band]=54자, 후보 4[too_ambiguous]=69자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"팀장님, 이번 토요일에 회사 근처 공연장에서…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"팀장님, 이번 토요일에 회사 근처 공연장에서…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"经理,这周六我参加演出的合唱音乐会在公司附近的剧…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"经理,这周六我参加演出的合唱音乐会在公司附近的剧…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}
