@@ -3195,6 +3195,12 @@
   500을 시작하지 않는다.
 - 근거: `docs/dev-log/2026-08-30-08-production-yield30.md`; run
   `scope-lock-pilot-20260830-08-yield30`; `EVD-20260830-13`, `ITER-20260830-13`.
+- 대체(2026-09-11 연구자 판정): 위 「대표 E2E 경계」의 **교과목용 reviewed mission·대표 세트에 OpenAI → Claude
+  독립 검수 → OpenAI adjudication을 전수 필수 적용한다**는 부분은 DEC-20260906-03의 `focused_v1` 정책으로
+  대체됐다(superseded). 현행은 규칙 검사 → 전수 production quality critic → 동일 content_hash 결과의 공식
+  content-review 재사용 → 위험·경계 항목에 한한 선택적 Claude 독립 검토 → Claude finding이 있을 때만 OpenAI
+  adjudication → 교수자 최종 승인이다. 이 결정의 나머지(canary 측정 범위, 호출 구분 원칙)는 유지한다.
+  기록: `docs/dev-log/2026-09-11-reason-item-contract-and-reaudit.md` 15절.
 
 ## DEC-20260830-14 · 상대경계 누락만 후보 단위 1회 복구하고 terminal 원인을 artifact에 분리
 
@@ -3600,6 +3606,9 @@ Railway 배포 및 인증 관리자 읽기 smoke를 확인했다. 실제 콘텐�
 - 유지: content_review_v2 의미 기준, 이전 결과·승인·학습 기록, 생성 critical override, DB hash·권한·원자적 최종화. AI가 교수자 승인을 대리하지 않는다.
 - 한계: 절차 경량화는 콘텐츠 타당도나 시간 절감 효과의 실증이 아니다. 판정 오류 수정과 교수자 확정은 별도 작업이다.
 - 근거: docs/dev-log/2026-09-06-focused-content-review.md.
+- 선행 결정 대체(2026-09-11 명시): DEC-20260827(규칙 → OpenAI → Claude → OpenAI 재검토 → 교수자 승인의 전수
+  연결)과 DEC-20260830-13의 「교과목용 reviewed mission·대표 세트 전수 3단 검수」 요구를 이 정책이 대체한다.
+  과거 승인 행의 `multimodel_v2` 증거는 보존한다. 현행 canonical workflow 문구는 DEC-20260830-13의 대체 항목과 같다.
 
 ## DEC-20260906-05 · 주차별 미션 메뉴와 직접 시작
 
