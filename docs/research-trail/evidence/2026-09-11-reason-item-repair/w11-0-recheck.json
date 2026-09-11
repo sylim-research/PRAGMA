@@ -1,0 +1,130 @@
+{
+  "at": "2026-09-11T05:35:22.590Z",
+  "key": "w11-0",
+  "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "공간을 넓히자는 취지는 이해해요. 그래도 작품 설명문은 모두 남기는 게 좋겠어요. 관람객이 작품을 이해하는 데 필요하니까요.",
+    "target": "我理解你想让空间更宽敞。观众理解作品需要这些说明，全部保留也可以考虑一下吧。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘全部保留也可以考虑一下吧’가 보존을 고려 가능한 방향으로만 제시하여, 설명문 삭제에 반대하는 입장인지 분명하게 전달하지 못하기 때문입니다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘我理解你想让空间更宽敞’로 상대 의도를 인정하는 문장이 먼저 와서, 반대 의견이 두 번째 문장 끝에야 나오기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘这些说明’이 어떤 설명문을 가리키는지 앞에서 말하지 않아, 상대가 낸 삭제안을 모르면 대상이 바로 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "全部保留也可以考虑一下吧"
+    ],
+    "item_focus": "opposition_stance_mitigation",
+    "corrections": [
+      {
+        "text": "我理解你想让空间更宽敞，不过我不赞成全部撤掉作品说明。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+        "note_ko": "전시 구성을 함께 결정하는 상황에서 ‘我不赞成全部撤掉’가 이견 대상을 확정하고 ‘我觉得’가 판단으로 제시해, 상대의 취지를 인정하면서 보존 입장을 유지합니다.",
+        "is_valid": true
+      },
+      {
+        "text": "我理解你想让空间更宽敞，不过全部撤掉作品说明这个提议实在欠考虑。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+        "note_ko": "‘我不赞成’을 ‘这个提议实在欠考虑’로 바꾸어 개인의 이견을 상대 제안의 숙고 부족에 대한 평가로 전환했습니다. 보존 입장과 관람객 이해라는 근거는 유지하되, 동등한 동료의 판단을 깎아내려 too_confrontational 방향으로 경계를 넘습니다.",
+        "is_valid": false
+      },
+      {
+        "text": "我理解你想让空间更宽敞，不过说到全部撤掉作品说明，我也有些想法。观众理解作品需要这些说明，全部保留也未尝不可。",
+        "note_ko": "명시적 반대를 ‘我也有些想法’라는 불특정 의견으로, 전부 보존하자는 판단을 ‘也未尝不可’라는 가능성 인정으로 낮췄습니다. 같은 근거로 삭제안에 이견을 비치지만 보존을 지지하는 정도가 불분명해져 too_obscured로 이동합니다.",
+        "is_valid": false
+      }
+    ],
+    "relation_ko": "지난달부터 사진전을 함께 준비해 온 동등한 동아리 동료",
+    "axis_feature": "opposition_stance_mitigation",
+    "situation_ko": "나는 지난달부터 함께 사진전을 준비한 동아리 동료와 전시 구성을 논의하고 있다. 상대가 공간을 넓히려고 작품 설명문을 모두 빼자고 했지만, 관람객의 작품 이해에 필요하다고 생각해 반대하려 한다.",
+    "explanation_ko": "함께 사진전을 준비하는 동등한 동료에게 작품 설명문을 모두 빼자는 제안에 반대하는 상황이므로, 공간 확보 취지를 인정하면서도 전부 보존하자는 입장을 분명히 해야 합니다. 최종 권장 후보는 ‘我理解你想让空间更宽敞’으로 상대의 취지를 받아들이고, ‘我不赞成全部撤掉作品说明’과 ‘我觉得还是全部保留比较好’로 반대 대상과 보존 판단을 밝혀 상대의 판단을 깎아내리지 않고 이견을 전달합니다. 관람객의 이해라는 근거는 유지하되, ‘全部保留也可以考虑一下吧’처럼 보존을 단순한 고려 사항으로 흐리는 표현은 명확한 반대와 보존 의견으로 조정하는 것이 적절합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_obscured",
+    "accepted_reason_id": "r3",
+    "accepted_band_codes": [
+      "too_obscured"
+    ],
+    "recommended_example": "我理解你想让空间更宽敞，不过我不赞成全部撤掉作品说明。观众理解作品需要这些说明，我觉得还是全部保留比较好。"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:54:26.012Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[1]",
+        "note_ko": "r1은 반대 의견이 두 번째 문장 끝에 나온다는 순서상의 문제를 지적하지만, 이는 실제로 이견 명료성 부족(too_obscured)의 주원인이 아니다. r3이 이미 '보존을 고려 가능한 방향으로만 제시하여, 설명문 삭제에 반대하는 입장인지 분명하게 전달하지 못한다'고 하여 주원인을 정확히 진단하고 있으므로, r1은 실제 주원인의 부분 설명 또는 바꿔 말하기에 불과하다.",
+        "severity": "fail",
+        "evidence_excerpt": "‘我理解你想让空间更宽敞’로 상대 의도를 인정하는 문장이 먼저 와서, 반대 의견이 두 번째 문장 끝에야 나오기 때문이다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[2]",
+        "note_ko": "r2는 설명문의 지시 대상이 불분명하다는 의미·문맥 오진을 들고 있으나, 실제로는 맥락상 설명문이 무엇을 가리키는지 명확하다. 이는 주원인과 별개의 오진이므로, 이유 선택지로서 적절하지 않다.",
+        "severity": "fail",
+        "evidence_excerpt": "‘这些说明’이 어떤 설명문을 가리키는지 앞에서 말하지 않아, 상대가 낸 삭제안을 모르면 대상이 바로 드러나지 않기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 화행 초점과 대역 구분을 충실히 반영하며, 학습 오도 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:35:22.387Z",
+      "mission_content_hash": "03f08d7597b6cf95d868030af485fa86bc6a2ec1eb4a76654564408789aa814c"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"공간을 넓히자는 취지는 이해해요. 그래도 작…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"공간을 넓히자는 취지는 이해해요. 그래도 작…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我理解你想让空间更宽敞。观众理解作品需要这些说明…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我理解你想让空间更宽敞。观众理解作品需要这些说明…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}

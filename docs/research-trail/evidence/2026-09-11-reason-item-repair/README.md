@@ -19,3 +19,11 @@
 6. 결과 표를 dev-log에 남기고, 경계 사례(w3-1 r1·w6-0 r3)는 연구자 판정을 받은 뒤 처리한다.
 
 이 러너는 교수자 승인·편성·공개를 하지 않는다.
+
+## 배포 뒤 실행(2026-09-11 오후, generate-scenario v124) — dev-log 9절
+
+- `*-recheck.json` 12건: 문항 불변 재검사(`repair.ts recheck`) — 새 lineage version으로 저장. pass 6(w2-0·w3-1·w4-1·w11-0·w11-1·w12-1) · fail 6(w5-0·w6-0·w9-0·w10-0·w12-0·w13-1).
+- `human-replacements-round2.json` → `*-apply-r2.json`: w3-0 r3·w5-1 r3(critic이 잡은 허위 전제), w2-1 r1·r2·w4-0 r1·r2(눈검사에서 잡은 허위 전제). pass 2(w2-1·w4-0) · fail 2(w3-0·w5-1 — note는 「정상/허용」인데 severity fail).
+- `human-replacements-round3.json` → `*-apply-r3.json`: w13-1 r1(내 1차 교체안의 허위 전제 정정 — 원문에 30분 없음), w6-1 r2(v124 생성분의 옛 형태 오답). w6-1 warning(Reason finding 0) · w13-1 fail(note 「정상」×2).
+- `status.ts`: 20칸 최종 상태 스냅샷(읽기 전용).
+- 러너의 `apply`는 `argv[4]`=교체 파일, `argv[5]`=출력 접미. 기존 결과 파일은 덮어쓰지 않는다.

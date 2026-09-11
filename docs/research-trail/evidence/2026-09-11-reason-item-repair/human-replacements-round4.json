@@ -1,0 +1,13 @@
+{
+  "scope": "Round 4 (2026-09-11). w13-0 was generated under the aligned rule (v124, fresh job 3c2686e5); the candidate-feedback microfix held, but the generator still produced two old-form distractors that the critic correctly failed as false premises. Only those two options are rewritten; accepted option, explanation and the rest of the mission are untouched. Same revision path.",
+  "replacements": {
+    "w13-0": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "문장 끝의 ‘吧’가 어조를 누그러뜨리는 구어 표지라, 팀장에게 보내는 업무 이메일에서는 격식이 낮게 들릴 수 있기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘这是星期五要提交的客户提案初稿’로 문서 설명을 먼저 두고 부탁은 두 번째 문장에 와서, 첫 문장만 읽으면 검토 요청인지 제출 보고인지 드러나지 않기 때문이다." }
+    }
+  },
+  "replaced_premises": {
+    "w13-0 r1": "「‘请您’와 ‘吧’가 지나치게 조심스럽게 타진해 요청의 힘이 너무 약해진다」 — 사실이 아님(target은 too_direct 대역의 직접 요청).",
+    "w13-0 r2": "「‘把需要修改的地方指出来’가 직접 수정해 달라는 뜻」 — 사실이 아님(指出来 = 짚어 달라, 원문과 같음)."
+  }
+}

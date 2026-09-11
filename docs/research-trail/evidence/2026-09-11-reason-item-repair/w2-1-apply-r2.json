@@ -1,0 +1,133 @@
+{
+  "at": "2026-09-11T05:38:07.988Z",
+  "key": "w2-1",
+  "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+  "outcome": "revised",
+  "replaced": [
+    "r1",
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "distant",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "제 펜 좀 주워 주세요. 제 자리에서는 손이 닿지 않네요.",
+    "target": "把我的笔捡给我吧。我这边够不着。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘吧’로 어조를 누그러뜨렸지만, 도움을 수락하지 않은 초면의 이용자에게 ‘把…捡给我’로 할 행동부터 정해 주어 수행 여부를 답할 여지가 부족하다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "문장 끝의 ‘吧’가 펜을 주워도 그만이라는 뜻을 강하게 만들어, 실제로 도움을 구하는 요청이 너무 약해진다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘我这边够不着’는 펜이 상대 발치에 있다는 위치를 말하지 않아, 이 장면에서 어떤 펜을 주워야 하는지 식별할 수 없게 한다."
+      }
+    ],
+    "highlights": [
+      "把我的笔捡给我吧"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "도서관에서 처음 만난 옆자리 이용자",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 도서관에서 펜을 떨어뜨렸고, 펜은 처음 보는 옆자리 이용자의 발치에 있다. 내 자리에서는 손이 닿지 않아 그 이용자에게 펜을 주워 달라고 부탁하려 한다.",
+    "explanation_ko": "처음 만난 이용자는 펜을 주워 주기로 한 상태가 아니므로, ‘把…捡给我吧’가 상대의 행동을 먼저 정하는 점이 가장 큰 문제입니다. ‘吧’가 요청을 없애는 것도 아니고, 발치에 떨어진 펜이 있는 상황에서 원문의 의미나 문법이 불완전한 것도 아닙니다. ‘能不能帮我…’로 바꾸어 도움 가능 여부에 답할 여지를 남기면 됩니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r3",
+    "recommended_example": "能不能帮我捡一下笔？我这边够不着。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "distant",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "제 펜 좀 주워 주세요. 제 자리에서는 손이 닿지 않네요.",
+    "target": "把我的笔捡给我吧。我这边够不着。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘吧’로 어조를 누그러뜨렸지만, 도움을 수락하지 않은 초면의 이용자에게 ‘把…捡给我’로 할 행동부터 정해 주어 수행 여부를 답할 여지가 부족하다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "문장 끝의 ‘吧’가 어조를 누그러뜨리는 구어 표지라, 처음 보는 이용자에게는 편한 사이의 말투로 들릴 수 있기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘我这边够不着’로 손이 닿지 않는 사정이 부탁 뒤에 와서, 왜 부탁하는지가 요청 다음에야 드러나기 때문이다."
+      }
+    ],
+    "highlights": [
+      "把我的笔捡给我吧"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "도서관에서 처음 만난 옆자리 이용자",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 도서관에서 펜을 떨어뜨렸고, 펜은 처음 보는 옆자리 이용자의 발치에 있다. 내 자리에서는 손이 닿지 않아 그 이용자에게 펜을 주워 달라고 부탁하려 한다.",
+    "explanation_ko": "처음 만난 이용자는 펜을 주워 주기로 한 상태가 아니므로, ‘把…捡给我吧’가 상대의 행동을 먼저 정하는 점이 가장 큰 문제입니다. ‘吧’가 요청을 없애는 것도 아니고, 발치에 떨어진 펜이 있는 상황에서 원문의 의미나 문법이 불완전한 것도 아닙니다. ‘能不能帮我…’로 바꾸어 도움 가능 여부에 답할 여지를 남기면 됩니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r3",
+    "recommended_example": "能不能帮我捡一下笔？我这边够不着。"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 요청 문항이 실제 맥락과 화용 초점에 맞게 적정 대역과 조정 방향을 구별하며, 오도할 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:38:07.695Z",
+      "mission_content_hash": "0d5f949d796f548d32ce18c3ae4d463d22eb9d96578babf72d4d88b98e5ce0a6"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"제 펜 좀 주워 주세요. 제 자리에서는 손이…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"제 펜 좀 주워 주세요. 제 자리에서는 손이…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把我的笔捡给我吧。我这边够不着。\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把我的笔捡给我吧。我这边够不着。\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

@@ -1,0 +1,110 @@
+{
+  "at": "2026-09-11T05:35:34.303Z",
+  "key": "w12-1",
+  "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "입력하신 행사 장소가 잘못돼서 제가 안내문을 다시 인쇄했어요. 이 일로 제가 추가 작업을 하게 돼서 번거롭네요.",
+    "target": "你填的活动地点不太对，通知单我这边也重新印了。这前前后后的事，多少让我有点不方便。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "재인쇄 사실은 말하지만, ‘我这边也’와 ‘这前前后后的事’로 사정을 나열해 입력 오류 때문에 떠안은 추가 작업이라는 불만의 초점을 흐리기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘通知单我这边也重新印了’가 몇 장을 얼마나 걸려 다시 찍었는지 말하지 않아, 원문의 추가 작업 규모가 상대에게 전해지지 않기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘你填的’로 동료를 직접 지목해, 확인된 입력 오류를 말하는 것만으로도 상대 개인을 비난하는 인상을 주기 때문이다."
+      }
+    ],
+    "highlights": [
+      "我这边也重新印了",
+      "这前前后后的事",
+      "多少让我有点不方便"
+    ],
+    "item_focus": "complaint_problem_accountability",
+    "relation_ko": "여러 번 함께 일한 같은 직급의 동료",
+    "axis_feature": "complaint_problem_accountability",
+    "situation_ko": "나는 여러 번 함께 일한 동료가 행사 장소를 잘못 입력해 안내문 50장을 다시 인쇄하느라 한 시간을 썼다. 직급이 같은 그 동료를 사무실에서 만나 잘못된 입력으로 생긴 추가 작업에 대해 불만을 말하려 한다.",
+    "explanation_ko": "이 사건에서는 장소 입력 오류 때문에 한 시간의 추가 작업이 생겼는데, ‘这前前后后的事’가 불편의 대상을 넓게 묶어 그 연결을 흐립니다. ‘重新印了’는 원문의 완료된 재인쇄와 맞고 동료의 입력을 지목하는 것 자체도 문제가 아니므로, 인신 비난을 피하려고 사실을 더 흐리기보다 오류와 추가 작업의 인과관계를 밝혀야 합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "under_specified",
+    "accepted_reason_id": "r2",
+    "recommended_example": "因为你把活动地点填错了，我不得不重新印通知单。这给我增加了额外的工作，确实挺麻烦的。"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:54:40.678Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[2]",
+        "note_ko": "r1(‘你填的’로 동료를 직접 지목해, 확인된 입력 오류를 말하는 것만으로도 상대 개인을 비난하는 인상을 주기 때문이다.)와 r2(재인쇄 사실은 말하지만, ‘我这边也’와 ‘这前前后后的事’로 사정을 나열해 입력 오류 때문에 떠안은 추가 작업이라는 불만의 초점을 흐리기 때문이다.)는 모두 책임 연결의 직접성/불명확성에 대한 평가로, 실제 주원인(불만의 초점 흐림)과 별개의 이유가 아니다. r1은 실제로는 주원인의 바꿔 말하기에 가깝다.",
+        "severity": "fail",
+        "evidence_excerpt": "‘你填的’로 동료를 직접 지목해, 확인된 입력 오류를 말하는 것만으로도 상대 개인을 비난하는 인상을 주기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 문제 명료화와 책임 범위 초점에 맞게 실제 상황과 화용 대역을 구별하며, 오도할 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:35:33.978Z",
+      "mission_content_hash": "1824d7dcb9102204172170dbac598ba91b9a46be9035377a2abe5b324fc11df2"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=38자, 후보 2[under_specified]=43자, 후보 3[within_band]=40자, 후보 4[over_attributed]=52자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"입력하신 행사 장소가 잘못돼서 제가 안내문을…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"입력하신 행사 장소가 잘못돼서 제가 안내문을…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你填的活动地点不太对,通知单我这边也重新印了。这…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你填的活动地点不太对,通知单我这边也重新印了。这…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}

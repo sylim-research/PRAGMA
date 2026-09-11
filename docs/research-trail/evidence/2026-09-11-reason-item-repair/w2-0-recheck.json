@@ -1,0 +1,128 @@
+{
+  "at": "2026-09-11T05:34:45.675Z",
+  "key": "w2-0",
+  "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+    "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘弄丢了’로 링크를 잃어버린 사정을 먼저 밝혀, 부탁의 이유 설명이 요청 자체보다 앞에 놓이기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘那个链接’이 앞 문장의 링크를 받는 지시어라, 첫 문장을 읽지 않으면 무엇을 보내 달라는지 바로 드러나지 않기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘吧’로 어조를 누그러뜨리기는 했지만, ‘你就把…’가 아직 수락하지 않은 동료의 재전송 행동을 정해 주는 방식으로 들리기 때문이다."
+      }
+    ],
+    "highlights": [
+      "你就把那个链接再发我一次吧"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "corrections": [
+      {
+        "text": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？",
+        "note_ko": "몇 차례 교류한 동료에게 ‘能不能’으로 재전송 가능성을 직접 물어 응답 여지를 남기므로, 요청 내용을 분명히 하면서 이 정도의 조절을 유지합니다.",
+        "is_valid": true
+      },
+      {
+        "text": "我把之前收到的会议室预约说明链接弄丢了。你得把那个链接再发我一次。",
+        "note_ko": "‘能不能’을 의무를 부여하는 ‘得’로 바꾸어 재전송을 상대가 해야 할 일로 단정합니다. 이미 합의한 전달을 재확인하는 장면과 달리, 아직 수락하지 않은 동료에게 자신의 링크 분실에 따른 재전송 의무를 부과하므로 too_direct입니다.",
+        "is_valid": false
+      },
+      {
+        "text": "我把之前收到的会议室预约说明链接弄丢了。不知道请你把那个链接再发我一次，会不会不太合适？",
+        "note_ko": "재전송 가능성을 묻는 대신 ‘会不会不太合适’로 부탁 자체의 적절성을 묻습니다. 재전송 요청은 유지되지만, 저장된 링크 하나를 받는 장면에서 상대가 수행 여부보다 부탁해도 괜찮다는 안심부터 제공하도록 응답 초점을 돌려 too_indirect로 이동합니다.",
+        "is_valid": false
+      }
+    ],
+    "relation_ko": "몇 차례 자료를 주고받은 같은 직급 동료",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 같은 직급 동료와 몇 차례 자료를 주고받았는데, 지난번에 받은 회의실 예약 안내 링크를 잃어버렸다. 그 링크를 저장해 둔 동료에게 메신저로 링크 하나를 다시 보내 달라고 부탁하려 한다.",
+    "explanation_ko": "몇 차례 자료를 주고받은 같은 직급 동료에게 저장된 링크 하나를 다시 부탁하는 상황이므로, 요청은 분명히 하되 수행을 당연시하지 않는 조절이 필요합니다. ‘你就把那个链接再发我一次吧’를 ‘你能不能把那个链接再发我一次？’로 바꾸면 재전송 가능성을 물어 상대에게 응답 여지를 남기므로, 동료 관계에 맞는 이 정도의 조절을 유지합니다. ‘得’로 의무를 부과하거나 ‘会不会不太合适’로 부탁 자체에 대한 안심을 구하는 방향은 피합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r3",
+    "accepted_band_codes": [
+      "too_direct"
+    ],
+    "recommended_example": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:53:39.942Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[0]",
+        "note_ko": "r1(‘弄丢了’로 링크를 잃어버린 사정을 먼저 밝혀, 부탁의 이유 설명이 요청 자체보다 앞에 놓이기 때문이다.)와 r3(‘吧’로 어조를 누그러뜨리기는 했지만, ‘你就把…’가 아직 수락하지 않은 동료의 재전송 행동을 정해 주는 방식으로 들리기 때문이다.)는 모두 요청의 직접성/완화와 관련된 실제 주원인과 별개로, r1은 이유 설명의 위치를 문제 삼으나, 실제로는 요청의 직접성(수락하지 않은 동료에게 행동을 정함)이 주요 원인이다. r1은 실제 주원인과 구별되는 별도의 오진이 아니다.",
+        "severity": "fail",
+        "evidence_excerpt": "‘弄丢了’로 링크를 잃어버린 사정을 먼저 밝혀, 부탁의 이유 설명이 요청 자체보다 앞에 놓이기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 요청 장면과 후보가 실제 맥락과 화용 초점에 맞게 설계되어 있으며, 오답 후보도 현실적 경계 사례로 구성되어 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:34:45.275Z",
+      "mission_content_hash": "8befdc5af7cf7b6043ab8407dcb0335afa5429ba1f075d55a1ed23976176adbf"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"지난번에 받은 회의실 예약 안내 링크를 잃어…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"지난번에 받은 회의실 예약 안내 링크를 잃어…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我把之前收到的会议室预约说明链接弄丢了。你就把那…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我把之前收到的会议室预约说明链接弄丢了。你就把那…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}

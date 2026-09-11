@@ -55,6 +55,8 @@ ${REASON_DISCRIMINATION_RULE}
   될 수 있는 오답이 있거나, 이유가 아닌 사실 확인 문장만 있으면 fail이다. 사실이고 명백히 부차적이거나
   다른 판단 차원인 오답은 정상이며, 주원인과 무관하다는 이유로 fail하지 않는다.
   서로 다른 말투로 썼다는 이유로 구별하지 않는다.
+- 문제가 없다고 판단한 선택지에는 finding을 만들지 않는다. note_ko가 「정상」「허용」으로 끝나는 finding은
+  내지 않는다. finding의 severity는 note_ko의 결론과 같아야 한다.
 - finding은 해당 reasons[i].text_ko를 인용하고, note_ko에 겹치는 선택지 ID와 근거를 적는다.
 
 3. internal_inconsistency / feedback_quality_mismatch

@@ -1,0 +1,124 @@
+{
+  "at": "2026-09-11T05:35:26.157Z",
+  "key": "w11-1",
+  "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+    "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "피로 근거 ‘连续站着接待三个小时会更累’가 반대 표명 뒤에 와서, 왜 반대하는지가 판정 다음에야 나오기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "피로 근거는 제시했지만 就是不合适로 동료의 안을 확정적으로 판정하여, 자신의 반대를 밝히는 것보다 상대 안을 잘라 말하는 효과가 앞서기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "我不同意",
+      "这样安排就是不合适"
+    ],
+    "item_focus": "opposition_stance_mitigation",
+    "corrections": [
+      {
+        "text": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+        "note_ko": "동등한 동료와의 운영 논의에서 不太赞成은 반대를 식별 가능하게 밝히고 因为로 피로 근거를 연결하므로, 상대 안을 확정 판정하지 않는 이 연결을 유지한다.",
+        "is_valid": true
+      },
+      {
+        "text": "我不同意把轮班间隔延长到三个小时，这样安排明摆着不合理，因为连续站着接待三个小时会更累。",
+        "note_ko": "반대 대상과 피로 근거는 유지하되, 자신의 입장을 한정하던 不太赞成을 明摆着不合理라는 자명성·부적합 단정으로 바꿨다. 동등한 동료의 안을 논의 가능한 판단이 아닌 명백한 잘못으로 처리하여 too_confrontational 방향으로 경계를 넘는다.",
+        "is_valid": false
+      },
+      {
+        "text": "关于把轮班间隔延长到三个小时，我只是想提一下连续站着接待三个小时会更累这一点。",
+        "note_ko": "세 시간 교대안과 피로 증가라는 반대 근거는 유지하되, 명시적 반대를 只是想提一下라는 참고 사항 제시로 바꿨다. 피로를 이유로 이견을 암시하지만 안을 거부하는지 주의점만 덧붙이는지 불분명해져 too_obscured로 이동한다.",
+        "is_valid": false
+      }
+    ],
+    "relation_ko": "두 달 동안 행사를 함께 준비한 동등한 역할의 동료",
+    "axis_feature": "opposition_stance_mitigation",
+    "situation_ko": "나는 두 달 동안 행사를 함께 준비한 동료와 안내 부스 운영을 논의하고 있다. 동료가 교대 간격을 한 시간에서 세 시간으로 늘리자고 했지만, 세 시간 내내 서서 안내하면 피로가 커지므로 나는 그 안에 반대하려 한다.",
+    "explanation_ko": "두 달 동안 함께 행사를 준비한 동등한 동료와의 운영 논의에서는 세 시간 연속 안내에 따른 피로를 근거로 반대를 분명히 밝힐 필요가 있다. 유효 후보의 ‘我不太赞成’은 자신의 반대 입장을 밝히고 ‘因为’는 피로 근거를 연결하여, 상대의 안을 명백한 잘못으로 단정하지 않으면서 협의 관계를 유지한다. 이처럼 반대와 근거의 연결은 유지하되, ‘明摆着不合理’처럼 안을 단정적으로 평가하거나 ‘只是想提一下’처럼 반대를 참고 의견으로 흐리는 방식은 피한다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_confrontational",
+    "accepted_reason_id": "r3",
+    "accepted_band_codes": [
+      "too_confrontational"
+    ],
+    "recommended_example": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:54:30.860Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[0]",
+        "note_ko": "r2(meaning_grammar_context)는 근거의 위치 문제를 지적하지만, 실제 주원인(r3)은 '근거는 제시했지만 就是不合适로 동료의 안을 확정적으로 판정하여, 자신의 반대를 밝히는 것보다 상대 안을 잘라 말하는 효과가 앞서기 때문'이다. r2는 단순히 근거가 뒤에 온다는 사실을 말할 뿐, 단정적 판정이 문제라는 주원인과 별개의 이유가 아니다. 근거 위치만으로는 too_confrontational의 핵심 원인을 설명하지 못한다.",
+        "severity": "fail",
+        "evidence_excerpt": "피로 근거 ‘连续站着接待三个小时会更累’가 반대 표명 뒤에 와서, 왜 반대하는지가 판정 다음에야 나오기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 화용 초점과 실제 상황에 맞게 구성되어 있으며, 극단적 오답이나 대역 오류 없이 학습 오도 위험이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:35:25.852Z",
+      "mission_content_hash": "9997927f113dbc6b4ef366d0fce0ec3ef00f761a5031d54cfb45766ea79bb89d"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"교대 간격을 세 시간으로 늘리는 데 반대해요…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"교대 간격을 세 시간으로 늘리는 데 반대해요…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我不同意把轮班间隔延长到三个小时,这样安排就是不…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我不同意把轮班间隔延长到三个小时,这样安排就是不…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}
