@@ -123,9 +123,14 @@ export function missionFinalizationInput(row: Record<string, any>) {
   const featureCode = DEFAULT_FEATURE_BY_ACT[row.speech_act];
   if (!featureCode || !getTargetFeature(featureCode)) throw new Error("문항 판정 초점을 확인할 수 없습니다.");
   const direction = coreDirection(row.core_content) === "zh_ko" || row.language_direction === "zh_ko" ? "zh_ko" : "ko_zh";
+  // Attribution runs only inside the current realization pack scope; other speech acts are marked
+  // not_covered explicitly instead of attributing against an empty catalog (no placeholder pack id).
+  const lineageScope = buildMissionLineageScope({ direction, speechAct: row.speech_act, targetFeature: featureCode });
   return {
     mission_content: row.mission_content,
-    feature: { lineage_scope: buildMissionLineageScope({ direction, speechAct: row.speech_act, targetFeature: featureCode }) },
+    feature: lineageScope.coverage_status === "covered"
+      ? { lineage_scope: lineageScope }
+      : { lineage_coverage: "not_covered" as const },
     direction,
     learner_level: row.learner_level,
     level_ko: LEVEL[row.learner_level as keyof typeof LEVEL],

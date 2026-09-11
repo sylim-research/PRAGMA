@@ -1326,6 +1326,8 @@ interface FeatureForGen {
   closing_principle_ko: string
   counter_rule_note: string
   lineage_scope?: MissionLineageScope
+  /** Set by the client when the mission's speech act is outside the current realization pack. No attribution, no placeholder pack id. */
+  lineage_coverage?: 'not_covered'
 }
 interface MissionGenBody {
   direction?: string // 0-l·90 — 부재 시 ko_zh
@@ -1429,7 +1431,9 @@ function collectMissionLineageTargets(mission: Record<string, unknown>): Mission
         context_ko: `유형=${String(item.type ?? '')}; band=${JSON.stringify(item.accepted_band_codes ?? item.accepted_scale_codes ?? [])}`,
       })
     }
-    if (Array.isArray(item.corrections)) {
+    // Reason items never carry learner-facing corrections in mission_v5; the schema drops them, so the
+    // client lineage check (expectedItemLineageTargetPaths on the normalized mission) has no such path.
+    if (item.type !== 'reason' && Array.isArray(item.corrections)) {
       item.corrections.forEach((rawCorrection, correctionIndex) => {
         const correction = rawCorrection && typeof rawCorrection === 'object'
           ? rawCorrection as Record<string, unknown>
@@ -4490,7 +4494,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           lineage_status: 'complete',
         },
       }
-      if (b.feature.lineage_scope) {
+      if (b.feature.lineage_scope && b.feature.lineage_scope.coverage_status === 'covered') {
         const attributionInput = { ...finalized }
         delete attributionInput.provenance
         delete attributionInput.quality_check
@@ -4508,6 +4512,12 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           )
         }
         finalized = { ...finalized, item_lineage: attribution.itemLineage }
+      } else {
+        // Outside the current realization pack: state N/A explicitly instead of attributing against an empty scope.
+        finalized = {
+          ...finalized,
+          authoring: { ...(finalized.authoring as Record<string, unknown>), item_lineage_coverage: 'not_covered' },
+        }
       }
       const missionAuditInput = collectMissionChineseTexts(finalized, direction)
       const hskLexicalAudit = await createHskLexicalAudit({
