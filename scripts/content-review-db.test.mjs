@@ -24,8 +24,8 @@ async function asRole(role, action, user = adminId) {
 }
 const admin = (action) => asRole('authenticated', action);
 const learner = (action) => asRole('authenticated', action, learnerId);
-const model = (stage, result) => ({ result, model: 'fixture-model', response_id: `fixture-${stage}`,
-  prompt_version: `content_review_v2:${stage}`, input_hash: hash });
+const model = (stage, result, version = 'content_review_v2') => ({ result, model: 'fixture-model', response_id: `fixture-${stage}`,
+  prompt_version: `${version}:${stage}`, input_hash: hash });
 const finding = { id: 'claude-1', severity: 'warning', issue_ko: '교수자 확인 필요' };
 const pass = { verdict: 'pass', findings: [] };
 
@@ -54,17 +54,17 @@ async function mission(status = 'generated') {
     VALUES ($1, 1, 'generated', $2, $3)`, [id, content, adminId]);
   return { id, content };
 }
-async function review(targetId, kind = 'mission', openaiFail = false, weekNo = 5) {
+async function review(targetId, kind = 'mission', openaiFail = false, weekNo = 5, version = 'content_review_v2') {
   const sourceHash = await scalar("select content_review_source_internal($1, $2, $3)->>'source_hash'", [kind, targetId, kind === 'mission' ? 0 : weekNo]);
   const snapshot = { content: { public_material: { title: 'approved public handout', sections: [], missions: [] }, instructor_only: 'PRIVATE NOTES' } };
   const id = await scalar(`INSERT INTO content_review_runs
     (kind, target_id, week_no, source_hash, content_hash, criteria_version, snapshot, rules, openai_review, claude_review, adjudication, professor_decisions, created_by)
-    VALUES ($1, $2, $3, $4, $5, 'content_review_v2', $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
+    VALUES ($1, $2, $3, $4, $5, $13, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
   [kind, targetId, kind === 'mission' ? 0 : weekNo, sourceHash, hash, snapshot, pass,
-    model('openai', openaiFail ? { verdict: 'fail', findings: [{ ...finding, id: 'openai-1', severity: 'fail' }] } : pass),
-    model('claude', { verdict: 'warning', findings: [finding] }),
-    model('adjudication', { decisions: [{ finding_id: finding.id, decision: 'reject', rationale_ko: rationale }] }),
-    [{ finding_id: finding.id, decision: 'no_change', rationale_ko: rationale }], adminId]);
+    model('openai', openaiFail ? { verdict: 'fail', findings: [{ ...finding, id: 'openai-1', severity: 'fail' }] } : pass, version),
+    model('claude', { verdict: 'warning', findings: [finding] }, version),
+    model('adjudication', { decisions: [{ finding_id: finding.id, decision: 'reject', rationale_ko: rationale }] }, version),
+    [{ finding_id: finding.id, decision: 'no_change', rationale_ko: rationale }], adminId, version]);
   return { id, snapshot };
 }
 const payload = (m, r, extra = {}) => ({ mission_content: finalized(m.content), review_id: r.id,
@@ -116,6 +116,8 @@ before(async () => {
     reviewSource:await scalar("select content_review_source_internal('weekly_material',$1,$2)",[existing.courseId,existing.weekNo]) };
   await db.exec(await sqlFile('20260909010000_source_teaching_studio.sql'));
   await db.exec(await sqlFile('20260909230000_quality_signal_review_flow.sql'));
+  // Every test below runs on the v3-compatible approval contract; the v2 tests above double as compatibility checks.
+  await db.exec(await sqlFile('20260912090000_content_review_v3_approval.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -359,14 +361,14 @@ test('weekly approval requires current mission QA and exposes only the public ap
   assert.equal(await publicRead(), null);
 });
 
-async function focusedReview(critical = false) {
+async function focusedReview(critical = false, version = 'content_review_v2') {
   const m = await mission();
   m.content.provenance.mission_content_hash = hash;
   m.content.quality_check = { verdict: critical ? 'fail' : 'pass', summary_ko: '생성 점검', model: 'gpt-4.1',
     prompt_version: 'quality_fixture', checked_at: '2026-09-06T00:00:00Z', mission_content_hash: hash,
     findings: critical ? [{code:'band_mismatch',where:'mpj_items[1].target',severity:'fail',note_ko:'판정 확인'}] : [] };
   await db.query('update scenarios set mission_content=$2 where scenario_id=$1',[m.id,m.content]);
-  const r = await review(m.id);
+  const r = await review(m.id, 'mission', false, 5, version);
   const evidence = {mission_content_hash: hash, quality_check:m.content.quality_check};
   await db.query(`update content_review_runs set approval_policy='focused_v1', generation_quality=$2,
     openai_review=null,claude_review=null,adjudication=null,professor_decisions='[]' where id=$1`,[r.id,evidence]);
@@ -430,6 +432,67 @@ test('signal flow requires prepared evidence and reasoned decisions, then approv
     {...prepared,authoring:{...prepared.authoring,professor_issue_overrides:[]}});
   assert.ok(await scalar('select approved_at from content_review_runs where id=$1',[r.id]));
   await assert.rejects(modelRoleSetPrepared(r.id,prepared),/Approved review evidence is immutable/);
+});
+
+const decideGeneration=(r,decision,reviewHash=hash)=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',
+  [r.id,reviewHash,[{finding_id:'generation-1',decision,rationale_ko:rationale}]]));
+const criticalOverride=(text=rationale)=>({issue_overrides:[{issue_index:0,code:'band_mismatch',where:'mpj_items[1].target',rationale_ko:text}]});
+
+test('v3: a current-hash review saves professor decisions and finalizes under the unchanged approval rules', async () => {
+  const {m,r}=await focusedReview(true,'content_review_v3');
+  await assert.rejects(finalize(m,r),/Record every professor decision/);      // unresolved critical finding blocks
+  await decideGeneration(r,'defer');                                           // decisions save on a v3 review
+  await assert.rejects(finalize(m,r),/Record every professor decision/);      // defer is never approvable
+  await decideGeneration(r,'no_change');
+  await assert.rejects(finalize(m,r),/unresolved critical/);                   // missing override blocks
+  await assert.rejects(finalize(m,r,criticalOverride('짧은 사유')),/unresolved critical/); // too-short override blocks
+  assert.equal(await finalize(m,r,criticalOverride()),m.id);
+  assert.equal(await scalar('select mission_status from scenarios where scenario_id=$1',[m.id]),'reviewed');
+  assert.equal(await scalar('select criteria_version from content_review_runs where id=$1 and approved_at is not null',[r.id]),'content_review_v3');
+  assert.equal(await scalar('select content_review_run_id from mission_lineage_versions where scenario_id=$1 order by version_no desc limit 1',[m.id]),r.id);
+  const stored=await scalar("select mission_content#>'{authoring,professor_issue_overrides}' from scenarios where scenario_id=$1",[m.id]);
+  assert.equal(stored[0].rationale_ko,rationale);
+});
+
+test('v3: review/content hash mismatch and a changed source stay blocked', async () => {
+  const {m,r}=await focusedReview(false,'content_review_v3');
+  await assert.rejects(finalize(m,r,{review_content_hash:'b'.repeat(64)}),/required quality evidence/);
+  await assert.rejects(decideGeneration(r,'no_change','b'.repeat(64)),/required quality evidence/);
+  await db.query(`update scenarios set core_content='{"situation_ko":"changed"}' where scenario_id=$1`,[m.id]);
+  await assert.rejects(finalize(m,r),/Content changed/);
+});
+
+test('unsupported criteria versions are never decided, approved or accepted by the scenario guard', async () => {
+  const {m,r}=await focusedReview(false,'content_review_v4');
+  await assert.rejects(admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[r.id,hash,[]])),/required quality evidence/);
+  await assert.rejects(finalize(m,r),/required quality evidence/);
+  // Even a directly written approval of an unsupported version cannot publish the mission.
+  await db.query('update content_review_runs set approved_at=now(), approved_by=$2 where id=$1',[r.id,adminId]);
+  await admin(()=>assert.rejects(db.query(`UPDATE scenarios SET mission_status='reviewed', mission_content=$2 WHERE scenario_id=$1`,
+    [m.id,finalized(m.content)]),/five-stage professor approval/));
+  // Control: the same direct write with a supported version is accepted, so the guard discriminates by version.
+  const control=await focusedReview(false,'content_review_v3');
+  await db.query('update content_review_runs set approved_at=now(), approved_by=$2 where id=$1',[control.r.id,adminId]);
+  await admin(()=>db.query(`UPDATE scenarios SET mission_status='reviewed', mission_content=$2 WHERE scenario_id=$1`,
+    [control.m.id,finalized(control.m.content)]));
+  assert.equal(await scalar('select mission_status from scenarios where scenario_id=$1',[control.m.id]),'reviewed');
+});
+
+test('v3 weekly material: unapproved stays hidden; the approved current v3 snapshot wins over a later v2 approval', async () => {
+  const m=await mission(); await finalize(m,await review(m.id,'mission',false,5,'content_review_v3'));
+  const courseId=randomUUID();
+  await db.query("insert into curriculum_outlines values ($1,'v3 course','published')",[courseId]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title) values ($1,5,'v3 week')",[courseId]);
+  await db.query("insert into curriculum_week_scenarios values ($1,5,$2,1,'required')",[courseId,m.id]);
+  const read=()=>learner(()=>scalar('select get_approved_weekly_material($1,5)',[courseId]));
+  const older=await review(courseId,'weekly_material',false,5,'content_review_v2');
+  const current=await review(courseId,'weekly_material',false,5,'content_review_v3');
+  assert.equal(await read(),null);                            // nothing approved yet
+  await approve(current);                                     // mission dependency was approved under v3
+  assert.deepEqual(await read(),{reviewId:current.id,contentHash:hash,material:current.snapshot.content.public_material});
+  await approve(older);                                       // a v2 approval of the same source, approved later
+  assert.equal((await read()).reviewId,current.id);           // stale v2 never shadows the current v3 approval
+  assert.ok(!JSON.stringify(await read()).includes('PRIVATE'));
 });
 
 async function modelRoleSetPrepared(id,prepared) {
