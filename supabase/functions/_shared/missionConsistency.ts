@@ -1,5 +1,5 @@
 /** Shared generation/critic rules; semantic checks remain model judgements. */
-import { REASON_BRANCHES } from './reasonCriticCalibration.ts'
+import { REASON_COMPETITION } from './reasonCriticCalibration.ts'
 
 export function missionCriticContent(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
@@ -60,10 +60,10 @@ ${REASON_DISCRIMINATION_RULE}
 - 문제가 없다고 판단한 선택지에는 finding을 만들지 않는다. note_ko가 「정상」「허용」으로 끝나는 finding은
   내지 않는다. finding의 severity는 note_ko의 결론과 같아야 한다.
 - finding은 해당 reasons[i].text_ko를 인용하고, note_ko에 겹치는 선택지 ID와 근거를 적는다.
-- primary_reason_ambiguity finding은 reason_branch를 적는다: false_premise(허위 전제) · paraphrase_of_primary(정답의
-  바꿔 말하기) · competing_clear(정답과 경합이 분명) · competing_possible(경합 가능성) · primary_off_focus(정답이
-  초점이 아닌 의미·문법 문제) · not_a_reason(이유가 아닌 사실 확인) · secondary(사실이고 부차적 — 원칙적으로
-  finding을 내지 않는다). 서버가 severity를 reason_branch로 다시 정한다. 다른 code의 reason_branch는 빈 문자열이다.
+- 오답 선택지(accepted_reason_id가 아닌 reasons[i])를 가리키는 primary_reason_ambiguity finding은 사실 두 가지를 적는다.
+  reason_observation_present: 그 오답이 말하는 표현·위치·어휘·사실이 target·원문·상황에 실제로 있으면 true, 없으면 false
+  (주원인인지는 묻지 않는다). reason_competition: 정답과 같은 강도로 가장 큰 이유가 될 수 있으면 clear, 가능성이 있으면
+  possible, 부차적이면 none. 서버가 이 두 값으로 severity를 정한다. 그 밖의 finding은 null과 빈 문자열이다.
 
 3. internal_inconsistency / feedback_quality_mismatch
 - 모든 explanation_ko, corrections/candidates의 note_ko, DCT reference_alternatives의 note_ko를
@@ -107,14 +107,15 @@ export const MISSION_CONSISTENCY_RESPONSE_FORMAT = {
         items: {
           type: 'object',
           additionalProperties: false,
-          required: ['code', 'severity', 'where', 'evidence_excerpt', 'reason_branch', 'note_ko'],
+          required: ['code', 'severity', 'where', 'evidence_excerpt', 'reason_observation_present', 'reason_competition', 'note_ko'],
           properties: {
             code: { type: 'string', enum: ['internal_inconsistency', 'context_plan_mismatch',
               'primary_reason_ambiguity', 'feedback_quality_mismatch', 'comparison_quality_mismatch', 'gate1_violation'] },
             severity: { type: 'string', enum: ['fail', 'warning'] },
             where: { type: 'string' },
             evidence_excerpt: { type: 'string' },
-            reason_branch: { type: 'string', enum: ['', ...REASON_BRANCHES] },
+            reason_observation_present: { type: ['boolean', 'null'] },
+            reason_competition: { type: 'string', enum: ['', ...REASON_COMPETITION] },
             note_ko: { type: 'string' },
           },
         },

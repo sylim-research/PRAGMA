@@ -23,7 +23,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const db = supabase as unknown as { from: (t: string) => any };
 const manifest = JSON.parse(readFileSync(resolve(process.argv[2]), 'utf8').replace(/^﻿/, ''));
 const skip = new Set((process.argv[3] ?? '').split(',').filter(Boolean));
-const out = resolve(here, 'gate-rerun-v23.json');
+// One result file per critic version: a v23 run (superseded by v24 after it regressed) must not make v24 skip keys.
+const out = resolve(here, `gate-rerun-${CURRENT_MISSION_QUALITY_PROMPT_VERSION}.json`);
 const results: Record<string, unknown> = existsSync(out) ? JSON.parse(readFileSync(out, 'utf8')).results : {};
 
 const { error: authError } = await supabase.auth.signInWithPassword({ email: process.env.PRAGMA_BATCH_ADMIN_EMAIL!, password: process.env.PRAGMA_BATCH_ADMIN_PASSWORD! });
