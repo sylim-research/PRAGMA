@@ -1,0 +1,35 @@
+{
+  "at": "2026-09-11T04:45:03.173Z",
+  "key": "w2-0",
+  "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "fail",
+  "reason_findings": [
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[0]",
+      "evidence_excerpt": "끝의 ‘吧’가 요청을 가벼운 제안처럼 만들어, 링크를 실제로 보내 달라는 뜻이 충분히 전달되지 않기 때문이다.",
+      "note_ko": "r1(‘끝의 ‘吧’가 요청을 가벼운 제안처럼 만들어, 링크를 실제로 보내 달라는 뜻이 충분히 전달되지 않기 때문이다.’)와 r3(‘‘吧’로 어조를 누그러뜨리기는 했지만, ‘你就把…’가 아직 수락하지 않은 동료의 재전송 행동을 정해 주는 방식으로 들리기 때문이다.’)는 모두 ‘你就把…吧’의 직접성/단정성에 대한 진단으로, 실제 주원인(too_direct)의 부분 설명 또는 바꿔 말하기에 해당한다. r1은 ‘뜻이 충분히 전달되지 않는다’고 했으나, 실제로는 요청이 너무 직접적이라는 점이 문제의 핵심이므로, 두 선택지가 명확히 구별되지 않는다."
+    }
+  ],
+  "other_findings": [],
+  "quality": {
+    "verdict": "fail",
+    "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 설계되어 있으며, 오답도 현실적 경계 사례로 적절하게 구성되어 있음.",
+    "findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[0]",
+        "evidence_excerpt": "끝의 ‘吧’가 요청을 가벼운 제안처럼 만들어, 링크를 실제로 보내 달라는 뜻이 충분히 전달되지 않기 때문이다.",
+        "note_ko": "r1(‘끝의 ‘吧’가 요청을 가벼운 제안처럼 만들어, 링크를 실제로 보내 달라는 뜻이 충분히 전달되지 않기 때문이다.’)와 r3(‘‘吧’로 어조를 누그러뜨리기는 했지만, ‘你就把…’가 아직 수락하지 않은 동료의 재전송 행동을 정해 주는 방식으로 들리기 때문이다.’)는 모두 ‘你就把…吧’의 직접성/단정성에 대한 진단으로, 실제 주원인(too_direct)의 부분 설명 또는 바꿔 말하기에 해당한다. r1은 ‘뜻이 충분히 전달되지 않는다’고 했으나, 실제로는 요청이 너무 직접적이라는 점이 문제의 핵심이므로, 두 선택지가 명확히 구별되지 않는다."
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:03.138Z",
+    "mission_content_hash": "3e47f16a0780ae415360bace3a5e45ea918efdb6de356c16a53b266146b91534"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

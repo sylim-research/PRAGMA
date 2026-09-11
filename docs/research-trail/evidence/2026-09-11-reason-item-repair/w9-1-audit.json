@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-11T04:45:06.074Z",
+  "key": "w9-1",
+  "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "pass",
+  "reason_findings": [],
+  "other_findings": [],
+  "quality": {
+    "verdict": "pass",
+    "summary_ko": "모든 문항이 실제 책임 인정과 수리의 대역을 적절히 구분하고, 극단적 오답이나 화용 오도 없이 설계됨.",
+    "findings": [],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:06.072Z",
+    "mission_content_hash": "a834efa1b5765c617cb64c156cc54dc216b0d33b7d4452c5f768a6561d18c32e"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

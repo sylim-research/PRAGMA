@@ -64,6 +64,9 @@ Yes라면 구현한다. No라면 지금은 하지 않는다.
    Railway의 **Wait for CI**를 켜서 GitHub Actions 성공 전 운영 배포가 시작되지 않게 유지한다.
 6. 배포 완료 보고에는 `요청 기능 커밋 → main 포함 → CI 성공 → Railway 배포 SHA → 운영 smoke`를
    구분해 기록한다. Railway에서 잠시 보였다는 사실만으로 main 통합 완료를 주장하지 않는다.
+7. Supabase Edge 함수도 같은 원칙을 따른다. `origin/main`에 병합된 커밋에서만 `npm run edge:deploy -- <함수>`로
+   배포하며, 이 스크립트는 미커밋 변경이나 main lineage 밖 커밋을 거부한다. `--allow-unmerged`는 사유를
+   dev-log에 남기는 예외 경로일 뿐 기본 절차가 아니다. (2026-09-11 연구자 승인)
 7. 운영에 이미 포함된 핵심 화면·라우트·메뉴는 회귀 테스트를 유지한다. 의도적으로 제거할 때는
    해당 테스트와 정본 문서, decision log를 같은 변경에서 갱신한다.
 

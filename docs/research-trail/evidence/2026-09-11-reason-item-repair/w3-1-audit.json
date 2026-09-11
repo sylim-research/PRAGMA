@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-11T04:45:09.328Z",
+  "key": "w3-1",
+  "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "pass",
+  "reason_findings": [],
+  "other_findings": [],
+  "quality": {
+    "verdict": "pass",
+    "summary_ko": "모든 문항에서 감사 강도 조절의 실제 경계와 전략 차이가 명확히 드러나며, 오답도 실제로 쓸 법한 경계 사례로 설계되어 결함이 없다.",
+    "findings": [],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:09.326Z",
+    "mission_content_hash": "e997f67614c0d285a7fafe990afbdd63d7288975b9a15c009015ac62f0a22bc3"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

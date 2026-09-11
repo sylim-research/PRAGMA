@@ -110,7 +110,14 @@ try {
     const out = resolve(here, `${target.key}-repair.json`);
     if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
     const audit = readJson(resolve(here, `${target.key}-audit.json`));
-    if (!audit.reason_findings.length) { console.log(JSON.stringify({ key: target.key, skipped: 'no reason findings' })); continue; }
+    // Researcher-accepted human re-audit findings are merged in; the automated critic missed several false premises.
+    const humanPath = resolve(here, 'human-findings.json');
+    const human: any[] = existsSync(humanPath) ? (readJson(humanPath).findings?.[target.key] ?? []) : [];
+    const seenWhere = new Set<string>();
+    // Human findings first so a researcher judgment (e.g. keep-but-reword) wins over the critic's verdict on the same option.
+    const findings = [...human, ...audit.reason_findings].filter(f => { if (seenWhere.has(f.where)) return false; seenWhere.add(f.where); return true; });
+    if (!findings.length) { console.log(JSON.stringify({ key: target.key, skipped: 'no reason findings' })); continue; }
+    audit.reason_findings = findings;
     const row = await loadRow(target.scenario_id);
     if (row.mission_status !== 'generated') { console.log(JSON.stringify({ key: target.key, skipped: `mission_status=${row.mission_status}` })); continue; }
     const featureCode = DEFAULT_FEATURE_BY_ACT[row.speech_act as keyof typeof DEFAULT_FEATURE_BY_ACT];

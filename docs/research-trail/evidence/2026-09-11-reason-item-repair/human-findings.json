@@ -1,0 +1,36 @@
+{
+  "scope": "Human targeted re-audit findings (docs/dev-log/2026-09-11-reason-item-contract-and-reaudit.md §3-4, researcher-accepted). Merged with the automated audit before mission_repair. Indexes refer to mpj_items[3].reasons[] order as stored.",
+  "rule": "모든 선택지는 원문·상황·target에 비추어 사실로 성립해야 한다. 오답은 사실이지만 명백히 부차적이거나 다른 판단 차원을 짚는다. 원문 오독·없는 사실·target에 없는 의미 오류를 전제로 한 오답은 교체한다. 정답·해설·다른 선택지는 유지한다.",
+  "findings": {
+    "w2-0": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[1]", "note_ko": "r2 「再发我一次가 회의실 예약을 다시 처리해 달라는 뜻」은 오독이다. 再发는 재전송이며 해설도 그렇게 적었다. target에 실제로 있는 표현을 근거로 한, 사실이지만 부차적인 다른 차원의 관찰로 교체한다." }
+    ],
+    "w9-1": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[1]", "note_ko": "r1 「以后我会更小心的 약속이 지금 바로 용서해 달라는 요구로 작용」은 성립하지 않는 해석이다. 사실로 성립하는 부차적 화용 요인으로 교체한다." },
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「以后我会更小心的는 같은 책을 다시 빌리겠다는 약속」은 오독이다. target에 실제로 있는 표현·구조를 근거로 한 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w3-1": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[1]", "note_ko": "r1 「辛苦了가 화자가 윗사람 입장에서 평가하는 말로 쓰였다」는 전제가 사실적이지 않다(친구·동료 사이에서도 자연스럽게 쓰인다). 연구자 판정: 교체. 사실로 성립하는 부차적 화용 요인으로 바꾼다." },
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「你陪我装了一个小时가 친구 혼자 조립했다는 뜻」은 오독이다(陪는 동행). 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w4-1": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「要先用的就好找了의 要 때문에 지시로 의미가 바뀐다」는 오독이다(要先用的=먼저 쓸 재료). 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w5-0": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「我也展出了照片가 화자가 전시 전체를 주최한다는 뜻」은 오독이다(출품). 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w6-0": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[1]", "note_ko": "r1 「일정을 설명하면 불참 사유를 승인해 달라는 인상」은 성립하지 않는 해석이다. 사실로 성립하는 부차적 화용 요인으로 교체한다." },
+      { "severity": "warning", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[0]", "note_ko": "r3는 유지하되 표현만 정교화한다(연구자 판정). 「앞으로의 대타까지 모두 거절하는 의미」로 단정하지 말고 「첫머리의 단독 不行이 뒤의 사유·범위보다 먼저 들려 강한 거절로 받아들여질 수 있다」 정도로 쓴다." }
+    ],
+    "w10-0": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「每天只能预约一个小时가 예약 가능한 총시간을 한 시간으로 제한」은 오독이다(하루당). 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w10-1": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[2]", "note_ko": "r2 「各自带来的一张风景照가 두 사람이 합쳐 한 장만 보자는 뜻」은 오독이다(各自=각자). 다른 차원의 사실 관찰로 교체한다." }
+    ],
+    "w12-1": [
+      { "severity": "fail", "code": "primary_reason_ambiguity", "where": "mpj_items[3].reasons[1]", "note_ko": "r3 「원문의 아직 해야 하는 추가 작업을 이미 끝난 일로 전달」은 원문 오독이다(원문도 「다시 인쇄했어요」로 완료). 다른 차원의 사실 관찰로 교체한다." }
+    ]
+  }
+}

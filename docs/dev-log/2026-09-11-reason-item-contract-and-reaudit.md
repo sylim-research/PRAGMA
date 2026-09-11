@@ -113,3 +113,10 @@ PR #135 조사에서 확인된 사실: 이 브랜치의 엣지 코드가 Supabas
 엣지 프롬프트를 고칠 때의 로컬 검증 목록(오늘 두 번 빠뜨린 것): `npm run prompts:snapshot` → `npm run typecheck` → `npx vitest run` → `node --test scripts/{teaching-materials,content-review,scene-grounding}-edge.test.mjs` → `node scripts/build-content-review-domain.mjs && … --check` → `npm run build`. 이 순서를 지키면 CI가 잡는 것을 미리 잡는다.
 
 PR #135 필수 CI **통과**(run 34561437184, 3분 32초). 병합은 연구자 결정. 병합 뒤 순서 = `npm run edge:deploy -- generate-scenario content-review`(guard 통과 확인) → `repair.ts audit` → `repair.ts repair` → 미승격 5칸 승격 → w6-1 재시도 → 결과 표.
+
+## 8. 실행 · 2026-09-11 (연구자 「진행 승인」)
+
+- 경계 사례 판정(연구자): **w3-1 r1 「辛苦了」 = 교체**(친구·동료 사이에서도 자연스러워 「윗사람 평가어」 전제가 사실적이지 않음). **w6-0 r3 「不行」 = 유지하되 표현 정교화**(「전면 거절」 단정 대신 「첫머리의 단독 不行이 강한 거절로 들릴 수 있음」). AGENTS.md 엣지 배포 원칙 1줄 승인. Actions 자동 배포는 보류(guard 운영 안정화 먼저). 콘텐츠 후보 ID `_03` 유지.
+- PR #135 병합 → main `19f05a01`. worktree HEAD가 main lineage에 포함됨을 확인하고 `npm run edge:deploy`로 배포.
+- 🔴 **guard 스크립트 버그 발견**: 플래그가 없을 때 `flagIndex + 1 = 0`을 제외해 **첫 함수 이름을 버렸다.** 첫 실행에서 `content-review`만 배포되고 `generate-scenario`는 배포되지 않았다(버전이 전날 v122 그대로임을 `functions list`로 확인). 그 사이 시작한 재감사 3건(w2-0·w9-1·w3-1)은 **옛 ⑨로 돌았으므로 폐기**했다(옛 기준에서 w9-1·w3-1이 pass로 나온 것은 앞선 관찰과 같다). 스크립트 수정 후 재배포: **generate-scenario v123, content-review v32**, 모두 main lineage `91494062`에서. 수정과 AGENTS 1줄은 PR #136.
+- 재감사(`repair.ts audit`)를 v123 기준으로 다시 시작.

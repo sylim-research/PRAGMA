@@ -1,0 +1,49 @@
+{
+  "at": "2026-09-11T04:45:27.927Z",
+  "key": "w9-0",
+  "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "fail",
+  "reason_findings": [
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[0]",
+      "evidence_excerpt": "‘你因此停下了手头的工作’가 동료가 자발적으로 일을 그만두었다는 뜻이어서, 자료 지연 때문에 작업이 중단되었다는 원문을 잘못 옮겼기 때문이다.",
+      "note_ko": "r3(meaning_grammar_context)은 실제 target의 주된 문제(피해 축소)와 무관하며, 문법적 오진이 아니라 번역 의미 해석의 오류를 주장한다. 그러나 target의 핵심 문제는 책임·영향 축소(‘不过这也只是给你添了点小麻烦’)에 있으므로, r2(primary)와는 별개의 이유로 인정된다. 오답이 주원인의 바꿔 말하기나 부분 설명이 아니므로, 이 항목은 경고가 아니라 허용된다."
+    },
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[2]",
+      "evidence_excerpt": "‘以后我会注意…’라는 재발 방지 약속을 마지막에 배치해 사과의 초점이 흐려지므로, 같은 약속을 사과보다 먼저 제시해야 하기 때문이다.",
+      "note_ko": "r1(pragmatic_misconception)은 target의 실제 문제(피해 축소)와 무관하게, 사과와 약속의 순서만을 문제 삼는다. 이는 실제 주원인과 별개의 이유로, 오답이 주원인의 바꿔 말하기나 부분 설명이 아니므로 허용된다."
+    }
+  ],
+  "other_findings": [],
+  "quality": {
+    "verdict": "fail",
+    "summary_ko": "모든 사과 책임 인정·수리 대역 구분과 해설이 실제 상황과 화용 초점에 맞게 잘 설계되어 있음.",
+    "findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[0]",
+        "evidence_excerpt": "‘你因此停下了手头的工作’가 동료가 자발적으로 일을 그만두었다는 뜻이어서, 자료 지연 때문에 작업이 중단되었다는 원문을 잘못 옮겼기 때문이다.",
+        "note_ko": "r3(meaning_grammar_context)은 실제 target의 주된 문제(피해 축소)와 무관하며, 문법적 오진이 아니라 번역 의미 해석의 오류를 주장한다. 그러나 target의 핵심 문제는 책임·영향 축소(‘不过这也只是给你添了点小麻烦’)에 있으므로, r2(primary)와는 별개의 이유로 인정된다. 오답이 주원인의 바꿔 말하기나 부분 설명이 아니므로, 이 항목은 경고가 아니라 허용된다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[2]",
+        "evidence_excerpt": "‘以后我会注意…’라는 재발 방지 약속을 마지막에 배치해 사과의 초점이 흐려지므로, 같은 약속을 사과보다 먼저 제시해야 하기 때문이다.",
+        "note_ko": "r1(pragmatic_misconception)은 target의 실제 문제(피해 축소)와 무관하게, 사과와 약속의 순서만을 문제 삼는다. 이는 실제 주원인과 별개의 이유로, 오답이 주원인의 바꿔 말하기나 부분 설명이 아니므로 허용된다."
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:27.923Z",
+    "mission_content_hash": "3c759394e2c07994f876ecdcaab8ff751de192ad66f0950ce2a67085f4a7b090"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}
