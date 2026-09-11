@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T15:22:57.652Z",
+  "at": "2026-09-11T16:14:41.936Z",
   "key": "w12-0",
   "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
   "mode": "independent",
@@ -9,10 +9,10 @@
     "claude",
     "adjudication"
   ],
-  "contentHash": "7ad07142f0055aa1d30d0dc17c1712edb05b6af8b1e74b809c65efbef3a2bfd9",
+  "contentHash": "e74a6f7bf5fda7d352ea120b35d303296f2ecf45bd3cda6bb5e5ce1fa8bd7e22",
   "run": {
-    "id": "eb135520-974f-4112-ad32-8b32fae31082",
-    "content_hash": "7ad07142f0055aa1d30d0dc17c1712edb05b6af8b1e74b809c65efbef3a2bfd9",
+    "id": "850bae2f-78a4-4079-aee4-2965166a5400",
+    "content_hash": "e74a6f7bf5fda7d352ea120b35d303296f2ecf45bd3cda6bb5e5ce1fa8bd7e22",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
@@ -21,12 +21,12 @@
     "openai_review": null,
     "independent_review_requested": true,
     "claude_review": {
-      "verdict": "warning",
-      "findings": 4,
+      "verdict": "fail",
+      "findings": 5,
       "model": "claude-opus-5"
     },
     "adjudication": {
-      "decisions": 4,
+      "decisions": 5,
       "model": "gpt-4.1-2025-04-14"
     },
     "prepared_finalization": true,
