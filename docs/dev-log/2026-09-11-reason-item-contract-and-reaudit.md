@@ -105,3 +105,9 @@ PR #135 조사에서 확인된 사실: 이 브랜치의 엣지 코드가 Supabas
 최소 guard(이 PR에 포함, `scripts/deploy-edge-function.mjs`, `npm run edge:deploy -- <fn>`): ①supabase/·src/에 미커밋 변경이 있으면 거부 ②`origin/main`을 fetch한 뒤 HEAD가 main lineage에 포함되지 않으면 거부 ③`--allow-unmerged "<사유 10자+>"`로만 우회하되 경고를 출력하고 사유를 dev-log에 남긴다. 후속 제안 = GitHub Actions에서 main 병합 시 자동 배포로 옮기면 우회 자체가 없어진다(별도 승인 사안). `AGENTS.md`의 배포 절에 「엣지 함수도 main lineage에서만 배포」 한 줄을 넣는 것을 제안한다(정본 수정이라 연구자 승인 후).
 
 **이번 배치의 배포 순서**: 위 guard 원칙을 스스로 지키기 위해, 이 커밋들은 **PR #135가 main에 병합된 뒤** main에서 배포한다. 그 전에는 w6-1 재시도·Reason 재감사·재생성을 실행하지 않는다.
+
+### PR #135 CI — 두 번째 실패와 원인
+
+첫 실패(`scene-grounding-edge.test.mjs`의 옛 `formal` 기대)를 고친 뒤에도 실패했다. 두 번째 원인은 「Build production bundle」 단계의 prebuild 검사 `build-content-review-domain.mjs --check` → **「Review domain bundle is stale」**. `content-review` 엣지 함수는 `_shared`의 검토 도메인을 `domain.generated.mjs`로 번들해 두는데, 공유 프롬프트(`sceneGrounding.ts`·`missionCandidateFeedback.ts`)를 바꾸면 이 번들도 다시 만들어야 한다. 재생성 후 검증 통과, 커밋 `c3747fce`.
+
+엣지 프롬프트를 고칠 때의 로컬 검증 목록(오늘 두 번 빠뜨린 것): `npm run prompts:snapshot` → `npm run typecheck` → `npx vitest run` → `node --test scripts/{teaching-materials,content-review,scene-grounding}-edge.test.mjs` → `node scripts/build-content-review-domain.mjs && … --check` → `npm run build`. 이 순서를 지키면 CI가 잡는 것을 미리 잡는다.
