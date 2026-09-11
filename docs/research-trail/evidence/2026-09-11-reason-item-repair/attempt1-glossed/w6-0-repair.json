@@ -1,0 +1,207 @@
+{
+  "at": "2026-09-11T04:48:47.395Z",
+  "key": "w6-0",
+  "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+  "outcome": "revised",
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+    "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "첫머리의 ‘不行’이 뒤의 시간 표현과 분리되어, 내일 한 시간이 아니라 앞으로의 안내 데스크 대타까지 모두 거절하는 의미가 되기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘我那时有外部培训’으로 일정을 설명하면 동등한 동료에게 자신의 불참 사유를 승인해 달라는 인상을 주기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "교육 사유는 전달하지만 단독 ‘不行’으로 먼저 부탁을 닫아, 다른 대체 인력을 구해야 하는 동료의 사정에 대한 반응이 충분히 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "我那时有外部培训"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "몇 차례 행사 준비를 함께한 같은 직급의 동료",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 몇 차례 행사 준비를 함께한 동료에게 내일 안내 데스크를 한 시간 대신 맡아 달라는 부탁을 받았다. 같은 시간에 외부 교육이 있어 거절하려 하며, 동료는 다른 대체 인력을 구해야 한다.",
+    "explanation_ko": "개인적으로 대타를 부탁한 동료가 다른 사람을 찾아야 하는 상황에서, 첫머리의 단독 ‘不行’이 거절의 단정성을 앞세우는 것이 주된 문제입니다. ‘我那时有外部培训’은 유효한 이유이며 ‘明天’과 ‘那一小时’도 거절 범위를 한정하므로, 이유 제시나 의미 범위가 문제인 것은 아닙니다. 첫머리에 짧은 유감을 표시하고 교육 사유와 거절 범위는 유지하세요.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r2",
+    "recommended_example": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+    "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "첫머리의 ‘不行’이 뒤의 시간 표현과 분리되어, 내일 한 시간이 아니라 앞으로의 안내 데스크 대타까지 모두 거절하는 의미가 되기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘我那时有外部培训’으로 일정을 설명하면 동등한 동료에게 자신의 불참 사유를 승인해 달라는 인상을 주기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "교육 사유는 전달하지만 단독 ‘不行’으로 먼저 부탁을 닫아, 다른 대체 인력을 구해야 하는 동료의 사정에 대한 반응이 충분히 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "我那时有外部培训"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "몇 차례 행사 준비를 함께한 같은 직급의 동료",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 몇 차례 행사 준비를 함께한 동료에게 내일 안내 데스크를 한 시간 대신 맡아 달라는 부탁을 받았다. 같은 시간에 외부 교육이 있어 거절하려 하며, 동료는 다른 대체 인력을 구해야 한다.",
+    "explanation_ko": "동료가 다른 대체 인력을 구해야 하는 상황이므로, 외부 교육 때문에 대타가 불가능하다는 결론을 분명히 전달해야 합니다. ‘不好意思’로 유감을 표시하고 교육 사유와 거절을 바로 연결하면 부탁을 존중하면서도 다음 인력을 찾을 수 있게 하므로 이 구성을 유지합니다. ‘找我没用’처럼 요청을 차단하거나 표현상의 난처함을 길게 설명해 결론을 늦추는 방식은 피해야 합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r2",
+    "recommended_example": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+    "corrections": [
+      {
+        "text": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+        "note_ko": "대체 인력을 찾아야 하는 동료에게 ‘不好意思’로 유감을 표시하고 교육 사유와 거절을 바로 연결하므로, 부탁을 존중하면서도 결론이 분명한 이 구성을 유지합니다.",
+        "is_valid": true
+      },
+      {
+        "text": "不行，找我没用。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+        "note_ko": "앵커의 유감 표시를 ‘找我没用’라는 요청 차단으로 바꾸고 교육 사유와 대타 불가 내용은 유지했습니다. 단순히 짧아서가 아니라, 대체 인력을 구해야 하는 동료의 부탁 자체를 무용한 것으로 처리하므로 too_blunt 쪽 경계를 넘습니다.",
+        "is_valid": false
+      },
+      {
+        "text": "不好意思，这个答复我得斟酌一下怎么说，免得显得不近人情：我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+        "note_ko": "앵커의 사유와 명확한 거절은 유지하되, 답변을 어떻게 표현해야 매정해 보이지 않을지 숙고하는 메타발화를 앞세웠습니다. 대체 인력 확보에 필요한 결론보다 화자의 표현상 난처함을 먼저 처리하게 하므로, 사과의 개수가 아니라 불필요한 결론 지연으로 over_elaborate 쪽을 구현합니다.",
+        "is_valid": false
+      }
+    ],
+    "accepted_band_codes": [
+      "too_blunt"
+    ]
+  },
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "mid"
+        },
+        "type": "reason",
+        "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+        "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+        "channel": "messenger",
+        "reasons": [
+          {
+            "id": "r3",
+            "kind": "meaning_grammar_context",
+            "text_ko": "첫머리의 ‘不行’이 뒤의 시간 표현과 분리되어, 내일 한 시간이 아니라 앞으로의 안내 데스크 대타까지 모두 거절하는 의미가 되기 때문이다."
+          },
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "‘我那时有外部培训’으로 일정을 설명하면 동등한 동료에게 자신의 불참 사유를 승인해 달라는 인상을 주기 때문이다."
+          },
+          {
+            "id": "r2",
+            "kind": "primary",
+            "text_ko": "교육 사유는 전달하지만 단독 ‘不行’으로 먼저 부탁을 닫아, 다른 대체 인력을 구해야 하는 동료의 사정에 대한 반응이 충분히 드러나지 않기 때문이다."
+          }
+        ],
+        "highlights": [
+          "不行",
+          "我那时有外部培训"
+        ],
+        "item_focus": "refusal_softening",
+        "relation_ko": "몇 차례 행사 준비를 함께한 같은 직급의 동료",
+        "axis_feature": "refusal_softening",
+        "situation_ko": "나는 몇 차례 행사 준비를 함께한 동료에게 내일 안내 데스크를 한 시간 대신 맡아 달라는 부탁을 받았다. 같은 시간에 외부 교육이 있어 거절하려 하며, 동료는 다른 대체 인력을 구해야 한다.",
+        "explanation_ko": "동료가 다른 대체 인력을 구해야 하는 상황이므로, 외부 교육 때문에 대타가 불가능하다는 결론을 분명히 전달해야 합니다. ‘不好意思’로 유감을 표시하고 교육 사유와 거절을 바로 연결하면 부탁을 존중하면서도 다음 인력을 찾을 수 있게 하므로 이 구성을 유지합니다. ‘找我没用’처럼 요청을 차단하거나 표현상의 난처함을 길게 설명해 결론을 늦추는 방식은 피해야 합니다.",
+        "preceding_turn": null,
+        "problem_band_code": "too_blunt",
+        "accepted_reason_id": "r2",
+        "recommended_example": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+        "corrections": [
+          {
+            "text": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+            "note_ko": "대체 인력을 찾아야 하는 동료에게 ‘不好意思’로 유감을 표시하고 교육 사유와 거절을 바로 연결하므로, 부탁을 존중하면서도 결론이 분명한 이 구성을 유지합니다.",
+            "is_valid": true
+          },
+          {
+            "text": "不行，找我没用。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+            "note_ko": "앵커의 유감 표시를 ‘找我没用’라는 요청 차단으로 바꾸고 교육 사유와 대타 불가 내용은 유지했습니다. 단순히 짧아서가 아니라, 대체 인력을 구해야 하는 동료의 부탁 자체를 무용한 것으로 처리하므로 too_blunt 쪽 경계를 넘습니다.",
+            "is_valid": false
+          },
+          {
+            "text": "不好意思，这个答复我得斟酌一下怎么说，免得显得不近人情：我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+            "note_ko": "앵커의 사유와 명확한 거절은 유지하되, 답변을 어떻게 표현해야 매정해 보이지 않을지 숙고하는 메타발화를 앞세웠습니다. 대체 인력 확보에 필요한 결론보다 화자의 표현상 난처함을 먼저 처리하게 하므로, 사과의 개수가 아니라 불필요한 결론 지연으로 over_elaborate 쪽을 구현합니다.",
+            "is_valid": false
+          }
+        ],
+        "accepted_band_codes": [
+          "too_blunt"
+        ]
+      }
+    }
+  ],
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 문항의 거절 완충 대역 구분과 피드백, 비교 후보가 실제 맥락과 화용 초점에 맞게 설계되어 결함이 없다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "첫머리의 ‘不行’이 뒤의 시간 표현과 분리되어, 내일 한 시간이 아니라 앞으로의 안내 데스크 대타까지 모두 거절하는 의미가 되기 때문이다.",
+          "note_ko": "r3(meaning_grammar_context)는 실제 target의 의미와 다르게, '앞으로의 안내 데스크 대타까지 모두 거절'로 해석하지만, 실제 target은 '내일 한 시간'에 한정된 거절임이 명확하다. 이 선택지는 실제 문구에서 연상할 수 있지만, 원문·문법·상황과 대조하면 반박되는 별개의 오진이 아니라, 실제 target의 의미를 잘못 해석한 것이다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[1]",
+          "evidence_excerpt": "‘我那时有外部培训’으로 일정을 설명하면 동등한 동료에게 자신의 불참 사유를 승인해 달라는 인상을 주기 때문이다.",
+          "note_ko": "r1(pragmatic_misconception)은 실제 target의 주원인과 무관한 오진이 아니라, '불참 사유를 승인해 달라는 인상'이라는 별개의 오진을 주장하지만, 실제 target은 거절의 완충 부족이 문제다. 이 선택지는 실제 주원인과 구별되는 별개의 오진을 주장하고 있으나, 실제 target의 문제와는 직접적 관련이 없다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:48:46.954Z",
+      "mission_content_hash": "d6e271e6f5bc84c0a86ed61f752f5fed91ce0dd9a4676c36205ed16b0d6218ee"
+    },
+    "ruleResult": "warning"
+  },
+  "scope": "AI editorial revision through the existing revision path; not instructor approval."
+}

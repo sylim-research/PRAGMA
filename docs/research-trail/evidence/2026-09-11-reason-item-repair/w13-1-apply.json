@@ -1,0 +1,148 @@
+{
+  "at": "2026-09-11T04:54:45.364Z",
+  "key": "w13-1",
+  "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+  "outcome": "revised",
+  "replaced": [
+    "r3",
+    "r1"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "새 행사 안내문 좀 검토해 주세요. 오탈자와 빠진 안내가 있는지 봐주시고 내일 오전까지 의견을 주세요.",
+    "target": "帮我检查一下新活动的通知吧。看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘把意见告诉我’가 의견을 전달하라는 요청을 구두 보고로만 제한하여, 원문에 없던 전달 방식을 지정하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘吧’와 ‘看看’가 검토 자체를 가볍게 제안하는 말로 만들어, 실제로 검토해 달라는 요청인지 불분명해지기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "‘一下’와 ‘吧’로 어조는 누그러뜨렸지만, 아직 수락하지 않은 동료에게 검토와 기한을 정해 주듯 말해 수용 여부를 답할 여지가 부족하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "帮我检查一下新活动的通知吧",
+      "明天上午之前把意见告诉我"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "여러 번 함께 행사를 준비한 같은 직급의 동료",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 여러 번 함께 행사를 준비한 동료에게 새 행사 안내문 검토를 부탁하려 한다. 오탈자와 빠진 안내를 확인하는 데 약 30분이 걸리며, 내일 오전까지 의견이 필요하다.",
+    "explanation_ko": "같은 직급의 동료에게 새로 30분의 검토를 부탁하면서 기한도 제시하는 장면입니다. ‘一下’와 ‘吧’가 있어도 ‘明天上午之前把意见告诉我’까지 이어지는 직접형은 동료의 수행을 전제하므로, 가장 큰 문제는 요청의 불명확성이나 전달 방식의 오역이 아니라 수용 여부를 확인하지 않는 강도입니다. 검토 내용은 유지하고 ‘能不能’이나 기한의 편의성을 묻는 질문으로 조정하세요.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r2",
+    "recommended_example": "能不能帮我检查一下新活动的通知，看看有没有错别字、有没有漏掉的信息？明天上午之前把意见告诉我，时间上方便吗？"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "새 행사 안내문 좀 검토해 주세요. 오탈자와 빠진 안내가 있는지 봐주시고 내일 오전까지 의견을 주세요.",
+    "target": "帮我检查一下新活动的通知吧。看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "검토 내용(‘错别字’·‘漏掉的信息’)이 부탁 문장 뒤에 따로 나와, 무엇을 봐 달라는지가 첫 문장에서 드러나지 않기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "검토에 삼십 분이 걸린다는 원문의 부담 정보를 옮기지 않아, 상대가 부탁의 크기를 가늠하기 어렵기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "‘一下’와 ‘吧’로 어조는 누그러뜨렸지만, 아직 수락하지 않은 동료에게 검토와 기한을 정해 주듯 말해 수용 여부를 답할 여지가 부족하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "帮我检查一下新活动的通知吧",
+      "明天上午之前把意见告诉我"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "여러 번 함께 행사를 준비한 같은 직급의 동료",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 여러 번 함께 행사를 준비한 동료에게 새 행사 안내문 검토를 부탁하려 한다. 오탈자와 빠진 안내를 확인하는 데 약 30분이 걸리며, 내일 오전까지 의견이 필요하다.",
+    "explanation_ko": "같은 직급의 동료에게 새로 30분의 검토를 부탁하면서 기한도 제시하는 장면입니다. ‘一下’와 ‘吧’가 있어도 ‘明天上午之前把意见告诉我’까지 이어지는 직접형은 동료의 수행을 전제하므로, 가장 큰 문제는 요청의 불명확성이나 전달 방식의 오역이 아니라 수용 여부를 확인하지 않는 강도입니다. 검토 내용은 유지하고 ‘能不能’이나 기한의 편의성을 묻는 질문으로 조정하세요.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r2",
+    "recommended_example": "能不能帮我检查一下新活动的通知，看看有没有错别字、有没有漏掉的信息？明天上午之前把意见告诉我，时间上方便吗？"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 설계되어 있으며, 오답도 현실적 경계 사례로 제시되어 결함이 없다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "검토 내용(‘错别字’·‘漏掉的信息’)이 부탁 문장 뒤에 따로 나와, 무엇을 봐 달라는지가 첫 문장에서 드러나지 않기 때문이다.",
+          "note_ko": "r3(meaning_grammar_context)와 r1(pragmatic_misconception)은 모두 실제 주원인(수용 여부를 답할 여지가 부족함)과 별개의 진단이지만, r3은 실제로는 요청의 직접성/선택권 문제와 무관한 정보 전달 방식의 문제만을 지적하고 있다. r1은 부담 정보의 명시 여부만을 언급하여, 실제로는 주원인(수락 여지 부족)과는 다른 설명이다. 그러나 세 선택지 모두 이유를 주장하고 있으므로, 주원인과 겹치는 오답은 없다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:54:45.132Z",
+      "mission_content_hash": "4ad1fd2f91a559d09826cc76990e14997a6ba477987ea9f2a7c5cf1d3ca24467"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

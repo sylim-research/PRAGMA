@@ -106,7 +106,35 @@ try {
       console.log(JSON.stringify({ key: target.key, verdict: quality.verdict, reason_findings: reasonFindings.map(f => `${f.severity}:${f.code}@${f.where}`) }));
       continue;
     }
-    if (mode !== 'repair') throw new Error('Choose audit or repair');
+    if (mode === 'apply') {
+      // Attempt 2: hand-written replacement distractors (human-replacements.json) through the same revision path.
+      const out = resolve(here, `${target.key}-apply.json`);
+      if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
+      const repl = readJson(resolve(here, 'human-replacements.json')).replacements?.[target.key];
+      if (!repl) { console.log(JSON.stringify({ key: target.key, skipped: 'no replacements' })); continue; }
+      const row = await loadRow(target.scenario_id);
+      if (row.mission_status !== 'generated') { console.log(JSON.stringify({ key: target.key, skipped: `mission_status=${row.mission_status}` })); continue; }
+      const reasonIndex = row.mission_content.mpj_items.findIndex((it: any) => it.type === 'reason');
+      const before = row.mission_content.mpj_items[reasonIndex];
+      const item = structuredClone(before);
+      const missing: string[] = [];
+      for (const [id, edit] of Object.entries(repl) as Array<[string, any]>) {
+        const reason = item.reasons.find((r: any) => r.id === id);
+        if (!reason) { missing.push(id); continue; }
+        reason.text_ko = edit.text_ko;
+        if (edit.kind) reason.kind = edit.kind;
+      }
+      if (missing.length) throw new Error(`${target.key}: reason ids not found: ${missing.join(',')}`);
+      const result = await promote.reviseMissionDraft(row, { itemBlocks: [{ itemIndex: reasonIndex, item }] }, 'ai');
+      writeFileSync(out, JSON.stringify({ at: new Date().toISOString(), key: target.key, scenario_id: target.scenario_id,
+        outcome: result.ok ? 'revised' : 'revision_rejected', replaced: Object.keys(repl), before, after: item,
+        result: { ok: result.ok, error: result.error, quality: result.quality, ruleResult: result.ruleResult, violations: result.violations },
+        scope: 'Human-authored distractor replacement through the existing AI-revision path; not instructor approval.' }, null, 2) + '\n');
+      console.log(JSON.stringify({ key: target.key, outcome: result.ok ? 'revised' : 'revision_rejected', quality: result.quality?.verdict,
+        reason_findings: result.quality?.findings?.filter((f: any) => /^mpj_items\[\d+\]\.reasons/.test(f.where ?? '')).map((f: any) => `${f.severity}@${f.where}`), error: result.error }));
+      continue;
+    }
+    if (mode !== 'repair') throw new Error('Choose audit, repair or apply');
     const out = resolve(here, `${target.key}-repair.json`);
     if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
     const audit = readJson(resolve(here, `${target.key}-audit.json`));

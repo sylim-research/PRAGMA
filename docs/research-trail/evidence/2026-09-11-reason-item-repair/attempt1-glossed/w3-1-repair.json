@@ -1,0 +1,75 @@
+{
+  "at": "2026-09-11T04:48:09.816Z",
+  "key": "w3-1",
+  "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+  "outcome": "needs_regeneration",
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "close",
+          "p": "equal",
+          "r": "mid"
+        },
+        "type": "reason",
+        "source": "책장 조립 도와줘서 정말 고마워. 한 시간이나 같이 조립하느라 수고 많았어.",
+        "target": "谢谢你帮我装书架，真的太感谢你了。你陪我装了一个小时，辛苦了，我都不知道怎么谢你才好了。",
+        "channel": "facetoface",
+        "reasons": [
+          {
+            "id": "r3",
+            "kind": "primary",
+            "text_ko": "도움과 수고를 이미 인정한 뒤 강한 감사와 ‘어떻게 감사해야 할지 모르겠다’는 표현까지 겹쳐, 함께 조립한 호의를 지나치게 무거운 은혜처럼 제시하기 때문이다."
+          },
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "‘辛苦了’가 친구의 수고를 인정하는 말이 아니라 화자가 윗사람의 입장에서 친구의 일을 평가하는 말로 쓰였기 때문이다."
+          },
+          {
+            "id": "r2",
+            "kind": "meaning_grammar_context",
+            "text_ko": "‘你陪我装了一个小时’가 친구 혼자 한 시간 동안 조립했다는 뜻이어서, 두 사람이 함께 조립한 상황과 어긋나기 때문이다."
+          }
+        ],
+        "highlights": [
+          "真的太感谢你了",
+          "我都不知道怎么谢你才好了"
+        ],
+        "item_focus": "gratitude_calibration",
+        "corrections": [
+          {
+            "text": "真谢谢你帮我装书架。你陪我装了一个小时，辛苦了。",
+            "note_ko": "한 시간 함께 조립한 장면에서 ‘真谢谢’와 ‘辛苦了’가 고마움과 수고의 인정을 나누어 전달하므로, 친구의 도움을 분명히 인정하는 이 조합을 유지할 수 있습니다.",
+            "is_valid": true
+          },
+          {
+            "text": "你帮我装书架，我也不好不说声谢谢。你陪我装了一个小时，辛苦了。",
+            "note_ko": "직접적인 ‘真谢谢’를 ‘不好不说声谢谢’라는 마지못한 의무 양태로 바꿨다. 도움의 내용과 수고 인정은 유지하지만, 감사가 자발적 고마움보다 안 하면 곤란한 인사처럼 들려 부족함 방향으로 경계를 넘는다.",
+            "is_valid": false
+          },
+          {
+            "text": "你帮我装书架，我真是怎么感谢你都不够。你陪我装了一个小时，辛苦了。",
+            "note_ko": "‘真谢谢’를 ‘怎么感谢你都不够’로 바꿔 감사로도 다 표현할 수 없는 은혜라는 평가를 부여했다. 한 시간 함께 조립한 사실과 수고 인정은 그대로지만, 친한 친구 사이의 도움을 끝없이 감사해야 할 일로 무겁게 만들어 과함 방향으로 이동한다.",
+            "is_valid": false
+          }
+        ],
+        "relation_ko": "2년째 사적으로 자주 만나는 친구",
+        "axis_feature": "gratitude_calibration",
+        "situation_ko": "나는 2년째 사적으로 자주 만나는 친구와 집에서 새 책장을 조립했다. 한 시간 동안 설명서를 보며 조립을 도와준 그 친구에게 감사를 전하려 한다.",
+        "explanation_ko": "친한 친구가 한 시간 동안 책장 조립을 도와준 상황이므로, 도움에 대한 고마움과 들인 수고를 함께 인정하는 것이 적절합니다. 최종 유효 후보의 ‘真谢谢你帮我装书架’와 ‘你陪我装了一个小时，辛苦了’는 감사와 수고 인정을 나누어 전달해, 친구 사이의 편안함을 유지하면서도 도움을 가볍게 넘기지 않습니다. 이 조합은 유지하고, 원래 표현의 ‘我都不知道怎么谢你才好了’처럼 보답하기 어려운 은혜로 무게를 더하는 부분은 덜어내는 것이 좋습니다.",
+        "preceding_turn": null,
+        "problem_band_code": "excessive",
+        "accepted_reason_id": "r3",
+        "accepted_band_codes": [
+          "excessive"
+        ],
+        "recommended_example": "真谢谢你帮我装书架。你陪我装了一个小时，辛苦了。"
+      }
+    }
+  ],
+  "note": "Repair returned no change for the Reason item; use supersede → promoteCore explicitly."
+}

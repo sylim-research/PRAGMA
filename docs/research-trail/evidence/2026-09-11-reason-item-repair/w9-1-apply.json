@@ -1,0 +1,133 @@
+{
+  "at": "2026-09-11T04:53:49.834Z",
+  "key": "w9-1",
+  "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+  "outcome": "revised",
+  "replaced": [
+    "r1",
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+    "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘一点小失误’는 자기 실수임을 인정하면서도 지인의 물건을 훼손한 잘못을 화자가 먼저 가볍게 규정하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘以后我会更小心的’는 주의 약속으로, 상대에게 향후 주의하겠다는 의지를 전달하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘以后我会更小心的’는 상대에게 재대출을 요구하는 것이 아니라, 단순히 주의하겠다는 약속을 의미하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "是我的一点小失误"
+    ],
+    "item_focus": "apology_accountability_repair",
+    "relation_ko": "독서 모임에서 여러 번 이야기를 나눈 동등한 회원",
+    "axis_feature": "apology_accountability_repair",
+    "situation_ko": "나는 독서 모임에서 여러 번 교류한 회원에게 빌린 책의 책장을 넘기다 모서리를 조금 찢었다. 글자는 손상되지 않았으며, 책을 돌려주면서 훼손한 일에 대해 회원에게 사과하려 한다.",
+    "explanation_ko": "몇 번 교류한 지인에게 훼손한 책을 돌려주면서 ‘一点小失误’라고 하면, 자신의 행위를 인정해도 잘못의 무게를 먼저 낮춘다는 인상을 줄 수 있다. 주원인은 이 책임 평가이며, ‘以后我会更小心的’는 원문에 있는 주의 약속이지 즉각적인 용서 요구나 재대출 약속이 아니다. ‘一点小失误’를 ‘是我不够小心’으로 바꾸어 책임 인정의 범위를 맞춘다.",
+    "preceding_turn": null,
+    "problem_band_code": "under_acknowledged",
+    "accepted_reason_id": "r3",
+    "recommended_example": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+    "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘一点小失误’는 자기 실수임을 인정하면서도 지인의 물건을 훼손한 잘못을 화자가 먼저 가볍게 규정하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘不好意思啊’의 ‘啊’가 사과를 가볍고 친근한 어조로 만들어, 몇 번 교류한 지인에게는 편한 사이처럼 들릴 수 있기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘翻页时’라는 경위 설명이 문장 첫머리에 와서, 잘못의 인정보다 상황 설명이 먼저 들리기 때문이다."
+      }
+    ],
+    "highlights": [
+      "是我的一点小失误"
+    ],
+    "item_focus": "apology_accountability_repair",
+    "relation_ko": "독서 모임에서 여러 번 이야기를 나눈 동등한 회원",
+    "axis_feature": "apology_accountability_repair",
+    "situation_ko": "나는 독서 모임에서 여러 번 교류한 회원에게 빌린 책의 책장을 넘기다 모서리를 조금 찢었다. 글자는 손상되지 않았으며, 책을 돌려주면서 훼손한 일에 대해 회원에게 사과하려 한다.",
+    "explanation_ko": "몇 번 교류한 지인에게 훼손한 책을 돌려주면서 ‘一点小失误’라고 하면, 자신의 행위를 인정해도 잘못의 무게를 먼저 낮춘다는 인상을 줄 수 있다. 주원인은 이 책임 평가이며, ‘以后我会更小心的’는 원문에 있는 주의 약속이지 즉각적인 용서 요구나 재대출 약속이 아니다. ‘一点小失误’를 ‘是我不够小心’으로 바꾸어 책임 인정의 범위를 맞춘다.",
+    "preceding_turn": null,
+    "problem_band_code": "under_acknowledged",
+    "accepted_reason_id": "r3",
+    "recommended_example": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 실제 책임 인정과 수리의 범위에 맞게 대역을 구분하고, 극단적 오답이나 화용 오도, 장면 불명확, 대역 코드 오류가 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:53:49.518Z",
+      "mission_content_hash": "836e580c28d35d50f83582cf1238d67270483f7b7522722adec2d05d3a90bdfd"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"책장을 넘기다가 책장 모서리를 조금 찢었어요…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"책장을 넘기다가 책장 모서리를 조금 찢었어요…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"翻页时,我把书页的边角弄破了一点。是我的一点小失…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"翻页时,我把书页的边角弄破了一点。是我的一点小失…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

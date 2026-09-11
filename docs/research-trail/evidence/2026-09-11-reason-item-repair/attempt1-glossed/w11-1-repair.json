@@ -1,0 +1,208 @@
+{
+  "at": "2026-09-11T04:49:37.878Z",
+  "key": "w11-1",
+  "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+  "outcome": "revised",
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+    "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "피로 근거는 제시했지만 就是不合适로 동료의 안을 확정적으로 판정하여, 자신의 반대를 밝히는 것보다 상대 안을 잘라 말하는 효과가 앞서기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "我不同意",
+      "这样安排就是不合适",
+      "连续站着接待三个小时"
+    ],
+    "item_focus": "opposition_stance_mitigation",
+    "relation_ko": "두 달 동안 행사를 함께 준비한 동등한 역할의 동료",
+    "axis_feature": "opposition_stance_mitigation",
+    "situation_ko": "나는 두 달 동안 행사를 함께 준비한 동료와 안내 부스 운영을 논의하고 있다. 동료가 교대 간격을 한 시간에서 세 시간으로 늘리자고 했지만, 세 시간 내내 서서 안내하면 피로가 커지므로 나는 그 안에 반대하려 한다.",
+    "explanation_ko": "두 달간 함께 일한 동등한 동료에게 就是不合适는 피로에 관한 자신의 우려를 상대 안에 대한 확정 판정처럼 들리게 한다. 连续站着接待三个小时는 연속으로 서서 안내하는 시간을 제대로 옮겼으며, 문제는 의미 오류나 선동의의 부재가 아니라 단정의 범위다. 근거를 유지하면서 不太赞成으로 자신의 반대 입장을 밝히도록 조정한다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_confrontational",
+    "accepted_reason_id": "r3",
+    "recommended_example": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+    "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "피로 근거는 제시했지만 就是不合适로 동료의 안을 확정적으로 판정하여, 자신의 반대를 밝히는 것보다 상대 안을 잘라 말하는 효과가 앞서기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "我不同意",
+      "这样安排就是不合适"
+    ],
+    "item_focus": "opposition_stance_mitigation",
+    "relation_ko": "두 달 동안 행사를 함께 준비한 동등한 역할의 동료",
+    "axis_feature": "opposition_stance_mitigation",
+    "situation_ko": "나는 두 달 동안 행사를 함께 준비한 동료와 안내 부스 운영을 논의하고 있다. 동료가 교대 간격을 한 시간에서 세 시간으로 늘리자고 했지만, 세 시간 내내 서서 안내하면 피로가 커지므로 나는 그 안에 반대하려 한다.",
+    "explanation_ko": "두 달 동안 함께 행사를 준비한 동등한 동료와의 운영 논의에서는 세 시간 연속 안내에 따른 피로를 근거로 반대를 분명히 밝힐 필요가 있다. 유효 후보의 ‘我不太赞成’은 자신의 반대 입장을 밝히고 ‘因为’는 피로 근거를 연결하여, 상대의 안을 명백한 잘못으로 단정하지 않으면서 협의 관계를 유지한다. 이처럼 반대와 근거의 연결은 유지하되, ‘明摆着不合理’처럼 안을 단정적으로 평가하거나 ‘只是想提一下’처럼 반대를 참고 의견으로 흐리는 방식은 피한다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_confrontational",
+    "accepted_reason_id": "r3",
+    "recommended_example": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+    "corrections": [
+      {
+        "text": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+        "note_ko": "동등한 동료와의 운영 논의에서 不太赞成은 반대를 식별 가능하게 밝히고 因为로 피로 근거를 연결하므로, 상대 안을 확정 판정하지 않는 이 연결을 유지한다.",
+        "is_valid": true
+      },
+      {
+        "text": "我不同意把轮班间隔延长到三个小时，这样安排明摆着不合理，因为连续站着接待三个小时会更累。",
+        "note_ko": "반대 대상과 피로 근거는 유지하되, 자신의 입장을 한정하던 不太赞成을 明摆着不合理라는 자명성·부적합 단정으로 바꿨다. 동등한 동료의 안을 논의 가능한 판단이 아닌 명백한 잘못으로 처리하여 too_confrontational 방향으로 경계를 넘는다.",
+        "is_valid": false
+      },
+      {
+        "text": "关于把轮班间隔延长到三个小时，我只是想提一下连续站着接待三个小时会更累这一点。",
+        "note_ko": "세 시간 교대안과 피로 증가라는 반대 근거는 유지하되, 명시적 반대를 只是想提一下라는 참고 사항 제시로 바꿨다. 피로를 이유로 이견을 암시하지만 안을 거부하는지 주의점만 덧붙이는지 불분명해져 too_obscured로 이동한다.",
+        "is_valid": false
+      }
+    ],
+    "accepted_band_codes": [
+      "too_confrontational"
+    ]
+  },
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "acquaintance",
+          "p": "equal",
+          "r": "mid"
+        },
+        "type": "reason",
+        "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+        "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+        "channel": "facetoface",
+        "reasons": [
+          {
+            "id": "r2",
+            "kind": "meaning_grammar_context",
+            "text_ko": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다."
+          },
+          {
+            "id": "r3",
+            "kind": "primary",
+            "text_ko": "피로 근거는 제시했지만 就是不合适로 동료의 안을 확정적으로 판정하여, 자신의 반대를 밝히는 것보다 상대 안을 잘라 말하는 효과가 앞서기 때문이다."
+          },
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다."
+          }
+        ],
+        "highlights": [
+          "我不同意",
+          "这样安排就是不合适"
+        ],
+        "item_focus": "opposition_stance_mitigation",
+        "relation_ko": "두 달 동안 행사를 함께 준비한 동등한 역할의 동료",
+        "axis_feature": "opposition_stance_mitigation",
+        "situation_ko": "나는 두 달 동안 행사를 함께 준비한 동료와 안내 부스 운영을 논의하고 있다. 동료가 교대 간격을 한 시간에서 세 시간으로 늘리자고 했지만, 세 시간 내내 서서 안내하면 피로가 커지므로 나는 그 안에 반대하려 한다.",
+        "explanation_ko": "두 달 동안 함께 행사를 준비한 동등한 동료와의 운영 논의에서는 세 시간 연속 안내에 따른 피로를 근거로 반대를 분명히 밝힐 필요가 있다. 유효 후보의 ‘我不太赞成’은 자신의 반대 입장을 밝히고 ‘因为’는 피로 근거를 연결하여, 상대의 안을 명백한 잘못으로 단정하지 않으면서 협의 관계를 유지한다. 이처럼 반대와 근거의 연결은 유지하되, ‘明摆着不合理’처럼 안을 단정적으로 평가하거나 ‘只是想提一下’처럼 반대를 참고 의견으로 흐리는 방식은 피한다.",
+        "preceding_turn": null,
+        "problem_band_code": "too_confrontational",
+        "accepted_reason_id": "r3",
+        "recommended_example": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+        "corrections": [
+          {
+            "text": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+            "note_ko": "동등한 동료와의 운영 논의에서 不太赞成은 반대를 식별 가능하게 밝히고 因为로 피로 근거를 연결하므로, 상대 안을 확정 판정하지 않는 이 연결을 유지한다.",
+            "is_valid": true
+          },
+          {
+            "text": "我不同意把轮班间隔延长到三个小时，这样安排明摆着不合理，因为连续站着接待三个小时会更累。",
+            "note_ko": "반대 대상과 피로 근거는 유지하되, 자신의 입장을 한정하던 不太赞成을 明摆着不合理라는 자명성·부적합 단정으로 바꿨다. 동등한 동료의 안을 논의 가능한 판단이 아닌 명백한 잘못으로 처리하여 too_confrontational 방향으로 경계를 넘는다.",
+            "is_valid": false
+          },
+          {
+            "text": "关于把轮班间隔延长到三个小时，我只是想提一下连续站着接待三个小时会更累这一点。",
+            "note_ko": "세 시간 교대안과 피로 증가라는 반대 근거는 유지하되, 명시적 반대를 只是想提一下라는 참고 사항 제시로 바꿨다. 피로를 이유로 이견을 암시하지만 안을 거부하는지 주의점만 덧붙이는지 불분명해져 too_obscured로 이동한다.",
+            "is_valid": false
+          }
+        ],
+        "accepted_band_codes": [
+          "too_confrontational"
+        ]
+      }
+    }
+  ],
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 후보가 실제로 쓸 법하고, 대역·이유·장면 설명이 화용 초점과 일치한다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다.",
+          "note_ko": "r2(meaning_grammar_context)는 실제 target의 의미가 변질된 사례가 아니며, target의 '连续站着接待三个小时'는 원문의 '세 시간 내내 서서 안내'와 일치한다. 이 선택지는 실제 target의 주원인(단정적 반대)과 무관한 별개의 오진이다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[2]",
+          "evidence_excerpt": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다.",
+          "note_ko": "r1(pragmatic_misconception)은 실제 target의 주원인(단정적 반대)과 무관하며, '먼저 동의해야 한다'는 근거는 이 상황에서 필수 조건이 아니다. r3(단정적 판정)이 이미 주원인을 설명하므로, r1은 별개의 오진이 아니라 주원인의 바꿔 말하기에 가깝다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:49:37.609Z",
+      "mission_content_hash": "1a8d93a4292859a4fa881d4aa835e4d981b0ad453ba03f3acda335ef42270942"
+    },
+    "ruleResult": "warning"
+  },
+  "scope": "AI editorial revision through the existing revision path; not instructor approval."
+}

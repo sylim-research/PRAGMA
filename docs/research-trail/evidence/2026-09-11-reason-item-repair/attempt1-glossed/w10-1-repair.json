@@ -1,0 +1,189 @@
+{
+  "at": "2026-09-11T04:49:15.099Z",
+  "key": "w10-1",
+  "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+  "outcome": "revised",
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "distant",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+    "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘就定这个吧’가 처음 만난 짝의 의견을 듣기 전에 함께할 활동을 확정하는 방향으로 제시하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘就定这个吧’라는 일상적인 말투가 사진 체험 수업에서 처음 만난 사람에게 필요한 격식을 갖추지 못했기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘各自带来的一张风景照’가 각자 한 장씩이 아니라 두 사람이 합쳐 한 장만 보자는 뜻으로 바뀌었기 때문이다."
+      }
+    ],
+    "highlights": [
+      "那我们就定这个吧"
+    ],
+    "item_focus": "proposal_optionality_clarity",
+    "relation_ko": "오늘 처음 만나 짝이 된 사진 체험 수업 참가자",
+    "axis_feature": "proposal_optionality_clarity",
+    "situation_ko": "나는 사진 체험 수업에서 오늘 처음 만난 참가자와 짝이 되었다. 연습 전 오 분의 여유가 있어 각자 가져온 풍경 사진 한 장씩을 함께 살펴보자고 제안하려 한다.",
+    "explanation_ko": "초면의 동등한 참가자와 아직 활동을 합의하지 않았는데, ‘就定这个吧’가 사진 보기 안의 확정을 앞세운다는 점이 가장 큰 문제다. ‘各自’는 각자 한 장씩이라는 내용을 보존하고 일상적인 구두체 자체도 문제가 아니므로, 격식이나 사진 수가 아니라 확정형 제시를 의견 질문으로 조정한다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_directive",
+    "accepted_reason_id": "r3",
+    "recommended_example": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "distant",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+    "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘就定这个吧’가 처음 만난 짝의 의견을 듣기 전에 함께할 활동을 확정하는 방향으로 제시하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘就定这个吧’라는 일상적인 말투가 사진 체험 수업에서 처음 만난 사람에게 필요한 격식을 갖추지 못했기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘各自带来的一张风景照’가 각자 한 장씩이 아니라 두 사람이 합쳐 한 장만 보자는 뜻으로 바뀌었기 때문이다."
+      }
+    ],
+    "highlights": [
+      "那我们就定这个吧"
+    ],
+    "item_focus": "proposal_optionality_clarity",
+    "relation_ko": "오늘 처음 만나 짝이 된 사진 체험 수업 참가자",
+    "axis_feature": "proposal_optionality_clarity",
+    "situation_ko": "나는 사진 체험 수업에서 오늘 처음 만난 참가자와 짝이 되었다. 연습 전 오 분의 여유가 있어 각자 가져온 풍경 사진 한 장씩을 함께 살펴보자고 제안하려 한다.",
+    "explanation_ko": "처음 만난 동등한 짝과 연습 전 오 분 동안 사진을 보려는 상황에서는, 활동을 미리 확정하기보다 참여 의사를 물을 필요가 있다. ‘要不要’는 사진 한 장씩 함께 보자는 구체적인 제안을 유지하면서 상대에게 수락하거나 거절할 자리를 주므로, 초면의 거리감을 존중하는 질문형을 유지한다. ‘那我们就定这个吧’처럼 결정을 닫는 표현은 조정하되, ‘只是随口一提，还算不上什么具体打算。’처럼 실행 제안 자체를 거두는 유보도 덧붙이지 않는다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_directive",
+    "accepted_reason_id": "r3",
+    "recommended_example": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+    "corrections": [
+      {
+        "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+        "note_ko": "초면의 짝에게 ‘要不要’로 구체적인 공동 활동의 수용 여부를 물어 상대가 답할 자리를 만들므로, 사진 한 장씩을 보자는 명료한 내용과 질문을 유지한다.",
+        "is_valid": true
+      },
+      {
+        "text": "练习开始前还有五分钟。那就这么安排：一起看看各自带来的一张风景照。",
+        "note_ko": "수용 여부를 묻는 ‘要不要’를 ‘那就这么安排’로 바꾸어 같은 사진 보기 안을 이미 정한 일정처럼 제시한다. 초면의 동등한 짝에게 선택을 요청하지 않고 활동을 확정하므로 too_directive 방향으로 경계를 넘는다.",
+        "is_valid": false
+      },
+      {
+        "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？只是随口一提，还算不上什么具体打算。",
+        "note_ko": "사진 보기 질문은 유지하되 ‘只是随口一提，还算不上什么具体打算’으로 방금 제시한 안의 실행 제안 지위를 거둔다. 단순한 공손화가 아니라 지금 함께할 방안인지 불분명하게 만드는 유보여서 too_tentative에 해당한다.",
+        "is_valid": false
+      }
+    ],
+    "accepted_band_codes": [
+      "too_directive"
+    ]
+  },
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "distant",
+          "p": "equal",
+          "r": "low"
+        },
+        "type": "reason",
+        "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+        "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+        "channel": "facetoface",
+        "reasons": [
+          {
+            "id": "r3",
+            "kind": "primary",
+            "text_ko": "‘就定这个吧’가 처음 만난 짝의 의견을 듣기 전에 함께할 활동을 확정하는 방향으로 제시하기 때문이다."
+          },
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "‘就定这个吧’라는 일상적인 말투가 사진 체험 수업에서 처음 만난 사람에게 필요한 격식을 갖추지 못했기 때문이다."
+          },
+          {
+            "id": "r2",
+            "kind": "meaning_grammar_context",
+            "text_ko": "‘各自带来的一张风景照’가 각자 한 장씩이 아니라 두 사람이 합쳐 한 장만 보자는 뜻으로 바뀌었기 때문이다."
+          }
+        ],
+        "highlights": [
+          "那我们就定这个吧"
+        ],
+        "item_focus": "proposal_optionality_clarity",
+        "relation_ko": "오늘 처음 만나 짝이 된 사진 체험 수업 참가자",
+        "axis_feature": "proposal_optionality_clarity",
+        "situation_ko": "나는 사진 체험 수업에서 오늘 처음 만난 참가자와 짝이 되었다. 연습 전 오 분의 여유가 있어 각자 가져온 풍경 사진 한 장씩을 함께 살펴보자고 제안하려 한다.",
+        "explanation_ko": "처음 만난 동등한 짝과 연습 전 오 분 동안 사진을 보려는 상황에서는, 활동을 미리 확정하기보다 참여 의사를 물을 필요가 있다. ‘要不要’는 사진 한 장씩 함께 보자는 구체적인 제안을 유지하면서 상대에게 수락하거나 거절할 자리를 주므로, 초면의 거리감을 존중하는 질문형을 유지한다. ‘那我们就定这个吧’처럼 결정을 닫는 표현은 조정하되, ‘只是随口一提，还算不上什么具体打算。’처럼 실행 제안 자체를 거두는 유보도 덧붙이지 않는다.",
+        "preceding_turn": null,
+        "problem_band_code": "too_directive",
+        "accepted_reason_id": "r3",
+        "recommended_example": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+        "corrections": [
+          {
+            "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+            "note_ko": "초면의 짝에게 ‘要不要’로 구체적인 공동 활동의 수용 여부를 물어 상대가 답할 자리를 만들므로, 사진 한 장씩을 보자는 명료한 내용과 질문을 유지한다.",
+            "is_valid": true
+          },
+          {
+            "text": "练习开始前还有五分钟。那就这么安排：一起看看各自带来的一张风景照。",
+            "note_ko": "수용 여부를 묻는 ‘要不要’를 ‘那就这么安排’로 바꾸어 같은 사진 보기 안을 이미 정한 일정처럼 제시한다. 초면의 동등한 짝에게 선택을 요청하지 않고 활동을 확정하므로 too_directive 방향으로 경계를 넘는다.",
+            "is_valid": false
+          },
+          {
+            "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？只是随口一提，还算不上什么具体打算。",
+            "note_ko": "사진 보기 질문은 유지하되 ‘只是随口一提，还算不上什么具体打算’으로 방금 제시한 안의 실행 제안 지위를 거둔다. 단순한 공손화가 아니라 지금 함께할 방안인지 불분명하게 만드는 유보여서 too_tentative에 해당한다.",
+            "is_valid": false
+          }
+        ],
+        "accepted_band_codes": [
+          "too_directive"
+        ]
+      }
+    }
+  ],
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 구성되어 있고, 오답도 경계 사례로 적절하다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:49:14.868Z",
+      "mission_content_hash": "3c5ea96e26d85cbc5c9afd76e934ae68ae33eb1e5cc5f5b29c04689d7bea50bb"
+    },
+    "ruleResult": "warning"
+  },
+  "scope": "AI editorial revision through the existing revision path; not instructor approval."
+}
