@@ -1,26 +1,26 @@
 {
-  "at": "2026-09-11T14:18:49.578Z",
+  "at": "2026-09-11T15:27:02.178Z",
   "key": "w5-1",
-  "scenario_id": "d56896f5-0d0e-4ec4-8e04-c2270baad51a",
-  "contentHash": "f5f1bd756de264a80dc3b3b2385ad6578523aa6ba0bcedd2519f9a165657c165",
-  "sourceHash": "879f5524c7732fd48c4dbbde40be5deb2859a47628189ace210fe38ee8e85691",
+  "scenario_id": "2032d1cc-25e3-4bf9-9eff-6f8a1fd7153e",
+  "contentHash": "2d2766e840c804e8be3f9b7c6e91d92ae0e35e9718774220bc5f653dc83fc560",
+  "sourceHash": "acb0c1b2201fa2049ff2c157430d4a7dd3f25bdae91193e46a578a94d8ef33d3",
   "run": {
-    "id": "ce164058-6904-48ef-a372-d68e0f291a05",
-    "content_hash": "f5f1bd756de264a80dc3b3b2385ad6578523aa6ba0bcedd2519f9a165657c165",
+    "id": "f4450900-b3df-47be-b936-20be68f81297",
+    "content_hash": "2d2766e840c804e8be3f9b7c6e91d92ae0e35e9718774220bc5f653dc83fc560",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,
-    "generation_quality_verdict": "fail",
+    "generation_quality_verdict": "warning",
     "openai_review": null,
     "independent_review_requested": true,
     "claude_review": {
       "verdict": "warning",
-      "findings": 2,
+      "findings": 1,
       "model": "claude-opus-5"
     },
     "adjudication": {
-      "decisions": 2,
+      "decisions": 1,
       "model": "gpt-4.1-2025-04-14"
     },
     "prepared_finalization": true,

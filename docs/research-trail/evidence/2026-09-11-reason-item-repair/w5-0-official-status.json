@@ -1,17 +1,17 @@
 {
-  "at": "2026-09-11T13:36:55.729Z",
+  "at": "2026-09-11T16:36:54.988Z",
   "key": "w5-0",
   "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
-  "contentHash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
-  "sourceHash": "9515fa7a259651a31109413fca9d3e11b06a623026e2ea88211b0c0e3a2a6605",
+  "contentHash": "c61a7a649f61595996bd71c2f2a6351dbfeb2a780d3ca3a9dc011bf4ec9cef64",
+  "sourceHash": "f7507db7d53a2b9d019d3fea6034b803d11c25f4384a03e2f465136ad4487c6b",
   "run": {
-    "id": "2ce52caf-6e6d-4fe2-b031-92141321f41d",
-    "content_hash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
+    "id": "a6b277fa-37ae-4ab6-9359-eb0fffdd1e98",
+    "content_hash": "c61a7a649f61595996bd71c2f2a6351dbfeb2a780d3ca3a9dc011bf4ec9cef64",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,
-    "generation_quality_verdict": "fail",
+    "generation_quality_verdict": "warning",
     "openai_review": null,
     "independent_review_requested": true,
     "claude_review": {
@@ -37,5 +37,5 @@
       "professor"
     ]
   },
-  "history": 3
+  "history": 5
 }

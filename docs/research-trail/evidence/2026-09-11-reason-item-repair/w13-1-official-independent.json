@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T13:57:31.000Z",
+  "at": "2026-09-11T15:24:15.832Z",
   "key": "w13-1",
   "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
   "mode": "independent",
@@ -9,10 +9,10 @@
     "claude",
     "adjudication"
   ],
-  "contentHash": "3fb2a5cff606727dcdb8d10f259e9f0574fe39862022f1b5c5ca28263b3c9437",
+  "contentHash": "0bd8fc497da3864ed78a370e0ee4e01a88f9637b7bcacce43867c123999a6a33",
   "run": {
-    "id": "05b7d913-4f07-4865-9b55-6eac8ee33ad1",
-    "content_hash": "3fb2a5cff606727dcdb8d10f259e9f0574fe39862022f1b5c5ca28263b3c9437",
+    "id": "9ffe8d11-5aa5-4097-abb6-1ccbcf974077",
+    "content_hash": "0bd8fc497da3864ed78a370e0ee4e01a88f9637b7bcacce43867c123999a6a33",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",

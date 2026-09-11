@@ -1,14 +1,11 @@
 {
-  "at": "2026-09-11T12:44:34.183Z",
+  "at": "2026-09-11T15:21:39.348Z",
   "key": "w9-1",
   "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
   "mode": "prepare",
   "status": "ready",
   "message": "AI 검토 완료 · 교수자 판단 대기",
-  "stages_run": [
-    "rules",
-    "finalization"
-  ],
+  "stages_run": [],
   "contentHash": "0a2c52d39c6312bb868d9bf9b0bb5a06253e0b771541ebf2d5d570908d6376f6",
   "run": {
     "id": "89682923-cf3f-45ac-bf1d-2ef4e6b127f9",

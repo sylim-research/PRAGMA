@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T13:26:43.597Z",
+  "at": "2026-09-11T16:35:39.069Z",
   "key": "w5-0",
   "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
   "mode": "prepare",
@@ -9,15 +9,15 @@
     "rules",
     "finalization"
   ],
-  "contentHash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
+  "contentHash": "c61a7a649f61595996bd71c2f2a6351dbfeb2a780d3ca3a9dc011bf4ec9cef64",
   "run": {
-    "id": "2ce52caf-6e6d-4fe2-b031-92141321f41d",
-    "content_hash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
+    "id": "a6b277fa-37ae-4ab6-9359-eb0fffdd1e98",
+    "content_hash": "c61a7a649f61595996bd71c2f2a6351dbfeb2a780d3ca3a9dc011bf4ec9cef64",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
     "generation_quality": true,
-    "generation_quality_verdict": "fail",
+    "generation_quality_verdict": "warning",
     "openai_review": null,
     "independent_review_requested": false,
     "claude_review": null,

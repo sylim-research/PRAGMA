@@ -1,0 +1,73 @@
+{
+  "at": "2026-09-11T16:10:45.417Z",
+  "key": "w12-0",
+  "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+  "mode": "mission",
+  "before": {
+    "revision_hash": "80bc1e16b97577abdd9fbaf75d003ed392d175c0394a2850c322f8dae2332cdd"
+  },
+  "changes": [
+    {
+      "path": "mpj_items[3].explanation_ko",
+      "before": "동등한 동료의 회의실 초과 사용으로 회의가 30분 지연되고 참석자 세 명이 다음 일정을 바꿔야 했으므로, 확인된 행동과 불편을 명확히 알릴 필요가 있습니다. 최종 권장 후보는 ‘你在我预约的时段还一直用着会议室’와 ‘导致’로 행동과 결과를 연결하고, ‘以后能不能在我预约的时间把会议室空出来？’로 재발 방지를 요청하여 동료 관계에서 책임 전달과 협력 가능성을 함께 유지합니다. 이처럼 구체적인 책임과 요청은 유지하되, 모든 원인을 상대 개인에게 몰아 붙이는 ‘都是因为你…才’나 상대가 피해를 입혔다고 탓하는 어감을 더하는 ‘害得’로 비난을 키우지 않는 것이 적절합니다.",
+      "after": "가장 큰 문제는 ‘都是因为你…才’입니다. 확인된 회의실 초과 사용과 30분 지연을 연결하는 데 그치지 않고 모든 원인을 상대 개인에게 몰아 붙여, 동등한 동료에게 확인된 행동 이상의 책임을 지우기 때문입니다. 지연·참석자 일정 변경·불편을 한 문장에 이어 붙인 정보 배열은 읽기 편의의 문제일 뿐 책임 범위를 넓히지는 않으므로 주된 이유가 아닙니다. 마지막의 재발 방지 요청은 원문의 ‘앞으로는 제 예약 시간에 맞춰 회의실을 비워주실 수 있을까요?’를 그대로 옮긴 것이라 과한 요구가 아니며 그대로 유지해야 합니다. ‘你…用着会议室，导致…’처럼 행동과 결과를 사실로 연결하는 데 그치면 충분합니다."
+    }
+  ],
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\""
+      }
+    ],
+    "quality": {
+      "verdict": "warning",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞는 적정·경계 대역을 구현하며, 오답도 현실적 경계 사례로 구성되어 결함이 없다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "warning",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다.",
+          "note_ko": "[reason_competes_possible] 이 선택지는 실제 target에 지연·일정 변경·불편이 한 문장에 나열되어 있으나, 이는 정보 배열의 문제로 책임 귀속의 과함(complaint_problem_accountability)과는 별개로 읽기 편의성에 관한 부차적 요인이다. 그러나, '어느 피해가 핵심인지 가려 읽어야 한다'는 점이 실제로 target에 존재하며, 책임 귀속의 과함과도 일정 부분 연관될 수 있으므로, 주원인과 경쟁 가능성이 있다. 하지만, 책임 귀속의 과함이 주된 문제이므로, 이 선택지는 부차적이지만 주원인과 경쟁 가능성이 있어 primary_reason_ambiguity에 해당한다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "warning",
+          "where": "mpj_items[3].reasons[2]",
+          "evidence_excerpt": "‘以后能不能在我预约的时间把会议室空出来？’로 불만 뒤에 재발 방지 요구까지 덧붙여, 동료에게 요구하는 것이 지나치게 많아지기 때문이다.",
+          "note_ko": "[reason_competes_possible] 이 선택지는 실제 target에 재발 방지 요구가 존재하며, 요구가 많아진다는 해석이 가능하다. 그러나, 원문의 의도와 서버 해설에 따르면 재발 방지 요구는 원문에도 있고, 책임 귀속의 과함과는 별개로 요구의 양에 관한 부차적 요인이다. 하지만, 요구가 많아진다는 점이 실제로 target에 존재하고, 책임 귀속의 과함과도 일정 부분 연관될 수 있으므로, 주원인과 경쟁 가능성이 있어 primary_reason_ambiguity에 해당한다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v24_reason_facts_severity",
+      "checked_at": "2026-09-11T16:10:44.635Z",
+      "mission_content_hash": "a781f0a8af2aa788bc54f7cd211e7e6602cda35394cb4f559fca22984eef1910"
+    },
+    "mission_content_hash": "a781f0a8af2aa788bc54f7cd211e7e6602cda35394cb4f559fca22984eef1910"
+  },
+  "scope": "Researcher-ruled learner-facing fix through reviseMissionDraft; not instructor approval."
+}

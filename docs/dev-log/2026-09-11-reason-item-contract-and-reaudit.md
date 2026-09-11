@@ -634,3 +634,69 @@ production gate fail 4건은 모두 Reason 오답 critic note의 자기모순 �
 - production gate fail 3건(위).
 
 교수자 승인·편성·override 실행 안 함. **콘텐츠 수정은 이 3건으로 종료.**
+
+## 20. 승인 전 정리 — Reason 게이트 v23·v24, 3건 추가 수정, 20건 재검사 · 2026-09-11~12
+
+연구자 지시: w5-1 R high 철회→mid, w12-0 MPJ5 잔여 결함, w13-1 후보 4 구조만 수정, Reason 게이트의 자기모순 원인 수정 후 20건 gate 재실행. 이후 범위 제한 지시(v25·추가 평가기/콘텐츠 수정·승인·편성 금지, 17건 검수 재실행 금지).
+
+### 평가기
+
+- 원인: ⑨ 규칙은 「사실이고 부차적인 오답 = 정상」인데 서버가 모델이 스스로 적은 severity를 그대로 썼다.
+- **v23**(PR #142, `8282ab7c`, generate-scenario v127·content-review v35): 지적마다 갈래 이름을 받아 서버가 severity 결정 → 모델이 평범한 오답을 fail 갈래로 오분류, v22 PASS였던 w2-0·w3-0·w6-0이 FAIL. 11건(w2-0~w9-1) 재실행 뒤 중단. `c9-fix/gate-rerun-v23.json`.
+- **v24**(PR #143, `e82d4e13`, main `575233251291bbf21bc4526d949527b8e2a768c6`, generate-scenario **v128**·content-review **v36**, `quality_v24_reason_facts_severity`): 오답을 가리키는 지적은 사실 2개(관찰 존재·경합 none/possible/clear)로 서버가 severity 결정. `c9-fix/gate-rerun-quality_v24_reason_facts_severity.json`.
+- v24 FAIL = 4 mission·6 finding, 전부 `competes_clear`. **6건 중 5건은 note가 「경합하지 않는다」「none이어야 한다」인데 필드는 clear(자기모순)**: w2-0 r1·r2, w10-0 r3·r2, w13-1 r3. w11-0 r2만 note와 판정이 일관(반대 입장 표명 위치 vs 주원인 「입장 불분명」의 실질적 겹침 주장). **v24는 안정화·freeze 판정 아님. v25·추가 수정 안 함(연구자 지시).**
+- 한계: 구조화 필드 원값은 저장되지 않는다. note 앞 표시(`[reason_competes_clear]` 등)로만 복원된다.
+
+### 콘텐츠 3건(`c9-fix/<key>-fix.json`, v23 gate로 1회 저장 후 v24 재gate로 1회 더 저장)
+
+- w5-1: C8 high 행 d56896f5 → **새 코어 행 2032d1cc**. core·production_task·MPJ1~4 r=mid, MPJ5 low 유지, MPJ2 해설 「회사 근처에서 90분간 비용 없이 열리는 주말 활동이라 주말 시간을 조금 내는 정도의 보통 부담」. 장면 불변. high 행과 원본 793a1576 보존(보관 없음), core `local_revision_history`에 경위.
+- w12-0(97c4834a): MPJ5 후보 3 「虽然只晚到了三分钟…」 → 「因为你在通知里写的房间号不对，我先去了隔壁，晚到了三分钟，这给我带来了一些不便。」(within 유지), 후보 4 주석에 「명제 추가는 없으나 有些不便→很不方便 강도 상승」 명시, 해설 「동료 관계」→「동아리 회원 사이」, 후보 1·권장안 「这个通知错误」→「通知上的这个错误」. MPJ4 해설·교정안 복제는 손대지 않음(아래).
+- w13-1(26412ba9): MPJ5 후보 4 「请你把…递给我，会不会让你为难？」 → 「不知道会不会让你为难，能不能把旁边那支备用笔递给我？」(too_indirect 유지), 주석·해설 인용 정렬. 앵커 too_direct는 유지(30분 검토+기한을 아직 수락하지 않은 동료에게 할 일처럼 제시한다는 현 해설로 설명 가능).
+- w12-0 MPJ4 복제 구분: `corrections`는 reason 스키마에 없는 필드(생성기 출력 잔여, 정규화에서 제거되어 학습자 화면에 안 보임) → 구조 문제. 해설 동일 문구는 개별 콘텐츠(틀린 내용은 아니고 Reason 초점 설명이 약함).
+
+### 20건 v24 gate(`c9-fix/final-revisions-v24.json`; 내용 불변 17건은 빈 편집 revision)
+
+| key | id | rev | mission hash | v22 | v23 | v24 |
+|---|---|---|---|---|---|---|
+| w2-0 | 4eac0623 | 6 | 8befdc5a | pass | fail | **FAIL**(clear×2, 모순) |
+| w2-1 | 63071ac4 | 4 | 0d5f949d | pass | pass | PASS |
+| w3-0 | d1a90772 | 5 | d85e5ed0 | pass | fail | WARNING(possible) |
+| w3-1 | ebc4e927 | 6 | d67cfaf0 | pass | pass | PASS |
+| w4-0 | a1ccc07b | 4 | 14d13194 | pass | pass | PASS |
+| w4-1 | 0350a784 | 6 | a07091fa | pass | pass | PASS |
+| w5-0 | b9a5249f | 9 | f3c9a794 | fail | fail | WARNING(possible) |
+| w5-1* | 2032d1cc | 3 | b73e204d | fail | fail | WARNING(possible×2) |
+| w6-0 | def83b4f | 7 | 345516de | pass | fail | PASS |
+| w6-1 | 34e8b1fd | 4 | e03f91ec | pass | pass | PASS |
+| w9-0 | fc3913de | 7 | 821666bb | pass | pass | WARNING(possible×2) |
+| w9-1 | 170e4b66 | 5 | 836e580c | pass | pass | PASS |
+| w10-0 | 1baacb9c | 3 | 9d6c4420 | fail | — | **FAIL**(clear×2, 모순) |
+| w10-1 | f5c7d021 | 4 | a7181733 | pass | — | PASS |
+| w11-0 | ad9fa216 | 5 | 03f08d75 | pass | — | **FAIL**(clear×1, 일관) |
+| w11-1 | 8755d9fb | 5 | 9997927f | pass | — | WARNING(possible×2) |
+| w12-0* | 97c4834a | 6 | 80bc1e16 | fail | fail | WARNING(possible×2) |
+| w12-1 | 544bab4a | 4 | 1824d7dc | pass | — | PASS |
+| w13-0 | 90e605ce | 3 | f57fca13 | pass | — | PASS |
+| w13-1* | 26412ba9 | 9 | 5629e456 | fail | fail | **FAIL**(clear×1 모순 + possible) |
+
+\* 콘텐츠 수정. — = v23 중단으로 미실행. 합계 PASS 10 · WARNING 6 · FAIL 4.
+
+### content-review(`v3-content-review-runs-after-c9.json`)
+
+- 내용 불변 17건: `prepare` stages 0, AI 호출 0. 검수 행의 content/source hash는 현재와 일치, next=professor. **다만 검수 행에 연결된 generation_quality는 v22 결과 그대로**(prepare가 rules 단계를 돌리지 않아 갱신되지 않음). 미션 행에는 v24가 저장돼 있어 두 화면의 gate 표시가 다르다. 지시대로 재실행하지 않았다.
+- 변경 3건: 새 hash라 유효한 검수 행이 없어(누락) rules·finalization·Claude·adjudication을 1회씩 실행.
+  - w5-1 `2d2766e8`: Claude 1 — 코어 R=mid가 DCT 장면(토요일 오전·교외 전시장·강평)에 비해 낮다(accept·교수자 확인).
+  - w12-0 `7ad07142`: Claude 4 — 진단 근거 서술 2건(accept·refine), MPJ1 accepted_scale(reject·교수자 확인), MPJ4 r1이 원문 그대로인 재발 방지 요청을 과한 요구로 서술(accept).
+  - w13-1 `0bd8fc49`: Claude 2 — 앵커 too_direct(원문도 직접 요청, accept·교수자 확인), role_pair 단수 vs 상황 복수(accept).
+- `v3-verify`: v3 행 28(대상 20 전부), professor_ready 28/28, approved 0, openai_review 0. 원본·대체 행 6개(013cc144·09bc6c81·1f6d8863·700f0bdd·793a1576·d56896f5) 모두 generated·보관 없음·검수 행 보존.
+
+교수자 승인·편성·override·학습자 수행 실행 안 함. 이 세션의 작업은 여기서 멈춘다.
+
+## 21. 교수자 판단 패킷 → 연구자 판정 → 보완 2건 반영 · 2026-09-12
+
+- 패킷 = `evidence/2026-09-11-reason-item-repair/professor-decision-packet-c9.md`. 사실층(Opus) → Fable 판정(17: 보완 4·기각 13) → 연구자 판정(보완 2·기각/현행 유지 15, 6-0-3·10-0-3은 P1 backlog). 「기각」은 현행 콘텐츠를 수정할 근거가 부족해 현재 버전을 유지한다는 연구자 결정이지 AI 지적이 틀렸다는 절대 판정이 아니다.
+- 반영(`c10-fix/content-fix.ts`, reviseMissionDraft, v24 gate):
+  - w5-0 rev 10 · hash ecb8ba83 · 검수 9020cb99: 「我也展出了照片的公司内部展览」→「有我照片参展的公司内部展览」 12곳(MJT2~4 target·권장안·교정안). Fable 제안문(我参展的…)은 「사진」이 빠져 채택하지 않음. gate warning(r1 possible) · Claude pass(0) · professor.
+  - w12-0 rev 7 · hash a781f0a8 · 검수 e74a6f7b: MJT4 해설을 Reason 전용으로 교체(r2 주원인 · r3 정보 배열 · r1 원문 요청). gate warning(r3·r1 possible) · Claude fail 5(진단 차원 비노출 2 fail·r1·MJT5 주석 오귀속·highlights) · adjudication accept 3·refine 2 · professor.
+- 새 evaluator issue E6: w12-0 claude-4가 MPJ5 후보 2 주석에 없는 구절(「지연·일정 변경·수리 요구는 유지하되」, 실제는 MJT3 교정안 2 주석)을 지적했고 adjudication이 accept. 원문 대조 없이 accept된 사례.
+- 상태: v3 검수 행 30, 20/20 next=professor, 승인 0, 이전 revision·v22/v23/v24 이력 보존. 실제 콘텐츠 blocker 없음. 승인·편성·vertical slice 미실행.

@@ -1,0 +1,313 @@
+{
+  "at": "2026-09-11T15:26:26.351Z",
+  "scope": "Read-only: lineage revision, mission content hash, stored production gate per course mission after the v24 re-run.",
+  "rows": [
+    {
+      "key": "w2-0",
+      "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+      "revision": 6,
+      "revision_at": "2026-09-11T15:18:18.311657+00:00",
+      "mission_content_hash": "8befdc5af7cf7b6043ab8407dcb0335afa5429ba1f075d55a1ed23976176adbf",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "fail",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_clear]",
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[1][reason_competes_clear]"
+        ]
+      }
+    },
+    {
+      "key": "w2-1",
+      "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+      "revision": 4,
+      "revision_at": "2026-09-11T15:18:22.926315+00:00",
+      "mission_content_hash": "0d5f949d796f548d32ce18c3ae4d463d22eb9d96578babf72d4d88b98e5ce0a6",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w3-0",
+      "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+      "revision": 5,
+      "revision_at": "2026-09-11T15:18:28.893098+00:00",
+      "mission_content_hash": "d85e5ed0cbd79d389e99226e6c7a272caf2f01c5e231cd7c7d54e3bc07f86388",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[2][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w3-1",
+      "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+      "revision": 6,
+      "revision_at": "2026-09-11T15:18:32.624696+00:00",
+      "mission_content_hash": "d67cfaf0a3882dc80cb255b42e1f4507d99dc4f8c1882eee7dafa83547e1a502",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w4-0",
+      "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+      "revision": 4,
+      "revision_at": "2026-09-11T15:18:37.243217+00:00",
+      "mission_content_hash": "14d1319416ee261146b95b15149b779d809cd6807d50bc4ffa3e7c7e47ccc6cf",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w4-1",
+      "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+      "revision": 6,
+      "revision_at": "2026-09-11T15:18:40.709742+00:00",
+      "mission_content_hash": "a07091fa35f749308c418af2c5f1623af01c63e966d11afc7eb6d6d4cd5ce6c7",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w5-0",
+      "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+      "revision": 9,
+      "revision_at": "2026-09-11T15:18:46.168294+00:00",
+      "mission_content_hash": "f3c9a794d69559d3da7947f21f2bde9710f224e9d89a081cd4aad2c9f5250eba",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w5-1",
+      "scenario_id": "2032d1cc-25e3-4bf9-9eff-6f8a1fd7153e",
+      "revision": 3,
+      "revision_at": "2026-09-11T15:18:53.828805+00:00",
+      "mission_content_hash": "b73e204dc8753d04cd35bad545af633593f6da745ccc6bfb8713baa4d10a6e60",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_possible]",
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[1][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w6-0",
+      "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+      "revision": 7,
+      "revision_at": "2026-09-11T15:18:58.560361+00:00",
+      "mission_content_hash": "345516de7501d0aa741f29dc7abd9851241b15d582cc10398acf51eb0311cb5e",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w6-1",
+      "scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+      "revision": 4,
+      "revision_at": "2026-09-11T15:19:01.484984+00:00",
+      "mission_content_hash": "e03f91ec9a9566c2bf2418ccb6908039c321897247e0e7c4b1dd77f2ab532724",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w9-0",
+      "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+      "revision": 7,
+      "revision_at": "2026-09-11T15:19:07.298785+00:00",
+      "mission_content_hash": "821666bb29f15e409eed972eb1cded0db622d395b7c65b41b7ce321d63051306",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_possible]",
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[2][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w9-1",
+      "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+      "revision": 5,
+      "revision_at": "2026-09-11T15:19:10.512125+00:00",
+      "mission_content_hash": "836e580c28d35d50f83582cf1238d67270483f7b7522722adec2d05d3a90bdfd",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w10-0",
+      "scenario_id": "1baacb9c-735d-4c29-a26e-b57ab6cf19d5",
+      "revision": 3,
+      "revision_at": "2026-09-11T15:19:15.904729+00:00",
+      "mission_content_hash": "9d6c44206b5f1463bfe593694e8ac69f7f3f6316673a022aa9b80d8ed8bb7cc7",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "fail",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_clear]",
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[2][reason_competes_clear]"
+        ]
+      }
+    },
+    {
+      "key": "w10-1",
+      "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+      "revision": 4,
+      "revision_at": "2026-09-11T15:19:18.923016+00:00",
+      "mission_content_hash": "a7181733d9fd129c3f4ab621045cf4c202bae8e8e300a9078390746056647085",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w11-0",
+      "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+      "revision": 5,
+      "revision_at": "2026-09-11T15:19:23.769848+00:00",
+      "mission_content_hash": "03f08d7597b6cf95d868030af485fa86bc6a2ec1eb4a76654564408789aa814c",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "fail",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[1][reason_competes_clear]"
+        ]
+      }
+    },
+    {
+      "key": "w11-1",
+      "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+      "revision": 5,
+      "revision_at": "2026-09-11T15:19:31.245879+00:00",
+      "mission_content_hash": "9997927f113dbc6b4ef366d0fce0ec3ef00f761a5031d54cfb45766ea79bb89d",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_possible]",
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[2][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w12-0",
+      "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+      "revision": 6,
+      "revision_at": "2026-09-11T15:19:37.521821+00:00",
+      "mission_content_hash": "80bc1e16b97577abdd9fbaf75d003ed392d175c0394a2850c322f8dae2332cdd",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "warning",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_possible]",
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[2][reason_competes_possible]"
+        ]
+      }
+    },
+    {
+      "key": "w12-1",
+      "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+      "revision": 4,
+      "revision_at": "2026-09-11T15:19:40.682711+00:00",
+      "mission_content_hash": "1824d7dcb9102204172170dbac598ba91b9a46be9035377a2abe5b324fc11df2",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w13-0",
+      "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+      "revision": 3,
+      "revision_at": "2026-09-11T15:19:44.099859+00:00",
+      "mission_content_hash": "f57fca13484b87caa7e2eb6d4f81f360416539b093484c618cb4549f07ab9fee",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "pass",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": []
+      }
+    },
+    {
+      "key": "w13-1",
+      "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+      "revision": 9,
+      "revision_at": "2026-09-11T15:19:49.771+00:00",
+      "mission_content_hash": "5629e456f53cdba0c0ea7fecc9816dfd2b8b3aacae5e7509c5de141a775bf61f",
+      "status": "generated",
+      "archived": false,
+      "gate": {
+        "verdict": "fail",
+        "prompt_version": "quality_v24_reason_facts_severity",
+        "findings": [
+          "fail:primary_reason_ambiguity@mpj_items[3].reasons[0][reason_competes_clear]",
+          "warning:primary_reason_ambiguity@mpj_items[3].reasons[1][reason_competes_possible]"
+        ]
+      }
+    }
+  ]
+}
