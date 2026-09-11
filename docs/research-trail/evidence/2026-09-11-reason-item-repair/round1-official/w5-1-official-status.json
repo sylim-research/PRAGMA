@@ -1,0 +1,38 @@
+{
+  "at": "2026-09-11T11:06:38.699Z",
+  "key": "w5-1",
+  "scenario_id": "793a1576-55c4-4790-9791-621685a9b3bb",
+  "contentHash": "df5ac4a78c2da2247aa08a0f83c6b5b78ebc977c2e7231cb926984dea9f33708",
+  "sourceHash": "0dc22c97b4ff84c35f345774dac838c2364d0a4aea46407e07c2a6d6cb0c1b75",
+  "run": {
+    "id": "4724c627-6f65-4679-a0cc-131c7ee403cf",
+    "content_hash": "df5ac4a78c2da2247aa08a0f83c6b5b78ebc977c2e7231cb926984dea9f33708",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "fail",
+    "openai_review": null,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "warning",
+      "findings": 1,
+      "model": "claude-opus-5"
+    },
+    "adjudication": null,
+    "prepared_finalization": false,
+    "running_stage": null,
+    "last_error": "재검토 선행 결과가 없습니다.",
+    "approved_at": null,
+    "next_stage": "adjudication",
+    "steps": [
+      "rules",
+      "openai",
+      "claude",
+      "adjudication",
+      "finalization",
+      "professor"
+    ]
+  },
+  "history": 1
+}

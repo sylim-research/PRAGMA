@@ -1,12 +1,12 @@
 {
-  "at": "2026-09-11T10:46:20.713Z",
+  "at": "2026-09-11T12:02:46.469Z",
   "key": "w5-1",
   "scenario_id": "793a1576-55c4-4790-9791-621685a9b3bb",
   "mode": "prepare",
-  "status": "held",
-  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=rule_时间条件_意向提问_结合; mpj_items[2].corrections[1]: scope 밖 risk_id=risk_选择权侵害_强迫; mpj_items[2].corrections[2]: scope 밖 risk_id=risk_模糊性_无回应期待; mpj_items[2].recommended_example: scope 밖 rule_id=rule_时间条件_意向提问_结合",
+  "status": "ready",
+  "message": "AI 검토 완료 · 교수자 판단 대기",
   "stages_run": [
-    "rules",
+    "adjudication",
     "finalization"
   ],
   "contentHash": "df5ac4a78c2da2247aa08a0f83c6b5b78ebc977c2e7231cb926984dea9f33708",
@@ -19,17 +19,26 @@
     "generation_quality": true,
     "generation_quality_verdict": "fail",
     "openai_review": null,
-    "independent_review_requested": false,
-    "claude_review": null,
-    "adjudication": null,
-    "prepared_finalization": false,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "warning",
+      "findings": 1,
+      "model": "claude-opus-5"
+    },
+    "adjudication": {
+      "decisions": 1,
+      "model": "gpt-4.1-2025-04-14"
+    },
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=rule_时间条件_意向提问_结合; mpj_items[2].corrections[1]: scope 밖 risk_id=risk_选择权侵害_强迫; mpj_items[2].corrections[2]: scope 밖 risk_id=risk_模糊性_无回应期待; mpj_items[2].recommended_example: scope 밖 rule_id=rule_时间条件_意向提问_结合",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",
+      "claude",
+      "adjudication",
       "finalization",
       "professor"
     ]

@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T11:06:46.617Z",
+  "at": "2026-09-11T12:08:45.484Z",
   "key": "w11-0",
   "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
   "contentHash": "30f36e92b5c4b875f864ddee0536614f1301a7a87fc68cc0c02cbbcaf6ab5b77",
@@ -16,11 +16,11 @@
     "independent_review_requested": false,
     "claude_review": null,
     "adjudication": null,
-    "prepared_finalization": false,
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=rule_이해_인정_후_반대_표현; mpj_items[3].corrections[1]: scope 밖 risk_id=risk_too_confrontational; mpj_items[3].corrections[2]: scope 밖 risk_id=risk_too_obscured; mpj_items[3].recommended_example: scope 밖 rule_id=rule_이해_인정_후_반대_표현; mpj_items[4].candidates[0]: scope 밖 rule_id=rule_이해_인정_후_반대_표현",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",

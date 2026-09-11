@@ -1,12 +1,11 @@
 {
-  "at": "2026-09-11T10:47:16.410Z",
+  "at": "2026-09-11T12:03:15.599Z",
   "key": "w9-1",
   "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
   "mode": "prepare",
-  "status": "held",
-  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=realization_reason_responsibility_limited; mpj_items[2].recommended_example: scope 밖 rule_id=realization_reason_responsibility_limited",
+  "status": "ready",
+  "message": "AI 검토 완료 · 교수자 판단 대기",
   "stages_run": [
-    "rules",
     "finalization"
   ],
   "contentHash": "9e1604f7b5726539b45de192b78e6522694e5d448cbfd54f954822d11ba3850b",
@@ -22,11 +21,11 @@
     "independent_review_requested": false,
     "claude_review": null,
     "adjudication": null,
-    "prepared_finalization": false,
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=realization_reason_responsibility_limited; mpj_items[2].recommended_example: scope 밖 rule_id=realization_reason_responsibility_limited",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",

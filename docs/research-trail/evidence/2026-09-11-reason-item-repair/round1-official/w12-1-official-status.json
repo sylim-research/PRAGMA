@@ -1,0 +1,32 @@
+{
+  "at": "2026-09-11T11:06:49.996Z",
+  "key": "w12-1",
+  "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+  "contentHash": "f258c2522cfd665104358980abf03aea12d48de0c471d35fff97b246c4bd4506",
+  "sourceHash": "409724b71ded766f462211fa08eff752bcc8380a5ec3a93dbf88fa76fa4e621a",
+  "run": {
+    "id": "bb9f50e7-cd84-4ac1-82a4-6f1d57e3dcad",
+    "content_hash": "f258c2522cfd665104358980abf03aea12d48de0c471d35fff97b246c4bd4506",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "pass",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": false,
+    "running_stage": null,
+    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=因果_因为; mpj_items[2].corrections[2]: scope 밖 risk_id=과도한책임추궁; mpj_items[2].recommended_example: scope 밖 rule_id=因果_因为",
+    "approved_at": null,
+    "next_stage": "finalization",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "history": 1
+}

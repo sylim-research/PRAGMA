@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T11:06:42.102Z",
+  "at": "2026-09-11T12:08:41.007Z",
   "key": "w9-0",
   "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
   "contentHash": "97c91446a56a9269a909b9a7ac561e035b974f3f3c9e43c44743caad7ff6d40f",
@@ -18,9 +18,9 @@
     "adjudication": null,
     "prepared_finalization": true,
     "running_stage": null,
-    "last_error": null,
+    "last_error": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
     "approved_at": null,
-    "next_stage": "professor",
+    "next_stage": "finalization",
     "steps": [
       "rules",
       "openai",

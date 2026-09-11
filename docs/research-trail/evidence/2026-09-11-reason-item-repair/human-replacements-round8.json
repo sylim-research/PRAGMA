@@ -1,0 +1,13 @@
+{
+  "scope": "Round 8 (2026-09-11). w6-1 was regenerated on the corrected core (new row 09bc6c81; freeze lifted for w6-1 only). The generator again produced two old-form Reason distractors that the production critic correctly failed: r1 prescribes omitting the deadline reason (a prescription, not a factual observation) and r2 asserts a meaning error in ‘再接’ that the target does not contain. Only those two options are rewritten through the revision path; accepted option, explanation and the rest of the mission are untouched.",
+  "replacements": {
+    "w6-1": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘你’로 팀장을 부르고 ‘吧’로 문장을 맺어, 업무 배정권을 가진 상사에게 동료에게 하듯 편한 말투로 들릴 수 있기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘不能再接了’로 결론을 먼저 말하고 마감 사유 ‘我得赶…截止时间’을 뒤에 두어, 왜 안 되는지가 거절 다음에야 나오기 때문이다." }
+    }
+  },
+  "replaced_premises": {
+    "w6-1 r1": "「마감 이유를 생략하는 것이 핵심이기 때문이다」 — 처방이며 사실 관찰이 아님(원문에도 이유가 있음).",
+    "w6-1 r2": "「‘再接’이 이미 맡았다가 돌려준다는 뜻」 — 사실이 아님(再接 = 추가로 맡다)."
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "at": "2026-09-11T11:52:30.312Z",
+  "key": "w6-1",
+  "draft_file": "w6-1-draft.json",
+  "draft_sha256": "32c2cf02340fd6e9d68a138ad407a111bf527813c6c7573b87c656d7399fcf45",
+  "original_scenario_id": "700f0bdd-54f7-4192-80e4-07dcd262e2de",
+  "new_scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "교수가 부탁한 학과 행사 접수 업무를 시험 일정 때문에 거절하는 학생의 말",
+    "speech_act": "refusal",
+    "learner_level": "intermediate",
+    "domain": "school",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "theme_code": "campus_study",
+    "topic_code": "school_request_refusal",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "channel": "facetoface",
+      "direction": "ko_zh",
+      "relation_ko": "과제 지도로 두 차례 만난 교수와 학생",
+      "source_text": "교수님, 죄송하지만 그 시간에 다른 수업 시험이 있어서 학과 행사 접수 업무를 맡을 수 없습니다. 다른 분께 부탁드리는 게 좋을 것 같습니다.",
+      "context_spec": {
+        "role_pair": {
+          "speaker_ko": "학생",
+          "addressee_ko": "교수"
+        },
+        "decision_authority": "화자가 자신의 참여·수락 여부를 결정하며, 거절 대상과 범위가 분명해야 한다.",
+        "speaker_entitlement": "화자는 앞선 요청·제안·초대의 수용 여부를 결정할 재량이 있다.",
+        "addressee_obligation": "상대는 거절 대상 행동을 먼저 요청·제안·초대한 사람이며, 거절을 수용할 여지가 있어야 한다.",
+        "standard_situation_code": "school.school_request_refusal.refusal",
+        "interpreter_role_contract": {
+          "pdr_relation": "A_to_B",
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C"
+        }
+      },
+      "situation_ko": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다.",
+      "brief_note_ko": "교수가 부탁한 학과 행사 접수 업무를 시험 일정 때문에 거절하는 학생의 말",
+      "length_policy": {
+        "max": 60,
+        "min": 40,
+        "unit": "effective_chars",
+        "actual": 55,
+        "version": "effective_chars_v2_min_warning"
+      },
+      "focal_segments": [
+        {
+          "role": "head",
+          "text": "학과 행사 접수 업무를 맡을 수 없습니다."
+        },
+        {
+          "role": "support",
+          "text": "죄송하지만 그 시간에 다른 수업 시험이 있어서"
+        }
+      ],
+      "preceding_turn": "我想请你帮忙负责明天中午系里活动的签到工作，可以吗？",
+      "schema_version": "scenario_core_v3",
+      "source_modality": "spoken",
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_gate",
+        "prompt_snapshot_hash": "9153d9c0a30ec06a705ad60787217ff8a84b4d1e3079c32c108cc61688c5f94d",
+        "generated_at": "2026-09-11T04:49:20.572Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "교수가 학생에게 학과 행사 접수 업무를 부탁했고, 학생은 일정상 거절 의사를 밝히는 상황으로, 지정된 PDR 조건과 실제 사건이 모두 일치한다.",
+          "scene_ko": "나는 이번 학기 과제 지도로 두 번 면담한 교수에게 학과 행사 접수 업무를 부탁받았다. 그 시간에 다른 수업 시험이 있어 직접 맡을 수 없다고 교수에게 말하려 한다.",
+          "relation_ko": "과제 지도로 두 차례 만난 교수와 학생",
+          "speaker_role_ko": "학생",
+          "addressee_role_ko": "교수",
+          "observed_pdr": {
+            "p": "speaker_lower",
+            "d": "acquaintance",
+            "r": "mid"
+          },
+          "p_evidence_ko": "교수가 학생에게 부탁을 하는 상황으로, 교수의 권한이 더 높다.",
+          "d_evidence_ko": "과제 지도로 두 차례 면담한 사이로, 이전에 실제 교류가 있었으나 친밀하지는 않다.",
+          "r_evidence_ko": "행사 접수 업무를 맡아 달라는 부탁을 일정상 거절하는 것으로, 상대의 계획에 영향을 주는 중간 정도의 부담이 있다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "학생이 교수의 행사 접수 부탁을 시험 일정으로 거절하는 장면이 기대 조건과 일치한다.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "source_text가 교수의 부탁에 대해 시험 일정으로 인해 접수 업무를 맡을 수 없다고 명확히 거절하고 있다."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "학생(화자)이 교수(상대)보다 낮은 지위로, 지정된 speaker_lower와 일치한다."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "과제 지도로 두 차례 만난 교수와 학생 관계로 acquaintance(아는 사이)에 해당한다."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "교수의 부탁을 거절하는 상황에서 중간 정도의 부담(mid)이 적절하다."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "학과 행사, 교수-학생 관계 등 학업 도메인에 해당한다."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 학업 상황이므로 pass."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "구두 통역 상황에 맞는 자연스러운 구어체 발화이다."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "학생이 자신의 수락 여부를 결정하며, 교수의 부탁을 명확히 거절하는 구조가 context_spec과 일치한다."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "학생이 교수의 부탁을 거절하며, 책임자·행위 대상·소유자 지시가 모든 필드에서 일관된다."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "학생이 자신의 참여 여부를 결정하고 거절하는 구조로, 거절의 결정 권한이 화자에게 있다."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "교수의 행사 접수 부탁과 학생의 시험 일정 거절이라는 시드의 핵심 사건이 그대로 구현되어 있다."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "preceding_turn에서 교수의 부탁이 명확히 제시되고, source_text가 그에 대한 직접적 거절 응답이다."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "화자는 학생, 상대는 교수로, 모든 필드에서 일관되게 유지된다."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 교수의 부탁과 학생의 시험 일정 거절이라는 핵심 사건이 일치한다."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황문이 실제 장면 설명만 제공하며, 내부 평가 기준이나 정답 방향을 노출하지 않는다."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "교수가 학생에게 행사 접수 업무를 부탁하고, 학생이 시험 일정으로 거절하는 상황이 현실적으로 자연스럽다."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-11T11:50:42.311Z",
+          "core_content_hash": "7491d2a56d985fd921cde977fe88b2ffa56abca7625b46a46c610897c38117df"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "700f0bdd-54f7-4192-80e4-07dcd262e2de",
+          "draft_file": "w6-1-draft.json",
+          "draft_sha256": "32c2cf02340fd6e9d68a138ad407a111bf527813c6c7573b87c656d7399fcf45",
+          "author": "Claude (FABLE), on researcher ruling 2026-09-11 (w6-1 content blocker)",
+          "edited_at": "2026-09-11T11:50:42.433Z",
+          "reason": "preceding_turn read as the student asking the professor (\"教授，…\") although the scene is the professor asking the student (role inversion, Claude independent review fail); and it named the task 接待工作 while the Korean source (접수 업무) and the mission reference alternatives use 签到工作. Address dropped, 接待→签到. No other change.",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "prompt_version": "core_v18_observed_pdr_scene_gate"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w6-1",
+    "content_hash": "930j7m",
+    "prompt_snapshot_hash": "9153d9c0a30ec06a705ad60787217ff8a84b4d1e3079c32c108cc61688c5f94d"
+  }
+}

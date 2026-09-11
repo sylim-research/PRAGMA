@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T11:12:18.600Z",
+  "at": "2026-09-11T12:08:54.957Z",
   "runs": [
     {
       "key": "w6-1",
@@ -56,6 +56,64 @@
           "uncertainty_ko": "",
           "needs_professor": false,
           "problem_type_ko": "판정·해설 일관성"
+        }
+      ]
+    },
+    {
+      "key": "w12-0",
+      "run_id": "9ebaa69d-c018-41e3-b703-e551be1359b3",
+      "content_hash": "b0f4934901d9943b2c51b720dc5824fed2e26a1881057a8ce725ff868283d9f6",
+      "model": "claude-opus-5",
+      "prompt_version": "content_review_v2:claude",
+      "verdict": "warning",
+      "summary_ko": "장면 현실성·PDR 근거·MPJ 구성(2적정 2조정, 앵커 공유, 밴드 배치)은 대체로 일관됩니다. 다만 코어 원문 마지막 문장의 '앞으로도'와 '가능한 빨리'가 한국어 자연성·논리 면에서 어색하여 수정이 필요합니다.",
+      "findings": [
+        {
+          "id": "claude-1",
+          "quote": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
+          "where": "/content/context/core_content/source_text",
+          "issue_ko": "원문 마지막 문장 '앞으로도 이런 일이 반복되지 않기를 바랍니다'에서 '앞으로도'는 이미 두 차례 발생한 사건과 논리적으로 맞지 않아 '앞으로는'이 자연스럽습니다. 또한 '가능한 빨리'는 '가능한 한 빨리'가 규범적 표현입니다.",
+          "severity": "warning",
+          "reason_ko": "'앞으로도 반복되지 않기를'은 지금까지 반복되지 않았음을 전제하는 표현이라 '이번 주에 두 번이나' 겪었다는 앞 문장과 충돌합니다. 같은 미션의 MPJ1 원문에서는 '앞으로는 이런 일이 반복되지 않았으면 해'로 올바르게 쓰였고, 참고 번역도 '希望以后不要再发生这样的事'로 '앞으로는'에 대응합니다.",
+          "suggestion_ko": "'가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로는 이런 일이 반복되지 않기를 바랍니다.'로 수정하고, focal_segments의 support 문장과 production_task의 동일 문구도 함께 맞춥니다.",
+          "uncertainty_ko": "",
+          "needs_professor": false,
+          "problem_type_ko": "언어 자연성"
+        }
+      ]
+    },
+    {
+      "key": "w5-0",
+      "run_id": "1d7da50a-408e-45ee-be5c-db3cac5a4f10",
+      "content_hash": "4c2adb9e2855f0f4971f36b625d5589d42d55bc69dec3d47e21bfc7b1584d2cf",
+      "model": "claude-opus-5",
+      "prompt_version": "content_review_v2:claude",
+      "verdict": "warning",
+      "summary_ko": "코어 장면(동호회 회원 간 30분 산책 초대)과 P/D/R(equal·acquaintance·low)은 사건 사실과 일치하며, MPJ1~5의 대역 배정(다중판단 2 적정/2 조정 필요 포함), 이유 문항 구성, DCT 참고안도 초점 invitation_choice_commitment와 정합적입니다. 다만 MPJ1 중국어의 어휘 자연성과 앵커 문항(MPJ2~4) 번역의 명제 변형 처리에 대해 확인이 필요합니다.",
+      "findings": [
+        {
+          "id": "claude-1",
+          "quote": "周五晚上我会组织一个半小时的线上答题聚会。不收参加费，有空就一起来玩吧！周四前发消息告诉我来不来就行。",
+          "where": "/content/mission/mpj_items/0/target",
+          "issue_ko": "MPJ1 중국어 산출의 '不收参加费'는 한국어 '참가비는 없으니까'의 직역에 가까워 중국어 구어 메신저 표현으로는 어색합니다. 통상 '不收费'·'免费参加'가 자연스럽습니다.",
+          "severity": "warning",
+          "reason_ko": "이 문항은 very_appropriate 참조 답안으로 제시되는 모범 산출이므로, 어휘 결합이 어색하면 학생이 부자연스러운 표현을 적정 모델로 학습할 수 있습니다.",
+          "suggestion_ko": "'不收参加费'를 '不收费'나 '免费参加'로 다듬어 recommended_example과 target을 동일하게 수정하는 것을 검토해 주세요('线上答题聚会'도 '线上答题活动' 등으로 점검 가능).",
+          "uncertainty_ko": "",
+          "needs_professor": false,
+          "problem_type_ko": "언어 자연성"
+        },
+        {
+          "id": "claude-2",
+          "quote": "周三午休时，一起来看看我也展出了照片的公司内部展览吧！展览免费，看完大约需要十五分钟。我就按你会来安排了，周二前发消息确认一下就好。",
+          "where": "/content/mission/mpj_items/1/target",
+          "issue_ko": "앵커 문항(MPJ2·3·4)의 중국어 산출은 한국어 원문의 '참석하실지 화요일까지 메시지로 알려 주세요'를 '我就按你会来安排了，周二前发消息确认一下就好'로 바꾸어, 회신 요청의 내용 자체(참석 여부 문의 → 참석 전제 후 확인)를 변경하고 있습니다.",
+          "severity": "warning",
+          "reason_ko": "현행 기준은 참여 약속의 성립 요건 조절을 대역으로 다루되, 원문 명제가 달라진 경우는 대역 문제가 아니라 명제 위반으로 구분합니다. 학생이 이를 화용 대역(too_pressuring) 문제로 볼지, 오역으로 볼지 갈릴 수 있어 판정·해설의 초점이 흐려질 여지가 있습니다.",
+          "suggestion_ko": "교수자가 이 변형을 대역 조작으로 유지할지 판단해 주시고, 유지한다면 MPJ3·4 해설에 '원문의 회신 요청 내용을 참석 전제로 바꾼 것이 압박으로 읽히는 지점'임을 한 문장 명시해 오역 판단과 구분되게 해 주세요.",
+          "uncertainty_ko": "의도된 대역 조작 범위(명제 변경 허용 폭)는 교수자의 설계 의도 확인이 필요합니다.",
+          "needs_professor": true,
+          "problem_type_ko": "의미 보존 / 판정·해설 일관성"
         }
       ]
     },
@@ -119,60 +177,37 @@
       ]
     },
     {
-      "key": "w12-0",
-      "run_id": "9ebaa69d-c018-41e3-b703-e551be1359b3",
-      "content_hash": "b0f4934901d9943b2c51b720dc5824fed2e26a1881057a8ce725ff868283d9f6",
+      "key": "w13-1",
+      "run_id": "153d5909-c063-4bd2-af80-2cc79c9dab07",
+      "content_hash": "2bf34ca7b4998579b7b233d64c80ceeb05848c0f35dfeeb954fa05fe06594aa9",
       "model": "claude-opus-5",
       "prompt_version": "content_review_v2:claude",
       "verdict": "warning",
-      "summary_ko": "장면 현실성·PDR 근거·MPJ 구성(2적정 2조정, 앵커 공유, 밴드 배치)은 대체로 일관됩니다. 다만 코어 원문 마지막 문장의 '앞으로도'와 '가능한 빨리'가 한국어 자연성·논리 면에서 어색하여 수정이 필요합니다.",
+      "summary_ko": "핵심 장면·PDR 근거와 MJT 구성(2적정·2조정, 반례 설계, 공유 앵커)은 전반적으로 기준에 부합합니다. 다만 다중판단 문항의 한 후보에 부여된 밴드 판정의 근거가 약하고, 코어 장면의 청자 수(단수/복수) 표기가 필드 간 일치하지 않아 확인이 필요합니다.",
       "findings": [
         {
           "id": "claude-1",
-          "quote": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
-          "where": "/content/context/core_content/source_text",
-          "issue_ko": "원문 마지막 문장 '앞으로도 이런 일이 반복되지 않기를 바랍니다'에서 '앞으로도'는 이미 두 차례 발생한 사건과 논리적으로 맞지 않아 '앞으로는'이 자연스럽습니다. 또한 '가능한 빨리'는 '가능한 한 빨리'가 규범적 표현입니다.",
+          "quote": "‘麻烦你…’로 행동을 바로 부탁하던 구조를 ‘会不会让你为难’라는 부담 우려 질문으로 바꾸었습니다. 펜을 건네 달라는 내용은 남지만, 바로 옆 여분 펜을 전달하는 작은 행동보다 상대가 곤란해질 가능성을 먼저 판단하게 하여 요청을 과도한 타진으로 돌리므로 too_indirect 방향입니다.",
+          "where": "/content/mission/mpj_items/4/candidates/3/note_ko",
+          "issue_ko": "다중판단 문항(id:5)의 네 번째 후보 '我这儿够不着。请你把旁边的一支备用笔递给我，会不会让你为难？'를 too_indirect(요청이 흐려짐)로 판정했지만, 해당 문장은 '请你把…递给我'라는 명시적 직접 요청을 그대로 유지하고 뒤에 부담 확인 질문만 덧붙인 형태입니다. 요청 내용이 흐려지지 않았고, 오히려 직접형+과잉 타진이 결합된 어색한 혼합형입니다.",
           "severity": "warning",
-          "reason_ko": "'앞으로도 반복되지 않기를'은 지금까지 반복되지 않았음을 전제하는 표현이라 '이번 주에 두 번이나' 겪었다는 앞 문장과 충돌합니다. 같은 미션의 MPJ1 원문에서는 '앞으로는 이런 일이 반복되지 않았으면 해'로 올바르게 쓰였고, 참고 번역도 '希望以后不要再发生这样的事'로 '앞으로는'에 대응합니다.",
-          "suggestion_ko": "'가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로는 이런 일이 반복되지 않기를 바랍니다.'로 수정하고, focal_segments의 support 문장과 production_task의 동일 문구도 함께 맞춥니다.",
-          "uncertainty_ko": "",
-          "needs_professor": false,
-          "problem_type_ko": "언어 자연성"
-        }
-      ]
-    },
-    {
-      "key": "w5-0",
-      "run_id": "1d7da50a-408e-45ee-be5c-db3cac5a4f10",
-      "content_hash": "4c2adb9e2855f0f4971f36b625d5589d42d55bc69dec3d47e21bfc7b1584d2cf",
-      "model": "claude-opus-5",
-      "prompt_version": "content_review_v2:claude",
-      "verdict": "warning",
-      "summary_ko": "코어 장면(동호회 회원 간 30분 산책 초대)과 P/D/R(equal·acquaintance·low)은 사건 사실과 일치하며, MPJ1~5의 대역 배정(다중판단 2 적정/2 조정 필요 포함), 이유 문항 구성, DCT 참고안도 초점 invitation_choice_commitment와 정합적입니다. 다만 MPJ1 중국어의 어휘 자연성과 앵커 문항(MPJ2~4) 번역의 명제 변형 처리에 대해 확인이 필요합니다.",
-      "findings": [
-        {
-          "id": "claude-1",
-          "quote": "周五晚上我会组织一个半小时的线上答题聚会。不收参加费，有空就一起来玩吧！周四前发消息告诉我来不来就行。",
-          "where": "/content/mission/mpj_items/0/target",
-          "issue_ko": "MPJ1 중국어 산출의 '不收参加费'는 한국어 '참가비는 없으니까'의 직역에 가까워 중국어 구어 메신저 표현으로는 어색합니다. 통상 '不收费'·'免费参加'가 자연스럽습니다.",
-          "severity": "warning",
-          "reason_ko": "이 문항은 very_appropriate 참조 답안으로 제시되는 모범 산출이므로, 어휘 결합이 어색하면 학생이 부자연스러운 표현을 적정 모델로 학습할 수 있습니다.",
-          "suggestion_ko": "'不收参加费'를 '不收费'나 '免费参加'로 다듬어 recommended_example과 target을 동일하게 수정하는 것을 검토해 주세요('线上答题聚会'도 '线上答题活动' 등으로 점검 가능).",
-          "uncertainty_ko": "",
-          "needs_professor": false,
-          "problem_type_ko": "언어 자연성"
+          "reason_ko": "criteria의 밴드 정의상 too_indirect는 요청이 흐려져 수락 여부를 확인하는 힘이 약해지는 경우입니다. 이 후보는 요청이 명료하게 남아 있어 판정 근거가 밴드 정의와 어긋나며, 학생이 '부담을 묻는 표현=우회적'이라는 표현형 기반 규칙을 학습할 위험이 있습니다. 또한 직접 명령형 뒤에 '会不会让你为难？'을 붙인 중국어 자체가 부자연스럽습니다.",
+          "suggestion_ko": "후보 문장을 요청 자체가 흐려지는 형태(예: 부담 우려 질문만 남기고 행동 지정을 약화시킨 표현)로 다듬거나, 밴드 판정을 문장의 실제 기능(직접성 유지+불필요한 타진)에 맞게 재검토하고 note_ko의 근거를 표현형이 아닌 요청 명료성 기준으로 다시 서술하십시오.",
+          "uncertainty_ko": "혼합형 발화의 밴드 귀속은 교수자의 척도 운용 판단이 필요합니다.",
+          "needs_professor": true,
+          "problem_type_ko": "판정·해설 일관성"
         },
         {
           "id": "claude-2",
-          "quote": "周三午休时，一起来看看我也展出了照片的公司内部展览吧！展览免费，看完大约需要十五分钟。我就按你会来安排了，周二前发消息确认一下就好。",
-          "where": "/content/mission/mpj_items/1/target",
-          "issue_ko": "앵커 문항(MPJ2·3·4)의 중국어 산출은 한국어 원문의 '참석하실지 화요일까지 메시지로 알려 주세요'를 '我就按你会来安排了，周二前发消息确认一下就好'로 바꾸어, 회신 요청의 내용 자체(참석 여부 문의 → 참석 전제 후 확인)를 변경하고 있습니다.",
+          "quote": "과제 조원",
+          "where": "/content/context/core_content/context_spec/role_pair/addressee_ko",
+          "issue_ko": "코어 장면의 상황문과 DCT 참고 산출은 '조원들'(복수, '大家好', '麻烦大家')을 대상으로 하지만, role_pair의 addressee_ko는 '과제 조원'(단수)으로 되어 있고 원문 '안녕하세요'는 단수/복수가 모호합니다.",
           "severity": "warning",
-          "reason_ko": "현행 기준은 참여 약속의 성립 요건 조절을 대역으로 다루되, 원문 명제가 달라진 경우는 대역 문제가 아니라 명제 위반으로 구분합니다. 학생이 이를 화용 대역(too_pressuring) 문제로 볼지, 오역으로 볼지 갈릴 수 있어 판정·해설의 초점이 흐려질 여지가 있습니다.",
-          "suggestion_ko": "교수자가 이 변형을 대역 조작으로 유지할지 판단해 주시고, 유지한다면 MPJ3·4 해설에 '원문의 회신 요청 내용을 참석 전제로 바꾼 것이 압박으로 읽히는 지점'임을 한 문장 명시해 오역 판단과 구분되게 해 주세요.",
-          "uncertainty_ko": "의도된 대역 조작 범위(명제 변경 허용 폭)는 교수자의 설계 의도 확인이 필요합니다.",
-          "needs_professor": true,
-          "problem_type_ko": "의미 보존 / 판정·해설 일관성"
+          "reason_ko": "청자가 한 명인지 여러 명인지에 따라 요청의 조정 여지와 자연스러운 중국어 호칭('你'/'大家')이 달라지므로, 필드 간 청자 수 불일치는 학습자 산출 판단 기준을 흔들 수 있습니다.",
+          "suggestion_ko": "청자를 복수(조원들)로 확정해 addressee_ko를 '과제 조원들'로 맞추거나, 반대로 단수 장면으로 통일하고 DCT 참고 산출의 '大家' 표현을 그에 맞게 조정하십시오.",
+          "uncertainty_ko": "",
+          "needs_professor": false,
+          "problem_type_ko": "맥락 일관성"
         }
       ]
     }

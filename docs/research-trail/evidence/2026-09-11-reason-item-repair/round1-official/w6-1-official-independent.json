@@ -1,0 +1,44 @@
+{
+  "at": "2026-09-11T11:01:28.529Z",
+  "key": "w6-1",
+  "scenario_id": "700f0bdd-54f7-4192-80e4-07dcd262e2de",
+  "mode": "independent",
+  "status": "held",
+  "message": "재검토 선행 결과가 없습니다.",
+  "stages_run": [
+    "claude",
+    "adjudication"
+  ],
+  "contentHash": "368877b64def1d91ded882177508a8468ff65ae67812a89e7ff3ef452ce2f651",
+  "run": {
+    "id": "a3078cc3-a89b-4cca-b358-47ae5cd34d30",
+    "content_hash": "368877b64def1d91ded882177508a8468ff65ae67812a89e7ff3ef452ce2f651",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "warning",
+    "openai_review": null,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "fail",
+      "findings": 2,
+      "model": "claude-opus-5"
+    },
+    "adjudication": null,
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": "재검토 선행 결과가 없습니다.",
+    "approved_at": null,
+    "next_stage": "adjudication",
+    "steps": [
+      "rules",
+      "openai",
+      "claude",
+      "adjudication",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}
