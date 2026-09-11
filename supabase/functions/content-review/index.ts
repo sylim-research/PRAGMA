@@ -85,7 +85,7 @@ Deno.serve(async (req) => {
       return json(await inspect());
     }
     const run = state.run;
-    if (action === "finalization" && run?.prepared_finalization && run.rules?.verdict !== "fail") return json(state);
+    if (action === "finalization" && run?.prepared_finalization) return json(state);
     if (action === "request_independent") {
       if (!run || run.approval_policy !== CONTENT_APPROVAL_POLICY || run.approved_at || run.running_stage
         || run.rules.verdict === "fail" || (!run.openai_review && !run.generation_quality)) return json({error:"현재 기본 점검을 먼저 준비하세요."},409);
@@ -94,14 +94,12 @@ Deno.serve(async (req) => {
       if (error) throw new Error("추가 검토 선택 저장 실패");
       return json(await inspect());
     }
-    // A finalization artifact that failed the structural rules blocks approval but may be prepared again.
-    const retryFinalization = action === "finalization" && Boolean(run?.prepared_finalization) && run?.rules?.verdict === "fail" && !run?.approved_at;
-    if (!run || (run.rules.verdict === "fail" && !retryFinalization) || nextReviewStage(run) !== action) return json({ error: "선행 단계를 완료하거나 현재 콘텐츠의 규칙 오류를 수정해 주세요." }, 409);
+    if (!run || run.rules.verdict === "fail" || nextReviewStage(run) !== action) return json({ error: "선행 단계를 완료하거나 현재 콘텐츠의 규칙 오류를 수정해 주세요." }, 409);
     if (action === "finalization") {
       const token = crypto.randomUUID();
       const { data: claimed, error: claimError } = await db.from("content_review_runs").update({
         running_stage: "finalization", lease_token: token, lease_until: new Date(Date.now() + 5 * 60_000).toISOString(), last_error: null,
-      }).eq("id", run.id).is("approved_at", null)
+      }).eq("id", run.id).is("prepared_finalization", null).is("approved_at", null)
         .or(`running_stage.is.null,lease_until.lt.${new Date().toISOString()}`).select("id").maybeSingle();
       if (claimError || !claimed) return json({ error: "최종 검수 자료가 이미 준비 중이거나 완료됐습니다. 결과를 새로고침하세요." }, 409);
       try {
@@ -125,7 +123,7 @@ Deno.serve(async (req) => {
         });
         const { data: saved, error } = await db.from("content_review_runs").update({
           ...prepared, professor_decisions: [], running_stage: null, lease_token: null, lease_until: null,
-        }).eq("id", run.id).eq("lease_token", token).select("id").maybeSingle();
+        }).eq("id", run.id).eq("lease_token", token).is("prepared_finalization", null).select("id").maybeSingle();
         if (error || !saved) throw new Error("최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.");
       } catch (cause) {
         await db.from("content_review_runs").update({ running_stage: null, lease_token: null, lease_until: null,
