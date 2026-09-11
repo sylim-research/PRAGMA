@@ -111,3 +111,5 @@ PR #135 조사에서 확인된 사실: 이 브랜치의 엣지 코드가 Supabas
 첫 실패(`scene-grounding-edge.test.mjs`의 옛 `formal` 기대)를 고친 뒤에도 실패했다. 두 번째 원인은 「Build production bundle」 단계의 prebuild 검사 `build-content-review-domain.mjs --check` → **「Review domain bundle is stale」**. `content-review` 엣지 함수는 `_shared`의 검토 도메인을 `domain.generated.mjs`로 번들해 두는데, 공유 프롬프트(`sceneGrounding.ts`·`missionCandidateFeedback.ts`)를 바꾸면 이 번들도 다시 만들어야 한다. 재생성 후 검증 통과, 커밋 `c3747fce`.
 
 엣지 프롬프트를 고칠 때의 로컬 검증 목록(오늘 두 번 빠뜨린 것): `npm run prompts:snapshot` → `npm run typecheck` → `npx vitest run` → `node --test scripts/{teaching-materials,content-review,scene-grounding}-edge.test.mjs` → `node scripts/build-content-review-domain.mjs && … --check` → `npm run build`. 이 순서를 지키면 CI가 잡는 것을 미리 잡는다.
+
+PR #135 필수 CI **통과**(run 34561437184, 3분 32초). 병합은 연구자 결정. 병합 뒤 순서 = `npm run edge:deploy -- generate-scenario content-review`(guard 통과 확인) → `repair.ts audit` → `repair.ts repair` → 미승격 5칸 승격 → w6-1 재시도 → 결과 표.
