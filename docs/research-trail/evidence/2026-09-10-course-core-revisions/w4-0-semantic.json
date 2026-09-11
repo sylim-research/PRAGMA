@@ -1,0 +1,91 @@
+{
+  "at": "2026-09-10T14:44:12.939Z",
+  "run_id": "scene_grounding_course_20260910",
+  "draft_file": "w4-0-draft.json",
+  "draft_sha256": "b78aa9a0f5c10e6ca0fc13f921ace46ced66cba7f436bd81095eaa427e0f34f3",
+  "scope": "Automated core semantic review only; not instructor approval or whole-mission validation",
+  "result": {
+    "ok": true,
+    "result": {
+      "verdict": "pass",
+      "reason": "",
+      "issues": [],
+      "check": {
+        "verdict": "pass",
+        "summary_ko": "동호회 회원이 졸업 축하 꽃 카드 사진을 칭찬하는 상황이 기대 조건과 잘 부합한다.",
+        "axes": {
+          "speech_act": {
+            "verdict": "pass",
+            "reason_ko": "카드의 색 조합과 손글씨에 대해 구체적으로 칭찬하고 있다."
+          },
+          "power": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 동등한 관계로, 지위 차이가 드러나지 않는다."
+          },
+          "distance": {
+            "verdict": "pass",
+            "reason_ko": "동호회에서 몇 번 만난 아는 사이로 acquaintance에 해당한다."
+          },
+          "burden": {
+            "verdict": "pass",
+            "reason_ko": "칭찬의 내용이 부담이 적고, 일상적이며 민감하지 않다."
+          },
+          "domain": {
+            "verdict": "pass",
+            "reason_ko": "동호회 및 졸업 축하 상황으로 일상 도메인에 해당한다."
+          },
+          "industry": {
+            "verdict": "pass",
+            "reason_ko": "직장/산업 배경이 없으므로 pass."
+          },
+          "mode": {
+            "verdict": "pass",
+            "reason_ko": "메신저를 통한 서면 메시지로, 번역(서면) 상황에 부합한다."
+          },
+          "context_spec": {
+            "verdict": "pass",
+            "reason_ko": "화자는 구체적 강점에 대해 칭찬하고, 상대는 반응 의무가 없다."
+          },
+          "referents": {
+            "verdict": "pass",
+            "reason_ko": "카드를 그려준 회원이 칭찬의 대상임이 일관되게 드러난다."
+          },
+          "decision_authority": {
+            "verdict": "pass",
+            "reason_ko": "칭찬에 결정권이 요구되지 않으며, 평가 근거와 주제도 적절하다."
+          },
+          "topic_seed": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원이 졸업 축하 꽃 카드 사진을 보내고, 이에 대해 칭찬하는 상황이 유지된다."
+          },
+          "adjacency": {
+            "verdict": "pass",
+            "reason_ko": "응답 화행이 아니므로 해당 없음."
+          },
+          "participant_roles": {
+            "verdict": "pass",
+            "reason_ko": "졸업을 맞은 회원이 카드를 그려준 회원에게 칭찬하는 역할이 일치한다."
+          },
+          "scene_source_alignment": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명과 source_text 모두 카드의 색 조합, 손글씨, 감사 표현이 일치한다."
+          },
+          "learner_scene": {
+            "verdict": "pass",
+            "reason_ko": "상황 설명에 답변 방향이나 내부 평가 기준이 드러나지 않는다."
+          },
+          "scene_plausibility": {
+            "verdict": "pass",
+            "reason_ko": "동호회 회원 간 졸업 축하와 카드 칭찬이 자연스럽고 현실적이다."
+          }
+        },
+        "model": "gpt-4.1",
+        "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+        "checked_at": "2026-09-10T14:44:12.760Z",
+        "core_content_hash": "a3dc69ec88197829f4c88ea08da3dfa1067679f9dc3c125e6475a56bf8aabf75"
+      },
+      "model": "gpt-4.1",
+      "promptVersion": "core_quality_v11_observed_pdr_scene_gate"
+    }
+  }
+}

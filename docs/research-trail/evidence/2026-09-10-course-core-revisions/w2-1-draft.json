@@ -1,0 +1,80 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE)",
+  "original_scenario_id": "527d90dc-3651-46b5-a4c3-b22b50a80921",
+  "original_artifact": ".tmp/scene-grounding/scene_grounding_course_20260910/w2-1-core.json",
+  "original_sha256": "6d83aeffed06fee2d005944aef2d6a70957abd887388ea5589994b74b5e764b6",
+  "revision_reason": "situation_ko told the learner the register (\"부담 없이 요청할 수 있는 상황\"). Keep the notice as a fact, drop the evaluative steer.",
+  "review_required": "Fresh semantic check of edited content, then promotion and whole-mission review. No approval or DB write performed.",
+  "plan": {
+    "key": "w2-1",
+    "week": 2,
+    "position": 1,
+    "replaces": "28d87b8e-ac97-4749-a4a5-3581f8c833df",
+    "cell": {
+      "speech_act_ui": "request",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "formal",
+      "pdr_burden": "low",
+      "theme_code": "daily_living",
+      "topic_code": "hospital_pharmacy_visit",
+      "situation_seed_ko": "처음 방문한 병원의 접수 직원에게 다음 주 월요일 예약을 화요일로 바꿀 수 있는지 직접 묻는다. 병원 안내문에 변경 가능한 시간이 남아 있다고 적혀 있고, 아직 어떤 준비나 비용도 발생하지 않았다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "나는 처음 방문한 병원에서 접수 창구에 가서 예약 변경을 문의하려 한다. 안내문에는 변경 가능한 시간이 남아 있다고 적혀 있다.",
+    "relation_ko": "병원 접수 직원·초면",
+    "source_modality": "spoken",
+    "source_text": "안녕하세요. 다음 주 월요일로 예약한 진료를 화요일로 변경할 수 있을까요? 안내문에 변경 가능하다고 해서 이렇게 문의드립니다.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "distant",
+      "r": "low"
+    },
+    "channel": "facetoface",
+    "context_spec": {
+      "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+      "role_pair": {
+        "speaker_ko": "환자",
+        "addressee_ko": "병원 접수 직원"
+      },
+      "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+      "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+      "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+      "interpreter_role_contract": {
+        "source_speaker": "A",
+        "target_addressee": "B",
+        "learner_interpreter": "C",
+        "pdr_relation": "A_to_B"
+      }
+    },
+    "brief_note_ko": "처음 방문한 병원에서 예약 변경을 문의하는 상황",
+    "focal_segments": [
+      {
+        "text": "다음 주 월요일로 예약한 진료를 화요일로 변경할 수 있을까요?",
+        "role": "head"
+      },
+      {
+        "text": "안내문에 변경 가능하다고 해서 이렇게 문의드립니다.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 40,
+      "max": 60,
+      "actual": 52
+    }
+  }
+}

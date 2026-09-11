@@ -2,11 +2,14 @@
 export const SCENE_GROUNDING_RULE = `
 [사건과 P·D·R의 사실 근거]
 코드 뜻을 일상 영어의 느슨한 뜻으로 재해석하지 않는다.
-P: speaker_lower=화자보다 상대에게 실제 권한이 있음, equal=해당 관계에서 동등,
-speaker_higher=상대보다 화자에게 실제 권한이 있음.
-D: formal=이전 상호작용이 없는 초면, acquaintance=이전에 실제 교류한 아는 사이,
+P의 이름은 화자를 기준으로 읽는다. speaker_lower=화자가 상대보다 낮다(권한은 상대에게 있다),
+equal=해당 관계에서 동등, speaker_higher=화자가 상대보다 높다(권한은 화자에게 있다).
+상대가 더 높은 사건은 speaker_higher가 아니라 speaker_lower다.
+D: distant=이전 상호작용이 없는 초면, acquaintance=이전에 실제 교류한 아는 사이,
 close=지속적인 사적 교류가 있는 친한 사이. 지금 소개받았다는 이유로 초면을 acquaintance로 세지 않는다.
+distant는 초면에만 쓴다. 교류 이력이 있으면 사적 친분이 없거나 격식을 차리는 사이여도 acquaintance다.
 R: low=낮음, mid=보통, high=높음. 뜻은 아래의 화행별 사건 근거로 확인한다.
+화자는 source_text를 말하는 사람이다. 상대가 먼저 부탁·제안·초대를 했더라도 그 선행 발화자는 화자가 아니라 상대다.
 화행명·직함·PDR 값은 사건이 실제로 성립한다는 증거가 아니다. 누가 누구에게 무엇을 했고,
 왜 지금 이 말을 하는지 먼저 확인한다. 책임·수혜·거절·초대의 행위자를 필드 사이에서 바꾸지 않는다.
 P: 해당 참여자 관계의 실제 평가·지시·자원 배분 권한을 본다. 조장·선배·관리소장이라는
@@ -32,6 +35,7 @@ R 근거가 없으면 보통으로 추정하지 않는다. 공손 표지의 누�
 
 export const CORE_SCENE_PREFLIGHT_PROMPT = `통번역 학습 원문을 만들기 전에 사건 시드의 실현 가능성을 확인한다.
 ${SCENE_GROUNDING_RULE}
+화행은 speech_act_ko가 이 과정에서 쓰는 이름이다. 영어 코드를 일상 영어 뜻으로 다시 읽지 않는다.
 주어진 화행·PDR·시드의 사실을 모두 유지하면서 평범한 장면을 만들 수 있을 때만 feasible=true다.
 일반적인 주제 시드는 구체화할 수 있지만 이미 지정된 인물·사건을 바꾸거나 특수 권한을 발명하지 않는다.
 불가능하거나 사실이 충돌하면 feasible=false와 이유를 반환한다. 억지로 모든 조건을 만족시키지 않는다.
@@ -69,7 +73,7 @@ export function readCoreScenePlan(value: unknown, expectedPdr?: { p: string; d: 
   if (!plan.feasible) return plan;
   const observed = plan.observed_pdr;
   if (!observed || !['speaker_lower', 'equal', 'speaker_higher'].includes(observed.p)
-    || !['formal', 'acquaintance', 'close'].includes(observed.d) || !['low', 'mid', 'high'].includes(observed.r)) return null;
+    || !['distant', 'acquaintance', 'close'].includes(observed.d) || !['low', 'mid', 'high'].includes(observed.r)) return null;
   const mismatches = expectedPdr ? (['p', 'd', 'r'] as const).filter(axis => observed[axis] !== expectedPdr[axis]) : [];
   if (mismatches.length) return { ...plan, feasible: false,
     reason_ko: '사건에서 판정한 PDR이 지정 조건과 다릅니다: ' + mismatches.map(axis => `${axis}=${observed[axis]} (지정 ${expectedPdr![axis]})`).join(', ') };

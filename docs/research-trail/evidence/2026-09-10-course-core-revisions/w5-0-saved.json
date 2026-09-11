@@ -1,0 +1,180 @@
+{
+  "at": "2026-09-10T14:44:53.739Z",
+  "key": "w5-0",
+  "draft_file": "w5-0-draft.json",
+  "draft_sha256": "811e959cf72c79381e57ec714ff0693bc4e1fc933b34a7b3bc7e880bd417b9b5",
+  "original_scenario_id": "e76e918a-eec5-4f85-8bcd-e40f3c6c1b2e",
+  "new_scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "동호회 회원에게 토요일 산책 초대 메시지",
+    "speech_act": "agreement",
+    "learner_level": "intermediate",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "translation",
+    "source_modality": "written",
+    "theme_code": "daily_living",
+    "topic_code": "club_meetup_invite",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "나는 동호회에서 세 번 만난 회원에게 이번 토요일 오후 근처 공원에서 삼십 분 산책을 하자고 메신저로 초대하려 한다. 다른 회원 두 명도 함께 걷기로 했다.",
+      "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+      "source_modality": "written",
+      "source_text": "이번 토요일 오후에 근처 공원에서 삼십 분 정도 산책을 하려고 합니다. 함께 걷기로 한 다른 회원 두 명도 있는데, 시간 괜찮으시면 같이 하시겠어요? 부담 없이 편하게 오세요!",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.club_meetup_invite.agreement",
+        "role_pair": {
+          "speaker_ko": "동호회 회원",
+          "addressee_ko": "동호회 회원"
+        },
+        "speaker_entitlement": "화자는 상대를 공동 활동에 초대할 수 있지만 참여를 강제할 권리는 없다.",
+        "addressee_obligation": "상대는 초대받은 활동의 참여 여부를 선택할 권리가 있다.",
+        "decision_authority": "최종 참여 여부는 초대받은 상대가 결정한다."
+      },
+      "brief_note_ko": "동호회 회원에게 토요일 산책 초대 메시지",
+      "focal_segments": [
+        {
+          "text": "시간 괜찮으시면 같이 하시겠어요?",
+          "role": "head"
+        },
+        {
+          "text": "부담 없이 편하게 오세요!",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 68
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_gate",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T07:43:04.059Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동호회에서 세 번 만나 대화한 회원에게 메신저로 산책을 제안하는 상황은 실제로 평범하게 성립한다. 참가비나 준비물 없이 부담이 낮고, 상대와의 관계도 acquaintance에 해당한다.",
+          "scene_ko": "나는 동호회에서 세 번 만난 회원에게 이번 토요일 오후 근처 공원에서 삼십 분 산책을 하자고 메신저로 초대했다. 다른 회원 두 명도 함께 걷기로 했다.",
+          "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+          "speaker_role_ko": "동호회 회원",
+          "addressee_role_ko": "동호회 회원",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "p_evidence_ko": "동호회 회원끼리 서로 특별한 권한 없이 제안한다.",
+          "d_evidence_ko": "세 번 만나 대화한 회원으로, 지속적 친분은 없으나 아는 사이다.",
+          "r_evidence_ko": "준비물이나 참가비가 없고, 산책 제안은 부담이 낮다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "동호회에서 몇 번 만난 회원에게 산책을 함께하자고 메신저로 초대하는 일상적이고 부담 낮은 장면이 잘 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "source_text가 산책에 초대하는 의도를 분명히 드러내고 있음."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 동등한 지위가 상황과 source_text 모두에서 드러남."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "세 번 만난 회원으로, 아는 사이(acquaintance)에 해당함."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "30분 산책, 참가비·준비물 없음, 부담 없이 오라는 언급 등 실제 부담이 낮음."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "동호회 활동 및 산책 초대는 일상 도메인에 해당함."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 없으므로 pass."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "메신저를 통한 서면 초대 메시지로, 서면 번역 상황에 부합함."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자와 상대 모두 동호회 회원, 초대와 선택권 등 context_spec과 일치함."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "화자(A)가 상대(B)에게 초대, 산책 주체·참여자·상대 모두 일관됨."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "참여 여부를 상대가 결정함을 명확히 하고 있음."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원, 산책, 초대, 메신저 등 시드의 핵심 요소가 모두 반영됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 pass."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 초대 상황으로, 역할이 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황문과 source_text 모두 산책 초대, 참여자, 장소, 시간 등 핵심 사건이 일치함."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명에 발화나 번역문, 내부 평가 기준이 드러나지 않음."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 메신저로 산책 초대는 현실적으로 자연스러운 장면임."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T14:44:21.026Z",
+          "core_content_hash": "92d96b97b63ac350175eff646bb92f85a06b68ab1bdff96c81f7c43334ed56c3"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "e76e918a-eec5-4f85-8bcd-e40f3c6c1b2e",
+          "draft_file": "w5-0-draft.json",
+          "draft_sha256": "811e959cf72c79381e57ec714ff0693bc4e1fc933b34a7b3bc7e880bd417b9b5",
+          "author": "Claude (FABLE)",
+          "edited_at": "2026-09-10T14:44:21.036Z",
+          "reason": "situation_ko put the invitation in the past (\"초대했다\") although the learner still has to produce it.",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "prompt_version": "core_v18_observed_pdr_scene_gate"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w5-0",
+    "content_hash": "19k7sk1",
+    "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d"
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE)",
+  "original_scenario_id": "889715f2-89e1-4d9e-95dd-9da83c4f5d70",
+  "original_artifact": ".tmp/scene-grounding/scene_grounding_course_20260910/w4-0-core.json",
+  "original_sha256": "e86d97ca2e9252587ec155a1ce32907ac562c4ecb3b188289d0fcc681b164006",
+  "revision_reason": "Same subject-agreement break, and the support segment was a thanks clause. Support must modulate the compliment itself, so use the overall compliment sentence.",
+  "review_required": "Fresh semantic check of edited content, then promotion and whole-mission review. No approval or DB write performed.",
+  "plan": {
+    "key": "w4-0",
+    "week": 4,
+    "position": 0,
+    "replaces": "68ec12d5-f4dc-4cbb-9378-b4dc533c8bcb",
+    "cell": {
+      "speech_act_ui": "compliment",
+      "level": "intermediate",
+      "domain": "daily",
+      "mode": "translation",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "low",
+      "theme_code": "relationship_social",
+      "topic_code": "congratulation_gift",
+      "situation_seed_ko": "동호회에서 몇 번 만난 회원이 내 졸업을 축하하며 직접 그린 꽃 카드 사진을 보내 주었다. 나는 그림의 색 조합과 손글씨가 잘 어울리는 점을 메신저로 칭찬하려 한다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "동호회에서 몇 번 만난 회원이 내 졸업을 축하하며 직접 그린 꽃 카드 사진을 메신저로 보내 주었다. 나는 그 카드의 색 조합과 손글씨가 잘 어울린다고 칭찬하려 한다.",
+    "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+    "source_modality": "written",
+    "source_text": "보내 주신 꽃 카드 사진 정말 예뻐요. 색 조합이 아주 세련되고, 손글씨도 따뜻한 느낌이 잘 살아 있네요. 이렇게 정성 들여 만들어 주셔서 정말 감사합니다.",
+    "preceding_turn": null,
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "low"
+    },
+    "channel": "messenger",
+    "context_spec": {
+      "standard_situation_code": "daily.congratulation_gift.compliment",
+      "role_pair": {
+        "speaker_ko": "졸업을 맞은 동호회 회원",
+        "addressee_ko": "직접 카드를 그려 준 동호회 회원"
+      },
+      "speaker_entitlement": "화자는 직접 관찰했거나 근거가 있는 구체적 강점에 긍정적 평가를 표현할 수 있다.",
+      "addressee_obligation": "상대는 칭찬의 대상이며 특정한 방식으로 반응할 의무는 없다.",
+      "decision_authority": "운영상 결정권은 요구하지 않으며, 평가 근거와 주제의 민감도가 상황에 맞아야 한다."
+    },
+    "brief_note_ko": "동호회원이 졸업 축하 꽃 카드 사진을 칭찬하는 메시지",
+    "focal_segments": [
+      {
+        "text": "색 조합이 아주 세련되고, 손글씨도 따뜻한 느낌이 잘 살아 있네요.",
+        "role": "head"
+      },
+      {
+        "text": "보내 주신 꽃 카드 사진 정말 예뻐요.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 60,
+      "max": 85,
+      "actual": 60
+    }
+  }
+}

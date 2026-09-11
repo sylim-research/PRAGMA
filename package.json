@@ -12,6 +12,7 @@
     "hsk3:build": "node scripts/build-hsk3-reference.mjs",
     "hsk3:audit": "node scripts/audit-hsk3-reference.mjs",
     "prompts:snapshot": "node scripts/snapshot-prompts.mjs",
+    "edge:deploy": "node scripts/deploy-edge-function.mjs",
     "prompts:verify": "node scripts/verify-deterministic-snapshots.mjs",
     "pack:attest": "node scripts/register-pack-manifest-attestation.mjs",
     "rls:smoke": "node scripts/rls-role-smoke.mjs",

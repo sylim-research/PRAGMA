@@ -1,0 +1,180 @@
+{
+  "at": "2026-09-10T14:44:53.343Z",
+  "key": "w4-0",
+  "draft_file": "w4-0-draft.json",
+  "draft_sha256": "b78aa9a0f5c10e6ca0fc13f921ace46ced66cba7f436bd81095eaa427e0f34f3",
+  "original_scenario_id": "889715f2-89e1-4d9e-95dd-9da83c4f5d70",
+  "new_scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "동호회원이 졸업 축하 꽃 카드 사진을 칭찬하는 메시지",
+    "speech_act": "compliment",
+    "learner_level": "intermediate",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "translation",
+    "source_modality": "written",
+    "theme_code": "relationship_social",
+    "topic_code": "congratulation_gift",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "동호회에서 몇 번 만난 회원이 내 졸업을 축하하며 직접 그린 꽃 카드 사진을 메신저로 보내 주었다. 나는 그 카드의 색 조합과 손글씨가 잘 어울린다고 칭찬하려 한다.",
+      "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+      "source_modality": "written",
+      "source_text": "보내 주신 꽃 카드 사진 정말 예뻐요. 색 조합이 아주 세련되고, 손글씨도 따뜻한 느낌이 잘 살아 있네요. 이렇게 정성 들여 만들어 주셔서 정말 감사합니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "acquaintance",
+        "r": "low"
+      },
+      "channel": "messenger",
+      "context_spec": {
+        "standard_situation_code": "daily.congratulation_gift.compliment",
+        "role_pair": {
+          "speaker_ko": "졸업을 맞은 동호회 회원",
+          "addressee_ko": "직접 카드를 그려 준 동호회 회원"
+        },
+        "speaker_entitlement": "화자는 직접 관찰했거나 근거가 있는 구체적 강점에 긍정적 평가를 표현할 수 있다.",
+        "addressee_obligation": "상대는 칭찬의 대상이며 특정한 방식으로 반응할 의무는 없다.",
+        "decision_authority": "운영상 결정권은 요구하지 않으며, 평가 근거와 주제의 민감도가 상황에 맞아야 한다."
+      },
+      "brief_note_ko": "동호회원이 졸업 축하 꽃 카드 사진을 칭찬하는 메시지",
+      "focal_segments": [
+        {
+          "text": "색 조합이 아주 세련되고, 손글씨도 따뜻한 느낌이 잘 살아 있네요.",
+          "role": "head"
+        },
+        {
+          "text": "보내 주신 꽃 카드 사진 정말 예뻐요.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 60,
+        "max": 85,
+        "actual": 60
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_gate",
+        "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d",
+        "generated_at": "2026-09-10T07:42:42.342Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "동호회에서 몇 번 만난 회원이 졸업을 축하하며 직접 만든 카드를 보내 주었고, 나는 그 그림의 색 조합과 손글씨를 칭찬하려는 상황은 평범하게 성립한다. 권한, 친분, 칭찬의 민감성 모두 조건에 맞는다.",
+          "scene_ko": "나는 동호회에서 몇 번 만난 회원이 졸업을 축하하며 직접 그린 꽃 카드 사진을 메신저로 보내 주었다. 나는 카드의 색 조합과 손글씨가 잘 어울린다고 칭찬하려 한다.",
+          "relation_ko": "동호회에서 몇 번 만난 회원·아는 사이",
+          "speaker_role_ko": "졸업을 맞은 동호회 회원",
+          "addressee_role_ko": "직접 카드를 그려 준 동호회 회원",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "acquaintance",
+            "r": "low"
+          },
+          "p_evidence_ko": "동호회 회원 사이로 서로 권한이 없다.",
+          "d_evidence_ko": "동호회에서 몇 번 만난 아는 사이다.",
+          "r_evidence_ko": "카드의 그림과 손글씨를 칭찬하는 것은 공개적 민감성이 낮다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "동호회 회원이 졸업 축하 꽃 카드 사진을 칭찬하는 상황이 기대 조건과 잘 부합한다.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "카드의 색 조합과 손글씨에 대해 구체적으로 칭찬하고 있다."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 동등한 관계로, 지위 차이가 드러나지 않는다."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "동호회에서 몇 번 만난 아는 사이로 acquaintance에 해당한다."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "칭찬의 내용이 부담이 적고, 일상적이며 민감하지 않다."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "동호회 및 졸업 축하 상황으로 일상 도메인에 해당한다."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 없으므로 pass."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "메신저를 통한 서면 메시지로, 번역(서면) 상황에 부합한다."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "화자는 구체적 강점에 대해 칭찬하고, 상대는 반응 의무가 없다."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "카드를 그려준 회원이 칭찬의 대상임이 일관되게 드러난다."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "칭찬에 결정권이 요구되지 않으며, 평가 근거와 주제도 적절하다."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원이 졸업 축하 꽃 카드 사진을 보내고, 이에 대해 칭찬하는 상황이 유지된다."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "졸업을 맞은 회원이 카드를 그려준 회원에게 칭찬하는 역할이 일치한다."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 카드의 색 조합, 손글씨, 감사 표현이 일치한다."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명에 답변 방향이나 내부 평가 기준이 드러나지 않는다."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "동호회 회원 간 졸업 축하와 카드 칭찬이 자연스럽고 현실적이다."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T14:44:12.760Z",
+          "core_content_hash": "a3dc69ec88197829f4c88ea08da3dfa1067679f9dc3c125e6475a56bf8aabf75"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "889715f2-89e1-4d9e-95dd-9da83c4f5d70",
+          "draft_file": "w4-0-draft.json",
+          "draft_sha256": "b78aa9a0f5c10e6ca0fc13f921ace46ced66cba7f436bd81095eaa427e0f34f3",
+          "author": "Claude (FABLE)",
+          "edited_at": "2026-09-10T14:44:12.939Z",
+          "reason": "Same subject-agreement break, and the support segment was a thanks clause. Support must modulate the compliment itself, so use the overall compliment sentence.",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "prompt_version": "core_v18_observed_pdr_scene_gate"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w4-0",
+    "content_hash": "aegc9i",
+    "prompt_snapshot_hash": "5547d0086cce9ff10b632b26a6a098b030c414ff22a1acd0148d15c8dded4d8d"
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "status": "local_unapproved_revision",
+  "author": "Claude (FABLE)",
+  "original_scenario_id": "c146e831-556d-4a60-93b1-c605d42a5b19",
+  "original_artifact": ".tmp/scene-grounding/scene_grounding_course_20260910/w11-1-core.json",
+  "original_sha256": "331e8eaddcb7a2dce38e808f7f1799161956cc5b5235d019474608e823c743cc",
+  "revision_reason": "situation_ko read unnaturally in Korean (\"제안한 상황을 겪었다\").",
+  "review_required": "Fresh semantic check of edited content, then promotion and whole-mission review. No approval or DB write performed.",
+  "plan": {
+    "key": "w11-1",
+    "week": 11,
+    "position": 1,
+    "replaces": "1fea5ef8-ce47-440e-b621-a20d71f9cdf5",
+    "cell": {
+      "speech_act_ui": "opposition",
+      "level": "intermediate",
+      "domain": "school",
+      "mode": "stt_interpreting",
+      "industry": null,
+      "business_function": null,
+      "pdr_power": "equal",
+      "pdr_distance": "acquaintance",
+      "pdr_burden": "mid",
+      "theme_code": "campus_study",
+      "topic_code": "school_viewpoint_opposition",
+      "situation_seed_ko": "이번 학기에 함께 과제해 온 조장이 리허설에서 발표 시간을 십 분 늘리자고 제안했다. 조장은 일정 진행만 맡고 평가는 교수에게 있으며, 전체 발표 제한이 이십 분이라 나는 그 제안에 반대한다.",
+      "direction": "ko_zh",
+      "count": 1
+    }
+  },
+  "coreContent": {
+    "schema_version": "scenario_core_v3",
+    "direction": "ko_zh",
+    "situation_ko": "이번 학기 내내 함께 과제를 해 온 조장이 리허설에서 발표 시간을 십 분 늘리자고 제안했다. 조장은 일정만 관리하고 평가 권한은 없으며, 나는 전체 발표 제한을 이유로 그 제안에 반대하려 한다.",
+    "relation_ko": "과제 조장과 조원, 함께 과제한 아는 사이",
+    "source_modality": "spoken",
+    "source_text": "발표 시간을 늘리는 건 전체 제한 시간이 있기 때문에 쉽지 않아 보입니다. 저는 그 제한을 지키는 게 중요하다고 생각해요.",
+    "preceding_turn": "我觉得在彩排时延长十分钟的时间会比较好，这样大家可以更充分地准备。",
+    "pdr": {
+      "p": "equal",
+      "d": "acquaintance",
+      "r": "mid"
+    },
+    "channel": "facetoface",
+    "context_spec": {
+      "standard_situation_code": "school.school_viewpoint_opposition.opposition",
+      "role_pair": {
+        "speaker_ko": "과제 조원",
+        "addressee_ko": "과제 조장"
+      },
+      "speaker_entitlement": "화자는 자신이 관련된 의견·평가·방안에 이견을 밝힐 정당한 참여 자격이 있다.",
+      "addressee_obligation": "상대는 이견 대상 의견·평가·방안을 제시한 사람이며 반대 의견을 검토할 수 있다.",
+      "decision_authority": "이견 대상 사안은 상대 또는 공동 논의의 결정 범위 안에 있다.",
+      "interpreter_role_contract": {
+        "source_speaker": "A",
+        "target_addressee": "B",
+        "learner_interpreter": "C",
+        "pdr_relation": "A_to_B"
+      }
+    },
+    "brief_note_ko": "조장의 발표 시간 연장 제안에 조원이 전체 제한 시간 이유로 반대함",
+    "focal_segments": [
+      {
+        "text": "발표 시간을 늘리는 건 전체 제한 시간이 있기 때문에 쉽지 않아 보입니다.",
+        "role": "head"
+      },
+      {
+        "text": "저는 그 제한을 지키는 게 중요하다고 생각해요.",
+        "role": "support"
+      }
+    ],
+    "length_policy": {
+      "version": "effective_chars_v2_min_warning",
+      "unit": "effective_chars",
+      "min": 40,
+      "max": 60,
+      "actual": 48
+    }
+  }
+}

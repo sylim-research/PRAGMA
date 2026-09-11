@@ -1,0 +1,186 @@
+{
+  "at": "2026-09-10T14:44:52.347Z",
+  "key": "w2-1",
+  "draft_file": "w2-1-draft.json",
+  "draft_sha256": "37290351c200c1ed046d34912b88acaf0ad5cf601c540ceb131f4c83fdeeb168",
+  "original_scenario_id": "527d90dc-3651-46b5-a4c3-b22b50a80921",
+  "new_scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+  "scope": "New draft core row (needs_review, archived_only). Not approved, not a mission, not assigned.",
+  "payload": {
+    "title": "처음 방문한 병원에서 예약 변경을 문의하는 상황",
+    "speech_act": "request",
+    "learner_level": "intermediate",
+    "domain": "daily",
+    "industry_sector": null,
+    "business_function": null,
+    "mode": "stt_interpreting",
+    "source_modality": "spoken",
+    "theme_code": "daily_living",
+    "topic_code": "hospital_pharmacy_visit",
+    "language_direction": "ko_zh",
+    "core_content": {
+      "schema_version": "scenario_core_v3",
+      "direction": "ko_zh",
+      "situation_ko": "나는 처음 방문한 병원에서 접수 창구에 가서 예약 변경을 문의하려 한다. 안내문에는 변경 가능한 시간이 남아 있다고 적혀 있다.",
+      "relation_ko": "병원 접수 직원·초면",
+      "source_modality": "spoken",
+      "source_text": "안녕하세요. 다음 주 월요일로 예약한 진료를 화요일로 변경할 수 있을까요? 안내문에 변경 가능하다고 해서 이렇게 문의드립니다.",
+      "preceding_turn": null,
+      "pdr": {
+        "p": "equal",
+        "d": "distant",
+        "r": "low"
+      },
+      "channel": "facetoface",
+      "context_spec": {
+        "standard_situation_code": "daily.hospital_pharmacy_visit.request",
+        "role_pair": {
+          "speaker_ko": "환자",
+          "addressee_ko": "병원 접수 직원"
+        },
+        "speaker_entitlement": "화자에게 해당 행동을 요청할 합리적 사유는 있으나, 상대의 선택권을 자동으로 박탈하지 않는다.",
+        "addressee_obligation": "상대는 요청을 이해하고 검토할 수 있으나, 수락 의무는 역할·규정·상황에 따라 달라진다.",
+        "decision_authority": "상대가 요청받은 행동을 직접 수행하거나 승인·연결할 실질적 권한을 가진다.",
+        "interpreter_role_contract": {
+          "source_speaker": "A",
+          "target_addressee": "B",
+          "learner_interpreter": "C",
+          "pdr_relation": "A_to_B"
+        }
+      },
+      "brief_note_ko": "처음 방문한 병원에서 예약 변경을 문의하는 상황",
+      "focal_segments": [
+        {
+          "text": "다음 주 월요일로 예약한 진료를 화요일로 변경할 수 있을까요?",
+          "role": "head"
+        },
+        {
+          "text": "안내문에 변경 가능하다고 해서 이렇게 문의드립니다.",
+          "role": "support"
+        }
+      ],
+      "length_policy": {
+        "version": "effective_chars_v2_min_warning",
+        "unit": "effective_chars",
+        "min": 40,
+        "max": 60,
+        "actual": 52
+      },
+      "generation": {
+        "content_release_id": "pragma_scene_grounding_candidate_20260910_03",
+        "prompt_version": "core_v18_observed_pdr_scene_gate",
+        "prompt_snapshot_hash": "7d8cc4e0d1b50042d444a156176b4745fb966c7d17acbddf49a5396b36f76ac3",
+        "generated_at": "2026-09-10T08:21:19.430Z",
+        "scene_plan": {
+          "feasible": true,
+          "reason_ko": "접수 직원과 환자는 실제 권한상 동등하며, 처음 방문한 병원이므로 초면이고, 예약 변경 요청은 준비나 비용이 발생하지 않아 부담이 낮다.",
+          "scene_ko": "나는 처음 방문한 병원에서 접수 창구에 가서 예약 변경에 대해 문의하려 한다. 안내문에 변경이 가능하다고 적혀 있어 부담 없이 요청할 수 있는 상황이다.",
+          "relation_ko": "병원 접수 직원·초면",
+          "speaker_role_ko": "환자",
+          "addressee_role_ko": "병원 접수 직원",
+          "observed_pdr": {
+            "p": "equal",
+            "d": "distant",
+            "r": "low"
+          },
+          "p_evidence_ko": "접수 직원과 환자는 예약 변경에 대해 서로 실제 권한이 없다.",
+          "d_evidence_ko": "처음 방문한 병원으로, 이전에 교류한 적이 없다.",
+          "r_evidence_ko": "아직 준비나 비용이 발생하지 않아 요청 부담이 낮다."
+        },
+        "semantic_check": {
+          "verdict": "pass",
+          "summary_ko": "병원 접수 직원에게 예약 변경을 문의하는 요청 상황이 기대 조건에 맞게 구현됨.",
+          "axes": {
+            "speech_act": {
+              "verdict": "pass",
+              "reason_ko": "예약 변경 가능 여부를 직접 문의하는 요청 화행이 명확히 드러남."
+            },
+            "power": {
+              "verdict": "pass",
+              "reason_ko": "환자와 접수 직원 사이에 특별한 상하 관계 없이 동등하게 설정됨."
+            },
+            "distance": {
+              "verdict": "pass",
+              "reason_ko": "처음 방문한 병원, 초면 관계로 distant에 부합함."
+            },
+            "burden": {
+              "verdict": "pass",
+              "reason_ko": "예약 변경은 안내문에 가능하다고 명시되어 있고, 준비나 비용 부담이 없어 low에 해당함."
+            },
+            "domain": {
+              "verdict": "pass",
+              "reason_ko": "병원 방문 및 예약 변경은 일상 도메인에 해당함."
+            },
+            "industry": {
+              "verdict": "pass",
+              "reason_ko": "직장/산업 배경이 요구되지 않는 일상 상황임."
+            },
+            "mode": {
+              "verdict": "pass",
+              "reason_ko": "구두로 접수 창구에서 문의하는 실제 말하기 상황임."
+            },
+            "context_spec": {
+              "verdict": "pass",
+              "reason_ko": "환자가 요청하고, 접수 직원이 검토 및 승인 권한을 가진다는 맥락이 잘 반영됨."
+            },
+            "referents": {
+              "verdict": "pass",
+              "reason_ko": "예약 변경을 요청하는 사람(환자)과 요청을 받는 사람(접수 직원)이 일관됨."
+            },
+            "decision_authority": {
+              "verdict": "pass",
+              "reason_ko": "접수 직원이 예약 변경을 직접 처리하거나 승인할 권한이 있음."
+            },
+            "topic_seed": {
+              "verdict": "pass",
+              "reason_ko": "병원 접수 직원에게 예약 변경을 문의하는 핵심 시드가 그대로 구현됨."
+            },
+            "adjacency": {
+              "verdict": "pass",
+              "reason_ko": "응답 화행이 아니므로 해당 없음."
+            },
+            "participant_roles": {
+              "verdict": "pass",
+              "reason_ko": "화자(A: 환자)와 상대(B: 접수 직원)의 역할이 일관됨."
+            },
+            "scene_source_alignment": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명과 source_text 모두 예약 변경 문의라는 동일한 사건을 다룸."
+            },
+            "learner_scene": {
+              "verdict": "pass",
+              "reason_ko": "상황 설명에 답변 방향이나 내부 평가 기준, 실제 발화가 노출되지 않음."
+            },
+            "scene_plausibility": {
+              "verdict": "pass",
+              "reason_ko": "병원 안내문, 예약 변경 가능성, 접수 직원의 역할 등 현실적으로 자연스러운 연결임."
+            }
+          },
+          "model": "gpt-4.1",
+          "prompt_version": "core_quality_v11_observed_pdr_scene_gate",
+          "checked_at": "2026-09-10T14:43:56.320Z",
+          "core_content_hash": "af89c8f2be2976d3976737d2b41c31bdc60828d4384f0d4f965ce5dabbe30952"
+        },
+        "local_revision": {
+          "revision_of_scenario_id": "527d90dc-3651-46b5-a4c3-b22b50a80921",
+          "draft_file": "w2-1-draft.json",
+          "draft_sha256": "37290351c200c1ed046d34912b88acaf0ad5cf601c540ceb131f4c83fdeeb168",
+          "author": "Claude (FABLE)",
+          "edited_at": "2026-09-10T14:43:56.439Z",
+          "reason": "situation_ko told the learner the register (\"부담 없이 요청할 수 있는 상황\"). Keep the notice as a fact, drop the evaluative steer.",
+          "note": "Human-corrected core text; the generation prompt data above describes the origin row, not this text."
+        }
+      }
+    },
+    "auto_check_result": "pass",
+    "meta": {
+      "provider": "openai",
+      "model": "gpt-4.1-mini",
+      "prompt_version": "core_v18_observed_pdr_scene_gate"
+    },
+    "generation_run_id": "scene_grounding_course_20260910",
+    "generation_item_key": "corrected:w2-1",
+    "content_hash": "qv1ovq",
+    "prompt_snapshot_hash": "7d8cc4e0d1b50042d444a156176b4745fb966c7d17acbddf49a5396b36f76ac3"
+  }
+}

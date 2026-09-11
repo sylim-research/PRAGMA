@@ -261,8 +261,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
 function ReviewFindings({ title, result, metadata }: { title: string; result: ReviewResult; metadata?: ModelReview<ReviewResult> }) {
   return <details open={result.findings.length > 0} className="rounded-lg border p-3">
     <summary className="cursor-pointer font-semibold">{title} · {verdictLabel[result.verdict]} · {result.findings.length}건</summary>
-    <p className="mt-2">{result.summary_ko}</p>
     {metadata && <p className="mt-1 text-xs text-muted-foreground">{metadata.model} · {metadata.checked_at}</p>}
+    {/* 판정·findings가 정본. 자유서술 요약은 판정과 어긋날 수 있어 목록 뒤에 보조로 둔다. */}
     <ul className="mt-2 space-y-3">{result.findings.map((finding) => <li key={finding.id} className="border-t pt-2">
       <strong>{finding.issue_ko}</strong><p>{finding.reason_ko}</p>
       <p className="text-xs">유형: {finding.problem_type_ko}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
@@ -270,5 +270,6 @@ function ReviewFindings({ title, result, metadata }: { title: string; result: Re
       {finding.quote && <blockquote className="my-1 border-l-2 pl-2">{finding.quote}</blockquote>}
       <p className="text-xs">제안: {finding.suggestion_ko}</p>
     </li>)}</ul>
+    {result.summary_ko && <p className="mt-2 text-xs text-muted-foreground"><b>요약(보조)</b> {result.summary_ko}</p>}
   </details>;
 }

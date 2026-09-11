@@ -90,7 +90,7 @@ export function MissionPreview({
             AI 품질점검: {QUALITY_LABEL[q.verdict]}
             {q.model && <span className="ml-1.5 font-normal opacity-70">({q.model})</span>}
           </div>
-          {q.summary_ko && <p className="mt-0.5">{q.summary_ko}</p>}
+          {/* 판정과 findings가 정본이다. 자유서술 요약은 판정과 어긋나는 경우가 있어 보조 근거로만 뒤에 둔다. */}
           {q.findings.length > 0 && (
             <ul className="mt-1.5 space-y-1">
               {q.findings.map((f, i) => (
@@ -103,6 +103,11 @@ export function MissionPreview({
                 </li>
               ))}
             </ul>
+          )}
+          {q.summary_ko && (
+            <p className="mt-1.5 opacity-80">
+              <span className="font-medium">요약(보조)</span> {q.summary_ko}
+            </p>
           )}
           <p className="mt-1.5 text-[11px] opacity-70">
             AI 보조 판정입니다 — 승인 여부는 아래 문항을 직접 확인하고 결정하세요.
