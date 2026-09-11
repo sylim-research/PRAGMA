@@ -291,3 +291,40 @@ fail 8의 성격: ⓐ note가 「정상/허용」인데 severity fail — w3-0·
 ### w6-0 r3 — override 후보(현행)
 
 현재 저장본 r3: 「첫머리의 단독 ‘不行’이 뒤의 사유와 범위보다 먼저 들려, 내일 한 시간에 한정된 거절이 아니라 강한 거절로 받아들여질 수 있기 때문이다」(「전면 거절」 단정 없음, 연구자 지시 그대로). critic은 주원인 r2(단독 不行으로 먼저 부탁을 닫아 동료 사정에 대한 반응이 부족)와 같은 ‘不行’ 근거라 경합으로 본다. 프롬프트를 더 흔들지 않고 **교수자 최종 승인의 issue override 후보**로 둔다(사유: 연구자 판정 — r3는 첫인상 강도, r2는 상대 사정에 대한 반응 부족으로 차원이 다름). override 실행은 교수자 화면에서 연구자가 한다.
+
+## 11. 품질 동결 실행 · 2026-09-11 밤 (연구자 승인·판정 반영)
+
+- PR #138 CI 통과·병합 → main `036d7b17`. `generate-scenario` **v125** 배포(main lineage `bb255b37`).
+- **자기모순 4건 재검사**(`*-recheck2.json`, 문항 불변, 새 lineage version): w3-0 **pass** · w5-1·w12-0·w13-1 **fail 유지** — note는 여전히 「부차적 판단 차원으로 허용된다」인데 severity가 fail. 「문제 없는 선택지에 finding 금지·severity=note 결론」 한 줄 지시로는 gpt-4.1의 출력 불일치가 잡히지 않았다. 연구자 지시(새 critic 체계 금지)에 따라 여기서 멈춘다.
+- **연구자 판정 반영**(`human-replacements-round5.json`·`round6.json`, revision 경로):
+  - w9-0: r3 유지, r1 교체(「‘你因此停下了…’ 상대 주어 서술이 상대 행동 보고처럼 들림」) → **pass**.
+  - w10-0: r1 교체(「‘虽然…’로 부담을 먼저 인정해 제안 앞에 양해가 붙음」), r2를 사실 관찰로 낮춤(「조건 설명이 제안보다 먼저 옴」) → fail이나 두 finding 모두 note가 「허용된다」(자기모순형).
+  - w5-0: r1 교체(소요 시간 먼저) → critic이 **r2와 같은 정보 순서 차원이라 구별성 부족**이라고 지적(타당) → round6에서 어조 차원(‘…吧！’의 가벼운 권유 어조가 몇 번 교류한 동료에게 사적으로 들림)으로 다시 교체 → fail이나 note는 「오답으로는 허용되나 … 다소 애매」(자기모순형).
+  - w6-0: 손대지 않음. 교수자 override 후보.
+
+### 20칸 최종(`status-20cells-20260911-final.json`) — **pass 13 · warning 1 · fail 6**
+
+| key | 판정 | lineage 판본 | fail 성격 |
+|---|---|---|---|
+| w2-0 | pass | 4 | |
+| w2-1 | pass | 2 | |
+| w3-0 | pass | 3 | |
+| w3-1 | pass | 4 | |
+| w4-0 | pass | 2 | |
+| w4-1 | pass | 4 | |
+| w5-0 | fail | 6 | note 「허용」·severity fail |
+| w5-1 | fail | 3 | note 「허용」·severity fail |
+| w6-0 | fail | 4 | 연구자 「유지」 판정 vs critic 경합 → override 후보 |
+| w6-1 | warning | 2 | grounding 격리뿐 |
+| w9-0 | pass | 5 | |
+| w9-1 | pass | 3 | |
+| w10-0 | fail | 5 | note 「허용」·severity fail |
+| w10-1 | pass | 3 | |
+| w11-0 | pass | 4 | |
+| w11-1 | pass | 4 | |
+| w12-0 | fail | 5 | note 「허용」·severity fail |
+| w12-1 | pass | 3 | |
+| w13-0 | pass | 2 | |
+| w13-1 | fail | 5 | note 「허용」·severity fail |
+
+20/20 미션 존재, 전부 `generated`, 다른 fail 코드 0, 교수자 승인·편성 0건. fail 6은 전부 교수자 최종 승인 화면의 issue override 후보다(건별 사유 필수, 일괄 override는 하지 않는다). 후속(범위 밖): critic note≠severity의 구조적 처리, 생성기의 옛 형태 오답, 복구 불가 실패 작업의 새 생성 차단.

@@ -1,0 +1,138 @@
+{
+  "at": "2026-09-11T07:32:35.139Z",
+  "key": "w12-0",
+  "scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "제 예약 시간에도 회의실을 계속 사용하셔서 회의를 30분 늦게 시작했습니다. 참석자 세 명이 다음 일정을 바꿔야 해서 불편했습니다. 앞으로는 제 예약 시간에 맞춰 회의실을 비워주실 수 있을까요?",
+    "target": "你在我预约的时段还一直用着会议室，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。这次日程安排上的问题都在你这边，以后能不能在我预约的时间把会议室空出来？",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "primary",
+        "text_ko": "‘这次日程安排上的问题都在你这边’가 확인된 회의실 초과 사용을 넘어 이번 일정 문제 전반을 상대의 책임으로 묶기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘这让我很不方便’가 업무상의 지연을 개인의 불편으로 표현하여, 동료에게 제기할 수 있는 업무상 불만의 범위를 벗어나기 때문이다."
+      }
+    ],
+    "highlights": [
+      "这次日程安排上的问题都在你这边"
+    ],
+    "item_focus": "complaint_problem_accountability",
+    "corrections": [
+      {
+        "text": "你在我预约的时段还一直用着会议室，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+        "note_ko": "동료의 초과 사용이 확인된 상황에서 ‘你…还一直用着’와 ‘导致’가 행동과 영향을 연결하므로, 일정 전체를 비난하지 않고 해당 사용 문제에 초점을 유지할 수 있습니다.",
+        "is_valid": true
+      },
+      {
+        "text": "我预约的时段，会议室那边有点问题，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+        "note_ko": "‘你…还一直用着’를 ‘会议室那边有点问题’로 바꾸어 지연·일정 변경·수리 요구는 유지하되, 확인된 초과 사용과 책임 주체를 막연한 회의실 문제로 흐렸다. 동등한 동료에게 문제 행동을 특정하지 못하는 under_specified 방향이다.",
+        "is_valid": false
+      },
+      {
+        "text": "你在我预约的时段还一直用着会议室，根本没把我的预约当回事，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+        "note_ko": "확인된 초과 사용과 직접적 영향은 유지하면서 ‘根本没把我的预约当回事’로 상대가 예약을 경시했다는 태도까지 단정했다. 행동에 대한 불만을 근거 없는 태도 귀속으로 확장하여 over_attributed 경계를 넘는다.",
+        "is_valid": false
+      }
+    ],
+    "relation_ko": "몇 차례 함께 일한 같은 직급의 동료",
+    "axis_feature": "complaint_problem_accountability",
+    "situation_ko": "나는 몇 차례 함께 일한 동료가 내 예약 시간에도 회의실을 계속 사용해 회의를 30분 늦게 시작했다. 그 동료에게 개인 메시지로 참석자 세 명이 다음 일정을 바꿔야 했던 불편을 알리려 한다.",
+    "explanation_ko": "동등한 동료의 회의실 초과 사용으로 회의가 30분 지연되고 참석자 세 명이 다음 일정을 바꿔야 했으므로, 확인된 행동과 불편을 명확히 알릴 필요가 있습니다. 최종 권장 후보는 ‘你在我预约的时段还一直用着会议室’와 ‘导致’로 행동과 결과를 연결하고, ‘以后能不能在我预约的时间把会议室空出来？’로 재발 방지를 요청하여 동료 관계에서 책임 전달과 협력 가능성을 함께 유지합니다. 이처럼 구체적인 책임과 요청은 유지하되, 일정 문제 전체를 상대 탓으로 돌리는 ‘这次日程安排上的问题都在你这边’이나 예약을 경시했다고 단정하는 ‘根本没把我的预约当回事’로 비난을 확장하지 않는 것이 적절합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "over_attributed",
+    "accepted_reason_id": "r2",
+    "accepted_band_codes": [
+      "over_attributed"
+    ],
+    "recommended_example": "你在我预约的时段还一直用着会议室，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T05:35:30.802Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[0]",
+        "note_ko": "r3(meaning_grammar_context)는 실제로 문제의 핵심 원인이 아니라 정보 배열상의 문제를 지적하고 있으나, 이 표현은 실제로 책임 귀속의 범위가 과도하다는 점이 주원인이다. r2(primary)와는 명확히 구별되나, r1(pragmatic_misconception)은 '업무상의 지연을 개인의 불편으로 표현'이 실제로 target에 있으나, 업무상 불만의 범위를 벗어난다고 볼 수 없으므로, 오답으로는 허용된다. 그러나 r3은 실제로 이 target의 주된 문제(책임 귀속의 범위 확대)가 아니라 부차적 관찰이므로, 주원인과 혼동될 가능성은 낮으나, 선택지로서의 타당성은 약간 떨어진다.",
+        "severity": "fail",
+        "evidence_excerpt": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 후보가 실제로 쓸 법하고, 대역 구분·피드백·장면 설명도 적절하게 이루어졌다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다.",
+          "note_ko": "이 선택지는 실제 target에 모두 존재하는 피해(지연, 일정 변경, 불편)를 한 문장에 나열했다는 점을 지적하지만, 이는 문제 명료화와 책임 범위(complaint_problem_accountability)의 핵심 원인이 아니다. 실제 주원인은 '이 일정 문제 전체를 상대 책임으로 확장'한 점(accepted_reason_id=r2)이다. 이 선택지는 단순히 정보 배열 방식에 대한 관찰로, meaning_grammar_context로 분류되어 있으나, 실제로는 주원인과 무관한 부차적 판단이므로 정답과 혼동될 위험은 없으나, 이유로서의 타당성이 약하다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[2]",
+          "evidence_excerpt": "‘这让我很不方便’가 업무상의 지연을 개인의 불편으로 표현하여, 동료에게 제기할 수 있는 업무상 불만의 범위를 벗어나기 때문이다.",
+          "note_ko": "이 선택지는 target에 실제로 존재하는 '이로 인해 불편했다'는 표현을 문제 삼으나, 이는 complaint_problem_accountability(문제 명료화와 책임 범위)의 핵심 원인이 아니다. 실제 주원인은 '이 일정 문제 전체를 상대 책임으로 확장'한 점(accepted_reason_id=r2)이다. 이 선택지는 업무상 불만의 범위라는 화용적 판단에 근거하지만, 이는 핵심 원인과 다르므로 정답과 혼동될 위험이 있다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T07:32:34.653Z",
+      "mission_content_hash": "b4cc35a33878de2525258fe0d34f11b3ffd21642d93b3b002ae203f0308a6938"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你在我预约的时段还一直用着会议室,导致我们的会议…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你在我预约的时段还一直用着会议室,导致我们的会议…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}
