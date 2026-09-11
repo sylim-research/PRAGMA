@@ -1,0 +1,115 @@
+{
+  "at": "2026-09-11T07:32:45.488Z",
+  "key": "w3-0",
+  "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+  "outcome": "rechecked",
+  "item_unchanged": true,
+  "reason_item": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "점심시간을 내서 발표 자료의 도표를 고쳐 줘서 고마워요. 덕분에 오후 발표에 쓸 수 있게 됐어요.",
+    "target": "你抽出午休时间帮我修好了演示文稿里的图表，小小地感谢你一下。多亏你，下午演示时能用上了。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘你抽出午休时间帮我修好了…图表’로 도움의 경위를 먼저 서술하고 감사 표현을 문장 끝에 두어, 첫 문장에서 감사보다 사실 확인이 먼저 들리기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "primary",
+        "text_ko": "도움과 효과를 인정하면서도 '小小地…一下'로 감사를 작게 한정해, 몇 번 교류한 동료가 내 준 점심시간에 대한 고마움을 낮춰 전하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "pragmatic_misconception",
+        "text_ko": "'小小地'는 자신의 감사를 낮추는 겸양 표현인데, 뒤에서 '多亏你'로 상대의 공을 직접 강조하여 그 겸양을 일관되게 유지하지 못하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "小小地感谢你一下"
+    ],
+    "item_focus": "gratitude_calibration",
+    "relation_ko": "자료를 몇 번 주고받은 같은 직급의 동료",
+    "axis_feature": "gratitude_calibration",
+    "situation_ko": "나는 자료를 몇 번 주고받은 같은 직급 동료의 도움으로 발표 자료의 깨진 도표를 고쳤다. 동료가 점심시간 삼십 분을 써 준 덕분에 오후 발표에 쓸 수 있게 되어 메신저로 감사를 전하려 한다.",
+    "explanation_ko": "도움의 내용과 수혜 결과는 모두 제시되어 있지만, 교류가 많지 않은 동료에게 쓰인 '小小地…一下'가 감사의 크기를 일부러 줄입니다. 문제는 감사 축소가 만드는 낮은 인정의 인상이며, '能用上了'의 상태 변화 표현이나 '多亏你'의 공로 인정이 아니므로 축소 표현만 조정하면 됩니다.",
+    "preceding_turn": null,
+    "problem_band_code": "insufficient",
+    "accepted_reason_id": "r1",
+    "recommended_example": "真心谢谢你抽出午休时间，帮我修好了演示文稿里的图表。多亏你，下午演示时能用上了。"
+  },
+  "previous_quality": {
+    "verdict": "fail",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T05:37:59.021Z",
+    "reason_findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[0]",
+        "note_ko": "r3(meaning_grammar_context)는 실제로는 정보 순서의 차이만을 근거로 들고 있으나, 이 장면에서 감사의 강도 부족의 주원인은 아니다. 그러나 이 선택지는 실제로도 감사의 강도 부족의 핵심 원인과는 무관한 정보 순서의 문제만을 지적하고 있으므로, 주원인과 명확히 구별된다. (정상)",
+        "severity": "fail",
+        "evidence_excerpt": "‘你抽出午休时间帮我修好了…图表’로 도움의 경위를 먼저 서술하고 감사 표현을 문장 끝에 두어, 첫 문장에서 감사보다 사실 확인이 먼저 들리기 때문이다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "where": "mpj_items[3].reasons[2]",
+        "note_ko": "r2(pragmatic_misconception)은 '小小地'의 겸양과 '多亏你'의 공로 강조가 일관되지 않다는 점을 지적하지만, 이는 실제로 감사의 강도 부족의 주원인(감사의 크기를 일부러 줄여 고마움을 낮춰 전함)과는 다르다. (정상)",
+        "severity": "fail",
+        "evidence_excerpt": "'小小地'는 자신의 감사를 낮추는 겸양 표현인데, 뒤에서 '多亏你'로 상대의 공을 직접 강조하여 그 겸양을 일관되게 유지하지 못하기 때문이다."
+      }
+    ]
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항에서 감사 강도 조절의 실제 경계와 전략이 적절히 구별되어 있고, 오답도 현실적이며, 해설과 비교도 명확하다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T07:32:45.258Z",
+      "mission_content_hash": "d85e5ed0cbd79d389e99226e6c7a272caf2f01c5e231cd7c7d54e3bc07f86388"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=21자, 후보 2[insufficient]=24자, 후보 3[within_band]=23자, 후보 4[excessive]=29자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"점심시간을 내서 발표 자료의 도표를 고쳐 줘…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"점심시간을 내서 발표 자료의 도표를 고쳐 줘…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你抽出午休时间帮我修好了演示文稿里的图表,小小地…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你抽出午休时间帮我修好了演示文稿里的图表,小小地…\""
+      }
+    ]
+  },
+  "scope": "Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version."
+}

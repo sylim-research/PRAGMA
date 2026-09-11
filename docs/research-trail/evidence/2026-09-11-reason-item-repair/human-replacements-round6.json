@@ -1,0 +1,9 @@
+{
+  "scope": "Round 6 (2026-09-11). The round-5 w5-0 r1 (time information first) duplicated the dimension of the stored r2 (information-first ordering); the critic's finding was valid. r1 moved to a different dimension (register/distance), still factual and secondary. Only this option changes.",
+  "replacements": {
+    "w5-0": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘一起来看看…吧！’의 느낌표와 ‘吧’가 가벼운 권유 어조를 만들어, 업무로 몇 번 교류한 동료에게는 사적인 말투로 들릴 수 있기 때문이다." }
+    }
+  },
+  "replaced": { "w5-0 r1": "round5 「‘看完大约需要十五分钟’으로 소요 시간을 먼저 안내해…」 — r2와 같은 정보 순서 차원이라 구별성 부족(critic 지적 타당)." }
+}

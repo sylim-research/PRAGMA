@@ -31,8 +31,13 @@ export async function callContentReviewer(options: {
         : { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       body: JSON.stringify(request),
     });
-    // Do not return/log provider bodies containing prompts or credentials.
-    if (!response.ok) throw new Error(`${anthropic ? "Claude" : "OpenAI"} API 오류 (${response.status}). 자동 재호출하지 않았습니다.`);
+    // Do not return/log provider bodies containing prompts or credentials. On a client error keep only the
+    // provider's short error type/message so the cause (schema, size, model) is diagnosable without a re-call.
+    if (!response.ok) {
+      let detail = "";
+      try { const err = (await response.json())?.error; detail = [err?.type, err?.message].filter((v) => typeof v === "string").join(": ").slice(0, 200); } catch { /* keep status only */ }
+      throw new Error(`${anthropic ? "Claude" : "OpenAI"} API 오류 (${response.status}${detail ? ` · ${detail}` : ""}). 자동 재호출하지 않았습니다.`);
+    }
     body = await response.json();
   } catch (cause) {
     if (signal.aborted) throw new Error(`${anthropic ? "Claude" : "OpenAI"} 응답 대기 ${timeoutMs / 1000}초를 초과했습니다. 이전 단계 결과는 보존되며 자동 재호출은 없습니다. 과금 여부는 제공자 사용 내역에서 확인하세요.`);
@@ -50,6 +55,11 @@ export async function callContentReviewer(options: {
     : validateReviewResult(grounded, run.snapshot, stage);
   return { result, provider: anthropic ? "anthropic" : "openai", model: body.model, requested_model: model,
     response_id: body.id, usage: body.usage ?? {}, checked_at: new Date().toISOString(),
+    // Adjudication provenance: under focused_v1 the primary basis is the reused generation quality check, never a copied openai_review.
+    ...(stage === "adjudication" ? {
+      primary_review_source: run.openai_review ? "openai_review" : "generation_quality",
+      primary_review_ref: run.openai_review?.input_hash ?? run.generation_quality?.mission_content_hash ?? null,
+    } : {}),
     // DB approval expects the criteria/stage version; wire format is separate.
     prompt_version: `${CONTENT_REVIEW_VERSION}:${stage}`, output_format_version: "evidence_refs_v2", raw_result: raw,
     input_hash: await reviewHash({ system: prompt.system, user: prompt.user, schema: prompt.schema }),

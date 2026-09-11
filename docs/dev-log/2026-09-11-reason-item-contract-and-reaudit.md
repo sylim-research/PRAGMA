@@ -291,3 +291,184 @@ fail 8의 성격: ⓐ note가 「정상/허용」인데 severity fail — w3-0·
 ### w6-0 r3 — override 후보(현행)
 
 현재 저장본 r3: 「첫머리의 단독 ‘不行’이 뒤의 사유와 범위보다 먼저 들려, 내일 한 시간에 한정된 거절이 아니라 강한 거절로 받아들여질 수 있기 때문이다」(「전면 거절」 단정 없음, 연구자 지시 그대로). critic은 주원인 r2(단독 不行으로 먼저 부탁을 닫아 동료 사정에 대한 반응이 부족)와 같은 ‘不行’ 근거라 경합으로 본다. 프롬프트를 더 흔들지 않고 **교수자 최종 승인의 issue override 후보**로 둔다(사유: 연구자 판정 — r3는 첫인상 강도, r2는 상대 사정에 대한 반응 부족으로 차원이 다름). override 실행은 교수자 화면에서 연구자가 한다.
+
+## 11. 품질 동결 실행 · 2026-09-11 밤 (연구자 승인·판정 반영)
+
+- PR #138 CI 통과·병합 → main `036d7b17`. `generate-scenario` **v125** 배포(main lineage `bb255b37`).
+- **자기모순 4건 재검사**(`*-recheck2.json`, 문항 불변, 새 lineage version): w3-0 **pass** · w5-1·w12-0·w13-1 **fail 유지** — note는 여전히 「부차적 판단 차원으로 허용된다」인데 severity가 fail. 「문제 없는 선택지에 finding 금지·severity=note 결론」 한 줄 지시로는 gpt-4.1의 출력 불일치가 잡히지 않았다. 연구자 지시(새 critic 체계 금지)에 따라 여기서 멈춘다.
+- **연구자 판정 반영**(`human-replacements-round5.json`·`round6.json`, revision 경로):
+  - w9-0: r3 유지, r1 교체(「‘你因此停下了…’ 상대 주어 서술이 상대 행동 보고처럼 들림」) → **pass**.
+  - w10-0: r1 교체(「‘虽然…’로 부담을 먼저 인정해 제안 앞에 양해가 붙음」), r2를 사실 관찰로 낮춤(「조건 설명이 제안보다 먼저 옴」) → fail이나 두 finding 모두 note가 「허용된다」(자기모순형).
+  - w5-0: r1 교체(소요 시간 먼저) → critic이 **r2와 같은 정보 순서 차원이라 구별성 부족**이라고 지적(타당) → round6에서 어조 차원(‘…吧！’의 가벼운 권유 어조가 몇 번 교류한 동료에게 사적으로 들림)으로 다시 교체 → fail이나 note는 「오답으로는 허용되나 … 다소 애매」(자기모순형).
+  - w6-0: 손대지 않음. 교수자 override 후보.
+
+### 20칸 최종(`status-20cells-20260911-final.json`) — **pass 13 · warning 1 · fail 6**
+
+| key | 판정 | lineage 판본 | fail 성격 |
+|---|---|---|---|
+| w2-0 | pass | 4 | |
+| w2-1 | pass | 2 | |
+| w3-0 | pass | 3 | |
+| w3-1 | pass | 4 | |
+| w4-0 | pass | 2 | |
+| w4-1 | pass | 4 | |
+| w5-0 | fail | 6 | note 「허용」·severity fail |
+| w5-1 | fail | 3 | note 「허용」·severity fail |
+| w6-0 | fail | 4 | 연구자 「유지」 판정 vs critic 경합 → override 후보 |
+| w6-1 | warning | 2 | grounding 격리뿐 |
+| w9-0 | pass | 5 | |
+| w9-1 | pass | 3 | |
+| w10-0 | fail | 5 | note 「허용」·severity fail |
+| w10-1 | pass | 3 | |
+| w11-0 | pass | 4 | |
+| w11-1 | pass | 4 | |
+| w12-0 | fail | 5 | note 「허용」·severity fail |
+| w12-1 | pass | 3 | |
+| w13-0 | pass | 2 | |
+| w13-1 | fail | 5 | note 「허용」·severity fail |
+
+20/20 미션 존재, 전부 `generated`, 다른 fail 코드 0, 교수자 승인·편성 0건. fail 6은 전부 교수자 최종 승인 화면의 issue override 후보다(건별 사유 필수, 일괄 override는 하지 않는다). 후속(범위 밖): critic note≠severity의 구조적 처리, 생성기의 옛 형태 오답, 복구 불가 실패 작업의 새 생성 차단.
+
+## 12. 품질 동결 — 예외 6건 정리(교수자 최종 승인 인계) · 2026-09-11
+
+생성·수리 단계 종료. 자동 수정·재생성·프롬프트 수정 없음. 아래는 저장된 현행 판본(`status-20cells-20260911-final.json`)의 사실과 권고만이다.
+
+### 자기모순형 fail 5건 — 문제된 선택지와 권고
+
+| key | ① 원문/상황 | ② 정답 Reason | ③ 문제 오답 | ④ critic note 요지 + severity | 권고 |
+|---|---|---|---|---|---|
+| w5-0 | 동료에게 사내 전시 초대. target 「…一起来看看…吧！…我就按你会来安排了…」(too_pressuring) | r3 참석을 먼저 전제하고 확인 답을 요구 | r1 「‘…吧！’의 느낌표와 ‘吧’가 가벼운 권유 어조를 만들어, 몇 번 교류한 동료에게 사적인 말투로 들릴 수 있다」 | 「핵심 원인이 아니라 어조에 초점… 오답으로는 허용되나 … 설명이 다소 애매」 → **fail** | **override** (note가 허용) |
+| w5-1 | 팀장에게 합창 공연 초대. target 「…有空的话，来听听吧，那就说定了。」(too_pressuring) | r2 ‘那就说定了’가 받지 않은 수락을 성립한 약속처럼 처리 | r3 「공연 정보 두 문장 뒤에 초대가 와, 초대인지 안내인지 끝 문장에서야 드러난다」 · r1(원본) 「‘有空的话’ 조건으로 마음이 약하게 들리므로 진정성을 보여 줄 권유가 더 필요하다」 | r3 「주원인과 무관… 오독 전제 없음… 부차적 차원으로 허용」 → **fail** · r1 「주원인과 반대 방향… 같은 강도의 핵심 이유가 될 수 없다」 → **fail** | r3 **override** · r1 **수정 권고** — w5-0 r1·w9-0 r1과 같은 평가·처방형 결과절(「마음이 약하게 들리므로 … 더 필요하다」)이라 연구자의 앞선 판정과 일관되게 사실 관찰로 낮출 대상. 대안: 「‘有空的话’로 조건을 앞에 두어, 초대가 상대 일정에 달린 일로 먼저 들리기 때문이다」 |
+| w10-0 | 친구에게 녹음 이틀 분할 제안. target 「…我建议分两天录，就这么定吧。」(too_directive) | r3 ‘就这么定吧’로 곧바로 결정을 마무리해 의견 낼 여지를 좁힘 | r1 「‘虽然…’로 두 사람의 부담을 먼저 인정해 제안 앞에 양해가 붙는다」 · r2 「대여 조건 설명이 제안보다 먼저 온다」 | r1 「사실에 기반한 부차적 요인이므로 허용된다」 → **fail** · r2 「주원인과 무관한 판단 차원의 관찰이므로 허용된다」 → **fail** | 둘 다 **override** |
+| w12-0 | 동료에게 회의실 초과 사용 불만. target 「…这次日程安排上的问题都在你这边…」(over_attributed) | r2 확인된 초과 사용을 넘어 일정 문제 전반을 상대 책임으로 묶음 | r3 「지연·일정 변경·불편을 한 문장에 이어 붙여 어느 피해가 핵심인지 가려 읽어야 한다」 · r1(원본) 「‘这让我很不方便’가 업무상 지연을 개인 불편으로 표현해 업무상 불만의 범위를 벗어난다」 | r3 「주원인과 무관한 부차적 판단… 혼동 위험 없음… 타당성이 약하다」 → **fail** · r1 「핵심 원인과 다르므로 정답과 혼동될 위험이 있다」 → **fail** | r3 **override** · r1 **override** — 「다르므로 혼동 위험」은 논리가 성립하지 않고(다르면 구별됨), 개인 불편 대 책임 범위는 다른 차원 |
+| w13-1 | 동료에게 안내문 검토 부탁. target 「帮我检查一下…吧。…明天上午之前把意见告诉我。」(too_direct) | r2 어조는 누그러뜨렸지만 검토와 기한을 정해 주듯 말해 수용 여부를 답할 여지 부족 | r3 「검토 내용이 부탁 문장 뒤에 따로 나와 첫 문장에서 드러나지 않는다」 · r1 「‘一下’가 검토를 잠깐 일처럼 제시해 부탁의 크기가 작게 전해진다」 | r3 「별개의 판단 차원… 부차적 판단이므로 허용된다」 → **fail** · r1 「실제로 부차적이므로 허용된다」 → **fail** | 둘 다 **override** |
+
+집계: override 권고 9개 finding(5건) · 수정 권고 1(w5-1 r1, 연구자 판단).
+
+### w6-0 r3 — override 후보 사유
+
+r2와 r3는 같은 단어 ‘不行’을 근거로 들지만 주장하는 결함이 다르다. r2는 이 발화가 **상대에게 해 주지 않는 것**(대체 인력을 구해야 하는 동료의 사정에 대한 반응 부재)을 짚는 관계적 배려 차원이고, r3는 첫머리의 단독 不行이 **한정 절보다 먼저 들려 강한 거절로 받아들여질 수 있다**는 첫인상 강도·범위 지각 차원이다. 고치는 방향도 다르다 — r2는 사정에 대한 한마디를 더하면 되고 不行을 없앨 필요가 없으며, r3는 첫머리를 바꾸거나 순서를 옮기면 되고 배려 문장을 더할 필요가 없다. 따라서 「같은 핵심 이유의 다른 표현」이 아니라 부차적 차원의 사실 관찰이며, 연구자 판정대로 유지하고 교수자 override로 닫는다.
+
+### w6-1 warning 사유
+
+콘텐츠 결함이 아니다. critic이 존재하지 않는 경로 `mpj_items[5]`(미션은 MJT 5문항 = [0]~[4])를 가리키는 finding을 내서 `critic_grounding_failure`로 격리됐고, 격리된 finding은 콘텐츠 fail로 승격하지 않는 규칙에 따라 warning으로 남았다. Reason·다른 코드 finding 0.
+
+### 교수자 최종 승인 대상(20건, 현재 승인 0)
+
+- 그대로 승인 14: pass 13(w2-0·w2-1·w3-0·w3-1·w4-0·w4-1·w9-0·w9-1·w10-1·w11-0·w11-1·w12-1·w13-0) + warning w6-1.
+- override 동반 승인 6(건별 사유, 일괄 금지): w5-0(1) · w5-1(2, 그중 r1은 수정 여부 연구자 판단) · w10-0(2) · w12-0(2) · w13-1(2) · w6-0(1). override는 `finalize_reviewed_mission`의 `issue_overrides`(index·code·where·사유)로 기록되며 critic 결과는 그대로 보존된다.
+
+## 13. 콘텐츠 동결 선언 · 교수자 최종 검수 단계 전환 · 2026-09-11
+
+- **마지막 콘텐츠 수정 = w5-1 r1**(연구자 문안 「‘有空的话’로 상대의 일정 가능성을 먼저 열어 두고 뒤에서 초대한다」, 이유 형식을 위해 「…하기 때문이다」만 붙임). `human-replacements-round7.json` → `w5-1-apply-r7.json`, revision 경로, 새 hash `9274cc7f`, lineage 4판. 재검사 결과 **fail**(2 finding): r3 「부차적 사실이나 세트 안에서 혼동될 수 있다」, r1 「‘有空的话’는 오히려 적정 초대의 바람직한 요소」. 둘 다 override 대상. 이로써 **20칸 콘텐츠 동결**(`status-20cells-20260911-frozen.json`: pass 13 · warning 1 · fail 6). Reason 계약·생성기·critic 프롬프트는 이후 수정하지 않는다.
+- **교수자 최종 검수 화면(현행, 변경 없음)**: `/admin/review` → `ProfessorMissionWorkbench`. fail finding마다 사유 입력란(10자 이상)이 있고 전부 채워야 승인 버튼이 열린다. 승인은 `reviewMission` → `finalize_reviewed_mission(issue_overrides)`로 저장되며, RPC가 `quality_check` 교체를 거부하므로 AI critic 결과는 원본 그대로 남는다. finding이 없는 미션은 사유 없이 승인된다 — 별도 「compact view」는 없지만 채울 것이 없어 한 화면·한 번의 승인이다. w6-0은 사유란에 「화용 경계」 취지를 적으면 되고 UI 표지는 필요 없다. 새 UI를 만들지 않는다(UI 게이트).
+- **편성 가능 여부(실측)**: 편성 조건 `isReviewedMission` = mission_status reviewed/released **and** `core_content.generation.content_release_id`가 현행 release. 20행 전부 release `_03`·`legacy_reviewed`·`generated`·`needs_review`. 따라서 **교수자 승인으로 reviewed가 되는 순간 20건 모두 편성 후보**가 된다. 교과목 `915fec24`(published, 20행)의 편성 행에 붙은 학습 기록 0건(2026-09-10 삭제 후 유지) → `saveWeekAssignments` 통상 경로로 교체 가능. 교체 뒤 구 미션 20건 보관은 별도 승인.
+
+### 교수자가 override 사유를 적어야 할 finding(정확한 목록, 10개)
+
+| key | where | 저장본 오답 | critic note 요지 |
+|---|---|---|---|
+| w5-0 | mpj_items[3].reasons[0] (r1) | ‘…吧！’ 느낌표·吧의 가벼운 권유 어조 | 「오답으로는 허용되나 다소 애매」 |
+| w5-1 | mpj_items[3].reasons[0] (r3) | 공연 정보 두 문장 뒤에 초대 | 「부차적 사실이나 세트 안에서 혼동될 수 있음」 |
+| w5-1 | mpj_items[3].reasons[1] (r1) | ‘有空的话’로 일정 가능성을 먼저 열어 둠 | 「오히려 적정 초대의 바람직한 요소」 |
+| w10-0 | mpj_items[3].reasons[0] (r1) | ‘虽然…’로 부담을 먼저 인정 | 「사실 기반 부차적 요인이므로 허용」 |
+| w10-0 | mpj_items[3].reasons[2] (r2) | 조건 설명이 제안보다 먼저 | 「무관한 판단 차원의 관찰이므로 허용」 |
+| w12-0 | mpj_items[3].reasons[0] (r3) | 세 피해를 한 문장에 나열 | 「부차적 판단… 타당성 약함」 |
+| w12-0 | mpj_items[3].reasons[2] (r1) | ‘这让我很不方便’ 개인 불편 표현 | 「핵심 원인과 다르므로 혼동 위험」 |
+| w13-1 | mpj_items[3].reasons[0] (r3) | 검토 내용이 부탁 문장 뒤에 | 「별개 차원… 허용」 |
+| w13-1 | mpj_items[3].reasons[1] (r1) | ‘一下’가 부담을 작게 전함 | 「부차적이므로 허용」 |
+| w6-0 | mpj_items[3].reasons[0] (r3) | 첫머리 단독 ‘不行’의 첫인상 강도 | 「r2와 같은 不行 근거」 — 화용 경계, 12절 사유 |
+
+## 14. 교수자 최종 승인 preflight(읽기 전용) · 2026-09-11
+
+확인 방법 = 코드 읽기 + 관리자 API 조회. **화면 클릭·승인·DB 변경 없음**(관리자 로그인은 연구자 몫).
+
+- **표시**: `/admin/review`는 `mission_status ∈ {generated, reviewed, released}`·미보관 행을 보여 주고 기본 필터는 「generated」다. 현재 generated·미보관 = **203행**이며 동결 20건은 전부 그 안에 있다(최근 수정순 상단). 20건만 보려면 행별 딥링크 `/admin/review?scenarioId=<uuid>`를 쓴다(아래 표).
+- **승인 경로(현행, 변경 없음)**: 행 「학생 화면으로 감수하기 ▾」 → 검토 준비(`content-review` 함수가 최종화 초안·HSK 어휘 감사를 만들어 `content_review_runs.prepared_finalization`에 저장) → 교수자가 학생 화면 각 구간을 확인 표시(전 구간 checked여야 승인 버튼 활성) → fail finding마다 사유 10자 이상 → 판정이 fail인 미션은 추가로 「AI 검토의 중대 문제 항목 사용 근거」 10자 이상 + 확인 체크 → 승인 → `reviewMission` → `finalize_reviewed_mission(issue_overrides, professor_note, openai_fail_override)` → `mission_status = reviewed`. RPC는 `quality_check` 교체를 거부하므로 AI 판정은 원본 보존. finding이 없는 14건은 사유란이 뜨지 않는다(warning은 사유 불필요).
+- **편성 조건**: reviewed + 코어 release 현행(`_03`) → 20건 전부 충족 예정. 교과목 `915fec24` 편성 행 학습 기록 0.
+
+### A. 일반 승인 14건(순서대로) — 딥링크
+
+| key | scenario_id | 판정 |
+|---|---|---|
+| w2-0 | 4eac0623-82b9-4c92-818d-23c2ba8876fc | pass |
+| w2-1 | 63071ac4-efcd-4b50-a8b6-323046496532 | pass |
+| w3-0 | d1a90772-808e-4cad-9365-6f003ab0d12c | pass |
+| w3-1 | ebc4e927-7e0d-495d-a06f-2d05e64bc29e | pass |
+| w4-0 | a1ccc07b-ab07-4845-a50d-63772bfc32ad | pass |
+| w4-1 | 0350a784-ee56-4927-b9ac-20f00843ee52 | pass |
+| w6-1 | 700f0bdd-54f7-4192-80e4-07dcd262e2de | warning(grounding 격리, 사유 불필요) |
+| w9-0 | fc3913de-4f5c-490b-9418-e89bb37bc1d7 | pass |
+| w9-1 | 170e4b66-a802-4d8c-8696-2fd25e0b4a2b | pass |
+| w10-1 | f5c7d021-4bd0-494e-9ab4-612353e4f2e6 | pass |
+| w11-0 | ad9fa216-5071-4b18-a5fe-6dd13cf1b048 | pass |
+| w11-1 | 8755d9fb-f8c0-4392-a17f-6944981624d3 | pass |
+| w12-1 | 544bab4a-b241-4ca5-b3a7-bd165df405d8 | pass |
+| w13-0 | 90e605ce-1097-4f32-9e73-45739149b0f6 | pass |
+
+### B. override 동반 승인 — 자기모순형 5건(finding 9개)
+
+공통 전제: AI 판정을 삭제·변경하지 않는다. 사유는 사실관계와 현행 Reason 계약(오답 = 사실이고 부차적/다른 차원, 허위 전제·경합만 fail)에만 근거한다.
+
+| key / where | critic 요지 | override 가능 근거 | 사유란 초안 |
+|---|---|---|---|
+| w5-0 / reasons[0] r1 (b9a5249f) | 어조에 초점, 「오답으로는 허용되나 다소 애매」 | target에 실재하는 ‘…吧！’ 어조의 사실 관찰, 정답 r3(참석 전제)와 다른 관계 거리·어조 차원, 경합 없음 | 「r1은 target에 실제로 있는 ‘…吧！’의 구어 어조를 근거로 한 사실 관찰이며, 정답 r3(참석 전제)와 다른 차원의 부차적 요인이다. critic도 오답으로 허용된다고 적었고 허위 전제·경합이 없어 현행 계약의 pass 조건에 해당한다.」 |
+| w5-1 / reasons[0] r3 (793a1576) | 「부차적 사실이나 세트 안에서 혼동 가능」 | 공연 정보 뒤 초대 = target 사실, 정답 r2(수락 선취)와 다른 정보 순서 차원 | 「공연 정보 두 문장 뒤에 초대가 오는 것은 target의 사실이고, 정답 r2(수락 선취)와 다른 정보 순서 차원이다. critic 스스로 부차적 사실로 인정했으며 정답과 비슷한 강도의 경합이 없다.」 |
+| w5-1 / reasons[1] r1 | 「‘有空的话’는 오히려 적정 초대의 바람직한 요소」 | 조건이 먼저·초대가 뒤 = 사실 관찰, 오독 없음; 핵심 이유가 될 수 없다는 지적은 곧 비경합 | 「‘有空的话’가 먼저 오고 초대가 뒤에 온다는 사실 관찰이며 오독·없는 사실이 없다. 적정 초대의 요소라는 critic 지적은 이 선택지가 핵심 이유가 될 수 없다는 뜻이므로 오답 조건(부차적·비경합)을 충족한다.」 |
+| w10-0 / reasons[0] r1 (1f6d8863) | 「사실 기반 부차적 요인이므로 허용」 | ‘虽然…’ 양해 = target 사실, 정답 r3(결정 마무리)와 무관 | 「‘虽然…’로 두 사람의 부담을 먼저 인정하는 것은 target의 사실이며 정답 r3(곧바로 결정 마무리)와 다른 부차적 요인이다. critic도 허용된다고 판단했다.」 |
+| w10-0 / reasons[2] r2 | 「무관한 판단 차원의 관찰이므로 허용」 | 조건 설명이 먼저 = 사실(연구자가 사실 수준으로 낮춘 문안) | 「조건 설명이 제안보다 먼저 온다는 정보 순서의 사실 관찰이며 연구자가 사실 수준으로 확정한 문안이다. critic도 허용된다고 판단했고 경합이 없다.」 |
+| w12-0 / reasons[0] r3 (013cc144) | 「부차적 판단… 혼동 위험 없음… 타당성 약함」 | 세 피해 나열 = target 사실, 정답 r2(책임 범위 확장)와 다른 정보 배열 차원 | 「지연·일정 변경·불편이 한 문장에 이어지는 것은 target의 사실이고 정답 r2(책임 범위 확장)와 다른 정보 배열 차원이다. critic도 혼동 위험이 없는 부차적 관찰이라고 적었다.」 |
+| w12-0 / reasons[2] r1 | 「핵심 원인과 다르므로 혼동 위험」 | ‘这让我很不方便’ 실재, 개인 불편 표현 대 책임 귀속 범위는 다른 차원; 「다르므로」는 구별 인정 | 「‘这让我很不方便’는 target에 있는 표현이며, 개인 불편 표현 여부는 정답 r2의 책임 귀속 범위와 다른 차원이다. critic의 「다르므로 혼동 위험」은 구별을 인정한 것이고 경합 근거가 없다.」 |
+| w13-1 / reasons[0] r3 (26412ba9) | 「별개 차원… 허용」 | 검토 내용이 뒤 문장 = 사실, 정답 r2(수용 여부 미확인)와 다른 정보 순서 차원 | 「검토 내용이 부탁 문장 뒤에 오는 것은 target의 사실이며 정답 r2(수용 여부를 묻지 않음)와 다른 정보 순서 차원이다. critic도 별개 차원으로 허용된다고 적었다.」 |
+| w13-1 / reasons[1] r1 | 「부차적이므로 허용」 | ‘一下’ 부담 축소 효과는 critic도 인정한 사실, 부담 인식 차원 | 「‘一下’의 부담 축소 효과는 critic도 인정한 사실이며, 정답과 다른 부담 인식 차원의 부차적 요인이다. 허위 전제·경합이 없다.」 |
+
+미션 단위 「AI 검토의 중대 문제 항목 사용 근거」 초안(5건 공통): 「fail 판정은 Reason 문항 오답 선택지에 대한 것이며 각 finding 사유란에 근거를 기록했다. 오답은 사실 관찰이고 정답·해설·다른 문항에는 결함이 없어 현재 판본을 그대로 사용한다.」
+
+### B′. 화용 경계 사례 — w6-0 (def83b4f) · 자기모순형과 별개 유형
+
+| where | critic 요지 | override 가능 근거 | 사유란 초안 |
+|---|---|---|---|
+| reasons[0] r3 | 「r2와 같은 단독 ‘不行’ 근거, 같은 핵심 이유의 다른 표현」 | 같은 단어를 근거로 들지만 r2 = 동료 사정에 대한 반응 부재(배려 차원), r3 = 첫머리 不行의 첫인상 강도·범위 지각(강도 차원); 수정 방향이 다름; 연구자 판정 유지 | 「r3는 첫머리 단독 ‘不行’이 한정 절보다 먼저 들리는 첫인상 강도를, 정답 r2는 동료 사정에 대한 반응 부재를 짚는다. 같은 단어를 근거로 하지만 결함의 종류와 수정 방향이 달라 바꿔 말하기가 아니며, 연구자 판정(2026-09-11)에 따라 화용 경계 사례로 유지한다.」 |
+
+미션 단위 근거 초안(w6-0): 「fail 판정은 Reason r3 하나에 대한 것으로, 연구자가 화용 경계 사례로 유지 판정했다(사유는 finding 사유란). 정답·해설·다른 문항에는 결함이 없다.」
+
+승인이 끝나면 `reviewed` 20/20만 검증하고, 그 뒤 교과목 편성 계획을 제시한다(편성 실행은 승인 후).
+
+## 15. 공식 content-review(focused_v1) 실행 · 2026-09-11
+
+연구자 판정: DEC-20260830-13의 전수 3단 요구는 DEC-20260906-03(`focused_v1`)으로 대체(02_decision_log에 명시). canonical workflow = 규칙 검사 → 전수 production quality critic → 동일 content_hash 결과의 공식 검수 재사용 → 위험·경계 항목 선택적 Claude 독립 검토 → Claude finding 시 OpenAI adjudication → 교수자 최종 승인. 운영 secrets에 `CLAUDE_AUDIT_MODEL`·`ANTHROPIC_API_KEY` 존재 확인(값 미열람). 실행은 관리자 화면과 같은 클라이언트 코드(`prepareContentReview` → `contentReviewRequest` → `content-review` v32)를 러너 `official-review.ts`로 호출했다. 승인·콘텐츠 수정 없음. 실제 상태는 `content_review_runs`에서 읽었다(`*-official-status.json`, `official-claude-findings-20260911.json`).
+
+### 결과(`content_review_runs`, 20건 전부 행 생성)
+
+| 구분 | 건수 | key |
+|---|---|---|
+| 규칙 검사 저장 | 20/20 | 전부. 규칙 warning은 R5(길이 단서)·R19(문항 2·3·4 source/target 중복 = 앵커 설계상 동일)·R32(미귀속 claim) |
+| 생성 품질점검 재사용(`generation_quality`) | 20/20 | 전부(OpenAI 1차 검토 호출 0건) |
+| 최종 검수 자료 저장 + 규칙 통과 | **5** | w2-1·w3-0·w13-0·w6-1·w13-1 |
+| 최종 검수 자료 저장됐으나 **규칙 fail** | 7 | R31 「미션에 없는 추적 경로 mpj_items[3].corrections[*]」 w2-0·w3-1·w6-0 / 「미션 스키마를 읽을 수 없습니다」(`item_lineage.realization_pack_id` null) w4-0·w4-1·w9-0·w10-1 |
+| 최종 검수 자료 **생성 실패**(저장 없음, `last_error`) | 8 | 귀속 모델이 scope 밖 rule/risk id 사용: w5-0·w5-1·w9-1·w10-0·w11-0·w11-1·w12-0·w12-1 |
+| Claude 독립 검토 완료 | **5/7** | w6-1(fail 1·warning 1)·w5-0(w2)·w5-1(w1)·w10-0(w4)·w12-0(w1). 모델 claude-opus-5 |
+| Claude 요청 불가/실패 | 2 | w6-0(규칙 fail이라 `request_independent` 거부) · w13-1(Claude API 400, 자동 재호출 없음) |
+| OpenAI adjudication | **0/5 실행** | 5건 모두 「재검토 선행 결과가 없습니다」 |
+| 교수자 최종 승인 준비 완료(next=professor·규칙 warning·보류 단계 없음) | **3/20** | w2-1·w3-0·w13-0 |
+
+### 🔴 발견한 workflow 결함 3건(코드 미수정, 보고만)
+
+1. **focused_v1에서 adjudication이 구조적으로 불가.** `buildReviewPrompt('adjudication')`은 `run.openai_review`를 요구하는데(`_shared/contentReview.ts:313`), focused_v1은 OpenAI 단계를 `generation_quality` 재사용으로 대체해 `openai_review`가 null이다. 따라서 「Claude finding이 있을 때만 adjudication」은 현행 코드에서 실행될 수 없고, Claude finding이 생긴 미션은 `nextReviewStage`가 adjudication에서 멈춰 교수자 단계로 못 간다(w6-1·w5-0·w5-1·w10-0·w12-0). 선택: adjudication 입력을 `generation_quality`로 대체하거나, focused_v1에서 adjudication을 생략하고 교수자가 Claude finding을 직접 판정(UI는 이미 finding별 결정 입력을 지원).
+2. **최종 검수 자료(귀속) 단계가 현행 realization pack 범위 밖 화행에서 실패.** pack `pragma_ko_zh_request_refusal_thanks_v1@1.2.0`의 `scope_speech_acts`는 request·refusal·thanks뿐. 초대·제안·반대·불만·사과·칭찬 미션은 scope가 비어 귀속 모델의 모든 id가 「scope 밖」(8건 실패) 또는 `realization_pack_id` null로 저장돼 스키마 fail(4건). 20칸 중 이 3화행이 아닌 12칸이 여기 걸린다. 규칙 fail로 저장된 7건은 `prepared_finalization`이 이미 있어 서버가 재실행을 거부한다(DB 초기화 없이는 재시도 불가).
+3. **R31 경로 불일치(request·thanks·refusal 3건).** Reason 문항이 `corrections` 배열을 지닌 미션(w2-0·w3-1·w6-0)에서 서버 귀속 대상은 `mpj_items[3].corrections[*]`를 포함하지만 스키마 정규화 뒤의 클라이언트 검사(`expectedItemLineageTargetPaths`)에는 그 경로가 없어 「미션에 없는 추적 경로」 fail.
+
+이 세 가지는 Reason 콘텐츠와 무관한 검수 파이프라인 결함이다. 동결 20건은 그대로다.
+
+### 교수자가 실제 확인해야 할 공식 finding
+
+- **Claude 독립 검토(원문 보존, `official-claude-findings-20260911.json`)**
+  - w6-1 **fail** `core_content.preceding_turn`: 선행 발화 「教授，我想请你帮忙…」가 학생이 교수에게 부탁하는 문장으로 읽힘(장면은 교수→학생 부탁). 역할 역전. warning: 참고 산출 「签到工作」 vs 선행 발화 「接待工作」 용건 불일치.
+  - w5-0 warning 2: MPJ1 「不收参加费」 직역 어색 · 앵커의 회신 요청 변형(참석 전제)이 대역 조작인지 교수자 판단.
+  - w5-1 warning 1: MPJ2 해설의 장면 비교 서술 부정확.
+  - w10-0 warning 4: 원문 존대 요체 vs close 설정 · 「那家有我们俩都爱吃的菜的面馆」 的 중첩 · MPJ4 해설의 「조건 모순」 표현이 r2 실제 진술과 불일치 · MPJ1 권장안 동사 연쇄 어색.
+  - w12-0 warning 1: 원문 「앞으로도」→「앞으로는」, 「가능한 빨리」→「가능한 한 빨리」.
+- **재사용된 production critic fail**(12절과 동일 10개): w5-0 1·w5-1 2·w6-0 1·w10-0 2·w12-0 2·w13-1 2.
+- **규칙 warning**: R5·R19·R32는 전 미션 공통 성격(길이 단서 눈검사, 앵커 문항 동일 원문, 미귀속 claim).
+
+교수자 최종 승인은 실행하지 않았다.

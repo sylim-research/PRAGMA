@@ -76,7 +76,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   const next = adopt ? "rules" : nextReviewStage(run);
   const stepIndex = next === "approved" ? steps.length : steps.findIndex((step) => step.key === next);
   const locked = run?.running_stage && run.lease_until && Date.parse(run.lease_until) > Date.now();
-  const blocked = run?.rules.verdict === "fail";
+  const blocked = run?.rules.verdict === "fail" && !(next === "finalization" && Boolean(run?.prepared_finalization));
   const dependencyBlocked = state?.dependencies.some((item) => !item.approved);
   const hasOpenaiFail = !focused && run?.openai_review?.result.verdict === "fail";
   const openaiFailClear = !hasOpenaiFail || (openaiFailConfirmed && openaiFailOverride.trim().length >= 10);

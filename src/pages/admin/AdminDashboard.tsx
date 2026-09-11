@@ -149,7 +149,7 @@ const SummaryMetric = ({
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
 // 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다
-// (논문 4.3.3: OpenAI 1차 검토 → Claude 별도 검토 → OpenAI가 Claude 의견을 재검토 → 교수자 최종 승인).
+// (논문 4.3.3, focused_v1: 규칙 검사 → AI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   rules: "규칙 기반 검사 대기",
   openai: "AI 검토 대기",
