@@ -554,3 +554,43 @@ r2와 r3는 같은 단어 ‘不行’을 근거로 들지만 주장하는 결�
 - 재사용된 production critic fail 10개(12절)도 v3 행에 그대로 표시된다.
 
 교수자 승인·편성은 실행하지 않았다. 옛 w6-1 행 700f0bdd의 보관은 새 w6-1 승인 뒤 별도 승인.
+
+## 18. C7 마지막 국소수정 → 7건 공식 검수 재실행 결과 · 2026-09-11 밤
+
+연구자 지시: A 13 동결, C 7만 마지막 국소수정 후 그 7건만 production gate + 공식 content-review. 수정 내용과 방식은 `docs/dev-log/2026-09-11-handoff-c7-final-review.md` 표와 `c7-fix/<key>-fix.json`. 새 세션은 추가 호출 없이 이전 세션의 `independent` 7건 실행(22:27–22:36 KST, exit 0)의 결과만 읽었다.
+
+### DB 상태(읽기 전용, `v3-content-review-runs-after-c7.json`)
+
+| 항목 | 결과 |
+|---|---|
+| 현재 content_hash 기준 v3 행 | **20/20 대상**. 미션 수준 수정 4건(w5-0·w5-1·w6-0·w13-1)은 옛 해시의 v3 행이 그대로 남아 v3 행 총 24 |
+| rules · finalization | 7/7 warning 통과 · 7/7 완료 |
+| production gate(재사용된 generation_quality) | pass 3(w6-0·w6-1·w12-0) · fail 4(w5-0·w5-1·w10-0·w13-1) |
+| Claude 독립 검토 | 7/7 완료 — **fail 0**, warning 12(w5-0 1·w5-1 0·w6-0 2·w6-1 1·w10-0 3·w12-0 2·w13-1 3) |
+| adjudication | 6/6(w5-1은 finding 0이라 불필요) · decisions 12 = accept 7·refine 5·reject 0 · 교수자 확인 표시 10 |
+| professor-ready | **7/7**(A 13 포함 20/20). `v3-verify.ts` 집계는 23/24로 나오는데, w5-1처럼 finding 0이면 adjudication이 없는 것을 미완으로 세는 식 때문이다(서버 `next_stage`는 professor) |
+| 원본 보존 | 013cc144·09bc6c81·1f6d8863·700f0bdd 모두 `generated`, archived_at null, v2·v3 검수 행 그대로 |
+| 교수자 승인 · 편성 · override | 0 · 미실행 · 없음 |
+
+### 이전 v3 finding의 해소
+
+직전 v3의 Claude fail 2(w6-0 r3≡r2 · w12-0 「앞으로도」)와 accept된 수정 제안은 새 검수에서 다시 나오지 않았다. w5-1은 finding 0으로 R=mid 지적(refine)도 다시 나오지 않았다.
+
+### 새 finding(전부 warning)
+
+- w5-0 claude-1 · 앵커와 MPJ3·4의 「我也展出了照片的公司内部展览」 관형 구성 어색 → refine · 교수자 확인
+- w6-0 claude-1 · MPJ1(팀장·very_appropriate 허용)과 MPJ2(동료·too_blunt)의 같은 「不行＋사유」 구성 판정 불일치 → refine · 교수자 확인 / claude-2 · 코어·DCT는 daily인데 MPJ 1–5가 전부 직장 장면 → accept · 교수자 확인
+- w6-1 claude-1 · 코어·DCT는 campus인데 MPJ 1–5가 전부 직장 장면 → accept · 교수자 확인
+- w10-0 claude-1 · MJT1 반례 슬롯의 accepted_scale에 somewhat 포함 → accept · 교수자 확인 / claude-2 · MJT5 후보 2가 r=low인데 too_directive → refine · 교수자 확인 / claude-3 · force_calibration evidence_refs에 mpj:4 누락 → accept
+- w12-0 claude-1 · MPJ2 앵커의 「问题都在你这边」는 원문에 없는 문장 추가로 의미 보존 위반으로도 성립 → accept · 교수자 확인 / claude-2 · MPJ5 후보 4의 「这是一次严重的通知失误」도 같은 추가인데 해설은 심각도 확대로만 설명 → accept · 교수자 확인
+- w13-1 claude-1 · **MPJ5 해설이 아직 「旁边的一支备用笔」를 인용**(후보는 「那支」로 고침) → accept. C7 수정이 해설 한 곳을 놓친 잔존물이다 / claude-2 · 후보 4 「请你把…递给我，会不会让你为难？」 구조 어색 → refine · 교수자 확인 / claude-3 · 원문도 직접 요청＋기한인데 앵커를 too_direct로 판정 → refine · 교수자 확인
+
+production gate fail 4건은 모두 Reason 오답 critic note의 자기모순 패턴(w5-0 r1 · w5-1 r3·r1 · w10-0 r1·r2 · w13-1 r3·r1)이고 지시대로 더 고치지 않았다.
+
+### 연구자 판단 대기
+
+- **w12-0 「问题都在你这边」**: 이전 세션은 over_attributed 대역을 만드는 의도된 조작이라 유지했으나, 새 Claude 검토와 adjudication은 이를 원문에 없는 추가(의미 보존 위반)로 accept했고 MPJ5 후보 4에서 같은 유형을 하나 더 짚었다. 유지 여부는 연구자·교수자 결정.
+- **w5-1 R=mid**: 유지(짧은 강평·통상 지도 업무·같은 미션의 주말 90분 활동도 mid). 새 검토는 이를 다시 지적하지 않았다.
+- **w13-1 해설 잔존물**: 콘텐츠 추가 수정 금지 지시에 따라 고치지 않았다. 교수자 승인 전 한 곳 수정 여부는 연구자 결정.
+
+교수자 승인·편성은 실행하지 않았다.
