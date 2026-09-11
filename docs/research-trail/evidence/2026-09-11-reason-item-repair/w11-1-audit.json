@@ -1,0 +1,49 @@
+{
+  "at": "2026-09-11T04:45:42.450Z",
+  "key": "w11-1",
+  "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "fail",
+  "reason_findings": [
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[0]",
+      "evidence_excerpt": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다.",
+      "note_ko": "이 선택지는 실제 target의 의미(연속 안내 시간)와 다르게 해석하여 의미 오류를 주장하지만, target의 '连续站着接待三个小时'는 원문의 '세 시간 내내 서서 안내'와 일치한다. 실제 주원인은 단정적 표현(就是不合适)으로 인한 관계 효과이며, 이 선택지는 별개의 오진이다. 주원인(r3)과 구별된다."
+    },
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[2]",
+      "evidence_excerpt": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다.",
+      "note_ko": "이 선택지는 '먼저 동의해야 한다'는 형식적 요구를 주장하지만, 실제 target은 반대 대상과 근거를 명확히 밝히고 있다. 주원인(r3)은 단정적 표현의 관계 효과이며, 이 선택지는 별개의 오진이다. 주원인(r3)과 구별된다."
+    }
+  ],
+  "other_findings": [],
+  "quality": {
+    "verdict": "fail",
+    "summary_ko": "모든 후보가 실제 맥락에서 쓸 법하며, 대역·피드백·장면 설명도 적절하게 구분되어 있음.",
+    "findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[0]",
+        "evidence_excerpt": "连续站着接待三个小时가 한 사람이 연속으로 안내하는 시간이 아니라 부스의 전체 운영 시간이 세 시간이라는 뜻으로 바뀌어, 반대 근거가 원문과 달라졌기 때문이다.",
+        "note_ko": "이 선택지는 실제 target의 의미(연속 안내 시간)와 다르게 해석하여 의미 오류를 주장하지만, target의 '连续站着接待三个小时'는 원문의 '세 시간 내내 서서 안내'와 일치한다. 실제 주원인은 단정적 표현(就是不合适)으로 인한 관계 효과이며, 이 선택지는 별개의 오진이다. 주원인(r3)과 구별된다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[2]",
+        "evidence_excerpt": "我不同意를 먼저 말해 동료가 제안한 취지를 인정하지 않았으므로, 단정을 줄이더라도 먼저 동의하는 말을 넣지 않으면 관계 조정이 되지 않기 때문이다.",
+        "note_ko": "이 선택지는 '먼저 동의해야 한다'는 형식적 요구를 주장하지만, 실제 target은 반대 대상과 근거를 명확히 밝히고 있다. 주원인(r3)은 단정적 표현의 관계 효과이며, 이 선택지는 별개의 오진이다. 주원인(r3)과 구별된다."
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:42.440Z",
+    "mission_content_hash": "31f1ee5b96fffd9235cad939559d0fc7e45c112208733f63742739f7abef172e"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

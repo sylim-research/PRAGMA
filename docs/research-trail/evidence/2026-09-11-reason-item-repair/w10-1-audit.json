@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-11T04:45:34.235Z",
+  "key": "w10-1",
+  "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "pass",
+  "reason_findings": [],
+  "other_findings": [],
+  "quality": {
+    "verdict": "pass",
+    "summary_ko": "모든 문항이 화용 초점과 실제 상황에 맞게 구성되어 결함이 없다.",
+    "findings": [],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:34.235Z",
+    "mission_content_hash": "08189315c079ab39147cde0139aa932865216df2a5a53434aab9752ff248e86e"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

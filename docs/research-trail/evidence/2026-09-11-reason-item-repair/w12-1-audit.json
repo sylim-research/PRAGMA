@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-11T04:45:49.729Z",
+  "key": "w12-1",
+  "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "pass",
+  "reason_findings": [],
+  "other_findings": [],
+  "quality": {
+    "verdict": "pass",
+    "summary_ko": "모든 문항이 문제 명료화와 책임 범위 초점에 맞게 실제 상황과 화용 대역을 구분하며, 오도할 결함이 없다.",
+    "findings": [],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:49.679Z",
+    "mission_content_hash": "5466613ef3e229216e683f99bb1706683aba888cfb7a783c8a767701c5148567"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

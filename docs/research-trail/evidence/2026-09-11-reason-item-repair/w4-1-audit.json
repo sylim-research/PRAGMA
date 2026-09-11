@@ -1,0 +1,33 @@
+{
+  "at": "2026-09-11T04:45:13.890Z",
+  "key": "w4-1",
+  "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "warning",
+  "reason_findings": [],
+  "other_findings": [
+    {
+      "code": "critic_grounding_failure",
+      "severity": "warning",
+      "where": "",
+      "note_ko": "현재 mission_content에 없는 경로입니다: mpj_items[3].reasons[0].text_ko / mpj_items[3].reasons[1].text_ko"
+    }
+  ],
+  "quality": {
+    "verdict": "warning",
+    "summary_ko": "AI critic finding 1건의 현재 문항 근거를 확인하지 못해 격리했습니다.",
+    "findings": [
+      {
+        "code": "critic_grounding_failure",
+        "severity": "warning",
+        "where": "",
+        "note_ko": "현재 mission_content에 없는 경로입니다: mpj_items[3].reasons[0].text_ko / mpj_items[3].reasons[1].text_ko"
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:13.849Z",
+    "mission_content_hash": "2711844fe61d6fd1c4b58e1e1b0f7375771a6094e60d97f5861be22e6d799182"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

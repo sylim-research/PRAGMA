@@ -1,0 +1,49 @@
+{
+  "at": "2026-09-11T04:45:38.427Z",
+  "key": "w11-0",
+  "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "fail",
+  "reason_findings": [
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[1]",
+      "evidence_excerpt": "‘我理解你想让空间更宽敞’가 설명문 삭제안에 이미 동의한다는 뜻이어서, 뒤의 보존 의견과 입장이 충돌하기 때문입니다.",
+      "note_ko": "r1(‘我理解你想让空间更宽敞’가 설명문 삭제안에 이미 동의한다는 뜻이어서, 뒤의 보존 의견과 입장이 충돌하기 때문입니다.)와 r3(‘全部保留也可以考虑一下吧’가 보존을 고려 가능한 방향으로만 제시하여, 설명문 삭제에 반대하는 입장인지 분명하게 전달하지 못하기 때문입니다.)는 모두 이견 명료성 부족을 지적하지만, r1은 실제로 ‘我理解’가 동의임을 의미하지 않으므로 오진이다. r3만이 실제 주원인을 설명한다."
+    },
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[2]",
+      "evidence_excerpt": "‘观众理解作品需要这些说明’의 ‘需要’가 관람객에게 설명문을 읽으라고 요구하여, 필요성 설명을 관람객에 대한 지시로 바꾸기 때문입니다.",
+      "note_ko": "r2(‘观众理解作品需要这些说明’의 ‘需要’가 관람객에게 설명문을 읽으라고 요구하여, 필요성 설명을 관람객에 대한 지시로 바꾸기 때문입니다.)는 실제 target의 의미와 무관한 별개의 오진으로, 주원인과 구별된다."
+    }
+  ],
+  "other_findings": [],
+  "quality": {
+    "verdict": "fail",
+    "summary_ko": "모든 문항이 화용 초점에 맞는 실제 경계 사례로 구성되어 있고, 극단적 오답이나 대역 코드 오류, 설명 불일치가 없다.",
+    "findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[1]",
+        "evidence_excerpt": "‘我理解你想让空间更宽敞’가 설명문 삭제안에 이미 동의한다는 뜻이어서, 뒤의 보존 의견과 입장이 충돌하기 때문입니다.",
+        "note_ko": "r1(‘我理解你想让空间更宽敞’가 설명문 삭제안에 이미 동의한다는 뜻이어서, 뒤의 보존 의견과 입장이 충돌하기 때문입니다.)와 r3(‘全部保留也可以考虑一下吧’가 보존을 고려 가능한 방향으로만 제시하여, 설명문 삭제에 반대하는 입장인지 분명하게 전달하지 못하기 때문입니다.)는 모두 이견 명료성 부족을 지적하지만, r1은 실제로 ‘我理解’가 동의임을 의미하지 않으므로 오진이다. r3만이 실제 주원인을 설명한다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[2]",
+        "evidence_excerpt": "‘观众理解作品需要这些说明’의 ‘需要’가 관람객에게 설명문을 읽으라고 요구하여, 필요성 설명을 관람객에 대한 지시로 바꾸기 때문입니다.",
+        "note_ko": "r2(‘观众理解作品需要这些说明’의 ‘需要’가 관람객에게 설명문을 읽으라고 요구하여, 필요성 설명을 관람객에 대한 지시로 바꾸기 때문입니다.)는 실제 target의 의미와 무관한 별개의 오진으로, 주원인과 구별된다."
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:38.427Z",
+    "mission_content_hash": "a4b39cd03e6abb31f8b75fb2ed7b5e0f31fd90c90e6b38537bcc8f49739b4957"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

@@ -1,0 +1,19 @@
+{
+  "at": "2026-09-11T04:45:31.015Z",
+  "key": "w10-0",
+  "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "pass",
+  "reason_findings": [],
+  "other_findings": [],
+  "quality": {
+    "verdict": "pass",
+    "summary_ko": "모든 문항이 화용 초점에 맞는 현실적 경계 사례로 구성되어 있고, 대역·피드백·비교 품질에 결함이 없다.",
+    "findings": [],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:31.012Z",
+    "mission_content_hash": "860147d63541e09d437bc0510933f24975c5fcb3432d67d956e18eac337b55c5"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}

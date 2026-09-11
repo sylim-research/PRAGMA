@@ -1,0 +1,49 @@
+{
+  "at": "2026-09-11T04:45:54.611Z",
+  "key": "w13-1",
+  "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+  "prompt_version": "quality_v22_observed_pdr_scene",
+  "verdict": "fail",
+  "reason_findings": [
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[0]",
+      "evidence_excerpt": "‘把意见告诉我’가 의견을 전달하라는 요청을 구두 보고로만 제한하여, 원문에 없던 전달 방식을 지정하기 때문이다.",
+      "note_ko": "r3(meaning_grammar_context)는 실제 target의 직접성 문제(수용 여부를 묻지 않음)가 아니라, 전달 방식의 지정(구두 보고로 제한)이라는 별개의 오진을 제시한다. 이는 실제 주원인(r2)과 구별되는 별개의 이유가 아니라, 문맥상 타당하지 않은 오진이다."
+    },
+    {
+      "code": "primary_reason_ambiguity",
+      "severity": "fail",
+      "where": "mpj_items[3].reasons[1]",
+      "evidence_excerpt": "‘吧’와 ‘看看’가 검토 자체를 가볍게 제안하는 말로 만들어, 실제로 검토해 달라는 요청인지 불분명해지기 때문이다.",
+      "note_ko": "r1(pragmatic_misconception)은 실제 target의 직접성 문제(수용 여부를 묻지 않음)가 아니라, 요청의 불분명성(검토 요청이 약해짐)이라는 별개의 오진을 제시한다. 이는 실제 주원인(r2)과 구별되는 별개의 이유가 아니라, 문맥상 타당하지 않은 오진이다."
+    }
+  ],
+  "other_findings": [],
+  "quality": {
+    "verdict": "fail",
+    "summary_ko": "모든 요청 문항이 실제 상황과 관계에 맞는 완화·선택권 대역 구분을 잘 반영하고, 오답도 현실적 경계 사례로 설계되어 결함이 없다.",
+    "findings": [
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[0]",
+        "evidence_excerpt": "‘把意见告诉我’가 의견을 전달하라는 요청을 구두 보고로만 제한하여, 원문에 없던 전달 방식을 지정하기 때문이다.",
+        "note_ko": "r3(meaning_grammar_context)는 실제 target의 직접성 문제(수용 여부를 묻지 않음)가 아니라, 전달 방식의 지정(구두 보고로 제한)이라는 별개의 오진을 제시한다. 이는 실제 주원인(r2)과 구별되는 별개의 이유가 아니라, 문맥상 타당하지 않은 오진이다."
+      },
+      {
+        "code": "primary_reason_ambiguity",
+        "severity": "fail",
+        "where": "mpj_items[3].reasons[1]",
+        "evidence_excerpt": "‘吧’와 ‘看看’가 검토 자체를 가볍게 제안하는 말로 만들어, 실제로 검토해 달라는 요청인지 불분명해지기 때문이다.",
+        "note_ko": "r1(pragmatic_misconception)은 실제 target의 직접성 문제(수용 여부를 묻지 않음)가 아니라, 요청의 불분명성(검토 요청이 약해짐)이라는 별개의 오진을 제시한다. 이는 실제 주원인(r2)과 구별되는 별개의 이유가 아니라, 문맥상 타당하지 않은 오진이다."
+      }
+    ],
+    "model": "gpt-4.1",
+    "prompt_version": "quality_v22_observed_pdr_scene",
+    "checked_at": "2026-09-11T04:45:54.533Z",
+    "mission_content_hash": "482332f318d6fcf1f34a8798b75e8179e5a458f717407396ffad5a3c9a9f7121"
+  },
+  "scope": "Automated re-audit only; no DB write."
+}
