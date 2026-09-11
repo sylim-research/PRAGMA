@@ -184,3 +184,87 @@ A = 사실이고 부차적인 오답(ⓑ)을 결함으로 봄(8건). B = 경합(
 2. 배포 뒤 순서(제안): 12건 fail revision을 새 감사로 **재검사만**(생성 없음) → 통과분은 판정 갱신(revision 저장 방식은 `확인 필요`: 같은 content hash 재저장 가능 여부) → w3-0·w5-1은 r3만 사람 교체안으로 수리 → w13-0·w6-1 생성.
 3. 경계 사례 판정: **w6-0 r3**(연구자 「유지」 vs critic 「주원인 r2와 같은 ‘不行’ 근거」 — r2를 사유·반응 부족 쪽으로 좁히거나 r3를 다른 차원으로 바꾸는 두 길) · **w4-1 r1**(교체안 준비됨, 적용 여부) · **w11-0 r1·r2** · **w12-1 r1**.
 4. 옛 규칙으로 생성된 `w2-1`·`w4-0` pass 미션의 Reason 오답도 정의상 「반박되는 오진」일 수 있다 — 승격 전 사람 눈검사 1회 필요(`확인 필요`).
+
+## 9. 정렬본 배포와 재검사 · 2026-09-11 (연구자 「root cause 수용 · 순서 승인」)
+
+연구자 지시: 정렬본 PR 병합·main lineage 배포 → 기존 12건은 **재생성 없이 재검사만** → 진짜 위반만 최소 수정(기존 revision 경로, 새 hash·lineage) → w13-0·w6-1은 새 기준으로 생성 → w2-1·w4-0은 Reason 오답 눈검사 1회 → 자동 수리가 악화시키면 중단, 반복 재생성 금지 → w6-0 r3 유지(정교화본), w3-1 辛苦了 교체, w4-1·w11-0·w12-1은 근거만 정리.
+
+- **PR #137** CI 통과·병합 → main `f8a5c9c9`. `npm run edge:deploy -- generate-scenario` → **generate-scenario v124**(main lineage `bad934f6`). `content-review`는 이 규칙을 쓰지 않아 v32 유지. 스냅샷에서 새 규칙 문구 6곳·옛 문구 0곳(생성 프롬프트와 정합성 감사가 같은 상수를 읽는다).
+- **재검사 방식**(`repair.ts recheck`): Reason 문항을 바꾸지 않고 `reviseMissionDraft(core, {같은 문항}, 'ai')`를 태워 새 판정을 **새 lineage version**으로 저장한다(content hash 동일, `ai_quality_result` 갱신, 이전 version과 판정은 장부에 그대로). `save_generated_mission_revision`은 같은 hash 재저장을 거부하지 않는다.
+
+### 재검사 결과(12건, v124) — pass 6 · fail 6
+
+| key | 전 | 후 | 남은 finding 요지 | 분류 |
+|---|---|---|---|---|
+| w2-0 | fail | **pass** | — | |
+| w3-1 | fail | **pass** | — (辛苦了 교체본 통과) | |
+| w4-1 | fail | **pass** | — | |
+| w11-0 | fail | **pass** | — | |
+| w11-1 | fail | **pass** | — | |
+| w12-1 | fail | **pass** | — | |
+| w5-0 | fail | fail | 원본 r1 「마음이 충분히 전달되지 않는다」 = 「초점과 무관한 오답」 | 전제 다툼 |
+| w6-0 | fail | fail | 정교화한 r3와 주원인 r2가 같은 단독 ‘不行’ 근거 → 「같은 핵심 이유의 다른 표현」 | 연구자 「유지」 판정과 충돌 |
+| w9-0 | fail | fail | r3(사과 위치)·r1(약속 위치) 「주원인(피해 축소)과 무관」 | 무관=fail 잔존 |
+| w10-0 | fail | fail | r1 「그런 태도가 중심이 되지 않음」(원본 오답의 과장) · r2 「떠밀린 결정처럼 읽히는 주된 이유가 아님」 | 전제 다툼 |
+| w12-0 | fail | fail | note가 「오답으로는 허용된다 … 타당성은 약간 떨어진다」고 쓰고 severity는 fail | **note≠severity** |
+| w13-1 | fail | fail | r3 「정상」, r1 「30분 부담이 암시…핵심 원인 아님」 | r1은 내 교체안 오류(아래) |
+
+w9-1·w10-1(2차에서 pass)을 더하면 14건 중 **pass 8 · fail 6**.
+
+### 최소 수정(사람 교체안, revision 경로) — `human-replacements-round2.json`·`round3.json`
+
+| key | 교체 | 전(허위 전제) | 후 | 판정 |
+|---|---|---|---|---|
+| w3-0 | r3 | ‘了’가 「이미 끝났다」는 뜻을 만든다 | 도움 경위를 먼저 서술하고 감사가 문장 끝에 와 사실 확인이 먼저 들린다 | fail — 그러나 두 finding 모두 note 끝이 「**(정상)**」 |
+| w5-1 | r3 | ‘来听听’가 「잠깐 들어 보라」로 바뀐다 | 공연 정보 두 문장 뒤에 초대가 와 초대인지 안내인지 끝에서야 드러난다 | fail — note 「오답으로는 허용되나 … 경계성 있음」 |
+| w2-1 | r1·r2 | 吧=「주워도 그만」 / 어떤 펜인지 식별 불가 | 吧가 초면에 편한 말투로 들림 / 사정이 부탁 뒤에 옴 | **pass** |
+| w4-0 | r1·r2 | 나머지는 나쁘다는 평가 / 실험 자체가 쉽다는 뜻 | 범위 한정으로 나머지 평가 유보처럼 들림 / 세 단계가 자료 정리인지 다시 밝히지 않음 | **pass** |
+| w13-1 | r1 | 「원문의 30분 부담 정보를 옮기지 않아」 — **원문에 30분이 없다(상황문에만). 내 1차 교체안의 오류** | ‘一下’가 검토를 잠깐 보는 일처럼 제시해 부탁의 크기가 작게 전해진다 | fail — 두 finding 모두 note가 「**정상**」 |
+| w6-1 | r2 | ‘下周会上’가 회의 참석 전체 거절로 범위를 넓힌다(v124 생성분인데 생성기가 낸 옛 형태 오답, critic 통과) | ‘那天’이 가리키는 날이 뒤 문장에서야 나온다 | **warning**(grounding 격리뿐, Reason finding 0) |
+
+### 🔴 관찰: critic이 「정상·허용」이라고 쓰면서 severity=fail을 낸다
+
+w3-0(2건)·w13-1(2건)·w12-0·w5-1의 finding은 note_ko가 「(정상)」「오답으로는 허용되나」로 끝나는데 severity가 fail이다. 정합성 감사 프롬프트는 「결함이 없으면 빈 배열」이라고 지시하지만, 모델이 검토한 선택지마다 finding을 만들고 severity를 fail로 채운다. 이것은 오답 정의의 문제가 아니라 **출력 형식의 불일치**다. 연구자 지시(반복 재생성·새 검수 체계 금지)에 따라 프롬프트를 더 손대지 않고 여기서 멈춘다. 이런 fail은 교수자 최종 승인의 **issue override**(`finalize_reviewed_mission`의 `issue_overrides`, 사유 필수)가 정확히 처리하도록 설계된 경우다.
+
+### 🔴 발견: 실패한 생성 작업이 같은 코어의 새 생성을 막는다(w13-0)
+
+`generation-jobs`의 request_key = hash(요청 본문, 시나리오 updated_at, 버전, release). 실패하고 `can_resume=false`인 작업이 있으면 같은 코어의 `start`는 **그 실패 작업을 그대로 돌려준다**(upsert `ignoreDuplicates`). 오늘 첫 w13-0 실행은 9-10의 실패 작업 `f4e3f949`를 다시 읽었을 뿐 생성하지 않았다(microfix v123·v124는 실행되지도 않았다). 관리자 화면(`GenerationJobsPanel`)도 이 상태에서 「새로 생성」을 제공하지 않는다. 이번에는 러너에서 telemetry item key에 `|retry_20260911_v124` 접미를 붙여(메모리상, 시나리오 행 불변) 새 request_key로 생성했다. 🔴 후속(범위 밖) = 복구 불가 실패 작업 뒤 새 생성 경로.
+
+### w13-0·w6-1 생성(v124)
+
+- **w6-1**(700f0bdd): 첫 시도에 생성·저장, 판정 warning(critic grounding 격리 2건뿐, 콘텐츠 fail 0). 눈검사에서 r2가 옛 형태 허위 전제(‘下周会上’=회의 참석 전체 거절)였고 critic은 통과시켰다 → round3 교체(‘那天’ 지시 순서) → warning 유지, Reason finding 0.
+- **w13-0**(90e605ce): 새 request_key로 생성 → **해설 갱신 microfix가 작동해 저장까지 도달**(9-10의 실패 지점 통과). 그러나 Reason r1(「지나치게 조심스럽게 타진」— too_direct 대역과 모순)·r2(‘指出来’=직접 수정 요구)가 허위 전제, critic이 ⓐ로 정확히 fail. 자동 수리도 재검사 미통과. round4 사람 교체(‘吧’ 격식 / 문서 설명이 먼저 옴) → **pass**.
+- 관찰: v124(정렬된 규칙)로 생성해도 생성기(gpt-6-astra)는 2건 모두 옛 형태 오답을 냈다. critic은 1건은 잡고 1건은 놓쳤다. 생성 쪽 계약 준수는 규칙 문구만으로 안정되지 않는다 — 소수 표본, 비율 주장 금지.
+
+### 20칸 최종 상태(2026-09-11, `status.ts` 스냅샷 = `status-20cells-20260911.json`)
+
+| key | scenario | 미션 | 판정 | Reason fail | lineage 판본 |
+|---|---|---|---|---|---|
+| w2-0 | 4eac0623 | generated | pass | 0 | 4 |
+| w2-1 | 63071ac4 | generated | pass | 0 | 2 |
+| w3-0 | d1a90772 | generated | fail | 2 (note 「정상」) | 2 |
+| w3-1 | ebc4e927 | generated | pass | 0 | 4 |
+| w4-0 | a1ccc07b | generated | pass | 0 | 2 |
+| w4-1 | 0350a784 | generated | pass | 0 | 4 |
+| w5-0 | b9a5249f | generated | fail | 1 (전제 다툼) | 4 |
+| w5-1 | 793a1576 | generated | fail | 2 (note 「허용」) | 2 |
+| w6-0 | def83b4f | generated | fail | 1 (연구자 「유지」) | 4 |
+| w6-1 | 700f0bdd | generated | warning | 0 | 2 |
+| w9-0 | fc3913de | generated | fail | 2 (전제 다툼) | 4 |
+| w9-1 | 170e4b66 | generated | pass | 0 | 3 |
+| w10-0 | 1f6d8863 | generated | fail | 2 (전제 다툼) | 4 |
+| w10-1 | f5c7d021 | generated | pass | 0 | 3 |
+| w11-0 | ad9fa216 | generated | pass | 0 | 4 |
+| w11-1 | 8755d9fb | generated | pass | 0 | 4 |
+| w12-0 | 013cc144 | generated | fail | 1 (note 「허용」) | 4 |
+| w12-1 | 544bab4a | generated | pass | 0 | 3 |
+| w13-0 | 90e605ce | generated | pass | 0 | 2 |
+| w13-1 | 26412ba9 | generated | fail | 2 (note 「정상」) | 4 |
+
+**20/20 미션 존재. pass 11 · warning 1 · fail 8.** 전부 `generated`(교수자 승인·편성 0건). 다른 fail 코드는 0.
+
+fail 8의 성격: ⓐ note가 「정상/허용」인데 severity fail — w3-0·w5-1·w12-0·w13-1(4) ⓑ 연구자 「유지」 판정과 critic 「r2와 경합」 충돌 — w6-0(1) ⓒ critic이 오답의 결과절이 이 장면에서 성립하지 않는다고 봄(전제 다툼) — w5-0 r1(원본 「마음이 충분히 전달되지 않는다」)·w9-0 r3·r1(사과·약속 위치)·w10-0 r1(원본 「꺼리는 태도가 중심」)·r2(조건에 떠밀린 결정)(3).
+
+여기서 멈춘다(연구자 지시: 반복 재생성·새 검수 체계 금지). ⓐ·ⓑ는 교수자 최종 승인 화면의 issue override(사유 필수)로 닫는 것이 설계된 경로다. ⓒ는 연구자 판정 — 오답의 결과절을 사실 관찰로 낮추는 최소 수정(예: w9-0 r3 「…순서로 읽히기 때문이다」→「…뒤에 온다」)이 가능하나, 「…때문이다」 형식을 유지하는 한 결과절 자체가 판단이라 critic이 다시 다툴 수 있다.
+
+후속(범위 밖, 기록만): ①critic의 note≠severity 불일치(정합성 감사 출력 형식) ②생성기가 정렬된 규칙에도 옛 형태 오답을 냄 ③복구 불가 실패 작업이 새 생성을 막음(`generation-jobs` request_key) ④수리 프롬프트에 Reason 계약 없음 ⑤코어 보관 후 재생성 시 유니크 키.

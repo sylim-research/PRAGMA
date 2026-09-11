@@ -8,7 +8,12 @@
 //            check and the quality check and stores an append-only revision with a new content hash.
 //            No direct mission_content overwrite. Missions with no safe operations are listed as
 //            needs_regeneration for the supersede → promoteCore path (run separately, explicitly).
-// Existing *-audit.json / *-repair.json results are preserved and never overwritten.
+//   apply  — hand-written replacement distractors (a replacements JSON, default human-replacements.json;
+//            argv[4] = file name, argv[5] = output suffix, default "apply") through the same revision path.
+//   recheck — re-runs the deployed quality check on the CURRENT Reason item without changing it, through
+//            reviseMissionDraft, so the new verdict is stored as a new append-only lineage version (same
+//            content hash, new ai_quality_result). Earlier versions and their verdicts stay in the ledger.
+// Existing *-audit.json / *-repair.json / *-apply*.json / *-recheck.json results are preserved and never overwritten.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -37,11 +42,18 @@ const db = supabase as unknown as { from: (table: string) => any };
 const TARGETS: Array<{ key: string; scenario_id: string }> = [
   { key: 'w2-0', scenario_id: readJson(resolve(earlier, 'w2-0-saved.json')).new_scenario_id },
   { key: 'w9-1', scenario_id: readJson(resolve(earlier, 'w9-1-saved.json')).new_scenario_id },
-  ...['w3-1', 'w4-1', 'w5-0', 'w6-0', 'w9-0', 'w10-0', 'w10-1', 'w11-0', 'w11-1', 'w12-0', 'w12-1', 'w13-1']
+  ...['w3-1', 'w4-1', 'w5-0', 'w6-0', 'w9-0', 'w10-0', 'w10-1', 'w11-0', 'w11-1', 'w12-0', 'w12-1', 'w13-1',
+    // Promoted on 2026-09-11 under the old shared rule; only their flagged Reason distractors are repaired
+    // (w3-0·w5-1 critic-flagged false premises; w2-1·w4-0 passed the old critic but the human eye check found false premises).
+    'w3-0', 'w5-1', 'w2-1', 'w4-0',
+    // Generated under the aligned rule (v124); the eye check still found one false-premise distractor.
+    'w6-1', 'w13-0']
     .map(key => ({ key, scenario_id: readJson(resolve(runDir, `${key}-core.json`)).result.scenarioId as string })),
 ];
 const mode = process.argv[2];
-const selected = process.argv[3] ? process.argv[3].split(',') : TARGETS.map(t => t.key);
+const selected = process.argv[3] && process.argv[3] !== 'all' ? process.argv[3].split(',') : TARGETS.map(t => t.key);
+const replacementsFile = process.argv[4] ?? 'human-replacements.json';
+const applySuffix = process.argv[5] ?? 'apply';
 const isReasonFinding = (mission: any, where: string) => {
   const match = /^mpj_items\[(\d+)\]/.exec(where ?? '');
   if (!match) return false;
@@ -106,11 +118,30 @@ try {
       console.log(JSON.stringify({ key: target.key, verdict: quality.verdict, reason_findings: reasonFindings.map(f => `${f.severity}:${f.code}@${f.where}`) }));
       continue;
     }
-    if (mode === 'apply') {
-      // Attempt 2: hand-written replacement distractors (human-replacements.json) through the same revision path.
-      const out = resolve(here, `${target.key}-apply.json`);
+    if (mode === 'recheck') {
+      const out = resolve(here, `${target.key}-recheck.json`);
       if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
-      const repl = readJson(resolve(here, 'human-replacements.json')).replacements?.[target.key];
+      const row = await loadRow(target.scenario_id);
+      if (row.mission_status !== 'generated') { console.log(JSON.stringify({ key: target.key, skipped: `mission_status=${row.mission_status}` })); continue; }
+      const reasonIndex = row.mission_content.mpj_items.findIndex((it: any) => it.type === 'reason');
+      const item = structuredClone(row.mission_content.mpj_items[reasonIndex]);
+      const previous = row.mission_content.quality_check ?? null;
+      const result = await promote.reviseMissionDraft(row, { itemBlocks: [{ itemIndex: reasonIndex, item }] }, 'ai');
+      writeFileSync(out, JSON.stringify({ at: new Date().toISOString(), key: target.key, scenario_id: target.scenario_id,
+        outcome: result.ok ? 'rechecked' : 'recheck_rejected', item_unchanged: true, reason_item: item,
+        previous_quality: previous ? { verdict: previous.verdict, prompt_version: previous.prompt_version, checked_at: previous.checked_at,
+          reason_findings: (previous.findings ?? []).filter((f: any) => /^mpj_items\[\d+\]\.reasons/.test(f.where ?? '')) } : null,
+        result: { ok: result.ok, error: result.error, quality: result.quality, ruleResult: result.ruleResult, violations: result.violations },
+        scope: 'Re-check only under the aligned shared rule; the Reason item is unchanged. Stored as a new lineage version.' }, null, 2) + '\n');
+      console.log(JSON.stringify({ key: target.key, outcome: result.ok ? 'rechecked' : 'recheck_rejected', before: previous?.verdict ?? null, after: result.quality?.verdict ?? null,
+        reason_findings: result.quality?.findings?.filter((f: any) => /^mpj_items\[\d+\]\.reasons/.test(f.where ?? '')).map((f: any) => `${f.severity}@${f.where}`), error: result.error }));
+      continue;
+    }
+    if (mode === 'apply') {
+      // Attempt 2+: hand-written replacement distractors through the same revision path.
+      const out = resolve(here, `${target.key}-${applySuffix}.json`);
+      if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
+      const repl = readJson(resolve(here, replacementsFile)).replacements?.[target.key];
       if (!repl) { console.log(JSON.stringify({ key: target.key, skipped: 'no replacements' })); continue; }
       const row = await loadRow(target.scenario_id);
       if (row.mission_status !== 'generated') { console.log(JSON.stringify({ key: target.key, skipped: `mission_status=${row.mission_status}` })); continue; }
@@ -134,7 +165,7 @@ try {
         reason_findings: result.quality?.findings?.filter((f: any) => /^mpj_items\[\d+\]\.reasons/.test(f.where ?? '')).map((f: any) => `${f.severity}@${f.where}`), error: result.error }));
       continue;
     }
-    if (mode !== 'repair') throw new Error('Choose audit, repair or apply');
+    if (mode !== 'repair') throw new Error('Choose audit, repair, apply or recheck');
     const out = resolve(here, `${target.key}-repair.json`);
     if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
     const audit = readJson(resolve(here, `${target.key}-audit.json`));

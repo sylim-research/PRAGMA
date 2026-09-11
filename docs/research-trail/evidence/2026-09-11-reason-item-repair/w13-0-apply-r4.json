@@ -1,0 +1,135 @@
+{
+  "at": "2026-09-11T06:32:32.122Z",
+  "key": "w13-0",
+  "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+  "outcome": "revised",
+  "replaced": [
+    "r1",
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "금요일에 제출할 고객 제안서 초안입니다. 네 쪽을 읽고 수정할 부분을 짚어 주시는 데 30분 정도 내 주세요.",
+    "target": "这是星期五要提交的客户提案初稿。请您抽三十分钟左右读一下这四页，把需要修改的地方指出来吧。",
+    "channel": "email",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘请您’와 ‘吧’로 어조는 누그러뜨렸지만, 아직 합의하지 않은 팀장의 30분 검토를 수행할 일로 제시하여 시간 배정 여부를 조정할 여지가 부족하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘请您’와 ‘吧’를 함께 써서 검토를 지나치게 조심스럽게 타진하므로, 금요일 제출에 필요한 요청의 힘이 너무 약해지기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘把需要修改的地方指出来’가 수정할 부분을 알려 달라는 뜻이 아니라 직접 수정해 달라는 뜻이어서, 원문보다 많은 작업을 요구하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "请您抽三十分钟左右",
+      "把需要修改的地方指出来吧"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "두 달간 함께 일하며 내 업무를 배정해 온 팀장",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 지난 두 달간 내 업무를 배정해 온 팀장에게 고객 제안서 초안을 보내려 한다. 금요일 제출 전에 네 쪽의 내용을 읽고 수정할 부분을 짚어 주는 데 30분 정도를 내 달라고 요청하려 한다.",
+    "explanation_ko": "팀장에게 새로 30분 검토를 요청하는 상황에서 ‘请您…把…吧’는 완화된 어조로도 상대가 그 일을 수행할 것을 전제합니다. 문제는 ‘指出来’의 의미나 문법이 아니라 시간 배정을 당연시하는 요청 강도이므로, ‘您看方便吗’처럼 검토 가능 여부에 답할 여지를 주어야 합니다. ‘请您’와 ‘吧’가 함께 있다는 사실만으로 지나치게 우회적인 요청이 되는 것은 아닙니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r3",
+    "recommended_example": "这是星期五要提交的客户提案初稿。想请您抽三十分钟左右读一下这四页，并指出需要修改的地方，您看方便吗？"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "금요일에 제출할 고객 제안서 초안입니다. 네 쪽을 읽고 수정할 부분을 짚어 주시는 데 30분 정도 내 주세요.",
+    "target": "这是星期五要提交的客户提案初稿。请您抽三十分钟左右读一下这四页，把需要修改的地方指出来吧。",
+    "channel": "email",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘请您’와 ‘吧’로 어조는 누그러뜨렸지만, 아직 합의하지 않은 팀장의 30분 검토를 수행할 일로 제시하여 시간 배정 여부를 조정할 여지가 부족하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "문장 끝의 ‘吧’가 어조를 누그러뜨리는 구어 표지라, 팀장에게 보내는 업무 이메일에서는 격식이 낮게 들릴 수 있기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘这是星期五要提交的客户提案初稿’로 문서 설명을 먼저 두고 부탁은 두 번째 문장에 와서, 첫 문장만 읽으면 검토 요청인지 제출 보고인지 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "请您抽三十分钟左右",
+      "把需要修改的地方指出来吧"
+    ],
+    "item_focus": "request_mitigation_optionality",
+    "relation_ko": "두 달간 함께 일하며 내 업무를 배정해 온 팀장",
+    "axis_feature": "request_mitigation_optionality",
+    "situation_ko": "나는 지난 두 달간 내 업무를 배정해 온 팀장에게 고객 제안서 초안을 보내려 한다. 금요일 제출 전에 네 쪽의 내용을 읽고 수정할 부분을 짚어 주는 데 30분 정도를 내 달라고 요청하려 한다.",
+    "explanation_ko": "팀장에게 새로 30분 검토를 요청하는 상황에서 ‘请您…把…吧’는 완화된 어조로도 상대가 그 일을 수행할 것을 전제합니다. 문제는 ‘指出来’의 의미나 문법이 아니라 시간 배정을 당연시하는 요청 강도이므로, ‘您看方便吗’처럼 검토 가능 여부에 답할 여지를 주어야 합니다. ‘请您’와 ‘吧’가 함께 있다는 사실만으로 지나치게 우회적인 요청이 되는 것은 아닙니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_direct",
+    "accepted_reason_id": "r3",
+    "recommended_example": "这是星期五要提交的客户提案初稿。想请您抽三十分钟左右读一下这四页，并指出需要修改的地方，您看方便吗？"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 요청 표현이 실제 상황의 부담과 관계에 맞는 완화·선택권 대역을 적절히 구분하고, 오답도 현실적 경계 사례로 구성되어 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T06:32:31.799Z",
+      "mission_content_hash": "f57fca13484b87caa7e2eb6d4f81f360416539b093484c618cb4549f07ab9fee"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"금요일에 제출할 고객 제안서 초안입니다. 네…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"금요일에 제출할 고객 제안서 초안입니다. 네…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"这是星期五要提交的客户提案初稿。请您抽三十分钟左…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"这是星期五要提交的客户提案初稿。请您抽三十分钟左…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

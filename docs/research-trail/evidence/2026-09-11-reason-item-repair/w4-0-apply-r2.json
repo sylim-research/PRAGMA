@@ -1,0 +1,133 @@
+{
+  "at": "2026-09-11T05:38:11.291Z",
+  "key": "w4-0",
+  "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+  "outcome": "revised",
+  "replaced": [
+    "r1",
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "발표 자료에서 절차를 설명한 부분이 정말 잘 정리됐네요. 복잡한 실험 절차를 세 단계로 나눠 놓으니 이해하기 쉬워요.",
+    "target": "只说资料里讲步骤的这部分，简直完美。复杂的实验流程分成三步，很容易理解。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘简直完美’는 범위를 해당 부분으로 한정했더라도 완벽성을 단정하므로, 몇 번 교류한 동료에게 이해하기 쉬웠다는 관찰을 전하기에는 평가가 지나치게 강하다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘只说…这部分’는 칭찬을 일부에만 한정하므로, 자료의 나머지 부분은 좋지 않다는 부정적 평가를 전달한다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘很容易理解’는 자료의 설명이 아니라 실험 자체가 쉽다는 뜻이므로, 복잡한 실험 절차라는 원문의 내용을 바꾼다."
+      }
+    ],
+    "highlights": [
+      "简直完美"
+    ],
+    "item_focus": "compliment_grounding_sensitivity",
+    "relation_ko": "몇 번 함께 공부한 스터디 동료",
+    "axis_feature": "compliment_grounding_sensitivity",
+    "situation_ko": "나는 몇 번 함께 공부한 스터디 동료가 메신저로 보낸 발표 자료를 읽었다. 복잡한 실험 절차를 세 단계로 나눠 이해하기 쉽게 정리한 점을 그 동료에게 개인 메시지로 칭찬하려 한다.",
+    "explanation_ko": "몇 번 교류한 동료에게는 ‘简直完美’의 완벽성 단정이 관찰한 명료성보다 강하게 들리는 것이 주된 문제입니다. ‘只说…这部分’라는 범위 한정은 실제로 있고, 문맥상 ‘很容易理解’도 정리된 설명을 이해하기 쉽다는 뜻이므로 나머지 부분에 대한 비판이나 의미 오류가 핵심은 아닙니다. 평가를 ‘写得很清楚’로 조정하면 근거 있는 인정은 유지하면서 과장된 인상을 줄일 수 있습니다.",
+    "preceding_turn": null,
+    "problem_band_code": "overreaching",
+    "accepted_reason_id": "r3",
+    "recommended_example": "资料里讲步骤的这部分写得很清楚。复杂的实验流程分成三步，很容易理解。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "equal",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "발표 자료에서 절차를 설명한 부분이 정말 잘 정리됐네요. 복잡한 실험 절차를 세 단계로 나눠 놓으니 이해하기 쉬워요.",
+    "target": "只说资料里讲步骤的这部分，简直完美。复杂的实验流程分成三步，很容易理解。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘简直完美’는 범위를 해당 부분으로 한정했더라도 완벽성을 단정하므로, 몇 번 교류한 동료에게 이해하기 쉬웠다는 관찰을 전하기에는 평가가 지나치게 강하다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘只说…这部分’로 칭찬 범위를 한 부분에 한정해, 자료의 나머지에 대한 평가는 유보한 것처럼 들릴 수 있기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘复杂的实验流程分成三步’가 자료 안의 정리를 말하는지 다시 밝히지 않아, 앞 문장을 놓치면 칭찬 대상이 자료인지 바로 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "简直完美"
+    ],
+    "item_focus": "compliment_grounding_sensitivity",
+    "relation_ko": "몇 번 함께 공부한 스터디 동료",
+    "axis_feature": "compliment_grounding_sensitivity",
+    "situation_ko": "나는 몇 번 함께 공부한 스터디 동료가 메신저로 보낸 발표 자료를 읽었다. 복잡한 실험 절차를 세 단계로 나눠 이해하기 쉽게 정리한 점을 그 동료에게 개인 메시지로 칭찬하려 한다.",
+    "explanation_ko": "몇 번 교류한 동료에게는 ‘简直完美’의 완벽성 단정이 관찰한 명료성보다 강하게 들리는 것이 주된 문제입니다. ‘只说…这部分’라는 범위 한정은 실제로 있고, 문맥상 ‘很容易理解’도 정리된 설명을 이해하기 쉽다는 뜻이므로 나머지 부분에 대한 비판이나 의미 오류가 핵심은 아닙니다. 평가를 ‘写得很清楚’로 조정하면 근거 있는 인정은 유지하면서 과장된 인상을 줄일 수 있습니다.",
+    "preceding_turn": null,
+    "problem_band_code": "overreaching",
+    "accepted_reason_id": "r3",
+    "recommended_example": "资料里讲步骤的这部分写得很清楚。复杂的实验流程分成三步，很容易理解。"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 칭찬의 강도와 범위, 근거에 맞는 적정·비적정 대역을 정확히 구별하며, 극단적 오답이나 화용 초점 외의 혼동 없이 실제로 쓸 법한 문장만 제시됨.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T05:38:10.925Z",
+      "mission_content_hash": "14d1319416ee261146b95b15149b779d809cd6807d50bc4ffa3e7c7e47ccc6cf"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"발표 자료에서 절차를 설명한 부분이 정말 잘…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"발표 자료에서 절차를 설명한 부분이 정말 잘…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"只说资料里讲步骤的这部分,简直完美。复杂的实验流…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"只说资料里讲步骤的这部分,简直完美。复杂的实验流…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

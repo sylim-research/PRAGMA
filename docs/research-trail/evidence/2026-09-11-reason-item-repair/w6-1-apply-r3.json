@@ -1,0 +1,141 @@
+{
+  "at": "2026-09-11T06:25:45.451Z",
+  "key": "w6-1",
+  "scenario_id": "700f0bdd-54f7-4192-80e4-07dcd262e2de",
+  "outcome": "revised",
+  "replaced": [
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "안 됩니다. 그날 이미 잡힌 고객 방문이 있어서 다음 주 회의에서 20분간 신제품을 시연할 수 없습니다. 다른 분께 부탁하시는 게 좋겠습니다.",
+    "target": "不行。那天我已经安排了客户拜访，没法在下周会上做二十分钟的新产品演示。你还是找别人吧。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "일정 이유는 설명했지만, ‘不行’으로 시작해 ‘你还是找别人吧’로 끝내어 팀장의 재배정 부담을 가볍게 넘기는 인상을 주기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘你还是找别人吧’에서 다른 사람에게 맡기자는 제안 자체가 팀장의 업무 배정 권한을 침해하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘下周会上’라는 표현이 시연뿐 아니라 다음 주 회의 참석 전체를 거절하는 뜻으로 범위를 넓혔기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "你还是找别人吧"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "여러 차례 함께 일했고 내 업무를 배정하고 평가하는 팀장",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 함께 일해 온 팀장에게 다음 주 회의에서 20분간 신제품을 시연해 달라는 요청을 받았다. 그날 이미 잡힌 고객 방문과 겹쳐 팀장이 다른 시연자를 구해야 하지만, 요청을 거절하려 한다.",
+    "explanation_ko": "팀장이 다른 시연자를 구해야 하는 상황에서, ‘不行’과 ‘你还是找别人吧’의 결합은 이유 설명이 있어도 재배정 부담을 가볍게 돌려주는 인상을 준다. 다른 사람에게 부탁하자는 제안 자체가 권한 침해인 것은 아니며, ‘做二十分钟的新产品演示’가 거절 대상을 명시하므로 회의 전체를 거절한 것도 아니다. 주된 문제는 거절 내용이 아니라 전달 방식이므로, 유감을 짧게 표시하고 대안을 제안형으로 조정하면 된다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r3",
+    "recommended_example": "不好意思，那天我已经安排了客户拜访，没法在下周会上做二十分钟的新产品演示。还是请别人来做比较合适。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "안 됩니다. 그날 이미 잡힌 고객 방문이 있어서 다음 주 회의에서 20분간 신제품을 시연할 수 없습니다. 다른 분께 부탁하시는 게 좋겠습니다.",
+    "target": "不行。那天我已经安排了客户拜访，没法在下周会上做二十分钟的新产品演示。你还是找别人吧。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "일정 이유는 설명했지만, ‘不行’으로 시작해 ‘你还是找别人吧’로 끝내어 팀장의 재배정 부담을 가볍게 넘기는 인상을 주기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘你还是找别人吧’에서 다른 사람에게 맡기자는 제안 자체가 팀장의 업무 배정 권한을 침해하기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘那天’이 가리키는 날이 뒤의 ‘下周会上’에서야 나와, 첫 문장만 들으면 고객 방문이 언제인지 바로 드러나지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "你还是找别人吧"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "여러 차례 함께 일했고 내 업무를 배정하고 평가하는 팀장",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 함께 일해 온 팀장에게 다음 주 회의에서 20분간 신제품을 시연해 달라는 요청을 받았다. 그날 이미 잡힌 고객 방문과 겹쳐 팀장이 다른 시연자를 구해야 하지만, 요청을 거절하려 한다.",
+    "explanation_ko": "팀장이 다른 시연자를 구해야 하는 상황에서, ‘不行’과 ‘你还是找别人吧’의 결합은 이유 설명이 있어도 재배정 부담을 가볍게 돌려주는 인상을 준다. 다른 사람에게 부탁하자는 제안 자체가 권한 침해인 것은 아니며, ‘做二十分钟的新产品演示’가 거절 대상을 명시하므로 회의 전체를 거절한 것도 아니다. 주된 문제는 거절 내용이 아니라 전달 방식이므로, 유감을 짧게 표시하고 대안을 제안형으로 조정하면 된다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r3",
+    "recommended_example": "不好意思，那天我已经安排了客户拜访，没法在下周会上做二十分钟的新产品演示。还是请别人来做比较合适。"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "warning",
+      "summary_ko": "AI critic finding 1건의 현재 문항 근거를 확인하지 못해 격리했습니다.",
+      "findings": [
+        {
+          "code": "critic_grounding_failure",
+          "severity": "warning",
+          "where": "",
+          "note_ko": "현재 mission_content에 없는 경로입니다: mpj_items[5]"
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T06:25:44.735Z",
+      "mission_content_hash": "a24e4a39d8baaecaf47434d256d653fb965ec38717d4bb529838b5d85299d6b1"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"안 됩니다. 그날 이미 잡힌 고객 방문이 있…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"안 됩니다. 그날 이미 잡힌 고객 방문이 있…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行。那天我已经安排了客户拜访,没法在下周会上做…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行。那天我已经安排了客户拜访,没法在下周会上做…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}
