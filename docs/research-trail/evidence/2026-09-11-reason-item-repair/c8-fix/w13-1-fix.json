@@ -1,0 +1,68 @@
+{
+  "at": "2026-09-11T13:51:51.840Z",
+  "key": "w13-1",
+  "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+  "mode": "mission",
+  "changes": [
+    {
+      "path": "mpj_items[4].explanation_ko",
+      "before": "여러 번 함께 근무한 동급 동료에게 바로 옆의 여분 펜을 건네 달라는 것은 부담이 작은 부탁이며, ‘我这儿够不着’가 요청의 이유를 알려 줍니다. ‘能把旁边的一支备用笔递给我吗？’는 응답 여지를 주고, ‘麻烦你把旁边的一支备用笔递给我。’는 작은 수고를 인정하면서 행동을 명확히 하므로 두 방식 모두 동료 관계에 적절합니다. 이 간결함을 유지하되, ‘你得’로 의무를 부과하거나 ‘会不会让你为难？’로 작은 부탁을 과도하게 타진하지 않도록 합니다.",
+      "after": "여러 번 함께 근무한 동급 동료에게 바로 옆의 여분 펜을 건네 달라는 것은 부담이 작은 부탁이며, ‘我这儿够不着’가 요청의 이유를 알려 줍니다. ‘能把旁边那支备用笔递给我吗？’는 응답 여지를 주고, ‘麻烦你把旁边那支备用笔递给我。’는 작은 수고를 인정하면서 행동을 명확히 하므로 두 방식 모두 동료 관계에 적절합니다. 이 간결함을 유지하되, ‘你得’로 의무를 부과하거나 ‘会不会让你为难？’로 작은 부탁을 과도하게 타진하지 않도록 합니다."
+    }
+  ],
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\""
+      }
+    ],
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 요청 문항이 실제 맥락과 화용 초점에 맞게 설계되어 결함이 없다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "검토 내용(‘错别字’·‘漏掉的信息’)이 부탁 문장 뒤에 따로 나와, 무엇을 봐 달라는지가 첫 문장에서 드러나지 않기 때문이다.",
+          "note_ko": "r3(meaning_grammar_context)은 실제 target에서 검토 요청의 직접성/선택권 부족이 아니라 정보 순서 문제를 주원인으로 제시하고 있다. 그러나 target은 검토 항목이 두 번째 문장에 나와도 요청의 직접성/선택권이 부족한 것이 핵심 문제이므로, 이 선택지는 실제 주원인과 동등하거나 더 큰 문제로 제시되어 primary_reason_ambiguity에 해당한다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T13:51:51.488Z",
+      "mission_content_hash": "34a2e6456da3b98d82a1c04e356213ed00a54341ef1901555b9b394014d775d7"
+    },
+    "reason_findings": 1
+  },
+  "scope": "Mission-level local fix through reviseMissionDraft; not instructor approval."
+}

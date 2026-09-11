@@ -1,0 +1,158 @@
+{
+  "at": "2026-09-11T13:53:19.246Z",
+  "criteria_version": "content_review_v3",
+  "policy": "focused_v1",
+  "scope": "Frozen 20 course cells re-reviewed on new v3 rows; v2 rows preserved untouched. w6-1 canonical = 09bc6c81 (corrected core, regenerated mission, round8 Reason fix); 700f0bdd excluded and preserved (not archived). C7 update: w12-0, w6-1, w10-0 moved to corrected core rows (origins preserved, not archived). C8 update (final three, researcher ruling 2026-09-11 night): w5-1 moved to corrected core row d56896f5 (pdr.r mid→high; origin 793a1576 preserved, not archived); w12-0 and w13-1 revised in place (new content_hash).",
+  "rows": [
+    {
+      "key": "w2-0",
+      "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+      "production_verdict": "pass",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w2-1",
+      "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+      "production_verdict": "pass",
+      "lineage_versions": 2
+    },
+    {
+      "key": "w3-0",
+      "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+      "production_verdict": "pass",
+      "lineage_versions": 3
+    },
+    {
+      "key": "w3-1",
+      "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+      "production_verdict": "pass",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w4-0",
+      "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+      "production_verdict": "pass",
+      "lineage_versions": 2
+    },
+    {
+      "key": "w4-1",
+      "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+      "production_verdict": "pass",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w5-0",
+      "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+      "production_verdict": "fail",
+      "lineage_versions": 6
+    },
+    {
+      "key": "w5-1",
+      "scenario_id": "d56896f5-0d0e-4ec4-8e04-c2270baad51a",
+      "production_verdict": "fail",
+      "lineage_versions": 4,
+      "superseded_scenario_id": "793a1576-55c4-4790-9791-621685a9b3bb",
+      "note": "core-level fix 2026-09-11 (C8): pdr.r mid→high on a corrected core row + transplanted mission; MPJ1–4 labels aligned"
+    },
+    {
+      "key": "w6-0",
+      "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+      "production_verdict": "fail",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w6-1",
+      "scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+      "production_verdict": "pass",
+      "lineage_versions": 2,
+      "superseded_scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
+      "note": "core-level fix 2026-09-11 (C7): corrected core row + transplanted mission"
+    },
+    {
+      "key": "w9-0",
+      "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+      "production_verdict": "pass",
+      "lineage_versions": 5
+    },
+    {
+      "key": "w9-1",
+      "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+      "production_verdict": "pass",
+      "lineage_versions": 3
+    },
+    {
+      "key": "w10-0",
+      "scenario_id": "1baacb9c-735d-4c29-a26e-b57ab6cf19d5",
+      "production_verdict": "fail",
+      "lineage_versions": 5,
+      "superseded_scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+      "note": "core-level fix 2026-09-11 (C7): corrected core row + transplanted mission"
+    },
+    {
+      "key": "w10-1",
+      "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+      "production_verdict": "pass",
+      "lineage_versions": 3
+    },
+    {
+      "key": "w11-0",
+      "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+      "production_verdict": "pass",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w11-1",
+      "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+      "production_verdict": "pass",
+      "lineage_versions": 4
+    },
+    {
+      "key": "w12-0",
+      "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+      "production_verdict": "fail",
+      "lineage_versions": 5,
+      "superseded_scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+      "note": "core-level fix 2026-09-11 (C7): corrected core row + transplanted mission"
+    },
+    {
+      "key": "w12-1",
+      "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+      "production_verdict": "pass",
+      "lineage_versions": 3
+    },
+    {
+      "key": "w13-0",
+      "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+      "production_verdict": "pass",
+      "lineage_versions": 2
+    },
+    {
+      "key": "w13-1",
+      "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+      "production_verdict": "fail",
+      "lineage_versions": 5
+    }
+  ],
+  "excluded": [
+    {
+      "key": "w6-1(old)",
+      "scenario_id": "700f0bdd-54f7-4192-80e4-07dcd262e2de",
+      "reason": "superseded by 09bc6c81; preserved, archive later by separate approval"
+    },
+    {
+      "key": "w12-0(pre-C7)",
+      "scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+      "reason": "superseded by 97c4834a-ee4a-4691-a042-0255c8fadc4b; preserved, archive later by separate approval"
+    },
+    {
+      "key": "w6-1(pre-C7)",
+      "scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
+      "reason": "superseded by 34e8b1fd-8ad3-4095-aed4-467b7b2b8510; preserved, archive later by separate approval"
+    },
+    {
+      "key": "w10-0(pre-C7)",
+      "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+      "reason": "superseded by 1baacb9c-735d-4c29-a26e-b57ab6cf19d5; preserved, archive later by separate approval"
+    }
+  ]
+}

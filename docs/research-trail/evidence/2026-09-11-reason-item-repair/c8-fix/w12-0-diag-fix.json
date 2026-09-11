@@ -1,0 +1,70 @@
+{
+  "at": "2026-09-11T14:17:10.479Z",
+  "key": "w12-0",
+  "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+  "mode": "mission",
+  "changes": [
+    {
+      "path": "diagnostic_dimensions[force_calibration].evidence_ko",
+      "before": "확인된 예약 실수에 책임을 직접 귀속하는 표현, 회의실 초과 사용에서 일정 문제 전반으로 책임을 넓히는 표현, 작은 안내 오류를 심각한 운영상 누락으로 평가하는 표현을 대비한다.",
+      "after": "확인된 예약 실수에 책임을 직접 귀속하는 표현, 회의실 초과 사용의 모든 원인을 상대 개인에게 몰아 붙이는 표현, 작은 안내 오류의 책임을 ‘都是因为你…害得’로 추궁하는 표현을 대비한다."
+    }
+  ],
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\""
+      }
+    ],
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 후보가 실제로 쓸 법하며, 대역 구분과 해설, 장면 설명이 일관되고 적절하다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다.",
+          "note_ko": "r3(meaning_grammar_context)은 실제 target의 문제점(책임 귀속의 과도함)과 무관하게, 정보 배열상의 모호함을 주원인으로 제시하고 있다. 그러나 target은 실제로 책임 귀속의 과도함이 문제이며, 정보 배열은 부차적이거나 별개의 차원이다. 이 선택지는 주원인과 무관한 이유를 정답과 같은 강도로 주장하므로 primary_reason_ambiguity에 해당한다."
+        },
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[2]",
+          "evidence_excerpt": "‘以后能不能在我预约的时间把会议室空出来？’로 불만 뒤에 재발 방지 요구까지 덧붙여, 동료에게 요구하는 것이 지나치게 많아지기 때문이다.",
+          "note_ko": "r1(pragmatic_misconception)은 target에 실제로 존재하는 재발 방지 요구가 문제의 핵심 원인이 아님에도, 요구의 양이 많아진 것을 주원인으로 제시한다. 그러나 target의 문제는 책임 귀속의 과도함(‘都是因为你…才’)에 있으며, 재발 방지 요구는 원문의 의도와 상황에 부합한다. 이 선택지는 주원인과 무관한 이유를 정답과 같은 강도로 주장하므로 primary_reason_ambiguity에 해당한다."
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T14:17:10.050Z",
+      "mission_content_hash": "d19ec334734b808f327dfc2651872dd39197671ce03b24600e8469f34082d156"
+    },
+    "reason_findings": 2
+  },
+  "scope": "Follow-up to c8-fix w12-0: diagnostic evidence aligned with the emphasis-only over_attributed devices; not instructor approval."
+}
