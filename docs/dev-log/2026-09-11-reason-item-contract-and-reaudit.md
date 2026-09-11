@@ -594,3 +594,43 @@ production gate fail 4건은 모두 Reason 오답 critic note의 자기모순 �
 - **w13-1 해설 잔존물**: 콘텐츠 추가 수정 금지 지시에 따라 고치지 않았다. 교수자 승인 전 한 곳 수정 여부는 연구자 결정.
 
 교수자 승인·편성은 실행하지 않았다.
+
+## 19. 마지막 3건(C8) — 연구자 판정 반영 · 재검수 · 2026-09-11 심야
+
+연구자(fable) 판정: ①w12-0 「问题都在你这边」 유형 제거(의미 보존 > 자연성 > 화용 — 원문에 없는 책임 귀속은 화용 조작 범위를 넘는 의미 추가) ②w5-1 R=mid→**high**(부담은 강평만이 아니라 토요일 오전 교외 이동·참석·강평 전체 행위) ③w13-1 해설 stale reference 정정. 3건 외 17건 수정 금지, 계약·critic·policy 불변, revision 경로, 3건만 production gate + focused_v1 공식 검수, 승인·편성 금지. 도구 = `c8-fix/content-fix.ts`(mission w12-0·w13-1 / core w5-1)·`c8-fix/w12-0-diag-fix.ts`, 결과 `c8-fix/<key>-fix.json`, manifest `v3-manifest-after-c8.json`, DB 실측 `v3-content-review-runs-after-c8.json`.
+
+### 3건 before → after
+
+| key | 행 | 수정 |
+|---|---|---|
+| w12-0 | 97c4834a(제자리, 새 hash 0c0552ac → 79a3fd93) | MPJ2·3·4 앵커 「…这次日程安排上的问题都在你这边，…」 삭제 → 「**都是因为你**在我预约的时段还一直用着会议室，我们的会议**才**晚开了三十分钟，…」(원문 명제만, 책임 강조로 over_attributed) · highlights 동기화 · MPJ3·4 교정안 3 「根本没把我的预约当回事」(같은 유형: 원문 없는 태도 귀속) → 「导致」를 「**害得**」로 · MPJ5 후보 4 「这是一次严重的通知失误」 삭제 → 「都是因为你把通知里的房间号写错了，害得我先去了隔壁，晚到了三分钟。这个错误的通知让我很不方便。」 · MPJ2 해설, MPJ3·4 해설·교정안 주석, MPJ5 해설·주석 정렬 · Reason r2(정답) 문구 갱신, r1은 새 앵커에서 정답과 겹치므로 「재발 방지 요구까지 덧붙여 요구가 많다」는 오개념으로 교체 · **후속** diagnostic_dimensions[force_calibration].evidence_ko의 옛 장치 언급 정렬(1차 재검수 claude-4가 잡은 내 잔존물) |
+| w5-1 | 793a1576 → **새 코어 행 d56896f5**(hash f5f1bd75) | core.pdr.r mid→high(장면·원문 불변, 코어 의미 검사 pass: 「교외 행사 참석과 강평 요청은 교수에게 시간과 노력이 드는 high 부담」) · 미션 이식 후 production_task.pdr.r high · **규칙 연쇄**: R23(production=core)·R2/R3/R4(MPJ2~4=production)·R27(MPJ1은 한 축만 다름)이 전부 fail 등급이라 MPJ1~4 라벨도 high(MPJ5 low 유지 = R 한 축 대비) · MPJ2 해설 「보통 부담」 → 「주말에 시간을 내야 하는 부담」 · scene_plan(observed_pdr=mid)은 생성 기록이라 두고 local_revision에 사유 기재 |
+| w13-1 | 26412ba9(제자리, hash 3fb2a5cf) | MPJ5 해설 인용 「旁边的一支备用笔」×2 → 「旁边那支备用笔」 |
+
+원본 보존(읽기 전용 확인): 793a1576·013cc144·09bc6c81·1f6d8863·700f0bdd 모두 `generated`, archived_at null, v2·v3 검수 행 그대로.
+
+### production gate(reviseMissionDraft, critic 재사용 없음): **3/3 fail**, 전부 Reason 오답
+
+- w12-0: r3(정보 배열) + r1(재발 방지 요구) — 1차에서는 r3만 fail이었고 그 note가 「fail은 아니고 … 경고를 남긴다」고 쓰면서 severity=fail인 자기모순. 후속 수정본에서는 둘 다 「주원인과 무관한 이유를 정답과 같은 강도로 주장」.
+- w5-1: r3(초대 표현 위치) — C7과 같은 패턴(「주원인과 무관」이면서 「구별되는 부차적 이유가 되지 못함」).
+- w13-1: r3(정보 순서) — C7과 같음.
+- 규칙 검사는 warning만(R5 길이 단서·R19 앵커 source/target 중복 — 구조상 항상 나오는 것).
+
+### 공식 content-review(focused_v1, v3): **professor-ready 3/3 → 20/20**
+
+| key | rules | Claude | adjudication |
+|---|---|---|---|
+| w12-0(79a3fd93) | warning | warning 3 | accept 2·refine 1 |
+| w5-1(f5f1bd75) | warning | warning 2 | refine 1·accept 1 |
+| w13-1(3fb2a5cf) | warning | warning 2 | accept 2 |
+
+`v3-verify`: v3 행 26(대상 20 전부, 옛 hash 행 보존), v2 17, professor_ready 26/26, approved 0, openai_review 0.
+
+### 남은 finding(전부 warning, Claude fail 0)
+
+- **w12-0** claude-1 MPJ5 후보 4 주석이 「내용을 더하지 않았다」지만 「有些不便→很不方便」로 불편 강도를 키움(accept — 강조 조절이 곧 의도이나 주석 문구는 교수자 판단) · claude-2 MPJ5 해설의 「동료 관계」(장면은 동아리 회원, 기존 문구, accept) · claude-3 「这个通知错误」 명사구 어색(기존, refine·교수자 확인). 1차(0c0552ac)에서 나온 것 중 유지되는 기존 사항: MPJ4 해설이 MPJ3과 동일·MPJ4에 corrections 복제(생성기 구조, accept) · **MPJ5 후보 3 「虽然只晚到了三分钟」이 원문 없는 축소 평가인데 within_band**(refine·교수자 확인 — 같은 「원문 없는 평가」 유형이라 연구자 판단 필요).
+- **w5-1** claude-1 **MPJ1~4 라벨 high가 장면 사실(회사 근처·90분·무료)에 비해 과함, MPJ5 low와의 대비가 mid 없이 과장**(refine·교수자 확인) — 규칙상 라벨을 코어와 따로 둘 수 없으므로 선택지는 라벨 유지 / 코어 R 원복 / MPJ 장면 재생성(금지 중) 셋뿐, 연구자 결정 · claude-2 scene_plan observed_pdr=mid와 최종 high 상충(accept — 생성 기록을 고치지 않은 결과, local_revision에 사유 있음).
+- **w13-1** claude-1 앵커가 원문도 직접 요청인데 too_direct(기존, accept·교수자 확인) · claude-2 후보 4 구조 어색(기존, accept·교수자 확인). C7의 「的一支」 잔존물 지적은 사라짐.
+- production gate fail 3건(위).
+
+교수자 승인·편성·override 실행 안 함. **콘텐츠 수정은 이 3건으로 종료.**
