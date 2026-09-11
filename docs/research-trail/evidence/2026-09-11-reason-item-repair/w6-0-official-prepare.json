@@ -1,14 +1,11 @@
 {
-  "at": "2026-09-11T13:27:01.275Z",
+  "at": "2026-09-11T15:21:35.915Z",
   "key": "w6-0",
   "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
   "mode": "prepare",
   "status": "ready",
   "message": "AI 검토 완료 · 교수자 판단 대기",
-  "stages_run": [
-    "rules",
-    "finalization"
-  ],
+  "stages_run": [],
   "contentHash": "c606245deb82c838f11a61cd0c18b8e90970f6b0492a3df468aa38974e0c0acc",
   "run": {
     "id": "9984e588-c349-43aa-a523-eecfa0ec482d",
@@ -19,9 +16,16 @@
     "generation_quality": true,
     "generation_quality_verdict": "pass",
     "openai_review": null,
-    "independent_review_requested": false,
-    "claude_review": null,
-    "adjudication": null,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "warning",
+      "findings": 2,
+      "model": "claude-opus-5"
+    },
+    "adjudication": {
+      "decisions": 2,
+      "model": "gpt-4.1-2025-04-14"
+    },
     "prepared_finalization": true,
     "running_stage": null,
     "last_error": null,
@@ -30,6 +34,8 @@
     "steps": [
       "rules",
       "openai",
+      "claude",
+      "adjudication",
       "finalization",
       "professor"
     ]
