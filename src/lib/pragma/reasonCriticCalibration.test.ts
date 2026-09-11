@@ -1,32 +1,46 @@
 import { describe, expect, it } from "vitest";
-import { calibrateReasonSeverity, REASON_BRANCHES } from "../../../supabase/functions/_shared/reasonCriticCalibration";
+import { calibrateReasonFinding, REASON_COMPETITION } from "../../../supabase/functions/_shared/reasonCriticCalibration";
 import { MISSION_CONSISTENCY_RESPONSE_FORMAT } from "../../../supabase/functions/_shared/missionConsistency";
 
-describe("primary_reason_ambiguity severity follows the critic's ⑨ branch", () => {
-  it("keeps real reason defects as fail regardless of the reported severity", () => {
-    for (const branch of ["false_premise", "paraphrase_of_primary", "competing_clear", "primary_off_focus", "not_a_reason"]) {
-      expect(calibrateReasonSeverity("fail", branch)).toEqual({ severity: "fail", prefix: "" });
-      expect(calibrateReasonSeverity("warning", branch)).toEqual({ severity: "fail", prefix: "" });
-    }
+const mission = {
+  mpj_items: [
+    { type: "scale4" },
+    { type: "judge3" },
+    { type: "fix_choice" },
+    { type: "reason", accepted_reason_id: "r2", reasons: [{ id: "r3" }, { id: "r1" }, { id: "r2" }] },
+  ],
+};
+const onDistractor = (severity: "warning" | "fail", facts: Record<string, unknown>) =>
+  calibrateReasonFinding(mission, "mpj_items[3].reasons[0]", severity, facts);
+
+describe("primary_reason_ambiguity severity on a distractor follows two facts", () => {
+  it("keeps a false premise and a clear competition as fail", () => {
+    expect(onDistractor("warning", { reason_observation_present: false, reason_competition: "none" })).toEqual({ severity: "fail", prefix: "[reason_false_premise] " });
+    expect(onDistractor("warning", { reason_observation_present: true, reason_competition: "clear" })).toEqual({ severity: "fail", prefix: "[reason_competes_clear] " });
   });
 
-  it("does not let a secondary distractor surface as a content fail", () => {
-    expect(calibrateReasonSeverity("fail", "secondary")).toEqual({ severity: "warning", prefix: "[critic_reason_secondary_calibrated] " });
+  it("does not let a true, non-competing distractor surface as a content fail", () => {
+    expect(onDistractor("fail", { reason_observation_present: true, reason_competition: "none" })).toEqual({ severity: "warning", prefix: "[critic_reason_secondary_calibrated] " });
   });
 
-  it("treats a possible competition as a warning", () => {
-    expect(calibrateReasonSeverity("fail", "competing_possible")).toEqual({ severity: "warning", prefix: "" });
+  it("treats a possible competition as a warning and never blocks on missing facts", () => {
+    expect(onDistractor("fail", { reason_observation_present: true, reason_competition: "possible" })).toEqual({ severity: "warning", prefix: "[reason_competes_possible] " });
+    expect(onDistractor("fail", {})).toEqual({ severity: "warning", prefix: "[critic_reason_facts_missing] " });
   });
 
-  it("downgrades an unclassified fail and marks it", () => {
-    expect(calibrateReasonSeverity("fail", "")).toEqual({ severity: "warning", prefix: "[critic_reason_branch_missing] " });
-    expect(calibrateReasonSeverity("fail", undefined)).toEqual({ severity: "warning", prefix: "[critic_reason_branch_missing] " });
-    expect(calibrateReasonSeverity("warning", "unknown")).toEqual({ severity: "warning", prefix: "" });
+  it("matches a path that continues into the option text", () => {
+    expect(calibrateReasonFinding(mission, "mpj_items[3].reasons[1].text_ko", "fail", { reason_observation_present: true, reason_competition: "none" }).severity).toBe("warning");
   });
 
-  it("asks the consistency audit for the same branch field", () => {
-    const item = (MISSION_CONSISTENCY_RESPONSE_FORMAT.json_schema.schema.properties as Record<string, { items: { required: string[]; properties: Record<string, { enum?: string[] }> } }>).reason_findings.items;
-    expect(item.required).toContain("reason_branch");
-    expect(item.properties.reason_branch.enum).toEqual(["", ...REASON_BRANCHES]);
+  it("keeps the critic's severity for the primary option and the item as a whole", () => {
+    expect(calibrateReasonFinding(mission, "mpj_items[3].reasons[2]", "fail", { reason_observation_present: true, reason_competition: "none" })).toEqual({ severity: "fail", prefix: "" });
+    expect(calibrateReasonFinding(mission, "mpj_items[3].accepted_reason_id", "fail", {})).toEqual({ severity: "fail", prefix: "" });
+  });
+
+  it("asks the consistency audit for the same two facts", () => {
+    const item = (MISSION_CONSISTENCY_RESPONSE_FORMAT.json_schema.schema.properties as Record<string, { items: { required: string[]; properties: Record<string, { enum?: string[]; type?: unknown }> } }>).reason_findings.items;
+    expect(item.required).toEqual(expect.arrayContaining(["reason_observation_present", "reason_competition"]));
+    expect(item.properties.reason_competition.enum).toEqual(["", ...REASON_COMPETITION]);
+    expect(item.properties.reason_observation_present.type).toEqual(["boolean", "null"]);
   });
 });

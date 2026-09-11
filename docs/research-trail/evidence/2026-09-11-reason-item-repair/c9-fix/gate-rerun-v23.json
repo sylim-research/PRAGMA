@@ -1,0 +1,237 @@
+{
+  "scope": "Production gate re-run after the quality_v23 critic deploy; content unchanged (empty-edit revision); not instructor approval.",
+  "results": {
+    "w2-0": {
+      "at": "2026-09-11T14:54:25.205Z",
+      "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "fail",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": [
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[0]",
+            "evidence_excerpt": "‘弄丢了’로 링크를 잃어버린 사정을 먼저 밝혀, 부탁의 이유 설명이 요청 자체보다 앞에 놓이기 때문이다.",
+            "note_ko": "이 선택지는 요청의 직접성/선택권 문제(완화와 선택권)와 무관하게, 이유 설명의 위치만을 언급하고 있다. 이는 실제로 요청이 너무 직접적이라는 주원인과 관련이 없으므로, 이유가 아닌 사실 확인에 해당한다. accepted_reason_id(r3)와 명확히 구별된다."
+          },
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[1]",
+            "evidence_excerpt": "‘那个链接’이 앞 문장의 링크를 받는 지시어라, 첫 문장을 읽지 않으면 무엇을 보내 달라는지 바로 드러나지 않기 때문이다.",
+            "note_ko": "이 선택지는 요청의 직접성/선택권 문제(완화와 선택권)와 무관하게, 지시어의 명확성만을 언급하고 있다. 이는 실제로 요청이 너무 직접적이라는 주원인과 관련이 없으므로, 이유가 아닌 사실 확인에 해당한다. accepted_reason_id(r3)와 명확히 구별된다."
+          }
+        ]
+      }
+    },
+    "w2-1": {
+      "at": "2026-09-11T14:54:28.945Z",
+      "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w3-0": {
+      "at": "2026-09-11T14:54:34.545Z",
+      "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "fail",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": [
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[0]",
+            "evidence_excerpt": "‘你抽出午休时间帮我修好了…图表’로 도움의 경위를 먼저 서술하고 감사 표현을 문장 끝에 두어, 첫 문장에서 감사보다 사실 확인이 먼저 들리기 때문이다.",
+            "note_ko": "이 선택지는 감사의 강도(축소)의 문제가 아니라 정보 순서와 사실 확인의 문제를 들어, 실제 주원인(감사의 크기를 낮춘 표현)과 초점이 다릅니다. 이는 의미·문맥 차원의 부차적 사실로, 주원인과 경합하거나 바꿔 말한 것이 아니므로 primary_off_focus에 해당합니다."
+          }
+        ]
+      }
+    },
+    "w3-1": {
+      "at": "2026-09-11T14:54:39.333Z",
+      "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w4-0": {
+      "at": "2026-09-11T14:54:42.911Z",
+      "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w4-1": {
+      "at": "2026-09-11T14:54:47.298Z",
+      "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w5-0": {
+      "at": "2026-09-11T14:54:53.088Z",
+      "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "fail",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": [
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[0].text_ko"
+          }
+        ]
+      },
+      "after": {
+        "verdict": "fail",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": [
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[0]",
+            "evidence_excerpt": "‘一起来看看…吧！’의 느낌표와 ‘吧’가 가벼운 권유 어조를 만들어, 업무로 몇 번 교류한 동료에게는 사적인 말투로 들릴 수 있기 때문이다.",
+            "note_ko": "r1은 실제 문제의 핵심(참석을 전제하여 선택권을 제한함)과 무관하게, 어조의 친근함이 문제라고 주장한다. 그러나 해당 표현은 초대 상황에서 자연스러운 권유 어조이며, 선택권 제한과 직접 관련이 없다. 실제 문제의 주원인은 참석을 전제하는 부분(‘我就按你会来安排了’)에 있다."
+          }
+        ]
+      }
+    },
+    "w6-0": {
+      "at": "2026-09-11T14:54:59.714Z",
+      "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "fail",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": [
+          {
+            "code": "primary_reason_ambiguity",
+            "severity": "fail",
+            "where": "mpj_items[3].reasons[0]",
+            "evidence_excerpt": "‘明天没办法…那一小时班’으로 날짜와 범위가 문장 끝에 와서, 무엇을 거절하는지가 끝에서야 드러나기 때문이다.",
+            "note_ko": "이 선택지는 실제로 target에 있는 정보 배열(날짜와 범위가 문장 끝에 위치함)을 근거로 들고 있으나, 이는 거절의 완충이나 대인 배려(즉, refusal_softening의 핵심 문제)가 아니라 정보의 배열·명확성에 관한 판단이다. 이 문항의 주원인은 단독 '不行'으로 부탁을 단칼에 닫아 대인 배려가 부족하다는 점이므로, 이 선택지는 초점이 다른 판단 차원(문장 구조/정보 배열)에 맞춰져 있어 정답과 경합하지 않지만, primary로 지정될 수 없는 이유에 해당한다."
+          }
+        ]
+      }
+    },
+    "w6-1": {
+      "at": "2026-09-11T14:55:03.165Z",
+      "scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w9-0": {
+      "at": "2026-09-11T14:55:07.064Z",
+      "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    },
+    "w9-1": {
+      "at": "2026-09-11T14:55:10.434Z",
+      "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+      "ok": true,
+      "error": null,
+      "rule": "warning",
+      "before": {
+        "verdict": "pass",
+        "prompt_version": "quality_v22_observed_pdr_scene",
+        "findings": []
+      },
+      "after": {
+        "verdict": "pass",
+        "prompt_version": "quality_v23_reason_branch_severity",
+        "findings": []
+      }
+    }
+  }
+}
