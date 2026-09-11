@@ -240,7 +240,7 @@ describe("prompt snapshot integrity", () => {
     expect(canonicalSource).toContain("verified_within_anchor");
     expect(canonicalSource).toContain("critic_self_contradiction_calibrated");
     expect(canonicalSource).toContain("normalizedPeers.has(normalizedReplacement)");
-    expect(canonicalSource).toContain("quality_consistency_v4_scene_reasons_feedback");
+    expect(canonicalSource).toContain("quality_consistency_v5_factual_reason_distractors");
     expect(canonicalSource).toContain("buildMissionConsistencyAuditPrompt");
     expect(canonicalSource).toContain("MISSION_CONSISTENCY_SECTIONS");
     expect(canonicalSource).toContain("canRepairSituation");
