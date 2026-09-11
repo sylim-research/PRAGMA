@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T11:06:49.996Z",
+  "at": "2026-09-11T12:08:48.804Z",
   "key": "w12-1",
   "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
   "contentHash": "f258c2522cfd665104358980abf03aea12d48de0c471d35fff97b246c4bd4506",
@@ -16,11 +16,11 @@
     "independent_review_requested": false,
     "claude_review": null,
     "adjudication": null,
-    "prepared_finalization": false,
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=因果_因为; mpj_items[2].corrections[2]: scope 밖 risk_id=과도한책임추궁; mpj_items[2].recommended_example: scope 밖 rule_id=因果_因为",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",

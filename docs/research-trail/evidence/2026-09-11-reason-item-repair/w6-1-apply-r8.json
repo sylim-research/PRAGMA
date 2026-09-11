@@ -1,0 +1,135 @@
+{
+  "at": "2026-09-11T12:01:28.124Z",
+  "key": "w6-1",
+  "scenario_id": "09bc6c81-0a33-4c3f-aca7-c668623ef6c5",
+  "outcome": "revised",
+  "replaced": [
+    "r1",
+    "r2"
+  ],
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "이번 주 매출 분석은 추가로 맡을 수 없습니다. 기존 보고서 마감을 맞춰야 하니 다른 분께 맡기는 게 좋겠습니다.",
+    "target": "不行，这周的销售分析我不能再接了。我得赶原来那份报告的截止时间，你还是找别人做吧。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "마감 이유는 있지만, ‘不行’으로 시작해 ‘你还是找别人做吧’로 끝내면서 업무를 재배정해야 할 팀장에게 처리를 돌려주며 대화를 닫는 인상이 강하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "기존 보고서 마감을 언급한 부분이 이번 요청의 중요성을 낮추므로, 이 장면에서는 마감 이유를 생략하는 것이 핵심이기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘再接’이 분석 업무를 이미 한 번 맡았다가 돌려준다는 뜻이어서, 추가 업무를 요청받은 상황과 맞지 않기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "你还是找别人做吧"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "내 업무를 지시하고 배정하며 여러 번 함께 일한 팀장",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 여러 번 함께 일한 팀장에게 이번 주 매출 분석을 추가로 맡아 달라는 요청을 받았다. 기존 보고서 마감 때문에 거절하려 하며, 팀장은 반나절 분량의 분석을 다른 직원에게 배정해야 한다.",
+    "explanation_ko": "현재 상대는 실제 업무 배정권이 있고 거절 이후 다른 담당자를 정해야 하는 팀장입니다. ‘不行’과 ‘你还是找别人做吧’의 결합이 조정에 필요한 배려를 충분히 전달하지 못하는 것이 주원인이며, 마감 이유 자체가 잘못되거나 ‘再接’이 업무를 반납했다는 뜻인 것은 아닙니다. 이유와 불가 결론은 유지하고, 다른 담당자 제안을 완충된 권고로 바꾸는 것이 적절합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r3",
+    "recommended_example": "不好意思，这周的销售分析我没法再接了，因为我得赶原来那份报告的截止时间。我觉得请别人来做会比较合适。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_lower",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "이번 주 매출 분석은 추가로 맡을 수 없습니다. 기존 보고서 마감을 맞춰야 하니 다른 분께 맡기는 게 좋겠습니다.",
+    "target": "不行，这周的销售分析我不能再接了。我得赶原来那份报告的截止时间，你还是找别人做吧。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "마감 이유는 있지만, ‘不行’으로 시작해 ‘你还是找别人做吧’로 끝내면서 업무를 재배정해야 할 팀장에게 처리를 돌려주며 대화를 닫는 인상이 강하기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘你’로 팀장을 부르고 ‘吧’로 문장을 맺어, 업무 배정권을 가진 상사에게 동료에게 하듯 편한 말투로 들릴 수 있기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘不能再接了’로 결론을 먼저 말하고 마감 사유 ‘我得赶…截止时间’을 뒤에 두어, 왜 안 되는지가 거절 다음에야 나오기 때문이다."
+      }
+    ],
+    "highlights": [
+      "不行",
+      "你还是找别人做吧"
+    ],
+    "item_focus": "refusal_softening",
+    "relation_ko": "내 업무를 지시하고 배정하며 여러 번 함께 일한 팀장",
+    "axis_feature": "refusal_softening",
+    "situation_ko": "나는 여러 번 함께 일한 팀장에게 이번 주 매출 분석을 추가로 맡아 달라는 요청을 받았다. 기존 보고서 마감 때문에 거절하려 하며, 팀장은 반나절 분량의 분석을 다른 직원에게 배정해야 한다.",
+    "explanation_ko": "현재 상대는 실제 업무 배정권이 있고 거절 이후 다른 담당자를 정해야 하는 팀장입니다. ‘不行’과 ‘你还是找别人做吧’의 결합이 조정에 필요한 배려를 충분히 전달하지 못하는 것이 주원인이며, 마감 이유 자체가 잘못되거나 ‘再接’이 업무를 반납했다는 뜻인 것은 아닙니다. 이유와 불가 결론은 유지하고, 다른 담당자 제안을 완충된 권고로 바꾸는 것이 적절합니다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_blunt",
+    "accepted_reason_id": "r3",
+    "recommended_example": "不好意思，这周的销售分析我没法再接了，因为我得赶原来那份报告的截止时间。我觉得请别人来做会比较合适。"
+  },
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 설계되어 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T12:01:27.567Z",
+      "mission_content_hash": "1ace0476d94bc4599e3d4929746882242f9cbad80a58ac7b666e6d39ae0180ec"
+    },
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\""
+      }
+    ]
+  },
+  "scope": "Human-authored distractor replacement through the existing AI-revision path; not instructor approval."
+}

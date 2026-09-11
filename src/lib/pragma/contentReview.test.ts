@@ -264,7 +264,7 @@ describe("current content five-stage review", () => {
     expect(request.output_config.format.schema.properties.findings.items.properties.where.enum).toContain("/content/source");
     expect(request.messages[0].content).not.toContain("OPENAI_PRIVATE_VERDICT");
     expect(result).toMatchObject({ result: { ...output, findings: [{ ...finding, id: "claude-1" }] }, raw_result: output,
-      prompt_version: "content_review_v2:claude", output_format_version: "evidence_refs_v2", model: "claude-opus-5", usage: { input_tokens: 100, output_tokens: 200 },
+      prompt_version: "content_review_v3:claude", output_format_version: "evidence_refs_v2", model: "claude-opus-5", usage: { input_tokens: 100, output_tokens: 200 },
       request_parameters: { max_tokens: 7000, timeout_ms: 130_000, effort: "medium" } });
     expect(JSON.stringify(result)).not.toContain("private");
     expect(fetcher).toHaveBeenCalledTimes(1);

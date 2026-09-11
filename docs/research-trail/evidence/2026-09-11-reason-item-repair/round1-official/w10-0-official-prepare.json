@@ -1,0 +1,38 @@
+{
+  "at": "2026-09-11T10:47:33.492Z",
+  "key": "w10-0",
+  "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+  "mode": "prepare",
+  "status": "held",
+  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=rule_ask_opinion; mpj_items[2].corrections[1]: scope 밖 risk_id=risk_too_directive; mpj_items[2].corrections[2]: scope 밖 risk_id=risk_too_tentative; mpj_items[2].recommended_example: scope 밖 rule_id=rule_ask_opinion",
+  "stages_run": [
+    "rules",
+    "finalization"
+  ],
+  "contentHash": "25612a7a7a0bc4dbde08195a857fd9ba5cd2ab3ed1c5e6895a460907240c4a6a",
+  "run": {
+    "id": "ec56d138-5137-432a-97fc-4bc5cf478149",
+    "content_hash": "25612a7a7a0bc4dbde08195a857fd9ba5cd2ab3ed1c5e6895a460907240c4a6a",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "fail",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": false,
+    "running_stage": null,
+    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=rule_ask_opinion; mpj_items[2].corrections[1]: scope 밖 risk_id=risk_too_directive; mpj_items[2].corrections[2]: scope 밖 risk_id=risk_too_tentative; mpj_items[2].recommended_example: scope 밖 rule_id=rule_ask_opinion",
+    "approved_at": null,
+    "next_stage": "finalization",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}

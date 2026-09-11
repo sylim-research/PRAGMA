@@ -1,0 +1,225 @@
+{
+  "at": "2026-09-11T12:15:53.585Z",
+  "rows": [
+    {
+      "key": "w2-0",
+      "scenario_id": "4eac0623",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w2-1",
+      "scenario_id": "63071ac4",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 2,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w3-0",
+      "scenario_id": "d1a90772",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 3,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w3-1",
+      "scenario_id": "ebc4e927",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w4-0",
+      "scenario_id": "a1ccc07b",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 2,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w4-1",
+      "scenario_id": "0350a784",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w5-0",
+      "scenario_id": "b9a5249f",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 1,
+      "other_fail": 0,
+      "lineage_versions": 6,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w5-1",
+      "scenario_id": "793a1576",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 2,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w6-0",
+      "scenario_id": "def83b4f",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 1,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w6-1",
+      "scenario_id": "09bc6c81",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 2,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w9-0",
+      "scenario_id": "fc3913de",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 5,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w9-1",
+      "scenario_id": "170e4b66",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 3,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w10-0",
+      "scenario_id": "1f6d8863",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 2,
+      "other_fail": 0,
+      "lineage_versions": 5,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w10-1",
+      "scenario_id": "f5c7d021",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 3,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w11-0",
+      "scenario_id": "ad9fa216",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w11-1",
+      "scenario_id": "8755d9fb",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 4,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w12-0",
+      "scenario_id": "013cc144",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 2,
+      "other_fail": 0,
+      "lineage_versions": 5,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w12-1",
+      "scenario_id": "544bab4a",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 3,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w13-0",
+      "scenario_id": "90e605ce",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "pass",
+      "reason_fail": 0,
+      "other_fail": 0,
+      "lineage_versions": 2,
+      "stage": "ai_repaired"
+    },
+    {
+      "key": "w13-1",
+      "scenario_id": "26412ba9",
+      "mission_status": "generated",
+      "archived": false,
+      "verdict": "fail",
+      "reason_fail": 2,
+      "other_fail": 0,
+      "lineage_versions": 5,
+      "stage": "ai_repaired"
+    }
+  ]
+}

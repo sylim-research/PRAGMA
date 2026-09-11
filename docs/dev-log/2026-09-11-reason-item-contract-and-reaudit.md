@@ -472,3 +472,57 @@ r2와 r3는 같은 단어 ‘不行’을 근거로 들지만 주장하는 결�
 - **규칙 warning**: R5·R19·R32는 전 미션 공통 성격(길이 단서 눈검사, 앵커 문항 동일 원문, 미귀속 claim).
 
 교수자 최종 승인은 실행하지 않았다.
+
+## 16. 파이프라인 blocker 최소 수정 → 공식 검수 재실행 · 2026-09-11
+
+연구자 지시(15절의 결함 3건 최소 수정, w6-1만 동결 해제, w13-1 1회 재시도, 나머지 콘텐츠·계약·critic 불변, 승인·편성 금지).
+
+### 순서(실측 시각, UTC)
+
+| 단계 | 시각 | 근거 |
+|---|---|---|
+| PR #139 CI 통과 | 11:55:16 | run 34596097201 success |
+| PR #139 병합 | 11:58:42 | main `42580b7e` |
+| `content-review` v33 배포 | 12:00:21 | `npm run edge:deploy`(main lineage `888d19eb`) |
+| `generate-scenario` v126 배포 | 12:00:29 | 같음 |
+| 공식 검수 재실행 첫 결과 | 12:01:57 | `*-official-prepare.json` `at` |
+
+1차 실행(10:42~10:49, 수정 전)의 결과 파일은 `round1-official/`로 옮겨 보존했다. 재실행은 배포 뒤에만 이루어졌다.
+
+### 수정 내용(PR #139, 코드)
+
+1. adjudication: `openai_review`가 없어도 `generation_quality`(같은 content_hash)를 1차 근거로 허용. 저장되는 adjudication에 `primary_review_source`(`generation_quality`|`openai_review`)·`primary_review_ref` 기록. openai_review로 복사·위장하지 않음. Claude finding이 있을 때만 실행하는 정책 유지.
+2. pack 범위 밖 화행: `missionFinalizationInput`이 covered일 때만 `lineage_scope`를 보내고, 아니면 `lineage_coverage: not_covered`. 서버 finalize는 귀속을 건너뛰고 `authoring.item_lineage_coverage = 'not_covered'`를 명시. 가짜 pack id 없음, pack 확장 없음.
+3. R31 경로: 서버 귀속 대상 열거에서 reason 문항의 `corrections`를 제외(스키마·클라이언트와 일치). 규칙 의미 불변.
+4. (추가) 규칙 fail로 저장된 최종 검수 자료의 재준비를 서버·클라이언트가 허용하도록 게이트 완화 — **DB 트리거에 막혀 무효(아래)**.
+- provider 4xx 오류 메시지에 제공자의 짧은 오류 유형·메시지를 남기도록(원인 진단용).
+
+### w6-1 수정 전/후
+
+- 코어 `preceding_turn`: 전 「教授，我想请你帮忙负责明天中午系里活动的**接待**工作，可以吗？」(학생이 교수에게 부탁하는 문장으로 읽힘, 용건 接待) → 후 「我想请你帮忙负责明天中午系里活动的**签到**工作，可以吗？」(교수가 학생에게, 용건은 원문 「접수 업무」·참고 산출 「签到工作」와 일치). 다른 필드 불변. 코어 의미 검사 pass → `save_generated_core`로 **새 행 09bc6c81**(원본 700f0bdd 보존, `generation.local_revision`) → 미션 재생성(v126) → 생성기가 Reason r1(처방)·r2(‘再接’ 허위 의미) 옛 형태 오답을 냄 → critic fail → round8 사람 교체(r1 격식 차원, r2 정보 순서) → **production critic pass**(hash 1ace0476… → 공식 검수 content_hash d560f419). 공식 검수: 규칙 warning, 최종 검수 자료(refusal은 pack 범위 안이라 귀속 실행) 저장, Claude warning 3, adjudication accept 2·refine 1(교수자 확인 1: 교체한 r1이 정답 r3와 같은 ‘你…吧’ 표현을 근거로 삼음).
+- 🔴 원본 행 700f0bdd(옛 w6-1, 미션 있음)는 현행·generated로 남아 있다. 보관(archived_at) 처리는 승인 필요.
+
+### 재실행 결과(`content_review_runs` 실측, `*-official-status.json`)
+
+| 항목 | 결과 |
+|---|---|
+| 규칙 검사 통과(warning 이하) | **13/20** |
+| 최종 검수 자료 준비 완료(저장 + 규칙 통과) | **13/20** — w2-1·w3-0·w5-0·w5-1·w6-1(new)·w9-1·w10-0·w11-0·w11-1·w12-0·w12-1·w13-0·w13-1. pack 범위 밖 8건은 not_covered로 통과 |
+| Claude 독립 검토 | 대상 7(fail 6 + warning 1=w6-1). **완료 6/7**: w5-0(2)·w5-1(1)·w10-0(4)·w12-0(1)·w13-1(2, 재시도 1회 성공)·w6-1 new(3). 불가 1: w6-0(규칙 fail 상태라 요청 거부) |
+| adjudication 완료 | **6건**(decisions 13: accept 7·refine 6·reject 0), 전부 `primary_review_source=generation_quality` |
+| 교수자 최종 승인 준비(next=professor) | **13/20** |
+| 막힌 미션 | **7**: w2-0·w3-1·w4-0·w4-1·w6-0·w9-0·w10-1 |
+
+### 🔴 남은 blocker 1개 — 규칙 fail 최종 검수 자료의 불변성(DB)
+
+7건은 1차 실행에서 결함 있는 최종 검수 자료가 저장되며 규칙 fail이 됐다. 수정 4로 재준비를 허용했더니 서버가 새 자료를 만들었지만(유료 귀속 7회) 저장이 거부됐다: `guard_prepared_content_review` 트리거(migration 20260909230000)가 **`prepared_finalization`·`rules`·`snapshot`을 불변**으로 만들고 「create a new review version」을 요구한다. 즉 재준비는 DB 설계상 불가하며 수정 4는 무효다(되돌릴 대상). 선택지:
+- (a) 트리거를 「규칙 fail 자료에 한해 교체 허용」으로 완화하는 migration — 증거 불변 원칙 수정, migration push 승인 필요.
+- (b) 미승인 7행 삭제 후 새로 실행 — 파괴적, 승인 필요. 실패 자료의 규칙 finding은 `round1-official/`에 보존돼 있음.
+- (c) **`CONTENT_REVIEW_VERSION`을 v3로 올려 새 검수 버전 생성**(설계가 요구하는 「새 검수 버전」). 오늘 이전에는 mission 검수 행이 0건이었으므로 기존 승인에 영향 없음. 20건 전부 새 행에서 다시 도는 비용(귀속 유료 = pack 범위 안 8건, Claude 7, adjudication ≤7)이 든다. 수정 4는 되돌린다.
+- 권고 = (c). 결정 전 실행하지 않는다.
+
+### 교수자 확인 대상(공식 finding, 원본 `official-claude-adjudication-20260911.json`)
+
+- 교수자 확인 표시(needs_professor): w6-1 new claude-3(r1이 정답과 같은 표현 근거 — refine) · w5-0 claude-2(앵커의 회신 요청 변형이 대역 조작인지 — refine) · w10-0 claude-1(원문 존대 요체 vs close — refine) · w13-1 claude-1(MJT5 후보 4의 too_indirect 판정 — refine).
+- accept된 지적(수정 제안, 자동 수정 없음): w5-0 「不收参加费」, w5-1 해설 장면 비교, w6-1 new DCT의 preceding_turn null·MJT2 해설 비교, w10-0 的 중첩·해설 「조건 모순」·동사 연쇄, w12-0 「앞으로도」·「가능한 한 빨리」, w13-1 addressee 단복수.
+- 재사용된 production critic fail 10개(12절)는 그대로 finding으로 표시된다.

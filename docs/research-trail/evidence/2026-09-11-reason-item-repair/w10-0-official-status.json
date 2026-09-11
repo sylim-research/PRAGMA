@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T11:06:44.348Z",
+  "at": "2026-09-11T12:08:43.247Z",
   "key": "w10-0",
   "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
   "contentHash": "25612a7a7a0bc4dbde08195a857fd9ba5cd2ab3ed1c5e6895a460907240c4a6a",
@@ -19,12 +19,15 @@
       "findings": 4,
       "model": "claude-opus-5"
     },
-    "adjudication": null,
-    "prepared_finalization": false,
+    "adjudication": {
+      "decisions": 4,
+      "model": "gpt-4.1-2025-04-14"
+    },
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "재검토 선행 결과가 없습니다.",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "adjudication",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",

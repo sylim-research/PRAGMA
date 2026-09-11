@@ -2,7 +2,9 @@ import { SCENE_PLAUSIBILITY_RULE } from "./learnerScene.ts";
 import { CURRENT_MISSION_QUALITY_PROMPT_VERSION } from "./contentRelease.ts";
 // Shared by the admin UI and Edge. A review concerns one current instructional
 // version; no model may approve, edit content, or erase another model's finding.
-export const CONTENT_REVIEW_VERSION = "content_review_v2";
+// v3 (2026-09-11): criteria changed — uncovered speech acts are marked not_covered in finalization and
+// reason-item lineage paths follow the schema. Earlier v2 rows stay untouched; a new version is a new row.
+export const CONTENT_REVIEW_VERSION = "content_review_v3";
 // Semantic criteria stay versioned separately, so completed reviews remain reusable.
 export const CONTENT_APPROVAL_POLICY = "focused_v1";
 export const CONTENT_REVIEW_STEPS = [
@@ -149,13 +151,12 @@ export function nextReviewStage(run: ContentReviewRun | null): ReviewStage | "pr
     if (!run.openai_review && !run.generation_quality) return "openai";
     if (run.independent_review_requested && !run.claude_review) return "claude";
     if (run.independent_review_requested && run.claude_review?.result.findings.length && !run.adjudication) return "adjudication";
-    // A stored finalization artifact that failed the structural rules is retryable, not terminal.
-    return requiresReviewFinalization(run) && (!run.prepared_finalization || run.rules?.verdict === "fail") ? "finalization" : "professor";
+    return requiresReviewFinalization(run) && !run.prepared_finalization ? "finalization" : "professor";
   }
   if (!run.openai_review) return "openai";
   if (!run.claude_review) return "claude";
   if (!run.adjudication) return "adjudication";
-  return requiresReviewFinalization(run) && (!run.prepared_finalization || run.rules?.verdict === "fail") ? "finalization" : "professor";
+  return requiresReviewFinalization(run) && !run.prepared_finalization ? "finalization" : "professor";
 }
 
 // Evidence paths are JSON Pointers into the exact saved snapshot, never a model's

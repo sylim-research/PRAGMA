@@ -1,12 +1,12 @@
 {
-  "at": "2026-09-11T10:48:48.905Z",
+  "at": "2026-09-11T12:03:52.051Z",
   "key": "w12-0",
   "scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
   "mode": "prepare",
-  "status": "held",
-  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=under_specified; mpj_items[2].corrections[2]: scope 밖 risk_id=over_attributed; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=over_attributed | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 risk_id=risk_over_attribution; mpj_items[3].recommended_example: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[4].candidates[0]: scope 밖 rule_id=realization_direct_cause_effect | batch 4: mpj_items[4].candidates[1]: scope 밖 risk_id=under_specified; mpj_items[4].candidates[2]: scope 밖 rule_id=within_band; mpj_items[4].candidates[3]: scope 밖 rule_id=over_attributed",
+  "status": "ready",
+  "message": "AI 검토 완료 · 교수자 판단 대기",
   "stages_run": [
-    "rules",
+    "adjudication",
     "finalization"
   ],
   "contentHash": "b0f4934901d9943b2c51b720dc5824fed2e26a1881057a8ce725ff868283d9f6",
@@ -19,17 +19,26 @@
     "generation_quality": true,
     "generation_quality_verdict": "fail",
     "openai_review": null,
-    "independent_review_requested": false,
-    "claude_review": null,
-    "adjudication": null,
-    "prepared_finalization": false,
+    "independent_review_requested": true,
+    "claude_review": {
+      "verdict": "warning",
+      "findings": 1,
+      "model": "claude-opus-5"
+    },
+    "adjudication": {
+      "decisions": 1,
+      "model": "gpt-4.1-2025-04-14"
+    },
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=under_specified; mpj_items[2].corrections[2]: scope 밖 risk_id=over_attributed; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=over_attributed | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 risk_id=risk_over_attribution; mpj_items[3].recommended_example: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[4].candidates[0]: scope 밖 rule_id=realization_direct_cause_effect | batch 4: mpj_items[4].candidates[1]: scope 밖 risk_id=under_specified; mpj_items[4].candidates[2]: scope 밖 rule_id=within_band; mpj_items[4].candidates[3]: scope 밖 rule_id=over_attributed",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",
+      "claude",
+      "adjudication",
       "finalization",
       "professor"
     ]

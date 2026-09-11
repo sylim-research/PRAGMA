@@ -1,12 +1,11 @@
 {
-  "at": "2026-09-11T10:48:29.856Z",
+  "at": "2026-09-11T12:03:42.012Z",
   "key": "w11-1",
   "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
   "mode": "prepare",
-  "status": "held",
-  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=too_confrontational; mpj_items[2].corrections[2]: scope 밖 risk_id=too_obscured; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=too_confrontational | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=not_too_confrontational; mpj_items[3].corrections[0]: scope 밖 rule_id=explicit_reasoning; mpj_items[3].corrections[1]: scope 밖 risk_id=too_confrontational; mpj_items[3].corrections[2]: scope 밖 risk_id=too_obscured; mpj_items[3].recommended_example: scope 밖 rule_id=not_too_confrontational; mpj_items[3].recommended_example: scope 밖 rule_id=explicit_reasoning; mpj_items[4].candidates[0]: scope 밖 rule_id=not_too_confrontational; mpj_items[4].candidates[0]: scope 밖 rule_id=explicit_reasoning | batch 5: production_task.reference_alternatives[1]: scope 밖 rule_id=rule_연결어_이유",
+  "status": "ready",
+  "message": "AI 검토 완료 · 교수자 판단 대기",
   "stages_run": [
-    "rules",
     "finalization"
   ],
   "contentHash": "552c7e39f76b6474867642875d0857c4447d0691ff011efb192bd6ed2a8b190b",
@@ -22,11 +21,11 @@
     "independent_review_requested": false,
     "claude_review": null,
     "adjudication": null,
-    "prepared_finalization": false,
+    "prepared_finalization": true,
     "running_stage": null,
-    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=too_confrontational; mpj_items[2].corrections[2]: scope 밖 risk_id=too_obscured; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=too_confrontational | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=not_too_confrontational; mpj_items[3].corrections[0]: scope 밖 rule_id=explicit_reasoning; mpj_items[3].corrections[1]: scope 밖 risk_id=too_confrontational; mpj_items[3].corrections[2]: scope 밖 risk_id=too_obscured; mpj_items[3].recommended_example: scope 밖 rule_id=not_too_confrontational; mpj_items[3].recommended_example: scope 밖 rule_id=explicit_reasoning; mpj_items[4].candidates[0]: scope 밖 rule_id=not_too_confrontational; mpj_items[4].candidates[0]: scope 밖 rule_id=explicit_reasoning | batch 5: production_task.reference_alternatives[1]: scope 밖 rule_id=rule_연결어_이유",
+    "last_error": null,
     "approved_at": null,
-    "next_stage": "finalization",
+    "next_stage": "professor",
     "steps": [
       "rules",
       "openai",

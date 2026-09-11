@@ -1,0 +1,38 @@
+{
+  "at": "2026-09-11T10:42:00.416Z",
+  "key": "w2-0",
+  "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+  "mode": "prepare",
+  "status": "held",
+  "message": "규칙 오류 · 수정 후 다시 시작하세요.",
+  "stages_run": [
+    "rules",
+    "finalization"
+  ],
+  "contentHash": "943a3beac9528dba84e862c7299a11fbd90e8b6f0a3a733fd0d0269e78da3d21",
+  "run": {
+    "id": "d0c4e54f-9172-4721-afb7-7489412e725c",
+    "content_hash": "943a3beac9528dba84e862c7299a11fbd90e8b6f0a3a733fd0d0269e78da3d21",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "fail",
+    "generation_quality": true,
+    "generation_quality_verdict": "pass",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": true,
+    "running_stage": null,
+    "last_error": null,
+    "approved_at": null,
+    "next_stage": "professor",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}

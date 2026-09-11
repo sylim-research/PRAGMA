@@ -28,7 +28,7 @@ export async function prepareContentReview(target: ReviewTarget, options: {
     if (options.stopped()) return { status: "stopped", message: "완료된 결과를 보존하고 중단했습니다.", inspection: state };
     const stage = nextReviewStage(state.run);
     if (stage === "approved") return { status: "approved", message: "이미 교수자 승인된 버전", inspection: state };
-    if (state.run?.rules.verdict === "fail" && !(stage === "finalization" && state.run.prepared_finalization)) return hold("규칙 오류 · 수정 후 다시 시작하세요.");
+    if (state.run?.rules.verdict === "fail") return hold("규칙 오류 · 수정 후 다시 시작하세요.");
     if (stage === "professor") return { status: "ready", message: "AI 검토 완료 · 교수자 판단 대기", inspection: state };
     if (state.run?.running_stage && state.run.lease_until && Date.parse(state.run.lease_until) > Date.now()) {
       return hold("다른 검토가 실행 중입니다. 완료 후 다시 시작하세요.");

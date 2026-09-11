@@ -9,7 +9,7 @@ const missionId = '20000000-0000-4000-8000-000000000001';
 const courseId = '10000000-0000-4000-8000-000000000001';
 const records = [{ id: 'historical', kind: 'mission', target_id: missionId, week_no: 0,
   source_hash: 'unchanged-source', content_hash: 'older-rule-catalog-hash',
-  criteria_version: 'content_review_v2', approved_at: '2026-09-08T00:00:00Z' }];
+  criteria_version: 'content_review_v3', approved_at: '2026-09-08T00:00:00Z' }];
 function query() {
   let found = [...records];
   const q = {

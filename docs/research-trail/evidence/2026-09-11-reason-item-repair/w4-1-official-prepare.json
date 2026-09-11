@@ -1,12 +1,11 @@
 {
-  "at": "2026-09-11T10:43:05.575Z",
+  "at": "2026-09-11T12:02:21.565Z",
   "key": "w4-1",
   "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
   "mode": "prepare",
   "status": "held",
-  "message": "규칙 오류 · 수정 후 다시 시작하세요.",
+  "message": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
   "stages_run": [
-    "rules",
     "finalization"
   ],
   "contentHash": "981666bfd3e9168200a19912797b3a5b45cd1ab5e2b905f46f050075a388a553",
@@ -24,9 +23,9 @@
     "adjudication": null,
     "prepared_finalization": true,
     "running_stage": null,
-    "last_error": null,
+    "last_error": "최종 검수 자료 저장 실패. 재실행 전 저장 결과를 확인하세요.",
     "approved_at": null,
-    "next_stage": "professor",
+    "next_stage": "finalization",
     "steps": [
       "rules",
       "openai",

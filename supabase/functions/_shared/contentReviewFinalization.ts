@@ -8,8 +8,8 @@ export async function prepareReviewFinalization(args: {
   inspectFinalized: (mission: Record<string, any>) => { snapshot: Record<string, unknown>; rules: ReviewResult };
 }) {
   if (!requiresReviewFinalization(args.run)) throw new Error("최종 검수 자료가 필요한 미션이 아닙니다.");
-  // Keep a sound artifact; regenerate one whose structural rule check failed (the failure is kept in run history by the caller).
-  if (args.run.prepared_finalization && args.run.rules?.verdict !== "fail") return { prepared_finalization: args.run.prepared_finalization, rules: args.run.rules };
+  // Prepared evidence is immutable in the DB (guard_prepared_content_review); a failed artifact needs a new review version.
+  if (args.run.prepared_finalization) return { prepared_finalization: args.run.prepared_finalization, rules: args.run.rules };
   // Historical finalized artifacts can be inspected without another paid attribution.
   const existing = args.currentMission;
   const prepared = existing.authoring?.stage === "professor_finalized" && existing.authoring?.lineage_status === "complete"
