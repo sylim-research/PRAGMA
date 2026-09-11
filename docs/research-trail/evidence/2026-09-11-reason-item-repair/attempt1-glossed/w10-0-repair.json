@@ -1,0 +1,160 @@
+{
+  "at": "2026-09-11T04:49:05.598Z",
+  "key": "w10-0",
+  "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+  "outcome": "revised",
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "close",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+    "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘虽然’로 두 사람의 추가 시간 부담을 먼저 부각해, 이틀로 나누자는 제안보다 친구와 녹음하기를 꺼린다는 태도가 중심이 되기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘我建议’로 안을 꺼냈지만 ‘就这么定吧’로 곧바로 결정을 마무리해, 친구가 일정 변경에 의견을 낼 여지를 좁히기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘每天只能预约一个小时’가 예약 가능한 총시간을 한 시간으로 제한하므로, ‘分两天录’가 앞에서 설명한 대여 조건과 충돌하기 때문이다."
+      }
+    ],
+    "highlights": [
+      "虽然我们俩下班后都得再空出一个晚上",
+      "就这么定吧"
+    ],
+    "item_focus": "proposal_optionality_clarity",
+    "relation_ko": "매주 사적으로 만나며 팟캐스트를 공동 제작하는 동등한 친구",
+    "axis_feature": "proposal_optionality_clarity",
+    "situation_ko": "나는 매주 사적으로 만나는 친구와 두 시간짜리 팟캐스트 녹음을 준비하지만, 대여실은 하루 한 시간만 예약할 수 있다. 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 방안을 친구에게 제안하려 한다.",
+    "explanation_ko": "추가 저녁 시간을 함께 조정할 친구에게 제안하는 상황에서 가장 큰 문제는 ‘就这么定吧’가 합의 절차를 닫는다는 점이다. ‘虽然’는 원문에 있는 부담을 인정하고 ‘每天’는 하루 단위의 제한을 나타내므로, 부담 언급이나 예약 조건의 모순이 주원인은 아니다. 구체적인 이틀 녹음안은 유지하고 확정하는 끝부분을 의견 질문으로 바꾼다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_directive",
+    "accepted_reason_id": "r3",
+    "recommended_example": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，你觉得怎么样？"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "close",
+      "p": "equal",
+      "r": "mid"
+    },
+    "type": "reason",
+    "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+    "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+    "channel": "messenger",
+    "reasons": [
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘虽然’로 두 사람의 추가 시간 부담을 먼저 부각해, 이틀로 나누자는 제안보다 친구와 녹음하기를 꺼린다는 태도가 중심이 되기 때문이다."
+      },
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "‘我建议’로 안을 꺼냈지만 ‘就这么定吧’로 곧바로 결정을 마무리해, 친구가 일정 변경에 의견을 낼 여지를 좁히기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘每天只能预约一个小时’는 하루에 한 시간만 예약할 수 있다는 의미로, 이틀로 나누어 녹음하는 제안과 모순되지 않는다. 대신, 이틀로 나누어야 하는 이유를 명확히 설명하지 않아 제안의 필요성이 흐려질 수 있다."
+      }
+    ],
+    "highlights": [
+      "虽然我们俩下班后都得再空出一个晚上",
+      "就这么定吧"
+    ],
+    "item_focus": "proposal_optionality_clarity",
+    "relation_ko": "매주 사적으로 만나며 팟캐스트를 공동 제작하는 동등한 친구",
+    "axis_feature": "proposal_optionality_clarity",
+    "situation_ko": "나는 매주 사적으로 만나는 친구와 두 시간짜리 팟캐스트 녹음을 준비하지만, 대여실은 하루 한 시간만 예약할 수 있다. 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 방안을 친구에게 제안하려 한다.",
+    "explanation_ko": "추가 저녁 시간을 함께 조정할 친구에게 제안하는 상황에서 가장 큰 문제는 ‘就这么定吧’가 합의 절차를 닫는다는 점이다. ‘虽然’는 원문에 있는 부담을 인정하고 ‘每天’는 하루 단위의 제한을 나타내므로, 부담 언급이나 예약 조건의 모순이 주원인은 아니다. 구체적인 이틀 녹음안은 유지하고 확정하는 끝부분을 의견 질문으로 바꾼다.",
+    "preceding_turn": null,
+    "problem_band_code": "too_directive",
+    "accepted_reason_id": "r3",
+    "recommended_example": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，你觉得怎么样？"
+  },
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "close",
+          "p": "equal",
+          "r": "mid"
+        },
+        "type": "reason",
+        "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+        "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+        "channel": "messenger",
+        "reasons": [
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "‘虽然’로 두 사람의 추가 시간 부담을 먼저 부각해, 이틀로 나누자는 제안보다 친구와 녹음하기를 꺼린다는 태도가 중심이 되기 때문이다."
+          },
+          {
+            "id": "r3",
+            "kind": "primary",
+            "text_ko": "‘我建议’로 안을 꺼냈지만 ‘就这么定吧’로 곧바로 결정을 마무리해, 친구가 일정 변경에 의견을 낼 여지를 좁히기 때문이다."
+          },
+          {
+            "id": "r2",
+            "kind": "meaning_grammar_context",
+            "text_ko": "‘每天只能预约一个小时’는 하루에 한 시간만 예약할 수 있다는 의미로, 이틀로 나누어 녹음하는 제안과 모순되지 않는다. 대신, 이틀로 나누어야 하는 이유를 명확히 설명하지 않아 제안의 필요성이 흐려질 수 있다."
+          }
+        ],
+        "highlights": [
+          "虽然我们俩下班后都得再空出一个晚上",
+          "就这么定吧"
+        ],
+        "item_focus": "proposal_optionality_clarity",
+        "relation_ko": "매주 사적으로 만나며 팟캐스트를 공동 제작하는 동등한 친구",
+        "axis_feature": "proposal_optionality_clarity",
+        "situation_ko": "나는 매주 사적으로 만나는 친구와 두 시간짜리 팟캐스트 녹음을 준비하지만, 대여실은 하루 한 시간만 예약할 수 있다. 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 방안을 친구에게 제안하려 한다.",
+        "explanation_ko": "추가 저녁 시간을 함께 조정할 친구에게 제안하는 상황에서 가장 큰 문제는 ‘就这么定吧’가 합의 절차를 닫는다는 점이다. ‘虽然’는 원문에 있는 부담을 인정하고 ‘每天’는 하루 단위의 제한을 나타내므로, 부담 언급이나 예약 조건의 모순이 주원인은 아니다. 구체적인 이틀 녹음안은 유지하고 확정하는 끝부분을 의견 질문으로 바꾼다.",
+        "preceding_turn": null,
+        "problem_band_code": "too_directive",
+        "accepted_reason_id": "r3",
+        "recommended_example": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，你觉得怎么样？"
+      }
+    }
+  ],
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "fail",
+      "summary_ko": "모든 문항이 실제 상황과 화용 초점에 맞게 구성되어 있으며, 극단적 오답이나 대역 오류 없이 학습자가 잘못 배우게 할 결함이 없다.",
+      "findings": [
+        {
+          "code": "primary_reason_ambiguity",
+          "severity": "fail",
+          "where": "mpj_items[3].reasons[0]",
+          "evidence_excerpt": "‘虽然’로 두 사람의 추가 시간 부담을 먼저 부각해, 이틀로 나누자는 제안보다 친구와 녹음하기를 꺼린다는 태도가 중심이 되기 때문이다.",
+          "note_ko": "r1(‘虽然’로 두 사람의 추가 시간 부담을 먼저 부각해, 이틀로 나누자는 제안보다 친구와 녹음하기를 꺼린다는 태도가 중심이 되기 때문이다.)와 r2(‘每天只能预约一个小时’는 하루에 한 시간만 예약할 수 있다는 의미로, 이틀로 나누어 녹음하는 제안과 모순되지 않는다. 대신, 이틀로 나누어야 하는 이유를 명확히 설명하지 않아 제안의 필요성이 흐려질 수 있다.) 모두 실제 주원인(‘我建议’로 안을 꺼냈지만 ‘就这么定吧’로 곧바로 결정을 마무리해, 친구가 일정 변경에 의견을 낼 여지를 좁히기 때문이다.)과 별개의 이유를 주장하지만, 둘 다 실제 target의 문제(제안의 선택권/명료성)와는 거리가 있다. 특히 r1은 실제 target의 주된 문제(선택권 박탈)가 아니라, 태도상의 문제(꺼린다는 인상)를 중심으로 "
+        }
+      ],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:49:04.992Z",
+      "mission_content_hash": "c7893722447254687ac8950473a38d88803adc0b14fe9ed660d50dc8cc6f1c0e"
+    },
+    "ruleResult": "warning"
+  },
+  "scope": "AI editorial revision through the existing revision path; not instructor approval."
+}

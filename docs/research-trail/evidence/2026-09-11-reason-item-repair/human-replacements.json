@@ -1,0 +1,54 @@
+{
+  "scope": "Attempt 2. Hand-written replacement distractors for the Reason item, by reason id. Rule (researcher, 2026-09-11): every option factual against source/situation/target; the accepted option is the core pragmatic reason; distractors are factual but clearly secondary or on another judgment dimension (information order, referent explicitness, register — never length); no misreadings, no invented facts, no fabricated meaning errors; no distractor competing with the accepted reason. Applied through reviseMissionDraft(core, itemBlocks, 'ai') so the rule check, the quality check, and an append-only revision with a new content hash all run. Accepted option, explanation and other options are untouched. Attempt 1 (attempt1-glossed/) showed the repair model turning distractors into meaning glosses.",
+  "replacements": {
+    "w2-0": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘弄丢了’로 링크를 잃어버린 사정을 먼저 밝혀, 부탁의 이유 설명이 요청 자체보다 앞에 놓이기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘那个链接’이 앞 문장의 링크를 받는 지시어라, 첫 문장을 읽지 않으면 무엇을 보내 달라는지 바로 드러나지 않기 때문이다." }
+    },
+    "w9-1": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘不好意思啊’의 ‘啊’가 사과를 가볍고 친근한 어조로 만들어, 몇 번 교류한 지인에게는 편한 사이처럼 들릴 수 있기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘翻页时’라는 경위 설명이 문장 첫머리에 와서, 잘못의 인정보다 상황 설명이 먼저 들리기 때문이다." }
+    },
+    "w3-1": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘你陪我装了一个小时’로 걸린 시간을 정확히 세어 말해, 친구의 도움을 시간으로 계산하는 인상을 줄 수 있기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘装了一个小时’가 무엇을 조립했는지 다시 말하지 않아, 앞 문장을 놓치면 무엇에 대한 수고인지 바로 드러나지 않기 때문이다." }
+    },
+    "w4-1": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘你把食材按保质期排好了’로 직원이 한 일을 먼저 서술하고 효과를 뒤에 붙여, 칭찬이 성과 보고처럼 들리기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "칭찬의 대상인 ‘按保质期排好了’가 두 번째 문장에 와서, 첫 문장만 들으면 무엇을 평가하는지 바로 드러나지 않기 때문이다." }
+    },
+    "w5-0": {
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘周三午休时’로 시간대를 먼저 지정하고 요일·소요 시간·회신 기한을 이어 붙여, 초대 문장이 일정 안내처럼 정보 위주로 읽히기 때문이다." }
+    },
+    "w6-0": {
+      "r3": { "kind": "meaning_grammar_context", "text_ko": "첫머리의 단독 ‘不行’이 뒤의 사유와 범위보다 먼저 들려, 내일 한 시간에 한정된 거절이 아니라 강한 거절로 받아들여질 수 있기 때문이다." },
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘我那时有外部培训’이 ‘그때’라고만 말해, 언제 교육이 있는지 상대가 부탁한 시간과 바로 맞춰 보기 어렵기 때문이다." }
+    },
+    "w9-0": {
+      "r3": { "kind": "meaning_grammar_context", "text_ko": "‘不好意思’가 지연 경위 설명 뒤에 한 번만 붙어, 사과보다 경위 보고가 앞서는 순서로 읽히기 때문이다." }
+    },
+    "w10-0": {
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘每天只能预约一个小时’라는 대여 조건을 먼저 설명하고 제안을 뒤에 두어, 제안이 조건에 떠밀린 결정처럼 읽히기 때문이다." }
+    },
+    "w10-1": {
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "제안 내용 ‘一起看看各自带来的一张风景照’가 ‘就定这个吧’ 뒤에 와서, 무엇을 하자는지보다 정하자는 말이 먼저 들리기 때문이다." }
+    },
+    "w11-0": {
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "‘我理解你想让空间更宽敞’로 상대 의도를 인정하는 문장이 먼저 와서, 반대 의견이 두 번째 문장 끝에야 나오기 때문이다." },
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "‘这些说明’이 어떤 설명문을 가리키는지 앞에서 말하지 않아, 상대가 낸 삭제안을 모르면 대상이 바로 드러나지 않기 때문이다." }
+    },
+    "w11-1": {
+      "r2": { "kind": "meaning_grammar_context", "text_ko": "피로 근거 ‘连续站着接待三个小时会更累’가 반대 표명 뒤에 와서, 왜 반대하는지가 판정 다음에야 나오기 때문이다." }
+    },
+    "w12-0": {
+      "r3": { "kind": "meaning_grammar_context", "text_ko": "지연·참석자 일정 변경·불편을 한 문장에 이어 붙여, 어느 피해가 핵심인지 상대가 가려 읽어야 하기 때문이다." }
+    },
+    "w12-1": {
+      "r3": { "kind": "meaning_grammar_context", "text_ko": "‘通知单我这边也重新印了’가 몇 장을 얼마나 걸려 다시 찍었는지 말하지 않아, 원문의 추가 작업 규모가 상대에게 전해지지 않기 때문이다." }
+    },
+    "w13-1": {
+      "r3": { "kind": "meaning_grammar_context", "text_ko": "검토 내용(‘错别字’·‘漏掉的信息’)이 부탁 문장 뒤에 따로 나와, 무엇을 봐 달라는지가 첫 문장에서 드러나지 않기 때문이다." },
+      "r1": { "kind": "pragmatic_misconception", "text_ko": "검토에 삼십 분이 걸린다는 원문의 부담 정보를 옮기지 않아, 상대가 부탁의 크기를 가늠하기 어렵기 때문이다." }
+    }
+  }
+}

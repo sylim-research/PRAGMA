@@ -1,0 +1,149 @@
+{
+  "at": "2026-09-11T04:48:18.729Z",
+  "key": "w4-1",
+  "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+  "outcome": "revised",
+  "before": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_higher",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+    "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "정리의 구체적인 장점은 말했지만, 업무 평가권자의 ‘还行’이 성과를 충분히 인정하기보다 겨우 무난하다는 평가로 들리기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘还行’이라는 짧은 구어 표현이 몇 번 함께 일한 직원에게 친구처럼 말하는 인상을 주어, 매니저와 직원 사이의 거리와 맞지 않기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "‘要先用的就好找了’의 ‘要’ 때문에 먼저 쓸 재료를 찾기 쉽다는 설명이 아니라, 직원에게 재료를 먼저 찾으라는 지시로 의미가 바뀌기 때문이다."
+      }
+    ],
+    "highlights": [
+      "整理得还行"
+    ],
+    "item_focus": "compliment_grounding_sensitivity",
+    "relation_ko": "몇 차례 함께 근무했고 내가 근무 배치와 업무 평가를 맡는 카페 직원",
+    "axis_feature": "compliment_grounding_sensitivity",
+    "situation_ko": "나는 근무 배치와 업무 평가를 맡은 카페 매니저로, 몇 번 함께 일한 직원이 냉장고 재료를 유통기한 순으로 정리한 것을 보았다. 직원과 둘이 있을 때 먼저 써야 할 재료를 쉽게 찾도록 정리한 점을 칭찬하려 한다.",
+    "explanation_ko": "직원의 정리 성과를 인정하려는 업무 평가권자의 말이므로, ‘还行’이 전달하는 소극적인 평가가 가장 큰 문제입니다. 유통기한 순서와 재료를 찾기 쉬워진 효과는 이미 제시되어 있으며, ‘要先用的’도 먼저 사용할 재료라는 뜻으로 문법이나 지시 화행의 문제가 아닙니다. 구어체와 구체적 근거는 유지하고 ‘很到位’처럼 이번 성과를 충분히 인정하는 강도로 바꾸면 됩니다.",
+    "preceding_turn": null,
+    "problem_band_code": "under_calibrated",
+    "accepted_reason_id": "r3",
+    "recommended_example": "这次整理得很到位。你把食材按保质期排好了，要先用的就好找了。"
+  },
+  "after": {
+    "id": 4,
+    "pdr": {
+      "d": "acquaintance",
+      "p": "speaker_higher",
+      "r": "low"
+    },
+    "type": "reason",
+    "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+    "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+    "channel": "facetoface",
+    "reasons": [
+      {
+        "id": "r3",
+        "kind": "primary",
+        "text_ko": "정리의 구체적인 장점은 말했지만, 업무 평가권자의 ‘还行’이 성과를 충분히 인정하기보다 겨우 무난하다는 평가로 들리기 때문이다."
+      },
+      {
+        "id": "r1",
+        "kind": "pragmatic_misconception",
+        "text_ko": "‘还行’이라는 짧은 구어 표현이 몇 번 함께 일한 직원에게 친구처럼 말하는 인상을 주어, 매니저와 직원 사이의 거리와 맞지 않기 때문이다."
+      },
+      {
+        "id": "r2",
+        "kind": "meaning_grammar_context",
+        "text_ko": "정리의 효과를 설명하는 ‘要先用的就好找了’는 직원에게 재료를 먼저 찾으라는 지시가 아니라, 유통기한 순으로 정리된 재료를 쉽게 찾을 수 있다는 설명이다."
+      }
+    ],
+    "highlights": [
+      "整理得还行"
+    ],
+    "item_focus": "compliment_grounding_sensitivity",
+    "relation_ko": "몇 차례 함께 근무했고 내가 근무 배치와 업무 평가를 맡는 카페 직원",
+    "axis_feature": "compliment_grounding_sensitivity",
+    "situation_ko": "나는 근무 배치와 업무 평가를 맡은 카페 매니저로, 몇 번 함께 일한 직원이 냉장고 재료를 유통기한 순으로 정리한 것을 보았다. 직원과 둘이 있을 때 먼저 써야 할 재료를 쉽게 찾도록 정리한 점을 칭찬하려 한다.",
+    "explanation_ko": "직원의 정리 성과를 인정하려는 업무 평가권자의 말이므로, ‘还行’이 전달하는 소극적인 평가가 가장 큰 문제입니다. 유통기한 순서와 재료를 찾기 쉬워진 효과는 이미 제시되어 있으며, ‘要先用的’도 먼저 사용할 재료라는 뜻으로 문법이나 지시 화행의 문제가 아닙니다. 구어체와 구체적 근거는 유지하고 ‘很到位’처럼 이번 성과를 충분히 인정하는 강도로 바꾸면 됩니다.",
+    "preceding_turn": null,
+    "problem_band_code": "under_calibrated",
+    "accepted_reason_id": "r3",
+    "recommended_example": "这次整理得很到位。你把食材按保质期排好了，要先用的就好找了。"
+  },
+  "operations": [
+    {
+      "operation": "replace_item_block",
+      "item_index": 3,
+      "item": {
+        "id": 4,
+        "pdr": {
+          "d": "acquaintance",
+          "p": "speaker_higher",
+          "r": "low"
+        },
+        "type": "reason",
+        "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+        "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+        "channel": "facetoface",
+        "reasons": [
+          {
+            "id": "r3",
+            "kind": "primary",
+            "text_ko": "정리의 구체적인 장점은 말했지만, 업무 평가권자의 ‘还行’이 성과를 충분히 인정하기보다 겨우 무난하다는 평가로 들리기 때문이다."
+          },
+          {
+            "id": "r1",
+            "kind": "pragmatic_misconception",
+            "text_ko": "‘还行’이라는 짧은 구어 표현이 몇 번 함께 일한 직원에게 친구처럼 말하는 인상을 주어, 매니저와 직원 사이의 거리와 맞지 않기 때문이다."
+          },
+          {
+            "id": "r2",
+            "kind": "meaning_grammar_context",
+            "text_ko": "정리의 효과를 설명하는 ‘要先用的就好找了’는 직원에게 재료를 먼저 찾으라는 지시가 아니라, 유통기한 순으로 정리된 재료를 쉽게 찾을 수 있다는 설명이다."
+          }
+        ],
+        "highlights": [
+          "整理得还行"
+        ],
+        "item_focus": "compliment_grounding_sensitivity",
+        "relation_ko": "몇 차례 함께 근무했고 내가 근무 배치와 업무 평가를 맡는 카페 직원",
+        "axis_feature": "compliment_grounding_sensitivity",
+        "situation_ko": "나는 근무 배치와 업무 평가를 맡은 카페 매니저로, 몇 번 함께 일한 직원이 냉장고 재료를 유통기한 순으로 정리한 것을 보았다. 직원과 둘이 있을 때 먼저 써야 할 재료를 쉽게 찾도록 정리한 점을 칭찬하려 한다.",
+        "explanation_ko": "직원의 정리 성과를 인정하려는 업무 평가권자의 말이므로, ‘还行’이 전달하는 소극적인 평가가 가장 큰 문제입니다. 유통기한 순서와 재료를 찾기 쉬워진 효과는 이미 제시되어 있으며, ‘要先用的’도 먼저 사용할 재료라는 뜻으로 문법이나 지시 화행의 문제가 아닙니다. 구어체와 구체적 근거는 유지하고 ‘很到位’처럼 이번 성과를 충분히 인정하는 강도로 바꾸면 됩니다.",
+        "preceding_turn": null,
+        "problem_band_code": "under_calibrated",
+        "accepted_reason_id": "r3",
+        "recommended_example": "这次整理得很到位。你把食材按保质期排好了，要先用的就好找了。"
+      }
+    }
+  ],
+  "result": {
+    "ok": true,
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 문항이 칭찬 강도와 민감도 초점에 맞게 실제 맥락과 근거에 따라 적절히 구분되어 있으며, 오답도 현실적 경계 사례로 구성되어 결함이 없다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T04:48:18.410Z",
+      "mission_content_hash": "352c81875ee748a915beef46bf0de8f8b9c966972696883478858838ddaacaeb"
+    },
+    "ruleResult": "warning"
+  },
+  "scope": "AI editorial revision through the existing revision path; not instructor approval."
+}
