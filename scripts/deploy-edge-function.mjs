@@ -9,7 +9,8 @@ import { execFileSync, spawnSync } from 'node:child_process';
 const args = process.argv.slice(2);
 const flagIndex = args.indexOf('--allow-unmerged');
 const allowReason = flagIndex >= 0 ? args[flagIndex + 1] : null;
-const functions = args.filter((value, index) => index !== flagIndex && index !== flagIndex + 1);
+// Only drop the flag and its reason when the flag is present; with no flag, index 0 is a function name.
+const functions = flagIndex >= 0 ? args.filter((value, index) => index !== flagIndex && index !== flagIndex + 1) : args;
 if (functions.length === 0) { console.error('usage: deploy-edge-function.mjs <function> [--allow-unmerged "<reason>"]'); process.exit(2); }
 const git = (...argv) => execFileSync('git', argv, { encoding: 'utf8' }).trim();
 
