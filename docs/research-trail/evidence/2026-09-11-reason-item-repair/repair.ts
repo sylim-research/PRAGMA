@@ -119,7 +119,8 @@ try {
       continue;
     }
     if (mode === 'recheck') {
-      const out = resolve(here, `${target.key}-recheck.json`);
+      // argv[4] = output suffix (default "recheck"); a second round writes e.g. *-recheck2.json and keeps the first.
+      const out = resolve(here, `${target.key}-${process.argv[4] ?? 'recheck'}.json`);
       if (existsSync(out)) { console.log(JSON.stringify({ key: target.key, preserved: true })); continue; }
       const row = await loadRow(target.scenario_id);
       if (row.mission_status !== 'generated') { console.log(JSON.stringify({ key: target.key, skipped: `mission_status=${row.mission_status}` })); continue; }
