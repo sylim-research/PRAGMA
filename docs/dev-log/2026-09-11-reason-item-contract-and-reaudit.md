@@ -433,3 +433,42 @@ r2와 r3는 같은 단어 ‘不行’을 근거로 들지만 주장하는 결�
 미션 단위 근거 초안(w6-0): 「fail 판정은 Reason r3 하나에 대한 것으로, 연구자가 화용 경계 사례로 유지 판정했다(사유는 finding 사유란). 정답·해설·다른 문항에는 결함이 없다.」
 
 승인이 끝나면 `reviewed` 20/20만 검증하고, 그 뒤 교과목 편성 계획을 제시한다(편성 실행은 승인 후).
+
+## 15. 공식 content-review(focused_v1) 실행 · 2026-09-11
+
+연구자 판정: DEC-20260830-13의 전수 3단 요구는 DEC-20260906-03(`focused_v1`)으로 대체(02_decision_log에 명시). canonical workflow = 규칙 검사 → 전수 production quality critic → 동일 content_hash 결과의 공식 검수 재사용 → 위험·경계 항목 선택적 Claude 독립 검토 → Claude finding 시 OpenAI adjudication → 교수자 최종 승인. 운영 secrets에 `CLAUDE_AUDIT_MODEL`·`ANTHROPIC_API_KEY` 존재 확인(값 미열람). 실행은 관리자 화면과 같은 클라이언트 코드(`prepareContentReview` → `contentReviewRequest` → `content-review` v32)를 러너 `official-review.ts`로 호출했다. 승인·콘텐츠 수정 없음. 실제 상태는 `content_review_runs`에서 읽었다(`*-official-status.json`, `official-claude-findings-20260911.json`).
+
+### 결과(`content_review_runs`, 20건 전부 행 생성)
+
+| 구분 | 건수 | key |
+|---|---|---|
+| 규칙 검사 저장 | 20/20 | 전부. 규칙 warning은 R5(길이 단서)·R19(문항 2·3·4 source/target 중복 = 앵커 설계상 동일)·R32(미귀속 claim) |
+| 생성 품질점검 재사용(`generation_quality`) | 20/20 | 전부(OpenAI 1차 검토 호출 0건) |
+| 최종 검수 자료 저장 + 규칙 통과 | **5** | w2-1·w3-0·w13-0·w6-1·w13-1 |
+| 최종 검수 자료 저장됐으나 **규칙 fail** | 7 | R31 「미션에 없는 추적 경로 mpj_items[3].corrections[*]」 w2-0·w3-1·w6-0 / 「미션 스키마를 읽을 수 없습니다」(`item_lineage.realization_pack_id` null) w4-0·w4-1·w9-0·w10-1 |
+| 최종 검수 자료 **생성 실패**(저장 없음, `last_error`) | 8 | 귀속 모델이 scope 밖 rule/risk id 사용: w5-0·w5-1·w9-1·w10-0·w11-0·w11-1·w12-0·w12-1 |
+| Claude 독립 검토 완료 | **5/7** | w6-1(fail 1·warning 1)·w5-0(w2)·w5-1(w1)·w10-0(w4)·w12-0(w1). 모델 claude-opus-5 |
+| Claude 요청 불가/실패 | 2 | w6-0(규칙 fail이라 `request_independent` 거부) · w13-1(Claude API 400, 자동 재호출 없음) |
+| OpenAI adjudication | **0/5 실행** | 5건 모두 「재검토 선행 결과가 없습니다」 |
+| 교수자 최종 승인 준비 완료(next=professor·규칙 warning·보류 단계 없음) | **3/20** | w2-1·w3-0·w13-0 |
+
+### 🔴 발견한 workflow 결함 3건(코드 미수정, 보고만)
+
+1. **focused_v1에서 adjudication이 구조적으로 불가.** `buildReviewPrompt('adjudication')`은 `run.openai_review`를 요구하는데(`_shared/contentReview.ts:313`), focused_v1은 OpenAI 단계를 `generation_quality` 재사용으로 대체해 `openai_review`가 null이다. 따라서 「Claude finding이 있을 때만 adjudication」은 현행 코드에서 실행될 수 없고, Claude finding이 생긴 미션은 `nextReviewStage`가 adjudication에서 멈춰 교수자 단계로 못 간다(w6-1·w5-0·w5-1·w10-0·w12-0). 선택: adjudication 입력을 `generation_quality`로 대체하거나, focused_v1에서 adjudication을 생략하고 교수자가 Claude finding을 직접 판정(UI는 이미 finding별 결정 입력을 지원).
+2. **최종 검수 자료(귀속) 단계가 현행 realization pack 범위 밖 화행에서 실패.** pack `pragma_ko_zh_request_refusal_thanks_v1@1.2.0`의 `scope_speech_acts`는 request·refusal·thanks뿐. 초대·제안·반대·불만·사과·칭찬 미션은 scope가 비어 귀속 모델의 모든 id가 「scope 밖」(8건 실패) 또는 `realization_pack_id` null로 저장돼 스키마 fail(4건). 20칸 중 이 3화행이 아닌 12칸이 여기 걸린다. 규칙 fail로 저장된 7건은 `prepared_finalization`이 이미 있어 서버가 재실행을 거부한다(DB 초기화 없이는 재시도 불가).
+3. **R31 경로 불일치(request·thanks·refusal 3건).** Reason 문항이 `corrections` 배열을 지닌 미션(w2-0·w3-1·w6-0)에서 서버 귀속 대상은 `mpj_items[3].corrections[*]`를 포함하지만 스키마 정규화 뒤의 클라이언트 검사(`expectedItemLineageTargetPaths`)에는 그 경로가 없어 「미션에 없는 추적 경로」 fail.
+
+이 세 가지는 Reason 콘텐츠와 무관한 검수 파이프라인 결함이다. 동결 20건은 그대로다.
+
+### 교수자가 실제 확인해야 할 공식 finding
+
+- **Claude 독립 검토(원문 보존, `official-claude-findings-20260911.json`)**
+  - w6-1 **fail** `core_content.preceding_turn`: 선행 발화 「教授，我想请你帮忙…」가 학생이 교수에게 부탁하는 문장으로 읽힘(장면은 교수→학생 부탁). 역할 역전. warning: 참고 산출 「签到工作」 vs 선행 발화 「接待工作」 용건 불일치.
+  - w5-0 warning 2: MPJ1 「不收参加费」 직역 어색 · 앵커의 회신 요청 변형(참석 전제)이 대역 조작인지 교수자 판단.
+  - w5-1 warning 1: MPJ2 해설의 장면 비교 서술 부정확.
+  - w10-0 warning 4: 원문 존대 요체 vs close 설정 · 「那家有我们俩都爱吃的菜的面馆」 的 중첩 · MPJ4 해설의 「조건 모순」 표현이 r2 실제 진술과 불일치 · MPJ1 권장안 동사 연쇄 어색.
+  - w12-0 warning 1: 원문 「앞으로도」→「앞으로는」, 「가능한 빨리」→「가능한 한 빨리」.
+- **재사용된 production critic fail**(12절과 동일 10개): w5-0 1·w5-1 2·w6-0 1·w10-0 2·w12-0 2·w13-1 2.
+- **규칙 warning**: R5·R19·R32는 전 미션 공통 성격(길이 단서 눈검사, 앵커 문항 동일 원문, 미귀속 claim).
+
+교수자 최종 승인은 실행하지 않았다.

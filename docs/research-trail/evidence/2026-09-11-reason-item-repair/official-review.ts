@@ -70,10 +70,12 @@ try {
     }
     if (mode !== 'prepare' && mode !== 'independent') throw new Error('Choose prepare, independent or status');
     const stages: string[] = [];
+    // Same as the admin queue: a failed call holds this item and the batch moves on. Never retried automatically.
     const result = await prepareContentReview(target, {
       request: contentReviewRequest, stopped: () => false,
       onStage: (stage) => { stages.push(stage); console.log(JSON.stringify({ key, stage })); },
-    });
+    }).catch(async (cause) => ({ status: 'held' as const, message: cause instanceof Error ? cause.message : String(cause),
+      inspection: await contentReviewRequest(target, 'inspect').catch(() => undefined) }));
     const row = { at: new Date().toISOString(), key, scenario_id: target.targetId, mode, status: result.status, message: result.message, stages_run: stages,
       contentHash: result.inspection?.contentHash ?? null, run: summarize(result.inspection?.run ?? null),
       scope: 'Official content-review through the existing client workflow; no approval, no content change.' };

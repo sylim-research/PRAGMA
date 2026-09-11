@@ -1,0 +1,38 @@
+{
+  "at": "2026-09-11T10:48:48.905Z",
+  "key": "w12-0",
+  "scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+  "mode": "prepare",
+  "status": "held",
+  "message": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=under_specified; mpj_items[2].corrections[2]: scope 밖 risk_id=over_attributed; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=over_attributed | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 risk_id=risk_over_attribution; mpj_items[3].recommended_example: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[4].candidates[0]: scope 밖 rule_id=realization_direct_cause_effect | batch 4: mpj_items[4].candidates[1]: scope 밖 risk_id=under_specified; mpj_items[4].candidates[2]: scope 밖 rule_id=within_band; mpj_items[4].candidates[3]: scope 밖 rule_id=over_attributed",
+  "stages_run": [
+    "rules",
+    "finalization"
+  ],
+  "contentHash": "b0f4934901d9943b2c51b720dc5824fed2e26a1881057a8ce725ff868283d9f6",
+  "run": {
+    "id": "9ebaa69d-c018-41e3-b703-e551be1359b3",
+    "content_hash": "b0f4934901d9943b2c51b720dc5824fed2e26a1881057a8ce725ff868283d9f6",
+    "criteria_version": "content_review_v2",
+    "approval_policy": "focused_v1",
+    "rules_verdict": "warning",
+    "generation_quality": true,
+    "generation_quality_verdict": "fail",
+    "openai_review": null,
+    "independent_review_requested": false,
+    "claude_review": null,
+    "adjudication": null,
+    "prepared_finalization": false,
+    "running_stage": null,
+    "last_error": "batch 2: mpj_items[2].corrections[0]: scope 밖 rule_id=reason; mpj_items[2].corrections[1]: scope 밖 risk_id=under_specified; mpj_items[2].corrections[2]: scope 밖 risk_id=over_attributed; mpj_items[2].recommended_example: scope 밖 rule_id=reason; mpj_items[3].target: scope 밖 risk_id=over_attributed | batch 3: mpj_items[3].corrections[0]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[3].corrections[2]: scope 밖 risk_id=risk_over_attribution; mpj_items[3].recommended_example: scope 밖 rule_id=realization_direct_cause_effect; mpj_items[4].candidates[0]: scope 밖 rule_id=realization_direct_cause_effect | batch 4: mpj_items[4].candidates[1]: scope 밖 risk_id=under_specified; mpj_items[4].candidates[2]: scope 밖 rule_id=within_band; mpj_items[4].candidates[3]: scope 밖 rule_id=over_attributed",
+    "approved_at": null,
+    "next_stage": "finalization",
+    "steps": [
+      "rules",
+      "openai",
+      "finalization",
+      "professor"
+    ]
+  },
+  "scope": "Official content-review through the existing client workflow; no approval, no content change."
+}
