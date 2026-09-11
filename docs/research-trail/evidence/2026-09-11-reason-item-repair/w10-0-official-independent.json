@@ -1,7 +1,7 @@
 {
-  "at": "2026-09-11T12:50:59.695Z",
+  "at": "2026-09-11T13:33:47.958Z",
   "key": "w10-0",
-  "scenario_id": "1f6d8863-c334-4d2b-a97f-3eb622e48c0c",
+  "scenario_id": "1baacb9c-735d-4c29-a26e-b57ab6cf19d5",
   "mode": "independent",
   "status": "ready",
   "message": "AI 검토 완료 · 교수자 판단 대기",
@@ -9,10 +9,10 @@
     "claude",
     "adjudication"
   ],
-  "contentHash": "bf74696d6517f173f1e1436db931bf4bb2fa2e8afb66a4c785e1314112457332",
+  "contentHash": "34bb5fdc96fb74f1ac06b0331afa84558399c77d4cd1350a96ef6b9c8075ac64",
   "run": {
-    "id": "b6f6094f-6b17-403c-8e42-2d0f4aa47b2f",
-    "content_hash": "bf74696d6517f173f1e1436db931bf4bb2fa2e8afb66a4c785e1314112457332",
+    "id": "51b9a25f-cb84-4da7-8f65-43c09fc2ee31",
+    "content_hash": "34bb5fdc96fb74f1ac06b0331afa84558399c77d4cd1350a96ef6b9c8075ac64",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",

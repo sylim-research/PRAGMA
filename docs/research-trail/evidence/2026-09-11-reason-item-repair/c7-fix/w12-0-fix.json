@@ -1,0 +1,101 @@
+{
+  "at": "2026-09-11T13:25:44.826Z",
+  "key": "w12-0",
+  "origin_scenario_id": "013cc144-9793-4e9b-a292-6ba58abe99dc",
+  "new_scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+  "mode": "core",
+  "changes": [
+    {
+      "path": "core.source_text",
+      "before": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
+      "after": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다."
+    },
+    {
+      "path": "core.source_text",
+      "before": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
+      "after": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로는 이런 일이 반복되지 않기를 바랍니다."
+    },
+    {
+      "path": "core.focal_segments[support].text",
+      "before": "가능한 빨리 볼륨을 줄여주실 수 있을까요?",
+      "after": "가능한 한 빨리 볼륨을 줄여주실 수 있을까요?"
+    },
+    {
+      "path": "production_task.source_text",
+      "before": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
+      "after": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다."
+    },
+    {
+      "path": "production_task.source_text",
+      "before": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로도 이런 일이 반복되지 않기를 바랍니다.",
+      "after": "안녕하세요, 이번 주에 두 번이나 밤늦게 음악 소리 때문에 잠을 제대로 못 잤습니다. 가능한 한 빨리 볼륨을 줄여주실 수 있을까요? 앞으로는 이런 일이 반복되지 않기를 바랍니다."
+    },
+    {
+      "path": "production_task.focal_segments[support].text",
+      "before": "가능한 빨리 볼륨을 줄여주실 수 있을까요?",
+      "after": "가능한 한 빨리 볼륨을 줄여주실 수 있을까요?"
+    },
+    {
+      "path": "mpj_items[3].reasons[r1].text_ko",
+      "before": "‘这让我很不方便’가 업무상의 지연을 개인의 불편으로 표현하여, 동료에게 제기할 수 있는 업무상 불만의 범위를 벗어나기 때문이다.",
+      "after": "‘你在我预约的时段还一直用着会议室’로 첫머리부터 ‘你’를 주어로 상대의 행동을 서술해, 불만이 사실 확인보다 지적으로 먼저 들릴 수 있기 때문이다."
+    }
+  ],
+  "semantic": {
+    "verdict": "pass",
+    "issues": []
+  },
+  "transplant": {
+    "saved": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+    "lineage_meta": {
+      "realization_pack_id": null,
+      "realization_pack_version": null,
+      "coverage_status": "not_covered",
+      "rule_scope_ids": [],
+      "risk_scope_ids": [],
+      "evidence_scope_ids": []
+    }
+  },
+  "revised": {
+    "ok": true,
+    "ruleResult": "warning",
+    "violations": [
+      {
+        "id": "R5",
+        "level": "warning",
+        "message": "문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)"
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 3 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "source 완전 중복: 문항 2 = 문항 4 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你在我预约的时段还一直用着会议室,导致我们的会议…\""
+      },
+      {
+        "id": "R19",
+        "level": "warning",
+        "message": "판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你在我预约的时段还一直用着会议室,导致我们的会议…\""
+      }
+    ],
+    "quality": {
+      "verdict": "pass",
+      "summary_ko": "모든 후보가 실제 화용 대역에 맞게 분류되어 있고, 극단적 오답이나 명백한 오도, 장면 불명확성 없이 설계되었다.",
+      "findings": [],
+      "model": "gpt-4.1",
+      "prompt_version": "quality_v22_observed_pdr_scene",
+      "checked_at": "2026-09-11T13:25:44.467Z",
+      "mission_content_hash": "5d4f30b8f1fa4cef7fd5bfbf1d1b730dbab07f9eb6c17824d05908342b8c50d7"
+    },
+    "reason_findings": 0
+  },
+  "scope": "Core-level fix as a new draft core row + mission transplant + revision; origin row and its review runs preserved; not instructor approval."
+}

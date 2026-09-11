@@ -1,5 +1,5 @@
 {
-  "at": "2026-09-11T12:47:14.134Z",
+  "at": "2026-09-11T13:28:54.098Z",
   "key": "w5-0",
   "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
   "mode": "independent",
@@ -9,10 +9,10 @@
     "claude",
     "adjudication"
   ],
-  "contentHash": "f872d5f9e7c760407ee0d92918e1537f8cbdafb79ceddb798a8080bb613c34bb",
+  "contentHash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
   "run": {
-    "id": "6d6b93b4-6a51-4bb5-aa92-bcb8a7cd1ed9",
-    "content_hash": "f872d5f9e7c760407ee0d92918e1537f8cbdafb79ceddb798a8080bb613c34bb",
+    "id": "2ce52caf-6e6d-4fe2-b031-92141321f41d",
+    "content_hash": "dbddbd65a06b1c38fd15c5d35f9cffaf9a25d289bc74d05b04b15c79e1c9c9c2",
     "criteria_version": "content_review_v3",
     "approval_policy": "focused_v1",
     "rules_verdict": "warning",
@@ -22,11 +22,11 @@
     "independent_review_requested": true,
     "claude_review": {
       "verdict": "warning",
-      "findings": 2,
+      "findings": 1,
       "model": "claude-opus-5"
     },
     "adjudication": {
-      "decisions": 2,
+      "decisions": 1,
       "model": "gpt-4.1-2025-04-14"
     },
     "prepared_finalization": true,
