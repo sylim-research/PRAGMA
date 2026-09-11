@@ -23,7 +23,7 @@ export const CURRENT_CONTENT_RELEASE = {
   ],
   qualityPromptVersions: {
     core: "core_quality_v11_observed_pdr_scene_gate",
-    mission: "quality_v22_observed_pdr_scene",
+    mission: "quality_v23_reason_branch_severity",
   },
 } as const;
 

@@ -4,6 +4,7 @@ import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
 import { CORE_SCENE_PREFLIGHT_PROMPT, readCoreScenePlan, coreSemanticGate, coreSemanticContent } from '../_shared/sceneGrounding.ts'
 import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
+import { calibrateReasonSeverity } from "../_shared/reasonCriticCalibration.ts"
 import {
   FEEDBACK_MAX_COMPLETION_TOKENS,
   feedbackPayloadIssue,
@@ -3393,6 +3394,11 @@ ${zhKoTranslationAudit}
    ⓒ 사실이고 정답과 비슷한 강도로 핵심 이유가 될 수 있으면 fail(경합이 분명할 때) 또는 warning(경합 가능성이 있을 때). 문항이 「가장 큰 이유」를 고르게 하므로 경합하는 오답은 문항 자체를 모호하게 만든다.
    오답이 주원인과 무관하거나 부차적이라는 것은 결함이 아니라 ⓑ의 정상 상태다. 오답에 「주원인과 구별되는 별개의 오진」이나 「주원인과의 연결」을 요구하지 마라. 이 코드의 fail은 ⓐ(허위 전제)와 ⓒ(경합)에만 낸다.
    문제가 없다고 판단한 선택지(「정상」「오답으로 허용」)에는 finding을 만들지 않는다. 검토 과정을 finding으로 적지 않는다.
+   primary_reason_ambiguity finding에는 reason_branch를 반드시 적어라: false_premise(ⓐ 허위 전제) ·
+   paraphrase_of_primary(정답의 바꿔 말하기) · competing_clear(ⓒ 경합이 분명) · competing_possible(ⓒ 경합 가능성) ·
+   primary_off_focus(정답이 target feature가 아닌 의미·문법 문제) · not_a_reason(이유가 아닌 사실 확인) ·
+   secondary(ⓑ 사실이고 부차적·다른 차원 — 결함이 아니므로 원칙적으로 finding을 만들지 않는다).
+   서버는 이 코드의 severity를 reason_branch로 다시 정한다. note_ko의 결론과 reason_branch가 같아야 한다.
 ⑩ context_plan_mismatch — scale4는 소박한 규칙을 깨는 적절한 대비 장면이고,
    ${contextPlan}이다. native MPJ5의 scale4↔judge3는 화행·item_focus·핵심 실현 전략을 유지하면서
    P/D/R 중 정확히 한 축만 달라져 적절성 방향이 바뀌어야 하며, multi_judge는 P/D/R 한 축만
@@ -3440,6 +3446,7 @@ MPJ1~5의 feedback_quality와 MPJ5 comparison_quality를 별도로 끝까지 확
       "actual_band_code": "실제 판정 대역 코드 | uncertain",
       "direction_from_within": "within | toward_lower | toward_upper | uncertain",
       "boundary_crossed": true | false | null,
+      "reason_branch": "primary_reason_ambiguity일 때만 false_premise | paraphrase_of_primary | competing_clear | competing_possible | primary_off_focus | not_a_reason | secondary, 그 밖에는 빈 문자열",
       "note_ko": "무엇이 왜 문제인지 1~2문장. 대안 문장을 쓰지 말 것."
     }
   ]
@@ -4788,6 +4795,11 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         const code = typeof f.code === 'string' && CODES.includes(f.code) ? f.code : 'internal_inconsistency'
         let severity: 'warning' | 'fail' = f.severity === 'fail' ? 'fail' : 'warning'
         let calibrationPrefix = ''
+        if (code === 'primary_reason_ambiguity') {
+          const calibrated = calibrateReasonSeverity(severity, f.reason_branch)
+          severity = calibrated.severity
+          calibrationPrefix = calibrated.prefix
+        }
         if (code === 'band_mismatch') {
           const reference = missionCandidateReferenceForPath(grounding.where)
           const blueprint = reference && Array.isArray(b.feature?.band_schema) && b.feature?.within_band_code
