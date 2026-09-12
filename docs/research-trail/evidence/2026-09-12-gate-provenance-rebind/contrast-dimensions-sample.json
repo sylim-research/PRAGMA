@@ -1,0 +1,505 @@
+{
+  "at": "2026-09-12T06:45:48.609Z",
+  "rows": [
+    {
+      "key": "w2-0",
+      "speech_act": "request",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w2-1",
+      "speech_act": "request",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "distant",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "초면"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 초면"
+      ]
+    },
+    {
+      "key": "w3-0",
+      "speech_act": "thanks",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w3-1",
+      "speech_act": "thanks",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "아는 사이",
+          "after": "친밀"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 아는 사이 → 친밀"
+      ]
+    },
+    {
+      "key": "w4-0",
+      "speech_act": "compliment",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w4-1",
+      "speech_act": "compliment",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_higher",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "p",
+          "axisLabel": "지위·권한 관계",
+          "before": "동등",
+          "after": "내가 높음"
+        }
+      ],
+      "reveal": [
+        "지위·권한 관계 · 동등 → 내가 높음"
+      ]
+    },
+    {
+      "key": "w5-0",
+      "speech_act": "agreement",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w5-1",
+      "speech_act": "agreement",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "p",
+          "axisLabel": "지위·권한 관계",
+          "before": "동등",
+          "after": "상대 높음"
+        }
+      ],
+      "reveal": [
+        "지위·권한 관계 · 동등 → 상대 높음"
+      ]
+    },
+    {
+      "key": "w6-0",
+      "speech_act": "refusal",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "p",
+          "axisLabel": "지위·권한 관계",
+          "before": "상대 높음",
+          "after": "동등"
+        }
+      ],
+      "reveal": [
+        "지위·권한 관계 · 상대 높음 → 동등"
+      ]
+    },
+    {
+      "key": "w6-1",
+      "speech_act": "refusal",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "p",
+          "axisLabel": "지위·권한 관계",
+          "before": "동등",
+          "after": "상대 높음"
+        }
+      ],
+      "reveal": [
+        "지위·권한 관계 · 동등 → 상대 높음"
+      ]
+    },
+    {
+      "key": "w9-0",
+      "speech_act": "apology",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w9-1",
+      "speech_act": "apology",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w10-0",
+      "speech_act": "proposal",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "아는 사이",
+          "after": "친밀"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 아는 사이 → 친밀"
+      ]
+    },
+    {
+      "key": "w10-1",
+      "speech_act": "proposal",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "distant",
+        "p": "equal",
+        "r": "low"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "초면"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 초면"
+      ]
+    },
+    {
+      "key": "w11-0",
+      "speech_act": "opposition",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "r",
+          "axisLabel": "부탁·사안의 부담",
+          "before": "부담 낮음",
+          "after": "부담 보통"
+        }
+      ],
+      "reveal": [
+        "부탁·사안의 부담 · 부담 낮음 → 부담 보통"
+      ]
+    },
+    {
+      "key": "w11-1",
+      "speech_act": "opposition",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w12-0",
+      "speech_act": "complaint",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    },
+    {
+      "key": "w12-1",
+      "speech_act": "complaint",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "r",
+          "axisLabel": "부탁·사안의 부담",
+          "before": "부담 낮음",
+          "after": "부담 보통"
+        }
+      ],
+      "reveal": [
+        "부탁·사안의 부담 · 부담 낮음 → 부담 보통"
+      ]
+    },
+    {
+      "key": "w13-0",
+      "speech_act": "request",
+      "mjt1_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "p",
+          "axisLabel": "지위·권한 관계",
+          "before": "동등",
+          "after": "상대 높음"
+        }
+      ],
+      "reveal": [
+        "지위·권한 관계 · 동등 → 상대 높음"
+      ]
+    },
+    {
+      "key": "w13-1",
+      "speech_act": "request",
+      "mjt1_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "mjt2_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "dimensions": [
+        {
+          "axis": "d",
+          "axisLabel": "관계의 거리",
+          "before": "친밀",
+          "after": "아는 사이"
+        }
+      ],
+      "reveal": [
+        "관계의 거리 · 친밀 → 아는 사이"
+      ]
+    }
+  ]
+}

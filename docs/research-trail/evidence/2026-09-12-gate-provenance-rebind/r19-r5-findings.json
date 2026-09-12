@@ -1,0 +1,3976 @@
+{
+  "at": "2026-09-12T04:21:09.936Z",
+  "missions": [
+    {
+      "key": "w2-0",
+      "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+      "speech_act": "request",
+      "mode": "translation",
+      "target_feature": "request_mitigation_optionality",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"지난번에 받은 회의실 예약 안내 링크를 잃어…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"지난번에 받은 회의실 예약 안내 링크를 잃어…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我把之前收到的会议室预约说明链接弄丢了。你就把那…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我把之前收到的会议室预约说明链接弄丢了。你就把那…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "내일 우리 집에서 보드게임 하기로 했잖아. 네가 가진 작은 카드 게임도 가져와.",
+          "target": "明天我们说好在我家玩桌游。你就把那个小卡牌游戏也带来吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你得把那个链接再发我一次。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。不知道请你把那个链接再发我一次，会不会不太合适？",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "지난번에 받은 회의실 예약 안내 링크를 잃어버렸어요. 그 링크를 한 번만 다시 보내 주실 수 있을까요?",
+          "target": "我把之前收到的会议室预约说明链接弄丢了。你就把那个链接再发我一次吧。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你能不能把那个链接再发我一次？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。你得把那个链接再发我一次。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "我把之前收到的会议室预约说明链接弄丢了。不知道请你把那个链接再发我一次，会不会不太合适？",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "이 발표 자료는 내일 제출해야 합니다. 검토에는 약 40분이 걸립니다. 오늘 안에 끝까지 검토해 주실 수 있을까요?",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。你能今天内帮我审阅完吗？",
+              "len": 34,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "담당 외 검토에 40분이 필요한 상황에서 ‘能…吗’로 당일 완료 가능성을 바로 물어, 동료가 시간 여건을 판단해 응답할 수 있으므로 이 간결한 방식을 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。你今天内帮我审阅完。",
+              "len": 32,
+              "bands": [
+                "too_direct"
+              ],
+              "role": null,
+              "note_ko": "앵커의 ‘能…吗’를 제거해 당일 완료 가능성을 묻는 요청을 수행 지시로 바꿉니다. 동료의 담당 업무가 아닌 40분짜리 검토를 사전 수락 없이 오늘 끝낼 일로 정하므로, 단순히 직접형이라는 이유가 아니라 업무 배정 권한과 합의가 없다는 점에서 too_direct입니다."
+            },
+            {
+              "n": 3,
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。想请你帮我审阅完，你看今天内方便吗？",
+              "len": 40,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "40분짜리 도움을 새로 청하면서 ‘想请你’로 요청 의도를 밝히고 ‘你看今天内方便吗’로 일정 판단을 동료에게 맡기므로, 부담을 인정하는 협의형 요청으로 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "这份演示材料明天要交，审阅大约需要四十分钟。想请你今天内帮我审阅完，但不知道这事该不该向你开口。",
+              "len": 48,
+              "bands": [
+                "too_indirect"
+              ],
+              "role": null,
+              "note_ko": "‘想请你’와 당일 검토 완료라는 요청 내용은 유지하되, 일정 판단을 묻던 부분을 ‘该不该向你开口’라는 요청 제기 자체에 대한 망설임으로 바꿉니다. 부담을 인정하며 수행 가능성을 협의하는 수준을 넘어, 상대가 수락 여부를 답해야 하는지 부탁을 꺼내도 된다고 안심시켜야 하는지 흐려져 too_indirect입니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w2-1",
+      "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+      "speech_act": "request",
+      "mode": "stt_interpreting",
+      "target_feature": "request_mitigation_optionality",
+      "within_code": null,
+      "production_pdr": {
+        "d": "distant",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"제 펜 좀 주워 주세요. 제 자리에서는 손이…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"제 펜 좀 주워 주세요. 제 자리에서는 손이…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"把我的笔捡给我吧。我这边够不着。\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"把我的笔捡给我吧。我这边够不着。\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "방금 찍은 풍경 사진 한 장 보내 줘. 휴대전화 배경으로 쓰려고.",
+          "target": "把你刚拍的那张风景照发我吧。我想用它当手机壁纸。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제 펜 좀 주워 주세요. 제 자리에서는 손이 닿지 않네요.",
+          "target": "把我的笔捡给我吧。我这边够不着。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제 펜 좀 주워 주세요. 제 자리에서는 손이 닿지 않네요.",
+          "target": "把我的笔捡给我吧。我这边够不着。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "能不能帮我捡一下笔？我这边够不着。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "帮我捡一下笔。我这边够不着。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "要是你能帮我捡一下笔就好了。我这边够不着。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제 펜 좀 주워 주세요. 제 자리에서는 손이 닿지 않네요.",
+          "target": "把我的笔捡给我吧。我这边够不着。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "이 원고 네 쪽의 흐름이 자연스러운지 확인하고 싶어요. 모임 끝나고 20분 정도 남아서 읽고 의견 좀 주실 수 있을까요?",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "我想看看这四页稿子读起来顺不顺。活动后留下二十分钟左右，读读并给我点意见，可以吗？",
+              "len": 41,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "초면인 참가자의 추가 20분이 필요한 상황에서 구체적인 일을 밝히고 ‘可以吗’로 수락 여부를 물으므로, 부담을 알고 바로 답할 수 있는 간결한 요청으로 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "我想看看这四页稿子读起来顺不顺。活动后留下二十分钟左右，读读并给我点意见。",
+              "len": 37,
+              "bands": [
+                "too_direct"
+              ],
+              "role": null,
+              "note_ko": "앵커의 요청 내용은 그대로 두고 수락 여부를 묻는 ‘可以吗’를 없애 직접형으로 만들었다. 추가 20분을 쓰기로 합의하지 않은 동등한 초면 참가자에게 잔류와 검토를 정해 주므로 too_direct 방향이다. 검토 약속이 이미 있는 관계라면 가능한 표현이다."
+            },
+            {
+              "n": 3,
+              "text": "我想看看这四页稿子读起来顺不顺。如果方便的话，想请你活动后留二十分钟左右，读一读，给我点意见。",
+              "len": 47,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "모임 뒤 시간을 요청하므로 ‘如果方便的话’로 실행 여건을 열어 두고 ‘想请你’로 부탁을 명시해, 상대의 일정 판단을 존중하면서 용건은 분명히 하는 전략으로 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "我想看看这四页稿子读起来顺不顺。要是你方便在活动后留二十分钟左右，读一读，给我点意见就好了。",
+              "len": 46,
+              "bands": [
+                "too_indirect"
+              ],
+              "role": null,
+              "note_ko": "앵커의 편의에 대한 여지는 ‘方便’으로 유지하되, ‘想请你’라는 명시적 부탁을 ‘要是…就好了’의 바람으로 바꿨다. 원고 분량·목적·시간·할 일은 보존하면서 실제 참여를 요청하는지 희망을 말하는지 상대가 해석하게 하므로 too_indirect 방향이다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w3-0",
+      "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+      "speech_act": "thanks",
+      "mode": "translation",
+      "target_feature": "gratitude_calibration",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=21자, 후보 2[insufficient]=24자, 후보 3[within_band]=23자, 후보 4[excessive]=29자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"점심시간을 내서 발표 자료의 도표를 고쳐 줘…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"점심시간을 내서 발표 자료의 도표를 고쳐 줘…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你抽出午休时间帮我修好了演示文稿里的图表,小小地…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你抽出午休时间帮我修好了演示文稿里的图表,小小地…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "오탈자를 찾아줘서 고마워. 덕분에 인쇄 전에 고칠 수 있게 됐어.",
+          "target": "你帮我找出了错别字，小小地感谢你一下。多亏你，我能在印刷前改好了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "점심시간을 내서 발표 자료의 도표를 고쳐 줘서 고마워요. 덕분에 오후 발표에 쓸 수 있게 됐어요.",
+          "target": "你抽出午休时间帮我修好了演示文稿里的图表，小小地感谢你一下。多亏你，下午演示时能用上了。",
+          "accepted_band_codes": [
+            "insufficient"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "점심시간을 내서 발표 자료의 도표를 고쳐 줘서 고마워요. 덕분에 오후 발표에 쓸 수 있게 됐어요.",
+          "target": "你抽出午休时间帮我修好了演示文稿里的图表，小小地感谢你一下。多亏你，下午演示时能用上了。",
+          "accepted_band_codes": [
+            "insufficient"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "真心谢谢你抽出午休时间，帮我修好了演示文稿里的图表。多亏你，下午演示时能用上了。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "你抽出午休时间，帮我修好了演示文稿里的图表，那就算我谢过你了吧。多亏你，下午演示时能用上了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "你抽出午休时间，帮我修好了演示文稿里的图表，我真不知道该怎么感谢你才够。多亏你，下午演示时能用上了。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "점심시간을 내서 발표 자료의 도표를 고쳐 줘서 고마워요. 덕분에 오후 발표에 쓸 수 있게 됐어요.",
+          "target": "你抽出午休时间帮我修好了演示文稿里的图表，小小地感谢你一下。多亏你，下午演示时能用上了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "방 번호를 알려 줘서 고마워요. 덕분에 방을 찾았어요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "谢谢你告诉我房间号。多亏你，我找到房间了。",
+              "len": 21,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "보고 있던 번호를 바로 알려 준 장면에서는 '谢谢'와 찾았다는 결과만으로 고마움이 분명해, 도움을 과장하지 않는 간결한 감사를 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "姑且谢谢你告诉我房间号吧。多亏你，我找到房间了。",
+              "len": 24,
+              "bands": [
+                "insufficient"
+              ],
+              "role": null,
+              "note_ko": "간단한 '谢谢' 자체가 아니라, 이를 잠정적으로만 인정하는 '姑且…吧'가 조절 자원이다. 방을 찾은 수혜는 유지하면서도 감사에 유보를 걸어, 고마워할지 망설일 근거가 없는 회원 간 안내 상황에서는 부족함으로 읽힌다. 친한 사이의 장난스러운 감사라면 가능한 표현이다."
+            },
+            {
+              "n": 3,
+              "text": "多亏你告诉我房间号，我才找到了房间，麻烦你了。",
+              "len": 23,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "번호 안내로 방을 찾은 장면에서 '多亏…才…'로 도움의 효과를 앞세우고 '麻烦你了'로 응해 준 수고를 인정해, 직접적인 '谢谢' 없이도 고마움을 충분히 전할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "多亏你告诉我房间号，我才找到了房间，真是欠了你一份大人情。",
+              "len": 29,
+              "bands": [
+                "excessive"
+              ],
+              "role": null,
+              "note_ko": "앵커의 수혜 인정은 그대로 두고 '麻烦你了'를 '欠了你一份大人情'으로 바꾸었다. 이미 보고 있던 번호를 알려 준 일을 큰 인정 빚으로 규정해 불필요한 보답 부담을 암시하므로 과함에 해당한다. 실제로 상당한 수고를 감수한 도움이라면 자연스러울 수 있지만 이 장면에는 그런 근거가 없다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w3-1",
+      "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+      "speech_act": "thanks",
+      "mode": "stt_interpreting",
+      "target_feature": "gratitude_calibration",
+      "within_code": null,
+      "production_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=13자, 후보 2[insufficient]=18자, 후보 3[within_band]=14자, 후보 4[excessive]=18자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"책장 조립 도와줘서 정말 고마워. 한 시간이…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"책장 조립 도와줘서 정말 고마워. 한 시간이…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"谢谢你帮我装书架,真的太感谢你了。你陪我装了一个…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"谢谢你帮我装书架,真的太感谢你了。你陪我装了一个…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "엑셀 오류 고쳐 줘서 정말 고마워. 네 일 끝내고 40분이나 도와주느라 수고 많았어.",
+          "target": "谢谢你帮我修好了Excel里的错误，真的太感谢你了。你忙完自己的工作，还帮了我四十分钟，辛苦了，我都不知道怎么谢你才好了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "책장 조립 도와줘서 정말 고마워. 한 시간이나 같이 조립하느라 수고 많았어.",
+          "target": "谢谢你帮我装书架，真的太感谢你了。你陪我装了一个小时，辛苦了，我都不知道怎么谢你才好了。",
+          "accepted_band_codes": [
+            "excessive"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "책장 조립 도와줘서 정말 고마워. 한 시간이나 같이 조립하느라 수고 많았어.",
+          "target": "谢谢你帮我装书架，真的太感谢你了。你陪我装了一个小时，辛苦了，我都不知道怎么谢你才好了。",
+          "accepted_band_codes": [
+            "excessive"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "真谢谢你帮我装书架。你陪我装了一个小时，辛苦了。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "你帮我装书架，我也不好不说声谢谢。你陪我装了一个小时，辛苦了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "你帮我装书架，我真是怎么感谢你都不够。你陪我装了一个小时，辛苦了。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "책장 조립 도와줘서 정말 고마워. 한 시간이나 같이 조립하느라 수고 많았어.",
+          "target": "谢谢你帮我装书架，真的太感谢你了。你陪我装了一个小时，辛苦了，我都不知道怎么谢你才好了。",
+          "accepted_band_codes": [
+            "excessive"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "真谢谢你帮我装书架。你陪我装了一个小时，辛苦了。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "你帮我装书架，我也不好不说声谢谢。你陪我装了一个小时，辛苦了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "你帮我装书架，我真是怎么感谢你都不够。你陪我装了一个小时，辛苦了。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "gratitude_calibration",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "장갑 주워 줬네. 고마워.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "你帮我捡起了手套，谢谢啊。",
+              "len": 13,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "장갑을 바로 주워 준 일을 둘 다 아는 장면에서 ‘谢谢啊’가 감사의 뜻을 직접 전달하므로, 가벼운 호의를 자연스럽게 주고받는 간결한 표현으로 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "你帮我捡起了手套，那就算谢过你了啊。",
+              "len": 18,
+              "bands": [
+                "insufficient"
+              ],
+              "role": null,
+              "note_ko": "‘谢谢啊’를 ‘就算谢过你了啊’로 바꿔 직접 감사하기보다 감사한 것으로 치자는 처리 방식으로 낮췄다. 짧아서 부족한 것이 아니라 감사 자체를 형식적으로 갈음하는 태도가 드러나, 별도의 장난 맥락이 없는 이 장면에서는 부족함으로 기운다."
+            },
+            {
+              "n": 3,
+              "text": "你帮我捡起了手套，麻烦你了。",
+              "len": 14,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "장갑을 주워 준 작은 수고에 ‘麻烦你了’로 반응하면 상대가 손을 써 준 점을 알아차렸다는 인상을 주므로, 직접적인 ‘谢谢’와 다른 방식의 감사로 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "你帮我捡起了手套，真是让我感激不尽。",
+              "len": 18,
+              "bands": [
+                "excessive"
+              ],
+              "role": null,
+              "note_ko": "‘麻烦你了’의 가벼운 수고 인정을 ‘感激不尽’의 다할 수 없는 감사로 바꿨다. 이미 서로 확인한 즉각적인 도움에 지속적이고 깊은 은혜의 무게를 부여하므로, 공손표지 수가 아니라 감사의 의미 강도에서 과함 경계를 넘는다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w4-0",
+      "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+      "speech_act": "compliment",
+      "mode": "translation",
+      "target_feature": "compliment_grounding_sensitivity",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"발표 자료에서 절차를 설명한 부분이 정말 잘…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"발표 자료에서 절차를 설명한 부분이 정말 잘…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"只说资料里讲步骤的这部分,简直完美。复杂的实验流…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"只说资料里讲步骤的这部分,简直完美。复杂的实验流…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "영상에서 길을 안내하는 부분이 정말 잘됐어. 갈림길마다 방향 자막이 있어서 이동 경로를 쉽게 따라갈 수 있네.",
+          "target": "只说视频里指路的这部分，简直完美。每个岔路口都有方向字幕，路线很容易跟上。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "발표 자료에서 절차를 설명한 부분이 정말 잘 정리됐네요. 복잡한 실험 절차를 세 단계로 나눠 놓으니 이해하기 쉬워요.",
+          "target": "只说资料里讲步骤的这部分，简直完美。复杂的实验流程分成三步，很容易理解。",
+          "accepted_band_codes": [
+            "overreaching"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "발표 자료에서 절차를 설명한 부분이 정말 잘 정리됐네요. 복잡한 실험 절차를 세 단계로 나눠 놓으니 이해하기 쉬워요.",
+          "target": "只说资料里讲步骤的这部分，简直完美。复杂的实验流程分成三步，很容易理解。",
+          "accepted_band_codes": [
+            "overreaching"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "资料里讲步骤的这部分写得很清楚。复杂的实验流程分成三步，很容易理解。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "资料里讲步骤的这部分写得还过得去。复杂的实验流程分成三步，很容易理解。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "资料里讲步骤的这部分写得已经没有需要改进的地方了。复杂的实验流程分成三步，很容易理解。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "발표 자료에서 절차를 설명한 부분이 정말 잘 정리됐네요. 복잡한 실험 절차를 세 단계로 나눠 놓으니 이해하기 쉬워요.",
+          "target": "只说资料里讲步骤的这部分，简直完美。复杂的实验流程分成三步，很容易理解。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "source": "이 장비 점검표를 정말 보기 좋게 만드셨네요. 필수 항목과 주의사항을 한눈에 찾을 수 있어요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "这份设备检查表做得很清楚。必查项目和注意事项一眼就能找到。",
+              "len": 29,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "업무를 평가하는 상사가 ‘做得很清楚’와 배치 근거로 성과를 명확히 인정하여 평가 기준이 분명한 인상을 주므로, 확인한 가독성에 한정해 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "这份设备检查表做得算是合格了。必查项目和注意事项一眼就能找到。",
+              "len": 31,
+              "bands": [
+                "under_calibrated"
+              ],
+              "role": null,
+              "note_ko": "‘很清楚’를 ‘算是合格了’로 바꿔 구체적 성과 인정을 최소 기준 충족 판정으로 낮춥니다. 평가권을 가진 상사의 말이므로 한눈에 찾게 만든 장점을 충분히 인정하지 않는 효과가 나며 부족함 대역으로 이동합니다."
+            },
+            {
+              "n": 3,
+              "text": "这份设备检查表看着真舒服。必查项目和注意事项，我一眼就能找到。",
+              "len": 31,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "상사가 ‘看着真舒服’와 ‘我一眼就能找到’로 사용자의 긍정적 경험을 전하여 팀원의 작업이 실제로 잘 읽힌다는 호응을 주므로, 이 점검표에 대한 효과로 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "这份设备检查表各方面都做得很出色。必查项目和注意事项，我一眼就能找到。",
+              "len": 35,
+              "bands": [
+                "overreaching"
+              ],
+              "role": null,
+              "note_ko": "‘看着真舒服’라는 사용 경험의 평가를 ‘各方面都做得很出色’라는 전면적 성과 평가로 확대합니다. 가독성 근거는 그대로지만 상사의 평가 범위가 확인하지 않은 측면까지 포괄하여 과함 대역으로 이동합니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w4-1",
+      "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+      "speech_act": "compliment",
+      "mode": "stt_interpreting",
+      "target_feature": "compliment_grounding_sensitivity",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_higher",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"정리 잘했네요. 재료를 유통기한 순으로 놓으…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"정리 잘했네요. 재료를 유통기한 순으로 놓으…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"整理得还行。你把食材按保质期排好了,要先用的就好…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"整理得还行。你把食材按保质期排好了,要先用的就好…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "포장 괜찮네요. 책 모서리마다 완충재를 덧대서 책이 쉽게 상하지 않겠어요.",
+          "target": "包得还行。你在每个书角都垫了缓冲材料，这样书就不容易磕坏了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+          "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+          "accepted_band_codes": [
+            "under_calibrated"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+          "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+          "accepted_band_codes": [
+            "under_calibrated"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "这次整理得很到位。你把食材按保质期排好了，要先用的就好找了。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "这次整理得还过得去。你把食材按保质期排好了，要先用的就好找了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "这次整理得很到位，你做什么都这么周到。你把食材按保质期排好了，要先用的就好找了。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "source": "정리 잘했네요. 재료를 유통기한 순으로 놓으니 먼저 쓸 재료를 쉽게 찾겠어요.",
+          "target": "整理得还行。你把食材按保质期排好了，要先用的就好找了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "compliment_grounding_sensitivity",
+          "pdr": {
+            "d": "close",
+            "p": "speaker_higher",
+            "r": "low"
+          },
+          "source": "봉투마다 메뉴를 표시해 두니 주문이 헷갈리지 않네요. 이번 표시는 정말 알아보기 쉽게 잘했어요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "每袋都标了菜名，订单就不会弄混了。这次标得真清楚。",
+              "len": 25,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "친한 직원과 둘이 있는 자리에서 ‘这次’와 ‘真清楚’로 이번 작업을 곧바로 인정해 친근하고 분명한 칭찬이 되므로 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "每袋都标了菜名，订单就不会弄混了。这次标得还算清楚。",
+              "len": 26,
+              "bands": [
+                "under_calibrated"
+              ],
+              "role": null,
+              "note_ko": "‘真清楚’를 ‘还算清楚’로 바꾸어 명료성에 대한 평가만 유보적으로 낮췄습니다. 성과를 직접 확인한 매니저이자 친한 친구의 칭찬으로는 마지못한 인정처럼 들려 부족함 대역으로 이동합니다."
+            },
+            {
+              "n": 3,
+              "text": "每袋都标了菜名，订单就不会弄混了。这次的标注，一看就明白。",
+              "len": 29,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "친한 직원에게 ‘一看就明白’라는 이해 효과로 칭찬을 드러내면 점수를 매기기보다 실제 장점을 함께 확인하는 인상이 되므로 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "每袋都标了菜名，订单就不会弄混了。这次的标注，一看就明白，你的工作真是处处都让人放心。",
+              "len": 43,
+              "bands": [
+                "overreaching"
+              ],
+              "role": null,
+              "note_ko": "‘一看就明白’라는 관찰 근거를 유지하면서 ‘工作处处都让人放心’으로 업무 전반에 대한 포괄적 신뢰까지 평가를 확장했습니다. 친한 사이여도 이번 표시의 명료성만으로 모든 업무를 보증하는 평가는 근거 범위를 넘어 과함 대역에 해당합니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w5-0",
+      "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+      "speech_act": "agreement",
+      "mode": "translation",
+      "target_feature": "invitation_choice_commitment",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"수요일 점심시간에 제가 사진을 출품한 사내 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"수요일 점심시간에 제가 사진을 출품한 사내 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"周三午休时,一起来看看我有照片参展的公司内部展览…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"周三午休时,一起来看看我有照片参展的公司内部展览…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "금요일 저녁에 내가 30분짜리 온라인 퀴즈 모임을 열어. 참가비는 없으니까 시간 되면 같이 하자! 참석할지 목요일까지 메시지로 알려 줘.",
+          "target": "周五晚上我会组织一个半小时的线上答题聚会。不收费，有空就一起来玩吧！周四前发消息告诉我来不来就行。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "수요일 점심시간에 제가 사진을 출품한 사내 전시를 함께 보실래요? 무료이고 관람은 15분 정도 걸려요. 참석하실지 화요일까지 메시지로 알려 주세요.",
+          "target": "周三午休时，一起来看看我有照片参展的公司内部展览吧！展览免费，看完大约需要十五分钟。我就按你会来安排了，周二前发消息确认一下就好。",
+          "accepted_band_codes": [
+            "too_pressuring"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "수요일 점심시간에 제가 사진을 출품한 사내 전시를 함께 보실래요? 무료이고 관람은 15분 정도 걸려요. 참석하실지 화요일까지 메시지로 알려 주세요.",
+          "target": "周三午休时，一起来看看我有照片参展的公司内部展览吧！展览免费，看完大约需要十五分钟。我就按你会来安排了，周二前发消息确认一下就好。",
+          "accepted_band_codes": [
+            "too_pressuring"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。周二前发消息告诉我是否参加就好。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。那就说定一起去了，周二前发消息确认一下就好。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。周二前发消息随便回我一句就好，来不来先不用定，到时候你看着安排。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "수요일 점심시간에 제가 사진을 출품한 사내 전시를 함께 보실래요? 무료이고 관람은 15분 정도 걸려요. 참석하실지 화요일까지 메시지로 알려 주세요.",
+          "target": "周三午休时，一起来看看我有照片参展的公司内部展览吧！展览免费，看完大约需要十五分钟。我就按你会来安排了，周二前发消息确认一下就好。",
+          "accepted_band_codes": [
+            "too_pressuring"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。周二前发消息告诉我是否参加就好。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。那就说定一起去了，周二前发消息确认一下就好。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "周三午休时，要不要一起看看我有照片参展的公司内部展览？展览免费，看完大约需要十五分钟。周二前发消息随便回我一句就好，来不来先不用定，到时候你看着安排。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "다음 달 토요일에 도자기 체험에 참가하려고 하는데, 함께 가실래요? 체험은 세 시간이고 참가비는 6만 원이에요. 함께 예약하려면 이번 금요일까지 참석 여부를 메시지로 알려 주세요. 참여가 어려우셔도 괜찮아요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "我打算下个月的周六去参加陶艺体验，想邀请你一起去。体验三小时，费用六万韩元。为了一起预约，请这周五前发消息告诉我是否参加，不方便也没关系。",
+              "len": 69,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "시간·비용을 검토해야 하는 회원에게 ‘想邀请你’로 초대를 명시하고 ‘不方便也没关系’로 거절 부담을 낮추므로, 조건과 참석 여부 회신을 함께 제시하는 구성을 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "我打算下个月的周六去参加陶艺体验，想邀请你一起去。体验三小时，费用六万韩元。为了一起预约，请这周五前发消息确认参加，不方便也请尽量抽出时间来。",
+              "len": 71,
+              "bands": [
+                "too_pressuring"
+              ],
+              "role": null,
+              "note_ko": "‘告诉我是否参加’를 ‘确认参加’로 바꾸고, 불참 허용을 ‘不方便也请尽量抽出时间来’라는 참석 요구로 전환한다. 시간·비용 부담을 검토해야 하는 회원에게 수락 회신을 요구하고 불참 선택을 제약하여 too_pressuring으로 이동한다."
+            },
+            {
+              "n": 3,
+              "text": "我下个月的周六打算去参加陶艺体验，三小时，六万韩元。有空的话，要不要一起去？想一起预约的话，这周五前发消息告诉我去不去就好，参加不了也没关系。",
+              "len": 71,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "일정 검토가 필요한 회원에게 ‘有空的话，要不要一起去’로 공동 활동 의향을 묻는 방식은 격의 없는 동행 초대의 인상을 주므로, 수락·불참 모두 가능한 회신 구조를 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "我下个月的周六打算去参加陶艺体验，三小时，六万韩元。有空的话，要不要一起去？想一起预约的话，这周五前发消息说说意向就好，去不去不用定，之后怎么安排你看情况就行，参加不了也没关系。",
+              "len": 89,
+              "bands": [
+                "too_ambiguous"
+              ],
+              "role": null,
+              "note_ko": "공동 예약을 위한 금요일 회신을 참석 여부 결정에서 ‘说说意向’로 낮추고, ‘去不去不用定’과 ‘之后怎么安排你看情况就行’으로 확정 절차를 열어 둔다. 초대와 체험 조건은 분명하지만 어떤 답이 예약·참석 약속으로 이어지는지 판단할 수 없어 too_ambiguous로 이동한다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w5-1",
+      "scenario_id": "2032d1cc-25e3-4bf9-9eff-6f8a1fd7153e",
+      "speech_act": "agreement",
+      "mode": "stt_interpreting",
+      "target_feature": "invitation_choice_commitment",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=51자, 후보 2[too_pressuring]=55자, 후보 3[within_band]=54자, 후보 4[too_ambiguous]=69자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"팀장님, 이번 토요일에 회사 근처 공연장에서…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"팀장님, 이번 토요일에 회사 근처 공연장에서…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"经理,这周六我参加演出的合唱音乐会在公司附近的剧…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"经理,这周六我参加演出的合唱音乐会在公司附近的剧…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "이번 토요일에 회사 근처 카페에서 제가 진행하는 독서 모임이 있어요. 90분 정도 하고, 책이랑 음료는 제가 준비해요. 시간 괜찮으면 같이 책 읽으러 오실래요?",
+          "target": "这周六我在公司附近的咖啡馆组织读书会。大概一个半小时，书和饮料都由我来准备。有空的话，来一起读书吧，你看怎么样？",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "팀장님, 이번 토요일에 회사 근처 공연장에서 제가 출연하는 합창 공연이 있어요. 공연은 90분이고 입장료는 없어요. 시간 괜찮으시면 들으러 오실래요?",
+          "target": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。有空的话，来听听吧，那就说定了。",
+          "accepted_band_codes": [
+            "too_pressuring"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "팀장님, 이번 토요일에 회사 근처 공연장에서 제가 출연하는 합창 공연이 있어요. 공연은 90분이고 입장료는 없어요. 시간 괜찮으시면 들으러 오실래요?",
+          "target": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。有空的话，来听听吧，那就说定了。",
+          "accepted_band_codes": [
+            "too_pressuring"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。您要是有时间，愿意来听听吗？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。您要是有时间，就来听听吧，我就当您答应了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。您要是有时间，欢迎您来听听，回不回复都行，来不来就到时候再说吧。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "팀장님, 이번 토요일에 회사 근처 공연장에서 제가 출연하는 합창 공연이 있어요. 공연은 90분이고 입장료는 없어요. 시간 괜찮으시면 들으러 오실래요?",
+          "target": "经理，这周六我参加演出的合唱音乐会在公司附近的剧场举行。演出一个半小时，免费入场。有空的话，来听听吧，那就说定了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "invitation_choice_commitment",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "low"
+          },
+          "source": "팀장님, 점심시간에 사내 휴게실에서 제가 개인적으로 준비한 차 시음회를 열어요. 업무와는 상관없는 모임이고, 10분 정도 걸리며 무료예요. 시간 괜찮으시면 같이 차 맛보러 오실래요?",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "经理，午休时我在公司休息室办个私人品茶会，跟工作无关，十分钟左右，免费。有空的话，您愿意一起来尝尝吗？",
+              "len": 51,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "10분 무료 시음회에서 '有空的话'와 '愿意一起来尝尝吗？'는 부담 정보를 바탕으로 의향을 간결하게 묻고 함께하는 느낌을 주므로, 답을 기다리는 초대로 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "经理，午休时我在公司休息室办个私人品茶会，跟工作无关，十分钟左右，免费。有空的话，您就一起来尝尝吧，可别推辞。",
+              "len": 55,
+              "bands": [
+                "too_pressuring"
+              ],
+              "role": null,
+              "note_ko": "일정 조건과 함께 맛보자는 초대는 유지하되 의향 질문을 '可别推辞'라는 사양 제한으로 바꿉니다. 짧은 무료 행사라도 업무상 상사에게 거절하지 말라고 요구하여 too_pressuring 경계를 넘습니다."
+            },
+            {
+              "n": 3,
+              "text": "经理，午休时我在公司休息室办个私人品茶会，跟工作无关，十分钟左右，免费。想邀请您一起来尝尝，您看时间方便吗？",
+              "len": 54,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "업무와 무관한 시음회에 '想邀请您'로 초대 의도를 명시하고 '时间方便吗？'로 일정을 확인하여 존중받는 손님이라는 인상을 주므로, 이런 초대와 확인의 결합도 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "经理，午休时我在公司休息室办个私人品茶会，跟工作无关，十分钟左右，免费。想邀请您一起来尝尝，是否参加、什么时候回复都随您，之后看情况再说。",
+              "len": 69,
+              "bands": [
+                "too_ambiguous"
+              ],
+              "role": null,
+              "note_ko": "명시적인 초대는 보존하고 일정 확인 질문만 참석·회신을 전적으로 미루는 표현으로 교체합니다. '什么时候回复都随您'에 '之后看情况再说'를 결합해 응답과 참여 확정의 기준을 남기지 않으므로 too_ambiguous 방향입니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w6-0",
+      "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+      "speech_act": "refusal",
+      "mode": "translation",
+      "target_feature": "refusal_softening",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"안 됩니다. 그 시간에 외부 교육이 있어서 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"안 됩니다. 그 시간에 외부 교육이 있어서 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行。我那时有外部培训,明天没办法替你在服务台值…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行。我那时有外部培训,明天没办法替你在服务台值…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "안 됩니다. 필수 통계가 원래 마감일 아침에 나와서 초안을 하루 앞당겨 드릴 수 없습니다.",
+          "target": "不行。必需的统计数据要到原定截止日当天早上才出来，初稿没办法提前一天交。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+          "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+          "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "不行，找我没用。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "不好意思，这个答复我得斟酌一下怎么说，免得显得不近人情：我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "안 됩니다. 그 시간에 외부 교육이 있어서 내일 안내 데스크를 한 시간 대신 맡을 수 없습니다.",
+          "target": "不行。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "不好意思，我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "不行，找我没用。我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "不好意思，这个答复我得斟酌一下怎么说，免得显得不近人情：我那时有外部培训，明天没办法替你在服务台值那一小时班。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "같이 걸을 수는 없어요. 곧 출발하는 버스를 타야 해요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "不好意思，不能一起走了，我得赶马上发车的公交车。",
+              "len": 24,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "동료가 혼자서도 갈 수 있는 가벼운 동행 제안에는 ‘不好意思’와 버스 사유만으로 제안을 존중하면서 불참을 알릴 수 있으므로, 짧은 사과와 분명한 결론을 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "一起走就免了，我得赶马上发车的公交车。",
+              "len": 19,
+              "bands": [
+                "too_blunt"
+              ],
+              "role": null,
+              "note_ko": "버스를 타야 한다는 제약은 유지하고, 앵커의 배려 있는 불가 통보를 ‘一起走就免了’라는 제안 일축으로 바꾸었습니다. 사과 없는 이유 중심 거절도 충분한 장면이지만, 여기서는 동행 제안 자체를 불필요한 것으로 밀어내므로 too_blunt 쪽입니다."
+            },
+            {
+              "n": 3,
+              "text": "我得赶马上发车的公交车，就不一起走了。",
+              "len": 19,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "동료의 이동 계획을 바꾸지 않는 상황에서 버스 제약을 먼저 밝히고 ‘就不一起走了’로 결론을 연결하면 개인적인 거부로 읽힐 여지가 줄어드므로, 사과 없이도 이 이유 중심 구성을 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "我得赶马上发车的公交车，至于一起走，我该怎么说才合适呢，直接说不能一起走又怕显得生硬，就不一起走了。",
+              "len": 50,
+              "bands": [
+                "over_elaborate"
+              ],
+              "role": null,
+              "note_ko": "앵커의 버스 사유와 불참 결론 사이에 표현 선택에 대한 자문과 자기수정을 넣었습니다. 동료의 이동 계획을 바꾸지 않는 가벼운 제안인데도 거절 문구 자체를 문제 삼아 결론을 늦추므로 over_elaborate입니다. 단순한 길이 증가나 공손표지 중첩이 아니라 발화 구성의 우회가 조절 자원입니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w6-1",
+      "scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+      "speech_act": "refusal",
+      "mode": "stt_interpreting",
+      "target_feature": "refusal_softening",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"이번 주 매출 분석은 추가로 맡을 수 없습니…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"不行,这周的销售分析我不能再接了。我得赶原来那份…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "금요일 고객 방문은 대신 갈 수 없어요. 이미 맡은 현장 점검과 겹치니 다른 분께 부탁하는 게 좋겠어요.",
+          "target": "不行，周五的客户拜访我不能替你去。跟我已经接下的现场检查时间冲突，你还是找别人去吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "이번 주 매출 분석은 추가로 맡을 수 없습니다. 기존 보고서 마감을 맞춰야 하니 다른 분께 맡기는 게 좋겠습니다.",
+          "target": "不行，这周的销售分析我不能再接了。我得赶原来那份报告的截止时间，你还是找别人做吧。",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "이번 주 매출 분석은 추가로 맡을 수 없습니다. 기존 보고서 마감을 맞춰야 하니 다른 분께 맡기는 게 좋겠습니다.",
+          "target": "不行，这周的销售分析我不能再接了。我得赶原来那份报告的截止时间，你还是找别人做吧。",
+          "accepted_band_codes": [
+            "too_blunt"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "不好意思，这周的销售分析我没法再接了，因为我得赶原来那份报告的截止时间。我觉得请别人来做会比较合适。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "不好意思，这周的销售分析我没法再接了，因为我得赶原来那份报告的截止时间。这活你找别人做。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "不好意思，这周的销售分析我没法再接了，因为我得赶原来那份报告的截止时间。我觉得请别人来做会比较合适，不过这话由我来说，不知道是不是不太合适，所以也不好把话说得太满。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "이번 주 매출 분석은 추가로 맡을 수 없습니다. 기존 보고서 마감을 맞춰야 하니 다른 분께 맡기는 게 좋겠습니다.",
+          "target": "不行，这周的销售分析我不能再接了。我得赶原来那份报告的截止时间，你还是找别人做吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "refusal_softening",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "low"
+          },
+          "source": "오늘 점심은 같이 못 먹겠습니다. 점심시간에 은행에 가야 합니다.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "不好意思，今天午饭不能一起吃了，午休时我得去趟银行。",
+              "len": 26,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "팀장 일행의 식사 계획은 그대로인 상황에서 ‘不好意思’가 함께 먹지 못하는 유감을 짧게 전하고 ‘不能一起吃’가 결론을 밝혀 관계와 일정을 함께 정리하므로 유지한다."
+            },
+            {
+              "n": 2,
+              "text": "免了，今天午饭不能一起吃了，午休时我得去趟银行。",
+              "len": 24,
+              "bands": [
+                "too_blunt"
+              ],
+              "role": null,
+              "note_ko": "점심 동석 불가와 은행 용무는 유지하고, 유감 표현을 제안을 일축하는 ‘免了’로 바꿨다. 짧아서 부적절한 것이 아니라, 친한 사이의 가벼운 응수로는 가능할 표현이 이 팀장 관계에서는 호의를 물리치는 태도로 들려 too_blunt가 된다."
+            },
+            {
+              "n": 3,
+              "text": "午休时得去趟银行，今天恐怕没法一起吃午饭了。",
+              "len": 22,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "예약이나 식사 계획을 바꾸지 않는 상황에서 은행 용무를 먼저 제시하고 ‘恐怕没法’로 불가를 완화해 개인적 거부보다 일정 제약으로 이해하게 하므로, 사과를 더하지 않고도 유지할 수 있다."
+            },
+            {
+              "n": 4,
+              "text": "午休时得去趟银行，今天一起吃午饭的事，我有些不好意思开口，不知道该怎么跟您说才合适……今天恐怕没法一起吃午饭了。",
+              "len": 56,
+              "bands": [
+                "over_elaborate"
+              ],
+              "role": null,
+              "note_ko": "은행 용무와 동석 불가를 유지하면서 그 사이에 ‘어떻게 말해야 적절할지 모르겠다’는 발화 자체에 대한 망설임을 넣었다. 일정 변경이 필요 없는 가벼운 제안인데도 관계상 난처함을 전면화하고 결론을 지연하므로, 단순한 길이 증가가 아니라 거절 전달을 어렵게 하는 over_elaborate가 된다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w9-0",
+      "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+      "speech_act": "apology",
+      "mode": "translation",
+      "target_feature": "apology_accountability_repair",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"오늘 오전까지 드리기로 한 자료를 오후에야 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"오늘 오전까지 드리기로 한 자료를 오후에야 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"今天上午该发给你的资料,我到下午才发,不好意思。…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"今天上午该发给你的资料,我到下午才发,不好意思。…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "내가 출발 시간을 잘못 계산해서 식당 앞에서 40분이나 기다리게 했네. 미안해, 나 때문에 고생했어.",
+          "target": "是我没算好出发时间，让你在餐厅门口等了40分钟。不好意思，让你受累了。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "오늘 오전까지 드리기로 한 자료를 오후에야 보내서 죄송합니다. 저 때문에 작업을 멈추고 퇴근 후에도 40분 더 일하시게 해서 미안합니다. 앞으로는 자료를 약속한 시간에 보내도록 주의하겠습니다.",
+          "target": "今天上午该发给你的资料，我到下午才发，不好意思。你因此停下了手头的工作，下班后又多做了40分钟，不过这也只是给你添了点小麻烦。以后我会注意按约定的时间发资料。",
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "오늘 오전까지 드리기로 한 자료를 오후에야 보내서 죄송합니다. 저 때문에 작업을 멈추고 퇴근 후에도 40분 더 일하시게 해서 미안합니다. 앞으로는 자료를 약속한 시간에 보내도록 주의하겠습니다.",
+          "target": "今天上午该发给你的资料，我到下午才发，不好意思。你因此停下了手头的工作，下班后又多做了40分钟，不过这也只是给你添了点小麻烦。以后我会注意按约定的时间发资料。",
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，实在抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，不过也算不上多大的耽误，抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，这反映出我在合作中缺乏应有的责任心，实在抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "오늘 오전까지 드리기로 한 자료를 오후에야 보내서 죄송합니다. 저 때문에 작업을 멈추고 퇴근 후에도 40분 더 일하시게 해서 미안합니다. 앞으로는 자료를 약속한 시간에 보내도록 주의하겠습니다.",
+          "target": "今天上午该发给你的资料，我到下午才发，不好意思。你因此停下了手头的工作，下班后又多做了40分钟，不过这也只是给你添了点小麻烦。以后我会注意按约定的时间发资料。",
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，实在抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，不过也算不上多大的耽误，抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "今天上午该发给你的资料，我到下午才发，不好意思。是我耽误了你的工作，让你下班后又多做了40分钟，这反映出我在合作中缺乏应有的责任心，实在抱歉。以后我会注意按约定的时间发资料。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제가 실수로 같은 일정 안내를 두 번 보냈네요. 일정에 혼선은 없었지만 서로 다른 내용인지 1분 동안 확인하게 해서 죄송합니다.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "是我不小心把同一条日程通知发了两遍。虽然没弄乱日程，还是让你花了一分钟核对内容，抱歉。",
+              "len": 43,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "혼선 없이 1분 확인한 상황에서 ‘是我不小心’가 실수의 주체를 분명히 해 책임을 피하지 않는 인상을 주므로, 간결한 영향 인정과 사과를 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "是我不小心把同一条日程通知发了两遍。虽然让你花了一分钟核对内容，但没弄乱日程，也就不算给你添麻烦了，抱歉。",
+              "len": 53,
+              "bands": [
+                "under_acknowledged"
+              ],
+              "role": null,
+              "note_ko": "실수의 주체와 1분간의 확인 수고는 남기되, 양보·역접의 초점을 뒤집고 ‘不算给你添麻烦’로 실제 부담을 인정하지 않습니다. 혼선이 없다는 사실로 확인 수고를 상쇄하여 부족함 대역으로 넘어갑니다."
+            },
+            {
+              "n": 3,
+              "text": "同一条日程通知我不小心发了两遍。日程虽然没弄乱，但让你花了一分钟核对是不是不同内容，给你添麻烦了，不好意思。",
+              "len": 54,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "혼선은 없었어도 ‘但…给你添麻烦了’가 실제 확인 수고를 사과의 중심에 놓아 상대의 시간을 알아주는 인상을 주므로, 작은 영향을 지우지 않는 이 방식을 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "同一条日程通知我不小心发了两遍。日程虽然没弄乱，但让你花了一分钟核对是不是不同内容，给你添麻烦了，是我对工作太不负责，真对不起。",
+              "len": 64,
+              "bands": [
+                "overextended"
+              ],
+              "role": null,
+              "note_ko": "중복 전송과 확인 수고는 그대로 두고 ‘对工作太不负责’로 작은 실수를 업무 태도에 대한 무거운 자기비판으로 바꿉니다. 혼선 없이 1분을 쓴 상황에 비해 책임 평가가 커져 과함 대역으로 넘어갑니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w9-1",
+      "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+      "speech_act": "apology",
+      "mode": "stt_interpreting",
+      "target_feature": "apology_accountability_repair",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"책장을 넘기다가 책장 모서리를 조금 찢었어요…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"책장을 넘기다가 책장 모서리를 조금 찢었어요…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"翻页时,我把书页的边角弄破了一点。是我的一点小失…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"翻页时,我把书页的边角弄破了一点。是我的一点小失…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "설거지하다가 내가 컵을 깨뜨렸네. 내가 조심하지 못했어, 미안해. 앞으로는 더 조심할게.",
+          "target": "洗碗时，我把杯子打碎了。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "accepted_band_codes": [
+            "under_acknowledged"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "翻页时，我把书页的边角弄破了一点。是我不够小心，不好意思啊。以后我会更小心的。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "翻页时，我把书页的边角弄破了一点。也就是我的一点小疏忽，不好意思啊。以后我会更小心的。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "翻页时，我把书页的边角弄破了一点。是我太不懂得尊重别人的东西了，不好意思啊。以后我会更小心的。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "책장을 넘기다가 책장 모서리를 조금 찢었어요. 제가 조심하지 못했네요, 죄송해요. 앞으로는 더 주의할게요.",
+          "target": "翻页时，我把书页的边角弄破了一点。是我的一点小失误，不好意思啊。以后我会更小心的。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "apology_accountability_repair",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "high"
+          },
+          "source": "제가 조심하지 못해서 카메라를 떨어뜨려 렌즈를 깨뜨렸어요. 제 잘못으로 한 달 동안 카메라를 못 쓰시게 돼서 정말 죄송해요. 수리비 150만 원은 제가 부담할게요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "我不小心把相机摔了，摔坏了镜头。是我的错，让你一个月用不了相机，真的对不起。150万韩元的维修费我来出。",
+              "len": 52,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "고액 수리와 한 달의 사용 중단에 ‘是我的错’로 책임을 명시하고 비용 부담을 연결해 책임을 맡는 인상을 주므로, 원문 범위의 인정과 수리를 유지한다."
+            },
+            {
+              "n": 2,
+              "text": "我不小心把相机摔了，摔坏了镜头。这只是个小失误，让你一个月用不了相机，真的对不起。150万韩元的维修费我来出。",
+              "len": 55,
+              "bands": [
+                "under_acknowledged"
+              ],
+              "role": null,
+              "note_ko": "‘是我的错’만 ‘这只是个小失误’로 바꾸고 파손·한 달 사용 중단·수리비 부담은 유지했다. ‘只是’와 ‘小失误’가 고액 파손의 책임을 작은 실수로 한정해, 피해를 말하고도 그 무게를 충분히 인정하지 않는 부족함 대역으로 이동한다."
+            },
+            {
+              "n": 3,
+              "text": "我不小心把相机摔了，摔坏了镜头，让你一个月都用不了，真是给你添麻烦了。真的对不起，150万韩元的维修费我来出。",
+              "len": 55,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "한 달간 사용하지 못하는 상황에서 ‘真是给你添麻烦了’는 상대가 겪는 불편을 전면에 두어 피해를 이해한다는 인상을 주므로, 행위 인정과 허용된 수리를 함께 유지한다."
+            },
+            {
+              "n": 4,
+              "text": "我不小心把相机摔了，摔坏了镜头，让你一个月都用不了，我真是个靠不住的人。真的对不起，150万韩元的维修费我来出。",
+              "len": 56,
+              "bands": [
+                "overextended"
+              ],
+              "role": null,
+              "note_ko": "피해 평가인 ‘真是给你添麻烦了’를 인격 평가인 ‘我真是个靠不住的人’으로 바꿨다. 파손과 수리 책임은 그대로지만 한 번의 부주의를 사람 전체의 신뢰성 결함으로 확대해, 구체적인 피해 인정에서 과함 대역으로 넘어간다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w10-0",
+      "scenario_id": "1baacb9c-735d-4c29-a26e-b57ab6cf19d5",
+      "speech_act": "proposal",
+      "mode": "translation",
+      "target_feature": "proposal_optionality_clarity",
+      "within_code": null,
+      "production_pdr": {
+        "d": "close",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=42자, 후보 2[too_directive]=52자, 후보 3[within_band]=51자, 후보 4[too_tentative]=74자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"녹음은 두 시간이 필요한데 대여실은 하루에 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"녹음은 두 시간이 필요한데 대여실은 하루에 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"录音需要两个小时,但录音室每天只能预约一个小时。…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-7",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"录音需要两个小时,但录音室每天只能预约一个小时。…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "입구가 복잡해서 방문객들이 길을 찾기 어려워요. 우리 둘 다 준비를 한 시간씩 더 해야 하지만, 구역별 안내판을 만들어 배치하는 게 어떨까요?",
+          "target": "入口有点乱，来宾不容易找到路。虽然我们俩都得多花一个小时准备，我建议做几块分区指示牌摆在入口，你看怎么样？",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+          "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+          "accepted_band_codes": [
+            "too_directive"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+          "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+          "accepted_band_codes": [
+            "too_directive"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，你觉得怎么样？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，咱们就照这个安排了。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，要不分两天录？不过我也就是随口一说，你不用当真。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "녹음은 두 시간이 필요한데 대여실은 하루에 한 시간만 예약할 수 있어. 우리 둘 다 퇴근 후 저녁을 한 번 더 비워야 하지만, 녹음을 이틀로 나누는 게 어떨까?",
+          "target": "录音需要两个小时，但录音室每天只能预约一个小时。虽然我们俩下班后都得再空出一个晚上，我建议分两天录，就这么定吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "근처 식당들은 가는 데 걸리는 시간과 가격이 비슷해. 오늘 점심은 우리 둘 다 좋아하는 메뉴가 있는 국숫집에서 먹는 게 어떨까?",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "附近几家餐馆的路程用时和价格都差不多。那家面馆有我们俩都爱吃的菜，今天中午要不要去？",
+              "len": 42,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "시간·가격 차이가 작은 점심 선택에서 ‘要不要去…’는 갈 곳과 시점을 짧게 제시하며 친구를 공동 선택에 참여시키므로, 간결한 질문을 유지해도 된다."
+            },
+            {
+              "n": 2,
+              "text": "附近几家餐馆的路程用时和价格都差不多。那家面馆有我们俩都爱吃的菜，今天中午就去那儿，咱们这就算定下来了。",
+              "len": 52,
+              "bands": [
+                "too_directive"
+              ],
+              "role": null,
+              "note_ko": "앵커의 ‘要不要去’ 대신 ‘就去’와 ‘这就算定下来了’로 같은 점심안을 공동 결정이 끝난 것처럼 제시했다. 가벼운 친구 사이 제안으로 발화 가능하지만 상대의 선택을 선취하므로 too_directive에 해당한다."
+            },
+            {
+              "n": 3,
+              "text": "附近几家餐馆的路程用时和价格都差不多。那家面馆有我们俩都爱吃的菜，如果今天中午去那儿吃，你觉得怎么样？",
+              "len": 51,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "가볍게 식당을 고르는 상황에서 ‘如果…你觉得怎么样？’는 국숫집 방문을 가정해 평가하게 하므로, 함께 갈지 바로 묻는 방식과 달리 안을 검토하는 인상을 유지한다."
+            },
+            {
+              "n": 4,
+              "text": "附近几家餐馆的路程用时和价格都差不多。那家面馆有我们俩都爱吃的菜，如果今天中午去那儿吃，也许也行，不过真要不要去，我也没个准主意，先这么随便想想吧。",
+              "len": 74,
+              "bands": [
+                "too_tentative"
+              ],
+              "role": null,
+              "note_ko": "조건절의 국숫집 방문안은 유지하고 평가 질문을 ‘没个准主意，先这么随便想想吧’로 바꾸었다. 오늘 점심의 실행 후보를 함께 판단하기보다 막연한 구상 단계에 머물게 하므로, 낮은 부담의 친구 관계에서는 too_tentative로 경계를 넘는다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w10-1",
+      "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+      "speech_act": "proposal",
+      "mode": "stt_interpreting",
+      "target_feature": "proposal_optionality_clarity",
+      "within_code": null,
+      "production_pdr": {
+        "d": "distant",
+        "p": "equal",
+        "r": "low"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"연습 시작 전까지 아직 오 분 남았네요. 각…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"연습 시작 전까지 아직 오 분 남았네요. 각…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"练习开始前还有五分钟。那我们就定这个吧:一起看看…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"练习开始前还有五分钟。那我们就定这个吧:一起看看…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "배달 음식이 오려면 아직 이십 분 남았네. 우리 그 십 분짜리 카드 게임 한 판 하는 걸로 하자.",
+          "target": "外卖还有二十分钟才到。咱们就定这个吧：玩一局那个十分钟的纸牌游戏。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+          "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+          "accepted_band_codes": [
+            "too_directive"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+          "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+          "accepted_band_codes": [
+            "too_directive"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "练习开始前还有五分钟。那就这么安排：一起看看各自带来的一张风景照。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？只是随口一提，还算不上什么具体打算。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "distant",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "연습 시작 전까지 아직 오 분 남았네요. 각자 가져온 풍경 사진 한 장씩 같이 살펴보는 건 어떨까요?",
+          "target": "练习开始前还有五分钟。那我们就定这个吧：一起看看各自带来的一张风景照。",
+          "accepted_band_codes": [
+            "too_directive"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "练习开始前还有五分钟。那就这么安排：一起看看各自带来的一张风景照。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "练习开始前还有五分钟。要不要一起看看各自带来的一张风景照？只是随口一提，还算不上什么具体打算。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "proposal_optionality_clarity",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "수업 시작까지 십 분 남았는데 우리 둘 다 할 일이 없네요. 지난 시간에 배운 단어로 짧게 퀴즈 놀이를 해 보면 어떨까요?",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "离上课还有十分钟，我们都没事。要不要用上节课学的单词玩个小测验？",
+              "len": 32,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "함께 연습해 온 수강생에게 ‘要不要’로 퀴즈 참여 여부를 바로 물어 간편하게 공동 결정을 열어 두므로, 짧은 질문과 구체적인 활동 내용을 유지한다."
+            },
+            {
+              "n": 2,
+              "text": "离上课还有十分钟，我们都没事。咱们就用上节课学的单词玩个小测验，就这么定了。",
+              "len": 38,
+              "bands": [
+                "too_directive"
+              ],
+              "role": null,
+              "note_ko": "‘要不要’의 선택 질문을 ‘咱们就……就这么定了’라는 확정형으로 바꾼다. 공동 퀴즈라는 내용은 그대로지만 동등한 수강생의 응답 전에 결정을 닫으므로 too_directive에 해당한다."
+            },
+            {
+              "n": 3,
+              "text": "离上课还有十分钟，我们都没事。如果你也想试试，不如用上节课学的单词玩个小测验，你看怎么样？",
+              "len": 45,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "알고 지내는 수강생에게 ‘如果你也想试试’와 ‘不如……你看怎么样’로 관심을 조건 삼아 구체안을 검토하게 하므로, 공동 연습 의향을 확인하는 방식을 유지한다."
+            },
+            {
+              "n": 4,
+              "text": "离上课还有十分钟，我们都没事。如果你也想试试，不如用上节课学的单词玩个小测验，不过先只当个设想吧。",
+              "len": 49,
+              "bands": [
+                "too_tentative"
+              ],
+              "role": null,
+              "note_ko": "관심을 조건으로 퀴즈를 제시하는 부분은 유지하고, 의견을 묻던 결말을 ‘不过先只当个设想吧’로 바꾼다. 지금 실행 여부를 함께 정할 안을 구상 단계에 묶어 두어 제안의 실행성이 흐려지므로 too_tentative 방향으로 경계를 넘는다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w11-0",
+      "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+      "speech_act": "opposition",
+      "mode": "translation",
+      "target_feature": "opposition_stance_mitigation",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"공간을 넓히자는 취지는 이해해요. 그래도 작…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"공간을 넓히자는 취지는 이해해요. 그래도 작…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我理解你想让空间更宽敞。观众理解作品需要这些说明…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我理解你想让空间更宽敞。观众理解作品需要这些说明…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제목은 파란색으로 바꾸기보다 검은색으로 유지하는 쪽이 좋겠어요. 배경과 더 잘 구분되니까요.",
+          "target": "我觉得也可以考虑保留黑色的标题吧。毕竟这样跟背景区分得更清楚。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "공간을 넓히자는 취지는 이해해요. 그래도 작품 설명문은 모두 남기는 게 좋겠어요. 관람객이 작품을 이해하는 데 필요하니까요.",
+          "target": "我理解你想让空间更宽敞。观众理解作品需要这些说明，全部保留也可以考虑一下吧。",
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "공간을 넓히자는 취지는 이해해요. 그래도 작품 설명문은 모두 남기는 게 좋겠어요. 관람객이 작품을 이해하는 데 필요하니까요.",
+          "target": "我理解你想让空间更宽敞。观众理解作品需要这些说明，全部保留也可以考虑一下吧。",
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我理解你想让空间更宽敞，不过我不赞成全部撤掉作品说明。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我理解你想让空间更宽敞，不过全部撤掉作品说明这个提议实在欠考虑。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "我理解你想让空间更宽敞，不过说到全部撤掉作品说明，我也有些想法。观众理解作品需要这些说明，全部保留也未尝不可。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "공간을 넓히자는 취지는 이해해요. 그래도 작품 설명문은 모두 남기는 게 좋겠어요. 관람객이 작품을 이해하는 데 필요하니까요.",
+          "target": "我理解你想让空间更宽敞。观众理解作品需要这些说明，全部保留也可以考虑一下吧。",
+          "accepted_band_codes": [
+            "too_obscured"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我理解你想让空间更宽敞，不过我不赞成全部撤掉作品说明。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我理解你想让空间更宽敞，不过全部撤掉作品说明这个提议实在欠考虑。观众理解作品需要这些说明，我觉得还是全部保留比较好。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "我理解你想让空间更宽敞，不过说到全部撤掉作品说明，我也有些想法。观众理解作品需要这些说明，全部保留也未尝不可。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "쇼핑 시간을 늘리자는 생각은 이해해. 그래도 박물관 관람을 빼는 건 반대야. 이번 여행에서 꼭 보고 싶은 전시가 있거든.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "想多逛会儿街，我理解。但我不赞成取消博物馆行程，这次有我特别想看的展览。",
+              "len": 36,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "친구와 함께 일정을 정하는 상황에서 ‘我理解’ 뒤의 ‘但我不赞成’이 이해와 반대를 구분해, 상대의 바람을 받아들이면서 자신의 관람 의사를 분명히 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "想多逛会儿街，我理解。但取消博物馆行程根本就不合理，这次有我特别想看的展览。",
+              "len": 38,
+              "bands": [
+                "too_confrontational"
+              ],
+              "role": null,
+              "note_ko": "‘我不赞成’을 ‘根本就不合理’로 바꾸어 자신의 선호에 따른 반대를 상대안 자체의 전면적 불합리성으로 단정했습니다. 친한 친구 사이의 직접적인 이견을 넘어 공동 일정에서 상대 선호의 정당성을 닫으므로 too_confrontational에 해당합니다."
+            },
+            {
+              "n": 3,
+              "text": "我反对的是取消博物馆行程，因为这次有我特别想看的展览。至于你想增加购物时间的想法，我是理解的。",
+              "len": 47,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "가까운 친구와의 일정 논의에서 ‘我反对的是’가 반대 범위를 박물관 취소로 먼저 한정해 전반적인 거부로 번지는 것을 막으므로, 선동의 없이 범위와 근거를 밝히는 전략을 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "取消博物馆行程这件事，我觉得也还有再想想的余地，因为这次有我特别想看的展览。至于你想增加购物时间的想法，我是理解的。",
+              "len": 58,
+              "bands": [
+                "too_obscured"
+              ],
+              "role": null,
+              "note_ko": "‘我反对的是’를 ‘也还有再想想的余地’로 바꾸고 전시 관람 희망과 쇼핑 취지에 대한 이해는 유지했습니다. 취소에 대한 이견이 재검토 가능성만 시사하는 수준으로 후퇴해, 친구가 취소 반대인지 단순한 망설임인지 구분하기 어려운 too_obscured로 이동합니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w11-1",
+      "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+      "speech_act": "opposition",
+      "mode": "stt_interpreting",
+      "target_feature": "opposition_stance_mitigation",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"교대 간격을 세 시간으로 늘리는 데 반대해요…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"교대 간격을 세 시간으로 늘리는 데 반대해요…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"我不同意把轮班间隔延长到三个小时,这样安排就是不…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"我不同意把轮班间隔延长到三个小时,这样安排就是不…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "택시로만 다니는 건 반대야. 그러면 각자 교통비가 삼만 원씩 더 들잖아.",
+          "target": "我不同意全程都坐出租车，这样安排就是不合适。这样每个人的交通费都要多三万韩元。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+          "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+          "accepted_band_codes": [
+            "too_confrontational"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+          "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+          "accepted_band_codes": [
+            "too_confrontational"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我不同意把轮班间隔延长到三个小时，这样安排明摆着不合理，因为连续站着接待三个小时会更累。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "关于把轮班间隔延长到三个小时，我只是想提一下连续站着接待三个小时会更累这一点。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "교대 간격을 세 시간으로 늘리는 데 반대해요. 세 시간 내내 서서 안내하면 피로가 커지니까요.",
+          "target": "我不同意把轮班间隔延长到三个小时，这样安排就是不合适。连续站着接待三个小时会更累。",
+          "accepted_band_codes": [
+            "too_confrontational"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "我不太赞成把轮班间隔延长到三个小时，因为连续站着接待三个小时会更累。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我不同意把轮班间隔延长到三个小时，这样安排明摆着不合理，因为连续站着接待三个小时会更累。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "关于把轮班间隔延长到三个小时，我只是想提一下连续站着接待三个小时会更累这一点。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "opposition_stance_mitigation",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제목 옆에 별표를 넣는 데는 반대해요. 저는 장식 없는 쪽이 더 좋아요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "标题旁边加星号，我不太赞成。我更喜欢不加装饰的。",
+              "len": 24,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "작은 장식을 고르는 상황에서 不太赞成은 반대를 짧고 분명하게 밝히고 更喜欢는 취향 근거를 제공하므로, 안을 비난하지 않는 간결한 입장 표명을 유지한다."
+            },
+            {
+              "n": 2,
+              "text": "标题旁边加星号，这个主意根本不合适。我更喜欢不加装饰的。",
+              "len": 28,
+              "bands": [
+                "too_confrontational"
+              ],
+              "role": null,
+              "note_ko": "별표 추가에 대한 반대와 무장식 선호는 그대로 두고, 不太赞成이라는 입장 표명을 根本不合适라는 안 자체의 부적합 판정으로 바꿨다. 낮은 부담의 동등한 회원 간 취향 논의에서 개인 선호를 상대 안에 대한 단정으로 앞세워 too_confrontational에 해당한다."
+            },
+            {
+              "n": 3,
+              "text": "就我的喜好来说，我更喜欢不加装饰的，所以不赞成在标题旁边加星号。",
+              "len": 32,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "동등한 회원과 장식을 고를 때 就我的喜好来说로 판단 범위를 개인 취향에 한정한 뒤 所以不赞成으로 반대를 연결하므로, 취향 차이를 인정하는 이 전략을 유지한다."
+            },
+            {
+              "n": 4,
+              "text": "就我的喜好来说，我更喜欢不加装饰的；说到在标题旁边加星号，我这也只是谈谈个人偏好。",
+              "len": 41,
+              "bands": [
+                "too_obscured"
+              ],
+              "role": null,
+              "note_ko": "개인 취향의 한정과 무장식 선호, 별표라는 이견 대상은 유지했다. 다만 所以不赞成이라는 반대 결론을 只是谈谈个人偏好로 대체해 선호가 실제 안에 대한 반대로 적용되는지를 유보한다. 단순 취향 소개와 반대의 구별이 흐려져 too_obscured로 이동한다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w12-0",
+      "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+      "speech_act": "complaint",
+      "mode": "translation",
+      "target_feature": "complaint_problem_accountability",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"제 예약 시간에도 회의실을 계속 사용하셔서 …\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"都是因为你在我预约的时段还一直用着会议室,我们的…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "숙소를 우리가 합의한 날짜와 다르게 예약해서 내가 취소 수수료 5만 원을 냈어. 이번 예약 문제는 네 쪽에서 생긴 거야. 추가 비용까지 부담하게 돼서 곤란해. 앞으로는 이런 일이 반복되지 않았으면 해.",
+          "target": "你订的住宿日期跟我们说好的不一样，我为此付了五万韩元的取消手续费。这次订房的问题都在你这边，多出的这笔费用让我很为难。希望以后不要再发生这样的事。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "제 예약 시간에도 회의실을 계속 사용하셔서 회의를 30분 늦게 시작했습니다. 참석자 세 명이 다음 일정을 바꿔야 해서 불편했습니다. 앞으로는 제 예약 시간에 맞춰 회의실을 비워주실 수 있을까요?",
+          "target": "都是因为你在我预约的时段还一直用着会议室，我们的会议才晚开了三十分钟，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+          "accepted_band_codes": [
+            "over_attributed"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "제 예약 시간에도 회의실을 계속 사용하셔서 회의를 30분 늦게 시작했습니다. 참석자 세 명이 다음 일정을 바꿔야 해서 불편했습니다. 앞으로는 제 예약 시간에 맞춰 회의실을 비워주실 수 있을까요?",
+          "target": "都是因为你在我预约的时段还一直用着会议室，我们的会议才晚开了三十分钟，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+          "accepted_band_codes": [
+            "over_attributed"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "你在我预约的时段还一直用着会议室，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我预约的时段，会议室那边有点问题，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "你在我预约的时段还一直用着会议室，害得我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "제 예약 시간에도 회의실을 계속 사용하셔서 회의를 30분 늦게 시작했습니다. 참석자 세 명이 다음 일정을 바꿔야 해서 불편했습니다. 앞으로는 제 예약 시간에 맞춰 회의실을 비워주실 수 있을까요?",
+          "target": "都是因为你在我预约的时段还一直用着会议室，我们的会议才晚开了三十分钟，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+          "accepted_band_codes": [
+            "over_attributed"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "你在我预约的时段还一直用着会议室，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "我预约的时段，会议室那边有点问题，导致我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "你在我预约的时段还一直用着会议室，害得我们的会议晚了三十分钟才开始，三位参会者都得调整接下来的安排，这让我很不方便。以后能不能在我预约的时间把会议室空出来？",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "공지에 방 호수를 잘못 적으셔서 옆방에 들렀다가 3분 늦었습니다. 잘못된 안내 때문에 불편했습니다.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "你在通知里把房间号写错了，我先去了隔壁，结果晚到了三分钟。通知上的这个错误让我有些不便。",
+              "len": 44,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "옆방에 들러 3분 늦은 상황에서 ‘把房间号写错了’와 ‘结果’가 안내 오류와 영향을 바로 연결하므로, 개인을 평가하지 않는 사실 중심의 불만으로 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "通知里的房间号好像有点问题，我先去了隔壁，结果晚到了三分钟。通知这件事让我有些不便。",
+              "len": 42,
+              "bands": [
+                "under_specified"
+              ],
+              "role": null,
+              "note_ko": "‘你…把房间号写错了’를 ‘房间号好像有点问题’로 바꾸어 작성자의 확인된 오기를 잠정적인 문제로 처리했다. 옆방 방문과 3분 지연은 유지하지만 오류의 성격과 책임 소재가 흐려져 under_specified 방향이 된다."
+            },
+            {
+              "n": 3,
+              "text": "因为你在通知里写的房间号不对，我先去了隔壁，晚到了三分钟，这给我带来了一些不便。",
+              "len": 40,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "‘因为你在通知里写的房间号不对’로 오류의 원인과 작성자를 짚고 ‘这给我带来了一些不便’으로 실제 불편을 담담하게 전하므로, 원문에 없는 평가를 더하지 않은 비례적인 불만으로 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "都是因为你把通知里的房间号写错了，害得我先去了隔壁，晚到了三分钟。这个错误的通知让我很不方便。",
+              "len": 47,
+              "bands": [
+                "over_attributed"
+              ],
+              "role": null,
+              "note_ko": "앵커의 안내 오류·옆방 방문·3분 지연·불편이라는 명제는 그대로 두되, ‘都是因为你’와 ‘害得’로 3분 지연의 모든 원인을 상대 개인에게 돌리는 어감을 더하고 ‘有些不便’ 대신 ‘很不方便’으로 불편의 강도도 높였다. 원문에 없는 명제는 더하지 않았지만 낮은 피해 수준에 비해 책임 추궁과 불편의 강도를 키워 over_attributed 방향으로 이동한다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w12-1",
+      "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+      "speech_act": "complaint",
+      "mode": "stt_interpreting",
+      "target_feature": "complaint_problem_accountability",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: multi_judge에서 부적절안과 적정안이 길이만으로 완전히 분리됨 (부적절안이 모두 적정안보다 김; 후보 1[within_band]=38자, 후보 2[under_specified]=43자, 후보 3[within_band]=40자, 후보 4[over_attributed]=52자). 재생성 시 각 후보의 초점 자원과 대역은 유지하고, 새 사실을 더하지 않는 중립적 연결·부연 또는 문장 압축으로 적정안과 부적절안의 길이 범위를 겹치게 하세요",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"입력하신 행사 장소가 잘못돼서 제가 안내문을…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"입력하신 행사 장소가 잘못돼서 제가 안내문을…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"你填的活动地点不太对,通知单我这边也重新印了。这…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"你填的活动地点不太对,通知单我这边也重新印了。这…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제 책상에 커피를 흘리셔서 제가 닦았어요. 제가 뒤처리를 하게 돼서 좀 번거롭네요.",
+          "target": "你把咖啡洒在我桌上，结果还得我来擦。让我来收拾，这事多少有点不方便。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "입력하신 행사 장소가 잘못돼서 제가 안내문을 다시 인쇄했어요. 이 일로 제가 추가 작업을 하게 돼서 번거롭네요.",
+          "target": "你填的活动地点不太对，通知单我这边也重新印了。这前前后后的事，多少让我有点不方便。",
+          "accepted_band_codes": [
+            "under_specified"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "입력하신 행사 장소가 잘못돼서 제가 안내문을 다시 인쇄했어요. 이 일로 제가 추가 작업을 하게 돼서 번거롭네요.",
+          "target": "你填的活动地点不太对，通知单我这边也重新印了。这前前后后的事，多少让我有点不方便。",
+          "accepted_band_codes": [
+            "under_specified"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "因为你把活动地点填错了，我不得不重新印通知单。这给我增加了额外的工作，确实挺麻烦的。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "活动地点那一栏有点出入，通知单我也重新印了。这次这些事情弄下来，我这边不太顺当。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "因为你把活动地点填错了，我不得不重新印通知单。这给我增加了额外的工作，你这根本就是不拿我的时间当回事。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "입력하신 행사 장소가 잘못돼서 제가 안내문을 다시 인쇄했어요. 이 일로 제가 추가 작업을 하게 돼서 번거롭네요.",
+          "target": "你填的活动地点不太对，通知单我这边也重新印了。这前前后后的事，多少让我有点不方便。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "complaint_problem_accountability",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "텐트 안에 음식물이랑 흙이 남아 있어서 내가 청소했어. 쓰고 나서 안 치운 채로 돌려주니까 내가 뒤처리를 하게 돼서 번거롭잖아.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "你用完帐篷没清理就还给我，里面的食物残渣和泥土还得我来清理。这给我添了麻烦。",
+              "len": 38,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "친구가 청소하지 않고 반납한 상황에서 ‘没清理就还给我’와 ‘还得我来’가 책임과 뒤처리를 간결하게 연결해 이번 행동만 짚는 인상을 주므로 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "你还回来的帐篷里有食物残渣和泥土，我也清理了。这次帐篷借出去再收回来，还是有点不方便。",
+              "len": 43,
+              "bands": [
+                "under_specified"
+              ],
+              "role": null,
+              "note_ko": "잔여물과 직접 청소한 사실은 유지하되 ‘没清理就还给我’와 ‘还得我来’의 책임 연결을 없앱니다. 불편의 범위를 미청소 반납이 아닌 대여·회수 과정 전체로 뭉뚱그려, 친한 친구가 어떤 행동으로 뒤처리를 떠넘겼는지 불분명한 부족함 대역으로 낮춥니다."
+            },
+            {
+              "n": 3,
+              "text": "帐篷里的食物残渣和泥土都是我清理的。你用完没清理就还给我，我怎么能不觉得麻烦呢？",
+              "len": 40,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "지속적으로 친하게 지낸 친구에게 ‘我怎么能不觉得麻烦呢’로 자신의 번거로움에 대한 공감을 구하되 원인은 미청소 반납에 한정하므로, 친밀한 관계의 공감 호소로 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "帐篷里的食物残渣和泥土都是我清理的。你用完没清理就还给我，分明是有意把麻烦留给我，我怎么能不觉得麻烦呢？",
+              "len": 52,
+              "bands": [
+                "over_attributed"
+              ],
+              "role": null,
+              "note_ko": "청소 사실과 반문형 불만은 유지하면서 ‘分明是有意’로 뒤처리를 의도적으로 남겼다고 단정합니다. 친한 사이에서 번거로움에 공감을 구하는 수준을 넘어, 확인되지 않은 의도를 귀속하므로 과함 대역으로 이동합니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w13-0",
+      "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+      "speech_act": "request",
+      "mode": "translation",
+      "target_feature": "request_mitigation_optionality",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "speaker_lower",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"금요일에 제출할 고객 제안서 초안입니다. 네…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"금요일에 제출할 고객 제안서 초안입니다. 네…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"这是星期五要提交的客户提案初稿。请您抽三十分钟左…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"这是星期五要提交的客户提案初稿。请您抽三十分钟左…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "배포 전에 오류를 확인하려고 합니다. 오늘 중 20분 정도 이 새 온라인 설문지에 시험 삼아 답하고, 잘못 연결되는 화면을 기록해 주세요.",
+          "target": "为了在发布前检查错误，请你今天花二十分钟左右试填一下这份新做的在线问卷。把跳转有误的页面记录下来吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "금요일에 제출할 고객 제안서 초안입니다. 네 쪽을 읽고 수정할 부분을 짚어 주시는 데 30분 정도 내 주세요.",
+          "target": "这是星期五要提交的客户提案初稿。请您抽三十分钟左右读一下这四页，把需要修改的地方指出来吧。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "금요일에 제출할 고객 제안서 초안입니다. 네 쪽을 읽고 수정할 부분을 짚어 주시는 데 30분 정도 내 주세요.",
+          "target": "这是星期五要提交的客户提案初稿。请您抽三十分钟左右读一下这四页，把需要修改的地方指出来吧。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "这是星期五要提交的客户提案初稿。想请您抽三十分钟左右读一下这四页，并指出需要修改的地方，您看方便吗？",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "这是星期五要提交的客户提案初稿。您抽三十分钟左右读一下这四页，并指出需要修改的地方。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "这是星期五要提交的客户提案初稿。想请您抽三十分钟左右读一下这四页，并指出需要修改的地方，不知道这样请您帮忙是否合适？",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "mid"
+          },
+          "source": "금요일에 제출할 고객 제안서 초안입니다. 네 쪽을 읽고 수정할 부분을 짚어 주시는 데 30분 정도 내 주세요.",
+          "target": "这是星期五要提交的客户提案初稿。请您抽三十分钟左右读一下这四页，把需要修改的地方指出来吧。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "speaker_lower",
+            "r": "low"
+          },
+          "source": "최신 보고서 양식 파일을 찾지 못했어요. 그 파일 하나 전달해 주세요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "我找不到最新的报告模板文件。您能转发给我一份吗？",
+              "len": 24,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "수정 없는 파일 전달에서는 짧은 ‘您能…吗’만으로도 행동과 가능 여부가 분명해지므로, 팀장에게 간결하게 답할 여지를 주는 이 요청을 유지할 수 있습니다."
+            },
+            {
+              "n": 2,
+              "text": "我找不到最新的报告模板文件。您把那个文件转发给我。",
+              "len": 25,
+              "bands": [
+                "too_direct"
+              ],
+              "role": null,
+              "note_ko": "‘您能…吗’를 ‘您把…’ 지시형으로 바꾸어 전달 수행을 단정했다. 이미 합의한 전달을 재확인하는 장면에서는 적절할 수 있지만, 여기서는 팀장에게 처음 요청하는 일이므로 낮은 부담만으로 실행을 당연시하는 too_direct 방향이다."
+            },
+            {
+              "n": 3,
+              "text": "我找不到最新的报告模板文件。如果方便的话，想请您转发一份。",
+              "len": 29,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "단순 전달 요청에서 ‘如果方便的话’와 ‘想请您’는 팀장의 현재 사정에 따라 응답할 여지를 두므로, 행동은 분명히 밝히되 실행을 단정하지 않는 이 전략을 유지할 수 있습니다."
+            },
+            {
+              "n": 4,
+              "text": "我找不到最新的报告模板文件。如果方便的话，您是否愿意考虑转发给我一份？",
+              "len": 35,
+              "bands": [
+                "too_indirect"
+              ],
+              "role": null,
+              "note_ko": "조건절은 유지하되 ‘想请您转发’를 ‘是否愿意考虑转发’로 바꾸었다. 전송 여부가 아니라 전송을 고려할 의향부터 묻는 단계를 두어, 수정 없는 파일 하나의 전달 요청을 불필요한 숙고 대상으로 만드는 too_indirect 방향이다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    },
+    {
+      "key": "w13-1",
+      "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+      "speech_act": "request",
+      "mode": "stt_interpreting",
+      "target_feature": "request_mitigation_optionality",
+      "within_code": null,
+      "production_pdr": {
+        "d": "acquaintance",
+        "p": "equal",
+        "r": "mid"
+      },
+      "findings": [
+        {
+          "id": "rule-1",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-2",
+          "rule": "R5",
+          "issue_ko": "R5: 문항 5: 과소안이 전부 최단 — 길이 단서 가능(눈검사)",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-3",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 3 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-4",
+          "rule": "R19",
+          "issue_ko": "R19: source 완전 중복: 문항 2 = 문항 4 — \"새 행사 안내문 좀 검토해 주세요. 오탈자와…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-5",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 3 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        },
+        {
+          "id": "rule-6",
+          "rule": "R19",
+          "issue_ko": "R19: 판정 후보 완전 중복: 문항 2 target = 문항 4 target — \"帮我检查一下新活动的通知吧。看看有没有错别字、有…\"",
+          "needs_professor": true,
+          "severity": "warning"
+        }
+      ],
+      "items": [
+        {
+          "id": 1,
+          "type": "scale4",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "close",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "자전거 펑크 수리 좀 같이 도와줘. 자전거는 내가 가져갈게.",
+          "target": "帮我一起补一下自行车胎吧。车我带过去。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 2,
+          "type": "judge3",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "새 행사 안내문 좀 검토해 주세요. 오탈자와 빠진 안내가 있는지 봐주시고 내일 오전까지 의견을 주세요.",
+          "target": "帮我检查一下新活动的通知吧。看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 3,
+          "type": "fix_choice",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "새 행사 안내문 좀 검토해 주세요. 오탈자와 빠진 안내가 있는지 봐주시고 내일 오전까지 의견을 주세요.",
+          "target": "帮我检查一下新活动的通知吧。看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+          "accepted_band_codes": [
+            "too_direct"
+          ],
+          "candidates": null,
+          "corrections": [
+            {
+              "n": 1,
+              "text": "能不能帮我检查一下新活动的通知，看看有没有错别字、有没有漏掉的信息？意见请在明天上午之前告诉我。",
+              "is_valid": true
+            },
+            {
+              "n": 2,
+              "text": "你把新活动的通知检查一下，看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+              "is_valid": false
+            },
+            {
+              "n": 3,
+              "text": "要是你能帮我检查一下新活动的通知，看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我就好了。",
+              "is_valid": false
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "type": "reason",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "mid"
+          },
+          "source": "새 행사 안내문 좀 검토해 주세요. 오탈자와 빠진 안내가 있는지 봐주시고 내일 오전까지 의견을 주세요.",
+          "target": "帮我检查一下新活动的通知吧。看看有没有错别字、有没有漏掉的信息，明天上午之前把意见告诉我。",
+          "accepted_band_codes": null,
+          "candidates": null,
+          "corrections": null
+        },
+        {
+          "id": 5,
+          "type": "multi_judge",
+          "item_focus": "request_mitigation_optionality",
+          "pdr": {
+            "d": "acquaintance",
+            "p": "equal",
+            "r": "low"
+          },
+          "source": "제 자리에서는 손이 안 닿네요. 옆에 있는 여분 펜 하나 건네주세요.",
+          "target": null,
+          "accepted_band_codes": null,
+          "candidates": [
+            {
+              "n": 1,
+              "text": "我这儿够不着。能把旁边那支备用笔递给我吗？",
+              "len": 21,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "손이 닿지 않는 펜을 건네는 작은 부탁에서 ‘能…吗’가 행동을 분명히 지정하면서 응답 여지를 주므로, 간결한 가능 여부 질문을 유지합니다."
+            },
+            {
+              "n": 2,
+              "text": "我这儿够不着。你得把旁边那支备用笔递给我。",
+              "len": 21,
+              "bands": [
+                "too_direct"
+              ],
+              "role": null,
+              "note_ko": "‘能…吗’를 의무를 부과하는 ‘你得…’로 바꾸었습니다. 단순한 직접형이라서가 아니라, 각자 자료를 읽는 동급 동료에게 펜을 건넬 의무가 있는 것처럼 요구하여 작은 부탁에 필요한 응답 여지를 닫으므로 too_direct 방향입니다."
+            },
+            {
+              "n": 3,
+              "text": "我这儿够不着。麻烦你把旁边那支备用笔递给我。",
+              "len": 22,
+              "bands": [
+                "within_band"
+              ],
+              "role": null,
+              "note_ko": "동료 바로 옆의 여분 펜을 건네는 일에서 ‘麻烦你’가 작은 수고를 인정하고 직접형이 행동을 명확히 하므로, 별도 조건을 쌓지 않는 이 요청 방식을 유지합니다."
+            },
+            {
+              "n": 4,
+              "text": "我这儿够不着。不知道会不会让你为难，能不能把旁边那支备用笔递给我？",
+              "len": 33,
+              "bands": [
+                "too_indirect"
+              ],
+              "role": null,
+              "note_ko": "‘能…吗’로 가능 여부만 묻던 부탁 앞에 ‘不知道会不会让你为难’라는 부담 우려를 덧붙였습니다. 바로 옆 여분 펜을 건네는 작은 행동인데도 상대가 곤란해질 가능성부터 타진하여 요청을 과도한 조심스러움으로 돌리므로 too_indirect 방향입니다."
+            }
+          ],
+          "corrections": null
+        }
+      ]
+    }
+  ]
+}
