@@ -47,8 +47,9 @@ Deno.serve(async (req) => {
       const contentHash = await reviewHash(domain.snapshot);
       const base = () => db.from("content_review_runs").select("*").eq("kind", target.kind).eq("target_id", target.targetId).eq("week_no", weekNo);
       const [current, history] = await Promise.all([
-        base().eq("source_hash", source.source_hash).eq("content_hash", contentHash).eq("criteria_version", CONTENT_REVIEW_VERSION).maybeSingle(),
-        db.from("content_review_runs").select("id,created_at,approved_at,content_hash").eq("kind", target.kind).eq("target_id", target.targetId).eq("week_no", weekNo).order("created_at", { ascending: false }).limit(12),
+        // Only the active row is operational; a row replaced by a gate rebind stays readable as history below.
+        base().eq("source_hash", source.source_hash).eq("content_hash", contentHash).eq("criteria_version", CONTENT_REVIEW_VERSION).is("superseded_by", null).maybeSingle(),
+        db.from("content_review_runs").select("id,created_at,approved_at,content_hash,superseded_by,rebound_from").eq("kind", target.kind).eq("target_id", target.targetId).eq("week_no", weekNo).order("created_at", { ascending: false }).limit(12),
       ]);
       if (current.error || history.error) throw new Error("검수 저장소를 사용할 수 없습니다. content-review 마이그레이션·Edge 배포 상태를 확인해 주세요.");
       const dependencies = await Promise.all(domain.dependencies.map(async (id: string) => {
@@ -56,7 +57,7 @@ Deno.serve(async (req) => {
         // Match SQL readiness: unchanged source keeps its historical approval even
         // when a newer rule catalog changes the computed review content hash.
         const { data, error } = await db.from("content_review_runs").select("id").eq("kind", "mission").eq("target_id", id)
-          .eq("source_hash", dependency.source_hash).eq("criteria_version", CONTENT_REVIEW_VERSION).not("approved_at", "is", null).limit(1);
+          .eq("source_hash", dependency.source_hash).eq("criteria_version", CONTENT_REVIEW_VERSION).is("superseded_by", null).not("approved_at", "is", null).limit(1);
         if (error) throw new Error("연결된 미션의 검수 기록 조회 실패");
         return { id, approved: Boolean(data?.length) };
       }));
@@ -71,12 +72,14 @@ Deno.serve(async (req) => {
     }
     if (action === "rules") {
       if (!state.run) {
-        const { error } = await db.from("content_review_runs").upsert({ kind: target.kind, target_id: target.targetId, week_no: weekNo,
+        // The review identity is unique among active rows only (partial index), so a concurrent insert is
+        // tolerated here rather than declared as an ON CONFLICT target.
+        const { error } = await db.from("content_review_runs").insert({ kind: target.kind, target_id: target.targetId, week_no: weekNo,
           source_hash: state.sourceHash, content_hash: state.contentHash, criteria_version: CONTENT_REVIEW_VERSION,
           snapshot: state.snapshot, rules: state.rules, created_by: user.user.id,
           approval_policy: CONTENT_APPROVAL_POLICY, generation_quality: state.reusableGenerationQuality,
-        }, { onConflict: "kind,target_id,week_no,source_hash,content_hash,criteria_version", ignoreDuplicates: true });
-        if (error) throw new Error(`규칙 검사 저장 실패: ${error.message}`);
+        });
+        if (error && error.code !== "23505") throw new Error(`규칙 검사 저장 실패: ${error.message}`);
       } else if (!state.run.approved_at && !state.run.running_stage) {
         const { error } = await db.from("content_review_runs").update({ approval_policy: CONTENT_APPROVAL_POLICY,
           generation_quality: state.reusableGenerationQuality }).eq("id", state.run.id).is("approved_at", null).is("running_stage", null);

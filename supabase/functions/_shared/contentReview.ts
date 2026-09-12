@@ -51,6 +51,10 @@ export type ContentReviewRun = {
   source_hash: string; content_hash: string; criteria_version: string;
   snapshot: Record<string, unknown>; rules: ReviewResult;
   prepared_finalization?: Record<string, unknown> | null;
+  /** Set when a later row replaced this one (gate provenance rebind). A superseded row is history, never operational. */
+  superseded_by?: string | null;
+  /** The review row whose semantic evidence this row carries forward. */
+  rebound_from?: string | null;
   approval_policy?: "multimodel_v2" | "focused_v1";
   generation_quality?: GenerationQualityEvidence | null;
   independent_review_requested?: boolean;
@@ -73,7 +77,8 @@ export type InstructorExperience = {
 };
 export type ReviewInspection = {
   run: ContentReviewRun | null; contentHash: string; sourceHash: string;
-  snapshot: Record<string, unknown>; history: Array<Pick<ContentReviewRun, "id" | "created_at" | "approved_at" | "content_hash">>;
+  snapshot: Record<string, unknown>;
+  history: Array<Pick<ContentReviewRun, "id" | "created_at" | "approved_at" | "content_hash" | "superseded_by" | "rebound_from">>;
   dependencies: Array<{ id: string; approved: boolean }>;
   models: { openai: string; claude: string | null };
   reusableGenerationQuality?: GenerationQualityEvidence | null;

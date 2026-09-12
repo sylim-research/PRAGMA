@@ -15,6 +15,7 @@ function query() {
   const q = {
     select: () => q, order: () => q, limit: () => q,
     eq: (key, value) => { found = found.filter(row => row[key] === value); return q; },
+    is: (key, value) => { found = found.filter(row => (row[key] ?? null) === value); return q; },
     not: (key, _operator, value) => { found = found.filter(row => row[key] !== value); return q; },
     maybeSingle: async () => ({ data: found[0] ?? null }),
     then: resolve => Promise.resolve({ data: found }).then(resolve),
