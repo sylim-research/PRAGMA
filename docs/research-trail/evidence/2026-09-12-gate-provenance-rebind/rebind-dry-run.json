@@ -1,0 +1,181 @@
+{
+  "summary": {
+    "at": "2026-09-12T03:26:03.694Z",
+    "applied": false,
+    "cells": 20,
+    "rebound": 0,
+    "no_change": 4,
+    "would_rebind": 16,
+    "blocked": 0,
+    "errors": 0,
+    "blocked_detail": [],
+    "error_detail": [],
+    "model_calls": 0
+  },
+  "cells": [
+    {
+      "key": "w2-0",
+      "scenario_id": "4eac0623-82b9-4c92-818d-23c2ba8876fc",
+      "old_review_id": "2c4f98e4-72d6-460f-b63d-de0cb168e9c9",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w2-1",
+      "scenario_id": "63071ac4-efcd-4b50-a8b6-323046496532",
+      "old_review_id": "3a0c42ce-54f6-4bb3-ae90-e144c112e6b8",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w3-0",
+      "scenario_id": "d1a90772-808e-4cad-9365-6f003ab0d12c",
+      "old_review_id": "f8088636-7590-4aee-8ff8-ef9807754369",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w3-1",
+      "scenario_id": "ebc4e927-7e0d-495d-a06f-2d05e64bc29e",
+      "old_review_id": "d592ded2-60e7-44c2-9d05-81d3eb864a6e",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w4-0",
+      "scenario_id": "a1ccc07b-ab07-4845-a50d-63772bfc32ad",
+      "old_review_id": "d1b5d819-c1ba-4582-a371-1e8bd836d9be",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w4-1",
+      "scenario_id": "0350a784-ee56-4927-b9ac-20f00843ee52",
+      "old_review_id": "982af629-b961-4700-bbe1-5f19a35ba2cc",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w5-0",
+      "scenario_id": "b9a5249f-fc09-4121-b4de-512f2f4a9079",
+      "old_review_id": "a6b277fa-37ae-4ab6-9359-eb0fffdd1e98",
+      "skip_reasons": [],
+      "already_current": true,
+      "action": "no_change",
+      "new_review_id": "a6b277fa-37ae-4ab6-9359-eb0fffdd1e98"
+    },
+    {
+      "key": "w5-1",
+      "scenario_id": "2032d1cc-25e3-4bf9-9eff-6f8a1fd7153e",
+      "old_review_id": "f4450900-b3df-47be-b936-20be68f81297",
+      "skip_reasons": [],
+      "already_current": true,
+      "action": "no_change",
+      "new_review_id": "f4450900-b3df-47be-b936-20be68f81297"
+    },
+    {
+      "key": "w6-0",
+      "scenario_id": "def83b4f-b281-4285-af06-7e9339269706",
+      "old_review_id": "9984e588-c349-43aa-a523-eecfa0ec482d",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w6-1",
+      "scenario_id": "34e8b1fd-8ad3-4095-aed4-467b7b2b8510",
+      "old_review_id": "9d3a6f60-58f6-4bb9-8a4b-9e144836f662",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w9-0",
+      "scenario_id": "fc3913de-4f5c-490b-9418-e89bb37bc1d7",
+      "old_review_id": "e5de3076-a88d-49ac-946e-07332bc70bf1",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w9-1",
+      "scenario_id": "170e4b66-a802-4d8c-8696-2fd25e0b4a2b",
+      "old_review_id": "89682923-cf3f-45ac-bf1d-2ef4e6b127f9",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w10-0",
+      "scenario_id": "1baacb9c-735d-4c29-a26e-b57ab6cf19d5",
+      "old_review_id": "51b9a25f-cb84-4da7-8f65-43c09fc2ee31",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w10-1",
+      "scenario_id": "f5c7d021-4bd0-494e-9ab4-612353e4f2e6",
+      "old_review_id": "cffe6a4a-2d81-4e58-993d-e939f8af1ec5",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w11-0",
+      "scenario_id": "ad9fa216-5071-4b18-a5fe-6dd13cf1b048",
+      "old_review_id": "f506d87a-4e08-4a1e-8fd3-f54cb25b76a3",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w11-1",
+      "scenario_id": "8755d9fb-f8c0-4392-a17f-6944981624d3",
+      "old_review_id": "b4b5e458-7cdb-42c2-9a07-21c981fd8720",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w12-0",
+      "scenario_id": "97c4834a-ee4a-4691-a042-0255c8fadc4b",
+      "old_review_id": "850bae2f-78a4-4079-aee4-2965166a5400",
+      "skip_reasons": [],
+      "already_current": true,
+      "action": "no_change",
+      "new_review_id": "850bae2f-78a4-4079-aee4-2965166a5400"
+    },
+    {
+      "key": "w12-1",
+      "scenario_id": "544bab4a-b241-4ca5-b3a7-bd165df405d8",
+      "old_review_id": "7cbf69ab-8e69-4d2d-ab10-ef9b33662cbf",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w13-0",
+      "scenario_id": "90e605ce-1097-4f32-9e73-45739149b0f6",
+      "old_review_id": "f2f4423c-e0dc-44ed-8ce6-6efe531e3456",
+      "skip_reasons": [],
+      "already_current": false,
+      "action": "would_rebind"
+    },
+    {
+      "key": "w13-1",
+      "scenario_id": "26412ba9-8942-4cba-a7c8-12e744f3891a",
+      "old_review_id": "9ffe8d11-5aa5-4097-abb6-1ccbcf974077",
+      "skip_reasons": [],
+      "already_current": true,
+      "action": "no_change",
+      "new_review_id": "9ffe8d11-5aa5-4097-abb6-1ccbcf974077"
+    }
+  ]
+}
