@@ -144,17 +144,6 @@ export interface DctFeedbackQuest extends QuestBase {
   feedback: DctQuest["feedback"];
 }
 
-/**
- * 앞 두 판단 문항의 저장된 P·D·R을 비교해 실제로 달라진 축만 담는다.
- * 학습자에게는 축 이름을 자연어로만 보이고 원시 코드는 노출하지 않는다.
- */
-export interface ContrastDimension {
-  axis: "p" | "d" | "r";
-  axisLabel: string;
-  before: string;
-  after: string;
-}
-
 export type MissionQuest =
   | ScaleQuest
   | FixChoiceQuest
@@ -190,8 +179,7 @@ export interface CanonicalMissionViewModel {
   contrast: {
     before: string;
     after: string;
-    /** 실제 P·D·R 비교 결과. 두 문항의 조건이 같으면 빈 배열이다. */
-    changedDimensions: ContrastDimension[];
+    changedDimensions: string[];
     note: string;
   };
   summaryPrinciple: string;
@@ -209,15 +197,10 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
   sourceLanguage: { code: "ko", label: "한국어", badge: "KO" },
   targetLanguage: { code: "zh", label: "중국어", badge: "ZH" },
   contrast: {
-    // 아래 A1·A2 두 문항의 조건에서 그대로 읽은 값이다(실데이터는 runtime이 계산한다).
-    before: "지도교수님께 대학원 추천서를 부탁하는 이메일",
-    after: "같이 사는 룸메이트에게 에어컨 온도를 낮춰 달라는 말",
-    changedDimensions: [
-      { axis: "p", axisLabel: "지위·권한 관계", before: "상대 높음", after: "동등" },
-      { axis: "d", axisLabel: "관계의 거리", before: "거리 있음", after: "친밀" },
-      { axis: "r", axisLabel: "부탁·사안의 부담", before: "부담 높음", after: "부담 낮음" },
-    ],
-    note: "두 상황에서 표현의 적절성이 어떻게 달라지는지 비교해 보세요.",
+    before: "초면의 인턴십 담당자에게 면접 일정 조정 요청",
+    after: "같은 담당자에게 안내 파일 재전송 요청",
+    changedDimensions: ["R: 중·상 → 낮음"],
+    note: "요청이라는 화행과 상대는 같지만, 이번 부탁은 아까보다 훨씬 가볍습니다.",
   },
   summaryPrinciple: "요청의 핵심 의미는 지키고, 이유·사과·선택권 같은 덧붙임은 관계와 상황에 맞게 선택합니다.",
   lessonPoints: [
