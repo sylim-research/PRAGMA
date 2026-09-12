@@ -1,0 +1,233 @@
+{
+  "summary": {
+    "at": "2026-09-12T03:29:33.206Z",
+    "cells": 20,
+    "errors": 0,
+    "active_row_resolved": 20,
+    "next_professor": 20,
+    "on_current_gate": 20,
+    "model_calls": 0
+  },
+  "cells": [
+    {
+      "key": "w2-0",
+      "run_id": "13e3fcbb-42ad-4bbc-9a97-715406d00f89",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w2-1",
+      "run_id": "9dfd50d7-8588-4eac-b76a-fc56cc4d3f75",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w3-0",
+      "run_id": "c898f9b5-b686-4ec0-b3fe-a3ce57b2c447",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w3-1",
+      "run_id": "90883831-4d5b-4850-9a59-670099e5c637",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w4-0",
+      "run_id": "309daa71-1a4a-4605-b050-586c33806cce",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w4-1",
+      "run_id": "3efc6268-bd59-49ca-8a2e-af3889eddd70",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w5-0",
+      "run_id": "a6b277fa-37ae-4ab6-9359-eb0fffdd1e98",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 5,
+      "history_superseded": 0
+    },
+    {
+      "key": "w5-1",
+      "run_id": "f4450900-b3df-47be-b936-20be68f81297",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 1,
+      "history_superseded": 0
+    },
+    {
+      "key": "w6-0",
+      "run_id": "6348a1d9-2887-4268-be0e-0f1ddc6782c8",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 4,
+      "history_superseded": 1
+    },
+    {
+      "key": "w6-1",
+      "run_id": "3f6e2648-cb28-44a7-81f2-553d8c377d28",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 2,
+      "history_superseded": 1
+    },
+    {
+      "key": "w9-0",
+      "run_id": "4558dc3a-96fd-4ed1-bb26-5dc06db2e292",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w9-1",
+      "run_id": "0d4f266c-dc28-40e9-89c5-85bf176ea1ef",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w10-0",
+      "run_id": "4f14308d-c2c7-470b-bc18-c8088b37908c",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 2,
+      "history_superseded": 1
+    },
+    {
+      "key": "w10-1",
+      "run_id": "b7e19943-eacd-4140-b83e-6f38552194f1",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w11-0",
+      "run_id": "e84a336b-0899-4367-a73f-312db58c408f",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w11-1",
+      "run_id": "afa9fbbd-7e4a-422a-b80e-ef501dc9d77d",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w12-0",
+      "run_id": "850bae2f-78a4-4079-aee4-2965166a5400",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 5,
+      "history_superseded": 0
+    },
+    {
+      "key": "w12-1",
+      "run_id": "ecffa75a-29ea-46c6-ab06-453b2c7346d2",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w13-0",
+      "run_id": "08a25fb9-dcb3-4c2d-9770-32e613ea0676",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 3,
+      "history_superseded": 1
+    },
+    {
+      "key": "w13-1",
+      "run_id": "9ffe8d11-5aa5-4097-abb6-1ccbcf974077",
+      "matches_expected_active": true,
+      "criteria_version": "content_review_v3",
+      "gate_prompt_version": "quality_v24_reason_facts_severity",
+      "prepared": true,
+      "next": "professor",
+      "history_rows": 5,
+      "history_superseded": 0
+    }
+  ]
+}
