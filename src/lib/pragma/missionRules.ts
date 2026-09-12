@@ -958,7 +958,7 @@ export function checkMission(
   }
 
   // ── R19 세트 내 source/candidate 완전 중복(warning) ──
-  checkInternalDuplicates(v, m);
+  checkInternalDuplicates(v, m, isCurrentNativeV5);
 
   // ── R21 recommended_example가 해당 문항 판정과 모순되지 않음(fail, 2026-08-25 상향) ──
   checkRecommendedConsistency(v, m, withinCode);
@@ -1185,6 +1185,13 @@ function checkMultiJudgeLength(
   withinCode: string,
 ) {
   const lens = candidates.map((c) => [...(c.text ?? "")].length);
+  // 길이 단서는 **차이가 눈에 띌 때만** 신호다. 1~3자 차이나 한 자릿수 %는 같은 화용
+  // 자원을 다르게 실현한 결과이지 "긴 걸 고르면 됨"을 가르치지 않는다. 두 기준을 모두
+  // 넘을 때만 보고한다(2026-09-12 R19·R5 감사 §B: 이 하한 아래 건은 전부 오탐이었다).
+  const CUE_MIN_GAP_CHARS = 4;
+  const CUE_MIN_GAP_RATIO = 0.1;
+  const isLengthCue = (gap: number, shorterSide: number) =>
+    gap >= CUE_MIN_GAP_CHARS && shorterSide > 0 && gap / shorterSide >= CUE_MIN_GAP_RATIO;
   const codesOf = (c: { accepted_band_codes?: string[] }) => c.accepted_band_codes ?? [];
   const isUnder = (c: { accepted_band_codes?: string[] }) =>
     codesOf(c).every((b) => b !== withinCode) && isUnderBand(codesOf(c));
@@ -1205,9 +1212,18 @@ function checkMultiJudgeLength(
     const badLens = paired.filter((p) => !p.ok).map((p) => p.len);
     if (okLens.length && badLens.length) {
       const okMin = Math.min(...okLens), okMax = Math.max(...okLens);
-      const separable = badLens.every((l) => l < okMin) || badLens.every((l) => l > okMax);
+      const shorterBad = badLens.every((l) => l < okMin);
+      const longerBad = badLens.every((l) => l > okMax);
+      // 분리돼 있어도 두 무리가 붙어 있으면 길이로 고를 수 없다. 무리 사이의 실제 간격을 본다.
+      const separationGap = shorterBad
+        ? okMin - Math.max(...badLens)
+        : longerBad
+          ? Math.min(...badLens) - okMax
+          : 0;
+      const separable = (shorterBad || longerBad) &&
+        isLengthCue(separationGap, shorterBad ? Math.max(...badLens) : okMax);
       if (separable) {
-        const separation = badLens.every((l) => l < okMin)
+        const separation = shorterBad
           ? "부적절안이 모두 적정안보다 짧음"
           : "부적절안이 모두 적정안보다 김";
         const candidateLengths = candidates
@@ -1235,13 +1251,23 @@ function checkMultiJudgeLength(
   const maxLen = Math.max(...lens);
   const maxCount = lens.filter((l) => l === maxLen).length;
   if (overIdx.length === 1 && lens[overIdx[0]] === maxLen && maxCount === 1) {
-    add(v, "R5", "warning", `문항 ${id}: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)`);
+    const runnerUp = Math.max(...lens.filter((_, i) => i !== overIdx[0]));
+    if (isLengthCue(maxLen - runnerUp, runnerUp)) {
+      add(v, "R5", "warning", `문항 ${id}: 과잉안이 유일한 최장문 — 길이 단서 가능(눈검사)`);
+    }
   }
 
   // under 전부가 최단 그룹 → warning (v1.4 증거 기반 강등)
+  // 과잉안 검사와 달리 최단의 유일성을 보지 않아, 적정안이 같은 길이여도 발동하던 것을 고친다.
   const minLen = Math.min(...lens);
   const underIdx = candidates.map((c, i) => (isUnder(c) ? i : -1)).filter((i) => i >= 0);
-  if (underIdx.length >= 1 && underIdx.every((i) => lens[i] === minLen)) {
+  const otherLens = lens.filter((_, i) => !underIdx.includes(i));
+  if (
+    underIdx.length >= 1 &&
+    underIdx.every((i) => lens[i] === minLen) &&
+    otherLens.length > 0 &&
+    isLengthCue(Math.min(...otherLens) - minLen, minLen)
+  ) {
     add(v, "R5", "warning", `문항 ${id}: 과소안이 전부 최단 — 길이 단서 가능(눈검사)`);
   }
 
@@ -1400,39 +1426,54 @@ function checkNationalization(v: RuleViolation[], m: MissionRuntime) {
   }
 }
 
-function checkInternalDuplicates(v: RuleViolation[], m: MissionRuntime) {
+/** 현행 native MJT5에서 같은 Anchor A 사건을 공유하도록 설계된 문항(MJT2·3·4). */
+const ANCHOR_SLOT_ITEM_IDS = new Set([2, 3, 4]);
+
+function checkInternalDuplicates(
+  v: RuleViolation[],
+  m: MissionRuntime,
+  /** R27이 Anchor A 상황문 동일성을 fail로 강제하는 현행 계약인지. */
+  anchorSlotShared = false,
+) {
   const normalized = (text: string) => text.normalize("NFKC").trim();
+  // 현행 계약에서 MJT2·3·4는 같은 Anchor A 사건을 판단·교정·이유화하므로 source와
+  // 판단 대상 target이 같아야 한다(R27이 상황문 동일성을 fail로 강제한다). 이 슬롯
+  // 안의 일치는 설계가 만든 것이라 중복으로 보고하지 않는다. 슬롯 밖 문항(MJT1·5)과의
+  // 일치, 교정안·후보 문장의 재사용은 그대로 남는다.
+  const slotOf = (itemId: number) =>
+    anchorSlotShared && ANCHOR_SLOT_ITEM_IDS.has(itemId) ? "anchor" : null;
   const checkGroup = (
     label: string,
-    values: Array<{ text: string; where: string }>,
+    values: Array<{ text: string; where: string; slot?: string | null }>,
   ) => {
-    const seen = new Map<string, string>();
+    const seen = new Map<string, { where: string; slot: string | null }>();
     for (const value of values) {
       const text = normalized(value.text);
       if (!text) continue;
-      const firstWhere = seen.get(text);
-      if (firstWhere) {
+      const first = seen.get(text);
+      if (first) {
+        if (first.slot !== null && first.slot === (value.slot ?? null)) continue;
         add(
           v,
           "R19",
           "warning",
-          `${label} 완전 중복: ${firstWhere} = ${value.where} — "${text.slice(0, 24)}${text.length > 24 ? "…" : ""}"`,
+          `${label} 완전 중복: ${first.where} = ${value.where} — "${text.slice(0, 24)}${text.length > 24 ? "…" : ""}"`,
         );
       } else {
-        seen.set(text, value.where);
+        seen.set(text, { where: value.where, slot: value.slot ?? null });
       }
     }
   };
 
   checkGroup(
     "source",
-    m.mpj_items.map((item) => ({ text: item.source, where: `문항 ${item.id}` })),
+    m.mpj_items.map((item) => ({ text: item.source, where: `문항 ${item.id}`, slot: slotOf(item.id) })),
   );
 
-  const candidates: Array<{ text: string; where: string }> = [];
+  const candidates: Array<{ text: string; where: string; slot?: string | null }> = [];
   for (const item of m.mpj_items) {
     if ("target" in item && item.target) {
-      candidates.push({ text: item.target, where: `문항 ${item.id} target` });
+      candidates.push({ text: item.target, where: `문항 ${item.id} target`, slot: slotOf(item.id) });
     }
     if (item.type === "fix_choice") {
       item.corrections.forEach((correction, index) => {

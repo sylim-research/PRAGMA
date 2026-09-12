@@ -71,7 +71,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R5: {
     category: "문항 구성·판정 데이터",
     nature: "structural",
-    summary_ko: "multi_judge 후보 수·대역 라벨 분포·문장 중복·PDR 한 축 차이를 확인하고, 길이만으로 정답이 갈리는 경우는 warning으로 남긴다.",
+    summary_ko: "multi_judge 후보 수·대역 라벨 분포·문장 중복·PDR 한 축 차이를 확인하고, 길이만으로 정답이 갈리는 경우는 warning으로 남긴다. 길이 단서는 차이가 4자 이상이면서 10% 이상일 때만 신호로 본다.",
   },
   R6: {
     category: "문항 구성·판정 데이터",
@@ -142,7 +142,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R19: {
     category: "문항 구성·판정 데이터",
     nature: "signal",
-    summary_ko: "문항 source·target·교정·후보 문자열의 완전 중복을 찾는다(warning). 의도된 Anchor 공유도 함께 잡힌다.",
+    summary_ko: "문항 source·target·교정·후보 문자열의 완전 중복을 찾는다(warning). 현행 계약에서 R27이 동일성을 강제하는 Anchor A 슬롯(MJT2·3·4)의 source·target 공유는 제외하고, 그 밖의 재사용만 남긴다.",
   },
   R20: {
     category: "생성 기록·계승·근거 귀속",

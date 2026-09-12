@@ -144,6 +144,75 @@ describe("mission rule audit regressions", () => {
     ]));
   });
 
+  /** 현행 계약(contrast_plan_v1)을 선언한 저장 미션 — R27이 Anchor A 공유를 강제하는 상태. */
+  const currentContractMission = () => {
+    const mission = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+    mission.contrast_plan = {
+      version: "contrast_plan_v1", speech_act: "request", mission_goal: "integrated_speech_act",
+      item_slots: mission.mpj_items.map(item => ({ item_id: item.id, item_type: item.type,
+        item_focus: item.axis_feature, intended_band_profile: "saved" })),
+    };
+    return mission;
+  };
+
+  it("stops reporting the Anchor A sharing that R27 itself requires, and still catches reuse outside it", () => {
+    // MJT2·3·4는 같은 Anchor A 사건을 판단·교정·이유화하므로 source와 target이 같다.
+    // R27이 그 동일성을 fail로 강제하는 이상 R19가 같은 사실을 중복으로 셀 이유가 없다.
+    const shared = currentContractMission();
+    expect(violationsFor(shared, "R27")).toEqual([]);
+    expect(violationsFor(shared, "R19")).toEqual([]);
+
+    // 슬롯 밖 문항(MJT1)이 Anchor와 같은 원문을 쓰면 그대로 남는다.
+    const copiedX = currentContractMission();
+    copiedX.mpj_items[0].source = copiedX.mpj_items[1].source;
+    expect(
+      violationsFor(copiedX, "R19").some(
+        (violation) => violation.level === "warning" && violation.message.includes("source 완전 중복"),
+      ),
+    ).toBe(true);
+
+    // 교정안·후보 문장의 재사용도 그대로 남는다 — 슬롯 면제는 source와 target에만 적용된다.
+    const reusedCandidate = currentContractMission();
+    const fix = reusedCandidate.mpj_items[2];
+    const multi = reusedCandidate.mpj_items[4];
+    if (fix.type !== "fix_choice" || multi.type !== "multi_judge") {
+      throw new Error("Expected fix_choice and multi_judge");
+    }
+    multi.candidates[0].text = fix.corrections[0].text;
+    expect(
+      violationsFor(reusedCandidate, "R19").some(
+        (violation) => violation.level === "warning" && violation.message.includes("판정 후보 완전 중복"),
+      ),
+    ).toBe(true);
+  });
+
+  it("treats a length difference as an answer cue only when it is actually visible", () => {
+    const withLengths = (lengths: number[]) => {
+      const mission = structuredClone(SAMPLE_MISSION_V5_NATIVE);
+      const multi = mission.mpj_items[4];
+      if (multi.type !== "multi_judge") throw new Error("Expected multi_judge");
+      const bands = [["within_band"], ["within_band"], ["too_direct"], ["too_indirect"]];
+      multi.candidates.forEach((candidate, index) => {
+        candidate.text = "可".repeat(lengths[index]);
+        candidate.accepted_band_codes = bands[index];
+      });
+      return mission;
+    };
+    const longestOverWarned = (mission: unknown) =>
+      violationsFor(mission, "R5").some((violation) => violation.message.includes("과잉안이 유일한 최장문"));
+
+    // 2자 차이(10%)는 같은 화용 자원의 다른 실현이지 "긴 걸 고르면 됨"이 아니다.
+    expect(longestOverWarned(withLengths([20, 20, 20, 22]))).toBe(false);
+    // 10자(50%) 차이는 눈에 띈다.
+    expect(longestOverWarned(withLengths([20, 20, 20, 30]))).toBe(true);
+
+    // 적정안이 과소안과 같은 길이면 최단은 과소안의 표지가 아니다.
+    const tiedShortest = withLengths([12, 20, 12, 25]);
+    expect(
+      violationsFor(tiedShortest, "R5").some((violation) => violation.message.includes("과소안이 전부 최단")),
+    ).toBe(false);
+  });
+
   it("fails when a recommended repair repeats an explicitly invalid correction", () => {
     const mission = structuredClone(SAMPLE_MISSION_V5_NATIVE);
     const fix = mission.mpj_items[2];
