@@ -19,7 +19,6 @@ import {
   comparisonCandidateLabel,
   type BestWorstQuest,
   type ChoiceOption,
-  type ContrastDimension,
   type DctFeedbackQuest,
   type DctQuest,
   type FixChoiceQuest,
@@ -482,81 +481,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
   );
 }
 
-/**
- * 조건 대비 렌즈 — 두 번째 판단 문항에서 직전 판단을 잠금 카드로 함께 보여 준다.
- * 판단 전에는 상황·관계·핵심 발화·학습자의 이전 선택만 보이고, 참고 판정·조건 칩·
- * 강조 구간은 제출 뒤에만 켠다(판단 전 단서 노출 금지).
- */
-function PriorJudgmentCard({ quest, pickLabel, revealed }: {
-  quest: ScaleQuest;
-  pickLabel?: string;
-  revealed: boolean;
-}) {
-  const mission = useCanonicalMission();
-  const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
-  const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
-  const acceptedLabel = quest.options
-    .filter((option) => acceptedIds.includes(option.id))
-    .map((option) => option.label)
-    .join(" ~ ");
-  return (
-    <section aria-label="방금 판단한 상황" className="rounded-xl border border-[#E2DED4] bg-[#F7F6F1] px-4 py-3 sm:px-5">
-      <p className="text-xs font-bold text-[#5D6980]">🔒 방금 판단한 상황</p>
-      <p className="mt-1.5 break-keep text-[15px] font-bold leading-6 text-[#2A3647]">{quest.context.situation}</p>
-      <p className="mt-1 break-keep text-[12.5px] leading-5 text-[#5D6980]">관계 · {quest.context.relation}</p>
-      {revealed && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {[
-            ["상대적 지위", quest.context.pdr.p],
-            ["친숙도", quest.context.pdr.d],
-            ["부담", quest.context.pdr.r.replace(/^부담\s*/, "")],
-          ].map(([label, value]) => (
-            <span key={label} className="rounded-full border border-[#D3D8E1] bg-white px-2.5 py-1 text-xs font-bold text-[#4D5A70]">
-              {label} · {value}
-            </span>
-          ))}
-        </div>
-      )}
-      <p className={`${targetFont} mt-2.5 break-keep border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15px] leading-7 text-[#101B2B]`}>
-        {revealed
-          ? <HighlightedText text={quest.target} highlights={quest.targetHighlights ?? []} target />
-          : quest.target}
-      </p>
-      <p className="mt-2 break-keep text-[12.5px] leading-5 font-bold text-[#4D5A70]">
-        내 선택 · {pickLabel ?? "선택 기록 없음"}
-        {revealed && <span className="ml-2 font-normal text-[#697386]">참고 판정 · {acceptedLabel}</span>}
-      </p>
-    </section>
-  );
-}
-
-/** 제출 뒤에만 두 상황의 실제 조건 차이를 자연어로 드러낸다. 표현의 동일성은 단정하지 않는다. */
-function ContrastReveal({ dimensions, note }: { dimensions: ContrastDimension[]; note: string }) {
-  return (
-    <section aria-label="두 상황 비교" className="rounded-xl border border-[#CFE4D8] bg-[#F2FAF6] px-4 py-3 sm:px-5">
-      <p className="text-[12.5px] font-black text-[#2E7D5B]">⇄ 두 상황 비교</p>
-      {dimensions.length > 0 && (
-        <ul className="mt-1.5 space-y-0.5 text-[13.5px] leading-6 text-[#2E5E4A]">
-          {dimensions.map((dimension) => (
-            <li key={dimension.axis}>
-              <b>{dimension.axisLabel}</b> · {dimension.before} → {dimension.after}
-            </li>
-          ))}
-        </ul>
-      )}
-      <p className="mt-2 break-keep text-[13.5px] leading-6 text-[#2E5E4A]">{note}</p>
-    </section>
-  );
-}
-
-function ScaleView({ quest, responses = {}, onDone, devAutofill = false, revealAnswers = false }: {
-  quest: ScaleQuest;
-  responses?: Record<string, QuestResponse | DctResponse>;
-  onDone: (response: QuestResponse) => void;
-  devAutofill?: boolean;
-  revealAnswers?: boolean;
-}) {
-  const mission = useCanonicalMission();
+function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ScaleQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
   const [pick, setPick] = useState<string | null>(() => devAutofill || revealAnswers ? quest.referenceAnswer : null);
   const [answered, setAnswered] = useState(revealAnswers);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
@@ -564,14 +489,7 @@ function ScaleView({ quest, responses = {}, onDone, devAutofill = false, revealA
     .filter((option) => acceptedIds.includes(option.id))
     .map((option) => option.label)
     .join(" ~ ");
-  // 두 번째 판단 문항에서만, 그리고 직전 문항도 선택형일 때만 렌즈를 연다.
-  const first = mission.quests[0];
-  const prior = quest.id === mission.quests[1]?.id && first?.kind === "scale" && first.id !== quest.id ? first : undefined;
-  const priorPick = prior ? (responses[prior.id] as QuestResponse | undefined)?.pick : undefined;
-  const priorPickLabel = prior && priorPick
-    ? prior.options.find((option) => option.id === priorPick)?.label
-    : undefined;
-  const body = (
+  return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
         <p className="mb-1 text-[11px] font-black text-[#6B7280]">지금 할 일</p>
@@ -583,7 +501,6 @@ function ScaleView({ quest, responses = {}, onDone, devAutofill = false, revealA
         </div>
         {answered && <div className="mt-4"><FeedbackBox verdict={`권장 답안 · 이 상황에서는 ${acceptedLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
       </section>
-      {prior && answered && <ContrastReveal dimensions={mission.contrast.changedDimensions} note={mission.contrast.note} />}
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : undefined}>
         {!answered ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "답안 확인하기" : "답을 선택해 주세요"}</Button>
@@ -592,13 +509,6 @@ function ScaleView({ quest, responses = {}, onDone, devAutofill = false, revealA
         )}
       </ActionBar>
     </QuestScaffold>
-  );
-  if (!prior) return body;
-  return (
-    <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:items-start lg:gap-4 lg:space-y-0">
-      <PriorJudgmentCard quest={prior} pickLabel={priorPickLabel} revealed={answered} />
-      <div className="space-y-3">{body}</div>
-    </div>
   );
 }
 
@@ -1626,7 +1536,7 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
   revealAnswers?: boolean;
   demoFillRequest?: number;
 }) {
-  if (quest.kind === "scale") return <ScaleView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
+  if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "best_worst") return <BestWorstView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;

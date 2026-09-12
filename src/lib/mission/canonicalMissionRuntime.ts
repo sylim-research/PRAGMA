@@ -6,7 +6,6 @@ import type { RunnableMission } from "@/lib/mission/missionDb";
 import type {
   BestWorstQuest,
   ChoiceOption,
-  ContrastDimension,
   DctQuest,
   FixChoiceQuest,
   MissionContext,
@@ -41,28 +40,6 @@ const BURDEN_LABEL: Record<Pdr["r"], string> = {
   mid: "부담 보통",
   high: "부담 높음",
 };
-
-/** 조건 대비를 설명할 때 쓰는 축 이름. 학습자에게 P/D/R 코드는 노출하지 않는다. */
-const CONTRAST_AXIS_LABEL = {
-  p: "지위·권한 관계",
-  d: "관계의 거리",
-  r: "부탁·사안의 부담",
-} as const;
-
-/**
- * 앞 두 판단 문항의 저장된 P·D·R을 그대로 비교한다. 값이 같은 축은 담지 않으므로
- * 결과가 비어 있으면 두 상황의 조건이 같다는 뜻이다. 실제 저장값만 읽으며 판정하지 않는다.
- */
-export function changedContrastDimensions(before: Pdr, after: Pdr): ContrastDimension[] {
-  const axes = [
-    { axis: "p" as const, changed: before.p !== after.p, before: POWER_LABEL[before.p], after: POWER_LABEL[after.p] },
-    { axis: "d" as const, changed: before.d !== after.d, before: DISTANCE_LABEL[before.d], after: DISTANCE_LABEL[after.d] },
-    { axis: "r" as const, changed: before.r !== after.r, before: BURDEN_LABEL[before.r], after: BURDEN_LABEL[after.r] },
-  ];
-  return axes
-    .filter((entry) => entry.changed)
-    .map((entry) => ({ axis: entry.axis, axisLabel: CONTRAST_AXIS_LABEL[entry.axis], before: entry.before, after: entry.after }));
-}
 
 const CHANNEL_LABEL: Record<ChannelUI, MissionContext["channel"]> = {
   email: "이메일",
@@ -432,8 +409,6 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
   let quests: MissionQuest[];
   let contrastBefore: string;
   let contrastAfter: string;
-  // 첫 두 판단 문항(quests[0]·quests[1])이 실제로 쓰는 문항에서 비교한다.
-  let contrastDimensions: ContrastDimension[];
   let lessonPoints: CanonicalMissionViewModel["lessonPoints"];
 
   if (mission.schema_version === "mission_v2") {
@@ -514,7 +489,6 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     ];
     contrastBefore = scale.situation_ko;
     contrastAfter = contrast.situation_ko;
-    contrastDimensions = changedContrastDimensions(scale.pdr, contrast.pdr);
     lessonPoints = mission.mpj_items.map((item, index) => ({
       questId: `A${index + 1}`,
       label: LESSON_LABELS[index],
@@ -592,7 +566,6 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     ];
     contrastBefore = scale.situation_ko;
     contrastAfter = contrast.situation_ko;
-    contrastDimensions = changedContrastDimensions(scale.pdr, contrast.pdr);
     lessonPoints = mission.mpj_items.map((item, index) => ({
       questId: `A${index + 1}`,
       label: LESSON_LABELS[index],
@@ -670,7 +643,6 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     ];
     contrastBefore = scale.situation_ko;
     contrastAfter = fixChoice.situation_ko;
-    contrastDimensions = changedContrastDimensions(scale.pdr, fixChoice.pdr);
     lessonPoints = [
       { questId: "A1", label: LESSON_LABELS[0], text: scale.explanation_ko, highlights: scale.highlights },
       { questId: "A2", label: LESSON_LABELS[1], text: fixChoice.explanation_ko, highlights: fixChoice.highlights },
@@ -770,8 +742,8 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     contrast: {
       before: contrastBefore,
       after: contrastAfter,
-      changedDimensions: contrastDimensions,
-      note: "두 상황에서 표현의 적절성이 어떻게 달라지는지 비교해 보세요.",
+      changedDimensions: [],
+      note: "첫인상 판단과 맥락 대비 판단에서 상황에 따라 달라지는 적절성을 비교합니다.",
     },
     summaryPrinciple: mission.unit.closing_ko,
     lessonPoints,
