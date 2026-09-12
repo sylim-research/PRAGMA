@@ -364,6 +364,8 @@ const AdminDashboard = () => {
           .select("target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id")
           .eq("kind", "mission")
           .eq("criteria_version", DASHBOARD_REVIEW_CRITERIA_VERSION)
+          // Counts describe the current review of each mission; a row replaced by a gate rebind is history.
+          .is("superseded_by", null)
           .order("created_at", { ascending: false })
           .range(from, to)),
         fetchAllDashboardRows<DashboardAssignmentRow>("수업 편성", (from, to) => db

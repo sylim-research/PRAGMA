@@ -1665,7 +1665,9 @@ export async function reviewMission(
     // Never make another model call after the professor has reviewed the findings.
     const { data, error: preparedError } = await (supabase as any).from("content_review_runs")
       .select("prepared_finalization").eq("id", approval.reviewId).eq("kind", "mission")
-      .eq("target_id", core.scenario_id).eq("content_hash", approval.contentHash).maybeSingle();
+      .eq("target_id", core.scenario_id).eq("content_hash", approval.contentHash)
+      // A review replaced by a gate rebind is history; finalization must consume the current row's artifact.
+      .is("superseded_by", null).maybeSingle();
     if (preparedError || !data?.prepared_finalization) {
       return { ok: false, error: "최종 검수 자료를 먼저 준비하고 교수자 판단을 저장해 주세요." };
     }

@@ -118,6 +118,7 @@ before(async () => {
   await db.exec(await sqlFile('20260909230000_quality_signal_review_flow.sql'));
   // Every test below runs on the v3-compatible approval contract; the v2 tests above double as compatibility checks.
   await db.exec(await sqlFile('20260912090000_content_review_v3_approval.sql'));
+  await db.exec(await sqlFile('20260912140000_content_review_gate_rebind.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -498,6 +499,176 @@ test('v3 weekly material: unapproved stays hidden; the approved current v3 snaps
 async function modelRoleSetPrepared(id,prepared) {
   return asRole('service_role',()=>db.query('update content_review_runs set prepared_finalization=$2 where id=$1',[id,prepared]));
 }
+
+// ── Gate provenance rebind (2026-09-12) ──
+// A gate re-run replaces only mission_content.quality_check. The instructional content, its mission_content_hash
+// and the review source/content hashes are unchanged, so the stored review keeps the earlier gate and approval
+// correctly refuses it. The rebind carries that review's semantic evidence onto a new row bound to the current gate.
+const gateEvidence=(promptVersion,verdict)=>({verdict,summary_ko:`${promptVersion} 판정`,model:'gpt-4.1',
+  prompt_version:promptVersion,checked_at:'2026-09-11T00:00:00Z',mission_content_hash:hash,
+  findings:verdict==='pass'?[]
+    :verdict==='warning'?[{code:'reason_scope',where:'mpj_items[3].reasons[0]',severity:'warning',note_ko:'부차적 이유인지 확인'}]
+    :[{code:'band_mismatch',where:'mpj_items[1].target',severity:'fail',note_ko:'판정 확인'}]});
+
+/** A production-shaped review: focused_v1, v3 criteria, independent review kept, prepared artifact stored. */
+async function gateRebindFixture(fromVerdict='pass',toVerdict='fail') {
+  const m=await mission();
+  m.content.provenance.mission_content_hash=hash;
+  m.content.quality_check=gateEvidence('quality_v22',fromVerdict);
+  await db.query('update scenarios set mission_content=$2 where scenario_id=$1',[m.id,m.content]);
+  const r=await review(m.id,'mission',false,5,'content_review_v3');
+  await db.query(`update content_review_runs set approval_policy='focused_v1',openai_review=null,
+    independent_review_requested=true,generation_quality=$2,professor_decisions='[]',
+    snapshot=jsonb_set(snapshot,'{criteria}',$3) where id=$1`,
+  [r.id,{mission_content_hash:hash,quality_check:m.content.quality_check},{finalization:'mission_finalization_v1'}]);
+  const prepared=finalized(m.content);          // prepared carries the earlier gate verbatim
+  await modelRoleSetPrepared(r.id,prepared);
+  const current=gateEvidence('quality_v24',toVerdict);
+  m.content.quality_check=current;              // the gate re-run: nothing else on the mission moves
+  await db.query("update scenarios set mission_content=jsonb_set(mission_content,'{quality_check}',$2) where scenario_id=$1",[m.id,current]);
+  return {m,r,prepared,current};
+}
+const rebind=(id,contentHash=hash)=>admin(()=>scalar('select rebind_content_review_gate($1,$2)',[id,contentHash]));
+const rowOf=(id)=>scalar('select to_jsonb(r) from content_review_runs r where id=$1',[id]);
+
+for (const [from,to] of [['pass','fail'],['pass','warning'],['pass','pass'],['fail','fail']]) {
+  test(`rebind moves the review to the current gate (${from} → ${to}) and freezes the earlier evidence`,async()=>{
+    const {m,r,prepared,current}=await gateRebindFixture(from,to);
+    // The stored review is genuinely blocked before the rebind, and that check is not relaxed.
+    await assert.rejects(finalize(m,r,{mission_content:prepared}),/does not match the stored mission/);
+    const before=await rowOf(r.id);
+
+    const id=await rebind(r.id);
+    assert.notEqual(id,r.id);
+    const old=await rowOf(r.id);
+    const next=await rowOf(id);
+
+    // Old row: byte-for-byte identical apart from the pointer to its replacement.
+    assert.deepEqual({...old,superseded_by:null},before);
+    assert.equal(old.superseded_by,id);
+    assert.equal(old.generation_quality.quality_check.prompt_version,'quality_v22');
+    assert.equal(old.prepared_finalization.quality_check.prompt_version,'quality_v22');
+    assert.equal(old.approved_at,null);
+
+    // New row: current gate, same semantic evidence, no professor work carried over, explicit provenance.
+    assert.deepEqual(next.generation_quality,{mission_content_hash:hash,quality_check:current});
+    assert.deepEqual(next.prepared_finalization,{...prepared,quality_check:current});
+    assert.deepEqual(next.prepared_finalization.item_lineage,prepared.item_lineage);
+    for (const key of ['kind','target_id','week_no','source_hash','content_hash','criteria_version','snapshot','rules',
+      'openai_review','claude_review','adjudication','approval_policy','independent_review_requested']) {
+      assert.deepEqual(next[key],before[key],`carried evidence differs: ${key}`);
+    }
+    assert.deepEqual(next.professor_decisions,[]);
+    assert.equal(next.professor_decisions_at,null);
+    assert.equal(next.approved_at,null);
+    assert.equal(next.rebound_from,r.id);
+    assert.equal(next.rebound_by,adminId);
+    assert.ok(next.rebound_at);
+    assert.equal(next.superseded_by,null);
+    // The gate re-run left the mission's own content hash alone; the rebind did not touch it either.
+    assert.equal(next.prepared_finalization.provenance.mission_content_hash,prepared.provenance.mission_content_hash);
+
+    // The replaced row can no longer carry a decision or an approval; the new one is ready.
+    const decide=(id2)=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[id2,hash,[]]));
+    await assert.rejects(decide(r.id),/was replaced/);
+    await assert.rejects(finalize(m,{id:r.id},{mission_content:next.prepared_finalization}),/was replaced/);
+    if (to!=='fail') assert.equal(await decide(id),id);
+    assert.equal(await scalar(`select count(*) from content_review_runs where target_id=$1 and superseded_by is null`,[m.id]),1);
+  });
+}
+
+test('a rebound review approves the current artifact; a critical current gate still needs decision and override',async()=>{
+  // pass → warning: no finding requires the professor, so the current artifact approves directly.
+  const ok=await gateRebindFixture('pass','warning');
+  const okId=await rebind(ok.r.id);
+  const okPrepared={...ok.prepared,quality_check:ok.current};
+  assert.equal(await finalize(ok.m,{id:okId},{mission_content:okPrepared}),ok.m.id);
+  assert.equal(await scalar('select mission_status from scenarios where scenario_id=$1',[ok.m.id]),'reviewed');
+  assert.equal(await scalar('select content_review_run_id from mission_lineage_versions where scenario_id=$1 order by version_no desc limit 1',[ok.m.id]),okId);
+
+  // pass → fail: the professor judgement that the rebind did not carry over is now demanded on the current gate.
+  const critical=await gateRebindFixture('pass','fail');
+  const criticalId=await rebind(critical.r.id);
+  const criticalPrepared={...critical.prepared,quality_check:critical.current};
+  await assert.rejects(finalize(critical.m,{id:criticalId},{mission_content:criticalPrepared}),/Record every professor decision/);
+  await admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',
+    [criticalId,hash,[{finding_id:'generation-1',decision:'no_change',rationale_ko:rationale}]]));
+  await assert.rejects(finalize(critical.m,{id:criticalId},{mission_content:criticalPrepared}),/unresolved critical/);
+  assert.equal(await finalize(critical.m,{id:criticalId},{mission_content:criticalPrepared,...criticalOverride()}),critical.m.id);
+});
+
+test('rebind is idempotent from either id and never leaves two active rows',async()=>{
+  const {m,r}=await gateRebindFixture('pass','fail');
+  const id=await rebind(r.id);
+  assert.equal(await rebind(r.id),id);            // following the pointer, not creating another row
+  assert.equal(await rebind(id),id);              // already bound to the current gate
+  assert.equal(await rebind(r.id),id);
+  assert.equal(await scalar('select count(*) from content_review_runs where target_id=$1',[m.id]),2);
+  assert.equal(await scalar('select count(*) from content_review_runs where target_id=$1 and superseded_by is null',[m.id]),1);
+  // The identity is unique among active rows only, so the preserved history stays insertable-around.
+  await assert.rejects(asRole('service_role',()=>db.query(
+    `insert into content_review_runs (kind,target_id,week_no,source_hash,content_hash,criteria_version,snapshot,rules,created_by)
+     select kind,target_id,week_no,source_hash,content_hash,criteria_version,snapshot,rules,created_by
+     from content_review_runs where id=$1`,[id])),/content_review_runs_active_identity_idx/);
+});
+
+test('rebind refuses professor work, approvals, stale content and unsupported versions',async()=>{
+  const decided=await gateRebindFixture('pass','fail');
+  await db.query('update content_review_runs set professor_decisions=$2, professor_decisions_at=now(), professor_decisions_by=$3 where id=$1',
+    [decided.r.id,[{finding_id:'generation-1',decision:'no_change',rationale_ko:rationale}],adminId]);
+  await assert.rejects(rebind(decided.r.id),/Professor work is already recorded/);
+
+  const overridden=await gateRebindFixture('pass','fail');
+  await db.query('update content_review_runs set openai_fail_override=$2 where id=$1',[overridden.r.id,rationale]);
+  await assert.rejects(rebind(overridden.r.id),/Professor work is already recorded/);
+
+  const approved=await gateRebindFixture('pass','fail');
+  await db.query('update content_review_runs set approved_at=now(), approved_by=$2, professor_note=$3 where id=$1',
+    [approved.r.id,adminId,rationale]);
+  await assert.rejects(rebind(approved.r.id),/Approved review evidence is immutable/);
+  assert.equal(await scalar('select superseded_by from content_review_runs where id=$1',[approved.r.id]),null);
+
+  const stale=await gateRebindFixture('pass','fail');
+  await assert.rejects(rebind(stale.r.id,'b'.repeat(64)),/content version mismatch/);
+  await db.query(`update scenarios set core_content='{"situation_ko":"changed"}' where scenario_id=$1`,[stale.m.id]);
+  await assert.rejects(rebind(stale.r.id),/Content changed/);
+
+  const unsupported=await gateRebindFixture('pass','fail');
+  await db.query("update content_review_runs set criteria_version='content_review_v4' where id=$1",[unsupported.r.id]);
+  await assert.rejects(rebind(unsupported.r.id),/Unsupported review criteria version/);
+
+  const learnerAttempt=await gateRebindFixture('pass','fail');
+  await assert.rejects(learner(()=>scalar('select rebind_content_review_gate($1,$2)',[learnerAttempt.r.id,hash])),/Admin required/);
+});
+
+test('a superseded review stays readable as history and can never be edited or deleted',async()=>{
+  const {r}=await gateRebindFixture('pass','fail');
+  const id=await rebind(r.id);
+  assert.equal(await scalar('select count(*) from content_review_runs where id in ($1,$2)',[r.id,id]),2);
+  const history=await db.query('select id,superseded_by,rebound_from from content_review_runs where id in ($1,$2) order by created_at',[r.id,id]);
+  assert.deepEqual(history.rows.map(row=>row.id),[r.id,id]);
+  await assert.rejects(asRole('service_role',()=>db.query('update content_review_runs set last_error=$2 where id=$1',[r.id,'edit'])),/Superseded review evidence is immutable/);
+  await assert.rejects(asRole('service_role',()=>db.query('delete from content_review_runs where id=$1',[r.id])),/Superseded review evidence is immutable/);
+});
+
+test('a weekly handout stays hidden until the rebound mission review is actually approved',async()=>{
+  const {m,r,prepared,current}=await gateRebindFixture('pass','warning');
+  const missionReviewId=await rebind(r.id);
+  const courseId=randomUUID();
+  await db.query("insert into curriculum_outlines values ($1,'rebind course','published')",[courseId]);
+  await db.query("insert into curriculum_weeks(outline_id,week_no,title) values ($1,5,'rebind week')",[courseId]);
+  await db.query("insert into curriculum_week_scenarios values ($1,5,$2,1,'required')",[courseId,m.id]);
+  const read=()=>learner(()=>scalar('select get_approved_weekly_material($1,5)',[courseId]));
+  const beforeApproval=await review(courseId,'weekly_material',false,5,'content_review_v3');
+  assert.equal(await read(),null);
+  // A rebound mission review is ready, not approved: the dependency check still refuses the week.
+  await assert.rejects(approve(beforeApproval),/each assigned mission first/);
+  assert.equal(await finalize(m,{id:missionReviewId},{mission_content:{...prepared,quality_check:current}}),m.id);
+  const week=await review(courseId,'weekly_material',false,5,'content_review_v3');  // mission status is part of the week source
+  assert.equal(await read(),null);
+  await approve(week);
+  assert.deepEqual(await read(),{reviewId:week.id,contentHash:hash,material:week.snapshot.content.public_material});
+});
 
 test('prepared signal evidence is stale after a source edit and cannot be replaced by an admin client',async()=>{
   const {m,r}=await focusedReview();
