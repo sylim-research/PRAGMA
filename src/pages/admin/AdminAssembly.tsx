@@ -49,7 +49,6 @@ import { MissionPreview } from "@/components/admin/MissionPreview";
 import { ProfessorMissionWorkbench } from "@/components/admin/ProfessorMissionWorkbench";
 import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import type { ContentReviewApproval } from "@/lib/pragma/contentReviewApi";
-import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
 import type { MissionRuntime } from "@/lib/pragma/missionSchema";
 import { toast } from "sonner";
 import { startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
@@ -92,12 +91,6 @@ const STATE_TONE: Record<AssemblyState, string> = {
   generated: "border-[#E7D9B8] bg-[#F8F3E8] text-[#765F1C]",
   reviewed: "border-[#CEE0D4] bg-[#EDF5F0] text-[#38634B]",
   failed: "border-[#E5CFCC] bg-[#F7EFEE] text-[#7B453F]",
-};
-const STATE_CARD_TONE: Record<AssemblyState, string> = {
-  core_only: "border-[#DDE1E2] bg-[#F5F6F6]",
-  generated: "border-[#D8E0E3] bg-[#EEF2F4]",
-  reviewed: "border-[#D0DDE1] bg-[#E7EEF0]",
-  failed: "border-[#E2D5D2] bg-[#F3ECEA]",
 };
 
 // ── 목록 배지 색 ──

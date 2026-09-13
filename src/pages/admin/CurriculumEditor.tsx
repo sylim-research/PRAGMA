@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CircleHelp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -257,7 +257,6 @@ export const CurriculumEditor = ({
 
   const errors = issues?.errors ?? [];
   const warnings = issues?.warnings ?? [];
-  const weekNumbers = useMemo(() => Array.from({ length: 15 }, (_, i) => i + 1), []);
 
   if (loading) {
     return (

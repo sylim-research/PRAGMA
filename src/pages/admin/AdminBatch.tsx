@@ -39,7 +39,6 @@ import {
   CORE_AXIS_LABEL,
   CORE_QUALITY_AXES,
   runCoreQualityPilot,
-  type CoreQualityAxis,
   type CoreQualityPilotResult,
 } from "@/lib/pragma/coreQualityAudit";
 import { THEME_LABEL } from "@/lib/pragma/scenarioTopics";
