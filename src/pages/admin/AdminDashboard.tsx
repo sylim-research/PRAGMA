@@ -106,46 +106,6 @@ const PanelHeader = ({
   </div>
 );
 
-const SummaryMetric = ({
-  to,
-  label,
-  value,
-  unit,
-  description,
-  error,
-  changed = false,
-}: {
-  to: string;
-  label: string;
-  value: number | null;
-  unit: string;
-  description: string;
-  error: string | null;
-  changed?: boolean;
-}) => (
-  <Link
-    to={to}
-    className={[
-      "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
-      "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
-      changed ? "border-[#D6B84A] bg-[#FFFBE8] ring-2 ring-[#F4D85E]/30" : "border-border",
-    ].join(" ")}
-  >
-    <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
-    <div className="mt-1.5 flex items-end gap-1.5">
-      {value === null && !error ? (
-        <span aria-label="불러오는 중" className="h-7 w-14 rounded bg-muted motion-safe:animate-pulse" />
-      ) : (
-        <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-          {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
-        </span>
-      )}
-      {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
-    </div>
-    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
-  </Link>
-);
-
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
 // 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다

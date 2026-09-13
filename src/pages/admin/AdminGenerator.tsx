@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
-import { addDraftScenario } from "@/lib/scenarioDrafts";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
 import { type AuthenticApply } from "./AuthenticImportPanel";
@@ -117,40 +116,10 @@ const CHALLENGE_KO: Record<string, string> = {
   imposition: "부담도",
 };
 
-type SpeechAct = "request" | "refusal";
-type Genre = "business_email" | "business_messenger" | "meeting_speech";
-type InteractionContext = "coordination" | "negotiation" | "follow_up";
-const SPEECH_ACT: Record<SpeechAct, string> = { request: "요청", refusal: "거절" };
-const GENRE: Record<Genre, string> = {
-  business_email: "업무 이메일",
-  business_messenger: "업무 메신저",
-  meeting_speech: "업무 회의",
-};
-const LEVEL_CANDIDATES: Record<LearnerLevel, number> = {
-  beginner_intermediate: 3,
-  intermediate: 5,
-  advanced: 7,
-};
-const CONTEXT: Record<InteractionContext, string> = {
-  coordination: "일정 조정",
-  negotiation: "조건 협의",
-  follow_up: "후속 확인",
-};
 // Speech-act pragmatic burden weight (0=low, 1=mid, 2=high). Reference only.
 const SPEECH_ACT_WEIGHT: Record<SpeechActUI, number> = {
   request: 1, refusal: 2, apology: 1, thanks: 0,
   proposal: 1, agreement: 1, opposition: 2, compliment: 0, complaint: 2,
-};
-const SPEECH_ACT_UI_TO_INTERNAL: Record<SpeechActUI, SpeechAct> = {
-  request: "request",
-  refusal: "refusal",
-  apology: "refusal",
-  thanks: "request",
-  proposal: "request",
-  agreement: "request",
-  opposition: "refusal",
-  compliment: "request",
-  complaint: "refusal",
 };
 
 // Derived pragmatic burden (참고용). Combines speech act weight + P/D/R.
@@ -253,169 +222,10 @@ function formWithGridPrefill(prefill: GeneratorPrefill | null): FormState {
   };
 }
 
-interface Generated {
-  title: string;
-  source_text: string;
-  task: string;
-  variants: { label: string; note: string; text: string }[];
-  feedback: { icon: string; role: string; text: string }[];
-  auto_check: "pass" | "warning";
-}
 
 interface BatchItem {
   title: string;
   auto_check: "pass" | "warning";
-}
-
-function buildScenario(f: FormState): Generated {
-  // Demo-safe mode: pick best-fit pre-baked scenario based on speech_act + genre.
-  const internalSpeechAct = SPEECH_ACT_UI_TO_INTERNAL[f.speech_act_ui];
-  const internalGenre = CHANNEL_TO_GENRE[f.channel];
-  const key = `${internalSpeechAct}-${internalGenre}`;
-
-
-  if (key === "refusal-business_email") {
-    return {
-      title: "K-pop 콘텐츠 협업 마케팅 비용 인하 거절 — 상하이 광고 에이전시",
-      source_text:
-        "검토해 본 결과, 이번에는 공동 프로모션 비용 인하가 어려울 것 같습니다. 본사 회계연도 마감 일정과 글로벌 캠페인 예산 배분이 이미 확정된 상태라서, 현 시점에서 단가 조정은 내부 승인을 받기 어렵습니다. 다만 다음 캠페인 일정에서는 더 협력할 수 있는 방안을 함께 찾아보고 싶습니다.",
-      task: "상하이 광고 에이전시 담당자에게 거절 의사를 명확히 전하되, 향후 협력 가능성을 열어두는 격식 있는 톤으로 중국어로 번역하세요.",
-      variants: [
-        {
-          label: "A",
-          note: "기본형",
-          text: "经过认真研究,我方此次恐难以接受共同推广费用的下调请求。由于本部财年结算时间已近,且全球营销预算分配业已确定,目前阶段进行单价调整难以通过内部审批。期望在下一轮营销活动中,双方能够进一步探讨更加深入的合作方案。",
-        },
-        {
-          label: "B",
-          note: "P-D-R 반영형",
-          text: "经过研究,本次共同推广费用的下调暂时无法接受。由于财年结算和全球预算已经确定,目前难以调整单价。下次合作时希望能再讨论。",
-        },
-        {
-          label: "C",
-          note: "P-D-R + 관계 유지형",
-          text: "我们认真讨论了贵方的提议,但因本部财年结算和全球营销预算分配的限制,此次单价调整确实有难度。如果方便的话,希望可以就替代方案(例如调整投放比例)继续交流,并在下次合作中进一步深化双方合作。",
-        },
-      ],
-      feedback: [
-        {
-          icon: "🎯",
-          role: "이메일 수신자 관점",
-          text: "수신자는 단순한 가격 거절이 아니라, 본사 일정과 예산 구조라는 명확한 사유를 전달받게 됩니다. 정중한 표현과 향후 협력 가능성에 대한 언급 덕분에 관계가 단절되지 않는다는 인상을 받습니다. 다만 대안에 대한 구체성이 부족하다고 느낄 수 있으므로, 향후 미팅 일정 등을 함께 제시하면 더 좋을 것입니다.",
-        },
-        {
-          icon: "📚",
-          role: "통번역 교수자 관점",
-          text: "거절 화행을 직접 표현하지 않고 '难以接受', '难以通过审批' 등 완곡 표현으로 처리한 점이 적절합니다. A안은 기본형으로 격식체 사용이 안정적이며, B안은 P-D-R 조건을 반영한 완곡·격식 조정이 적용되었고, C안은 P-D-R 반영에 관계 유지 표현까지 추가되어 가장 완성도가 높습니다.",
-        },
-        {
-          icon: "💼",
-          role: "업무 현장 전문가 관점",
-          text: "실제 마케팅 협업 협의에서 자주 발생하는 상황으로, 표현 모두 현장에서 무리 없이 사용 가능합니다. 특히 회계연도·글로벌 예산이라는 구조적 사유를 명확히 든 점이 설득력 있고, '下次合作' 언급은 관계 유지 측면에서 매우 적절합니다. 단가 조정 거절 시 자주 쓰이는 패턴을 잘 따르고 있습니다.",
-        },
-      ],
-      auto_check: "pass",
-    };
-  }
-
-  if (key === "request-business_email") {
-    return {
-      title: "납기 단축 요청 — 광저우 가구 공급사",
-      source_text:
-        "안녕하세요, 저희 측 매장 오픈 일정이 앞당겨져 다음 컨테이너 출고를 2주 앞당겨 주실 수 있을지 확인 부탁드립니다. 가능하시다면 추가 비용 산정 기준도 함께 공유해 주세요. 일정 조정이 어렵다면 부분 출고 방안도 검토 가능합니다.",
-      task: "광저우 가구 공급사 담당자에게 납기 단축 요청을 정중히 전달하고, 추가 비용·부분 출고 가능성을 함께 문의하는 격식 있는 톤으로 중국어로 번역하세요.",
-      variants: [
-        {
-          label: "A",
-          note: "기본형",
-          text: "您好,因我方门店开业时间提前,恳请贵司确认是否可将下一批集装箱出货时间提前两周。若可行,烦请一并告知额外费用的核算标准。如调整确有难度,我方也可考虑分批出货的方案。",
-        },
-        {
-          label: "B",
-          note: "P-D-R 반영형",
-          text: "您好,门店开业提前,请问下一批集装箱能否提前两周出货?如果可以,请告知额外费用。若不便调整,可以考虑分批出货。",
-        },
-        {
-          label: "C",
-          note: "P-D-R + 관계 유지형",
-          text: "您好,由于我方门店开业时间提前,想与贵司确认下一批集装箱是否能够提前两周出货。如方便,希望同时了解额外费用的计算方式;如全量提前确有难度,我们也愿意讨论分批出货等灵活方案,以便共同找到合适的安排。",
-        },
-      ],
-      feedback: [
-        {
-          icon: "🎯",
-          role: "이메일 수신자 관점",
-          text: "공급사 입장에서는 일방적 요구가 아니라 사정을 설명하고 대안까지 제시하는 정중한 톤이라 부담이 적습니다. 분할 출고라는 백업안이 있어 협상 여지가 명확하게 보입니다. 다만 정확한 희망 출고 일자를 함께 명시하면 회신이 더 빨라질 것입니다.",
-        },
-        {
-          icon: "📚",
-          role: "통번역 교수자 관점",
-          text: "요청 화행을 '恳请', '请问' 등으로 격식 수준에 맞게 처리한 점이 좋습니다. A는 기본형으로 정중도가 가장 높고, B는 P-D-R 조건 반영형으로 정보 전달 효율이 높으며, C는 P-D-R + 관계 유지형으로 조율·대안 표현이 잘 드러납니다. 비즈니스 이메일 첫 인사는 '您好' 외에 회사명/담당자 호칭을 추가하는 변형도 학습 포인트가 됩니다.",
-        },
-        {
-          icon: "💼",
-          role: "업무 현장 전문가 관점",
-          text: "납기 단축 요청은 실제 거래에서 가장 빈번한 시나리오 중 하나로, 추가 비용 기준과 분할 출고 가능성을 동시에 묻는 구조가 매우 현실적입니다. 표현 모두 무리 없이 사용 가능하며, 회신 시간을 단축하기 위해 희망 출고일·발주서 번호를 추가하는 패턴도 학습할 가치가 있습니다.",
-        },
-      ],
-      auto_check: "pass",
-    };
-  }
-
-  // Generic fallback (covers messenger/meeting variants)
-  const isRefusal = SPEECH_ACT_UI_TO_INTERNAL[f.speech_act_ui] === "refusal";
-  return {
-    title: isRefusal
-      ? `${INDUSTRY[f.industry]} — ${BUSINESS_FUNCTION[f.func]} 협의에서의 정중한 거절`
-      : `${INDUSTRY[f.industry]} — ${BUSINESS_FUNCTION[f.func]} 관련 협조 요청`,
-    source_text: isRefusal
-      ? "말씀 주신 제안은 내부에서 신중히 검토했습니다. 다만 현재 조건에서는 수용이 어렵다는 결론에 이르렀습니다. 가능하신 범위에서 일정·조건을 일부 조정해 주신다면, 다음 단계 협의를 이어갈 수 있을 것 같습니다."
-      : "지난번 논의 이후 진행 상황을 공유드리며, 다음 단계 협조를 부탁드리고자 연락드립니다. 가능하신 일정과 범위를 알려주시면, 저희 측 내부 일정과 맞춰 조정해 회신드리겠습니다.",
-    task: isRefusal
-      ? "상대방에게 거절 의사를 명확히 전하되, 향후 협업 여지를 남기는 격식 있는 톤으로 중국어로 번역하세요."
-      : "상대방에게 협조 요청을 정중히 전달하고, 후속 일정 조율 의사를 함께 표현하는 격식 있는 톤으로 중국어로 번역하세요.",
-    variants: [
-      {
-        label: "A",
-        note: "기본형",
-        text: isRefusal
-          ? "贵方所提建议,我方内部已审慎研究。然而,在现有条件下确难以接受。若能在日程或条件上做出部分调整,我方愿与贵方继续推进下一阶段的协商。"
-          : "继上次沟通之后,谨向贵方汇报最新进展,并请贵方协助下一阶段的工作。烦请告知贵方可行的日程与范围,我方将据此与内部安排进行协调后回复。",
-      },
-      {
-        label: "B",
-        note: "P-D-R 반영형",
-        text: isRefusal
-          ? "经研究,目前条件下我们难以接受您的提议。如能调整部分日程或条件,可以继续讨论下一步。"
-          : "上次沟通后向您汇报进展,并希望就下一步工作得到您的协助。请告知您方便的时间和范围。",
-      },
-      {
-        label: "C",
-        note: "P-D-R + 관계 유지형",
-        text: isRefusal
-          ? "我们认真讨论了您的提议,在现有条件下确有难度。如果可以在日程或条件上稍作调整,我们非常愿意就替代方案与贵方继续探讨,共同推进下一阶段。"
-          : "想就上次沟通的内容向您同步进展,并希望与贵方协商下一步安排。如方便,请告知您的日程与可行范围,我方会据此与内部对齐后再行回复。",
-      },
-    ],
-    feedback: [
-      {
-        icon: "🎯",
-        role: "이메일 수신자 관점",
-        text: "수신자는 일방적 통보가 아닌 협의 여지가 있는 메시지로 받아들이게 됩니다. 격식과 배려가 모두 드러나, 관계 단절 없이 다음 단계를 논의할 수 있는 분위기를 만들어 줍니다. 단, 구체적인 조정안이나 시점이 함께 제시되면 회신이 더 명확해질 것입니다.",
-      },
-      {
-          icon: "📚",
-          role: "통번역 교수자 관점",
-          text: "화행 표현과 격식 수준이 한국어 원문 의도와 일치하도록 처리되었습니다. A는 기본형으로 안정적인 직역, B는 P-D-R 반영형으로 상황 조건에 맞는 격식·완곡 조정, C는 P-D-R + 관계 유지형으로 관계 유지 표현이 추가되어 차이가 분명합니다. 학습자는 기본형과 상황 반영형, 관계 유지형 사이의 trade-off를 학습할 수 있습니다.",
-        },
-      {
-        icon: "💼",
-        role: "업무 현장 전문가 관점",
-        text: "실무에서 자주 쓰이는 패턴으로, 모두 자연스럽게 통용됩니다. 거절·요청 모두 단정적 표현 대신 협상 여지를 남기는 어휘 선택이 현장 관례에 부합합니다. 후속 회신을 빠르게 받으려면 희망 일정이나 담당자 정보를 함께 명시하는 것이 좋습니다.",
-      },
-    ],
-    auto_check: "pass",
-  };
 }
 
 const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
@@ -427,11 +237,9 @@ const AdminGenerator = () => {
   const initialForm = formWithGridPrefill(gridPrefill);
   const [form, setForm] = useState<FormState>(initialForm);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Generated | null>(null);
   const [aiResult, setAiResult] = useState<AiScenario | null>(null);
   const [aiMeta, setAiMeta] = useState<AiMeta | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
-  const [activeVariant, setActiveVariant] = useState(0);
   const [saved, setSaved] = useState(false);
   const [savedScenarioId, setSavedScenarioId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -444,7 +252,6 @@ const AdminGenerator = () => {
     gridPrefill?.mode ?? CHANNEL_TO_MODE[initialForm.channel],
   );
   const [outlineCount, setOutlineCount] = useState<1 | 3 | 5>(1);
-  const [seedsGenerated, setSeedsGenerated] = useState(false);
 
   // v8 two-step outline → select → final flow.
   const [outlines, setOutlines] = useState<{ title: string; situation: string }[] | null>(null);
@@ -452,9 +259,6 @@ const AdminGenerator = () => {
   const [outlineLoading, setOutlineLoading] = useState(false);
   const [outlineError, setOutlineError] = useState<string | null>(null);
   const [finalizing, setFinalizing] = useState(false);
-  const [finalResults, setFinalResults] = useState<
-    { title: string; ok: boolean; scenarioId?: string; error?: string; metaUpdate?: "ok" | "failed" }[]
-  | null>(null);
   // Single-shot save: surfaces a non-fatal partial failure (row saved but the
   // follow-up mode/language_direction update failed).
   const [metaWarning, setMetaWarning] = useState<string | null>(null);
@@ -508,8 +312,6 @@ const AdminGenerator = () => {
     setOutlines(null);
     setSelectedOutlines(new Set());
     setOutlineError(null);
-    setFinalResults(null);
-    setSeedsGenerated(false);
   };
 
   const setTaskModeSafe = (m: GenMode) => {
@@ -559,7 +361,6 @@ const AdminGenerator = () => {
     resetOutlines();
     // 이전 미리보기/저장 상태 초기화.
     setAiResult(null);
-    setResult(null);
     setSaved(false);
     setSavedScenarioId(null);
     setSaveError(null);
@@ -641,7 +442,6 @@ const AdminGenerator = () => {
       if (!Array.isArray(list) || list.length === 0) throw new Error(data?.error ?? "개요가 비어 있습니다.");
       setOutlines(list);
       setSelectedOutlines(new Set(list.map((_, i) => i))); // default: all selected (v8)
-      setSeedsGenerated(true);
     } catch (e) {
       setOutlineError((e as Error).message ?? "개요 생성에 실패했습니다.");
     } finally {
@@ -843,21 +643,12 @@ const AdminGenerator = () => {
     form.speech_act_ui, form.pdr_power, form.pdr_distance, form.pdr_burden,
   );
 
-  const tagNote =
-    sourceMode === "ai"
-      ? "선택한 화행 · P·D·R 등은 새 원문의 생성 조건으로 사용됩니다."
-      : "선택한 화행 · P·D·R 등은 이미 존재하는 원문을 분류·점검하는 태그로 사용됩니다.";
 
-
-  // NOTE (1b-①): 이전 dummy 경로는 rollback 대비 buildScenario()로 남겨둠.
-  // 이번 단계는 실제 OpenAI 호출 결과를 aiResult에 담아 미리보기만 렌더한다.
   const generate = async () => {
     setLoading(true);
-    setResult(null);
     setAiResult(null);
     setAiMeta(null);
     setAiError(null);
-    setActiveVariant(0);
     setSaved(false);
     setSavedScenarioId(null);
     setSaveError(null);

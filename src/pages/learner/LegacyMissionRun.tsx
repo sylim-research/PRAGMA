@@ -156,7 +156,6 @@ const WORKFLOW_EXPAND_SCROLL_Y = 100;
 const SCROLL_TARGET_GAP = 12;
 
 const card = "rounded-xl border border-[#EAE4D2] bg-white p-4";
-const srcBox = "rounded-lg border-l-[3px] border-[#EAE4D2] border-l-[#FAD338] bg-[#F5F5F2] p-3";
 // 데모/검증 전용 버튼(프로토타입 v2 "데모 채우기") — IS_DEMO(개발·데모 배포)에서만 노출.
 // 실제 학습 세션(VITE_ENABLE_DEMO 미설정)에는 나오지 않아 수행 데이터 오염 없음.
 const demoBtn =

@@ -41,7 +41,6 @@ const AdminFinalCorpusReview = ({ preview = false }: { preview?: boolean }) => {
     searchParams.get("focus") === "hsk" ? "warning" : "pending",
   );
   const [selectedId, setSelectedId] = useState(preview ? PREVIEW_ITEMS[1].scenario_id : "");
-  const [reviewStartedAt, setReviewStartedAt] = useState(() => new Date().toISOString());
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(!preview);
 
@@ -98,7 +97,6 @@ const AdminFinalCorpusReview = ({ preview = false }: { preview?: boolean }) => {
 
   useEffect(() => { void loadRuns(); }, [loadRuns]);
   useEffect(() => { void loadItems(); }, [loadItems]);
-  useEffect(() => { setReviewStartedAt(new Date().toISOString()); }, [selectedId]);
 
   const visible = useMemo(() => items.filter((item) => filter === "all" || (filter === "pending" ? !item.review : item.warning && !item.review)), [filter, items]);
   const selected = items.find((item) => item.scenario_id === selectedId) ?? visible[0] ?? null;

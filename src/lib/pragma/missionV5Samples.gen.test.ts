@@ -12,7 +12,7 @@
 
 import { describe, expect, it } from "vitest";
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { resolve, dirname } from "node:path";
+import { resolve } from "node:path";
 import { buildBatchPlan, type BatchCell } from "@/lib/pragma/batchPlan";
 import {
   buildContentCanaryPlan,
