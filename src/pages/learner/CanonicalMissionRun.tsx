@@ -1506,6 +1506,18 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   );
 }
 
+// Display-only copy for this one local fixture; its scenario/PDR and all stored missions stay intact.
+// An empty string means the source already supplies the context needed for this activity.
+const PILOT_CONTEXT_COPY: Partial<Record<string, string>> = {
+  A1: "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.",
+  A2: "수업에서만 뵌 교수님께 이메일로 처음 부탁하며, 아직 수락을 받지 않았습니다.",
+  A3: "",
+  A4: "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.",
+  A5: "활동 중 몇 번 이야기한 한 학년 위 여자 선배와의 메신저 대화입니다.",
+  "A-DCT": "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.",
+  "A-FEEDBACK": "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.",
+};
+
 function QuestScaffold({ quest, target, targetHighlights, children }: {
   quest: MissionQuest;
   target?: string;
@@ -1513,6 +1525,7 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
   children: React.ReactNode;
 }) {
   const mission = useCanonicalMission();
+  const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
   return (
     <div className={quest.id === "A1" ? "space-y-2.5" : "space-y-3"}>
       {quest.id === "A1" && (
@@ -1524,7 +1537,8 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
         </div>
       )}
       {quest.id === "A1" && <p className="px-1 text-sm leading-6 text-[#596579]">먼저 여러 상황에서 표현을 판단합니다. 다섯 문항을 마치면 새로운 상황에서 직접 옮겨 봅니다.</p>}
-      <ContextCard context={quest.context} />
+      {pilotContext === undefined ? <ContextCard context={quest.context} />
+        : pilotContext && <p className="px-1 text-sm leading-6 text-[#596579]">{pilotContext}</p>}
       {quest.kind !== "dct" && <LanguagePair source={quest.source} target={target} targetHighlights={targetHighlights} />}
       {children}
     </div>
