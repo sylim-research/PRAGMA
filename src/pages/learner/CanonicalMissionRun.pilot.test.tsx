@@ -60,8 +60,14 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByRole("button", { name: "판단 확인하기" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "원문의 뜻을 유지하면서 이 상황에 맞게 고친 표현을 골라보세요." })).toBeInTheDocument();
     expect(screen.queryByText(/가장 알맞게 고친 표현/)).not.toBeInTheDocument();
-    click("助教您好，系统显示我上周缺勤，能帮我核实一下吗？");
-    click("교정안 확인하기"); click("다음: 직접 고쳐 보기");
+    click("助教您好，不好意思，我上周忘了签到，能帮我查一下记录吗？");
+    click("교정안 확인하기");
+    const inventedCause = screen.getByRole("button", { name: /助教您好，不好意思，我上周忘了签到/ });
+    expect(inventedCause).toHaveTextContent("원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다.");
+    expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
+    expect(within(inventedCause).queryByText("가능한 수정안")).not.toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("가능한 수정안")).toBeInTheDocument();
+    click("다음: 직접 고쳐 보기");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
     expect(screen.queryByText("이렇게도 고칠 수 있어요")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
@@ -79,7 +85,7 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByText(/권장 답안과 같아요|권장 답안과 달라요/)).not.toBeInTheDocument();
     click("다음: 표현 비교하기");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
-    expect(snapshot.responses.A3).toEqual({ correctionIds: ["check"] });
+    expect(snapshot.responses.A3).toEqual({ correctionIds: ["apology"] });
     expect(snapshot.responses.A4).toEqual({ revisedText: freeAnswer });
     expect(snapshot.questIndex).toBe(4);
     // Only completed-step progress is restored; no full draft recovery machinery.

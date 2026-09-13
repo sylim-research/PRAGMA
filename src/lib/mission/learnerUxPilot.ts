@@ -1,7 +1,7 @@
 import type { CanonicalMissionViewModel, ChoiceOption, DctQuest, MissionContext } from "./canonicalMissionPreview";
 
 // Hand-authored, unapproved UX fixture. No production schema, lineage or evaluator claims.
-export const LEARNER_UX_PILOT_ID = "school-request-free-correction-v2";
+export const LEARNER_UX_PILOT_ID = "school-request-free-correction-v3";
 export const LEARNER_UX_PILOT_STORAGE_KEY = `pragma:local-ux:${LEARNER_UX_PILOT_ID}`;
 
 const judgment: ChoiceOption[] = [
@@ -83,9 +83,9 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       corrections: [
         { id: "honorific", text: "助教您好，麻烦您把我上周的缺勤记录改成出勤，谢谢您。", valid: false, note: "존칭과 감사를 보탰지만, 확인 요청을 출석 기록 변경 요구로 바꾼 문제는 남습니다." },
         { id: "check", text: "助教您好，系统显示我上周缺勤，能帮我核实一下吗？", valid: true, note: "표시된 상태를 설명하고 사실 확인을 요청합니다. 출석 인정이나 기록 변경을 미리 요구하지 않습니다." },
-        { id: "apology", text: "助教您好，实在万分抱歉打扰您，系统显示我上周缺勤，不知能否劳烦您帮我核实一下，给您添麻烦了，真是过意不去。", valid: false, note: "확인 요청은 유지하지만, 통상적인 출석 문의에 사과와 의례 표현을 거듭 쌓아 용건이 무거워졌습니다." },
+        { id: "apology", text: "助教您好，不好意思，我上周忘了签到，能帮我查一下记录吗？", valid: false, note: "확인 요청은 남겼지만, 원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다. 사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다." },
       ],
-      feedback: "먼저 ‘확인’이 ‘변경’으로 바뀌지 않았는지 보세요. 말투만 공손하게 다듬어도 원문의 요청 범위가 달라지면 해결되지 않습니다.",
+      feedback: "‘확인’을 ‘기록 변경’으로 바꾸거나, 원문에 없는 원인을 덧붙이지 않았는지 보세요. 공손한 말투와 별개로 원문의 요청 범위와 확인된 사실을 유지해야 합니다.",
     },
     {
       id: "A4", module: "A", kind: "free_correction", shortLabel: "직접 고쳐 보기", title: "시간은 그대로, 부탁하는 방식은?",
