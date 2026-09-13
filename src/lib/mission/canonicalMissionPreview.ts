@@ -24,6 +24,8 @@ interface QuestBase {
   source: string;
   /** 제출 뒤 목표어에서 직접 짚어 줄 표현 */
   targetHighlights?: string[];
+  /** Local UX fixtures may name their next activity without changing saved missions. */
+  nextLabel?: string;
 }
 
 export interface MissionLessonPoint {
@@ -82,6 +84,24 @@ export interface ReasonQuest extends QuestBase {
   /** legacy MPJ5에서 복수 근거를 허용한 경우의 읽기 호환. 최신 설계는 단일 ID를 사용한다. */
   acceptedReasonIds?: string[];
   feedback: string;
+}
+
+/** Learner UX pilot only; not a persisted mission_v5 item contract. */
+export interface FreeCorrectionQuest extends QuestBase {
+  kind: "free_correction";
+  prompt: string;
+  target: string;
+  judgmentOptions: ChoiceOption[];
+  references: string[];
+  feedback: string;
+}
+
+/** Independent candidate placement for the local learner UX pilot. */
+export interface SpectrumQuest extends QuestBase {
+  kind: "spectrum";
+  prompt: string;
+  options: ChoiceOption[];
+  candidates: Array<{ id: string; text: string; acceptedAnswers: string[]; note: string }>;
 }
 
 export interface BestWorstQuest extends QuestBase {
@@ -148,6 +168,8 @@ export type MissionQuest =
   | ScaleQuest
   | FixChoiceQuest
   | ReasonQuest
+  | FreeCorrectionQuest
+  | SpectrumQuest
   | BestWorstQuest
   | DctQuest
   | DctFeedbackQuest;

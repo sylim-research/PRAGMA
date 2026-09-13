@@ -22,6 +22,8 @@ import {
   type DctFeedbackQuest,
   type DctQuest,
   type FixChoiceQuest,
+  type FreeCorrectionQuest,
+  type SpectrumQuest,
   type MissionContext,
   type MissionLessonPoint,
   type MissionQuest,
@@ -51,6 +53,7 @@ import { getTargetFeature } from "@/lib/pragma/targetFeatures";
 import type { RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
 import { CONSENT_VERSION, POLICY_VERSION } from "@/lib/research/versions";
 import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
+import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -107,6 +110,7 @@ type SceneIntroConfig = {
   previewOnly?: boolean;
   context: MissionContext;
   outputName: string;
+  practiceDescription?: string;
 };
 
 function buildSceneIntroConfig(mission: CanonicalMissionViewModel): SceneIntroConfig {
@@ -115,6 +119,8 @@ function buildSceneIntroConfig(mission: CanonicalMissionViewModel): SceneIntroCo
     missionLabel: mission.metaLabel ?? "이번 미션",
     context: production?.context ?? mission.quests[0].context,
     outputName: mission.activityMode === "interpreting" ? "통역" : "번역",
+    practiceDescription: mission.quests.some(item => item.kind === "free_correction")
+      ? "매번 다른 학교생활 장면에서 판단하고, 고르고, 직접 고쳐 보며 감각을 쌓습니다." : undefined,
   };
 }
 
@@ -185,7 +191,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
 };
 
 function nextActionLabel(quest: MissionQuest) {
-  return NEXT_ACTION_LABEL[quest.id] ?? "다음 문항으로";
+  return quest.nextLabel ?? NEXT_ACTION_LABEL[quest.id] ?? "다음 문항으로";
 }
 
 function ActionBar({ hint, children }: { hint?: string; children: React.ReactNode }) {
@@ -209,7 +215,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         <ol className="grid gap-3 sm:grid-cols-2">
           <li className="rounded-xl bg-[#F8F6EE] p-4">
             <h2 className="font-bold">1. 표현 판단 연습</h2>
-            <p className="mt-1 text-sm leading-6 text-[#596579]">여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다.</p>
+            <p className="mt-1 text-sm leading-6 text-[#596579]">{config.practiceDescription ?? "여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다."}</p>
           </li>
           <li className="rounded-xl bg-[#F8F6EE] p-4">
             <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
@@ -613,6 +619,85 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       </ActionBar>
     </QuestScaffold>
   );
+}
+
+function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
+  const [judgment, setJudgment] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(quest.target);
+  const [submitted, setSubmitted] = useState(false);
+  return <QuestScaffold quest={quest} target={quest.target}>
+    <section className={taskPanelBody}>
+      <h3 className="text-base font-bold">{quest.prompt}</h3>
+      <div className={optionGrid}>{quest.judgmentOptions.map(option => <OptionButton key={option.id} option={option} value={judgment} disabled={editing} onSelect={setJudgment} />)}</div>
+      {editing && <div className="mt-5 border-t border-[#E4E0D5] pt-4">
+        <label htmlFor="free-correction-draft" className="font-bold">내가 고친 번역</label>
+        <p className="mt-1 text-sm leading-6 text-[#596579]">원문의 시간과 이유는 유지하고, 필요하다고 생각하는 부분을 직접 고쳐 보세요.</p>
+        <Textarea id="free-correction-draft" className="font-zh mt-3 text-base leading-8" rows={3} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
+        <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
+      </div>}
+      {submitted && <section className="mt-5 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="자유교정 참고 표현">
+        <h4 className="font-bold">이렇게도 고칠 수 있어요</h4>
+        <p className="text-sm leading-6">{quest.feedback}</p>
+        {quest.references.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
+        <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 표현입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
+      </section>}
+    </section>
+    <ActionBar>
+      {!editing ? <Button className={`h-12 ${actionButton}`} disabled={!judgment} onClick={() => setEditing(true)}>판단 남기고 직접 고치기</Button>
+        : !submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim()} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
+        : <Button className="h-12 w-full" onClick={() => onDone({ judgment, revisedText: draft.trim() })}>다음: 표현 비교하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+    </ActionBar>
+  </QuestScaffold>;
+}
+
+function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (response: QuestResponse) => void }) {
+  const [picks, setPicks] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const allPicked = quest.candidates.every(candidate => Boolean(picks[candidate.id]));
+  return <QuestScaffold quest={quest}>
+    <section className={taskPanelBody}>
+      <h3 className="text-base font-bold">{quest.prompt}</h3>
+      <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
+        <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
+        <p className="font-zh text-base leading-7">{candidate.text}</p>
+        <div className="relative mt-4 grid grid-cols-3 gap-1.5" role="radiogroup" aria-label={`표현 ${index + 1}의 위치`}>
+          {quest.options.map(option => <button key={option.id} type="button" role="radio" aria-checked={picks[candidate.id] === option.id} disabled={submitted}
+            onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
+            className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold sm:text-sm ${picks[candidate.id] === option.id ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] bg-white"}`}>
+            {option.label}
+          </button>)}
+        </div>
+        {submitted && <div className="mt-3 border-t border-[#E4E0D5] pt-3 text-sm leading-6">
+          <p className="font-bold">참고 위치 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
+          <p className="mt-1">{candidate.note}</p>
+        </div>}
+      </fieldset>)}</div>
+    </section>
+    <ActionBar hint={!submitted ? `${Object.keys(picks).length}/4개 표현의 위치를 골랐습니다.` : undefined}>
+      {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>네 표현 확인하기</Button>
+        : <Button className="h-12 w-full" onClick={() => onDone({ candidateJudgments: picks })}>다음: 직접 옮겨 보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+    </ActionBar>
+  </QuestScaffold>;
+}
+
+/** Static references for the local pilot; never calls or simulates an evaluator. */
+function PilotDctReferenceView({ quest, response, onDone }: { quest: DctFeedbackQuest; response?: DctResponse; onDone: (response: DctResponse) => void }) {
+  const first = response?.first ?? "";
+  const [draft, setDraft] = useState(first);
+  return <QuestScaffold quest={quest}>
+    <section className={`${panel} space-y-4 p-5`}>
+      <p className="text-sm leading-6 text-[#596579]">이번 체험에서는 AI 채점을 하지 않습니다. 참고 표현과 원문을 비교한 뒤, 내 번역을 유지하거나 다듬어 주세요.</p>
+      <div><h3 className="text-sm font-bold">처음 작성한 번역</h3><p className="font-zh mt-2 whitespace-pre-wrap text-base leading-8">{first}</p></div>
+      <details className="rounded-xl bg-[#F8F7F2] p-4">
+        <summary className="cursor-pointer font-bold">참고 표현 보기</summary>
+        <div className="mt-3 space-y-4">{quest.feedback.alternatives.map(item => <div key={item.text}><p className="font-zh text-base leading-7">{item.text}</p><p className="mt-1 text-sm leading-6">{item.note}</p></div>)}</div>
+      </details>
+      <p className="text-sm leading-6">{quest.feedback.action}</p>
+      <div><label htmlFor="pilot-dct-final" className="font-bold">내 최종 번역</label><Textarea id="pilot-dct-final" className="font-zh mt-2 text-base leading-8" rows={4} value={draft} onChange={event => setDraft(event.target.value)} /></div>
+    </section>
+    <ActionBar><Button className={`h-12 ${actionButton}`} disabled={!draft.trim()} onClick={() => onDone({ first, revised: draft.trim(), reflected: first !== draft.trim() })}>이 번역으로 미션 마치기</Button></ActionBar>
+  </QuestScaffold>;
 }
 
 export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ReasonQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
@@ -1455,6 +1540,7 @@ const PROGRESS_LABELS: Record<string, string> = {
 };
 
 function progressLabel(quest: MissionQuest) {
+  if (quest.kind === "free_correction" || quest.kind === "spectrum") return quest.shortLabel;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
 
@@ -1525,7 +1611,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   );
 }
 
-function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMode = false, devAutofill = false, devDraft = "", revealAnswers = false, demoFillRequest = 0 }: {
+function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMode = false, devAutofill = false, devDraft = "", revealAnswers = false, demoFillRequest = 0, localPilot = false }: {
   quest: MissionQuest;
   responses: Record<string, QuestResponse | DctResponse>;
   onDone: (response: QuestResponse | DctResponse) => void;
@@ -1535,7 +1621,11 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
   devDraft?: string;
   revealAnswers?: boolean;
   demoFillRequest?: number;
+  localPilot?: boolean;
 }) {
+  if (quest.kind === "free_correction") return <FreeCorrectionView quest={quest} onDone={onDone} />;
+  if (quest.kind === "spectrum") return <SpectrumView quest={quest} onDone={onDone} />;
+  if (localPilot && quest.kind === "dct_feedback") return <PilotDctReferenceView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} />;
   if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
@@ -1980,27 +2070,46 @@ export function shouldPersistMissionAttempt(
   return Boolean(runtime) && questKind === "dct_feedback" && !demoMode;
 }
 
-export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMode = false, courseContext }: {
+function readLocalPilotProgress(enabled: boolean) {
+  if (!enabled) return null;
+  try {
+    const value = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY) ?? "null");
+    if (!value || !Number.isInteger(value.questIndex) || value.questIndex < 0 || value.questIndex > 6
+      || typeof value.completed !== "boolean" || typeof value.mpjRecapOpen !== "boolean"
+      || (value.sceneIntroStep !== null && value.sceneIntroStep !== 0)
+      || !value.responses || typeof value.responses !== "object" || Array.isArray(value.responses)) return null;
+    return value as {
+      questIndex: number; completed: boolean; mpjRecapOpen: boolean; sceneIntroStep: number | null;
+      responses: Record<string, QuestResponse | DctResponse>;
+    };
+  } catch { return null; }
+}
+
+export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMode = false, courseContext, localPilot = false }: {
   mission: CanonicalMissionViewModel;
   runtime?: RunnableMission;
   isDevPreview: boolean;
   /** 디펜스 시연은 실제 미션·피드백을 쓰되 학습자 수행 로그는 만들지 않는다. */
   demoMode?: boolean;
   courseContext?: MissionCourseLocation | null;
+  /** DEV-only fixture in the learner route; session progress only, no DB runtime. */
+  localPilot?: boolean;
 }) {
   const requestedMission = new URLSearchParams(window.location.search).get("mission")?.toUpperCase();
   const sceneIntroConfig = isDevPreview && requestedMission === "B"
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(0);
-  const [questIndex, setQuestIndex] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  const [pilotProgress] = useState(() => readLocalPilotProgress(localPilot));
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(pilotProgress ? pilotProgress.sceneIntroStep : 0);
+  const [questIndex, setQuestIndex] = useState(pilotProgress?.questIndex ?? 0);
+  const [completed, setCompleted] = useState(pilotProgress?.completed ?? false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
-  const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
+  const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>(pilotProgress?.responses ?? {});
   const [devPreset, setDevPreset] = useState<DevPreviewPreset>(readDevPreviewPreset);
   const [devAutofillQuestId, setDevAutofillQuestId] = useState<string | null>(null);
   const [feedbackRevisionOpen, setFeedbackRevisionOpen] = useState(false);
-  const [mpjRecapOpen, setMpjRecapOpen] = useState(false);
+  const [mpjRecapOpen, setMpjRecapOpen] = useState(pilotProgress?.mpjRecapOpen ?? false);
+  const [pilotStorageAvailable, setPilotStorageAvailable] = useState(true);
   const [renderNonce, setRenderNonce] = useState(0);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const pendingSaveRef = useRef<{ input: SaveAttemptInput; logId: string } | null>(null);
@@ -2011,6 +2120,13 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     : "pragma:mission-attempt:preview";
   const [attemptId, setAttemptId] = useState(() => getOrCreateMissionAttemptId(attemptStorageKey));
   const quest = mission.quests[questIndex];
+
+  useEffect(() => {
+    if (!localPilot) return;
+    try {
+      sessionStorage.setItem(LEARNER_UX_PILOT_STORAGE_KEY, JSON.stringify({ sceneIntroStep, questIndex, completed, mpjRecapOpen, responses }));
+    } catch { setPilotStorageAvailable(false); }
+  }, [localPilot, sceneIntroStep, questIndex, completed, mpjRecapOpen, responses]);
 
   const emitMissionEvent = (eventType: MissionEventType, payload: Record<string, unknown> = {}) => {
     if (!runtime || demoMode) return;
@@ -2282,6 +2398,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         />
       )}
       <div className="mx-auto max-w-3xl">
+        {localPilot && <p className="mb-3 text-xs leading-5 text-[#697386]">
+          로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
+        </p>}
         {sceneIntroStep !== null ? (
           <div className="space-y-5">
             <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} />
@@ -2316,6 +2435,11 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               />
             </div>
             <DissentSummary dissent={aDct?.dissent} />
+            {localPilot && typeof (responses.A4 as QuestResponse | undefined)?.revisedText === "string" && <details className={`${panel} p-5`}>
+              <summary className="cursor-pointer text-sm font-bold">내가 직접 고친 문장 다시 보기</summary>
+              <p className="font-zh mt-3 whitespace-pre-wrap text-base leading-8">{String((responses.A4 as QuestResponse).revisedText)}</p>
+              <p className="mt-2 text-xs text-[#697386]">자유교정에서 제출한 문장입니다. 자동 채점하지 않았습니다.</p>
+            </details>}
             {runtime && !demoMode && (
               <details className={`${panel} p-5`}><summary className="cursor-pointer text-sm font-bold">익명 학급 응답 보기</summary><div className="mt-4">
               <PeerResponsesPanel
@@ -2325,7 +2449,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 learnerChoices={peerChoices}
               /></div></details>
             )}
-            <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState} />
+            {localPilot ? <Button variant="outline" className="h-12 w-full" onClick={restart}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
+              : <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState} />}
           </div>
         ) : (
           <div className="space-y-5">
@@ -2340,6 +2465,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               devAutofill={devAutofillQuestId === quest.id}
               devDraft={demoMode && quest.kind === "dct" ? quest.referenceAnswer : DEV_PREVIEW_COPY[devPreset].a}
               demoFillRequest={demoMode && devAutofillQuestId === quest.id ? renderNonce : 0}
+              localPilot={localPilot}
             />
           </div>
         )}
@@ -2376,6 +2502,9 @@ const CanonicalMissionRun = ({
 } = {}) => {
   const { scenarioId: routeScenarioId } = useParams<{ scenarioId: string }>();
   const scenarioId = scenarioIdOverride ?? routeScenarioId;
+  const localPilot = import.meta.env.DEV && !scenarioId
+    && new URLSearchParams(window.location.search).get("preview") === "v5"
+    && new URLSearchParams(window.location.search).get("pilot") === "free-correction";
   const courseLocation = parseMissionCourseLocation(window.location.search);
   const [runtimeMission, setRuntimeMission] = useState<CanonicalMissionViewModel | null>(null);
   const [runtimeRunnable, setRuntimeRunnable] = useState<RunnableMission | null>(null);
@@ -2466,13 +2595,14 @@ const CanonicalMissionRun = ({
     );
   }
 
-  const mission = runtimeMission ?? CANONICAL_MISSION_PREVIEW;
+  const mission = runtimeMission ?? (localPilot ? LEARNER_UX_PILOT : CANONICAL_MISSION_PREVIEW);
   return (
     <CanonicalMissionRunner
-      key={mission.scenarioId ?? "preview"}
+      key={localPilot ? LEARNER_UX_PILOT_STORAGE_KEY : mission.scenarioId ?? "preview"}
       mission={mission}
       runtime={runtimeRunnable ?? undefined}
-      isDevPreview={import.meta.env.DEV && !scenarioId}
+      isDevPreview={import.meta.env.DEV && !scenarioId && !localPilot}
+      localPilot={localPilot}
       demoMode={demoMode}
       courseContext={courseLocation.context}
     />
