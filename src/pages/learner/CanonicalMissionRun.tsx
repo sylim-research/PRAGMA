@@ -506,6 +506,11 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           ))}
         </div>
         {answered && <div className="mt-4"><FeedbackBox verdict={`권장 답안 · 이 상황에서는 ${acceptedLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
+        {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
+          <h4 className="font-bold">가능한 수정 예시</h4>
+          {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
+          <p className="text-xs leading-5 text-[#697386]">원문의 뜻을 유지하며 부탁하는 방식은 여러 가지입니다. 이 두 문장만 정답이라는 뜻은 아닙니다.</p>
+        </section>}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : undefined}>
         {!answered ? (
@@ -518,12 +523,13 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   );
 }
 
-function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAnswers = false }: {
+function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAnswers = false, correctionOnly = false }: {
   quest: FixChoiceQuest;
   responses: Record<string, QuestResponse | DctResponse>;
   onDone: (response: QuestResponse) => void;
   devAutofill?: boolean;
   revealAnswers?: boolean;
+  correctionOnly?: boolean;
 }) {
   const mission = useCanonicalMission();
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
@@ -531,7 +537,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
     ? (responses[quest.judgmentQuestId] as QuestResponse | undefined)?.pick as string | undefined
     : undefined;
   const [judgment, setJudgment] = useState<string | null>(() => revealAnswers ? quest.referenceJudgment : linkedJudgment ?? (devAutofill ? quest.referenceJudgment : null));
-  const [locked, setLocked] = useState(Boolean(linkedJudgment) || devAutofill || revealAnswers);
+  const [locked, setLocked] = useState(correctionOnly || Boolean(linkedJudgment) || devAutofill || revealAnswers);
   const [correctionId, setCorrectionId] = useState<string | null>(() => devAutofill || revealAnswers
     ? (quest.corrections.find((option) => option.valid)?.id ?? null)
     : null
@@ -546,14 +552,14 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       <section className={taskPanelBody}>
         <p className="mb-1 text-[11px] font-black text-[#6B7280]">지금 할 일</p>
         <h3 className="text-base font-bold">{quest.prompt}</h3>
-        <div className={optionGrid}>
+        {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
             <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} onSelect={setJudgment} />
           ))}
-        </div>
+        </div>}
         {locked && (
-          <div className="mt-5 border-t border-[#E4E0D5] pt-4">
-            <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]" : "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]"}`}>
+          <div className={correctionOnly ? "mt-3" : "mt-5 border-t border-[#E4E0D5] pt-4"}>
+            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]" : "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]"}`}>
               <p className="flex items-center gap-2 font-black">
                 <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${judgmentMatched ? "bg-[#DCEFE4] text-[#245E44]" : "bg-[#F4D8D5] text-[#8B3531]"}`}>
                   {judgmentMatched ? <Check className="h-4 w-4" strokeWidth={3} /> : <X className="h-4 w-4" strokeWidth={3} />}
@@ -569,10 +575,10 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                   ? "이 장면을 읽은 방향이 같습니다. 이제 같은 뜻을 더 자연스럽게 옮긴 안을 찾아보세요."
                   : "관계와 채널 단서를 다시 보고 수정안을 골라보세요."}
               </p>
-            </div>
-            <div className="mt-5">
+            </div>}
+            <div className={correctionOnly ? "" : "mt-5"}>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <h4 className="font-bold">가장 알맞게 고친 표현은 무엇일까요?</h4>
+                {!correctionOnly && <h4 className="font-bold">가장 알맞게 고친 표현은 무엇일까요?</h4>}
                 <span className={`text-xs font-black ${correctionId ? "text-[#245E44]" : "text-[#687387]"}`} aria-live="polite">{correctionId ? "1개 선택됨 · 확인할 수 있어요" : "1개를 선택하세요"}</span>
               </div>
               <div className={optionGrid}>
@@ -594,7 +600,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
                             {picked && <span className="rounded-full border border-[#15202B] bg-white px-2 py-0.5 text-[10px] font-black text-[#15202B]">내 선택</span>}
-                            {correction.valid && <span className="rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[10px] font-black text-[#245E44]">권장 수정안</span>}
+                            {correction.valid && <span className="rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[10px] font-black text-[#245E44]">{correctionOnly ? "가능한 수정안" : "권장 수정안"}</span>}
                           </span>
                         )}
                       </span>
@@ -606,15 +612,15 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
             </div>
           </div>
         )}
-        {answered && <div className="mt-4"><FeedbackBox verdict={`권장 답안 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
+        {answered && <div className="mt-4"><FeedbackBox verdict={correctionOnly ? undefined : `권장 답안 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
       </section>
-      <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
+      <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
           <Button className={`h-12 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
           <Button className={`h-12 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>교정안 확인하기</Button>
         ) : (
-          <Button className="h-12 w-full" onClick={() => onDone({ judgment, correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className="h-12 w-full" onClick={() => onDone({ ...(!correctionOnly ? { judgment } : {}), correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -622,20 +628,17 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
 }
 
 function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
-  const [judgment, setJudgment] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(quest.target);
   const [submitted, setSubmitted] = useState(false);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
       <h3 className="text-base font-bold">{quest.prompt}</h3>
-      <div className={optionGrid}>{quest.judgmentOptions.map(option => <OptionButton key={option.id} option={option} value={judgment} disabled={editing} onSelect={setJudgment} />)}</div>
-      {editing && <div className="mt-5 border-t border-[#E4E0D5] pt-4">
+      <div className="mt-4">
         <label htmlFor="free-correction-draft" className="font-bold">내가 고친 번역</label>
         <p className="mt-1 text-sm leading-6 text-[#596579]">원문의 시간과 이유는 유지하고, 필요하다고 생각하는 부분을 직접 고쳐 보세요.</p>
         <Textarea id="free-correction-draft" className="font-zh mt-3 text-base leading-8" rows={3} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
         <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
-      </div>}
+      </div>
       {submitted && <section className="mt-5 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="자유교정 참고 표현">
         <h4 className="font-bold">이렇게도 고칠 수 있어요</h4>
         <p className="text-sm leading-6">{quest.feedback}</p>
@@ -644,9 +647,8 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       </section>}
     </section>
     <ActionBar>
-      {!editing ? <Button className={`h-12 ${actionButton}`} disabled={!judgment} onClick={() => setEditing(true)}>판단 남기고 직접 고치기</Button>
-        : !submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim()} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
-        : <Button className="h-12 w-full" onClick={() => onDone({ judgment, revisedText: draft.trim() })}>다음: 표현 비교하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+      {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim()} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
+        : <Button className="h-12 w-full" onClick={() => onDone({ revisedText: draft.trim() })}>다음: 표현 비교하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
 }
@@ -1554,7 +1556,7 @@ function macroProgressIndex(activeIndex: number, completed: boolean | undefined,
   return revisionOpen ? 4 : 3;
 }
 
-function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false }: {
+function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false }: {
   activeIndex: number;
   completed?: boolean;
   reviewIndex?: number | null;
@@ -1562,9 +1564,11 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   sceneIntroStep?: number | null;
   sceneIntroConfig?: SceneIntroConfig;
   mpjRecapOpen?: boolean;
+  skipIntro?: boolean;
 }) {
   const quests = useCanonicalMission().quests;
-  const macroIndex = macroProgressIndex(activeIndex, completed, revisionOpen, sceneIntroStep);
+  const macroIndex = macroProgressIndex(activeIndex, completed, revisionOpen, sceneIntroStep) - (skipIntro ? 1 : 0);
+  const stages = skipIntro ? MACRO_PROGRESS.slice(1) : MACRO_PROGRESS;
   const detail = completed
     ? { phase: "미션 완료", activity: "내 산출 돌아보기" }
       : reviewIndex !== null
@@ -1583,8 +1587,8 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
       <div className="flex items-center gap-3 sm:gap-4">
-        <ol className="grid min-w-0 flex-1 grid-cols-5" aria-label={MACRO_PROGRESS.join(", ")}>
-          {MACRO_PROGRESS.map((label, index) => {
+        <ol className={`grid min-w-0 flex-1 ${skipIntro ? "grid-cols-4" : "grid-cols-5"}`} aria-label={stages.join(", ")}>
+          {stages.map((label, index) => {
             const done = Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
             return (
@@ -1627,7 +1631,7 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
   if (quest.kind === "spectrum") return <SpectrumView quest={quest} onDone={onDone} />;
   if (localPilot && quest.kind === "dct_feedback") return <PilotDctReferenceView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} />;
   if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
-  if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
+  if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} correctionOnly={localPilot} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "best_worst") return <BestWorstView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "dct_feedback") return <DctFeedbackView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} onRevisionStateChange={onRevisionStateChange} devMode={devMode} devAutofill={devAutofill} demoFillRequest={demoFillRequest} />;
@@ -2100,7 +2104,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
   const [pilotProgress] = useState(() => readLocalPilotProgress(localPilot));
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(pilotProgress ? pilotProgress.sceneIntroStep : 0);
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(localPilot ? null : 0);
   const [questIndex, setQuestIndex] = useState(pilotProgress?.questIndex ?? 0);
   const [completed, setCompleted] = useState(pilotProgress?.completed ?? false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
@@ -2330,7 +2334,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const restart = () => {
     if (savingRef.current) return;
     pendingSaveRef.current = null;
-    setSceneIntroStep(0);
+    setSceneIntroStep(localPilot ? null : 0);
     setMpjRecapOpen(false);
     setQuestIndex(0);
     setCompleted(false);
@@ -2411,18 +2415,18 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : mpjRecapOpen ? (
           <div className="space-y-5">
-            <Progress activeIndex={5} mpjRecapOpen />
+            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} />
             <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={continueFromMpjRecap} />
           </div>
         ) : reviewedQuest && reviewedResponse ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed={completed} reviewIndex={reviewIndex} revisionOpen={feedbackRevisionOpen} />
+            <Progress activeIndex={currentProgressIndex} completed={completed} reviewIndex={reviewIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <ReviewModeBanner index={reviewIndex ?? 0} completed={completed} onExit={() => setReviewIndex(null)} />
             <CompletedQuestReview quest={reviewedQuest} response={reviewedResponse} />
           </div>
         ) : completed ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} />
+            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
               <h1 className="mt-2 text-2xl font-black">이번 미션에서 확정한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
@@ -2454,7 +2458,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} />
+            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}

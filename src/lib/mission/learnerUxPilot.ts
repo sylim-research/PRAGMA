@@ -1,12 +1,12 @@
 import type { CanonicalMissionViewModel, ChoiceOption, DctQuest, MissionContext } from "./canonicalMissionPreview";
 
 // Hand-authored, unapproved UX fixture. No production schema, lineage or evaluator claims.
-export const LEARNER_UX_PILOT_ID = "school-request-free-correction-v1";
+export const LEARNER_UX_PILOT_ID = "school-request-free-correction-v2";
 export const LEARNER_UX_PILOT_STORAGE_KEY = `pragma:local-ux:${LEARNER_UX_PILOT_ID}`;
 
 const judgment: ChoiceOption[] = [
   { id: "appropriate", label: "상황에 잘 맞음" },
-  { id: "adjust", label: "조정이 필요함" },
+  { id: "adjust", label: "수정 필요" },
 ];
 const spectrum: ChoiceOption[] = [
   { id: "too_direct", label: "너무 직접적" },
@@ -68,16 +68,18 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       context: context("수업에서만 뵌 교수님께 교환학생 지원용 추천서를 처음 부탁합니다. 제출 마감은 다음 주 금요일이며, 교수님은 작성 여부를 아직 답하지 않았습니다.", "수업 담당 교수님", "상대 높음", "거리 있음", "부담 높음", "이메일"),
       source: "교수님, 교환학생 지원에 필요한 추천서를 써주실 수 있을까요? 다음 주 금요일까지 필요합니다.",
       target: "老师，麻烦您帮我写一封交换生申请的推荐信，下周五之前发给我，谢谢。",
-      prompt: "이 번역안은 이 상황에 잘 맞나요?", options: judgment,
-      referenceAnswer: "adjust",
+      prompt: "이 번역안은 이 상황에 얼마나 잘 맞나요?",
+      options: [{ id: "very_appropriate", label: "매우 적절" }, { id: "somewhat_appropriate", label: "다소 적절" }, { id: "somewhat_inappropriate", label: "다소 부적절" }, { id: "very_inappropriate", label: "매우 부적절" }],
+      referenceAnswer: "somewhat_inappropriate", acceptedAnswers: ["somewhat_inappropriate", "very_inappropriate"],
       feedback: "麻烦您·谢谢는 공손한 표지지만, 전체 발화는 작성과 전달을 이미 맡긴 듯 들립니다. 원문은 작성 가능 여부를 묻고 있는데, 번역은 수락을 전제하는 요구로 바뀌었습니다.",
+      revisionExamples: ["老师，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。", "老师，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？"],
     },
     {
       id: "A3", module: "A", kind: "fix_choice", shortLabel: "선택교정", title: "어디까지 고쳐 달라고 했나요?", nextLabel: "다음: 직접 고쳐 보기",
       context: context("출석 앱에서 지난주 수업이 결석으로 표시된 것을 보고 조교에게 연락합니다. 표시가 잘못된 것인지는 아직 확인되지 않았습니다.", "담당 조교 · 몇 번 이야기한 사이", "상대 조금 높음", "아는 사이", "부담 보통"),
       source: "조교님, 지난주 출석이 결석으로 되어 있는데 확인해 주실 수 있나요?",
       target: "助教您好，请把我上周的缺勤记录改成出勤。",
-      prompt: "이 번역안은 원문과 상황에 잘 맞나요?", judgmentOptions: judgment, referenceJudgment: "adjust",
+      prompt: "원문의 뜻을 유지하면서 이 상황에 맞게 고친 표현을 골라보세요.", judgmentOptions: judgment, referenceJudgment: "adjust",
       corrections: [
         { id: "honorific", text: "助教您好，麻烦您把我上周的缺勤记录改成出勤，谢谢您。", valid: false, note: "존칭과 감사를 보탰지만, 확인 요청을 출석 기록 변경 요구로 바꾼 문제는 남습니다." },
         { id: "check", text: "助教您好，系统显示我上周缺勤，能帮我核实一下吗？", valid: true, note: "표시된 상태를 설명하고 사실 확인을 요청합니다. 출석 인정이나 기록 변경을 미리 요구하지 않습니다." },
@@ -90,7 +92,7 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       context: context("팀플 조원들과 내일 저녁 7시에 발표 리허설을 하기로 했습니다. 수업이 늦게 끝나 30분 늦추고 싶지만, 다른 조원들의 동의는 아직 구하지 않았습니다.", "같은 수업의 팀플 조원들", "동등", "아는 사이", "부담 보통"),
       source: "내일 발표 리허설을 7시에서 7시 반으로 늦춰도 될까? 수업이 늦게 끝나서.",
       target: "我下课晚，明天的汇报彩排就从七点改到七点半吧。",
-      prompt: "이 번역안은 원문과 상황에 잘 맞나요?", judgmentOptions: judgment,
+      prompt: "원문의 뜻을 유지하면서 필요한 부분을 직접 고쳐 보세요.",
       references: ["我下课晚，明天的汇报彩排能从七点推迟到七点半吗？", "明天我下课晚，彩排从七点改到七点半，可以吗？"],
       feedback: "원문은 변경 허락을 묻지만, 就……改到……吧는 이미 정한 변경을 알리는 듯 들릴 수 있습니다. 시간과 이유를 유지하면서 동의를 묻도록 고쳐 보세요. 아래 표현은 가능한 예시이며, 다른 방식으로도 옮길 수 있습니다.",
     },
@@ -101,7 +103,7 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       prompt: "네 번역안을 각각 스펙트럼 위에 놓아 보세요. 같은 위치에 여러 표현을 놓아도 됩니다.", options: spectrum,
       candidates: [
         { id: "a", text: "学姐，能把社团宣传海报的原文件发给我吗？我只改一下日期。", acceptedAnswers: ["appropriate"], note: "용건과 이유를 간결하게 밝히고 전달 가능 여부를 묻습니다." },
-        { id: "b", text: "学姐，实在不好意思，又来麻烦您了。不知能否请您把社团宣传海报的原文件发给我？我只改一下日期，给您添麻烦了，真是过意不去。", acceptedAnswers: ["too_indirect"], note: "작은 파일 전달 부탁에 사과와 의례 표현이 누적돼 지나치게 무거워집니다. 您나 사과 자체가 문제인 것은 아닙니다." },
+        { id: "b", text: "学姐，能否劳烦您发一下社团宣传海报的原文件？我只改一下日期。", acceptedAnswers: ["appropriate"], note: "劳烦您는 조금 격식이 있지만, 요청과 이유가 분명한 가능한 표현입니다. 이 정도의 격식이나 您만으로 지나치게 우회적이라고 단정하지 않습니다." },
         { id: "c", text: "学姐，我想改一下社团宣传海报上的日期，方便把原文件发给我吗？", acceptedAnswers: ["appropriate"], note: "목적을 먼저 밝히고 상대가 전달할 수 있는지 묻는 또 다른 적절한 표현입니다." },
         { id: "d", text: "学姐，社团宣传海报的原文件发我，我要改一下日期。", acceptedAnswers: ["too_direct"], note: "전달 가능 여부를 묻는 원문을 짧은 전달 지시로 바꿨습니다. 단순히 짧아서가 아니라 수락을 전제하는 요청 방식이 문제입니다." },
       ],

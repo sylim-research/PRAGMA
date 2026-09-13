@@ -51,6 +51,8 @@ export interface ScaleQuest extends QuestBase {
   /** 제출 뒤 정답 효과를 함께 표시할 수용 대역 */
   acceptedAnswers?: string[];
   feedback: string;
+  /** Authored alternatives revealed after judgment, not a unique translation key. */
+  revisionExamples?: string[];
 }
 
 export interface FixChoiceQuest extends QuestBase {
@@ -91,7 +93,6 @@ export interface FreeCorrectionQuest extends QuestBase {
   kind: "free_correction";
   prompt: string;
   target: string;
-  judgmentOptions: ChoiceOption[];
   references: string[];
   feedback: string;
 }
