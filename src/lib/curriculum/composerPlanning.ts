@@ -167,20 +167,6 @@ export function hasSameSituation(
   return firstSituation.length > 0 && firstSituation === normalizedSituation(second);
 }
 
-/** 후보 순서를 보존하되 같은 상황문의 명백한 복제본은 한 주차에 함께 고르지 않는다. */
-export function pickDistinctSituationMissions(
-  candidates: readonly ComposerCore[],
-  count: number,
-): ComposerCore[] {
-  const picked: ComposerCore[] = [];
-  for (const candidate of candidates) {
-    if (picked.some((item) => hasSameSituation(item, candidate))) continue;
-    picked.push(candidate);
-    if (picked.length === count) break;
-  }
-  return picked;
-}
-
 /** 두 모드와 서로 다른 상황을 함께 만족시킨다. 첫 후보의 충돌 때문에 유효한 쌍을 놓치지 않는다. */
 export function pickMissionsForModes(candidates: readonly ComposerCore[], modes: readonly GenMode[]): ComposerCore[] {
   if (modes.length !== 2) return [];

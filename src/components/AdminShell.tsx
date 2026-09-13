@@ -194,20 +194,4 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
   );
 };
 
-export const AdminPlaceholder = ({
-  title,
-  description,
-  note = "이 화면은 후속 단계에서 구현됩니다.",
-}: {
-  title: string;
-  description?: string;
-  note?: string;
-}) => (
-  <AdminShell title={title} description={description}>
-    <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center">
-      <p className="text-sm text-muted-foreground">{note}</p>
-    </div>
-  </AdminShell>
-);
-
 export default AdminShell;

@@ -10,7 +10,6 @@
 // 여기는 리웨이/노트, 미션은 샤오린/발표자료다.
 
 export const INTRO_STEPS = ["결과 보기", "단서 추리", "원리 연결", "적용 판단"] as const;
-export type IntroStep = (typeof INTRO_STEPS)[number];
 
 /** 이 아크가 도입하는 전략군. 완료 시 LearnerFeatureState에 기록된다. */
 export const INTRO_FEATURE_ID = "request_directness_mitigation";

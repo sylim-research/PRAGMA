@@ -8,23 +8,6 @@ export const TASK_MODE_KEY = "entryGate.taskMode";
 export const LANGUAGE_DIRECTION_KEY = "entryGate.languageDirection";
 export const SCENARIO_ID_KEY = "entryGate.scenarioId";
 
-export function setSelectedScenarioId(id: string | null) {
-  try {
-    if (id) localStorage.setItem(SCENARIO_ID_KEY, id);
-    else localStorage.removeItem(SCENARIO_ID_KEY);
-  } catch {
-    /* ignore */
-  }
-}
-
-export function getSelectedScenarioId(): string | null {
-  try {
-    return localStorage.getItem(SCENARIO_ID_KEY);
-  } catch {
-    return null;
-  }
-}
-
 export type TaskMode = "translation" | "interpreting";
 export type LanguageDirection = "ko_to_zh" | "zh_to_ko";
 
@@ -51,20 +34,4 @@ export function getTaskMode(): TaskMode | null {
   } catch {
     return null;
   }
-}
-
-export function getLanguageDirection(): LanguageDirection | null {
-  try {
-    const v = localStorage.getItem(LANGUAGE_DIRECTION_KEY);
-    return v === "ko_to_zh" || v === "zh_to_ko" ? v : null;
-  } catch {
-    return null;
-  }
-}
-
-export function isCoreCombination(
-  mode: TaskMode | null,
-  dir: LanguageDirection | null,
-) {
-  return mode === "translation" && dir === "ko_to_zh";
 }

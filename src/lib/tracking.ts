@@ -74,19 +74,6 @@ function pushAction({ actionType, pageName, details = {} }: PushArgs) {
   }
 }
 
-export function logAction(
-  actionType: ActionType,
-  details: Record<string, unknown> = {},
-  pageName?: string,
-) {
-  ensureSession();
-  pushAction({
-    actionType,
-    pageName: pageName ?? (typeof window !== "undefined" ? window.location.pathname : ""),
-    details,
-  });
-}
-
 export function getActions(): LearnerAction[] {
   try {
     const raw = localStorage.getItem(ACTIONS_KEY);
@@ -94,30 +81,4 @@ export function getActions(): LearnerAction[] {
   } catch {
     return [];
   }
-}
-
-export function getSessionStart(): Date | null {
-  const v = localStorage.getItem(SESSION_START_KEY);
-  return v ? new Date(v) : null;
-}
-
-export function downloadActions() {
-  const actions = getActions();
-  const sessionId = localStorage.getItem(SESSION_KEY) || "no-session";
-  const ts = new Date().toISOString().replace(/[:.]/g, "-");
-  const payload = {
-    sessionId,
-    sessionStart: localStorage.getItem(SESSION_START_KEY),
-    exportedAt: new Date().toISOString(),
-    actions,
-  };
-  const blob = new Blob([JSON.stringify(payload, null, 2)], {
-    type: "application/json",
-  });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `learner_actions_${sessionId}_${ts}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
 }
