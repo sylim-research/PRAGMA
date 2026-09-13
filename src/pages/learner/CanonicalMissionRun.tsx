@@ -683,25 +683,6 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
   </QuestScaffold>;
 }
 
-/** Static references for the local pilot; never calls or simulates an evaluator. */
-function PilotDctReferenceView({ quest, response, onDone }: { quest: DctFeedbackQuest; response?: DctResponse; onDone: (response: DctResponse) => void }) {
-  const first = response?.first ?? "";
-  const [draft, setDraft] = useState(first);
-  return <QuestScaffold quest={quest}>
-    <section className={`${panel} space-y-4 p-5`}>
-      <p className="text-sm leading-6 text-[#596579]">이번 체험에서는 AI 채점을 하지 않습니다. 참고 표현과 원문을 비교한 뒤, 내 번역을 유지하거나 다듬어 주세요.</p>
-      <div><h3 className="text-sm font-bold">처음 작성한 번역</h3><p className="font-zh mt-2 whitespace-pre-wrap text-base leading-8">{first}</p></div>
-      <details className="rounded-xl bg-[#F8F7F2] p-4">
-        <summary className="cursor-pointer font-bold">참고 표현 보기</summary>
-        <div className="mt-3 space-y-4">{quest.feedback.alternatives.map(item => <div key={item.text}><p className="font-zh text-base leading-7">{item.text}</p><p className="mt-1 text-sm leading-6">{item.note}</p></div>)}</div>
-      </details>
-      <p className="text-sm leading-6">{quest.feedback.action}</p>
-      <div><label htmlFor="pilot-dct-final" className="font-bold">내 최종 번역</label><Textarea id="pilot-dct-final" className="font-zh mt-2 text-base leading-8" rows={4} value={draft} onChange={event => setDraft(event.target.value)} /></div>
-    </section>
-    <ActionBar><Button className={`h-12 ${actionButton}`} disabled={!draft.trim()} onClick={() => onDone({ first, revised: draft.trim(), reflected: first !== draft.trim() })}>이 번역으로 미션 마치기</Button></ActionBar>
-  </QuestScaffold>;
-}
-
 export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ReasonQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
   const acceptedReasonIds = quest.acceptedReasonIds ?? [quest.acceptedReasonId];
   const [reasonId, setReasonId] = useState<string | null>(() => devAutofill || revealAnswers ? quest.acceptedReasonId : null);
@@ -1284,6 +1265,7 @@ function StudentAnswerCard({ text, highlights = [] }: { text: string; highlights
 
 function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: string }) {
   const mission = useCanonicalMission();
+  const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
@@ -1293,21 +1275,21 @@ function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: st
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="flex items-center gap-1.5 text-xs font-black text-[#4F5B6F]"><Eye className="h-3.5 w-3.5" /> 원문·상황 다시 보기</p>
-            <p className="mt-1 text-xs leading-5 text-[#707A8B]">{quest.context.relation} · {quest.context.channel}</p>
+            <p className="mt-1 text-xs leading-5 text-[#707A8B]">{pilotContext ?? `${quest.context.relation} · ${quest.context.channel}`}</p>
           </div>
           <span className="shrink-0 text-xs font-bold text-[#6A7485]"><span className="group-open:hidden">펼치기</span><span className="hidden group-open:inline">접기</span></span>
         </div>
-        <div className="mt-2 flex flex-wrap gap-1.5">
+        {pilotContext === undefined && <div className="mt-2 flex flex-wrap gap-1.5">
           <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">상대적 지위 · {quest.context.pdr.p}</span>
           <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">친숙도 · {quest.context.pdr.d}</span>
           <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">부담 · {quest.context.pdr.r.replace(/^부담\s*/, "")}</span>
-        </div>
+        </div>}
       </summary>
       <div className="space-y-3 border-t border-[#E2DED4] px-4 py-4 sm:px-5">
-        <div>
+        {pilotContext === undefined && <div>
           <p className="text-[11px] font-black text-[#707A8B]">상황</p>
           <p className="mt-1 text-sm leading-6">{quest.context.situation}</p>
-        </div>
+        </div>}
         <div>
           <p className="text-[11px] font-black text-[#707A8B]">{mission.sourceLanguage.label} 원문</p>
           <p className={`${sourceFont} mt-1 text-sm font-bold leading-6`}>{quest.source}</p>
@@ -1332,11 +1314,22 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
 }) {
   const runtime = useRuntimeMission();
   const mission = useCanonicalMission();
+  const localPilot = mission === LEARNER_UX_PILOT;
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const first = response?.first ?? "";
-  const [ready, setReady] = useState(false);
-  const previewEvaluation = useMemo(() => evaluateDct(quest, first), [first, quest]);
+  const [ready, setReady] = useState(localPilot);
+  const previewEvaluation = useMemo<DctEvaluation>(() => localPilot ? {
+    // Authored display guidance only. Never inspect the answer or persist this as an evaluation.
+    available: false,
+    criteria: [{ key: "meaning", label: "의미 전달", question: "원문의 내용과 확정성을 유지했나요?", level: "recommend", body: quest.feedback.action }],
+    headline: "원문과 비교해 내 번역을 확인해 보세요.",
+    body: quest.feedback.action,
+    feedback: quest.feedback.action,
+    highlights: [],
+    example: quest.referenceAnswer,
+    takeaway: quest.feedback.action,
+  } : evaluateDct(quest, first), [first, localPilot, quest]);
   const [evaluation, setEvaluation] = useState<DctEvaluation>(previewEvaluation);
   const [runtimeFeedback, setRuntimeFeedback] = useState<RuntimeFeedback | undefined>(response?.runtimeFeedback);
   const [revised, setRevised] = useState(() => devAutofill ? quest.referenceAnswer : first);
@@ -1352,6 +1345,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }, [demoFillRequest, first, quest]);
   useEffect(() => {
     let cancelled = false;
+    if (localPilot) {
+      setEvaluation(previewEvaluation);
+      setReady(true);
+      return;
+    }
     setReady(false);
     if (runtime) {
       void requestFeedback(runtime.mission, first).then((result) => {
@@ -1374,7 +1372,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     }
     const timer = window.setTimeout(() => setReady(true), 1250);
     return () => window.clearTimeout(timer);
-  }, [first, mission.targetLanguage.label, outputName, previewEvaluation, quest, runtime]);
+  }, [first, localPilot, mission.targetLanguage.label, outputName, previewEvaluation, quest, runtime]);
   useEffect(() => {
     if (!revisionOpen) return;
     const timer = window.setTimeout(() => revisionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
@@ -1387,14 +1385,14 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const feedbackUnavailable = evaluation.available === false;
   const needsChange = feedbackNeedsRevision(evaluation);
   const primaryCriterion = primaryFeedbackCriterion(evaluation.criteria);
-  const overallHeadline = feedbackUnavailable
+  const overallHeadline = localPilot ? previewEvaluation.headline : feedbackUnavailable
     ? "자동 피드백을 확인하지 못했습니다."
     : primaryCriterion.level === "required"
       ? "다시 살펴봐야 합니다."
       : primaryCriterion.level === "recommend"
         ? "한 가지만 고치면 됩니다."
         : "이대로 확정해도 좋습니다.";
-  const overallBadge = feedbackUnavailable
+  const overallBadge = localPilot ? "AI 미실행" : feedbackUnavailable
     ? "판정 보류"
     : `${primaryCriterion.label} · ${FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}`;
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
@@ -1405,7 +1403,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     first,
     revised: first.trim(),
     reflected: false,
-    evaluation,
+    evaluation: localPilot ? undefined : evaluation,
     runtimeFeedback,
     dissent,
   });
@@ -1441,20 +1439,20 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             </div>
 
             <div className="border-t border-[#E6E1D6] p-4 sm:p-5">
-              <article className={`rounded-xl border p-4 ${FEEDBACK_LEVEL_CARD_STYLE[primaryCriterion.level]}`}>
+              <article className={`rounded-xl border p-4 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[primaryCriterion.level]}`}>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-xs font-black text-[#4F5B6E]">먼저 확인할 한 가지 · {primaryCriterion.label}</h3>
-                  <span className={`rounded-full px-2 py-1 text-[10px] font-black ${FEEDBACK_LEVEL_STYLE[primaryCriterion.level]}`}>{FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</span>
+                  {!localPilot && <span className={`rounded-full px-2 py-1 text-[10px] font-black ${FEEDBACK_LEVEL_STYLE[primaryCriterion.level]}`}>{FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</span>}
                 </div>
                 <p className="mt-3 text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                 <FeedbackRemainder text={primaryCriterion.body} />
               </article>
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-5 py-3 text-[11px] leading-5 text-[#6D7788]">AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다.</p>
+            <p className="border-t border-[#EEEAE1] px-5 py-3 text-[11px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
-          <MissionDissentPanel onSubmit={setDissent} />
+          {!localPilot && <MissionDissentPanel onSubmit={setDissent} />}
 
           {revisionOpen ? (
             <>
@@ -1462,11 +1460,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-black text-[#776727]">다시 다듬기</p>
-                    <h2 className="mt-1 text-lg font-black">피드백을 반영해 다시 써보세요.</h2>
+                    <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : "피드백을 반영해 다시 써보세요."}</h2>
                   </div>
                   {needsChange && <span className={`rounded-full px-2.5 py-1 text-[10px] font-black ${FEEDBACK_LEVEL_STYLE[primaryCriterion.level]}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</span>}
                 </div>
-                {needsChange && (
+                {(needsChange || localPilot) && (
                   <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     <FeedbackRemainder text={primaryCriterion.body} />
@@ -1477,7 +1475,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="grid gap-2">
-                  <Button className={`h-12 ${actionButton}`} disabled={!canConfirmRevision} onClick={() => onDone({ first, revised: revised.trim(), reflected, evaluation, runtimeFeedback, dissent })}>{reflected ? "수정안 확정하기" : needsChange ? "피드백을 반영해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-12 ${actionButton}`} disabled={!canConfirmRevision} onClick={() => onDone({ first, revised: revised.trim(), reflected, evaluation: localPilot ? undefined : evaluation, runtimeFeedback, dissent })}>{reflected ? "수정안 확정하기" : needsChange ? "피드백을 반영해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {needsChange && !reflected && canRetainWithDissent && (
                     <Button variant="outline" className="h-11 w-full" onClick={retainFirstResponse}>수정하지 않고 첫 {outputName} 유지하기</Button>
                   )}
@@ -1494,8 +1492,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 </div>
               ) : (
                 <div className="grid gap-2">
-                  <Button className="h-12 w-full" onClick={() => onDone({ first, revised: first.trim(), reflected: false, evaluation, runtimeFeedback, dissent })}>이 {outputName}으로 확정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                  <Button variant="outline" className="h-11 w-full" onClick={() => setRevisionOpen(true)}>다른 표현도 시도해보기</Button>
+                  <Button className="h-12 w-full" onClick={() => onDone({ first, revised: first.trim(), reflected: false, evaluation: localPilot ? undefined : evaluation, runtimeFeedback, dissent })}>이 {outputName}으로 확정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button variant="outline" className="h-11 w-full" onClick={() => setRevisionOpen(true)}>{localPilot ? "한 번 다듬어보기" : "다른 표현도 시도해보기"}</Button>
                 </div>
               )}
             </ActionBar>
@@ -1643,7 +1641,6 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
 }) {
   if (quest.kind === "free_correction") return <FreeCorrectionView quest={quest} onDone={onDone} />;
   if (quest.kind === "spectrum") return <SpectrumView quest={quest} onDone={onDone} />;
-  if (localPilot && quest.kind === "dct_feedback") return <PilotDctReferenceView quest={quest} response={responses[quest.dctId] as DctResponse | undefined} onDone={onDone} />;
   if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} correctionOnly={localPilot} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
