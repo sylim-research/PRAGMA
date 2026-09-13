@@ -1,5 +1,14 @@
 # PRAGMA 연구 증거 색인
 
+## EVD-20260914-01 · 7/22 학습 미션 프로토타입 원본과 변천 대조
+
+- 원본: 커밋 `473b1235`(2026-07-22)의 `src/pages/learner/PrototypeMissionV2.tsx`·`src/lib/mission/protoMissionV2.ts`.
+  main `54a868d1`에도 개발 환경 전용 경로 `/prototype/mission-v2`로 남아 있다.
+- 대조: `docs/dev-log/2026-09-14-0722-prototype-rediscovery.md` 2절. 요소별로 확인된 결정 ID·커밋만 연결했고,
+  기록을 찾지 못한 전환(과잉공손 전용 척도·자유 교정 폐기, 5점→4점 시점)은 미확인으로 표시했다.
+- 연구자 평가와 보고·승인 경위는 사용자 진술이다. 학습자 비교·학습 효과·소요 시간 측정 증거가 아니며,
+  앱·프롬프트·콘텐츠·DB 변경은 없다.
+
 ## EVD-20260910-09 · 장면·PDR 생성 경로와 조사 파손 감사
 
 - 보고: `docs/dev-log/2026-09-10-scene-pdr-pipeline-audit.md`. 조건 선지정, 역할/시드,
