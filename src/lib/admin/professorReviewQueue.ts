@@ -22,7 +22,23 @@ export function professorQueueOf(
     : "in_progress";
 }
 
-const STAGE_STATUS: Record<Exclude<DashboardReviewQueueStage, "rules">, string> = {
+export type QualityCheckQueue = "needs_check" | "rules_error" | "decision";
+
+/**
+ * 자동 품질 점검 화면의 대기열. 같은 generated 미션을 점검 쪽에서 본 이름이다.
+ * decision은 교수자 최종 승인 화면의 「결정 대기」와 같은 집합이고, rules_error는
+ * 대시보드 countRulesFailures와 같은 조건(최신 run의 규칙 검사 fail)이다.
+ */
+export function qualityCheckQueueOf(
+  row: DashboardScenarioRow,
+  runs: readonly DashboardReviewRunRow[],
+): QualityCheckQueue {
+  if (professorQueueOf(row, runs) === "decision") return "decision";
+  if (isDashboardReviewTarget(row) && latestDashboardReviewRun(row, runs)?.rules_verdict === "fail") return "rules_error";
+  return "needs_check";
+}
+
+const STAGE_STATUS:Record<Exclude<DashboardReviewQueueStage, "rules">, string> = {
   openai: "규칙 통과 · AI 검토 전",
   claude: "규칙 통과 · AI 검토 완료 · 추가 모델 검토 전",
   adjudication: "규칙 통과 · 추가 모델 의견 재검토 전",

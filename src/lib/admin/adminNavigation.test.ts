@@ -70,15 +70,15 @@ describe("admin navigation reachability", () => {
     // handoffHref가 주어지면 승인 절과 승인 버튼이 렌더되지 않는다.
     expect(panel).toContain('next === "professor" && !handoffHref');
     expect(panel).toContain('!(handoffHref && next === "professor")');
-    expect(panel).toContain("교수자 최종 승인 화면에서 열기");
+    expect(panel).toContain("교수자 최종 승인에서 이 미션 열기");
 
     const assembly = readFileSync(
       resolve(process.cwd(), "src/pages/admin/AdminAssembly.tsx"),
       "utf8",
     );
     expect(assembly).toContain("handoffHref={`/admin/review?scenarioId=${r.scenario_id}`}");
-    // 조립 화면도 승인을 넘긴다.
-    expect(assembly).toContain("approvalHref={reviewMode ? undefined :");
+    // 조립 화면은 승인하지 않고 같은 미션을 품질 점검 화면으로 넘긴다.
+    expect(assembly).toContain("approvalHref={`/admin/ai-review?scenarioId=${r.scenario_id}`}");
   });
 
   it("keeps a route or compatibility route for every restored entry", () => {
