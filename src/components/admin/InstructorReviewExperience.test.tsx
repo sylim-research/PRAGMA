@@ -41,6 +41,24 @@ describe("instructor experience", () => {
     expect(screen.queryByText(/이 부분의 AI·규칙 문제 항목/)).not.toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "현재 문항 감수 메모" })).toHaveAttribute("rows", "7");
   });
+  it("offers only 확인 and 수정 요청, saves a note typed before judging with the judgment, and keeps legacy 보류 read-only", async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    const legacy: ReviewInspection = { ...inspection(), run: { instructor_experience: { version: "instructor_experience_v1", active_seconds: 30,
+      decisions: [{ section: "mjt-0", status: "defer", note: "예전 메모" }] } } as unknown as ReviewInspection["run"] };
+    render(<MemoryRouter><InstructorReviewExperience inspection={legacy} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
+    expect(screen.queryByRole("button", { name: "보류" })).not.toBeInTheDocument();
+    const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
+    expect(within(nav).getByText("보류(기존 기록)")).toBeInTheDocument();
+    expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
+    fireEvent.change(screen.getByRole("textbox", { name: "현재 문항 감수 메모" }), { target: { value: "도입 문구를 줄이면 좋겠습니다." } });
+    expect(onSave).not.toHaveBeenCalled();
+    expect(screen.getByText("확인 또는 수정 요청을 누르면 메모가 함께 저장됩니다.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [
+      { section: "mjt-0", status: "defer", note: "예전 메모" },
+      { section: "scene", status: "revision_required", note: "도입 문구를 줄이면 좋겠습니다." },
+    ] })));
+  });
   it("keeps the fixed v5 section labels", () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={vi.fn()} onReady={vi.fn()} /></MemoryRouter>);
     const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
