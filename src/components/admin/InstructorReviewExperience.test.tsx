@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { InstructorReviewExperience } from "./InstructorReviewExperience";
@@ -41,6 +41,54 @@ describe("instructor experience", () => {
     render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="mjt-2" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     for (const correction of SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[2].corrections) expect(screen.getByText(correction.text)).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled();
+  });
+  it("lets the professor preview change the v6 MJT2 judgment after a reason, as learners can", () => {
+    const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
+    render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="mjt-1" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "다소 적절" })); fireEvent.click(screen.getByRole("button", { name: "판단 확정하기" }));
+    expect(screen.queryByRole("button", { name: "다소 부적절" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
+    fireEvent.click(screen.getByRole("button", { name: "다소 부적절" }));
+    fireEvent.click(screen.getByRole("button", { name: "판단과 이유 확인하기" }));
+    expect(within(screen.getByRole("button", { name: /다소 부적절/ })).getByText("내 선택")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /다소 적절/ })).queryByText("내 선택")).not.toBeInTheDocument();
+  });
+  it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
+    const v6 = (learner_level: "intermediate" | "advanced"): ReviewInspection => ({ ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } });
+    const task = SAMPLE_MISSION_V6_REASON_CONTRAST.production_task;
+    const { unmount } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6("intermediate"))} section="scene" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+    expect(screen.getByText(/다섯 문항을 마친 뒤 새로운 상황의 원문을 직접 옮기고/)).toBeInTheDocument();
+    expect(screen.queryByText(task.situation_ko)).not.toBeInTheDocument();
+    expect(screen.queryByText("상대·관계")).not.toBeInTheDocument();
+    unmount();
+    for (const level of ["intermediate", "advanced"] as const) {
+      const { unmount: close } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6(level))} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+      expect(screen.getByText("단어 힌트 보기")).toBeInTheDocument();
+      for (const hint of task.vocabulary_hints!) expect(screen.getByText(hint.target)).toBeInTheDocument();
+      close();
+    }
+  });
+  it("continues a v6 DCT preview through feedback, revision and final confirm without AI or saving", async () => {
+    const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
+    render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+    const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
+    fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
+    // Same stage order as the learner runner: feedback → revision → final confirm.
+    expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(screen.getByText("AI 미실행")).toBeInTheDocument();
+    expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 참고 피드백을 받습니다/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
+    fireEvent.click(screen.getByRole("button", { name: /수정안 확정하기/ }));
+    const final = screen.getByRole("region", { name: "최종 확정 미리보기" });
+    expect(within(final).getByText(first)).toBeInTheDocument();
+    expect(within(final).getByText(revised)).toBeInTheDocument();
+    expect(effects.feedback).not.toHaveBeenCalled(); expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled();
   });
   it("keeps all confirmation states incomplete when a hold exists", () => {
     const value = { version: "instructor_experience_v1" as const, active_seconds: 20, decisions: EXPERIENCE_SECTIONS.map(({ id }) => ({ section: id, status: "checked" as const, note: "" })) };
