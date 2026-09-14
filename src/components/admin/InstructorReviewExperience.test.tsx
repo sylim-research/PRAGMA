@@ -29,6 +29,23 @@ describe("instructor experience", () => {
     expect(onReady).not.toHaveBeenCalledWith(true);
     expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled(); expect(effects.feedback).not.toHaveBeenCalled();
   });
+  it("names v6 sections by their v6 roles, summarizes progress, and drops the duplicate findings box", async () => {
+    const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
+    render(<MemoryRouter><InstructorReviewExperience inspection={v6} onSave={vi.fn()} onReady={vi.fn()} /></MemoryRouter>);
+    const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
+    const v6Labels = ["미션 안내", "1. 적절성 판단", "2. 새 장면 판단 · 이유", "3. 선택교정", "4. 자유교정 · 대조", "5. 후보별 적절성 판단", "핵심 정리", "직접 통번역 · DCT"];
+    expect(within(nav).getAllByRole("button").map((button) => button.firstElementChild?.textContent)).toEqual(v6Labels);
+    for (const old of ["4. 이유 찾기", "5. 여러 초안 비교", "문항별 핵심"]) expect(within(nav).queryByText(old)).not.toBeInTheDocument();
+    expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
+    expect(screen.queryByText(/이 부분의 AI·규칙 문제 항목/)).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "현재 문항 감수 메모" })).toHaveAttribute("rows", "7");
+  });
+  it("keeps the fixed v5 section labels", () => {
+    render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={vi.fn()} onReady={vi.fn()} /></MemoryRouter>);
+    const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
+    expect(within(nav).getAllByRole("button").map((button) => button.firstElementChild?.textContent)).toEqual(EXPERIENCE_SECTIONS.map((item) => item.label));
+  });
   it("shows every candidate explanation without requiring a student answer", async () => {
     const model = viewModelFromReview(inspection());
     render(<MemoryRouter><CanonicalReviewStage mission={model} section="mjt-4" revealAnswers onNext={vi.fn()} /></MemoryRouter>);

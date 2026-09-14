@@ -738,8 +738,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const isAssembling = busy === r.scenario_id && assemblyProgress?.id === r.scenario_id;
     const loaded = preview[r.scenario_id];
     // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
+    // The final-approval screen already implies the review stage, so the header omits pipeline status.
     const metaLine = reviewMode
-      ? [missionVersionLabel(r.mission_schema_version), info?.placement, info?.progress, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
+      ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
       : [STATE_KO[st], ...context];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
