@@ -25,6 +25,7 @@ export function ProfessorMissionWorkbench({
   onSave,
   onReview,
   approvalHref,
+  traceHash,
 }: {
   scenarioId: string;
   mission: LearnerMissionRuntime;
@@ -36,6 +37,8 @@ export function ProfessorMissionWorkbench({
    * 링크를 보여 준다 — 미션을 만드는 자리와 승인하는 자리를 가른다.
    */
   approvalHref?: string;
+  /** 미션 콘텐츠 해시 전체. 승인 흐름의 세부 추적 정보에 그대로 남긴다. */
+  traceHash?: string | null;
 }) {
   const initialItems = useMemo(
     () => mission.mpj_items.map((item) => JSON.stringify(item, null, 2)),
@@ -90,19 +93,7 @@ export function ProfessorMissionWorkbench({
   const canReview = overrides.every((override) => override.rationale_ko.length >= 10);
   const dirty = referenceText !== initialReferences || itemTexts.some((text, index) => text !== initialItems[index]);
 
-  return (
-    <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수</h4>
-          <p className="mt-0.5 text-[12px] text-muted-foreground">
-            학생에게 제시할 화면과 참고 판정을 확인하고, 수정·유지·보류를 판단합니다.
-            수정한 내용은 저장해야 하며, <b>수정 저장은 최종 승인이 아닙니다.</b>
-          </p>
-        </div>
-      </div>
-
-      {failFindings.length > 0 && (
+  const failFindingsBlock = failFindings.length > 0 && (
         <div className="mt-3 space-y-2 rounded-lg border border-red-200 bg-red-50 p-3">
           <p className="font-semibold text-red-900">남은 AI 결함 {failFindings.length}건</p>
           {failFindings.map(({ finding, issueIndex }) => (
@@ -122,10 +113,18 @@ export function ProfessorMissionWorkbench({
             </label>
           ))}
         </div>
-      )}
+  );
 
+  const editor = (
       <details className="mt-3 rounded-lg border border-[#E3E6E7] bg-[#FAFBFB] p-3">
-        <summary className="cursor-pointer font-medium text-[#34444D]">문항 block 직접 수정</summary>
+        <summary className="cursor-pointer font-medium text-[#34444D]">
+          {approvalHref ? "문항 block 직접 수정" : "원본 수정하기 · 문항 block 직접 수정"}
+        </summary>
+        {!approvalHref && (
+          <p className="mt-2 text-[12px] text-muted-foreground">
+            수정본은 구조검사·AI 재점검을 거쳐 새 버전으로 저장되며, <b>수정 저장은 최종 승인이 아닙니다.</b>
+          </p>
+        )}
         <div className="mt-3 space-y-3">
           {itemTexts.map((text, itemIndex) => (
             <label key={itemIndex} className="block">
@@ -154,16 +153,23 @@ export function ProfessorMissionWorkbench({
           </Button>
         </div>
       </details>
-      {!approvalHref && (
-        <div className="mt-4 border-t border-[#E3E6E7] pt-3">
-          <h4 className="text-[14px] font-bold text-[#233542]">② 최종 승인</h4>
-          <p className="mt-0.5 text-[12px] text-muted-foreground">
-            감수를 마친 <b>이 버전</b>에 수업 사용·학습자 공개 자격을 부여하는 결정입니다.
-            내용을 다시 고치면 새 버전이 되어 점검과 승인을 다시 거칩니다.
-          </p>
+  );
+
+  // 미션을 만드는 자리(approvalHref)는 기존 배치 그대로 둔다.
+  if (approvalHref) {
+    return (
+      <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수</h4>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">
+              학생에게 제시할 화면과 참고 판정을 확인하고, 수정·유지·보류를 판단합니다.
+              수정한 내용은 저장해야 하며, <b>수정 저장은 최종 승인이 아닙니다.</b>
+            </p>
+          </div>
         </div>
-      )}
-      {approvalHref ? (
+        {failFindingsBlock}
+        {editor}
         <div className="mt-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
           <p className="text-[#3F4E57]">
             이 화면은 미션을 만들고 고치는 자리입니다. 자동 품질 점검과 AI 검토를 거쳐 교수자가 콘텐츠를
@@ -173,12 +179,24 @@ export function ProfessorMissionWorkbench({
             교수자 최종 승인 화면에서 열기 →
           </Link>
         </div>
-      ) : (
-        <ContentReviewPanel experiential target={{ kind: "mission", targetId: scenarioId }}
-          refreshKey={mission.provenance?.mission_content_hash ?? "draft"}
-          approvalDisabled={busy || !canReview || dirty}
-          onApprove={(approval) => onReview(overrides, approval)} />
-      )}
+      </section>
+    );
+  }
+
+  // 교수자 최종 승인: ① 내용 확인 → ② 판정 → ③ 승인을 한 흐름으로 두고, 원본 수정은 흐름 아래 접어 둔다.
+  return (
+    <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h4 className="text-[14px] font-bold text-[#233542]">교수자 감수·최종 승인</h4>
+        <p className="text-[12px] text-muted-foreground">① 내용 확인 → ② 판정 → ③ 승인</p>
+      </div>
+      <ContentReviewPanel experiential target={{ kind: "mission", targetId: scenarioId }}
+        refreshKey={mission.provenance?.mission_content_hash ?? "draft"}
+        approvalDisabled={busy || !canReview || dirty}
+        missionContentHash={traceHash ?? mission.provenance?.mission_content_hash}
+        decisionSlot={failFindingsBlock || undefined}
+        onApprove={(approval) => onReview(overrides, approval)} />
+      {editor}
     </section>
   );
 }
