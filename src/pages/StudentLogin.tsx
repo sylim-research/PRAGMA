@@ -60,41 +60,25 @@ const StudentLogin = () => {
           </p>
         ) : (
           <>
-            {/* 로그인은 학습의 목적이 아니라 입구다. 왼쪽은 무엇을 하는 곳인지(학습 흐름),
-                오른쪽은 인증 행동만 둔다. 인증 우회는 접근 정책에 따라 제공하지 않는다. */}
-            <section className="grid w-full max-w-[760px] overflow-hidden rounded-2xl border border-[#E8E4D8] bg-white shadow-sm md:grid-cols-[1.05fr_1fr]">
-              <div className="flex flex-col gap-5 bg-[#15202B] px-7 py-7 text-[#E9ECEF] sm:px-9 sm:py-10">
-                <p className="text-[11.5px] font-bold tracking-[0.14em] text-[#FAD338]">학습자 영역</p>
-                <h1 className="break-keep text-[28px] font-bold leading-[1.2] tracking-[-0.025em] text-white">
+            {/* 로그인은 학습의 목적이 아니라 입구다. 역할 → 학습 가치 → 인증 행동의
+                순서로 읽히게 하고, 인증 우회는 접근 정책에 따라 제공하지 않는다. */}
+            <section className="w-full max-w-[420px] overflow-hidden rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white shadow-sm">
+              <div className="px-7 pb-6 pt-7 sm:px-8 sm:pt-8">
+                <h1 className="break-keep text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">
                   학습 시작하기
                 </h1>
-                <ol className="hidden gap-3.5 text-[14px] leading-snug text-[#C5CDD5] sm:grid">
-                  {["표현을 비교해 판단합니다", "직접 번역·통역합니다", "피드백을 보고 다듬습니다"].map((step, index) => (
-                    <li key={step} className="flex items-center gap-3">
-                      <span
-                        aria-hidden
-                        className="grid h-6 w-6 shrink-0 place-items-center rounded-full border border-[#3E4C5A] text-[11.5px] font-bold text-[#FAD338]"
-                      >
-                        {index + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-                <p className="break-keep text-balance border-t border-[#2A3844] pt-4 text-[13px] leading-relaxed text-[#95A2B0] md:mt-auto">
-                  그 과정이 학습 기록에 저장돼 다음에 이어서 할 수 있습니다.
+                <p className="mt-2 break-keep text-[13.5px] leading-relaxed text-[#6B665C]">
+                  기록을 저장해 다음에 이어서 할 수 있습니다.
                 </p>
-              </div>
 
-              <div className="flex flex-col justify-center gap-4 px-7 py-7 sm:px-9 sm:py-10">
                 <button
                   type="button"
                   onClick={handleGoogle}
                   disabled={busy}
                   aria-busy={busy}
-                  className="flex min-h-[52px] w-full items-center justify-center gap-3 rounded-[10px] bg-[#FAD338] px-5 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_1px_0_rgba(21,32,43,0.12)] transition-colors hover:bg-[#F2C81F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                  className="mt-6 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-[10px] bg-[#15202B] px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#22303E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
                 >
-                  <span aria-hidden className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white">
+                  <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
                     <svg viewBox="0 0 48 48" className="h-5 w-5">
                       <path
                         fill="#EA4335"
@@ -117,7 +101,7 @@ const StudentLogin = () => {
                   <span>{busy ? "Google로 이동하는 중…" : "Google 계정으로 로그인"}</span>
                 </button>
 
-                <ul className="grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
+                <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
                   {["학교·개인 Google 계정 모두 사용할 수 있습니다.", "같은 계정으로 로그인해야 기록이 이어집니다."].map((note) => (
                     <li key={note} className="flex items-start gap-2 break-keep">
                       <Check aria-hidden size={15} strokeWidth={2.2} className="mt-[1px] shrink-0 text-[#2F6B4F]" />
@@ -125,12 +109,16 @@ const StudentLogin = () => {
                     </li>
                   ))}
                 </ul>
+              </div>
 
+              <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE0] bg-[#FBFAF6] px-7 py-3 text-[12.5px] text-[#8A8578] sm:px-8">
+                <span>개인정보처리방침</span>
                 <Link
                   to="/privacy"
-                  className="self-start rounded-sm text-[12.5px] text-[#8A8578] underline underline-offset-2 transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
+                  aria-label="개인정보처리방침 보기"
+                  className="rounded-sm font-medium text-[#6B665C] underline underline-offset-2 transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
                 >
-                  개인정보처리방침
+                  보기
                 </Link>
               </div>
             </section>
