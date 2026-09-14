@@ -44,6 +44,7 @@ import {
   CURRENT_FEEDBACK_PROMPT_VERSIONS,
   CURRENT_ITEM_LINEAGE_PROMPT_VERSION,
   CURRENT_MISSION_QUALITY_PROMPT_VERSION,
+  MISSION_V6_QUALITY_PROMPT_VERSION,
   CURRENT_MISSION_PROMPT_VERSIONS,
 } from '../_shared/contentRelease.ts'
 import {
@@ -3259,8 +3260,26 @@ function buildQualitySystemPrompt(
   speechActKo: string,
   nativeMpj5 = true,
   isSpoken = false,
+  isV6 = false,
 ): string {
   const { src, tgt } = DIR_LANGS[direction]
+  if (isV6) return `너는 L2 화용 교육 자료의 품질 심사자다. 다음 mission_v6 요청 미션 한 건의 실제 결함과 근거만 보고하고 내용을 고치지 마라.
+방향은 ${LANG_KO[src]} → ${LANG_KO[tgt]}, 수행은 ${isSpoken ? '통역' : '번역'}이다.
+구조는 scale4 → scale4+inline reason → fix_choice → free_correction → multi_judge → DCT다.
+MJT 5개·수정안 3개·비교 후보 4개는 이 format의 계약이며 교육적 최적값이 아니다.
+원문의 의미·화행 목적·사실·확정성·요청 범위 보존을 먼저 본다. 표면 존칭·사과·길이만으로 판정하지 마라.
+MJT1/2의 target은 판단 대상이므로 비권장 표현일 수 있다. 해당 장면과 reference/accepted_scale_codes·해설이 일치하는지 본다.
+MJT2 reason_choice는 판단 후 선택하는 맥락별 이유 자료다. 정답 이유·단일 주원인·고정 taxonomy를 요구하지 않는다. 원문 쟁점과 무관하거나 피드백을 미리 누설하는 선택지는 지적한다.
+MJT3 is_valid=true는 의미를 보존하면서 상황에 맞게 쓸 수 있는 수정안이다. false에는 의미 범위·사실을 바꾸는 오답도 포함할 수 있으며 note_ko가 실제 문제를 정확히 설명해야 한다. 적절안 유일성은 요구하지 않는다.
+MJT4는 학습자가 직접 고친다. 참고안은 원문 의도·사실을 보존해야 하며 유일 정답이 아니다. 선택적 contrast는 같은 의미·목적에 맥락 조건 하나가 달라진 가능한 목표어 표현이다. 방어 가능한 대조가 없으면 생략 가능하다.
+MJT5는 네 후보 각각의 band를 독립 판단한다. 복수 적절을 허용하며 적절 후보 수·band 분포·BEST/WORST·후보 간 우열을 강제하지 않는다.
+공유 Anchor, relation-pair, diagnostic_dimensions, v5 주원인 문항을 요구하지 않는다.
+장면·관계·매체의 개연성, 원문과 목표어의 자연성, 판단·수정안·해설·참고 표현의 정합을 해당 문항 원문에서 확인하라.
+DCT는 코어 원문·PDR·usable_facts를 따른다. 통역이면 실제 발화 상황과 spoken 원문을 확인한다.
+취향·변이를 결함으로 세지 말고 학습자가 잘못 배우게 되는 경우만 보고하라. 확신이 없으면 warning으로 남겨라.
+기존 결과 형식의 JSON만 출력:
+{"verdict":"pass|warning|fail","summary_ko":"짧은 요약","findings":[{"code":"gate1_violation|implausible_distractor|answer_cue|band_mismatch|unnatural_language|internal_inconsistency|scene_underspecified|implausible_scene|feedback_quality_mismatch","severity":"warning|fail","where":"mpj_items[0] 등 실제 문항 경로","note_ko":"현재 원문의 실제 인용과 결함 근거"}]}
+새 점수·코드를 만들지 마라. 문제가 없으면 findings=[]이다.`
   const politenessMarkers = tgt === 'zh'
     ? '请·谢谢·不好意思·호칭·완화어'
     : '존댓말 종결형·감사·사과·호칭·완화어'
@@ -4720,12 +4739,14 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const isSpoken = productionTask.mode === 'interpreting' || productionTask.source_modality === 'spoken'
       const nativeMpj5 = missionRecord.schema_version === 'mission_v5' &&
         Array.isArray(missionRecord.mpj_items) && missionRecord.mpj_items.length === 5
-      const sys = buildQualitySystemPrompt(dir, actKo, nativeMpj5, isSpoken)
+      const isV6 = missionRecord.schema_version === 'mission_v6'
+      const qualityVersion = isV6 ? MISSION_V6_QUALITY_PROMPT_VERSION : CURRENT_MISSION_QUALITY_PROMPT_VERSION
+      const sys = buildQualitySystemPrompt(dir, actKo, nativeMpj5, isSpoken, isV6)
       const usr = buildQualityUserPrompt(b)
       const model = CRITIC_PRIMARY_MODEL
       const att = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey, sys, usr, 0.2, {
         telemetry: telemetryFor('mission_critic', true, {
-          promptVersion: CURRENT_MISSION_QUALITY_PROMPT_VERSION,
+          promptVersion: qualityVersion,
         }),
       })
       if (!att.ok) {
@@ -4864,10 +4885,10 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
             findings,
             mission_content_hash: missionContentHash,
             model,
-            prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION,
+            prompt_version: qualityVersion,
             checked_at: checkedAt,
           },
-          meta: { provider: PROVIDER, model, prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION, generated_at: checkedAt },
+          meta: { provider: PROVIDER, model, prompt_version: qualityVersion, generated_at: checkedAt },
         }),
         { status: 200, headers: jsonHeaders },
       )

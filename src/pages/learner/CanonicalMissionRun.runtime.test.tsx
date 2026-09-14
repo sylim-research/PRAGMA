@@ -5,6 +5,7 @@ import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { SAMPLE_MISSION_V5, SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
+import { SAMPLE_MISSION_V6_REASON_CONTRAST } from "@/lib/mission/missionV6Sample";
 import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
 import { requestFeedback } from "@/lib/mission/missionFeedback";
 import { saveMissionAttempt } from "@/lib/mission/missionLog";
@@ -37,6 +38,21 @@ import CanonicalMissionRun, {
 } from "@/pages/learner/CanonicalMissionRun";
 
 describe("CanonicalMissionRun live CTA route", () => {
+  it("opens an actual v6 runtime with no responses and keeps save validation strict", () => {
+    window.scrollTo = vi.fn();
+    const runtime = { scenario_id: scenarioId, speech_act: "request" as const, learner_level: "intermediate" as const,
+      mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh" as const,
+      mission: SAMPLE_MISSION_V6_REASON_CONTRAST };
+    render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)}
+      runtime={runtime} isDevPreview={false} /></MemoryRouter>);
+    expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("button", { name: "매우 적절" }));
+    fireEvent.click(screen.getByRole("button", { name: "답안 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: /^다음:/ }));
+    expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
+    expect(saveMissionAttempt).not.toHaveBeenCalled();
+    expect(() => buildRuntimeMpjTraces(runtime, {})).toThrow();
+  });
   beforeEach(() => {
     vi.clearAllMocks();
     window.scrollTo = vi.fn();
@@ -184,7 +200,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByText(/^상대적 지위 · /)).toBeInTheDocument();
     expect(screen.getByText(/^친숙도 · /)).toBeInTheDocument();
     expect(screen.getByText(/^부담 · /)).toBeInTheDocument();
-    expect(fetchMissionByScenario).toHaveBeenCalledWith(scenarioId);
+    expect(fetchMissionByScenario).toHaveBeenCalledWith(scenarioId, { includeV6: true });
   });
 
   it.each([

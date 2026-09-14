@@ -1,0 +1,44 @@
+import { z } from "zod";
+import { ScaleCodeV6, SpectrumCodeV6, type MissionV6 } from "@/lib/pragma/missionV6";
+import type { MpjResponseTrace } from "./missionAttemptRow";
+
+const base = { completed_at: z.string().datetime() };
+const scale = z.object({ ...base, item_type: z.literal("scale4"), scale_code: ScaleCodeV6 }).strict();
+export const MissionV6ResponsesSchema = z.tuple([
+  scale.extend({ item_id: z.literal(1) }),
+  scale.extend({ item_id: z.literal(2), reason_id: z.string().min(1).optional() }),
+  z.object({ ...base, item_id: z.literal(3), item_type: z.literal("fix_choice"), correction_indexes: z.array(z.number().int().min(0).max(2)).length(1) }).strict(),
+  z.object({ ...base, item_id: z.literal(4), item_type: z.literal("free_correction"), revised_text: z.string().refine(value => value.trim().length > 0, "A submitted correction is required") }).strict(),
+  z.object({ ...base, item_id: z.literal(5), item_type: z.literal("multi_judge"), candidate_band_codes: z.array(SpectrumCodeV6).length(4) }).strict(),
+]);
+
+/** Validate membership against the exact content, without judging the reason. */
+export function parseMissionV6Responses(mission: MissionV6, input: unknown): MpjResponseTrace[] {
+  const parsed = MissionV6ResponsesSchema.parse(input);
+  const choices = mission.mpj_items[1].reason_choice?.options;
+  const selected = parsed[1].reason_id;
+  if (choices ? !choices.some(choice => choice.id === selected) : selected !== undefined) {
+    throw new z.ZodError([{ code: z.ZodIssueCode.custom, path: [1, "reason_id"],
+      message: "Select one reason from this mission's MJT2 choices" }]);
+  }
+  return parsed as MpjResponseTrace[];
+}
+
+/** Read actual choices, never reference answers. Existing v5 mapping is separate. */
+export function buildMissionV6Responses(mission: MissionV6, responses: Record<string, unknown>, completedAt: string): MpjResponseTrace[] {
+  const response = (id: string) => (responses[id] ?? {}) as Record<string, unknown>;
+  const correctionIds = response("A3").correctionIds;
+  const picks = response("A5").candidateJudgments as Record<string, unknown> | undefined;
+  const trace = (index: number, values: Record<string, unknown>) => ({
+    item_id: mission.mpj_items[index].id, item_type: mission.mpj_items[index].type, completed_at: completedAt, ...values,
+  });
+  return parseMissionV6Responses(mission, [
+    trace(0, { scale_code: response("A1").pick }),
+    trace(1, { scale_code: response("A2").pick,
+      ...(response("A2").reasonId !== undefined ? { reason_id: response("A2").reasonId } : {}) }),
+    trace(2, { correction_indexes: Array.isArray(correctionIds)
+      ? correctionIds.map(id => mission.mpj_items[2].corrections.findIndex((_, index) => id === `A3-${index}`)) : undefined }),
+    trace(3, { revised_text: response("A4").revisedText }),
+    trace(4, { candidate_band_codes: mission.mpj_items[4].candidates.map((_, index) => picks?.[`A5-${index}`]) }),
+  ]);
+}

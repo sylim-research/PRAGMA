@@ -6,7 +6,7 @@ import { buildReviewPrompt, effectiveReviewSteps, instructionalMission, material
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
-import { CURRENT_CONTENT_RELEASE_ID, CURRENT_MISSION_QUALITY_PROMPT_VERSION } from "../../../supabase/functions/_shared/contentRelease";
+import { CURRENT_CONTENT_RELEASE_ID, CURRENT_MISSION_QUALITY_PROMPT_VERSION, MISSION_V6_QUALITY_PROMPT_VERSION } from "../../../supabase/functions/_shared/contentRelease";
 
 const snapshot = { content: { source: "请您参加活动。" }, criteria: { version: "test" } };
 const finding = { severity: "warning", where: "/content/source", quote: "请您参加活动。", issue_ko: "지적", reason_ko: "이유", suggestion_ko: "제안",
@@ -24,6 +24,16 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("current content five-stage review", () => {
+  it("reuses critic evidence only for the matching v5 or v6 instructional contract", () => {
+    const raw = { schema_version: "mission_v6", provenance: { mission_content_hash: "a".repeat(64) },
+      quality_check: { verdict: "pass", findings: [], model: "fixture", prompt_version: MISSION_V6_QUALITY_PROMPT_VERSION,
+        checked_at: "2026-09-14T00:00:00Z", mission_content_hash: "a".repeat(64) } };
+    expect(reusableGenerationQuality(raw)).not.toBeNull();
+    expect(reusableGenerationQuality({ ...raw, schema_version: "mission_v5" })).toBeNull();
+    const v5 = { ...raw, schema_version: "mission_v5", quality_check: { ...raw.quality_check, prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION } };
+    expect(reusableGenerationQuality(v5)).not.toBeNull();
+    expect(reusableGenerationQuality({ ...v5, schema_version: "mission_v6" })).toBeNull();
+  });
   it("reuses matching generation evidence and makes additional models opt-in", () => {
     const hash = "a".repeat(64);
     const quality = { verdict: "pass", findings: [], summary_ko: "완료", model: "gpt-4.1", prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION,

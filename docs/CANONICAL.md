@@ -26,12 +26,17 @@
 
 ## 최신 학습설계와 운영 구현의 구분
 
-최신 승인 학습설계는 **MJT5 + DCT1**이다. 다섯 MJT의 기능은
-`첫인상 판단 → 맥락 대비 판단 → 판단하고 고쳐보기 → 이유 찾기 → 여러 초안 비교`이며,
-localhost `CanonicalMissionRun`의 다섯 MJT를 설계 기준으로 삼는다. MJT5의 한 문항을 제거해 MJT4로
-되돌리는 것은 승인된 설계가 아니다.
+2026-09-14 사용자 결정으로 현재 구현된 `mission_v6`를 정식 mission format으로 채택했다
+(DEC-20260914-02). 요청 미션의 순서는 `scale4 → scale4 → fix_choice → free_correction → multi_judge → DCT`다.
+MJT 5개·MJT3 선택지 3개·MJT5 후보 4개는 이번 버전의 구현 계약이며 화용교육의 보편적 최적값으로
+해석하지 않는다. MJT4는 자유교정문, MJT5는 후보별 독립 band 판단을 수집한다.
+DEC-20260914-03은 MJT2 판단 확정 뒤 inline reason-choice 1회와 MJT4 피드백의 선택적 contrast 1회를
+추가한다. 문항 수는 유지하며 저작 원칙과 대표 1건의 구현 범위를 구별한다.
+정식 format 채택과 정상 승인·편성·DB 저장 연결 완료는 구별한다. 현재 연결 상태와 검증 근거는
+`docs/dev-log/2026-09-14-mission-v6-implementation-review.md`의 채택 후속 절을 따른다.
 
-현행 소스의 `mission_v5` 생성·검사·러너 계약도 승인된 **MJT5 + DCT1**에 동기화됐고
+아래 두 문단의 생성·문항·대역 계약은 **기존 `mission_v5`에 한정**하며 v6에 전용하지 않는다.
+기존 소스의 `mission_v5` 생성·검사·러너 계약은 **MJT5 + DCT1**에 동기화됐고
 운영 DB·Edge·Railway에 반영됐다. 신규 생성 순서는
 `scale4 → judge3 → fix_choice → reason → multi_judge`이고, 네이티브 응답은
 `mpj_response_v2`로 저장한다. 과거 `mission_v5` MJT4 행은 legacy 구현으로 읽기 호환하며

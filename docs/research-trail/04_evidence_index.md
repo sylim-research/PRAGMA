@@ -461,3 +461,16 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 교과목 18칸 착수분(run `scene_grounding_course_20260910`)의 사전 검토 결함 2건과 코어 17건 직접 검수: `docs/dev-log/2026-09-10-scene-grounding-gate.md`(결함·수정·배포)와 `docs/dev-log/2026-09-10-course-core-review.md`(검수 표). 규칙 검사 17/17 pass·AI 의미 검사 17/17 16축 pass인 자료에서 직접 검수가 재생성 1건·국소 수정 5건·관찰 2건을 찾았다. 특히 선행 발화의 부탁 행위자가 뒤바뀐 w6-1을 관련 5개 축이 모두 pass로 판정했다. **소수 표본이므로 오류율로 일반화하지 않으며**, 자동 검사가 교수자 최종 승인을 대신할 수 없다는 근거로만 쓴다. 원자료는 Git 미추적 로컬(`.tmp/scene-grounding/`)이다.
 - FABLE 인수 후 실제 실행(같은 README): 반대 v2 재작성(`prepare-opposition-v2.ts`, 유효 85자) → 사과·요청·반대 v2 의미 검사 `*-semantic.json` 3/3 pass(16축 근거 직접 확인) → `save-and-promote.ts`로 새 draft 코어 3행 저장(`*-saved.json`, 원본 보존) → 전체 MJT5+DCT1 승격 4건(`*-mission.json`): 사과·반대 v2·불만 자동 품질 pass, 요청 fail(문항 4 오답 「주원인 모호」, 수리 재통과 실패). 네 미션의 문항·정답·해설·DCT 정합성 직접 검수 판정은 README 표에 있다. 교수자 승인·공개·편성 0건이며 소수 표본이라 전수 품질 보증이 아니다. 교체 경로 실측(2주차 편성 1행에 로그 2건 귀속, 삭제 롤백)과 게이트는 인수인계 문서에 있다.
 - Reason 문항 오답 계약 정교화와 표적 수리(2026-09-11): `docs/research-trail/evidence/2026-09-11-reason-item-repair/`(README·`repair.ts` audit/repair/apply·자동 재감사 14건·사람 finding·교체 오답 14건·1차 수리 12건·2차 적용 14건)와 `docs/dev-log/2026-09-11-reason-item-contract-and-reaudit.md`. 결과 = 2차 적용 pass 2·fail 12, fail 8건의 원인은 공유 규칙 `REASON_DISCRIMINATION_RULE`이 옛 오답 정의(반박되는 오진)를 담아 생성·2차 critic 양쪽에 들어간 것. **「자동 검수 오류율」이 아니라 계약 정교화가 공유 규칙 한 곳에 미치지 않은 누락의 증거로만 쓴다.** 정렬본은 미배포·연구자 승인 대기, 사람 교체안은 교수자 승인이 아니다.
+
+## EVD-20260914-01 · v6 대표 요청의 이유 선택·맥락 대조
+
+- 결정: DEC-20260914-03. 코드·계약·대표 후보·응답 예·재현 명령은 `docs/dev-log/2026-09-14-mission-v6-reason-contrast.md`에서 추적한다.
+- 관련 6개 파일 61개 테스트, 타입 검사, 운영 모드 Vite bundle 통과. 생성 스냅샷 prebuild는 미실행. localhost HTTP 200과 실제 브라우저 MJT2/MJT4 노출 순서·좁은 화면 배치를 확인했다.
+- 응답 직렬화 후 reason_id·revised_text·candidate_band_codes 보존을 확인했다. 실제 DB 저장/재조회 증거는 아니며 운영 E2E 0/3, runtime/DB 호환성 검증 미완료다.
+- branch `codex/request-course-pilot-2026-09-14`, HEAD `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`의 미커밋 변경. 과거 environment-blocked 테스트 기록을 이번 결과로 소급하지 않는다.
+
+## EVD-20260914-02 · v6 정상 경로의 호환성 gate 확인
+
+- DEC-20260914-02의 실행 상태를 확인한 근거다. 전체 경로·파일/함수·최소 diff 후보·검증 한계는 `docs/dev-log/2026-09-14-mission-v6-normal-path-compatibility-map.md`에 기록했다.
+- 같은 branch/HEAD의 기존 Reason/Contrast fixture와 순수 함수를 메모리에서 호출했다. v6 fixture는 유효하지만 기존 parser/checkMission은 R1 fail, 최상위 승인 metadata 4개는 unrecognized_keys, 빈 응답의 v6 직렬화는 예외임을 확인했다. 파일 출력·DB 접근·코드 수정 없음.
+- 초기 직렬화의 실제 호출 경로는 정적으로 대조했다. 인증된 learner 화면 재현·운영 DB catalog 조회·정상 저장/재조회는 미실행이며 운영 E2E 0/3이다. 설계 채택·로컬 probe·운영 통합 검증을 구별하는 증거로만 사용한다.

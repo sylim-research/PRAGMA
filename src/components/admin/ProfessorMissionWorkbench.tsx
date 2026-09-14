@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ContentReviewPanel } from "./ContentReviewPanel";
 import type { ContentReviewApproval } from "@/lib/pragma/contentReviewApi";
-import type { MissionRuntime } from "@/lib/pragma/missionSchema";
+import type { LearnerMissionRuntime } from "@/lib/pragma/missionV6";
 import type {
   ProfessorIssueOverride,
   ProfessorMissionEdits,
@@ -27,7 +27,7 @@ export function ProfessorMissionWorkbench({
   approvalHref,
 }: {
   scenarioId: string;
-  mission: MissionRuntime;
+  mission: LearnerMissionRuntime;
   busy: boolean;
   onSave: (edits: ProfessorMissionEdits) => Promise<void>;
   onReview: (overrides: ProfessorIssueOverride[], approval: ContentReviewApproval) => Promise<void>;

@@ -53,6 +53,8 @@ export interface ScaleQuest extends QuestBase {
   feedback: string;
   /** Authored alternatives revealed after judgment, not a unique translation key. */
   revisionExamples?: string[];
+  /** One inline choice after committing the initial judgment, before feedback. */
+  reasonChoice?: { prompt: string; options: ChoiceOption[] };
 }
 
 export interface FixChoiceQuest extends QuestBase {
@@ -95,6 +97,8 @@ export interface FreeCorrectionQuest extends QuestBase {
   target: string;
   references: string[];
   feedback: string;
+  /** Authored feedback only; no learner response or scoring. */
+  contrast?: { context: string; target: string; explanation: string };
 }
 
 /** Independent candidate placement for the local learner UX pilot. */
@@ -189,6 +193,9 @@ const DIRECTNESS_3: ChoiceOption[] = [
 ];
 
 export interface CanonicalMissionViewModel {
+  /** Explicit stored format; absence preserves legacy and the frozen UX fixture. */
+  missionFormat?: "mission_v6";
+  learnerContextCopy?: Partial<Record<string, string>>;
   scenarioId?: string;
   metaLabel?: string;
   weekNo: number;

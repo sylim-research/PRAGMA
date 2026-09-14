@@ -3922,6 +3922,27 @@ Railway 배포 및 인증 관리자 읽기 smoke를 확인했다. 실제 콘텐�
 - 근거·한계: 사용자 확정 지시, 대표 fixture와 실제 화면·테스트 확인이다. 흥미·학습효과·전이 향상을 실증한 결과가 아니다. 새 이유 수집 절차·측정 도구·schema·evaluator·생성 규칙을 추가하지 않는다.
 - 기록: `docs/dev-log/2026-09-14-learner-free-correction-pilot.md`의 MJT3 후속 절과 해당 파일의 Git 이력.
 
+## DEC-20260914-02 · mission_v6 정식 채택과 3건 저장 E2E의 경계
+
+- 선행: DEC-20260914-01 및 `docs/dev-log/2026-09-14-mission-v6-implementation-review.md`. 사용자가 구현·제약·호환성·restore 미구현 보고서를 수용하고 현재 v6를 정식 format으로 채택했다.
+- 결정: 요청 전용 `scale4 → scale4 → fix_choice → free_correction → multi_judge → DCT`와 MJT 5개·MJT3 선택지 3개·MJT5 후보 4개를 현재 구현 계약으로 유지한다. 앞선 수량 완화 검토는 이번 채택에 적용하지 않으며, 화용교육의 보편적 최적값이라는 해석과 미래 유연성을 위한 범용화를 하지 않는다.
+- 응답: MJT4 `revised_text`를 명시적으로 보존하고 MJT5는 후보 순서별 독립 band 판단이라는 기존 의미가 확인된 `candidate_band_codes`를 재사용한다. 새 매핑은 v6에만 적용하고 v5와 과거 응답은 유지한다. 적절 후보 유일성·band 분포·오류유형의 고정 규칙을 추가하지 않는다.
+- 검증: 최종 유지될 2주차 요청 슬롯에서 교과목별 1건, 총 3건을 새 version/candidate로 연결한다. 정상 reviewed/released·published course·assignment/hash 계보를 유지한다. P0는 실제 DB 저장 후 재조회한 MJT4 문자열과 MJT5 배열의 원응답 일치다. 화면 restore·중도 이어하기는 선행 blocker로 확대하지 않는다.
+- 기각·범위: 관리자+candidate+draft 저장 예외, test 응답 전용 상태·집계 제외 규칙, staging 신설을 사용하지 않는다. SQL·새 테이블·집계·교수자 화면·60개 확장은 이번 범위 밖이다. 동결 대표 미션 콘텐츠·리듬과 기존 공개 미션은 보존한다.
+- 실행과 구분: 현행 승인 parser와 저장소의 DB CHECK가 v6를 허용하지 않아 실제 3건 E2E는 미실행이다. 사용자 채택은 이 호환성 연결이나 운영 배포를 완료한 증거가 아니다. 새 구현 없이 blocker와 결정만 기록한다.
+- 근거: 위 dev-log의 채택 후속 절 및 현행 코드·migration 읽기 대조. 기준 branch/HEAD는 `codex/request-course-pilot-2026-09-14` / `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`; v6 구현과 본 기록은 미커밋 변경이다.
+- 호환성 후속 확인(2026-09-14, 설계 결정 변경 없음): `docs/dev-log/2026-09-14-mission-v6-normal-path-compatibility-map.md`, EVD-20260914-02. 승인·검수·편성·저장의 실제 gate와 최소 diff 후보만 정리했다. **v6 설계/계약 채택 완료, 운영 E2E 0/3 및 runtime/DB 호환성 검증 미완료**이며 코드·운영 DB 수정은 하지 않았다. 새로 확인한 초기 응답 직렬화 P0는 v6의 완료 전 호출 보류 후보로 한정하고 lifecycle·restore로 확대하지 않는다.
+
+## DEC-20260914-03 · MJT2 이유 선택 1회와 MJT4 선택적 맥락 대조
+
+- 선행: DEC-20260914-01·02. 사용자는 v6 구조를 유지하면서 기존 설계의 구조화된 이유 자료와 맥락 대조를 최소 비용으로 회수하는 원칙을 승인하고 대표 1건 구현을 지시했다.
+- 결정: REASON은 최초 판단 확정 후·피드백 전 MJT2 inline 단일 선택으로 두며, 문항의 의미·화용 쟁점에 맞는 후보를 쓴다. CONTRAST는 MJT4 제출 후 피드백에만 두고, 의미·화행 목적을 보존한 채 맥락 조건 하나가 달라진 가능한 목표어 표현을 최대 1개 제시한다. 방어할 수 없으면 생략한다.
+- 기각: 이유 독립 문항, relation-pair 복원, 고정 오류 taxonomy, 새 점수·evaluator. 최초 판단 전에 이유를 보여 주지 않는다. 기존 `reason_id`는 선택한 후보 ID의 의미로 재사용하고 `reason_kind`는 추가하지 않는다.
+- 해석: REASON은 판단 근거에 대한 구조화된 선택 자료다. 직접 이유 설명 능력·학습효과의 측정으로 주장하지 않는다. CONTRAST는 교육적 대조이며 단일변수 실험의 성립을 주장하지 않는다.
+- 구현 경계: 별도 로컬 대표 요청 후보 1건만 적용했다. 추가 콘텐츠 필드는 선택형이어서 기존 v6 checkpoint·응답도 유지한다. 일반 저작 원칙을 채택했으나 코드의 요청 전용 범위·MJT 5개·MJT3 3개·MJT5 4개는 유지하며 9개 화행 지원·60개 콘텐츠·생성기 일반화는 하지 않았다.
+- 검증·상태: 관련 6개 파일 61개 테스트, 타입 검사, 로컬 브라우저와 운영 모드 번들 확인. **v6 설계/계약 채택 완료, 운영 E2E 0/3 및 runtime/DB 호환성 검증 미완료**. 정상 승인·편성·저장의 기존 blocker는 이번에 수정하지 않았다.
+- 증거: `docs/dev-log/2026-09-14-mission-v6-reason-contrast.md`, EVD-20260914-01. branch `codex/request-course-pilot-2026-09-14`, HEAD `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`의 미커밋 변경이다.
+
 ## ID 규칙
 
 - 결정 ID는 `DEC-YYYYMMDD-NN` 형식을 사용한다.
