@@ -67,3 +67,23 @@
 1. 수치·버전·배포: 로컬 통합본 943 pass/9 skip, PostgreSQL·Edge 35 pass. 운영 E2E 0/3, 원격 push·운영 반영 없음.
 2. 화면: 완료 전 v6 runtime 예외만 해소. 동결한 대표 콘텐츠·Reason/Contrast·기존 v5 화면 유지.
 3. 프롬프트·계약: metadata 네 필드의 기존 계약 재사용 및 format별 검수 지시 연결. v5 계약·과거 응답 보존, 운영 동결본 재발행은 아직 없음.
+
+## 제한된 Claude 독립 검토 완료 · 2026-09-14 21:42 KST
+
+- 위 자동 승인 거절 이후, 사용자가 사전 점검 결과를 확인하고 **13개 파일 diff 단독 전송**을 명시적으로 승인했다. 원본 `review.diff` 60,784 bytes, BOM/CRLF만 정규화한 stdin 59,877 bytes. 전송 본문 SHA-256: `568885c20e58d3d8db55438df86d3e1ad43993288bd88a5acf8c249d8de40a6a`.
+- 저장소 밖 빈 임시 디렉터리에서 Claude Code 2.1.110을 실행했다. 도구 0개, MCP·자동 문서·메모리·hooks 비활성화, 사용자/프로젝트 설정 제외. 외부 전송 전 로컬 HTTP capture에서 diff·검토 지시·CLI 기본 날짜/버전 정보만 포함함을 확인했다. 내부 문서·환경값·실제 DB 원본·사용자 응답은 보내지 않았다.
+- `claude-opus-4-6[1m]` 1턴, 정상 종료. 추가 자료 요청/제공 없음. 원문은 `.tmp/v6-e2e/independent-review-result.md` 및 `.json`, 실행 근거는 `restricted-review-execution.json`이다.
+- Claude 최종 결론: **diff에서 차단급 결함은 입증되지 않음**. 미완성 응답이 DCT 저장 시 strict serializer에 도달하는지는 포함되지 않은 흐름에 달린 조건부 우려로 남겼다. 이 검토에서 해당 실행 경로를 추가 조사하거나 재현하지 않았다.
+- 원문은 일부 항목을 「검증된 결함」/Medium/High로 시작했지만, 같은 항목 안에서 null optional chaining·reason 필수 선택·correction index 검증을 정상으로 정정한다. 따라서 이를 확정 결함으로 집계하지 않는다. 명칭 `is_native_mpj5`와 CHECK 교체 잠금은 비차단 관찰 사항이다.
+- 사용자 지시에 따라 결과 보고 후 보류한다. 앱 코드 수정·추가 검토 전송·운영 DB 변경·배포·3건 E2E 없음. **운영 E2E 0/3, DB 재조회 보존 미검증**은 그대로이며 diff 검토를 통합 성공으로 해석하지 않는다.
+
+## 추가 호출경로 독립 검토 완료 · 2026-09-14
+
+- 사용자가 같은 독립 검토의 직접 관련 코드·테스트 최소 발췌와 검사 후 추가 맥락 전송을 승인했다. 이전 13개 파일 diff는 재전송하지 않았다. 작업 HEAD `8b964679ca88d0dee84210df2fc851fa52d06c7e`, 통합 HEAD `6d9f16c841d33958d9a5254aaa8e4d7655ce3a61`을 확인했다.
+- 준비 자료의 PowerShell 단일 range 배열 평탄화 때문에 serializer와 pilot 테스트 본문이 빠져 있었음을 전송 전에 발견했다. 이미 명시했던 같은 6개 파일 범위에서 누락 발췌를 복원했다. 실제 전송은 `.tmp/v6-e2e/supplemental-dct-reachability-v2.txt` 53,564 bytes, SHA-256 `a4194431ed91f44abdd4792b48b92872b198e7a199a187535ae927e50eaf0ab8`이다. 원래 승인 대상 자료와 manifest는 그대로 보존했다.
+- 별도 `supplemental-review.cjs`에서 허용 파일·고정 hash·secret/token/credential/이메일/전화번호/내부 문서 패턴을 검사했고 검출 0건이었다. 로컬 설정 값 5개와의 대조도 일치 0건이다. 실제 사용자 응답·DB 자료·내부 문서를 전송하지 않았다. `.env` 유사 패턴은 `import.meta.env.DEV` 소스 표현이다.
+- 저장소 밖 빈 임시 디렉터리, 도구 0개, MCP·자동 문서·메모리·hooks 비활성 상태를 로컬 HTTP 요청 capture로 다시 확인한 후 실행했다. 제한 샌드박스 실행은 요청 capture 없이 끝났으므로 격리 확인에 성공한 것으로 취급하지 않았고, 해당 명령만 좁게 승인해 재실행했다. 외부 검토는 1턴, 정상 종료, 추가 자료 요청 없음. 원문은 `.tmp/v6-e2e/supplemental-review-result.md`/`.json`, 실행·격리·검사 근거는 같은 디렉터리의 `supplemental-review-execution.json`, `supplemental-review-preflight.json`, `supplemental-review-audit.json`이다.
+- Claude 최종 판정은 **PASS**. 문항별 필수 입력 게이트, 순차 진행, 응답 누적, 마지막 DCT feedback의 저장 호출을 근거로 정상 UI에서 미완성 MJT가 저장 serializer에 도달하는 경로는 입증되지 않았다고 판단했다. Codex는 이 제한된 정적 호출경로 결론을 수용했다. 실제 blocker/severity는 없음이며 완전한 runtime 저장 E2E를 수행했다는 뜻은 아니다.
+- **기각한 설명 1건:** Claude는 serializer의 ZodError가 `persistPendingAttempt`의 catch에 잡힌다고 썼지만, 실제 `buildRuntimeMpjTraces` 호출은 `finishQuest`의 `saveInput` 생성 중(line 2346), `persistPendingAttempt` 호출(line 2361)보다 먼저 발생한다. 따라서 해당 catch 설명과 이를 포함한 ‘3중 방어’ 표현은 채택하지 않는다. 이것만으로 정상 UI 도달 경로가 증명되지는 않으므로 앱 코드를 변경하거나 validator를 완화하지 않았다.
+- 제품 코드·테스트 추가 변경 없음. 기존 관련 Vitest 153개, PostgreSQL/Edge 35개, 최신 main 기반 통합본 943 pass/9 skip 및 타입 검사·production build 통과 결과를 재사용했다. 근거 없는 검사 반복 없음.
+- 로컬 독립 검토 게이트는 완료했다. 다음 권고는 사용자 운영 게이트 승인 후 정식 main/CI/배포 계보 절차에 따라 최소 migration·필요 Edge/웹 반영과 승인된 3건 정상 E2E를 수행하는 것이다. 운영 CHECK는 여전히 v1~v5이며 운영 적용·candidate 승인·편성 변경·실제 attempt 저장은 하지 않았다. **운영 E2E 0/3, MJT2 scale_code+reason_id / MJT4 revised_text / MJT5 candidate_band_codes DB 재조회 미검증**을 유지한다.

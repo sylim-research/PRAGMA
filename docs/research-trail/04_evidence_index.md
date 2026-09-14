@@ -489,5 +489,6 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - DEC-20260914-04. 구현 `b3e319b5`, 정본 테스트 정렬 `788f35e9`. metadata 네 필드의 동일 의미 확인·변경 파일·로컬 검증·운영 준비/보류 사실은 `docs/dev-log/2026-09-14-mission-v6-normal-path-implementation.md`에 기록했다.
 - 관련 Vitest 153개와 PostgreSQL/Edge 35개, 타입 검사·production build를 통과했다. 실제 v6 runtime prop의 초기/부분 응답 DOM 진입을 확인했고 저장 serializer의 미완성 응답 거부는 유지했다.
 - 기존 PRAGMA 관리자 로그인/is_admin 및 공개 교과목 3개·2주 요청 슬롯, 운영 CHECK의 v1~v5 정의를 직접 읽었다. 아직 운영 DB migration·Edge 배포·candidate 승인·편성 변경·attempt 저장/재조회 증거는 없다.
-- Claude 독립 검토는 자동 승인 거절로 실행되지 않았다. 원격 검토 완료·운영 E2E 완료로 해석하지 않는다. 로컬 diff 전송에 대한 사용자 승인을 요청한 상태다.
+- Claude 독립 검토는 최초 자동 승인 거절 후, 사용자의 명시적 13개 파일 diff 단독 전송 승인으로 2026-09-14 21:42 KST 완료했다. Claude Code 도구 0개·자동 문서/MCP/메모리/hooks 비활성 상태에서 1턴 실행했다. 원문·전송 hash·제한 조건은 위 dev-log의 「제한된 Claude 독립 검토 완료」에서 추적한다. diff에서 차단급 결함은 입증되지 않았고, 미완성 응답의 저장 호출 가능성은 미확인 조건부 우려로 남았다. 실제 저장/재조회나 운영 E2E 완료의 증거는 아니다.
 - 최신 main 통합본 `cde595cc`에서는 전체 Vitest 943 pass/9 skip, 타입 검사·운영 빌드도 통과했다. 로그 위치와 앞선 문서 기대값 실패·UI 대기 만료 재검증은 위 dev-log에 명시했다. 운영 사용자 대상 실험·DB round-trip의 증거는 아니다.
+- 2026-09-14 추가 호출경로 검토: Claude **PASS**, 정상 UI에서 미완성 MJT가 마지막 DCT 저장 serializer까지 도달하는 경로는 입증되지 않음. `.tmp/v6-e2e/supplemental-review-result.md`/`.json` 및 `supplemental-review-execution.json`이 원문·실행 근거다. 같은 dev-log의 「추가 호출경로 독립 검토 완료」에 전송 hash, 준비 발췌 누락 복원, 격리 검사, 수용한 결론과 기각한 serializer catch 설명을 기록했다. 제품 코드 변경·테스트 재실행 없음. 로컬 정적 독립 검토 완료의 증거이며 운영 E2E 0/3·DB 저장/재조회 미검증 상태는 유지한다.
