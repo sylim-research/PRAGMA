@@ -1,7 +1,7 @@
 import { normalizeLearnerMission } from "./missionV6";
 import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
 import type { LearnerLevel, SpeechActUI } from "./enums";
-import type { InstructorExperience, ReviewFinding, ReviewInspection } from "../../../supabase/functions/_shared/contentReview";
+import type { InstructorExperience, ReviewInspection } from "../../../supabase/functions/_shared/contentReview";
 
 export const EXPERIENCE_SECTIONS = [
   { id: "scene", label: "장면 도입" },
@@ -28,11 +28,4 @@ export function viewModelFromReview(inspection: ReviewInspection) {
     speech_act: content?.context?.speech_act ?? null, learner_level: content?.context?.learner_level ?? null,
     mission_status: "generated", release_gate_mode: null, direction: parsed.data.direction, mission: parsed.data,
   });
-}
-
-export function findingAppliesToSection(finding: ReviewFinding, section: string) {
-  const item = finding.where.match(/^\/content\/mission\/mpj_items\/(\d+)(?:\/|$)/);
-  if (item) return section === `mjt-${item[1]}` || section === "recap";
-  if (finding.where.startsWith("/content/mission/production_task")) return section === "dct";
-  return true; // Global or imprecise findings remain visible in every section.
 }

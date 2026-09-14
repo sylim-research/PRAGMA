@@ -91,7 +91,8 @@ describe("professor final approval workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     expect(await within(bench).findByText("교수자 작업대")).toBeInTheDocument();
-    expect(within(bench).getByText(/Mission v6 · 비즈니스 중국어 3주차 · 규칙 통과 · AI 검토 완료 · 교수자 결정 대기 · 수정 .* · Trace a84f21c/)).toBeInTheDocument();
+    expect(within(bench).getByText(/^Mission v6 · 비즈니스 중국어 3주차 · 수정 .* · Trace a84f21c$/)).toBeInTheDocument();
+    expect(within(bench).queryByText(/규칙 통과|AI 검토 완료|교수자 결정 대기/)).not.toBeInTheDocument();
     // 교수자 최종 승인은 대기열을 옆에 두지 않는다. 목록은 머리의 버튼으로 연다.
     expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
     fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));

@@ -125,7 +125,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   return <section aria-label="콘텐츠 승인" className={framed ? "my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm" : "space-y-3 text-sm"}>
     {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. */}
     <div className="flex flex-wrap items-center justify-between gap-2">
-      <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px]" aria-label={target.kind === "mission" ? "점검 단계 · 코어·MJT5·DCT1 전체" : "점검 단계 · 편성 후 공통 수업자료·교수자 고유 메모"}>
+      {/* The final-approval screen already shows its own ①②③ flow; the stage line stays on the quality-check screen. */}
+      {experiential ? <span /> : <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px]" aria-label={target.kind === "mission" ? "점검 단계 · 코어·MJT5·DCT1 전체" : "점검 단계 · 편성 후 공통 수업자료·교수자 고유 메모"}>
         {steps.map((step, index) => {
           const failed = Boolean(state) && index === 0 && blocked;
           const done = Boolean(state) && index < stepIndex && !failed;
@@ -139,7 +140,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </span>
           </li>;
         })}
-      </ol>
+      </ol>}
       <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>
     </div>
     {query.isPending && <p role="status">저장된 콘텐츠와 승인 이력을 확인하는 중…</p>}
