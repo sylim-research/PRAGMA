@@ -98,12 +98,12 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-3 rounded-r-md border-l-4 border-[#D6BE42] bg-[#F3F0E5] px-3 py-1.5">
+  <div className="mb-2.5 mt-8">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
     </div>
-    {description && <p className="mt-0.5 text-[11px] text-muted-foreground">{description}</p>}
+    {description && <p className="mt-0.5 text-[12px] text-muted-foreground">{description}</p>}
   </div>
 );
 
@@ -112,12 +112,16 @@ const PanelHeader = ({
 // 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다
 // (논문 4.3.3, focused_v1: 규칙 검사 → AI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 기반 검사 대기",
+  rules: "규칙 검사 대기",
   openai: "AI 검토 대기",
   claude: "AI 독립 검토 대기",
   adjudication: "AI 재검토 대기",
-  professor: "교수자 최종 승인 대기",
+  // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
+  professor: "교수자 승인 대기",
 };
+
+// 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
+const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "professor" ? "/admin/review" : "/admin/ai-review");
 
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
@@ -161,22 +165,21 @@ const ReviewPipeline = ({
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
           <div key={stage.key} className="relative min-w-0">
+            {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
-              to="/admin/review"
+              to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
-                "motion-safe:transition-all motion-safe:duration-200 hover:border-[#C9B54E] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
-                active ? "border-[#D6B84A] bg-[#FFFBE8]" : "border-border",
+                "group flex min-h-[72px] flex-col rounded-lg border bg-white px-3 py-2.5",
+                "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
+                stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
                 stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
+              data-dominant={active ? "true" : undefined}
             >
               <div className="flex items-center gap-2">
-                <span className={[
-                  "inline-flex h-5 w-5 items-center justify-center rounded-full text-[9px] font-bold tabular-nums",
-                  active ? "bg-[#F1D54A] text-[#293641]" : "bg-[#EEF1F2] text-[#63727C]",
-                ].join(" ")}>
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#63727C]">
                   {stage.step}
                 </span>
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
@@ -185,7 +188,7 @@ const ReviewPipeline = ({
                 {value === null && !error ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
                   </span>
                 )}
@@ -225,9 +228,9 @@ const OperationMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[68px] flex-col rounded-lg border bg-card px-3 py-2 shadow-[0_1px_2px_rgba(21,32,43,0.04)]",
-      "motion-safe:transition-all motion-safe:duration-200 hover:border-[#789184] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
-      changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-border",
+      "group flex min-h-[72px] flex-col rounded-lg border bg-white px-3 py-2.5",
+      "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
+      changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
   >
     <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
@@ -235,7 +238,7 @@ const OperationMetric = ({
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
       <span className="mt-1.5 flex items-end gap-1.5">
-        <span className="text-[24px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+        <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
         {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
@@ -415,6 +418,10 @@ const AdminDashboard = () => {
     [snapshot],
   );
   const displayError = snapshot ? null : dashboardError;
+  // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
+  const needsCheckCount = snapshot
+    ? snapshot.review.rules + snapshot.review.openai + snapshot.review.claude + snapshot.review.adjudication - snapshot.rulesFailCount
+    : null;
 
   const handleReset = async () => {
     setResetting(true);
@@ -458,53 +465,65 @@ const AdminDashboard = () => {
       {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
           구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
           숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
-      <div className="mb-2"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
-      <section className="overflow-hidden rounded-xl border border-[#D9D4C8] bg-white">
+      <div className="mb-3 flex justify-end"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
+
+      {/* 첫 화면의 주인공은 지금 교수자를 기다리는 일이다. 수는 품질 점검·최종 승인 화면과 같은 검수 단계 판정으로 센다.
+          이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
+      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-5 text-white">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
+            <p className="mt-1.5 text-[24px] font-bold leading-tight">
+              교수자 승인 대기{" "}
+              <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
+            </p>
+            <p className="mt-1 text-[13px] text-[#B9C3CA]">품질 점검을 마친 미션입니다. 감수한 뒤 승인·보류·수정을 결정합니다.</p>
+          </div>
+          <Button asChild className="h-10 bg-[#FAD338] px-5 text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
+            <Link to="/admin/review">결정하러 가기 →</Link>
+          </Button>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-3 text-[13px] text-[#B9C3CA]">
+          <span>점검 필요 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
+          <span>규칙 오류 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : snapshot?.rulesFailCount ?? "—"}</b>개</span>
+          <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 화면 →</Link>
+        </div>
+      </section>
+
+      {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
+      <PanelHeader title="전체 흐름" description="단계별 누적 수입니다. 눌러서 해당 화면으로 이동합니다." />
+      <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
             { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
             { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
-            { to: "/admin/ai-review", stage: "품질 관리", screen: "자동 점검·AI 검토", value: snapshot?.content.reviewTargetCount },
-            { to: "/admin/review", stage: "교수자 결정", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
-            { to: "/admin/composer", stage: "수업 편성", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
+            { to: "/admin/ai-review", stage: "승인 전 미션", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
+            // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
+            { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
+            { to: "/admin/composer", stage: "미션 배정", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
             { to: "/admin/decision-traces", stage: "학습 수행", screen: "수행 기록", value: snapshot?.learnerRecordCount },
           ].map((step, index) => (
-            <li key={step.to} className={index > 0 ? "border-t border-[#EDE9DE] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-2 hover:bg-[#FBFAF6]">
-                <span className="text-[12.5px] font-semibold text-[#5D6970]">{step.stage}</span>
+            <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
+              <Link to={step.to} className="flex h-full flex-col px-4 py-3 hover:bg-[#FBFAF6]">
+                <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
                 {step.value == null && !displayError ? (
-                  <span aria-label="불러오는 중" className="mt-1.5 h-7 w-14 rounded bg-muted motion-safe:animate-pulse" />
+                  <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="mt-0.5 text-[23px] font-bold leading-none tabular-nums text-[#15202B]">
+                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
                     {displayError ? "—" : step.value}
                   </span>
                 )}
-                <span className="mt-auto pt-1 text-[12px] text-[#8A9299]">{step.screen} →</span>
+                <span className="mt-auto pt-1.5 text-[11.5px] text-[#9AA3A9]">{step.screen} →</span>
               </Link>
             </li>
           ))}
         </ol>
       </section>
 
-      {/* 위 줄이 흐름 전체라면, 이것은 그중 지금 사람을 기다리는 한 칸이다.
-          227(감수·승인 대기)의 대부분은 아직 기계 검사 전이므로 교수자의 할 일이 아니다. */}
-      <section className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#D6BE42] bg-[#FFFCF0] px-4 py-3">
-        <div>
-          <p className="text-[14px] font-bold text-[#15202B]">
-            교수자 최종 승인 대기{" "}
-            <span className="tabular-nums">{snapshot?.review?.professor ?? "—"}</span>개
-          </p>
-          <p className="mt-0.5 text-[12.5px] text-[#5D6970]">
-            감수를 마친 뒤 승인 여부를 결정합니다. 이 화면에서 승인하지 않습니다.
-          </p>
-        </div>
-        <Button asChild><Link to="/admin/review">확인하기 →</Link></Button>
-      </section>
-
-      {/* 위 「감수·승인 대기」를 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
+      {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
       <PanelHeader
-        title={snapshot ? `품질 관리 단계별 현황 — 감수·승인 대기 ${snapshot.content.reviewTargetCount}개` : "품질 관리 단계별 현황"}
-        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 승인 완료·수정 필요·보류 미션은 제외합니다."
+        title={snapshot ? `검수 단계별 현황 — 승인 전 ${snapshot.content.reviewTargetCount}개` : "검수 단계별 현황"}
+        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 1~4단계는 품질 점검, 5단계는 최종 승인 화면에서 처리합니다."
       />
       <ReviewPipeline
         review={snapshot?.review ?? null}
