@@ -91,7 +91,7 @@ describe("professor final approval workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     expect(await within(bench).findByText("교수자 작업대")).toBeInTheDocument();
-    expect(within(bench).getByText("규칙 통과 · AI 검토 완료 · 교수자 결정 대기")).toBeInTheDocument();
+    expect(within(bench).getByText(/Mission v6 · 비즈니스 중국어 3주차 · 규칙 통과 · AI 검토 완료 · 교수자 결정 대기 · 수정 .* · Trace a84f21c/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /결정 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /승인 완료\s*1/ })).toBeInTheDocument();
