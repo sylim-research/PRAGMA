@@ -82,6 +82,11 @@ import {
   type CourseMode,
 } from "@/lib/curriculum/courseModePolicy";
 
+// 이 브라우저에서 마지막으로 연 교과목(편의 기능). 서버 상태가 아니다.
+const LAST_OUTLINE_KEY = "pragma.admin.composer.lastOutline";
+const SETTINGS_MENU_ITEM =
+  "flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[13px] text-[#26333B] hover:bg-[#F6F5F1] disabled:pointer-events-none disabled:opacity-50";
+
 // 15주 편성기 (태스크 D) — 관리자구조md §6-2 + 계약 0-g·47.
 // 흐름: 강좌 골격 선택 → 수준·주제·모드·언어방향 조절 → 자동 채우기
 //       → 주차별 수동 교체 → 저장. 편성 후보와 저장 대상은 검토 완료 미션으로 제한한다.
@@ -111,6 +116,10 @@ const AdminComposer = () => {
     else next.delete("outline");
     return next;
   }, { replace: true });
+
+  // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"unpublish" | "delete" | null>(null);
 
   const [outline, setOutline] = useState<CurriculumOutlineRow | null>(null);
   const [weeks, setWeeks] = useState<CurriculumWeekRow[]>([]);
@@ -208,6 +217,19 @@ const AdminComposer = () => {
       cancelled = true;
     };
   }, [reloadToken]);
+
+  // 교과목이 있으면 빈 화면으로 시작하지 않는다. 주소 지정 > 이 브라우저에서 마지막으로 연 교과목 > 첫 교과목.
+  useEffect(() => {
+    if (loading || outlineId || outlines.length === 0) return;
+    let remembered: string | null = null;
+    try { remembered = window.localStorage.getItem(LAST_OUTLINE_KEY); } catch { /* 저장소를 쓸 수 없으면 첫 교과목 */ }
+    setOutlineId((outlines.find((item) => item.id === remembered) ?? outlines[0]).id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, outlineId, outlines]);
+  useEffect(() => {
+    if (!outlineId) return;
+    try { window.localStorage.setItem(LAST_OUTLINE_KEY, outlineId); } catch { /* 기억은 편의 기능이라 실패해도 무시 */ }
+  }, [outlineId]);
 
   // ── 커리큘럼 선택 시: 주차 골격 + 기존 배정 로드(새로고침 복원 경로) ──
   useEffect(() => {
@@ -716,18 +738,17 @@ const AdminComposer = () => {
           </p>
         )}
 
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#E2DED2] bg-white p-3 text-[13px] shadow-[0_4px_14px_rgba(21,32,43,0.04)]">
-          <span className="shrink-0 rounded-full bg-[#EEF2F1] px-3 py-1.5 font-semibold text-[#365F58]">
-            교과목
-          </span>
+        {/* 교과목 줄 — 무엇을 편성 중인지와 교과목 단위 설정만 둔다.
+            일상 업무(저장·자동 채우기·강의계획서)는 아래 편성 카드에, 위험 작업은 설정 메뉴 안쪽에 둔다. */}
+        <div className="flex flex-wrap items-center gap-2 text-[13px]">
           <select
             aria-label="교과목 선택"
             value={outlineId}
             onChange={(event) => setOutlineId(event.target.value)}
             disabled={loading}
-            className="h-9 min-w-[280px] max-w-[620px] flex-1 rounded-md border border-[#D9DED9] bg-white px-3"
+            className="h-10 min-w-[280px] max-w-[560px] flex-1 rounded-lg border border-[#D9DED9] bg-white px-3 text-[14px] font-semibold text-[#15202B]"
           >
-            <option value="">— 교과목 선택 —</option>
+            {!outlineId && <option value="">{outlines.length ? "— 교과목 선택 —" : "— 교과목 없음 —"}</option>}
             {outlines.map((item) => (
               <option key={item.id} value={item.id}>
                 {courseDisplayTitle(item)} · {LEVEL[item.level as LearnerLevel] ?? item.level}
@@ -745,46 +766,66 @@ const AdminComposer = () => {
               {selectedIsPublished ? "공개" : "비공개"}
             </Badge>
           )}
-          <Button className="h-9" variant="outline" onClick={() => setStructureEditor("new")}>
-            새 교과목
-          </Button>
-          <Button className="h-9" variant="ghost" asChild>
-            <Link to={outlineId ? `/admin/data-backup?courseId=${encodeURIComponent(outlineId)}` : "/admin/data-backup"}>백업·복원</Link>
-          </Button>
-          <Button
-            className="h-9"
-            variant="outline"
-            onClick={() => setStructureEditor("current")}
-            disabled={!outlineId}
-          >
-            주차 계획 수정
-          </Button>
-          <Button
-            className="h-9"
-            variant="outline"
-            onClick={handleSave}
-            disabled={!outlineId || saving}
-          >
-            {saving ? "저장 중…" : "편성 저장"}
-          </Button>
-          <Button
-            className="h-9"
-            variant="outline"
-            onClick={openSyllabus}
-            disabled={!outlineId || loadingOutline}
-          >
-            강의계획서
-          </Button>
+          <div className="ml-auto flex items-center gap-1.5">
+            <Button className="h-9" variant="ghost" onClick={() => setStructureEditor("new")}>
+              + 새 교과목
+            </Button>
+            <div
+              className="relative"
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setSettingsOpen(false);
+              }}
+            >
+              <Button
+                className="h-9 gap-1.5"
+                variant="outline"
+                aria-haspopup="menu"
+                aria-expanded={settingsOpen}
+                disabled={!outlineId}
+                onClick={() => setSettingsOpen((open) => !open)}
+              >
+                교과목 설정 <span aria-hidden className="text-muted-foreground">⋯</span>
+              </Button>
+              {settingsOpen && (
+                <div
+                  role="menu"
+                  aria-label="교과목 설정"
+                  onMouseDown={(event) => event.preventDefault()}
+                  className="absolute right-0 top-full z-30 mt-1.5 w-64 rounded-xl border border-[#E2DED2] bg-white p-1.5 shadow-[0_12px_32px_rgba(21,32,43,0.12)]"
+                >
+                  <button type="button" role="menuitem" className={SETTINGS_MENU_ITEM}
+                    onClick={() => { setSettingsOpen(false); setStructureEditor("current"); }}>
+                    주차 계획 수정
+                  </button>
+                  <Link role="menuitem" className={SETTINGS_MENU_ITEM} onClick={() => setSettingsOpen(false)}
+                    to={outlineId ? `/admin/data-backup?courseId=${encodeURIComponent(outlineId)}` : "/admin/data-backup"}>
+                    백업·복원
+                  </Link>
+                  {selectedIsPublished && (
+                    <button type="button" role="menuitem" className={SETTINGS_MENU_ITEM} disabled={unpublishing}
+                      onClick={() => { setSettingsOpen(false); setConfirmAction("unpublish"); }}>
+                      {unpublishing ? "처리 중…" : "학습자에게 비공개로 전환"}
+                    </button>
+                  )}
+                  <div className="my-1.5 border-t border-[#EFEBE1]" />
+                  <p className="px-2.5 pb-0.5 pt-1 text-[11px] font-semibold text-[#8B3531]">위험 작업</p>
+                  <button type="button" role="menuitem" disabled={deleting || selectedIsPublished}
+                    className={`${SETTINGS_MENU_ITEM} flex-col items-start text-[#8B3531] hover:bg-[#FFF3F1]`}
+                    onClick={() => { setSettingsOpen(false); setConfirmAction("delete"); }}>
+                    <span>{deleting ? "삭제 중…" : "교과목 삭제"}</span>
+                    <span className="text-[11px] text-[#9AA3A9]">
+                      {selectedIsPublished ? "학습자에게 공개 중인 교과목은 삭제할 수 없습니다." : "주차 계획과 배정이 함께 삭제됩니다."}
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
 
-          {/* 위험 동작(비공개·삭제)은 오른쪽 끝으로 분리해 일상 동작과 섞이지 않게 한다. */}
-          <div className="ml-auto flex items-center gap-2 border-l border-[#E2DED2] pl-3">
-            {selectedIsPublished && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button className="h-9" variant="outline" disabled={unpublishing}>
-                    {unpublishing ? "처리 중…" : "비공개"}
-                  </Button>
-                </AlertDialogTrigger>
+        {/* 확인 대화상자 — 메뉴 밖에 두어 메뉴가 닫혀도 유지된다. 내용과 동작은 이전과 같다. */}
+        {selectedIsPublished && (
+              <AlertDialog open={confirmAction === "unpublish"} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle>이 교과목을 비공개로 바꾸시겠습니까?</AlertDialogTitle>
@@ -803,17 +844,7 @@ const AdminComposer = () => {
                 </AlertDialogContent>
               </AlertDialog>
             )}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  className="h-9 border-[#D9B0AC] text-[#8B3531] hover:bg-[#FFF3F1] hover:text-[#8B3531]"
-                  variant="outline"
-                  disabled={!outlineId || deleting || selectedIsPublished}
-                  title={selectedIsPublished ? "학습자에게 게시 중인 교과목은 삭제할 수 없습니다." : undefined}
-                >
-                  {deleting ? "삭제 중…" : "교과목 삭제"}
-                </Button>
-              </AlertDialogTrigger>
+            <AlertDialog open={confirmAction === "delete"} onOpenChange={(open) => { if (!open) setConfirmAction(null); }}>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>이 교과목을 삭제하시겠습니까?</AlertDialogTitle>
@@ -832,23 +863,33 @@ const AdminComposer = () => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </div>
-        </div>
 
-        <div className="mt-3 rounded-xl border border-[#E2DED2] bg-white">
-          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-[15px] font-semibold">미션 편성</h2>
+        {/* 지금 편성 중인 교과목과, 편성의 일상 업무 세 가지. 저장만 채운 버튼으로 둔다. */}
+        <div className="mt-4 rounded-xl border border-[#E2DED2] bg-white">
+          <div className="flex flex-wrap items-start justify-between gap-4 px-5 py-4">
+            <div className="min-w-0">
+              <p className="text-[11.5px] font-semibold tracking-[0.06em] text-[#8A9299]">지금 편성 중</p>
+              <div className="mt-0.5 flex flex-wrap items-center gap-2">
+                <h2 className="text-[18px] font-bold leading-snug text-[#15202B]">
+                  {selectedOutline ? courseDisplayTitle(selectedOutline) : loading ? "교과목을 불러오는 중…" : "선택한 교과목 없음"}
+                </h2>
                 {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
               </div>
-              <p className="mt-1 text-[12px] text-muted-foreground">
+              <p className="mt-1 text-[12.5px] text-muted-foreground">
                 {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
               </p>
             </div>
-            <Button variant="outline" onClick={() => autoFill(false)} disabled={!outline || loadingOutline}>
-              미션 자동 채우기
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button className="h-9" variant="ghost" onClick={openSyllabus} disabled={!outlineId || loadingOutline}>
+                강의계획서
+              </Button>
+              <Button className="h-9" variant="outline" onClick={() => autoFill(false)} disabled={!outline || loadingOutline}>
+                미션 자동 채우기
+              </Button>
+              <Button className="h-9 px-5" onClick={handleSave} disabled={!outlineId || saving}>
+                {saving ? "저장 중…" : "편성 저장"}
+              </Button>
+            </div>
           </div>
           <details className="border-t border-[#EAE4D2]">
             <summary className="cursor-pointer px-4 py-3 text-[13px] font-semibold">편성 조건 조정</summary>
@@ -1017,9 +1058,14 @@ const AdminComposer = () => {
 
       {/* ── 편성표 ── */}
       {!outlineId ? (
-        <div className="mt-4 rounded-lg border border-dashed border-[#CFC9B9] bg-white/55 px-4 py-3 text-[12px] text-muted-foreground">
-          교과목을 만들거나 기존 교과목을 선택하면 15주 미션 배치가 이곳에 나타납니다.
-        </div>
+        !loading && outlines.length === 0 ? (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-[#CFC9B9] bg-white/60 px-5 py-4">
+            <p className="text-[13px] text-[#46515A]">아직 교과목이 없습니다. 새 교과목을 만들면 표준 15주 계획이 준비됩니다.</p>
+            <Button className="h-9" onClick={() => setStructureEditor("new")}>+ 새 교과목</Button>
+          </div>
+        ) : (
+          <p className="mt-4 text-[13px] text-muted-foreground">교과목을 불러오는 중…</p>
+        )
       ) : loadingOutline ? (
         <p className="mt-4 text-[13px] text-muted-foreground">주차 골격을 불러오는 중…</p>
       ) : (

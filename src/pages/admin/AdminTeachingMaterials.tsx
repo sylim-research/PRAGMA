@@ -70,6 +70,7 @@ const AdminTeachingMaterials = () => {
   const [reviewOpen, setReviewOpen] = useState(params.get("review") === "1");
   const [notesOpen, setNotesOpen] = useState(false);
   const [projectorOpen, setProjectorOpen] = useState(false);
+  const [overviewOpen, setOverviewOpen] = useState(true);
   const [activeSection, setActiveSection] = useState(0);
   const projectorRef = useRef<HTMLDivElement>(null);
   const projectorButtonRef = useRef<HTMLButtonElement>(null);
@@ -240,31 +241,72 @@ const AdminTeachingMaterials = () => {
     URL.revokeObjectURL(url);
   };
 
-  return <AdminShell title="주차별 수업 운영" description="교과목과 주차를 선택해 자료를 준비하고, 교실 화면과 학급 응답을 확인합니다.">
+  // 상단 작업대가 쓰는 선택 주차 요약. 표시만 하며 상태 판정 기준은 아래 15주 현황과 같다.
+  const selectedWeekIndex = course && week ? course.weeks.findIndex((item) => item.week_no === week.week_no) : -1;
+  const prevWeek = course && selectedWeekIndex > 0 ? course.weeks[selectedWeekIndex - 1] : undefined;
+  const nextWeek = course && selectedWeekIndex >= 0 ? course.weeks[selectedWeekIndex + 1] : undefined;
+  const selectedExpected = week && (week.speech_act || weekRole(week.week_no) === "contextualization") ? 2 : 0;
+  const selectedMaterialState = week ? weeklyReviewStates.data?.get(week.week_no) : undefined;
+
+  return <AdminShell title="주차별 수업 운영" description="선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다.">
     <div className="max-w-[1080px] space-y-5">
-      <section className="rounded-xl border bg-white p-4">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <label className="text-sm font-semibold">교과목
-            <select aria-label="수업자료 교과목" value={courseId} onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})} className="mt-2 h-10 w-full rounded-md border bg-white px-3 font-normal">
+      {/* 이 화면의 주인공은 지금 고른 주차다. 15주 전체 현황은 맨 아래 개요로 둔다. */}
+      <section aria-label="선택 주차 작업대" className="rounded-2xl border border-[#E2DED2] bg-white">
+        <div className="flex flex-wrap items-end gap-3 border-b border-[#EFEBE1] px-5 py-3">
+          <label className="min-w-[240px] flex-1 text-[12px] font-semibold text-[#6B7780]">교과목
+            <select aria-label="수업자료 교과목" value={courseId} onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})} className="mt-1 h-9 w-full rounded-md border border-[#D9DED9] bg-white px-2.5 text-[14px] font-normal text-[#15202B]">
               {!courseId && <option value="">교과목 선택</option>}
               {outlines.data?.map((outline) => <option key={outline.id} value={outline.id}>{outline.title}</option>)}
             </select>
           </label>
-          <label className="text-sm font-semibold">주차
-            <select aria-label="수업자료 주차" value={week?.week_no ?? ""} disabled={!course} onChange={(event) => setParams({ courseId, weekNo: event.target.value })} className="mt-2 h-10 w-full rounded-md border bg-white px-3 font-normal">
+          <label className="min-w-[220px] text-[12px] font-semibold text-[#6B7780]">주차
+            <select aria-label="수업자료 주차" value={week?.week_no ?? ""} disabled={!course} onChange={(event) => setParams({ courseId, weekNo: event.target.value })} className="mt-1 h-9 w-full rounded-md border border-[#D9DED9] bg-white px-2.5 text-[14px] font-normal text-[#15202B]">
               {!week && <option value="">주차 선택</option>}
               {course?.weeks.map((item) => <option key={item.week_no} value={item.week_no}>{operationWeekLabel(item)}</option>)}
             </select>
           </label>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" className="h-9" disabled={!prevWeek} onClick={() => prevWeek && setParams({ courseId, weekNo: String(prevWeek.week_no) })}>◀ 이전 주차</Button>
+            <Button variant="outline" className="h-9" disabled={!nextWeek} onClick={() => nextWeek && setParams({ courseId, weekNo: String(nextWeek.week_no) })}>다음 주차 ▶</Button>
+          </div>
         </div>
-        <p className="mt-3 text-xs text-muted-foreground">선택한 주차의 학습목표와 수업자료를 확인하고, 편성된 번역·통역 미션으로 이동합니다.</p>
-        {course && week && <div className="mt-3 flex flex-wrap gap-2" aria-label="선택 주차 작업">
-          {teachingKind(week.week_no, week.type) && <Button variant="outline" asChild>
-            <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
-          </Button>}
-          {week.scenarios[0] && <Button variant="outline" asChild>
-            <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학급 응답 확인</Link>
-          </Button>}
+        {course && week && <div className="space-y-4 px-5 py-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-[12px] text-[#8A9299]">{course.outline.title}</p>
+              <h2 className="mt-0.5 text-[22px] font-bold leading-tight text-[#15202B]">{operationWeekLabel(week)}</h2>
+              <p className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-[#5D6970]">
+                <span>{selectedExpected > 0 ? `편성 미션 ${week.scenarios.length}/${selectedExpected}` : "수업 안내 주차"}</span>
+                <span aria-hidden className="text-[#C9CED0]">·</span>
+                <span className={selectedMaterialState === "approved" ? "text-emerald-800" : selectedMaterialState === "pending" ? "text-amber-800" : ""}>
+                  수업자료 {selectedMaterialState === "approved" ? "확정됨" : selectedMaterialState === "pending" ? "승인 전" : "상태 확인 중"}
+                </span>
+                <span aria-hidden className="text-[#C9CED0]">·</span>
+                <span>{course.outline.status === "published" ? "학습자에게 공개 중인 강좌" : "비공개 강좌"}</span>
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2" aria-label="선택 주차 작업">
+              {teachingKind(week.week_no, week.type) && <Button asChild>
+                <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
+              </Button>}
+              {week.scenarios[0] && <Button variant="outline" asChild>
+                <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학급 응답 확인</Link>
+              </Button>}
+            </div>
+          </div>
+          {/* 미션을 쓰지 않는 주차(오리엔테이션·시험 등)에는 빈 안내를 띄우지 않는다. */}
+          {material && (selectedExpected > 0 || material.missions.length > 0) && <div>
+            <p className="text-[12px] font-semibold text-[#6B7780]">편성 미션</p>
+            {material.missions.length ? <ul className="mt-1.5 divide-y divide-[#EFEBE1] rounded-lg border border-[#EFEBE1]">
+              {material.missions.map((mission) => <li key={mission.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-1.5">
+                <span className="text-[13.5px] font-medium text-[#15202B]">{mission.label}</span>
+                <span className="flex gap-1">
+                  <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" asChild><Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, week.week_no, mission.id, week.scenarios.find((scenario) => scenario.scenario_id === mission.id)?.assignment_id)}>{mission.label} 열기 ↗</Link></Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" asChild><Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(mission.id)}`}>{mission.label} 응답</Link></Button>
+                </span>
+              </li>)}
+            </ul> : <p className="mt-1 text-[13px] text-muted-foreground">연결된 공개 미션이 없습니다. 미션을 사용하는 주차는 수업 편성에서 먼저 편성해 주세요.</p>}
+          </div>}
         </div>}
       </section>
       {outlines.isError && <p role="alert">교과목 목록을 불러오지 못했습니다.</p>}
@@ -276,80 +318,6 @@ const AdminTeachingMaterials = () => {
       {courseId && courseQuery.isPending && <p role="status">주차 계획을 불러오는 중…</p>}
       {courseQuery.isError && <p role="alert">주차 계획을 불러오지 못했습니다. 교과목 선택을 확인해 주세요.</p>}
       {course && !week && <p role="alert">해당 주차를 찾을 수 없습니다.</p>}
-      {course && <section aria-labelledby="course-operation-heading" className="rounded-xl border bg-white p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 id="course-operation-heading" className="text-lg font-black text-[#15202B]">15주 운영 현황</h2>
-            <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              편성·자료 확정·학습자 공개는 저장된 상태만 표시합니다. 참여·완료·이견은 점수가 아닌 실제 수행 기록의 익명 집계입니다.
-            </p>
-          </div>
-          <StatusChip tone={course.outline.status === "published" ? "good" : "attention"}>
-            {course.outline.status === "published" ? "강좌 공개" : "강좌 비공개"}
-          </StatusChip>
-        </div>
-        {operationLogs.isError && <p role="alert" className="mt-3 text-xs text-destructive">수행 현황을 불러오지 못했습니다. 편성·자료 상태는 계속 확인할 수 있습니다.</p>}
-        <div className="mt-4 divide-y rounded-lg border">
-          {course.weeks.map((item) => {
-            // 기존 수업자료와 같은 2미션 기준을 읽되 검수·생성 계약은 변경하지 않는다.
-            const expected = item.speech_act || weekRole(item.week_no) === "contextualization" ? 2 : 0;
-            const assigned = item.scenarios.length;
-            const missionsReady = expected === 0 || assigned >= expected;
-            const materialState = weeklyReviewStates.data?.get(item.week_no);
-            const operation = operationSummaries.get(item.week_no);
-            const firstMission = item.scenarios[0];
-            const selected = item.week_no === week?.week_no;
-            const issue = !missionsReady
-              ? `미션 ${expected - assigned}개 미배정`
-              : materialState === "pending"
-                ? "수업자료 승인 대기"
-                : course.outline.status !== "published"
-                  ? "강좌 비공개"
-                  : null;
-            return <article key={item.week_no} className={[
-              "grid gap-3 px-3 py-3 xl:grid-cols-[minmax(160px,1fr)_minmax(284px,1.4fr)_230px] xl:items-center",
-              selected ? "bg-[#FFFBEA]" : "bg-white",
-            ].join(" ")}>
-              <div>
-                <button
-                  type="button"
-                  onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
-                  className="text-left text-sm font-black text-[#15202B] hover:underline"
-                >{operationWeekLabel(item)}</button>
-                {issue && <p className="mt-1 text-[11px] font-semibold text-amber-800">확인 · {issue}</p>}
-              </div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <StatusChip className="min-w-[4.5rem]" tone={missionsReady ? "good" : "attention"}>
-                  {expected > 0 ? `미션 ${assigned}/${expected}` : "수업 안내"}
-                </StatusChip>
-                <StatusChip className="min-w-[7rem]" tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
-                  {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 승인 대기" : "자료 상태 확인 중"}
-                </StatusChip>
-                <StatusChip className="min-w-[5.5rem]" tone={course.outline.status === "published" && missionsReady ? "good" : "attention"}>
-                  {course.outline.status === "published" && missionsReady ? "학습자 공개" : "공개 준비 중"}
-                </StatusChip>
-                {operation && operation.participants > 0 && <StatusChip>
-                  참여 {operation.participants}명 · 완료 {operation.completedLearners}명
-                </StatusChip>}
-                {operation && operation.dissents > 0 && <StatusChip tone="attention">이견 {operation.dissents}건</StatusChip>}
-              </div>
-              <div className="flex flex-wrap gap-1.5 xl:justify-end">
-                <Button size="sm" variant="outline" asChild>
-                  <Link onClick={openMaterialDetail} to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
-                </Button>
-                {firstMission && <>
-                  <Button size="sm" variant="outline" asChild>
-                    <Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, item.week_no, firstMission.scenario_id, firstMission.assignment_id)}>미션</Link>
-                  </Button>
-                  <Button size="sm" variant="outline" asChild>
-                    <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}&missionId=${encodeURIComponent(firstMission.scenario_id)}`}>응답 분포</Link>
-                  </Button>
-                </>}
-              </div>
-            </article>;
-          })}
-        </div>
-      </section>}
       {course && week && material && <>
         {!projectorOpen && <TeachingGeneratorPanel key={`${courseId}-${week.week_no}`} course={course} week={week}
           state={generated.data} loading={generated.isPending} loadError={generated.isError}
@@ -375,16 +343,6 @@ const AdminTeachingMaterials = () => {
           {missionNotes.isError && <p role="alert">미션 해설을 불러오지 못했습니다. 공통 수업자료는 계속 사용할 수 있습니다.</p>}
           <WeeklyInstructorNotes week={week} direction={course.outline.language_direction} missions={missionNotes.data ?? []} generatedNotes={draft?.content.instructor_notes} />
         </> : !projectorOpen && <WeeklyMaterialDocument material={material} />}
-        {!projectorOpen && <section className="rounded-xl border bg-white p-4">
-          <h2 className="font-semibold">연결된 실습</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {material.missions.map((mission) => <div key={mission.id} className="flex gap-1.5">
-              <Button variant="outline" asChild><Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, week.week_no, mission.id, week.scenarios.find((scenario) => scenario.scenario_id === mission.id)?.assignment_id)}>{mission.label} 열기 ↗</Link></Button>
-              <Button variant="outline" asChild><Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(mission.id)}`}>{mission.label} 응답</Link></Button>
-            </div>)}
-            {!material.missions.length && <p className="text-sm text-muted-foreground">연결된 공개 미션이 없습니다. 미션을 사용하는 주차는 Composer에서 편성을 먼저 완료해 주세요.</p>}
-          </div>
-        </section>}
         {projectorOpen && <div ref={projectorRef} role="dialog" aria-modal="true" aria-label="주차 프로젝터" tabIndex={-1} className="fixed inset-0 z-[100] overflow-y-auto bg-[#F8F6EE] p-5 sm:p-10">
           <div className="mx-auto max-w-5xl">
             <div className="mb-5 flex items-center justify-between gap-3">
@@ -401,6 +359,78 @@ const AdminTeachingMaterials = () => {
           </div>
         </div>}
       </>}
+      {/* 15주 전체 현황 — 개요라서 선택 주차 작업대보다 조용하게, 맨 아래에 둔다.
+          행마다 같은 문구를 반복하지 않도록 강좌 공개 여부는 머리에 한 번만 보이고, 행에는 주차별로 다른 것만 남긴다. */}
+      {course && !projectorOpen && <section aria-labelledby="course-operation-heading" className="rounded-xl border border-[#E6E1D5] bg-[#FBFAF7]">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
+          <div className="min-w-0">
+            <h2 id="course-operation-heading" className="text-[15px] font-semibold text-[#15202B]">15주 운영 현황</h2>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">저장된 편성·자료 상태와, 점수가 아닌 실제 수행 기록의 익명 집계입니다.</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <StatusChip tone={course.outline.status === "published" ? "good" : "attention"}>
+              {course.outline.status === "published" ? "강좌 공개" : "강좌 비공개"}
+            </StatusChip>
+            <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" aria-expanded={overviewOpen} onClick={() => setOverviewOpen((open) => !open)}>
+              {overviewOpen ? "접기 ▴" : "펼치기 ▾"}
+            </Button>
+          </div>
+        </div>
+        {operationLogs.isError && <p role="alert" className="px-5 pb-2 text-xs text-destructive">수행 현황을 불러오지 못했습니다. 편성·자료 상태는 계속 확인할 수 있습니다.</p>}
+        {overviewOpen && <div className="divide-y divide-[#EFEBE1] border-t border-[#EFEBE1] bg-white">
+          {course.weeks.map((item) => {
+            // 기존 수업자료와 같은 2미션 기준을 읽되 검수·생성 계약은 변경하지 않는다.
+            const expected = item.speech_act || weekRole(item.week_no) === "contextualization" ? 2 : 0;
+            const assigned = item.scenarios.length;
+            const missionsReady = expected === 0 || assigned >= expected;
+            const materialState = weeklyReviewStates.data?.get(item.week_no);
+            const operation = operationSummaries.get(item.week_no);
+            const firstMission = item.scenarios[0];
+            const selected = item.week_no === week?.week_no;
+            // 자료 상태와 강좌 공개 여부는 칩·머리에 이미 보이므로 확인 문구는 미배정만 남긴다.
+            const issue = !missionsReady ? `미션 ${expected - assigned}개 미배정` : null;
+            return <article key={item.week_no} className={[
+              "grid gap-2 px-5 py-2.5 xl:grid-cols-[minmax(180px,1fr)_minmax(260px,1.4fr)_auto] xl:items-center",
+              selected ? "bg-[#FFFBEA] shadow-[inset_3px_0_0_#15202B]" : "",
+            ].join(" ")}>
+              <div>
+                <button
+                  type="button"
+                  aria-current={selected ? "true" : undefined}
+                  onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
+                  className={["text-left text-[13.5px] hover:underline", selected ? "font-bold text-[#15202B]" : "font-semibold text-[#34444D]"].join(" ")}
+                >{operationWeekLabel(item)}</button>
+                {issue && <p className="mt-0.5 text-[11.5px] font-medium text-amber-800">확인 · {issue}</p>}
+              </div>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <StatusChip tone={missionsReady ? "good" : "attention"}>
+                  {expected > 0 ? `미션 ${assigned}/${expected}` : "수업 안내"}
+                </StatusChip>
+                <StatusChip tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
+                  {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 승인 대기" : "자료 상태 확인 중"}
+                </StatusChip>
+                {operation && operation.participants > 0 && <StatusChip>
+                  참여 {operation.participants}명 · 완료 {operation.completedLearners}명
+                </StatusChip>}
+                {operation && operation.dissents > 0 && <StatusChip tone="attention">이견 {operation.dissents}건</StatusChip>}
+              </div>
+              <div className="flex flex-wrap gap-0.5 xl:justify-end">
+                <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
+                  <Link onClick={openMaterialDetail} to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
+                </Button>
+                {firstMission && <>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
+                    <Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, item.week_no, firstMission.scenario_id, firstMission.assignment_id)}>미션</Link>
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
+                    <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}&missionId=${encodeURIComponent(firstMission.scenario_id)}`}>응답 분포</Link>
+                  </Button>
+                </>}
+              </div>
+            </article>;
+          })}
+        </div>}
+      </section>}
     </div>
   </AdminShell>;
 };
