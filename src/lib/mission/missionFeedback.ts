@@ -27,7 +27,7 @@ export interface FeedbackRequestResult {
  * @param answer 통역이면 **학습자가 확인한 전사**만 넘긴다(§4 제약 7).
  */
 export async function requestFeedback(
-  mission: MissionRuntime,
+  mission: Pick<MissionRuntime, "direction" | "unit" | "production_task">,
   answer: string,
 ): Promise<FeedbackRequestResult> {
   const feature = getTargetFeature(mission.unit.target_feature);

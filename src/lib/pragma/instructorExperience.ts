@@ -1,4 +1,4 @@
-import { normalizeMission } from "./missionSchema";
+import { normalizeLearnerMission } from "./missionV6";
 import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
 import type { LearnerLevel, SpeechActUI } from "./enums";
 import type { InstructorExperience, ReviewFinding, ReviewInspection } from "../../../supabase/functions/_shared/contentReview";
@@ -21,7 +21,7 @@ export function experienceComplete(experience?: InstructorExperience | null) {
 
 export function viewModelFromReview(inspection: ReviewInspection) {
   const content = inspection.snapshot.content as { mission?: unknown; context?: { scenario_id?: string; speech_act?: SpeechActUI; learner_level?: LearnerLevel } } | undefined;
-  const parsed = normalizeMission(content?.mission);
+  const parsed = normalizeLearnerMission(content?.mission);
   if (!parsed.ok || !parsed.data || parsed.data.mpj_items.length !== 5) throw new Error("이 버전은 현재 MJT5 학습 화면으로 표시할 수 없습니다. 원본과 규칙 오류를 확인하세요.");
   return adaptRunnableMissionToCanonical({
     scenario_id: content?.context?.scenario_id ?? inspection.run?.target_id ?? "review",

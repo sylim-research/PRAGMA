@@ -15,6 +15,7 @@
 // source/target 언어를 스왑한다. R9는 중국·한국 국가 일반화를 양방향 공통으로 잡는다.
 
 import { getTargetFeature, TARGET_FEATURES } from "@/lib/pragma/targetFeatures";
+import { MissionV6Schema, type MissionV6 } from "./missionV6";
 import {
   normalizeMission,
   type MissionV4,
@@ -555,6 +556,9 @@ export function checkMission(
   ctx: CheckContext,
   coreInput?: unknown,
 ): RuleResult {
+  if ((missionInput as { schema_version?: string } | null)?.schema_version === "mission_v6") {
+    return checkV6Mission(missionInput, ctx, coreInput);
+  }
   const v: RuleViolation[] = [];
   const parsed = normalizeMission(missionInput);
   if (!parsed.ok) {
@@ -1115,7 +1119,75 @@ export function checkMission(
 }
 
 // R20 — 미션 provenance 객체 존재 + 필수값(prompt_snapshot_hash는 선택).
-function checkProvenance(v: RuleViolation[], m: MissionRuntime) {
+/** The adopted v6 contract, plus the existing approval metadata/core checks. */
+function checkV6Mission(missionInput: unknown, ctx: CheckContext, coreInput?: unknown): RuleResult {
+  const v: RuleViolation[] = [];
+  const parsed = MissionV6Schema.safeParse(missionInput);
+  if (!parsed.success) {
+    add(v, "R1", "fail", `스키마 위반: ${parsed.error.issues[0]?.path?.join(".")} ${parsed.error.issues[0]?.message ?? ""}`);
+    return finalize(v);
+  }
+  const m = parsed.data as MissionV6;
+  const dir = m.direction;
+  const feature = getTargetFeature(m.unit.target_feature);
+  checkDirectionMatch(v, dir, ctx);
+  if (!feature || feature.version !== m.unit.target_feature_version) add(v, "R13", "fail", "미션 초점·버전이 카탈로그와 다름");
+  if (m.learning_goal.speech_act !== ctx.speech_act || feature?.speech_act !== ctx.speech_act) add(v, "R15", "fail", "미션·카탈로그 화행이 요청 화행과 다름");
+  if (ctx.planned_target_feature && ctx.planned_target_feature !== m.unit.target_feature) add(v, "R24", "fail", "미션 초점이 계획한 초점과 다름");
+  const pt = m.production_task;
+  const expectedMode = ctx.mode === "stt_interpreting" ? "interpreting" : "translation";
+  if (pt.mode !== expectedMode || pt.source_modality !== ctx.source_modality) {
+    add(v, "R16", "fail", "미션 수행모드·매체가 요청 셀과 다름", { subrule: "mode_modality_mismatch", modality: pt.mode, direction: dir });
+  }
+  checkProvenance(v, m);
+  if (coreInput != null) {
+    const core = normalizeCore(coreInput);
+    if (core.ok) checkInheritance(v, m, core.data);
+  }
+  checkNationalization(v, m);
+  for (const item of m.mpj_items) {
+    checkSourceLang(v, dir, item.source, `문항 ${item.id} source`);
+    if ("target" in item) checkTargetLangHard(v, dir, item.target, `문항 ${item.id} target`);
+    const alternatives = item.type === "fix_choice" ? item.corrections.map(c => c.text)
+      : item.type === "multi_judge" ? item.candidates.map(c => c.text)
+      : item.type === "free_correction" ? [...item.reference_alternatives, ...(item.contrast ? [item.contrast.target] : [])]
+      : item.revision_examples ?? [];
+    checkTargetLangSoft(v, dir, `문항 ${item.id} 참고 표현`, alternatives);
+  }
+  checkSourceLang(v, dir, pt.source_text, "production_task.source_text");
+  checkTargetLangSoft(v, dir, "production_task.reference_alternatives", pt.reference_alternatives.map(a => a.text));
+  for (const [index, scene] of [...m.mpj_items, pt].entries()) {
+    if (coreLearnerSceneIssue(scene.situation_ko)) add(v, "R30", "warning",
+      `${index < 5 ? `MJT ${index + 1}` : "DCT"} 상황문에 답안 평가 방향으로 읽힐 수 있는 표현 — 교수자 확인: ${scene.situation_ko}`,
+      { subrule: "learner_scene_evaluation_cue", modality: ctx.mode, direction: dir });
+  }
+  // Pending attribution is prepared by the same finalization service before approval.
+  if (m.authoring?.lineage_status !== "pending") {
+    const scope = buildMissionLineageScope({ direction: dir, speechAct: ctx.speech_act, targetFeature: m.unit.target_feature });
+    for (const issue of validateItemLineage(m, scope)) add(v, "R31", "fail", `${issue.target_path ? `${issue.target_path}: ` : ""}${issue.message}`);
+    if (scope.coverage_status === "covered" && m.item_lineage) {
+      const { claim_status, coverage_summary: coverage, attribution_provenance: attribution } = m.item_lineage;
+      if (claim_status !== "model_attribution_pending_review" || !coverage) add(v, "R31", "fail", "최종 귀속 claim 상태·coverage_summary가 필요함");
+      if (!attribution || attribution.prompt_version !== CURRENT_ITEM_LINEAGE_PROMPT_VERSION
+        || !attribution.provider || !attribution.prompt_instance_hash || !attribution.batch_count || !attribution.calls
+        || attribution.calls.length !== attribution.batch_count
+        || attribution.calls.some((call, index) => call.batch_index !== index + 1 || call.target_count < 1
+          || call.target_count > ITEM_LINEAGE_MAX_BATCH_SIZE || call.attempts < 1)
+        || (coverage && attribution.calls.reduce((sum, call) => sum + call.target_count, 0) !== coverage.total_count)) {
+        add(v, "R31", "fail", "item_lineage attribution provenance가 기존 최종화 계약과 다름");
+      }
+      if (coverage?.unattributed_count > 0) {
+        const ratio = coverage.unattributed_count / coverage.total_count;
+        add(v, "R32", "warning", `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개`,
+          { subrule: ratio > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO ? "unattributed_over_reference_ratio" : "unattributed_present",
+            actual: ratio, threshold: ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO, direction: dir });
+      }
+    }
+  }
+  return finalize(v);
+}
+
+function checkProvenance(v: RuleViolation[], m: Pick<MissionRuntime, "provenance">) {
   const p = m.provenance;
   if (!p) {
     add(v, "R20", "fail", "mission_content.provenance 객체가 없음");
@@ -1408,10 +1480,10 @@ function checkSetDistribution(v: RuleViolation[], m: MissionRuntime, withinCode:
   }
 }
 
-function checkNationalization(v: RuleViolation[], m: MissionRuntime) {
+function checkNationalization(v: RuleViolation[], m: MissionRuntime | MissionV6) {
   const fields: string[] = [];
   for (const it of m.mpj_items) {
-    fields.push(it.explanation_ko);
+    if ("explanation_ko" in it) fields.push(it.explanation_ko);
     if (it.type === "fix_choice") fields.push(...it.corrections.map((c) => c.note_ko));
     if (it.type === "reason") fields.push(...it.reasons.map((r) => r.text_ko));
     if (it.type === "multi_judge") fields.push(...it.candidates.map((c) => c.note_ko));
@@ -1507,7 +1579,7 @@ function checkRecommendedConsistency(v: RuleViolation[], m: MissionRuntime, with
   }
 }
 
-function checkInheritance(v: RuleViolation[], m: MissionRuntime, core: ScenarioCoreRuntime) {
+function checkInheritance(v: RuleViolation[], m: Pick<MissionRuntime, "direction" | "production_task">, core: ScenarioCoreRuntime) {
   const pt = m.production_task;
   if (pt.source_text !== core.source_text) {
     add(v, "R23", "fail", "production_task.source_text가 코어를 계승하지 않음");

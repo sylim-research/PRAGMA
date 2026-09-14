@@ -49,7 +49,7 @@ import { MissionPreview } from "@/components/admin/MissionPreview";
 import { ProfessorMissionWorkbench } from "@/components/admin/ProfessorMissionWorkbench";
 import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import type { ContentReviewApproval } from "@/lib/pragma/contentReviewApi";
-import type { MissionRuntime } from "@/lib/pragma/missionSchema";
+import type { LearnerMissionRuntime } from "@/lib/pragma/missionV6";
 import { toast } from "sonner";
 import { startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
 
@@ -202,7 +202,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   // 이번 세션의 조립 실패: scenario_id → 실패 사유(R규칙 포함).
   const [failures, setFailures] = useState<Record<string, string>>({});
   const [rowMsg, setRowMsg] = useState<Record<string, string>>({});
-  const [preview, setPreview] = useState<Record<string, { mission: MissionRuntime; warnings: string[] }>>({});
+  const [preview, setPreview] = useState<Record<string, { mission: LearnerMissionRuntime; warnings: string[] }>>({});
   const [openId, setOpenId] = useState<string | null>(null);
   const [reviewSelection, setReviewSelection] = useState<Set<string>>(new Set());
   const reviewQueue = useReviewPreparationQueue();
@@ -453,7 +453,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     setOpenId(r.scenario_id);
     if (!preview[r.scenario_id]) {
       try {
-        const res = await fetchMissionForReview(r.scenario_id);
+        const res = await fetchMissionForReview(r.scenario_id, { includeV6: true });
         if (res) setPreview((m) => ({ ...m, [r.scenario_id]: { mission: res.mission, warnings: [] } }));
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "미션 조회 실패");
@@ -598,6 +598,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <ul className="space-y-2">
             {visible.map((r) => {
               const st = stateOf(r);
+              const previewMission = preview[r.scenario_id]?.mission;
               const isAssembling = busy === r.scenario_id && assemblyProgress?.id === r.scenario_id;
               const contextLabels = [
                 r.domain ? DOMAIN[r.domain] : null,
@@ -705,8 +706,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   )}
                   {openId === r.scenario_id && preview[r.scenario_id] && (
                     <>
-                      {!reviewMode && <MissionPreview
-                        mission={preview[r.scenario_id].mission}
+                      {!reviewMode && previewMission && previewMission.schema_version !== "mission_v6" && <MissionPreview
+                        mission={previewMission}
                         warnings={preview[r.scenario_id].warnings}
                       />}
                       {aiReview && (st === "generated" || st === "reviewed") && (

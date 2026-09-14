@@ -1,11 +1,12 @@
 import type { Json } from "@/integrations/supabase/types";
 import { DIRECTION_LANGS, type LanguageDirection } from "@/lib/pragma/enums";
 import type { RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
-import type { MissionRuntime } from "@/lib/pragma/missionSchema";
+import type { LearnerMissionRuntime } from "@/lib/pragma/missionV6";
 import { POLICY_VERSION } from "@/lib/research/versions";
+import { parseMissionV6Responses } from "./missionV6Responses";
 
 export interface SaveAttemptInput {
-  mission: MissionRuntime;
+  mission: LearnerMissionRuntime;
   /** DB 미션이면 scenarios.scenario_id(uuid), 샘플이면 null */
   scenarioId: string | null;
   speechAct: string | null;
@@ -46,6 +47,8 @@ export interface MpjResponseTrace extends Record<string, Json | undefined> {
   item_id: number;
   item_type: string;
   completed_at: string;
+  /** MJT 자유교정에서 학습자가 제출한 수정문. 비채점 원응답. */
+  revised_text?: string;
   /** legacy scale4 */
   scale_code?: string;
   /** judge3 또는 fix_choice의 최초 조절 정도 판단 */
@@ -54,7 +57,7 @@ export interface MpjResponseTrace extends Record<string, Json | undefined> {
   correction_indexes?: number[];
   /** legacy reason_conf */
   reason_ids?: string[];
-  /** mission_v4 reason의 단일 주원인 선택 */
+  /** 학습자가 선택한 이유 후보 ID. v4/v5 reason 또는 v6 MJT2의 단일 선택. */
   reason_id?: string;
   /** reason 문항에서 해설을 보기 전에 제출한 최초 적절성 판단. */
   initial_judgment?: "appropriate" | "inappropriate";
@@ -112,10 +115,12 @@ export function buildMissionAttemptRow(
         distorted: "fail",
       }[feedback.verdicts.semantic_fidelity]
     : null;
-  const mpjResponses = input.mpjResponses?.map((response) => {
+  const submittedResponses = input.mission.schema_version === "mission_v6"
+    ? parseMissionV6Responses(input.mission, input.mpjResponses) : input.mpjResponses;
+  const mpjResponses = submittedResponses?.map((response) => {
     // v4·v5는 같은 reason 계약(확신도 없음, DEC-20260730-01) — legacy confidence를 남기지 않는다.
     const noConfidenceContract =
-      input.mission.schema_version === "mission_v4" || input.mission.schema_version === "mission_v5";
+      input.mission.schema_version === "mission_v4" || input.mission.schema_version === "mission_v5" || input.mission.schema_version === "mission_v6";
     if (!noConfidenceContract || response.confidence === undefined) {
       return response;
     }
@@ -126,7 +131,7 @@ export function buildMissionAttemptRow(
     (mpjResponses && mpjResponses.length > 0) || input.productionSupport
       ? ({
           schema_version:
-            input.mission.schema_version === "mission_v5" && input.mission.mpj_items.length === 5
+            (input.mission.schema_version === "mission_v5" && input.mission.mpj_items.length === 5) || input.mission.schema_version === "mission_v6"
               ? "mpj_response_v2"
               : "mpj_response_v1",
           mission_schema_version: input.mission.schema_version,

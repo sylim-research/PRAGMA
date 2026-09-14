@@ -2,7 +2,7 @@ import { naturalLearnerScene } from "../../../supabase/functions/_shared/learner
 import { LEVEL, SPEECH_ACT_UI, type ChannelUI } from "@/lib/pragma/enums";
 import type { Pdr } from "@/lib/pragma/coreSchema";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
-import type { RunnableMission } from "@/lib/mission/missionDb";
+import type { CanonicalRunnableMission as RunnableMission } from "@/lib/mission/missionDb";
 import type {
   BestWorstQuest,
   ChoiceOption,
@@ -411,7 +411,38 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
   let contrastAfter: string;
   let lessonPoints: CanonicalMissionViewModel["lessonPoints"];
 
-  if (mission.schema_version === "mission_v2") {
+  if (mission.schema_version === "mission_v6") {
+    quests = mission.mpj_items.map((item, index): MissionQuest => {
+      const base = { id: `A${index + 1}`, module: "A" as const, shortLabel: item.short_label,
+        title: item.title, prompt: item.prompt, source: item.source,
+        context: contextFrom({ situation_ko: item.situation_ko, relation_ko: item.relation_ko, channel: item.channel, pdr: item.pdr }) };
+      switch (item.type) {
+        case "scale4": return { ...base, kind: "scale", target: item.target, options: APPROPRIATENESS_OPTIONS,
+          referenceAnswer: item.reference_scale_code, acceptedAnswers: item.accepted_scale_codes,
+          feedback: item.explanation_ko, revisionExamples: item.revision_examples,
+          ...(item.id === 2 && item.reason_choice ? { reasonChoice: {
+            prompt: item.reason_choice.prompt,
+            options: item.reason_choice.options.map(reason => ({ id: reason.id, label: reason.text })),
+          } } : {}) };
+        case "fix_choice": return { ...base, kind: "fix_choice", target: item.target,
+          // Compatibility properties are not displayed or persisted for v6.
+          judgmentOptions: [], referenceJudgment: "", nextLabel: "다음: 직접 고쳐 보기",
+          corrections: item.corrections.map((candidate, i) => ({ id: `A3-${i}`, text: candidate.text, valid: candidate.is_valid, note: candidate.note_ko })),
+          feedback: item.explanation_ko };
+        case "free_correction": return { ...base, kind: "free_correction", target: item.target,
+          references: item.reference_alternatives, feedback: item.explanation_ko,
+          ...(item.contrast ? { contrast: { context: item.contrast.context_ko,
+            target: item.contrast.target, explanation: item.contrast.explanation_ko } } : {}) };
+        case "multi_judge": return { ...base, kind: "spectrum",
+          options: [{ id: "too_direct", label: "너무 직접적" }, { id: "appropriate", label: "상황에 맞음" }, { id: "too_indirect", label: "지나치게 우회적" }],
+          candidates: item.candidates.map((candidate, i) => ({ id: `A5-${i}`, text: candidate.text,
+            acceptedAnswers: candidate.accepted_band_codes, note: candidate.note_ko })) };
+      }
+    });
+    contrastBefore = mission.mpj_items[0].situation_ko;
+    contrastAfter = mission.mpj_items[1].situation_ko;
+    lessonPoints = mission.lesson_points.map(point => ({ questId: `A${point.item_id}`, label: point.label, text: point.text }));
+  } else if (mission.schema_version === "mission_v2") {
     const [rawScale, rawContrast, rawFixChoice, rawReason, rawMultiJudge] = mission.mpj_items;
     if (
       rawScale.type !== "scale4" ||
@@ -661,7 +692,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     );
   }
 
-  lessonPoints = concreteLessonPoints(quests);
+  if (mission.schema_version !== "mission_v6") lessonPoints = concreteLessonPoints(quests);
 
   const task = mission.production_task;
   const dctContext = contextFrom({
@@ -725,6 +756,13 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
   );
 
   return {
+    ...(mission.schema_version === "mission_v6" ? {
+      missionFormat: "mission_v6" as const,
+      learnerContextCopy: Object.fromEntries([
+        ...mission.mpj_items.map(item => [`A${item.id}`, item.learner_context_ko]),
+        ["A-DCT", mission.production_task.learner_context_ko], ["A-FEEDBACK", mission.production_task.learner_context_ko],
+      ]),
+    } : {}),
     scenarioId: runnable.scenario_id,
     metaLabel: "실제 미션",
     weekNo: 0,
@@ -743,7 +781,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       before: contrastBefore,
       after: contrastAfter,
       changedDimensions: [],
-      note: "첫인상 판단과 맥락 대비 판단에서 상황에 따라 달라지는 적절성을 비교합니다.",
+      note: mission.schema_version === "mission_v6" ? "서로 다른 장면에서 표현의 적절성을 살펴봅니다." : "첫인상 판단과 맥락 대비 판단에서 상황에 따라 달라지는 적절성을 비교합니다.",
     },
     summaryPrinciple: mission.unit.closing_ko,
     lessonPoints,
