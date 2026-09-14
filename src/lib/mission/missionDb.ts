@@ -100,32 +100,6 @@ export async function fetchMissionForReview(
   return { mission: parsed.data, mission_status: data.mission_status ?? null };
 }
 
-/** 실행 가능한 미션 목록. RLS와 같은 release semantics를 클라이언트에서도 재확인한다. */
-export async function listRunnableMissions(): Promise<MissionListItem[]> {
-  const statuses = IS_DEV ? ["released", "reviewed", "generated"] : ["released", "reviewed"];
-  const { data, error } = await db
-    .from("scenarios")
-    .select("scenario_id, speech_act, learner_level, mission_status, release_gate_mode, core_content, mission_content")
-    .in("mission_status", statuses)
-    .is("archived_at", null)
-    .order("mission_reviewed_at", { ascending: false, nullsFirst: false });
-  if (error) throw new Error(`미션 목록 조회 실패: ${error.message}`);
-  return ((data ?? []) as any[])
-    .filter((r) => {
-      const contentReleaseId = parsedReleaseId(r.mission_content);
-      return isCurrentMissionReleasedForLearner({ ...r, content_release_id: contentReleaseId })
-        || (IS_DEV && r.mission_status === "generated" && contentReleaseId === CURRENT_CONTENT_RELEASE_ID);
-    })
-    .map((r) => ({
-      scenario_id: r.scenario_id,
-      speech_act: (r.speech_act as SpeechActUI) ?? null,
-      learner_level: (r.learner_level as LearnerLevel) ?? null,
-      mission_status: r.mission_status ?? null,
-      release_gate_mode: r.release_gate_mode ?? "legacy_reviewed",
-      situation_ko: r.core_content?.situation_ko ?? "",
-    }));
-}
-
 function parsedReleaseId(missionContent: unknown): string | null {
   if (!missionContent || typeof missionContent !== "object" || Array.isArray(missionContent)) return null;
   const provenance = (missionContent as Record<string, unknown>).provenance;

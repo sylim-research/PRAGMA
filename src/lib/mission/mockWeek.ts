@@ -79,39 +79,6 @@ export interface TodayAssignment {
   allDone?: boolean;
 }
 
-export function getTodayAssignment(): TodayAssignment {
-  const progress = getProgress();
-  const quickDone = progress.completedMissionIds.includes(MISSION_ID_BY_MODE.quick);
-  const transferDone = progress.completedMissionIds.includes(MISSION_ID_BY_MODE.transfer);
-
-  if (!quickDone) {
-    return {
-      missionId: MISSION_ID_BY_MODE.quick,
-      mode: "quick",
-      title: "상황에 맞게 부탁하기 (위챗 · 동급생)",
-      minutes: 6,
-      reason: "이번 주 표현을 처음 연습하는 단계라 기본 상황부터 시작해요",
-    };
-  }
-  if (!transferDone) {
-    return {
-      missionId: MISSION_ID_BY_MODE.transfer,
-      mode: "transfer",
-      title: "같은 부탁, 상황 바꿔보기 (교수 · 이메일)",
-      minutes: 8,
-      reason: "기본 연습을 마쳤으니 조건을 하나 바꿔 적용해 볼 차례예요",
-    };
-  }
-  return {
-    missionId: MISSION_ID_BY_MODE.quick,
-    mode: "quick",
-    title: "이번 주 연습을 모두 마쳤어요",
-    minutes: 0,
-    reason: "실력 점검이 공개되면 홈에서 알려드릴게요",
-    allDone: true,
-  };
-}
-
 /** 주차 진행률 (mock): 도입 1 + 활성 연습 1 + 전이 1 = 분모 3 */
 export function getWeekProgress(): { done: number; total: number } {
   const progress = getProgress();

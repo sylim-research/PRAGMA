@@ -26,40 +26,6 @@ export type SaveAttemptResult =
   | { ok: false; reason: "no_auth" | "error"; message?: string };
 
 /**
- * 현재 학습자가 완료한 미션 ID만 조회한다.
- *
- * 노트 해금은 기존 완료 로그를 읽기만 하며 새 로그나 파생 점수를 만들지 않는다.
- * 인증 세션이 없는 데모에서는 빈 배열을 반환해 복습면을 안전하게 잠근다.
- */
-export async function listCompletedMissionIds(
-  missionIds: string[],
-): Promise<string[]> {
-  const uniqueMissionIds = [...new Set(missionIds.filter(Boolean))];
-  if (uniqueMissionIds.length === 0) return [];
-
-  const { data: sessionData, error: sessionError } =
-    await supabase.auth.getSession();
-  if (sessionError) {
-    throw new Error(`수행 상태 확인 실패: ${sessionError.message}`);
-  }
-  if (!sessionData.session?.user?.id) return [];
-
-  // ⚠️ `auth_user_id`를 명시적으로 건다. RLS에는 관리자 전체 조회 정책이 함께 있어,
-  // 관리자 계정으로 학습자 화면을 열면 남의 완료가 내 진행률로 잡힌다.
-  const { data, error } = await supabase
-    .from("learner_mission_logs")
-    .select("mission_id")
-    .eq("auth_user_id", sessionData.session.user.id)
-    .in("mission_id", uniqueMissionIds)
-    .eq("mission_completed", true);
-  if (error) {
-    throw new Error(`수행 상태 확인 실패: ${error.message}`);
-  }
-
-  return [...new Set((data ?? []).map((row) => row.mission_id))];
-}
-
-/**
  * 미션 완료 로그를 저장한다. 실제 세션이 없으면(데모 스텁) 저장하지 않고
  * reason:'no_auth'를 돌려준다(호출측이 화면에 "데모 — 미저장"을 표시).
  */

@@ -83,19 +83,3 @@ export function getProgress(): LearnerProgress {
     return { ...EMPTY_PROGRESS };
   }
 }
-
-export function markMissionCompleted(missionId: string, nextActivityId: string | null) {
-  const cur = getProgress();
-  if (cur.completedMissionIds.includes(missionId)) return cur;
-  const next: LearnerProgress = {
-    completedMissionIds: [...cur.completedMissionIds, missionId],
-    practiceCount: cur.practiceCount + 1,
-    currentActivityId: nextActivityId,
-  };
-  try {
-    localStorage.setItem(progressKey(), JSON.stringify(next));
-  } catch {
-    /* ignore */
-  }
-  return next;
-}

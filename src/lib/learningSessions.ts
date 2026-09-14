@@ -3,7 +3,6 @@
 // A draft (in-progress) session is kept under localStorage["learning_session_draft"]
 // and is only promoted to the array when the learner reaches step 5 and confirms.
 
-import { useEffect } from "react";
 
 export const SESSIONS_KEY = "learning_sessions";
 export const DRAFT_KEY = "learning_session_draft";
@@ -88,8 +87,6 @@ const MATERIAL_BY_ACT: Record<ActId, {
   },
 };
 
-export const MATERIAL_CATALOG = MATERIAL_BY_ACT;
-
 // ---------- helpers ----------
 
 function uuid(): string {
@@ -140,14 +137,6 @@ export function ensureDraft(): Draft {
   return d;
 }
 
-export function resetDraft() {
-  try {
-    localStorage.removeItem(DRAFT_KEY);
-  } catch {
-    /* ignore */
-  }
-}
-
 export function addStageSeconds(step: StepNum, seconds: number) {
   if (seconds <= 0) return;
   const d = ensureDraft();
@@ -156,84 +145,7 @@ export function addStageSeconds(step: StepNum, seconds: number) {
   writeDraft(d);
 }
 
-/** Mount-time hook that accumulates seconds spent on a step page. */
-export function useStageTimer(step: StepNum) {
-  useEffect(() => {
-    ensureDraft();
-    const start = Date.now();
-    return () => {
-      const sec = Math.round((Date.now() - start) / 1000);
-      addStageSeconds(step, sec);
-    };
-  }, [step]);
-}
-
 // ---------- session assembly ----------
-
-function readSelectedAct(): ActId | null {
-  const raw = localStorage.getItem("step1-speech-act");
-  return raw === "request" || raw === "refusal" ? raw : null;
-}
-
-function readSelectedTranslation(): string {
-  const raw = localStorage.getItem("step2-best") || "";
-  return raw === "A" || raw === "B" || raw === "C" ? raw : "";
-}
-
-function readStep4(): { finalTranslation: string; justification: string } {
-  try {
-    const raw = localStorage.getItem("step4-final-translation");
-    if (!raw) return { finalTranslation: "", justification: "" };
-    const d = JSON.parse(raw) as { finalTranslation?: string; justification?: string };
-    return {
-      finalTranslation: d.finalTranslation ?? "",
-      justification: d.justification ?? "",
-    };
-  } catch {
-    return { finalTranslation: "", justification: "" };
-  }
-}
-
-/** Assemble and persist the current learner's session. Idempotent per draft. */
-export function saveCompletedSession(): LearningSession | null {
-  const draft = ensureDraft();
-  if (draft.saved) return null;
-
-  const act = readSelectedAct();
-  if (!act) return null;
-  const material = MATERIAL_BY_ACT[act];
-  const step4 = readStep4();
-  const durations = { ...draft.stage_durations_sec };
-  const total = (Object.values(durations) as number[]).reduce((a, b) => a + b, 0);
-
-  const session: LearningSession = {
-    session_id: draft.session_id,
-    material_id: material.material_id,
-    mode: "translation",
-    speech_act: material.speech_act,
-    discourse_genre: material.discourse_genre,
-    sector: material.sector,
-    difficulty: material.difficulty,
-    source_text: material.source_text,
-    ai_translations: material.ai_translations,
-    selected_translation: readSelectedTranslation(),
-    final_translation: step4.finalTranslation,
-    final_reasoning: step4.justification,
-    stage_durations_sec: durations,
-    total_duration_sec: total,
-    timestamp: new Date().toISOString(),
-  };
-
-  const all = getSessions();
-  all.push(session);
-  try {
-    localStorage.setItem(SESSIONS_KEY, JSON.stringify(all));
-  } catch {
-    /* ignore */
-  }
-  writeDraft({ ...draft, saved: true });
-  return session;
-}
 
 export function getSessions(): LearningSession[] {
   try {
@@ -340,19 +252,4 @@ export function serializeSessions(
     return sessions.map((s) => JSON.stringify(s)).join("\n");
   }
   return JSON.stringify(sessions, null, 2);
-}
-
-export function downloadSessions(
-  sessions: LearningSession[],
-  format: "json" | "jsonl",
-) {
-  const body = serializeSessions(sessions, format);
-  const mime = format === "jsonl" ? "application/x-ndjson" : "application/json";
-  const blob = new Blob([body], { type: `${mime};charset=utf-8` });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = formatExportFilename(format);
-  a.click();
-  URL.revokeObjectURL(url);
 }

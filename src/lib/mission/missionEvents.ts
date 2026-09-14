@@ -107,11 +107,3 @@ export function rotateMissionAttemptId(storageKey: string): string {
   }
   return created;
 }
-
-export function clearMissionAttemptId(storageKey: string): void {
-  try {
-    localStorage.removeItem(storageKey);
-  } catch {
-    /* ignore */
-  }
-}
