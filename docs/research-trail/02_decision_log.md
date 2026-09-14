@@ -3943,6 +3943,15 @@ Railway 배포 및 인증 관리자 읽기 smoke를 확인했다. 실제 콘텐�
 - 검증·상태: 관련 6개 파일 61개 테스트, 타입 검사, 로컬 브라우저와 운영 모드 번들 확인. **v6 설계/계약 채택 완료, 운영 E2E 0/3 및 runtime/DB 호환성 검증 미완료**. 정상 승인·편성·저장의 기존 blocker는 이번에 수정하지 않았다.
 - 증거: `docs/dev-log/2026-09-14-mission-v6-reason-contrast.md`, EVD-20260914-01. branch `codex/request-course-pilot-2026-09-14`, HEAD `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`의 미커밋 변경이다.
 
+## DEC-20260914-04 · v6의 정상 승인·저장 최소 호환성 구현
+
+- 선행: DEC-20260914-02·03. 사용자가 blocker map을 수용하고 최소 구현과 교과목별 3건 정상 E2E를 지시했다. 학습설계 재개방은 하지 않는다.
+- 결정: authoring·quality_check·hsk_lexical_audit·item_lineage의 의미가 기존 계약과 동일함을 확인해 기존 schema를 재사용한다. v6 parser/검수 분기·편성 허용·CHECK의 v6 추가만 연결하며 승인·hash·RPC·published 편성·저장 계보는 유지한다.
+- v6의 미완성 응답 직렬화 P0는 완료 전 파생값 호출 보류로 수정한다. 저장 시 strict tuple 검증과 v5 response mapping은 유지하고 lifecycle·restore로 확대하지 않는다.
+- 기존 critic의 v6 계약 지시와 증거 버전만 분리한다. 새 evaluator·scoring·고정 오류 taxonomy·새 table/state·candidate 예외·집계 변경·60개 확장은 하지 않는다.
+- 근거: `b3e319b5`, `788f35e9`, `docs/dev-log/2026-09-14-mission-v6-normal-path-implementation.md`. 로컬 검증과 운영 완료를 구분한다. **v6 설계/계약 채택 완료, 로컬 최소 호환성 구현·검증 완료, 운영 E2E 0/3 및 운영 runtime/DB 호환성 검증 미완료**.
+- 운영 반영 전 독립 검토 요청은 외부 Claude에 비공개 소스를 전달할 구체적 승인 부족으로 자동 승인 검토에서 거절됐다. 해당 diff 전송을 사용자에게 요청했으며 DB·Edge·편성·응답 데이터는 변경하지 않았다.
+
 ## ID 규칙
 
 - 결정 ID는 `DEC-YYYYMMDD-NN` 형식을 사용한다.

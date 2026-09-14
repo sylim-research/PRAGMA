@@ -483,3 +483,11 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - DEC-20260914-02의 실행 상태를 확인한 근거다. 전체 경로·파일/함수·최소 diff 후보·검증 한계는 `docs/dev-log/2026-09-14-mission-v6-normal-path-compatibility-map.md`에 기록했다.
 - 같은 branch/HEAD의 기존 Reason/Contrast fixture와 순수 함수를 메모리에서 호출했다. v6 fixture는 유효하지만 기존 parser/checkMission은 R1 fail, 최상위 승인 metadata 4개는 unrecognized_keys, 빈 응답의 v6 직렬화는 예외임을 확인했다. 파일 출력·DB 접근·코드 수정 없음.
 - 초기 직렬화의 실제 호출 경로는 정적으로 대조했다. 인증된 learner 화면 재현·운영 DB catalog 조회·정상 저장/재조회는 미실행이며 운영 E2E 0/3이다. 설계 채택·로컬 probe·운영 통합 검증을 구별하는 증거로만 사용한다.
+
+## EVD-20260914-03 · v6 정상 경로 최소 구현과 운영 준비
+
+- DEC-20260914-04. 구현 `b3e319b5`, 정본 테스트 정렬 `788f35e9`. metadata 네 필드의 동일 의미 확인·변경 파일·로컬 검증·운영 준비/보류 사실은 `docs/dev-log/2026-09-14-mission-v6-normal-path-implementation.md`에 기록했다.
+- 관련 Vitest 153개와 PostgreSQL/Edge 35개, 타입 검사·production build를 통과했다. 실제 v6 runtime prop의 초기/부분 응답 DOM 진입을 확인했고 저장 serializer의 미완성 응답 거부는 유지했다.
+- 기존 PRAGMA 관리자 로그인/is_admin 및 공개 교과목 3개·2주 요청 슬롯, 운영 CHECK의 v1~v5 정의를 직접 읽었다. 아직 운영 DB migration·Edge 배포·candidate 승인·편성 변경·attempt 저장/재조회 증거는 없다.
+- Claude 독립 검토는 자동 승인 거절로 실행되지 않았다. 원격 검토 완료·운영 E2E 완료로 해석하지 않는다. 로컬 diff 전송에 대한 사용자 승인을 요청한 상태다.
+- 최신 main 통합본 `cde595cc`에서는 전체 Vitest 943 pass/9 skip, 타입 검사·운영 빌드도 통과했다. 로그 위치와 앞선 문서 기대값 실패·UI 대기 만료 재검증은 위 dev-log에 명시했다. 운영 사용자 대상 실험·DB round-trip의 증거는 아니다.
