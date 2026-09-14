@@ -10,6 +10,7 @@ import { applyCandidateFeedback } from '../../../supabase/functions/_shared/miss
 // 자동 기본값으로 선택하지 않는다.
 
 import { supabase } from "@/integrations/supabase/client";
+import { normalizeLearnerMission, type LearnerMissionRuntime } from "./missionV6";
 import {
   checkCore,
   checkMission,
@@ -1658,7 +1659,7 @@ export async function reviewMission(
   core: PromotableCore,
   issueOverrides: ProfessorIssueOverride[] = [],
   approval?: { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string },
-): Promise<{ ok: boolean; mission?: MissionRuntime; error?: string }> {
+): Promise<{ ok: boolean; mission?: LearnerMissionRuntime; error?: string }> {
   try {
     if (!approval) return { ok: false, error: "교수자 최종 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
     // The service prepares and checks attribution before professor decisions.
@@ -1672,7 +1673,7 @@ export async function reviewMission(
       return { ok: false, error: "최종 검수 자료를 먼저 준비하고 교수자 판단을 저장해 주세요." };
     }
     const finalized = data.prepared_finalization;
-    const parsed = normalizeMission(finalized);
+    const parsed = normalizeLearnerMission(finalized);
     if (!parsed.ok || !parsed.data || !isRecord(finalized)) {
       return { ok: false, error: "최종화된 미션이 스키마를 통과하지 못했습니다." };
     }

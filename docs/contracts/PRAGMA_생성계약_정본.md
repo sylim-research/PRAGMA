@@ -4,8 +4,8 @@
 > 식별 규칙: 날짜 없는 이 경로만 현행이며, 날짜 판본은 `history/`의 역사 자료다.
 > 대외 과업명은 **MJT(Metapragmatic Judgement Task)**·**DCT형 통번역 산출 과제**다(DCT: Discourse Completion Task).
 > 코드·DB·JSON의 기존 `mpj_*` 식별자는 내부 호환 이름으로 유지하며 대외 표기 변경을 이유로 rename하지 않는다.
-> 최신 승인 학습설계와 현행 소스 계약: **네이티브 MJT5 + DCT1**. 과거 `mission_v5`
-> MJT4 행은 legacy 읽기 호환 범위이며 신규 생성 계약이 아니다.
+> 최신 채택 format: **`mission_v6`, MJT5 + DCT1** (DEC-20260914-02). 아래 v6 절이 해당 버전의 문항·응답 계약을 정한다.
+> 기존 `mission_v5` native/legacy 및 과거 응답 계약은 유지한다. 본문의 기존 v5 생성·문항 규칙을 v6에 자동 적용하지 않는다.
 > 테스트 수·Edge 버전·해시 값·배포 상태 같은 날짜 종속 사실은
 > `docs/research-trail/04_evidence_index.md`와 관련 dev-log가 정본이며, 여기에 적지 않는다.
 > **2026-08-25 구현 동기화: `21afafd`** — 현행 native 장면 2문장·선행 발화 null,
@@ -27,6 +27,23 @@
 > 비차단 사후감사 계약을 §8.1에 추가했다. migration·seed·Edge·Railway는 미적용 상태다.
 > 적용 범위: 코어 생성, Full Mission 승격, 자동검사, 사람 검수, 저장, provenance, 학습자 수행 로그
 > 이전 문서: `history/legacy/PRAGMA_생성계약_v1_2026-07-23.md`는 결정 이력 보존용이며, 현재 동작과 충돌하면 이 문서가 우선한다.
+
+### 2026-09-14 mission_v6 정식 채택과 버전별 적용 범위
+
+- 현재 구현된 요청 전용 v6를 채택한다. 문항 순서는 `scale4 → scale4 → fix_choice → free_correction → multi_judge`이며 DCT 1개가 뒤따른다.
+- MJT 정확히 5개, MJT3 선택지 정확히 3개, MJT5 후보 정확히 4개를 이번 v6 구현 계약으로 유지한다. 이 수량을 화용교육의 보편적 최적값으로 주장하거나 미래 유연성을 위한 범용화를 추가하지 않는다.
+- MJT3은 적절 후보가 최소 1개 있어야 한다. 적절 후보의 유일성, 문항별 적절/비권장 방향, 후보 전체 band 분포·적절 후보 수·오류유형을 고정하지 않는다. 후보별 허용 band는 각 콘텐츠의 준거로 저장한다.
+- v6 MJT4는 명시적 `revised_text`에 학습자가 제출한 자유교정문을 보존한다. v6 MJT5는 기존 `candidate_band_codes`에 **콘텐츠 후보 순서대로 각 후보에 대한 band 판단**을 저장한다. 배열은 순서를 보존하고 같은 band의 반복을 허용한다.
+- REASON(DEC-20260914-03): 새 v6 저작에서 미션당 1회, MJT2의 최초 척도 판단을 확정한 뒤 피드백 전에 해당 문항의 핵심 의미·화용 쟁점에 관한 이유를 하나 선택한다. 약 3개 후보는 화행·장면에 맞게 쓰며 표면 단서나 고정 오류 taxonomy로 구성하지 않는다. 구조화된 선택 자료이며 이유 설명 능력의 측정으로 해석하지 않는다.
+- MJT2 콘텐츠의 선택적 `reason_choice: { prompt, options: [{ id, text }] }`와 응답의 기존 `reason_id`를 사용한다. 이는 선택한 이유 후보 ID라는 기존 의미를 유지한다. 최초 판단은 `scale_code`에 남기고 `reason_kind`, 새 scoring/evaluator는 추가하지 않는다. 이유 후보가 있는 콘텐츠의 제출에는 해당 후보 ID 1개가 필요하며, 어떤 척도·이유 조합을 골랐는지로 저장을 차단하지 않는다.
+- CONTRAST: MJT4 피드백에서 원문의 의미·화행 목적을 유지하고 관계·부담·사전합의·매체 등 맥락 조건 하나가 달라졌을 때 가능한 목표어 표현을 최대 1개 제시한다. 방어 가능한 대조가 없으면 생략한다. 콘텐츠의 선택적 `contrast: { context_ko, target, explanation_ko }`만 사용하며 응답·클릭·수행 저장 필드는 없다. 한 조건만 달라졌는지와 표현의 방어 가능성은 저작·검토 원칙이며 자동 의미검사 통과를 뜻하지 않는다.
+- 추가 필드가 없는 기존 v6 콘텐츠·응답은 그대로 허용한다. 추가 필드는 MJT2·MJT4에만 두며 reason 후보는 최소 2개·고유 ID·비어 있지 않은 문구를 검사한다. 대표 후보는 3개를 사용한다. 일반 저작 원칙의 채택과 다른 화행의 schema/생성기 지원은 구별한다.
+- response envelope는 기존 `mpj_response_v2`를 재사용하고 `mission_schema_version: mission_v6`로 구별한다. 기존 v5 validation/rendering/response mapping 및 과거 응답은 그대로 유지하며 재해석·백필하지 않는다.
+- 정상 `reviewed/released → 편성 → 수행 → 저장`과 published course·정확한 assignment/content hash 검증을 유지한다. 새 콘텐츠는 새 version/candidate로 연결하며 기존 공개 미션 본문을 같은 ID에 덮어쓰지 않는다.
+- 교과목별 1건씩 총 3건의 저장 E2E에서 P0는 MJT4 문자열과 MJT5 배열이 **DB 저장 후 재조회 시 원응답과 동일한지**다. 중도 이어하기 UI는 이 검증의 선행 blocker가 아니다.
+- 채택은 운영 연결 완료를 뜻하지 않는다. 현재 승인 parser·DB format 허용 조건의 연결 미완료 상태는 관련 dev-log에서 추적한다. SQL·새 테이블·집계·교수자 화면·60개 확장은 이번 범위에 포함하지 않는다.
+
+기존 v5에 관한 §2.2·§2.3 및 뒤의 문항별 생성 규칙은 v5의 호환 계약으로 유지한다. v6에는 이 절과 현재 `src/lib/pragma/missionV6.ts`, `src/lib/mission/missionV6Responses.ts`의 명시적 계약을 적용하며, v5의 reason/BEST·WORST나 고정 band 분포를 추가하지 않는다.
 
 ### 2026-08-02 원문 분량 정책 파일럿 보정
 

@@ -9,6 +9,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeMission, type MissionRuntime } from "@/lib/pragma/missionSchema";
+import { normalizeLearnerMission, type LearnerMissionRuntime } from "@/lib/pragma/missionV6";
 import type { LanguageDirection, LearnerLevel, SpeechActUI } from "@/lib/pragma/enums";
 import { isCurrentMissionReleasedForLearner } from "@/lib/mission/missionRelease";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
@@ -17,15 +18,17 @@ const db = supabase as unknown as { from: (t: string) => any };
 
 const IS_DEV = import.meta.env.DEV;
 
-export interface RunnableMission {
+export interface RunnableMission<T extends LearnerMissionRuntime = MissionRuntime> {
   scenario_id: string;
   speech_act: SpeechActUI | null;
   learner_level: LearnerLevel | null;
   mission_status: string | null;
   release_gate_mode: string | null;
   direction: LanguageDirection;
-  mission: MissionRuntime;
+  mission: T;
 }
+
+export type CanonicalRunnableMission = RunnableMission<LearnerMissionRuntime>;
 
 export interface MissionListItem {
   scenario_id: string;
@@ -37,7 +40,9 @@ export interface MissionListItem {
 }
 
 /** 한 시나리오의 미션을 읽어 검증된 런타임 형태로 돌려준다. 없거나 파싱 실패면 에러. */
-export async function fetchMissionByScenario(scenarioId: string): Promise<RunnableMission> {
+export function fetchMissionByScenario(scenarioId: string): Promise<RunnableMission>;
+export function fetchMissionByScenario(scenarioId: string, formats: { includeV6: true }): Promise<CanonicalRunnableMission>;
+export async function fetchMissionByScenario(scenarioId: string, formats?: { includeV6: true }): Promise<CanonicalRunnableMission> {
   const { data, error } = await db
     .from("scenarios")
     .select("scenario_id, speech_act, learner_level, mission_status, release_gate_mode, mission_content")
@@ -63,7 +68,7 @@ export async function fetchMissionByScenario(scenarioId: string): Promise<Runnab
     );
   }
 
-  const parsed = normalizeMission(data.mission_content);
+  const parsed = formats?.includeV6 ? normalizeLearnerMission(data.mission_content) : normalizeMission(data.mission_content);
   if (!parsed.ok || !parsed.data) {
     throw new Error("미션 데이터 형식이 유효하지 않습니다(mission 스키마 불일치).");
   }
@@ -83,9 +88,12 @@ export async function fetchMissionByScenario(scenarioId: string): Promise<Runnab
  * 관리자 검수용 — 상태와 무관하게 미션을 읽어 검증된 런타임 형태로 돌려준다.
  * (실행 게이트가 아니라 눈검사용. admin RLS 전제.) 없으면 null.
  */
+export function fetchMissionForReview(scenarioId: string): Promise<{ mission: MissionRuntime; mission_status: string | null } | null>;
+export function fetchMissionForReview(scenarioId: string, formats: { includeV6: true }): Promise<{ mission: LearnerMissionRuntime; mission_status: string | null } | null>;
 export async function fetchMissionForReview(
   scenarioId: string,
-): Promise<{ mission: MissionRuntime; mission_status: string | null } | null> {
+  formats?: { includeV6: true },
+): Promise<{ mission: LearnerMissionRuntime; mission_status: string | null } | null> {
   const { data, error } = await db
     .from("scenarios")
     .select("mission_status, mission_content")
@@ -93,7 +101,7 @@ export async function fetchMissionForReview(
     .maybeSingle();
   if (error) throw new Error(`미션 조회 실패: ${error.message}`);
   if (!data?.mission_content) return null;
-  const parsed = normalizeMission(data.mission_content);
+  const parsed = formats?.includeV6 ? normalizeLearnerMission(data.mission_content) : normalizeMission(data.mission_content);
   if (!parsed.ok || !parsed.data) {
     throw new Error("미션 데이터 형식이 유효하지 않습니다(mission 스키마 불일치).");
   }

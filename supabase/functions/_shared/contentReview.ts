@@ -1,5 +1,5 @@
 import { SCENE_PLAUSIBILITY_RULE } from "./learnerScene.ts";
-import { CURRENT_MISSION_QUALITY_PROMPT_VERSION } from "./contentRelease.ts";
+import { CURRENT_MISSION_QUALITY_PROMPT_VERSION, MISSION_V6_QUALITY_PROMPT_VERSION } from "./contentRelease.ts";
 // Shared by the admin UI and Edge. A review concerns one current instructional
 // version; no model may approve, edit content, or erase another model's finding.
 // v3 (2026-09-11): criteria changed — uncovered speech acts are marked not_covered in finalization and
@@ -91,9 +91,10 @@ export type GenerationQualityEvidence = {
 export function reusableGenerationQuality(raw: Record<string, any>): GenerationQualityEvidence | null {
   const quality = raw.quality_check;
   const hash = raw.provenance?.mission_content_hash;
+  const qualityVersion = raw.schema_version === "mission_v6" ? MISSION_V6_QUALITY_PROMPT_VERSION : CURRENT_MISSION_QUALITY_PROMPT_VERSION;
   if (!quality || !/^[0-9a-f]{64}$/.test(hash ?? "") || quality.mission_content_hash !== hash
     || !["pass", "warning", "fail"].includes(quality.verdict) || !Array.isArray(quality.findings)
-    || !quality.model?.trim() || quality.prompt_version !== CURRENT_MISSION_QUALITY_PROMPT_VERSION || !Number.isFinite(Date.parse(quality.checked_at))) return null;
+    || !quality.model?.trim() || quality.prompt_version !== qualityVersion || !Number.isFinite(Date.parse(quality.checked_at))) return null;
   if (quality.findings.some((f: any) => !["warning", "fail"].includes(f.severity) || !f.code || typeof f.where !== "string" || !f.note_ko)) return null;
   const verdict = quality.findings.some((f: any) => f.severity === "fail") ? "fail" : quality.findings.length ? "warning" : "pass";
   if (quality.verdict !== verdict) return null;

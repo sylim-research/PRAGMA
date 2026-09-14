@@ -1,5 +1,5 @@
 import { checkCore, checkMission, type CheckContext } from "./missionRules";
-import { normalizeMission } from "./missionSchema";
+import { normalizeLearnerMission } from "./missionV6";
 import { DEFAULT_FEATURE_BY_ACT, FEATURE_CODES_BY_ACT, getTargetFeature } from "./targetFeatures";
 import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourseProjection";
 import { buildWeeklyCourseMaterial } from "@/lib/curriculum/weeklyMaterials";
@@ -26,11 +26,12 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   let content: Record<string, unknown>;
   let act: string | null;
   let dependencies: string[] = [];
+  const isV6 = kind === "mission" && source.scenario?.mission_content?.schema_version === "mission_v6";
   if (kind === "mission") {
     const row = source.scenario;
     act = row.speech_act;
     const raw = row.mission_content;
-    const parsed = normalizeMission(raw);
+    const parsed = normalizeLearnerMission(raw);
     if (!parsed.ok || !parsed.data) add("미션 스키마를 읽을 수 없습니다.");
     else {
       const context: CheckContext = { speech_act: row.speech_act, level: row.learner_level,
@@ -106,10 +107,12 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
   const featureCodes = act ? FEATURE_CODES_BY_ACT[act as keyof typeof FEATURE_CODES_BY_ACT] ?? [] : [];
   const snapshot = { content, criteria: { version: CONTENT_REVIEW_VERSION,
     // Rule corrections get a new content hash without replacing prior runs.
-    rules_version: "mission_rules_v13_professor_signal_flow",
+    rules_version: isV6 ? "mission_rules_v6_normal_approval_v1" : "mission_rules_v13_professor_signal_flow",
     ...(kind === "mission" ? { finalization: "mission_finalization_v1" } : {}),
     scene_policy: NATURAL_INTERPRETING_SCENE_RULE + SCENE_PLAUSIBILITY_RULE,
-    mission_design: "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
+    mission_design: isV6
+      ? "mission_v6 요청: scale4 → scale4+inline reason → fix_choice → free_correction → multi_judge → DCT. MJT 5개·MJT3 수정안 3개·MJT5 후보 4개는 이번 구현 계약이다. 원문의 의미·화행 목적·확정성·사실을 보존한다. MJT2는 판단 후 피드백 전에 문항 쟁점에 맞는 이유 하나를 선택하며, 정답 이유·설명 능력 점수·고정 오류 taxonomy가 아니다. MJT4의 선택적 contrast는 의미와 목적을 유지하고 맥락 조건 하나가 달라진 표현을 피드백으로만 보여준다. 공유 Anchor·relation-pair·적절 후보 유일성·band 분포를 요구하지 않는다. MJT5는 각 후보의 band를 독립 판단한다. A/B 실험·학습효과 검증 아님."
+      : "MJT5+DCT1. 상황 topology는 X→A→A→A→Y→C이며 Anchor A를 MJT2·3·4가 공유함. A/B 실험·전이 효과 검증 아님.",
     features: featureCodes.map((code) => getTargetFeature(code)).filter(Boolean),
     scope: "수업에 채택할 현재 정적 콘텐츠 원본. 개별 학습자 실시간 피드백의 전수 감사는 포함하지 않음.",
   } };

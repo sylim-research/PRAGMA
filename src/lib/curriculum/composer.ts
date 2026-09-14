@@ -44,7 +44,7 @@ export interface ComposerCore {
   content_release_id?: string | null;
   /** 미션 승격 시에만 채워짐. 코어만 있으면 null → 편성표 "미지정" */
   target_feature: string | null;
-  /** 현행 완전 미션 후보: mission_v5이며 독립 MPJ가 정확히 5개다. */
+  /** 편성 가능한 v5/v6 완전 미션: 독립 MJT가 정확히 5개다. */
   is_native_mpj5: boolean;
   situation_ko: string;
   /** 저장된 상황 요약. 학습자 미션 선택 카드에도 같은 문구를 사용한다. */
@@ -132,7 +132,7 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
         typeof generation.content_release_id === "string" ? generation.content_release_id : null,
       target_feature: r.target_feature ?? null,
       is_native_mpj5:
-        r.mission_schema_version === "mission_v5" &&
+        (r.mission_schema_version === "mission_v5" || r.mission_schema_version === "mission_v6") &&
         Array.isArray(r.mission_mpj_items) &&
         r.mission_mpj_items.length === 5,
       situation_ko: typeof content.situation_ko === "string" ? content.situation_ko : "",

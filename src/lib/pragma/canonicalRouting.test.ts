@@ -91,11 +91,12 @@ describe("canonical document routing", () => {
     const contract = readFileSync(join(ROOT, CURRENT_CANONICALS[0]), "utf8");
 
     expect(manifest).toContain("MJT(Metapragmatic Judgement Task)");
-    expect(manifest).toContain("최신 승인 학습설계는 **MJT5 + DCT1**");
-    expect(manifest).toContain("현행 소스의 `mission_v5` 생성·검사·러너 계약도 승인된 **MJT5 + DCT1**");
+    expect(manifest).toContain("현재 구현된 `mission_v6`를 정식 mission format으로 채택했다");
+    expect(manifest).toContain("아래 두 문단의 생성·문항·대역 계약은 **기존 `mission_v5`에 한정**");
     expect(manifest).toContain("운영 DB·Edge·Railway에 반영됐다");
     expect(manifest).toContain("과거 `mission_v5` MJT4 행은 legacy 구현으로 읽기 호환");
-    expect(contract).toContain("최신 승인 학습설계와 현행 소스 계약: **네이티브 MJT5 + DCT1**");
+    expect(contract).toContain("최신 채택 format: **`mission_v6`, MJT5 + DCT1**");
+    expect(contract).toContain("기존 `mission_v5` native/legacy 및 과거 응답 계약은 유지한다");
     expect(contract).toContain("현행 소스의 `mission_v5`는 네이티브 MJT5+DCT1");
     expect(contract).toContain("mpj_response_v2");
   });

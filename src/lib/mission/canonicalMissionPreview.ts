@@ -24,6 +24,8 @@ interface QuestBase {
   source: string;
   /** 제출 뒤 목표어에서 직접 짚어 줄 표현 */
   targetHighlights?: string[];
+  /** Local UX fixtures may name their next activity without changing saved missions. */
+  nextLabel?: string;
 }
 
 export interface MissionLessonPoint {
@@ -49,6 +51,10 @@ export interface ScaleQuest extends QuestBase {
   /** 제출 뒤 정답 효과를 함께 표시할 수용 대역 */
   acceptedAnswers?: string[];
   feedback: string;
+  /** Authored alternatives revealed after judgment, not a unique translation key. */
+  revisionExamples?: string[];
+  /** One inline choice after committing the initial judgment, before feedback. */
+  reasonChoice?: { prompt: string; options: ChoiceOption[] };
 }
 
 export interface FixChoiceQuest extends QuestBase {
@@ -82,6 +88,25 @@ export interface ReasonQuest extends QuestBase {
   /** legacy MPJ5에서 복수 근거를 허용한 경우의 읽기 호환. 최신 설계는 단일 ID를 사용한다. */
   acceptedReasonIds?: string[];
   feedback: string;
+}
+
+/** Learner UX pilot only; not a persisted mission_v5 item contract. */
+export interface FreeCorrectionQuest extends QuestBase {
+  kind: "free_correction";
+  prompt: string;
+  target: string;
+  references: string[];
+  feedback: string;
+  /** Authored feedback only; no learner response or scoring. */
+  contrast?: { context: string; target: string; explanation: string };
+}
+
+/** Independent candidate placement for the local learner UX pilot. */
+export interface SpectrumQuest extends QuestBase {
+  kind: "spectrum";
+  prompt: string;
+  options: ChoiceOption[];
+  candidates: Array<{ id: string; text: string; acceptedAnswers: string[]; note: string }>;
 }
 
 export interface BestWorstQuest extends QuestBase {
@@ -148,6 +173,8 @@ export type MissionQuest =
   | ScaleQuest
   | FixChoiceQuest
   | ReasonQuest
+  | FreeCorrectionQuest
+  | SpectrumQuest
   | BestWorstQuest
   | DctQuest
   | DctFeedbackQuest;
@@ -166,6 +193,9 @@ const DIRECTNESS_3: ChoiceOption[] = [
 ];
 
 export interface CanonicalMissionViewModel {
+  /** Explicit stored format; absence preserves legacy and the frozen UX fixture. */
+  missionFormat?: "mission_v6";
+  learnerContextCopy?: Partial<Record<string, string>>;
   scenarioId?: string;
   metaLabel?: string;
   weekNo: number;
