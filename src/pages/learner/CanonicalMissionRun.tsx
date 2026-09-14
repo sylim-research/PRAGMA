@@ -1689,6 +1689,8 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
         : section === "recap" ? <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={onNext} />
         : quest && quest.kind !== "dct_feedback" ? <>
           <QuestRenderer key={`${quest.id}-${revealAnswers}`} quest={quest} responses={responses} revealAnswers={revealAnswers}
+            // Same direct-correction flow as the learner runner: v6 MJT3 has no judgment step before its corrections.
+            localPilot={mission.missionFormat === "mission_v6"}
             onDone={(response) => {
               setResponses((current) => ({ ...current, [quest.id]: response }));
               if (quest.kind !== "dct") onNext();

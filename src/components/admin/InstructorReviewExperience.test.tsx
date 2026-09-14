@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { InstructorReviewExperience } from "./InstructorReviewExperience";
 import { CanonicalReviewStage } from "@/pages/learner/CanonicalMissionRun";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
+import { SAMPLE_MISSION_V6_REASON_CONTRAST } from "@/lib/mission/missionV6Sample";
 import { EXPERIENCE_SECTIONS, experienceComplete, viewModelFromReview } from "@/lib/pragma/instructorExperience";
 import { instructionalMission, type ReviewInspection } from "../../../supabase/functions/_shared/contentReview";
 
@@ -32,6 +33,13 @@ describe("instructor experience", () => {
     const model = viewModelFromReview(inspection());
     render(<MemoryRouter><CanonicalReviewStage mission={model} section="mjt-4" revealAnswers onNext={vi.fn()} /></MemoryRouter>);
     for (const candidate of SAMPLE_MISSION_V5_NATIVE.mpj_items[4].candidates) expect(screen.getByText(candidate.note_ko)).toBeInTheDocument();
+    expect(effects.save).not.toHaveBeenCalled();
+  });
+  it("shows v6 MJT3 corrections directly, as the learner runner does", () => {
+    const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
+    render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="mjt-2" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+    for (const correction of SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[2].corrections) expect(screen.getByText(correction.text)).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled();
   });
   it("keeps all confirmation states incomplete when a hold exists", () => {
