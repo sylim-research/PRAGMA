@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
@@ -49,6 +49,8 @@ describe("학습 미션 라이브러리", () => {
     expect(within(item).getByText("1곳에 편성됨")).toBeInTheDocument();
     expect(within(item).getByRole("link", { name: /수업에 편성/ })).toHaveAttribute("href", "/admin/composer?scenarioId=released");
     expect(within(item).getByRole("link", { name: /감수·승인 확인/ })).toHaveAttribute("href", "/admin/review?scenarioId=released");
+    // Let the post-load effect that collapses previews settle first; otherwise it can run after the click and close it.
+    await act(async () => {});
     fireEvent.click(within(item).getByRole("button", { name: /미션 보기/ }));
     await screen.findByText("검증용 미션 본문");
     expect(mocks.preview).toHaveBeenCalledWith("released");
