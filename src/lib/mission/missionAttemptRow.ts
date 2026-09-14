@@ -49,8 +49,10 @@ export interface MpjResponseTrace extends Record<string, Json | undefined> {
   completed_at: string;
   /** MJT 자유교정에서 학습자가 제출한 수정문. 비채점 원응답. */
   revised_text?: string;
-  /** legacy scale4 */
+  /** legacy scale4. v6 MJT2에서는 이유를 보기 전의 최초 판단이며 덮어쓰지 않는다. */
   scale_code?: string;
+  /** v6 MJT2에서 이유를 살펴본 뒤 최초 판단과 다르게 고친 판단. 바꾸지 않았으면 없다. */
+  revised_scale_code?: string;
   /** judge3 또는 fix_choice의 최초 조절 정도 판단 */
   band_code?: string;
   /** fix_choice에서 고른 수정안의 0-based 위치 */

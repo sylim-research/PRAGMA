@@ -66,6 +66,26 @@ describe("v6 inline reason and feedback-only contrast", () => {
     const input = { ...rawResponses(), A2: { pick: "very_appropriate", reasonId: "assumed-acceptance" } };
     expect(() => buildMissionV6Responses(SAMPLE_MISSION_V6, input, at)).toThrow();
   });
+  it("keeps the first judgment and records a judgment changed after reasons separately", () => {
+    const reasonId = mission.mpj_items[1].reason_choice.options[1].id;
+    const unchanged = buildMissionV6Responses(mission, { ...rawResponses(), A2: { pick: "somewhat_appropriate", reasonId, revisedPick: "somewhat_appropriate" } }, at);
+    expect(unchanged[1]).not.toHaveProperty("revised_scale_code");
+    const traces = buildMissionV6Responses(mission, { ...rawResponses(), A2: { pick: "somewhat_appropriate", reasonId, revisedPick: "somewhat_inappropriate" } }, at);
+    const restored = JSON.parse(JSON.stringify(buildMissionAttemptRow({ ...attempt(traces), mission }, "profile", "user", at))).context_judgment.responses;
+    expect(restored[1]).toEqual({ item_id: 2, item_type: "scale4", completed_at: at,
+      scale_code: "somewhat_appropriate", reason_id: reasonId, revised_scale_code: "somewhat_inappropriate" });
+  });
+  it("rejects a revised judgment that repeats the first, is unknown, or appears without reasons", () => {
+    const reasonId = mission.mpj_items[1].reason_choice.options[0].id;
+    const traces = buildMissionV6Responses(mission, { ...rawResponses(), A2: { pick: "very_appropriate", reasonId } }, at);
+    for (const revised of ["very_appropriate", "invented"]) {
+      const mutated = structuredClone(traces); mutated[1].revised_scale_code = revised;
+      expect(() => buildMissionAttemptRow({ ...attempt(mutated), mission }, "profile", "user", at)).toThrow();
+    }
+    const withoutReasons = buildMissionV6Responses(SAMPLE_MISSION_V6, rawResponses(), at);
+    withoutReasons[1].revised_scale_code = "very_inappropriate";
+    expect(() => buildMissionAttemptRow(attempt(withoutReasons), "profile", "user", at)).toThrow();
+  });
 });
 
 describe("mission_v6 format and backward compatibility", () => {

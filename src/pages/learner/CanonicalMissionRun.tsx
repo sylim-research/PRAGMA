@@ -114,6 +114,8 @@ type SceneIntroConfig = {
   context: MissionContext;
   outputName: string;
   practiceDescription?: string;
+  /** v6 MJTs use separate scenes, so the intro briefs the flow without showing one scenario as the mission's anchor. */
+  briefingOnly?: boolean;
 };
 
 function buildSceneIntroConfig(mission: CanonicalMissionViewModel): SceneIntroConfig {
@@ -123,7 +125,8 @@ function buildSceneIntroConfig(mission: CanonicalMissionViewModel): SceneIntroCo
     context: production?.context ?? mission.quests[0].context,
     outputName: mission.activityMode === "interpreting" ? "통역" : "번역",
     practiceDescription: mission.quests.some(item => item.kind === "free_correction")
-      ? "매번 다른 학교생활 장면에서 판단하고, 고르고, 직접 고쳐 보며 감각을 쌓습니다." : undefined,
+      ? "매번 다른 상황에서 표현을 판단하고, 고르고, 직접 고쳐 봅니다." : undefined,
+    briefingOnly: mission.missionFormat === "mission_v6",
   };
 }
 
@@ -222,14 +225,18 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
           </li>
           <li className="rounded-xl bg-[#F8F6EE] p-4">
             <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
-            <p className="mt-1 text-sm leading-6 text-[#596579]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
+            <p className="mt-1 text-sm leading-6 text-[#596579]">{config.briefingOnly
+              ? "다섯 문항을 마친 뒤 새로운 상황의 원문을 직접 옮기고, 피드백을 보고 내 최종안을 정합니다."
+              : "아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다."}</p>
           </li>
         </ol>
-        <ContextCard context={config.context} title={`직접 ${config.outputName}할 상황`} />
-        <dl className="grid gap-3 text-sm sm:grid-cols-[1fr_auto]">
-          <div><dt className="text-xs font-bold text-[#697386]">상대·관계</dt><dd className="mt-1 leading-6">{config.context.relation}</dd></div>
-          <div><dt className="text-xs font-bold text-[#697386]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
-        </dl>
+        {!config.briefingOnly && <>
+          <ContextCard context={config.context} title={`직접 ${config.outputName}할 상황`} />
+          <dl className="grid gap-3 text-sm sm:grid-cols-[1fr_auto]">
+            <div><dt className="text-xs font-bold text-[#697386]">상대·관계</dt><dd className="mt-1 leading-6">{config.context.relation}</dd></div>
+            <div><dt className="text-xs font-bold text-[#697386]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
+          </dl>
+        </>}
         <Button className="h-12 w-full" onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "표현 판단 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
@@ -495,6 +502,9 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   const [answered, setAnswered] = useState(revealAnswers);
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
   const [reasonId, setReasonId] = useState<string | null>(null);
+  // Judgment made before reasons were shown. After choosing a reason the learner may change the current pick.
+  const [firstPick, setFirstPick] = useState<string | null>(null);
+  const reconsidering = Boolean(quest.reasonChoice && judgmentCommitted && !answered && reasonId);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
   const acceptedLabel = quest.options
     .filter((option) => acceptedIds.includes(option.id))
@@ -506,10 +516,11 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <p className="mb-1 text-[11px] font-black text-[#6B7280]">지금 할 일</p>
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         <div className={optionGrid}>
-          {quest.options.filter(option => !quest.reasonChoice || !judgmentCommitted || answered || option.id === pick).map((option) => (
-            <OptionButton key={option.id} option={option} value={pick} disabled={answered || judgmentCommitted} answered={answered} acceptedIds={acceptedIds} onSelect={setPick} />
+          {quest.options.filter(option => !quest.reasonChoice || !judgmentCommitted || answered || reconsidering || option.id === pick).map((option) => (
+            <OptionButton key={option.id} option={option} value={pick} disabled={answered || (judgmentCommitted && !reconsidering)} answered={answered} acceptedIds={acceptedIds} onSelect={setPick} />
           ))}
         </div>
+        {reconsidering && <p className="mt-2 break-keep text-xs leading-5 text-[#596579]">이유를 살펴본 뒤 생각이 달라졌다면 위에서 판단을 바꿀 수 있습니다.</p>}
         {quest.reasonChoice && judgmentCommitted && !answered && <fieldset className="mt-4 border-t border-[#DDD8CB] pt-4">
           <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
@@ -529,13 +540,13 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
-            if (!judgmentCommitted) setJudgmentCommitted(true);
+            if (!judgmentCommitted) { setFirstPick(pick); setJudgmentCommitted(true); }
             else setAnswered(true);
           }}>{judgmentCommitted ? "판단과 이유 확인하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "답안 확인하기" : "답을 선택해 주세요"}</Button>
         ) : (
-          <Button className="h-12 w-full" onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className="h-12 w-full" onClick={() => onDone({ pick: firstPick ?? pick, ...(reasonId ? { reasonId } : {}), ...(firstPick && pick !== firstPick ? { revisedPick: pick } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -856,10 +867,12 @@ function isOverMitigated(text: string) {
 function VocabularyHints({ quest }: { quest: DctQuest }) {
   const mission = useCanonicalMission();
   const supportLevel = mission.supportLevel;
-  if (supportLevel === "advanced" || quest.vocabularyHints.length === 0) return null;
+  // Every level shows the core's own hints, at most two; none are generated here.
+  const hints = quest.vocabularyHints.slice(0, 2);
+  if (hints.length === 0) return null;
   const chips = (
     <div className="flex flex-wrap gap-2">
-      {quest.vocabularyHints.map((hint) => (
+      {hints.map((hint) => (
         <span key={hint.source} className="rounded-full border border-[#D8D4C8] bg-[#FAF8F2] px-3 py-1.5 text-xs">
           <b>{hint.source}</b> · <span className={mission.targetLanguage.code === "zh" ? "font-zh" : ""}>{hint.target}</span>
         </span>
@@ -1743,7 +1756,7 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
 }
 function responseLabel(quest: MissionQuest, response: QuestResponse) {
   if (quest.kind === "scale") {
-    const judgment = quest.options.find((item) => item.id === response.pick)?.label ?? "선택 기록";
+    const judgment = quest.options.find((item) => item.id === (response.revisedPick ?? response.pick))?.label ?? "선택 기록";
     const reason = quest.reasonChoice?.options.find(item => item.id === response.reasonId)?.label;
     return reason ? `${judgment}\n내 판단 이유 · ${reason}` : judgment;
   }
