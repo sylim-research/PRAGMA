@@ -12,8 +12,12 @@ import { GenerationJobsPanel } from '@/components/admin/GenerationJobsPanel';
 // prompt_snapshot_hash 필터는 편의가 아니라 안전장치다 — 서로 다른 생성 계열
 // (예: dc8f1494… 신계열 vs 구계열·legacy NULL)을 한 배치에 섞어 조립하는 것은
 // 금지사항이다. A2(다중 선택·일괄 조립)는 별도 승인 후 이 화면에 추가된다.
+//
+// 2026-09-14: 세 화면 모두 「왼쪽 대기열 + 오른쪽 작업대」로 통일했다. 진입하면 대기열 첫 미션이
+// 작업대에 열리고, 작업을 마쳐도 다음 미션으로 저절로 넘어가지 않는다(「다음 미션 ▶」으로만 이동).
+// 여는 것은 읽기뿐이며, 조립·유료 AI 검토·승인은 지금처럼 버튼을 눌러야 실행된다.
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -65,10 +69,12 @@ import {
   missionVersionLabel,
   placementLabel,
   professorQueueOf,
+  qualityCheckQueueOf,
   reviewProgressLabel,
   traceLabel,
   updatedAtLabel,
   type ProfessorQueue,
+  type QualityCheckQueue,
 } from "@/lib/admin/professorReviewQueue";
 
 interface CoreRow {
@@ -94,7 +100,7 @@ interface CoreRow {
     source_text_ko?: string;
     direction?: string;
   } | null;
-  // 교수자 최종 승인 화면에서만 함께 읽는 판별 정보.
+  // 점검·최종 승인 화면에서만 함께 읽는 판별 정보.
   review_status?: string | null;
   updated_at?: string | null;
   mission_schema_version?: string | null;
@@ -109,6 +115,8 @@ type ReviewMeta = {
   assignments: DashboardAssignmentRow[];
   outlineTitles: Map<string, string>;
 };
+
+type ReviewInfo = { queue: ProfessorQueue; check: QualityCheckQueue; progress: string; placement: string };
 
 const toDashboardRow = (r: CoreRow): DashboardScenarioRow => ({
   scenario_id: r.scenario_id,
@@ -128,12 +136,12 @@ const STATE_KO: Record<AssemblyState, string> = {
   reviewed: "검토 완료",
   failed: "이번 조립 실패",
 };
-const STATE_TONE: Record<AssemblyState, string> = {
-  core_only: "border-[#DDE1E2] bg-[#F3F5F5] text-[#59656D]",
-  generated: "border-[#E7D9B8] bg-[#F8F3E8] text-[#765F1C]",
-  reviewed: "border-[#CEE0D4] bg-[#EDF5F0] text-[#38634B]",
-  failed: "border-[#E5CFCC] bg-[#F7EFEE] text-[#7B453F]",
-};
+
+// 상태 칩. 점검 화면의 칩은 DB 상태가 아니라 같은 generated 미션을 검수 단계로 나눈 보기다.
+type StateChip = "all" | AssemblyState | ProfessorQueue | Exclude<QualityCheckQueue, "decision">;
+const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "failed", "generated", "reviewed", "all"];
+const QUALITY_CHIPS: StateChip[] = ["needs_check", "rules_error", "decision", "all"];
+const PROFESSOR_CHIPS: StateChip[] = ["decision", "in_progress", "reviewed", "all"];
 
 // ── 목록 배지 색 ──
 // 네 축을 눈으로 갈라 읽기 위한 것이지 장식이 아니다. 축마다 다른 방식으로 구분한다:
@@ -200,9 +208,11 @@ const progressLabel = (stage: PromoteStage) => {
   return "수리본 재검사";
 };
 
+const titleOf = (r: CoreRow) => r.core_content?.brief_note_ko?.trim() || r.core_content?.situation_ko || "—";
+
 /**
- * 한 컴포넌트가 세 화면을 그린다. 목록·필터 기계장치가 같기 때문이며, 화면마다 다른 것은
- * 조회 범위와 그 자리에서 할 수 있는 일이다.
+ * 한 컴포넌트가 세 화면을 그린다. 대기열·필터 기계장치가 같기 때문이며, 화면마다 다른 것은
+ * 대기열의 상태 칩·정렬과 작업대에서 할 수 있는 일이다.
  *   reviewMode=false      → 학습 미션 조립 (코어를 미션으로 만든다)
  *   reviewMode + aiReview → 자동 품질 점검·AI 검토 (판단 자료를 준비한다. 승인 기능 없음)
  *   reviewMode            → 교수자 최종 승인 (감수하고 승인한다)
@@ -212,6 +222,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [searchParams] = useSearchParams();
   // 교수자 최종 승인 화면. 자동 품질 점검 화면도 reviewMode를 쓰므로 aiReview로 가른다.
   const professorScreen = reviewMode && !aiReview;
+  const chips = professorScreen ? PROFESSOR_CHIPS : aiReview ? QUALITY_CHIPS : ASSEMBLY_CHIPS;
   const [rows, setRows] = useState<CoreRow[]>([]);
   const [reviewMeta, setReviewMeta] = useState<ReviewMeta | null>(null);
   const [generationModel, setGenerationModel] = useState<"existing" | "astra">("existing");
@@ -222,12 +233,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const initAct = searchParams.get("act");
   const initLevel = searchParams.get("level");
 
-  // 각 화면이 맡은 일부터 띄운다 — 조립은 아직 미션이 없는 코어, 점검은 감수 대기 미션,
-  // 최종 승인은 교수자 차례가 된 미션(결정 대기)만.
-  // 상태가 하나로 걸러져 있으면 행의 상태 배지도 함께 사라진다(모든 행이 같은 값이므로).
-  const [fState, setFState] = useState<"all" | AssemblyState | ProfessorQueue>(
-    searchParams.get("scenarioId") ? "all" : professorScreen ? "decision" : reviewMode ? "generated" : "core_only",
-  );
+  // 각 화면이 맡은 일부터 띄운다 — 조립은 아직 미션이 없는 코어, 점검은 점검이 필요한 미션,
+  // 최종 승인은 교수자 차례가 된 미션(결정 대기).
+  const [fState, setFState] = useState<StateChip>(chips[0]);
   const [fAct, setFAct] = useState<"all" | SpeechActUI>(
     ACTS.includes(initAct as SpeechActUI) ? (initAct as SpeechActUI) : "all",
   );
@@ -238,6 +246,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
   const [fRun, setFRun] = useState<string>("all");
   const [fHash, setFHash] = useState<string>("all");
+  const [search, setSearch] = useState("");
+  // 조립은 방금 만든 것을 확인하는 일이 많아 최신순, 점검·승인은 밀린 일부터 줄이도록 오래 기다린 순.
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode ? "oldest" : "newest");
   const [showAll, setShowAll] = useState(false);
 
   const [busy, setBusy] = useState<string | null>(null);
@@ -249,10 +260,15 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [failures, setFailures] = useState<Record<string, string>>({});
   const [rowMsg, setRowMsg] = useState<Record<string, string>>({});
   const [preview, setPreview] = useState<Record<string, { mission: LearnerMissionRuntime; warnings: string[] }>>({});
-  const [openId, setOpenId] = useState<string | null>(null);
+  // 작업대에 열린 미션. 대기열 필터와 따로 둔다 — 작업을 마쳐 대기열에서 빠져도 결과를 계속 보여 준다.
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  // 선택한 미션이 대기열에서 빠졌을 때 「다음 미션」을 정하는 기준 위치.
+  const [anchorIndex, setAnchorIndex] = useState(0);
+  const pendingScenarioId = useRef(searchParams.get("scenarioId"));
+  const previewLoading = useRef(new Set<string>());
   const [reviewSelection, setReviewSelection] = useState<Set<string>>(new Set());
   const reviewQueue = useReviewPreparationQueue();
-  useEffect(() => { setReviewSelection(new Set()); }, [fState, fAct, fLevel, fMode, fDirection, fRun, fHash]);
+  useEffect(() => { setReviewSelection(new Set()); }, [fState, fAct, fLevel, fMode, fDirection, fRun, fHash, search]);
 
   const loadRows = useCallback(async () => {
     setLoading(true);
@@ -262,24 +278,24 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       // scenarios의 신규 조립 메타 컬럼이 생성 타입보다 앞서 배포돼 임시 query builder cast가 필요하다.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as unknown as { from: (t: string) => any };
+      const select = reviewMode ? CORE_ROW_SELECT + REVIEW_META_SELECT : CORE_ROW_SELECT;
       let request = db
         .from("scenarios")
-        .select(professorScreen ? CORE_ROW_SELECT + REVIEW_META_SELECT : CORE_ROW_SELECT)
+        .select(select)
         .eq("content_format", "scenario_core_v1")
         .order("created_at", { ascending: false })
         .limit(ROW_CAP);
       if (reviewMode) request = request.in("mission_status", ["generated", "reviewed", "released"]);
-      if (searchParams.get("scenarioId")) request = request.eq("scenario_id", searchParams.get("scenarioId"));
-      // 보관(archived_at) 행은 조립·검토·승인 후보가 아니다. 직접 링크(scenarioId)로 여는 경우만 예외.
-      else request = request.neq("review_status", "revise_required").is("archived_at", null);
+      // 보관(archived_at) 행은 조립·검토·승인 후보가 아니다. 직접 링크(scenarioId)로 여는 미션만 아래에서 따로 읽는다.
+      request = request.neq("review_status", "revise_required").is("archived_at", null);
       const timeout = new Promise<never>((_, reject) => {
         timeoutId = setTimeout(() => reject(new Error("조회 시간이 15초를 초과했습니다.")), QUERY_TIMEOUT_MS);
       });
-      // 결정 대기 판정(검수 이력)과 교과목·주차(편성)는 목록 전체에 대해 한 번씩만 읽는다.
+      // 검수 단계 판정(검수 이력)과 교과목·주차(편성)는 목록 전체에 대해 한 번씩만 읽는다.
       // 대시보드와 같은 조회 조건이어야 두 화면의 「교수자 차례」 수가 같다.
       const page = <T,>(query: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) =>
         fetchAllPages<T>(async (from, to) => await query(from, to));
-      const metaRequest: Promise<ReviewMeta | null> = professorScreen
+      const metaRequest: Promise<ReviewMeta | null> = reviewMode
         ? Promise.all([
           page<DashboardReviewRunRow>((from, to) => db.from("content_review_runs").select(DASHBOARD_REVIEW_RUN_SELECT)
             .eq("kind", "mission").eq("criteria_version", DASHBOARD_REVIEW_CRITERIA_VERSION).is("superseded_by", null)
@@ -300,15 +316,21 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         timeout,
       ]);
       if (queryError) throw new Error(queryError.message);
+      let loaded = (data ?? []) as CoreRow[];
+      const linkedId = searchParams.get("scenarioId");
+      if (linkedId && !loaded.some((row) => row.scenario_id === linkedId)) {
+        const { data: linked } = await db.from("scenarios").select(select).eq("scenario_id", linkedId).maybeSingle();
+        if (linked) loaded = [linked as CoreRow, ...loaded];
+      }
       setReviewMeta(meta);
-      setRows((data ?? []) as CoreRow[]);
+      setRows(loaded);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "시나리오를 불러오지 못했습니다.");
     } finally {
       if (timeoutId) clearTimeout(timeoutId);
       setLoading(false);
     }
-  }, [reviewMode, professorScreen, searchParams]);
+  }, [reviewMode, searchParams]);
 
   useEffect(() => {
     void loadRows();
@@ -326,7 +348,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   // 줄마다 검수 이력·편성 전체를 다시 훑지 않도록 scenario_id별로 한 번 묶어 판정해 둔다.
   const reviewInfo = useMemo(() => {
-    const info = new Map<string, { queue: ProfessorQueue; progress: string; placement: string }>();
+    const info = new Map<string, ReviewInfo>();
     if (!reviewMeta) return info;
     const runsByTarget = new Map<string, DashboardReviewRunRow[]>();
     for (const run of reviewMeta.runs) {
@@ -340,6 +362,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       const runs = runsByTarget.get(r.scenario_id) ?? [];
       info.set(r.scenario_id, {
         queue: professorQueueOf(dashboardRow, runs),
+        check: qualityCheckQueueOf(dashboardRow, runs),
         progress: reviewProgressLabel(dashboardRow, runs),
         placement: placementLabel(assignmentsByScenario.get(r.scenario_id), reviewMeta.outlineTitles),
       });
@@ -348,15 +371,28 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   }, [reviewMeta, rows]);
 
   const matchesState = useCallback(
-    (r: CoreRow, state: "all" | AssemblyState | ProfessorQueue) => {
+    (r: CoreRow, state: StateChip) => {
       if (state === "all") return true;
       if (state === "decision" || state === "in_progress") {
         return stateOf(r) === "generated" && (reviewInfo.get(r.scenario_id)?.queue ?? "in_progress") === state;
+      }
+      if (state === "needs_check" || state === "rules_error") {
+        return stateOf(r) === "generated" && (reviewInfo.get(r.scenario_id)?.check ?? "needs_check") === state;
       }
       return stateOf(r) === state;
     },
     [reviewInfo, stateOf],
   );
+
+  const chipLabel = (chip: StateChip) => {
+    if (chip === "all") return "전체";
+    if (chip === "decision") return aiReview ? "교수자 승인 대기" : "결정 대기";
+    if (chip === "in_progress") return "검수 진행 중";
+    if (chip === "needs_check") return "점검 필요";
+    if (chip === "rules_error") return "규칙 오류";
+    if (chip === "reviewed" && professorScreen) return "승인 완료";
+    return STATE_KO[chip];
+  };
 
   const runIds = useMemo(
     () => [...new Set(rows.map((r) => r.generation_run_id).filter(Boolean))] as string[],
@@ -369,36 +405,96 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   // 상태를 뺀 나머지 필터. 상태 칩의 건수는 이 결과에서 세야 상태를 바꾸기 전에
   // 각 상태가 몇 건인지 보인다.
-  const matchedExceptState = useMemo(
-    () =>
-      rows.filter(
-        (r) =>
-          (fAct === "all" || r.speech_act === fAct) &&
-          (fLevel === "all" || r.learner_level === fLevel) &&
-          (fMode === "all" || r.mode === fMode) &&
-          (fDirection === "all" || coreDirection(r.core_content) === fDirection) &&
-          (fRun === "all" || r.generation_run_id === fRun) &&
-          (fHash === "all" || (r.prompt_snapshot_hash ?? "null") === fHash),
-      ),
-    [rows, fAct, fLevel, fMode, fDirection, fRun, fHash],
-  );
+  const matchedExceptState = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    return rows.filter(
+      (r) =>
+        (fAct === "all" || r.speech_act === fAct) &&
+        (fLevel === "all" || r.learner_level === fLevel) &&
+        (fMode === "all" || r.mode === fMode) &&
+        (fDirection === "all" || coreDirection(r.core_content) === fDirection) &&
+        (fRun === "all" || r.generation_run_id === fRun) &&
+        (fHash === "all" || (r.prompt_snapshot_hash ?? "null") === fHash) &&
+        (!needle || [r.core_content?.brief_note_ko, r.core_content?.situation_ko, r.scenario_id, r.mission_content_hash?.slice(0, 7)]
+          .some((text) => text?.toLowerCase().includes(needle))),
+    );
+  }, [rows, fAct, fLevel, fMode, fDirection, fRun, fHash, search]);
 
-  const filtered = useMemo(
-    () => matchedExceptState.filter((r) => matchesState(r, fState)),
-    [matchedExceptState, fState, matchesState],
-  );
+  const filtered = useMemo(() => {
+    const list = matchedExceptState.filter((r) => matchesState(r, fState));
+    // 조회 자체가 생성 최신순이다. 점검·승인은 마지막 수정 시각으로 기다린 시간을 잰다.
+    if (!reviewMode) return sortOrder === "newest" ? list : [...list].reverse();
+    const time = (r: CoreRow) => (r.updated_at ? Date.parse(r.updated_at) : Number.NaN);
+    return [...list].sort((a, b) => {
+      const ta = time(a), tb = time(b);
+      if (Number.isNaN(ta) || Number.isNaN(tb)) return Number.isNaN(ta) ? (Number.isNaN(tb) ? 0 : 1) : -1;
+      return sortOrder === "oldest" ? ta - tb : tb - ta;
+    });
+  }, [matchedExceptState, fState, matchesState, reviewMode, sortOrder]);
 
   const dash = useMemo(() => {
-    const d: Record<AssemblyState | ProfessorQueue, number> = {
-      core_only: 0, generated: 0, reviewed: 0, failed: 0, decision: 0, in_progress: 0,
-    };
-    for (const r of matchedExceptState) {
-      const st = stateOf(r);
-      d[st] += 1;
-      if (st === "generated") d[reviewInfo.get(r.scenario_id)?.queue ?? "in_progress"] += 1;
-    }
+    const d = {} as Record<StateChip, number>;
+    for (const chip of chips) d[chip] = matchedExceptState.filter((r) => matchesState(r, chip)).length;
     return d;
-  }, [matchedExceptState, stateOf, reviewInfo]);
+  }, [chips, matchedExceptState, matchesState]);
+
+  // 진입·필터 변경 시에만 대기열 첫 미션을 연다. 작업을 마쳐 대기열이 바뀌어도 선택은 그대로 둔다.
+  const filteredRef = useRef(filtered);
+  filteredRef.current = filtered;
+  const rowsRef = useRef(rows);
+  rowsRef.current = rows;
+  const matchesRef = useRef(matchesState);
+  matchesRef.current = matchesState;
+  useEffect(() => {
+    if (loading) return;
+    const linkedId = pendingScenarioId.current;
+    if (linkedId) {
+      pendingScenarioId.current = null;
+      const linked = rowsRef.current.find((row) => row.scenario_id === linkedId);
+      if (linked) {
+        const chip = chips.find((candidate) => candidate !== "all" && matchesRef.current(linked, candidate)) ?? "all";
+        setFState(chip);
+        setSelectedId(linkedId);
+        return;
+      }
+    }
+    const list = filteredRef.current;
+    setSelectedId((current) => (current && list.some((row) => row.scenario_id === current) ? current : list[0]?.scenario_id ?? null));
+    setAnchorIndex(0);
+  }, [loading, chips, fState, fAct, fLevel, fMode, fDirection, fRun, fHash, search, sortOrder]);
+
+  const selectedRow = selectedId ? rows.find((row) => row.scenario_id === selectedId) ?? null : null;
+  const selectedIndex = selectedId ? filtered.findIndex((row) => row.scenario_id === selectedId) : -1;
+  const prevRow = selectedIndex >= 0 ? filtered[selectedIndex - 1] : filtered[anchorIndex - 1];
+  const nextRow = selectedIndex >= 0 ? filtered[selectedIndex + 1] : filtered[anchorIndex];
+
+  const selectRow = useCallback((row: CoreRow | undefined) => {
+    if (!row) return;
+    const index = filteredRef.current.findIndex((candidate) => candidate.scenario_id === row.scenario_id);
+    setSelectedId(row.scenario_id);
+    setAnchorIndex(Math.max(index, 0));
+    if (index >= LIST_CAP) setShowAll(true);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) return;
+    document.getElementById(`queue-${selectedId}`)?.scrollIntoView?.({ block: "nearest" });
+  }, [selectedId]);
+
+  // 작업대에 연 미션의 저장본을 읽는다(읽기 전용). 생성·검수 실행은 여기서 일어나지 않는다.
+  useEffect(() => {
+    if (!selectedRow) return;
+    const id = selectedRow.scenario_id;
+    const st = stateOf(selectedRow);
+    if ((st !== "generated" && st !== "reviewed") || preview[id] || previewLoading.current.has(id)) return;
+    previewLoading.current.add(id);
+    fetchMissionForReview(id, { includeV6: true })
+      .then((res) => {
+        if (res) setPreview((m) => ({ ...m, [id]: { mission: res.mission, warnings: [] } }));
+      })
+      .catch((e) => toast.error(e instanceof Error ? e.message : "미션 조회 실패"))
+      .finally(() => previewLoading.current.delete(id));
+  }, [selectedRow, stateOf, preview]);
 
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
@@ -439,7 +535,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           // 품질점검은 저장 직전에 붙으므로 엣지 응답 미션에는 없다 — 미리보기용으로 합친다.
           const withQuality = res.quality ? { ...res.mission, quality_check: res.quality } : res.mission;
           setPreview((m) => ({ ...m, [r.scenario_id]: { mission: withQuality, warnings } }));
-          setOpenId(r.scenario_id); // 조립 직후 바로 눈검사 뷰 펼침
         }
         if (res.quality?.verdict === "fail") {
           toast.warning("유효 초안을 저장했습니다. 남은 결함은 교수자가 문항 단위로 수정하거나 근거를 남겨 승인할 수 있습니다.");
@@ -542,7 +637,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         const { [r.scenario_id]: _drop, ...rest } = prev;
         return rest;
       });
-      setOpenId(null);
+      setSelectedId(replacement.scenario_id);
       setBusy(null);
       toast.info("기존 미션은 반려 이력으로 보존했습니다. 새 시나리오로 다시 조립합니다.");
       await onAssemble(replacement);
@@ -553,25 +648,230 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     }
   };
 
-  const togglePreview = async (r: CoreRow) => {
-    if (openId === r.scenario_id) {
-      setOpenId(null);
-      return;
-    }
-    setOpenId(r.scenario_id);
-    if (!preview[r.scenario_id]) {
-      try {
-        const res = await fetchMissionForReview(r.scenario_id, { includeV6: true });
-        if (res) setPreview((m) => ({ ...m, [r.scenario_id]: { mission: res.mission, warnings: [] } }));
-      } catch (e) {
-        toast.error(e instanceof Error ? e.message : "미션 조회 실패");
-      }
-    }
+  const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
+  // 접혀 있어도 필터가 걸려 있는지 알 수 있어야 한다.
+  const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
+  const nextLabel = professorScreen && fState === "decision" ? "다음 결정 대기 미션 ▶" : "다음 미션 ▶";
+
+  const badges = (r: CoreRow, size: "sm" | "md") => {
+    const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
+    const direction = coreDirection(r.core_content);
+    const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
+    return (
+      <span className="flex flex-wrap items-center gap-1">
+        <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
+        <span className={["rounded border font-bold", cls, DIRECTION_TONE[direction]].join(" ")}>{DIRECTION_LABEL[direction]}</span>
+        <span className={["rounded border font-semibold", cls, LEVEL_TONE[r.learner_level]].join(" ")}>{LEVEL[r.learner_level]}</span>
+        <span className={["rounded border font-semibold", cls, MODE_TONE[mode]].join(" ")}>{MODE_LABEL[mode]}</span>
+      </span>
+    );
   };
 
-  const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
-  // 접혀 있어도 4축 필터가 걸려 있는지 알 수 있어야 한다.
-  const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
+  // 대기열 카드에는 고르는 데 필요한 것만. 전체 해시·run ID·원본은 작업대의 세부 추적 정보에 둔다.
+  const cardMeta = (r: CoreRow) => {
+    const info = reviewInfo.get(r.scenario_id);
+    const st = stateOf(r);
+    if (!reviewMode) {
+      if (busy === r.scenario_id && assemblyProgress?.id === r.scenario_id) return ["조립 중"];
+      return [fState === "all" ? STATE_KO[st] : null, failures[r.scenario_id] && st === "failed" ? "조립 실패 · 사유 확인" : null];
+    }
+    if (aiReview) return [info?.progress, traceLabel(r.mission_content_hash)];
+    return [info?.placement, missionVersionLabel(r.mission_schema_version),
+      fState === "decision" ? null : info?.progress, traceLabel(r.mission_content_hash)];
+  };
+
+  const contextLabels = (r: CoreRow) => [
+    r.domain ? DOMAIN[r.domain] : null,
+    r.industry_sector ? (INDUSTRY[r.industry_sector as keyof typeof INDUSTRY] ?? r.industry_sector) : null,
+    r.theme_code ? THEME_LABEL[r.theme_code] : null,
+  ].filter(Boolean) as string[];
+
+  const emptyWorkbench = () => {
+    if (professorScreen && fState === "decision") {
+      return (
+        <>
+          <p>지금 결정할 미션이 없습니다.</p>
+          {dash.in_progress > 0 && (
+            <Link className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4" to="/admin/ai-review">
+              검수 진행 중인 {dash.in_progress}개는 품질 점검 화면에서 확인하세요 →
+            </Link>
+          )}
+        </>
+      );
+    }
+    if (aiReview && fState === "needs_check") {
+      return (
+        <>
+          <p>지금 점검할 미션이 없습니다.</p>
+          {dash.decision > 0 && (
+            <Link className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4" to="/admin/review">
+              교수자 승인 대기 {dash.decision}개는 교수자 최종 승인 화면에서 확인하세요 →
+            </Link>
+          )}
+        </>
+      );
+    }
+    return <p>조건에 맞는 미션이 없습니다. 상태·필터를 바꾸거나 시나리오 개별·배치 생성에서 새 시나리오를 만드세요.</p>;
+  };
+
+  const renderWorkbench = (r: CoreRow) => {
+    const st = stateOf(r);
+    const info = reviewInfo.get(r.scenario_id);
+    const context = contextLabels(r);
+    const isAssembling = busy === r.scenario_id && assemblyProgress?.id === r.scenario_id;
+    const loaded = preview[r.scenario_id];
+    const metaLine = reviewMode
+      ? [info?.placement, missionVersionLabel(r.mission_schema_version), info?.progress, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
+      : [STATE_KO[st], ...context];
+    const scenarioText = (
+      <div className="space-y-1.5">
+        <p className="max-w-[54rem] text-[14.5px] leading-[1.8] text-[#202B33]">{r.core_content?.situation_ko ?? "—"}</p>
+        {context.length > 0 && (
+          <p className="text-[12.5px] text-[#758087]">
+            <span className="font-semibold text-[#5D6970]">맥락</span>
+            <span className="mx-1.5 text-[#B2B8BB]">·</span>
+            {context.join(" · ")}
+          </p>
+        )}
+      </div>
+    );
+    const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
+
+    return (
+      <div key={r.scenario_id} className="space-y-4">
+        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-[#ECE8DE] pb-3">
+          <div className="min-w-0 flex-1 space-y-1.5">
+            {badges(r, "md")}
+            <h2 className="text-[18px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <p className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px] text-[#66727A]">
+              {metaLine.filter(Boolean).map((part, index) => (
+                <span key={index}>{index > 0 && <span className="mr-2 text-[#B2B8BB]">·</span>}{part}</span>
+              ))}
+            </p>
+          </div>
+          <div className="flex shrink-0 items-center gap-2 text-[12.5px] text-[#66727A]">
+            {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
+            <Button size="sm" variant="outline" disabled={!prevRow} onClick={() => selectRow(prevRow)}>◀ 이전</Button>
+            <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음 ▶</Button>
+          </div>
+        </header>
+
+        {/* ── 학습 미션 조립: 만드는 화면 ── */}
+        {!reviewMode && (
+          <>
+            {scenarioText}
+            {(st === "core_only" || st === "failed") && (
+              <section aria-label="조립" className="space-y-3 rounded-lg border border-[#E2DED2] bg-[#FBFAF6] p-3.5">
+                {DEFAULT_FEATURE_BY_ACT[r.speech_act] ? (
+                  <>
+                    <label className="flex flex-wrap items-center gap-3 text-sm">미션 생성 모델
+                      <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
+                        onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="rounded-lg border bg-white px-3 py-2">
+                        <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
+                      </select>
+                      <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 AI 검토를 진행합니다.</span>
+                    </label>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <Button disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
+                        {isAssembling && <span className="mr-1.5 size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+                        {isAssembling ? "조립 중" : st === "failed" ? "다시 조립" : "미션 조립"}
+                      </Button>
+                      <span className="text-[12.5px] text-muted-foreground">MJT 5문항 + 직접 산출 과제 1개 · 누를 때만 생성 비용이 발생합니다.</span>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-muted-foreground">화용 초점 카탈로그 없음 — 조립 불가</p>
+                )}
+                {isAssembling && rowMsg[r.scenario_id] && <p className="text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
+                {isAssembling && assemblyProgress && <AssemblyProgressView stage={assemblyProgress.stage} />}
+                {failures[r.scenario_id] && st === "failed" && (
+                  <p className="rounded-md border border-[#E5CFCC] bg-[#F7EFEE] px-3 py-2 text-[12px] leading-relaxed text-[#7B453F]">
+                    {failures[r.scenario_id]}
+                  </p>
+                )}
+              </section>
+            )}
+            {(st === "generated" || st === "reviewed") && (
+              <section aria-label="조립 결과" className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="text-[14px] font-bold text-[#233542]">조립 결과</h3>
+                  {st === "generated" && (
+                    <Button size="sm" variant="ghost" disabled={busy === r.scenario_id}
+                      title="현재 생성물은 이력에 보존하고 같은 시나리오로 새 미션을 조립합니다." onClick={() => onRework(r)}>
+                      반려·재조립
+                    </Button>
+                  )}
+                </div>
+                {rowMsg[r.scenario_id] && <p className="text-[12.5px] text-muted-foreground">{rowMsg[r.scenario_id]}</p>}
+                {!loaded ? loadingMission : (
+                  <>
+                    {loaded.mission.schema_version !== "mission_v6" && <MissionPreview mission={loaded.mission} warnings={loaded.warnings} />}
+                    {st === "generated" && (
+                      <ProfessorMissionWorkbench
+                        scenarioId={r.scenario_id}
+                        key={`${loaded.mission.provenance?.mission_content_hash ?? "draft"}-${loaded.mission.quality_check?.verdict ?? "none"}`}
+                        mission={loaded.mission}
+                        busy={busy === r.scenario_id}
+                        onSave={(edits) => onSaveEdits(r, edits)}
+                        onReview={(overrides, approval) => onReview(r, overrides, approval)}
+                        approvalHref={`/admin/ai-review?scenarioId=${r.scenario_id}`}
+                      />
+                    )}
+                  </>
+                )}
+              </section>
+            )}
+          </>
+        )}
+
+        {/* ── 자동 품질 점검·AI 검토: 검사하고 넘기는 화면 ── */}
+        {aiReview && (
+          <>
+            {(st === "generated" || st === "reviewed") && (
+              <ContentReviewPanel target={{ kind: "mission", targetId: r.scenario_id }}
+                handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+            )}
+            <details className="rounded-lg border border-[#E2DED2] bg-white p-3">
+              <summary className="cursor-pointer text-[13px] font-semibold text-[#34444D]">시나리오 전문</summary>
+              <div className="mt-2">{scenarioText}</div>
+            </details>
+          </>
+        )}
+
+        {/* ── 교수자 최종 승인: 결정하는 화면 ── */}
+        {professorScreen && (
+          <>
+            {scenarioText}
+            {st === "generated" && info?.queue !== "decision" && (
+              <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
+                <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>
+                <Link to={`/admin/ai-review?scenarioId=${r.scenario_id}`} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
+                  품질 점검 화면에서 이 미션 열기 →
+                </Link>
+              </div>
+            )}
+            {st === "generated" && info?.queue === "decision" && (!loaded ? loadingMission : (
+              <ProfessorMissionWorkbench
+                scenarioId={r.scenario_id}
+                key={`${loaded.mission.provenance?.mission_content_hash ?? "draft"}-${loaded.mission.quality_check?.verdict ?? "none"}`}
+                mission={loaded.mission}
+                busy={busy === r.scenario_id}
+                onSave={(edits) => onSaveEdits(r, edits)}
+                onReview={(overrides, approval) => onReview(r, overrides, approval)}
+                traceHash={r.mission_content_hash ?? loaded.mission.provenance?.mission_content_hash}
+              />
+            ))}
+            {st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
+          </>
+        )}
+
+        {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
+        <footer className="flex justify-end border-t border-[#ECE8DE] pt-3">
+          <Button variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
+        </footer>
+      </div>
+    );
+  };
 
   return (
     <AdminShell
@@ -579,111 +879,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       description={aiReview
         ? "규칙 기반 자동 점검과 AI 검토로 교수자가 판단할 자료를 준비합니다. 이 화면에는 승인 기능이 없습니다."
         : reviewMode
-          ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다. 미션을 열어 시작하세요."
+          ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다."
           : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
     >
-      <div className="max-w-[1080px]">
-      {!reviewMode && <>
-        <label className="my-4 flex flex-wrap items-center gap-3 text-sm">미션 생성 모델
-          <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
-            onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="rounded-lg border bg-white px-3 py-2">
-            <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
-          </select>
-          <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 AI 검토를 진행합니다.</span>
-        </label>
-        <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
-          onResume={async (id, jobId) => {
-            const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
-            if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-            if (data.mission_status) { toast.info("이미 생성된 미션입니다. 교수자 최종 승인 화면에서 확인해 주세요."); return; }
-            setGenerationModel("astra"); void onAssemble(data as unknown as CoreRow, true, jobId);
-          }} />
-      </>}
-      {reviewMode && searchParams.get("scenarioId") && (
-        <p className="mb-3 text-sm"><Link className="underline" to="/admin/review">← 전체 미션 목록</Link></p>
-      )}
-      {/* 이 화면이 무엇을 하는 자리인지 맨 위에 두고, 필터를 그 바로 아래·목록 바로 위에 둔다.
-          상태는 계기판 카드가 아니라 필터의 한 축으로 둔다 — 카드가 유일한 상태 필터였다. */}
-      <section className="rounded-xl border border-[#E2DED2] bg-white p-3.5">
-        {rows.length >= ROW_CAP && (
-          <p className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
-            ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 아래 숫자를
-            전체 현황으로 읽지 마세요.
-          </p>
-        )}
-
-        {/* 상태는 처리 순서를 정하는 첫 축이라 다른 필터보다 앞에 둔다. 건수를 함께 보여
-            계기판 카드가 알려주던 현황을 잃지 않는다. */}
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[13.5px] font-bold text-[#233542]">상태</span>
-          {/* 최종 승인 화면은 교수자가 결정할 미션을 먼저 두고, 진행 중·승인 완료는 보조 칩으로 남긴다. */}
-          {((professorScreen
-            ? ["decision", "in_progress", "reviewed", "all"]
-            : ["all", ...(reviewMode ? ["generated", "reviewed"] : Object.keys(STATE_KO))]
-          ) as Array<"all" | AssemblyState | ProfessorQueue>).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setFState(s)}
-              aria-pressed={fState === s}
-              className={[
-                "rounded-full border px-3.5 py-1.5 text-[13.5px] transition-colors",
-                fState === s
-                  ? "border-[#233542] bg-[#233542] font-semibold text-white"
-                  : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
-              ].join(" ")}
-            >
-              {s === "all" ? "전체" : s === "decision" ? "결정 대기" : s === "in_progress" ? "검수 진행 중"
-                : professorScreen && s === "reviewed" ? "승인 완료" : STATE_KO[s]}
-              <span className="ml-1.5 tabular-nums opacity-80">{s === "all" ? matchedExceptState.length : dash[s]}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* ── 학습설계 축과 생성 기준은 역할이 다르므로 시각적으로 분리한다. ── */}
-        <div className="mt-2.5 grid gap-2.5 lg:grid-cols-[1.45fr_1fr]">
-          {/* 필요한 미션을 바로 찾는 것이 두 화면 모두의 첫 동작이라 펼쳐 둔다. */}
-          <details open
-            className="rounded-lg border border-[#DDE2E4] border-t-4 border-t-[#18232D] bg-[#F8FAFA] p-3 pt-2">
-            {/* summary에 display:flex를 주면 펼침 표시가 사라지므로 배지는 띄워서 배치한다. */}
-            <summary className="mb-2 cursor-pointer">
-              <span className="float-right rounded-full bg-[#E7ECEE] px-2.5 py-1 text-[12px] font-semibold text-[#53656F]">
-                PRAGMA 편성 기준
-              </span>
-              <span className="ml-1 text-[14.5px] font-bold text-[#233542]">학습설계 4축</span>
-              {axisFilterActive && <span className="ml-2 text-[12.5px] font-semibold text-[#8A6B24]">필터 적용 중</span>}
-            </summary>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
-                opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
-              <AxisSel index="2" label="수준" value={fLevel} onChange={(v) => setFLevel(v as typeof fLevel)}
-                opts={[["all", "전체"], ...LEVELS.map((l) => [l, LEVEL[l]] as [string, string])]} />
-              <AxisSel index="3" label="모드" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
-                opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-              <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
-                opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-            </div>
-          </details>
-
-          <details className="rounded-lg border border-[#E6E1D5] border-t-4 border-t-[#18232D] bg-[#FBFAF6] p-3 pt-2">
-            <summary className="cursor-pointer text-[14.5px] font-bold text-[#3D464D]">고급 필터 (연구자용)
-              {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">필터 적용 중</span>}
-            </summary>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              <CompactSel label="생성 run" value={fRun} onChange={setFRun}
-                opts={[["all", "전체"], ...runIds.map((id) => {
-                  const label = id.length > 24 ? `${id.slice(0, 12)}…${id.slice(-8)}` : id;
-                  const duplicate = runIds.some(other => other !== id &&
-                    (other.length > 24 ? `${other.slice(0, 12)}…${other.slice(-8)}` : other) === label);
-                  return [id, duplicate ? id : label] as [string, string];
-                })]} />
-              <CompactSel label="프롬프트 계열" value={fHash} onChange={setFHash}
-                opts={[["all", "전체"], ...hashes.map((h) => [h, h === "null" ? "legacy·없음" : `${h.slice(0, 10)}…`] as [string, string])]} />
-            </div>
-          </details>
-        </div>
-      </section>
-
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
       ) : error ? (
@@ -692,202 +890,172 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
-        <section className="mt-4 space-y-2">
-          {/* 일괄 AI 검토는 쓸 때만 필요하다. 행을 하나라도 고른 뒤에 한 줄로 나타난다.
-              진행 상황은 AdminShell 상단의 ReviewPreparationStatus가 따로 보여 준다. */}
-          {aiReview && reviewSelection.size > 0 && (
-            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#D8D3C4] bg-white px-4 py-2.5">
-              <span className="text-[14px] font-semibold text-[#202B33]">{reviewSelection.size}건 선택됨</span>
-              <Button size="sm" variant="outline" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 미션 모두 선택</Button>
-              <Button size="sm" variant="ghost" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>
-              <Button size="sm" disabled={reviewQueue.active || Boolean(busy)} onClick={() => void startReviewPreparation(
-                filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
-                  target: { kind: "mission" as const, targetId: row.scenario_id },
-                  label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
-                })))}>{reviewSelection.size}건 감수 자료 준비</Button>
-              <p className="w-full text-[12px] text-muted-foreground">저장된 결과를 재사용하며, 없을 때만 유료 AI 검토를 실행합니다.</p>
-            </div>
-          )}
-          <ul className="space-y-2">
-            {visible.map((r) => {
-              const st = stateOf(r);
-              const previewMission = preview[r.scenario_id]?.mission;
-              const info = reviewInfo.get(r.scenario_id);
-              // 교수자 차례가 아닌 generated 미션은 이 화면에서 점검을 실행하지 않고 점검 화면으로 보낸다.
-              const notProfessorTurn = professorScreen && st === "generated" && info?.queue !== "decision";
-              const isAssembling = busy === r.scenario_id && assemblyProgress?.id === r.scenario_id;
-              const contextLabels = [
-                r.domain ? DOMAIN[r.domain] : null,
-                r.industry_sector
-                  ? (INDUSTRY[r.industry_sector as keyof typeof INDUSTRY] ?? r.industry_sector)
-                  : null,
-                r.theme_code ? THEME_LABEL[r.theme_code] : null,
-              ].filter(Boolean) as string[];
-              return (
-                <li key={r.scenario_id} className="rounded-lg border border-[#E7E2D7] bg-[#FBFAF6] px-4 py-3">
-                  {/* 대기열은 어느 미션을 감수할지 「고르는」 자리다. 판별에 필요한 만큼만 한 줄로
-                      보이고, 상황 전문·맥락은 행을 펼쳤을 때 본다. */}
-                  <div className="flex items-center gap-3">
-                    {/* 상태가 하나로 걸러져 있으면 모든 행이 같은 값이라 배지가 정보를 주지 않는다.
-                        「전체」로 볼 때만 상태를 표시한다. */}
-                    {fState === "all" && (
-                      <span className={["shrink-0 rounded-md border px-2 py-0.5 text-[11px]", STATE_TONE[st]].join(" ")}>
-                        {STATE_KO[st]}
-                      </span>
-                    )}
-                    <span className="hidden shrink-0 items-center gap-1 sm:inline-flex">
-                      <span className={["w-[3.5rem] rounded-md px-2 py-1 text-center text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
-                        {SPEECH_ACT_UI[r.speech_act]}
-                      </span>
-                      <span className={["rounded-md border px-2 py-1 text-[13px] font-bold", DIRECTION_TONE[coreDirection(r.core_content)]].join(" ")}>
-                        {DIRECTION_LABEL[coreDirection(r.core_content)]}
-                      </span>
-                      <span className={["rounded-md border px-2 py-1 text-[12.5px] font-semibold", LEVEL_TONE[r.learner_level]].join(" ")}>
-                        {LEVEL[r.learner_level]}
-                      </span>
-                      <span className={["rounded-md border px-2 py-1 text-[12.5px] font-semibold", MODE_TONE[r.mode === "stt_interpreting" ? "stt_interpreting" : "translation"]].join(" ")}>
-                        {r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
-                      </span>
-                    </span>
-                    {/* 목록은 미션을 「고르는」 자리라 명사구 요약을 제목으로 쓴다. 상황 전문은 펼쳤을 때 본다. */}
-                    <p
-                      className="min-w-0 flex-1 truncate text-[15px] font-medium text-[#202B33]"
-                      title={[r.core_content?.situation_ko, contextLabels.length ? `맥락 · ${contextLabels.join(" · ")}` : null]
-                        .filter(Boolean).join("\n\n")}
-                    >
-                      {r.core_content?.brief_note_ko?.trim() || r.core_content?.situation_ko || "—"}
-                    </p>
-                    <div className="flex shrink-0 items-center gap-2">
-                      {(st === "core_only" || st === "failed") &&
-                        (DEFAULT_FEATURE_BY_ACT[r.speech_act] ? (
-                          <Button size="sm" disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
-                            {isAssembling && <span className="mr-1.5 size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
-                            {isAssembling ? "조립 중" : st === "failed" ? "다시 조립" : "미션 조립"}
-                          </Button>
-                        ) : (
-                          <span className="text-[11.5px] text-muted-foreground">화용 초점 카탈로그 없음 — 조립 불가</span>
-                        ))}
-                      {st === "generated" && !reviewMode && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            disabled={busy === r.scenario_id}
-                            title="현재 생성물은 이력에 보존하고 같은 시나리오로 새 미션을 조립합니다."
-                            onClick={() => onRework(r)}
-                          >
-                            반려·재조립
-                          </Button>
-                        </>
-                      )}
-                      {(st === "generated" || st === "reviewed") && (
-                        <>
-                        {aiReview && st === "generated" && <label className="mr-2 flex items-center gap-2 text-[13px]">
-                          <input type="checkbox" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
-                            checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
-                              const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
-                            })} />선택
-                        </label>}
-                        {notProfessorTurn ? (
-                          <Link className="text-[13px] font-semibold text-[#15202B] underline underline-offset-4"
-                            to={`/admin/ai-review?scenarioId=${r.scenario_id}`}>품질 점검 화면에서 진행 →</Link>
-                        ) : (
-                        <Button size="sm" variant="ghost" onClick={() => togglePreview(r)}>
-                          {openId === r.scenario_id ? "미션 접기 ▴" : aiReview ? "점검·검토 결과 보기 ▾" : reviewMode ? "학생 화면으로 감수하기 ▾" : "미션 보기 ▾"}
-                        </Button>
-                        )}
-                        </>
-                      )}
-                      {!isAssembling && rowMsg[r.scenario_id] && (
-                        <span className="text-[11.5px] text-muted-foreground">{rowMsg[r.scenario_id]}</span>
-                      )}
-                    </div>
-                  </div>
-                  {/* 같은 제목이 반복돼도 어느 수업·어느 버전인지 가를 수 있게 실데이터가 있는 것만 한 줄로 붙인다. */}
-                  {professorScreen && info && (
-                    <p className="mt-1.5 flex flex-wrap gap-x-2 gap-y-0.5 text-[12px] text-[#66727A]">
-                      {[info.placement, missionVersionLabel(r.mission_schema_version), info.progress,
-                        updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
-                        .filter(Boolean)
-                        .map((part, index) => (
-                          <span key={index}>{index > 0 && <span className="mr-2 text-[#B2B8BB]">·</span>}{part}</span>
-                        ))}
-                    </p>
-                  )}
-                  {failures[r.scenario_id] && st === "failed" && (
-                    <p className="mt-2 rounded-md border border-[#E5CFCC] bg-[#F7EFEE] px-3 py-2 text-[12px] leading-relaxed text-[#7B453F]">
-                      {failures[r.scenario_id]}
-                    </p>
-                  )}
-                  {isAssembling && rowMsg[r.scenario_id] && <p className="mt-2 text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
-                  {isAssembling && assemblyProgress && <AssemblyProgressView stage={assemblyProgress.stage} />}
-                  {/* 제목으로 접어 둔 상황 전문과 맥락은 펼치면 그대로 보인다. */}
-                  {openId === r.scenario_id && (
-                    <div className="mt-2.5 border-t border-[#ECE8DE] pt-2.5">
-                      <p className="max-w-[54rem] text-[14.5px] leading-[1.8] text-[#202B33]">
-                        {r.core_content?.situation_ko ?? "—"}
-                      </p>
-                      {contextLabels.length > 0 && (
-                        <p className="mt-2 text-[12.5px] text-[#758087]">
-                          <span className="font-semibold text-[#5D6970]">맥락</span>
-                          <span className="mx-1.5 text-[#B2B8BB]">·</span>
-                          {contextLabels.join(" · ")}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                  {openId === r.scenario_id && preview[r.scenario_id] && (
-                    <>
-                      {!reviewMode && previewMission && previewMission.schema_version !== "mission_v6" && <MissionPreview
-                        mission={previewMission}
-                        warnings={preview[r.scenario_id].warnings}
-                      />}
-                      {aiReview && (st === "generated" || st === "reviewed") && (
-                        <ContentReviewPanel target={{ kind: "mission", targetId: r.scenario_id }}
-                          handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
-                      )}
-                      {!aiReview && st === "generated" && !notProfessorTurn && (
-                        <ProfessorMissionWorkbench
-                          scenarioId={r.scenario_id}
-                          key={`${preview[r.scenario_id].mission.provenance?.mission_content_hash ?? "draft"}-${preview[r.scenario_id].mission.quality_check?.verdict ?? "none"}`}
-                          mission={preview[r.scenario_id].mission}
-                          busy={busy === r.scenario_id}
-                          onSave={(edits) => onSaveEdits(r, edits)}
-                          onReview={(overrides, approval) => onReview(r, overrides, approval)}
-                          approvalHref={reviewMode ? undefined : `/admin/review?scenarioId=${r.scenario_id}`}
-                          traceHash={r.mission_content_hash ?? preview[r.scenario_id].mission.provenance?.mission_content_hash}
-                        />
-                      )}
-                      {reviewMode && !aiReview && st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
-                    </>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-          {/* 한 번 펼치면 되돌릴 수 없어 목록이 계속 길게 남던 문제를 고친다. */}
-          {filtered.length > LIST_CAP && (
-            <Button variant="outline" className="w-full" onClick={() => setShowAll((prev) => !prev)}>
-              {showAll ? `처음 ${LIST_CAP}개만 보기` : `전체 ${filtered.length}개 모두 표시`}
-            </Button>
-          )}
-          {filtered.length === 0 && professorScreen && fState === "decision" ? (
-            <p className="rounded-md border border-dashed border-[#EAE4D2] bg-white px-4 py-8 text-center text-[13.5px] text-[#46515A]">
-              지금 결정할 미션이 없습니다.{" "}
-              {dash.in_progress > 0 && (
-                <Link className="font-semibold text-[#15202B] underline underline-offset-4" to="/admin/ai-review">
-                  검수 진행 중인 {dash.in_progress}개는 품질 점검 화면에서 확인하세요 →
-                </Link>
+        <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]">
+          {/* ── 왼쪽 대기열 ── */}
+          <aside aria-label="대기열"
+            className="flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]">
+            <div className="space-y-2.5 border-b border-[#E2DED2] p-3">
+              {rows.length >= ROW_CAP && (
+                <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
+                  ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 숫자를 전체 현황으로 읽지 마세요.
+                </p>
               )}
-            </p>
-          ) : filtered.length === 0 && (
-            <p className="rounded-md border border-dashed border-[#EAE4D2] bg-white px-4 py-8 text-center text-[13px] text-muted-foreground">
-              조건에 맞는 재료가 없습니다. 필터를 조정하거나 시나리오 개별·배치 생성에서 새 시나리오를 만드세요.
-            </p>
-          )}
-        </section>
+              <div className="flex flex-wrap gap-1.5" role="group" aria-label="상태">
+                {chips.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setFState(s)}
+                    aria-pressed={fState === s}
+                    className={[
+                      "rounded-full border px-2.5 py-1 text-[12.5px] transition-colors",
+                      fState === s
+                        ? "border-[#233542] bg-[#233542] font-semibold text-white"
+                        : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
+                    ].join(" ")}
+                  >
+                    {chipLabel(s)}
+                    <span className="ml-1 tabular-nums opacity-80">{dash[s]}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  id="queue-search"
+                  type="search"
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="제목·상황·Trace 검색"
+                  aria-label="대기열 검색"
+                  className="h-8 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[13px]"
+                />
+                <select
+                  id="queue-sort"
+                  aria-label="정렬"
+                  value={sortOrder}
+                  onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
+                  className="h-8 rounded-md border border-[#D9D7CF] bg-white px-1.5 text-[12px] text-[#46515A]"
+                >
+                  {reviewMode
+                    ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
+                    : <><option value="newest">최신순</option><option value="oldest">오래된 순</option></>}
+                </select>
+              </div>
+              <details className="rounded-md border border-[#DDE2E4] bg-white px-2.5 py-1.5">
+                <summary className="cursor-pointer text-[13px] font-semibold text-[#233542]">
+                  필터 · 학습설계 4축
+                  {axisFilterActive && <span className="ml-2 text-[12px] font-semibold text-[#8A6B24]">적용 중</span>}
+                </summary>
+                <div className="mt-2 grid grid-cols-2 gap-2 pb-1">
+                  <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
+                    opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
+                  <AxisSel index="2" label="수준" value={fLevel} onChange={(v) => setFLevel(v as typeof fLevel)}
+                    opts={[["all", "전체"], ...LEVELS.map((l) => [l, LEVEL[l]] as [string, string])]} />
+                  <AxisSel index="3" label="모드" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+                    opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
+                  <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+                    opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
+                </div>
+              </details>
+              <details className="rounded-md border border-[#E6E1D5] bg-[#FBFAF6] px-2.5 py-1.5">
+                <summary className="cursor-pointer text-[13px] font-semibold text-[#3D464D]">고급 필터 (연구자용)
+                  {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">적용 중</span>}
+                </summary>
+                <div className="mt-2 grid gap-2 pb-1">
+                  <CompactSel label="생성 run" value={fRun} onChange={setFRun}
+                    opts={[["all", "전체"], ...runIds.map((id) => {
+                      const label = id.length > 24 ? `${id.slice(0, 12)}…${id.slice(-8)}` : id;
+                      const duplicate = runIds.some(other => other !== id &&
+                        (other.length > 24 ? `${other.slice(0, 12)}…${other.slice(-8)}` : other) === label);
+                      return [id, duplicate ? id : label] as [string, string];
+                    })]} />
+                  <CompactSel label="프롬프트 계열" value={fHash} onChange={setFHash}
+                    opts={[["all", "전체"], ...hashes.map((h) => [h, h === "null" ? "legacy·없음" : `${h.slice(0, 10)}…`] as [string, string])]} />
+                </div>
+              </details>
+            </div>
+
+            <ul className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2" aria-label="미션 목록">
+              {visible.map((r) => {
+                const st = stateOf(r);
+                const selected = r.scenario_id === selectedId;
+                const meta = cardMeta(r).filter(Boolean);
+                return (
+                  <li key={r.scenario_id} id={`queue-${r.scenario_id}`}
+                    className={[
+                      "flex gap-2 rounded-lg border bg-white px-2.5 py-2",
+                      selected ? "border-2 border-[#233542] px-[9px] py-[7px]" : "border-[#E7E2D7] hover:border-[#C9CED0]",
+                    ].join(" ")}>
+                    {aiReview && st === "generated" && (
+                      <input type="checkbox" className="mt-1 shrink-0" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
+                        checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
+                          const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
+                        })} />
+                    )}
+                    <button type="button" className="min-w-0 flex-1 space-y-1 text-left" aria-current={selected ? "true" : undefined}
+                      onClick={() => selectRow(r)}>
+                      {badges(r, "sm")}
+                      <span className="line-clamp-2 block text-[13.5px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
+                      {meta.length > 0 && (
+                        <span className="block text-[11.5px] text-[#66727A]">{meta.join(" · ")}</span>
+                      )}
+                    </button>
+                  </li>
+                );
+              })}
+              {filtered.length === 0 && (
+                <li className="px-2 py-6 text-center text-[12.5px] text-muted-foreground">이 조건의 미션이 없습니다.</li>
+              )}
+              {filtered.length > LIST_CAP && (
+                <li>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAll((prev) => !prev)}>
+                    {showAll ? `처음 ${LIST_CAP}개만 보기` : `전체 ${filtered.length}개 모두 표시`}
+                  </Button>
+                </li>
+              )}
+            </ul>
+
+            {/* 일괄 감수 자료 준비는 늘 보인다. 실행은 버튼으로만. 진행 상황은 AdminShell 상단 표시가 따로 보여 준다. */}
+            {aiReview && (
+              <div className="space-y-1.5 border-t border-[#E2DED2] bg-white p-2.5">
+                <div className="flex flex-wrap items-center gap-1.5 text-[12.5px]">
+                  <span className="font-semibold text-[#202B33]">{reviewSelection.size}건 선택</span>
+                  <Button size="sm" variant="ghost" className="h-7 px-2" disabled={reviewQueue.active}
+                    onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 미션 모두 선택</Button>
+                  {reviewSelection.size > 0 && <Button size="sm" variant="ghost" className="h-7 px-2" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>}
+                </div>
+                <Button size="sm" className="w-full" disabled={reviewSelection.size === 0 || reviewQueue.active || Boolean(busy)} onClick={() => void startReviewPreparation(
+                  filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
+                    target: { kind: "mission" as const, targetId: row.scenario_id },
+                    label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
+                  })))}>{reviewSelection.size}건 감수 자료 준비</Button>
+                <p className="text-[11.5px] text-muted-foreground">저장된 결과를 재사용하며, 없을 때만 유료 AI 검토를 실행합니다.</p>
+              </div>
+            )}
+            {!reviewMode && (
+              <div className="border-t border-[#E2DED2] px-2.5 [&>section]:my-2.5 [&>section]:p-3">
+                <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
+                  onResume={async (id, jobId) => {
+                    const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
+                    if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
+                    if (data.mission_status) { toast.info("이미 생성된 미션입니다. 품질 점검 화면에서 확인해 주세요."); return; }
+                    const row = data as unknown as CoreRow;
+                    setRows((prev) => (prev.some((candidate) => candidate.scenario_id === id) ? prev : [row, ...prev]));
+                    setSelectedId(id);
+                    setGenerationModel("astra"); void onAssemble(row, true, jobId);
+                  }} />
+              </div>
+            )}
+          </aside>
+
+          {/* ── 오른쪽 작업대 ── */}
+          <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white p-4 xl:p-5">
+            {selectedRow ? renderWorkbench(selectedRow) : (
+              <div className="py-10 text-center text-[13.5px] text-[#46515A]">{emptyWorkbench()}</div>
+            )}
+          </section>
+        </div>
       )}
-      </div>
     </AdminShell>
   );
 };

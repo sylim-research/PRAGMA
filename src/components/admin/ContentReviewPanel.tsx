@@ -254,7 +254,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           : next === "professor"
             ? "이 버전에 필요한 자동 점검과 AI 검토가 끝났습니다. AI 검토 의견은 교수자가 판단할 자료이며 콘텐츠를 승인하지 않습니다."
             : "감수와 최종 승인은 이 화면의 일이 아닙니다. 남은 점검을 여기서 마치면 교수자 화면의 「결정 대기」에 올라갑니다."}</p>
-        <Link to={handoffHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인 화면에서 열기 →</Link>
+        <Link to={handoffHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인에서 이 미션 열기 →</Link>
       </div>}
       {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 AI 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>

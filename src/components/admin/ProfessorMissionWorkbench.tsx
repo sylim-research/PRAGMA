@@ -172,11 +172,11 @@ export function ProfessorMissionWorkbench({
         {editor}
         <div className="mt-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
           <p className="text-[#3F4E57]">
-            이 화면은 미션을 만들고 고치는 자리입니다. 자동 품질 점검과 AI 검토를 거쳐 교수자가 콘텐츠를
-            감수한 뒤 최종 승인하는 일은 「교수자 최종 승인」 화면에서 진행합니다.
+            이 화면은 미션을 만들고 고치는 자리입니다. 다음 단계는 자동 품질 점검·AI 검토이고,
+            그 뒤 교수자가 콘텐츠를 감수해 최종 승인합니다.
           </p>
           <Link to={approvalHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
-            교수자 최종 승인 화면에서 열기 →
+            품질 점검 화면에서 이 미션 열기 →
           </Link>
         </div>
       </section>
