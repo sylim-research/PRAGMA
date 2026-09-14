@@ -33,6 +33,10 @@ export type DashboardReviewRunRow = {
   approved_at?: string | null;
 };
 
+/** content_review_runs에서 DashboardReviewRunRow를 읽는 선택 컬럼. 대시보드와 승인 목록이 같은 규칙으로 센다. */
+export const DASHBOARD_REVIEW_RUN_SELECT =
+  "target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id";
+
 export type DashboardAssignmentRow = {
   outline_id: string;
   week_no: number;
@@ -122,7 +126,7 @@ const FOCUSED_POLICY = "focused_v1";
  * 콘텐츠가 마지막 검수 run 뒤 수정됐다면 과거 결과를 재사용하지 않고 규칙 검사로 되돌린다.
  * 규칙 검사 fail도 원본 수정 뒤 다시 확인해야 하므로 rules에 남긴다.
  */
-function latestCurrentRun(
+export function latestDashboardReviewRun(
   row: DashboardScenarioRow,
   runs: readonly DashboardReviewRunRow[],
 ): DashboardReviewRunRow | undefined {
@@ -140,7 +144,7 @@ export function nextDashboardReviewStage(
   row: DashboardScenarioRow,
   runs: readonly DashboardReviewRunRow[],
 ): DashboardReviewQueueStage {
-  const run = latestCurrentRun(row, runs);
+  const run = latestDashboardReviewRun(row, runs);
 
   if (!run || run.rules_verdict === "fail") return "rules";
   if (run.approval_policy === FOCUSED_POLICY) {
@@ -177,7 +181,7 @@ export function countRulesFailures(
   rows: readonly DashboardScenarioRow[],
   runs: readonly DashboardReviewRunRow[],
 ): number {
-  return rows.filter(isDashboardReviewTarget).filter((row) => latestCurrentRun(row, runs)?.rules_verdict === "fail").length;
+  return rows.filter(isDashboardReviewTarget).filter((row) => latestDashboardReviewRun(row, runs)?.rules_verdict === "fail").length;
 }
 
 export function dominantDashboardReviewStage(

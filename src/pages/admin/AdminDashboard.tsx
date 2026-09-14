@@ -33,6 +33,7 @@ import {
   summarizeAssignmentApproval,
   summarizeCourses,
   type DashboardCourseRow,
+  DASHBOARD_REVIEW_RUN_SELECT,
 } from "@/lib/admin/adminDashboardMetrics";
 import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
 import { toast } from "sonner";
@@ -321,7 +322,7 @@ const AdminDashboard = () => {
           .range(from, to)),
         fetchAllDashboardRows<DashboardReviewRunRow>("점검·승인 이력", (from, to) => db
           .from("content_review_runs")
-          .select("target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id")
+          .select(DASHBOARD_REVIEW_RUN_SELECT)
           .eq("kind", "mission")
           .eq("criteria_version", DASHBOARD_REVIEW_CRITERIA_VERSION)
           // Counts describe the current review of each mission; a row replaced by a gate rebind is history.
