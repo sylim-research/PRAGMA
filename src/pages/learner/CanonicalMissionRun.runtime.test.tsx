@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -52,6 +52,48 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
     expect(() => buildRuntimeMpjTraces(runtime, {})).toThrow();
+  });
+  it("runs a v6 runtime from the DCT draft through feedback, revision and final confirmation, then saves both responses", async () => {
+    window.scrollTo = vi.fn(); Element.prototype.scrollIntoView = vi.fn();
+    const mission = SAMPLE_MISSION_V6_REASON_CONTRAST;
+    const runtime = { scenario_id: scenarioId, speech_act: "request" as const, learner_level: "intermediate" as const,
+      mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh" as const, mission };
+    vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
+    vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "log-1" });
+    render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
+    const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+    click("다소 적절"); click("답안 확인하기"); click(/^다음:/);
+    const reason = mission.mpj_items[1].reason_choice.options[1];
+    click("매우 적절"); click("판단 확정하기");
+    fireEvent.click(screen.getByRole("radio", { name: reason.text }));
+    click("다소 부적절"); click("판단과 이유 확인하기"); click(/^다음:/);
+    click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
+    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 번역" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
+    click("수정안 제출하기"); click(/^다음:/);
+    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
+      fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
+    });
+    click("네 표현 확인하기"); click(/^다음:/);
+    click("직접 옮겨 보기");
+    const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
+    click("번역 제출하기");
+    // Stage 2: feedback for the submitted draft (live request, not a preview).
+    expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(requestFeedback).toHaveBeenCalledWith(mission, first);
+    await screen.findByText("자동 피드백을 확인하지 못했습니다.");
+    // Stage 3: revision.
+    click("다른 표현도 시도해보기");
+    const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
+    // Stage 4: final confirmation and save.
+    click("수정안 확정하기");
+    expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
+    await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
+    const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
+    expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
+    expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id, revised_scale_code: "somewhat_inappropriate" });
+    expect(requestFeedback).toHaveBeenCalledTimes(1);
   });
   beforeEach(() => {
     vi.clearAllMocks();

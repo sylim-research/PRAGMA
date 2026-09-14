@@ -70,6 +70,26 @@ describe("instructor experience", () => {
       close();
     }
   });
+  it("continues a v6 DCT preview through feedback, revision and final confirm without AI or saving", async () => {
+    const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
+      mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
+    render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
+    const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
+    fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
+    // Same stage order as the learner runner: feedback → revision → final confirm.
+    expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(screen.getByText("AI 미실행")).toBeInTheDocument();
+    expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 참고 피드백을 받습니다/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
+    fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
+    fireEvent.click(screen.getByRole("button", { name: /수정안 확정하기/ }));
+    const final = screen.getByRole("region", { name: "최종 확정 미리보기" });
+    expect(within(final).getByText(first)).toBeInTheDocument();
+    expect(within(final).getByText(revised)).toBeInTheDocument();
+    expect(effects.feedback).not.toHaveBeenCalled(); expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled();
+  });
   it("keeps all confirmation states incomplete when a hold exists", () => {
     const value = { version: "instructor_experience_v1" as const, active_seconds: 20, decisions: EXPERIENCE_SECTIONS.map(({ id }) => ({ section: id, status: "checked" as const, note: "" })) };
     expect(experienceComplete(value)).toBe(true);

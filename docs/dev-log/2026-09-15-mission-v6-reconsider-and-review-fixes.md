@@ -36,6 +36,16 @@
 - 이전: `supportLevel === "advanced"`이면 core에 힌트가 있어도 숨김.
 - 이후: 수준과 무관하게 core의 기존 힌트를 최대 2개 표시(초급은 펼침, 중·고급은 「단어 힌트 보기」 접힘). 힌트가 없으면 표시하지 않으며 새로 만들지 않는다. 학습자 화면·교수자 미리보기가 같은 컴포넌트다.
 
+## 5. 교수자 미리보기 DCT — 제출 후 멈춤 해소
+
+- 증상: 교수자 최종 승인 화면의 학생 화면 미리보기에서 DCT를 제출하면 피드백으로 넘어가지 않았다.
+- 경로 조사:
+  - 학습자 경로(정상): `DctDraftView` 제출 → `finishQuest`가 `first`·`revised`를 응답에 보관하고 다음 문항으로 → `dct_feedback`의 `DctFeedbackView`가 `requestFeedback(runtime.mission, first)` 호출 → 다듬기 → 확정 시 `firstResponse`·`revisedResponse`·피드백으로 저장.
+  - 교수자 미리보기(멈춤): `CanonicalReviewStage`의 dct 섹션은 초안만 보관하고 정적 「DCT 참고 표현·해설」만 표시했다. `dct_feedback` 단계를 렌더하지 않아 이후 흐름이 없었다. AI 호출·저장을 막으려는 의도였으나 흐름이 끊겼다.
+- 수정: 미리보기에서 초안 제출 뒤 같은 `DctFeedbackView`를 기존 로컬 체험 모드(`LocalPilotContext`, AI 미실행·미리 작성한 확인 기준)로 렌더한다. 다듬기 → 확정까지 이어지고, 확정하면 첫 산출·확정 산출을 보여 주며 저장하지 않는다고 안내한다. 「실제 학습자 화면에서는 이 단계에서 AI 참고 피드백을 받습니다」 안내를 붙였다. 참고 표현·해설은 그대로 둔다.
+- 새 evaluator·유료 호출·저장·상태 없음. 학습자 경로 동작과 DCT 저장 의미는 바꾸지 않았다.
+- 회귀 테스트: 학습자 v6 실제 runtime에서 DCT 제출 → 피드백(실제 요청 호출) → 다듬기 → 최종 확정 → `firstResponse`·`revisedResponse`·MJT2 `revised_scale_code` 저장, 미리보기에서 DCT 제출 → 피드백 → 다듬기 → 최종 확정(AI 호출·저장·이벤트 없음). 두 경로의 단계 순서가 같다.
+
 ## 불변
 
 MJT 5개, MJT3 선택지 3개, MJT5 후보 4개, REASON=MJT2, CONTRAST=MJT4, DCT 구조, `candidate_band_codes`·MJT4 `revised_text`·DCT first/revised 의미, 승인 semantics, DB·schema·migration·Edge, v5 응답.

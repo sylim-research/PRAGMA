@@ -1688,26 +1688,42 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
 }
 
 /** Admin-only host uses the same learner components, without the attempt runner.
- * No learner events, answer storage, or synthetic/live DCT feedback is produced.
+ * No learner events, answer storage, or live DCT feedback is produced. After the DCT draft it shows the
+ * learner's next stages (feedback → revision → final confirm) with the authored no-AI guidance.
  */
 export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }: {
   mission: CanonicalMissionViewModel; section: string; revealAnswers: boolean; onNext: () => void;
 }) {
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
+  const [finalDct, setFinalDct] = useState<DctResponse | null>(null);
   const quest = section === "dct" ? mission.quests.find((item) => item.kind === "dct")
     : section.startsWith("mjt-") ? mission.quests[Number(section.slice(4))] : undefined;
+  const feedbackQuest = mission.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback");
+  const draft = quest?.kind === "dct" ? responses[quest.id] as DctResponse | undefined : undefined;
+  const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   return <RuntimeMissionContext.Provider value={null}><CanonicalMissionContext.Provider value={mission}>
     <div className="space-y-5">
       {section === "scene" ? <SceneIntroFlow config={buildSceneIntroConfig(mission)} onNext={onNext} />
         : section === "recap" ? <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={onNext} />
         : quest && quest.kind !== "dct_feedback" ? <>
-          <QuestRenderer key={`${quest.id}-${revealAnswers}`} quest={quest} responses={responses} revealAnswers={revealAnswers}
+          {draft && feedbackQuest ? finalDct ? <section className={`${panel} space-y-3 p-5`} aria-label="최종 확정 미리보기">
+            <p className="text-xs font-black text-[#776727]">최종 확정</p>
+            <h3 className="font-bold">학습자는 여기서 최종 {outputName}을 확정하고, 학습 기록이 저장됩니다.</h3>
+            <p className="text-sm text-muted-foreground">감수 화면에서는 저장하지 않습니다.</p>
+            <div><p className="text-xs font-bold text-[#697386]">첫 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
+            <div><p className="text-xs font-bold text-[#697386]">확정한 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
+          </section> : <>
+            <p className="rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs leading-5 text-[#6B5518]">실제 학습자 화면에서는 이 단계에서 AI 참고 피드백을 받습니다. 감수 화면은 AI를 호출하지 않고, 미리 작성한 확인 기준으로 같은 피드백·다듬기·확정 순서를 보여 줍니다.</p>
+            <LocalPilotContext.Provider value={true}>
+              <DctFeedbackView quest={feedbackQuest} response={draft} onDone={setFinalDct} />
+            </LocalPilotContext.Provider>
+          </> : <QuestRenderer key={`${quest.id}-${revealAnswers}`} quest={quest} responses={responses} revealAnswers={revealAnswers}
             // Same direct-correction flow as the learner runner: v6 MJT3 has no judgment step before its corrections.
             localPilot={mission.missionFormat === "mission_v6"}
             onDone={(response) => {
               setResponses((current) => ({ ...current, [quest.id]: response }));
               if (quest.kind !== "dct") onNext();
-            }} />
+            }} />}
           {quest.kind === "dct" && (revealAnswers || responses[quest.id]) && <section className={`${panel} space-y-3 p-5`}>
             <h3 className="font-bold">DCT 참고 표현·해설</h3>
             <p className="text-sm text-muted-foreground">정적 콘텐츠 감수입니다. 이 화면의 제출은 학습 기록이나 AI 피드백 요청을 만들지 않습니다.</p>
