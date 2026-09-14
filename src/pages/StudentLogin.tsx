@@ -87,7 +87,6 @@ const StudentLogin = () => {
               </div>
 
               <div className="flex flex-col justify-center gap-4 px-7 py-7 sm:px-9 sm:py-10">
-                <p className="text-[14px] font-semibold text-[#15202B]">Google 계정으로 계속하기</p>
                 <button
                   type="button"
                   onClick={handleGoogle}
@@ -138,7 +137,7 @@ const StudentLogin = () => {
 
             <Link
               to="/"
-              className="group mt-5 inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-[13px] font-medium text-[#687584] transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
+              className="group mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#D6D0C2] bg-white/70 px-5 text-[14px] font-semibold text-[#3E4C57] shadow-sm transition-colors hover:border-[#15202B] hover:bg-white hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
             >
               <span aria-hidden className="transition-transform group-hover:-translate-x-0.5">
                 ←
