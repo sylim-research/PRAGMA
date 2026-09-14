@@ -252,6 +252,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [showAll, setShowAll] = useState(false);
   // 대기열 상단의 두 필터는 한 줄짜리 토글로 두고, 펼친 쪽만 아래에 연다(기본 접힘).
   const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
+  // 교수자 최종 승인은 한 미션을 깊게 읽는 화면이라 대기열을 옆에 두지 않고 필요할 때만 서랍으로 연다.
+  const [queueOpen, setQueueOpen] = useState(false);
+  useEffect(() => {
+    if (!queueOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setQueueOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [queueOpen]);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [assemblyProgress, setAssemblyProgress] = useState<{
@@ -481,7 +489,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   useEffect(() => {
     if (!selectedId) return;
     document.getElementById(`queue-${selectedId}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [selectedId]);
+  }, [selectedId, queueOpen]);
 
   // 작업대에 연 미션의 저장본을 읽는다(읽기 전용). 생성·검수 실행은 여기서 일어나지 않는다.
   useEffect(() => {
@@ -716,6 +724,13 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     return <p>조건에 맞는 미션이 없습니다. 상태·필터를 바꾸거나 시나리오 개별·배치 생성에서 새 시나리오를 만드세요.</p>;
   };
 
+  const queueButton = (
+    <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
+      className="h-8 shrink-0 gap-1.5 px-2.5 text-[12.5px]" onClick={() => setQueueOpen(true)}>
+      <span aria-hidden>☰</span>{chipLabel(fState)}<span className="tabular-nums text-[#66727A]">{dash[fState]}</span>
+    </Button>
+  );
+
   const renderWorkbench = (r: CoreRow) => {
     const st = stateOf(r);
     const info = reviewInfo.get(r.scenario_id);
@@ -738,6 +753,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
         <header className="sticky top-16 z-10 flex items-start justify-between gap-3 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+          {professorScreen && queueButton}
           <div className="min-w-0 flex-1 space-y-0.5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
@@ -888,10 +904,20 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
-        <div className="grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]">
-          {/* ── 왼쪽 대기열 ── */}
+        <div className={professorScreen ? "grid items-start" : "grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]"}>
+          {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
+          {(!professorScreen || queueOpen) && <>
+          {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
           <aside aria-label="대기열"
-            className="flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]">
+            className={professorScreen
+              ? "fixed inset-y-0 left-0 z-50 flex w-[380px] max-w-[90vw] flex-col overflow-hidden border-r border-[#E2DED2] bg-[#F7F6F1] shadow-xl"
+              : "flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]"}>
+            {professorScreen && (
+              <div className="flex items-center justify-between border-b border-[#E2DED2] bg-white px-3 py-2">
+                <span className="text-[13.5px] font-bold text-[#233542]">미션 목록</span>
+                <Button size="sm" variant="ghost" className="h-7 px-2" aria-label="미션 목록 닫기" onClick={() => setQueueOpen(false)}>닫기 ✕</Button>
+              </div>
+            )}
             <div className="space-y-1.5 border-b border-[#E2DED2] px-2.5 py-2">
               {rows.length >= ROW_CAP && (
                 <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-2 py-1 text-[11.5px] text-[#92400E]">
@@ -998,7 +1024,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                         })} />
                     )}
                     <button type="button" className="min-w-0 flex-1 space-y-0.5 text-left" aria-current={selected ? "true" : undefined}
-                      onClick={() => selectRow(r)}>
+                      onClick={() => { selectRow(r); if (professorScreen) setQueueOpen(false); }}>
                       {badges(r, "sm")}
                       <span className="line-clamp-2 block text-[13px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
                       {meta.length > 0 && (
@@ -1053,11 +1079,15 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               </div>
             )}
           </aside>
+          </>}
 
           {/* ── 오른쪽 작업대 ── */}
           <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
             {selectedRow ? renderWorkbench(selectedRow) : (
-              <div className="py-10 text-center text-[13.5px] text-[#46515A]">{emptyWorkbench()}</div>
+              <div className="space-y-3 py-10 text-center text-[13.5px] text-[#46515A]">
+                {professorScreen && <div className="flex justify-center">{queueButton}</div>}
+                {emptyWorkbench()}
+              </div>
             )}
           </section>
         </div>

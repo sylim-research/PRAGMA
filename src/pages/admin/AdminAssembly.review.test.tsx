@@ -92,6 +92,9 @@ describe("professor final approval workbench", () => {
     expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     expect(await within(bench).findByText("교수자 작업대")).toBeInTheDocument();
     expect(within(bench).getByText(/Mission v6 · 비즈니스 중국어 3주차 · 규칙 통과 · AI 검토 완료 · 교수자 결정 대기 · 수정 .* · Trace a84f21c/)).toBeInTheDocument();
+    // 교수자 최종 승인은 대기열을 옆에 두지 않는다. 목록은 머리의 버튼으로 연다.
+    expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
+    fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
     expect(screen.getByRole("button", { name: /결정 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /승인 완료\s*1/ })).toBeInTheDocument();
@@ -119,8 +122,23 @@ describe("professor final approval workbench", () => {
     expect(within(workbench()).getByRole("button", { name: "◀ 이전" })).toBeDisabled();
   });
 
+  it("opens the queue drawer, switches missions from a card and returns to the wide review", async () => {
+    show();
+    const bench = await screen.findByRole("region", { name: "작업대" });
+    await within(bench).findByRole("heading", { name: "결정할 미션" });
+    fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
+    fireEvent.click(within(queue()).getByText("나중에 올라온 결정 미션"));
+    expect(await within(workbench()).findByRole("heading", { name: "나중에 올라온 결정 미션" })).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
+    fireEvent.click(within(workbench()).getByRole("button", { name: "미션 목록 열기" }));
+    fireEvent.keyDown(window, { key: "Escape" });
+    expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
+  });
+
   it("shows the quality-check handoff for missions that are not the professor's turn", async () => {
     show();
+    await within(await screen.findByRole("region", { name: "작업대" })).findByRole("heading", { name: "결정할 미션" });
+    fireEvent.click(within(workbench()).getByRole("button", { name: "미션 목록 열기" }));
     fireEvent.click(await screen.findByRole("button", { name: /검수 진행 중/ }));
     const bench = workbench();
     expect(await within(bench).findByRole("link", { name: "품질 점검 화면에서 이 미션 열기 →" }))
@@ -131,7 +149,9 @@ describe("professor final approval workbench", () => {
   it("opens a linked mission selected inside its own chip", async () => {
     show({ reviewMode: true }, "/admin/review?scenarioId=m-rules");
     expect(await within(await screen.findByRole("region", { name: "작업대" })).findByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
+    fireEvent.click(within(workbench()).getByRole("button", { name: "미션 목록 열기" }));
     expect(screen.getByRole("button", { name: /검수 진행 중/ })).toHaveAttribute("aria-pressed", "true");
+    expect(within(queue()).getByText("규칙 검사 전 미션").closest("button")).toHaveAttribute("aria-current", "true");
   });
 
   it("explains an empty decision queue", async () => {

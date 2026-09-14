@@ -61,7 +61,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
       <Button size="sm" variant={answers ? "default" : "outline"} aria-pressed={answers} onClick={() => setAnswers(!answers)}>{answers ? "직접 풀기로 전환" : "참고 판정·해설 바로 보기"}</Button>
     </div>
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(17rem,27%)]">
       <div className="min-w-0">
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
