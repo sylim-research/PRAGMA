@@ -158,7 +158,7 @@ export function ProfessorMissionWorkbench({
   // 미션을 만드는 자리(approvalHref)는 기존 배치 그대로 둔다.
   if (approvalHref) {
     return (
-      <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
+      <section className="space-y-1 border-t border-[#ECE8DE] pt-3 text-[12px]">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수</h4>
@@ -184,13 +184,10 @@ export function ProfessorMissionWorkbench({
   }
 
   // 교수자 최종 승인: ① 내용 확인 → ② 판정 → ③ 승인을 한 흐름으로 두고, 원본 수정은 흐름 아래 접어 둔다.
+  // 작업대 상자 안에 놓이므로 바깥 상자·중복 머리말 없이 ①②③ 흐름만 둔다.
   return (
-    <section className="mt-3 rounded-xl border border-[#D7DDE0] bg-white p-3.5 text-[12px]">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h4 className="text-[14px] font-bold text-[#233542]">교수자 감수·최종 승인</h4>
-        <p className="text-[12px] text-muted-foreground">① 내용 확인 → ② 판정 → ③ 승인</p>
-      </div>
-      <ContentReviewPanel experiential target={{ kind: "mission", targetId: scenarioId }}
+    <section aria-label="교수자 감수·최종 승인" className="space-y-3 text-[12px]">
+      <ContentReviewPanel experiential framed={false} target={{ kind: "mission", targetId: scenarioId }}
         refreshKey={mission.provenance?.mission_content_hash ?? "draft"}
         approvalDisabled={busy || !canReview || dirty}
         missionContentHash={traceHash ?? mission.provenance?.mission_content_hash}

@@ -250,6 +250,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   // 조립은 방금 만든 것을 확인하는 일이 많아 최신순, 점검·승인은 밀린 일부터 줄이도록 오래 기다린 순.
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode ? "oldest" : "newest");
   const [showAll, setShowAll] = useState(false);
+  // 대기열 상단의 두 필터는 한 줄짜리 토글로 두고, 펼친 쪽만 아래에 연다(기본 접힘).
+  const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [assemblyProgress, setAssemblyProgress] = useState<{
@@ -720,65 +722,60 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const context = contextLabels(r);
     const isAssembling = busy === r.scenario_id && assemblyProgress?.id === r.scenario_id;
     const loaded = preview[r.scenario_id];
+    // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
     const metaLine = reviewMode
-      ? [info?.placement, missionVersionLabel(r.mission_schema_version), info?.progress, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
+      ? [missionVersionLabel(r.mission_schema_version), info?.placement, info?.progress, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
       : [STATE_KO[st], ...context];
     const scenarioText = (
-      <div className="space-y-1.5">
-        <p className="max-w-[54rem] text-[14.5px] leading-[1.8] text-[#202B33]">{r.core_content?.situation_ko ?? "—"}</p>
-        {context.length > 0 && (
-          <p className="text-[12.5px] text-[#758087]">
-            <span className="font-semibold text-[#5D6970]">맥락</span>
-            <span className="mx-1.5 text-[#B2B8BB]">·</span>
-            {context.join(" · ")}
-          </p>
-        )}
-      </div>
+      <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
+        {r.core_content?.situation_ko ?? "—"}
+        {reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
+      </p>
     );
     const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
 
     return (
-      <div key={r.scenario_id} className="space-y-4">
-        <header className="flex flex-wrap items-start justify-between gap-3 border-b border-[#ECE8DE] pb-3">
-          <div className="min-w-0 flex-1 space-y-1.5">
-            {badges(r, "md")}
-            <h2 className="text-[18px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
-            <p className="flex flex-wrap gap-x-2 gap-y-0.5 text-[12px] text-[#66727A]">
-              {metaLine.filter(Boolean).map((part, index) => (
-                <span key={index}>{index > 0 && <span className="mr-2 text-[#B2B8BB]">·</span>}{part}</span>
-              ))}
-            </p>
+      <div key={r.scenario_id}>
+        {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
+        <header className="sticky top-16 z-10 flex items-start justify-between gap-3 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+          <div className="min-w-0 flex-1 space-y-0.5">
+            <div className="flex min-w-0 items-center gap-2">
+              {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
+              <span className="shrink-0 [&>span]:flex-nowrap">{badges(r, "sm")}</span>
+              <p className="min-w-0 truncate text-[11.5px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
+                {metaLine.filter(Boolean).join(" · ")}
+              </p>
+            </div>
+            <h2 className="line-clamp-2 text-[16px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
-          <div className="flex shrink-0 items-center gap-2 text-[12.5px] text-[#66727A]">
+          <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
             {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
-            <Button size="sm" variant="outline" disabled={!prevRow} onClick={() => selectRow(prevRow)}>◀ 이전</Button>
-            <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음 ▶</Button>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}>◀ 이전</Button>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음 ▶</Button>
           </div>
         </header>
+        <div className="space-y-3 px-4 py-3 xl:px-5">
 
         {/* ── 학습 미션 조립: 만드는 화면 ── */}
         {!reviewMode && (
           <>
             {scenarioText}
             {(st === "core_only" || st === "failed") && (
-              <section aria-label="조립" className="space-y-3 rounded-lg border border-[#E2DED2] bg-[#FBFAF6] p-3.5">
+              <section aria-label="조립" className="space-y-2 rounded-lg border border-[#E2DED2] bg-[#FBFAF6] px-3 py-2.5">
                 {DEFAULT_FEATURE_BY_ACT[r.speech_act] ? (
-                  <>
-                    <label className="flex flex-wrap items-center gap-3 text-sm">미션 생성 모델
-                      <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
-                        onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="rounded-lg border bg-white px-3 py-2">
-                        <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
-                      </select>
-                      <span className="text-muted-foreground">Astra는 수 분 걸릴 수 있습니다. 완료 후 AI 검토를 진행합니다.</span>
-                    </label>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <Button disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
-                        {isAssembling && <span className="mr-1.5 size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
-                        {isAssembling ? "조립 중" : st === "failed" ? "다시 조립" : "미션 조립"}
-                      </Button>
-                      <span className="text-[12.5px] text-muted-foreground">MJT 5문항 + 직접 산출 과제 1개 · 누를 때만 생성 비용이 발생합니다.</span>
-                    </div>
-                  </>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
+                      onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="h-9 rounded-md border bg-white px-2 text-sm">
+                      <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
+                    </select>
+                    <Button disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
+                      {isAssembling && <span className="mr-1.5 size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
+                      {isAssembling ? "조립 중" : st === "failed" ? "다시 조립" : "미션 조립"}
+                    </Button>
+                    <span className="text-[12px] text-muted-foreground">
+                      MJT 5 + DCT 1 · 누를 때만 생성 비용{generationModel === "astra" ? " · Astra는 수 분 걸릴 수 있음" : ""}
+                    </span>
+                  </div>
                 ) : (
                   <p className="text-[13px] text-muted-foreground">화용 초점 카탈로그 없음 — 조립 불가</p>
                 )}
@@ -828,12 +825,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {aiReview && (
           <>
             {(st === "generated" || st === "reviewed") && (
-              <ContentReviewPanel target={{ kind: "mission", targetId: r.scenario_id }}
+              <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }}
                 handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
             )}
-            <details className="rounded-lg border border-[#E2DED2] bg-white p-3">
-              <summary className="cursor-pointer text-[13px] font-semibold text-[#34444D]">시나리오 전문</summary>
-              <div className="mt-2">{scenarioText}</div>
+            <details>
+              <summary className="cursor-pointer text-[12.5px] font-semibold text-[#5D6970]">시나리오 전문</summary>
+              <div className="mt-1.5">{scenarioText}</div>
             </details>
           </>
         )}
@@ -861,14 +858,15 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 traceHash={r.mission_content_hash ?? loaded.mission.provenance?.mission_content_hash}
               />
             ))}
-            {st === "reviewed" && <ContentReviewPanel experiential target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
+            {st === "reviewed" && <ContentReviewPanel experiential framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval />}
           </>
         )}
 
         {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
-        <footer className="flex justify-end border-t border-[#ECE8DE] pt-3">
-          <Button variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
+        <footer className="flex justify-end pt-1">
+          <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
         </footer>
+        </div>
       </div>
     );
   };
@@ -877,10 +875,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 조립"}
       description={aiReview
-        ? "규칙 기반 자동 점검과 AI 검토로 교수자가 판단할 자료를 준비합니다. 이 화면에는 승인 기능이 없습니다."
+        ? "자동 점검·AI 검토로 감수 자료를 준비합니다. 승인은 하지 않습니다."
         : reviewMode
-          ? "교수자가 수업에 사용할 현재 콘텐츠를 감수한 뒤 최종 승인합니다."
-          : "시나리오를 MJT 5문항과 직접 산출 과제로 완성하고, 감수할 수 있는 학습 미션으로 저장합니다."}
+          ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
+          : "시나리오를 MJT 5문항·직접 산출 과제 미션으로 조립합니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -894,13 +892,13 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {/* ── 왼쪽 대기열 ── */}
           <aside aria-label="대기열"
             className="flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]">
-            <div className="space-y-2.5 border-b border-[#E2DED2] p-3">
+            <div className="space-y-1.5 border-b border-[#E2DED2] px-2.5 py-2">
               {rows.length >= ROW_CAP && (
-                <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-3 py-2 text-[12px] text-[#92400E]">
-                  ⚠️ 조회 상한 {ROW_CAP}건에 도달했습니다 — 최신 {ROW_CAP}건만 보고 있습니다. 숫자를 전체 현황으로 읽지 마세요.
+                <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-2 py-1 text-[11.5px] text-[#92400E]">
+                  ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="상태">
+              <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
                 {chips.map((s) => (
                   <button
                     key={s}
@@ -908,7 +906,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     onClick={() => setFState(s)}
                     aria-pressed={fState === s}
                     className={[
-                      "rounded-full border px-2.5 py-1 text-[12.5px] transition-colors",
+                      "rounded-full border px-2 py-0.5 text-[12px] transition-colors",
                       fState === s
                         ? "border-[#233542] bg-[#233542] font-semibold text-white"
                         : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
@@ -919,7 +917,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   </button>
                 ))}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 <input
                   id="queue-search"
                   type="search"
@@ -927,26 +925,36 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder="제목·상황·Trace 검색"
                   aria-label="대기열 검색"
-                  className="h-8 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[13px]"
+                  className="h-7 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[12.5px]"
                 />
                 <select
                   id="queue-sort"
                   aria-label="정렬"
                   value={sortOrder}
                   onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-                  className="h-8 rounded-md border border-[#D9D7CF] bg-white px-1.5 text-[12px] text-[#46515A]"
+                  className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[11.5px] text-[#46515A]"
                 >
                   {reviewMode
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
                     : <><option value="newest">최신순</option><option value="oldest">오래된 순</option></>}
                 </select>
               </div>
-              <details className="rounded-md border border-[#DDE2E4] bg-white px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[13px] font-semibold text-[#233542]">
-                  필터 · 학습설계 4축
-                  {axisFilterActive && <span className="ml-2 text-[12px] font-semibold text-[#8A6B24]">적용 중</span>}
-                </summary>
-                <div className="mt-2 grid grid-cols-2 gap-2 pb-1">
+              <div className="flex gap-1.5 text-[12px]">
+                {([["axis", "필터 · 학습설계 4축", axisFilterActive], ["advanced", "고급 필터 (연구자용)", fRun !== "all" || fHash !== "all"]] as const).map(([key, label, active]) => (
+                  <button key={key} type="button" aria-expanded={openFilter === key}
+                    onClick={() => setOpenFilter((current) => (current === key ? null : key))}
+                    className={[
+                      "flex h-7 min-w-0 items-center gap-1 rounded-md border px-2 font-semibold",
+                      openFilter === key ? "border-[#233542] bg-white text-[#233542]" : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
+                    ].join(" ")}>
+                    <span className="truncate">{label}</span>
+                    {active && <span className="shrink-0 rounded bg-[#F6EDD0] px-1 text-[10.5px] text-[#8A6B24]">적용</span>}
+                    <span aria-hidden className="shrink-0 text-[#8C969B]">{openFilter === key ? "▴" : "▾"}</span>
+                  </button>
+                ))}
+              </div>
+              {openFilter === "axis" && (
+                <div className="grid grid-cols-2 gap-1.5">
                   <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
                     opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
                   <AxisSel index="2" label="수준" value={fLevel} onChange={(v) => setFLevel(v as typeof fLevel)}
@@ -956,12 +964,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                     opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
                 </div>
-              </details>
-              <details className="rounded-md border border-[#E6E1D5] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[13px] font-semibold text-[#3D464D]">고급 필터 (연구자용)
-                  {(fRun !== "all" || fHash !== "all") && <span className="ml-2 text-xs font-normal">적용 중</span>}
-                </summary>
-                <div className="mt-2 grid gap-2 pb-1">
+              )}
+              {openFilter === "advanced" && (
+                <div className="grid gap-1.5">
                   <CompactSel label="생성 run" value={fRun} onChange={setFRun}
                     opts={[["all", "전체"], ...runIds.map((id) => {
                       const label = id.length > 24 ? `${id.slice(0, 12)}…${id.slice(-8)}` : id;
@@ -972,10 +977,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <CompactSel label="프롬프트 계열" value={fHash} onChange={setFHash}
                     opts={[["all", "전체"], ...hashes.map((h) => [h, h === "null" ? "legacy·없음" : `${h.slice(0, 10)}…`] as [string, string])]} />
                 </div>
-              </details>
+              )}
             </div>
 
-            <ul className="min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2" aria-label="미션 목록">
+            <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto p-1.5" aria-label="미션 목록">
               {visible.map((r) => {
                 const st = stateOf(r);
                 const selected = r.scenario_id === selectedId;
@@ -983,8 +988,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 return (
                   <li key={r.scenario_id} id={`queue-${r.scenario_id}`}
                     className={[
-                      "flex gap-2 rounded-lg border bg-white px-2.5 py-2",
-                      selected ? "border-2 border-[#233542] px-[9px] py-[7px]" : "border-[#E7E2D7] hover:border-[#C9CED0]",
+                      "flex gap-2 rounded-md border px-2 py-1.5",
+                      selected ? "border-[#233542] bg-white shadow-[inset_3px_0_0_#233542]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
                     ].join(" ")}>
                     {aiReview && st === "generated" && (
                       <input type="checkbox" className="mt-1 shrink-0" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
@@ -992,12 +997,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                           const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
                         })} />
                     )}
-                    <button type="button" className="min-w-0 flex-1 space-y-1 text-left" aria-current={selected ? "true" : undefined}
+                    <button type="button" className="min-w-0 flex-1 space-y-0.5 text-left" aria-current={selected ? "true" : undefined}
                       onClick={() => selectRow(r)}>
                       {badges(r, "sm")}
-                      <span className="line-clamp-2 block text-[13.5px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
+                      <span className="line-clamp-2 block text-[13px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
                       {meta.length > 0 && (
-                        <span className="block text-[11.5px] text-[#66727A]">{meta.join(" · ")}</span>
+                        <span className="block truncate text-[11px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
                       )}
                     </button>
                   </li>
@@ -1017,23 +1022,24 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
             {/* 일괄 감수 자료 준비는 늘 보인다. 실행은 버튼으로만. 진행 상황은 AdminShell 상단 표시가 따로 보여 준다. */}
             {aiReview && (
-              <div className="space-y-1.5 border-t border-[#E2DED2] bg-white p-2.5">
-                <div className="flex flex-wrap items-center gap-1.5 text-[12.5px]">
+              <div className="space-y-1 border-t border-[#E2DED2] bg-white px-2.5 py-2">
+                <div className="flex flex-wrap items-center gap-1 text-[12px]">
                   <span className="font-semibold text-[#202B33]">{reviewSelection.size}건 선택</span>
-                  <Button size="sm" variant="ghost" className="h-7 px-2" disabled={reviewQueue.active}
+                  <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[12px]" disabled={reviewQueue.active}
                     onClick={() => setReviewSelection(new Set(visible.filter((row) => stateOf(row) === "generated").map((row) => row.scenario_id)))}>표시된 미션 모두 선택</Button>
-                  {reviewSelection.size > 0 && <Button size="sm" variant="ghost" className="h-7 px-2" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>}
+                  {reviewSelection.size > 0 && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[12px]" disabled={reviewQueue.active} onClick={() => setReviewSelection(new Set())}>선택 해제</Button>}
                 </div>
-                <Button size="sm" className="w-full" disabled={reviewSelection.size === 0 || reviewQueue.active || Boolean(busy)} onClick={() => void startReviewPreparation(
+                <Button size="sm" className="h-8 w-full" disabled={reviewSelection.size === 0 || reviewQueue.active || Boolean(busy)} onClick={() => void startReviewPreparation(
                   filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
                     target: { kind: "mission" as const, targetId: row.scenario_id },
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
                   })))}>{reviewSelection.size}건 감수 자료 준비</Button>
-                <p className="text-[11.5px] text-muted-foreground">저장된 결과를 재사용하며, 없을 때만 유료 AI 검토를 실행합니다.</p>
+                <p className="text-[11px] text-muted-foreground">저장 결과 재사용 · 없을 때만 유료 AI 검토</p>
               </div>
             )}
             {!reviewMode && (
-              <div className="border-t border-[#E2DED2] px-2.5 [&>section]:my-2.5 [&>section]:p-3">
+              // 진행 중인 생성 작업이 없으면 패널이 비어 이 자리도 사라진다.
+              <div className="border-t border-[#E2DED2] px-2.5 empty:hidden [&>section]:my-2 [&>section]:p-2.5">
                 <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
                   onResume={async (id, jobId) => {
                     const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
@@ -1049,7 +1055,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           </aside>
 
           {/* ── 오른쪽 작업대 ── */}
-          <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white p-4 xl:p-5">
+          <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
             {selectedRow ? renderWorkbench(selectedRow) : (
               <div className="py-10 text-center text-[13.5px] text-[#46515A]">{emptyWorkbench()}</div>
             )}
