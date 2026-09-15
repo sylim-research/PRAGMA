@@ -210,6 +210,18 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
   );
 }
 
+/** v6 미션 시작 전 안내 카드. 핵심 정리는 독립 과제가 아니라 DCT로 넘어가는 전환이라 6번 카드에 함께 적는다. */
+function v6IntroSteps(outputName: string) {
+  return [
+    { title: "상황에 맞는지 판단", body: "한 표현이 지금 상황과 관계에 얼마나 맞는지 판단합니다." },
+    { title: "판단하고 이유 고르기", body: "먼저 판단하고, 가장 큰 이유를 고릅니다. 이유를 본 뒤 다시 판단할 수 있습니다." },
+    { title: "고친 표현 고르기", body: "세 수정안 가운데 원문의 뜻과 상황을 함께 지킨 표현을 고릅니다." },
+    { title: "직접 고치고 비교하기", body: "표현을 직접 고쳐 보고, 관계가 달라지면 어떻게 달라지는지도 봅니다." },
+    { title: "여러 표현 비교하기", body: "네 표현을 각각 너무 직접적인지, 상황에 맞는지, 지나치게 우회적인지 판단합니다." },
+    { title: `새 상황 직접 ${outputName}`, body: "핵심 정리 뒤 새 원문을 직접 옮기고, 피드백을 참고해 최종안을 정합니다." },
+  ];
+}
+
 function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
@@ -218,18 +230,28 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         <h1 className="mt-2 text-xl font-black">표현을 판단하고, 직접 {config.outputName}해 봅니다</h1>
       </div>
       <div className="space-y-5 p-5 sm:p-6">
-        <ol className="grid gap-3 sm:grid-cols-2">
-          <li className="rounded-xl bg-[#F8F6EE] p-4">
-            <h2 className="font-bold">1. 표현 판단 연습</h2>
-            <p className="mt-1 text-sm leading-6 text-[#596579]">{config.practiceDescription ?? "여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다."}</p>
-          </li>
-          <li className="rounded-xl bg-[#F8F6EE] p-4">
-            <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
-            <p className="mt-1 text-sm leading-6 text-[#596579]">{config.briefingOnly
-              ? "다섯 문항을 마친 뒤 새로운 상황의 원문을 직접 옮기고, 피드백을 보고 내 최종안을 정합니다."
-              : "아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다."}</p>
-          </li>
-        </ol>
+        {config.briefingOnly ? (
+          // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
+          <ol className="grid gap-3 sm:grid-cols-2 md:grid-cols-3" aria-label="이번 미션의 활동">
+            {v6IntroSteps(config.outputName).map((step, index) => (
+              <li key={step.title} className="rounded-xl bg-[#F8F6EE] p-4">
+                <h2 className="break-keep font-bold">{index + 1}. {step.title}</h2>
+                <p className="mt-1 break-keep text-sm leading-6 text-[#596579]">{step.body}</p>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <ol className="grid gap-3 sm:grid-cols-2">
+            <li className="rounded-xl bg-[#F8F6EE] p-4">
+              <h2 className="font-bold">1. 표현 판단 연습</h2>
+              <p className="mt-1 text-sm leading-6 text-[#596579]">{config.practiceDescription ?? "여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다."}</p>
+            </li>
+            <li className="rounded-xl bg-[#F8F6EE] p-4">
+              <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
+              <p className="mt-1 text-sm leading-6 text-[#596579]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
+            </li>
+          </ol>
+        )}
         {!config.briefingOnly && <>
           <ContextCard context={config.context} title={`직접 ${config.outputName}할 상황`} />
           <dl className="grid gap-3 text-sm sm:grid-cols-[1fr_auto]">
@@ -1746,7 +1768,6 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
       <p className="text-[11px] font-black tracking-[0.12em] text-[#8A7419]">직접 산출하기 전에</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-2">
         <h1 className="break-keep text-2xl font-black tracking-[-0.03em] text-[#15202B]">문항별 핵심 5가지</h1>
-        <span className="text-[10px] font-black tracking-[0.14em] text-[#8B94A1]">5 POINT LESSON</span>
       </div>
       <ol className="mt-4 border-y border-[#E2DED4]">
         {lessonPoints.map((point, index) => (
@@ -2178,7 +2199,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
   const [pilotProgress] = useState(() => readLocalPilotProgress(localPilot, pilotStorageKey));
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(directCorrectionFlow ? null : 0);
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(localPilot ? null : 0);
   const [questIndex, setQuestIndex] = useState(pilotProgress?.questIndex ?? 0);
   const [completed, setCompleted] = useState(pilotProgress?.completed ?? false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
@@ -2408,7 +2429,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const restart = () => {
     if (savingRef.current) return;
     pendingSaveRef.current = null;
-    setSceneIntroStep(directCorrectionFlow ? null : 0);
+    setSceneIntroStep(localPilot ? null : 0);
     setMpjRecapOpen(false);
     setQuestIndex(0);
     setCompleted(false);
@@ -2492,18 +2513,18 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : mpjRecapOpen ? (
           <div className="space-y-5">
-            <Progress activeIndex={5} mpjRecapOpen skipIntro={directCorrectionFlow} />
+            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} />
             <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={continueFromMpjRecap} />
           </div>
         ) : reviewedQuest && reviewedResponse ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed={completed} reviewIndex={reviewIndex} revisionOpen={feedbackRevisionOpen} skipIntro={directCorrectionFlow} />
+            <Progress activeIndex={currentProgressIndex} completed={completed} reviewIndex={reviewIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <ReviewModeBanner index={reviewIndex ?? 0} completed={completed} onExit={() => setReviewIndex(null)} />
             <CompletedQuestReview quest={reviewedQuest} response={reviewedResponse} />
           </div>
         ) : completed ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={directCorrectionFlow} />
+            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
               <h1 className="mt-2 text-2xl font-black">이번 미션에서 확정한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
@@ -2535,7 +2556,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={directCorrectionFlow} />
+            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}
@@ -2678,7 +2699,7 @@ const CanonicalMissionRun = ({
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">미션을 열지 못했습니다</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">{error}</p>
-          <Button asChild className="mt-5"><Link to="/learner">학습 홈으로 돌아가기</Link></Button>
+          <Button asChild className="mt-5"><Link to="/learner/course">수업 목록으로 돌아가기</Link></Button>
         </section>
       </LearnerJourneyShell>
     );

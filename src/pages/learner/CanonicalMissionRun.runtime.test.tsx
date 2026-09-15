@@ -45,6 +45,13 @@ describe("CanonicalMissionRun live CTA route", () => {
       mission: SAMPLE_MISSION_V6_REASON_CONTRAST };
     render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)}
       runtime={runtime} isDevPreview={false} /></MemoryRouter>);
+    // v6 learners see the six-activity briefing first; no item content is shown before starting.
+    const briefing = screen.getByRole("list", { name: "이번 미션의 활동" });
+    expect(within(briefing).getAllByRole("listitem")).toHaveLength(6);
+    expect(within(briefing).getByText("6. 새 상황 직접 번역")).toBeInTheDocument();
+    expect(screen.queryByText(SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[0].source)).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: /미션 안내, 표현 판단/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /표현 판단 시작하기/ }));
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "매우 적절" }));
     fireEvent.click(screen.getByRole("button", { name: "답안 확인하기" }));
@@ -62,6 +69,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "log-1" });
     render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
     const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
+    click(/표현 판단 시작하기/);
     click("다소 적절"); click("답안 확인하기"); click(/^다음:/);
     const reason = mission.mpj_items[1].reason_choice.options[1];
     click("매우 적절"); click("판단 확정하기");
