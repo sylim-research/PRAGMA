@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
@@ -131,7 +131,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   openai: "내용 검토 · 기존 결과 재사용",
   claude: "선택 시에만 · 독립 검토",
   adjudication: "선택 시에만 · Claude 의견 재검토",
-  professor: "감수 뒤 승인·보류·수정 결정",
+  professor: "내용 확인 뒤 승인 결정",
 };
 
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
@@ -160,13 +160,16 @@ const ReviewPipeline = ({
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
-  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-      {REVIEW_STAGE_ITEMS.map((stage) => {
+  // 화살표는 실제 검수 순서에만 쓰고, 끝의 합계로 위 「승인 전 미션」 칸의 부분집합임을 보인다.
+  <div role="group" aria-label="승인 전 미션의 검수 단계" className="flex flex-wrap items-stretch gap-y-2 lg:flex-nowrap">
+      {REVIEW_STAGE_ITEMS.map((stage, index) => {
         const value = review?.[stage.key] ?? null;
         const active = dominant === stage.key;
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
-          <div key={stage.key} className="relative min-w-0">
+          <Fragment key={stage.key}>
+          {index > 0 && <ArrowRight aria-hidden className="mx-1 h-4 w-4 shrink-0 self-center text-[#81909A]" />}
+          <div className="relative min-w-0 flex-1 basis-40">
             {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
@@ -201,14 +204,27 @@ const ReviewPipeline = ({
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 실패 ${rulesFailCount}`}
               </span>
             </Link>
-            {stage.step < REVIEW_STAGE_ITEMS.length && (
-              <ArrowRight aria-hidden className="absolute -right-[26px] top-1/2 hidden h-5 w-5 -translate-y-1/2 text-[#81909A] xl:block" />
-            )}
           </div>
+          </Fragment>
         );
       })}
+      <span className="ml-2 flex shrink-0 items-center gap-1 self-center text-[13px] text-[#3F4E59]">
+        = <b className="text-[16px] font-semibold tabular-nums text-[#15202B]">
+          {review && !error ? REVIEW_STAGE_ITEMS.reduce((sum, stage) => sum + review[stage.key], 0) : "—"}
+        </b>개
+      </span>
   </div>
 );
+
+// 운영 층위 한 줄: 왼쪽에 층위 이름, 오른쪽에 그 층위의 수. 층위 사이에는 화살표를 두지 않는다(깔때기가 아니다).
+const DashboardLayer = ({ label, children }: { label: string; children: ReactNode }) => (
+  <section aria-label={label} className="grid gap-2 border-t border-[#EFEBE1] px-4 py-3 first:border-t-0 lg:grid-cols-[148px_minmax(0,1fr)] lg:gap-4">
+    <h3 className="pt-1 text-[13px] font-semibold text-[#1B2A36]">{label}</h3>
+    <div className="min-w-0 space-y-2">{children}</div>
+  </section>
+);
+
+const LAYER_GRID = "grid grid-cols-2 gap-2.5 lg:grid-cols-4";
 
 const OperationMetric = ({
   to,
@@ -218,23 +234,25 @@ const OperationMetric = ({
   description,
   error,
   changed = false,
+  emphasis = false,
 }: {
-  to: string;
+  /** 없으면 이동할 화면이 없는 수라 링크가 아닌 칸으로 보인다. */
+  to?: string;
+  /** 아래에 부분집합을 펼쳐 보이는 부모 칸. */
+  emphasis?: boolean;
   label: string;
   value: number | null;
   unit: string;
   description: string;
   error: string | null;
   changed?: boolean;
-}) => (
-  <Link
-    to={to}
-    className={[
-      "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
-      "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
-      changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
-    ].join(" ")}
-  >
+}) => {
+  const className = [
+    "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
+    to ? "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]" : "",
+    changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : emphasis ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
+  ].join(" ");
+  const body = (<>
     <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
     {value === null && !error ? (
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
@@ -247,8 +265,9 @@ const OperationMetric = ({
       </span>
     )}
     <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
-  </Link>
-);
+  </>);
+  return to ? <Link to={to} className={className}>{body}</Link> : <div className={className}>{body}</div>;
+};
 
 const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; announce?: boolean }) => (
   <span
@@ -502,51 +521,44 @@ const AdminDashboard = () => {
         </div>
       </section>
 
-      {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
-      <PanelHeader title="전체 흐름" action={liveStatus(true)} />
-      <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
-        <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          {[
-            { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
-            { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
-            { to: "/admin/ai-review", stage: "승인 전 미션", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
-            // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
-            { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
-            { to: "/admin/composer", stage: "미션 배정", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
-            { to: "/admin/decision-traces", stage: "학습 수행", screen: "수행 기록", value: snapshot?.learnerRecordCount },
-          ].map((step, index) => (
-            <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
-                <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
-                {step.value == null && !displayError ? (
-                  <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
-                ) : (
-                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
-                    {displayError ? "—" : step.value}
-                  </span>
-                )}
-                <span className="mt-auto pt-1.5 text-[11.5px] text-[#9AA3A9]">{step.screen} →</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </section>
+      {/* 세 운영 층위. 층위 사이는 순서가 아니라 서로 다른 층이라 화살표 없이 쌓는다.
+          숫자는 전부 기존 snapshot 필드다 — 새로 계산하는 것은 검수 단계 합계(표시용 덧셈)뿐이다. */}
+      <PanelHeader title="운영 현황" action={liveStatus(true)} />
+      <div className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
+        <DashboardLayer label="① 콘텐츠 준비">
+          <div className={LAYER_GRID}>
+            <OperationMetric to="/admin/library" label="시나리오 재료" value={snapshot?.content.coreCount ?? null} unit="개"
+              description="라이브러리 →" error={displayError} changed={changedKeys.has("core")} />
+            <OperationMetric to="/admin/assembly" label="학습 미션" value={snapshot?.content.generatedMissionCount ?? null} unit="개"
+              description="조립 →" error={displayError} changed={changedKeys.has("mission")} />
+          </div>
+        </DashboardLayer>
 
-      {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
-      <PanelHeader
-        title="검수 단계별 현황"
-        action={liveStatus()}
-      />
-      <ReviewPipeline
-        review={snapshot?.review ?? null}
-        dominant={dominantReviewStage}
-        rulesFailCount={snapshot?.rulesFailCount ?? 0}
-        error={displayError}
-        changedKeys={changedKeys}
-      />
+        {/* 학습 미션 = 승인 전 + 승인 완료 + 수정·옛 상태(기존 pendingRevisionCount). 승인 전은 아래 단계로 다시 쪼갠다. */}
+        <DashboardLayer label="② 품질 검수·승인">
+          <div className={LAYER_GRID}>
+            <OperationMetric to="/admin/ai-review" label="승인 전 미션" value={snapshot?.content.reviewTargetCount ?? null} unit="개"
+              description="품질 점검 →" error={displayError} changed={changedKeys.has("reviewTarget")} emphasis />
+            {/* 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다. */}
+            <OperationMetric to="/admin/review" label="교수자 승인 완료" value={snapshot?.content.professorFinalizedCount ?? null} unit="개"
+              description="최종 승인 →" error={displayError} changed={changedKeys.has("finalized")} />
+            <OperationMetric label="수정·옛 상태" value={snapshot?.content.pendingRevisionCount ?? null} unit="개"
+              description="수정 요청 · 승인 기록 없는 옛 미션" error={displayError} changed={changedKeys.has("pending")} />
+          </div>
+          <div className="rounded-r-lg border-l-2 border-[#D9CB8F] bg-[#FBFAF6] py-2 pl-3 pr-2">
+            <p className="mb-1.5 text-[12px] font-medium text-[#6B7780]">승인 전 미션의 현재 단계</p>
+            <ReviewPipeline
+              review={snapshot?.review ?? null}
+              dominant={dominantReviewStage}
+              rulesFailCount={snapshot?.rulesFailCount ?? 0}
+              error={displayError}
+              changedKeys={changedKeys}
+            />
+          </div>
+        </DashboardLayer>
 
-      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        <DashboardLayer label="③ 수업 운영·학습 수행">
+      <div className={LAYER_GRID}>
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
@@ -567,7 +579,11 @@ const AdminDashboard = () => {
           unit="건"
           description={
             snapshot
-              ? `미션 ${snapshot.assignments.missionCount}개(승인 ${snapshot.assignmentApproval.approvedMissionCount}) · 주차 ${snapshot.assignments.weekCount}개`
+              ? `주차 ${snapshot.assignments.weekCount}개 · 미션 ${snapshot.assignments.missionCount}개`
+                // 승인 전 미션이 섞인 옛 편성이 실제로 있을 때만 알린다.
+                + (snapshot.assignmentApproval.unapprovedMissionCount > 0
+                  ? ` · 승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함`
+                  : "")
               : "교과목 주차에 놓인 미션"
           }
           error={displayError}
@@ -594,6 +610,8 @@ const AdminDashboard = () => {
           error={displayError}
           changed={changedKeys.has("records")}
         />
+      </div>
+        </DashboardLayer>
       </div>
 
       {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
