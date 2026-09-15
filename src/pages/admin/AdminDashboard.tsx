@@ -197,19 +197,14 @@ const ReviewPipeline = ({
           </Fragment>
         );
       })}
-      <span className="ml-2 flex shrink-0 items-center gap-1 self-center text-[13px] text-[#3F4E59]">
-        = <b className="text-[16px] font-semibold tabular-nums text-[#15202B]">
-          {review && !error ? REVIEW_STAGE_ITEMS.reduce((sum, stage) => sum + review[stage.key], 0) : "—"}
-        </b>개
-      </span>
   </div>
 );
 
-// 운영 층위 한 줄: 층위 이름을 위에 작게 두고 가로 폭은 수에 준다. 층위 사이에는 화살표를 두지 않는다(깔때기가 아니다).
+// 운영 층위 한 줄: 왼쪽 칠한 칸이 세 층의 세로 축이 된다. 층위 사이에는 화살표도 번호도 두지 않는다(순서·깔때기가 아니다).
 const DashboardLayer = ({ label, children }: { label: string; children: ReactNode }) => (
-  <section aria-label={label} className="border-t border-[#EFEBE1] px-4 pb-2.5 pt-2 first:border-t-0">
-    <h3 className="mb-1 text-[13px] font-semibold text-[#1B2A36]">{label}</h3>
-    <div className="min-w-0 space-y-2">{children}</div>
+  <section aria-label={label} className="grid border-t-2 border-[#E6E1D5] first:border-t-0 lg:grid-cols-[120px_minmax(0,1fr)]">
+    <h3 className="bg-[#F4F1E8] px-3 py-2.5 text-[14px] font-bold leading-5 text-[#15202B]">{label}</h3>
+    <div className="min-w-0 space-y-2 px-4 py-2.5">{children}</div>
   </section>
 );
 
@@ -514,7 +509,7 @@ const AdminDashboard = () => {
           숫자는 전부 기존 snapshot 필드다 — 새로 계산하는 것은 검수 단계 합계(표시용 덧셈)뿐이다. */}
       <PanelHeader title="운영 현황" action={liveStatus(true)} />
       <div className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
-        <DashboardLayer label="① 콘텐츠 준비">
+        <DashboardLayer label="콘텐츠 준비">
           <div className={LAYER_GRID}>
             <OperationMetric to="/admin/library" label="시나리오 재료" value={snapshot?.content.coreCount ?? null} unit="개"
               description="라이브러리 →" error={displayError} changed={changedKeys.has("core")} />
@@ -524,7 +519,7 @@ const AdminDashboard = () => {
         </DashboardLayer>
 
         {/* 학습 미션 = 승인 전 + 승인 완료 + 수정·옛 상태(기존 pendingRevisionCount). 승인 전은 아래 단계로 다시 쪼갠다. */}
-        <DashboardLayer label="② 품질 검수·승인">
+        <DashboardLayer label="품질 검수·승인">
           <div className={LAYER_GRID}>
             <OperationMetric to="/admin/ai-review" label="승인 전 미션" value={snapshot?.content.reviewTargetCount ?? null} unit="개"
               description="품질 점검 →" error={displayError} changed={changedKeys.has("reviewTarget")} emphasis />
@@ -546,7 +541,7 @@ const AdminDashboard = () => {
           </div>
         </DashboardLayer>
 
-        <DashboardLayer label="③ 수업 운영·학습 수행">
+        <DashboardLayer label="수업 운영·학습 수행">
       <div className={LAYER_GRID}>
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}

@@ -85,13 +85,14 @@ describe("admin dashboard task-first counts", () => {
     show();
     const stages = await screen.findByRole("group", { name: "승인 전 미션의 검수 단계" });
     // 승인 전 3 = 규칙 검사 대기 2(검사 전 1 + 불통과 1) + 교수자 승인 대기 1.
-    await waitFor(() => expect(stages.textContent).toContain("= 3개"));
-    const reviewLayer = screen.getByRole("region", { name: "② 품질 검수·승인" });
+    await waitFor(() => expect(within(stages).getByRole("link", { name: /규칙 검사 대기/ }).textContent).toContain("2"));
+    expect(within(stages).getByRole("link", { name: /교수자 승인 대기/ }).textContent).toContain("1");
+    const reviewLayer = screen.getByRole("region", { name: "품질 검수·승인" });
     expect(within(reviewLayer).getByRole("link", { name: /승인 전 미션/ }).textContent).toContain("3");
     expect(reviewLayer.textContent).toContain("수정·옛 상태");
     expect(screen.queryByText(/보류/)).not.toBeInTheDocument();
     // 편성된 미션이 모두 승인 완료면 「승인 전 미션 포함」을 붙이지 않는다.
-    expect(screen.getByRole("region", { name: "③ 수업 운영·학습 수행" }).textContent).not.toContain("포함");
+    expect(screen.getByRole("region", { name: "수업 운영·학습 수행" }).textContent).not.toContain("포함");
   });
 
   it("notes unapproved missions inside assignments only when there are some", async () => {
@@ -100,7 +101,7 @@ describe("admin dashboard task-first counts", () => {
       { outline_id: "c1", week_no: 3, scenario_id: "ready" },
     ];
     show();
-    const operations = screen.getByRole("region", { name: "③ 수업 운영·학습 수행" });
+    const operations = screen.getByRole("region", { name: "수업 운영·학습 수행" });
     await waitFor(() => expect(operations.textContent).toContain("승인 전 미션 1개 포함"));
   });
 
