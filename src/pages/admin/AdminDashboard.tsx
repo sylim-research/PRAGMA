@@ -136,21 +136,14 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: `생성 계약 규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
-  openai: "내용 검토 · 기존 결과 재사용",
-  claude: "선택 시에만 · 독립 검토",
-  adjudication: "선택 시에만 · Claude 의견 재검토",
-  // 보류 판정은 없앴다(확인·수정 요청만) — 최종 결정은 승인이다.
-  professor: "내용 확인 뒤 최종 승인",
+  rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
+  // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
+  openai: "의미·자연성 검토",
+  claude: "선택형",
+  adjudication: "선택형 · Claude 의견 대상",
+  // 교수자는 학생에게 보이는 화면 그대로 감수한다 — AI 검토와 다른 사람의 확인이다.
+  professor: "학생 화면으로 감수",
 };
-
-// 품질관리의 세 의미 단위. 숫자보다 눈에 띄지 않게 카드 위 흐린 머리표로만 둔다.
-const REVIEW_STAGE_GROUP_LABELS = [
-  { label: "규칙 검사", span: "lg:col-span-1" },
-  { label: "AI 문맥 검토", span: "lg:col-span-3" },
-  { label: "교수자 승인", span: "lg:col-span-1" },
-] as const;
-
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
 const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "adjudication"]);
@@ -182,11 +175,6 @@ const ReviewPipeline = ({
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
   <div role="group" aria-label="품질 검수 단계">
-  <div className="mb-1 grid grid-cols-1 gap-2.5 text-[11px] font-medium text-[#6B7780] lg:grid-cols-5">
-    {REVIEW_STAGE_GROUP_LABELS.map((group) => (
-      <span key={group.label} className={["hidden border-b border-[#EFEBE1] pb-0.5 lg:block", group.span].join(" ")}>{group.label}</span>
-    ))}
-  </div>
   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
       {REVIEW_STAGE_ITEMS.map((stage) => {
         const value = review?.[stage.key] ?? null;
@@ -228,7 +216,7 @@ const ReviewPipeline = ({
               </div>
               <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
                 {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 실패 ${rulesFailCount}`}
+                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
             </Link>
             {stage.step < REVIEW_STAGE_ITEMS.length && (
@@ -299,7 +287,7 @@ const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; a
       {!delayed && <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50 motion-safe:animate-ping" />}
       <span className={["relative inline-flex h-2 w-2 rounded-full", delayed ? "bg-amber-500" : "bg-emerald-500"].join(" ")} />
     </span>
-    {delayed ? "갱신 지연" : "DB 실시간"}
+    {delayed ? "갱신 지연" : "실시간"}
   </span>
 );
 
@@ -528,25 +516,23 @@ const AdminDashboard = () => {
         <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="min-w-0">
             <p className="text-[22px] font-bold leading-tight">
-              교수자 승인 대기 · 학습 미션{" "}
+              교수자 승인 대기{" "}
               <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
             </p>
-            <p className="mt-0.5 text-[13px] text-[#B9C3CA]">품질 점검을 마치고 교수자 승인을 기다리는 미션입니다.</p>
           </div>
           <Button asChild className="h-10 bg-[#FAD338] px-5 text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
             <Link to="/admin/review">승인하러 가기 →</Link>
           </Button>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2 text-[13px] text-[#B9C3CA]">
-          <span>품질 점검 대기 · 학습 미션 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
-          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 뜻과 함께 보인다. */}
+          <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
+          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다. */}
           {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
             <span>
-              규칙 검사 불통과 · <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
-              <span className="ml-2">생성 계약 규칙 위반을 확인해야 합니다.</span>
+              규칙 검사 불통과 <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
             </span>
           )}
-          <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 화면 →</Link>
+          <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 →</Link>
         </div>
       </section>
 
@@ -562,9 +548,10 @@ const AdminDashboard = () => {
             { to: "/admin/ai-review", stage: "검수·승인 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
             // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
             { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
-            { to: "/admin/composer", stage: "미션 배정", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
+            // 사람에게 준 과제가 아니라 교과목·주차에 놓인 미션 건수다 — 사이드바 「수업 편성」과 같은 말로 부른다.
+            { to: "/admin/composer", stage: "미션 편성", screen: "수업 편성", value: snapshot?.assignments.assignmentCount },
             // 계정·기간으로 거르지 않은 전체 행이라 실제 수업 수행으로 단정하지 않는다.
-            { to: "/admin/decision-traces", stage: "수행 기록", screen: "기록 → 연구 데이터", value: snapshot?.learnerRecordCount },
+            { to: "/admin/decision-traces", stage: "수행 기록", screen: "기록 목록", value: snapshot?.learnerRecordCount },
           ].map((step, index) => (
             <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
               <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
@@ -614,14 +601,11 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          label="미션 배정"
+          label="미션 편성"
           value={snapshot?.assignments.assignmentCount ?? null}
           unit="건"
-          description={
-            snapshot
-              ? `미션 ${snapshot.assignments.missionCount}개 · 주차 ${snapshot.assignments.weekCount}개`
-              : "교과목 주차에 놓인 미션"
-          }
+          // 서로 다른 미션 수를 다시 쓰면 큰 수(편성 건수)와 같은 뜻으로 읽혀 주차 수만 둔다.
+          description={snapshot ? `주차 ${snapshot.assignments.weekCount}개` : "교과목 주차에 놓인 미션"}
           error={displayError}
           changed={changedKeys.has("assignments")}
           title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
@@ -634,7 +618,7 @@ const AdminDashboard = () => {
           label="승인 학습자 계정"
           value={snapshot?.approvedLearnerCount ?? null}
           unit="개"
-          description="계정 승인 · 전체 교과목 공통"
+          description="전체 교과목 공통"
           error={displayError}
           changed={changedKeys.has("learners")}
         />
@@ -645,7 +629,8 @@ const AdminDashboard = () => {
           label="수행 기록"
           value={snapshot?.learnerRecordCount ?? null}
           unit="건"
-          description={`교과목 연결 ${snapshot && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건 · 연구 데이터로 내보내기`}
+          // 실제 수업 기록과 시범 수행을 가르는 유일한 단서라 남긴다(교과목 맥락 없는 실행은 연결되지 않는다).
+          description={`교과목 연결 ${snapshot && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건`}
           error={displayError}
           changed={changedKeys.has("records")}
         />

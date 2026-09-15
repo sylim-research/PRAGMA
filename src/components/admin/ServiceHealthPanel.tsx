@@ -82,7 +82,8 @@ const summarizeStatuses = (statuses: ServiceStatus[]) => {
   if (manual.length > 0) {
     return { tone: "ok" as const, text: `${ok.length}개 정상 · ${manual.join("·")} 직접 확인` };
   }
-  return { tone: "ok" as const, text: `${statuses.length}개 서비스 모두 정상` };
+  // 제목이 「외부 서비스 연동」이라 「서비스」를 되풀이하지 않는다.
+  return { tone: "ok" as const, text: `${statuses.length}개 모두 정상` };
 };
 
 const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolean }) => {

@@ -56,7 +56,7 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("모두 정상이면 한 줄로 접어 두고 요약만 보여 준다", () => {
     storeAgeMs(60_000, ALL_OK);
     render(<ServiceHealthPanel />);
-    expect(screen.getByText("5개 서비스 모두 정상")).toBeVisible();
+    expect(screen.getByText("5개 모두 정상")).toBeVisible();
     expect(screen.queryByTestId("service-openai")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /펼쳐 보기/ })).toHaveAttribute("aria-expanded", "false");
     expect(screen.getByTestId("summary-dot")).toHaveClass("bg-emerald-500");
