@@ -1746,7 +1746,6 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
       <p className="text-[11px] font-black tracking-[0.12em] text-[#8A7419]">직접 산출하기 전에</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-2">
         <h1 className="break-keep text-2xl font-black tracking-[-0.03em] text-[#15202B]">문항별 핵심 5가지</h1>
-        <span className="text-[10px] font-black tracking-[0.14em] text-[#8B94A1]">5 POINT LESSON</span>
       </div>
       <ol className="mt-4 border-y border-[#E2DED4]">
         {lessonPoints.map((point, index) => (
@@ -2678,7 +2677,7 @@ const CanonicalMissionRun = ({
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">미션을 열지 못했습니다</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">{error}</p>
-          <Button asChild className="mt-5"><Link to="/learner">학습 홈으로 돌아가기</Link></Button>
+          <Button asChild className="mt-5"><Link to="/learner/course">수업 목록으로 돌아가기</Link></Button>
         </section>
       </LearnerJourneyShell>
     );

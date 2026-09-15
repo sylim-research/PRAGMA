@@ -145,7 +145,9 @@ function actWeek(act: SpeechActUI, course: LearnerCourse | null) {
 }
 
 function focusLabel(record: ReportRecord) {
-  if (record.revisionFocus?.trim()) return record.revisionFocus.trim();
+  const focus = record.revisionFocus?.trim();
+  // 저장값이 내부 코드(예: "feature")면 학습자에게 보이지 않게 기본 문구로 대신한다.
+  if (focus && !/^[a-z0-9_-]+$/i.test(focus)) return focus;
   return record.speechAct ? ACT_FOCUS[record.speechAct] : "표현 선택과 맥락 적합성";
 }
 
