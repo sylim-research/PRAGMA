@@ -27,7 +27,12 @@ const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
   openai: { name: "OpenAI", role: "생성·AI 검토·STT" },
   anthropic: { name: "Anthropic", role: "콘텐츠 검토" },
   supabase: { name: "Supabase", role: "로그인·데이터" },
-  app: { name: "앱 배포", role: "화면 제공" },
+  // 다른 칸처럼 제공사 이름을 쓰되, 이 칸은 Railway에 묻지 않고 「이 화면이 열렸다」만 보므로
+  // 실제로 Railway에서 열렸을 때만 Railway라고 부른다(로컬에서 「Railway 정상」은 틀린 표시다).
+  app: {
+    name: typeof window !== "undefined" && window.location.hostname.endsWith(".railway.app") ? "Railway" : "로컬 개발 서버",
+    role: "화면 제공",
+  },
 };
 
 const TONE: Record<ServiceTone, { label: string; dot: string; text: string }> = {
