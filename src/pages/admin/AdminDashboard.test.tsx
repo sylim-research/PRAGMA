@@ -84,7 +84,7 @@ describe("admin dashboard task-first counts", () => {
     show();
     const rulesCard = await screen.findByRole("link", { name: /규칙 검사 대기/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["AI 검토 대기", "AI 독립 검토 대기", "AI 재검토 대기"]) {
+    for (const label of ["OpenAI 검토 대기", "Claude 독립 검토 대기", "OpenAI 재검토 대기"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
     const professorCards = screen.getAllByRole("link", { name: /교수자 승인 대기/ });
