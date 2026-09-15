@@ -11,14 +11,6 @@ export type DashboardScenarioRow = {
   mission_schema_version: string | null;
   authoring_stage: string | null;
   updated_at: string | null;
-  /** 커버리지 요약용 축. 대시보드 조회만 채우고, 다른 호출부는 비워 둬도 된다. */
-  speech_act?: string | null;
-  language_direction?: string | null;
-  learner_level?: string | null;
-  /** mission_content.production_task.mode — translation | interpreting */
-  dct_mode?: string | null;
-  /** core_content.provenance.source_type — 실제 자료에서 만든 코어만 값이 있다. */
-  source_type?: string | null;
 };
 
 export type DashboardReviewRunRow = {
@@ -115,39 +107,6 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
     // 최종 승인 없이 reviewed/released로 남은 옛 항목이다. 화면에서 세 수가 더해지도록 함께 보인다.
     pendingRevisionCount: generated.length - reviewTargets.length - finalized.length,
   };
-}
-
-function tallyBy<T extends string>(rows: readonly DashboardScenarioRow[], pick: (row: DashboardScenarioRow) => string | null | undefined, keys: readonly T[]) {
-  const counts = Object.fromEntries(keys.map((key) => [key, 0])) as Record<T, number>;
-  for (const row of rows) {
-    const value = pick(row);
-    if (value && (keys as readonly string[]).includes(value)) counts[value as T] += 1;
-  }
-  return counts;
-}
-
-/**
- * 콘텐츠 폭 요약 — 「학습 미션」 집합의 실제 분포. 설계상 축 수가 아니라 존재하는 값만 센다
- * (예: 입문 미션이 적으면 적은 대로 보인다). 화행별 개수는 라이브러리 상세 표의 몫이라 종 수만 낸다.
- */
-export function summarizeContentCoverage(rows: readonly DashboardScenarioRow[]) {
-  const missions = rows.filter(isGeneratedMission);
-  return {
-    speechActCount: new Set(missions.map((row) => row.speech_act).filter(Boolean)).size,
-    direction: tallyBy(missions, (row) => row.language_direction, ["ko_zh", "zh_ko"] as const),
-    level: tallyBy(missions, (row) => row.learner_level, ["beginner_intermediate", "intermediate", "advanced"] as const),
-    mode: tallyBy(missions, (row) => row.dct_mode, ["translation", "interpreting"] as const),
-  };
-}
-
-/** core_content.provenance.source_type의 정본 값(coreSchema CoreSourceTypeSchema). PDF·웹·오디오는 저장 경로가 없어 세지 않는다. */
-export const AUTHENTIC_SOURCE_TYPES = ["authentic_text", "authentic_image", "authentic_youtube"] as const;
-
-/** 실제 자료에서 만든 시나리오 재료 — 현재 코어 전체에서 출처 유형별로 센다. */
-export function summarizeCoreProvenance(rows: readonly DashboardScenarioRow[]) {
-  const cores = rows.filter((row) => row.content_format === "scenario_core_v1");
-  const byType = tallyBy(cores, (row) => row.source_type, AUTHENTIC_SOURCE_TYPES);
-  return { byType, total: AUTHENTIC_SOURCE_TYPES.reduce((sum, key) => sum + byType[key], 0) };
 }
 
 function runIsCurrentForRow(run: DashboardReviewRunRow, row: DashboardScenarioRow): boolean {

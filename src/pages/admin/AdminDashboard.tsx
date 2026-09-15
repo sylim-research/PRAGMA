@@ -38,8 +38,6 @@ import {
   summarizeCumulativeReviewCompletion,
   type DashboardCumulativeReviewCounts,
   type DashboardCumulativeRunRow,
-  summarizeContentCoverage,
-  summarizeCoreProvenance,
 } from "@/lib/admin/adminDashboardMetrics";
 import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
@@ -64,15 +62,7 @@ type DashboardSnapshot = {
   rulesFailCount: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
-  coverage: ReturnType<typeof summarizeContentCoverage>;
-  provenance: ReturnType<typeof summarizeCoreProvenance>;
-  /** 실제 자료 분석·활용 후보 저장 건수. 읽지 못하면 null. */
-  authenticAnalysisCount: number | null;
-  authenticCandidateCount: number | null;
 };
-
-const LEVEL_LABEL = { beginner_intermediate: "입문", intermediate: "중급", advanced: "고급" } as const;
-const SOURCE_TYPE_LABEL = { authentic_text: "텍스트", authentic_image: "이미지", authentic_youtube: "YouTube(옛 경로)" } as const;
 
 type DashboardMetricKey =
   | "core"
@@ -203,23 +193,22 @@ const ReviewPipeline = ({
                 </span>
                 <span className="whitespace-nowrap text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
-              {/* 전광판: 해낸 일(누적 완료)은 큰 숫자로 차분하게, 기다리는 일(현재 대기)은 있을 때만 노란 배지로. */}
-              <div className="mt-1.5 flex items-center justify-between gap-2">
-                <span className="flex items-baseline gap-1.5 whitespace-nowrap">
-                  <span className="text-[11px] font-medium text-[#63727C]">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
+              {/* 전광판처럼 두 칸을 나란히 둔다: 이미 해낸 일(누적 완료, 중립 바탕)과 지금 기다리는 일(현재 대기, 대기가 있으면 노란 바탕). */}
+              <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                <div className="rounded-md bg-[#EEF1F2] px-2 py-1">
+                  <span className="block text-[11px] font-medium text-[#63727C]">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
                   {completed === null && !error && review === null ? (
-                    <span aria-label="불러오는 중" className="inline-block h-6 w-10 rounded bg-muted motion-safe:animate-pulse" />
+                    <span aria-label="불러오는 중" className="mt-0.5 block h-6 w-10 rounded bg-muted motion-safe:animate-pulse" />
                   ) : (
-                    <span className="text-[22px] font-bold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                    <span className="text-[20px] font-bold leading-7 tracking-[-0.025em] text-[#15202B] tabular-nums">
                       {error || completed === null ? <span className="text-xs font-normal text-destructive">확인 필요</span> : completed}
                     </span>
                   )}
-                </span>
-                {!error && (queue ?? 0) > 0 ? (
-                  <span className="whitespace-nowrap rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[12px] font-bold tabular-nums text-[#15202B]">현재 대기 {queue}</span>
-                ) : (
-                  <span className="whitespace-nowrap text-[11px] text-[#9AA3A9]">{error || queue === null ? "—" : "대기 없음"}</span>
-                )}
+                </div>
+                <div className={["rounded-md px-2 py-1", !error && (queue ?? 0) > 0 ? "bg-[#FAD338]/35 text-[#5C4300]" : "bg-[#F7F6F2] text-[#9AA3A9]"].join(" ")}>
+                  <span className="block text-[11px] font-medium">현재 대기</span>
+                  <span className="text-[20px] font-bold leading-7 tracking-[-0.025em] tabular-nums">{error ? "—" : queue ?? "—"}</span>
+                </div>
               </div>
               {(stage.key === "rules" || stage.optional) && (
                 <span className="mt-auto whitespace-nowrap pt-1 text-[11px] text-muted-foreground">
@@ -363,10 +352,10 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, analysisResult, candidateResult] = await Promise.all([
+      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
-          .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage,speech_act,language_direction,learner_level,dct_mode:mission_content->production_task->>mode,source_type:core_content->provenance->>source_type")
+          .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
           .eq("content_format", "scenario_core_v1")
           .is("archived_at", null)
           .order("scenario_id", { ascending: true })
@@ -405,9 +394,6 @@ const AdminDashboard = () => {
           .range(from, to)),
         db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
-        // 실제 자료 활용 경로의 저장 건수. 보조 지표라 실패해도 대시보드 전체를 막지 않는다.
-        db.from("authentic_analyses").select("id", { count: "exact" }).limit(1),
-        db.from("authentic_candidates").select("id", { count: "exact" }).limit(1),
       ]);
 
       const results = [
@@ -428,10 +414,6 @@ const AdminDashboard = () => {
         rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
-        coverage: summarizeContentCoverage(scenarioRows),
-        provenance: summarizeCoreProvenance(scenarioRows),
-        authenticAnalysisCount: analysisResult.error ? null : analysisResult.count ?? 0,
-        authenticCandidateCount: candidateResult.error ? null : candidateResult.count ?? 0,
       };
       if (!mountedRef.current) return;
 
@@ -577,25 +559,6 @@ const AdminDashboard = () => {
               description="라이브러리 →" error={displayError} changed={changedKeys.has("core")} />
             <OperationMetric to="/admin/assembly" label="학습 미션" value={snapshot?.content.generatedMissionCount ?? null} unit="개"
               description="조립 →" error={displayError} changed={changedKeys.has("mission")} />
-            {/* 콘텐츠 폭(실제 분포)과 근거 경로(실제 자료 활용)를 숫자 카드 대신 두 줄로. 값이 0이어도 그대로 보인다. */}
-            <div className="col-span-2 flex flex-col justify-center gap-2 text-[12px] leading-5 text-[#5F6B73]">
-              {snapshot && (<>
-                <p aria-label="콘텐츠 커버리지">
-                  <span className="mr-2 font-semibold text-[#1B2A36]">콘텐츠 커버리지</span>
-                  화행 {snapshot.coverage.speechActCount}종 · 한→중 {snapshot.coverage.direction.ko_zh} · 중→한 {snapshot.coverage.direction.zh_ko}
-                  {" · "}{(Object.keys(LEVEL_LABEL) as (keyof typeof LEVEL_LABEL)[]).map((key) => `${LEVEL_LABEL[key]} ${snapshot.coverage.level[key]}`).join(" · ")}
-                  {" · "}번역 {snapshot.coverage.mode.translation} · 통역 {snapshot.coverage.mode.interpreting}
-                  <Link to="/admin/library" className="ml-2 font-medium text-[#3F4E59] underline-offset-4 hover:underline">상세 분포 →</Link>
-                </p>
-                <p aria-label="실제 자료 활용">
-                  <span className="mr-2 font-semibold text-[#1B2A36]">실제 자료 활용</span>
-                  분석 {snapshot.authenticAnalysisCount ?? "—"}건 · 활용 후보 {snapshot.authenticCandidateCount ?? "—"}건 · 재료 반영 {snapshot.provenance.total}건
-                  <span className="text-[#9AA3A9]">
-                    {" ("}{(Object.keys(SOURCE_TYPE_LABEL) as (keyof typeof SOURCE_TYPE_LABEL)[]).map((key) => `${SOURCE_TYPE_LABEL[key]} ${snapshot.provenance.byType[key]}`).join(" · ")}{")"}
-                  </span>
-                </p>
-              </>)}
-            </div>
           </div>
         </DashboardLayer>
 
@@ -624,7 +587,7 @@ const AdminDashboard = () => {
           </div>
         </DashboardLayer>
 
-        <DashboardLayer label="수업 운영">
+        <DashboardLayer label="수업 운영·학습 수행">
       <div className={LAYER_GRID}>
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
@@ -637,16 +600,6 @@ const AdminDashboard = () => {
           error={displayError}
           changed={changedKeys.has("courses")}
         />
-        {/* 달력 주가 아니라 「교과목×주차」 가운데 미션이 하나라도 놓인 칸 수다. */}
-        <OperationMetric
-          to="/admin/composer"
-          label="편성 주차"
-          value={snapshot?.assignments.weekCount ?? null}
-          unit="개"
-          description="교과목별로 미션이 놓인 주차"
-          error={displayError}
-          changed={changedKeys.has("assignments")}
-        />
         {/* 큰 수 = 배정 건수(운영 단위). 승인 전 미션이 섞여 있으면 게이트 이전의 옛 편성이다 —
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
@@ -656,7 +609,7 @@ const AdminDashboard = () => {
           unit="건"
           description={
             snapshot
-              ? `미션 ${snapshot.assignments.missionCount}개`
+              ? `주차 ${snapshot.assignments.weekCount}개 · 미션 ${snapshot.assignments.missionCount}개`
                 // 승인 전 미션이 섞인 옛 편성이 실제로 있을 때만 알린다.
                 + (snapshot.assignmentApproval.unapprovedMissionCount > 0
                   ? ` · 승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함`
@@ -666,12 +619,6 @@ const AdminDashboard = () => {
           error={displayError}
           changed={changedKeys.has("assignments")}
         />
-      </div>
-        </DashboardLayer>
-
-        {/* 학습 수행은 사용 실적이지 학습 효과가 아니다 — 추이·성취 그래프를 두지 않는다. */}
-        <DashboardLayer label="학습 수행">
-      <div className={LAYER_GRID}>
         {/* 계정 이용 승인이지 교과목별 수강 등록이 아니다 — 「수강생」으로 부르지 않는다. */}
         <OperationMetric
           to="/admin/learners"

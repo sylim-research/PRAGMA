@@ -93,7 +93,7 @@ describe("admin dashboard task-first counts", () => {
     expect(reviewLayer.textContent).toContain("기타 상태");
     expect(screen.queryByText(/보류/)).not.toBeInTheDocument();
     // 편성된 미션이 모두 승인 완료면 「승인 전 미션 포함」을 붙이지 않는다.
-    expect(screen.getByRole("region", { name: "수업 운영" }).textContent).not.toContain("포함");
+    expect(screen.getByRole("region", { name: "수업 운영·학습 수행" }).textContent).not.toContain("포함");
   });
 
   it("notes unapproved missions inside assignments only when there are some", async () => {
@@ -102,28 +102,8 @@ describe("admin dashboard task-first counts", () => {
       { outline_id: "c1", week_no: 3, scenario_id: "ready" },
     ];
     show();
-    const operations = screen.getByRole("region", { name: "수업 운영" });
+    const operations = screen.getByRole("region", { name: "수업 운영·학습 수행" });
     await waitFor(() => expect(operations.textContent).toContain("승인 전 미션 1개 포함"));
-    // 편성 주차 = 교과목×주차 칸 수(c1의 2·3주차 = 2).
-    expect(within(operations).getByRole("link", { name: /편성 주차/ }).textContent).toContain("2");
-  });
-
-  it("summarizes content coverage from actual mission values and shows authentic-source counts even when zero", async () => {
-    mocks.tables.scenarios = [
-      scenario("a", { speech_act: "request", language_direction: "ko_zh", learner_level: "intermediate", dct_mode: "translation" }),
-      scenario("b", { speech_act: "refusal", language_direction: "zh_ko", learner_level: "advanced", dct_mode: "interpreting", source_type: "authentic_text" }),
-      // 미션 내용이 없는 코어는 커버리지에 들어가지 않지만 출처 집계(재료)에는 들어간다.
-      scenario("c", { mission_status: null, mission_schema_version: null, speech_act: "thanks", source_type: "authentic_image" }),
-    ];
-    mocks.tables.authentic_analyses = [{ id: "an1" }];
-    mocks.tables.authentic_candidates = [];
-    show();
-    const content = screen.getByRole("region", { name: "콘텐츠 준비" });
-    await waitFor(() => expect(content.textContent).toContain("화행 2종"));
-    expect(content.textContent).toMatch(/한→중 1 · 중→한 1 · 입문 0 · 중급 1 · 고급 1 · 번역 1 · 통역 1/);
-    expect(within(content).getByRole("link", { name: "상세 분포 →" })).toHaveAttribute("href", "/admin/library");
-    expect(content.textContent).toMatch(/분석 1건 · 활용 후보 0건 · 재료 반영 2건/);
-    expect(content.textContent).toMatch(/텍스트 1 · 이미지 1 · YouTube\(옛 경로\) 0/);
   });
 
   it("hides the rule-failure line when no mission failed the rule check", async () => {
@@ -150,8 +130,8 @@ describe("admin dashboard task-first counts", () => {
     const card = (name: RegExp) => within(stages).getByRole("link", { name });
     await waitFor(() => expect(card(/결정론 규칙 검사/).textContent).toMatch(/누적 완료\s*2/));
     expect(card(/OpenAI 품질 검토/).textContent).toMatch(/누적 완료\s*2/);
-    expect(card(/Claude 독립 검토/).textContent).toMatch(/누적 완료\s*1.*대기 없음.*선택형/);
-    expect(card(/OpenAI 재검토/).textContent).toMatch(/누적 완료\s*1.*대기 없음.*선택형/);
+    expect(card(/Claude 독립 검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
+    expect(card(/OpenAI 재검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
     expect(card(/교수자 최종 승인/).textContent).toMatch(/승인 완료\s*2/);
     expect(card(/결정론 규칙 검사/).textContent).toMatch(/규칙 33개/);
   });
