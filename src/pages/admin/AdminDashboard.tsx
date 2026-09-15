@@ -193,22 +193,30 @@ const ReviewPipeline = ({
                 </span>
                 <span className="whitespace-nowrap text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
-              <div className="mt-1 flex items-end gap-1.5">
-                <span className="pb-0.5 text-[11px] text-muted-foreground">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
-                {completed === null && !error && review === null ? (
-                  <span aria-label="불러오는 중" className="h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
-                ) : (
-                  <span className="text-[20px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-                    {error || completed === null ? <span className="text-xs font-normal text-destructive">확인 필요</span> : completed}
-                  </span>
-                )}
+              {/* 전광판처럼 두 칸을 나란히 둔다: 이미 해낸 일(누적 완료, 중립 바탕)과 지금 기다리는 일(현재 대기, 대기가 있으면 노란 바탕). */}
+              <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                <div className="rounded-md bg-[#EEF1F2] px-2 py-1">
+                  <span className="block text-[11px] font-medium text-[#63727C]">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
+                  {completed === null && !error && review === null ? (
+                    <span aria-label="불러오는 중" className="mt-0.5 block h-6 w-10 rounded bg-muted motion-safe:animate-pulse" />
+                  ) : (
+                    <span className="text-[20px] font-bold leading-7 tracking-[-0.025em] text-[#15202B] tabular-nums">
+                      {error || completed === null ? <span className="text-xs font-normal text-destructive">확인 필요</span> : completed}
+                    </span>
+                  )}
+                </div>
+                <div className={["rounded-md px-2 py-1", !error && (queue ?? 0) > 0 ? "bg-[#FAD338]/35 text-[#5C4300]" : "bg-[#F7F6F2] text-[#9AA3A9]"].join(" ")}>
+                  <span className="block text-[11px] font-medium">현재 대기</span>
+                  <span className="text-[20px] font-bold leading-7 tracking-[-0.025em] tabular-nums">{error ? "—" : queue ?? "—"}</span>
+                </div>
               </div>
-              <span className="mt-auto whitespace-nowrap pt-1 text-[11px] text-muted-foreground">
-                현재 대기 <b className="font-semibold tabular-nums text-[#3F4E59]">{error ? "—" : queue ?? "—"}</b>
-                {stage.key === "rules" && ` · 규칙 ${ACTIVE_RULE_IDS.length}개`}
-                {stage.optional && " · 선택형"}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
-              </span>
+              {(stage.key === "rules" || stage.optional) && (
+                <span className="mt-auto whitespace-nowrap pt-1 text-[11px] text-muted-foreground">
+                  {stage.key === "rules" && `규칙 ${ACTIVE_RULE_IDS.length}개`}
+                  {stage.optional && "선택형"}
+                  {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
+                </span>
+              )}
             </Link>
           </div>
           </Fragment>
@@ -226,8 +234,8 @@ const ReviewPipeline = ({
 
 // 운영 층위 한 줄: 왼쪽 칠한 칸이 세 층의 세로 축이 된다. 층위 사이에는 화살표도 번호도 두지 않는다(순서·깔때기가 아니다).
 const DashboardLayer = ({ label, children }: { label: string; children: ReactNode }) => (
-  <section aria-label={label} className="grid border-t-2 border-[#E6E1D5] first:border-t-0 lg:grid-cols-[120px_minmax(0,1fr)]">
-    <h3 className="bg-[#F4F1E8] px-3 py-2.5 text-[14px] font-bold leading-5 text-[#15202B]">{label}</h3>
+  <section aria-label={label} className="grid border-t-2 border-[#E6E1D5] first:border-t-0 lg:grid-cols-[164px_minmax(0,1fr)]">
+    <h3 className="whitespace-nowrap bg-[#F4F1E8] px-3 py-2.5 text-[14px] font-bold leading-5 text-[#15202B]">{label}</h3>
     <div className="min-w-0 space-y-2 px-4 py-2.5">{children}</div>
   </section>
 );
