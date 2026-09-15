@@ -65,11 +65,12 @@ describe("admin dashboard task-first counts", () => {
   it("shows the professor approval queue as the pending task, not the approved total", async () => {
     show();
     const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 1개"));
-    // 점검 필요 = 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것(규칙 검사 전 1건).
-    expect(band.textContent).toContain("점검 필요 1개");
-    expect(band.textContent).toContain("규칙 오류 1개");
-    expect(within(band).getByRole("link", { name: "결정하러 가기 →" })).toHaveAttribute("href", "/admin/review");
+    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 · 학습 미션 1개"));
+    // 품질 점검 대기 = 교수자 차례가 아닌 미션 중 규칙 검사 불통과를 뺀 것(규칙 검사 전 1건).
+    expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개");
+    expect(band.textContent).toContain("규칙 검사 불통과 · 1개");
+    expect(band.textContent).not.toContain("보류");
+    expect(within(band).getByRole("link", { name: "승인하러 가기 →" })).toHaveAttribute("href", "/admin/review");
     expect(within(band).getByRole("link", { name: "품질 점검 화면 →" })).toHaveAttribute("href", "/admin/ai-review");
 
     // 승인 완료 누적 수(2)는 「교수자 승인 완료」로만 보이고, 대기·결정으로 부르지 않는다.
@@ -78,6 +79,15 @@ describe("admin dashboard task-first counts", () => {
     expect(approvedLink).toHaveAttribute("href", "/admin/review");
     expect(screen.queryByText("교수자 결정")).not.toBeInTheDocument();
     expect(band.textContent).not.toContain("교수자 승인 대기 2개");
+  });
+
+  it("hides the rule-failure line when no mission failed the rule check", async () => {
+    mocks.tables.content_review_runs = [run("ready")];
+    mocks.tables.scenarios = mocks.tables.scenarios.filter((row) => (row as { scenario_id: string }).scenario_id !== "rule-fail");
+    show();
+    const band = screen.getByRole("region", { name: "지금 할 일" });
+    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개"));
+    expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {

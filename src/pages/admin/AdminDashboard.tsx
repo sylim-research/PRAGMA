@@ -98,7 +98,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2.5 mt-8">
+  <div className="mb-2 mt-5">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -126,7 +126,8 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 위반 확인",
+  // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
+  rules: "생성 계약 규칙 자동 검사",
   openai: "내용 검토 · 기존 결과 재사용",
   claude: "선택 시에만 · 독립 검토",
   adjudication: "선택 시에만 · Claude 의견 재검토",
@@ -170,7 +171,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[72px] flex-col rounded-lg border bg-white px-3 py-2.5",
+                "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
                 stage.optional ? "border-dashed" : "",
@@ -229,7 +230,7 @@ const OperationMetric = ({
   <Link
     to={to}
     className={[
-      "group flex min-h-[72px] flex-col rounded-lg border bg-white px-3 py-2.5",
+      "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
@@ -472,23 +473,31 @@ const AdminDashboard = () => {
 
       {/* 첫 화면의 주인공은 지금 교수자를 기다리는 일이다. 수는 품질 점검·최종 승인 화면과 같은 검수 단계 판정으로 센다.
           이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
-      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-5 text-white">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+      {/* 숫자마다 「무엇의 몇 개인지」를 붙인다 — 설명문을 읽기 전에 뜻이 서야 한다.
+          「품질 점검 대기」는 규칙 검사 전과 AI 검토 진행 중을 함께 센다(규칙 검사 불통과는 따로). 그래서 「시작 전」이라 부르지 않는다. */}
+      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-3.5 text-white">
+        <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="min-w-0">
-            <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
-            <p className="mt-1.5 text-[24px] font-bold leading-tight">
-              교수자 승인 대기{" "}
+            <p className="text-[22px] font-bold leading-tight">
+              교수자 승인 대기 · 학습 미션{" "}
               <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
             </p>
-            <p className="mt-1 text-[13px] text-[#B9C3CA]">품질 점검을 마친 미션입니다. 감수한 뒤 승인·보류·수정을 결정합니다.</p>
+            <p className="mt-0.5 text-[13px] text-[#B9C3CA]">품질 점검을 마치고 교수자 승인을 기다리는 미션입니다.</p>
           </div>
           <Button asChild className="h-10 bg-[#FAD338] px-5 text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
-            <Link to="/admin/review">결정하러 가기 →</Link>
+            <Link to="/admin/review">승인하러 가기 →</Link>
           </Button>
         </div>
-        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-3 text-[13px] text-[#B9C3CA]">
-          <span>점검 필요 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
-          <span>규칙 오류 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : snapshot?.rulesFailCount ?? "—"}</b>개</span>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2.5 text-[13px] text-[#B9C3CA]">
+          <span>품질 점검 대기 · 학습 미션 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
+          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 뜻과 함께 보인다. */}
+          {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
+            <span>
+              규칙 검사 불통과 · <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
+              <span className="ml-2">생성 계약 규칙 위반을 확인해야 합니다.</span>
+            </span>
+          )}
           <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 화면 →</Link>
         </div>
       </section>
@@ -507,7 +516,7 @@ const AdminDashboard = () => {
             { to: "/admin/decision-traces", stage: "학습 수행", screen: "수행 기록", value: snapshot?.learnerRecordCount },
           ].map((step, index) => (
             <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-3 hover:bg-[#FBFAF6]">
+              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
                 <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
                 {step.value == null && !displayError ? (
                   <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
