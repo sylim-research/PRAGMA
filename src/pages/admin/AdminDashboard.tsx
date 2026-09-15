@@ -503,7 +503,7 @@ const AdminDashboard = () => {
       </section>
 
       {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
-      <PanelHeader title="전체 흐름" description="단계별 누적 수입니다. 눌러서 해당 화면으로 이동합니다." action={liveStatus(true)} />
+      <PanelHeader title="전체 흐름" action={liveStatus(true)} />
       <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
@@ -536,7 +536,6 @@ const AdminDashboard = () => {
       <PanelHeader
         title="검수 단계별 현황"
         action={liveStatus()}
-        description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 1~4단계는 품질 점검, 5단계는 최종 승인 화면에서 처리합니다."
       />
       <ReviewPipeline
         review={snapshot?.review ?? null}
