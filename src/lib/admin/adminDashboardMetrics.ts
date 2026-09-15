@@ -86,12 +86,16 @@ export function isDashboardReviewTarget(row: DashboardScenarioRow): boolean {
     && hasMissionContent(row);
 }
 
+/** 대시보드 「학습 미션」 칸의 집합: 현재 코어에서 미션 내용이 만들어진 것. */
+function isGeneratedMission(row: DashboardScenarioRow): boolean {
+  return row.content_format === "scenario_core_v1"
+    && ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
+    && hasMissionContent(row);
+}
+
 export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[]) {
   const currentCoreRows = rows.filter((row) => row.content_format === "scenario_core_v1");
-  const generated = currentCoreRows.filter(
-    (row) => ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
-      && hasMissionContent(row),
-  );
+  const generated = currentCoreRows.filter(isGeneratedMission);
   const reviewTargets = generated.filter(isDashboardReviewTarget);
   const finalized = generated.filter(isFinalizedMission);
   return {
@@ -182,6 +186,47 @@ export function countRulesFailures(
   runs: readonly DashboardReviewRunRow[],
 ): number {
   return rows.filter(isDashboardReviewTarget).filter((row) => latestDashboardReviewRun(row, runs)?.rules_verdict === "fail").length;
+}
+
+/** 누적 완료 집계용 run 행. 기준 버전·게이트 재결합(superseded) 구분 없이 모든 mission run을 읽는다. */
+export type DashboardCumulativeRunRow = Pick<
+  DashboardReviewRunRow,
+  "target_id" | "kind" | "rules_verdict" | "openai_response_id" | "claude_response_id" | "adjudication_response_id" | "generation_quality_hash"
+>;
+
+export const DASHBOARD_CUMULATIVE_RUN_SELECT =
+  "target_id,kind,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,generation_quality_hash:generation_quality->>mission_content_hash";
+
+export type DashboardCumulativeReviewCounts = Record<Exclude<DashboardReviewQueueStage, "professor">, number>;
+
+/**
+ * 검수 단계별 누적 완료 — 현재 「학습 미션」 집합 가운데 그 단계를 한 번이라도 마친 **서로 다른 미션 수**.
+ * run 횟수가 아니다: 재실행·기준 버전 변경·게이트 재결합으로 run이 여럿이어도 미션 하나는 1로 센다.
+ * 규칙 검사는 fail이 아닌 판정(pass·warning — warning은 다음 단계로 넘어간다)만 완료로 센다.
+ * AI 단계는 규칙 검사를 통과한 run에 응답이 저장된 경우만 센다(실패를 완료로 부풀리지 않는다).
+ * OpenAI 검토에는 생성 단계에서 같은 OpenAI critic이 남긴 품질 점검 재사용을 포함한다 — 대기열 판정(nextDashboardReviewStage)과 같은 기준.
+ * 교수자 최종 승인의 누적은 이 함수가 아니라 summarizeDashboardContent의 professorFinalizedCount를 쓴다.
+ */
+export function summarizeCumulativeReviewCompletion(
+  rows: readonly DashboardScenarioRow[],
+  runs: readonly DashboardCumulativeRunRow[],
+): DashboardCumulativeReviewCounts {
+  const missionIds = new Set(rows.filter(isGeneratedMission).map((row) => row.scenario_id));
+  const done = { rules: new Set<string>(), openai: new Set<string>(), claude: new Set<string>(), adjudication: new Set<string>() };
+  for (const run of runs) {
+    if (run.kind !== "mission" || !missionIds.has(run.target_id)) continue;
+    if (!run.rules_verdict || run.rules_verdict === "fail") continue;
+    done.rules.add(run.target_id);
+    if (run.openai_response_id || run.generation_quality_hash) done.openai.add(run.target_id);
+    if (run.claude_response_id) done.claude.add(run.target_id);
+    if (run.adjudication_response_id) done.adjudication.add(run.target_id);
+  }
+  return {
+    rules: done.rules.size,
+    openai: done.openai.size,
+    claude: done.claude.size,
+    adjudication: done.adjudication.size,
+  };
 }
 
 export function dominantDashboardReviewStage(

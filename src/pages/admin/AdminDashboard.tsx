@@ -34,7 +34,12 @@ import {
   summarizeCourses,
   type DashboardCourseRow,
   DASHBOARD_REVIEW_RUN_SELECT,
+  DASHBOARD_CUMULATIVE_RUN_SELECT,
+  summarizeCumulativeReviewCompletion,
+  type DashboardCumulativeReviewCounts,
+  type DashboardCumulativeRunRow,
 } from "@/lib/admin/adminDashboardMetrics";
+import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
 import { toast } from "sonner";
 
@@ -46,6 +51,8 @@ const db = supabase as unknown as { from: (table: string) => any };
 type DashboardSnapshot = {
   content: ReturnType<typeof summarizeDashboardContent>;
   review: DashboardReviewStageCounts;
+  /** 단계별 누적 완료(서로 다른 미션 수). 읽지 못하면 null — 대기열 지표는 그대로 보인다. */
+  cumulative: DashboardCumulativeReviewCounts | null;
   assignments: ReturnType<typeof summarizeDashboardAssignments>;
   /** 편성된 미션(중복 제거) 중 승인 완료·승인 전. */
   assignmentApproval: ReturnType<typeof summarizeAssignmentApproval>;
@@ -112,13 +119,13 @@ const PanelHeader = ({
 // 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
+// 운영 파이프라인의 단계 카드는 단계 이름을 주어로 두고, 누적 완료(주)와 현재 대기(보조)를 함께 보인다.
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 검사 대기",
-  openai: "OpenAI 검토 대기",
-  claude: "Claude 독립 검토 대기",
-  adjudication: "OpenAI 재검토 대기",
-  // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
-  professor: "교수자 승인 대기",
+  rules: "결정론 규칙 검사",
+  openai: "OpenAI 품질 검토",
+  claude: "Claude 독립 검토",
+  adjudication: "OpenAI 재검토",
+  professor: "교수자 최종 승인",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -138,26 +145,33 @@ const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== 
 
 const ReviewPipeline = ({
   review,
+  cumulative,
+  professorFinalized,
   dominant,
   rulesFailCount,
   error,
   changedKeys,
 }: {
   review: DashboardReviewStageCounts | null;
+  /** null = 누적 집계를 읽지 못함(대기열과 따로 실패할 수 있다). */
+  cumulative: DashboardCumulativeReviewCounts | null;
+  professorFinalized: number | null;
   dominant: DashboardReviewQueueStage | null;
   rulesFailCount: number;
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
-  // 화살표는 실제 검수 순서에만 쓰고, 끝의 합계로 위 「승인 전 미션」 칸의 부분집합임을 보인다.
-  <div role="group" aria-label="승인 전 미션의 검수 단계" className="flex flex-wrap items-stretch gap-y-2 lg:flex-nowrap">
+  // 화살표는 실제 검수 순서에만 쓴다. 현재 대기 합계로 위 「품질 검수·승인 진행 중」 칸의 부분집합임을 보인다.
+  <div role="group" aria-label="품질 검수 단계">
+  <div className="flex flex-wrap items-stretch gap-y-2 lg:flex-nowrap">
       {REVIEW_STAGE_ITEMS.map((stage, index) => {
-        const value = review?.[stage.key] ?? null;
+        const queue = review?.[stage.key] ?? null;
+        const completed = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
         const active = dominant === stage.key;
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
           <Fragment key={stage.key}>
-          {index > 0 && <ArrowRight aria-hidden className="mx-1 h-4 w-4 shrink-0 self-center text-[#81909A]" />}
+          {index > 0 && <ArrowRight aria-hidden className="mx-0.5 h-4 w-4 shrink-0 self-center text-[#81909A]" />}
           <div className="relative min-w-0 flex-1 basis-40">
             {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
@@ -177,26 +191,36 @@ const ReviewPipeline = ({
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#63727C]">
                   {stage.step}
                 </span>
-                <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
+                <span className="whitespace-nowrap text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
               <div className="mt-1 flex items-end gap-1.5">
-                {value === null && !error ? (
-                  <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
+                <span className="pb-0.5 text-[11px] text-muted-foreground">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
+                {completed === null && !error && review === null ? (
+                  <span aria-label="불러오는 중" className="h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
                   <span className="text-[20px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
+                    {error || completed === null ? <span className="text-xs font-normal text-destructive">확인 필요</span> : completed}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
               </div>
-              {stage.key === "rules" && rulesFailCount > 0 && (
-                <span className="mt-auto pt-1 text-[11px] text-muted-foreground">규칙 검사 불통과 {rulesFailCount}</span>
-              )}
+              <span className="mt-auto whitespace-nowrap pt-1 text-[11px] text-muted-foreground">
+                현재 대기 <b className="font-semibold tabular-nums text-[#3F4E59]">{error ? "—" : queue ?? "—"}</b>
+                {stage.key === "rules" && ` · 규칙 ${ACTIVE_RULE_IDS.length}개`}
+                {stage.optional && " · 선택형"}
+                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
+              </span>
             </Link>
           </div>
           </Fragment>
         );
       })}
+  </div>
+  <p className="mt-1.5 text-right text-[12px] text-[#6B7780]">
+    현재 대기 합계{" "}
+    <b className="font-semibold tabular-nums text-[#15202B]">
+      {review && !error ? REVIEW_STAGE_ITEMS.reduce((sum, stage) => sum + review[stage.key], 0) : "—"}
+    </b>개
+  </p>
   </div>
 );
 
@@ -320,7 +344,7 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, assignmentRows, courseRows, learnerResult, learnerRecordResult] = await Promise.all([
+      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
@@ -337,6 +361,17 @@ const AdminDashboard = () => {
           .is("superseded_by", null)
           .order("created_at", { ascending: false })
           .range(from, to)),
+        // 누적 완료는 기준 버전·재결합 이력까지 모든 mission run에서 미션 단위로 센다.
+        // 이 조회가 실패해도 대기열·할 일은 보여야 하므로 따로 받아 null로 둔다.
+        fetchAllDashboardRows<DashboardCumulativeRunRow>("검수 누적 이력", (from, to) => db
+          .from("content_review_runs")
+          .select(DASHBOARD_CUMULATIVE_RUN_SELECT)
+          .eq("kind", "mission")
+          .order("created_at", { ascending: true })
+          .range(from, to)).catch((cause: unknown) => {
+            console.error("[dashboard] cumulative review counts failed:", cause);
+            return null;
+          }),
         fetchAllDashboardRows<DashboardAssignmentRow>("수업 편성", (from, to) => db
           .from("curriculum_week_scenarios")
           .select("outline_id,week_no,scenario_id")
@@ -364,6 +399,7 @@ const AdminDashboard = () => {
       const next: DashboardSnapshot = {
         content: summarizeDashboardContent(scenarioRows),
         review: summarizeDashboardReviewStages(scenarioRows, reviewRows),
+        cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,
         assignments: summarizeDashboardAssignments(assignmentRows),
         assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
         courses: summarizeCourses(courseRows),
@@ -507,7 +543,7 @@ const AdminDashboard = () => {
 
       {/* 세 운영 층위. 층위 사이는 순서가 아니라 서로 다른 층이라 화살표 없이 쌓는다.
           숫자는 전부 기존 snapshot 필드다 — 새로 계산하는 것은 검수 단계 합계(표시용 덧셈)뿐이다. */}
-      <PanelHeader title="운영 현황" action={liveStatus(true)} />
+      <PanelHeader title="PRAGMA 품질·운영 파이프라인" action={liveStatus(true)} />
       <div className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <DashboardLayer label="콘텐츠 준비">
           <div className={LAYER_GRID}>
@@ -518,21 +554,23 @@ const AdminDashboard = () => {
           </div>
         </DashboardLayer>
 
-        {/* 학습 미션 = 승인 전 + 승인 완료 + 수정·옛 상태(기존 pendingRevisionCount). 승인 전은 아래 단계로 다시 쪼갠다. */}
+        {/* 학습 미션 = 진행 중 + 승인 완료 + 기타 상태(기존 pendingRevisionCount — 수정 요청과 승인 기록 없는 옛 항목이 섞여 있어 하나로 이름 붙이지 않는다).
+            진행 중은 아래 단계별 현재 대기로 다시 쪼갠다. */}
         <DashboardLayer label="품질 검수·승인">
           <div className={LAYER_GRID}>
-            <OperationMetric to="/admin/ai-review" label="승인 전 미션" value={snapshot?.content.reviewTargetCount ?? null} unit="개"
+            <OperationMetric to="/admin/ai-review" label="품질 검수·승인 진행 중" value={snapshot?.content.reviewTargetCount ?? null} unit="개"
               description="품질 점검 →" error={displayError} changed={changedKeys.has("reviewTarget")} emphasis />
             {/* 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다. */}
             <OperationMetric to="/admin/review" label="교수자 승인 완료" value={snapshot?.content.professorFinalizedCount ?? null} unit="개"
               description="최종 승인 →" error={displayError} changed={changedKeys.has("finalized")} />
-            <OperationMetric label="수정·옛 상태" value={snapshot?.content.pendingRevisionCount ?? null} unit="개"
+            <OperationMetric label="기타 상태" value={snapshot?.content.pendingRevisionCount ?? null} unit="개"
               description="수정 요청 · 승인 기록 없는 옛 미션" error={displayError} changed={changedKeys.has("pending")} />
           </div>
           <div className="rounded-r-lg border-l-2 border-[#D9CB8F] bg-[#FBFAF6] py-2 pl-3 pr-2">
-            <p className="mb-1.5 text-[12px] font-medium text-[#6B7780]">승인 전 미션의 현재 단계</p>
             <ReviewPipeline
               review={snapshot?.review ?? null}
+              cumulative={snapshot?.cumulative ?? null}
+              professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
               dominant={dominantReviewStage}
               rulesFailCount={snapshot?.rulesFailCount ?? 0}
               error={displayError}
@@ -558,7 +596,7 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          label="미션 배정"
+          label="미션 편성"
           value={snapshot?.assignments.assignmentCount ?? null}
           unit="건"
           description={
@@ -587,7 +625,7 @@ const AdminDashboard = () => {
             시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          label="미션 수행 기록"
+          label="학습 수행 기록"
           value={snapshot?.learnerRecordCount ?? null}
           unit="건"
           description="전체 계정·기간 누적 · 1회 수행 = 1건"

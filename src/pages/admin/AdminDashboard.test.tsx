@@ -81,15 +81,16 @@ describe("admin dashboard task-first counts", () => {
     expect(band.textContent).not.toContain("교수자 승인 대기 2개");
   });
 
-  it("shows the review stages as a subset that adds up to the pending-approval count", async () => {
+  it("shows the review stages as a subset whose current queues add up to the in-progress count", async () => {
     show();
-    const stages = await screen.findByRole("group", { name: "승인 전 미션의 검수 단계" });
-    // 승인 전 3 = 규칙 검사 대기 2(검사 전 1 + 불통과 1) + 교수자 승인 대기 1.
-    await waitFor(() => expect(within(stages).getByRole("link", { name: /규칙 검사 대기/ }).textContent).toContain("2"));
-    expect(within(stages).getByRole("link", { name: /교수자 승인 대기/ }).textContent).toContain("1");
+    const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
+    // 진행 중 3 = 결정론 규칙 검사 대기 2(검사 전 1 + 불통과 1) + 교수자 최종 승인 대기 1.
+    await waitFor(() => expect(within(stages).getByRole("link", { name: /결정론 규칙 검사/ }).textContent).toMatch(/현재 대기\s*2/));
+    expect(within(stages).getByRole("link", { name: /교수자 최종 승인/ }).textContent).toMatch(/현재 대기\s*1/);
+    expect(stages.textContent).toMatch(/현재 대기 합계\s*3개/);
     const reviewLayer = screen.getByRole("region", { name: "품질 검수·승인" });
-    expect(within(reviewLayer).getByRole("link", { name: /승인 전 미션/ }).textContent).toContain("3");
-    expect(reviewLayer.textContent).toContain("수정·옛 상태");
+    expect(within(reviewLayer).getByRole("link", { name: /품질 검수·승인 진행 중/ }).textContent).toContain("3");
+    expect(reviewLayer.textContent).toContain("기타 상태");
     expect(screen.queryByText(/보류/)).not.toBeInTheDocument();
     // 편성된 미션이 모두 승인 완료면 「승인 전 미션 포함」을 붙이지 않는다.
     expect(screen.getByRole("region", { name: "수업 운영·학습 수행" }).textContent).not.toContain("포함");
@@ -114,14 +115,35 @@ describe("admin dashboard task-first counts", () => {
     expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 
+  it("counts cumulative completions per distinct mission, not per run, and never counts a failed rule check", async () => {
+    mocks.tables.content_review_runs = [
+      run("ready"),
+      // 같은 미션의 재실행 — 누적은 여전히 1이다.
+      run("ready", { created_at: "2026-09-03T00:00:00Z", claude_response_id: "c", adjudication_response_id: "a" }),
+      // 규칙 검사 실패 run의 AI 응답은 완료로 세지 않는다.
+      run("rule-fail", { rules_verdict: "fail" }),
+      // warning은 다음 단계로 넘어가므로 완료다.
+      run("done-1", { rules_verdict: "warning", openai_response_id: null, generation_quality_hash: "h" }),
+    ];
+    show();
+    const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
+    const card = (name: RegExp) => within(stages).getByRole("link", { name });
+    await waitFor(() => expect(card(/결정론 규칙 검사/).textContent).toMatch(/누적 완료\s*2/));
+    expect(card(/OpenAI 품질 검토/).textContent).toMatch(/누적 완료\s*2/);
+    expect(card(/Claude 독립 검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
+    expect(card(/OpenAI 재검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
+    expect(card(/교수자 최종 승인/).textContent).toMatch(/승인 완료\s*2/);
+    expect(card(/결정론 규칙 검사/).textContent).toMatch(/규칙 33개/);
+  });
+
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {
     show();
-    const rulesCard = await screen.findByRole("link", { name: /규칙 검사 대기/ });
+    const rulesCard = await screen.findByRole("link", { name: /결정론 규칙 검사/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["OpenAI 검토 대기", "Claude 독립 검토 대기", "OpenAI 재검토 대기"]) {
+    for (const label of ["OpenAI 품질 검토", "Claude 독립 검토", "OpenAI 재검토"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
-    const professorCards = screen.getAllByRole("link", { name: /교수자 승인 대기/ });
+    const professorCards = screen.getAllByRole("link", { name: /교수자 최종 승인/ });
     expect(professorCards).toHaveLength(1);
     expect(professorCards[0]).toHaveAttribute("href", "/admin/review");
   });
