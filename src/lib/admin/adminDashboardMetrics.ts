@@ -1,4 +1,5 @@
 import { CONTENT_REVIEW_VERSION } from "../../../supabase/functions/_shared/contentReview";
+import { libraryMissionIsReady } from "./missionLibrary";
 
 export const DASHBOARD_ROW_CAP = 4000;
 export const DASHBOARD_REVIEW_CRITERIA_VERSION = CONTENT_REVIEW_VERSION;
@@ -11,6 +12,11 @@ export type DashboardScenarioRow = {
   mission_schema_version: string | null;
   authoring_stage: string | null;
   updated_at: string | null;
+  /** 편성 가능 판정용 — core_content.generation.content_release_id. 대시보드 조회만 채운다. */
+  content_release_id?: string | null;
+  /** mission_content.mpj_items[4]·[5]의 type — 문항 전체를 읽지 않고 「정확히 5문항」만 확인한다. */
+  mpj_item_5_type?: string | null;
+  mpj_item_6_type?: string | null;
 };
 
 export type DashboardReviewRunRow = {
@@ -106,7 +112,24 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
     // 생성 완료 = 검토 대상 + 승인 완료 + 나머지. 나머지는 「수정 필요」로 되돌아간 것과
     // 최종 승인 없이 reviewed/released로 남은 옛 항목이다. 화면에서 세 수가 더해지도록 함께 보인다.
     pendingRevisionCount: generated.length - reviewTargets.length - finalized.length,
+    // 위 나머지의 두 부분. 합은 pendingRevisionCount와 같다.
+    reviseRequestedCount: generated.filter((row) => row.mission_status === "generated" && row.review_status === "revise_required").length,
+    legacyReviewedCount: generated.filter((row) => ["reviewed", "released"].includes(row.mission_status ?? "") && !isProfessorFinalized(row)).length,
+    composerReadyCount: generated.filter(isComposerReadyMission).length,
   };
+}
+
+/**
+ * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5·MJT 5문항).
+ * 교수자 승인 완료의 부분집합이며, 새 편성은 이 집합에서만 고른다.
+ */
+function isComposerReadyMission(row: DashboardScenarioRow): boolean {
+  return libraryMissionIsReady({
+    mission_status: row.mission_status,
+    mission_schema_version: row.mission_schema_version,
+    mission_mpj_items: row.mpj_item_5_type && !row.mpj_item_6_type ? [0, 0, 0, 0, 0] : [],
+    core_content: { generation: { content_release_id: row.content_release_id ?? undefined } },
+  });
 }
 
 function runIsCurrentForRow(run: DashboardReviewRunRow, row: DashboardScenarioRow): boolean {

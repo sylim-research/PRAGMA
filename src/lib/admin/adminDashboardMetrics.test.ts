@@ -74,6 +74,11 @@ describe("admin dashboard metrics", () => {
       professorFinalizedCount: 1,
       // 「수정 필요」 1 + 최종 승인 없는 옛 reviewed 1 — 생성 4 = 대상 1 + 승인 1 + 나머지 2
       pendingRevisionCount: 2,
+      // 나머지 2의 두 부분 — 합이 pendingRevisionCount와 같다.
+      reviseRequestedCount: 1,
+      legacyReviewedCount: 1,
+      // 편성 가능은 현재 release·mission_v5·MJT 5문항이 모두 있어야 한다(이 fixture에는 없음).
+      composerReadyCount: 0,
     });
     expect(isDashboardReviewTarget(rows[1])).toBe(true);
     expect(isDashboardReviewTarget(rows[2])).toBe(false);

@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ChevronDown, ChevronRight, Lock, Pencil, Plus, Trash2 } from "lucide-react";
 import { PROMPT_SNAPSHOT, type PromptSnapshotEntry } from "@/lib/pragma/promptSnapshot.generated";
+import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 
 type PromptTemplate = {
   id: string;
@@ -176,7 +177,7 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[14px] font-bold">규칙 기반 검사</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            같은 입력에는 같은 결과를 냅니다. HSK 어휘 참고 범위 점검과 R1–R29 규칙이
+            같은 입력에는 같은 결과를 냅니다. HSK 어휘 참고 범위 점검과 현행 규칙 {ACTIVE_RULE_IDS.length}개가
             여기에 속합니다.
           </p>
         </div>

@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminDashboard from "./AdminDashboard";
 import { DASHBOARD_REVIEW_CRITERIA_VERSION } from "@/lib/admin/adminDashboardMetrics";
+import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
 
 const mocks = vi.hoisted(() => ({ tables: {} as Record<string, unknown[]> }));
 
@@ -45,7 +46,7 @@ beforeEach(() => {
       // 교수자 승인 완료 2건 — 누적 완료 수이지 할 일이 아니다.
       scenario("done-1", { mission_status: "reviewed", authoring_stage: "professor_finalized" }),
       scenario("done-2", { mission_status: "released", authoring_stage: "professor_finalized" }),
-      // 교수자 차례 1건, 규칙 검사 전 1건, 규칙 오류 1건.
+      // 교수자 차례 1건, 규칙 검사 전 1건, 규칙 검사 불통과 1건.
       scenario("ready"),
       scenario("no-run"),
       scenario("rule-fail"),
@@ -61,8 +62,8 @@ afterEach(cleanup);
 
 const show = () => render(<MemoryRouter><AdminDashboard /></MemoryRouter>);
 
-describe("admin dashboard task-first counts", () => {
-  it("shows the professor approval queue as the pending task, not the approved total", async () => {
+describe("admin dashboard", () => {
+  it("keeps the action bar to the professor queue and the quality-check queue", async () => {
     show();
     const band = screen.getByRole("region", { name: "지금 할 일" });
     await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 · 학습 미션 1개"));
@@ -72,47 +73,45 @@ describe("admin dashboard task-first counts", () => {
     expect(band.textContent).not.toContain("보류");
     expect(within(band).getByRole("link", { name: "승인하러 가기 →" })).toHaveAttribute("href", "/admin/review");
     expect(within(band).getByRole("link", { name: "품질 점검 화면 →" })).toHaveAttribute("href", "/admin/ai-review");
-
-    // 승인 완료 누적 수(2)는 「교수자 승인 완료」로만 보이고, 대기·결정으로 부르지 않는다.
-    const approvedLink = screen.getByRole("link", { name: /교수자 승인 완료/ });
-    expect(approvedLink.textContent).toContain("2");
-    expect(approvedLink).toHaveAttribute("href", "/admin/review");
     expect(screen.queryByText("교수자 결정")).not.toBeInTheDocument();
-    expect(band.textContent).not.toContain("교수자 승인 대기 2개");
   });
 
-  it("shows the review stages as a subset whose current queues add up to the in-progress count", async () => {
+  it("shows the five lifecycle steps in sidebar order with their destinations", async () => {
+    show();
+    const spine = screen.getByRole("list", { name: "PRAGMA 운영 워크플로우" });
+    const links = within(spine).getAllByRole("link");
+    expect(links.map((link) => link.getAttribute("href"))).toEqual([
+      "/admin/prompt-harness", "/admin/library", "/admin/assembly", "/admin/composer", "/admin/decision-traces",
+    ]);
+    expect(links[0].textContent).toMatch(/생성 기준.*규칙\s*33개/);
+    await waitFor(() => expect(links[2].textContent).toMatch(/학습 미션\s*5개/));
+  });
+
+  it("splits learning missions into in-progress, approved and other states that add up", async () => {
+    mocks.tables.scenarios.push(
+      scenario("revise", { review_status: "revise_required" }),
+      scenario("legacy", { mission_status: "reviewed" }),
+    );
+    show();
+    const quality = screen.getByRole("region", { name: "학습 미션 제작·품질 관리" });
+    await waitFor(() => expect(quality.textContent).toMatch(/학습 미션\s*7개\s*=/));
+    expect(within(quality).getByRole("link", { name: /검수 진행 중/ }).textContent).toContain("3");
+    const approved = within(quality).getByRole("link", { name: /교수자 승인 완료/ });
+    expect(approved.textContent).toContain("2");
+    expect(approved).toHaveAttribute("href", "/admin/review");
+    expect(quality.textContent).toMatch(/기타 상태\s*2\s*\(수정 요청 1 · 승인 기록 없는 옛 미션 1\)/);
+  });
+
+  it("groups the five review stages as rules, AI review and professor gate with queues adding up", async () => {
     show();
     const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
+    expect(stages.textContent).toMatch(/결정론 검사.*AI 문맥 검토.*교수자 승인/);
     // 진행 중 3 = 결정론 규칙 검사 대기 2(검사 전 1 + 불통과 1) + 교수자 최종 승인 대기 1.
     await waitFor(() => expect(within(stages).getByRole("link", { name: /결정론 규칙 검사/ }).textContent).toMatch(/현재 대기\s*2/));
     expect(within(stages).getByRole("link", { name: /교수자 최종 승인/ }).textContent).toMatch(/현재 대기\s*1/);
+    expect(within(stages).getByRole("link", { name: /OpenAI 품질 검토/ }).textContent).toContain("대기 없음");
     expect(stages.textContent).toMatch(/현재 대기 합계\s*3개/);
-    const reviewLayer = screen.getByRole("region", { name: "품질 검수·승인" });
-    expect(within(reviewLayer).getByRole("link", { name: /품질 검수·승인 진행 중/ }).textContent).toContain("3");
-    expect(reviewLayer.textContent).toContain("기타 상태");
     expect(screen.queryByText(/보류/)).not.toBeInTheDocument();
-    // 편성된 미션이 모두 승인 완료면 「승인 전 미션 포함」을 붙이지 않는다.
-    expect(screen.getByRole("region", { name: "수업 운영·학습 수행" }).textContent).not.toContain("포함");
-  });
-
-  it("notes unapproved missions inside assignments only when there are some", async () => {
-    mocks.tables.curriculum_week_scenarios = [
-      { outline_id: "c1", week_no: 2, scenario_id: "done-1" },
-      { outline_id: "c1", week_no: 3, scenario_id: "ready" },
-    ];
-    show();
-    const operations = screen.getByRole("region", { name: "수업 운영·학습 수행" });
-    await waitFor(() => expect(operations.textContent).toContain("승인 전 미션 1개 포함"));
-  });
-
-  it("hides the rule-failure line when no mission failed the rule check", async () => {
-    mocks.tables.content_review_runs = [run("ready")];
-    mocks.tables.scenarios = mocks.tables.scenarios.filter((row) => (row as { scenario_id: string }).scenario_id !== "rule-fail");
-    show();
-    const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개"));
-    expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 
   it("counts cumulative completions per distinct mission, not per run, and never counts a failed rule check", async () => {
@@ -130,10 +129,48 @@ describe("admin dashboard task-first counts", () => {
     const card = (name: RegExp) => within(stages).getByRole("link", { name });
     await waitFor(() => expect(card(/결정론 규칙 검사/).textContent).toMatch(/누적 완료\s*2/));
     expect(card(/OpenAI 품질 검토/).textContent).toMatch(/누적 완료\s*2/);
-    expect(card(/Claude 독립 검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
-    expect(card(/OpenAI 재검토/).textContent).toMatch(/누적 완료\s*1.*선택형/);
+    expect(card(/Claude 독립 검토/).textContent).toMatch(/누적 완료\s*1.*대기 없음.*선택형/);
+    expect(card(/OpenAI 재검토/).textContent).toMatch(/누적 완료\s*1.*대기 없음.*선택형/);
     expect(card(/교수자 최종 승인/).textContent).toMatch(/승인 완료\s*2/);
     expect(card(/결정론 규칙 검사/).textContent).toMatch(/규칙 33개/);
+  });
+
+  it("shows the approved-to-classroom gate with the library's composer-ready count", async () => {
+    mocks.tables.scenarios.push(scenario("ready-v5", {
+      mission_status: "reviewed", authoring_stage: "professor_finalized", mission_schema_version: "mission_v5",
+      content_release_id: CURRENT_CONTENT_RELEASE_ID, mpj_item_5_type: "scale4", mpj_item_6_type: null,
+    }));
+    show();
+    const operations = screen.getByRole("region", { name: "수업 운영" });
+    await waitFor(() => expect(within(operations).getByRole("link", { name: /편성 가능 미션/ }).textContent).toContain("1"));
+    expect(within(operations).getByRole("link", { name: /교수자 승인/ }).textContent).toContain("3");
+    expect(operations.textContent).not.toContain("포함");
+  });
+
+  it("notes unapproved missions inside assignments only when there are some", async () => {
+    mocks.tables.curriculum_week_scenarios = [
+      { outline_id: "c1", week_no: 2, scenario_id: "done-1" },
+      { outline_id: "c1", week_no: 3, scenario_id: "ready" },
+    ];
+    show();
+    const operations = screen.getByRole("region", { name: "수업 운영" });
+    await waitFor(() => expect(operations.textContent).toContain("승인 전 미션 1개 포함"));
+  });
+
+  it("closes the workflow at research data export", async () => {
+    show();
+    const records = screen.getByRole("region", { name: "학습 기록·연구 자료" });
+    expect(within(records).getByRole("link", { name: /학습 수행 기록/ })).toHaveAttribute("href", "/admin/decision-traces");
+    expect(within(records).getByRole("link", { name: "연구 데이터 내보내기" })).toHaveAttribute("href", "/admin/export");
+  });
+
+  it("hides the rule-failure line when no mission failed the rule check", async () => {
+    mocks.tables.content_review_runs = [run("ready")];
+    mocks.tables.scenarios = mocks.tables.scenarios.filter((row) => (row as { scenario_id: string }).scenario_id !== "rule-fail");
+    show();
+    const band = screen.getByRole("region", { name: "지금 할 일" });
+    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개"));
+    expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {
