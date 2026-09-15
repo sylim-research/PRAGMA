@@ -62,6 +62,8 @@ type DashboardSnapshot = {
   rulesFailCount: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
+  /** 교과목(course_id)에 연결된 수행 기록 수. 읽지 못하면 null. */
+  courseLinkedRecordCount: number | null;
 };
 
 type DashboardMetricKey =
@@ -237,8 +239,13 @@ const ReviewPipeline = ({
   </div>
 );
 
-// 사이드바 5단계와 같은 이름·순서의 흐름 줄. 단계마다 대표 수 하나와 그 메뉴로 가는 링크만 둔다.
-const WorkflowStep = ({ step, title, to, changed = false, children }: {
+// 사이드바의 노란 번호와 같은 모양. 원문자(③ 등)는 글꼴에 따라 깨져 보여 쓰지 않는다.
+const StepBadge = ({ step }: { step: number }) => (
+  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF3C4] text-[11px] font-bold text-[#15202B]">{step}</span>
+);
+
+// 사이드바 5단계와 같은 이름·순서의 흐름 줄. 상세가 아래에 있는 ③④⑤는 숫자를 반복하지 않고 흐름만 말한다.
+const WorkflowStep =({ step, title, to, changed = false, children }: {
   step: number;
   title: string;
   to: string;
@@ -256,7 +263,7 @@ const WorkflowStep = ({ step, title, to, changed = false, children }: {
       ].join(" ")}
     >
       <span className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-bold text-[#15202B]">
-        <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF3C4] text-[11px] font-bold text-[#15202B]">{step}</span>
+        <StepBadge step={step} />
         {title}
       </span>
       <span className="mt-1 whitespace-nowrap text-[12px] text-[#5F6B73]">{children}</span>
@@ -341,7 +348,7 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult] = await Promise.all([
+      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage,content_release_id:core_content->generation->>content_release_id,mpj_item_5_type:mission_content->mpj_items->4->>type,mpj_item_6_type:mission_content->mpj_items->5->>type")
@@ -383,6 +390,7 @@ const AdminDashboard = () => {
           .range(from, to)),
         db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
+        db.from("learner_mission_logs").select("id", { count: "exact" }).not("course_id", "is", null).limit(1),
       ]);
 
       const results = [
@@ -403,6 +411,7 @@ const AdminDashboard = () => {
         rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
+        courseLinkedRecordCount: courseLinkedResult.error ? null : courseLinkedResult.count ?? 0,
       };
       if (!mountedRef.current) return;
 
@@ -546,31 +555,33 @@ const AdminDashboard = () => {
           시나리오 재료 <Num value={snapshot?.content.coreCount} unit="개" error={displayError} />
         </WorkflowStep>
         <WorkflowStep step={3} title="학습 미션 제작·품질 관리" to="/admin/assembly" changed={changedKeys.has("mission")}>
-          학습 미션 <Num value={snapshot?.content.generatedMissionCount} unit="개" error={displayError} />
+          규칙 · AI · 교수자 검수
         </WorkflowStep>
         <WorkflowStep step={4} title="수업 운영" to="/admin/composer" changed={changedKeys.has("assignments")}>
-          미션 편성 <Num value={snapshot?.assignments.assignmentCount} unit="건" error={displayError} />
+          승인 미션을 교과목·주차에 편성
         </WorkflowStep>
         <WorkflowStep step={5} title="학습 기록·연구 자료" to="/admin/decision-traces" changed={changedKeys.has("records")}>
-          수행 기록 <Num value={snapshot?.learnerRecordCount} unit="건" error={displayError} />
+          수행 기록 → 연구 데이터
         </WorkflowStep>
       </ol>
 
       {/* ③ 상세. 학습 미션 = 검수 진행 중 + 교수자 승인 완료 + 기타 상태(수정 요청 + 승인 기록 없는 옛 미션). 진행 중은 아래 단계별 현재 대기로 다시 쪼갠다. */}
       <section aria-label="학습 미션 제작·품질 관리" className="mt-2.5 rounded-xl border border-[#E6E1D5] bg-white px-4 py-3">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
-          <span className="mr-2 font-bold text-[#15202B]">③ 학습 미션 제작·품질 관리</span>
+          <span className="mr-2 inline-flex items-center gap-1.5 self-center font-bold text-[#15202B]"><StepBadge step={3} />학습 미션 제작·품질 관리</span>
           <span>학습 미션 <Num value={snapshot?.content.generatedMissionCount} unit="개" error={displayError} /> =</span>
           <Link to="/admin/ai-review" className="underline-offset-4 hover:underline">검수 진행 중 <Num value={snapshot?.content.reviewTargetCount} error={displayError} /></Link>
           <span>+</span>
           {/* 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다. */}
           <Link to="/admin/review" className="underline-offset-4 hover:underline">교수자 승인 완료 <Num value={snapshot?.content.professorFinalizedCount} error={displayError} /></Link>
           <span>+</span>
-          <span>
+          {/* 내역(수정 요청·승인 기록 없는 옛 미션)은 운영 점검용 2차 정보라 마우스를 올릴 때만 보인다. 합계는 그대로 남긴다. */}
+          <span
+            title={snapshot && !displayError
+              ? `수정 요청 ${snapshot.content.reviseRequestedCount} · 승인 기록 없는 옛 미션 ${snapshot.content.legacyReviewedCount}`
+              : undefined}
+          >
             기타 상태 <Num value={snapshot?.content.pendingRevisionCount} error={displayError} />
-            {snapshot && !displayError && (
-              <span className="ml-1 text-[12px] text-[#9AA3A9]">(수정 요청 {snapshot.content.reviseRequestedCount} · 승인 기록 없는 옛 미션 {snapshot.content.legacyReviewedCount})</span>
-            )}
           </span>
         </div>
           <div className="mt-2.5">
@@ -589,34 +600,46 @@ const AdminDashboard = () => {
       <div className="mt-2.5 grid gap-2.5 lg:grid-cols-[3fr_2fr]">
         {/* ④ 상세. 승인된 콘텐츠가 수업으로 들어가는 문: 교수자 승인 ⊃ 편성 가능(현재 release·MJT5) → 교과목·주차 편성.
             승인 전 미션이 섞인 편성은 게이트 이전의 옛 편성이라, 있을 때만 알린다. */}
-        <section aria-label="수업 운영" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-3">
-          <p className="text-[13px] font-bold text-[#15202B]">④ 수업 운영</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
+        <section aria-label="수업 운영" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-2.5">
+          <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#15202B]"><StepBadge step={4} />수업 운영</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
             <Link to="/admin/review" className="underline-offset-4 hover:underline">교수자 승인 <Num value={snapshot?.content.professorFinalizedCount} unit="개" error={displayError} /></Link>
             <FlowArrow />
             <Link to="/admin/library" className="underline-offset-4 hover:underline">편성 가능 미션 <Num value={snapshot?.content.composerReadyCount} unit="개" error={displayError} /></Link>
-            <FlowArrow />
-            <Link to="/admin/composer" className="underline-offset-4 hover:underline">미션 편성 <Num value={snapshot?.assignments.assignmentCount} unit="건" error={displayError} /></Link>
+            {/* 편성 건수는 위 미션 수에서 파생된 값이 아니다(교과목×주차 배정 건수, 게이트 이전의 옛 편성 포함) — 화살표로 잇지 않는다. */}
+            <span aria-hidden className="text-[#B9C3CA]">·</span>
+            <Link
+              to="/admin/composer"
+              className="underline-offset-4 hover:underline"
+              title={snapshot && !displayError && snapshot.assignmentApproval.unapprovedMissionCount > 0
+                ? `승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함(게이트 이전 편성)`
+                : undefined}
+            >
+              주차별 미션 편성 <Num value={snapshot?.assignments.assignmentCount} unit="건" error={displayError} />
+            </Link>
           </div>
           {snapshot && !displayError && (
             <p className="mt-1 text-[12px] text-[#9AA3A9]">
               교과목 {snapshot.courses.total}개(공개 {snapshot.courses.published}) · 편성 주차 {snapshot.assignments.weekCount}개
-              {snapshot.assignmentApproval.unapprovedMissionCount > 0 && ` · 승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함`}
               {" · "}
-              <Link to="/admin/learners" className="underline-offset-4 hover:underline">승인 학습자 {snapshot.approvedLearnerCount}명</Link>
+              {/* 계정 이용 승인이지 수강 등록이 아니다. */}
+              <Link to="/admin/learners" className="underline-offset-4 hover:underline">승인 학습자 계정 {snapshot.approvedLearnerCount}개</Link>
             </p>
           )}
         </section>
 
         {/* ⑤ 상세. 학습 수행이 연구 기록으로 닫힌다 — 표 전체 행 수이고 계정·기간으로 거르지 않는다. 내보내기는 동의 기록만. */}
-        <section aria-label="학습 기록·연구 자료" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-3">
-          <p className="text-[13px] font-bold text-[#15202B]">⑤ 학습 기록·연구 자료</p>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
-            <Link to="/admin/decision-traces" className="underline-offset-4 hover:underline">학습 수행 기록 <Num value={snapshot?.learnerRecordCount} unit="건" error={displayError} /></Link>
+        <section aria-label="학습 기록·연구 자료" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-2.5">
+          <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#15202B]"><StepBadge step={5} />학습 기록·연구 자료</p>
+          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
+            <Link to="/admin/decision-traces" className="underline-offset-4 hover:underline">수행 기록 <Num value={snapshot?.learnerRecordCount} unit="건" error={displayError} /></Link>
             <FlowArrow />
             <Link to="/admin/export" className="font-medium text-[#15202B] underline-offset-4 hover:underline">연구 데이터 내보내기</Link>
           </div>
-          <p className="mt-1 text-[12px] text-[#9AA3A9]">전체 계정·기간 누적 · 내보내기는 동의 기록만</p>
+          {/* 수행 기록은 계정·기간으로 거르지 않은 전체 행이다. 교과목에 연결된 기록 수를 함께 보여 수업 운영 기록과 시범 수행을 가를 수 있게 한다. */}
+          <p className="mt-1 text-[12px] text-[#9AA3A9]">
+            교과목 연결 {snapshot && !displayError && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건 · 내보내기는 동의 기록만
+          </p>
         </section>
       </div>
 

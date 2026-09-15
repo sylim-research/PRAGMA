@@ -13,10 +13,13 @@ vi.mock("@/integrations/supabase/client", () => ({
     from: (table: string) => {
       let from = 0, to = 999;
       const builder: Record<string, unknown> = {};
+      let requireCourse = false;
       for (const method of ["select", "eq", "is", "order", "limit", "in", "neq"]) builder[method] = () => builder;
+      builder.not = (column: string) => { if (column === "course_id") requireCourse = true; return builder; };
       builder.range = (start: number, end: number) => { from = start; to = end; return builder; };
       builder.then = (resolve: (value: unknown) => unknown) => {
-        const rows = mocks.tables[table] ?? [];
+        const all = mocks.tables[table] ?? [];
+        const rows = requireCourse ? all.filter((row) => (row as { course_id?: string | null }).course_id) : all;
         return Promise.resolve({ data: rows.slice(from, to + 1), count: rows.length, error: null }).then(resolve);
       };
       return builder;
@@ -84,7 +87,10 @@ describe("admin dashboard", () => {
       "/admin/prompt-harness", "/admin/library", "/admin/assembly", "/admin/composer", "/admin/decision-traces",
     ]);
     expect(links[0].textContent).toMatch(/생성 기준.*규칙\s*33개/);
-    await waitFor(() => expect(links[2].textContent).toMatch(/학습 미션\s*5개/));
+    await waitFor(() => expect(links[1].textContent).toMatch(/시나리오 재료\s*5개/));
+    // 상세가 아래에 있는 ③④⑤는 숫자를 반복하지 않는다.
+    expect(links[2].textContent).toContain("규칙 · AI · 교수자 검수");
+    expect(links[4].textContent).toContain("수행 기록 → 연구 데이터");
   });
 
   it("splits learning missions into in-progress, approved and other states that add up", async () => {
@@ -99,7 +105,10 @@ describe("admin dashboard", () => {
     const approved = within(quality).getByRole("link", { name: /교수자 승인 완료/ });
     expect(approved.textContent).toContain("2");
     expect(approved).toHaveAttribute("href", "/admin/review");
-    expect(quality.textContent).toMatch(/기타 상태\s*2\s*\(수정 요청 1 · 승인 기록 없는 옛 미션 1\)/);
+    // 내역은 메인 문구에서 내리고 마우스를 올릴 때만 보인다(합계는 유지).
+    const other = within(quality).getByText(/기타 상태/);
+    expect(other.textContent).toMatch(/기타 상태\s*2$/);
+    expect(other).toHaveAttribute("title", "수정 요청 1 · 승인 기록 없는 옛 미션 1");
   });
 
   it("groups the five review stages as rules, AI review and professor gate with queues adding up", async () => {
@@ -154,13 +163,19 @@ describe("admin dashboard", () => {
     ];
     show();
     const operations = screen.getByRole("region", { name: "수업 운영" });
-    await waitFor(() => expect(operations.textContent).toContain("승인 전 미션 1개 포함"));
+    const assignments = within(operations).getByRole("link", { name: /주차별 미션 편성/ });
+    await waitFor(() => expect(assignments).toHaveAttribute("title", "승인 전 미션 1개 포함(게이트 이전 편성)"));
+    expect(operations.textContent).not.toContain("포함");
+    expect(operations.textContent).toContain("승인 학습자 계정");
   });
 
-  it("closes the workflow at research data export", async () => {
+  it("closes the workflow at research data export and shows how many records are tied to a course", async () => {
+    mocks.tables.learner_mission_logs = [{ id: "l1", course_id: "c1" }, { id: "l2", course_id: null }, { id: "l3", course_id: null }];
     show();
     const records = screen.getByRole("region", { name: "학습 기록·연구 자료" });
-    expect(within(records).getByRole("link", { name: /학습 수행 기록/ })).toHaveAttribute("href", "/admin/decision-traces");
+    await waitFor(() => expect(records.textContent).toMatch(/수행 기록\s*3건/));
+    expect(records.textContent).toMatch(/교과목 연결 1건/);
+    expect(within(records).getByRole("link", { name: /수행 기록/ })).toHaveAttribute("href", "/admin/decision-traces");
     expect(within(records).getByRole("link", { name: "연구 데이터 내보내기" })).toHaveAttribute("href", "/admin/export");
   });
 
