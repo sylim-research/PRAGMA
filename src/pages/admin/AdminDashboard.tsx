@@ -523,7 +523,7 @@ const AdminDashboard = () => {
           이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
       {/* 숫자마다 「무엇의 몇 개인지」를 붙인다 — 설명문을 읽기 전에 뜻이 서야 한다.
           「품질 점검 대기」는 규칙 검사 전과 AI 검토 진행 중을 함께 센다(규칙 검사 불통과는 따로). 그래서 「시작 전」이라 부르지 않는다. */}
-      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-3.5 text-white">
+      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-2.5 text-white">
         <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
         <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="min-w-0">
@@ -537,7 +537,7 @@ const AdminDashboard = () => {
             <Link to="/admin/review">승인하러 가기 →</Link>
           </Button>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2.5 text-[13px] text-[#B9C3CA]">
+        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2 text-[13px] text-[#B9C3CA]">
           <span>품질 점검 대기 · 학습 미션 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
           {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 뜻과 함께 보인다. */}
           {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
@@ -557,8 +557,9 @@ const AdminDashboard = () => {
           {[
             { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
             { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
-            // 수정 요청은 뺀 집합이다(라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청) — 같은 이름으로 부르지 않는다.
-            { to: "/admin/ai-review", stage: "검수 진행 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
+            // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
+            // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
+            { to: "/admin/ai-review", stage: "검수·승인 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
             // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
             { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
             { to: "/admin/composer", stage: "미션 배정", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },

@@ -85,7 +85,7 @@ describe("admin dashboard", () => {
 
   it("keeps the number-first overall flow with accurate labels and no helper sentence", async () => {
     show();
-    const inProgress = await screen.findByRole("link", { name: /검수 진행 중/ });
+    const inProgress = await screen.findByRole("link", { name: /검수·승인 중/ });
     await waitFor(() => expect(inProgress.textContent).toContain("3"));
     expect(inProgress).toHaveAttribute("href", "/admin/ai-review");
     expect(screen.queryByText("승인 전 미션")).not.toBeInTheDocument();
