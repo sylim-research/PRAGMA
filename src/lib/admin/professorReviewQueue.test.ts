@@ -20,10 +20,10 @@ describe("professor review queue", () => {
     const decision = rows.filter((r) => professorQueueOf(r, runs) === "decision").map((r) => r.scenario_id);
     expect(decision).toEqual(["ready"]);
     expect(summarizeDashboardReviewStages(rows, runs).professor).toBe(decision.length);
-    expect(reviewProgressLabel(rows[0], runs)).toBe("규칙 통과 · AI 검토 완료 · 교수자 결정 대기");
+    expect(reviewProgressLabel(rows[0], runs)).toBe("규칙 통과 · OpenAI 검토 완료 · 교수자 결정 대기");
     expect(reviewProgressLabel(rows[1], runs)).toBe("규칙 검사 전");
     expect(reviewProgressLabel(rows[2], runs)).toBe("규칙 검사 오류 · 수정 필요");
-    expect(reviewProgressLabel(rows[3], runs)).toBe("규칙 통과 · AI 검토 전");
+    expect(reviewProgressLabel(rows[3], runs)).toBe("규칙 통과 · OpenAI 검토 전");
   });
 
   it("sends content edited after the last run back to rule checking", () => {

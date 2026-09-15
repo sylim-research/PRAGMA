@@ -50,7 +50,7 @@ describe("current content five-stage review", () => {
     expect(nextReviewStage({...focused, generation_quality: null})).toBe("openai");
     expect(effectiveReviewSteps(focused)).toEqual([
       { key: "rules", label: "규칙 검사" },
-      { key: "openai", label: "AI 검토" },
+      { key: "openai", label: "OpenAI 검토" },
       { key: "professor", label: "교수자 최종 승인" },
     ]);
     expect(effectiveReviewSteps({...focused, independent_review_requested: true, claude_review: run().claude_review})

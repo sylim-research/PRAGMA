@@ -9,9 +9,9 @@ export const CONTENT_REVIEW_VERSION = "content_review_v3";
 export const CONTENT_APPROVAL_POLICY = "focused_v1";
 export const CONTENT_REVIEW_STEPS = [
   { key: "rules", label: "규칙 검사" },
-  { key: "openai", label: "AI 검토" },
-  { key: "claude", label: "AI 독립 검토" },
-  { key: "adjudication", label: "AI 재검토" },
+  { key: "openai", label: "OpenAI 검토" },
+  { key: "claude", label: "Claude 독립 검토" },
+  { key: "adjudication", label: "OpenAI 재검토" },
   { key: "finalization", label: "최종 검수 자료" },
   { key: "professor", label: "교수자 최종 승인" },
 ] as const;

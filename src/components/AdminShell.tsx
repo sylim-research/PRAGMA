@@ -15,9 +15,11 @@ interface AdminShellProps {
   description?: string;
   children?: ReactNode;
   compact?: boolean;
+  /** 제목을 화면에서 숨기고 보조기기용 제목으로만 남긴다(사이드바에 같은 이름이 있는 홈 화면용). */
+  hideTitle?: boolean;
 }
 
-export const AdminShell = ({ title, description, children, compact = false }: AdminShellProps) => {
+export const AdminShell = ({ title, description, children, compact = false, hideTitle = false }: AdminShellProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mobileNavValue = adminMobileNavValue(pathname);
@@ -173,7 +175,7 @@ export const AdminShell = ({ title, description, children, compact = false }: Ad
             </select>
           </div>
 
-          <div className="flex items-stretch gap-3 print:hidden">
+          <div className={hideTitle ? "sr-only" : "flex items-stretch gap-3 print:hidden"}>
             <span
               aria-hidden
               className="mt-1 w-[5px] shrink-0 self-stretch rounded-sm bg-[#FAD338]"

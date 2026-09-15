@@ -109,13 +109,14 @@ const PanelHeader = ({
 
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
-// 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다
-// (논문 4.3.3, focused_v1: 규칙 검사 → AI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
+// 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다 —
+// 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
+// (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   rules: "규칙 검사 대기",
-  openai: "AI 검토 대기",
-  claude: "AI 독립 검토 대기",
-  adjudication: "AI 재검토 대기",
+  openai: "OpenAI 검토 대기",
+  claude: "Claude 독립 검토 대기",
+  adjudication: "OpenAI 재검토 대기",
   // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
   professor: "교수자 승인 대기",
 };
@@ -128,7 +129,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: "규칙 위반 확인",
   openai: "내용 검토 · 기존 결과 재사용",
   claude: "선택 시에만 · 독립 검토",
-  adjudication: "선택 시에만 · 독립 검토 의견 재검토",
+  adjudication: "선택 시에만 · Claude 의견 재검토",
   professor: "감수 뒤 승인·보류·수정 결정",
 };
 
@@ -248,9 +249,9 @@ const OperationMetric = ({
   </Link>
 );
 
-const LiveDatabaseStatus = ({ delayed }: { delayed: boolean }) => (
+const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; announce?: boolean }) => (
   <span
-    aria-live="polite"
+    aria-live={announce ? "polite" : undefined}
     className={[
       "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium",
       delayed
@@ -418,6 +419,8 @@ const AdminDashboard = () => {
     [snapshot],
   );
   const displayError = snapshot ? null : dashboardError;
+  // 지표 묶음마다 제목 옆에 붙인다. 알림 영역은 첫 묶음 하나만 두어 보조기기가 같은 말을 세 번 읽지 않게 한다.
+  const liveStatus = (announce = false) => <LiveDatabaseStatus delayed={Boolean(dashboardError)} announce={announce} />;
   // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
   const needsCheckCount = snapshot
     ? snapshot.review.rules + snapshot.review.openai + snapshot.review.claude + snapshot.review.adjudication - snapshot.rulesFailCount
@@ -452,6 +455,7 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="PRAGMA 운영 워크플로우"
+      hideTitle
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -465,7 +469,6 @@ const AdminDashboard = () => {
       {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
           구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
           숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
-      <div className="mb-3 flex justify-end"><LiveDatabaseStatus delayed={Boolean(dashboardError)} /></div>
 
       {/* 첫 화면의 주인공은 지금 교수자를 기다리는 일이다. 수는 품질 점검·최종 승인 화면과 같은 검수 단계 판정으로 센다.
           이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
@@ -491,7 +494,7 @@ const AdminDashboard = () => {
       </section>
 
       {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
-      <PanelHeader title="전체 흐름" description="단계별 누적 수입니다. 눌러서 해당 화면으로 이동합니다." />
+      <PanelHeader title="전체 흐름" description="단계별 누적 수입니다. 눌러서 해당 화면으로 이동합니다." action={liveStatus(true)} />
       <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
@@ -522,7 +525,8 @@ const AdminDashboard = () => {
 
       {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
       <PanelHeader
-        title={snapshot ? `검수 단계별 현황 — 승인 전 ${snapshot.content.reviewTargetCount}개` : "검수 단계별 현황"}
+        title="검수 단계별 현황"
+        action={liveStatus()}
         description="각 미션을 다음에 처리할 단계 하나에만 셉니다. 1~4단계는 품질 점검, 5단계는 최종 승인 화면에서 처리합니다."
       />
       <ReviewPipeline
@@ -533,7 +537,7 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader title="수업 운영·학습 수행 현황" />
+      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
