@@ -98,7 +98,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-5">
+  <div className="mb-2 mt-4">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -124,16 +124,6 @@ const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
 const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "professor" ? "/admin/review" : "/admin/ai-review");
 
-// 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
-const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
-  // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: "생성 계약 규칙 자동 검사",
-  openai: "내용 검토 · 기존 결과 재사용",
-  claude: "선택 시에만 · 독립 검토",
-  adjudication: "선택 시에만 · Claude 의견 재검토",
-  professor: "내용 확인 뒤 승인 결정",
-};
-
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
 const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "adjudication"]);
@@ -143,7 +133,6 @@ const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== 
   ...stage,
   step: index + 1,
   displayLabel: REVIEW_STAGE_DISPLAY_LABELS[stage.key],
-  description: REVIEW_STAGE_DESCRIPTIONS[stage.key],
   optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
 }));
 
@@ -176,7 +165,8 @@ const ReviewPipeline = ({
               className={[
                 "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
-                stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
+                // 금색 테두리는 부모 칸(승인 전 미션)에만 쓴다.
+                "border-[#E6E1D5]",
                 stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
@@ -189,20 +179,19 @@ const ReviewPipeline = ({
                 </span>
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
-              <div className="mt-1.5 flex items-end gap-1.5">
+              <div className="mt-1 flex items-end gap-1.5">
                 {value === null && !error ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  <span className="text-[20px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
                   </span>
                 )}
                 {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
-                {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 실패 ${rulesFailCount}`}
-              </span>
+              {stage.key === "rules" && rulesFailCount > 0 && (
+                <span className="mt-auto pt-1 text-[11px] text-muted-foreground">규칙 검사 불통과 {rulesFailCount}</span>
+              )}
             </Link>
           </div>
           </Fragment>
@@ -216,10 +205,10 @@ const ReviewPipeline = ({
   </div>
 );
 
-// 운영 층위 한 줄: 왼쪽에 층위 이름, 오른쪽에 그 층위의 수. 층위 사이에는 화살표를 두지 않는다(깔때기가 아니다).
+// 운영 층위 한 줄: 층위 이름을 위에 작게 두고 가로 폭은 수에 준다. 층위 사이에는 화살표를 두지 않는다(깔때기가 아니다).
 const DashboardLayer = ({ label, children }: { label: string; children: ReactNode }) => (
-  <section aria-label={label} className="grid gap-2 border-t border-[#EFEBE1] px-4 py-3 first:border-t-0 lg:grid-cols-[148px_minmax(0,1fr)] lg:gap-4">
-    <h3 className="pt-1 text-[13px] font-semibold text-[#1B2A36]">{label}</h3>
+  <section aria-label={label} className="border-t border-[#EFEBE1] px-4 pb-2.5 pt-2 first:border-t-0">
+    <h3 className="mb-1 text-[13px] font-semibold text-[#1B2A36]">{label}</h3>
     <div className="min-w-0 space-y-2">{children}</div>
   </section>
 );
@@ -257,14 +246,14 @@ const OperationMetric = ({
     {value === null && !error ? (
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
-      <span className="mt-1.5 flex items-end gap-1.5">
-        <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+      <span className="mt-1 flex items-end gap-1.5">
+        <span className="text-[20px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
         {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
+    <span className="mt-auto pt-1 text-[11px] leading-4 text-muted-foreground">{description}</span>
   </>);
   return to ? <Link to={to} className={className}>{body}</Link> : <div className={className}>{body}</div>;
 };
