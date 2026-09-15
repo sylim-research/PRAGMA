@@ -11,11 +11,14 @@ vi.mock("@/integrations/supabase/client", () => ({
     rpc: vi.fn(async () => ({ data: false, error: null })),
     from: (table: string) => {
       let from = 0, to = 999;
+      let requireCourse = false;
       const builder: Record<string, unknown> = {};
       for (const method of ["select", "eq", "is", "order", "limit", "in", "neq"]) builder[method] = () => builder;
+      builder.not = (column: string) => { if (column === "course_id") requireCourse = true; return builder; };
       builder.range = (start: number, end: number) => { from = start; to = end; return builder; };
       builder.then = (resolve: (value: unknown) => unknown) => {
-        const rows = mocks.tables[table] ?? [];
+        const all = mocks.tables[table] ?? [];
+        const rows = requireCourse ? all.filter((row) => (row as { course_id?: string | null }).course_id) : all;
         return Promise.resolve({ data: rows.slice(from, to + 1), count: rows.length, error: null }).then(resolve);
       };
       return builder;
@@ -45,7 +48,7 @@ beforeEach(() => {
       // 교수자 승인 완료 2건 — 누적 완료 수이지 할 일이 아니다.
       scenario("done-1", { mission_status: "reviewed", authoring_stage: "professor_finalized" }),
       scenario("done-2", { mission_status: "released", authoring_stage: "professor_finalized" }),
-      // 교수자 차례 1건, 규칙 검사 전 1건, 규칙 오류 1건.
+      // 교수자 차례 1건, 규칙 검사 전 1건, 규칙 검사 불통과 1건.
       scenario("ready"),
       scenario("no-run"),
       scenario("rule-fail"),
@@ -61,24 +64,82 @@ afterEach(cleanup);
 
 const show = () => render(<MemoryRouter><AdminDashboard /></MemoryRouter>);
 
-describe("admin dashboard task-first counts", () => {
+describe("admin dashboard", () => {
   it("shows the professor approval queue as the pending task, not the approved total", async () => {
     show();
     const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 · 학습 미션 1개"));
+    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 1개"));
     // 품질 점검 대기 = 교수자 차례가 아닌 미션 중 규칙 검사 불통과를 뺀 것(규칙 검사 전 1건).
-    expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개");
-    expect(band.textContent).toContain("규칙 검사 불통과 · 1개");
+    expect(band.textContent).toContain("품질 점검 대기 1개");
+    expect(band.textContent).toContain("규칙 검사 불통과 1개");
     expect(band.textContent).not.toContain("보류");
+    // 제목을 되풀이하는 설명문은 두지 않는다.
+    expect(band.textContent).not.toContain("기다리는 미션입니다");
     expect(within(band).getByRole("link", { name: "승인하러 가기 →" })).toHaveAttribute("href", "/admin/review");
-    expect(within(band).getByRole("link", { name: "품질 점검 화면 →" })).toHaveAttribute("href", "/admin/ai-review");
+    expect(within(band).getByRole("link", { name: "품질 점검 →" })).toHaveAttribute("href", "/admin/ai-review");
 
     // 승인 완료 누적 수(2)는 「교수자 승인 완료」로만 보이고, 대기·결정으로 부르지 않는다.
     const approvedLink = screen.getByRole("link", { name: /교수자 승인 완료/ });
     expect(approvedLink.textContent).toContain("2");
     expect(approvedLink).toHaveAttribute("href", "/admin/review");
     expect(screen.queryByText("교수자 결정")).not.toBeInTheDocument();
-    expect(band.textContent).not.toContain("교수자 승인 대기 2개");
+  });
+
+  it("keeps the number-first overall flow with accurate labels and no helper sentence", async () => {
+    show();
+    const inProgress = await screen.findByRole("link", { name: /검수·승인 중/ });
+    await waitFor(() => expect(inProgress.textContent).toContain("3"));
+    expect(inProgress).toHaveAttribute("href", "/admin/ai-review");
+    expect(screen.queryByText("승인 전 미션")).not.toBeInTheDocument();
+    const records = screen.getAllByRole("link", { name: /수행 기록/ })[0];
+    expect(records).toHaveAttribute("href", "/admin/decision-traces");
+    expect(screen.queryByText(/단계별 누적 수입니다/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/각 미션을 다음에 처리할 단계/)).not.toBeInTheDocument();
+  });
+
+  it("keeps review cards queue-first with faint group labels and cumulative completions only in the tooltip", async () => {
+    mocks.tables.content_review_runs = [
+      run("ready"),
+      // 같은 미션의 재실행 — 누적은 여전히 1이다.
+      run("ready", { created_at: "2026-09-03T00:00:00Z", claude_response_id: "c", adjudication_response_id: "a" }),
+      run("rule-fail", { rules_verdict: "fail" }),
+    ];
+    show();
+    const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
+    // 카드 제목(규칙 검사 · OpenAI/Claude · 교수자)이 이미 세 층을 말하므로 묶음 머리표는 두지 않는다.
+    expect(stages.textContent).not.toContain("AI 문맥 검토");
+    const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
+    await waitFor(() => expect(rules.textContent).toMatch(/2\s*개/));
+    expect(rules.textContent).not.toContain("누적");
+    expect(rules.textContent).toContain("규칙 33개 자동 검사");
+    // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
+    expect(stages.textContent).not.toContain("재사용");
+    expect(rules).toHaveAttribute("title", "누적 완료 1개");
+    expect(within(stages).getByRole("link", { name: /Claude 독립 검토 대기/ })).toHaveAttribute("title", "누적 완료 1개");
+    const professor = within(stages).getByRole("link", { name: /교수자 승인 대기/ });
+    expect(professor).toHaveAttribute("title", "승인 완료 2개");
+    expect(professor.textContent).not.toContain("보류");
+  });
+
+  it("keeps the four operation cards with account and record labels that do not imply real students", async () => {
+    mocks.tables.learner_mission_logs = [{ id: "l1", course_id: "c1" }, { id: "l2", course_id: null }, { id: "l3", course_id: null }];
+    mocks.tables.curriculum_week_scenarios = [
+      { outline_id: "c1", week_no: 2, scenario_id: "done-1" },
+      { outline_id: "c1", week_no: 3, scenario_id: "ready" },
+    ];
+    show();
+    // 「미션 편성」은 전체 흐름 칸에도 있으므로 주차 설명이 붙은 운영 카드를 고른다.
+    await waitFor(() => expect(screen.getAllByRole("link", { name: /미션 편성/ }).some((link) => /주차 2개/.test(link.textContent ?? ""))).toBe(true));
+    const assignments = screen.getAllByRole("link", { name: /미션 편성/ }).find((link) => /주차 2개/.test(link.textContent ?? ""))!;
+    expect(assignments.textContent).toMatch(/미션 편성\s*2\s*건\s*주차 2개$/);
+    expect(screen.queryByText("미션 배정")).not.toBeInTheDocument();
+    // 게이트 이전 편성 부채는 메인 문구에 두지 않고 마우스를 올릴 때만 보인다.
+    expect(assignments.textContent).not.toContain("승인");
+    expect(assignments).toHaveAttribute("title", "승인 전 미션 1개 포함(게이트 이전 편성)");
+    expect(screen.getByRole("link", { name: /승인 학습자 계정/ })).toHaveAttribute("href", "/admin/learners");
+    const records = screen.getByRole("link", { name: /교과목 연결/ });
+    expect(records.textContent).toMatch(/수행 기록\s*3\s*건/);
+    expect(records.textContent).toMatch(/교과목 연결 1건$/);
   });
 
   it("hides the rule-failure line when no mission failed the rule check", async () => {
@@ -86,7 +147,7 @@ describe("admin dashboard task-first counts", () => {
     mocks.tables.scenarios = mocks.tables.scenarios.filter((row) => (row as { scenario_id: string }).scenario_id !== "rule-fail");
     show();
     const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 · 학습 미션 1개"));
+    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 1개"));
     expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 

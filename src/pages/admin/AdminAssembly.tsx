@@ -133,7 +133,7 @@ type AssemblyState = "core_only" | "generated" | "reviewed" | "failed";
 const STATE_KO: Record<AssemblyState, string> = {
   core_only: "시나리오만 (조립 대기)",
   generated: "미션 생성됨 (감수 대기)",
-  reviewed: "검토 완료",
+  reviewed: "검토 완료 상태",
   failed: "이번 조립 실패",
 };
 
@@ -398,9 +398,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     if (chip === "all") return "전체";
     if (chip === "decision") return aiReview ? "교수자 승인 대기" : "결정 대기";
     if (chip === "in_progress") return "검수 진행 중";
-    if (chip === "needs_check") return "점검 필요";
-    if (chip === "rules_error") return "규칙 오류";
-    if (chip === "reviewed" && professorScreen) return "승인 완료";
+    // 대시보드와 같은 집합은 같은 이름으로 부른다.
+    if (chip === "needs_check") return "품질 점검 대기";
+    if (chip === "rules_error") return "규칙 검사 불통과";
+    // reviewed·released 상태 전체라 교수자 최종 승인 기록이 없는 옛 미션도 들어 있다 — 대시보드 「교수자 승인 완료」(최종 승인 기록 기준)와 다른 집합이다.
+    if (chip === "reviewed" && professorScreen) return "검토 완료 상태";
     return STATE_KO[chip];
   };
 

@@ -98,7 +98,7 @@ describe("professor final approval workbench", () => {
     fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
     expect(screen.getByRole("button", { name: /결정 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /승인 완료\s*1/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /검토 완료 상태\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "정렬" })).toHaveValue("oldest");
 
     const cards = within(queue()).getAllByRole("listitem");
@@ -168,8 +168,8 @@ describe("quality check workbench", () => {
   it("splits generated missions into needs-check, rule-error and awaiting-professor chips", async () => {
     show({ reviewMode: true, aiReview: true }, "/admin/ai-review");
     const bench = await screen.findByRole("region", { name: "작업대" });
-    expect(screen.getByRole("button", { name: /점검 필요\s*1/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: /규칙 오류\s*1/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /품질 점검 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /규칙 검사 불통과\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /교수자 승인 대기\s*2/ })).toBeInTheDocument();
     expect(within(bench).getByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
     expect(within(bench).getByText("점검 패널 /admin/review?scenarioId=m-rules")).toBeInTheDocument();

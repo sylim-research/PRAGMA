@@ -1,4 +1,5 @@
 import { CONTENT_REVIEW_VERSION } from "../../../supabase/functions/_shared/contentReview";
+import { libraryMissionIsReady } from "./missionLibrary";
 
 export const DASHBOARD_ROW_CAP = 4000;
 export const DASHBOARD_REVIEW_CRITERIA_VERSION = CONTENT_REVIEW_VERSION;
@@ -11,6 +12,11 @@ export type DashboardScenarioRow = {
   mission_schema_version: string | null;
   authoring_stage: string | null;
   updated_at: string | null;
+  /** 편성 가능 판정용 — core_content.generation.content_release_id. 대시보드 조회만 채운다. */
+  content_release_id?: string | null;
+  /** mission_content.mpj_items[4]·[5]의 type — 문항 전체를 읽지 않고 「정확히 5문항」만 확인한다. */
+  mpj_item_5_type?: string | null;
+  mpj_item_6_type?: string | null;
 };
 
 export type DashboardReviewRunRow = {
@@ -86,12 +92,16 @@ export function isDashboardReviewTarget(row: DashboardScenarioRow): boolean {
     && hasMissionContent(row);
 }
 
+/** 대시보드 「학습 미션」 칸의 집합: 현재 코어에서 미션 내용이 만들어진 것. */
+function isGeneratedMission(row: DashboardScenarioRow): boolean {
+  return row.content_format === "scenario_core_v1"
+    && ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
+    && hasMissionContent(row);
+}
+
 export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[]) {
   const currentCoreRows = rows.filter((row) => row.content_format === "scenario_core_v1");
-  const generated = currentCoreRows.filter(
-    (row) => ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
-      && hasMissionContent(row),
-  );
+  const generated = currentCoreRows.filter(isGeneratedMission);
   const reviewTargets = generated.filter(isDashboardReviewTarget);
   const finalized = generated.filter(isFinalizedMission);
   return {
@@ -102,7 +112,24 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
     // 생성 완료 = 검토 대상 + 승인 완료 + 나머지. 나머지는 「수정 필요」로 되돌아간 것과
     // 최종 승인 없이 reviewed/released로 남은 옛 항목이다. 화면에서 세 수가 더해지도록 함께 보인다.
     pendingRevisionCount: generated.length - reviewTargets.length - finalized.length,
+    // 위 나머지의 두 부분. 합은 pendingRevisionCount와 같다.
+    reviseRequestedCount: generated.filter((row) => row.mission_status === "generated" && row.review_status === "revise_required").length,
+    legacyReviewedCount: generated.filter((row) => ["reviewed", "released"].includes(row.mission_status ?? "") && !isProfessorFinalized(row)).length,
+    composerReadyCount: generated.filter(isComposerReadyMission).length,
   };
+}
+
+/**
+ * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5·MJT 5문항).
+ * 교수자 승인 완료의 부분집합이며, 새 편성은 이 집합에서만 고른다.
+ */
+function isComposerReadyMission(row: DashboardScenarioRow): boolean {
+  return libraryMissionIsReady({
+    mission_status: row.mission_status,
+    mission_schema_version: row.mission_schema_version,
+    mission_mpj_items: row.mpj_item_5_type && !row.mpj_item_6_type ? [0, 0, 0, 0, 0] : [],
+    core_content: { generation: { content_release_id: row.content_release_id ?? undefined } },
+  });
 }
 
 function runIsCurrentForRow(run: DashboardReviewRunRow, row: DashboardScenarioRow): boolean {
@@ -182,6 +209,47 @@ export function countRulesFailures(
   runs: readonly DashboardReviewRunRow[],
 ): number {
   return rows.filter(isDashboardReviewTarget).filter((row) => latestDashboardReviewRun(row, runs)?.rules_verdict === "fail").length;
+}
+
+/** 누적 완료 집계용 run 행. 기준 버전·게이트 재결합(superseded) 구분 없이 모든 mission run을 읽는다. */
+export type DashboardCumulativeRunRow = Pick<
+  DashboardReviewRunRow,
+  "target_id" | "kind" | "rules_verdict" | "openai_response_id" | "claude_response_id" | "adjudication_response_id" | "generation_quality_hash"
+>;
+
+export const DASHBOARD_CUMULATIVE_RUN_SELECT =
+  "target_id,kind,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,generation_quality_hash:generation_quality->>mission_content_hash";
+
+export type DashboardCumulativeReviewCounts = Record<Exclude<DashboardReviewQueueStage, "professor">, number>;
+
+/**
+ * 검수 단계별 누적 완료 — 현재 「학습 미션」 집합 가운데 그 단계를 한 번이라도 마친 **서로 다른 미션 수**.
+ * run 횟수가 아니다: 재실행·기준 버전 변경·게이트 재결합으로 run이 여럿이어도 미션 하나는 1로 센다.
+ * 규칙 검사는 fail이 아닌 판정(pass·warning — warning은 다음 단계로 넘어간다)만 완료로 센다.
+ * AI 단계는 규칙 검사를 통과한 run에 응답이 저장된 경우만 센다(실패를 완료로 부풀리지 않는다).
+ * OpenAI 검토에는 생성 단계에서 같은 OpenAI critic이 남긴 품질 점검 재사용을 포함한다 — 대기열 판정(nextDashboardReviewStage)과 같은 기준.
+ * 교수자 최종 승인의 누적은 이 함수가 아니라 summarizeDashboardContent의 professorFinalizedCount를 쓴다.
+ */
+export function summarizeCumulativeReviewCompletion(
+  rows: readonly DashboardScenarioRow[],
+  runs: readonly DashboardCumulativeRunRow[],
+): DashboardCumulativeReviewCounts {
+  const missionIds = new Set(rows.filter(isGeneratedMission).map((row) => row.scenario_id));
+  const done = { rules: new Set<string>(), openai: new Set<string>(), claude: new Set<string>(), adjudication: new Set<string>() };
+  for (const run of runs) {
+    if (run.kind !== "mission" || !missionIds.has(run.target_id)) continue;
+    if (!run.rules_verdict || run.rules_verdict === "fail") continue;
+    done.rules.add(run.target_id);
+    if (run.openai_response_id || run.generation_quality_hash) done.openai.add(run.target_id);
+    if (run.claude_response_id) done.claude.add(run.target_id);
+    if (run.adjudication_response_id) done.adjudication.add(run.target_id);
+  }
+  return {
+    rules: done.rules.size,
+    openai: done.openai.size,
+    claude: done.claude.size,
+    adjudication: done.adjudication.size,
+  };
 }
 
 export function dominantDashboardReviewStage(
