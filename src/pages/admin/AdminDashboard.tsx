@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
@@ -51,8 +51,6 @@ const db = supabase as unknown as { from: (table: string) => any };
 type DashboardSnapshot = {
   content: ReturnType<typeof summarizeDashboardContent>;
   review: DashboardReviewStageCounts;
-  /** 단계별 누적 완료(서로 다른 미션 수). 읽지 못하면 null — 대기열 지표는 그대로 보인다. */
-  cumulative: DashboardCumulativeReviewCounts | null;
   assignments: ReturnType<typeof summarizeDashboardAssignments>;
   /** 편성된 미션(중복 제거) 중 승인 완료·승인 전. */
   assignmentApproval: ReturnType<typeof summarizeAssignmentApproval>;
@@ -62,7 +60,9 @@ type DashboardSnapshot = {
   rulesFailCount: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
-  /** 교과목(course_id)에 연결된 수행 기록 수. 읽지 못하면 null. */
+  /** 단계별 누적 완료(서로 다른 미션 수). 메인에는 대기량을 두고, 누적은 카드에 마우스를 올릴 때 보인다. 읽지 못하면 null. */
+  cumulative: DashboardCumulativeReviewCounts | null;
+  /** 교과목(course_id)에 연결된 수행 기록 수 — 수업 운영 기록과 시범 수행을 가른다. 읽지 못하면 null. */
   courseLinkedRecordCount: number | null;
 };
 
@@ -107,7 +107,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-4">
+  <div className="mb-2 mt-5">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -121,17 +121,35 @@ const PanelHeader = ({
 // 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
-// 운영 파이프라인의 단계 카드는 단계 이름을 주어로 두고, 누적 완료(주)와 현재 대기(보조)를 함께 보인다.
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "결정론 규칙 검사",
-  openai: "OpenAI 품질 검토",
-  claude: "Claude 독립 검토",
-  adjudication: "OpenAI 재검토",
-  professor: "교수자 최종 승인",
+  rules: "규칙 검사 대기",
+  openai: "OpenAI 검토 대기",
+  claude: "Claude 독립 검토 대기",
+  adjudication: "OpenAI 재검토 대기",
+  // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
+  professor: "교수자 승인 대기",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
 const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "professor" ? "/admin/review" : "/admin/ai-review");
+
+// 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
+const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
+  // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
+  rules: `생성 계약 규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
+  openai: "내용 검토 · 기존 결과 재사용",
+  claude: "선택 시에만 · 독립 검토",
+  adjudication: "선택 시에만 · Claude 의견 재검토",
+  // 보류 판정은 없앴다(확인·수정 요청만) — 최종 결정은 승인이다.
+  professor: "내용 확인 뒤 최종 승인",
+};
+
+// 품질관리의 세 의미 단위. 숫자보다 눈에 띄지 않게 카드 위 흐린 머리표로만 둔다.
+const REVIEW_STAGE_GROUP_LABELS = [
+  { label: "규칙 검사", span: "lg:col-span-1" },
+  { label: "AI 문맥 검토", span: "lg:col-span-3" },
+  { label: "교수자 승인", span: "lg:col-span-1" },
+] as const;
 
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
@@ -142,15 +160,9 @@ const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== 
   ...stage,
   step: index + 1,
   displayLabel: REVIEW_STAGE_DISPLAY_LABELS[stage.key],
+  description: REVIEW_STAGE_DESCRIPTIONS[stage.key],
   optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
 }));
-
-// 품질관리의 세 의미 단위(논문 4.3.3 · 생성 계약 화면의 「재현 가능 검사 / 문맥 검토 / 최종 권한」과 같은 틀).
-const REVIEW_STAGE_GROUPS: readonly { label: string; keys: readonly DashboardReviewQueueStage[] }[] = [
-  { label: "결정론 검사", keys: ["rules"] },
-  { label: "AI 문맥 검토", keys: ["openai", "claude", "adjudication"] },
-  { label: "교수자 승인", keys: ["professor"] },
-];
 
 const ReviewPipeline = ({
   review,
@@ -162,7 +174,6 @@ const ReviewPipeline = ({
   changedKeys,
 }: {
   review: DashboardReviewStageCounts | null;
-  /** null = 누적 집계를 읽지 못함(대기열과 따로 실패할 수 있다). */
   cumulative: DashboardCumulativeReviewCounts | null;
   professorFinalized: number | null;
   dominant: DashboardReviewQueueStage | null;
@@ -170,116 +181,109 @@ const ReviewPipeline = ({
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
-  // 규칙 → AI → 사람. 세 묶음 머리표만 두고 설명문은 쓰지 않는다. 화살표는 실제 검수 순서에만 쓴다.
   <div role="group" aria-label="품질 검수 단계">
-  <div className="flex flex-wrap items-stretch gap-2 lg:flex-nowrap">
-      {REVIEW_STAGE_GROUPS.map((group, groupIndex) => (
-        <Fragment key={group.label}>
-          {groupIndex > 0 && <ArrowRight aria-hidden className="mt-5 h-4 w-4 shrink-0 self-center text-[#81909A]" />}
-          <div className="min-w-0" style={{ flex: group.keys.length }}>
-            <p className="mb-1 border-b border-[#E6E1D5] pb-0.5 text-[11px] font-semibold tracking-[0.04em] text-[#6B7780]">{group.label}</p>
-            <div className="flex items-stretch gap-1">
-      {group.keys.map((key, index) => {
-        const stage = REVIEW_STAGE_ITEMS.find((item) => item.key === key)!;
-        const queue = review?.[stage.key] ?? null;
+  <div className="mb-1 grid grid-cols-1 gap-2.5 text-[11px] font-medium text-[#6B7780] lg:grid-cols-5">
+    {REVIEW_STAGE_GROUP_LABELS.map((group) => (
+      <span key={group.label} className={["hidden border-b border-[#EFEBE1] pb-0.5 lg:block", group.span].join(" ")}>{group.label}</span>
+    ))}
+  </div>
+  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+      {REVIEW_STAGE_ITEMS.map((stage) => {
+        const value = review?.[stage.key] ?? null;
+        // 메인은 대기량이다. 이미 해낸 양(서로 다른 미션 수)은 마우스를 올릴 때만 보인다.
         const completed = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
         const active = dominant === stage.key;
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
-          <Fragment key={stage.key}>
-          {index > 0 && <ArrowRight aria-hidden className="h-3.5 w-3.5 shrink-0 self-center text-[#B9C3CA]" />}
+          <div key={stage.key} className="relative min-w-0">
+            {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-w-0 flex-1 flex-col rounded-lg border border-[#E6E1D5] bg-white px-2.5 py-2",
+                "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
+                stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
+                stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
               data-dominant={active ? "true" : undefined}
+              title={completed === null || error ? undefined : `${stage.key === "professor" ? "승인 완료" : "누적 완료"} ${completed}개`}
             >
-              <span className="flex items-center gap-1.5 whitespace-nowrap text-xs font-semibold leading-4 text-[#3F4E59]">
-                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] tabular-nums text-[#63727C]">{stage.step}</span>
-                {stage.displayLabel}
-              </span>
-              {/* 해낸 일(누적 완료)은 큰 숫자로 차분하게, 기다리는 일은 있을 때만 노란 배지로. */}
-              <span className="mt-1 flex items-baseline gap-1 whitespace-nowrap">
-                <span className="text-[11px] text-[#63727C]">{stage.key === "professor" ? "승인 완료" : "누적 완료"}</span>
-                {completed === null && !error && review === null ? (
-                  <span aria-label="불러오는 중" className="inline-block h-5 w-10 rounded bg-muted motion-safe:animate-pulse" />
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#63727C]">
+                  {stage.step}
+                </span>
+                <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
+              </div>
+              <div className="mt-1.5 flex items-end gap-1.5">
+                {value === null && !error ? (
+                  <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="text-[20px] font-bold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-                    {error || completed === null ? <span className="text-xs font-normal text-destructive">확인 필요</span> : completed}
+                  <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
                   </span>
                 )}
-              </span>
-              <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 whitespace-nowrap text-[11px] text-[#5F6B73]">
-                {!error && (queue ?? 0) > 0
-                  ? <span className="rounded-full bg-[#FAD338] px-2 py-px font-bold tabular-nums text-[#15202B]">현재 대기 {queue}</span>
-                  : <span>{error || queue === null ? "—" : "대기 없음"}</span>}
-                {stage.key === "rules" && <span>규칙 {ACTIVE_RULE_IDS.length}개</span>}
-                {stage.optional && <span>선택형</span>}
-                {stage.key === "rules" && rulesFailCount > 0 && <span>불통과 {rulesFailCount}</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
+              </div>
+              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
+                {stage.description}
+                {stage.key === "rules" && rulesFailCount > 0 && ` · 실패 ${rulesFailCount}`}
               </span>
             </Link>
-          </Fragment>
+            {stage.step < REVIEW_STAGE_ITEMS.length && (
+              <ArrowRight aria-hidden className="absolute -right-[26px] top-1/2 hidden h-5 w-5 -translate-y-1/2 text-[#81909A] xl:block" />
+            )}
+          </div>
         );
       })}
-            </div>
-          </div>
-        </Fragment>
-      ))}
   </div>
-  <p className="mt-1.5 text-right text-[12px] text-[#6B7780]">
-    현재 대기 합계{" "}
-    <b className="font-semibold tabular-nums text-[#15202B]">
-      {review && !error ? REVIEW_STAGE_ITEMS.reduce((sum, stage) => sum + review[stage.key], 0) : "—"}
-    </b>개
-  </p>
   </div>
 );
 
-// 사이드바의 노란 번호와 같은 모양. 원문자(③ 등)는 글꼴에 따라 깨져 보여 쓰지 않는다.
-const StepBadge = ({ step }: { step: number }) => (
-  <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF3C4] text-[11px] font-bold text-[#15202B]">{step}</span>
-);
-
-// 사이드바 5단계와 같은 이름·순서의 흐름 줄. 상세가 아래에 있는 ③④⑤는 숫자를 반복하지 않고 흐름만 말한다.
-const WorkflowStep =({ step, title, to, changed = false, children }: {
-  step: number;
-  title: string;
+const OperationMetric = ({
+  to,
+  label,
+  value,
+  unit,
+  description,
+  error,
+  changed = false,
+  title,
+}: {
   to: string;
+  label: string;
+  value: number | null;
+  unit: string;
+  description: string;
+  error: string | null;
   changed?: boolean;
-  children: ReactNode;
+  /** 운영 점검용 2차 정보. 메인 문구에 두지 않고 마우스를 올릴 때만 보인다. */
+  title?: string;
 }) => (
-  <li className="flex min-w-0 flex-1 items-stretch gap-1.5">
-    {step > 1 && <ArrowRight aria-hidden className="hidden h-4 w-4 shrink-0 self-center text-[#81909A] lg:block" />}
-    <Link
-      to={to}
-      className={[
-        "flex min-w-0 flex-1 flex-col rounded-lg border border-[#E6E1D5] bg-white px-3 py-2",
-        "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
-        changed ? "ring-2 ring-[#F4D85E]/35" : "",
-      ].join(" ")}
-    >
-      <span className="flex items-center gap-1.5 whitespace-nowrap text-[13px] font-bold text-[#15202B]">
-        <StepBadge step={step} />
-        {title}
+  <Link
+    to={to}
+    title={title}
+    className={[
+      "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
+      "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
+      changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
+    ].join(" ")}
+  >
+    <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
+    {value === null && !error ? (
+      <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
+    ) : (
+      <span className="mt-1.5 flex items-end gap-1.5">
+        <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+          {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
+        </span>
+        {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
       </span>
-      <span className="mt-1 whitespace-nowrap text-[12px] text-[#5F6B73]">{children}</span>
-    </Link>
-  </li>
+    )}
+    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
+  </Link>
 );
-
-/** 흐름 줄·상세 줄 안의 수. 단위를 늘 붙인다(미션 수·건수·명수를 섞어 읽지 않게). */
-const Num = ({ value, unit, error }: { value: number | null | undefined; unit?: string; error: string | null }) => (
-  <>
-    <b className="text-[17px] font-bold tabular-nums text-[#15202B]">{error || value == null ? "—" : value}</b>
-    {unit}
-  </>
-);
-
-const FlowArrow = () => <ArrowRight aria-hidden className="h-3.5 w-3.5 shrink-0 text-[#81909A]" />;
 
 const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; announce?: boolean }) => (
   <span
@@ -351,7 +355,7 @@ const AdminDashboard = () => {
       const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
-          .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage,content_release_id:core_content->generation->>content_release_id,mpj_item_5_type:mission_content->mpj_items->4->>type,mpj_item_6_type:mission_content->mpj_items->5->>type")
+          .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
           .eq("content_format", "scenario_core_v1")
           .is("archived_at", null)
           .order("scenario_id", { ascending: true })
@@ -365,8 +369,7 @@ const AdminDashboard = () => {
           .is("superseded_by", null)
           .order("created_at", { ascending: false })
           .range(from, to)),
-        // 누적 완료는 기준 버전·재결합 이력까지 모든 mission run에서 미션 단위로 센다.
-        // 이 조회가 실패해도 대기열·할 일은 보여야 하므로 따로 받아 null로 둔다.
+        // 누적 완료는 기준 버전·재결합 이력까지 모든 mission run에서 미션 단위로 센다. 실패해도 대기열은 보여야 해서 null로 받는다.
         fetchAllDashboardRows<DashboardCumulativeRunRow>("검수 누적 이력", (from, to) => db
           .from("content_review_runs")
           .select(DASHBOARD_CUMULATIVE_RUN_SELECT)
@@ -404,13 +407,13 @@ const AdminDashboard = () => {
       const next: DashboardSnapshot = {
         content: summarizeDashboardContent(scenarioRows),
         review: summarizeDashboardReviewStages(scenarioRows, reviewRows),
-        cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,
         assignments: summarizeDashboardAssignments(assignmentRows),
         assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
         courses: summarizeCourses(courseRows),
         rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
+        cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,
         courseLinkedRecordCount: courseLinkedResult.error ? null : courseLinkedResult.count ?? 0,
       };
       if (!mountedRef.current) return;
@@ -520,127 +523,131 @@ const AdminDashboard = () => {
           이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
       {/* 숫자마다 「무엇의 몇 개인지」를 붙인다 — 설명문을 읽기 전에 뜻이 서야 한다.
           「품질 점검 대기」는 규칙 검사 전과 AI 검토 진행 중을 함께 센다(규칙 검사 불통과는 따로). 그래서 「시작 전」이라 부르지 않는다. */}
-      {/* 행동이 필요한 두 대기열만 한 줄로. 흐름 전체가 첫 화면에 들어오도록 높이를 낮게 둔다. */}
-      <section aria-label="지금 할 일" className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl bg-[#15202B] px-4 py-2.5 text-white">
-        <span className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</span>
-        <span className="text-[15px] font-bold">
-          교수자 승인 대기 · 학습 미션{" "}
-          <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
-        </span>
-        <Button asChild className="h-8 bg-[#FAD338] px-3 text-[13px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
-          <Link to="/admin/review">승인하러 가기 →</Link>
-        </Button>
-        <span aria-hidden className="hidden h-4 w-px bg-white/20 sm:block" />
-        <span className="text-[13px] text-[#B9C3CA]">
-          품질 점검 대기 · 학습 미션 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개
-        </span>
-        {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다. */}
-        {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
-          <span className="text-[13px] text-[#B9C3CA]">
-            규칙 검사 불통과 · <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
-          </span>
-        )}
-        <Link to="/admin/ai-review" className="ml-auto text-[13px] font-medium text-white underline-offset-4 hover:underline">품질 점검 화면 →</Link>
-      </section>
-
-      {/* 세 운영 층위. 층위 사이는 순서가 아니라 서로 다른 층이라 화살표 없이 쌓는다.
-          숫자는 전부 기존 snapshot 필드다 — 새로 계산하는 것은 검수 단계 합계(표시용 덧셈)뿐이다. */}
-      {/* 사이드바의 5단계 생애와 같은 흐름 줄 + 그중 상세가 필요한 ③·④·⑤. 숫자는 전부 기존 snapshot 필드다. */}
-      <PanelHeader title="PRAGMA 운영 워크플로우" action={liveStatus(true)} />
-      <ol aria-label="PRAGMA 운영 워크플로우" className="flex flex-col gap-2 lg:flex-row lg:gap-1.5">
-        <WorkflowStep step={1} title="생성 기준" to="/admin/prompt-harness">
-          생성 계약 · 규칙 <Num value={ACTIVE_RULE_IDS.length} unit="개" error={null} />
-        </WorkflowStep>
-        <WorkflowStep step={2} title="학습 미션 재료" to="/admin/library" changed={changedKeys.has("core")}>
-          시나리오 재료 <Num value={snapshot?.content.coreCount} unit="개" error={displayError} />
-        </WorkflowStep>
-        <WorkflowStep step={3} title="학습 미션 제작·품질 관리" to="/admin/assembly" changed={changedKeys.has("mission")}>
-          규칙 · AI · 교수자 검수
-        </WorkflowStep>
-        <WorkflowStep step={4} title="수업 운영" to="/admin/composer" changed={changedKeys.has("assignments")}>
-          승인 미션을 교과목·주차에 편성
-        </WorkflowStep>
-        <WorkflowStep step={5} title="학습 기록·연구 자료" to="/admin/decision-traces" changed={changedKeys.has("records")}>
-          수행 기록 → 연구 데이터
-        </WorkflowStep>
-      </ol>
-
-      {/* ③ 상세. 학습 미션 = 검수 진행 중 + 교수자 승인 완료 + 기타 상태(수정 요청 + 승인 기록 없는 옛 미션). 진행 중은 아래 단계별 현재 대기로 다시 쪼갠다. */}
-      <section aria-label="학습 미션 제작·품질 관리" className="mt-2.5 rounded-xl border border-[#E6E1D5] bg-white px-4 py-3">
-        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
-          <span className="mr-2 inline-flex items-center gap-1.5 self-center font-bold text-[#15202B]"><StepBadge step={3} />학습 미션 제작·품질 관리</span>
-          <span>학습 미션 <Num value={snapshot?.content.generatedMissionCount} unit="개" error={displayError} /> =</span>
-          <Link to="/admin/ai-review" className="underline-offset-4 hover:underline">검수 진행 중 <Num value={snapshot?.content.reviewTargetCount} error={displayError} /></Link>
-          <span>+</span>
-          {/* 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다. */}
-          <Link to="/admin/review" className="underline-offset-4 hover:underline">교수자 승인 완료 <Num value={snapshot?.content.professorFinalizedCount} error={displayError} /></Link>
-          <span>+</span>
-          {/* 내역(수정 요청·승인 기록 없는 옛 미션)은 운영 점검용 2차 정보라 마우스를 올릴 때만 보인다. 합계는 그대로 남긴다. */}
-          <span
-            title={snapshot && !displayError
-              ? `수정 요청 ${snapshot.content.reviseRequestedCount} · 승인 기록 없는 옛 미션 ${snapshot.content.legacyReviewedCount}`
-              : undefined}
-          >
-            기타 상태 <Num value={snapshot?.content.pendingRevisionCount} error={displayError} />
-          </span>
-        </div>
-          <div className="mt-2.5">
-            <ReviewPipeline
-              review={snapshot?.review ?? null}
-              cumulative={snapshot?.cumulative ?? null}
-              professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
-              dominant={dominantReviewStage}
-              rulesFailCount={snapshot?.rulesFailCount ?? 0}
-              error={displayError}
-              changedKeys={changedKeys}
-            />
-          </div>
-      </section>
-
-      <div className="mt-2.5 grid gap-2.5 lg:grid-cols-[3fr_2fr]">
-        {/* ④ 상세. 승인된 콘텐츠가 수업으로 들어가는 문: 교수자 승인 ⊃ 편성 가능(현재 release·MJT5) → 교과목·주차 편성.
-            승인 전 미션이 섞인 편성은 게이트 이전의 옛 편성이라, 있을 때만 알린다. */}
-        <section aria-label="수업 운영" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-2.5">
-          <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#15202B]"><StepBadge step={4} />수업 운영</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
-            <Link to="/admin/review" className="underline-offset-4 hover:underline">교수자 승인 <Num value={snapshot?.content.professorFinalizedCount} unit="개" error={displayError} /></Link>
-            <FlowArrow />
-            <Link to="/admin/library" className="underline-offset-4 hover:underline">편성 가능 미션 <Num value={snapshot?.content.composerReadyCount} unit="개" error={displayError} /></Link>
-            {/* 편성 건수는 위 미션 수에서 파생된 값이 아니다(교과목×주차 배정 건수, 게이트 이전의 옛 편성 포함) — 화살표로 잇지 않는다. */}
-            <span aria-hidden className="text-[#B9C3CA]">·</span>
-            <Link
-              to="/admin/composer"
-              className="underline-offset-4 hover:underline"
-              title={snapshot && !displayError && snapshot.assignmentApproval.unapprovedMissionCount > 0
-                ? `승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함(게이트 이전 편성)`
-                : undefined}
-            >
-              주차별 미션 편성 <Num value={snapshot?.assignments.assignmentCount} unit="건" error={displayError} />
-            </Link>
-          </div>
-          {snapshot && !displayError && (
-            <p className="mt-1 text-[12px] text-[#5F6B73]">
-              교과목 {snapshot.courses.total}개(공개 {snapshot.courses.published}) · 편성 주차 {snapshot.assignments.weekCount}개
-              {" · "}
-              {/* 계정 이용 승인이지 수강 등록이 아니다. */}
-              <Link to="/admin/learners" className="underline-offset-4 hover:underline">승인 학습자 계정 {snapshot.approvedLearnerCount}개</Link>
+      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-3.5 text-white">
+        <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
+        <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <div className="min-w-0">
+            <p className="text-[22px] font-bold leading-tight">
+              교수자 승인 대기 · 학습 미션{" "}
+              <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
             </p>
-          )}
-        </section>
-
-        {/* ⑤ 상세. 학습 수행이 연구 기록으로 닫힌다 — 표 전체 행 수이고 계정·기간으로 거르지 않는다. 내보내기는 동의 기록만. */}
-        <section aria-label="학습 기록·연구 자료" className="rounded-xl border border-[#E6E1D5] bg-white px-4 py-2.5">
-          <p className="inline-flex items-center gap-1.5 text-[13px] font-bold text-[#15202B]"><StepBadge step={5} />학습 기록·연구 자료</p>
-          <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-[#5F6B73]">
-            <Link to="/admin/decision-traces" className="underline-offset-4 hover:underline">수행 기록 <Num value={snapshot?.learnerRecordCount} unit="건" error={displayError} /></Link>
-            <FlowArrow />
-            <Link to="/admin/export" className="font-medium text-[#15202B] underline-offset-4 hover:underline">연구 데이터 내보내기</Link>
+            <p className="mt-0.5 text-[13px] text-[#B9C3CA]">품질 점검을 마치고 교수자 승인을 기다리는 미션입니다.</p>
           </div>
-          {/* 수행 기록은 계정·기간으로 거르지 않은 전체 행이다. 교과목에 연결된 기록 수를 함께 보여 수업 운영 기록과 시범 수행을 가를 수 있게 한다. */}
-          <p className="mt-1 text-[12px] text-[#5F6B73]">
-            교과목 연결 {snapshot && !displayError && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건 · 내보내기는 동의 기록만
-          </p>
-        </section>
+          <Button asChild className="h-10 bg-[#FAD338] px-5 text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
+            <Link to="/admin/review">승인하러 가기 →</Link>
+          </Button>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2.5 text-[13px] text-[#B9C3CA]">
+          <span>품질 점검 대기 · 학습 미션 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
+          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 뜻과 함께 보인다. */}
+          {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
+            <span>
+              규칙 검사 불통과 · <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
+              <span className="ml-2">생성 계약 규칙 위반을 확인해야 합니다.</span>
+            </span>
+          )}
+          <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 화면 →</Link>
+        </div>
+      </section>
+
+      {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
+      <PanelHeader title="전체 흐름" action={liveStatus(true)} />
+      <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
+        <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+          {[
+            { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
+            { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
+            // 수정 요청은 뺀 집합이다(라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청) — 같은 이름으로 부르지 않는다.
+            { to: "/admin/ai-review", stage: "검수 진행 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
+            // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
+            { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
+            { to: "/admin/composer", stage: "미션 배정", screen: "15주 편성", value: snapshot?.assignments.assignmentCount },
+            // 계정·기간으로 거르지 않은 전체 행이라 실제 수업 수행으로 단정하지 않는다.
+            { to: "/admin/decision-traces", stage: "수행 기록", screen: "기록 → 연구 데이터", value: snapshot?.learnerRecordCount },
+          ].map((step, index) => (
+            <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
+              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
+                <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
+                {step.value == null && !displayError ? (
+                  <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
+                ) : (
+                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
+                    {displayError ? "—" : step.value}
+                  </span>
+                )}
+                <span className="mt-auto pt-1.5 text-[11.5px] text-[#9AA3A9]">{step.screen} →</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
+      <PanelHeader
+        title="검수 단계별 현황"
+      />
+      <ReviewPipeline
+        review={snapshot?.review ?? null}
+        cumulative={snapshot?.cumulative ?? null}
+        professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
+        dominant={dominantReviewStage}
+        rulesFailCount={snapshot?.rulesFailCount ?? 0}
+        error={displayError}
+        changedKeys={changedKeys}
+      />
+
+      <PanelHeader title="수업 운영·학습 수행 현황" />
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+        {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
+            운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
+        <OperationMetric
+          to="/admin/composer"
+          label="교과목"
+          value={snapshot?.courses.total ?? null}
+          unit="개"
+          description={snapshot ? `공개 ${snapshot.courses.published}개 · 비공개 ${snapshot.courses.unpublished}개` : "15주 수업의 단위"}
+          error={displayError}
+          changed={changedKeys.has("courses")}
+        />
+        {/* 큰 수 = 배정 건수(운영 단위). 승인 전 미션이 섞여 있으면 게이트 이전의 옛 편성이다 —
+            새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
+        <OperationMetric
+          to="/admin/composer"
+          label="미션 배정"
+          value={snapshot?.assignments.assignmentCount ?? null}
+          unit="건"
+          description={
+            snapshot
+              ? `미션 ${snapshot.assignments.missionCount}개 · 주차 ${snapshot.assignments.weekCount}개`
+              : "교과목 주차에 놓인 미션"
+          }
+          error={displayError}
+          changed={changedKeys.has("assignments")}
+          title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
+            ? `승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함(게이트 이전 편성)`
+            : undefined}
+        />
+        {/* 계정 이용 승인이지 교과목별 수강 등록이 아니다 — 「수강생」으로 부르지 않는다. */}
+        <OperationMetric
+          to="/admin/learners"
+          label="승인 학습자 계정"
+          value={snapshot?.approvedLearnerCount ?? null}
+          unit="개"
+          description="계정 승인 · 전체 교과목 공통"
+          error={displayError}
+          changed={changedKeys.has("learners")}
+        />
+        {/* 표 전체 행 수다 — 계정 역할·기간으로 거르지 않는다. 시험 기록과 실제 학습을 나누려면
+            시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
+        <OperationMetric
+          to="/admin/decision-traces"
+          label="수행 기록"
+          value={snapshot?.learnerRecordCount ?? null}
+          unit="건"
+          description={`교과목 연결 ${snapshot && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건 · 연구 데이터로 내보내기`}
+          error={displayError}
+          changed={changedKeys.has("records")}
+        />
       </div>
 
       {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
