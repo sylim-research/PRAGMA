@@ -33,5 +33,13 @@
 - v6 형식 규칙이 `production_task.vocabulary_hints`를 정확히 2개로 요구해 저장 전 검사에서 거부됐다.
 - 형식 규칙은 바꾸지 않았다. 원문에 있는 표현으로 두 번째 힌트를 대체할지 연구자 결정이 필요하다.
 
+## 3번 후속 생성 (같은 날)
+- 연구자가 두 번째 힌트를 원문에 있는 「借给 = 빌려주다」로 확정했다. 현행 2개 형식 요구를 충족하기 위한 콘텐츠 선택이며 생성 규칙으로 일반화하지 않는다.
+- `63ddb0d4-e0ab-496a-8942-d229455e2d43` → `eba33dab-9c18-412c-ae7b-41fa5520ec4a` (「[v6 E2E 3 수정본 2] …」, `case_3_lessons_r4`).
+- 변경 필드: `mpj_items[4].candidates[0].text`·`.note_ko`·`.accepted_band_codes`(→ 상황에 맞음), `lesson_points[0-4].text`, `production_task.vocabulary_hints`(두 번째 항목), `production_task.reference_alternatives[0].text`.
+- 품질 점검 pass(지적 0), 규칙 검사 pass(지적 0), 최종 검수 자료 준비 완료, 교수자 승인 대기.
+- readback: 변경 경로가 승인 목록과 일치, 코어·DCT 원문·참고 번역 해설 동일, 옛 행 해시·검토 기록 보존, 새 행 승인 0·편성 0.
+- 힌트 개수(수준별 2·3개) 조정은 형식 규칙·생성 계약 변경이라 이번에 하지 않았다. E2E 이후 판단 대상이다.
+
 ## 로컬 준비 파일
-- E2E 편성·readback 대상은 1·2번만 새 ID로 바꿨고, 옛 ID는 대체 기록으로 남겼다.
+- E2E 편성·readback 대상은 1·2·3번 모두 새 ID로 바꿨고, 옛 ID는 대체 기록으로 남겼다.
