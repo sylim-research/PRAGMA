@@ -160,9 +160,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
-        {primary && <ReviewFindings title={run.openai_review ? "AI 검토" : "저장된 AI 검토 재사용 · 추가 호출 없음"} result={primary} metadata={experiential ? undefined : run.openai_review ?? undefined} />}
-        {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 AI 검토" result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && <ReviewFindings title="저장된 AI 독립 검토" result={run.claude_review.result} metadata={experiential ? undefined : run.claude_review} />}
+        {primary && <ReviewFindings title={run.openai_review ? "OpenAI 검토" : "저장된 OpenAI 검토 재사용 · 추가 호출 없음"} result={primary} metadata={experiential ? undefined : run.openai_review ?? undefined} />}
+        {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 단계 OpenAI 검토"result={generationQualityResult(run.generation_quality)} />}
+        {run.claude_review && <ReviewFindings title="저장된 Claude 독립 검토"result={run.claude_review.result} metadata={experiential ? undefined : run.claude_review} />}
         {findings.length > 0 && <details open={!experiential || undefined} className="space-y-3 rounded-lg border p-3">
           <summary className="cursor-pointer font-semibold">교수자 판단이 필요한 문제 항목 ({findings.length}건)</summary>
           <p>중대 문제 항목과 맥락 판단이 필요한 항목을 확인하세요. 일반 경고와 이전 검토 전문은 위에 보존됩니다.</p>
@@ -173,17 +173,17 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
             return <div key={finding.id} className="grid gap-3 rounded border p-3 lg:grid-cols-3">
-              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
+              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "Claude 독립 검토" : finding.id.startsWith("generation-") ? "생성 단계 OpenAI 검토" : "OpenAI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
                 <p className="mt-1 text-xs">유형: {finding.problem_type_ko} · {verdictLabel[finding.severity]}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
                 {finding.uncertainty_ko && <p className="mt-1 text-xs">불확실성: {finding.uncertainty_ko}</p>}
                 {finding.quote && <blockquote className="my-2 border-l-2 pl-2">{finding.quote}</blockquote>}
                 <p className="text-xs">제안: {finding.suggestion_ko}</p><code className="break-all text-[10px]">{finding.where}</code></div>
               <div className="rounded bg-[#F8F7F3] p-3">{decision ? <>
-                <strong>AI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                <strong>OpenAI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                 <p className="mt-1">{decision.rationale_ko}</p>
                 {decision.proposed_change_ko && <p className="mt-2 text-xs">제안: {decision.proposed_change_ko}</p>}
                 {decision.evidence_quote && <blockquote className="mt-2 border-l-2 pl-2">{decision.evidence_quote}</blockquote>}
-              </> : focused ? "추가 AI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "AI 재검토 전"}</div>
+              </> : focused ? "추가 OpenAI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "OpenAI 재검토 전"}</div>
               <div className="space-y-2 rounded bg-amber-50 p-3">
                 {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}</strong><p>{saved?.rationale_ko}</p></>
                   : focused || run.adjudication ? <>
@@ -195,12 +195,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     </select>
                     <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft?.rationale_ko ?? ""} disabled={busy}
                       onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
-                  </> : <p>AI 재검토 후 교수자 결정을 기록합니다.</p>}
+                  </> : <p>OpenAI 재검토 후 교수자 결정을 기록합니다.</p>}
               </div>
             </div>;
           })}
           {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-          <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 독립 AI 검토 의견도 보존합니다. AI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
+          <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 Claude 독립 검토 의견도 보존합니다. OpenAI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
           {next === "professor" && findings.length > 0 && <>
             <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
               || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장 · 무료</Button>
@@ -265,7 +265,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             : "점검을 마치면 교수자 최종 승인의 「결정 대기」로 넘어갑니다."}</p>
         <Link to={handoffHref} className="font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인에서 이 미션 열기 →</Link>
       </div>}
-      {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 AI 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
+      {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
         {/* 승인·편성·노출은 서로 다른 사건이다. 노출 여부는 이 화면이 판정하지 않으므로 조건만 안내한다. */}
@@ -282,9 +282,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             ["검수 run ID", run?.id],
             ["검수 기준", run?.criteria_version],
             ["승인 정책", run?.approval_policy],
-            ["AI 검토 모델", run?.openai_review ? `${run.openai_review.model} · ${run.openai_review.checked_at}` : null],
-            ["독립 검토 모델", run?.claude_review ? `${run.claude_review.model} · ${run.claude_review.checked_at}` : null],
-            ["재검토 모델", run?.adjudication ? `${run.adjudication.model} · ${run.adjudication.checked_at}` : null],
+            ["OpenAI 검토 모델", run?.openai_review ? `${run.openai_review.model} · ${run.openai_review.checked_at}` : null],
+            ["Claude 독립 검토 모델", run?.claude_review ? `${run.claude_review.model} · ${run.claude_review.checked_at}` : null],
+            ["OpenAI 재검토 모델",run?.adjudication ? `${run.adjudication.model} · ${run.adjudication.checked_at}` : null],
           ] as Array<[string, string | null | undefined]>).filter(([, value]) => value).map(([label, value]) => <div key={label} className="contents">
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>
           </div>)}

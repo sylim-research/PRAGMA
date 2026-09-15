@@ -29,11 +29,11 @@ export async function prepareContentReview(target: ReviewTarget, options: {
     const stage = nextReviewStage(state.run);
     if (stage === "approved") return { status: "approved", message: "이미 교수자 승인된 버전", inspection: state };
     if (state.run?.rules.verdict === "fail") return hold("규칙 오류 · 수정 후 다시 시작하세요.");
-    if (stage === "professor") return { status: "ready", message: "AI 검토 완료 · 교수자 판단 대기", inspection: state };
+    if (stage === "professor") return { status: "ready", message: "OpenAI 검토 완료 · 교수자 판단 대기", inspection: state };
     if (state.run?.running_stage && state.run.lease_until && Date.parse(state.run.lease_until) > Date.now()) {
       return hold("다른 검토가 실행 중입니다. 완료 후 다시 시작하세요.");
     }
-    if (stage === "claude" && !state.models.claude) return hold("독립 AI 검토 모델 설정이 필요합니다. 유료 호출을 시작하지 않았습니다.");
+    if (stage === "claude" && !state.models.claude) return hold("Claude 독립 검토 모델 설정이 필요합니다. 유료 호출을 시작하지 않았습니다.");
     if (attempted.has(stage)) return hold("검토 단계가 진행되지 않았습니다. 저장 결과를 확인하세요.");
     attempted.add(stage);
     options.onStage?.(stage);

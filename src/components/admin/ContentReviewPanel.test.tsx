@@ -69,8 +69,8 @@ describe("professor finding decisions", () => {
   it.each(["revision_required", "defer"] as const)("preserves rejected Claude findings and saves %s without approval", async (decision) => {
     showPanel();
     await enterDecision(decision);
-    expect(screen.getByText("AI 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
-    expect(screen.getByText(/AI 재검토 · 기각/)).toBeInTheDocument();
+    expect(screen.getByText("Claude 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.getByText(/OpenAI 재검토 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
@@ -93,7 +93,7 @@ describe("professor finding decisions", () => {
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     await screen.findByText("교수자 · 수정 없이 사용 가능");
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    expect(screen.getByText("AI 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.getByText("Claude 독립 검토 · 초대의 선택권 확인")).toBeInTheDocument();
   });
 
   it("does not carry professor decisions into changed content", async () => {
