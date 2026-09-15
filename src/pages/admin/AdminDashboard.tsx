@@ -140,9 +140,10 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "의미·자연성 검토",
   claude: "선택형",
-  adjudication: "선택형 · Claude 의견 대상",
-  // 교수자는 학생에게 보이는 화면 그대로 감수한다 — AI 검토와 다른 사람의 확인이다.
-  professor: "학생 화면으로 감수",
+  // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
+  adjudication: "선택형 · Claude 의견 재검토",
+  // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
+  professor: "학습자 화면 확인 후 승인",
 };
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
@@ -287,7 +288,7 @@ const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; a
       {!delayed && <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50 motion-safe:animate-ping" />}
       <span className={["relative inline-flex h-2 w-2 rounded-full", delayed ? "bg-amber-500" : "bg-emerald-500"].join(" ")} />
     </span>
-    {delayed ? "갱신 지연" : "실시간"}
+    {delayed ? "갱신 지연" : "DB 실시간"}
   </span>
 );
 
@@ -573,6 +574,7 @@ const AdminDashboard = () => {
       {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
       <PanelHeader
         title="검수 단계별 현황"
+        action={liveStatus()}
       />
       <ReviewPipeline
         review={snapshot?.review ?? null}
@@ -584,7 +586,7 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader title="수업 운영·학습 수행 현황" />
+      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
