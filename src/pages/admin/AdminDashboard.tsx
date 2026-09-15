@@ -213,7 +213,7 @@ const ReviewPipeline = ({
                   </span>
                 )}
               </span>
-              <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 whitespace-nowrap text-[11px] text-[#9AA3A9]">
+              <span className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 whitespace-nowrap text-[11px] text-[#5F6B73]">
                 {!error && (queue ?? 0) > 0
                   ? <span className="rounded-full bg-[#FAD338] px-2 py-px font-bold tabular-nums text-[#15202B]">현재 대기 {queue}</span>
                   : <span>{error || queue === null ? "—" : "대기 없음"}</span>}
@@ -274,7 +274,7 @@ const WorkflowStep =({ step, title, to, changed = false, children }: {
 /** 흐름 줄·상세 줄 안의 수. 단위를 늘 붙인다(미션 수·건수·명수를 섞어 읽지 않게). */
 const Num = ({ value, unit, error }: { value: number | null | undefined; unit?: string; error: string | null }) => (
   <>
-    <b className="text-[15px] font-bold tabular-nums text-[#15202B]">{error || value == null ? "—" : value}</b>
+    <b className="text-[17px] font-bold tabular-nums text-[#15202B]">{error || value == null ? "—" : value}</b>
     {unit}
   </>
 );
@@ -619,7 +619,7 @@ const AdminDashboard = () => {
             </Link>
           </div>
           {snapshot && !displayError && (
-            <p className="mt-1 text-[12px] text-[#9AA3A9]">
+            <p className="mt-1 text-[12px] text-[#5F6B73]">
               교과목 {snapshot.courses.total}개(공개 {snapshot.courses.published}) · 편성 주차 {snapshot.assignments.weekCount}개
               {" · "}
               {/* 계정 이용 승인이지 수강 등록이 아니다. */}
@@ -637,7 +637,7 @@ const AdminDashboard = () => {
             <Link to="/admin/export" className="font-medium text-[#15202B] underline-offset-4 hover:underline">연구 데이터 내보내기</Link>
           </div>
           {/* 수행 기록은 계정·기간으로 거르지 않은 전체 행이다. 교과목에 연결된 기록 수를 함께 보여 수업 운영 기록과 시범 수행을 가를 수 있게 한다. */}
-          <p className="mt-1 text-[12px] text-[#9AA3A9]">
+          <p className="mt-1 text-[12px] text-[#5F6B73]">
             교과목 연결 {snapshot && !displayError && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건 · 내보내기는 동의 기록만
           </p>
         </section>
