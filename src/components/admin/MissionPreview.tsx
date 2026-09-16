@@ -61,7 +61,7 @@ export function MissionPreview({
         <span className="rounded bg-[#E7EFF5] px-1.5 py-0.5 text-[11px] font-semibold text-[#2B5B7A]">{DIRECTION_LABEL[mission.direction]}</span>
         <span className="text-muted-foreground">({feat} v{mission.unit.target_feature_version})</span>
         {p && (
-          <span className="text-[11.5px] text-muted-foreground">
+          <span className="text-[12px] text-muted-foreground">
             provenance: {p.model} · {p.prompt_version} · 시도 {p.generation_attempt} · #{p.mission_content_hash.slice(0, 8)}
           </span>
         )}
@@ -109,7 +109,7 @@ export function MissionPreview({
               <span className="font-medium">요약(보조)</span> {q.summary_ko}
             </p>
           )}
-          <p className="mt-1.5 text-[11px] opacity-70">
+          <p className="mt-1.5 text-[12px] opacity-70">
             AI 보조 판정입니다 — 승인 여부는 아래 문항을 직접 확인하고 결정하세요.
           </p>
         </div>
@@ -122,7 +122,7 @@ export function MissionPreview({
 
       {/* DCT */}
       <div className={box}>
-        <div className="text-[11.5px] font-semibold text-muted-foreground">
+        <div className="text-[12px] font-semibold text-muted-foreground">
           산출 과제 (DCT · {mission.production_task.mode === "interpreting" ? "통역" : "번역"})
         </div>
         <p className="mt-1">{mission.production_task.situation_ko}</p>
@@ -152,7 +152,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
   return (
     <div className={box}>
       <div className="flex items-center justify-between">
-        <span className="text-[11.5px] font-semibold text-muted-foreground">{TYPE_LABEL[item.type] ?? item.type}</span>
+        <span className="text-[12px] font-semibold text-muted-foreground">{TYPE_LABEL[item.type] ?? item.type}</span>
         {accepted.length > 0 && (
           <span className="rounded bg-[#E7F5EE] px-1.5 py-0.5 text-[11px] font-semibold text-[#2E7D5B]">
             정답 대역: {accepted.join(" / ")}
@@ -166,7 +166,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
         <p className="mt-1 font-medium">초안: {item.target}</p>
       )}
       {item.type === "scale4" && "reference_scale_code" in item && (
-        <p className="mt-1 text-[11.5px] text-[#2E7D5B]">
+        <p className="mt-1 text-[12px] text-[#2E7D5B]">
           대표 정도: {SCALE4_LABELS[item.reference_scale_code as Scale4Code]}
           <span className="ml-1 text-muted-foreground">· 정오는 적절/부적절 방향만 판단</span>
         </p>
@@ -176,7 +176,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
         <ul className="mt-1 space-y-0.5">
           {item.corrections.map((c, i) => (
             <li key={i} className={c.is_valid ? "text-[#2E7D5B]" : "text-muted-foreground"}>
-              {c.is_valid ? "✓" : "✗"} {c.text} <span className="text-[11.5px]">— {c.note_ko}</span>
+              {c.is_valid ? "✓" : "✗"} {c.text} <span className="text-[12px]">— {c.note_ko}</span>
             </li>
           ))}
         </ul>
@@ -195,7 +195,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
           {item.reasons.map((r) => (
             <li key={r.id} className={item.accepted_reason_id === r.id ? "text-[#2E7D5B]" : "text-muted-foreground"}>
               {item.accepted_reason_id === r.id ? "✓" : "·"} {r.text_ko}
-              <span className="ml-1 text-[11px] opacity-70">({r.kind})</span>
+              <span className="ml-1 text-[12px] opacity-70">({r.kind})</span>
             </li>
           ))}
         </ul>
@@ -205,7 +205,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
           {item.candidates.map((c, i) => (
             <li key={i}>
               <span className="text-[#2E7D5B]">[{c.accepted_band_codes.map((b) => bandLabel(featureCode, b)).join("/")}]</span>{" "}
-              {c.text} <span className="text-[11.5px] text-muted-foreground">— {c.note_ko}</span>
+              {c.text} <span className="text-[12px] text-muted-foreground">— {c.note_ko}</span>
             </li>
           ))}
         </ul>

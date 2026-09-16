@@ -98,7 +98,7 @@ export function ProfessorMissionWorkbench({
           <p className="font-semibold text-red-900">남은 AI 결함 {failFindings.length}건</p>
           {failFindings.map(({ finding, issueIndex }) => (
             <label key={`${finding.code}-${issueIndex}`} className="block">
-              <span className="block text-[11.5px] text-red-900">
+              <span className="block text-[12px] text-red-900">
                 {finding.code}{finding.where ? ` · ${finding.where}` : ""} — {finding.note_ko}
               </span>
               <Textarea
