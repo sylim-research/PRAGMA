@@ -2616,6 +2616,13 @@ const CanonicalMissionRun = ({
     mission_status: null, release_gate_mode: null,
     direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
   }), metaLabel: "대표 요청 후보" } : null, [reasonContrastPilot]);
+  // 데모는 승인·편성과 무관하게 열려야 하므로 저장된 미션을 조회하지 않고 코드의 v6 샘플로 실행한다.
+  // 수행 기록·이벤트는 demoMode에서 이미 차단되고, runtime이 없어 AI 피드백도 호출하지 않는다.
+  const demoPreview = useMemo(() => demoMode && !scenarioId ? { ...adaptRunnableMissionToCanonical({
+    scenario_id: "", speech_act: "request", learner_level: "intermediate",
+    mission_status: null, release_gate_mode: null,
+    direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
+  }), metaLabel: "대표 미션 시연" } : null, [demoMode, scenarioId]);
   const pilotStorageKey = reasonContrastPilot ? REASON_CONTRAST_PILOT_STORAGE_KEY : LEARNER_UX_PILOT_STORAGE_KEY;
   const courseLocation = parseMissionCourseLocation(window.location.search);
   const [runtimeMission, setRuntimeMission] = useState<CanonicalMissionViewModel | null>(null);
@@ -2707,7 +2714,7 @@ const CanonicalMissionRun = ({
     );
   }
 
-  const mission = runtimeMission ?? reasonContrastPreview ?? (localPilot ? LEARNER_UX_PILOT : CANONICAL_MISSION_PREVIEW);
+  const mission = runtimeMission ?? reasonContrastPreview ?? demoPreview ?? (localPilot ? LEARNER_UX_PILOT : CANONICAL_MISSION_PREVIEW);
   return (
     <CanonicalMissionRunner
       key={localPilot ? pilotStorageKey : mission.scenarioId ?? "preview"}
