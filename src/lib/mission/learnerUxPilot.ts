@@ -100,7 +100,7 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       id: "A5", module: "A", kind: "spectrum", shortLabel: "네 표현 비교", title: "각 표현은 어디쯤에 놓일까요?",
       context: context("동아리 홍보 포스터의 날짜를 바꾸려고 지난해 담당 선배에게 원본 파일을 부탁합니다. 선배와는 활동 중 몇 번 이야기했고, 파일은 선배가 보관하고 있습니다.", "한 학년 위 여자 선배", "상대 조금 높음", "아는 사이", "부담 낮음"),
       source: "선배, 동아리 홍보 포스터 원본 파일을 보내주실 수 있나요? 날짜만 바꾸려고요.",
-      prompt: "네 번역안을 각각 스펙트럼 위에 놓아 보세요. 같은 위치에 여러 표현을 놓아도 됩니다.", options: spectrum,
+      prompt: "각 표현을 읽고, 이 상황에서 어떻게 들리는지 판단해 보세요.", options: spectrum,
       candidates: [
         { id: "a", text: "学姐，能把社团宣传海报的原文件发给我吗？我只改一下日期。", acceptedAnswers: ["appropriate"], note: "용건과 이유를 간결하게 밝히고 전달 가능 여부를 묻습니다." },
         { id: "b", text: "学姐，能否劳烦您发一下社团宣传海报的原文件？我只改一下日期。", acceptedAnswers: ["appropriate"], note: "劳烦您는 조금 격식이 있지만, 요청과 이유가 분명한 가능한 표현입니다. 이 정도의 격식이나 您만으로 지나치게 우회적이라고 단정하지 않습니다." },
