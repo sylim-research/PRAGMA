@@ -1761,12 +1761,46 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
   </CanonicalMissionContext.Provider></RuntimeMissionContext.Provider>;
 }
 
+/**
+ * 문항 해설(`explanation_ko`) 끝에 저장된 「표현 메모」 줄을 모은다.
+ * 새 필드를 만들지 않고 이미 승인된 콘텐츠를 그대로 읽으므로, 메모가 없는 미션에서는 빈 배열이다.
+ */
+export type ExpressionNote = { term: string; gloss: string };
+export const EXPRESSION_MEMO_LABEL = "표현 메모";
+
+export function collectExpressionNotes(quests: readonly MissionQuest[]): ExpressionNote[] {
+  const notes: ExpressionNote[] = [];
+  const seen = new Set<string>();
+  for (const quest of quests) {
+    const feedback = "feedback" in quest && typeof quest.feedback === "string" ? quest.feedback : "";
+    const lines = feedback.split(/\r?\n/);
+    const start = lines.findIndex((line) => line.trim() === EXPRESSION_MEMO_LABEL);
+    if (start < 0) continue;
+    for (const line of lines.slice(start + 1)) {
+      const body = line.trim();
+      // 메모 블록은 해설 맨 끝에 오고 불릿으로만 이어진다 — 다른 줄을 만나면 거기서 끝난다.
+      if (!body.startsWith("·")) break;
+      const parsed = body.slice(1).trim().match(/^(`[^`]+`|「[^」]+」)\s*—\s*(.+)$/);
+      if (!parsed) continue;
+      const [, term, explanation] = parsed;
+      if (seen.has(term)) continue;
+      seen.add(term);
+      // 정리 화면에서는 첫 문장까지만 — 상세 설명은 문항 피드백 카드에 그대로 남는다.
+      const end = explanation.search(/[.。]/);
+      notes.push({ term, gloss: end >= 0 ? explanation.slice(0, end + 1) : explanation });
+    }
+  }
+  return notes;
+}
+
 function MpjLessonBridge({ lessonPoints, onContinue }: {
   lessonPoints: MissionLessonPoint[];
   onContinue: () => void;
 }) {
+  const mission = useCanonicalMission();
+  const expressionNotes = collectExpressionNotes(mission.quests);
   return (
-    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-6 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-8 sm:py-7" aria-label="직접 산출 전 5 POINT LESSON">
+    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-6 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-8 sm:py-7" aria-label="직접 산출 전 문항별 핵심 정리">
       <p className="text-[12px] font-black tracking-[0.12em] text-[#8A7419]">직접 산출하기 전에</p>
       <div className="mt-1 flex flex-wrap items-end justify-between gap-2">
         <h1 className="break-keep text-xl font-black tracking-[-0.03em] text-[#15202B]">문항별 핵심 5가지</h1>
@@ -1784,6 +1818,22 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
           </li>
         ))}
       </ol>
+
+      {/* 문항마다 흩어져 있던 표현을 산출 직전에 한 번 더 모아 준다. 화용 판단 요약(위의 다섯 줄)이
+          먼저 읽히도록 크기와 색은 한 단계 낮춘다. */}
+      {expressionNotes.length > 0 && (
+        <section className="mt-4 rounded-xl border border-[#E2DED4] bg-white px-4 py-3" aria-label="이번 미션에 나온 표현">
+          <p className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">이번 미션에 나온 표현</p>
+          <ul className="mt-2 grid gap-x-5 gap-y-1 sm:grid-cols-2">
+            {expressionNotes.map((note) => (
+              <li key={note.term} className="break-keep text-[13px] leading-6 text-[#5C6A7A] [overflow-wrap:anywhere]">
+                <span className="font-semibold text-[#15202B]"><RichLine text={note.term} /></span>
+                {" — "}<RichLine text={note.gloss} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="mt-5 flex justify-end">
         <Button type="button" className="h-11 px-5 font-black" onClick={onContinue}>
