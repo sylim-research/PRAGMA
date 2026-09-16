@@ -10,9 +10,10 @@ import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 // "이 카드가 반응한다"까지만 말하고, 화살표의 이동이 "누르면 저쪽으로 간다"를 말한다.
 const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 보조 이동은 두 역할 카드보다 한 단계 아래로 읽혀야 한다 — 테두리를 카드와 같은
-// 연한 선으로 낮추고, 굵기·글자색·그림자를 덜어 낸다. 크기와 배치는 그대로다.
+// 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
+// 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[178px] items-center justify-center gap-2 rounded-lg border border-[#DCD6C6] bg-white px-4 py-2 text-[13px] font-semibold text-[#3E4C57] transition-colors hover:border-[#C7BFA9] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[180px] items-center justify-center gap-2 rounded-lg border border-[#C4BCA8] bg-white px-4 py-[9px] text-[13.5px] font-semibold text-[#2F3D48] shadow-sm transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 const Landing = () => {
   useEffect(() => {

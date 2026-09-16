@@ -2574,7 +2574,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         {demoMode && (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs text-[#6B5518]">
             <p className="flex flex-wrap items-center gap-x-2" role="status">
-              <span className="font-black">디펜스 대표 미션 시연</span>
+              <span className="font-black">대표 미션 미리 보기</span>
               <span>수행 기록 저장 안 됨</span>
             </p>
             {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
@@ -2648,7 +2648,10 @@ const CanonicalMissionRun = ({
           setFallbackToLegacy(true);
           return;
         }
-        setError(reason instanceof Error ? reason.message : "미션을 불러오지 못했습니다.");
+        // 학습자 화면에는 DB·API 원문(권한 오류 문구 등)을 그대로 두지 않는다.
+        // 실패를 감추지는 않되, 기술적 원인은 콘솔에만 남긴다.
+        console.error("[mission] 미션 로드 실패", reason);
+        setError("미션을 불러오지 못했습니다. 잠시 후 다시 시도하거나 담당 교수자에게 알려 주세요.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
