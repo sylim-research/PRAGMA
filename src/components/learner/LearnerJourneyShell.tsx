@@ -23,7 +23,7 @@ export const LearnerJourneyShell = ({
   missionLayout = false,
 }: LearnerJourneyShellProps) => {
   const widthClass = wide ? "max-w-6xl" : missionLayout ? "max-w-4xl" : "max-w-3xl";
-  const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-5" : "py-6";
+  const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-4" : "py-6";
   const headerAlignmentClass = missionLayout
     ? "xl:w-[61rem] xl:max-w-none xl:-translate-x-[6.5rem] xl:px-0"
     : "";
