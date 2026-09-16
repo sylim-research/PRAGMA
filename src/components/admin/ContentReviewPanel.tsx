@@ -27,6 +27,13 @@ function signalSummary(findings: ReviewFinding[]): string {
   return [...counts].map(([id, n]) => `${id} ×${n}`).join(" · ");
 }
 
+/**
+ * 승인 근거는 교수자가 남기고 싶을 때만 적는다. 비워 두면 이 문구로 기록한다 — 승인 시점의 근거가
+ * 비어 있지 않게 하려는 것이고, 저장 계약이 요구하는 최소 길이도 이 문구가 충족한다.
+ */
+const DEFAULT_APPROVAL_NOTE = "현재 버전을 수업에 사용합니다.";
+const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
+
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
   /** false면 바깥 테두리 상자를 그리지 않는다(이미 작업대 상자 안에 놓일 때). */
   framed?: boolean;
@@ -135,8 +142,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     setBusy(true); setError(null);
     try {
       if (next === "professor") {
-        if (!run || !ready || !confirmed || note.trim().length < 10) return;
-        const approval: ContentReviewApproval = { reviewId: run.id, contentHash: state!.contentHash, professorNote: note.trim(),
+        if (!run || !ready || !confirmed) return;
+        const approval: ContentReviewApproval = { reviewId: run.id, contentHash: state!.contentHash, professorNote: approvalNote(note),
           ...(hasOpenaiFail ? { openaiFailOverride: openaiFailOverride.trim() } : {}) };
         await (onApprove ?? approveContentReview)(approval);
         await query.refetch();
@@ -288,12 +295,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" value={note} onChange={(event) => setNote(event.target.value)} placeholder="수업 사용 적합성과 남은 문제 항목에 대한 교수자 판단을 10자 이상 기록하세요." />
+        <Textarea aria-label="교수자 승인 근거" value={note} onChange={(event) => setNote(event.target.value)} placeholder="남길 말이 있으면 적어 주세요(선택). 비워 두면 「현재 버전을 수업에 사용합니다」로 기록합니다." />
         <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
       {next !== "approved" && !(handoffHref && next === "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
-        || (next === "professor" && (!ready || !confirmed || note.trim().length < 10))} onClick={() => void runNext()}>
+        || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작 · 무료" : next === "professor" ? "교수자 최종 승인" : `${steps[stepIndex].label} 실행 · 유료`}
       </Button>}
       {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.

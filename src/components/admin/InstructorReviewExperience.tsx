@@ -74,6 +74,13 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     setPendingNotes(({ [section.id]: _used, ...rest }) => rest);
     void persist({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { section: section.id, status, note: noteValue }] });
   };
+  // 판정이 이미 있는 문항에 메모를 고치면 따로 저장을 누르지 않아도 잠시 뒤 저장한다.
+  // 저장 버튼을 남겨 두면 메모만 고친 교수자가 최종 승인에서 막힌다(2026-09-17).
+  useEffect(() => {
+    if (!dirty || saving || approved || disabled || error) return;
+    const timer = window.setTimeout(() => { void persist(draft); }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [dirty, saving, approved, disabled, error, draft]);
   return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
       <div><h3 className="text-lg font-bold">학생 화면으로 감수하기</h3>
@@ -108,8 +115,8 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
               : setPendingNotes((notes) => ({ ...notes, [section.id]: event.target.value }))} />
-          {dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => void persist(draft)}>감수 메모 저장</Button>}
-          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty ? "저장하지 않은 감수 기록이 있습니다." : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 함께 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : "확인 또는 수정 요청을 누르면 현재 버전에 저장합니다."}</p>
+          {error && dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
+          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 함께 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : "확인 또는 수정 요청을 누르면 현재 버전에 저장합니다."}</p>
           {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
           {current?.status === "revision_required" && <p className="text-sm text-amber-800">현재 미션의 최종 승인을 보류합니다. 아래 원본 수정 도구에서 수정하거나, 판단을 재검토하고 확인으로 바꾸세요.</p>}
           {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 요청으로 다시 판정하세요.</p>}
