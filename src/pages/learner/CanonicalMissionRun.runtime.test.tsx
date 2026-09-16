@@ -48,7 +48,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     // v6 learners see the six-activity briefing first; no item content is shown before starting.
     const briefing = screen.getByRole("list", { name: "이번 미션의 활동" });
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(6);
-    expect(within(briefing).getByText("6. 새 상황 직접 번역")).toBeInTheDocument();
+    expect(within(briefing).getByText("6. 직접 번역하기")).toBeInTheDocument();
     expect(screen.queryByText(SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[0].source)).not.toBeInTheDocument();
     expect(screen.getByRole("list", { name: /미션 안내, 표현 판단/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /표현 판단 시작하기/ }));
