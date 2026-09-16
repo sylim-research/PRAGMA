@@ -7,12 +7,25 @@ import { approveContentReview, contentReviewRequest, saveProfessorDecisions, sav
 import { InstructorReviewExperience } from "./InstructorReviewExperience";
 import { experienceComplete } from "@/lib/pragma/instructorExperience";
 import { reviewTargetKey, startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
-import { CONTENT_APPROVAL_POLICY, effectiveReviewSteps, primaryReviewResult, generationQualityResult, professorReviewFindings, PROFESSOR_DECISION_LABELS, nextReviewStage, professorDecisionsComplete,
-  type InstructorExperience, type ModelReview, type ProfessorFindingDecision, type ReviewResult, type ReviewTarget } from "../../../supabase/functions/_shared/contentReview";
+import { CONTENT_APPROVAL_POLICY, BULK_SIGNAL_RATIONALE, effectiveReviewSteps, isBulkEligibleSignal, primaryReviewResult, generationQualityResult, professorReviewFindings, PROFESSOR_DECISION_LABELS, nextReviewStage, professorDecisionsComplete,
+  type InstructorExperience, type ReviewFinding, type ModelReview, type ProfessorFindingDecision, type ReviewResult, type ReviewTarget } from "../../../supabase/functions/_shared/contentReview";
 
 const verdictLabel = { pass: "보고된 문제 항목 없음", warning: "확인 필요", fail: "수정 검토 필요" };
 const decisionLabel = { accept: "수용", refine: "보완", reject: "기각" };
-type ProfessorDecisionDraft = { decision: ProfessorFindingDecision["decision"] | ""; rationale_ko: string };
+type ProfessorDecisionDraft = { decision: ProfessorFindingDecision["decision"] | ""; rationale_ko: string; mode?: ProfessorFindingDecision["mode"] };
+/** 초안 → 저장 형식. 묶음 확인으로 채운 항목만 mode를 실어 보낸다. */
+function toDecisions(findings: ReviewFinding[], drafts: Record<string, ProfessorDecisionDraft>): ProfessorFindingDecision[] {
+  return findings.flatMap((finding) => {
+    const draft = drafts[finding.id];
+    return draft?.decision ? [{ finding_id: finding.id, decision: draft.decision, rationale_ko: draft.rationale_ko.trim(), ...(draft.mode ? { mode: draft.mode } : {}) }] : [];
+  });
+}
+/** 신호 요약 — issue_ko 앞머리(R30/… 또는 R32:)에서 규칙 번호만 세어 「R30 ×2 · R32 ×1」로 만든다. */
+function signalSummary(findings: ReviewFinding[]): string {
+  const counts = new Map<string, number>();
+  findings.forEach((finding) => { const id = finding.issue_ko.split(/[/:]/)[0].trim() || finding.id; counts.set(id, (counts.get(id) ?? 0) + 1); });
+  return [...counts].map(([id, n]) => `${id} ×${n}`).join(" · ");
+}
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
   /** false면 바깥 테두리 상자를 그리지 않는다(이미 작업대 상자 안에 놓일 때). */
@@ -65,10 +78,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   const findings = professorReviewFindings(run);
   const primary = run ? primaryReviewResult(run) : null;
   const steps = effectiveReviewSteps(run);
-  const draftDecisions: ProfessorFindingDecision[] = findings.flatMap((finding) => {
-    const draft = decisionDrafts[finding.id];
-    return draft?.decision ? [{ finding_id: finding.id, decision: draft.decision, rationale_ko: draft.rationale_ko.trim() }] : [];
-  });
+  const draftDecisions = toDecisions(findings, decisionDrafts);
+  // 결정론적 신호는 묶어서 확인하고, AI 의미 지적은 항목별로 판정한다. 규칙 fail은 run을 막으므로 여기 오지 않는다.
+  const signalFindings = findings.filter(isBulkEligibleSignal);
+  const substantiveFindings = findings.filter((finding) => !isBulkEligibleSignal(finding));
+  // 이미 개별 결정(저장분·초안)이 있는 신호는 묶음 확인이 건드리지 않는다.
+  const pendingSignals = signalFindings.filter((finding) => !decisionDrafts[finding.id]?.decision);
   const decisionsDirty = findings.some((finding) => {
     const draft = decisionDrafts[finding.id];
     const saved = run?.professor_decisions.find((entry) => entry.finding_id === finding.id);
@@ -76,7 +91,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   });
   const decisionsClear = professorDecisionsComplete(findings, run?.professor_decisions ?? [], true) && !decisionsDirty;
   const updateDecision = (id: string, patch: Partial<ProfessorDecisionDraft>) => {
-    setDecisionDrafts((drafts) => ({ ...drafts, [id]: { decision: "", rationale_ko: "", ...drafts[id], ...patch } }));
+    // 손으로 고치면 그 항목은 묶음 확인이 아니라 개별 판정이 된다.
+    setDecisionDrafts((drafts) => ({ ...drafts, [id]: { decision: "", rationale_ko: "", ...drafts[id], ...patch, mode: undefined } }));
     setConfirmed(false);
   };
   const adopt = Boolean(run && !run.approved_at && !focused && state?.reusableGenerationQuality !== undefined);
@@ -97,14 +113,23 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     await saveInstructorExperience(current.run.id, current.contentHash, experience);
     await query.refetch();
   };
-  const saveDecisions = async () => {
-    if (!run || !state || next !== "professor" || !professorDecisionsComplete(findings, draftDecisions)) return;
+  const persistDecisions = async (decisions: ProfessorFindingDecision[]) => {
+    if (!run || !state || next !== "professor" || !professorDecisionsComplete(findings, decisions)) return;
     setBusy(true); setError(null);
     try {
-      await saveProfessorDecisions(run.id, state.contentHash, draftDecisions);
+      await saveProfessorDecisions(run.id, state.contentHash, decisions);
       await query.refetch();
     } catch (cause) { setError(cause instanceof Error ? cause.message : "교수자 판단 저장 실패"); }
     finally { setBusy(false); }
+  };
+  const saveDecisions = () => persistDecisions(draftDecisions);
+  /** 미결 신호만 「수정 없이 사용」으로 채운다. 판정이 전부 갖춰지면 바로 저장하고, AI 쟁점이 남았으면 초안으로 둔다. */
+  const confirmSignals = async () => {
+    if (pendingSignals.length === 0) return;
+    const filled = { ...decisionDrafts };
+    pendingSignals.forEach((finding) => { filled[finding.id] = { decision: "no_change", rationale_ko: BULK_SIGNAL_RATIONALE, mode: "bulk_signal" }; });
+    setDecisionDrafts(filled); setConfirmed(false);
+    await persistDecisions(toDecisions(findings, filled));
   };
   const runNext = async () => {
     setBusy(true); setError(null);
@@ -163,12 +188,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {primary && <ReviewFindings title={run.openai_review ? "OpenAI 검토" : "저장된 OpenAI 검토 재사용 · 추가 호출 없음"} result={primary} metadata={experiential ? undefined : run.openai_review ?? undefined} />}
         {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 단계 OpenAI 검토"result={generationQualityResult(run.generation_quality)} />}
         {run.claude_review && <ReviewFindings title="저장된 Claude 독립 검토"result={run.claude_review.result} metadata={experiential ? undefined : run.claude_review} />}
-        {findings.length > 0 && <details open={!experiential || undefined} className="space-y-3 rounded-lg border p-3">
-          <summary className="cursor-pointer font-semibold">교수자 판단이 필요한 문제 항목 ({findings.length}건)</summary>
-          <p>중대 문제 항목과 맥락 판단이 필요한 항목을 확인하세요. 일반 경고와 이전 검토 전문은 위에 보존됩니다.</p>
-          
-          
-          {findings.map((finding) => {
+        {findings.length > 0 && (() => {
+          const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
@@ -185,7 +206,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 {decision.evidence_quote && <blockquote className="mt-2 border-l-2 pl-2">{decision.evidence_quote}</blockquote>}
               </> : focused ? "추가 OpenAI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "OpenAI 재검토 전"}</div>
               <div className="space-y-2 rounded bg-amber-50 p-3">
-                {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}</strong><p>{saved?.rationale_ko}</p></>
+                {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}{saved?.mode === "bulk_signal" ? " (묶음 확인)" : ""}</strong><p>{saved?.rationale_ko}</p></>
                   : focused || run.adjudication ? <>
                     <label className="block text-xs font-semibold" htmlFor={`decision-${run.id}-${finding.id}`}>교수자 결정 · {finding.id}</label>
                     <select id={`decision-${run.id}-${finding.id}`} className="w-full rounded border bg-white p-2" value={draft?.decision ?? ""} disabled={busy}
@@ -195,19 +216,39 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     </select>
                     <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft?.rationale_ko ?? ""} disabled={busy}
                       onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
+                    {draft?.mode === "bulk_signal" && <p className="text-xs text-muted-foreground">묶음 확인으로 채워진 항목입니다. 결정이나 근거를 고치면 개별 판정이 됩니다.</p>}
                   </> : <p>OpenAI 재검토 후 교수자 결정을 기록합니다.</p>}
               </div>
             </div>;
-          })}
-          {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-          <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 Claude 독립 검토 의견도 보존합니다. OpenAI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
-          {next === "professor" && findings.length > 0 && <>
-            <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
-              || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장 · 무료</Button>
-            <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : professorDecisionsComplete(findings, run.professor_decisions) ? "교수자 판단이 현재 버전에 저장되어 있습니다." : "모든 문제 항목의 결정과 근거를 입력한 뒤 저장하세요."}</p>
-            <p className="text-xs">판단 저장은 승인이 아닙니다. ‘수정 필요’·‘판단 보류’가 남으면 최종 승인할 수 없습니다. 수정한 콘텐츠는 새 버전의 규칙·품질점검을 연결합니다. 추가 모델 전수 검토를 반복하지 않습니다.</p>
-          </>}
-        </details>}
+          };
+          const canDecide = next === "professor" && !run.approved_at && (focused || Boolean(run.adjudication));
+          return <div className="space-y-3">
+            {signalFindings.length > 0 && <section className="space-y-2 rounded-lg border p-3" aria-label="자동 품질 점검 신호">
+              <h4 className="text-[14px] font-bold text-[#233542]">자동 품질 점검 신호 {signalFindings.length}건</h4>
+              <p className="text-xs">규칙·정규식·집계로 잡힌 비차단 신호입니다 — {signalSummary(signalFindings)}. 묶어서 확인하거나, 필요한 항목만 열어 수정 필요·판단 보류로 바꿀 수 있습니다.</p>
+              {canDecide && (pendingSignals.length > 0
+                ? <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled} onClick={() => void confirmSignals()}>
+                    미결 자동 품질 점검 신호 {pendingSignals.length}건 확인 · 현재 버전 그대로 사용
+                  </Button>
+                : <p className="text-xs text-muted-foreground">모든 신호에 교수자 결정이 있습니다.</p>)}
+              <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
+                <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
+            </section>}
+            {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="의미 쟁점 판정">
+              <h4 className="text-[14px] font-bold text-[#233542]">의미 쟁점 판정 {substantiveFindings.length}건</h4>
+              <p className="text-xs">AI 검토가 근거를 들어 제기한 의미·화용·콘텐츠 쟁점입니다. 항목마다 교수자가 판정하고 근거를 남깁니다.</p>
+              {substantiveFindings.map(findingCard)}
+            </section>}
+            {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
+            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 Claude 독립 검토 의견도 보존합니다. OpenAI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
+            {next === "professor" && <>
+              <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
+                || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장 · 무료</Button>
+              <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : professorDecisionsComplete(findings, run.professor_decisions) ? "교수자 판단이 현재 버전에 저장되어 있습니다." : "모든 문제 항목의 결정과 근거를 입력한 뒤 저장하세요."}</p>
+              <p className="text-xs">판단 저장은 승인이 아닙니다. ‘수정 필요’·‘판단 보류’가 남으면 최종 승인할 수 없습니다. 수정한 콘텐츠는 새 버전의 규칙·품질점검을 연결합니다. 추가 모델 전수 검토를 반복하지 않습니다.</p>
+            </>}
+          </div>;
+        })()}
       </>}
       {decisionSlot}
       {state.dependencies.length > 0 &&<div className="rounded-lg border p-3"><h4 className="text-[14px] font-bold text-[#233542]">재사용 미션 해설</h4>

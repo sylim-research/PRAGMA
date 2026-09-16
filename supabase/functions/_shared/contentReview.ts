@@ -27,6 +27,8 @@ export const PROFESSOR_DECISION_LABELS = {
 } as const;
 export type ProfessorFindingDecision = {
   finding_id: string; decision: keyof typeof PROFESSOR_DECISION_LABELS; rationale_ko: string;
+  /** 결정론적 규칙 신호를 묶어서 확인한 결정. 개별로 판정한 결정에는 없다. */
+  mode?: "bulk_signal";
 };
 export type ReviewVerdict = "pass" | "warning" | "fail";
 export type ReviewResult = { verdict: ReviewVerdict; summary_ko: string; findings: ReviewFinding[] };
@@ -121,6 +123,16 @@ export function professorReviewFindings(run: ContentReviewRun | null): ReviewFin
   const generation = run.openai_review && run.generation_quality ? generationQualityResult(run.generation_quality).findings : [];
   return [...ruleSignals, ...primary, ...generation, ...(run.claude_review?.result.findings ?? [])]
     .filter(f => f.severity === "fail" || f.needs_professor || run.professor_decisions.some(d => d.finding_id === f.id));
+}
+/** 묶음 확인의 저장 문구. 교수자가 타이핑하지 않아도 결정의 성격이 기록에 남는다. */
+export const BULK_SIGNAL_RATIONALE = "자동 품질 점검 신호 묶음 확인 · 현재 버전 그대로 사용";
+/**
+ * 묶음 확인 대상 = 결정론적 규칙(rule-*)의 비차단 warning 신호. 규칙 fail은 계약 위반이라
+ * run 자체를 막고 이 목록에 오지 않지만, id만으로 분류하지 않도록 severity도 함께 본다.
+ * AI 검토(openai-*·claude-*·generation-*)는 의미 판단이라 대상이 아니다.
+ */
+export function isBulkEligibleSignal(finding: ReviewFinding): boolean {
+  return finding.id.startsWith("rule-") && finding.severity === "warning" && finding.needs_professor === true;
 }
 export function effectiveReviewSteps(run: ContentReviewRun | null) {
   const steps = CONTENT_REVIEW_STEPS.filter(s => s.key !== "finalization" || requiresReviewFinalization(run));

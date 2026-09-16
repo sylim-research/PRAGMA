@@ -2,7 +2,7 @@ import { webcrypto } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { buildContentReviewDomain } from "./contentReviewDomain";
-import { buildReviewPrompt, effectiveReviewSteps, instructionalMission, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
+import { BULK_SIGNAL_RATIONALE, buildReviewPrompt, effectiveReviewSteps, instructionalMission, isBulkEligibleSignal, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
@@ -109,6 +109,27 @@ describe("current content five-stage review", () => {
     }
     expect(professorDecisionsComplete([...audit.findings, { ...audit.findings[0], id: "claude-2" }], [decision, decision])).toBe(false);
     expect(professorDecisionsComplete([], [], true)).toBe(true);
+  });
+
+  it("treats only non-blocking rule signals as bundle-eligible", () => {
+    const base = { where: "", quote: null, issue_ko: "R32/unattributed_present: 확인", reason_ko: "이유",
+      suggestion_ko: "제안", problem_type_ko: "교수자 확인 신호", uncertainty_ko: "정규식·집계 기반 신호" };
+    expect(isBulkEligibleSignal({ ...base, id: "rule-1", severity: "warning", needs_professor: true })).toBe(true);
+    expect(isBulkEligibleSignal({ ...base, id: "rule-core-1", severity: "warning", needs_professor: true })).toBe(true);
+    // 계약 위반(fail)과 AI 의미 지적은 묶음 대상이 아니다.
+    expect(isBulkEligibleSignal({ ...base, id: "rule-2", severity: "fail", needs_professor: true })).toBe(false);
+    expect(isBulkEligibleSignal({ ...base, id: "rule-3", severity: "warning", needs_professor: false })).toBe(false);
+    for (const id of ["claude-1", "openai-1", "generation-1"]) {
+      expect(isBulkEligibleSignal({ ...base, id, severity: "warning", needs_professor: true })).toBe(false);
+    }
+  });
+
+  it("accepts a bundle decision as a cleared professor decision", () => {
+    const findings = [{ ...finding, id: "rule-1" }] as any;
+    const bundled = [{ finding_id: "rule-1", decision: "no_change" as const, rationale_ko: BULK_SIGNAL_RATIONALE, mode: "bulk_signal" as const }];
+    expect(BULK_SIGNAL_RATIONALE.trim().length).toBeGreaterThanOrEqual(10);
+    expect(professorDecisionsComplete(findings, bundled, true)).toBe(true);
+    expect(professorDecisionsComplete(findings, [{ ...bundled[0], decision: "defer" }], true)).toBe(false);
   });
 
   it("hashes instructional changes but not finalization metadata or object key order", async () => {
