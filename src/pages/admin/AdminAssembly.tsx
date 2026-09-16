@@ -335,7 +335,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       setReviewMeta(meta);
       setRows(loaded);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "시나리오를 불러오지 못했습니다.");
+      console.error("[admin] 목록 조회 실패", cause);
+      setError("목록을 불러오지 못했습니다.");
     } finally {
       if (timeoutId) clearTimeout(timeoutId);
       setLoading(false);
@@ -761,7 +762,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0 [&>span]:flex-nowrap">{badges(r, "sm")}</span>
-              <p className="min-w-0 truncate text-[11.5px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
+              <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
                 {metaLine.filter(Boolean).join(" · ")}
               </p>
             </div>
@@ -903,7 +904,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
       ) : error ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
-          <p>조회 실패: {error} 관리자 로그인 상태를 확인해 주세요.</p>
+          <p>{error} 관리자 로그인 상태를 확인해 주세요.</p>
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
@@ -923,7 +924,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             )}
             <div className="space-y-1.5 border-b border-[#E2DED2] px-2.5 py-2">
               {rows.length >= ROW_CAP && (
-                <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-2 py-1 text-[11.5px] text-[#92400E]">
+                <p className="rounded-md border border-[#FCD34D] bg-[#FEF3C7] px-2 py-1 text-[12px] text-[#92400E]">
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
@@ -961,7 +962,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   aria-label="정렬"
                   value={sortOrder}
                   onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-                  className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[11.5px] text-[#46515A]"
+                  className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[12px] text-[#46515A]"
                 >
                   {reviewMode
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
@@ -977,7 +978,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                       openFilter === key ? "border-[#233542] bg-white text-[#233542]" : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
                     ].join(" ")}>
                     <span className="truncate">{label}</span>
-                    {active && <span className="shrink-0 rounded bg-[#F6EDD0] px-1 text-[10.5px] text-[#8A6B24]">적용</span>}
+                    {active && <span className="shrink-0 rounded bg-[#F6EDD0] px-1 text-[11px] text-[#8A6B24]">적용</span>}
                     <span aria-hidden className="shrink-0 text-[#8C969B]">{openFilter === key ? "▴" : "▾"}</span>
                   </button>
                 ))}
@@ -1031,7 +1032,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                       {badges(r, "sm")}
                       <span className="line-clamp-2 block text-[13px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
                       {meta.length > 0 && (
-                        <span className="block truncate text-[11px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
+                        <span className="block truncate text-[12px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
                       )}
                     </button>
                   </li>
@@ -1063,7 +1064,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     target: { kind: "mission" as const, targetId: row.scenario_id },
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
                   })))}>{reviewSelection.size}건 감수 자료 준비</Button>
-                <p className="text-[11px] text-muted-foreground">저장 결과 재사용 · 없을 때만 유료 AI 검토</p>
+                <p className="text-[12px] text-muted-foreground">저장 결과 재사용 · 없을 때만 유료 AI 검토</p>
               </div>
             )}
             {!reviewMode && (
@@ -1136,7 +1137,7 @@ const AxisSel = ({
 }) => (
   <label className="rounded-md border border-[#E1E5E6] bg-white p-2">
     <span className="mb-1.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-[#34444D]">
-      <span className="flex size-4.5 items-center justify-center rounded-full bg-[#E7ECEE] text-[10.5px] text-[#53656F]">{index}</span>
+      <span className="flex size-4.5 items-center justify-center rounded-full bg-[#E7ECEE] text-[11px] text-[#53656F]">{index}</span>
       {label}
     </span>
     <SelectField value={value} onChange={onChange} opts={opts} />
@@ -1169,7 +1170,7 @@ const AssemblyProgressView = ({
   return (
     <div className="min-w-0 rounded-md bg-[#F1F4F5] px-3 py-2" aria-live="polite">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-[11.5px] font-semibold text-[#233542]">{progressLabel(stage)}</span>
+        <span className="text-[12px] font-semibold text-[#233542]">{progressLabel(stage)}</span>
       </div>
       <ol className="mt-1.5 grid grid-cols-5 gap-1.5">
         {PROGRESS_STEPS.map((label, index) => {
@@ -1184,7 +1185,7 @@ const AssemblyProgressView = ({
                 ].join(" ")}
               />
               <span className={[
-                "mt-1 block truncate text-[10px]",
+                "mt-1 block truncate text-[11px]",
                 isActive ? "font-semibold text-[#233542]" : isDone ? "text-[#53656F]" : "text-[#98A1A6]",
               ].join(" ")}>{label}</span>
             </li>

@@ -210,7 +210,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </details>}
       </>}
       {decisionSlot}
-      {state.dependencies.length > 0 &&<div className="rounded-lg border p-3"><h4 className="font-semibold">재사용 미션 해설</h4>
+      {state.dependencies.length > 0 &&<div className="rounded-lg border p-3"><h4 className="text-[14px] font-bold text-[#233542]">재사용 미션 해설</h4>
         <p className="mt-1 text-xs">주차 자료 승인 전 연결 미션의 현재 버전 승인도 완료해야 합니다. 같은 해설을 출력 형식별로 중복 검토하지 않습니다.</p>
         <ul className="mt-2 space-y-1">{state.dependencies.map((item, index) => <li key={item.id}><Link className="underline" to={`/admin/review?scenarioId=${item.id}`}>미션 {index + 1} 승인 확인</Link> · {item.approved ? "현재 버전 승인" : "승인 필요"}</li>)}</ul>
       </div>}
@@ -232,7 +232,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           : <div className="rounded-lg border p-3">{body}</div>;
       })()}
       {next === "professor" && !handoffHref && <div className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
-        <h4 className="font-semibold">{experiential ? "③ 교수자 최종 승인" : "교수자 최종 승인"}</h4>
+        <h4 className="text-[14px] font-bold text-[#233542]">{experiential ? "③ 교수자 최종 승인" : "교수자 최종 승인"}</h4>
         {experiential && <p className="text-xs text-muted-foreground">감수를 마친 <b>이 버전</b>에 수업 사용·학습자 공개 자격을 부여하는 결정입니다. 내용을 다시 고치면 새 버전이 되어 점검과 승인을 다시 거칩니다.</p>}
         <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
