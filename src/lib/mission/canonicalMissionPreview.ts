@@ -286,7 +286,7 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
       options: APPROPRIATENESS_4,
       referenceAnswer: "somewhat_inappropriate",
       acceptedAnswers: ["somewhat_inappropriate", "very_inappropriate"],
-      feedback: "내용은 전달되지만 请给我写는 추천서 작성을 직접 요구합니다. 부담이 큰 부탁인데 가능 여부나 선택할 여지를 충분히 남기지 못했습니다.",
+      feedback: "내용은 전달되지만 请给我写는 추천서 작성을 직접 요구합니다. 부담이 큰 부탁인데 가능 여부나 선택할 여지를 충분히 남기지 못했습니다.\n표현 메모\n· `一封推荐信` — 추천서·편지는 양사 `封`으로 셉니다.\n· `下周五之前` — 「다음 주 금요일까지」라는 기한 표현입니다.",
     },
     {
       id: "A2",
@@ -307,7 +307,7 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
       prompt: "이 번역안은 이 상황에 맞나요?",
       options: DIRECTNESS_3,
       referenceAnswer: "appropriate",
-      feedback: "有点冷으로 이유를 먼저 말하고 吧로 직접형의 강도를 낮췄습니다. 친밀하고 부담이 낮은 상황에서는 간결한 직접형도 자연스럽습니다.",
+      feedback: "有点冷으로 이유를 먼저 말하고 吧로 직접형의 강도를 낮췄습니다. 친밀하고 부담이 낮은 상황에서는 간결한 직접형도 자연스럽습니다.\n표현 메모\n· `有点冷` — 「좀 춥다」처럼 정도를 낮춰 말하는 표현입니다.",
     },
     {
       id: "A3",
