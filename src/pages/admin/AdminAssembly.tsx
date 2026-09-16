@@ -1030,7 +1030,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     <button type="button" className="min-w-0 flex-1 space-y-0.5 text-left" aria-current={selected ? "true" : undefined}
                       onClick={() => { selectRow(r); if (professorScreen) setQueueOpen(false); }}>
                       {badges(r, "sm")}
-                      <span className="line-clamp-2 block text-[13px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
+                      <span className="line-clamp-2 block text-[14px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
                       {meta.length > 0 && (
                         <span className="block truncate text-[12px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
                       )}
