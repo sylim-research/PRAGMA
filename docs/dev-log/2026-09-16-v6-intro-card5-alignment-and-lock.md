@@ -39,7 +39,16 @@
 - `CanonicalMissionRun.runtime.test.tsx`(18) · `InstructorReviewExperience.test.tsx`(12) 통과.
 - 전체 단위 테스트 · `npm run build` 통과.
 
-## SCREEN LOCK
+## SCREEN LOCK (잠정)
 
-v6 학습자 도입 화면(`SceneIntroFlow` / `v6IntroSteps`)을 LOCK한다.
-이후 여는 조건 = blocker · 기능 오류 · 오탈자 · 논문/정본 불일치. 그 외 수정 금지.
+v6 학습자 도입 화면(`SceneIntroFlow` / `v6IntroSteps`)을 **잠정 LOCK**한다.
+지금 여는 조건 = blocker · 기능 오류 · 오탈자 · 논문/정본 불일치. 그 외 수정 금지.
+
+**final LOCK은 2026-09-19 Codex 검수 뒤에 선언한다.** 그때까지는 취향·미화 수정을 하지 않되,
+검수 결과에 따른 변경은 가능한 상태로 둔다.
+
+## 제목 표기 후속 (2026-09-16)
+
+`docs/CANONICAL.md`의 미션 구조 약칭 규칙을 완화했다. 간결하게 지칭할 때는 `MJT5+DCT1`을
+쓸 수 있고, 정식 서술과 표·도식 캡션에만 표준 표현을 쓴다. 이에 따라
+`docs/contracts/PRAGMA_생성계약_정본.md`의 기존 `MJT5+DCT1` 표기 8곳은 수정 대상이 아니다.
