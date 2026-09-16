@@ -37,6 +37,20 @@ import CanonicalMissionRun, {
   shouldPersistMissionAttempt,
 } from "@/pages/learner/CanonicalMissionRun";
 
+describe("demo route", () => {
+  it("runs the v6 sample without reading a saved mission, so approval and assignment do not gate it", () => {
+    window.scrollTo = vi.fn();
+    render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
+    const briefing = screen.getByRole("list", { name: "이번 미션의 활동" });
+    expect(within(briefing).getAllByRole("listitem")).toHaveLength(6);
+    expect(within(briefing).getByText("1. 상황에 맞는지 판단하기")).toBeInTheDocument();
+    expect(within(briefing).getByText("6. 직접 번역하기")).toBeInTheDocument();
+    expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
+    expect(fetchMissionByScenario).not.toHaveBeenCalled();
+    expect(appendMissionEvent).not.toHaveBeenCalled();
+  });
+});
+
 describe("CanonicalMissionRun live CTA route", () => {
   it("opens an actual v6 runtime with no responses and keeps save validation strict", () => {
     window.scrollTo = vi.fn();

@@ -7,7 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { seedIfEmpty } from "./lib/learningSessions";
 import { IS_DEMO } from "./lib/auth/useProfile";
-import { REPRESENTATIVE_MISSION_SCENARIO_ID } from "./lib/demo/representativeMission";
 
 const RequireApproved = lazy(() => import("./components/RequireApproved"));
 const RequireAdmin = lazy(() => import("./components/RequireAdmin"));
@@ -88,7 +87,7 @@ const App = () => (
             path="/demo/mission"
             element={
               IS_DEMO
-                ? <RequireApproved><CanonicalMissionRun scenarioId={REPRESENTATIVE_MISSION_SCENARIO_ID} demoMode /></RequireApproved>
+                ? <RequireApproved><CanonicalMissionRun demoMode /></RequireApproved>
                 : <Navigate to="/" replace />
             }
           />
