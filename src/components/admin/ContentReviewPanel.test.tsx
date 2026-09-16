@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ContentReviewPanel } from "./ContentReviewPanel";
-import { CONTENT_REVIEW_VERSION, type ModelReview, type ProfessorFindingDecision, type ReviewInspection, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
+import { BULK_SIGNAL_RATIONALE, CONTENT_REVIEW_VERSION, type ModelReview, type ProfessorFindingDecision, type ReviewFinding, type ReviewInspection, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 
 const mocks = vi.hoisted(() => ({ inspect: vi.fn(), save: vi.fn(), approve: vi.fn() }));
 vi.mock("@/lib/pragma/contentReviewApi", () => ({ contentReviewRequest: mocks.inspect, saveProfessorDecisions: mocks.save, approveContentReview: mocks.approve }));
@@ -14,6 +14,14 @@ const finding = { id: "claude-1", severity: "warning" as const, where: "/content
 const rationale = "행사 참여가 자율적인 상황임을 확인했습니다.";
 const metadata = <T,>(result: T): ModelReview<T> => ({ result, provider: "openai", model: "fixture-model", requested_model: "fixture-model",
   response_id: "fixture", usage: {}, checked_at: "2026-08-27", prompt_version: CONTENT_REVIEW_VERSION, input_hash: "input" });
+const signal = (id: string, rule: string, severity: "warning" | "fail" = "warning"): ReviewFinding => ({
+  id, severity, where: "", quote: null, issue_ko: `${rule}: 교수자가 우선 확인할 신호`, reason_ko: "자동 규칙의 신호",
+  suggestion_ko: "자동 규칙의 신호입니다. 실제 위반인지 교수자가 판단하세요.", problem_type_ko: "교수자 확인 신호",
+  needs_professor: true, uncertainty_ko: "정규식·집계 기반 신호이며 의미 판단이 아닙니다." });
+/** 규칙 신호를 현재 run에 실어 준다. 기본 fixture는 신호 없이 Claude 지적 1건만 있다. */
+function withSignals(...findings: ReviewFinding[]) {
+  inspection.run!.rules = { verdict: "warning", summary_ko: "규칙 신호", findings };
+}
 let inspection: ReviewInspection;
 
 beforeEach(() => {
@@ -130,5 +138,86 @@ describe("professor finding decisions", () => {
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
     expect(await screen.findByText(`AI 검토의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
+  });
+});
+
+describe("automated quality signals", () => {
+  const bundleButton = (count: number) => screen.findByRole("button", { name: `미결 자동 품질 점검 신호 ${count}건 확인 · 현재 버전 그대로 사용` });
+  const setDecision = (id: string, decision: ProfessorFindingDecision["decision"], rationale_ko: string) => {
+    fireEvent.change(screen.getByRole("combobox", { name: `교수자 결정 · ${id}` }), { target: { value: decision } });
+    fireEvent.change(screen.getByRole("textbox", { name: `교수자 판단 근거 · ${id}` }), { target: { value: rationale_ko } });
+  };
+
+  it("bundles pending signals in one decision but still blocks approval on the AI finding", async () => {
+    withSignals(signal("rule-1", "R30"), signal("rule-2", "R30"), signal("rule-3", "R32"));
+    showPanel();
+    // 요약은 규칙 번호로 묶어서 보여 준다.
+    expect(await screen.findByText(/R30 ×2 · R32 ×1/)).toBeInTheDocument();
+    fireEvent.click(await bundleButton(3));
+    await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
+    // AI 의미 지적이 미결이라 저장도 승인도 되지 않는다.
+    expect(mocks.save).not.toHaveBeenCalled();
+    expect(screen.getByText("저장하지 않은 판단이 있습니다.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
+  });
+
+  it("approves once the bundled signals and the AI finding are both decided", async () => {
+    withSignals(signal("rule-1", "R32"));
+    showPanel();
+    fireEvent.click(await bundleButton(1));
+    await waitFor(() => expect(screen.getByRole("combobox", { name: "교수자 결정 · claude-1" })).toBeInTheDocument());
+    setDecision("claude-1", "no_change", rationale);
+    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    expect(mocks.save).toHaveBeenLastCalledWith("review-1", "hash-current", [
+      { finding_id: "rule-1", decision: "no_change", rationale_ko: BULK_SIGNAL_RATIONALE, mode: "bulk_signal" },
+      { finding_id: "claude-1", decision: "no_change", rationale_ko: rationale },
+    ]);
+    fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: "원본과 신호를 확인하여 수업 사용을 판단함" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
+    fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
+    await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText(/교수자 · 수정 없이 사용 가능 \(묶음 확인\)/)).toBeInTheDocument();
+  });
+
+  it("lets a bundled signal be reopened as an individual decision that blocks approval", async () => {
+    withSignals(signal("rule-1", "R30"), signal("rule-2", "R32"));
+    showPanel();
+    fireEvent.click(await bundleButton(2));
+    await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
+    setDecision("rule-2", "defer", "수업 맥락을 더 확인한 뒤 판단합니다.");
+    setDecision("claude-1", "no_change", rationale);
+    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    // 되돌린 항목은 묶음 표식 없이 개별 판정으로 저장된다.
+    expect(mocks.save).toHaveBeenLastCalledWith("review-1", "hash-current", expect.arrayContaining([
+      { finding_id: "rule-2", decision: "defer", rationale_ko: "수업 맥락을 더 확인한 뒤 판단합니다." },
+    ]));
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
+    expect(mocks.approve).not.toHaveBeenCalled();
+  });
+
+  it("keeps a blocking rule finding out of the bundle", async () => {
+    withSignals(signal("rule-1", "R30"), signal("rule-2", "R31", "fail"));
+    showPanel();
+    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
+    await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
+    // 계약 위반은 묶이지 않고 개별 판정 자리에 남는다.
+    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-2" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
+  });
+
+  it("never overwrites a decision the professor already made", async () => {
+    withSignals(signal("rule-1", "R30"), signal("rule-2", "R32"));
+    inspection.run!.professor_decisions = [{ finding_id: "rule-1", decision: "defer", rationale_ko: "현장 확인 뒤 판단합니다." }];
+    showPanel();
+    // 이미 결정된 1건은 대상에서 빠진다.
+    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
+    await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
+    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-1" })).toHaveValue("defer");
+    expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-1" })).toHaveValue("현장 확인 뒤 판단합니다.");
+    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-2" })).toHaveValue("no_change");
+    expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-2" })).toHaveValue(BULK_SIGNAL_RATIONALE);
   });
 });

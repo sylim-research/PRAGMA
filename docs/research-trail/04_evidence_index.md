@@ -492,3 +492,12 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - Claude 독립 검토는 최초 자동 승인 거절 후, 사용자의 명시적 13개 파일 diff 단독 전송 승인으로 2026-09-14 21:42 KST 완료했다. Claude Code 도구 0개·자동 문서/MCP/메모리/hooks 비활성 상태에서 1턴 실행했다. 원문·전송 hash·제한 조건은 위 dev-log의 「제한된 Claude 독립 검토 완료」에서 추적한다. diff에서 차단급 결함은 입증되지 않았고, 미완성 응답의 저장 호출 가능성은 미확인 조건부 우려로 남았다. 실제 저장/재조회나 운영 E2E 완료의 증거는 아니다.
 - 최신 main 통합본 `cde595cc`에서는 전체 Vitest 943 pass/9 skip, 타입 검사·운영 빌드도 통과했다. 로그 위치와 앞선 문서 기대값 실패·UI 대기 만료 재검증은 위 dev-log에 명시했다. 운영 사용자 대상 실험·DB round-trip의 증거는 아니다.
 - 2026-09-14 추가 호출경로 검토: Claude **PASS**, 정상 UI에서 미완성 MJT가 마지막 DCT 저장 serializer까지 도달하는 경로는 입증되지 않음. `.tmp/v6-e2e/supplemental-review-result.md`/`.json` 및 `supplemental-review-execution.json`이 원문·실행 근거다. 같은 dev-log의 「추가 호출경로 독립 검토 완료」에 전송 hash, 준비 발췌 누락 복원, 격리 검사, 수용한 결론과 기각한 serializer catch 설명을 기록했다. 제품 코드 변경·테스트 재실행 없음. 로컬 정적 독립 검토 완료의 증거이며 운영 E2E 0/3·DB 저장/재조회 미검증 상태는 유지한다.
+
+## EVD-20260916-01 · 검수 게이트 묶음 확인의 구현과 read-only 운영 확인
+
+- DEC-20260916-01·ITER-20260916-01의 근거다. 구현 커밋 `b615072c`, PR #178. 변경은 4파일 +193/−30이며 `supabase/functions/_shared/contentReview.ts`(+12: `mode:"bulk_signal"` 선택 필드, `BULK_SIGNAL_RATIONALE`, `isBulkEligibleSignal()`), `src/components/admin/ContentReviewPanel.tsx`(+97/−30), 테스트 2파일(+114)이다. migration·RPC·Edge Function 변경 0건.
+- 마찰의 출처를 코드에서 특정했다. `src/lib/pragma/contentReviewDomain.ts:60`이 규칙 warning을 모두 `needs_professor: true`로 승격하고, `supabase/functions/_shared/contentReview.ts:241-247`의 승인 게이트가 `requireClear=true`와 10자 이상 `rationale_ko`를 동시에 요구한다. 미션 1건당 최소 인터랙션 14회는 8섹션 확인 8 + 문제 항목당 3 + 승인 3으로 계수했다.
+- 묶음 대상 판정은 id 접두만으로 하지 않는다. `rule-` 접두 **그리고** `severity === "warning"` **그리고** `needs_professor === true`를 함께 본다. 계약 위반(`fail`)이 묶음에 섞이지 않는지, 이미 저장·입력된 개별 결정이 보존되는지는 각각 전용 테스트로 확인했다.
+- 자동 검증: `npm run typecheck`, `npm run build`, 단위 테스트 991 pass / 9 skip. 신규 7건 = 패널 5(묶음 후에도 AI 지적 미결이면 승인 잠김 / 둘 다 판정하면 승인 / 묶음 항목을 보류로 되돌리면 재잠금 / 규칙 fail은 묶음 제외 / 기존 결정 미덮어쓰기) + 단위 2(eligibility predicate, 묶음 결정의 완결성 통과).
+- 운영 데이터 read-only 확인(2026-09-16, localhost, 관리자 세션은 연구자가 직접 생성): 대기 미션 3건을 열람했고 쓰기 동작은 0건이다. 신호 3건 미션에서 「자동 품질 점검 신호 3건」 블록·요약 `R30 ×2 · R32 ×1`·「미결 … 3건 확인」 버튼·상세 열람 내부의 항목별 판정 select 3개(`rule-1`·`rule-2`·`rule-core-1`)를 확인했다. 신호 0건 미션에서는 블록이 렌더되지 않았고, 8섹션(「확인 0 · 수정 요청 0 · 미확인 8」)과 ③ 교수자 최종 승인 영역(설명·게이트 문구·근거 입력·체크박스·비활성 버튼)은 그대로였다.
+- 한계: 표본 3건 모두 AI 검토 findings가 0건이라 「의미 쟁점 판정」 블록의 실데이터 렌더는 확인하지 못했다. 기존 개별 판정의 보존도 그 상태를 만들려면 저장이 필요해 화면으로 확인하지 않았다. 두 항목은 테스트 근거이며 운영 화면 증거가 아니다. 묶음 확인 버튼의 실제 클릭·저장도 이 시점에는 실행하지 않았다.
