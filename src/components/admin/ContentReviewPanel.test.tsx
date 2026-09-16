@@ -89,6 +89,20 @@ describe("professor finding decisions", () => {
     expect(mocks.approve).not.toHaveBeenCalled();
   });
 
+  it("approves with a recorded default rationale when the professor types nothing", async () => {
+    showPanel();
+    fireEvent.change(await screen.findByRole("combobox", { name: "교수자 결정 · claude-1" }), { target: { value: "no_change" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" }), { target: { value: rationale } });
+    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장 · 무료" }));
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    // 승인 근거를 비워 둔 채 확인 체크만 하고 승인한다 — 타이핑 없이 승인이 열려야 한다.
+    fireEvent.click(screen.getByRole("checkbox", { name: "현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다." }));
+    const approve = screen.getByRole("button", { name: "교수자 최종 승인" });
+    expect(approve).toBeEnabled();
+    fireEvent.click(approve);
+    await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ professorNote: "현재 버전을 수업에 사용합니다." })));
+  });
+
   it("requires saved clear decisions and then locks the approved decision", async () => {
     showPanel();
     await enterDecision("no_change");
