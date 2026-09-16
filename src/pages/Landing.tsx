@@ -9,8 +9,11 @@ import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 // 화살표는 hover에서 진행 방향으로 살짝 미끄러진다. 카드가 통째로 떠오르는 동작은
 // "이 카드가 반응한다"까지만 말하고, 화살표의 이동이 "누르면 저쪽으로 간다"를 말한다.
 const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
-const defenseLink =
-  "group inline-flex w-[178px] items-center justify-center gap-2 rounded-lg border-[1.5px] border-[#15202B] bg-white px-3 py-2.5 text-[13.5px] font-bold text-[#15202B] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#FFFDF4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+// 보조 이동은 두 역할 카드보다 한 단계 아래로 읽혀야 한다 — 테두리를 카드와 같은
+// 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
+// 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
+const secondaryLink =
+  "group inline-flex min-w-[180px] items-center justify-center gap-2 rounded-lg border border-[#C4BCA8] bg-white px-4 py-[9px] text-[13.5px] font-semibold text-[#2F3D48] shadow-sm transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 const Landing = () => {
   useEffect(() => {
@@ -62,7 +65,7 @@ const Landing = () => {
           </h1>
 
           {/* break-keep — 없으면 낱말 중간에서 줄이 끊긴다. */}
-          <p className="mx-auto mt-5 max-w-[620px] break-keep text-[15.5px] leading-relaxed text-muted-foreground sm:text-[16.5px]">
+          <p className="mx-auto mt-4 max-w-[620px] break-keep text-[15.5px] leading-relaxed text-muted-foreground sm:text-[16.5px]">
             {/* 의미 단위 2행. 각 행이 max-w를 넘지 않아야 짧은 꼬리 줄이 생기지 않는다(2026-08-06 실측). */}
             <span className="block">
               PRAGMA는 한·중 통번역에서 원문의 의미는 유지하면서 상황과 관계에 맞게
@@ -78,7 +81,7 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        <section className="mt-6 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="mt-5 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
             className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
@@ -128,13 +131,13 @@ const Landing = () => {
           </Link>
         </section>
 
-        {/* 디펜스 진입점. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
+        {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
             학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
         {IS_DEMO && (
-          <section className="mt-6 flex flex-wrap items-center justify-center gap-3" aria-label="디펜스 시연">
+          <section className="mt-6 flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to="/architecture"
-              className={defenseLink}
+              className={secondaryLink}
             >
               <Network aria-hidden size={17} strokeWidth={1.9} className="text-[#5C6A7A]" />
               통합 구조 보기
@@ -142,10 +145,10 @@ const Landing = () => {
             </Link>
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
-              className={defenseLink}
+              className={secondaryLink}
             >
               <Play aria-hidden size={16} strokeWidth={1.6} className="fill-[#3E4C57] text-[#3E4C57]" />
-              대표 미션 시연
+              대표 미션 살펴보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
             </Link>
           </section>
