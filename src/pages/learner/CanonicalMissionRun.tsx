@@ -210,18 +210,46 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
   );
 }
 
-/** v6 미션 시작 전 안내 카드. 핵심 정리는 독립 과제가 아니라 DCT로 넘어가는 전환이라 6번 카드에 함께 적는다. */
+/** v6 미션 시작 전 안내. 다섯 판단 활동을 먼저 훑고, 마지막 직접 산출이 이 미션의 목적지다. */
 function v6IntroSteps(outputName: string) {
-  const interpreting = outputName === "통역";
-  return [
-    { title: "상황에 맞는지 판단하기", body: "제시된 표현이 지금 상황과 관계에 얼마나 잘 맞는지 판단합니다." },
-    { title: "판단하고 이유 고르기", body: "먼저 판단한 뒤, 가장 큰 이유를 하나 고릅니다. 이유를 본 뒤 판단을 바꿀 수도 있습니다." },
-    { title: "고친 표현 고르기", body: "세 수정안 가운데 원문의 핵심 의미와 화행 목적을 지킨 표현을 고릅니다." },
-    { title: "직접 고치고 비교하기", body: "표현을 직접 고쳐 봅니다. 상황 조건이 달라지면 표현이 어떻게 달라질 수 있는지도 비교합니다." },
-    { title: "여러 표현 비교하기", body: "네 표현을 하나씩 보고 너무 직접적 · 상황에 맞음 · 지나치게 우회적 가운데 하나로 판단합니다." },
-    { title: `직접 ${outputName}하기`,
-      body: `새로운 상황의 ${interpreting ? "원발화를 직접 통역합니다" : "원문을 직접 번역합니다"}. AI 피드백을 확인하고 최종안을 정합니다.` },
-  ];
+  return {
+    judgment: [
+      "상황에 맞는지 판단하기",
+      "판단하고 이유 고르기",
+      "고친 표현 고르기",
+      "직접 고치고 비교하기",
+      "여러 표현 비교하기",
+    ],
+    production: {
+      // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
+      title: outputName === "통역" ? "다른 상황의 원발화를 직접 통역하기" : "다른 상황의 원문을 직접 번역하기",
+      body: "AI 피드백을 확인하고 최종안을 정합니다.",
+    },
+  };
+}
+
+/** 활동 수를 세지 않고 순서만 보여 준다 — 다섯 판단 뒤에 직접 산출이 온다는 흐름이 배치로 드러나게. */
+function V6IntroOutline({ outputName }: { outputName: string }) {
+  const steps = v6IntroSteps(outputName);
+  return (
+    <div className="space-y-5">
+      <section>
+        <h2 className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">표현 판단</h2>
+        <ol className="mt-2 space-y-1.5" aria-label="표현 판단 활동">
+          {steps.judgment.map((title) => (
+            <li key={title} className="break-keep rounded-xl bg-[#F8F6EE] px-4 py-3 font-bold">{title}</li>
+          ))}
+        </ol>
+      </section>
+      <section aria-label={`직접 ${outputName} 활동`}>
+        <h2 className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">직접 {outputName}</h2>
+        <div className="mt-2 rounded-xl bg-[#F8F6EE] px-4 py-3">
+          <p className="break-keep font-bold">{steps.production.title}</p>
+          <p className="mt-1 break-keep text-sm leading-6 text-[#596579]">{steps.production.body}</p>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
@@ -234,14 +262,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
       <div className="space-y-5 p-5 sm:p-6">
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
-          <ol className="grid gap-3 sm:grid-cols-2 md:grid-cols-3" aria-label="이번 미션의 활동">
-            {v6IntroSteps(config.outputName).map((step, index) => (
-              <li key={step.title} className="rounded-xl bg-[#F8F6EE] p-4">
-                <h2 className="break-keep font-bold">{index + 1}. {step.title}</h2>
-                <p className="mt-1 break-keep text-sm leading-6 text-[#596579]">{step.body}</p>
-              </li>
-            ))}
-          </ol>
+          <V6IntroOutline outputName={config.outputName} />
         ) : (
           <ol className="grid gap-3 sm:grid-cols-2">
             <li className="rounded-xl bg-[#F8F6EE] p-4">
@@ -530,10 +551,14 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   const [firstPick, setFirstPick] = useState<string | null>(null);
   const reconsidering = Boolean(quest.reasonChoice && judgmentCommitted && !answered && reasonId);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
-  const acceptedLabel = quest.options
-    .filter((option) => acceptedIds.includes(option.id))
-    .map((option) => option.label)
-    .join(" ~ ");
+  // 대표 판정은 하나다. 같은 방향의 인접 응답도 허용 범위라는 사실은 **답한 뒤에만** 알린다
+  // (답하기 전에 알리면 4점 판단 자체를 무력화한다).
+  const referenceLabel = quest.options.find((option) => option.id === quest.referenceAnswer)?.label ?? "";
+  const alsoAcceptedLabels = quest.options
+    .filter((option) => acceptedIds.includes(option.id) && option.id !== quest.referenceAnswer)
+    .map((option) => option.label);
+  const scaleVerdict = `대표 판정: ${referenceLabel}`
+    + (alsoAcceptedLabels.length ? ` · ${alsoAcceptedLabels.join("·")}도 가능한 판단입니다.` : "");
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
@@ -554,7 +579,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {answered && reasonId && <p className="mt-4 text-sm leading-6 text-[#596579]">
           내 판단 이유 · {quest.reasonChoice?.options.find(option => option.id === reasonId)?.label}
         </p>}
-        {answered && <div className="mt-4"><FeedbackBox verdict={`권장 답안 · 이 상황에서는 ${acceptedLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
+        {answered && <div className="mt-4"><FeedbackBox verdict={scaleVerdict} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
         {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
           <h4 className="font-bold">가능한 수정 예시</h4>
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
@@ -684,6 +709,9 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
 function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
   const [draft, setDraft] = useState(quest.target);
   const [submitted, setSubmitted] = useState(false);
+  // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
+  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락 → 표현 메모.
+  const { paragraphs, memo } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
       <h3 className="text-base font-bold">{quest.prompt}</h3>
@@ -693,9 +721,11 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
         <Textarea id="free-correction-draft" className="font-zh mt-3 text-base leading-8" rows={3} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
         <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
       </div>
-      {submitted && <section className="mt-5 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="자유교정 참고 표현">
+      {submitted && <section className="mt-5 space-y-3" aria-label="화용 해설">
+        {paragraphs.map(line => <p key={line} className="text-sm leading-6">{line}</p>)}
+      </section>}
+      {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="자유교정 참고 표현">
         <h4 className="font-bold">이렇게도 고칠 수 있어요</h4>
-        <p className="text-sm leading-6">{quest.feedback}</p>
         {quest.references.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
         <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 표현입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
       </section>}
@@ -704,6 +734,12 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
         <p className="text-sm leading-6">{quest.contrast.context}</p>
         <p className="font-zh text-base leading-7">{quest.contrast.target}</p>
         <p className="text-sm leading-6 text-[#596579]">{quest.contrast.explanation}</p>
+      </section>}
+      {submitted && memo.length > 0 && <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label={EXPRESSION_MEMO_LABEL}>
+        <h4 className="font-bold">{EXPRESSION_MEMO_LABEL}</h4>
+        <ul className="space-y-1.5">
+          {memo.map(line => <li key={line} className="text-sm leading-6 text-[#596579]">{line}</li>)}
+        </ul>
       </section>}
     </section>
     <ActionBar>
@@ -1598,7 +1634,7 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
       )}
       {quest.id === "A1" && <p className="px-1 text-sm leading-6 text-[#596579]">먼저 여러 상황에서 표현을 판단합니다. 다섯 문항을 마치면 새로운 상황에서 직접 옮겨 봅니다.</p>}
       {pilotContext === undefined ? <ContextCard context={quest.context} />
-        : pilotContext && <p className="px-1 text-sm leading-6 text-[#596579]">{pilotContext}</p>}
+        : pilotContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{pilotContext}</p>}
       {quest.kind !== "dct" && <LanguagePair source={quest.source} target={target} targetHighlights={targetHighlights} />}
       {children}
     </div>
@@ -1791,6 +1827,25 @@ export function collectExpressionNotes(quests: readonly MissionQuest[]): Express
     }
   }
   return notes;
+}
+
+/**
+ * 같은 해설 문자열을 문항 화면에서 쓰기 위해 화용 해설 문단과 표현 메모 줄로 가른다.
+ * 저장된 콘텐츠는 그대로 두고 표시 순서만 만든다 — 메모가 없으면 두 번째 배열이 비어 있다.
+ */
+export function splitExpressionMemo(feedback: string): { paragraphs: string[]; memo: string[] } {
+  const lines = feedback.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === EXPRESSION_MEMO_LABEL);
+  const body = (start < 0 ? lines : lines.slice(0, start)).map((line) => line.trim()).filter(Boolean);
+  if (start < 0) return { paragraphs: body, memo: [] };
+  const memo: string[] = [];
+  for (const line of lines.slice(start + 1)) {
+    const text = line.trim();
+    if (!text.startsWith("·")) break;
+    const entry = text.slice(1).trim();
+    if (entry) memo.push(entry);
+  }
+  return { paragraphs: body, memo };
 }
 
 function MpjLessonBridge({ lessonPoints, onContinue }: {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { collectExpressionNotes } from "./CanonicalMissionRun";
+import { collectExpressionNotes, splitExpressionMemo } from "./CanonicalMissionRun";
 import type { MissionQuest } from "@/lib/mission/canonicalMissionPreview";
 
 const quest = (feedback: string) => ({ id: "A1", kind: "scale", feedback } as unknown as MissionQuest);
@@ -36,5 +36,30 @@ describe("collectExpressionNotes", () => {
       quest("해설.\n표현 메모\n· `核实` — 사실이나 기록이 맞는지 확인하다.\n덧붙이는 다른 문단입니다.\n· `系统显示` — 읽히면 안 됩니다."),
     ]);
     expect(notes).toEqual([{ term: "`核实`", gloss: "사실이나 기록이 맞는지 확인하다." }]);
+  });
+});
+
+describe("splitExpressionMemo", () => {
+  it("메모가 없으면 해설 문단만 돌려준다", () => {
+    expect(splitExpressionMemo("원문은 허락을 묻습니다.\n\n시간과 이유를 유지해 보세요.")).toEqual({
+      paragraphs: ["원문은 허락을 묻습니다.", "시간과 이유를 유지해 보세요."],
+      memo: [],
+    });
+  });
+
+  it("문항 화면이 해설과 표현 메모를 따로 그릴 수 있게 가른다", () => {
+    expect(
+      splitExpressionMemo(
+        "원문은 변경 허락을 묻습니다.\n표현 메모\n· `从A改到B` — 시간을 옮긴다고 말하는 틀입니다.\n· `推迟` — 예정된 시간을 뒤로 미루다.",
+      ),
+    ).toEqual({
+      paragraphs: ["원문은 변경 허락을 묻습니다."],
+      memo: ["`从A改到B` — 시간을 옮긴다고 말하는 틀입니다.", "`推迟` — 예정된 시간을 뒤로 미루다."],
+    });
+  });
+
+  it("메모 블록 뒤에 불릿이 아닌 줄이 오면 거기서 멈춘다", () => {
+    expect(splitExpressionMemo("해설.\n표현 메모\n· 「이따」 — 조금 뒤에.\n덧붙임\n· 「캡처」 — 읽히면 안 됩니다.").memo)
+      .toEqual(["「이따」 — 조금 뒤에."]);
   });
 });
