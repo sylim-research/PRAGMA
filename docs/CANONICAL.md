@@ -29,9 +29,10 @@
 
 용어는 세 층으로 구분한다.
 
-- **A. 연구·설계 문서(논문·README·도식·교수자 자료)** — 정식 용어는 **판단형 MJT**
-  (MJT: Metapragmatic Judgement Task)와 **DCT형 통번역 산출 과제**
-  (DCT: Discourse Completion Task)다. 필요 시 개별 문항을 `MJT1`~`MJT5`로 식별한다.
+- **A. 연구·설계 문서(논문·README·도식·교수자 자료)** — 정식 용어는
+  **판단형 MJT(Metapragmatic Judgement Task)**와
+  **DCT형 통번역 산출 과제**(DCT: Discourse Completion Task)다.
+  필요 시 개별 문항을 `MJT1`~`MJT5`로 식별한다.
 - **B. 학습자 화면** — `MJT`·`DCT` 약어를 직접 노출하지 않는다(2026-09-16 연구자 결정).
   학술적 과제 유형명보다 「지금 무엇을 해야 하는가」가 바로 보이는 **행동 중심 명칭**을
   우선하되, 아래 표로 연구 문서의 구조와 1:1 대응을 유지한다.
