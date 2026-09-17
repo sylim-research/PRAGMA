@@ -33,8 +33,10 @@ export interface V5ToV6Conversion {
 
 /** 승인본 여섯 건에서 문항 위치별로 고정된 화면 문구. */
 const SHORT_LABELS = ["첫인상 판단", "맥락 판단", "선택교정", "직접 고쳐 보기", "네 표현 비교"] as const;
+// 판단 문항의 지시문은 산출물 이름만 수행모드를 따른다(화면의 원문·산출 배지와 같은 규칙).
 const PROMPTS = {
   scale: "이 번역안은 이 상황에 얼마나 잘 맞나요?",
+  scale_interpreting: "이 통역안은 이 상황에 얼마나 잘 맞나요?",
   fix_choice: "원문의 핵심 의미와 화행 목적을 지키면서 이 상황에 맞게 고친 표현을 골라보세요.",
   free_correction: "원문의 핵심 의미와 화행 목적을 지키면서 필요한 부분을 직접 고쳐 보세요.",
   multi_judge: "각 표현을 읽고, 이 상황에서 어떻게 들리는지 판단해 보세요.",
@@ -46,11 +48,25 @@ const SCALE_FOR_WITHIN = { accepted: ["very_appropriate", "somewhat_appropriate"
 
 type AnyItem = Record<string, any>;
 
+// 2026-09-07 이전 통역 저장본은 장면을 「학습자 통역사 C인 당신은 … 통역을 맡았습니다.」로
+// 열고 인물을 A·B로 부른다. 그 서술 방식은 DEC-20260907-02로 폐지됐고 새 콘텐츠는 1인칭이나
+// 역할명으로 쓴다. 여는 문장은 정확히 그 형태일 때만 떼어 내고(조사 손대지 않음), A·B가
+// 남은 장면은 사람이 다시 쓰도록 gap으로 보고한다. 편성된 60슬롯 실측: 통역 30/30이 이 형태.
+const INTERPRETER_INTRO = /^학습자\s*통역사\s*C인\s*당신은\s*[^.]*?통역을\s*맡았습니다\.\s*/u;
+const ROLE_LETTER = /(^|[^A-Za-z])[AB](?=[는가와을를에의도]|에게|\s|$)/u;
+
+export function stripInterpreterIntro(text: string): string {
+  return text.replace(INTERPRETER_INTRO, "").trim();
+}
+function namesRoleLetters(text: string): boolean {
+  return ROLE_LETTER.test(text);
+}
+
 /** v5 문항에서 v6가 그대로 쓰는 장면 필드만 남긴다. */
 function scene(item: AnyItem) {
   return {
-    situation_ko: item.situation_ko,
-    relation_ko: item.relation_ko,
+    situation_ko: stripInterpreterIntro(String(item.situation_ko ?? "")),
+    relation_ko: stripInterpreterIntro(String(item.relation_ko ?? "")),
     channel: item.channel,
     pdr: item.pdr,
     // v6 장면은 self-contained이므로 앞선 발화는 옮기지 않는다(R8).
@@ -85,6 +101,7 @@ export function convertMissionV5ToV6(
   }
 
   const gaps: V6AuthoringGap[] = [];
+  const scalePrompt = (mission.production_task as AnyItem).mode === "interpreting" ? PROMPTS.scale_interpreting : PROMPTS.scale;
   const title = (index: number) => {
     gaps.push({ path: `mpj_items[${index}].title`, why: "문항 제목(한 줄 질문) — v5에 대응 필드 없음" });
     return "";
@@ -98,7 +115,7 @@ export function convertMissionV5ToV6(
     .join("\n\n");
 
   const mpj_items = [
-    { ...scene(first), short_label: SHORT_LABELS[0], title: title(0), prompt: PROMPTS.scale, id: 1, type: "scale4",
+    { ...scene(first), short_label: SHORT_LABELS[0], title: title(0), prompt: scalePrompt, id: 1, type: "scale4",
       source: first.source, target: first.target,
       accepted_scale_codes: first.accepted_scale_codes,
       reference_scale_code: first.reference_scale_code,
@@ -129,6 +146,16 @@ export function convertMissionV5ToV6(
   );
 
   const { preceding_turn, ...task } = mission.production_task as AnyItem;
+  task.situation_ko = stripInterpreterIntro(String(task.situation_ko ?? ""));
+  task.relation_ko = stripInterpreterIntro(String(task.relation_ko ?? ""));
+  // 여는 문장을 뗀 뒤에도 A·B로 인물을 부르는 장면은 옮길 수 없다 — 1인칭·역할명으로 다시 쓴다.
+  for (const [index, entry] of [...mpj_items, task].entries()) {
+    for (const field of ["situation_ko", "relation_ko"] as const) {
+      if (namesRoleLetters(String((entry as AnyItem)[field] ?? ""))) {
+        gaps.push({ path: index < 5 ? `mpj_items[${index}].${field}` : `production_task.${field}`, why: "인물을 A·B로 부르는 옛 통역 장면 — 1인칭·역할명으로 다시 쓴다" });
+      }
+    }
+  }
   const learning_goal = (mission as AnyItem).learning_goal
     ?? (options.speechAct ? { kind: "speech_act", speech_act: options.speechAct } : undefined);
   if (!learning_goal) {

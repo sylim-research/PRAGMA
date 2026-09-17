@@ -90,6 +90,23 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
     expect(parsed.success ? [] : parsed.error.issues.map(i => `${i.path.join(".")}: ${i.message}`)).toEqual([]);
   });
 
+  it("옛 통역 장면의 통역사 소개 문장은 떼고, A·B로 남은 장면은 다시 쓰라고 보고한다", () => {
+    const old = structuredClone(v5);
+    old.production_task = { ...old.production_task, mode: "interpreting", source_modality: "spoken", replay_limit: 2,
+      situation_ko: "학습자 통역사 C인 당신은 중국어 원발화자 A와 한국어 청자 B 사이에서 통역을 맡았습니다. A는 동료 B의 추가 업무 요청을 거절해야 하는 상황입니다.",
+      relation_ko: "A와 B는 동등한 직급의 동료 관계입니다." };
+    old.mpj_items[0].situation_ko = "학습자 통역사 C인 당신은 중국어 원발화자 A와 한국어 청자 B 사이에서 통역을 맡았습니다. 저는 상사에게 새 프로젝트를 배정받았습니다.";
+    const { draft, gaps } = convertMissionV5ToV6(old, { speechAct: "request" });
+    const task = draft.production_task as any;
+    expect(task.situation_ko).toBe("A는 동료 B의 추가 업무 요청을 거절해야 하는 상황입니다.");
+    expect((draft.mpj_items as any[])[0].situation_ko).toBe("저는 상사에게 새 프로젝트를 배정받았습니다.");
+    expect((draft.mpj_items as any[])[0].prompt).toBe("이 통역안은 이 상황에 얼마나 잘 맞나요?");
+    const paths = gaps.map(gap => gap.path);
+    expect(paths).toContain("production_task.situation_ko");
+    expect(paths).toContain("production_task.relation_ko");
+    expect(paths).not.toContain("mpj_items[0].situation_ko");
+  });
+
   it("다섯 문항이 갖춰지지 않은 저장본은 변환하지 않는다", () => {
     const missing = structuredClone(v5);
     missing.mpj_items = missing.mpj_items.filter((i: any) => i.type !== "judge3");

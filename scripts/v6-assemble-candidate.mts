@@ -29,15 +29,26 @@ const { draft, gaps } = convertMissionV5ToV6(source.content);
 const items = draft.mpj_items as Record<string, unknown>[];
 
 // ── 집필분을 gap 자리에만 얹는다. 옮겨온 값은 건드리지 않는다. ──
+const task = draft.production_task as Record<string, unknown>;
 authored.titles.forEach((title: string, index: number) => { items[index].title = title; });
 authored.learner_contexts.forEach((context: string, index: number) => { items[index].learner_context_ko = context; });
 Object.assign(items[3], authored.mjt4);
 draft.lesson_points = authored.lesson_points.map((point: { label: string; text: string }, index: number) => ({ item_id: index + 1, ...point }));
-(draft.production_task as Record<string, unknown>).learner_context_ko = authored.dct_learner_context;
+task.learner_context_ko = authored.dct_learner_context;
+// 옛 통역 저장본의 A·B 장면을 다시 쓴 경우(선택). 있는 문항만 덮는다.
+(authored.scenes ?? []).forEach((scene: { situation_ko?: string; relation_ko?: string } | null, index: number) => { if (scene) Object.assign(items[index], scene); });
+if (authored.dct_scene) Object.assign(task, authored.dct_scene);
 
 const unfilled = gaps.filter(gap => {
   const [, index, field] = gap.path.match(/^mpj_items\[(\d)\]\.(\w+)$/) ?? [];
-  if (index !== undefined) { const value = items[Number(index)][field]; return value === "" || (Array.isArray(value) && value.length === 0); }
+  const isEmpty = (value: unknown) => value === "" || (Array.isArray(value) && value.length === 0);
+  if (index !== undefined) {
+    const value = items[Number(index)][field];
+    // 장면 gap은 집필분이 그 자리를 덮었으면 채워진 것으로 본다.
+    if (gap.why.includes("A·B")) return !(authored.scenes?.[Number(index)]?.[field as "situation_ko" | "relation_ko"]);
+    return isEmpty(value);
+  }
+  if (gap.path.startsWith("production_task.")) return !(authored.dct_scene?.[gap.path.slice("production_task.".length) as "situation_ko" | "relation_ko"]);
   if (gap.path.startsWith("lesson_points")) return false;
   return true;
 });
