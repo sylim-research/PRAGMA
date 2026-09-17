@@ -76,9 +76,11 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
   };
   // 판정이 이미 있는 문항에 메모를 고치면 따로 저장을 누르지 않아도 잠시 뒤 저장한다.
   // 저장 버튼을 남겨 두면 메모만 고친 교수자가 최종 승인에서 막힌다(2026-09-17).
+  // 저장은 입력을 멈추지 않는다 — 메모 칸을 저장 중에 잠그면 문장 사이 짧은 멈춤마다 커서를 잃고
+  // 긴 메모를 쓸 수 없게 된다(2026-09-17 실사용에서 확인). 저장 중 이어 쓴 글은 다음 저장이 담는다.
   useEffect(() => {
     if (!dirty || saving || approved || disabled || error) return;
-    const timer = window.setTimeout(() => { void persist(draft); }, 1200);
+    const timer = window.setTimeout(() => { void persist(draft); }, 2500);
     return () => window.clearTimeout(timer);
   }, [dirty, saving, approved, disabled, error, draft]);
   return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
@@ -110,7 +112,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
             <Button className="h-11 text-base" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
             <Button className="h-11 text-base" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 요청</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={7} className="min-h-[10rem] resize-y text-[15px] leading-7" value={noteValue} disabled={disabled || saving || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={7} className="min-h-[10rem] resize-y text-[15px] leading-7" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
