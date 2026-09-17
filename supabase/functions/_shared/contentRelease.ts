@@ -35,4 +35,6 @@ export const CURRENT_FEEDBACK_PROMPT_VERSIONS = CURRENT_CONTENT_RELEASE.feedback
 export const CURRENT_CORE_QUALITY_PROMPT_VERSION = CURRENT_CONTENT_RELEASE.qualityPromptVersions.core;
 export const CURRENT_MISSION_QUALITY_PROMPT_VERSION = CURRENT_CONTENT_RELEASE.qualityPromptVersions.mission;
 // Same critic/result contract; v6 has different instructional semantics.
-export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_request_reason_contrast_v1";
+// v2: the header names the mission's own speech act instead of assuming request;
+// the judgment axis was already the feature block passed with the request.
+export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_act_general_v2";

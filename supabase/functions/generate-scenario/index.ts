@@ -3263,7 +3263,7 @@ function buildQualitySystemPrompt(
   isV6 = false,
 ): string {
   const { src, tgt } = DIR_LANGS[direction]
-  if (isV6) return `너는 L2 화용 교육 자료의 품질 심사자다. 다음 mission_v6 요청 미션 한 건의 실제 결함과 근거만 보고하고 내용을 고치지 마라.
+  if (isV6) return `너는 L2 화용 교육 자료의 품질 심사자다. 다음 mission_v6 ${speechActKo} 미션 한 건의 실제 결함과 근거만 보고하고 내용을 고치지 마라.
 방향은 ${LANG_KO[src]} → ${LANG_KO[tgt]}, 수행은 ${isSpoken ? '통역' : '번역'}이다.
 구조는 scale4 → scale4+inline reason → fix_choice → free_correction → multi_judge → DCT다.
 MJT 5개·수정안 3개·비교 후보 4개는 이 format의 계약이며 교육적 최적값이 아니다.
