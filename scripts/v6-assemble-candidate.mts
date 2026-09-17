@@ -40,13 +40,15 @@ task.learner_context_ko = authored.dct_learner_context;
 if (authored.dct_scene) Object.assign(task, authored.dct_scene);
 // 옮겨온 값을 자리별로 덮는다 — 한국어 목표문 자연화 패스(2026-09-17). 화행 이동·대역은 그대로 두고 표면만 바꾼다.
 // 값이 {text} 객체인 자리에 문자열을 주면 text만 바꾼다(note_ko·band 등은 유지).
-for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<string, string>)) {
+for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<string, unknown>)) {
   const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
   const last = keys.pop()!;
   const parent = keys.reduce<any>((node, key) => node?.[key], draft);
   if (parent == null || !(last in parent)) throw new Error(`override 자리가 없음: ${path}`);
   const existing = parent[last];
-  if (existing && typeof existing === "object" && "text" in existing) existing.text = value; else parent[last] = value;
+  if (value === null) delete parent[last];
+  else if (typeof value === "string" && existing && typeof existing === "object" && "text" in existing) existing.text = value;
+  else parent[last] = value;
 }
 
 const unfilled = gaps.filter(gap => {
