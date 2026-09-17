@@ -258,34 +258,37 @@ const Architecture = () => (
         수행 기록으로 연결합니다.
       </p>
 
-      {/* 3레인. 중앙을 넓게 두는 비대칭은 유지한다 — ②가 핵심 개입이다.
-          레인 사이 여백 56px는 인계 라벨을 가로로 쓰기 위한 것이다. */}
-      <div className="grid grid-cols-1 items-start lg:grid-cols-[236px_56px_372px_56px_252px] lg:items-stretch">
+      {/* 3레인. 양옆은 272px 대칭, 중앙 320px — 중앙 폭은 그 안의 가장 긴 한 줄 설명
+          (226px)이 한 줄로 들어가는 최소값이다(2026-09-17 실측). 그 이상은 빈 여백이다.
+          레인 사이 여백 56px는 인계 라벨을 가로로 쓰기 위한 것이다.
+          카드 설명은 한 줄이 원칙이다 — 두 줄이 되면 두 줄을 꽉 채우고, 애매하게
+          넘치는 두 줄은 만들지 않는다. */}
+      <div className="grid grid-cols-1 items-start lg:grid-cols-[272px_56px_320px_56px_272px] lg:items-stretch">
         {/* ① 콘텐츠 제작 — 관리자 메뉴 1·2·3(생성 기준 → 미션 재료 → 제작·품질 관리) */}
         <section className="rounded-[13px] border border-border bg-card px-3.5 pb-3.5 pt-3.5 lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="supply"
             num="1"
             title="콘텐츠 제작"
-            desc="생성 기준을 고정하고, 조건대로 만들고, 관문을 통과한 것만 넘긴다"
+            desc="기준 고정 → 조건 생성 → 관문 통과분만 인계"
           />
 
           <Node
             lane="supply"
             title="생성 기준"
-            desc="생성 계약 · 버전 관리 프롬프트 · HSK 3.0 어휘 범위 · 실제 자료 활용 분석"
+            desc="생성 계약 · 프롬프트 · HSK 3.0 어휘 · 실제 자료"
           />
           <Down />
           <Node
             lane="supply"
             title="조건 설계 생성"
-            desc="목표 화행 × P·D·R × 도메인 · 개별/배치 생성 · 분포 계획"
+            desc="화행 × P·D·R × 도메인 · 개별/배치 · 분포 계획"
           />
           <Down />
           <Node
             lane="supply"
             title="학습 미션 조립"
-            desc={`MJT ${MPJ_ITEM_COUNT}문항 + DCT형 통번역 산출 1건 · 미션 라이브러리`}
+            desc={`MJT ${MPJ_ITEM_COUNT} + DCT형 통번역 산출 1 · 라이브러리`}
           />
           <Down />
           <Chain
@@ -293,8 +296,8 @@ const Architecture = () => (
             label="품질 관문 · 승인분만 통과"
             steps={[
               { title: "자동 품질 점검", detail: "규칙 기반 · 같은 입력에 같은 결과" },
-              { title: "AI 검토", detail: "1차 검토 → 독립 교차 검토 → 재검토 · 판정 권한 없음" },
-              { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 자격 결정 · 이력 저장" },
+              { title: "AI 검토", detail: "1차 → 독립 교차 → 재검토 · 판정 권한 없음" },
+              { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 자격 결정" },
             ]}
           />
         </section>
@@ -307,7 +310,7 @@ const Architecture = () => (
             lane="learn"
             num="2"
             title="학습자 수행"
-            desc="승인·편성된 미션에서 판단 → 산출 → 피드백을 잇고, 결정은 학습자가 한다"
+            desc="판단 → 산출 → 피드백 · 최종 결정은 학습자"
           />
 
           <Node lane="learn" title="교과목 선택 · 주차 학습 진입" desc="이번 주차 미션 · 학습 자료 · 진행 상태" />
@@ -327,7 +330,7 @@ const Architecture = () => (
           <Node
             lane="learn"
             title="수행 기록 · 이견 제기"
-            desc="판단 · 선택 · 근거 · 최초안 · 최종 산출을 버전과 함께 저장 · AI 판정에 이견 제기"
+            desc="판단 · 근거 · 최초안 · 최종 산출을 버전과 저장 · 이견 제기"
             status="수업 운영"
           />
           <Down />
@@ -336,43 +339,42 @@ const Architecture = () => (
 
         <Handoff label="수행 기록" />
 
-        {/* ③ 수업 운영 — 관리자 메뉴 4·5 (3.6.1 ~ 3.6.4) */}
+        {/* ③ 수업 운영 — 관리자 메뉴 4·5 (3.6.1 · 3.6.3 · 3.6.4) */}
         <section className="rounded-[13px] border border-border bg-card px-3.5 pb-3.5 pt-3.5 lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="class"
             num="3"
             title="수업 운영"
-            desc="교수자가 편성·자료·기록을 관리하고 후속 검토를 결정한다"
+            desc="편성 · 자료 · 기록 관리 → 후속 검토 결정"
           />
 
           <Node
             lane="class"
             title="15주 편성 · 강의계획서"
-            desc="교과목 · 주차별 주제 · 승인 미션 배치 · 미션 자동 채우기"
+            desc="교과목 · 주차 주제 · 승인 미션 배치 · 자동 채우기"
           />
           <Down />
           <Node
             lane="class"
             title="주차별 수업 운영"
-            desc="수업 자료 · 토론 자료 생성·승인 · 교실 화면 · 교수자 진행 메모"
+            desc="수업·토론 자료 생성·승인 · 교실 화면 · 진행 메모"
           />
           <Down />
-          <Node
-            lane="class"
-            title="조건 대비 · 학급 응답"
-            desc="같은 화행의 두 사건 비교 · 익명 학급 집계 · 이견 건수"
-          />
+          {/* 「조건 대비」(미션 1 vs 미션 2)는 폐기한 개념이다(연구자 결정 2026-09-17) —
+              한 주차 두 미션이지만 조건은 이미 미션 하나 안에 들어 있다. 학급 응답은
+              화면만 있고 아직 자료가 쌓이지 않았으므로 점선 배지로 둔다. */}
+          <Node lane="class" title="학급 응답 집계" desc="익명 학급 집계 · 이견 건수" status="준비 중" />
           <Down />
           <Node
             lane="class"
             title="학습자 관리 · 수행 기록"
-            desc="개인 기록 열람 범위 · 연구용 내보내기(동의자 · 비식별) · 백업·복원"
+            desc="개인 기록 · 동의자 비식별 내보내기 · 백업·복원"
           />
           <Down />
           <Node
             lane="class"
             title="후속 콘텐츠 검토"
-            desc="수업에서 확인한 문제 → 콘텐츠 · 편성 · 절차 재검토"
+            desc="확인한 문제 → 콘텐츠 · 편성 · 절차 재검토"
             decision
           />
         </section>
