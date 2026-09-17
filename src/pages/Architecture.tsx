@@ -128,12 +128,14 @@ const Handoff = ({ label }: { label: string }) => (
 // 오른쪽에서 출발해 아래를 감고 왼쪽 ①로 올라가는 U자형 화살표로 순환을 명시한다.
 // 라벨에 「재승인」을 반드시 남긴다 — 수정한 콘텐츠가 교수자 최종 승인을 다시
 // 받는다는 것이 이 환류가 자동 최적화가 아님을 말하는 지점이다(3.7절).
-const CYCLE_LABEL = "문제 확인 → 권한자 검토 → 수정 → 재승인";
+// 검토 주체는 3.7절 표현 그대로 「교수자·연구자」로 적는다. 「권한자」처럼 대장에
+// 없는 조어를 만들지 않는다.
+const CYCLE_LABEL = "문제 확인 → 교수자·연구자 검토 → 수정 → 재승인";
 
 const CycleReturn = () => (
   <div
     className="relative mt-1 h-[40px]"
-    aria-label="수업에서 확인한 문제는 권한자의 검토를 거쳐 콘텐츠와 수업 설계를 수정하고 다시 최종 승인을 받는다"
+    aria-label="수업에서 확인한 문제는 권한을 가진 교수자·연구자의 검토를 거쳐 콘텐츠와 수업 설계를 수정하고 다시 최종 승인을 받는다"
   >
     <svg
       className="absolute inset-0 hidden h-full w-full overflow-visible lg:block"
