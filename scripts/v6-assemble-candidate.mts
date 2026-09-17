@@ -32,6 +32,7 @@ const items = draft.mpj_items as Record<string, unknown>[];
 const task = draft.production_task as Record<string, unknown>;
 authored.titles.forEach((title: string, index: number) => { items[index].title = title; });
 authored.learner_contexts.forEach((context: string, index: number) => { items[index].learner_context_ko = context; });
+Object.assign(items[2], authored.mjt3);
 Object.assign(items[3], authored.mjt4);
 draft.lesson_points = authored.lesson_points.map((point: { label: string; text: string }, index: number) => ({ item_id: index + 1, ...point }));
 task.learner_context_ko = authored.dct_learner_context;
