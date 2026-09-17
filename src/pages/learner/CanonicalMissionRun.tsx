@@ -763,8 +763,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
       <h3 className="text-base font-bold">{FREE_CORRECTION_INSTRUCTION}</h3>
       <div className="mt-4">
-        <label htmlFor="free-correction-draft" className="font-bold">내가 고친 표현</label>
-        <Textarea id="free-correction-draft" className={`${targetFont} mt-3 text-base leading-8`} rows={3} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
+        <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
         <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 답안을 확인합니다.</p>
       </div>
       {submitted && <section className="mt-5 space-y-3" aria-label="화용 해설">
@@ -1012,15 +1011,14 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
 const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "문법 정확성", "화용 적절성"] as const;
 
 /**
- * 빈칸 크기는 방향에 따라 다르다 — 한자는 압축적이고 한국어는 풀어 쓴다.
- * 한→중은 원문 줄 수 그대로, 중→한은 1.5배에 한 줄. 최소 2줄·최대 5줄이며 필요하면 끌어서 늘린다.
+ * 빈칸은 기준 문장보다 딱 한 줄만 크다. 크게 벌어진 칸은 「이만큼 써야 한다」로 읽힌다.
+ * 기준 문장은 화면마다 다르다 — 직접 산출은 옮길 원문, 자유교정은 고쳐 쓸 대상 표현.
  */
-function sourceAlignedRows(source: string, targetCode: string) {
+function sourceAlignedRows(source: string) {
   const estimatedLines = source
     .split("\n")
     .reduce((total, line) => total + Math.max(1, Math.ceil(line.length / 45)), 0);
-  // 원문과 같은 줄 수, 넉넉해야 한 줄만 더. 빈칸이 원문보다 커 보이면 부담이 된다.
-  return Math.min(5, Math.max(2, Math.ceil(estimatedLines * (targetCode === "zh" ? 1 : 1.5)) + (targetCode === "zh" ? 0 : 1)));
+  return Math.min(6, Math.max(2, estimatedLines + 1));
 }
 
 function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: string; onChange: (value: string) => void }) {
@@ -1050,7 +1048,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           id={`${quest.id}-draft`}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          rows={sourceAlignedRows(quest.source, mission.targetLanguage.code)}
+          rows={sourceAlignedRows(quest.source)}
           className={`${targetFont} mt-3 resize-y border-[#C9D0DA] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
         />
         <VocabularyHints quest={quest} />
@@ -1064,7 +1062,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
 }
 
 const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
-  very_good: "안정",
+  very_good: "좋음",
   recommend: "보완 권장",
   required: "수정 필요",
 };
@@ -1221,7 +1219,9 @@ function evaluationFromRuntimeFeedback(
       label: "문법 정확성",
       question: `${targetLanguage} 표현이 자연스러운가요?`,
       level: grammarLevel,
-      body: grammarNote?.explanation_ko || (grammarLevel === "very_good"
+      // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
+      body: [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
+        .filter(Boolean).join(" ") || (grammarLevel === "very_good"
         ? "의미 이해를 막는 문법 문제는 확인되지 않았습니다."
         : "이해를 방해하는 표현을 다시 확인해 주세요."),
     },
@@ -1302,21 +1302,23 @@ export function feedbackNeedsRevision(
 }
 
 const DEV_PREVIEW_COPY: Record<DevPreviewPreset, { label: string; a: string }> = {
+  // 개발 미리보기 전용 채우기 문장. /demo/mission이 여는 v6 견본(세미나실 대여 요청)과 같은 원문을 옮긴 것이어야
+  // 의미 충실성 판정이 엉뚱하게 나오지 않는다.
   all_good: {
     label: "수정 없이 확정",
-    a: "您好，下周二的面试我可能无法参加，非常抱歉。请问能否调整到同一周的其他日期？",
+    a: "您好，请问下周三下午三点到四点可以借用研讨室吗？我们想和社团的新成员开第一次见面会。",
   },
   direct: {
     label: "화용 보완 · 직접적",
-    a: "您好，下周二的面试我无法参加，请把面试改到周三。",
+    a: "下周三下午三点到四点我们要用研讨室，请帮我预约一下。社团新成员要开第一次见面会。",
   },
   over_mitigated: {
     label: "수정 없이 확정 · 완화형",
-    a: "您好，下周二的面试我可能无法参加，非常抱歉。请问能否调整到同一周的其他日期？",
+    a: "您好，实在不好意思打扰您。如果方便的话，不知道能不能麻烦您看看下周三下午三点到四点研讨室是否可以借用？我们想和社团的新成员开第一次见面会，给您添麻烦了。",
   },
   mixed: {
     label: "화용 보완 · 기본",
-    a: "您好，下周二的面试我无法参加，请把面试改到周三。",
+    a: "您好，下周三下午三点到四点我们要借用研讨室，请安排一下。社团新成员要开第一次见面会。",
   },
 };
 
@@ -1419,23 +1421,40 @@ function FeedbackLoading() {
   );
 }
 
-function StudentAnswerCard({ text, highlights = [] }: { text: string; highlights?: string[] }) {
+/**
+ * 원문과 내 번역을 한 줄에 나란히 둔다 — 화면이 바뀌어도 원문이 곁에 있고,
+ * 라벨 줄이 둘 사이를 벌리지 않도록 배지 옆에 바로 문장을 붙인다.
+ */
+function SourceAnswerCompare({ source, answer, highlights = [] }: {
+  source: string;
+  answer: string;
+  highlights?: string[];
+}) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
+  const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
-    <section className="rounded-2xl bg-[#15202B] p-5 text-white shadow-[0_12px_28px_rgba(21,32,43,0.12)] sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-black text-[#F0D44F]">내 {outputName}</p>
-        <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg border border-white/15 bg-white/5 px-3 text-xs font-black text-white/90">{mission.targetLanguage.badge}</span>
+    <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
+      <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-3 sm:px-5">
+        <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] font-bold text-[#697386]">원문</p>
+          <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-8 text-[#101B2B]`}>{source}</p>
+        </div>
       </div>
-      <p className={`${targetFont} mt-4 whitespace-pre-wrap text-[17px] leading-8 text-white sm:text-[18px]`}>
-        <HighlightedText text={text} highlights={highlights} target />
-      </p>
+      <div className="flex items-start gap-4 border-t border-dashed border-[#D8D4C8] px-4 py-3 sm:px-5">
+        <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] font-bold text-[#697386]">내 {outputName}</p>
+          <p className={`${targetFont} mt-0.5 break-keep text-[17px] leading-8 text-[#101B2B]`}>
+            <HighlightedText text={answer} highlights={highlights} target />
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
-
 function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: string }) {
   const mission = useCanonicalMission();
   const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : mission.learnerContextCopy?.[quest.id];
@@ -1464,8 +1483,8 @@ function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: st
           <p className="mt-1 text-sm leading-6">{quest.context.situation}</p>
         </div>}
         <div>
-          <p className="text-[12px] font-black text-[#707A8B]">{mission.sourceLanguage.label} 원문</p>
-          <p className={`${sourceFont} mt-1 text-sm font-bold leading-6`}>{quest.source}</p>
+          <p className="text-[12px] font-black text-[#707A8B]">첫 {outputName}</p>
+          <p className={`${targetFont} mt-1 text-sm font-bold leading-6`}>{first}</p>
         </div>
         <div>
           <p className="text-[12px] font-black text-[#707A8B]">내 첫 {outputName}</p>
@@ -1558,16 +1577,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const feedbackUnavailable = evaluation.available === false;
   const needsChange = feedbackNeedsRevision(evaluation);
   const primaryCriterion = primaryFeedbackCriterion(evaluation.criteria);
-  const overallHeadline = localPilot ? previewEvaluation.headline : feedbackUnavailable
-    ? "자동 피드백을 확인하지 못했습니다."
-    : primaryCriterion.level === "required"
-      ? "다시 살펴봐야 합니다."
-      : primaryCriterion.level === "recommend"
-        ? "한 가지만 고치면 됩니다."
-        : "이대로 확정해도 좋습니다.";
-  const overallBadge = localPilot ? "AI 미실행" : feedbackUnavailable
-    ? "판정 보류"
-    : `${primaryCriterion.label} · ${FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}`;
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = devMode || (revisionValidation.valid && (!needsChange || reflected));
   const canRetainWithDissent = Boolean(dissent);
@@ -1590,43 +1599,39 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-3">
-      <div className="px-1">
-        <p className="text-xs font-bold text-[#776727]">{progressLabel(quest, outputName)}</p>
-        <h1 className="mt-1 text-xl font-black">{outputName} 피드백</h1>
-      </div>
-      {!revisionOpen && <StudentAnswerCard text={first} highlights={ready ? evaluation.highlights : []} />}
+      <h1 className="px-1 text-xl font-bold">{outputName} 피드백</h1>
+      <SourceAnswerCompare source={quest.source} answer={first} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
+          {/* 판정 한 줄 요약과 배지는 두지 않는다 — 세 기준 각각이 이미 등급과 이유를 말한다. */}
           {!revisionOpen && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
-            <div className={`p-5 sm:p-6 ${feedbackUnavailable || needsChange ? "bg-[#FFFCF0]" : "bg-[#F7FBF8]"}`}>
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex min-w-0 items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#F0D44F] text-[#15202B]"><Sparkles className="h-5 w-5" /></span>
-                  <div>
-                    <p className="text-xs font-black text-[#596579]">답안 피드백</p>
-                    <h2 className="mt-1 text-lg font-black leading-7">{overallHeadline}</h2>
-                  </div>
-                </div>
-                <span className={`shrink-0 rounded-full px-3 py-1.5 text-[11px] font-black ${feedbackUnavailable ? "bg-[#EEECE6] text-[#596579]" : needsChange ? FEEDBACK_LEVEL_STYLE[primaryCriterion.level] : FEEDBACK_LEVEL_STYLE.very_good}`}>{overallBadge}</span>
-              </div>
-            </div>
-
-            {/* 세 기준을 늘 보여 준다 — 학습자가 의미·문법·화용 세 층을 알고 읽게. 고칠 기준은 펼치고, 통과한 기준은 한 줄. */}
-            <div className="space-y-3 border-t border-[#E6E1D6] p-4 sm:p-5">
+            <div className="space-y-2 p-3.5 sm:p-4">
+              {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
+              {(localPilot || feedbackUnavailable) && (
+                <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#596579]">
+                  {localPilot ? "AI 미실행" : "자동 피드백을 확인하지 못했습니다."}
+                </p>
+              )}
+              {/* 세 기준은 늘 보이되, 펼쳐 읽는 것은 의미→언어→화용 순서에서 처음 걸린 하나뿐이다(한 번에 한 초점). */}
               {evaluation.criteria.map((criterion) => {
                 const passed = !localPilot && criterion.level === "very_good";
+                const expanded = localPilot || (!passed && criterion.key === primaryCriterion.key);
                 return (
-                  <article key={criterion.key} className={`rounded-xl border p-4 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
+                  <article key={criterion.key} className={`rounded-xl border px-4 py-3 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="text-[15px] font-black text-[#2B3647]">{criterion.label}</h3>
-                      {!localPilot && <span className={`rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>{FEEDBACK_LEVEL_LABEL[criterion.level]}</span>}
+                      {!localPilot && (
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
+                          {passed && <Sparkles aria-hidden className="h-3 w-3" />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
+                        </span>
+                      )}
                     </div>
-                    {passed
-                      ? <p className="mt-2 text-[15px] leading-7 text-[#3F4A59]">{conciseFeedback(criterion.body)}</p>
-                      : <>
-                        <p className="mt-3 text-[15px] leading-7">{conciseFeedback(criterion.body)}</p>
+                    {expanded
+                      ? <>
+                        <p className="mt-2 text-[15px] leading-7">{conciseFeedback(criterion.body)}</p>
                         <FeedbackRemainder text={criterion.body} />
-                      </>}
+                      </>
+                      : <p className={`mt-1.5 text-[15px] leading-7 ${passed ? "text-[#3F4A59]" : "text-[#5A6673]"}`}>{feedbackSentences(criterion.body)[0]}</p>}
                   </article>
                 );
               })}
@@ -1653,7 +1658,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <FeedbackRemainder text={primaryCriterion.body} />
                   </div>
                 )}
-                <Textarea id={`${quest.id}-revise`} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source, mission.targetLanguage.code)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <Textarea id={`${quest.id}-revise`} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
                 <div className="mt-3"><DctContextReview quest={quest} first={first} /></div>
               </section>
               <ActionBar hint={actionHint}>
@@ -2804,11 +2809,16 @@ const CanonicalMissionRun = ({
   }), metaLabel: "대표 요청 후보" } : null, [reasonContrastPilot]);
   // 데모는 승인·편성과 무관하게 열려야 하므로 저장된 미션을 조회하지 않고 코드의 v6 샘플로 실행한다.
   // 수행 기록·이벤트는 demoMode에서 이미 차단되고, runtime이 없어 AI 피드백도 호출하지 않는다.
-  const demoPreview = useMemo(() => demoMode && !scenarioId ? { ...adaptRunnableMissionToCanonical({
+  // 시연 경로도 실제 피드백 엔진을 부른다 — 하드코딩된 간이 판정기는 이 견본의 원문을 모른다.
+  // demoMode라 수행 로그·이벤트는 남지 않는다(emitMissionEvent·shouldPersistMissionAttempt가 막는다).
+  const demoRunnable = useMemo<RunnableMission | null>(() => demoMode && !scenarioId ? {
     scenario_id: "", speech_act: "request", learner_level: "intermediate",
     mission_status: null, release_gate_mode: null,
     direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
-  }), metaLabel: "대표 미션 시연" } : null, [demoMode, scenarioId]);
+  } : null, [demoMode, scenarioId]);
+  const demoPreview = useMemo(() => demoRunnable
+    ? { ...adaptRunnableMissionToCanonical(demoRunnable), metaLabel: "대표 미션 시연" }
+    : null, [demoRunnable]);
   const pilotStorageKey = reasonContrastPilot ? REASON_CONTRAST_PILOT_STORAGE_KEY : LEARNER_UX_PILOT_STORAGE_KEY;
   const courseLocation = parseMissionCourseLocation(window.location.search);
   const [runtimeMission, setRuntimeMission] = useState<CanonicalMissionViewModel | null>(null);
@@ -2908,7 +2918,7 @@ const CanonicalMissionRun = ({
     <CanonicalMissionRunner
       key={localPilot ? pilotStorageKey : mission.scenarioId ?? "preview"}
       mission={mission}
-      runtime={runtimeRunnable ?? undefined}
+      runtime={runtimeRunnable ?? demoRunnable ?? undefined}
       isDevPreview={import.meta.env.DEV && !scenarioId && !localPilot}
       localPilot={localPilot}
       pilotStorageKey={pilotStorageKey}
