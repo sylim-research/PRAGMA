@@ -192,3 +192,41 @@ worktree에 Supabase 연결 상태가 없어 루트의 `supabase/.temp`를 복�
   쓸 만하고 `situation_ko`만 다시 쓰면 된다.
 
 추출본과 실측표(`tmp/v6-conversion/_report.json`)는 `tmp/`라 커밋하지 않는다 — 스크립트로 언제든 다시 만든다.
+
+## 규칙 검사가 막힌 원인 두 가지
+
+파일럿 2건을 관리자 화면에서 규칙 검사에 넣었더니 **「미션 스키마를 읽을 수 없습니다」(구조·형식 fail)** 가 났다.
+콘텐츠 결함이 아니었고 원인이 둘이었다.
+
+### ① content-review Edge가 v39에 멈춰 있었다 — 배포로 해결
+
+규칙 검사는 앱이 아니라 `content-review` Edge 안의 `domain.generated.mjs`에서 돈다. 배포본은 **v39(2026-09-14)**,
+그 번들의 v6 스키마는 `speech_act: z.literal("request")`라 거절 미션을 파싱하지 못한다. 어제 배포한 것은
+`generate-scenario` 하나뿐이었다. 같은 검사를 현행 코드로 돌리면 두 건 다 통과했고, 서버가 읽는
+`get_content_review_source` 결과를 그대로 넣어도 통과했다 — 입력이 아니라 검사기가 낡았다는 뜻이다.
+
+v39 이후 이 함수의 번들을 바꾼 커밋은 `b18a4b64` 하나뿐이고 `index.ts`는 변경이 없었다. 새 규칙 코드는 전부
+`schema_version === "mission_v6"` 분기 안이라 v5 미션 판정은 변하지 않는다. 배포 delta에서 서버 동작이 바뀌는 곳은
+규칙 개방 외에 **품질 점검 증거의 재사용 조건** 하나 더였다 — v39는 v6 품질 버전 `_v1`만 인정하는데 새 행 2건은
+`_v2`로 점검돼 있어, 배포하지 않으면 「최종 검수 자료」 단계에서 다시 막혔을 것이다. v40은 `_v1`·`_v2` 둘 다 인정하므로
+이미 승인된 요청 6건의 증거도 그대로 유효하다.
+
+`npm run edge:deploy content-review` → **v39 → v40** (main 계보 `b18a4b64`). 그 뒤 통역 `cdff1b28`은 규칙 검사 **pass**.
+
+### ② 낡은 검사기가 남긴 run이 지워지지 않는다 — 코드 수정
+
+번역 `40c7aa46`은 배포 뒤에도 fail이었다. `inspect`를 찍어 보니 **방금 계산한 규칙은 pass인데 저장된 run
+(`b758d741`, 배포 전 19:42 생성)의 `rules`가 fail**이었고, 두 `content_hash`가 같았다(`f867b344a27f`).
+
+`action: "rules"`는 같은 (source_hash, content_hash)의 활성 run이 있으면 새로 넣지 않고 `approval_policy`와
+`generation_quality`만 갱신했다. **`rules`는 손대지 않는다.** 규칙 카탈로그가 바뀌어도 검수 content hash는 바뀌지 않으므로,
+고장난 배포 중에 만들어진 run은 낡은 판정을 그대로 안고 영영 남는다. 관리자에게는 「규칙 오류를 수정·저장해야」라고만
+보이는데 고칠 콘텐츠가 없다. `content_review_runs`는 admin에게 SELECT만 열려 있어 화면에서도 스크립트에서도 지울 수 없다.
+
+→ 재실행이 **현재 엔진의 판정을 기록**하도록 고쳤다(`supabase/functions/content-review/index.ts`).
+`prepared_finalization`이 있는 run은 DB 트리거 `guard_prepared_content_review`가 `rules` 변경을 막으므로 그대로 둔다 —
+유료 산출물이 만들어진 버전은 그 산출물이 딛고 선 판정을 유지해야 한다. 승인·실행 중 run은 기존 조건 그대로 제외된다.
+승인 조건을 완화하지 않는다: fail은 여전히 fail로 기록되고 교수자 5단계는 그대로다.
+
+테스트 2개 추가(`scripts/content-review-edge.test.mjs`) — 재실행이 현재 판정을 기록한다 · 최종 검수 자료가 만들어진 run은
+딛고 선 판정을 유지한다. 전체 1,010 pass · typecheck · build · 정합성 가드 2개 통과.
