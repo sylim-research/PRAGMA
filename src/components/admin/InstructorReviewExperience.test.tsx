@@ -142,6 +142,22 @@ describe("instructor experience", () => {
     expect(screen.getByText("DCT 참고 표현·해설")).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled(); expect(effects.feedback).not.toHaveBeenCalled();
   });
+  it("keeps the memo editable while an autosave is in flight, and the next save carries what was typed meanwhile", async () => {
+    let release: () => void = () => {};
+    const onSave = vi.fn().mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve; })).mockResolvedValue(undefined);
+    render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    const memo = screen.getByRole("textbox", { name: "현재 문항 감수 메모" });
+    // The first save is still pending: the professor must be able to keep writing.
+    expect(memo).not.toBeDisabled();
+    expect(screen.getByRole("button", { name: "✓ 확인" })).toBeDisabled();
+    fireEvent.change(memo, { target: { value: "기계 번역투라 자연스럽지 않습니다." } });
+    expect(memo).toHaveValue("기계 번역투라 자연스럽지 않습니다.");
+    release();
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2), { timeout: 4000 });
+    expect(onSave).toHaveBeenLastCalledWith(expect.objectContaining({ decisions: [{ section: "scene", status: "revision_required", note: "기계 번역투라 자연스럽지 않습니다." }] }));
+  });
   it("retains and exposes an unsaved decision after a save failure", async () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={vi.fn().mockRejectedValue(new Error("保存失敗"))} onReady={vi.fn()} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
