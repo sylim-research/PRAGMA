@@ -64,9 +64,17 @@ const Landing = () => {
             </span>
           </h1>
 
-          {/* break-keep — 없으면 낱말 중간에서 줄이 끊긴다. */}
-          <p className="mx-auto mt-4 max-w-[620px] break-keep text-[15.5px] leading-relaxed text-muted-foreground sm:text-[16.5px]">
-            {/* 의미 단위 2행. 각 행이 max-w를 넘지 않아야 짧은 꼬리 줄이 생기지 않는다(2026-08-06 실측). */}
+          {/* break-keep — 없으면 낱말 중간에서 줄이 끊긴다.
+              글자색은 muted-foreground(#5C6A7A, 배경 #FAF7F0 대비 5.1:1)에서 같은 남색
+              계열 한 단계 위(#4E5F6C, 6.3:1)로 올린다 — 논문 도판으로 축소·인쇄될 때
+              본문이 흐려지지 않게 하려는 것이다. 크기·줄수는 그대로 둔다.
+              🔴 글자 크기는 올릴 수 없다: 이 단락의 폭은 h1이 정하고(489px),
+              1행 실측이 488.9px로 여유가 0.1px다. 16.5→17px만 해도 503.7px가 되어
+              2행 구조가 3행으로 깨진다(2026-09-17 실측). */}
+          <p className="mx-auto mt-4 max-w-[620px] break-keep text-[15.5px] leading-relaxed text-[#4E5F6C] sm:text-[16.5px]">
+            {/* 의미 단위 2행. 각 행이 max-w를 넘지 않아야 짧은 꼬리 줄이 생기지 않는다(2026-08-06 실측).
+                「원문의 의미와 화행 목적을 유지하면서」로 늘리는 안은 기각 — 1행이 568.5px가
+                되어 폭(489px)을 80px 넘고, 3행에 짧은 꼬리가 남는다(2026-09-17 실측). */}
             <span className="block">
               PRAGMA는 한·중 통번역에서 원문의 의미는 유지하면서 상황과 관계에 맞게
             </span>

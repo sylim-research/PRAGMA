@@ -1,18 +1,27 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, ChevronRight, PlayCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, ChevronDown, PlayCircle, RotateCcw } from "lucide-react";
 import { MPJ_ITEM_COUNT } from "@/lib/curriculum/learnerWorkflow";
-import { FINAL_GOLD_POPULATION_COUNT } from "@/lib/pragma/goldProtocol";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 
-// 심사 설명용 read-only 화면. 현재 런타임 흐름과 연구자료 처리 경계를 요약한다.
+// 심사 설명용 read-only 화면. 현재 런타임 흐름과 수행 기록의 연구 활용 경계를 요약한다.
+//
+// 세 레인은 3.7절이 확정한 세 워크플로우 그대로다 — 콘텐츠 제작 / 학습자 수행 / 수업 운영.
+// 수행 기록의 연구 활용은 네 번째 워크플로우가 아니라 세 레인 밖의 별도 절차이므로
+// 레인으로 세우지 않고 하단 띠에 경계만 적는다. 각 카드는 3.5·3.6의 항과 1:1로 맞춘다.
+//   ① 근거 자료·생성 계약 → 생성 → 자동 품질 점검 → AI 검토 → 교수자 최종 승인
+//   ② 3.5.1 진입 · 도입 활동 · [미션] · 3.5.4 기록·이견 · 3.5.5 기록·후속 수행
+//   ③ 3.6.1 편성 · 3.6.3 자료 · 3.6.2 조건 대비 · 3.6.4 기록 확인 · 후속 콘텐츠 검토
+//
+// 「검증」·「감수·승인」 세트명·수량 목표는 쓰지 않는다(용어대장 187·188행). 자동 품질
+// 점검과 AI 검토는 층위가 다르므로 한 카드로 합치지 않는다(정본형 네 단계, 176행).
 
-type Lane = "supply" | "learn" | "res";
+type Lane = "supply" | "learn" | "class";
 
 const LANE = {
   supply: { num: "bg-[#3A4A5F]", node: "bg-[#EDF0F4] border-[#DCE1E9]" },
   learn: { num: "bg-[#2F6660]", node: "bg-[#E9F1EF] border-[#CFE0DC]" },
-  res: { num: "bg-[#8A6A55]", node: "bg-[#F4EDE7] border-[#E3D5C8]" },
+  class: { num: "bg-[#8A6A55]", node: "bg-[#F4EDE7] border-[#E3D5C8]" },
 } as const;
 
 // 배지 규칙 — 화면 전체에서 이 두 가지만 쓴다. 나머지(배지 없음)는 구현 완료다.
@@ -98,30 +107,35 @@ const Down = () => (
   </div>
 );
 
-// 레인 사이의 인계는 이 도식에서 가장 중요한 두 지점이다(승인분만 넘어간다 /
-// 수행 로그만 넘어간다). 옅은 화살표 하나로는 그 관문이 보이지 않아, 레인 높이를
+// 레인 사이의 인계는 이 도식에서 가장 중요한 두 지점이다(승인 미션만 넘어간다 /
+// 수행 기록만 넘어간다). 옅은 화살표 하나로는 그 관문이 보이지 않아, 레인 높이를
 // 관통하는 세로선 위에 노란 토큰으로 얹는다.
+// 라벨은 가로쓰기다. 세로쓰기(writing-mode)는 한글에서 글자마다 시선이 끊겨
+// 읽기 어렵고 도식의 격을 떨어뜨린다 — 그래서 레인 사이 여백을 56px로 넓혀
+// 네 글자 라벨이 한 줄로 들어가게 했다.
 const Handoff = ({ label }: { label: string }) => (
-  <div className="relative grid self-stretch content-center justify-items-center" aria-hidden>
-    <span className="absolute inset-y-4 left-1/2 w-px -translate-x-1/2 bg-[#E7E1CF]" />
-    <span className="relative grid justify-items-center gap-1 rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-[7px] py-2.5 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)]">
-      <ArrowRight size={16} strokeWidth={2.5} className="text-[#A9761A]" />
-      <span
-        className="text-[10px] font-bold tracking-[0.08em] text-[#6B5518]"
-        style={{ writingMode: "vertical-rl" }}
-      >
-        {label}
-      </span>
+  <div className="relative grid self-stretch content-center justify-items-center py-1 lg:py-0" aria-hidden>
+    <span className="absolute inset-y-4 left-1/2 hidden w-px -translate-x-1/2 bg-[#E7E1CF] lg:block" />
+    <span className="relative flex items-center gap-1 rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-2.5 py-1 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:flex-col lg:gap-0.5 lg:px-[5px] lg:py-2">
+      <ArrowRight size={14} strokeWidth={2.5} className="shrink-0 text-[#A9761A] lg:hidden" />
+      <ChevronDown size={14} strokeWidth={2.5} className="hidden shrink-0 text-[#A9761A] lg:block" />
+      <span className="whitespace-nowrap text-[10.5px] font-bold text-[#6B5518] lg:text-[9.5px]">{label}</span>
     </span>
   </div>
 );
 
-// ③의 개선 판단이 다음 ①·② 설계로 돌아가는 회귀 경로. 데스크톱에서는
+// ③에서 확인한 문제가 다음 ①·② 설계로 돌아가는 회귀 경로. 데스크톱에서는
 // 오른쪽에서 출발해 아래를 감고 왼쪽 ①로 올라가는 U자형 화살표로 순환을 명시한다.
+// 라벨에 「재승인」을 반드시 남긴다 — 수정한 콘텐츠가 교수자 최종 승인을 다시
+// 받는다는 것이 이 환류가 자동 최적화가 아님을 말하는 지점이다(3.7절).
+// 검토 주체는 3.7절 표현 그대로 「교수자·연구자」로 적는다. 「권한자」처럼 대장에
+// 없는 조어를 만들지 않는다.
+const CYCLE_LABEL = "문제 확인 → 교수자·연구자 검토 → 수정 → 재승인";
+
 const CycleReturn = () => (
   <div
     className="relative mt-1 h-[40px]"
-    aria-label="평가와 개선 결과를 다음 콘텐츠, 미션, 수업 설계에 반영"
+    aria-label="수업에서 확인한 문제는 권한을 가진 교수자·연구자의 검토를 거쳐 콘텐츠와 수업 설계를 수정하고 다시 최종 승인을 받는다"
   >
     <svg
       className="absolute inset-0 hidden h-full w-full overflow-visible lg:block"
@@ -145,13 +159,30 @@ const CycleReturn = () => (
     </svg>
     <div className="absolute left-1/2 top-[10px] hidden -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-3 py-1 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:flex">
       <RotateCcw size={13} strokeWidth={2.5} className="text-[#A9761A]" aria-hidden />
-      <span className="text-[10.5px] font-bold text-[#6B5518]">③ 설계 개선 → ①·② 반영</span>
+      <span className="text-[10.5px] font-bold text-[#6B5518]">{CYCLE_LABEL}</span>
     </div>
     <div className="flex items-center justify-center gap-1.5 rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:hidden">
       <RotateCcw size={14} strokeWidth={2.5} className="shrink-0 text-[#A9761A]" aria-hidden />
-      <span className="text-[11px] font-bold text-[#6B5518]">③ 설계 개선 → ①·② 반영</span>
+      <span className="break-keep text-center text-[11px] font-bold text-[#6B5518]">{CYCLE_LABEL}</span>
     </div>
   </div>
+);
+
+// 수행 기록의 연구 활용은 세 워크플로우와 나란한 네 번째 흐름이 아니다. 레인으로
+// 세우면 학습 기록이 자동으로 연구 자료가 되는 것처럼 읽힌다 — 그래서 레인 밖
+// 얇은 띠에 경계만 적는다. 적는 조건은 정본에 있는 세 가지뿐이다(1.4.3 · 3.1.4).
+const ResearchBoundary = () => (
+  <section className="mt-2.5 rounded-[11px] border border-dashed border-[#C9C2B2] bg-white/70 px-3.5 py-2.5">
+    <div className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+      <h2 className="text-[12.5px] font-extrabold tracking-[-0.01em] text-[#15202B]">
+        학습 수행 기록의 연구 활용
+      </h2>
+      <p className="break-keep text-[11px] leading-[1.45] text-muted-foreground">
+        저장된 수행 기록은 <b className="font-semibold text-[#4A5A66]">자동으로 연구 자료가 되지 않습니다.</b>{" "}
+        기관 연구윤리 절차 · 참여 동의 · 가명처리를 별도로 적용한 자료만 연구에 사용합니다.
+      </p>
+    </div>
+  </section>
 );
 
 const Architecture = () => (
@@ -196,164 +227,175 @@ const Architecture = () => (
         내용의 자연 높이 아래로 이어져 카드 밖 넘침과 화살표 겹침을 막는다. */}
     <div className="mx-auto max-w-[1024px] px-6 pb-5 pt-3 lg:flex lg:min-h-[calc(100dvh-66px)] lg:flex-col lg:pt-4">
       {/* 세 레인을 한 문장으로 — 강조한 세 마디가 그대로 ①②③ 제목이다.
-          밑줄 2px 대신 글자 아래쪽을 덮는 반투명 형광펜을 쓴다(랜딩 후크와 같은 어법).
-          문장 자체는 굵기를 낮춰, 강조가 세 마디에만 남게 한다. */}
+          문장은 3.7절 첫 문단의 결론을 그대로 옮긴 것이다: 세 워크플로우를
+          같은 콘텐츠 버전과 수행 기록으로 연결한 하나의 구조. */}
       <p className="mb-2 text-[14.5px] font-medium leading-relaxed text-[#4A5A66]">
-        <Mark>콘텐츠를 생성·품질 검증</Mark>하고, <Mark>학습자가 수행</Mark>하며, 그 기록이{" "}
-        <Mark>연구자료와 설계 개선</Mark>으로 돌아옵니다.
+        <Mark>콘텐츠 제작</Mark> · <Mark>학습자 수행</Mark> · <Mark>수업 운영</Mark>을 같은 콘텐츠 버전과
+        수행 기록으로 연결합니다.
       </p>
 
-      {/* 3레인 */}
-      <div className="grid grid-cols-1 items-start lg:flex-1 lg:grid-cols-[243px_44px_393px_44px_251px] lg:items-stretch">
-        {/* ① 콘텐츠 생성·품질 검증 */}
+      {/* 3레인. 중앙을 넓게 두는 비대칭은 유지한다 — ②가 핵심 개입이므로
+          균등 폭이 오히려 부정확하다. 레인 사이 여백은 라벨 가로쓰기를 위해
+          44 → 56px로 넓혔고, 그만큼을 좌우 레인에서 덜어냈다. */}
+      <div className="grid grid-cols-1 items-start lg:flex-1 lg:grid-cols-[228px_56px_388px_56px_244px] lg:items-stretch">
+        {/* ① 콘텐츠 제작 */}
         <section className="rounded-[13px] border border-border bg-card px-3.5 pb-4 pt-4 lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="supply"
             num="1"
-            title="콘텐츠 생성·품질 검증"
-            desc="규칙 확정 → 504개 생성 목표 → 4단계 승인"
+            title="콘텐츠 제작"
+            desc="목표 화행·상황 조건에서 교수자 최종 승인까지"
           />
 
-          <Node lane="supply" title="표현 규칙·생성계약 확정" desc="9개 화행의 목표 요소·판정 대역·근거 고정" />
+          <Node
+            lane="supply"
+            title="근거 자료·생성 계약 설정"
+            desc="목표 화행과 상황 조건, 판단 기준을 계약으로 고정"
+          />
           <Down />
-          <Node lane="supply" title="AI 학습 콘텐츠 신규 생성" desc="확정 규칙으로 정식 문항 504개 생성 목표" />
-          <Down />
-          <Node lane="supply" title="1. 준거 사례 연구 책임자 판정" desc={`9화행 × 5개 = ${FINAL_GOLD_POPULATION_COUNT}개 계획 · 시스템 운영 게이트 설정`} />
-          <Down />
-          <Node lane="supply" title="2. 준거 사례 자동 회귀 점검" desc="연구자 확정 준거 사례로 품질 점검 자동화의 작동 조건 확인" />
-          <Down />
-          <Node lane="supply" title="3. 콘텐츠 자동 점검·교수자 검수" desc="생성 문항 전량 자동 점검 · 교수자는 경고 문항을 우선 확인하고 최종 승인" />
+          <Node lane="supply" title="시나리오·학습 미션 생성" desc="확정한 계약으로 콘텐츠 후보를 생성" />
           <Down />
           <Node
             lane="supply"
-            title="4. 교수자의 학습자 사용 승인"
-            desc="시스템이 필수 조건 확인 · 교수자가 최종 사용 여부 결정 · 이력 저장"
+            title="자동 품질 점검"
+            desc="필수 항목·허용값·구조를 규칙으로 검사 · 같은 입력과 규칙에 같은 결과"
+          />
+          <Down />
+          <Node
+            lane="supply"
+            title="AI 검토"
+            desc="복수 모델이 문제 가능성·근거·수정 제안을 제시 · 판정 권한 없음"
+          />
+          <Down />
+          <Node
+            lane="supply"
+            title="교수자 최종 승인"
+            desc="① 교수자 감수 → ② 수업 사용·공개 자격 최종 결정 · 이력 저장"
             decision
           />
         </section>
 
-        <Handoff label="교수자 승인분" />
+        <Handoff label="승인 미션" />
 
-        {/* ② 학습자 워크플로우 */}
+        {/* ② 학습자 수행 */}
         <section className="rounded-[13px] border border-[#D3D1C7] bg-card px-3.5 pb-4 pt-4 shadow-[0_8px_20px_-18px_rgba(21,32,43,.55)] lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="learn"
             num="2"
-            title="학습자 워크플로우"
-            desc="15주 동안 승인된 콘텐츠로 판단·산출·수정을 반복"
+            title="학습자 수행"
+            desc="승인·편성된 미션에서 판단 · 산출 · 피드백 · 유지/수정을 연결"
           />
 
           <Node
             lane="learn"
-            title="15주 강좌 편성"
-            desc="9개 화행과 목표 요소를 순환 배치 · 승인 미션만 사용"
+            title="교과목 선택·주차 학습 진입"
+            desc="수강 중인 교과목에서 이번 주차 미션으로 진입"
           />
           <Down />
-          <Node lane="learn" title="강의 유인물" desc="교과목·주차 공통 자료 · 목표와 핵심 설명" />
-          <Down />
-          <Node
-            lane="learn"
-            title="주차 도입 활동"
-            desc="장면 제시 → 차이 인식 → 원리 이해"
-          />
+          <Node lane="learn" title="주차 도입 활동" desc="장면 제시 → 차이 인식 → 원리 이해" />
           <Down />
 
-          {/* 핵심 엔진 */}
+          {/* 핵심 엔진. 네 칩이 이 연구의 핵심 기여다 — 화용적 판단을 직접 통번역
+              산출과 연결하고, AI 피드백 뒤의 최종 결정을 학습자에게 남긴다.
+              대외 용어는 MJT / DCT형 통번역 산출 과제다(용어대장 36·70행) —
+              수식 없는 `DCT`로 이 과제를 지칭하지 않는다. */}
           <div className="rounded-[11px] border-[1.5px] border-[#FAD338] bg-[#FFFDF4] px-[11px] pb-[11px] pt-2.5">
             <span className="inline-block rounded-[5px] bg-[#FDF1C4] px-[7px] py-0.5 text-[10px] font-bold tracking-[0.07em] text-[#8A6D00]">
               한 미션의 흐름 · 매 미션 반복
             </span>
-            <div className="mt-2 flex flex-wrap items-center gap-[5px] lg:justify-center lg:gap-0.5 xl:gap-1">
-              {[`감각 익히기(MJT ${MPJ_ITEM_COUNT})`, "직접 표현하기", "피드백 확인", "한 곳 다듬기"].map((step, i) => (
+            {/* 네 단계는 세로 연쇄다. 가로 한 줄로는 들어가지 않는다 — 이 레인의
+                안쪽 폭이 338px인데 네 칩과 연결자가 372px를 쓴다(2026-09-17 실측).
+                줄여 쓴 약칭으로 맞추는 대신 정본 용어를 온전히 두고 방향을 돌렸다.
+                도식의 다른 흐름도 모두 세로라 어법도 어긋나지 않는다. */}
+            <div className="mt-2 grid gap-[3px]">
+              {[
+                `화용적 적절성 판단(MJT ${MPJ_ITEM_COUNT})`,
+                "DCT형 통번역 산출",
+                "AI 피드백 검토",
+                "유지·수정 결정",
+              ].map((step, i) => (
                 <span key={step} className="contents">
-                  {i > 0 && <ChevronRight size={9} strokeWidth={2.25} className="shrink-0 text-[#D6B84A]" />}
-                  <span className="whitespace-nowrap rounded-md border border-[#EADFAF] bg-white px-2 py-1 text-[11px] font-semibold lg:px-[5px] lg:text-[9.5px] xl:px-1.5 xl:text-[10px]">
-                    {step}
+                  {i > 0 && (
+                    <ChevronDown size={11} strokeWidth={2.25} className="mx-auto shrink-0 text-[#D6B84A]" />
+                  )}
+                  <span className="flex items-center gap-1.5 rounded-md border border-[#EADFAF] bg-white px-2 py-[5px] text-[11px] font-semibold">
+                    <span
+                      aria-hidden
+                      className="grid h-[15px] w-[15px] shrink-0 place-items-center rounded-[4px] bg-[#FDF1C4] text-[9px] font-bold text-[#8A6D00]"
+                    >
+                      {i + 1}
+                    </span>
+                    <span className="break-keep">{step}</span>
                   </span>
                 </span>
               ))}
             </div>
-            <p className="mt-2 text-[11px] leading-[1.4] text-muted-foreground">
-              번역·통역 수행에서 의미·문법·화용 피드백을 확인하고 핵심 한 곳을 수정
+            <p className="mt-2 break-keep text-[11px] leading-[1.4] text-muted-foreground">
+              최초 산출에 대한 의미·언어·화용 피드백을 검토하고 최종 표현을 유지하거나 수정합니다.
             </p>
           </div>
 
           <Down />
-          <Node lane="learn" title="상황 바꿔보기" desc="같은 화행의 새로운 상황에서 다음 미션 수행" />
+          <Node
+            lane="learn"
+            title="수행 기록·이견 제기"
+            desc="판단·선택·근거·최초안·최종 산출을 맥락·버전과 함께 저장 · 학습자가 이견을 남김"
+            status="수업 운영"
+          />
           <Down />
           <Node
             lane="learn"
-            title="수행·의사결정 기록"
-            desc="판단·선택·근거·최초안·수정안을 맥락·버전과 함께 저장"
-            status="수업 운영"
+            title="개인별 학습 기록·후속 수행"
+            desc="주차·미션에 걸친 자기 기록 확인 · 같은 목표 화행의 다른 사건에서 다시 수행"
           />
         </section>
 
-        <Handoff label="동의한 수행기록" />
+        <Handoff label="수행 기록" />
 
-        {/* ③ 학습 기록·연구자료 */}
+        {/* ③ 수업 운영 */}
         <section className="rounded-[13px] border border-border bg-card px-3.5 pb-4 pt-4 lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
-            lane="res"
+            lane="class"
             num="3"
-            title="학습 기록·연구자료"
-            desc="학습 운영과 연구자료 포함 여부를 분리"
+            title="수업 운영"
+            desc="교수자가 편성·자료·기록을 관리하고 후속 검토를 결정"
           />
 
           <Node
-            lane="res"
-            title="수행·의사결정 기록"
-            desc={
-              <>
-                판단·선택·근거·수정·최종 산출을
-                <br />
-                맥락·버전과 함께 저장
-              </>
-            }
+            lane="class"
+            title="교과목·주차별 미션 편성"
+            desc="승인된 미션을 수업 목표와 주차 조건에 맞게 배치"
           />
           <Down />
           <Node
-            lane="res"
-            title="연구자료 포함 여부 확인"
-            desc={
-              <>
-                참여 동의·과제 완료·필수 응답의
-                <br />포함·제외 조건 확인
-              </>
-            }
+            lane="class"
+            title="수업 자료 제시 관리"
+            desc="주차별 수업 자료·토론 자료와 교수자 진행 메모를 구분해 준비"
           />
           <Down />
           <Node
-            lane="res"
-            title="가명 처리"
-            desc={
-              <>
-                직접 식별자를 제외하고 안정된
-                <br />가명 식별자로 연결
-              </>
-            }
+            lane="class"
+            title="조건 대비와 수업 토론"
+            desc="같은 목표 화행의 두 사건에서 조건과 표현 선택을 비교"
           />
           <Down />
           <Node
-            lane="res"
-            title="수행기록 내려받기"
-            desc="포함 기준을 통과한 가명 연구자료만 버전과 함께 추출"
+            lane="class"
+            title="학급 응답·개인 수행 기록 확인"
+            desc="익명 학급 집계와 개인 기록의 열람 범위를 구분"
           />
           <Down />
           <Node
-            lane="res"
-            title="학습 콘텐츠 개선"
-            desc={
-              <>
-                반복되는 학습자 반응·품질 신호를 모으고
-                <br />연구 책임자가 반영 여부 결정
-              </>
-            }
+            lane="class"
+            title="후속 콘텐츠 검토"
+            desc="수업에서 확인한 문제를 콘텐츠·편성·절차의 재검토로 연결"
+            decision
           />
         </section>
       </div>
 
       <CycleReturn />
+      <ResearchBoundary />
     </div>
   </div>
 );
