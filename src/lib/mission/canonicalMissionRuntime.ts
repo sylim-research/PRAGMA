@@ -2,6 +2,7 @@ import { naturalLearnerScene } from "../../../supabase/functions/_shared/learner
 import { LEVEL, SPEECH_ACT_UI, type ChannelUI } from "@/lib/pragma/enums";
 import type { Pdr } from "@/lib/pragma/coreSchema";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { withinBandCodeFor } from "@/lib/pragma/missionV6";
 import type { CanonicalRunnableMission as RunnableMission } from "@/lib/mission/missionDb";
 import type {
   BestWorstQuest,
@@ -297,6 +298,24 @@ function bandChoiceOption(
   };
 }
 
+/**
+ * v6 MJT5 대역 선택지. 축 이름은 화행마다 다르므로 카탈로그에서 가져오되,
+ * 화면 문구는 요청 3건에서 고정된 형태(짧은 이름만, 보조 문구 없음)를 유지한다.
+ */
+function v6BandOptions(
+  bands: { code: string; label_ko: string }[],
+  catalogWithinBand: string,
+  contentWithinBand: string,
+): ChoiceOption[] {
+  return bands.map((band) => {
+    const isWithinBand = band.code === catalogWithinBand;
+    return {
+      id: isWithinBand ? contentWithinBand : band.code,
+      label: isWithinBand ? "상황에 맞음" : band.label_ko.match(/^(.+?)(?:\s*\([^)]+\))?$/)?.[1]?.trim() || band.label_ko,
+    };
+  });
+}
+
 function runtimeFeedbackMode(pdr: Pdr): DctQuest["feedback"]["mode"] {
   return pdr.p === "speaker_lower" || pdr.d === "distant" || pdr.r === "high"
     ? "needs_mitigation"
@@ -434,7 +453,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
           ...(item.contrast ? { contrast: { context: item.contrast.context_ko,
             target: item.contrast.target, explanation: item.contrast.explanation_ko } } : {}) };
         case "multi_judge": return { ...base, kind: "spectrum",
-          options: [{ id: "too_direct", label: "너무 직접적" }, { id: "appropriate", label: "상황에 맞음" }, { id: "too_indirect", label: "지나치게 우회적" }],
+          options: v6BandOptions(feature.band_schema, feature.within_band_code, withinBandCodeFor(mission.unit.target_feature)),
           candidates: item.candidates.map((candidate, i) => ({ id: `A5-${i}`, text: candidate.text,
             acceptedAnswers: candidate.accepted_band_codes, note: candidate.note_ko })) };
       }

@@ -169,3 +169,80 @@ describe("v6 unscored response contract", () => {
     expect(() => buildMissionAttemptRow(attempt(traces), "profile", "user", at)).toThrow();
   });
 });
+
+describe("v6 beyond request — the skeleton is act-neutral, the judgment axis is not", () => {
+  // The same five items with gratitude's axis: the catalog names the bands, so
+  // nothing about the item structure moves.
+  const asThanks = (): any => {
+    const mission = structuredClone(SAMPLE_MISSION_V6) as any;
+    mission.learning_goal.speech_act = "thanks";
+    mission.unit.target_feature = "gratitude_calibration";
+    const band: Record<string, string> = { too_direct: "insufficient", appropriate: "within_band", too_indirect: "excessive" };
+    for (const candidate of mission.mpj_items[4].candidates) {
+      candidate.accepted_band_codes = candidate.accepted_band_codes.map((code: string) => band[code]);
+    }
+    return mission;
+  };
+
+  it("accepts a non-request act whose bands come from its own feature", () => {
+    expect(MissionV6Schema.safeParse(asThanks()).success).toBe(true);
+  });
+
+  it("keeps the request exception to request alone", () => {
+    expect(MissionV6Schema.safeParse(SAMPLE_MISSION_V6).success).toBe(true);
+    const thanks = asThanks();
+    thanks.mpj_items[4].candidates[0].accepted_band_codes = ["appropriate"];
+    expect(MissionV6Schema.safeParse(thanks).success).toBe(false);
+  });
+
+  it.each([
+    ["another act's bands", (m: any) => { m.mpj_items[4].candidates[0].accepted_band_codes = ["too_direct"]; }],
+    ["a feature the act does not own", (m: any) => { m.unit.target_feature = "request_mitigation_optionality"; }],
+    ["an act outside the nine", (m: any) => { m.learning_goal.speech_act = "small_talk"; }],
+  ])("rejects %s", (_, mutate) => {
+    const mission = asThanks(); mutate(mission);
+    expect(MissionV6Schema.safeParse(mission).success).toBe(false);
+  });
+
+  it("requires the prior move on the task for acts that answer one", () => {
+    const refusal = structuredClone(SAMPLE_MISSION_V6) as any;
+    refusal.learning_goal.speech_act = "refusal";
+    refusal.unit.target_feature = "refusal_softening";
+    const band: Record<string, string> = { too_direct: "too_blunt", appropriate: "within_band", too_indirect: "over_elaborate" };
+    for (const candidate of refusal.mpj_items[4].candidates) {
+      candidate.accepted_band_codes = candidate.accepted_band_codes.map((code: string) => band[code]);
+    }
+    expect(MissionV6Schema.safeParse(refusal).success).toBe(false);
+    refusal.production_task.preceding_turn = "같이 저녁 먹을래?";
+    expect(MissionV6Schema.safeParse(refusal).success).toBe(true);
+  });
+
+  it("reads MJT5 choices off the catalog without moving the approved request screen", () => {
+    const requestView = adaptRunnableMissionToCanonical(runnable());
+    const requestSpectrum = requestView.quests[4];
+    expect(requestSpectrum.kind === "spectrum" && requestSpectrum.options).toEqual([
+      { id: "too_direct", label: "너무 직접적" },
+      { id: "appropriate", label: "상황에 맞음" },
+      { id: "too_indirect", label: "지나치게 우회적" },
+    ]);
+    const thanksView = adaptRunnableMissionToCanonical({
+      ...runnable(asThanks() as MissionV6), speech_act: "thanks" as const,
+    });
+    const thanksSpectrum = thanksView.quests[4];
+    expect(thanksSpectrum.kind === "spectrum" && thanksSpectrum.options).toEqual([
+      { id: "insufficient", label: "부족함" },
+      { id: "within_band", label: "상황에 맞음" },
+      { id: "excessive", label: "과함" },
+    ]);
+  });
+
+  it("checks a learner's judgments against the mission's own bands", () => {
+    const thanks = asThanks() as MissionV6;
+    const responses = rawResponses();
+    responses.A5 = { candidateJudgments: { "A5-0": "insufficient", "A5-1": "within_band", "A5-2": "excessive", "A5-3": "within_band" } };
+    expect(buildMissionV6Responses(thanks, responses, at)[4].candidate_band_codes)
+      .toEqual(["insufficient", "within_band", "excessive", "within_band"]);
+    const requestBands = rawResponses();
+    expect(() => buildMissionV6Responses(thanks, requestBands, at)).toThrow();
+  });
+});

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ScaleCodeV6, SpectrumCodeV6, type MissionV6 } from "@/lib/pragma/missionV6";
+import { ScaleCodeV6, allowedBandCodes, type MissionV6 } from "@/lib/pragma/missionV6";
 import type { MpjResponseTrace } from "./missionAttemptRow";
 
 const base = { completed_at: z.string().datetime() };
@@ -10,7 +10,8 @@ export const MissionV6ResponsesSchema = z.tuple([
   scale.extend({ item_id: z.literal(2), reason_id: z.string().min(1).optional(), revised_scale_code: ScaleCodeV6.optional() }),
   z.object({ ...base, item_id: z.literal(3), item_type: z.literal("fix_choice"), correction_indexes: z.array(z.number().int().min(0).max(2)).length(1) }).strict(),
   z.object({ ...base, item_id: z.literal(4), item_type: z.literal("free_correction"), revised_text: z.string().refine(value => value.trim().length > 0, "A submitted correction is required") }).strict(),
-  z.object({ ...base, item_id: z.literal(5), item_type: z.literal("multi_judge"), candidate_band_codes: z.array(SpectrumCodeV6).length(4) }).strict(),
+  // Band names differ per speech act, so the codes are checked against this mission's feature below.
+  z.object({ ...base, item_id: z.literal(5), item_type: z.literal("multi_judge"), candidate_band_codes: z.array(z.string().min(1)).length(4) }).strict(),
 ]);
 
 /** Validate membership against the exact content, without judging the reason. */
@@ -26,6 +27,12 @@ export function parseMissionV6Responses(mission: MissionV6, input: unknown): Mpj
   if (revised !== undefined && (!choices || revised === parsed[1].scale_code)) {
     throw new z.ZodError([{ code: z.ZodIssueCode.custom, path: [1, "revised_scale_code"],
       message: "A revised judgment follows reasons and differs from the first judgment" }]);
+  }
+  const bands = allowedBandCodes(mission.unit.target_feature);
+  const strayBand = parsed[4].candidate_band_codes.findIndex(code => !bands.includes(code));
+  if (bands.length && strayBand >= 0) {
+    throw new z.ZodError([{ code: z.ZodIssueCode.custom, path: [4, "candidate_band_codes", strayBand],
+      message: `Each judgment must be a band of ${mission.unit.target_feature}` }]);
   }
   return parsed as MpjResponseTrace[];
 }
