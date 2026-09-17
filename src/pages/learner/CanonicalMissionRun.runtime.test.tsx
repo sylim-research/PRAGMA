@@ -91,13 +91,13 @@ describe("CanonicalMissionRun live CTA route", () => {
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
     click("다소 부적절"); click("판단과 이유 확인하기"); click(/^다음:/);
     click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
-    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 번역" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
     click("수정안 제출하기"); click(/^다음:/);
     ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기"); click(/^다음:/);
-    click("직접 옮겨 보기");
+    click("번역하기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
     click("번역 제출하기");
@@ -163,7 +163,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       fireEvent.click(screen.getByRole("button", { name: next }));
     }
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "직접 옮겨 보기" }));
+    fireEvent.click(screen.getByRole("button", { name: /^(번역|통역)하기$/ }));
     fill();
     const reference = mission.production_task.reference_alternatives[0].text;
     if (mode === "translation") {
@@ -254,7 +254,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     );
 
     expect(await screen.findByRole("heading", { name: SAMPLE_MISSION_V5.production_task.situation_ko })).toBeInTheDocument();
-    expect(screen.getByText("요청 표현 · 한국어 → 중국어")).toBeInTheDocument();
+    expect(screen.getByText("요청 화행 · 한국어 → 중국어")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "상황에 맞는 표현 판단하기" })).not.toBeInTheDocument();
 

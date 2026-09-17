@@ -24,12 +24,13 @@ describe("CanonicalMissionRun completion connections", () => {
         ],
       },
     }} />);
-    expect(screen.getByText("다시 살펴본 기준: 화용 적절성")).toBeInTheDocument();
+    expect(screen.queryByText(/다시 살펴본 기준/)).not.toBeInTheDocument();
     expect(screen.queryByText(/원문의 핵심 내용이 빠졌습니다/)).not.toBeInTheDocument();
+    expect(screen.getByText("请帮我收一下快递。")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "내가 확정한 최종안" })).toBeVisible();
     expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
     expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();
-    expect(screen.getByText("다시 살펴본 기준: 화용 적절성").closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByText("您方便帮我收一下快递吗？")).toBeInTheDocument();
   });
 
   it("shows the priority feedback once on each action screen", () => {
@@ -38,11 +39,13 @@ describe("CanonicalMissionRun completion connections", () => {
     const quest = CANONICAL_MISSION_PREVIEW.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback")!;
     render(<DctFeedbackView quest={quest} response={{ first: "你必须改时间。", revised: "你必须改时间。", reflected: false }} onDone={vi.fn()} />);
     act(() => vi.advanceTimersByTime(1300));
-    const point = screen.getByRole("heading", { name: /먼저 확인할 한 가지/ }).closest("article")!.querySelector("p")!.textContent!;
+    // 세 기준이 모두 보이고, 우선 기준의 본문은 화면마다 한 번만 나온다.
+    ["의미 충실성", "문법 정확성", "화용 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
+    const point = screen.getByRole("heading", { name: "의미 충실성" }).closest("article")!.querySelector("p")!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
     expect(screen.getAllByText(point)).toHaveLength(1);
-    expect(screen.queryByRole("heading", { name: /먼저 확인할 한 가지/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "의미 충실성" })).not.toBeInTheDocument();
   });
 
   it("offers save-only retry after failure and prevents navigation while saving", () => {
@@ -70,23 +73,24 @@ describe("CanonicalMissionRun completion connections", () => {
     const onSubmit = vi.fn();
     render(<MissionDissentPanel onSubmit={onSubmit} />);
 
-    fireEvent.click(screen.getByRole("button", { name: /이의 제기하기/ }));
-    expect(screen.getByRole("heading", { name: "AI 참고 판정에 대한 이의 제기" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /내 판단 남기기/ }));
+    expect(screen.getByRole("heading", { name: "AI 판정과 생각이 다르다면" })).toBeInTheDocument();
 
-    const submit = screen.getByRole("button", { name: "이의 제기 남기기" });
+    const submit = screen.getByRole("button", { name: "내 판단 남기기" });
     expect(submit).toBeDisabled();
 
-    fireEvent.click(screen.getByRole("button", { name: "관계·친밀도에 대한 다른 판단" }));
-    fireEvent.change(screen.getByPlaceholderText("한 줄 이유 (선택)"), {
+    // 조건 선택지는 없다 — 한 줄 서술만 받는다.
+    expect(screen.queryByRole("button", { name: "관계·친밀도에 대한 다른 판단" })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByPlaceholderText("어떤 점에서 다르게 봤는지 한 줄로 적어 주세요."), {
       target: { value: "초면보다 이미 아는 사이에 가깝다고 보았습니다." },
     });
     fireEvent.click(submit);
 
     expect(onSubmit).toHaveBeenCalledWith({
-      conditions: ["relationship"],
+      conditions: [],
       reason: "초면보다 이미 아는 사이에 가깝다고 보았습니다.",
     });
-    expect(screen.getByText(/AI 참고 판정과 나의 판단을 함께/)).toBeInTheDocument();
+    expect(screen.getByText("내 판단을 기록했습니다.")).toBeInTheDocument();
   });
 
   it("lets the learner retain the first response after recording a challenge to revision feedback", () => {
@@ -105,12 +109,11 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(retain).toBeDisabled();
     expect(screen.getByText(/첫 번역을 유지하려면/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: /이의 제기하기/ }));
-    fireEvent.click(screen.getByRole("button", { name: "관계·친밀도에 대한 다른 판단" }));
-    fireEvent.change(screen.getByPlaceholderText("한 줄 이유 (선택)"), {
+    fireEvent.click(screen.getByRole("button", { name: /내 판단 남기기/ }));
+    fireEvent.change(screen.getByPlaceholderText("어떤 점에서 다르게 봤는지 한 줄로 적어 주세요."), {
       target: { value: "이미 합의된 일정이라 더 직접적으로 말해도 된다고 판단했습니다." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "이의 제기 남기기" }));
+    fireEvent.click(screen.getByRole("button", { name: "내 판단 남기기" }));
 
     expect(retain).toBeEnabled();
     fireEvent.click(retain);
@@ -119,7 +122,7 @@ describe("CanonicalMissionRun completion connections", () => {
       revised: first,
       reflected: false,
       dissent: {
-        conditions: ["relationship"],
+        conditions: [],
         reason: "이미 합의된 일정이라 더 직접적으로 말해도 된다고 판단했습니다.",
       },
     }));

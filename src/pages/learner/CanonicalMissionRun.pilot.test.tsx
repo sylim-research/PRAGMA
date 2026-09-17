@@ -65,24 +65,27 @@ describe("local learner UX pilot", () => {
     const inventedCause = screen.getByRole("button", { name: /助教您好，不好意思，我上周忘了签到/ });
     expect(inventedCause).toHaveTextContent("원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다.");
     expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
-    expect(within(inventedCause).queryByText("가능한 수정안")).not.toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("가능한 수정안")).toBeInTheDocument();
+    expect(within(inventedCause).queryByText("참고 답안")).not.toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("참고 답안")).toBeInTheDocument();
     click("다음: 직접 고쳐 보기");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
-    expect(screen.queryByText("이렇게도 고칠 수 있어요")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "참고 답안" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
-    // The correction field opens immediately; a non-reference answer remains the learner's answer.
-    const input = screen.getByRole("textbox", { name: "내가 고친 번역" });
-    expect(input).toHaveValue("我下课晚，明天的汇报彩排就从七点改到七点半吧。");
+    // The correction field opens immediately and empty; the unchanged original cannot be submitted.
+    const input = screen.getByRole("textbox", { name: "내가 고친 표현" });
+    expect(input).toHaveValue("");
     fireEvent.change(input, { target: { value: "  " } });
     expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
+    fireEvent.change(input, { target: { value: "我下课晚，明天的汇报彩排就从七点改到七点半吧。" } });
+    expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
+    expect(screen.getByText(/원래 표현을 그대로 제출할 수 없습니다/)).toBeInTheDocument();
     const freeAnswer = "明天我下课比较晚，大家方便把彩排从七点推迟到七点半吗？";
     fireEvent.change(input, { target: { value: freeAnswer } });
     click("수정안 제출하기");
-    expect(screen.getByRole("textbox", { name: "내가 고친 번역" })).toHaveValue(freeAnswer);
-    expect(screen.getByText("이렇게도 고칠 수 있어요")).toBeInTheDocument();
+    expect(screen.getByRole("textbox", { name: "내가 고친 표현" })).toHaveValue(freeAnswer);
+    expect(screen.getByRole("heading", { name: "참고 답안" })).toBeInTheDocument();
     expect(screen.getByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).toBeInTheDocument();
-    expect(screen.queryByText(/권장 답안과 같아요|권장 답안과 달라요/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/참고 답안과 같아요|참고 답안과 달라요/)).not.toBeInTheDocument();
     click("다음: 표현 비교하기");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(snapshot.responses.A3).toEqual({ correctionIds: ["apology"] });
@@ -97,8 +100,8 @@ describe("local learner UX pilot", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${index + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기");
-    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("참고 위치 · 상황에 맞음")).toBeInTheDocument();
-    click("다음: 직접 옮겨 보기"); click("직접 옮겨 보기");
+    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("참고 답안 · 상황에 맞음")).toBeInTheDocument();
+    click("다음: 번역하기"); click("번역하기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
     const dct = screen.getByRole("textbox");
     expect(dct).toHaveValue("");

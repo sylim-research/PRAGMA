@@ -61,7 +61,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기"); click("다음: 직접 고쳐 보기");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
-    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 번역" }), { target: { value: revisedText } });
+    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: revisedText } });
     click("수정안 제출하기");
     const contrast = screen.getByRole("region", { name: "다른 맥락에서는?" });
     expect(within(contrast).getByText(mission.mpj_items[3].contrast.target)).toBeInTheDocument();
@@ -71,13 +71,13 @@ describe("representative v6 reason / contrast rhythm", () => {
     ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
-    click("네 표현 확인하기"); click("다음: 직접 옮겨 보기");
+    click("네 표현 확인하기"); click("다음: 번역하기");
     const traces = buildMissionV6Responses(mission, snapshot().responses, "2026-09-14T12:00:00.000Z");
     expect(traces[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id, revised_scale_code: "somewhat_inappropriate" });
     expect(traces[3].revised_text).toBe(revisedText);
     expect(traces[4].candidate_band_codes).toEqual(["appropriate", "too_direct", "too_indirect", "appropriate"]);
     expect(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)).toBeNull();
-    click("직접 옮겨 보기");
+    click("번역하기");
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。" } });
     click("번역 제출하기");
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
