@@ -379,7 +379,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const situationLines = context.situation.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
   return (
     <section className={compact
-      ? "rounded-xl bg-[#F7F5EE] px-4 py-3.5 sm:px-5"
+      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-gradient-to-b from-[#FAF8F1] to-[#F2EFE4] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-5"
       : "rounded-xl border border-[#E2DED4] bg-[#F4F2EC] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
@@ -389,8 +389,16 @@ function ContextCard({ context, headerRight, title = "상황" }: {
       )}
       {compact ? (
         // 화행은 상단 바에 이미 있다. 이 카드는 장면만 전한다.
-        <h2 className="break-keep text-[16.5px] font-medium leading-8 text-[#1D2A36]">
-          {situationLines.map((line) => <span key={line} className="block">{line}</span>)}
+        // 첫 문장이 장면을 세우고, 뒤따르는 문장은 조건을 덧붙이는 지문이라 한 단 낮춘다.
+        <h2 className="break-keep">
+          {situationLines.map((line, index) => (
+            <span key={line} className={index === 0
+              ? "block text-[17px] font-semibold leading-8 tracking-[-0.01em] text-[#16222E]"
+              : "mt-1 block text-[15.5px] font-normal leading-7 text-[#5A6673]"}>
+              {index === 0 && <span aria-hidden className="mr-2 inline-block h-px w-4 align-middle bg-[#C9A62E]" />}
+              {line}
+            </span>
+          ))}
         </h2>
       ) : (
         <h2 className="mt-1.5 break-keep text-[17px] font-bold leading-8 text-[#101B2B]">{context.situation}</h2>
