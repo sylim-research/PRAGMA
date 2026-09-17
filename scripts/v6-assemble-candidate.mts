@@ -40,13 +40,15 @@ task.learner_context_ko = authored.dct_learner_context;
 if (authored.dct_scene) Object.assign(task, authored.dct_scene);
 // 옮겨온 값을 자리별로 덮는다 — 한국어 목표문 자연화 패스(2026-09-17). 화행 이동·대역은 그대로 두고 표면만 바꾼다.
 // 값이 {text} 객체인 자리에 문자열을 주면 text만 바꾼다(note_ko·band 등은 유지).
-for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<string, string>)) {
+for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<string, unknown>)) {
   const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
   const last = keys.pop()!;
   const parent = keys.reduce<any>((node, key) => node?.[key], draft);
   if (parent == null || !(last in parent)) throw new Error(`override 자리가 없음: ${path}`);
   const existing = parent[last];
-  if (existing && typeof existing === "object" && "text" in existing) existing.text = value; else parent[last] = value;
+  if (value === null) delete parent[last];
+  else if (typeof value === "string" && existing && typeof existing === "object" && "text" in existing) existing.text = value;
+  else parent[last] = value;
 }
 
 const unfilled = gaps.filter(gap => {
@@ -96,7 +98,16 @@ const ctx: CheckContext = {
   planned_target_feature: feature.code,
   direction: draft.direction as CheckContext["direction"],
 };
-const check = checkMission(draft, ctx, source.core_content ?? undefined);
+// 코어 오버라이드(DCT PDR을 바꿀 때 코어도 같이 — R23). 로컬 검사에도 같은 코어를 쓴다.
+const coreOverrides = (authored.core_overrides ?? null) as { scenario_d?: string; pdr_d?: string; situation_ko?: string; relation_ko?: string } | null;
+const coreForCheck = source.core_content
+  ? { ...source.core_content,
+      ...(coreOverrides?.pdr_d ? { pdr: { ...source.core_content.pdr, d: coreOverrides.pdr_d } } : {}),
+      ...(coreOverrides?.situation_ko ? { situation_ko: coreOverrides.situation_ko } : {}),
+      ...(coreOverrides?.relation_ko ? { relation_ko: coreOverrides.relation_ko } : {}) }
+  : undefined;
+if (!source.core_content) console.warn("[warn] v5.json에 core_content가 없어 R23(코어 계승) 검사를 로컬에서 못 한다 — dump를 다시 뜰 것");
+const check = checkMission(draft, ctx, coreForCheck);
 for (const violation of check.violations) console.log(`[${violation.level}] ${violation.id} ${violation.message}`);
 if (check.result === "fail") throw new Error("규칙검사 fail — 후보 파일을 쓰지 않음");
 
@@ -105,6 +116,8 @@ const zh = (base: unknown, variant: unknown) => (direction === "zh_ko" && varian
 const candidate = {
   source_scenario_id: source.scenario_id,
   title: `[v6 변환] ${source.title}`,
+  ...(coreOverrides ? { core_overrides: coreOverrides } : {}),
+  ...(authored.rework_of ? { rework_of: authored.rework_of } : {}),
   mission_content: draft,
   validation_result: { result: check.result, violations: check.violations.map(v => ({ id: v.id, level: v.level, message: v.message })), generation_attempts: 1, repair_attempts: 0 },
   lineage_meta: buildMissionLineageScope({ direction, speechAct: ctx.speech_act, targetFeature: feature.code }),

@@ -60,16 +60,28 @@ const clone = {
   final_corpus_release_id: null,
   archived_at: null,
   archive_note: null,
-  supersedes_scenario_id: candidate.source_scenario_id,
+  // rework_of가 있으면 앞서 등록한 v6 행을 잇는다(3bfec949 → b12b0549 → 새 행). 코어는 여전히 v5 원본에서 복제.
+  supersedes_scenario_id: candidate.rework_of ?? candidate.source_scenario_id,
   generation_provider: "retained_source",
   generator_model: "retained_reviewed_v5_items",
   generation_prompt_version: candidate.mission_content.provenance.prompt_version,
   generation_run_id: `v6_conversion_${stamp}`,
-  generation_item_key: `${source.speech_act}:${source.language_direction}:${source.learner_level}:${source.mode}:${candidate.source_scenario_id.slice(0, 8)}`,
+  // 같은 원본을 다시 등록하면 (run, item_key) 유일 제약에 걸린다 → rework 접미사(supersede RPC와 같은 꼴).
+  generation_item_key: `${source.speech_act}:${source.language_direction}:${source.learner_level}:${source.mode}:${candidate.source_scenario_id.slice(0, 8)}${candidate.rework_of ? `:rework:${newId.slice(0, 8)}` : ""}`,
   prompt_snapshot_hash: null,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
 };
+// 코어 오버라이드 — DCT PDR을 바꾼 후보는 코어도 같이 바꿔야 R23을 통과한다. 원본은 불변, 복제 행에만.
+const co = candidate.core_overrides;
+if (co) {
+  if (co.scenario_d) clone.scenario_d = co.scenario_d;
+  clone.core_content = { ...clone.core_content,
+    ...(co.pdr_d ? { pdr: { ...clone.core_content.pdr, d: co.pdr_d } } : {}),
+    ...(co.situation_ko ? { situation_ko: co.situation_ko } : {}),
+    ...(co.relation_ko ? { relation_ko: co.relation_ko } : {}) };
+  console.log(`0/3 코어 오버라이드 적용: ${Object.keys(co).join(", ")}`);
+}
 const { error: insertError } = await db.from("scenarios").insert(clone);
 if (insertError) throw new Error(`복제 행 삽입 실패: ${insertError.message}`);
 console.log(`1/3 복제 행 생성: ${newId}`);
