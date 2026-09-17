@@ -96,10 +96,14 @@ const rawSchema = z.object({
   item_lineage: MissionV5NativeSchema.shape.item_lineage,
 }).strict();
 
-// Acts that answer a prior move need that move on the production task. Held to
-// the two the contract already obliges; agreement and compliment response are
-// not extended here (2026-09-17 decision 4).
-const RESPONSE_ACTS: readonly string[] = ["refusal", "opposition"];
+// v6 items are self-contained scenarios like native MPJ5, so a prior move
+// belongs inside situation_ko and this field stays empty (R8). The response acts
+// carry their obligation on the core, not here. The key stays readable so
+// content that wrongly carries a turn fails with this reason rather than as an
+// unrecognized key.
+function carriesPrecedingTurn(value: string | null | undefined): boolean {
+  return typeof value === "string" && value.trim().length > 0;
+}
 
 export const MissionV6Schema = rawSchema.superRefine((raw, ctx) => {
   const mission = raw as MissionV6;
@@ -132,9 +136,14 @@ export const MissionV6Schema = rawSchema.superRefine((raw, ctx) => {
   const task = mission.production_task;
   if ((task.mode === "translation") !== (task.source_modality === "written")) issue(["production_task", "source_modality"], "Task mode and modality must agree");
   if (task.mode === "interpreting" && !task.replay_limit) issue(["production_task", "replay_limit"], "Interpreting requires replay limit");
-  if (RESPONSE_ACTS.includes(act) && !task.preceding_turn) {
-    issue(["production_task", "preceding_turn"], `${act} answers a prior move, so the task needs that turn`);
+  if (carriesPrecedingTurn(task.preceding_turn)) {
+    issue(["production_task", "preceding_turn"], "v6 scenarios are self-contained; summarize any prior move in situation_ko");
   }
+  mission.mpj_items.forEach((item, index) => {
+    if (carriesPrecedingTurn(item.preceding_turn)) {
+      issue(["mpj_items", index, "preceding_turn"], "v6 scenarios are self-contained; summarize any prior move in situation_ko");
+    }
+  });
   if (task.focal_segments.filter(segment => segment.role === "head").length !== 1
     || task.focal_segments.some(segment => !task.source_text.includes(segment.text))) {
     issue(["production_task", "focal_segments"], "One head and source-grounded focal segments are required");

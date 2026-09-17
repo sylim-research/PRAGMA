@@ -46,7 +46,42 @@ reviewed v6 6건의 구조를 먼저 읽어 고정했다. 6건 모두 `request` 
   MJT5 선택지가 카탈로그에서 나오되 요청 화면은 그대로 · 학습자 판단이 미션 대역으로 검증됨.
 - 운영 DB·콘텐츠·편성은 읽기만 했고 쓰지 않았다.
 
+## 정정 — 응답류의 preceding_turn
+
+처음에 refusal·opposition은 `production_task.preceding_turn`이 있어야 통과하도록 썼다가 되돌렸다.
+`missionRules.ts`의 R8은 반대로 **native MJT5가 preceding_turn을 쓰면 fail**이고
+(`문항 N: native MJT5는 preceding_turn을 생성하지 않음`, `production_task: native MJT5는
+preceding_turn을 사용하지 않음`), `missionConsistency.ts`도 「native 미션은 preceding_turn=null이
+정식 설계다. 앞선 사건은 situation_ko 안에서 확인한다」로 적고 있다. 실측도 같다 — reviewed
+refusal 저장본 6건 전부 `preceding_turn`이 null이다. 응답류의 의무는 코어(R8 코어 절)에 있고
+미션에 있지 않다. 스키마는 이제 v6가 preceding_turn을 **들고 있으면** 거부한다.
+
+## v5 → v6 변환 (`missionV5ToV6.ts`)
+
+refusal 1건으로 변환 경로를 확인했다. 결과: **기계적 변환만으로는 끝나지 않는다.**
+
+옮겨지는 것 — 판정·교정안·후보·대역·해설·장면·관계·PDR·채널·`unit`·DCT 전체.
+v5의 `reason` 선택지는 v6 2번 문항의 이유 선택으로 그대로 옮겨 붙는다.
+v6가 쓰지 않는 필드(`axis_feature`·`highlights`·`item_focus`·`recommended_example`·
+`preceding_turn`·`contrast_plan`·`diagnostic_dimensions`)는 떨군다.
+
+사람이 써야 하는 것 — **미션 1건당 29자리**:
+
+| 자리 | 수 | 이유 |
+|---|---|---|
+| 문항 5개 × `short_label`·`title`·`prompt` | 15 | v6 화면 문구, v5에 대응 필드 없음 |
+| 2번 `accepted_scale_codes`·`reference_scale_code`·`reason_choice.prompt` | 3 | judge3의 3대역과 4점 척도는 자가 다르다 |
+| 4번 자유 교정 문항 전체(장면·관계·원문·대상·참고안·해설) | 6 | v5에 자유 교정 문항이 없다 |
+| 문항별 핵심 5줄 | 5 | v5에 없다 |
+
+즉 대표 3건이 자동 변환기가 아니라 개별 작업이었던 이유가 확인된다. 변환기는 옮길 수 있는
+것을 옮기고 남은 자리를 경로와 이유로 보고하며, **내용을 지어내지 않는다.** 변환 결과가
+스키마를 통과한다는 것은 형식이 맞다는 뜻일 뿐 학습 자료로 타당하다는 뜻이 아니다.
+
+변환기를 쓰면서 저장본 실측으로 잡은 두 가지: v5 후보·교정안에 v6가 쓰지 않는 필드가 섞여
+있을 수 있어 세 필드만 골라 옮긴다. `learning_goal`이 없는 옛 저장본은 화행을 따로 받는다.
+
 ## 남은 것 (이 커밋 범위 밖)
-- v5 저장본 → v6 변환의 실제 수행. 대표 3건은 자동 변환기가 아니라 사람이 검토한 개별 작업이었다.
+- 29자리의 실제 집필과 화행별 내용 판정. 이 커밋은 자리만 만들고 비워 둔다.
 - 생성계약 v6 절과 규칙 카탈로그·결정 기록 갱신은 승인 사항이라 하지 않았다.
-- 화행별 변환본의 내용 판정, 교수자 승인, 편성.
+- 교수자 승인, 편성, DB 쓰기. 이번 작업은 운영 DB를 읽기만 했다.

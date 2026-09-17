@@ -204,17 +204,25 @@ describe("v6 beyond request — the skeleton is act-neutral, the judgment axis i
     expect(MissionV6Schema.safeParse(mission).success).toBe(false);
   });
 
-  it("requires the prior move on the task for acts that answer one", () => {
-    const refusal = structuredClone(SAMPLE_MISSION_V6) as any;
-    refusal.learning_goal.speech_act = "refusal";
-    refusal.unit.target_feature = "refusal_softening";
+  // R8: native MJT5 scenarios are self-contained, so the prior move is summarized
+  // in situation_ko and preceding_turn stays empty even for the response acts.
+  const asRefusal = (): any => {
+    const mission = structuredClone(SAMPLE_MISSION_V6) as any;
+    mission.learning_goal.speech_act = "refusal";
+    mission.unit.target_feature = "refusal_softening";
     const band: Record<string, string> = { too_direct: "too_blunt", appropriate: "within_band", too_indirect: "over_elaborate" };
-    for (const candidate of refusal.mpj_items[4].candidates) {
+    for (const candidate of mission.mpj_items[4].candidates) {
       candidate.accepted_band_codes = candidate.accepted_band_codes.map((code: string) => band[code]);
     }
-    expect(MissionV6Schema.safeParse(refusal).success).toBe(false);
-    refusal.production_task.preceding_turn = "같이 저녁 먹을래?";
-    expect(MissionV6Schema.safeParse(refusal).success).toBe(true);
+    return mission;
+  };
+
+  it("keeps response-act scenarios self-contained", () => {
+    expect(MissionV6Schema.safeParse(asRefusal()).success).toBe(true);
+    const onTask = asRefusal(); onTask.production_task.preceding_turn = "같이 저녁 먹을래?";
+    expect(MissionV6Schema.safeParse(onTask).success).toBe(false);
+    const onItem = asRefusal(); onItem.mpj_items[0].preceding_turn = "같이 저녁 먹을래?";
+    expect(MissionV6Schema.safeParse(onItem).success).toBe(false);
   });
 
   it("reads MJT5 choices off the catalog without moving the approved request screen", () => {
