@@ -1,5 +1,5 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
-@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -168,11 +168,20 @@
   h2 { letter-spacing: -0.01em; line-height: 1.25; }
 }
 
-@layer utilities {
+/* 중국어 예문 글꼴. components 층에 두는 이유: 같은 요소에 붙은 font-semibold 같은
+   가중치 유틸리티가 항상 이겨야 하기 때문이다(utilities 층에 두면 출력 순서에 좌우된다).
+   기본 가중치 500 — 명조(宋体)의 가로획은 400에서 머리카락 굵기라 논문 도판으로 60~70%
+   축소하면 끊긴다. 500은 명조 인상은 그대로 두고 축소를 버틴다(2026-09-17 1:1 비교 후 결정).
+   Pretendard를 serif 앞에 끼운 이유: Noto Serif SC에는 한글이 없어, 학습자 기록처럼
+   한국어가 이 상자에 들어오면 Windows 기본 명조(바탕)로 떨어지던 것을 막는다. */
+@layer components {
   .font-zh {
-    font-family: "Noto Serif SC", "Songti SC", SimSun, serif;
+    font-family: "Noto Serif SC", "Songti SC", SimSun, "Pretendard Variable", Pretendard, serif;
+    font-weight: 500;
   }
+}
 
+@layer utilities {
   .fade-in {
     animation: fadeIn 0.35s ease-out both;
   }
