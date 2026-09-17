@@ -22,7 +22,7 @@ describe("instructor experience", () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={onReady} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: /3. 판단하고 고쳐보기/ }));
     fireEvent.click(screen.getByRole("button", { name: "참고 판정·해설 바로 보기" }));
-    await screen.findByText("권장 수정안");
+    await screen.findAllByText("참고 답안");
     for (const correction of SAMPLE_MISSION_V5_NATIVE.mpj_items[2].corrections) expect(screen.getByText(correction.note_ko)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [{ section: "mjt-2", status: "revision_required", note: "" }] })));
@@ -94,14 +94,15 @@ describe("instructor experience", () => {
       mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } });
     const task = SAMPLE_MISSION_V6_REASON_CONTRAST.production_task;
     const { unmount } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6("intermediate"))} section="scene" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
-    expect(screen.getByRole("list", { name: "표현 판단 활동" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "적절성 판단 활동" })).toBeInTheDocument();
     expect(screen.getByText("다른 상황의 원문을 직접 번역하기")).toBeInTheDocument();
     expect(screen.queryByText(task.situation_ko)).not.toBeInTheDocument();
     expect(screen.queryByText("상대·관계")).not.toBeInTheDocument();
     unmount();
     for (const level of ["intermediate", "advanced"] as const) {
       const { unmount: close } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6(level))} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
-      expect(screen.getByText("단어 힌트 보기")).toBeInTheDocument();
+      // 힌트는 기본이 접힘이다 — 열어야 보인다.
+      fireEvent.click(screen.getByText(/단어 힌트 \d+개/));
       for (const hint of task.vocabulary_hints!) expect(screen.getByText(hint.target)).toBeInTheDocument();
       close();
     }

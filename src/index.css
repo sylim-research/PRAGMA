@@ -208,9 +208,19 @@
     to { opacity: 1; transform: translateX(0); }
   }
 
+  /* 장면이 열리듯 한 번 떠오른다 — 상황 카드는 과제가 아니라 배경이라는 신호. */
+  .scene-in {
+    animation: sceneIn 1680ms cubic-bezier(0.22, 0.7, 0.24, 1) both;
+  }
+  @keyframes sceneIn {
+    from { opacity: 0; transform: translateX(-18px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .mission-message-in,
-    .mission-card-in {
+    .mission-card-in,
+    .scene-in {
       animation: none;
     }
   }
