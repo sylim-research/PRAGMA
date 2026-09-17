@@ -37,16 +37,31 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
     expect((draft.production_task as any).preceding_turn).toBeNull();
   });
 
+  it("승인본에서 상수로 굳은 자리는 규칙으로 채운다", () => {
+    expect(items.map((entry: any) => entry.short_label)).toEqual(["첫인상 판단", "맥락 판단", "선택교정", "직접 고쳐 보기", "네 표현 비교"]);
+    expect(items[0].prompt).toBe(items[1].prompt);
+    expect(items[1].reason_choice.prompt).toBe("가장 큰 이유는 무엇인가요?");
+    // v5 topology X→A→A→A→Y: judge3는 within 밖이므로 승인본 여섯 건과 같은 척도.
+    expect(item("judge3").accepted_band_codes).not.toContain("within_band");
+    expect(items[1].accepted_scale_codes).toEqual(["somewhat_inappropriate", "very_inappropriate"]);
+    expect(items[1].reference_scale_code).toBe("somewhat_inappropriate");
+    // judge3의 권장 예시는 수정 예시로, reason의 해설은 2번 해설 뒤에 붙는다.
+    expect(items[1].revision_examples).toEqual([item("judge3").recommended_example]);
+    expect(items[1].explanation_ko).toContain(item("reason").explanation_ko);
+  });
+
   it("사람이 써야 하는 자리를 빠짐없이 보고한다", () => {
     const paths = gaps.map(gap => gap.path);
-    // 문항 다섯 개의 화면 문구 3종 + 2번 척도·질문 + 4번 문항 전체 + 핵심 다섯 줄.
-    expect(paths).toHaveLength(15 + 3 + 6 + 5);
-    expect(paths).toContain("mpj_items[1].accepted_scale_codes");
+    // 문항 다섯 개의 제목 + 4번 문항 전체(장면·관계·PDR·원문·대상·참고안·해설) + 핵심 다섯 줄.
+    expect(paths).toHaveLength(5 + 7 + 5);
+    expect(paths).toContain("mpj_items[1].title");
     expect(paths).toContain("mpj_items[3].target");
     expect(paths).toContain("lesson_points[0]");
-    // 옮겨온 자리는 gap이 아니다.
+    // 옮겨오거나 규칙으로 채운 자리는 gap이 아니다.
     expect(paths).not.toContain("mpj_items[2].corrections");
     expect(paths).not.toContain("mpj_items[4].candidates");
+    expect(paths).not.toContain("mpj_items[1].accepted_scale_codes");
+    expect(paths).not.toContain("mpj_items[0].prompt");
   });
 
   it("빈 채로는 스키마를 통과하지 못하고, 자리를 채우면 통과한다", () => {

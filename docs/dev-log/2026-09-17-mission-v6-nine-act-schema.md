@@ -81,7 +81,37 @@ v6가 쓰지 않는 필드(`axis_feature`·`highlights`·`item_focus`·`recommen
 변환기를 쓰면서 저장본 실측으로 잡은 두 가지: v5 후보·교정안에 v6가 쓰지 않는 필드가 섞여
 있을 수 있어 세 필드만 골라 옮긴다. `learning_goal`이 없는 옛 저장본은 화행을 따로 받는다.
 
+## 29자리 → 17자리 (승인본 실측으로 규칙이 된 것)
+
+reviewed v6 여섯 건을 대조하니 다음이 전부 같았다. 변환기가 규칙으로 채운다.
+- 문항 짧은이름 5개(첫인상 판단·맥락 판단·선택교정·직접 고쳐 보기·네 표현 비교)와 지시문 5개,
+  이유 질문 「가장 큰 이유는 무엇인가요?」.
+- **2번 문항 척도**: 여섯 건 모두 기준 `somewhat_inappropriate` · 허용 +`very_inappropriate`.
+  v5 native의 topology X→A→A→A→Y에서 2번(judge3)은 항상 within 밖 대역이라 결과가 같다.
+  judge3가 within이면 1번과 같은 척도를 쓴다(현재 재고에는 없음).
+- judge3의 `recommended_example`(target과 다를 때)은 2번의 `revision_examples`로, reason의
+  해설은 judge3 해설 뒤에 이어 붙인다 — v6 2번은 판단과 이유를 한 화면에서 확인한다.
+
+남는 집필 = **문항 제목 5 + 4번 자유 교정 문항 7(장면·관계·PDR·원문·대상·참고안·해설) + 핵심 5줄 = 17자리**
+(+ 선택인 `learner_context_ko` 6). 대표 3건의 문항이 v5에서 온 것이 아니라 09-14 로컬 파일럿
+(`learnerUxPilot.ts`)의 손으로 쓴 문항이었음을 확인했다 — 그쪽 「A」는 코어·DCT만 승계했고,
+이번 변환기는 승인된 v5 문항 4/5까지 승계한다. 둘 다 새 생성 프롬프트 없이 가는 경로다.
+
+## 파일럿 1 — 거절 · 중→한 · 중급 · 번역 (`ea0976f1`, c2 6주차 번역 슬롯)
+
+- 입력 `tmp/v6-conversion/ea0976f1.v5.json`(저장본 그대로) + `ea0976f1.authored.json`(17자리 집필).
+- `scripts/v6-assemble-candidate.mts`: 변환 → 집필분 덮기 → `authoring{ai_draft, lineage pending}` →
+  승격 경로와 같은 방식의 `mission_content_hash` → MissionV6Schema → `checkMission`(v6 경로).
+  결과 **스키마 pass · 규칙검사 pass · warning 0 · hash `5dca40d0…`**. 후보 `ea0976f1.v6.candidate.json`.
+- 4번 문항은 새 장면(같은 과 선배 · 토요일 독서 모임 · 아르바이트 사정)이며 2번과 같은 축
+  (too_blunt)을 다른 P에서 되짚는다. 판정·교정안·후보·대역·DCT는 v5 승인본 그대로다.
+- **DB에는 쓰지 않았다.** 등록은 `scripts/register-v6-candidate.mjs`(관리자 계정 필요)가
+  ① 원본 코어 행을 새 id로 복제(원본·편성 불변) ② edge `quality_check` ③ `save_generated_mission`
+  순으로 하고, 규칙검사·최종검수·승인·편성은 관리자 화면의 기존 절차를 따른다.
+- 집필분·후보 사본은 `Documents/pragma-v6-conversion/`에도 두었다(tmp/는 git 밖).
+
 ## 남은 것 (이 커밋 범위 밖)
-- 29자리의 실제 집필과 화행별 내용 판정. 이 커밋은 자리만 만들고 비워 둔다.
+- 파일럿 1 등록·품질 점검·교수자 승인·6주차 편성 교체·학습자 실행 — 관리자 실행.
+- 파일럿 2 = 같은 주차의 통역 슬롯(`509589aa`). v6 통역은 아직 한 번도 실행된 적이 없다.
+- 나머지 55슬롯(3교과목 × 9주차 × 번역·통역, 2주차 번역 3건 제외)의 17자리 집필과 판정.
 - 생성계약 v6 절과 규칙 카탈로그·결정 기록 갱신은 승인 사항이라 하지 않았다.
-- 교수자 승인, 편성, DB 쓰기. 이번 작업은 운영 DB를 읽기만 했다.

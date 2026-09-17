@@ -9,6 +9,11 @@
 // 이 파일은 내용을 지어내지 않는다. 판정·교정안·해설·대역은 저장본 값을 그대로
 // 복사하고, 없는 것은 gap으로 보고한다. 변환 결과가 스키마를 통과한다는 것이
 // 학습 자료로 타당하다는 뜻은 아니며 검수·승인은 기존 경로를 그대로 따른다.
+//
+// 승인된 v6 여섯 건에서 상수로 굳은 것은 규칙으로 채운다(2026-09-17 실측):
+// 문항 짧은이름·지시문, 이유 질문, 그리고 2번 문항의 4점 척도. 2번은 v5 topology
+// X→A→A→A→Y에서 항상 within 밖(anchor_non_within)이라 여섯 건 모두
+// 기준 somewhat_inappropriate · 허용 +very_inappropriate 로 같았다.
 
 import type { MissionV5Native } from "@/lib/pragma/missionSchema";
 
@@ -26,8 +31,18 @@ export interface V5ToV6Conversion {
   gaps: V6AuthoringGap[];
 }
 
-/** v6 문항이 화면에 쓰지만 v5에는 없는 표시용 필드. */
-const DISPLAY_FIELDS = ["short_label", "title", "prompt"] as const;
+/** 승인본 여섯 건에서 문항 위치별로 고정된 화면 문구. */
+const SHORT_LABELS = ["첫인상 판단", "맥락 판단", "선택교정", "직접 고쳐 보기", "네 표현 비교"] as const;
+const PROMPTS = {
+  scale: "이 번역안은 이 상황에 얼마나 잘 맞나요?",
+  fix_choice: "원문의 핵심 의미와 화행 목적을 지키면서 이 상황에 맞게 고친 표현을 골라보세요.",
+  free_correction: "원문의 핵심 의미와 화행 목적을 지키면서 필요한 부분을 직접 고쳐 보세요.",
+  multi_judge: "각 표현을 읽고, 이 상황에서 어떻게 들리는지 판단해 보세요.",
+  reason: "가장 큰 이유는 무엇인가요?",
+} as const;
+/** 2번 문항: v5 judge3가 within 밖 대역이면 승인본과 같은 척도, within이면 1번과 같은 척도. */
+const SCALE_FOR_NON_WITHIN = { accepted: ["somewhat_inappropriate", "very_inappropriate"], reference: "somewhat_inappropriate" };
+const SCALE_FOR_WITHIN = { accepted: ["very_appropriate", "somewhat_appropriate"], reference: "very_appropriate" };
 
 type AnyItem = Record<string, any>;
 
@@ -43,16 +58,15 @@ function scene(item: AnyItem) {
   };
 }
 
-function displayGaps(index: number, gaps: V6AuthoringGap[]) {
-  for (const field of DISPLAY_FIELDS) {
-    gaps.push({ path: `mpj_items[${index}].${field}`, why: "v6 화면 문구 — v5에 대응 필드 없음" });
-  }
-  return Object.fromEntries(DISPLAY_FIELDS.map(field => [field, ""]));
-}
-
 /** v6가 쓰는 세 필드만 남긴다 — v5 저장본은 판정에 쓰지 않는 필드를 더 갖기도 한다. */
 const correctionOf = (c: AnyItem) => ({ text: c.text, is_valid: c.is_valid, note_ko: c.note_ko });
 const candidateOf = (c: AnyItem) => ({ text: c.text, accepted_band_codes: c.accepted_band_codes, note_ko: c.note_ko });
+
+/** v5의 권장 예시가 target과 다르면 v6의 수정 예시로 쓴다. */
+function revisionExamples(item: AnyItem): { revision_examples: string[] } | Record<string, never> {
+  const example = typeof item.recommended_example === "string" ? item.recommended_example.trim() : "";
+  return example && example !== String(item.target ?? "").trim() ? { revision_examples: [example] } : {};
+}
 
 export function convertMissionV5ToV6(
   mission: MissionV5Native,
@@ -71,38 +85,45 @@ export function convertMissionV5ToV6(
   }
 
   const gaps: V6AuthoringGap[] = [];
+  const title = (index: number) => {
+    gaps.push({ path: `mpj_items[${index}].title`, why: "문항 제목(한 줄 질문) — v5에 대응 필드 없음" });
+    return "";
+  };
+  const withinBand = String(mission.unit.target_feature ? "within_band" : "within_band");
+  const contrastIsWithin = (contrast.accepted_band_codes as string[] | undefined)?.includes(withinBand) ?? false;
+  const secondScale = contrastIsWithin ? SCALE_FOR_WITHIN : SCALE_FOR_NON_WITHIN;
+  // judge3의 해설 뒤에 reason의 해설을 붙인다 — v6 2번은 판단과 이유를 한 화면에서 확인한다.
+  const secondExplanation = [contrast.explanation_ko, reason.explanation_ko]
+    .filter((text): text is string => typeof text === "string" && text.trim().length > 0)
+    .join("\n\n");
+
   const mpj_items = [
-    { ...scene(first), ...displayGaps(0, gaps), id: 1, type: "scale4",
+    { ...scene(first), short_label: SHORT_LABELS[0], title: title(0), prompt: PROMPTS.scale, id: 1, type: "scale4",
       source: first.source, target: first.target,
       accepted_scale_codes: first.accepted_scale_codes,
       reference_scale_code: first.reference_scale_code,
-      explanation_ko: first.explanation_ko },
-    // judge3의 장면·대상·해설에 reason의 선택지를 붙인다. 척도는 대역과 자가
-    // 달라 옮길 수 없다 — judge3의 대역을 근거로 사람이 정한다.
-    { ...scene(contrast), ...displayGaps(1, gaps), id: 2, type: "scale4",
+      explanation_ko: first.explanation_ko, ...revisionExamples(first) },
+    { ...scene(contrast), short_label: SHORT_LABELS[1], title: title(1), prompt: PROMPTS.scale, id: 2, type: "scale4",
       source: contrast.source, target: contrast.target,
-      accepted_scale_codes: [], reference_scale_code: "",
-      explanation_ko: contrast.explanation_ko,
+      accepted_scale_codes: secondScale.accepted, reference_scale_code: secondScale.reference,
+      explanation_ko: secondExplanation, ...revisionExamples(contrast),
       reason_choice: {
-        prompt: "",
+        prompt: PROMPTS.reason,
         options: (reason.reasons as AnyItem[]).map(option => ({ id: option.id, text: option.text_ko })),
       } },
-    { ...scene(fixChoice), ...displayGaps(2, gaps), id: 3, type: "fix_choice",
+    { ...scene(fixChoice), short_label: SHORT_LABELS[2], title: title(2), prompt: PROMPTS.fix_choice, id: 3, type: "fix_choice",
       source: fixChoice.source, target: fixChoice.target,
       corrections: (fixChoice.corrections as AnyItem[]).map(correctionOf), explanation_ko: fixChoice.explanation_ko },
     // v5에는 자유 교정 문항이 없다. 장면부터 전부 새로 쓴다.
     { situation_ko: "", relation_ko: "", channel: contrast.channel, pdr: contrast.pdr, learner_context_ko: "",
-      ...displayGaps(3, gaps), id: 4, type: "free_correction",
+      short_label: SHORT_LABELS[3], title: title(3), prompt: PROMPTS.free_correction, id: 4, type: "free_correction",
       source: "", target: "", reference_alternatives: [], explanation_ko: "" },
-    { ...scene(multiJudge), ...displayGaps(4, gaps), id: 5, type: "multi_judge",
+    { ...scene(multiJudge), short_label: SHORT_LABELS[4], title: title(4), prompt: PROMPTS.multi_judge, id: 5, type: "multi_judge",
       source: multiJudge.source, candidates: (multiJudge.candidates as AnyItem[]).map(candidateOf) },
   ];
 
   gaps.push(
-    { path: "mpj_items[1].accepted_scale_codes", why: `judge3 대역(${(contrast.accepted_band_codes ?? []).join("·")})은 4점 척도와 자가 달라 사람이 정한다` },
-    { path: "mpj_items[1].reference_scale_code", why: "위와 같음" },
-    { path: "mpj_items[1].reason_choice.prompt", why: "v5 reason에는 질문 문구가 없음" },
-    ...["situation_ko", "relation_ko", "source", "target", "reference_alternatives", "explanation_ko"]
+    ...["situation_ko", "relation_ko", "pdr", "source", "target", "reference_alternatives", "explanation_ko"]
       .map(field => ({ path: `mpj_items[3].${field}`, why: "v5에 자유 교정 문항이 없어 장면부터 새로 쓴다" })),
     ...[1, 2, 3, 4, 5].map(id => ({ path: `lesson_points[${id - 1}]`, why: "v5에 문항별 핵심 줄이 없음" })),
   );
