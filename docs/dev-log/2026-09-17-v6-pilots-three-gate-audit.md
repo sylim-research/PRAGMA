@@ -51,3 +51,18 @@
 - 자기 판정을 지키려고 자극문을 갈아 끼우면 진단이 사라진다(③=0 보고 → 정정).
 - 초점의 성격(방식 축/양 축)을 이유로 대역과 충실성을 합치고 싶어지지만, 합치는 순간 v5와 같은 오류가 된다.
 - 통역 슬롯은 장면 6쌍이 전부 옛 형식이라 손대는 비율이 번역의 1.6배.
+
+## 추가 (자정 뒤) — ② R23 처리: 연구자 결정 C = 코어 오버라이드로 재등록, 옛 행은 이력으로 보존
+
+등록된 `generated` 행을 직접 UPDATE하지 않는다는 원칙에 따라 `b12b0549`는 손대지 않았다(R23 불일치 이력 그대로 보존).
+새 후보에서만 코어를 고쳐 재등록했다: `scenario_d`·`core_content.pdr.d` = acquaintance, 코어 상황문·관계문 = 확정 자연화 문안.
+미션 내용은 확정본 그대로(hash `37875071589d` 동일).
+
+- 도구: dump가 `core_content`를 함께 뽑아 R23을 로컬에서 검사 · 조립기 `core_overrides`·`rework_of` 전달 · 등록 스크립트가 INSERT 전에 코어를 덮고
+  `supersedes` = 재작업 대상 행, item key에 `:rework:<새 id>`(rework RPC와 같은 꼴 — 같은 원본 재등록 시 (run, key) 유일 제약).
+- 첫 시도는 유일 제약에 걸렸다(같은 run·key). rework 접미사로 해결.
+- readback (`tmp/readback-1d61.mjs`): 새 행 **`1d61b487`** — core.pdr = DCT.pdr = acquaintance · 코어 상황문 자연화본 ·
+  supersedes = `b12b0549`(→ `3bfec949`) · provenance hash = quality_check hash = 후보 hash = `37875071589d` · 품질 pass 0 ·
+  규칙 pass(R23 포함) · 다음 단계 finalization · lineage v1 generated. 옛 행·v5 원본 불변.
+- `b12b0549`: 상태 체계에 generated 행을 물러나게 하는 RPC가 없고(archive는 raw UPDATE), 원칙상 손대지 않았다.
+  관리자 목록에 남는다 — 보관(archived_at) 처리는 별도 승인 사안.
