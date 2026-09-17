@@ -14,8 +14,6 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
     expect(items[0].accepted_scale_codes).toEqual(item("scale4").accepted_scale_codes);
     expect(items[0].reference_scale_code).toBe(item("scale4").reference_scale_code);
     // 판정에 쓰는 세 필드만 옮기고 v5의 여분 필드는 떨군다.
-    expect(items[2].corrections).toEqual(item("fix_choice").corrections.map((c: any) =>
-      ({ text: c.text, is_valid: c.is_valid, note_ko: c.note_ko })));
     expect(items[4].candidates).toEqual(item("multi_judge").candidates.map((c: any) =>
       ({ text: c.text, accepted_band_codes: c.accepted_band_codes, note_ko: c.note_ko })));
     expect(items[4].candidates[0]).not.toHaveProperty("comparison_role");
@@ -52,13 +50,15 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
 
   it("사람이 써야 하는 자리를 빠짐없이 보고한다", () => {
     const paths = gaps.map(gap => gap.path);
-    // 문항 다섯 개의 제목 + 4번 문항 전체(장면·관계·PDR·원문·대상·참고안·해설) + 핵심 다섯 줄.
-    expect(paths).toHaveLength(5 + 7 + 5);
+    // 문항 다섯 개의 제목 + 3·4번 문항 전체(장면·관계·PDR·원문·대상·교정안 또는 참고안·해설) + 핵심 다섯 줄.
+    expect(paths).toHaveLength(5 + 7 + 7 + 5);
     expect(paths).toContain("mpj_items[1].title");
     expect(paths).toContain("mpj_items[3].target");
     expect(paths).toContain("lesson_points[0]");
+    // 3번은 v5 fix_choice가 2번과 같은 자극문을 써서 옮기지 않는다.
+    expect(paths).toContain("mpj_items[2].corrections");
+    expect(paths).toContain("mpj_items[2].source");
     // 옮겨오거나 규칙으로 채운 자리는 gap이 아니다.
-    expect(paths).not.toContain("mpj_items[2].corrections");
     expect(paths).not.toContain("mpj_items[4].candidates");
     expect(paths).not.toContain("mpj_items[1].accepted_scale_codes");
     expect(paths).not.toContain("mpj_items[0].prompt");
@@ -76,6 +76,17 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
     filled.mpj_items[1].accepted_scale_codes = ["somewhat_inappropriate"];
     filled.mpj_items[1].reference_scale_code = "somewhat_inappropriate";
     filled.mpj_items[1].reason_choice.prompt = "가장 큰 이유는 무엇인가요?";
+    const third = filled.mpj_items[2];
+    third.situation_ko = "새로 쓴 3번 장면";
+    third.relation_ko = "새로 쓴 3번 관계";
+    third.source = "새로 쓴 3번 원문";
+    third.target = "새로 쓴 3번 번역안";
+    third.corrections = [
+      { text: "고친 표현", is_valid: true, note_ko: "왜 알맞은지" },
+      { text: "덜 고친 표현", is_valid: false, note_ko: "왜 아닌지" },
+      { text: "다르게 고친 표현", is_valid: false, note_ko: "왜 아닌지" },
+    ];
+    third.explanation_ko = "새로 쓴 3번 해설";
     const fourth = filled.mpj_items[3];
     fourth.situation_ko = "새로 쓴 장면";
     fourth.relation_ko = "새로 쓴 관계";

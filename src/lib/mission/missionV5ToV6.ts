@@ -4,7 +4,11 @@
 // v5 native와 v6는 문항 다섯 개와 DCT라는 골격은 같지만 2·4번 문항이 다르다.
 // v5는 judge3(3대역 판단) + reason(주원인 고르기)이고, v6는 scale4+이유 선택 +
 // 자유 교정이다. 따라서 v5의 reason 선택지는 v6 2번 문항으로 옮겨 붙고,
-// **4번 자유 교정 문항 전체와 문항별 핵심 다섯 줄은 대응하는 v5 자료가 없다.**
+// **3·4번 문항 전체와 문항별 핵심 다섯 줄은 대응하는 v5 자료가 없다.**
+//
+// 3번이 없는 이유(2026-09-18): v5는 judge3와 fix_choice가 같은 자극문을 쓴다.
+// 그대로 옮기면 v6 3번이 2번의 장면·PDR·원문을 되풀이한다. 승인된 v6 여섯 건은
+// 1·2·3이 모두 다른 장면·PDR·원문이므로, 3번은 교정안까지 새로 쓰도록 gap으로 넘긴다.
 //
 // 이 파일은 내용을 지어내지 않는다. 판정·교정안·해설·대역은 저장본 값을 그대로
 // 복사하고, 없는 것은 gap으로 보고한다. 변환 결과가 스키마를 통과한다는 것이
@@ -75,7 +79,6 @@ function scene(item: AnyItem) {
 }
 
 /** v6가 쓰는 세 필드만 남긴다 — v5 저장본은 판정에 쓰지 않는 필드를 더 갖기도 한다. */
-const correctionOf = (c: AnyItem) => ({ text: c.text, is_valid: c.is_valid, note_ko: c.note_ko });
 const candidateOf = (c: AnyItem) => ({ text: c.text, accepted_band_codes: c.accepted_band_codes, note_ko: c.note_ko });
 
 /** v5의 권장 예시가 target과 다르면 v6의 수정 예시로 쓴다. */
@@ -128,9 +131,10 @@ export function convertMissionV5ToV6(
         prompt: PROMPTS.reason,
         options: (reason.reasons as AnyItem[]).map(option => ({ id: option.id, text: option.text_ko })),
       } },
-    { ...scene(fixChoice), short_label: SHORT_LABELS[2], title: title(2), prompt: PROMPTS.fix_choice, id: 3, type: "fix_choice",
-      source: fixChoice.source, target: fixChoice.target,
-      corrections: (fixChoice.corrections as AnyItem[]).map(correctionOf), explanation_ko: fixChoice.explanation_ko },
+    // v5 fix_choice는 judge3와 같은 자극문을 쓴다 — 옮기면 2번의 되풀이가 된다. 장면부터 새로 쓴다.
+    { situation_ko: "", relation_ko: "", channel: fixChoice.channel, pdr: fixChoice.pdr, learner_context_ko: "",
+      short_label: SHORT_LABELS[2], title: title(2), prompt: PROMPTS.fix_choice, id: 3, type: "fix_choice",
+      source: "", target: "", corrections: [], explanation_ko: "" },
     // v5에는 자유 교정 문항이 없다. 장면부터 전부 새로 쓴다.
     { situation_ko: "", relation_ko: "", channel: contrast.channel, pdr: contrast.pdr, learner_context_ko: "",
       short_label: SHORT_LABELS[3], title: title(3), prompt: PROMPTS.free_correction, id: 4, type: "free_correction",
@@ -140,6 +144,8 @@ export function convertMissionV5ToV6(
   ];
 
   gaps.push(
+    ...["situation_ko", "relation_ko", "pdr", "source", "target", "corrections", "explanation_ko"]
+      .map(field => ({ path: `mpj_items[2].${field}`, why: "v5는 2번 문항과 같은 자극문을 써서 옮기면 되풀이가 된다 — 장면부터 새로 쓴다" })),
     ...["situation_ko", "relation_ko", "pdr", "source", "target", "reference_alternatives", "explanation_ko"]
       .map(field => ({ path: `mpj_items[3].${field}`, why: "v5에 자유 교정 문항이 없어 장면부터 새로 쓴다" })),
     ...[1, 2, 3, 4, 5].map(id => ({ path: `lesson_points[${id - 1}]`, why: "v5에 문항별 핵심 줄이 없음" })),
