@@ -438,11 +438,11 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
     <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] bg-white shadow-sm">
-      <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-3 sm:px-5">
+      <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-bold text-[#697386]">원문</p>
-          <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-8 text-[#101B2B]`}>{source}</p>
+          <p className="text-[11.5px] font-bold text-[#697386]">원문</p>
+          <p className={`${sourceFont} break-keep text-[16px] font-semibold leading-7 text-[#101B2B]`}>{source}</p>
         </div>
       </div>
       {target && (
@@ -1436,62 +1436,23 @@ function SourceAnswerCompare({ source, answer, highlights = [] }: {
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
     <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
-      <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-3 sm:px-5">
+      <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-bold text-[#697386]">원문</p>
-          <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-8 text-[#101B2B]`}>{source}</p>
+          <p className="text-[11.5px] font-bold text-[#697386]">원문</p>
+          <p className={`${sourceFont} break-keep text-[16px] font-semibold leading-7 text-[#101B2B]`}>{source}</p>
         </div>
       </div>
-      <div className="flex items-start gap-4 border-t border-dashed border-[#D8D4C8] px-4 py-3 sm:px-5">
+      <div className="flex items-start gap-3.5 border-t border-dashed border-[#D8D4C8] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-bold text-[#697386]">내 {outputName}</p>
-          <p className={`${targetFont} mt-0.5 break-keep text-[17px] leading-8 text-[#101B2B]`}>
+          <p className="text-[11.5px] font-bold text-[#697386]">내 {outputName}</p>
+          <p className={`${targetFont} break-keep text-[16px] leading-7 text-[#101B2B]`}>
             <HighlightedText text={answer} highlights={highlights} target />
           </p>
         </div>
       </div>
     </section>
-  );
-}
-function DctContextReview({ quest, first }: { quest: DctFeedbackQuest; first: string }) {
-  const mission = useCanonicalMission();
-  const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : mission.learnerContextCopy?.[quest.id];
-  const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
-  const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
-  const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
-  return (
-    <details className="group rounded-xl border border-[#DDD8CB] bg-[#FAF9F5]">
-      <summary className="cursor-pointer list-none px-4 py-3 sm:px-5">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="flex items-center gap-1.5 text-xs font-black text-[#4F5B6F]"><Eye className="h-3.5 w-3.5" /> 원문·상황 다시 보기</p>
-            <p className="mt-1 text-xs leading-5 text-[#707A8B]">{pilotContext ?? `${quest.context.relation} · ${quest.context.channel}`}</p>
-          </div>
-          <span className="shrink-0 text-xs font-bold text-[#6A7485]"><span className="group-open:hidden">펼치기</span><span className="hidden group-open:inline">접기</span></span>
-        </div>
-        {pilotContext === undefined && <div className="mt-2 flex flex-wrap gap-1.5">
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">상대적 지위 · {quest.context.pdr.p}</span>
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">친숙도 · {quest.context.pdr.d}</span>
-          <span className="rounded-full border border-[#D9DEE7] bg-white px-2.5 py-1 text-[11px] font-bold text-[#536075]">부담 · {quest.context.pdr.r.replace(/^부담\s*/, "")}</span>
-        </div>}
-      </summary>
-      <div className="space-y-3 border-t border-[#E2DED4] px-4 py-4 sm:px-5">
-        {pilotContext === undefined && <div>
-          <p className="text-[12px] font-black text-[#707A8B]">상황</p>
-          <p className="mt-1 text-sm leading-6">{quest.context.situation}</p>
-        </div>}
-        <div>
-          <p className="text-[12px] font-black text-[#707A8B]">첫 {outputName}</p>
-          <p className={`${targetFont} mt-1 text-sm font-bold leading-6`}>{first}</p>
-        </div>
-        <div>
-          <p className="text-[12px] font-black text-[#707A8B]">내 첫 {outputName}</p>
-          <p className={`${targetFont} mt-1 text-[15px] leading-7`}>{first}</p>
-        </div>
-      </div>
-    </details>
   );
 }
 
@@ -1598,14 +1559,14 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     );
   }
   return (
-    <div className="space-y-3">
-      <h1 className="px-1 text-xl font-bold">{outputName} 피드백</h1>
+    <div className="space-y-2.5">
+      <h1 className="px-1 text-lg font-bold">{outputName} 피드백</h1>
       <SourceAnswerCompare source={quest.source} answer={first} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
           {/* 판정 한 줄 요약과 배지는 두지 않는다 — 세 기준 각각이 이미 등급과 이유를 말한다. */}
           {!revisionOpen && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
-            <div className="space-y-2 p-3.5 sm:p-4">
+            <div className="space-y-1.5 p-3 sm:p-3.5">
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
               {(localPilot || feedbackUnavailable) && (
                 <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#596579]">
@@ -1617,7 +1578,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 const passed = !localPilot && criterion.level === "very_good";
                 const expanded = localPilot || (!passed && criterion.key === primaryCriterion.key);
                 return (
-                  <article key={criterion.key} className={`rounded-xl border px-4 py-3 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
+                  <article key={criterion.key} className={`rounded-xl border px-4 py-2.5 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="text-[15px] font-black text-[#2B3647]">{criterion.label}</h3>
                       {!localPilot && (
@@ -1628,16 +1589,16 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     </div>
                     {expanded
                       ? <>
-                        <p className="mt-2 text-[15px] leading-7">{conciseFeedback(criterion.body)}</p>
+                        <p className="mt-1.5 text-[14.5px] leading-6">{conciseFeedback(criterion.body)}</p>
                         <FeedbackRemainder text={criterion.body} />
                       </>
-                      : <p className={`mt-1.5 text-[15px] leading-7 ${passed ? "text-[#3F4A59]" : "text-[#5A6673]"}`}>{feedbackSentences(criterion.body)[0]}</p>}
+                      : <p className={`mt-1 text-[14.5px] leading-6 ${passed ? "text-[#3F4A59]" : "text-[#5A6673]"}`}>{feedbackSentences(criterion.body)[0]}</p>}
                   </article>
                 );
               })}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-5 py-3 text-[12px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
           {!localPilot && <MissionDissentPanel onSubmit={setDissent} />}
@@ -1659,7 +1620,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
-                <div className="mt-3"><DctContextReview quest={quest} first={first} /></div>
               </section>
               <ActionBar hint={actionHint}>
                 <div className="grid gap-2">

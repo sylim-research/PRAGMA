@@ -117,7 +117,8 @@ describe("local learner UX pilot", () => {
     expect(screen.getByRole("button", { name: "이 번역으로 확정하기" })).toBeEnabled();
     click("한 번 다듬어보기");
     expect(screen.getByRole("textbox")).toHaveValue(first);
-    expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
+    // 다듬기 화면은 원문과 내 번역만 둔다 — 접히는 「원문·상황 다시 보기」는 없앴다.
+    expectCompactContext("A-DCT");
     const final = `${first}谢谢！`;
     fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
     click("수정안 확정하기");
