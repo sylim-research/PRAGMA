@@ -132,7 +132,32 @@ feature 블록(대역 정본·조작적 정의)에서 오므로 거절 미션도
 작업 트리에만 두었다. **Edge 배포는 승인 사항이라 하지 않았다.** 승인된 6건의 v1 품질 증거는
 재사용 검사에서 계속 인정하도록 두 버전을 허용했다.
 
-## 남은 것 (이 커밋 범위 밖)
-- v6 심사 프롬프트 수정 배포(승인 뒤) → 파일럿 1·2 등록·품질 점검·교수자 승인·6주차 편성 교체·학습자 실행.
+## 배포와 등록 (연구자 승인 후 실행)
+
+PR [#184](https://github.com/sylim-research/PRAGMA/pull/184) 머지 → main `b18a4b64`. 머지 전 CI가 두 번 막았고 둘 다 정합성 가드였다.
+- **프롬프트 스냅숏 무결성** — edge 소스를 고쳤는데 스냅숏을 다시 뜨지 않았다. `npm run prompts:snapshot`.
+  바뀐 것은 `edge_source_sha256`과 수집 메타데이터뿐이다(v6 심사 머리글은 스냅숏 대상이 아니다).
+  덤으로 09-14에 dirty 트리에서 뜬 기록이 깨끗한 커밋으로 고정됐다.
+- **검수 도메인 번들 staleness** — 번들은 앱 규칙에서 생성되는데 v6 스키마가 바뀌었다. `node scripts/build-content-review-domain.mjs`.
+- 교훈: **edge 소스나 규칙을 고치면 전체 테스트와 `npm run build`를 다시 돌린다.** 문항 테스트만으로는 두 가드를 못 본다.
+
+`npm run edge:deploy generate-scenario` → `b18a4b64` (main 계보). 배포 가드는 dirty 트리·미머지 커밋을 거부한다.
+worktree에 Supabase 연결 상태가 없어 루트의 `supabase/.temp`를 복사했다(루트 자체는 미커밋 작업이 있어 건드리지 않았다).
+
+등록 결과 — `node scripts/register-v6-candidate.mjs`:
+
+| 새 행 | 원본 | 화행·모드 | 해시 | 품질 점검 |
+|---|---|---|---|---|
+| `40c7aa46` | `ea0976f1` | 거절·번역 | `5dca40d0` | warning 1 — `critic_grounding_failure @mpj_items[4].candidates[3]` |
+| `cdff1b28` | `509589aa` | 거절·통역 | `7e9e0838` | warning 1 — `critic_grounding_failure @mpj_items[2].corrections[1]` |
+
+- 두 warning 모두 **AI 지적이 인용 근거를 찾지 못해 격리된 것**이고 내용 결함 판정이 아니다(09-16 `630e6459`와 같은 패턴).
+- 심사 프롬프트 버전이 `quality_mission_v6_act_general_v2`로 기록됐다 — 배포된 수정본이 실제로 쓰였다.
+- readback: 새 행 `generated` · 편성 없음 · `supersedes`로 원본 연결. **원본 2건은 `reviewed` 그대로이고 c2 6주차 편성도 그대로**라
+  학습자에게는 계속 v5가 보인다.
+
+## 남은 것
+- 관리자 화면에서 새 행 2건의 규칙검사·최종검수·**교수자 5단계 승인**(DB 트리거가 승인 기록 없이는 `reviewed` 전환을 막는다).
+- 승인 뒤 c2 6주차 편성을 새 행으로 교체 → 학습자 E2E(통역 v6 첫 실행) → readback.
 - 나머지 55슬롯(3교과목 × 9주차 × 번역·통역, 2주차 번역 3건 제외)의 집필과 판정.
 - 생성계약 v6 절과 규칙 카탈로그·결정 기록 갱신은 승인 사항이라 하지 않았다.
