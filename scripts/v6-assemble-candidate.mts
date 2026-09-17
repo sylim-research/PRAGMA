@@ -38,6 +38,16 @@ task.learner_context_ko = authored.dct_learner_context;
 // 옛 통역 저장본의 A·B 장면을 다시 쓴 경우(선택). 있는 문항만 덮는다.
 (authored.scenes ?? []).forEach((scene: { situation_ko?: string; relation_ko?: string } | null, index: number) => { if (scene) Object.assign(items[index], scene); });
 if (authored.dct_scene) Object.assign(task, authored.dct_scene);
+// 옮겨온 값을 자리별로 덮는다 — 한국어 목표문 자연화 패스(2026-09-17). 화행 이동·대역은 그대로 두고 표면만 바꾼다.
+// 값이 {text} 객체인 자리에 문자열을 주면 text만 바꾼다(note_ko·band 등은 유지).
+for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<string, string>)) {
+  const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
+  const last = keys.pop()!;
+  const parent = keys.reduce<any>((node, key) => node?.[key], draft);
+  if (parent == null || !(last in parent)) throw new Error(`override 자리가 없음: ${path}`);
+  const existing = parent[last];
+  if (existing && typeof existing === "object" && "text" in existing) existing.text = value; else parent[last] = value;
+}
 
 const unfilled = gaps.filter(gap => {
   const [, index, field] = gap.path.match(/^mpj_items\[(\d)\]\.(\w+)$/) ?? [];
@@ -107,6 +117,7 @@ const candidate = {
       operational_definition: zh(feature.operational_definition, feature.operational_definition_zh_ko),
       excluded_confounds: zh(feature.excluded_confounds, feature.excluded_confounds_zh_ko),
       counter_rule_note: zh(feature.counter_rule_note, feature.counter_rule_note_zh_ko),
+      fidelity_note: feature.fidelity_note,
     },
     direction, speech_act: ctx.speech_act,
   },

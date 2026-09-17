@@ -30,6 +30,10 @@ export interface HandoffSummaryCopy {
   compare_high: string;
 }
 
+/** 모든 초점 공용 — 대역 판정의 전제(원문 내용·기능 보존)를 「선택적 자원」 문구와 함께 읽게 한다. */
+const FIDELITY_NOTE =
+  "「선택적 자원」은 특정 표현형을 의무화하지 않는다는 뜻이다. 원문에서 실제로 전달한 내용과 대인적 기능을 임의로 생략하거나, 원문에 없는 약속·사유·조건을 더해도 된다는 뜻이 아니다. 압축·통합은 허용하되, 대역 판정은 내용과 기능이 보존된 산출물에만 매긴다.";
+
 export interface TargetFeature {
   /** 안정 식별자 — 문항·행에 저장(R13). 예: "request_mitigation_optionality" */
   code: string;
@@ -54,6 +58,8 @@ export interface TargetFeature {
   handoff_summary: HandoffSummaryCopy;
   /** judge3 반례가 깨야 할 "소박한 규칙"(A1 일반화) */
   counter_rule_note: string;
+  /** 「선택적 자원」의 적용 범위 — 형태 비의무이지 내용·기능 생략 허용이 아님(DEC 2026-09-17, GPT 교차검증). 화행 공용 */
+  fidelity_note: string;
   // ── zh_ko(중→한) 방향 변형 (계약 0-l·86, 선택 — 없으면 zh_ko 승격 불가) ──
   // 구인 동일(상황 P·D·R 화용 적절성), 산출 장치만 한국어. version·band·within·
   // learner_label·closing은 방향 공용이라 여기엔 없다(비파괴 확장, version 불변).
@@ -67,6 +73,7 @@ export interface TargetFeature {
 const REQUEST_MITIGATION_OPTIONALITY: TargetFeature = {
   code: "request_mitigation_optionality",
   version: "1.1",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "request",
   learner_label: "완화와 선택권",
   operational_definition:
@@ -118,6 +125,7 @@ const REQUEST_MITIGATION_OPTIONALITY: TargetFeature = {
 const REFUSAL_SOFTENING: TargetFeature = {
   code: "refusal_softening",
   version: "1.1",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "refusal",
   learner_label: "완충과 대안",
   operational_definition:
@@ -169,6 +177,7 @@ const REFUSAL_SOFTENING: TargetFeature = {
 const GRATITUDE_CALIBRATION: TargetFeature = {
   code: "gratitude_calibration",
   version: "1.1",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "thanks",
   learner_label: "강도 조절",
   operational_definition:
@@ -217,6 +226,7 @@ const GRATITUDE_CALIBRATION: TargetFeature = {
 const APOLOGY_ACCOUNTABILITY_REPAIR: TargetFeature = {
   code: "apology_accountability_repair",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "apology",
   learner_label: "책임 인정과 수리",
   operational_definition:
@@ -276,6 +286,7 @@ const APOLOGY_ACCOUNTABILITY_REPAIR: TargetFeature = {
 const PROPOSAL_OPTIONALITY_CLARITY: TargetFeature = {
   code: "proposal_optionality_clarity",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "proposal",
   learner_label: "선택지와 방안 명료성",
   operational_definition:
@@ -340,6 +351,7 @@ const INVITATION_CHOICE_COMMITMENT: TargetFeature = {
   // v1.2는 행사·의도가 식별되더라도 '언제·어떤 방식으로 답해야 하는지'가 결정 불가능한
   // 상태를 과잉으로 삼는다. v1.1이 세운 오탐 가드는 그대로 유지한다.
   version: "1.2",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "agreement",
   learner_label: "참여 선택권과 약속 명료성",
   operational_definition:
@@ -405,6 +417,7 @@ const INVITATION_CHOICE_COMMITMENT: TargetFeature = {
 const OPPOSITION_STANCE_MITIGATION: TargetFeature = {
   code: "opposition_stance_mitigation",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "opposition",
   learner_label: "이견 명료성과 관계 조정",
   operational_definition:
@@ -464,6 +477,7 @@ const OPPOSITION_STANCE_MITIGATION: TargetFeature = {
 const COMPLIMENT_GROUNDING_SENSITIVITY: TargetFeature = {
   code: "compliment_grounding_sensitivity",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "compliment",
   learner_label: "평가 강도와 민감도",
   operational_definition:
@@ -523,6 +537,7 @@ const COMPLIMENT_GROUNDING_SENSITIVITY: TargetFeature = {
 const COMPLIMENT_RESPONSE_UPTAKE: TargetFeature = {
   code: "compliment_response_uptake",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "compliment",
   learner_label: "칭찬 처리와 관계 조정",
   operational_definition:
@@ -582,6 +597,7 @@ const COMPLIMENT_RESPONSE_UPTAKE: TargetFeature = {
 const COMPLAINT_PROBLEM_ACCOUNTABILITY: TargetFeature = {
   code: "complaint_problem_accountability",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "complaint",
   learner_label: "문제 명료화와 책임 범위",
   operational_definition:
@@ -643,6 +659,7 @@ const COMPLAINT_PROBLEM_ACCOUNTABILITY: TargetFeature = {
 const POLITENESS: TargetFeature = {
   code: "politeness",
   version: "1.0",
+  fidelity_note: FIDELITY_NOTE,
   speech_act: "request", // placeholder — 공손성 중심 단원 정의 시 확정
   learner_label: "공손성",
   operational_definition:
