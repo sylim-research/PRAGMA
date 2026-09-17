@@ -46,7 +46,7 @@ if (slotError) throw slotError;
 const { data: scenarios, error: scenarioError } = await db
   .from("scenarios")
   .select(
-    "scenario_id,title,mission_content,content_hash,learner_level,language_direction,mode,source_modality,domain,industry_sector,theme_code,topic_code,scenario_p,scenario_d,scenario_r",
+    "scenario_id,title,mission_content,core_content,content_hash,learner_level,language_direction,mode,source_modality,domain,industry_sector,theme_code,topic_code,scenario_p,scenario_d,scenario_r",
   );
 if (scenarioError) throw scenarioError;
 const byId = new Map(scenarios.map((s) => [s.scenario_id, s]));
@@ -87,6 +87,7 @@ for (const slot of slots
           core_snapshot_hash: row.content_hash,
         },
         content,
+        core_content: row.core_content,
       },
       null,
       2,
