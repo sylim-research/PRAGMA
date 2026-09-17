@@ -16,11 +16,11 @@ export type PromptSnapshot = {
   prompts: PromptSnapshotEntry[];
 };
 export const PROMPT_SNAPSHOT: PromptSnapshot = {
-  "generated_at": "2026-09-14T02:27:02+09:00",
-  "git_commit": "8dd14fbe",
-  "git_dirty": true,
+  "generated_at": "2026-09-17T17:10:26+09:00",
+  "git_commit": "b83b4ce6",
+  "git_dirty": false,
   "edge_source": "supabase/functions/generate-scenario/index.ts",
-  "edge_source_sha256": "97c5b265b45e0a3d8f01f0a8f47aa4a32689e6731f4bc857d5ba0345548d7108",
+  "edge_source_sha256": "b23e1fc3c6c8e7af66d69b0b382db6194b7c90edf72afed46c71a6f23ec35d11",
   "core_surface_hash": "9153d9c0a30ec06a705ad60787217ff8a84b4d1e3079c32c108cc61688c5f94d",
   "generation_config": {
     "model": "gpt-4.1-mini",

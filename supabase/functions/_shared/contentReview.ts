@@ -93,10 +93,14 @@ export type GenerationQualityEvidence = {
 export function reusableGenerationQuality(raw: Record<string, any>): GenerationQualityEvidence | null {
   const quality = raw.quality_check;
   const hash = raw.provenance?.mission_content_hash;
-  const qualityVersion = raw.schema_version === "mission_v6" ? MISSION_V6_QUALITY_PROMPT_VERSION : CURRENT_MISSION_QUALITY_PROMPT_VERSION;
+  // The six request missions approved before 2026-09-17 carry the v1 critic version; its
+  // judgment axis was the same feature block, so their evidence stays reusable.
+  const qualityVersions = raw.schema_version === "mission_v6"
+    ? [MISSION_V6_QUALITY_PROMPT_VERSION, "quality_mission_v6_request_reason_contrast_v1"]
+    : [CURRENT_MISSION_QUALITY_PROMPT_VERSION];
   if (!quality || !/^[0-9a-f]{64}$/.test(hash ?? "") || quality.mission_content_hash !== hash
     || !["pass", "warning", "fail"].includes(quality.verdict) || !Array.isArray(quality.findings)
-    || !quality.model?.trim() || quality.prompt_version !== qualityVersion || !Number.isFinite(Date.parse(quality.checked_at))) return null;
+    || !quality.model?.trim() || !qualityVersions.includes(quality.prompt_version) || !Number.isFinite(Date.parse(quality.checked_at))) return null;
   if (quality.findings.some((f: any) => !["warning", "fail"].includes(f.severity) || !f.code || typeof f.where !== "string" || !f.note_ko)) return null;
   const verdict = quality.findings.some((f: any) => f.severity === "fail") ? "fail" : quality.findings.length ? "warning" : "pass";
   if (quality.verdict !== verdict) return null;
