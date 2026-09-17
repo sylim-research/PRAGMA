@@ -42,7 +42,7 @@ describe("local learner UX pilot", () => {
     expect(new Set(scenes.map(q => q.source)).size).toBe(6);
     expect(new Set(scenes.map(q => q.context.situation)).size).toBe(6);
     const view = mount();
-    expect(screen.queryByRole("button", { name: /표현 판단 시작하기/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /학습 미션 시작하기/ })).not.toBeInTheDocument();
     expect(screen.queryByText("미션 안내")).not.toBeInTheDocument();
     expect(screen.queryByText(/세미나실 예약 가능 여부/)).not.toBeInTheDocument();
     expectCompactContext("A1", "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.");
@@ -132,7 +132,7 @@ describe("local learner UX pilot", () => {
     expect(completed.responses.A5.candidateJudgments).toEqual({ a: "appropriate", b: "appropriate", c: "appropriate", d: "too_direct" });
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();
     click("처음부터 다시 보기");
-    expect(screen.queryByRole("button", { name: /표현 판단 시작하기/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /학습 미션 시작하기/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "매우 적절" })).toBeInTheDocument();
     expect(JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!).responses).toEqual({});
   });
