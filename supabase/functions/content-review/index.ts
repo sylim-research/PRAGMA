@@ -81,8 +81,15 @@ Deno.serve(async (req) => {
         });
         if (error && error.code !== "23505") throw new Error(`규칙 검사 저장 실패: ${error.message}`);
       } else if (!state.run.approved_at && !state.run.running_stage) {
+        // Re-running the step must record what the rule engine says now. The stored verdict was
+        // produced by whichever engine was deployed when the run started, and the review content
+        // hash does not change when the catalog does, so a run created during a bad deploy would
+        // otherwise keep a stale verdict with no way to clear it. Finalized evidence is frozen by
+        // guard_prepared_content_review, so those rows keep the verdict their artifact was built on.
         const { error } = await db.from("content_review_runs").update({ approval_policy: CONTENT_APPROVAL_POLICY,
-          generation_quality: state.reusableGenerationQuality }).eq("id", state.run.id).is("approved_at", null).is("running_stage", null);
+          generation_quality: state.reusableGenerationQuality,
+          ...(state.run.prepared_finalization ? {} : { rules: state.rules }),
+        }).eq("id", state.run.id).is("approved_at", null).is("running_stage", null);
         if (error) throw new Error(`기존 점검 연결 실패: ${error.message}`);
       }
       return json(await inspect());
