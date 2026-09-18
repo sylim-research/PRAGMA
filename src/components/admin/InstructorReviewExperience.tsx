@@ -70,9 +70,32 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     catch (cause) { setError(cause instanceof Error ? cause.message : "감수 기록 저장 실패"); }
     finally { setSaving(false); }
   };
+  // 빠른 감수: 「확인」을 누르면 아직 판정하지 않은 다음 문항으로 넘어가고, 모두 확인되면 최종 승인 칸으로 내려간다.
+  // 「수정 요청」은 메모를 적어야 하므로 그 자리에 머문다.
+  const decided = (decisions: InstructorExperience["decisions"], id: string) =>
+    decisions.some((entry) => entry.section === id && (entry.status === "checked" || entry.status === "revision_required"));
+  const goToApproval = () => window.setTimeout(() => document.getElementById("professor-final-approval")?.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
   const mark = (status: "checked" | "revision_required") => {
     setPendingNotes(({ [section.id]: _used, ...rest }) => rest);
-    void persist({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { section: section.id, status, note: noteValue }] });
+    const decisions = [...draft.decisions.filter((entry) => entry.section !== section.id), { section: section.id, status, note: noteValue }];
+    void persist({ ...draft, decisions });
+    if (status !== "checked") return;
+    const order = EXPERIENCE_SECTIONS.map((item, index) => ({ item, index }));
+    const nextOpen = [...order.slice(sectionIndex + 1), ...order.slice(0, sectionIndex)].find(({ item }) => !decided(decisions, item.id));
+    if (nextOpen) setSectionIndex(nextOpen.index);
+    else if (decisions.filter((entry) => entry.status === "checked").length === EXPERIENCE_SECTIONS.length) goToApproval();
+  };
+  // 남은 문항 일괄 확인. 이미 「수정 요청」한 문항은 건드리지 않고, 적어 둔 메모는 그대로 함께 저장한다.
+  const openSections = EXPERIENCE_SECTIONS.filter((item) => !decided(draft.decisions, item.id));
+  const markAllOpen = () => {
+    const decisions = [
+      ...draft.decisions.filter((entry) => decided(draft.decisions, entry.section)),
+      ...openSections.map((item) => ({ section: item.id, status: "checked" as const,
+        note: pendingNotes[item.id] ?? draft.decisions.find((entry) => entry.section === item.id)?.note ?? "" })),
+    ];
+    setPendingNotes({});
+    void persist({ ...draft, decisions });
+    if (decisions.every((entry) => entry.status === "checked")) goToApproval();
   };
   // 판정이 이미 있는 문항에 메모를 고치면 따로 저장을 누르지 않아도 잠시 뒤 저장한다.
   // 저장 버튼을 남겨 두면 메모만 고친 교수자가 최종 승인에서 막힌다(2026-09-17).
@@ -98,6 +121,8 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
         <p className="text-sm text-muted-foreground" aria-label="감수 진행">
           확인 {tally.checked} · 수정 요청 {tally.revision} · 미확인 {tally.open}
         </p>
+        {openSections.length > 0 && <Button variant="outline" className="h-10 w-full border-[#CAB23D] text-sm font-bold" disabled={disabled || saving || approved || !model.value}
+          onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{EXPERIENCE_SECTIONS.map((item, index) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
