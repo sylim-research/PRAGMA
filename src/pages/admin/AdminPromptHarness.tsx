@@ -27,13 +27,13 @@ function HarnessOverview() {
     >
       <div className="max-w-[48rem]">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">
-          품질관리 구조
+          품질 관리 구조
         </p>
         <h2 id="harness-overview-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
-          자동 점검은 두 방식으로, 최종 권한은 교수자에게 둡니다
+          자동 점검은 근거를 제시하고, 승인은 교수자가 합니다
         </h2>
         <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
-          규칙 검사와 AI 검토가 근거를 제시하고, 교수자가 감수해 최종 승인합니다.
+          규칙 검사와 AI 검토, 두 갈래의 자동 점검을 거친 뒤 교수자가 감수해 최종 승인합니다.
         </p>
       </div>
 

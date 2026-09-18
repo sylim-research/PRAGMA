@@ -13,10 +13,7 @@ import {
   selectRecentAudit,
   type AuditSnapshot,
 } from "@/lib/pragma/hskAuditSnapshot";
-import {
-  HSK3_LEXICAL_AUDIT_POLICY_VERSION,
-  HSK3_REFERENCE_SOURCE_ID,
-} from "@/lib/pragma/hskReference";
+import { HSK3_REFERENCE_SOURCE_ID } from "@/lib/pragma/hskReference";
 
 const EXPECTED_VOCABULARY_ENTRIES = 11_000;
 const EXPECTED_TOPIC_ROWS = 427;
@@ -264,9 +261,9 @@ function OperationsSection({
   const contentKind = audit?.contentKind === "mission"
     ? "학습 미션 1건"
     : audit?.contentKind === "core"
-      ? "미션 재료 1건"
+      ? "상황 시나리오 1건"
       : "콘텐츠 1건";
-  const caseTitle = audit?.title ?? null;
+  const caseTitle = audit?.title?.replace(/^\s*\[[^\]]*\]\s*/, "") || null;
   const caseAxes = [speechAct, level, mode, direction].filter((item): item is string => Boolean(item));
   const referenceEntries = referenceEntriesForCeiling(audit?.referenceCeiling ?? null);
   const emptyTitle = lookupFailed || audit?.status === "unavailable"
@@ -334,7 +331,7 @@ function OperationsSection({
             <li className="bg-[#FBFAF6] px-4 py-3">
               <p className="text-[11px] font-semibold tracking-[0.06em] text-[#8A7423]">03 · HSK 데이터셋 대조</p>
               <div className="mt-2 grid grid-cols-2 gap-2">
-                <div className="rounded-md bg-emerald-50 px-3 py-2.5 text-emerald-950">
+                <div className="rounded-md bg-[#EEF1F2] px-3 py-2.5 text-[#15202B]">
                   <p className="text-[24px] font-semibold leading-none tabular-nums">
                     {fmt(audit.matchedTokenCount ?? 0)}<span className="ml-0.5 text-[11px] font-normal">개</span>
                   </p>
@@ -398,11 +395,8 @@ function AuditMethodSection() {
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A7621]">
             규칙 기반 검사
           </p>
-          <span className="rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-900">
+          <span className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11px] font-medium text-[#5A6670]">
             실제 콘텐츠·감수 연결
-          </span>
-          <span className="rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-900">
-            비차단
           </span>
         </div>
         <h2 id="audit-method-title" className="mt-1 text-[18px] font-semibold tracking-[-0.02em] text-[#15202B]">
@@ -435,38 +429,25 @@ function AuditMethodSection() {
             <span className="text-[10.5px] font-semibold text-[#8A7621]">03 · 기록·연결</span>
             <p className="mt-1 font-semibold text-[#26333B]">확인 수 + 교수자 감수 후보</p>
             <p className="mt-1 leading-relaxed text-[#716B61]">
-              결과와 정책 버전을 콘텐츠에 저장하고 3단계 자동 점검·경고 검토로 연결합니다.
+              결과를 콘텐츠에 저장하고, 감수 후보는 교수자 최종 승인에서 확인합니다.
             </p>
           </li>
         </ol>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <div className="rounded-lg bg-emerald-50 px-3 py-3 text-[12px] text-emerald-950">
+          <div className="rounded-lg border border-[#E5DEC9] bg-white px-3 py-3 text-[12px] text-[#26333B]">
             <p className="font-semibold">이 검사가 확인하는 것</p>
             <p className="mt-1 leading-relaxed">
               추출 어휘 수, HSK 누적 참고 범위에서 확인된 수, 교수자 감수 후보 수를 같은 규칙으로
               계산합니다.
             </p>
           </div>
-          <div className="rounded-lg bg-amber-50 px-3 py-3 text-[12px] text-amber-950">
+          <div className="rounded-lg bg-[#F6F3EA] px-3 py-3 text-[12px] text-[#26333B]">
             <p className="font-semibold">이 검사가 판정하지 않는 것</p>
             <p className="mt-1 leading-relaxed">
               콘텐츠 전체가 수준에 비해 너무 쉽거나 어려운지, 목록 밖 어휘가 부적절한지,
               교체·재생성이 필요한지는 판정하지 않습니다.
             </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E5DEC9] bg-white px-3 py-3">
-          <div className="min-w-0 text-[11px] text-[#716B61]">
-            <p>
-              내부 기록 <code>hsk_lexical_audit</code> · 정책 <code>{HSK3_LEXICAL_AUDIT_POLICY_VERSION}</code>
-            </p>
-            <p className="mt-0.5 break-all">
-              출처 <code>{HSK3_REFERENCE_SOURCE_ID}</code>
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-x-4 gap-y-2 text-[12px] font-semibold">
           </div>
         </div>
       </div>
@@ -510,15 +491,14 @@ function DatasetOverview({
     <section className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white" aria-labelledby="dataset-title">
       <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F2F8F4] text-emerald-700" aria-hidden>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF1F2] text-[#3F4E59]" aria-hidden>
             <Database className="h-4 w-4" />
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-700 px-2 py-0.5 text-[12px] font-semibold tracking-[0.06em] text-white">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-200" aria-hidden /> LIVE
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-700">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> DB 실시간
               </span>
-              <span className="text-[12px] font-medium text-emerald-800">운영 DB 실시간 연결</span>
             </div>
             <h2 id="dataset-title" className="mt-0.5 text-[17px] font-semibold tracking-[-0.015em] text-[#15202B]">
               HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
@@ -526,8 +506,7 @@ function DatasetOverview({
           </div>
         </div>
         <div className="text-left sm:text-right">
-          <p className="text-[12px] font-medium text-[#315D47]">현재 점검에 적용 <strong className="font-semibold tabular-nums">5,400개</strong></p>
-          {checkedTime && <p className="mt-0.5 text-[12px] text-[#668273]">연결 확인 {checkedTime}</p>}
+          {checkedTime && <p className="text-[12px] text-[#5A6670]">연결 확인 {checkedTime}</p>}
         </div>
       </div>
 
