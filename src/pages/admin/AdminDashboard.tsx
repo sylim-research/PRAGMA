@@ -561,8 +561,8 @@ const AdminDashboard = () => {
       <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
-            // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「시나리오」로 부른다.
-            { to: "/admin/library", stage: "시나리오", screen: "라이브러리", value: snapshot?.content.coreCount,
+            // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
+            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount,
               // 큰 수는 현행본이다. 누적(보관 포함)은 곁에 작게 둔다.
               aside: snapshot?.cumulativeCoreCount != null ? `누적 생성 ${snapshot.cumulativeCoreCount.toLocaleString("ko-KR")}` : undefined },
             { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
