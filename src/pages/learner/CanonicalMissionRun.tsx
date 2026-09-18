@@ -489,17 +489,24 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
-function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, onSelect }: {
+// 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
+// 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「인정 범위」, 키가 있는 선택형 = 「정답」.
+function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "정답", referenceId, onSelect }: {
   option: ChoiceOption;
   value: string | null;
   disabled?: boolean;
   answered?: boolean;
   acceptedIds?: string[];
   radio?: boolean;
+  /** 키 쪽 선택지 배지. 적절성 판단은 「기준 판단」. */
+  acceptedLabel?: string;
+  /** 주면 이 선택지만 acceptedLabel이고, 나머지 허용 선택지는 「인정 범위」다. */
+  referenceId?: string;
   onSelect: (id: string) => void;
 }) {
   const picked = value === option.id;
   const accepted = acceptedIds.includes(option.id);
+  const badge = referenceId && option.id !== referenceId ? "인정 범위" : acceptedLabel;
   return (
     <button
       type="button"
@@ -517,7 +524,7 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
         {answered && (
           <span className="flex shrink-0 flex-wrap items-center gap-1.5">
             {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${accepted ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{accepted ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
-            {accepted && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />참고 답안</span>}
+            {accepted && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />{badge}</span>}
           </span>
         )}
       </span>
@@ -655,30 +662,23 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
-            <OptionButton key={option.id} option={option} value={pick} disabled={judgmentShown} answered={judgmentShown} acceptedIds={acceptedIds} onSelect={setPick} />
+            <OptionButton key={option.id} option={option} value={pick} disabled={judgmentShown} answered={judgmentShown} acceptedIds={acceptedIds}
+              acceptedLabel="기준 판단" referenceId={quest.referenceAnswer} onSelect={setPick} />
           ))}
         </div>
-        {judgmentShown && <div className="mt-4">
-          <VerdictBanner tone={judgmentOk ? "ok" : "miss"} title={judgmentOk ? "알맞은 판단이에요" : "참고 답안과 달라요"}>
-            <p className="font-bold">
-              {judgmentOk && pick !== quest.referenceAnswer
-                ? `내 판단 · ${pickLabel} — 참고 답안(${referenceLabel})과 같은 방향이라 알맞은 판단으로 봅니다.`
-                : judgmentOk ? `참고 답안 · ${referenceLabel}` : `내 판단 · ${pickLabel} / 참고 답안 · ${referenceLabel}`}
-            </p>
-            {alsoAcceptedLabels.length > 0 && <p className="text-xs">{alsoAcceptedLabels.join("·")}도 가능한 판단입니다.</p>}
-          </VerdictBanner>
-        </div>}
+        {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
+        <p className="sr-only" aria-live="polite">
+          {judgmentShown ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 인정 범위 ${alsoAcceptedLabels.join(", ")}.` : ""}` : ""}
+        </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
           <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
           </div>
-          {answered && reasonAcceptedId && <div className="mt-3">
-            <VerdictBanner tone={reasonOk ? "ok" : "miss"} title={reasonOk ? "이유도 맞았어요" : "참고 이유는 다른 것이에요"}>
-              {!reasonOk && <p className="font-bold">참고 이유 · {reasonLabel(reasonAcceptedId)}</p>}
-            </VerdictBanner>
-          </div>}
+          <p className="sr-only" aria-live="polite">
+            {answered && reasonAcceptedId ? `${reasonOk ? "정답입니다" : "오답입니다"}. 정답 이유 ${reasonLabel(reasonAcceptedId)}.` : ""}
+          </p>
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#596579]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
@@ -735,7 +735,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
-            <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} onSelect={setJudgment} />
+            <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} acceptedLabel="기준 판단" onSelect={setJudgment} />
           ))}
         </div>}
         {locked && (
@@ -745,11 +745,11 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                 <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${judgmentMatched ? "bg-[#DCEFE4] text-[#245E44]" : "bg-[#F4D8D5] text-[#8B3531]"}`}>
                   {judgmentMatched ? <Check className="h-4 w-4" strokeWidth={3} /> : <X className="h-4 w-4" strokeWidth={3} />}
                 </span>
-                {judgmentMatched ? "참고 답안과 같아요" : "참고 답안과 달라요"}
+                {judgmentMatched ? "기준 판단과 같아요" : "기준 판단과 달라요"}
               </p>
               <div className="flex flex-wrap items-center gap-2 text-xs font-black">
                 <span className="mt-2 rounded-full border border-current bg-white px-2 py-0.5">내 답안 · {judgmentLabel}</span>
-                <span className="mt-2 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[#245E44]">참고 답안 · {referenceLabel}</span>
+                <span className="mt-2 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[#245E44]">기준 판단 · {referenceLabel}</span>
               </div>
               <p className="mt-2 break-keep">
                 {judgmentMatched
@@ -780,8 +780,8 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         <span className={`${targetFont} min-w-0 max-w-full break-normal text-[16.5px] font-normal leading-7`}>{correction.text}</span>
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
-                            {picked && <span className="rounded-full border border-[#15202B] bg-white px-2 py-0.5 text-[11px] font-black text-[#15202B]">내 선택</span>}
-                            {correction.valid && <span className="rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]">참고 답안</span>}
+                            {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
+                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />정답</span>}
                           </span>
                         )}
                       </span>
@@ -790,19 +790,16 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                   );
                 })}
               </div>
-              {answered && correctionId && (() => {
-                const pickedCorrection = quest.corrections.find(item => item.id === correctionId);
-                return pickedCorrection && <div className="mt-4">
-                  <VerdictBanner tone={pickedCorrection.valid ? "ok" : "miss"} title={pickedCorrection.valid ? "알맞게 고친 표현을 골랐어요" : "참고 답안은 다른 표현이에요"} />
-                </div>;
-              })()}
+              <p className="sr-only" aria-live="polite">
+                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "정답입니다." : "오답입니다. 정답 표현에 정답 표시가 있습니다.") : ""}
+              </p>
             </div>
           </div>
         )}
         {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감추고 표현 메모만 남긴다. 저장된 콘텐츠는 그대로다. */}
         {answered && (correctionOnly
           ? <ExpressionMemoSection feedback={quest.feedback} />
-          : <div className="mt-4"><FeedbackBox verdict={`참고 답안 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>)}
+          : <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>)}
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
@@ -828,7 +825,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
   // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
-  // 내가 고친 표현 → 화용 해설 → 참고 답안 → 다른 맥락 → 표현 메모.
+  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락 → 표현 메모.
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
@@ -836,7 +833,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       <h3 className="text-base font-bold">{FREE_CORRECTION_INSTRUCTION}</h3>
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
-        <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 답안을 확인합니다.</p>
+        <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
@@ -845,10 +842,10 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
-      {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
-        <h4 className="font-bold">참고 답안</h4>
+      {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
+        <h4 className="font-bold">참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
-        <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 답안입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
+        <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 표현입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
       </section>}
       {submitted && quest.contrast && <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label="다른 맥락에서는?">
         <h4 className="font-bold">다른 맥락에서는?</h4>
@@ -891,7 +888,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
       <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
       <h3 className="text-base font-bold">{quest.prompt}</h3>
       {submitted && <div className="mt-4">
-        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 참고 답안과 같아요`} />
+        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 기준 판단과 같아요`} />
       </div>}
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
@@ -904,7 +901,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
               className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] bg-white"}`}>
-              {submitted && picked && <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />}{option.label}
+              {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
         </div>
@@ -916,7 +913,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
                 {ok ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <X className="h-3.5 w-3.5" strokeWidth={3.5} />}
               </span>
               <span className="sr-only">{ok ? "O " : "X "}</span>
-              참고 답안 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
+              기준 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
             </p>
             <NoteLine>{candidate.note}</NoteLine>
           </div>;

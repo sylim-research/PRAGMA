@@ -22,7 +22,7 @@ describe("instructor experience", () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={onReady} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: /3. 판단하고 고쳐보기/ }));
     fireEvent.click(screen.getByRole("button", { name: "참고 판정·해설 바로 보기" }));
-    await screen.findAllByText("참고 답안");
+    await screen.findAllByText("정답");
     for (const correction of SAMPLE_MISSION_V5_NATIVE.mpj_items[2].corrections) expect(screen.getByText(correction.note_ko)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [{ section: "mjt-2", status: "revision_required", note: "" }] })));
@@ -86,7 +86,7 @@ describe("instructor experience", () => {
     expect(screen.getByRole("button", { name: /^다소 부적절/ })).toBeDisabled();
     fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
     fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
-    expect(screen.getByText("이유도 맞았어요")).toBeInTheDocument();
+    expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
   });
   it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
     const v6 = (learner_level: "intermediate" | "advanced"): ReviewInspection => ({ ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level },

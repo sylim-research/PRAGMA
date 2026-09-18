@@ -65,11 +65,11 @@ describe("local learner UX pilot", () => {
     const inventedCause = screen.getByRole("button", { name: /助教您好，不好意思，我上周忘了签到/ });
     expect(inventedCause).toHaveTextContent("원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다.");
     expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
-    expect(within(inventedCause).queryByText("참고 답안")).not.toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("참고 답안")).toBeInTheDocument();
+    expect(within(inventedCause).queryByText("정답")).not.toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("정답")).toBeInTheDocument();
     click("다음: 직접 고쳐 보기");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
-    expect(screen.queryByRole("heading", { name: "참고 답안" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "참고 표현" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
     // The correction field opens immediately and empty; the unchanged original cannot be submitted.
     const input = screen.getByRole("textbox", { name: "내가 고친 표현" });
@@ -83,9 +83,9 @@ describe("local learner UX pilot", () => {
     fireEvent.change(input, { target: { value: freeAnswer } });
     click("수정안 제출하기");
     expect(screen.getByRole("textbox", { name: "내가 고친 표현" })).toHaveValue(freeAnswer);
-    expect(screen.getByRole("heading", { name: "참고 답안" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
     expect(screen.getByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).toBeInTheDocument();
-    expect(screen.queryByText(/참고 답안과 같아요|참고 답안과 달라요/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/기준 판단과 같아요|기준 판단과 달라요/)).not.toBeInTheDocument();
     click("다음: 표현 비교하기");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(snapshot.responses.A3).toEqual({ correctionIds: ["apology"] });
@@ -100,7 +100,7 @@ describe("local learner UX pilot", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${index + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기");
-    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("참고 답안 · 상황에 맞음")).toBeInTheDocument();
+    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("기준 판단 · 상황에 맞음")).toBeInTheDocument();
     click("다음: 번역하기"); click("번역하기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
     const dct = screen.getByRole("textbox");

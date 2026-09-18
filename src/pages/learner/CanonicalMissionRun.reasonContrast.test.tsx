@@ -40,8 +40,12 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.queryByText(reason.text)).not.toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
     click("매우 적절"); click("판단 확인하기");
-    expect(screen.getByText("참고 답안과 달라요")).toBeInTheDocument();
-    // 네 선지는 그대로 남고 잠긴다 — 내 선택과 참고 답안이 함께 보인다.
+    // 판정은 선택지 위 배지로만 보이고(하단 배너 없음), 스크린리더에는 같은 내용이 문장으로 간다.
+    expect(screen.getByText(/^기준 판단과 다릅니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("인정 범위")).toBeInTheDocument();
+    // 네 선지는 그대로 남고 잠긴다.
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: new RegExp(`^${label}`) })).toBeDisabled();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "가능한 수정 예시" })).not.toBeInTheDocument();
@@ -50,7 +54,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.getByRole("button", { name: "이유 확인하기" })).toBeDisabled();
     fireEvent.click(within(reasons).getByRole("radio", { name: reason.text }));
     click("이유 확인하기");
-    expect(screen.getByText("이유도 맞았어요")).toBeInTheDocument();
+    expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
+    expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("정답")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
@@ -89,8 +94,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다소 적절"); click("판단 확인하기");
     fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
     click("이유 확인하기");
-    expect(screen.getByText("참고 이유는 다른 것이에요")).toBeInTheDocument();
-    expect(screen.getByText(`참고 이유 · ${accepted.text}`)).toBeInTheDocument();
+    expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text}.`)).toBeInTheDocument();
+    expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
   });
