@@ -153,7 +153,7 @@ describe("admin dashboard", () => {
     show();
     // 편성 건수는 전체 흐름 칸에만 두고, 운영 카드는 주차를 큰 수로 보인다.
     const assignments = await screen.findByRole("link", { name: /편성 주차/ });
-    await waitFor(() => expect(assignments.textContent).toMatch(/편성 주차\s*2\s*개\s*서로 다른 미션 2개$/));
+    await waitFor(() => expect(assignments.textContent).toMatch(/편성 주차\s*2\s*개\s*교과목 1개에 배치$/));
     expect(screen.queryByText("미션 배정")).not.toBeInTheDocument();
     // 게이트 이전 편성 부채는 메인 문구에 두지 않고 마우스를 올릴 때만 보인다.
     expect(assignments.textContent).not.toContain("승인");

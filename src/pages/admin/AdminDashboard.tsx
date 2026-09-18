@@ -638,7 +638,7 @@ const AdminDashboard = () => {
           label="편성 주차"
           value={snapshot?.assignments.weekCount ?? null}
           unit="개"
-          description={snapshot ? `서로 다른 미션 ${snapshot.assignments.missionCount}개` : "교과목 주차에 놓인 미션"}
+          description={snapshot ? `교과목 ${snapshot.assignments.courseCount}개에 배치` : "교과목 주차에 놓인 미션"}
           error={displayError}
           changed={changedKeys.has("assignments")}
           title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
