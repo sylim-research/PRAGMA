@@ -16,8 +16,8 @@ export type PromptSnapshot = {
   prompts: PromptSnapshotEntry[];
 };
 export const PROMPT_SNAPSHOT: PromptSnapshot = {
-  "generated_at": "2026-09-19T01:16:00+09:00",
-  "git_commit": "0b824edf",
+  "generated_at": "2026-09-17T17:10:26+09:00",
+  "git_commit": "b83b4ce6",
   "git_dirty": false,
   "edge_source": "supabase/functions/generate-scenario/index.ts",
   "edge_source_sha256": "b23e1fc3c6c8e7af66d69b0b382db6194b7c90edf72afed46c71a6f23ec35d11",
@@ -97,7 +97,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.system.ko_zh",
-      "label": "상황 시나리오 생성 · 지시문 (한→중)",
+      "label": "코어 생성 · 지시문 (한→중)",
       "group": "core",
       "note": "500개 뱅크를 만드는 프롬프트. 상황·원문만 생성한다.",
       "sha256": "d592f100d2e644bc22ba277c964235d8c25f88a556e458f54bb9d41ba3adba0f",
@@ -105,7 +105,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.system.zh_ko",
-      "label": "상황 시나리오 생성 · 지시문 (중→한)",
+      "label": "코어 생성 · 지시문 (중→한)",
       "group": "core",
       "note": "중→한 스모크용. 같은 구조, 원문·산출 언어만 반대.",
       "sha256": "00e36f0e9544f327d28e079f39f572d2d506ab7ee8a4374ffff6f95a0fcc3cbf",
@@ -113,7 +113,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.written",
-      "label": "상황 시나리오 생성 · 요청서 (번역)",
+      "label": "코어 생성 · 요청서 (번역)",
       "group": "core",
       "note": "직장·산업 셀 조건이 들어가는 자리. PROBE_* 는 호출마다 바뀌는 값.",
       "sha256": "6839cafdbf97dbae2def97a6ecaeb2ee706fdf9068d3a0d7a4ce2a1ad6f92088",
@@ -121,7 +121,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.written.zh_ko",
-      "label": "상황 시나리오 생성 · 요청서 (중→한 번역)",
+      "label": "코어 생성 · 요청서 (중→한 번역)",
       "group": "core",
       "note": "중국어 자기 발신 원문과 지정 화행을 번역 코어 단계에서 고정한다.",
       "sha256": "97b16f85983e4ee451dc4a28b65acd937a5642fbee4182e3da887efb2e8b6741",
@@ -129,7 +129,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.spoken",
-      "label": "상황 시나리오 생성 · 요청서 (통역)",
+      "label": "코어 생성 · 요청서 (통역)",
       "group": "core",
       "note": "통역 셀은 구두 담화체 지시가 추가된다.",
       "sha256": "b2ff93078681943647142610f0941191b8805614587269b2b3e3895d4b7a2f2f",
@@ -137,7 +137,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.spoken.zh_ko",
-      "label": "상황 시나리오 생성 · 요청서 (중→한 통역)",
+      "label": "코어 생성 · 요청서 (중→한 통역)",
       "group": "core",
       "note": "중국어 원발화자 A·한국어 청자 B·학습자 통역사 C를 고정한다.",
       "sha256": "35edbdb4de5b017e69c79fa2e637f404b128b6b1a9ad3290336071e42907b977",
@@ -145,7 +145,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.spoken.zh_ko.response_act",
-      "label": "상황 시나리오 생성 · 요청서 (중→한 응답 통역)",
+      "label": "코어 생성 · 요청서 (중→한 응답 통역)",
       "group": "core",
       "note": "중국어 화자 A와 한국어 화자 B 사이의 교차 언어 인접쌍과 통역 개입을 고정한다.",
       "sha256": "687f42f1634a25923273fde289bf12e43764e336f901c00f40a8ae48d9e3b230",
@@ -153,7 +153,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.response_act",
-      "label": "상황 시나리오 생성 · 요청서 (거절·반대 등 인접쌍)",
+      "label": "코어 생성 · 요청서 (거절·반대 등 인접쌍)",
       "group": "core",
       "note": "선행 발화(preceding_turn)를 반드시 채우게 하는 분기.",
       "sha256": "90d3eb332e59d4129f1d468e6ee7eafdf9912c21f8ef5ff7f5ef8463cdb7d60d",
@@ -161,7 +161,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.source_repair",
-      "label": "상황 시나리오 생성 · 원문 분량 1회 교정",
+      "label": "코어 생성 · 원문 분량 1회 교정",
       "group": "core",
       "note": "글자 수·문장 경계가 어긋났을 때 기존 사실을 보존하며 전체 JSON을 한 번 교정한다.",
       "sha256": "6f9def14e669fdb600e031dbb541c2da545e99fb566167b34612d76f46bdcfd9",
@@ -169,7 +169,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.preceding_turn_repair",
-      "label": "상황 시나리오 생성 · 선행 발화 언어 1회 교정",
+      "label": "코어 생성 · 선행 발화 언어 1회 교정",
       "group": "core",
       "note": "응답 화행의 선행 발화가 목표 언어가 아닐 때 명제와 역할을 보존하며 전체 JSON을 한 번 교정한다.",
       "sha256": "83f88d06a6faf9e7d631a001869705a4ff5032d1128716a5745281e4f0d9c0a8",
@@ -177,7 +177,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.bilingual_scene_repair",
-      "label": "상황 시나리오 생성 · 이중언어 통역 장면 1회 교정",
+      "label": "코어 생성 · 이중언어 통역 장면 1회 교정",
       "group": "core",
       "note": "통역 상황문의 원발화자·학습자 통역사·청자 역할 중첩을 제거한다.",
       "sha256": "1a4a895156f136f5805e48d8072b00c3236dbb9d9f3c456201eef2dcd08e9232",
@@ -185,7 +185,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system",
-      "label": "학습 미션 조립 · 지시문 (번역)",
+      "label": "미션 승격 · 지시문 (번역)",
       "group": "mission",
       "note": "코어를 네이티브 MPJ5 + 산출 과제로 승격시킬 때의 지시문.",
       "sha256": "27905d051dad7da3adb3cd45a9e7b06350f668412cb9e5c7c480c7ab23aa472b",
@@ -193,7 +193,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system.zh_ko",
-      "label": "학습 미션 조립 · 지시문 (중→한 번역)",
+      "label": "미션 승격 · 지시문 (중→한 번역)",
       "group": "mission",
       "note": "중국어 원문 제약과 자연스러운 한국어 관계 실현을 함께 잠근다.",
       "sha256": "653608362d42d8d00b7598c0aa60f8ce38de5483ecb448152ad433163bb34460",
@@ -201,7 +201,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system.zh_ko.spoken",
-      "label": "학습 미션 조립 · 지시문 (중→한 통역)",
+      "label": "미션 승격 · 지시문 (중→한 통역)",
       "group": "mission",
       "note": "A/B/C 참여자와 중국어 원발화→한국어 통역의 기능적 등가를 잠근다.",
       "sha256": "dafbd5581076baabf6f3cb523e22cba7c54cf14a411a94f70dfebb8e72bc7dc2",
@@ -209,7 +209,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system.proposal",
-      "label": "학습 미션 조립 · 제안 대역 경계",
+      "label": "미션 승격 · 제안 대역 경계",
       "group": "mission",
       "note": "선택 가능성과 방안 명료성 초점의 적정/과소/과잉 경계를 고정한다.",
       "sha256": "7235c1997af189fa128a487649c5e27a07b48922c6027f31b9ce14d36489a5eb",
@@ -217,7 +217,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system.spoken",
-      "label": "학습 미션 조립 · 지시문 (통역)",
+      "label": "미션 승격 · 지시문 (통역)",
       "group": "mission",
       "note": "구두 산출 미션용 분기.",
       "sha256": "bc17e1b8907747a3a2fef6bc16e7bcad73629d9f88ab570a60b140527c11ba82",
@@ -225,7 +225,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.system.legacy_v4",
-      "label": "학습 미션 조립 · 이전 4문항 MJT 지시문",
+      "label": "미션 승격 · legacy MPJ4 지시문",
       "group": "mission",
       "note": "focal segment가 없는 과거 단문 코어의 읽기·승격 호환 분기.",
       "sha256": "575846bb8515e38592455871231b22f6facf76c89d99cb50de3c1b329a48e011",
@@ -233,7 +233,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.user.contrast_plan",
-      "label": "학습 미션 조립 · 고정 대비 계획 요청서",
+      "label": "미션 승격 · 고정 대비 계획 요청서",
       "group": "mission",
       "note": "화행 목표와 다섯 문항의 내부 판정 초점을 생성 전에 고정한다.",
       "sha256": "428c9049bc73c94cd91c5a24e32a311416b252b0e1d783d0edbbd8c9221a864b",
@@ -241,7 +241,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "mission.item_lineage.system",
-      "label": "학습 미션 문항별 근거 연결 · 지시문",
+      "label": "미션 문항별 근거 귀속 · 지시문",
       "group": "review",
       "note": "생성이 끝난 mission_v5 목표어 문장을 pack rule/risk에 귀속하되 승인 상태로 승격하지 않는다.",
       "sha256": "cff12bb5742921cacab19745b89a350419a48e680f07eff3f2a87d5e660ec07d",
@@ -249,7 +249,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core.user.learner_scene_repair",
-      "label": "상황 시나리오 생성 · 학습자용 평가 기준 노출 1회 교정",
+      "label": "코어 생성 · 학생용 평가 기준 노출 1회 교정",
       "group": "core",
       "note": "상황 사실은 보존하고 정중성·완화·선택권 같은 답 방향 단서만 제거한다.",
       "sha256": "829ff5c5558e45412ba0a453fc5296e3fbffbf9e4c185a1fa211b8fb099da101",
@@ -257,7 +257,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "quality.system",
-      "label": "AI 검토 · 지시문",
+      "label": "검증② · AI 품질점검 지시문",
       "group": "review",
       "note": "생성과 분리된 모델이 미션을 비평한다(계약 0-n·94).",
       "sha256": "2c265c993fedae43f216d5d7037de993683dfb7256584299858bf25880c1b742",
@@ -265,7 +265,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "quality.system.zh_ko",
-      "label": "AI 검토 · 지시문 (중→한 번역)",
+      "label": "검증② · AI 품질점검 지시문 (중→한 번역)",
       "group": "review",
       "note": "중→한 번역의 화행·등가·한국어 자연성 결함을 기존 코드로 비평한다.",
       "sha256": "f9a965d004fadb20813caef8a9bbdd56c5ff0c8188458db93576abbe59821fdb",
@@ -273,7 +273,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "quality.system.zh_ko.spoken",
-      "label": "AI 검토 · 지시문 (중→한 통역)",
+      "label": "검증② · AI 품질점검 지시문 (중→한 통역)",
       "group": "review",
       "note": "중→한 통역의 A/B/C 역할과 한국어 등가 산출을 비평한다.",
       "sha256": "704aacc0fd75be0ad7451946ba2a56ab8518f1f36facc9e73b7b73141d875c03",
@@ -281,7 +281,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "quality.system.legacy_v4",
-      "label": "AI 검토 · 이전 4문항 MJT 지시문",
+      "label": "검증② · legacy MPJ4 품질점검 지시문",
       "group": "review",
       "note": "과거 단문 코어 승격분의 4문항 맥락 계획을 보존한다.",
       "sha256": "d9e862d57bfc7cb04b721a10772aa78f98cd418b7b93d558d57f5b3e30ebffb3",
@@ -289,7 +289,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core_quality.system",
-      "label": "상황 시나리오 조건 검토 · 지시문",
+      "label": "코어 축 준수 비평 · 지시문",
       "group": "review",
       "note": "화행·P/D/R·도메인·산업·모드·역할권한·topic·인접쌍을 생성 모델과 분리해 감사한다.",
       "sha256": "1ee586a17885825eb68a3d49eb1126243d0bffd79d57651a9cbe8c6dde1b2567",
@@ -297,7 +297,7 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
     },
     {
       "key": "core_quality.system.zh_ko",
-      "label": "상황 시나리오 조건 검토 · 지시문 (중→한 번역)",
+      "label": "코어 축 준수 비평 · 지시문 (중→한 번역)",
       "group": "review",
       "note": "중→한 번역 코어의 자기 발신 역할과 지정 화행을 감사한다.",
       "sha256": "5e393fb490e6871bb478e7f0aed26098ce0198b2da67af46f5e37986832c283e",

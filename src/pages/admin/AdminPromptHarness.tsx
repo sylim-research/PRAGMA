@@ -12,10 +12,10 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 // 실제 edge 소스에서 자동 재생성되므로(prebuild) 화면이 코드보다 낡을 수 없다.
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
-  core: "상황 시나리오 생성",
-  mission: "학습 미션 조립 (MJT + DCT)",
+  core: "시나리오 생성",
+  mission: "미션 승격 (MJT + 산출 과제)",
   review: "프롬프트 통제 기반 검토",
-  runtime: "학습자 피드백",
+  runtime: "학습자 실행 중 피드백",
   authoring: "실제 자료 활용",
 };
 const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
@@ -99,7 +99,7 @@ function ProvenanceBanner({
     <section className="rounded-xl border border-[#EAE4D2] bg-[#FBFAF7] p-4">
       <div className="flex flex-wrap items-center gap-2">
         <Lock className="h-4 w-4 text-[#8a857c]" />
-        <h2 className="text-[15px] font-bold">프롬프트 원문 · 읽기 전용</h2>
+        <h2 className="text-[15px] font-bold">프롬프트·지문 관리 · 읽기 전용</h2>
         <Badge variant="outline" className="font-normal">
           커밋 {snap.git_commit}
         </Badge>
@@ -110,12 +110,14 @@ function ProvenanceBanner({
         )}
       </div>
       <p className="mt-2 max-w-[42rem] text-[12.5px] leading-relaxed text-muted-foreground">
-        모델에 실제로 보내는 지시문을 그대로 보여 줍니다. 지시문이 바뀌면 지문이 달라지고, 시나리오마다 생성에 쓴 지문이 기록됩니다.
+        아래에는 모델에 실제로 전송되는 지시문과 모델 설정, 출력 형식, 버전·지문을 함께 표시합니다.
+        <code>PROBE_*</code>는 호출마다 달라지는 입력값 자리이고, 실제 값은 시나리오 행에 따로
+        저장됩니다.
       </p>
 
       <div className="mt-3 grid gap-2 text-[12.5px] sm:grid-cols-2">
         <div className="rounded-lg border border-[#EAE4D2] bg-white px-3 py-2">
-          <div className="text-[11.5px] text-muted-foreground">현재 상황 시나리오 생성 지시문의 지문</div>
+          <div className="text-[11.5px] text-muted-foreground">시나리오 생성 표면 지문 (SHA-256)</div>
           <div className="mt-0.5 break-all font-mono text-[11px]">{snap.core_surface_hash}</div>
           <div className="mt-1 text-[11px] text-muted-foreground">
             모델 {snap.generation_config.model} · temperature {snap.generation_config.temperature} ·{" "}
@@ -190,6 +192,9 @@ function ProvenanceBanner({
         </div>
       )}
 
+      <p className="mt-2 text-[11.5px] text-muted-foreground">
+        스냅샷 캡처: {new Date(snap.generated_at).toLocaleString()} · 출처 {snap.edge_source}
+      </p>
     </section>
   );
 }
@@ -215,6 +220,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
+        <p className="mt-1 text-xs text-muted-foreground">{entry.note}</p>
       </CardHeader>
       {open && (
         <CardContent className="p-4 pt-0">
