@@ -60,6 +60,8 @@ const AdminAuthentic = () => {
     setLoadingList(true);
     const res = await listAuthenticAnalyses();
     setRows(res.rows);
+    // 최근 분석 1건은 펼친 채로 연다 — 접혀 있으면 이 화면이 무엇을 만들어 내는지 보이지 않는다.
+    setOpenId((current) => current ?? res.rows[0]?.id ?? null);
     setPending(res.pending);
     setListError(res.error);
     setLoadingList(false);
@@ -122,7 +124,7 @@ const AdminAuthentic = () => {
   return (
     <AdminShell
       title="실제 자료 활용 분석"
-      description="쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 활용 후보를 제안합니다. 분석한 자료는 후보까지 보관함에 남아 나중에 다시 꺼내 쓸 수 있습니다."
+      description="쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 상황 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 보관함에 남습니다."
     >
       {saveNote && (
         <p
@@ -261,9 +263,9 @@ const AdminAuthentic = () => {
                                 {c.source_text && c.usage_type !== "expression_resource" && (
                                   <Button
                                     onClick={() => void sendStoredToGenerator(c, row)}
-                                    className="h-7 bg-[#BA7517] px-2.5 text-[11.5px] text-white hover:bg-[#BA7517]/90"
+                                    className="h-7 bg-[#15202B] px-2.5 text-[11.5px] text-white hover:bg-[#15202B]/90"
                                   >
-                                    → 시나리오 만들기
+                                    상황 시나리오 만들기
                                   </Button>
                                 )}
                                 <button
@@ -278,7 +280,7 @@ const AdminAuthentic = () => {
                                   onClick={() => void mark(c, "discarded")}
                                   className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
                                 >
-                                  버림
+                                  버리기
                                 </button>
                               </div>
                             </div>
