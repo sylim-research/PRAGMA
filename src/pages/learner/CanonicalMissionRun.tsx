@@ -677,7 +677,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
           </div>
           <p className="sr-only" aria-live="polite">
-            {answered && reasonAcceptedId ? `${reasonOk ? "정답입니다" : "오답입니다"}. 정답 이유 ${reasonLabel(reasonAcceptedId)}.` : ""}
+            {answered && reasonAcceptedId ? `${reasonOk ? "정답입니다" : "오답입니다"}. 정답 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
           </p>
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#596579]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
