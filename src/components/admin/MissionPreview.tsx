@@ -109,9 +109,6 @@ export function MissionPreview({
               <span className="font-medium">요약(보조)</span> {q.summary_ko}
             </p>
           )}
-          <p className="mt-1.5 text-[12px] opacity-70">
-            AI 보조 판정입니다 — 승인 여부는 아래 문항을 직접 확인하고 결정하세요.
-          </p>
         </div>
       )}
 

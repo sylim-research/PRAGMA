@@ -334,7 +334,6 @@ const AdminTeachingMaterials = () => {
           <summary className="cursor-pointer font-semibold">이 주차 수업자료 승인</summary>
           {reviewOpen && <ContentReviewPanel key={`${courseId}-${week.week_no}-${draft?.revision ?? 0}`} refreshKey={String(draft?.revision ?? 0)} target={{ kind: "weekly_material", targetId: courseId, weekNo: week.week_no }} />}
         </details>}
-        {!projectorOpen && <p className="text-xs text-muted-foreground">아래는 현재 편성의 교수자 미리보기입니다. 학생 유인물은 이 주차 자료의 최종 승인 후 공개되며, 내용이나 편성이 바뀌면 다시 확인하고 승인해야 합니다.</p>}
         <div className="flex flex-wrap items-center gap-2">
           <Button ref={projectorButtonRef} onClick={() => { setNotesOpen(false); setActiveSection(0); setProjectorOpen(true); }}>프로젝터 화면</Button>
           <Button variant="outline" onClick={exportHtml}>HTML</Button>
@@ -368,7 +367,6 @@ const AdminTeachingMaterials = () => {
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
           <div className="min-w-0">
             <h2 id="course-operation-heading" className="text-[15px] font-semibold text-[#15202B]">15주 운영 현황</h2>
-            <p className="mt-0.5 text-[12px] text-muted-foreground">저장된 편성·자료 상태와, 점수가 아닌 실제 수행 기록의 익명 집계입니다.</p>
           </div>
           <div className="flex items-center gap-2">
             <StatusChip tone={course.outline.status === "published" ? "good" : "attention"}>

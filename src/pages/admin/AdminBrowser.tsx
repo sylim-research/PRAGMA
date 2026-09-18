@@ -296,11 +296,6 @@ const AdminBrowser = () => {
             </div>
           </div>
           <p className="mt-3 text-[12px] text-muted-foreground">편성 가능 미션은 현재 편성 기준을 충족한 MJT5+DCT1입니다. 실제 배정은 교과목·주차 조건에 따라 선택합니다.</p>
-          {fArchive !== "current" && (
-            <p className="mt-1.5 text-[12px] text-[#7A6418]" role="status">
-              보관 콘텐츠는 지난 세대의 자료로 남겨 둔 것입니다. 제작·검토·편성 대상이 아니며 삭제된 것도 아닙니다.
-            </p>
-          )}
         </section>
 
       {loading ? (

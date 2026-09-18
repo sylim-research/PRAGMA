@@ -82,12 +82,6 @@ export const ResearchWorkflowGuide = ({ current }: { current: ResearchStep | "ov
           );
         })}
       </ol>
-
-      {current === "overview" && (
-        <p className="mt-4 border-t pt-4 text-xs leading-5 text-muted-foreground">
-          전문가 3인의 설계·사용성 형성평가는 학습 콘텐츠 승인 절차가 아니므로 이 품질관리 흐름에 포함하지 않습니다.
-        </p>
-      )}
     </section>
   );
 };

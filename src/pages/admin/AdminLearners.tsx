@@ -397,9 +397,7 @@ const Page = () => {
               </div>
 
               <DialogFooter className="flex-wrap gap-2 sm:justify-between">
-                <div className="text-xs text-muted-foreground">
-                  승인 시 익명 식별자가 없으면 자동 생성됩니다(있으면 유지).
-                </div>
+                <div />
                 <div className="flex flex-wrap gap-2">
                   <Button
                     variant="outline"

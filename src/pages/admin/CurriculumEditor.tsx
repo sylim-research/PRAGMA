@@ -625,10 +625,6 @@ export const CurriculumEditor = ({
                                 <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
                                   [상황·관계]에서 [소통 행동]을 [맥락 조건]에 맞게 수행할 수 있다.
                                 </p>
-                                <p className="mt-1 text-[10.5px] leading-relaxed text-muted-foreground">
-                                  행동 중심 원리를 반영한 PRAGMA 내부 가이드이며, CEFR·ACTFL의
-                                  공식 표준 문구를 옮긴 것은 아닙니다.
-                                </p>
                               </div>
                               <div className="space-y-2">
                                 {canDoSuggestions.map((suggestion) => (
