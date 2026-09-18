@@ -100,7 +100,7 @@ describe("professor finding decisions", () => {
     const approve = screen.getByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
-    await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ professorNote: "현재 버전을 수업에 사용합니다." })));
+    await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ professorNote: "이 학습 미션을 수업에 사용합니다." })));
   });
 
   it("requires saved clear decisions and then locks the approved decision", async () => {

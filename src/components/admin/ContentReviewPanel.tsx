@@ -28,10 +28,10 @@ function signalSummary(findings: ReviewFinding[]): string {
 }
 
 /**
- * 승인 근거는 교수자가 남기고 싶을 때만 적는다. 비워 두면 이 문구로 기록한다 — 승인 시점의 근거가
+ * 승인 근거 칸은 이 문구로 미리 채워 둔다. 교수자가 지우고 비워 두어도 이 문구로 기록한다 — 승인 시점의 근거가
  * 비어 있지 않게 하려는 것이고, 저장 계약이 요구하는 최소 길이도 이 문구가 충족한다.
  */
-const DEFAULT_APPROVAL_NOTE = "현재 버전을 수업에 사용합니다.";
+const DEFAULT_APPROVAL_NOTE = "이 학습 미션을 수업에 사용합니다.";
 const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
@@ -56,7 +56,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   const query = useQuery({ queryKey: key, queryFn: () => contentReviewRequest(target), retry: false, staleTime: 0 });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(DEFAULT_APPROVAL_NOTE);
   const [confirmed, setConfirmed] = useState(false);
   const [openaiFailOverride, setOpenaiFailOverride] = useState("");
   const [openaiFailConfirmed, setOpenaiFailConfirmed] = useState(false);
@@ -74,7 +74,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   const run = state?.run ?? null;
   const savedDecisionsJson = JSON.stringify(run?.professor_decisions ?? []);
   useEffect(() => {
-    setConfirmed(false); setNote(""); setOpenaiFailOverride(""); setOpenaiFailConfirmed(false);
+    setConfirmed(false); setNote(DEFAULT_APPROVAL_NOTE); setOpenaiFailOverride(""); setOpenaiFailConfirmed(false);
   }, [state?.contentHash, run?.id]);
   useEffect(() => {
     const saved: ProfessorFindingDecision[] = JSON.parse(savedDecisionsJson);
@@ -155,8 +155,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     finally { setBusy(false); }
   };
   return <section aria-label="콘텐츠 승인" className={framed ? "my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm" : "space-y-3 text-sm"}>
-    {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. */}
-    <div className="flex flex-wrap items-center justify-between gap-2">
+    {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. 최종 승인 화면은 이 줄 없이 감수부터 시작한다. */}
+    {!experiential && <div className="flex flex-wrap items-center justify-between gap-2">
       {/* The final-approval screen already shows its own ①②③ flow; the stage line stays on the quality-check screen. */}
       {experiential ? <span /> : <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px]" aria-label={target.kind === "mission" ? "점검 단계 · 코어·MJT5·DCT1 전체" : "점검 단계 · 편성 후 공통 수업자료·교수자 고유 메모"}>
         {steps.map((step, index) => {
@@ -174,11 +174,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         })}
       </ol>}
       <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>
-    </div>
+    </div>}
     {query.isPending && <p role="status">저장된 콘텐츠와 승인 이력을 확인하는 중…</p>}
     {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
     {state && <>
-      {experiential && <FlowHeading step="①" title="내용 확인" note="학생에게 보이는 장면과 문항을 순서대로 확인합니다." />}
       {experiential && target.kind === "mission" && <InstructorReviewExperience key={`${target.targetId}-${state.contentHash}-${state.sourceHash}`}
         inspection={state} onSave={saveExperience} onReady={setExperienceReady} disabled={busy || approvalDisabled} />}
       {next !== "approved" && next !== "professor" && <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-[#E2DED2] bg-[#FBFAF6] px-3 py-2.5">
@@ -187,7 +186,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 유료로 실행합니다. 추가 모델 검토는 선택 시에만.</p>
       </div>}
       {!experiential && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사 무료 · 최종 검수 자료는 문항별 근거 생성 비용 발생</p>}
-      {experiential && (run || decisionSlot) && <FlowHeading step="②" title="판정" note="자동 검수 결과를 근거로, 문제 항목마다 교수자 결정을 남깁니다." />}
+      {experiential && (run || decisionSlot) && <FlowHeading title="자동 검수 결과" />}
       {!run && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
@@ -280,12 +279,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           : <div className="rounded-lg border p-3">{body}</div>;
       })()}
       {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
-        <h4 className="text-[14px] font-bold text-[#233542]">{experiential ? "③ 교수자 최종 승인" : "교수자 최종 승인"}</h4>
-        {experiential && <p className="text-xs text-muted-foreground">감수를 마친 <b>이 버전</b>에 수업 사용·학습자 공개 자격을 부여하는 결정입니다. 내용을 다시 고치면 새 버전이 되어 점검과 승인을 다시 거칩니다.</p>}
-        <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>
+        <h4 className="text-[14px] font-bold text-[#233542]">교수자 최종 승인</h4>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다.</p>}
-        {onApprove && <p className="text-xs text-muted-foreground">미션 승인은 미리 준비한 최종 검수 자료를 그대로 저장합니다.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
           <p className="text-xs">독립 AI 검토의 문제 항목 유무와 별개입니다. 수정이 필요하면 원본을 수정하고 다시 점검하세요. 수정 없이 사용할 때만 그 근거를 남깁니다.</p>
@@ -295,7 +291,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" value={note} onChange={(event) => setNote(event.target.value)} placeholder="남길 말이 있으면 적어 주세요(선택). 비워 두면 「현재 버전을 수업에 사용합니다」로 기록합니다." />
+        <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
         <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
@@ -321,6 +317,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           교수자 승인은 수업 사용·학습자 공개 <b>자격</b>을 부여합니다. 실제 노출에는 주차 편성과 공개 강좌의 접근 조건이 더 필요합니다.
         </p>
       </div>}
+      {experiential && <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>}
       <details><summary className="cursor-pointer text-xs">{experiential ? "세부 추적 정보 · 콘텐츠 원본·승인 이력" : "콘텐츠 원본·승인 이력"}</summary>
         {experiential && <dl className="my-2 grid gap-x-3 gap-y-1 break-all text-[11px] sm:grid-cols-[10rem_1fr]">
           {([
@@ -346,10 +343,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   </section>;
 }
 
-function FlowHeading({ step, title, note }: { step: string; title: string; note: string }) {
+function FlowHeading({ step, title, note }: { step?: string; title: string; note?: string }) {
   return <div className="border-t pt-3 first:border-t-0 first:pt-0">
-    <h4 className="text-[14px] font-bold text-[#233542]">{step} {title}</h4>
-    <p className="mt-0.5 text-xs text-muted-foreground">{note}</p>
+    <h4 className="text-[14px] font-bold text-[#233542]">{step ? `${step} ${title}` : title}</h4>
+    {note && <p className="mt-0.5 text-xs text-muted-foreground">{note}</p>}
   </div>;
 }
 
