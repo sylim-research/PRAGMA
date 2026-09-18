@@ -815,14 +815,21 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
   );
 }
 
-/** v6 자유교정의 과제 지시문. 대상 표현은 계약상 고쳐야 하는 표현이라, 선택처럼 읽히는 「필요한 부분」을 쓰지 않는다. */
-const FREE_CORRECTION_INSTRUCTION = "원문의 핵심 의미와 화행 목적은 그대로 두고, 상황에 맞게 고쳐 쓰세요.";
+/**
+ * v6 자유교정은 결함안에서 출발하는 편집 과제다(DEC-20260918-05). 지시문은 할 일 하나만 말하고,
+ * 의미 보존(Gate B)은 바로 아래 한 줄로 따로 둔다. 연구 용어(핵심 의미·화행 목적)는 화면에 쓰지 않는다.
+ */
+const freeCorrectionInstruction = (output: string) => `위 ${output}에서 상황에 맞지 않는 부분을 고쳐 보세요.`;
+const FREE_CORRECTION_FIDELITY = "원문의 뜻은 바꾸지 마세요.";
 
 function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
   const mission = useCanonicalMission();
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
-  // 빈 칸에서 시작한다 — 원래 표현을 미리 채워 두면 한 글자도 고치지 않은 제출이 기록으로 남는다.
-  const [draft, setDraft] = useState("");
+  const output = mission.activityMode === "interpreting" ? "통역안" : "번역안";
+  // 결함안을 미리 넣어 두고 고칠 곳만 바꾸게 한다. 그대로 제출은 아래 관문이 막는다.
+  // 비교 기준(결함안)은 저장되는 수행 기록의 mission_content_hash가 가리키는 콘텐츠 버전의 이 문항 target이다.
+  const [draft, setDraft] = useState(quest.target);
+  const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
   // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
@@ -831,10 +838,12 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
       <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-      <h3 className="text-base font-bold">{FREE_CORRECTION_INSTRUCTION}</h3>
+      <h3 className="text-base font-bold">{freeCorrectionInstruction(output)}</h3>
+      <p className="mt-1 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       <div className="mt-4">
-        <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
-        <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
+        <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
+        {!submitted && <p className="mt-2 text-xs leading-5 text-[#697386]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
+        <p className="mt-1 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
@@ -855,7 +864,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       </section>}
       {submitted && <ExpressionMemoSection feedback={quest.feedback} />}
     </section>
-    <ActionBar hint={!submitted && unchanged ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
+    <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
       {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
         : <Button className="h-12 w-full" onClick={() => onDone({ revisedText: draft.trim() })}>다음: 표현 비교하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
