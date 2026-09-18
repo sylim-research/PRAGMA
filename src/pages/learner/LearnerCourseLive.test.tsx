@@ -54,7 +54,7 @@ describe("주차를 펼쳐 보는 강의계획서", () => {
     expect(panel.queryByRole("heading", { name: "중심 질문" })).not.toBeInTheDocument();
     expect(panel.queryByText(/이 상황에서 요청의 뜻을/)).not.toBeInTheDocument();
     expect(panel.getByText(/같은 요청 화행을 서로 다른 상황에서 번역과 통역으로 연습합니다/)).toBeInTheDocument();
-    expect(panel.getByRole("link", { name: "이번 주 수업자료" })).toHaveAttribute("href", `/learner/course/${courseId}/week/2/note`);
+    expect(panel.queryByRole("link", { name: "이번 주 수업자료" })).toBeNull();
     expect(screen.queryByText(missionWeek.scenarios[0].brief_note_ko!)).not.toBeInTheDocument();
     expect(screen.queryByText(/0\/2|시작 전|예정|학기 일정|수업 활동|통역사 C|중심 질문은 수업의 방향/)).not.toBeInTheDocument();
   });
@@ -106,7 +106,7 @@ describe("주차를 펼쳐 보는 강의계획서", () => {
     fireEvent.click(screen.getByRole("button", { name: "7주차 중간 메타화용 토론" }));
     expect(screen.getByRole("region", { name: "7주차 중간 메타화용 토론" })).toBeVisible();
     expect(screen.queryByRole("link", { name: /미션 시작/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "이번 주 수업자료" })).toHaveAttribute("href", `/learner/course/${courseId}/week/7/note`);
+    expect(screen.queryByRole("link", { name: "이번 주 수업자료" })).toBeNull();
     expect(screen.getByRole("button", { name: "14주차 종합 메타화용 토론" })).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByText(/클리닉/)).not.toBeInTheDocument();
   });
@@ -115,6 +115,6 @@ describe("주차를 펼쳐 보는 강의계획서", () => {
     show([missionWeek, { ...missionWeek, week_no: 13 }], `/learner/course/${courseId}/week/13`);
     expect(screen.getByRole("button", { name: "13주차 요청 화행 · 새 상황에 적용하기" })).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("button", { name: "2주차 요청 화행" })).toHaveAttribute("aria-expanded", "false");
-    expect(screen.getByRole("link", { name: "이번 주 수업자료" })).toHaveAttribute("href", `/learner/course/${courseId}/week/13/note`);
+    expect(screen.queryByRole("link", { name: "이번 주 수업자료" })).toBeNull();
   });
 });
