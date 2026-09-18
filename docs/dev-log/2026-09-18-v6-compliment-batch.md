@@ -6,3 +6,8 @@
 - 코어 수정 1건: `809c7ccb` 코어 원문이 상대를 「B님」으로 부름 → 복제 행에서 「작가님」으로 교체. 이를 위해 `core_overrides.source_text`·`focal_segments`를 조립·등록 스크립트에 추가(원본 행 불변). 조립기는 v5 권장안이 목표문과 같아 `revision_examples`가 없는 자리에 override로 새 값을 넣을 수 있게 완화.
 - 결과: 조립 6/6 규칙 pass(warning 0) → 등록 6/6 AI 품질 pass(지적 0) → 운영 규칙검사 pass 5·warning 1(`3515c807` R29 코어 원문 59자, v5 코어 그대로). 새 행 = `3515c807`·`9f1cefc7`·`dea0b68c`·`d37985e5`·`ad8af87d`·`10703387`(generated). 편성 교체는 승인 뒤.
 - 산출: readback `Documents/pragma-v6-conversion/readback/2026-09-18_칭찬배치_readback.md` · DeepSeek 검토 docx 70문장 · 연구자 확인 3건(`68ec12d5` DCT 원문 감사 주도 / `b04d4d34` DCT 「당신이」 / `809c7ccb` 코어 교체).
+
+## v2 전면 재집필 (같은 날 밤)
+- 연구자 검수에서 첫 미션 거부(사유: 관계에 안 맞는 평가서 말투 · 「과함」 오답 불성립 · 감사가 칭찬을 대체 · 한국어 자연성 검사층 없음) → 6건 전부 재집필. 집필 스크립트 `tmp/_compliment_v2_author.cjs`, v1 집필분은 `*.authored.v1.json`.
+- 규칙: 「과함」 = 근거 넘는 개인·사적 영역 평가(관계 먼 장면) · MJT4 = 원문에 없는 제3자 비교 · MJT3 과장 오답 = 없던 남의 말 · 감사 원문 제거 · 오답 한 자리 = 평가서·공문 말투(DEC-20260918-07). DCT 원문이 문제인 5건은 core_overrides로 코어 원문 교체.
+- 결과: 조립 6/6 pass → 새 행 `b96f626d`·`f9a7907d`·`983da1ac`·`2652f9f1`·`aa4d2100`·`d15f2c35`(generated, rework). 규칙 pass 5·warning 1(`aa4d2100` 코어 77자 < 고급 권장 80). AI 품질 pass 3·warning 3(근거 확인 못 한 지적 격리). DeepSeek v3 docx 76문장.
