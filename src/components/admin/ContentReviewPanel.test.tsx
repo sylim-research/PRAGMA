@@ -235,3 +235,38 @@ describe("automated quality signals", () => {
     expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-2" })).toHaveValue(BULK_SIGNAL_RATIONALE);
   });
 });
+
+describe("professor approval screen (experiential)", () => {
+  function showApprovalScreen() {
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter><ContentReviewPanel target={{ kind: "weekly_material", targetId: "course-1", weekNo: 3 }} experiential /></MemoryRouter>
+    </QueryClientProvider>);
+  }
+  beforeEach(() => {
+    inspection.run!.approval_policy = "focused_v1";
+    inspection.run!.claude_review = null;
+    inspection.run!.adjudication = null;
+  });
+  it("shows one plain button, no stage names or costs, when automated checks are unfinished", async () => {
+    inspection.run!.openai_review = null;
+    showApprovalScreen();
+    expect(await screen.findByRole("button", { name: "자동 점검 마치기" })).toBeInTheDocument();
+    expect(screen.getByText("이 버전은 자동 점검이 아직 끝나지 않았습니다.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /실행 · 유료/ })).toBeNull();
+    expect(screen.queryByText(/추가 모델 검토 선택/)).toBeNull();
+    expect(screen.queryByText(/유료로 실행/)).toBeNull();
+  });
+  it("marks checks complete and moves isolated grounding failures out of the main findings", async () => {
+    const isolated: ReviewFinding = { id: "generation-1", severity: "warning", where: "", quote: null, issue_ko: "현재 표현 인용이 없습니다: mpj_items[2].corrections[2]",
+      reason_ko: "", suggestion_ko: "", problem_type_ko: "critic_grounding_failure", needs_professor: false, uncertainty_ko: "" };
+    inspection.run!.openai_review = metadata({ verdict: "warning", summary_ko: "격리", findings: [isolated] } as ReviewResult);
+    showApprovalScreen();
+    expect(await screen.findByText("자동 점검 결과")).toBeInTheDocument();
+    expect(screen.getByText("자동 점검 완료")).toBeInTheDocument();
+    expect(screen.getByText(/^AI 검토 · /)).toBeInTheDocument();
+    expect(screen.getAllByText(isolated.issue_ko)).toHaveLength(1);
+    expect(screen.getByText(/근거를 확인하지 못해 따로 둔 AI 지적 1건/)).toBeInTheDocument();
+    expect(screen.queryByText(/추가 모델 검토 선택/)).toBeNull();
+    expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeInTheDocument();
+  });
+});
