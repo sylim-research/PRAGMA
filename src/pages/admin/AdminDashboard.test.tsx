@@ -121,7 +121,7 @@ describe("admin dashboard", () => {
     expect(professor.textContent).not.toContain("보류");
   });
 
-  it("keeps unconverted v5 missions out of the waiting counts and names them separately", async () => {
+  it("keeps unconverted v5 missions out of the waiting counts without a separate label", async () => {
     mocks.tables.scenarios = [
       ...(mocks.tables.scenarios as unknown[]),
       // 현재 기준 run이 없는 v5 2건 — 검수 대신 v6로 전환한다.
@@ -138,7 +138,7 @@ describe("admin dashboard", () => {
     const stages = screen.getByRole("group", { name: "품질 검수 단계" });
     const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
     expect(rules.textContent).toMatch(/2s*개/);
-    expect(rules.textContent).toContain("v5 미전환 2개 별도");
+    expect(rules.textContent).not.toContain("v5");
   });
 
   it("keeps the four operation cards with account and record labels that do not imply real students", async () => {

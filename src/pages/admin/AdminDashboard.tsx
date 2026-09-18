@@ -59,8 +59,6 @@ type DashboardSnapshot = {
   courses: ReturnType<typeof summarizeCourses>;
   /** 규칙 검사 칸 안의 검사 실패 수. */
   rulesFailCount: number;
-  /** 검수 대기에서 뺀 v5 미전환 미션 수(규칙 검사 칸의 부분집합). */
-  unconvertedV5Count: number;
   approvedLearnerCount: number;
   learnerRecordCount: number;
   /** 단계별 누적 완료(서로 다른 미션 수). 메인에는 대기량을 두고, 누적은 카드에 마우스를 올릴 때 보인다. 읽지 못하면 null. */
@@ -167,7 +165,6 @@ const ReviewPipeline = ({
   professorFinalized,
   dominant,
   rulesFailCount,
-  unconvertedV5Count,
   error,
   changedKeys,
 }: {
@@ -176,7 +173,6 @@ const ReviewPipeline = ({
   professorFinalized: number | null;
   dominant: DashboardReviewQueueStage | null;
   rulesFailCount: number;
-  unconvertedV5Count: number;
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
@@ -224,9 +220,6 @@ const ReviewPipeline = ({
                 {/* 규칙 칸 = 검사 전 + 불통과. 불통과가 있으면 합이 바로 읽히도록 둘로 나눠 적는다. */}
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
-                {stage.key === "rules" && unconvertedV5Count > 0 && (
-                  <span className="block">v5 미전환 {unconvertedV5Count}개 별도</span>
-                )}
               </span>
             </Link>
             {stage.step < REVIEW_STAGE_ITEMS.length && (
@@ -406,14 +399,13 @@ const AdminDashboard = () => {
       const content = summarizeDashboardContent(scenarioRows);
       const review = summarizeDashboardReviewStages(scenarioRows, reviewRows);
       const next: DashboardSnapshot = {
-        // v5 미전환 미션은 검수하지 않고 v6로 전환한다 — 대기·검수 중 수에서 빼고 규칙 검사 칸 아래에 따로 적는다.
+        // v5 미전환 미션은 검수하지 않고 v6로 전환한다 — 대기·검수 중 수에서 뺀다.
         content: { ...content, reviewTargetCount: content.reviewTargetCount - unconvertedV5Count },
         review: { ...review, rules: review.rules - unconvertedV5Count },
         assignments: summarizeDashboardAssignments(assignmentRows),
         assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
         courses: summarizeCourses(courseRows),
         rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
-        unconvertedV5Count,
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
         cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,
@@ -597,7 +589,6 @@ const AdminDashboard = () => {
         professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
         dominant={dominantReviewStage}
         rulesFailCount={snapshot?.rulesFailCount ?? 0}
-        unconvertedV5Count={snapshot?.unconvertedV5Count ?? 0}
         error={displayError}
         changedKeys={changedKeys}
       />
