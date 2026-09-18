@@ -120,7 +120,7 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
 }
 
 /**
- * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5·MJT 5문항).
+ * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5/v6·MJT 5문항).
  * 교수자 승인 완료의 부분집합이며, 새 편성은 이 집합에서만 고른다.
  */
 function isComposerReadyMission(row: DashboardScenarioRow): boolean {
