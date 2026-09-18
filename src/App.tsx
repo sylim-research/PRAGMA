@@ -1,6 +1,8 @@
 import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes, useSearchParams } from "react-router-dom";
+import { LEGACY_TEACHING_MATERIALS } from "@/lib/admin/legacyFeatures";
+import { classResponsesTabPath } from "@/lib/admin/classResponsesPath";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -61,6 +63,13 @@ const EntryUnavailable = lazy(() => import("./pages/EntryUnavailable.tsx"));
 seedIfEmpty();
 
 const queryClient = new QueryClient();
+
+// 「주차별 수업 운영」은 메뉴에서 내리고 「학습 수행 기록 › 학급 응답 분포」 탭으로 합쳤다. 옛 링크는 교과목·주차를 이어서 넘긴다.
+const PackageRoute = () => {
+  const [params] = useSearchParams();
+  if (LEGACY_TEACHING_MATERIALS) return <AdminTeachingMaterials />;
+  return <Navigate to={classResponsesTabPath(params)} replace />;
+};
 
 const RouteFallback = () => (
   <div className="flex min-h-screen items-center justify-center bg-background text-sm text-muted-foreground">
@@ -292,7 +301,7 @@ const App = () => (
           <Route path="/admin/research-qa/final-review" element={<RequireAdmin><AdminFinalCorpusReview /></RequireAdmin>} />
           <Route path="/admin/research-qa/releases" element={<RequireAdmin><Navigate to="/admin/review" replace /></RequireAdmin>} />
           <Route path="/admin/research-qa/improvements" element={<RequireAdmin><Navigate to="/admin/review" replace /></RequireAdmin>} />
-          <Route path="/admin/package" element={<RequireAdmin><AdminTeachingMaterials /></RequireAdmin>} />
+          <Route path="/admin/package" element={<RequireAdmin><PackageRoute /></RequireAdmin>} />
           <Route path="/admin/teaching-generator" element={<RequireAdmin><AdminTeachingStudio /></RequireAdmin>} />
           <Route path="/admin/class-responses" element={<RequireAdmin><AdminClassResponses /></RequireAdmin>} />
           {/* /admin/course-ops 제거(2026-08-05) — 메뉴에 없고 어디서도 링크되지 않는 고아

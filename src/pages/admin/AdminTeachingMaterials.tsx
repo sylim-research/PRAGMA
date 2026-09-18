@@ -36,9 +36,9 @@ import { teachingKind } from "../../../supabase/functions/_shared/teachingMateri
 type MaterialReviewState = "approved" | "pending" | "unavailable";
 
 function operationWeekLabel(week: Parameters<typeof weekActivityLabel>[0]) {
-  if (week.type === "orientation") return `${week.week_no}주차 오리엔테이션`;
-  if (week.type === "midterm") return `${week.week_no}주차 중간고사`;
-  if (week.type === "final") return `${week.week_no}주차 기말고사`;
+  if (week.type === "orientation") return `${week.week_no}주차 · 오리엔테이션`;
+  if (week.type === "midterm") return `${week.week_no}주차 · 중간고사`;
+  if (week.type === "final") return `${week.week_no}주차 · 기말고사`;
   return `${week.week_no}주차 · ${weekActivityLabel(week)}`;
 }
 
@@ -391,7 +391,7 @@ const AdminTeachingMaterials = () => {
             // 자료 상태와 강좌 공개 여부는 칩·머리에 이미 보이므로 확인 문구는 미배정만 남긴다.
             const issue = !missionsReady ? `미션 ${expected - assigned}개 미배정` : null;
             return <article key={item.week_no} className={[
-              "grid gap-2 px-5 py-2.5 xl:grid-cols-[minmax(180px,1fr)_minmax(260px,1.4fr)_auto] xl:items-center",
+              "grid gap-2 px-5 py-2.5 xl:grid-cols-[16rem_minmax(0,1fr)_9rem] xl:items-center",
               selected ? "bg-[#FFFBEA] shadow-[inset_3px_0_0_#15202B]" : "",
             ].join(" ")}>
               <div>
