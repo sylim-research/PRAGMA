@@ -141,9 +141,9 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "의미·자연성 검토",
-  claude: "선택형",
+  claude: "교수자가 요청할 때",
   // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "선택형 · Claude 의견 재검토",
+  adjudication: "Claude 의견이 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -179,7 +179,8 @@ const ReviewPipeline = ({
 }) => (
   <div role="group" aria-label="품질 검수 단계">
   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-      {REVIEW_STAGE_ITEMS.map((stage) => {
+    {(() => {
+      const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
         // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
         const waiting = review?.[stage.key] ?? null;
         const value = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
@@ -196,7 +197,6 @@ const ReviewPipeline = ({
                 "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
-                stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
@@ -229,7 +229,27 @@ const ReviewPipeline = ({
             )}
           </div>
         );
-      })}
+      };
+      const optional = REVIEW_STAGE_ITEMS.filter((stage) => stage.optional);
+      const firstOptional = REVIEW_STAGE_ITEMS.findIndex((stage) => stage.optional);
+      return (
+        <>
+          {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
+          {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
+          <div
+            role="group"
+            aria-label="선택 검토"
+            className="relative -my-1.5 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] p-1.5 pt-3 sm:col-span-2 sm:grid-cols-2"
+          >
+            <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
+              선택 검토
+            </span>
+            {optional.map(renderStage)}
+          </div>
+          {REVIEW_STAGE_ITEMS.slice(firstOptional + optional.length).map(renderStage)}
+        </>
+      );
+    })()}
   </div>
   </div>
 );
