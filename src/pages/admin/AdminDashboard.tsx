@@ -554,8 +554,10 @@ const AdminDashboard = () => {
           </Button>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2 text-[13px] text-[#B9C3CA]">
-          <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
-          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다. */}
+          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다(아래 불통과도 같다). */}
+          {!displayError && (needsCheckCount ?? 0) > 0 && (
+            <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{needsCheckCount}</b>개</span>
+          )}
           {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
             <span>
               규칙 검사 불통과 <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
@@ -632,11 +634,11 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          label="미션 편성"
-          value={snapshot?.assignments.assignmentCount ?? null}
-          unit="건"
-          // 서로 다른 미션 수를 다시 쓰면 큰 수(편성 건수)와 같은 뜻으로 읽혀 주차 수만 둔다.
-          description={snapshot ? `주차 ${snapshot.assignments.weekCount}개` : "교과목 주차에 놓인 미션"}
+          // 편성 건수는 위 전체 흐름에 이미 있다 — 같은 수를 되풀이하지 않고 주차를 큰 수로 둔다.
+          label="편성 주차"
+          value={snapshot?.assignments.weekCount ?? null}
+          unit="개"
+          description={snapshot ? `서로 다른 미션 ${snapshot.assignments.missionCount}개` : "교과목 주차에 놓인 미션"}
           error={displayError}
           changed={changedKeys.has("assignments")}
           title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
@@ -657,12 +659,15 @@ const AdminDashboard = () => {
             시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          label="수행 기록"
-          value={snapshot?.learnerRecordCount ?? null}
+          // 전체 수행 기록은 위 전체 흐름에 이미 있다. 여기서는 교과목 맥락에서 나온 기록을 큰 수로 둔다
+          // (실제 수업 기록과 시범 수행을 가르는 유일한 단서 — 교과목 맥락 없는 실행은 연결되지 않는다).
+          label="교과목 수업 기록"
+          value={snapshot?.courseLinkedRecordCount ?? null}
           unit="건"
-          // 실제 수업 기록과 시범 수행을 가르는 유일한 단서라 남긴다(교과목 맥락 없는 실행은 연결되지 않는다).
-          description={`교과목 연결 ${snapshot && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건`}
-          error={displayError}
+          description={snapshot && snapshot.courseLinkedRecordCount !== null
+            ? `시범 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
+            : "교과목에 연결된 수행"}
+          error={displayError ?? (snapshot && snapshot.courseLinkedRecordCount === null ? "교과목 연결 조회 실패" : null)}
           changed={changedKeys.has("records")}
         />
       </div>

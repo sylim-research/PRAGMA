@@ -151,18 +151,17 @@ describe("admin dashboard", () => {
       { outline_id: "c1", week_no: 3, scenario_id: "ready" },
     ];
     show();
-    // 「미션 편성」은 전체 흐름 칸에도 있으므로 주차 설명이 붙은 운영 카드를 고른다.
-    await waitFor(() => expect(screen.getAllByRole("link", { name: /미션 편성/ }).some((link) => /주차 2개/.test(link.textContent ?? ""))).toBe(true));
-    const assignments = screen.getAllByRole("link", { name: /미션 편성/ }).find((link) => /주차 2개/.test(link.textContent ?? ""))!;
-    expect(assignments.textContent).toMatch(/미션 편성\s*2\s*건\s*주차 2개$/);
+    // 편성 건수는 전체 흐름 칸에만 두고, 운영 카드는 주차를 큰 수로 보인다.
+    const assignments = await screen.findByRole("link", { name: /편성 주차/ });
+    await waitFor(() => expect(assignments.textContent).toMatch(/편성 주차\s*2\s*개\s*서로 다른 미션 2개$/));
     expect(screen.queryByText("미션 배정")).not.toBeInTheDocument();
     // 게이트 이전 편성 부채는 메인 문구에 두지 않고 마우스를 올릴 때만 보인다.
     expect(assignments.textContent).not.toContain("승인");
     expect(assignments).toHaveAttribute("title", "승인 전 미션 1개 포함(게이트 이전 편성)");
     expect(screen.getByRole("link", { name: /승인 학습자 계정/ })).toHaveAttribute("href", "/admin/learners");
-    const records = screen.getByRole("link", { name: /교과목 연결/ });
-    expect(records.textContent).toMatch(/수행 기록\s*3\s*건/);
-    expect(records.textContent).toMatch(/교과목 연결 1건$/);
+    const records = screen.getByRole("link", { name: /교과목 수업 기록/ });
+    expect(records.textContent).toMatch(/교과목 수업 기록\s*1\s*건/);
+    expect(records.textContent).toMatch(/시범 수행 2건 별도$/);
   });
 
   it("hides the rule-failure line when no mission failed the rule check", async () => {
