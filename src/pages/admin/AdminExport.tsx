@@ -81,9 +81,6 @@ const Page = () => {
           내보낼 때는 데이터 이용·가명 분석 동의와 동의 버전이 유효한 기록만 자동으로 포함합니다.
           필수 활동 완료·응답 누락 여부 같은 분석 포함 기준은 내보낸 뒤 연구자가 별도로 확인합니다.
         </p>
-        <div className="mt-4 rounded-lg border border-dashed border-border bg-muted/20 px-4 py-5 text-center text-xs text-muted-foreground">
-          이 화면은 파일 준비만 담당하며 포함·제외 판정이나 집단 비교 결과를 자동으로 만들지 않습니다.
-        </div>
       </div>
     </div>
 

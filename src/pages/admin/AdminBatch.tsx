@@ -453,10 +453,6 @@ const AdminBatch = () => {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="text-[13px] font-semibold">설계 기준 준수 AI 비평 파일럿</div>
-                <p className="mt-1 text-[11.5px] text-muted-foreground">
-                  감사 표시 전용이며 저장·배치 게이트가 아닙니다. 18건 눈검사와 대조해
-                  BLOCKER 11건 중 9건 이상 검출하고 수용 4건을 fail로 오판하지 않을 때만 확대합니다.
-                </p>
               </div>
               <Button
                 variant="outline"

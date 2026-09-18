@@ -238,7 +238,6 @@ function ProvenanceBanner({
       </div>
       <p className="mt-2 max-w-[42rem] text-[12.5px] leading-relaxed text-muted-foreground">
         아래에는 모델에 실제로 전송되는 지시문과 모델 설정, 출력 형식, 버전·지문을 함께 표시합니다.
-        빌드할 때마다 배포되는 edge 소스에서 다시 읽어 오며 이 화면에는 편집 경로가 없습니다.
         <code>PROBE_*</code>는 호출마다 달라지는 입력값 자리이고, 실제 값은 시나리오 행에 따로
         저장됩니다.
       </p>
@@ -596,12 +595,6 @@ const AdminPromptHarness = () => {
             {legacyOpen ? "보관함 닫기" : `보관함 열기 (${rows.length})`}
           </Button>
         </div>
-        <p className="mt-1 text-[12.5px] text-muted-foreground">
-          별도 DB 테이블(<code>prompt_templates</code>)입니다. <b>생성·점검 파이프라인은 이 테이블을
-          조회하지 않습니다</b> — 위 「프롬프트·지문 관리」가 실제로 쓰이는 지시문입니다. 아래 항목은
-          2026-07-06에 만든 문서 틀이며 마감 후 정리 후보입니다. 코드 프롬프트의 DB 이관
-          계획이나 v2 구현 상태를 뜻하지 않습니다.
-        </p>
       </div>
 
       {legacyOpen && (

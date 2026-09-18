@@ -284,7 +284,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
-          <p className="text-xs">독립 AI 검토의 문제 항목 유무와 별개입니다. 수정이 필요하면 원본을 수정하고 다시 점검하세요. 수정 없이 사용할 때만 그 근거를 남깁니다.</p>
           <Textarea aria-label="AI 검토의 중대 문제 항목 사용 근거" value={openaiFailOverride}
             onChange={(event) => { setOpenaiFailOverride(event.target.value); setOpenaiFailConfirmed(false); setConfirmed(false); }}
             placeholder="중대 문제 항목을 검토하고도 현재 내용을 사용할 수 있는 근거를 10자 이상 기록하세요." />
@@ -312,10 +311,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
-        {/* 승인·편성·노출은 서로 다른 사건이다. 노출 여부는 이 화면이 판정하지 않으므로 조건만 안내한다. */}
-        <p className="mt-2 border-t border-emerald-200 pt-2 text-xs text-emerald-900">
-          교수자 승인은 수업 사용·학습자 공개 <b>자격</b>을 부여합니다. 실제 노출에는 주차 편성과 공개 강좌의 접근 조건이 더 필요합니다.
-        </p>
       </div>}
       {experiential && <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>}
       <details><summary className="cursor-pointer text-xs">{experiential ? "세부 추적 정보 · 콘텐츠 원본·승인 이력" : "콘텐츠 원본·승인 이력"}</summary>
@@ -334,7 +329,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>
           </div>)}
         </dl>}
-        <p className="my-2 text-xs">현재 정적 콘텐츠 원본을 확인합니다. 개별 학습자 실시간 피드백을 전수 검토했다는 뜻은 아닙니다.</p>
         <pre className="max-h-72 overflow-auto rounded bg-[#F7F7F5] p-3 text-[11px]">{JSON.stringify(state.snapshot, null, 2)}</pre>
         <ul className="mt-2 space-y-1 text-xs">{state.history.map((item) => <li key={item.id}>{item.created_at} · {experiential ? item.content_hash : item.content_hash.slice(0, 12)} · {item.approved_at ? "당시 승인" : "점검·승인 이력"}</li>)}</ul>
       </details>

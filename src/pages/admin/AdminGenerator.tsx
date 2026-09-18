@@ -960,9 +960,6 @@ const AdminGenerator = () => {
                 근거: {burden.reasons.join(" · ")}
               </span>
             </div>
-            <p className="mt-1.5 text-[10.5px] text-[#7A4A0A]/80">
-              참고용 파생 지표 · 교수자 감수 참고 · 이론적 정답 아님 (입력값·저장값 아님)
-            </p>
           </div>
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
@@ -1011,9 +1008,6 @@ const AdminGenerator = () => {
             <div className="mt-3 rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[11.5px] leading-relaxed text-[#5B5446]">
               <span className="font-medium text-foreground">
                 중국어 어휘 참고 상한 · HSK 1–{HSK_REFERENCE_CEILING[form.level]}급 누적
-              </span>
-              <span className="ml-1 text-muted-foreground">
-                · 숙달도 등가가 아니며, 생성 후 비차단 감사의 실제 실행 여부는 결과 provenance에서 확인합니다.
               </span>
             </div>
           </div>
@@ -1110,7 +1104,6 @@ const AdminGenerator = () => {
               </SelectContent>
             </Select>
             <p className="mt-1 text-[10.5px] text-muted-foreground">
-              시나리오 메타(theme·topic)로 저장돼 교강사 '주제별 편성' 필터에 쓰입니다. (topic은 자동 배정) ·
               현재 도메인({DOMAIN[form.domain]})에서 고를 수 있는 주제만 표시됩니다.
             </p>
           </div>
@@ -1226,11 +1219,6 @@ const AdminGenerator = () => {
             )}
           </div>
 
-          <p className="rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2.5 text-[11px] leading-relaxed text-[#5B5446]">
-            생성 흐름: 위에서 <b>상황 개요 생성 → 개요 선택 → 시나리오 생성</b>. 생성된 시나리오는
-            교수자 감수 대기(draft)로 저장돼 batch·편성과 같은 뱅크에 들어갑니다.
-          </p>
-
         </section>
 
 
@@ -1251,9 +1239,6 @@ const AdminGenerator = () => {
           {saveError && (
             <div className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEE2E2] p-3 text-[12.5px] text-[#991B1B]">
               저장 실패: {saveError}
-              <div className="mt-1 text-[11px] text-[#991B1B]/80">
-                한 단계라도 실패하면 전체가 롤백되어 고아 데이터는 남지 않습니다.
-              </div>
             </div>
           )}
           {metaWarning && (
@@ -1273,15 +1258,6 @@ const AdminGenerator = () => {
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
                 <p className="mt-3 text-[12px] text-muted-foreground">시나리오 생성 중...</p>
-              </div>
-            )}
-
-            {!finalizing && !coreResults && !aiResult && !aiError && (
-              <div className="flex items-center justify-center py-20 text-center">
-                <p className="text-[12px] leading-relaxed text-muted-foreground">
-                  좌측에서 조건·주제를 정하고 <b>상황 개요 생성 → 개요 선택 → 시나리오 생성</b>을 누르면<br />
-                  생성된 scenario_core_v1이 여기에 표시됩니다.
-                </p>
               </div>
             )}
 
@@ -1346,9 +1322,6 @@ const AdminGenerator = () => {
                   <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2">
                     <p className="text-[12.5px] font-medium text-[#5B5446]">
                       총 {batchItems.length}개의 시나리오가 생성 예정입니다.
-                    </p>
-                    <p className="mt-0.5 text-[11px] text-[#8a857c]">
-                      이번 단계에서는 첫 번째 항목만 실제 GPT 결과로 미리보기됩니다. (DB 저장은 다음 단계)
                     </p>
                   </div>
                 )}
@@ -1473,12 +1446,6 @@ const AdminGenerator = () => {
                     </span>
                   </div>
                 )}
-
-                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
-                  <span className="text-[11px] text-muted-foreground">
-                    ℹ 저장 시 scenarios / scenario_candidates / scenario_feedback 에 단일 트랜잭션으로 INSERT 됩니다. (승인 상태: needs_review)
-                  </span>
-                </div>
 
                 <div className="flex justify-end gap-2 pt-1">
                   <Button

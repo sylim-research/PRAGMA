@@ -122,7 +122,7 @@ export function ProfessorMissionWorkbench({
         </summary>
         {!approvalHref && (
           <p className="mt-2 text-[12px] text-muted-foreground">
-            수정본은 구조검사·AI 재점검을 거쳐 새 버전으로 저장되며, <b>수정 저장은 최종 승인이 아닙니다.</b>
+            수정본은 구조검사·AI 재점검을 거쳐 새 버전으로 저장됩니다.
           </p>
         )}
         <div className="mt-3 space-y-3">
@@ -164,7 +164,6 @@ export function ProfessorMissionWorkbench({
             <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수</h4>
             <p className="mt-0.5 text-[12px] text-muted-foreground">
               학생에게 제시할 화면과 참고 판정을 확인하고, 수정·유지·보류를 판단합니다.
-              수정한 내용은 저장해야 하며, <b>수정 저장은 최종 승인이 아닙니다.</b>
             </p>
           </div>
         </div>
