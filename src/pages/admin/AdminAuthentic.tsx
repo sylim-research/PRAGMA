@@ -122,7 +122,7 @@ const AdminAuthentic = () => {
   };
 
   const archive = (
-    <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
+    <section className="mt-8 rounded-lg border border-border bg-card p-5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-[15px] font-semibold text-foreground">보관함</h2>
         <span className="text-[12px] text-muted-foreground">
@@ -149,7 +149,7 @@ const AdminAuthentic = () => {
         </div>
       ) : rows.length === 0 && !pending && !listError ? (
         <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
-          분석한 자료가 아직 없습니다. 왼쪽에서 자료를 분석해 보세요.
+          분석한 자료가 아직 없습니다. 위에서 자료를 분석해 보세요.
         </p>
       ) : (
         <div className="mt-4 flex flex-col gap-2">
@@ -295,8 +295,10 @@ const AdminAuthentic = () => {
         </p>
       )}
 
-      {/* 보관함은 오른쪽 칸에 둔다 — 분석 전에도 화면이 비지 않고, 무엇이 만들어지는지 바로 보인다. */}
-      <AuthenticImportPanel onApply={handleApply} onAnalyzed={handleAnalyzed} aside={archive} />
+      <AuthenticImportPanel onApply={handleApply} onAnalyzed={handleAnalyzed} />
+
+      {/* ── 보관함 ── */}
+      {archive}
     </AdminShell>
   );
 };
