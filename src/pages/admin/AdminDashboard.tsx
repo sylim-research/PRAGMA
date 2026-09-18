@@ -119,16 +119,17 @@ const PanelHeader = ({
 
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
-// 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다 —
+// 카드 숫자는 그 단계를 마친 서로 다른 미션 수(누적)다 — 대기는 대부분 0이라 흐름이 보이지 않는다.
+// 지금 기다리는 수는 위 「지금 할 일」과 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 검사 대기",
-  openai: "OpenAI 검토 대기",
-  claude: "Claude 독립 검토 대기",
-  adjudication: "OpenAI 재검토 대기",
-  // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
-  professor: "교수자 승인 대기",
+  rules: "규칙 검사 완료",
+  openai: "OpenAI 검토 완료",
+  claude: "Claude 독립 검토 완료",
+  adjudication: "OpenAI 재검토 완료",
+  // 전체 흐름 「교수자 승인 완료」와 같은 수다.
+  professor: "교수자 승인 완료",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -179,9 +180,11 @@ const ReviewPipeline = ({
   <div role="group" aria-label="품질 검수 단계">
   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
       {REVIEW_STAGE_ITEMS.map((stage) => {
-        const value = review?.[stage.key] ?? null;
-        // 메인은 대기량이다. 이미 해낸 양(서로 다른 미션 수)은 마우스를 올릴 때만 보인다.
-        const completed = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
+        // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
+        const waiting = review?.[stage.key] ?? null;
+        const value = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
+        // 대기는 읽혔는데 누적 조회만 실패한 경우 — 스켈레톤 대신 「—」.
+        const unavailable = waiting !== null && value === null;
         const active = dominant === stage.key;
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
@@ -198,7 +201,7 @@ const ReviewPipeline = ({
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
               data-dominant={active ? "true" : undefined}
-              title={completed === null || error ? undefined : `${stage.key === "professor" ? "승인 완료" : "누적 완료"} ${completed}개`}
+              title={waiting === null || error ? undefined : `지금 대기 ${waiting}개`}
             >
               <div className="flex items-center gap-2">
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#56646E]">
@@ -207,17 +210,16 @@ const ReviewPipeline = ({
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
               <div className="mt-1.5 flex items-end gap-1.5">
-                {value === null && !error ? (
+                {value === null && !error && !unavailable ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
                   <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
+                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
                 {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">개</span>}
               </div>
               <span className="mt-auto pt-1.5 text-[11px] text-[#4F5D68]">
-                {/* 규칙 칸 = 검사 전 + 불통과. 불통과가 있으면 합이 바로 읽히도록 둘로 나눠 적는다. */}
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -578,7 +580,7 @@ const AdminDashboard = () => {
         </ol>
       </section>
 
-      {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
+      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
         title="검수 단계별 현황"
         action={liveStatus()}

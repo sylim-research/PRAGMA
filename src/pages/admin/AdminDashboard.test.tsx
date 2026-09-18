@@ -79,7 +79,7 @@ describe("admin dashboard", () => {
     expect(within(band).getByRole("link", { name: "품질 점검 →" })).toHaveAttribute("href", "/admin/ai-review");
 
     // 승인 완료 누적 수(2)는 「교수자 승인 완료」로만 보이고, 대기·결정으로 부르지 않는다.
-    const approvedLink = screen.getByRole("link", { name: /교수자 승인 완료/ });
+    const approvedLink = screen.getAllByRole("link", { name: /교수자 승인 완료/ })[0];
     expect(approvedLink.textContent).toContain("2");
     expect(approvedLink).toHaveAttribute("href", "/admin/review");
     expect(screen.queryByText("교수자 결정")).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("admin dashboard", () => {
     expect(screen.queryByText(/각 미션을 다음에 처리할 단계/)).not.toBeInTheDocument();
   });
 
-  it("keeps review cards queue-first with faint group labels and cumulative completions only in the tooltip", async () => {
+  it("shows cumulative completions on review cards and the waiting count only in the tooltip", async () => {
     mocks.tables.content_review_runs = [
       run("ready"),
       // 같은 미션의 재실행 — 누적은 여전히 1이다.
@@ -108,16 +108,19 @@ describe("admin dashboard", () => {
     const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
     // 카드 제목(규칙 검사 · OpenAI/Claude · 교수자)이 이미 세 층을 말하므로 묶음 머리표는 두지 않는다.
     expect(stages.textContent).not.toContain("AI 문맥 검토");
-    const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
-    await waitFor(() => expect(rules.textContent).toMatch(/2\s*개/));
-    expect(rules.textContent).not.toContain("누적");
+    const rules = within(stages).getByRole("link", { name: /규칙 검사 완료/ });
+    // 규칙 검사를 통과한 서로 다른 미션 1건(재실행 중복·불통과 제외).
+    await waitFor(() => expect(rules.textContent).toMatch(/1\s*개/));
     expect(rules.textContent).toContain("규칙 33개 자동 검사");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
-    expect(rules).toHaveAttribute("title", "누적 완료 1개");
-    expect(within(stages).getByRole("link", { name: /Claude 독립 검토 대기/ })).toHaveAttribute("title", "누적 완료 1개");
-    const professor = within(stages).getByRole("link", { name: /교수자 승인 대기/ });
-    expect(professor).toHaveAttribute("title", "승인 완료 2개");
+    expect(rules).toHaveAttribute("title", "지금 대기 2개");
+    const claude = within(stages).getByRole("link", { name: /Claude 독립 검토 완료/ });
+    expect(claude.textContent).toMatch(/1\s*개/);
+    expect(claude).toHaveAttribute("title", "지금 대기 0개");
+    const professor = within(stages).getByRole("link", { name: /교수자 승인 완료/ });
+    expect(professor.textContent).toMatch(/2\s*개/);
+    expect(professor).toHaveAttribute("title", "지금 대기 1개");
     expect(professor.textContent).not.toContain("보류");
   });
 
@@ -136,8 +139,8 @@ describe("admin dashboard", () => {
     await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 2개"));
     expect(band.textContent).toContain("품질 점검 대기 1개");
     const stages = screen.getByRole("group", { name: "품질 검수 단계" });
-    const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
-    expect(rules.textContent).toMatch(/2s*개/);
+    const rules = within(stages).getByRole("link", { name: /규칙 검사 완료/ });
+    expect(rules).toHaveAttribute("title", "지금 대기 2개");
     expect(rules.textContent).not.toContain("v5");
   });
 
@@ -173,12 +176,13 @@ describe("admin dashboard", () => {
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {
     show();
-    const rulesCard = await screen.findByRole("link", { name: /규칙 검사 대기/ });
+    const rulesCard = await screen.findByRole("link", { name: /규칙 검사 완료/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["OpenAI 검토 대기", "Claude 독립 검토 대기", "OpenAI 재검토 대기"]) {
+    for (const label of ["OpenAI 검토 완료", "Claude 독립 검토 완료", "OpenAI 재검토 완료"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
-    const professorCards = screen.getAllByRole("link", { name: /교수자 승인 대기/ });
+    const stages = screen.getByRole("group", { name: "품질 검수 단계" });
+    const professorCards = within(stages).getAllByRole("link", { name: /교수자 승인 완료/ });
     expect(professorCards).toHaveLength(1);
     expect(professorCards[0]).toHaveAttribute("href", "/admin/review");
   });
