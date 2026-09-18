@@ -112,7 +112,7 @@ const PanelHeader = ({
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
     </div>
-    {description && <p className="mt-0.5 text-[12px] text-muted-foreground">{description}</p>}
+    {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
   </div>
 );
 
@@ -139,9 +139,9 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "의미·자연성 검토",
-  claude: "선택형",
+  claude: "교수자가 요청할 때만",
   // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "선택형 · Claude 의견 재검토",
+  adjudication: "Claude 의견이 있을 때만",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -192,7 +192,7 @@ const ReviewPipeline = ({
                 "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
-                stage.optional ? "border-dashed" : "",
+                stage.optional ? "border-dashed !border-[#BDB5A2] bg-[#FDFCF8]" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
@@ -200,10 +200,15 @@ const ReviewPipeline = ({
               title={completed === null || error ? undefined : `${stage.key === "professor" ? "승인 완료" : "누적 완료"} ${completed}개`}
             >
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#63727C]">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#56646E]">
                   {stage.step}
                 </span>
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
+                {stage.optional && (
+                  <span className="ml-auto shrink-0 rounded border border-dashed border-[#A89F88] px-1.5 text-[10px] font-medium leading-4 text-[#5A6670]">
+                    선택 단계
+                  </span>
+                )}
               </div>
               <div className="mt-1.5 flex items-end gap-1.5">
                 {value === null && !error ? (
@@ -213,11 +218,13 @@ const ReviewPipeline = ({
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
-                {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
+              <span className="mt-auto pt-1.5 text-[11px] text-[#4F5D68]">
+                {/* 규칙 칸 = 검사 전 + 불통과. 불통과가 있으면 합이 바로 읽히도록 둘로 나눠 적는다. */}
+                {stage.key === "rules" && rulesFailCount > 0 && value !== null
+                  ? `검사 전 ${value - rulesFailCount} · 불통과 ${rulesFailCount}`
+                  : stage.description}
               </span>
             </Link>
             {stage.step < REVIEW_STAGE_ITEMS.length && (
@@ -259,7 +266,7 @@ const OperationMetric = ({
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
   >
-    <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
+    <span className="text-xs font-medium text-[#4F5D68] group-hover:text-[#273B4A]">{label}</span>
     {value === null && !error ? (
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
@@ -267,10 +274,10 @@ const OperationMetric = ({
         <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
-        {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
+        {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
+    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -457,7 +464,7 @@ const AdminDashboard = () => {
     [snapshot],
   );
   const displayError = snapshot ? null : dashboardError;
-  // 지표 묶음마다 제목 옆에 붙인다. 알림 영역은 첫 묶음 하나만 두어 보조기기가 같은 말을 세 번 읽지 않게 한다.
+  // 세 묶음이 같은 조회에서 나오므로 첫 묶음 제목 옆에 한 번만 둔다.
   const liveStatus = (announce = false) => <LiveDatabaseStatus delayed={Boolean(dashboardError)} announce={announce} />;
   // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
   const needsCheckCount = snapshot
@@ -556,7 +563,7 @@ const AdminDashboard = () => {
           ].map((step, index) => (
             <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
               <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
-                <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
+                <span className="text-[12px] font-medium text-[#5A6670]">{step.stage}</span>
                 {step.value == null && !displayError ? (
                   <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
@@ -564,7 +571,7 @@ const AdminDashboard = () => {
                     {displayError ? "—" : step.value}
                   </span>
                 )}
-                <span className="mt-auto pt-1.5 text-[11.5px] text-[#9AA3A9]">{step.screen} →</span>
+                <span className="mt-auto pt-1.5 text-[11.5px] text-[#6F7B83]">{step.screen} →</span>
               </Link>
             </li>
           ))}
@@ -572,10 +579,7 @@ const AdminDashboard = () => {
       </section>
 
       {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
-      <PanelHeader
-        title="검수 단계별 현황"
-        action={liveStatus()}
-      />
+      <PanelHeader title="검수 단계별 현황" />
       <ReviewPipeline
         review={snapshot?.review ?? null}
         cumulative={snapshot?.cumulative ?? null}
@@ -586,7 +590,7 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
+      <PanelHeader title="수업 운영·학습 수행 현황" />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
@@ -647,7 +651,7 @@ const AdminDashboard = () => {
       {isAdmin && IS_DEV && (
         <div className="mt-4 flex justify-end">
           <AlertDialog>
-            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-muted-foreground" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
+            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-[#4F5D68]" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>내 프로필을 초기화하시겠습니까?</AlertDialogTitle>

@@ -70,7 +70,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     ],
   },
   {
-    header: "5. 학습 기록·연구 자료",
+    header: "5. 학습 기록·연구 활용",
     items: [
       { to: "/admin/decision-traces", label: "학습 수행 기록" },
       { to: "/admin/export", label: "연구 데이터 내보내기" },
