@@ -113,10 +113,6 @@ describe("admin dashboard", () => {
     expect(rules.textContent).not.toContain("누적");
     // 불통과가 있으면 칸의 합(2)을 검사 전·불통과로 나눠 적는다.
     expect(rules.textContent).toContain("검사 전 1 · 불통과 1");
-    // 선택 단계는 카드에 표시한다.
-    expect(within(stages).getByRole("link", { name: /Claude 독립 검토 대기/ }).textContent).toContain("선택 단계");
-    expect(within(stages).getByRole("link", { name: /OpenAI 재검토 대기/ }).textContent).toContain("선택 단계");
-    expect(rules.textContent).not.toContain("선택 단계");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "누적 완료 1개");

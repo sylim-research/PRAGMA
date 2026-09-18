@@ -139,9 +139,9 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "의미·자연성 검토",
-  claude: "교수자가 요청할 때만",
+  claude: "선택형",
   // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "Claude 의견이 있을 때만",
+  adjudication: "선택형 · Claude 의견 재검토",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -192,7 +192,7 @@ const ReviewPipeline = ({
                 "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
-                stage.optional ? "border-dashed !border-[#BDB5A2] bg-[#FDFCF8]" : "",
+                stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
@@ -204,11 +204,6 @@ const ReviewPipeline = ({
                   {stage.step}
                 </span>
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
-                {stage.optional && (
-                  <span className="ml-auto shrink-0 rounded border border-dashed border-[#A89F88] px-1.5 text-[10px] font-medium leading-4 text-[#5A6670]">
-                    선택 단계
-                  </span>
-                )}
               </div>
               <div className="mt-1.5 flex items-end gap-1.5">
                 {value === null && !error ? (
@@ -464,7 +459,7 @@ const AdminDashboard = () => {
     [snapshot],
   );
   const displayError = snapshot ? null : dashboardError;
-  // 세 묶음이 같은 조회에서 나오므로 첫 묶음 제목 옆에 한 번만 둔다.
+  // 지표 묶음마다 제목 옆에 붙인다. 알림 영역은 첫 묶음 하나만 두어 보조기기가 같은 말을 세 번 읽지 않게 한다.
   const liveStatus = (announce = false) => <LiveDatabaseStatus delayed={Boolean(dashboardError)} announce={announce} />;
   // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
   const needsCheckCount = snapshot
@@ -579,7 +574,10 @@ const AdminDashboard = () => {
       </section>
 
       {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
-      <PanelHeader title="검수 단계별 현황" />
+      <PanelHeader
+        title="검수 단계별 현황"
+        action={liveStatus()}
+      />
       <ReviewPipeline
         review={snapshot?.review ?? null}
         cumulative={snapshot?.cumulative ?? null}
@@ -590,7 +588,7 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader title="수업 운영·학습 수행 현황" />
+      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
