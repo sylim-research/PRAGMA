@@ -12,7 +12,7 @@
 // 업로드 이미지는 분석에만 쓰이고 저장/학습자 노출하지 않는다(전송 후 폐기) —
 // 드라마·쇼츠 캡처를 DB에 저장하면 저작권 문제가 생기므로 지켜야 할 설계다.
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -244,6 +244,8 @@ interface Props {
   onApply: (a: AuthenticApply, index: number) => void;
   /** 분석 성공 직후 1회. 호스트가 보관함에 저장한다(고르지 않은 후보도 남기려고). */
   onAnalyzed?: (a: AuthenticAnalyzed) => void;
+  /** 오른쪽 칸 아래에 둘 내용(보관함). 분석 전에는 이것만 보인다 — 빈 안내 상자로 칸을 비워 두지 않는다. */
+  aside?: ReactNode;
 }
 
 // YouTube 자막 탭 제거(2026-08-05): supadata 연동이 배포 환경에 없어 동작하지 않았고,
@@ -251,7 +253,7 @@ interface Props {
 // provenance `authentic_youtube`는 읽기 위해 스키마·라벨에 그대로 남긴다.
 type InputTab = "image" | "text";
 
-const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
+const AuthenticImportPanel = ({ onApply, onAnalyzed, aside }: Props) => {
   const [inputTab, setInputTab] = useState<InputTab>("image");
   const [imgLarge, setImgLarge] = useState(false);
   const [text, setText] = useState("");
@@ -401,7 +403,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                   onClick={() => setInputTab(k)}
                   className={[
                     "h-8 rounded-md font-medium transition-colors",
-                    inputTab === k ? "bg-white text-[#1d2336] shadow-sm" : "text-[#5A6670] hover:bg-white/60",
+                    inputTab === k ? "bg-white text-[#1d2336] shadow-sm" : "text-[#3F4E59] hover:bg-white/60",
                   ].join(" ")}
                 >
                   {l}
@@ -416,7 +418,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-24 w-full items-center justify-center rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] text-[12px] text-muted-foreground hover:bg-muted"
+                  className="flex h-24 w-full items-center justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
                   + 쇼츠·드라마 캡처 업로드 (jpg·png·webp)
                 </button>
@@ -480,7 +482,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
 
         {/* 기본 언어 방향 */}
         <div>
-          <label className="text-[12px] text-muted-foreground">기본 언어 방향</label>
+          <label className="text-[12.5px] font-medium text-[#3F4E59]">기본 언어 방향</label>
           <div className="mt-1.5 flex gap-1.5">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (
               <button
@@ -491,7 +493,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                   "h-9 flex-1 rounded-md text-[12.5px] font-medium transition-colors",
                   direction === d
                     ? "border-2 border-[#15202B] bg-white text-[#15202B]"
-                    : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
+                    : "border border-[#D9D2BF] bg-white text-[#3F4E59] hover:bg-[#F3F0E7]",
                 ].join(" ")}
               >
                 {d === "zh_ko" ? "중→한" : "한→중"}
@@ -503,7 +505,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
         <Button
           onClick={() => runAnalyze()}
           disabled={loading || (!text.trim() && !imageDataUrl)}
-          className="w-full bg-[#FAD338] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:bg-[#F3F0E7] disabled:text-[#8A939A] disabled:opacity-100"
+          className="w-full bg-[#FAD338] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:opacity-50"
         >
           {loading ? "분석 중…" : "활용 가능성 분석"}
         </Button>
@@ -547,7 +549,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
         )}
 
         {/* 출처·메모 = 소스가 아니라 메타데이터 — 보조 위계로 격하 */}
-        <details className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2">
+        <details className="rounded-md border border-[#D9D2BF] bg-[#FAF8F2] px-3 py-2 text-[#3F4E59]">
           <summary className="cursor-pointer text-[12px] font-medium text-muted-foreground">
             출처 정보·관리 메모 (선택)
           </summary>
@@ -574,7 +576,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
       <section className="space-y-4 lg:col-span-3">
-        {!analysis && (
+        {!analysis && !aside && (
           <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
@@ -786,6 +788,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
               </div>
             </div>
           )}
+        {aside}
       </section>
     </div>
   );
