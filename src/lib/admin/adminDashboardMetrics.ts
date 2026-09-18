@@ -201,6 +201,20 @@ export function summarizeDashboardReviewStages(
 }
 
 /**
+ * 현재 기준 검수를 한 번도 받지 않은 mission_v5 미션. v5는 검수 대신 v6로 전환하므로(2026-09-17 결정)
+ * 대시보드의 대기 수에서 빼고 따로 센다. 규칙 검사 칸(rules)의 부분집합이다.
+ */
+export function countUnconvertedV5Missions(
+  rows: readonly DashboardScenarioRow[],
+  runs: readonly DashboardReviewRunRow[],
+): number {
+  return rows
+    .filter(isDashboardReviewTarget)
+    .filter((row) => row.mission_schema_version === "mission_v5" && !latestDashboardReviewRun(row, runs))
+    .length;
+}
+
+/**
  * 「규칙 기반 검사」 칸에는 아직 검사하지 않은 미션과 검사에 실패한 미션이 함께 들어간다.
  * 실패는 재검사가 아니라 내용 수정이 필요하므로 그 수를 따로 보인다.
  */

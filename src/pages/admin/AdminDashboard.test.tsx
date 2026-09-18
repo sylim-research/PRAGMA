@@ -111,8 +111,7 @@ describe("admin dashboard", () => {
     const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
     await waitFor(() => expect(rules.textContent).toMatch(/2\s*개/));
     expect(rules.textContent).not.toContain("누적");
-    // 불통과가 있으면 칸의 합(2)을 검사 전·불통과로 나눠 적는다.
-    expect(rules.textContent).toContain("검사 전 1 · 불통과 1");
+    expect(rules.textContent).toContain("규칙 33개 자동 검사");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "누적 완료 1개");
@@ -120,6 +119,26 @@ describe("admin dashboard", () => {
     const professor = within(stages).getByRole("link", { name: /교수자 승인 대기/ });
     expect(professor).toHaveAttribute("title", "승인 완료 2개");
     expect(professor.textContent).not.toContain("보류");
+  });
+
+  it("keeps unconverted v5 missions out of the waiting counts and names them separately", async () => {
+    mocks.tables.scenarios = [
+      ...(mocks.tables.scenarios as unknown[]),
+      // 현재 기준 run이 없는 v5 2건 — 검수 대신 v6로 전환한다.
+      scenario("v5-a", { mission_schema_version: "mission_v5" }),
+      scenario("v5-b", { mission_schema_version: "mission_v5" }),
+      // 현재 기준 run이 있는 v5는 원래대로 센다.
+      scenario("v5-ready", { mission_schema_version: "mission_v5" }),
+    ];
+    mocks.tables.content_review_runs = [...(mocks.tables.content_review_runs as unknown[]), run("v5-ready")];
+    show();
+    const band = screen.getByRole("region", { name: "지금 할 일" });
+    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 2개"));
+    expect(band.textContent).toContain("품질 점검 대기 1개");
+    const stages = screen.getByRole("group", { name: "품질 검수 단계" });
+    const rules = within(stages).getByRole("link", { name: /규칙 검사 대기/ });
+    expect(rules.textContent).toMatch(/2s*개/);
+    expect(rules.textContent).toContain("v5 미전환 2개 별도");
   });
 
   it("keeps the four operation cards with account and record labels that do not imply real students", async () => {
