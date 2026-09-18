@@ -280,12 +280,12 @@ function ProvenanceBanner({
         </div>
       </div>
 
-      {/* 지문이 없는 현행분 — 지문 기록 도입 전 생성분과, 생성 함수를 거치지 않고 등록된 변환본이 섞여 있다.
+      {/* 지문이 없는 현행분 — 생성 함수를 거치지 않고 직접 등록된 변환·집필본이다(2026-09-19 실측: 현행 80건 모두 09-13~09-18).
           숨기지 않고 정직하게 표기한다(소급 기록 금지). */}
       {!loading && !error && legacyNull && (
         <p className="mt-2 max-w-[46rem] rounded-lg bg-[#F6F3EA] px-3 py-2 text-[12px] text-[#4F5D68]">
           지문이 기록되지 않은 현행 시나리오 <b>{legacyNull.count}건</b>({legacyNull.first.slice(0, 10)} ~{" "}
-          {legacyNull.last.slice(0, 10)}) — 지문 기록 도입 전 생성분과 생성 함수 밖에서 등록된 변환본입니다.
+          {legacyNull.last.slice(0, 10)}) — 생성 함수를 거치지 않고 직접 등록된 시나리오(변환·집필본)입니다.
           어떤 지시문이었는지 소급해 채우지 않았습니다.
         </p>
       )}
