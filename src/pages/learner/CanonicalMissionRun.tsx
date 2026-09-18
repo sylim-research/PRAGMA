@@ -68,7 +68,8 @@ const useRuntimeMission = () => useContext(RuntimeMissionContext);
 const LocalPilotContext = createContext(false);
 
 type QuestResponse = Record<string, unknown>;
-type FeedbackLevel = "very_good" | "recommend" | "required";
+// deferred = 의미 충실성이 무너져 뒤 층을 아직 보지 않음(DEC-20260918-04). 판정 원자료(verdicts)는 그대로 저장된다.
+type FeedbackLevel = "very_good" | "recommend" | "required" | "deferred";
 type FeedbackCriterion = {
   key: "meaning" | "language" | "pragmatics";
   label: string;
@@ -1152,18 +1153,21 @@ const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
   very_good: "좋음",
   recommend: "보완 권장",
   required: "수정 필요",
+  deferred: "다음 단계",
 };
 
 const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
   very_good: "bg-[#EAF4ED] text-[#286247]",
   recommend: "bg-[#FFF2B8] text-[#725B12]",
   required: "bg-[#FCE7E4] text-[#8D3B36]",
+  deferred: "bg-[#EEECE6] text-[#596579]",
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
   very_good: "border-[#C6DDCE] bg-[#F4FAF6]",
   recommend: "border-[#E2C84F] bg-[#FFFAE8]",
   required: "border-[#D79A94] bg-[#FFF7F5]",
+  deferred: "border-[#E2DED3] bg-[#FAF9F5]",
 };
 
 /**
@@ -1268,11 +1272,13 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
   };
 }
 
+const FIDELITY_FIRST_NOTE = "의미 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.";
+
 function feedbackLevel(ok: boolean, warning = false): FeedbackLevel {
   return ok ? "very_good" : warning ? "recommend" : "required";
 }
 
-function evaluationFromRuntimeFeedback(
+export function evaluationFromRuntimeFeedback(
   runtime: RunnableMission,
   quest: DctFeedbackQuest,
   feedback: RuntimeFeedback,
@@ -1288,8 +1294,10 @@ function evaluationFromRuntimeFeedback(
     : feedback.verdicts.semantic_fidelity === "minor_loss"
       ? "recommend"
       : "required";
-  const grammarLevel = feedbackLevel(feedback.verdicts.grammatical_accuracy === "clean");
-  const pragmaticLevel = feedbackLevel(pragmaticOk, true);
+  // 네 층 순서(Gate B 충실성 → 대역 → 자연성): 뜻이 옮겨지지 않았으면 뒤 층 판정을 보여 주지 않고 순서만 알린다.
+  const fidelityFirst = meaningLevel === "required";
+  const grammarLevel = fidelityFirst ? "deferred" : feedbackLevel(feedback.verdicts.grammatical_accuracy === "clean");
+  const pragmaticLevel = fidelityFirst ? "deferred" : feedbackLevel(pragmaticOk, true);
   const grammarNote = feedback.blocks.grammar[0];
   const criteria: FeedbackCriterion[] = [
     {
@@ -1307,7 +1315,7 @@ function evaluationFromRuntimeFeedback(
       question: `${targetLanguage} 표현이 자연스러운가요?`,
       level: grammarLevel,
       // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
-      body: [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
+      body: fidelityFirst ? FIDELITY_FIRST_NOTE : [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
         .filter(Boolean).join(" ") || (grammarLevel === "very_good"
         ? "의미 이해를 막는 문법 문제는 확인되지 않았습니다."
         : "이해를 방해하는 표현을 다시 확인해 주세요."),
@@ -1317,7 +1325,7 @@ function evaluationFromRuntimeFeedback(
       label: "화용 적절성",
       question: "이 관계와 상황에 잘 맞나요?",
       level: pragmaticLevel,
-      body: feedback.blocks.feature_ko || (pragmaticOk
+      body: fidelityFirst ? FIDELITY_FIRST_NOTE : feedback.blocks.feature_ko || (pragmaticOk
         ? "이번 목표 화용 요소의 적정 범위에 들어갑니다."
         : "관계와 상황에 맞게 표현의 정도를 다시 조절해 보세요."),
     },
@@ -1333,11 +1341,11 @@ function evaluationFromRuntimeFeedback(
         : undefined;
   return {
     criteria,
-    headline: allGood ? `아주 좋습니다. 이 ${outputName}으로 충분합니다.` : "피드백을 확인하고 한 번 다듬어 보세요.",
+    headline: allGood ? `아주 좋습니다. 이 ${outputName}으로 충분합니다.` : fidelityFirst ? "먼저 원문의 뜻을 옮겨 주세요." : "피드백을 확인하고 한 번 다듬어 보세요.",
     body: primary.body,
-    highlights: grammarNote?.anchor_text ? [grammarNote.anchor_text] : [],
+    highlights: !fidelityFirst && grammarNote?.anchor_text ? [grammarNote.anchor_text] : [],
     feedback: primary.body,
-    action: action && action !== primary.body ? action : undefined,
+    action: !fidelityFirst && action && action !== primary.body ? action : undefined,
     example: feedback.blocks.alternatives[0]?.text ?? quest.referenceAnswer,
     takeaway: runtime.mission.unit.closing_ko,
   };
