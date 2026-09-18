@@ -37,8 +37,7 @@ function HarnessOverview() {
           자동 점검은 두 방식으로, 최종 권한은 교수자에게 둡니다
         </h2>
         <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
-          품질 점검 자동화는 규칙 기반 검사와 프롬프트 통제 기반 검토를 함께 사용합니다. 두 방식은
-          조정 후보와 근거를 제공하며, 교수자가 콘텐츠를 감수한 뒤 수업 사용·공개 자격을 최종 승인합니다.
+          규칙 검사와 AI 검토가 근거를 제시하고, 교수자가 감수해 최종 승인합니다.
         </p>
       </div>
 
