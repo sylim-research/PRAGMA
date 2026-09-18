@@ -67,8 +67,6 @@ type DashboardSnapshot = {
   cumulative: DashboardCumulativeReviewCounts | null;
   /** 교과목(course_id)에 연결된 수행 기록 수 — 수업 운영 기록과 시범 수행을 가른다. 읽지 못하면 null. */
   courseLinkedRecordCount: number | null;
-  /** 보관·폐기본까지 포함한 현행 형식 시나리오 누적 생성 수. 읽지 못하면 null. */
-  cumulativeCoreCount: number | null;
 };
 
 type DashboardMetricKey =
@@ -352,7 +350,7 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult, cumulativeCoreResult] = await Promise.all([
+      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
           .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
@@ -394,8 +392,6 @@ const AdminDashboard = () => {
         db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).not("course_id", "is", null).limit(1),
-        // 보관(archived) 포함 — 반복 생성·폐기 이력까지 센 누적 규모다. 현행 수는 위 scenarioRows.
-        db.from("scenarios").select("scenario_id", { count: "exact" }).eq("content_format", "scenario_core_v1").limit(1),
       ]);
 
       const results = [
@@ -422,7 +418,6 @@ const AdminDashboard = () => {
         learnerRecordCount: learnerRecordResult.count ?? 0,
         cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,
         courseLinkedRecordCount: courseLinkedResult.error ? null : courseLinkedResult.count ?? 0,
-        cumulativeCoreCount: cumulativeCoreResult.error ? null : cumulativeCoreResult.count ?? null,
       };
       if (!mountedRef.current) return;
 
@@ -562,9 +557,7 @@ const AdminDashboard = () => {
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
             // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
-            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount,
-              // 큰 수는 현행본이다. 누적(보관 포함)은 곁에 작게 둔다.
-              aside: snapshot?.cumulativeCoreCount != null ? `누적 생성 ${snapshot.cumulativeCoreCount.toLocaleString("ko-KR")}` : undefined },
+            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount },
             { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
             // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
             // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
@@ -582,13 +575,8 @@ const AdminDashboard = () => {
                 {step.value == null && !displayError ? (
                   <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="mt-1 flex items-baseline gap-2">
-                    <span className="text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
-                      {displayError ? "—" : step.value}
-                    </span>
-                    {!displayError && "aside" in step && step.aside && (
-                      <span className="text-[11.5px] tabular-nums text-[#5A6670]">{step.aside}</span>
-                    )}
+                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
+                    {displayError ? "—" : step.value}
                   </span>
                 )}
                 <span className="mt-auto pt-1.5 text-[11.5px] text-[#6F7B83]">{step.screen} →</span>
