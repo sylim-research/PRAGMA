@@ -79,7 +79,9 @@ if (co) {
   clone.core_content = { ...clone.core_content,
     ...(co.pdr_d ? { pdr: { ...clone.core_content.pdr, d: co.pdr_d } } : {}),
     ...(co.situation_ko ? { situation_ko: co.situation_ko } : {}),
-    ...(co.relation_ko ? { relation_ko: co.relation_ko } : {}) };
+    ...(co.relation_ko ? { relation_ko: co.relation_ko } : {}),
+    ...(co.source_text ? { source_text: co.source_text } : {}),
+    ...(co.focal_segments ? { focal_segments: co.focal_segments } : {}) };
   console.log(`0/3 코어 오버라이드 적용: ${Object.keys(co).join(", ")}`);
 }
 const { error: insertError } = await db.from("scenarios").insert(clone);

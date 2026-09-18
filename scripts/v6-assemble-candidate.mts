@@ -49,7 +49,8 @@ for (const [path, value] of Object.entries((authored.overrides ?? {}) as Record<
   const keys = path.replace(/\[(\d+)\]/g, ".$1").split(".");
   const last = keys.pop()!;
   const parent = keys.reduce<any>((node, key) => node?.[key], draft);
-  if (parent == null || !(last in parent)) throw new Error(`override 자리가 없음: ${path}`);
+  // v5 권장안이 목표문과 같으면 변환기가 revision_examples를 만들지 않는다 — 그 자리만 새로 만들 수 있게 둔다(경로 오타 가드는 유지).
+  if (parent == null || (!(last in parent) && !(last === "revision_examples" && value !== null))) throw new Error(`override 자리가 없음: ${path}`);
   const existing = parent[last];
   if (value === null) delete parent[last];
   else if (typeof value === "string" && existing && typeof existing === "object" && "text" in existing) existing.text = value;
@@ -104,12 +105,15 @@ const ctx: CheckContext = {
   direction: draft.direction as CheckContext["direction"],
 };
 // 코어 오버라이드(DCT PDR을 바꿀 때 코어도 같이 — R23). 로컬 검사에도 같은 코어를 쓴다.
-const coreOverrides = (authored.core_overrides ?? null) as { scenario_d?: string; pdr_d?: string; situation_ko?: string; relation_ko?: string } | null;
+const coreOverrides = (authored.core_overrides ?? null) as { scenario_d?: string; pdr_d?: string; situation_ko?: string; relation_ko?: string; source_text?: string; focal_segments?: { role: string; text: string }[] } | null;
 const coreForCheck = source.core_content
   ? { ...source.core_content,
       ...(coreOverrides?.pdr_d ? { pdr: { ...source.core_content.pdr, d: coreOverrides.pdr_d } } : {}),
       ...(coreOverrides?.situation_ko ? { situation_ko: coreOverrides.situation_ko } : {}),
-      ...(coreOverrides?.relation_ko ? { relation_ko: coreOverrides.relation_ko } : {}) }
+      ...(coreOverrides?.relation_ko ? { relation_ko: coreOverrides.relation_ko } : {}),
+      // 코어 원문 자체를 고칠 때(예: 인물을 B로 부르는 원문). production_task 쪽은 overrides로 같이 바꾼다(R23).
+      ...(coreOverrides?.source_text ? { source_text: coreOverrides.source_text } : {}),
+      ...(coreOverrides?.focal_segments ? { focal_segments: coreOverrides.focal_segments } : {}) }
   : undefined;
 if (!source.core_content) console.warn("[warn] v5.json에 core_content가 없어 R23(코어 계승) 검사를 로컬에서 못 한다 — dump를 다시 뜰 것");
 const check = checkMission(draft, ctx, coreForCheck);
