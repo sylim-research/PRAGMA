@@ -94,7 +94,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다소 적절"); click("판단 확인하기");
     fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
     click("이유 확인하기");
-    expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text}.`)).toBeInTheDocument();
+    expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
