@@ -9,6 +9,10 @@ import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
 import { parseMissionCourseLocation } from "@/lib/mission/missionCourseContext";
 
+// 수업자료는 DEC-20260918-06으로 legacy(화면 숨김)지만, 되살릴 수 있게 기존 동작 검사는 스위치를 켠 채 유지한다.
+const legacy = vi.hoisted(() => ({ on: true }));
+vi.mock("@/lib/admin/legacyFeatures", () => ({ get LEGACY_TEACHING_MATERIALS() { return legacy.on; } }));
+
 const mocks = vi.hoisted(() => ({
   outlines: vi.fn(),
   curriculum: vi.fn(),
@@ -39,6 +43,7 @@ const guide = buildInstructorMissionGuide(SAMPLE_MISSION_V5_NATIVE, "요청");
 
 beforeEach(() => {
   vi.clearAllMocks();
+  legacy.on = true;
   Element.prototype.scrollIntoView = mocks.scrollIntoView;
   mocks.outlines.mockResolvedValue([outline]);
   mocks.curriculum.mockResolvedValue({ outline, weeks: courseWeeks });
@@ -218,5 +223,20 @@ describe("교과목·주차 수업자료 연결", () => {
       "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1",
     );
     expect(screen.getByText("확인 · 미션 2개 미배정")).toBeVisible();
+  });
+});
+
+describe("수업자료 de-scope(DEC-20260918-06)", () => {
+  it("스위치가 꺼지면 수업자료·프로젝터·유인물·메모는 숨기고 편성 미션·학급 응답·운영 현황만 남긴다", async () => {
+    legacy.on = false;
+    mount();
+    expect(await screen.findByRole("link", { name: "미션 1 · 번역 열기 ↗" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "학급 응답 확인" })).toBeInTheDocument();
+    expect(screen.getByText(/참여 2명 · 완료 2명/)).toBeInTheDocument();
+    for (const name of ["프로젝터 화면", "HTML", "교수자 전용 메모"]) expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "수업자료·토론 만들기" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "수업자료" })).not.toBeInTheDocument();
+    expect(screen.queryByText("이 주차 수업자료 승인")).not.toBeInTheDocument();
+    expect(screen.queryByText(/자료 확정|자료 승인 대기|수업자료 확정됨|수업자료 승인 전/)).not.toBeInTheDocument();
   });
 });

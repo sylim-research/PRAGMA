@@ -28,6 +28,7 @@ import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import { getApprovedWeeklyMaterial } from "@/lib/pragma/contentReviewApi";
 import { supabase } from "@/integrations/supabase/client";
 import { TeachingGeneratorPanel } from "@/components/admin/TeachingGeneratorPanel";
+import { LEGACY_TEACHING_MATERIALS as materialsOn } from "@/lib/admin/legacyFeatures";
 import { getTeachingState } from "@/lib/curriculum/teachingGenerationApi";
 import { applyTeachingDraft } from "@/lib/curriculum/teachingGeneration";
 import { teachingKind } from "../../../supabase/functions/_shared/teachingMaterial";
@@ -248,7 +249,7 @@ const AdminTeachingMaterials = () => {
   const selectedExpected = week && (week.speech_act || weekRole(week.week_no) === "contextualization") ? 2 : 0;
   const selectedMaterialState = week ? weeklyReviewStates.data?.get(week.week_no) : undefined;
 
-  return <AdminShell title="주차별 수업 운영" description="선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다.">
+  return <AdminShell title="주차별 수업 운영" description={materialsOn ? "선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다." : "선택한 주차의 편성 미션을 열어 수업에 쓰고, 학급 응답과 운영 현황을 확인합니다."}>
     <div className="max-w-[1080px] space-y-5">
       {/* 이 화면의 주인공은 지금 고른 주차다. 15주 전체 현황은 맨 아래 개요로 둔다. */}
       <section aria-label="선택 주차 작업대" className="rounded-2xl border border-[#E2DED2] bg-white">
@@ -277,16 +278,18 @@ const AdminTeachingMaterials = () => {
               <h2 className="mt-0.5 text-[22px] font-bold leading-tight text-[#15202B]">{operationWeekLabel(week)}</h2>
               <p className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[13px] text-[#5D6970]">
                 <span>{selectedExpected > 0 ? `편성 미션 ${week.scenarios.length}/${selectedExpected}` : "수업 안내 주차"}</span>
+                {materialsOn && <>
                 <span aria-hidden className="text-[#C9CED0]">·</span>
                 <span className={selectedMaterialState === "approved" ? "text-emerald-800" : selectedMaterialState === "pending" ? "text-amber-800" : ""}>
                   수업자료 {selectedMaterialState === "approved" ? "확정됨" : selectedMaterialState === "pending" ? "승인 전" : "상태 확인 중"}
                 </span>
+                </>}
                 <span aria-hidden className="text-[#C9CED0]">·</span>
                 <span>{course.outline.status === "published" ? "학습자에게 공개 중인 강좌" : "비공개 강좌"}</span>
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2" aria-label="선택 주차 작업">
-              {teachingKind(week.week_no, week.type) && <Button asChild>
+              {materialsOn && teachingKind(week.week_no, week.type) && <Button asChild>
                 <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
               </Button>}
               {week.scenarios[0] && <Button variant="outline" asChild>
@@ -312,13 +315,13 @@ const AdminTeachingMaterials = () => {
       {outlines.isError && <p role="alert">교과목 목록을 불러오지 못했습니다.</p>}
       {outlines.isSuccess && outlines.data.length === 0 && <p className="text-sm">조회 가능한 교과목이 없습니다. 관리자 로그인과 <Link className="underline" to="/admin/composer">저장된 교과목</Link>을 확인해 주세요.</p>}
       {!courseId && <div className="rounded-xl border border-dashed p-5 text-sm">
-        교과목과 주차를 선택해 주세요. 미편성 주차는 계획만 미리 보고, 편성 후 해당 미션에 맞춰 자료를 구성합니다.
+        교과목과 주차를 선택해 주세요.{materialsOn && " 미편성 주차는 계획만 미리 보고, 편성 후 해당 미션에 맞춰 자료를 구성합니다."}
         {params.get("mission") && <p className="mt-2">미션 단독 주소로 들어왔습니다. 이 미션을 사용할 교과목과 주차를 선택해 주세요.</p>}
       </div>}
       {courseId && courseQuery.isPending && <p role="status">주차 계획을 불러오는 중…</p>}
       {courseQuery.isError && <p role="alert">주차 계획을 불러오지 못했습니다. 교과목 선택을 확인해 주세요.</p>}
       {course && !week && <p role="alert">해당 주차를 찾을 수 없습니다.</p>}
-      {course && week && material && <>
+      {materialsOn && course && week && material && <>
         {!projectorOpen && <TeachingGeneratorPanel key={`${courseId}-${week.week_no}`} course={course} week={week}
           state={generated.data} loading={generated.isPending} loadError={generated.isError}
           onReload={() => { void generated.refetch(); }} onReview={openMaterialDetail}
@@ -406,18 +409,18 @@ const AdminTeachingMaterials = () => {
                 <StatusChip tone={missionsReady ? "good" : "attention"}>
                   {expected > 0 ? `미션 ${assigned}/${expected}` : "수업 안내"}
                 </StatusChip>
-                <StatusChip tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
+                {materialsOn && <StatusChip tone={materialState === "approved" ? "good" : materialState === "pending" ? "attention" : "neutral"}>
                   {materialState === "approved" ? "자료 확정" : materialState === "pending" ? "자료 승인 대기" : "자료 상태 확인 중"}
-                </StatusChip>
+                </StatusChip>}
                 {operation && operation.participants > 0 && <StatusChip>
                   참여 {operation.participants}명 · 완료 {operation.completedLearners}명
                 </StatusChip>}
                 {operation && operation.dissents > 0 && <StatusChip tone="attention">이견 {operation.dissents}건</StatusChip>}
               </div>
               <div className="flex flex-wrap gap-0.5 xl:justify-end">
-                <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
+                {materialsOn && <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
                   <Link onClick={openMaterialDetail} to={`${weeklyMaterialsPath(courseId, item.week_no)}#weekly-material-detail`}>수업자료</Link>
-                </Button>
+                </Button>}
                 {firstMission && <>
                   <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
                     <Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, item.week_no, firstMission.scenario_id, firstMission.assignment_id)}>미션</Link>
