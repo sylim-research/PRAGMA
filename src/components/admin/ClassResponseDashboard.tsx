@@ -31,7 +31,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
     </div>
 
     {!selected ? <p className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
-      {pattern.learners > 0 ? "집계된 기록에 문항별 선택 응답이 없습니다." : "아직 이 주차 미션의 수행 기록이 없습니다."} 주차 수업자료로 수업을 진행할 수 있습니다.
+      {pattern.learners > 0 ? "집계된 기록에 문항별 선택 응답이 없습니다." : "아직 이 주차 미션의 수행 기록이 없습니다."}
     </p> : <>
       <div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5" aria-label="판단 문항 선택">

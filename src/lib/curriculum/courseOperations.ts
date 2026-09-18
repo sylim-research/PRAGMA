@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { parseJudgmentEnvelope } from "@/lib/mission/classResponsePatterns";
+import { CLASS_LEARNER_PROFILE_SELECT, isCountedClassLearner } from "@/lib/mission/classResponseFetch";
 import type { LearnerCourseWeek } from "./learnerCourse";
 
 export interface CourseOperationLogRow {
@@ -9,6 +10,7 @@ export interface CourseOperationLogRow {
   completed_at: string | null;
   updated_at: string | null;
   context_judgment: unknown;
+  profiles?: { role?: string | null; consent_class_record_sharing?: boolean | null } | null;
 }
 
 export interface WeekOperationSummary {
@@ -45,11 +47,12 @@ export async function fetchCourseOperationLogs(
   if (!courseId || missionIds.length === 0) return [];
   const { data, error } = await operationDb
     .from("learner_mission_logs")
-    .select("mission_id,profile_id,mission_completed,completed_at,updated_at,context_judgment")
+    .select(`mission_id,profile_id,mission_completed,completed_at,updated_at,context_judgment,${CLASS_LEARNER_PROFILE_SELECT}`)
     .eq("course_id", courseId)
     .in("mission_id", missionIds);
   if (error) throw new Error(error.message);
-  return data ?? [];
+  // 학급 분포와 같은 기준 — 수업 기록 공유에 동의한 학습자 계정만 센다.
+  return (data ?? []).filter((row) => isCountedClassLearner(row.profiles));
 }
 
 const attemptTime = (row: CourseOperationLogRow) => row.completed_at ?? row.updated_at ?? "";

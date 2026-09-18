@@ -41,6 +41,7 @@ beforeEach(() => {
     select: () => {
       if (table === "learner_mission_logs") return result(LOGS);
       if (table === "curriculum_outlines") return result([{ id: "course-a", title: "2026-2 통번역" }]);
+      if (table === "scenarios") return { in: () => result([{ scenario_id: "m-1", core_content: { brief_note_ko: "교수님께 논문 개요 면담 요청 이메일을 작성한다" } }]) };
       return result([{ outline_id: "course-a", scenario_id: "m-1" }]);
     },
   }));
@@ -56,6 +57,15 @@ describe("학습 수행 기록", () => {
     expect(await screen.findByText("총 2건")).toBeVisible();
     expect(screen.getByText("김학생")).toBeVisible();
     expect(screen.getByText("이학생")).toBeVisible();
+  });
+
+  it("표에는 코드값 대신 사람이 읽는 화행·과업·미션 이름을 보여 준다", async () => {
+    mountAt("/admin/decision-traces");
+    expect(await screen.findAllByText("논문 면담 요청")).not.toHaveLength(0);
+    expect(screen.getAllByText("요청").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("번역").length).toBeGreaterThan(0);
+    expect(screen.queryByText("request")).not.toBeInTheDocument();
+    expect(screen.queryByText(/translation/)).not.toBeInTheDocument();
   });
 
   it("학습자 승인·관리에서 넘어온 ?q= 검색어로 목록이 좁혀진 채 열린다", async () => {

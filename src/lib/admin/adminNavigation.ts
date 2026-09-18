@@ -65,14 +65,13 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     header: "4. 수업 운영",
     items: [
       { to: "/admin/composer", label: "수업 편성·강의계획서", activePaths: ["/admin/data-backup"] },
-      { to: "/admin/package", label: "주차별 수업 운영", activePaths: ["/admin/teaching-generator", "/admin/class-responses"] },
       { to: "/admin/learners", label: "학습자 관리" },
     ],
   },
   {
     header: "5. 학습 기록·연구 자료",
     items: [
-      { to: "/admin/decision-traces", label: "학습 수행 기록" },
+      { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
       { to: "/admin/export", label: "연구 데이터 내보내기" },
     ],
   },
@@ -81,7 +80,6 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
 const PRIORITY_PATHS = [
   "/admin/review",
   "/admin/composer",
-  "/admin/package",
   "/admin/learners",
   "/admin/decision-traces",
   "/admin/export",

@@ -1,10 +1,13 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
+import { ClassResponsePanel } from "@/components/admin/ClassResponsePanel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
-import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
+import { MODE_LABEL, SPEECH_ACT_UI, type GenMode, type SpeechActUI } from "@/lib/pragma/enums";
+import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
+import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
 import {
   buildMissionCourseIndex,
   EMPTY_FILTERS,
@@ -62,6 +65,17 @@ const renderValue = (value: unknown): string => {
   return JSON.stringify(value, null, 2);
 };
 
+// 표에는 사람이 읽는 이름만 둔다. 원래 코드값·ID는 행의 title과 「보기」 상세, 연구 데이터 내보내기에 그대로 남는다.
+const speechActLabel = (act: string | null) => (act ? SPEECH_ACT_UI[act as SpeechActUI] ?? act : "—");
+const taskLabel = (taskType: string | null) => (taskType ? MODE_LABEL[taskType as GenMode] ?? taskType : "—");
+const missionLabel = (brief: string | undefined, missionId: string) => {
+  const title = missionMenuTitle(brief);
+  if (title) return title;
+  const text = brief?.replace(/\s+/g, " ").trim().replace(/[.。]$/, "");
+  if (text) return text.length > 26 ? `${text.slice(0, 26).trimEnd()}…` : text;
+  return `미션 ${missionId.slice(0, 8)}`;
+};
+
 const learnerLabel = (row: MissionLogRow) =>
   row.profiles?.full_name ?? row.profiles?.anonymous_participant_id ?? `${row.profile_id.slice(0, 8)}…`;
 
@@ -89,7 +103,7 @@ const DetailPanel = ({ row }: { row: MissionLogRow }) => {
   );
 };
 
-const Page = () => {
+const IndividualRecords = () => {
   const [rows, setRows] = useState<MissionLogRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
@@ -151,6 +165,34 @@ const Page = () => {
     };
   }, []);
 
+  // 미션 제목은 로그에 없으므로 시나리오의 짧은 설명에서 가져온다. 실패하면 짧은 ID로 둔다.
+  const [missionBriefs, setMissionBriefs] = useState<Map<string, string>>(new Map());
+  const missionIds = useMemo(() => [...new Set((rows ?? []).map((row) => row.mission_id))], [rows]);
+  useEffect(() => {
+    if (missionIds.length === 0) return;
+    let cancelled = false;
+    void (async () => {
+      const { data, error: briefError } = await supabase
+        .from("scenarios")
+        .select("scenario_id,core_content")
+        .in("scenario_id", missionIds);
+      if (cancelled || briefError) return;
+      setMissionBriefs(new Map((data ?? []).flatMap((item) => {
+        // 짧은 설명(brief)이 없는 미션(v6 전환분 일부)은 상황 설명의 첫 문장으로 대신한다.
+        const content = item.core_content as { brief_note_ko?: unknown; situation_ko?: unknown } | null;
+        const brief = typeof content?.brief_note_ko === "string" && content.brief_note_ko.trim()
+          ? content.brief_note_ko
+          : typeof content?.situation_ko === "string" && content.situation_ko.trim()
+            ? missionSituationSummary(content.situation_ko)
+            : null;
+        return brief ? [[item.scenario_id, brief] as [string, string]] : [];
+      })));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [missionIds]);
+
   const visibleRows = useMemo(
     () => (rows ? filterMissionLogs(rows, filters, courseIndex) : []),
     [rows, filters, courseIndex],
@@ -168,10 +210,7 @@ const Page = () => {
   const selectClass = "h-9 rounded-md border border-border bg-white px-2 text-sm";
 
   return (
-    <AdminShell
-      title="학습 수행 기록"
-      description="현행 학습미션의 판단, 최초 산출, 피드백 후 수정과 완료 상태를 학습자별로 확인합니다."
-    >
+    <>
       {!loading && !error && rows.length > 0 && (
         <div className="mb-3 flex flex-wrap items-end gap-2">
           <label className="text-xs font-medium text-muted-foreground">
@@ -314,18 +353,16 @@ const Page = () => {
                       <td className="px-3 py-2" title={row.profiles?.email ?? undefined}>
                         {learnerLabel(row)}
                       </td>
-                      <td className="px-3 py-2">{row.speech_act ?? "—"}</td>
-                      <td className="max-w-56 truncate px-3 py-2 font-mono text-xs" title={row.mission_id}>
-                        {row.mission_id}
+                      <td className="whitespace-nowrap px-3 py-2">{speechActLabel(row.speech_act)}</td>
+                      <td className="max-w-56 truncate px-3 py-2" title={row.mission_id}>
+                        {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
                       </td>
                       <td className="max-w-52 px-3 py-2 text-xs">
                         {row.course_id
                           ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
-                          : "직접 수행"}
+                          : "편성 외 수행"}
                       </td>
-                      <td className="px-3 py-2">
-                        {[row.task_type, row.mode].filter(Boolean).join(" · ") || "—"}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-2">{taskLabel(row.task_type)}</td>
                       <td className="px-3 py-2">
                         <span
                           className={[
@@ -363,6 +400,40 @@ const Page = () => {
           </table>
         </div>
       )}
+    </>
+  );
+};
+
+const TABS = [
+  { key: "records", label: "개별 수행 기록" },
+  { key: "class", label: "학급 응답 분포" },
+] as const;
+
+/** 같은 학습 기록을 개인 단위(개별 수행 기록)와 익명 집계 단위(학급 응답 분포)로 나눠 본다. */
+const Page = () => {
+  const [params, setParams] = useSearchParams();
+  const tab = params.get("tab") === "class" ? "class" : "records";
+  return (
+    <AdminShell
+      title="학습 수행 기록"
+      description="학습 미션 수행 기록을 개별 학습자 단위와 익명 학급 집계 단위로 확인합니다."
+    >
+      <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
+        {TABS.map((item) => (
+          <button
+            key={item.key}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.key}
+            onClick={() => setParams(item.key === "class" ? { tab: "class" } : {})}
+            className={[
+              "-mb-px border-b-2 px-4 py-2 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+              tab === item.key ? "border-[#15202B] font-semibold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
+            ].join(" ")}
+          >{item.label}</button>
+        ))}
+      </div>
+      {tab === "class" ? <ClassResponsePanel /> : <IndividualRecords />}
     </AdminShell>
   );
 };

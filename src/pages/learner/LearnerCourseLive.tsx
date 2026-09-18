@@ -174,7 +174,7 @@ const LearnerCourseLive = () => {
                               </ul>
                             </section>
                           ) : (
-                            <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#68757F]">{activityCopy(week)}</p>
+                            <p className="break-keep py-1 text-[13px] leading-5 text-[#52606A]">{activityCopy(week)}</p>
                           )}
                           {materialsOn && <div className="mt-4 border-t border-[#EAE5DB] pt-3">
                             <Link to={`${weekPath}/note`} className="inline-flex items-center gap-1 rounded text-[13px] text-[#52606A] underline-offset-4 hover:text-[#15202B] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]">이번 주 수업자료 <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
