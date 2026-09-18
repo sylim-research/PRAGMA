@@ -30,6 +30,7 @@ import {
   type DashboardReviewStageCounts,
   type DashboardScenarioRow,
   countRulesFailures,
+  countUnconvertedV5Missions,
   summarizeAssignmentApproval,
   summarizeCourses,
   type DashboardCourseRow,
@@ -112,22 +113,23 @@ const PanelHeader = ({
       <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
     </div>
-    {description && <p className="mt-0.5 text-[12px] text-muted-foreground">{description}</p>}
+    {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
   </div>
 );
 
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
-// 숫자 옆에는 행위가 아니라 상태(「~ 대기」)가 보여야 한다. 누가 무엇을 검토하는지도 이름에 둔다 —
+// 카드 숫자는 그 단계를 마친 서로 다른 미션 수(누적)다 — 대기는 대부분 0이라 흐름이 보이지 않는다.
+// 지금 기다리는 수는 위 「지금 할 일」과 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 검사 대기",
-  openai: "OpenAI 검토 대기",
-  claude: "Claude 독립 검토 대기",
-  adjudication: "OpenAI 재검토 대기",
-  // 품질 점검 화면의 「교수자 승인 대기」 칩과 같은 집합이라 같은 이름을 쓴다.
-  professor: "교수자 승인 대기",
+  rules: "규칙 검사 완료",
+  openai: "OpenAI 검토 완료",
+  claude: "Claude 독립 검토 완료",
+  adjudication: "OpenAI 재검토 완료",
+  // 전체 흐름 「교수자 승인 완료」와 같은 수다.
+  professor: "교수자 승인 완료",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -139,9 +141,9 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "의미·자연성 검토",
-  claude: "선택형",
+  claude: "교수자가 요청할 때",
   // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "선택형 · Claude 의견 재검토",
+  adjudication: "Claude 의견이 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -177,10 +179,13 @@ const ReviewPipeline = ({
 }) => (
   <div role="group" aria-label="품질 검수 단계">
   <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
-      {REVIEW_STAGE_ITEMS.map((stage) => {
-        const value = review?.[stage.key] ?? null;
-        // 메인은 대기량이다. 이미 해낸 양(서로 다른 미션 수)은 마우스를 올릴 때만 보인다.
-        const completed = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
+    {(() => {
+      const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
+        // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
+        const waiting = review?.[stage.key] ?? null;
+        const value = stage.key === "professor" ? professorFinalized : cumulative?.[stage.key] ?? null;
+        // 대기는 읽혔는데 누적 조회만 실패한 경우 — 스켈레톤 대신 「—」.
+        const unavailable = waiting !== null && value === null;
         const active = dominant === stage.key;
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
@@ -192,30 +197,29 @@ const ReviewPipeline = ({
                 "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
-                stage.optional ? "border-dashed" : "",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
               data-optional={stage.optional ? "true" : undefined}
               data-dominant={active ? "true" : undefined}
-              title={completed === null || error ? undefined : `${stage.key === "professor" ? "승인 완료" : "누적 완료"} ${completed}개`}
+              title={waiting === null || error ? undefined : `지금 대기 ${waiting}개`}
             >
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#63727C]">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#56646E]">
                   {stage.step}
                 </span>
                 <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
               <div className="mt-1.5 flex items-end gap-1.5">
-                {value === null && !error ? (
+                {value === null && !error && !unavailable ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
                   <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
-                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value}
+                    {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11px] text-muted-foreground">
+              <span className="mt-auto pt-1.5 text-[11px] text-[#4F5D68]">
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -225,7 +229,27 @@ const ReviewPipeline = ({
             )}
           </div>
         );
-      })}
+      };
+      const optional = REVIEW_STAGE_ITEMS.filter((stage) => stage.optional);
+      const firstOptional = REVIEW_STAGE_ITEMS.findIndex((stage) => stage.optional);
+      return (
+        <>
+          {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
+          {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
+          <div
+            role="group"
+            aria-label="선택 검토"
+            className="relative -my-1.5 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] p-1.5 pt-3 sm:col-span-2 sm:grid-cols-2"
+          >
+            <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
+              선택 검토
+            </span>
+            {optional.map(renderStage)}
+          </div>
+          {REVIEW_STAGE_ITEMS.slice(firstOptional + optional.length).map(renderStage)}
+        </>
+      );
+    })()}
   </div>
   </div>
 );
@@ -259,7 +283,7 @@ const OperationMetric = ({
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
   >
-    <span className="text-xs font-medium text-muted-foreground group-hover:text-[#273B4A]">{label}</span>
+    <span className="text-xs font-medium text-[#4F5D68] group-hover:text-[#273B4A]">{label}</span>
     {value === null && !error ? (
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
@@ -267,10 +291,10 @@ const OperationMetric = ({
         <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
-        {!error && value !== null && <span className="pb-0.5 text-[11px] text-muted-foreground">{unit}</span>}
+        {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-muted-foreground">{description}</span>
+    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -393,9 +417,13 @@ const AdminDashboard = () => {
         if (result.error) throw new Error(`${label} 집계 실패: ${result.error.message}`);
       }
 
+      const unconvertedV5Count = countUnconvertedV5Missions(scenarioRows, reviewRows);
+      const content = summarizeDashboardContent(scenarioRows);
+      const review = summarizeDashboardReviewStages(scenarioRows, reviewRows);
       const next: DashboardSnapshot = {
-        content: summarizeDashboardContent(scenarioRows),
-        review: summarizeDashboardReviewStages(scenarioRows, reviewRows),
+        // v5 미전환 미션은 검수하지 않고 v6로 전환한다 — 대기·검수 중 수에서 뺀다.
+        content: { ...content, reviewTargetCount: content.reviewTargetCount - unconvertedV5Count },
+        review: { ...review, rules: review.rules - unconvertedV5Count },
         assignments: summarizeDashboardAssignments(assignmentRows),
         assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
         courses: summarizeCourses(courseRows),
@@ -526,8 +554,10 @@ const AdminDashboard = () => {
           </Button>
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2 text-[13px] text-[#B9C3CA]">
-          <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{displayError ? "—" : needsCheckCount ?? "—"}</b>개</span>
-          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다. */}
+          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다(아래 불통과도 같다). */}
+          {!displayError && (needsCheckCount ?? 0) > 0 && (
+            <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{needsCheckCount}</b>개</span>
+          )}
           {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
             <span>
               규칙 검사 불통과 <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
@@ -542,7 +572,8 @@ const AdminDashboard = () => {
       <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
         <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
           {[
-            { to: "/admin/library", stage: "시나리오 재료", screen: "라이브러리", value: snapshot?.content.coreCount },
+            // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
+            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount },
             { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
             // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
             // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
@@ -556,7 +587,7 @@ const AdminDashboard = () => {
           ].map((step, index) => (
             <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
               <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
-                <span className="text-[12px] font-medium text-[#6B7780]">{step.stage}</span>
+                <span className="text-[12px] font-medium text-[#5A6670]">{step.stage}</span>
                 {step.value == null && !displayError ? (
                   <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
@@ -564,14 +595,14 @@ const AdminDashboard = () => {
                     {displayError ? "—" : step.value}
                   </span>
                 )}
-                <span className="mt-auto pt-1.5 text-[11.5px] text-[#9AA3A9]">{step.screen} →</span>
+                <span className="mt-auto pt-1.5 text-[11.5px] text-[#6F7B83]">{step.screen} →</span>
               </Link>
             </li>
           ))}
         </ol>
       </section>
 
-      {/* 「승인 전 미션」을 다음 처리 단계별로 쪼갠 것 — 완료 실적이 아니라 지금 어디서 기다리는가. */}
+      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
         title="검수 단계별 현황"
         action={liveStatus()}
@@ -603,11 +634,11 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          label="미션 편성"
-          value={snapshot?.assignments.assignmentCount ?? null}
-          unit="건"
-          // 서로 다른 미션 수를 다시 쓰면 큰 수(편성 건수)와 같은 뜻으로 읽혀 주차 수만 둔다.
-          description={snapshot ? `주차 ${snapshot.assignments.weekCount}개` : "교과목 주차에 놓인 미션"}
+          // 편성 건수는 위 전체 흐름에 이미 있다 — 같은 수를 되풀이하지 않고 주차를 큰 수로 둔다.
+          label="편성 주차"
+          value={snapshot?.assignments.weekCount ?? null}
+          unit="개"
+          description={snapshot ? `교과목 ${snapshot.assignments.courseCount}개에 배치` : "교과목 주차에 놓인 미션"}
           error={displayError}
           changed={changedKeys.has("assignments")}
           title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
@@ -628,12 +659,15 @@ const AdminDashboard = () => {
             시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          label="수행 기록"
-          value={snapshot?.learnerRecordCount ?? null}
+          // 전체 수행 기록은 위 전체 흐름에 이미 있다. 여기서는 교과목 맥락에서 나온 기록을 큰 수로 둔다
+          // (실제 수업 기록과 시범 수행을 가르는 유일한 단서 — 교과목 맥락 없는 실행은 연결되지 않는다).
+          label="교과목 수업 기록"
+          value={snapshot?.courseLinkedRecordCount ?? null}
           unit="건"
-          // 실제 수업 기록과 시범 수행을 가르는 유일한 단서라 남긴다(교과목 맥락 없는 실행은 연결되지 않는다).
-          description={`교과목 연결 ${snapshot && snapshot.courseLinkedRecordCount !== null ? snapshot.courseLinkedRecordCount : "—"}건`}
-          error={displayError}
+          description={snapshot && snapshot.courseLinkedRecordCount !== null
+            ? `시범 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
+            : "교과목에 연결된 수행"}
+          error={displayError ?? (snapshot && snapshot.courseLinkedRecordCount === null ? "교과목 연결 조회 실패" : null)}
           changed={changedKeys.has("records")}
         />
       </div>
@@ -647,7 +681,7 @@ const AdminDashboard = () => {
       {isAdmin && IS_DEV && (
         <div className="mt-4 flex justify-end">
           <AlertDialog>
-            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-muted-foreground" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
+            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-[#4F5D68]" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>내 프로필을 초기화하시겠습니까?</AlertDialogTitle>

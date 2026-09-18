@@ -24,7 +24,7 @@ export function libraryMissionIsReady(row: LibraryMissionState): boolean {
   return isReviewedMission({
     mission_status: row.mission_status,
     content_release_id: row.core_content?.generation?.content_release_id,
-  }) && row.mission_schema_version === "mission_v5"
+  }) && (row.mission_schema_version === "mission_v5" || row.mission_schema_version === "mission_v6")
     && Array.isArray(row.mission_mpj_items) && row.mission_mpj_items.length === 5;
 }
 

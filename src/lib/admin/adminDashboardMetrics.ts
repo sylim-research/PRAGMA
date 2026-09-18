@@ -120,7 +120,7 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
 }
 
 /**
- * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5·MJT 5문항).
+ * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5/v6·MJT 5문항).
  * 교수자 승인 완료의 부분집합이며, 새 편성은 이 집합에서만 고른다.
  */
 function isComposerReadyMission(row: DashboardScenarioRow): boolean {
@@ -198,6 +198,20 @@ export function summarizeDashboardReviewStages(
     counts[nextDashboardReviewStage(row, runs)] += 1;
   }
   return counts;
+}
+
+/**
+ * 현재 기준 검수를 한 번도 받지 않은 mission_v5 미션. v5는 검수 대신 v6로 전환하므로(2026-09-17 결정)
+ * 대시보드의 대기 수에서 빼고 따로 센다. 규칙 검사 칸(rules)의 부분집합이다.
+ */
+export function countUnconvertedV5Missions(
+  rows: readonly DashboardScenarioRow[],
+  runs: readonly DashboardReviewRunRow[],
+): number {
+  return rows
+    .filter(isDashboardReviewTarget)
+    .filter((row) => row.mission_schema_version === "mission_v5" && !latestDashboardReviewRun(row, runs))
+    .length;
 }
 
 /**

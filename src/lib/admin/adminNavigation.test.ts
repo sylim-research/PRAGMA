@@ -48,7 +48,7 @@ describe("admin navigation reachability", () => {
     expect(operations?.items.map((item) => item.to)).toEqual([
       "/admin/composer", "/admin/learners",
     ]);
-    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 자료");
+    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 활용");
     expect(research?.items.map((item) => item.to)).toEqual([
       "/admin/decision-traces",
       "/admin/export",
