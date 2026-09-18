@@ -108,8 +108,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
   }, [dirty, saving, approved, disabled, error, draft]);
   return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <div><h3 className="text-lg font-bold">학생 화면으로 감수하기</h3>
-        <p className="mt-1 text-xs text-muted-foreground">직접 풀거나 참고 판정·해설을 바로 볼 수 있습니다. 체크는 교수자의 확인 기록이며 최종 승인은 아래에서 별도로 합니다.</p></div>
+      <h3 className="text-lg font-bold">학생 화면으로 감수하기</h3>
       <Button size="sm" variant={answers ? "default" : "outline"} aria-pressed={answers} onClick={() => setAnswers(!answers)}>{answers ? "직접 풀기로 전환" : "참고 판정·해설 바로 보기"}</Button>
     </div>
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
@@ -137,7 +136,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
             <Button className="h-11 text-base" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
             <Button className="h-11 text-base" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 요청</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={7} className="min-h-[10rem] resize-y text-[15px] leading-7" value={noteValue} disabled={disabled || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={5} className="resize-y text-[15px] leading-7" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })

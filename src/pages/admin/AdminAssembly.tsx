@@ -858,7 +858,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 교수자 최종 승인: 결정하는 화면 ── */}
         {professorScreen && (
           <>
-            {scenarioText}
+            {/* 감수 대상은 아래 학생 화면이다. 코어 원문은 필요할 때만 펼친다. */}
+            <details>
+              <summary className="cursor-pointer text-[12.5px] font-semibold text-[#5D6970]">시나리오 전문</summary>
+              <div className="mt-1.5">{scenarioText}</div>
+            </details>
             {st === "generated" && info?.queue !== "decision" && (
               <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>

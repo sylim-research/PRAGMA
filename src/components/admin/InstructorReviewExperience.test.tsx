@@ -39,7 +39,7 @@ describe("instructor experience", () => {
     for (const old of ["4. 이유 찾기", "5. 여러 초안 비교", "문항별 핵심"]) expect(within(nav).queryByText(old)).not.toBeInTheDocument();
     expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
     expect(screen.queryByText(/이 부분의 AI·규칙 문제 항목/)).not.toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "현재 문항 감수 메모" })).toHaveAttribute("rows", "7");
+    expect(screen.getByRole("textbox", { name: "현재 문항 감수 메모" })).toHaveAttribute("rows", "5");
   });
   it("offers only 확인 and 수정 요청, saves a note typed before judging with the judgment, and keeps legacy 보류 read-only", async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
