@@ -255,8 +255,9 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
   const [inputTab, setInputTab] = useState<InputTab>("image");
   const [imgLarge, setImgLarge] = useState(false);
   const [text, setText] = useState("");
-  const [sourceRef, setSourceRef] = useState("");
-  const [note, setNote] = useState("");
+  // 출처·메모 입력 칸은 화면에서 뺐다(2026-09-19). 저장 형식은 그대로 두고 빈 값으로 보낸다.
+  const sourceRef = "";
+  const note = "";
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
   const [direction, setDirection] = useState<LanguageDirection>("zh_ko");
@@ -547,29 +548,6 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
         )}
 
         {/* 출처·메모 = 소스가 아니라 메타데이터 — 보조 위계로 격하 */}
-        <details className="rounded-md border border-[#D9D2BF] bg-[#FAF8F2] px-3 py-2 text-[#3F4E59]">
-          <summary className="cursor-pointer text-[12px] font-medium text-muted-foreground">
-            출처 정보·관리 메모 (선택)
-          </summary>
-          <div className="mt-2 space-y-2.5">
-            <div>
-              <label className="text-[11.5px] text-muted-foreground">출처 URL·책·시점</label>
-              <input
-                value={sourceRef}
-                onChange={(e) => setSourceRef(e.target.value)}
-                className="mt-1 h-9 w-full rounded-md border border-[#EAE4D2] bg-white px-3 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
-              />
-            </div>
-            <div>
-              <label className="text-[11.5px] text-muted-foreground">관리자 메모</label>
-              <input
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                className="mt-1 h-9 w-full rounded-md border border-[#EAE4D2] bg-white px-3 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
-              />
-            </div>
-          </div>
-        </details>
       </section>
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}

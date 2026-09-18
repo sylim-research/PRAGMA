@@ -79,7 +79,7 @@ const isMissingSchema = (message: string) =>
   /does not exist|schema cache|not find the function|relation .* does not exist/i.test(message);
 
 export const AUTHENTIC_STORE_PENDING =
-  "보관함 테이블이 아직 원격에 없습니다. 마이그레이션 적용 후 저장됩니다.";
+  "분석 기록 저장소가 아직 준비되지 않았습니다. 마이그레이션 적용 후 저장됩니다.";
 
 export async function saveAuthenticAnalysis(
   analysis: AuthenticAnalysisInput,
