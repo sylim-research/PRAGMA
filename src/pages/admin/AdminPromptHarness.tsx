@@ -139,7 +139,7 @@ const CARD_DISPLAY: Record<
 // 실제 edge 소스에서 자동 재생성되므로(prebuild) 화면이 코드보다 낡을 수 없다.
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
-  core: "시나리오 생성 (500개 라이브러리)",
+  core: "시나리오 생성",
   mission: "미션 승격 (MJT + 산출 과제)",
   review: "프롬프트 통제 기반 검토",
   runtime: "학습자 실행 중 피드백",
@@ -252,7 +252,7 @@ function ProvenanceBanner({
           </div>
         </div>
         <div className="rounded-lg border border-[#EAE4D2] bg-white px-3 py-2">
-          <div className="text-[11.5px] text-muted-foreground">이 지문으로 생성된 시나리오</div>
+          <div className="text-[11.5px] text-muted-foreground">이 지문으로 생성된 현행 시나리오</div>
           {loading ? (
             <div className="mt-1 text-[12px] text-muted-foreground">확인 중…</div>
           ) : error ? (
@@ -280,33 +280,34 @@ function ProvenanceBanner({
         </div>
       </div>
 
-      {/* 지문이 없는 과거 생성분 — 숨기지 않고 정직하게 표기(소급 기록 금지) */}
+      {/* 지문이 없는 현행분 — 지문 기록 도입 전 생성분과, 생성 함수를 거치지 않고 등록된 변환본이 섞여 있다.
+          숨기지 않고 정직하게 표기한다(소급 기록 금지). */}
       {!loading && !error && legacyNull && (
-        <p className="mt-2 max-w-[46rem] rounded-lg bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
-          지문 기록 이전에 생성된 시나리오 <b>{legacyNull.count}건</b>은 프롬프트 지문이
-          비어 있습니다({legacyNull.first.slice(0, 10)} ~ {legacyNull.last.slice(0, 10)}). 어떤
-          프롬프트로 만들었는지 소급 확인이 불가능하므로 거짓으로 채우지 않았습니다.
+        <p className="mt-2 max-w-[46rem] rounded-lg bg-[#F6F3EA] px-3 py-2 text-[12px] text-[#4F5D68]">
+          지문이 기록되지 않은 현행 시나리오 <b>{legacyNull.count}건</b>({legacyNull.first.slice(0, 10)} ~{" "}
+          {legacyNull.last.slice(0, 10)}) — 지문 기록 도입 전 생성분과 생성 함수 밖에서 등록된 변환본입니다.
+          어떤 지시문이었는지 소급해 채우지 않았습니다.
         </p>
       )}
 
       {/* 과거 지문을 한 줄씩 늘어놓으면 현재 하네스가 화면 아래로 밀린다. 증거는 접어서 보존한다. */}
       {!loading && !error && mismatched.length > 0 && (
-        <div className="mt-2 max-w-[46rem] rounded-lg bg-red-50 px-3 py-2 text-[12px] text-red-900">
+        <div className="mt-2 max-w-[46rem] rounded-lg bg-[#F6F3EA] px-3 py-2 text-[12px] text-[#4F5D68]">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p>
-              ⚠️ 현재 정본과 다른 과거 지문 <b>{mismatched.length}종 · 시나리오 {mismatchTotal}건</b>
+              이전 버전 지시문 <b>{mismatched.length}종</b>으로 생성된 현행 시나리오 <b>{mismatchTotal}건</b>
             </p>
             <button
               type="button"
               onClick={() => setHistoryOpen((open) => !open)}
-              className="inline-flex items-center gap-1 font-semibold underline decoration-red-300 underline-offset-2"
+              className="inline-flex items-center gap-1 font-semibold underline decoration-[#B9C3CA] underline-offset-2"
             >
               {historyOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
               {historyOpen ? "이력 닫기" : "이력 보기"}
             </button>
           </div>
           {historyOpen && (
-            <ul className="mt-2 space-y-1 border-t border-red-200 pt-2">
+            <ul className="mt-2 space-y-1 border-t border-[#E6E1D5] pt-2">
               {mismatched.map((row) => (
                 <li key={row.hash}>
                   <span className="font-mono">{row.hash?.slice(0, 12)}…</span> · {row.count}건 ·{" "}
@@ -393,6 +394,8 @@ const AdminPromptHarness = () => {
       .from("scenarios")
       .select("prompt_snapshot_hash, created_at")
       .eq("content_format", "scenario_core_v1")
+      // 현행(보관 안 된) 시나리오만 센다 — 보관·폐기된 초안까지 섞으면 숫자가 현재 라이브러리를 말하지 않는다.
+      .is("archived_at", null)
       .limit(2000);
     // 조회 실패(RLS·비로그인)를 0건으로 표시하면 화면이 조용히 거짓말한다 —
     // "확인 필요"로 구분해서 내보낸다.
