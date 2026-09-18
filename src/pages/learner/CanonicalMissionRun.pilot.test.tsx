@@ -71,9 +71,13 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
     expect(screen.queryByRole("heading", { name: "참고 표현" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
-    // The correction field opens immediately and empty; the unchanged original cannot be submitted.
-    const input = screen.getByRole("textbox", { name: "내가 고친 표현" });
-    expect(input).toHaveValue("");
+    // The correction field opens prefilled with the flawed draft; the unchanged original cannot be submitted.
+    const input = screen.getByRole("textbox", { name: "내가 고친 표현" }) as HTMLTextAreaElement;
+    expect(input.value).not.toBe("");
+    expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
+    expect(screen.queryByText(/원래 표현을 그대로 제출할 수 없습니다/)).not.toBeInTheDocument();
+    expect(screen.getByText("원문의 뜻은 바꾸지 마세요.")).toBeInTheDocument();
+    expect(screen.getByText(/미리 넣어 두었습니다\. 필요한 부분만 고쳐 주세요\./)).toBeInTheDocument();
     fireEvent.change(input, { target: { value: "  " } });
     expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
     fireEvent.change(input, { target: { value: "我下课晚，明天的汇报彩排就从七点改到七点半吧。" } });
