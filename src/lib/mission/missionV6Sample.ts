@@ -63,6 +63,7 @@ reasonContrastCandidate.mpj_items[1].reason_choice = {
     { id: "assumed-acceptance", text: "작성 가능 여부를 묻기보다, 이미 맡긴 일처럼 전달을 요구하기 때문입니다." },
     { id: "earlier-deadline", text: "원문보다 마감을 앞당겨 교수님이 준비할 시간을 줄였기 때문입니다." },
   ],
+  accepted_id: "assumed-acceptance",
 };
 reasonContrastCandidate.mpj_items[3].contrast = {
   context_ko: "같은 일정 변경을 절친한 친구인 조원들에게 부탁한다면",

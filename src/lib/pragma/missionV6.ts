@@ -54,12 +54,14 @@ const scale = z.object({
   explanation_ko: text, revision_examples: z.array(text).min(1).max(2).optional(),
 }).strict();
 // Optional for pre-addition v6 content. New authoring uses one MJT2 reason choice.
-// IDs identify contextual choices, not correctness or a fixed error taxonomy.
+// IDs identify contextual choices, not a fixed error taxonomy. accepted_id names the reference
+// reason so the learner sees whether their reason matched; content written before it has none.
 const scaleWithReason = scale.extend({
   id: z.literal(2),
   reason_choice: z.object({
     prompt: text,
     options: z.array(z.object({ id: text, text }).strict()).min(2),
+    accepted_id: text.optional(),
   }).strict().optional(),
 });
 const correction = z.object({
@@ -117,6 +119,10 @@ export const MissionV6Schema = rawSchema.superRefine((raw, ctx) => {
   const reasons = mission.mpj_items[1].reason_choice?.options;
   if (reasons && new Set(reasons.map(reason => reason.id)).size !== reasons.length) {
     issue(["mpj_items", 1, "reason_choice", "options"], "Reason choice IDs must be distinct");
+  }
+  const acceptedReason = mission.mpj_items[1].reason_choice?.accepted_id;
+  if (reasons && acceptedReason !== undefined && !reasons.some(reason => reason.id === acceptedReason)) {
+    issue(["mpj_items", 1, "reason_choice", "accepted_id"], "Accepted reason must be one of the options");
   }
   for (const [i, item] of mission.mpj_items.entries()) {
     if (item.type === "scale4" && (!item.accepted_scale_codes.includes(item.reference_scale_code)

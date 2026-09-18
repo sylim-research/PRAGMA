@@ -21,7 +21,6 @@ import CanonicalMissionRun from "./CanonicalMissionRun";
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 const snapshot = () => JSON.parse(sessionStorage.getItem(storageKey)!);
 const feedbackSentence = mission.mpj_items[1].explanation_ko.split(". ")[1];
-const reconsiderHint = "이유를 살펴본 뒤 생각이 달라졌다면 위에서 판단을 바꿀 수 있습니다.";
 const toSecondJudgment = () => {
   render(<MemoryRouter><CanonicalMissionRun /></MemoryRouter>);
   click("다소 적절"); click("답안 확인하기"); click("다음: 상황에 맞는지 판단하기");
@@ -34,30 +33,27 @@ describe("representative v6 reason / contrast rhythm", () => {
   });
   afterEach(cleanup);
 
-  it("holds the first judgment until a reason is chosen, lets it change afterwards, and carries both into the serializer", () => {
+  it("shows the judgment O/X right after committing, then marks the reason, and carries both into the serializer", () => {
     toSecondJudgment();
-    const reason = mission.mpj_items[1].reason_choice.options[0];
+    const reason = mission.mpj_items[1].reason_choice.options[1];
+    expect(mission.mpj_items[1].reason_choice.accepted_id).toBe(reason.id);
     expect(screen.queryByText(reason.text)).not.toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
-    click("매우 적절"); click("판단 확정하기");
-    expect(screen.getByRole("button", { name: "매우 적절" })).toBeDisabled();
-    expect(screen.queryByRole("button", { name: "다소 부적절" })).not.toBeInTheDocument();
-    expect(screen.queryByText(reconsiderHint)).not.toBeInTheDocument();
+    click("매우 적절"); click("판단 확인하기");
+    expect(screen.getByText("참고 답안과 달라요")).toBeInTheDocument();
+    // 네 선지는 그대로 남고 잠긴다 — 내 선택과 참고 답안이 함께 보인다.
+    for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: new RegExp(`^${label}`) })).toBeDisabled();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "가능한 수정 예시" })).not.toBeInTheDocument();
     const reasons = screen.getByRole("radiogroup", { name: "판단 이유" });
     expect(within(reasons).getAllByRole("radio")).toHaveLength(3);
-    expect(screen.getByRole("button", { name: "판단과 이유 확인하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "이유 확인하기" })).toBeDisabled();
     fireEvent.click(within(reasons).getByRole("radio", { name: reason.text }));
-    expect(screen.getByText(reconsiderHint)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "다소 부적절" })).toBeEnabled();
-    expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
-    click("다소 부적절");
-    click("판단과 이유 확인하기");
+    click("이유 확인하기");
+    expect(screen.getByText("이유도 맞았어요")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
-    expect(screen.queryByRole("radiogroup", { name: "판단 이유" })).not.toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
-    expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id, revisedPick: "somewhat_inappropriate" });
+    expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
     click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기"); click("다음: 직접 고쳐 보기");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
@@ -73,7 +69,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     });
     click("네 표현 확인하기"); click("다음: 번역하기");
     const traces = buildMissionV6Responses(mission, snapshot().responses, "2026-09-14T12:00:00.000Z");
-    expect(traces[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id, revised_scale_code: "somewhat_inappropriate" });
+    expect(traces[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
+    expect(traces[1]).not.toHaveProperty("revised_scale_code");
     expect(traces[3].revised_text).toBe(revisedText);
     expect(traces[4].candidate_band_codes).toEqual(["appropriate", "too_direct", "too_indirect", "appropriate"]);
     expect(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)).toBeNull();
@@ -86,13 +83,15 @@ describe("representative v6 reason / contrast rhythm", () => {
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();
   });
 
-  it("keeps only the first judgment when it is not changed after the reason", () => {
+  it("marks a reason that differs from the reference and names the reference reason", () => {
     toSecondJudgment();
-    const reason = mission.mpj_items[1].reason_choice.options[1];
-    click("다소 적절"); click("판단 확정하기");
-    fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: reason.text }));
-    click("매우 부적절"); click("다소 적절");
-    click("판단과 이유 확인하기"); click("다음: 판단하고 고쳐 보기");
-    expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: reason.id });
+    const [picked, accepted] = mission.mpj_items[1].reason_choice.options;
+    click("다소 적절"); click("판단 확인하기");
+    fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
+    click("이유 확인하기");
+    expect(screen.getByText("참고 이유는 다른 것이에요")).toBeInTheDocument();
+    expect(screen.getByText(`참고 이유 · ${accepted.text}`)).toBeInTheDocument();
+    click("다음: 판단하고 고쳐 보기");
+    expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
   });
 });

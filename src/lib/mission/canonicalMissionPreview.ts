@@ -54,7 +54,7 @@ export interface ScaleQuest extends QuestBase {
   /** Authored alternatives revealed after judgment, not a unique translation key. */
   revisionExamples?: string[];
   /** One inline choice after committing the initial judgment, before feedback. */
-  reasonChoice?: { prompt: string; options: ChoiceOption[] };
+  reasonChoice?: { prompt: string; options: ChoiceOption[]; /** 참고 이유. 없으면 이유의 맞음·다름을 표시하지 않는다. */ acceptedId?: string };
 }
 
 export interface FixChoiceQuest extends QuestBase {

@@ -87,9 +87,9 @@ describe("CanonicalMissionRun live CTA route", () => {
     click(/학습 미션 시작하기/);
     click("다소 적절"); click("답안 확인하기"); click(/^다음:/);
     const reason = mission.mpj_items[1].reason_choice.options[1];
-    click("매우 적절"); click("판단 확정하기");
+    click("매우 적절"); click("판단 확인하기");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
-    click("다소 부적절"); click("판단과 이유 확인하기"); click(/^다음:/);
+    click("이유 확인하기"); click(/^다음:/);
     click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
     click("수정안 제출하기"); click(/^다음:/);
@@ -115,7 +115,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
     expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
-    expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id, revised_scale_code: "somewhat_inappropriate" });
+    expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
     expect(requestFeedback).toHaveBeenCalledTimes(1);
   });
   beforeEach(() => {
