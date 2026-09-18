@@ -77,17 +77,16 @@ describe("instructor experience", () => {
     for (const correction of SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[2].corrections) expect(screen.getByText(correction.text)).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled();
   });
-  it("lets the professor preview change the v6 MJT2 judgment after a reason, as learners can", () => {
+  it("shows the professor preview the same verdict-then-reason MJT2 flow learners see", () => {
     const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
       mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
     render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="mjt-1" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "다소 적절" })); fireEvent.click(screen.getByRole("button", { name: "판단 확정하기" }));
-    expect(screen.queryByRole("button", { name: "다소 부적절" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "다소 적절" })); fireEvent.click(screen.getByRole("button", { name: "판단 확인하기" }));
+    expect(within(screen.getByRole("button", { name: /^다소 적절/ })).getByText("내 선택")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^다소 부적절/ })).toBeDisabled();
     fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
-    fireEvent.click(screen.getByRole("button", { name: "다소 부적절" }));
-    fireEvent.click(screen.getByRole("button", { name: "판단과 이유 확인하기" }));
-    expect(within(screen.getByRole("button", { name: /다소 부적절/ })).getByText("내 선택")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /다소 적절/ })).queryByText("내 선택")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
+    expect(screen.getByText("이유도 맞았어요")).toBeInTheDocument();
   });
   it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
     const v6 = (learner_level: "intermediate" | "advanced"): ReviewInspection => ({ ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level },

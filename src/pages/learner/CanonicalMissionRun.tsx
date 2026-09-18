@@ -366,6 +366,20 @@ function SentenceLines({ text, highlights = [] }: { text: string; highlights?: s
   );
 }
 
+/**
+ * 상황문에서 「내가 지금 할 말」을 적은 문장의 위치. 말을 건네는 동사가 현재형으로 끝나는 마지막 문장을 고르고
+ * (「…에게 연락합니다」「…사과하려고 합니다」), 없으면 마지막 문장이다. 「아직 …하지 않았습니다」 같은
+ * 과거·완료형 조건 문장은 행동이 아니라 단서라 고르지 않는다.
+ */
+export function actionLineIndex(lines: string[]) {
+  const speechVerb = /려고|연락|문의|부탁|요청|보냅|보내|건넵|전하|전합|알리|알립|사과|말하|말씀|답하|답합|여쭙|제기|물어|묻습|건의/;
+  const completed = /[았었였]습니다[.!?]?$|않았|없었/;
+  for (let index = lines.length - 1; index >= 0; index -= 1) {
+    if (speechVerb.test(lines[index]) && !completed.test(lines[index].trim())) return index;
+  }
+  return lines.length - 1;
+}
+
 function ContextCard({ context, headerRight, title = "상황" }: {
   context: MissionContext;
   headerRight?: React.ReactNode;
@@ -377,6 +391,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const compact = mission.missionFormat === "mission_v6";
   // 문장 단위로 줄을 나눠 화행 태그 오른쪽 열에 세운다 — 둘째 문장이 태그 아래로 흘러 들어가지 않는다.
   const situationLines = context.situation.split(/(?<=[.!?。！？])\s+/).filter(Boolean);
+  const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
       ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-gradient-to-b from-[#FAF8F1] to-[#F2EFE4] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-5"
@@ -389,16 +404,19 @@ function ContextCard({ context, headerRight, title = "상황" }: {
       )}
       {compact ? (
         // 화행은 상단 바에 이미 있다. 이 카드는 장면만 전한다.
-        // 첫 문장이 장면을 세우고, 뒤따르는 문장은 조건을 덧붙이는 지문이라 한 단 낮춘다.
+        // 배경 문장은 한 단 낮추고, 내가 할 말(화행)을 적은 문장을 대시와 함께 세운다.
         <h2 className="break-keep">
-          {situationLines.map((line, index) => (
-            <span key={line} className={index === 0
-              ? "block text-[17px] font-semibold leading-8 tracking-[-0.01em] text-[#16222E]"
-              : "mt-1 block text-[15.5px] font-normal leading-7 text-[#5A6673]"}>
-              {index === 0 && <span aria-hidden className="mr-2 inline-block h-px w-4 align-middle bg-[#C9A62E]" />}
-              {line}
-            </span>
-          ))}
+          {situationLines.map((line, index) => {
+            const action = index === actionIndex;
+            return (
+              <span key={line} className={action
+                ? `${index > 0 ? "mt-1.5 " : ""}block text-[17px] font-bold leading-8 tracking-[-0.01em] text-[#16222E]`
+                : `${index > 0 ? "mt-1.5 " : ""}block text-[15.5px] font-normal leading-7 text-[#5A6673]`}>
+                {action && <span aria-hidden className="mr-2 inline-block h-px w-4 align-middle bg-[#C9A62E]" />}
+                {line}
+              </span>
+            );
+          })}
         </h2>
       ) : (
         <h2 className="mt-1.5 break-keep text-[17px] font-bold leading-8 text-[#101B2B]">{context.situation}</h2>
@@ -526,6 +544,39 @@ function FeedbackBox({ verdict, feedback, action, highlights = [] }: {
   );
 }
 
+/**
+ * 확인 직후 맨 위에 두는 O/X 한 줄. 허용 범위 안의 판단이면 O다(대표 답과 한 칸 다른 인접 판단 포함).
+ * partial은 여러 표현을 한꺼번에 판단하는 문항에서 일부만 맞았을 때 쓴다.
+ */
+function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "partial"; title: string; children?: React.ReactNode }) {
+  const palette = tone === "ok"
+    ? { box: "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]", mark: "bg-[#245E44] text-white" }
+    : tone === "miss"
+      ? { box: "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]", mark: "bg-[#B5504A] text-white" }
+      : { box: "border-[#E6D49A] bg-[#FBF6E6] text-[#6B5414]", mark: "bg-[#C9A62E] text-white" };
+  return (
+    <div role="status" className={`rounded-xl border px-4 py-3 text-sm leading-6 ${palette.box}`}>
+      <p className="flex items-center gap-2.5 text-[16px] font-black">
+        <span aria-hidden className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${palette.mark}`}>
+          {tone === "miss" ? <X className="h-5 w-5" strokeWidth={3.5} /> : <Check className="h-5 w-5" strokeWidth={3.5} />}
+        </span>
+        <span><span className="sr-only">{tone === "ok" ? "O " : tone === "miss" ? "X " : "일부 "}</span>{title}</span>
+      </p>
+      {children && <div className="mt-2 pl-[42px]">{children}</div>}
+    </div>
+  );
+}
+
+/** 후보 문장 아래에 붙는 해설 — 문제집처럼 꼬리표·작은 글씨·구분선으로 문장과 층을 나눈다. */
+function NoteLine({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="mt-2 block border-t border-dashed border-[#DDD8CB] pt-2 text-[13.5px] font-normal leading-6 text-[#5D6980]">
+      <span className="mr-1.5 inline-block rounded bg-[#EEECE6] px-1.5 py-px align-[1px] text-[11px] font-black text-[#5D6980]">해설</span>
+      {children}
+    </span>
+  );
+}
+
 const DISSENT_CONDITIONS = [
   { code: "relationship", label: "관계·친밀도에 대한 다른 판단" },
   { code: "burden", label: "행위의 부담 크기에 대한 다른 판단" },
@@ -581,57 +632,72 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
 function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ScaleQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
   const [pick, setPick] = useState<string | null>(() => devAutofill || revealAnswers ? quest.referenceAnswer : null);
   const [answered, setAnswered] = useState(revealAnswers);
+  // 이유를 묻는 문항(MJT2)은 판정을 확정하면 곧바로 판정의 O/X를 보이고, 그 다음에 이유를 고른다.
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
-  const [reasonId, setReasonId] = useState<string | null>(null);
-  // Judgment made before reasons were shown. After choosing a reason the learner may change the current pick.
-  const [firstPick, setFirstPick] = useState<string | null>(null);
-  const reconsidering = Boolean(quest.reasonChoice && judgmentCommitted && !answered && reasonId);
+  const [reasonId, setReasonId] = useState<string | null>(() => revealAnswers ? quest.reasonChoice?.acceptedId ?? null : null);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
+  const judgmentShown = answered || (Boolean(quest.reasonChoice) && judgmentCommitted);
+  const judgmentOk = pick !== null && acceptedIds.includes(pick);
   // 대표 판정은 하나다. 같은 방향의 인접 응답도 허용 범위라는 사실은 **답한 뒤에만** 알린다
   // (답하기 전에 알리면 4점 판단 자체를 무력화한다).
   const referenceLabel = quest.options.find((option) => option.id === quest.referenceAnswer)?.label ?? "";
+  const pickLabel = quest.options.find((option) => option.id === pick)?.label ?? "";
   const alsoAcceptedLabels = quest.options
     .filter((option) => acceptedIds.includes(option.id) && option.id !== quest.referenceAnswer)
     .map((option) => option.label);
-  const scaleVerdict = `참고 답안: ${referenceLabel}`
-    + (alsoAcceptedLabels.length ? ` · ${alsoAcceptedLabels.join("·")}도 가능한 판단입니다.` : "");
+  const reasonAcceptedId = quest.reasonChoice?.acceptedId;
+  const reasonOk = reasonId !== null && reasonId === reasonAcceptedId;
+  const reasonLabel = (id: string | null | undefined) => quest.reasonChoice?.options.find(option => option.id === id)?.label;
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
         <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         <div className={optionGrid}>
-          {quest.options.filter(option => !quest.reasonChoice || !judgmentCommitted || answered || reconsidering || option.id === pick).map((option) => (
-            <OptionButton key={option.id} option={option} value={pick} disabled={answered || (judgmentCommitted && !reconsidering)} answered={answered} acceptedIds={acceptedIds} onSelect={setPick} />
+          {quest.options.map((option) => (
+            <OptionButton key={option.id} option={option} value={pick} disabled={judgmentShown} answered={judgmentShown} acceptedIds={acceptedIds} onSelect={setPick} />
           ))}
         </div>
-        {reconsidering && <p className="mt-2 break-keep text-xs leading-5 text-[#596579]">이유를 살펴본 뒤 생각이 달라졌다면 위에서 판단을 바꿀 수 있습니다.</p>}
-        {quest.reasonChoice && judgmentCommitted && !answered && <fieldset className="mt-4 border-t border-[#DDD8CB] pt-4">
+        {judgmentShown && <div className="mt-4">
+          <VerdictBanner tone={judgmentOk ? "ok" : "miss"} title={judgmentOk ? "알맞은 판단이에요" : "참고 답안과 달라요"}>
+            <p className="font-bold">
+              {judgmentOk && pick !== quest.referenceAnswer
+                ? `내 판단 · ${pickLabel} — 참고 답안(${referenceLabel})과 같은 방향이라 알맞은 판단으로 봅니다.`
+                : judgmentOk ? `참고 답안 · ${referenceLabel}` : `내 판단 · ${pickLabel} / 참고 답안 · ${referenceLabel}`}
+            </p>
+            {alsoAcceptedLabels.length > 0 && <p className="text-xs">{alsoAcceptedLabels.join("·")}도 가능한 판단입니다.</p>}
+          </VerdictBanner>
+        </div>}
+        {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
           <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
-            {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio onSelect={setReasonId} />)}
+            {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
+              answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
           </div>
+          {answered && reasonAcceptedId && <div className="mt-3">
+            <VerdictBanner tone={reasonOk ? "ok" : "miss"} title={reasonOk ? "이유도 맞았어요" : "참고 이유는 다른 것이에요"}>
+              {!reasonOk && <p className="font-bold">참고 이유 · {reasonLabel(reasonAcceptedId)}</p>}
+            </VerdictBanner>
+          </div>}
+          {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#596579]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
-        {answered && reasonId && <p className="mt-4 text-sm leading-6 text-[#596579]">
-          내 판단 이유 · {quest.reasonChoice?.options.find(option => option.id === reasonId)?.label}
-        </p>}
-        {answered && <div className="mt-4"><FeedbackBox verdict={scaleVerdict} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
+        {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
         {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
           <h4 className="font-bold">가능한 수정 예시</h4>
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
-          <p className="text-xs leading-5 text-[#697386]">원문의 뜻을 유지하며 부탁하는 방식은 여러 가지입니다. 이 두 문장만 정답이라는 뜻은 아닙니다.</p>
+          <p className="text-xs leading-5 text-[#697386]">원문의 뜻을 지키며 옮기는 방식은 여러 가지입니다. 이 문장만 정답이라는 뜻은 아닙니다.</p>
         </section>}
       </section>
-      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : undefined}>
+      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
-            if (!judgmentCommitted) { setFirstPick(pick); setJudgmentCommitted(true); }
+            if (!judgmentCommitted) setJudgmentCommitted(true);
             else setAnswered(true);
-          }}>{judgmentCommitted ? "판단과 이유 확인하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          }}>{judgmentCommitted ? "이유 확인하기" : pick ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "답안 확인하기" : "답을 선택해 주세요"}</Button>
         ) : (
-          <Button className="h-12 w-full" onClick={() => onDone({ pick: firstPick ?? pick, ...(reasonId ? { reasonId } : {}), ...(firstPick && pick !== firstPick ? { revisedPick: pick } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className="h-12 w-full" onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -719,11 +785,17 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                           </span>
                         )}
                       </span>
-                      {answered && <span className="mt-1.5 block break-keep text-[15px] font-normal leading-7">{correction.note}</span>}
+                      {answered && <NoteLine>{correction.note}</NoteLine>}
                     </button>
                   );
                 })}
               </div>
+              {answered && correctionId && (() => {
+                const pickedCorrection = quest.corrections.find(item => item.id === correctionId);
+                return pickedCorrection && <div className="mt-4">
+                  <VerdictBanner tone={pickedCorrection.valid ? "ok" : "miss"} title={pickedCorrection.valid ? "알맞게 고친 표현을 골랐어요" : "참고 답안은 다른 표현이에요"} />
+                </div>;
+              })()}
             </div>
           </div>
         )}
@@ -766,8 +838,12 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => setDraft(event.target.value)} />
         <p className="mt-2 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 답안을 확인합니다.</p>
       </div>
-      {submitted && <section className="mt-5 space-y-3" aria-label="화용 해설">
-        {paragraphs.map(line => <p key={line} className="text-[15px] leading-7"><RichLine text={line} /></p>)}
+      {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
+      {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
+        <h4 className="text-[13px] font-black text-[#5D6980]">해설</h4>
+        <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[14.5px] leading-7 text-[#3F4A59] marker:text-[#C9A62E]">
+          {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
+        </ul>
       </section>}
       {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
         <h4 className="font-bold">참고 답안</h4>
@@ -808,10 +884,15 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
   const [picks, setPicks] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
   const allPicked = quest.candidates.every(candidate => Boolean(picks[candidate.id]));
+  const matched = quest.candidates.filter(candidate => candidate.acceptedAnswers.includes(picks[candidate.id] ?? "")).length;
+  const total = quest.candidates.length;
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
       <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
       <h3 className="text-base font-bold">{quest.prompt}</h3>
+      {submitted && <div className="mt-4">
+        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 참고 답안과 같아요`} />
+      </div>}
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
         <p className={`${targetFont} text-[16.5px] leading-8`}>{candidate.text}</p>
@@ -827,10 +908,19 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
             </button>;
           })}
         </div>
-        {submitted && <div className="mt-3 border-t border-[#E4E0D5] pt-3">
-          <p className="text-sm font-bold text-[#245E44]">참고 답안 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
-          <p className="mt-1.5 break-keep text-[15px] leading-7 text-[#3F4A59]">{candidate.note}</p>
-        </div>}
+        {submitted && (() => {
+          const ok = candidate.acceptedAnswers.includes(picks[candidate.id] ?? "");
+          return <div className="mt-3">
+            <p className={`flex items-center gap-1.5 text-sm font-black ${ok ? "text-[#245E44]" : "text-[#8B3531]"}`}>
+              <span aria-hidden className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-white ${ok ? "bg-[#245E44]" : "bg-[#B5504A]"}`}>
+                {ok ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <X className="h-3.5 w-3.5" strokeWidth={3.5} />}
+              </span>
+              <span className="sr-only">{ok ? "O " : "X "}</span>
+              참고 답안 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
+            </p>
+            <NoteLine>{candidate.note}</NoteLine>
+          </div>;
+        })()}
       </fieldset>)}</div>
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/4개 표현의 위치를 골랐습니다.` : undefined}>

@@ -442,6 +442,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
           ...(item.id === 2 && item.reason_choice ? { reasonChoice: {
             prompt: item.reason_choice.prompt,
             options: item.reason_choice.options.map(reason => ({ id: reason.id, label: reason.text })),
+            ...(item.reason_choice.accepted_id ? { acceptedId: item.reason_choice.accepted_id } : {}),
           } } : {}) };
         case "fix_choice": return { ...base, kind: "fix_choice", target: item.target,
           // Compatibility properties are not displayed or persisted for v6.
