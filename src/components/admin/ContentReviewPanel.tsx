@@ -279,7 +279,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           ? <details className="rounded-lg border p-3"><summary className="cursor-pointer text-xs font-semibold">추가 모델 검토 선택 (필요할 때만)</summary><div className="mt-2">{body}</div></details>
           : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
         <h4 className="text-[14px] font-bold text-[#233542]">{experiential ? "③ 교수자 최종 승인" : "교수자 최종 승인"}</h4>
         {experiential && <p className="text-xs text-muted-foreground">감수를 마친 <b>이 버전</b>에 수업 사용·학습자 공개 자격을 부여하는 결정입니다. 내용을 다시 고치면 새 버전이 되어 점검과 승인을 다시 거칩니다.</p>}
         <p className="text-xs">현재 원본과 저장된 품질점검을 확인하세요. 중대 문제 항목·판단이 필요한 쟁점의 결정을 저장하고 수업 사용 근거를 남깁니다.</p>

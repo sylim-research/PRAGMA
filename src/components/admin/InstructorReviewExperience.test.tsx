@@ -163,4 +163,31 @@ describe("instructor experience", () => {
     await screen.findByRole("alert");
     expect(screen.getByText("저장하지 않은 감수 기록이 있습니다.")).toBeInTheDocument();
   });
+  it("moves to the next unchecked section after 확인, and stays on 수정 요청", async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
+    const current = () => screen.getByRole("navigation", { name: "감수할 장면과 문항" }).querySelector('[aria-current="step"] > span')!.textContent;
+    const first = current();
+    fireEvent.click(screen.getByRole("button", { name: "✓ 확인" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(current()).not.toBe(first));
+    const second = current();
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(current()).toBe(second);
+  });
+  it("checks every open section at once and leaves 수정 요청 untouched", async () => {
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: `남은 ${EXPERIENCE_SECTIONS.length - 1}개 모두 확인` }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    const saved = onSave.mock.calls[1][0];
+    expect(saved.decisions).toHaveLength(EXPERIENCE_SECTIONS.length);
+    expect(saved.decisions.filter((entry: { status: string }) => entry.status === "revision_required")).toEqual([
+      { section: EXPERIENCE_SECTIONS[0].id, status: "revision_required", note: "" },
+    ]);
+    expect(screen.queryByRole("button", { name: /모두 확인/ })).not.toBeInTheDocument();
+  });
 });
