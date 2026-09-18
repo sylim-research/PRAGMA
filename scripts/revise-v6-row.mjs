@@ -33,7 +33,8 @@ const { data: row, error: rowError } = await db.from("scenarios")
   .eq("scenario_id", scenarioId).single();
 if (rowError || !row) throw new Error(`행을 읽지 못함: ${rowError?.message}`);
 if (row.mission_status !== "generated") throw new Error(`승인 전 행만 고칠 수 있음 — 현재 ${row.mission_status}`);
-if (row.supersedes_scenario_id !== candidate.source_scenario_id) throw new Error("후보의 원본과 행의 supersedes가 다름");
+// 등록 스크립트와 같은 규칙: rework 행은 앞선 v6 행을, 아니면 v5 원본을 잇는다.
+if (row.supersedes_scenario_id !== (candidate.rework_of ?? candidate.source_scenario_id)) throw new Error("후보의 원본과 행의 supersedes가 다름");
 const before = row.mission_content?.provenance?.mission_content_hash ?? "";
 const after = candidate.mission_content.provenance.mission_content_hash;
 if (before === after) { console.log("내용 해시가 같아 저장할 것이 없음"); process.exit(0); }
