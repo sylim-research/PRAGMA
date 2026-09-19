@@ -18,7 +18,6 @@ import {
   SPEECH_ACT_UI,
   SPEECH_ACT_UI_EN,
   LEVEL,
-  HSK_REFERENCE_CEILING,
   CHANNEL_TO_MODE,
   PDR_POWER,
   PDR_DISTANCE,
@@ -1046,19 +1045,13 @@ const AdminGenerator = () => {
               </Field>
             </div>
 
-            {/* HSK는 숙달도 등가가 아니라 중국어 생성물의 누적 어휘 참고 상한이다. */}
-            <div className="mt-3 rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[11.5px] leading-relaxed text-[#5B5446]">
-              <span className="font-medium text-foreground">
-                중국어 어휘 참고 상한 · HSK 1–{HSK_REFERENCE_CEILING[form.level]}급 누적
-              </span>
-            </div>
           </div>
 
           {/* 7. 도메인 · 산업 · 직무 */}
           <div>
             <SectionTitle n={5} label="도메인 · 산업 · 직무" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
+              <div>
                 <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
                 <div className="mt-1.5 flex h-9 items-center gap-3">
                   {(Object.keys(DOMAIN) as Domain[]).map((d) => (
@@ -1088,10 +1081,23 @@ const AdminGenerator = () => {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">주제</label>
+                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
+                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
+                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
+                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
+                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {form.domain === "work" && (
                 <div>
                   <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    산업 분야 <span className="text-muted-foreground/70">· 직장만</span>
+                    산업 분야
                   </label>
                   <Select
                     value={form.industry}
@@ -1109,7 +1115,7 @@ const AdminGenerator = () => {
               {form.domain === "work" && (
                 <div>
                   <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    직무 기능 <span className="text-muted-foreground/70">· 직장만</span>
+                    직무 기능
                   </label>
                   <Select
                     value={form.func}
@@ -1126,26 +1132,6 @@ const AdminGenerator = () => {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* 7b. 주제(theme) — 편성 메타(코어 CHECK 필수) */}
-          <div>
-            <div className="text-[12.5px] font-semibold text-[#3F4E59]">주제</div>
-            {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
-                (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
-            <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
-              <SelectTrigger className="mt-1.5 h-9 text-[13px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
-                  <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="mt-1 text-[10.5px] text-muted-foreground">
-              현재 도메인({DOMAIN[form.domain]})에서 고를 수 있는 주제만 표시됩니다.
-            </p>
           </div>
 
           {/* 8. 개요 후보 수 */}
