@@ -440,9 +440,9 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
   return (
     // 좌 = 자료 입력(고정폭 썸네일·문구·출처·방향), 우 = 분석·후보. 입력 칼럼은
     // 스크롤해도 따라오게 sticky — 후보를 훑다가 원문을 고치는 왕복이 잦다.
-    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
       {/* ── LEFT: 자료 → 문구 확정 ── */}
-      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4 lg:col-span-5">
+      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
           <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
@@ -641,7 +641,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
       </section>
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
-      <section className="space-y-4 lg:col-span-7">
+      <section className="space-y-4">
         {!analysis && !history && (
           <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
@@ -727,7 +727,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                       <span className="block border-l-[3px] border-[#FAD338] pl-2.5 text-[12.5px] font-bold text-[#1d2336]">
                         ④ {title} · {items.length}개
                       </span>
-                      <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2.5">
                 {items.map(({ c, i }, k) => {
                   const spanFull = items.length % 2 === 1 && k === items.length - 1;
                   const ut = asUsageType(c.usage_type);

@@ -193,7 +193,7 @@ const AdminAuthentic = () => {
                       </div>
                     )}
 
-                    <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-2">
                       {row.candidates.map((c) => {
                         const status = STATUS_LABEL[c.status];
                         const cond = c.conditions;
