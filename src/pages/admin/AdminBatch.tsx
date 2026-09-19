@@ -367,16 +367,17 @@ const AdminBatch = () => {
               ) : <>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold">화행별</h3>
-                <div className="mt-2 flex flex-wrap gap-2">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
-                  <Badge key={key} variant="outline" className="gap-2 py-1 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
+                <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
+                  <h3 className="text-[12.5px] font-semibold">화행별</h3>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
+                    <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                </div>
               </div>
               </>}
             </section>
