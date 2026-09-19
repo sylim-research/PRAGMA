@@ -938,8 +938,9 @@ const AdminGenerator = () => {
           {/* 4. P-D-R 관계 조건 + 5. 예상 화용 부담도 */}
           <div className="rounded-md bg-[#FBEFD9]/40 border border-[#EAE4D2] p-3.5">
             <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
+            <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="Power (P) · 지위" tone="accent">
+              <Field label="지위 · P" tone="accent">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -952,7 +953,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Distance (D) · 거리" tone="accent">
+              <Field label="거리 · D" tone="accent">
                 <Select
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
@@ -965,7 +966,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Imposition (R) · 부담" tone="accent">
+              <Field label="부담 · R" tone="accent">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -1005,7 +1006,7 @@ const AdminGenerator = () => {
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
           <div>
-            <SectionTitle n={4} label="언어 · 학습 · 상황 조건" />
+            <SectionTitle n={4} label="언어 · 수준 · 채널" />
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="언어 방향">
                 <Select
@@ -1058,7 +1059,7 @@ const AdminGenerator = () => {
             <SectionTitle n={5} label="도메인 · 산업 · 직무" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="text-[12px] text-muted-foreground">도메인</label>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
                 <div className="mt-1.5 flex h-9 items-center gap-3">
                   {(Object.keys(DOMAIN) as Domain[]).map((d) => (
                     <label key={d} className="flex items-center gap-1.5 text-[13px] cursor-pointer">
@@ -1089,7 +1090,7 @@ const AdminGenerator = () => {
               </div>
               {form.domain === "work" && (
                 <div>
-                  <label className="text-[12px] text-muted-foreground">
+                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
                     산업 분야 <span className="text-muted-foreground/70">· 직장만</span>
                   </label>
                   <Select
@@ -1107,7 +1108,7 @@ const AdminGenerator = () => {
               )}
               {form.domain === "work" && (
                 <div>
-                  <label className="text-[12px] text-muted-foreground">
+                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
                     직무 기능 <span className="text-muted-foreground/70">· 직장만</span>
                   </label>
                   <Select
@@ -1131,7 +1132,7 @@ const AdminGenerator = () => {
 
           {/* 7b. 주제(theme) — 편성 메타(코어 CHECK 필수) */}
           <div>
-            <div className="text-[12px] font-medium text-muted-foreground">주제</div>
+            <div className="text-[12.5px] font-semibold text-[#3F4E59]">주제</div>
             {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
                 (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
             <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
@@ -1537,8 +1538,8 @@ const Field = ({
   <div>
     <label
       className={[
-        "text-[12px] font-medium",
-        tone === "accent" ? "text-[#7A4A0A]" : "text-muted-foreground",
+        "text-[12.5px] font-semibold",
+        tone === "accent" ? "text-[#7A4A0A]" : "text-[#3F4E59]",
       ].join(" ")}
     >
       {label}
@@ -1560,22 +1561,18 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-1.5 text-[12px] font-medium",
-      tone === "accent" ? "text-[#7A4A0A]" : "text-muted-foreground",
+      "flex items-center gap-2 text-[14.5px] font-bold text-[#15202B]",
     ].join(" ")}
   >
     <span
       className={[
-        "inline-flex h-[18px] w-[18px] items-center justify-center rounded-full text-[10.5px] font-semibold",
-        tone === "accent"
-          ? "bg-background text-[#7A4A0A]"
-          : "bg-[#FBEFD9] text-[#7A4A0A]",
+        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12px] font-bold text-[#15202B]",
       ].join(" ")}
     >
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="text-[#7A4A0A] font-normal">· {accent}</span>}
+    {accent && <span className="rounded-full bg-[#FBEFD9] px-2 py-0.5 text-[11px] font-semibold text-[#7A4A0A]">{accent}</span>}
   </h3>
 );
 
