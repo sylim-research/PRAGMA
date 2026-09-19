@@ -739,7 +739,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
-        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
+        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
+          <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
+        </span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
         {facet("과제", MODE_LABEL[mode])}
