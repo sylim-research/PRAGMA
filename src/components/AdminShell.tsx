@@ -45,7 +45,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[1px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-muted text-foreground font-normal"
         : "text-foreground font-normal hover:bg-muted hover:text-foreground",
@@ -88,7 +88,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
               // ml-3은 대시보드 링크와 같은 값이다 — 하위 항목의 세로선이 「운영 대시보드」 상자
               // 왼쪽 테두리와 맞아 1~4번 묶음이 그 아래에 종속돼 보인다.
               return (
-                <div key={group.header} className="ml-3 mt-1.5 flex flex-col">
+                <div key={group.header} className="ml-3 mt-2 flex flex-col">
                   <button
                     type="button"
                     aria-expanded={expanded}
