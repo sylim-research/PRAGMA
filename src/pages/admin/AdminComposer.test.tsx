@@ -49,7 +49,9 @@ beforeEach(() => {
 afterEach(cleanup);
 
 const show = (path = "/admin/composer") => render(<MemoryRouter initialEntries={[path]}><AdminComposer /></MemoryRouter>);
-const courseSelect = () => screen.getByRole("combobox", { name: "교과목 선택" });
+/** 선택된 교과목 카드의 id. 선택된 카드가 없으면 "". */
+const selectedCourseId = () =>
+  screen.queryAllByRole("radio").find((card) => card.getAttribute("aria-checked") === "true")?.getAttribute("data-course-id") ?? "";
 const openSettings = async () => {
   const button = screen.getByRole("button", { name: /교과목 설정/ });
   await waitFor(() => expect(button).toBeEnabled());
@@ -60,34 +62,34 @@ const openSettings = async () => {
 describe("course planning selection", () => {
   it("selects a course automatically when courses exist and none is chosen", async () => {
     show();
-    await waitFor(() => expect(courseSelect()).toHaveValue(draft.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(draft.id));
     expect(screen.queryByText(/아직 교과목이 없습니다/)).not.toBeInTheDocument();
   });
 
   it("keeps the course given in the URL over the remembered and first course", async () => {
     window.localStorage.setItem("pragma.admin.composer.lastOutline", draft.id);
     show(`/admin/composer?outline=${published.id}`);
-    await waitFor(() => expect(courseSelect()).toHaveValue(published.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(published.id));
   });
 
   it("reopens the course last opened in this browser when the URL has none", async () => {
     window.localStorage.setItem("pragma.admin.composer.lastOutline", published.id);
     show();
-    await waitFor(() => expect(courseSelect()).toHaveValue(published.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(published.id));
   });
 
   it("shows the empty state only when there is no course", async () => {
     mocks.outlines.mockResolvedValue([]);
     show();
     expect(await screen.findByText(/아직 교과목이 없습니다/)).toBeInTheDocument();
-    expect(courseSelect()).toHaveValue("");
+    expect(selectedCourseId()).toBe("");
   });
 });
 
 describe("course planning danger actions", () => {
   it("keeps delete out of the save actions and inside the settings danger section", async () => {
     show();
-    await waitFor(() => expect(courseSelect()).toHaveValue(draft.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(draft.id));
     const save = screen.getByRole("button", { name: "편성 저장" });
     expect(screen.queryByRole("menuitem", { name: /교과목 삭제/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /교과목 삭제/ })).not.toBeInTheDocument();
@@ -100,7 +102,7 @@ describe("course planning danger actions", () => {
 
   it("disables delete for a published course and offers unpublish with the same confirmation", async () => {
     show(`/admin/composer?outline=${published.id}`);
-    await waitFor(() => expect(courseSelect()).toHaveValue(published.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(published.id));
     const menu = await openSettings();
     expect(within(menu).getByRole("menuitem", { name: /교과목 삭제/ })).toBeDisabled();
 
@@ -114,7 +116,7 @@ describe("course planning danger actions", () => {
 
   it("deletes a draft course only after the confirmation", async () => {
     show();
-    await waitFor(() => expect(courseSelect()).toHaveValue(draft.id));
+    await waitFor(() => expect(selectedCourseId()).toBe(draft.id));
     const menu = await openSettings();
     fireEvent.click(within(menu).getByRole("menuitem", { name: /교과목 삭제/ }));
     const dialog = await screen.findByRole("alertdialog");
