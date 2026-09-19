@@ -176,22 +176,27 @@ const Page = () => {
     const learners = (data ?? []) as LearnerRow[];
     setRows(learners);
     if (learners.length === 0) return;
-    const [{ data: logs }, { data: courses }] = await Promise.all([
-      supabase
-        .from("learner_mission_logs")
-        .select("profile_id, course_id, updated_at")
-        .in("profile_id", learners.map((learner) => learner.id)),
-      supabase.from("curriculum_outlines").select("id, title"),
-    ]);
-    const titleById = new Map((courses ?? []).map((course) => [course.id, courseDisplayTitle(course)]));
-    const next: Record<string, LearnerActivity> = {};
-    for (const log of logs ?? []) {
-      const entry = (next[log.profile_id] ??= { courses: [], last: null });
-      const title = log.course_id ? titleById.get(log.course_id) : undefined;
-      if (title && !entry.courses.includes(title)) entry.courses.push(title);
-      if (!entry.last || log.updated_at > entry.last) entry.last = log.updated_at;
+    // 활동 요약은 보조 정보다 — 조회가 실패해도 학습자 목록은 그대로 보인다.
+    try {
+      const [{ data: logs }, { data: courses }] = await Promise.all([
+        supabase
+          .from("learner_mission_logs")
+          .select("profile_id, course_id, updated_at")
+          .in("profile_id", learners.map((learner) => learner.id)),
+        supabase.from("curriculum_outlines").select("id, title"),
+      ]);
+      const titleById = new Map((courses ?? []).map((course) => [course.id, courseDisplayTitle(course)]));
+      const next: Record<string, LearnerActivity> = {};
+      for (const log of logs ?? []) {
+        const entry = (next[log.profile_id] ??= { courses: [], last: null });
+        const title = log.course_id ? titleById.get(log.course_id) : undefined;
+        if (title && !entry.courses.includes(title)) entry.courses.push(title);
+        if (!entry.last || log.updated_at > entry.last) entry.last = log.updated_at;
+      }
+      setActivity(next);
+    } catch {
+      setActivity({});
     }
-    setActivity(next);
   };
 
   useEffect(() => {

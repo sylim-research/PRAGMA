@@ -11,6 +11,9 @@ vi.mock("@/integrations/supabase/client", () => ({
     from: () => ({
       select: () => ({
         eq: () => ({ order: mocks.order }),
+        // 학습한 교과목·최근 활동 조회(learner_mission_logs·curriculum_outlines)
+        in: () => Promise.resolve({ data: [], error: null }),
+        then: (resolve: (value: { data: unknown[]; error: null }) => unknown) => resolve({ data: [], error: null }),
       }),
     }),
   },
