@@ -97,6 +97,15 @@ export function adminNavItemIsActive(item: AdminNavItem, pathname: string) {
   return item.to === pathname || item.activePaths?.includes(pathname) === true;
 }
 
+// 관리자 화면 폭 기준 2개: 시나리오·검토 내용이 빽빽한 2·3번 묶음만 넓은 본문(1,200px), 나머지는 1,040px.
+const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS.slice(1, 3)
+  .flatMap((group) => group.items)
+  .flatMap((item) => [item.to, ...(item.activePaths ?? [])]);
+
+export function adminUsesWideCanvas(pathname: string) {
+  return WIDE_CANVAS_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 export function adminMobileNavValue(pathname: string) {
   const active = ADMIN_NAV_GROUPS.flatMap((group) => group.items)
     .find((item) => adminNavItemIsActive(item, pathname));

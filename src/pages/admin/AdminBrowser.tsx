@@ -270,7 +270,7 @@ const AdminBrowser = () => {
       title="학습 미션 라이브러리"
       description="수업에 쓸 수 있는 학습 미션을 화행·수준별로 봅니다."
     >
-      <div className="max-w-[1080px]">
+      <div className="w-full">
         {/* ── 요약 ── */}
         <section className="rounded-xl border border-[#E2DED2] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
           <div className="mb-4 flex flex-wrap gap-2" aria-label="라이브러리 보기">

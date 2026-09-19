@@ -1,20 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DOMAIN, LEVEL, MODE_LABEL, PDR_BURDEN, PDR_DISTANCE, PDR_POWER, SPEECH_ACT_UI } from "@/lib/pragma/enums";
 import { getScenarioTopic } from "@/lib/pragma/scenarioTopics";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 // 짧은 범주 칸은 고르게 나누고 주제가 나머지를 쓴다 — 글자가 왼쪽에 몰리지 않게.
 const COLUMN_WIDTHS = ["5%", "5%", "8%", "8%", "8%", "8%", "10%", "8%", "8%", "32%"];
 
-export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: {
+export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, footer }: {
   plan: BatchCell[];
   selected: readonly number[];
   disabled: boolean;
   onSelect: (indexes: number[]) => void;
   actions?: React.ReactNode;
+  /** 표 아래 실행 영역(생성 시작 버튼·진행 상황). 항목을 고른 자리에서 바로 실행한다. */
+  footer?: React.ReactNode;
 }) {
   const [page, setPage] = useState(0);
   useEffect(() => setPage(0), [plan]);
@@ -25,24 +27,28 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
   const toggle = (index: number) => onSelect(selected.includes(index)
     ? selected.filter(value => value !== index)
     : [...selected, index].sort((a, b) => a - b));
+  const pageSelectedCount = indexes.filter(index => selected.includes(index)).length;
+  const pageAllSelected = indexes.length > 0 && pageSelectedCount === indexes.length;
+  const pageCheckRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (pageCheckRef.current) pageCheckRef.current.indeterminate = pageSelectedCount > 0 && !pageAllSelected;
+  }, [pageSelectedCount, pageAllSelected]);
 
   return <section aria-labelledby="batch-items-heading" className="rounded-xl border bg-white p-5">
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 id="batch-items-heading" className="font-bold">생성 항목 확인·선택</h2>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant="outline" disabled={disabled || !indexes.length}
-          onClick={() => onSelect([...new Set([...selected, ...indexes])].sort((a, b) => a - b))}>이 페이지 선택</Button>
-        <Button size="sm" variant="outline" disabled={disabled || !selected.length} onClick={() => onSelect([])}>선택 해제</Button>
-      </div>
-    </div>
+    <h2 id="batch-items-heading" className="flex items-center gap-2 text-lg font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">3</span>생성 항목 확인·실행</h2>
     {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
       <table className="w-full min-w-[820px] table-fixed text-[13px]">
         <colgroup>{COLUMN_WIDTHS.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
-          <tr>{["선택", "번호", "화행", "수준", "과업", "도메인", "지위", "거리", "부담"].map(label =>
+          <tr><th className="px-2 py-2 text-center font-semibold">
+            {/* 머리 칸 체크박스: 누르면 이 페이지 전체 선택, 다시 누르면 이 페이지 전체 해제. 일부만 골랐으면 반쯤 찬 표시. */}
+            <input ref={pageCheckRef} type="checkbox" aria-label="이 페이지 전체 선택" className="h-4 w-4 align-middle accent-[#15202B]"
+              checked={pageAllSelected} disabled={disabled || !indexes.length}
+              onChange={() => onSelect(pageAllSelected
+                ? selected.filter(value => !indexes.includes(value))
+                : [...new Set([...selected, ...indexes])].sort((a, b) => a - b))} />
+          </th>{["번호", "화행", "수준", "과업", "도메인", "지위", "거리", "부담"].map(label =>
             <th key={label} className="px-2 py-2 text-center font-semibold">{label}</th>)}<th className="px-3 py-2 text-left font-semibold">주제</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
@@ -72,5 +78,6 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
         <Button size="sm" variant="outline" disabled={currentPage >= pages - 1} onClick={() => setPage(currentPage + 1)}>다음 항목</Button>
       </div>
     </div>
+    {footer && <div className="mt-4 border-t pt-4">{footer}</div>}
   </section>;
 }

@@ -2750,7 +2750,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <LocalPilotContext.Provider value={localPilot}>
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <CanonicalMissionContext.Provider value={mission}>
-    <LearnerJourneyShell missionLayout headerRight={<span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>}>
+    <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>}>
       {isDevPreview && (
         <DevPreviewToolbar
           sceneIntroConfig={sceneIntroConfig}
@@ -2939,7 +2939,7 @@ const CanonicalMissionRun = ({
 
   if (courseLocation.ok === false) {
     return (
-      <LearnerJourneyShell missionLayout>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">교과목 수행 경로를 확인해 주세요</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">{courseLocation.error}</p>
@@ -2953,7 +2953,7 @@ const CanonicalMissionRun = ({
 
   if (scenarioId && fallbackToLegacy) {
     return (
-      <LearnerJourneyShell missionLayout>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">대표 미션을 열지 못했습니다</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">현행 MJT5+DCT1 실행 계약을 지원하는 대표 미션을 다시 지정해 주세요.</p>
@@ -2965,7 +2965,7 @@ const CanonicalMissionRun = ({
 
   if (loading) {
     return (
-      <LearnerJourneyShell missionLayout>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <div className="mx-auto flex max-w-3xl items-center justify-center gap-3 rounded-2xl border border-[#DED9CD] bg-white px-6 py-12 text-sm font-bold text-[#5B6678]">
           <LoaderCircle className="h-5 w-5 animate-spin" /> 실제 미션을 불러오고 있습니다.
         </div>
@@ -2975,7 +2975,7 @@ const CanonicalMissionRun = ({
 
   if (error) {
     return (
-      <LearnerJourneyShell missionLayout>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">미션을 열지 못했습니다</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">{error}</p>

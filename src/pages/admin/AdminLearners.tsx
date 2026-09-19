@@ -102,25 +102,6 @@ const Section = ({
 );
 
 /** 소속/신분·동의는 신·구 컬럼이 공존한다 — 마법사가 쓰는 쪽을 우선하고 없으면 구 값. */
-/** 목록용 동의 요약 한 칸. 둘 다 동의면 초록, 미동의가 있으면 적색, 그 밖에는 호박색(회색 금지). */
-function ConsentSummary({ research, sharing }: { research: boolean | null | undefined; sharing: boolean | null | undefined }) {
-  const word = (value: boolean | null | undefined) => (value === true ? "✓" : value === false ? "✕" : "?");
-  const tone = research === true && sharing === true
-    ? "border-[#9CC7B0] bg-[#F4FAF6] text-[#245E44]"
-    : research === false || sharing === false
-      ? "border-[#E8B4AE] bg-[#FFF3F1] text-[#8B3531]"
-      : "border-[#E3C77A] bg-[#FFFBEF] text-[#8A5A14]";
-  const state = (value: boolean | null | undefined) => (value === true ? "동의" : value === false ? "미동의" : "미확인");
-  return (
-    <span
-      title={`연구 활용 ${state(research)} · 학습 기록 공유 ${state(sharing)}`}
-      className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] font-semibold ${tone}`}
-    >
-      연구 {word(research)} · 공유 {word(sharing)}
-    </span>
-  );
-}
-
 /** 표 머리글과 칸이 같은 좌우 여백·정렬을 쓰도록 한곳에서 정한다. */
 const TH = "h-11 px-3 text-left align-middle text-xs font-bold text-[#46515A]";
 const TD = "px-3 py-2 align-middle text-sm text-[#343B42]";
@@ -242,17 +223,16 @@ const Page = () => {
         {rows === null ? "불러오는 중…" : `총 ${rows.length}명`}
       </div>
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
-        <Table className="min-w-[1180px] table-fixed">
+        <Table className="min-w-[920px] table-fixed">
           <colgroup>
             <col style={{ width: "21%" }} />
-            <col style={{ width: "13%" }} />
-            <col style={{ width: "8%" }} />
-            <col style={{ width: "8%" }} />
-            <col style={{ width: "15%" }} />
-            <col style={{ width: "8%" }} />
-            <col style={{ width: "10%" }} />
-            <col style={{ width: "8%" }} />
+            <col style={{ width: "14%" }} />
             <col style={{ width: "9%" }} />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "17%" }} />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "12%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
@@ -262,7 +242,6 @@ const Page = () => {
               <TableHead className={TH}>공인 급수</TableHead>
               <TableHead className={TH}>학습한 교과목</TableHead>
               <TableHead className={TH}>최근 활동</TableHead>
-              <TableHead className={TH}>연구 동의</TableHead>
               <TableHead className={TH}>상태</TableHead>
               <TableHead className={`${TH} pr-5 text-right`}>관리</TableHead>
             </TableRow>
@@ -270,13 +249,13 @@ const Page = () => {
           <TableBody>
             {rows === null ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-sm text-muted-foreground">
                   불러오는 중…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-sm text-muted-foreground">
                   표시할 학습자가 없습니다.
                 </TableCell>
               </TableRow>
@@ -326,9 +305,6 @@ const Page = () => {
                   </TableCell>
                   <TableCell className={`${TD} tabular-nums`}>
                     {act?.last ? formatActivityDate(act.last) : <span className="text-xs text-amber-700">—</span>}
-                  </TableCell>
-                  <TableCell className={TD}>
-                    <ConsentSummary research={firstOf(r.consent_data_use, r.research_use_consent)} sharing={r.consent_class_record_sharing} />
                   </TableCell>
                   <TableCell className={TD}>
                     <Badge

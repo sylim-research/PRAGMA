@@ -342,11 +342,18 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
+              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
                 <PlanMetric label="통역" value={summary.interpreting} />
                 <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
+                {summary.total > 0 && <>
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
+                    description="화행 × 수준 × 번역/통역" />
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                    description="화행 × P × D × R" />
+                </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
@@ -358,36 +365,27 @@ const AdminBatch = () => {
                   <p className="text-sm font-medium text-[#3F4E59]">① 에서 건수를 정하면 화행·관계 분포가 여기에 채워집니다.</p>
                 </div>
               ) : <>
-              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description="화행 × 수준 × 번역/통역" />
-                <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                  description="화행 × P × D × R" />
-              </div>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
-              </div>
-              <div className="mt-4">
-                <h3 className="text-sm font-semibold">화행별</h3>
-                <div className="mt-2 flex flex-wrap gap-2">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
-                  <Badge key={key} variant="outline" className="gap-2 py-1 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
+                <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
+                  <h3 className="text-[12.5px] font-semibold">화행별</h3>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
+                    <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                </div>
               </div>
               </>}
             </section>
-            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
-          </div>
-
-          <section id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
-                <p className="mt-1 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-              </div>
+            {/* 생성 실행은 따로 단계를 두지 않는다 — 항목을 고른 표 바로 아래에서 시작한다. */}
+            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} footer={
+          <div id="batch-execution" aria-label="생성 실행" className="scroll-mt-20">
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <p className="text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={selectedPlan.indexes.length > 0 ? () => startSelected("current") : start} disabled={busy || plan.length === 0}>
                   <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
@@ -407,7 +405,8 @@ const AdminBatch = () => {
                 <div><dt className="text-muted-foreground">실패</dt><dd className="mt-1 font-bold">{failCount}건</dd></div>
               </dl>
             </div>}
-          </section>
+          </div>} />
+          </div>
         </div>
 
         {failures.length > 0 && <section aria-label="배치 생성 실패" className="rounded-xl border border-red-200 bg-red-50 p-5">

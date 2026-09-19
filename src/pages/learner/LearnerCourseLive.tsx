@@ -3,7 +3,6 @@ import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowRight, ChevronDown } from "lucide-react";
 
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
 import { MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
 import { isReinforcementWeek, weekActivityLabel } from "@/lib/curriculum/weekGuidance";
@@ -74,7 +73,7 @@ const LearnerCourseLive = () => {
   }
 
   return (
-    <LearnerJourneyShell>
+    <LearnerJourneyShell nav>
       <main className="pb-24">
         {loading ? (
           <p className="mt-6 text-[13px] text-muted-foreground">강좌를 불러오는 중…</p>
@@ -189,7 +188,6 @@ const LearnerCourseLive = () => {
           </>
         )}
       </main>
-      <LearnerBottomNav />
     </LearnerJourneyShell>
   );
 };

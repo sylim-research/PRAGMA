@@ -704,7 +704,7 @@ const AdminComposer = () => {
       description="주차별 주제를 정하고 승인된 미션을 배치합니다."
       compact
     >
-      <div className="w-full max-w-[1200px]">
+      <div className="w-full">
       {libraryScenarioId && <section aria-label="라이브러리에서 선택한 미션" className="mb-4 rounded-xl border border-[#D6BC40] bg-[#FFFBEA] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-[15px] font-semibold">라이브러리에서 선택한 미션</h2>

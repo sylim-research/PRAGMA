@@ -14,7 +14,6 @@ import {
   Target,
 } from "lucide-react";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import {
   Dialog,
   DialogContent,
@@ -251,8 +250,7 @@ const LearnerRecords = () => {
 
   if (recordsError || remoteRecords === null) {
     return (
-      <LearnerJourneyShell
-        missionLayout
+      <LearnerJourneyShell nav
         headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
       >
         <div className="pb-24">
@@ -268,14 +266,12 @@ const LearnerRecords = () => {
             )}
           </div>
         </div>
-        <LearnerBottomNav />
       </LearnerJourneyShell>
     );
   }
 
   return (
-    <LearnerJourneyShell
-      missionLayout
+    <LearnerJourneyShell nav
       headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
     >
       <div className="pb-24">
@@ -480,7 +476,6 @@ const LearnerRecords = () => {
           )}
         </section>
       </div>
-      <LearnerBottomNav />
     </LearnerJourneyShell>
   );
 };

@@ -7,13 +7,16 @@ import { NavLink } from "react-router-dom";
 // 홈에 남은 것이 다른 탭으로 가는 우회 링크뿐이었고, 홈의 이월 조언은 이번 주 화행과
 // 무관한 지난 화행을 나란히 보여 오히려 오해를 만들었다. 이월은 관련 미션 직전에서
 // 회수한다(latestFocusCarryOver는 그 용도로 남겨 둔다).
+//
+// 같은 두 탭을 PC에서는 헤더 안(LearnerTopNav)에, 모바일에서는 화면 아래(LearnerBottomNav)에 둔다(2026-09-19).
+// 하단 탭바는 모바일 관례라 PC 화면에서는 빈 공간만 강조했다.
 const TABS = [
   { to: "/learner/course", label: "수업", icon: BookOpen },
   { to: "/learner/records", label: "기록", icon: History },
 ];
 
 export const LearnerBottomNav = () => (
-  <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-[#EAE4D2] bg-white/95 backdrop-blur">
+  <nav aria-label="학습자 메뉴" className="fixed inset-x-0 bottom-0 z-50 border-t border-[#EAE4D2] bg-white/95 backdrop-blur md:hidden">
     <div className="mx-auto flex max-w-3xl">
       {TABS.map((t) => (
         <NavLink
@@ -42,5 +45,26 @@ export const LearnerBottomNav = () => (
         </NavLink>
       ))}
     </div>
+  </nav>
+);
+
+/** PC 헤더 안의 같은 두 탭. 현재 탭은 노란 밑줄로 표시한다. */
+export const LearnerTopNav = () => (
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
+    {TABS.map((t) => (
+      <NavLink
+        key={t.to}
+        to={t.to}
+        className={({ isActive }) =>
+          [
+            "flex items-center gap-1.5 border-b-2 px-3 py-1.5 text-[14px] font-bold transition-colors",
+            isActive ? "border-[#FAD338] text-white" : "border-transparent text-[#B9C4CE] hover:text-white",
+          ].join(" ")
+        }
+      >
+        <t.icon className="h-4 w-4" aria-hidden />
+        {t.label}
+      </NavLink>
+    ))}
   </nav>
 );

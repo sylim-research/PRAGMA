@@ -151,6 +151,8 @@
 
   html {
     font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    /* 스크롤바 자리를 항상 비워 두어, 짧은 화면과 긴 화면을 오갈 때 헤더·본문이 좌우로 흔들리지 않게 한다. */
+    scrollbar-gutter: stable;
   }
 
   body {
