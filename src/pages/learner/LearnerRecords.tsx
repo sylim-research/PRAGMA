@@ -150,10 +150,10 @@ function SourceText({ text, className = "" }: { text: string; className?: string
   return (
     <div className={`break-words text-[#4F6070] ${className}`}>
       <p className={long && !open ? "line-clamp-2" : ""}>
-        <span className="mr-2 text-[11.5px] font-semibold">원문</span>{text}
+        <span className="mr-2 text-[12.5px] font-semibold">원문</span>{text}
       </p>
       {long && (
-        <button type="button" onClick={() => setOpen((v) => !v)} className="mt-0.5 text-[11.5px] font-semibold text-[#344F63] hover:underline">
+        <button type="button" onClick={() => setOpen((v) => !v)} className="mt-0.5 text-[12.5px] font-semibold text-[#344F63] hover:underline">
           {open ? "접기" : "펼치기"}
         </button>
       )}
@@ -277,12 +277,12 @@ const LearnerRecords = () => {
           ].map(([value, label]) => (
             <div key={label} className="px-5 py-4">
               <div className="text-[23px] font-bold leading-none text-[#15202B]">{value}</div>
-              <div className="mt-2 text-[12.5px] font-medium text-muted-foreground">{label}</div>
+              <div className="mt-2 text-[13.5px] font-medium text-muted-foreground">{label}</div>
             </div>
           ))}
         </section>
         {!usingLocalPreview && excludedCount > 0 && (
-          <p className="mt-2 text-[11.5px] text-muted-foreground">
+          <p className="mt-2 text-[12.5px] text-muted-foreground">
             미션·화행 연결을 확인할 수 없는 이전 시험 기록 {excludedCount}건은 집계에서 제외했습니다.
           </p>
         )}
@@ -302,7 +302,7 @@ const LearnerRecords = () => {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h2 className="text-[19px] font-bold">9개 화행 학습 지도</h2>
-              <p className="mt-1 text-[12.5px] text-[#4F6070]">화행을 누르면 아래에서 내 기록을 볼 수 있습니다.</p>
+              <p className="mt-1 text-[13.5px] text-[#4F6070]">화행을 누르면 아래에서 내 기록을 볼 수 있습니다.</p>
             </div>
             <span className="text-[12.5px] font-medium text-muted-foreground">{actsCovered.size}/9 화행 수행</span>
           </div>
@@ -332,26 +332,26 @@ const LearnerRecords = () => {
                     ].join(" ")}
                     aria-hidden
                   />
-                  <span className="block pr-5 text-[16px] font-bold text-[#15202B]">{SPEECH_ACT_UI[act]}</span>
-                  <span className="mt-2 block text-[12px] text-[#4F6070]">
+                  <span className="block pr-5 text-[17px] font-bold text-[#15202B]">{SPEECH_ACT_UI[act]}</span>
+                  <span className="mt-2 block text-[13.5px] text-[#4F6070]">
                     {count ? `${count}건 완료` : "아직 기록 없음"}
                   </span>
                 </button>
               );
             })}
           </div>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px] text-[#4F6070]">
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[12.5px] text-[#4F6070]">
             <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#344F63]" aria-hidden />완료 기록 있음</span>
             <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full border border-[#B9A77A]" aria-hidden />아직 기록 없음</span>
           </div>
         </section>
 
         <section ref={reviewRef} className={`${panel} mt-5 scroll-mt-24 p-5 sm:p-6`} aria-live="polite" aria-label="선택한 화행 돌아보기">
-          <p className="text-[12px] font-semibold text-[#857653]">선택한 화행 돌아보기</p>
+          <p className="text-[13px] font-semibold text-[#857653]">선택한 화행 돌아보기</p>
           <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
             <h2 className="text-[22px] font-bold">{actLabel}</h2>
             {selectedRecords.length > 0 && (
-              <p className="text-[13px] text-[#4F6070]">
+              <p className="text-[14.5px] text-[#4F6070]">
                 완료 {selectedRecords.length}건 · 고쳐 쓴 기록 {selectedRevisions}건 · 번역 {selectedRecords.filter((r) => r.taskType === "translation").length} · 통역 {selectedRecords.filter((r) => r.taskType === "interpreting").length}
               </p>
             )}
@@ -361,21 +361,21 @@ const LearnerRecords = () => {
           ) : (
             <ol className="mt-4 space-y-3" aria-label={`${actLabel} 완료 기록`}>
               {selectedRecords.map((record) => (
-                <li key={record.id} className="rounded-xl bg-[#F7F5EE] px-4 py-3 text-[13px]">
-                  <p className="text-[11.5px] font-semibold text-[#5C6A7A]">{recordMeta(record)}</p>
-                  <SourceText text={record.sourceText} className="mt-1.5" />
-                  <p className="mt-1.5 break-words font-zh leading-relaxed"><span className="mr-2 font-sans text-[11.5px] font-semibold text-[#5C6A7A]">처음</span>{record.firstResponse || "기록 없음"}</p>
-                  <p className="mt-1 break-words font-zh leading-relaxed">
-                    <span className="mr-2 font-sans text-[11.5px] font-semibold text-[#5C6A7A]">최종</span>
-                    {changed(record) ? record.revisedResponse : <span className="font-sans text-[#5C6A7A]">처음 표현을 그대로 유지</span>}
+                <li key={record.id} className="rounded-xl bg-[#F7F5EE] px-5 py-4 text-[15px] leading-relaxed">
+                  <p className="text-[13px] font-semibold text-[#5C6A7A]">{recordMeta(record)}</p>
+                  <SourceText text={record.sourceText} className="mt-2" />
+                  <p className="mt-2.5 break-words font-zh text-[18px] leading-[1.75] text-[#15202B]"><span className="mr-2 font-sans text-[12.5px] font-semibold text-[#5C6A7A]">처음</span>{record.firstResponse || "기록 없음"}</p>
+                  <p className="mt-1.5 break-words font-zh text-[18px] leading-[1.75] text-[#15202B]">
+                    <span className="mr-2 font-sans text-[12.5px] font-semibold text-[#5C6A7A]">최종</span>
+                    {changed(record) ? record.revisedResponse : <span className="font-sans text-[15px] text-[#5C6A7A]">처음 표현을 그대로 유지</span>}
                   </p>
                 </li>
               ))}
             </ol>
           )}
           <div className="mt-4 rounded-xl border border-[#E4DFD0] px-4 py-3">
-            <p className="text-[12px] font-semibold text-[#5C6A7A]">회고 질문 · 모든 학습자에게 같은 질문입니다 — 위 기록을 보며 답해 보세요</p>
-            <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-[#26323D]">
+            <p className="text-[13px] font-semibold text-[#5C6A7A]">회고 질문 · 모든 학습자에게 같은 질문입니다 — 위 기록을 보며 답해 보세요</p>
+            <ul className="mt-2 space-y-2 text-[15.5px] leading-relaxed text-[#26323D]">
               <li>· 최종 표현에서도 원문의 의미와 {actLabel}의 목적이 유지되었나요?</li>
               <li>· 표현을 그대로 유지하거나 바꾼 이유는 무엇인가요? <span className="text-[#5C6A7A]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
             </ul>
@@ -388,7 +388,7 @@ const LearnerRecords = () => {
             {revisions.length > 0 && (
               <Dialog>
                 <DialogTrigger asChild>
-                  <button type="button" className="text-[12px] font-semibold text-[#4F6070] hover:underline">전체 수정 노트 →</button>
+                  <button type="button" className="text-[13.5px] font-semibold text-[#4F6070] hover:underline">전체 수정 노트 →</button>
                 </DialogTrigger>
                 <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto bg-[#FAF8F2]">
                   <DialogHeader>
@@ -398,12 +398,12 @@ const LearnerRecords = () => {
                   <div className="space-y-3">
                     {revisions.map((record) => (
                       <article key={record.id} className="rounded-xl border border-[#E4DFD0] bg-white p-4">
-                        <p className="text-[11px] font-semibold text-muted-foreground">{recordMeta(record)}</p>
-                        <SourceText text={record.sourceText} className="mb-3 mt-1 text-[12px]" />
-                        <div className="grid gap-3 text-[12px] md:grid-cols-3">
-                          <div><strong className="text-[11px] text-muted-foreground">최초 표현</strong><p className="mt-1 break-words font-zh leading-relaxed">{record.firstResponse || "기록 없음"}</p></div>
-                          <div><strong className="text-[11px] text-muted-foreground">재검토 지점</strong><p className="mt-1 leading-relaxed">{scopeLabel(record)}</p></div>
-                          <div><strong className="text-[11px] text-muted-foreground">최종 선택</strong><p className="mt-1 break-words font-zh leading-relaxed">{record.revisedResponse || "기록 없음"}</p></div>
+                        <p className="text-[12.5px] font-semibold text-muted-foreground">{recordMeta(record)}</p>
+                        <SourceText text={record.sourceText} className="mb-3 mt-1 text-[14px]" />
+                        <div className="grid gap-4 text-[14px] md:grid-cols-3">
+                          <div><strong className="text-[12.5px] text-muted-foreground">최초 표현</strong><p className="mt-1 break-words font-zh text-[16.5px] leading-[1.75] text-[#15202B]">{record.firstResponse || "기록 없음"}</p></div>
+                          <div><strong className="text-[12.5px] text-muted-foreground">재검토 지점</strong><p className="mt-1 leading-relaxed">{scopeLabel(record)}</p></div>
+                          <div><strong className="text-[12.5px] text-muted-foreground">최종 선택</strong><p className="mt-1 break-words font-zh text-[16.5px] leading-[1.75] text-[#15202B]">{record.revisedResponse || "기록 없음"}</p></div>
                         </div>
                       </article>
                     ))}
@@ -413,12 +413,12 @@ const LearnerRecords = () => {
             )}
           </div>
           {latestRevision ? (<>
-            <p className="mt-3 text-[12px] font-semibold text-[#5C6A7A]">{recordMeta(latestRevision)}</p>
-            <SourceText text={latestRevision.sourceText} className="mt-1 text-[12.5px]" />
-            <div className="mt-3 grid gap-4 text-[13px] sm:grid-cols-[minmax(0,1.15fr)_minmax(150px,.7fr)_minmax(0,1.15fr)] sm:divide-x sm:divide-[#EEE9DC]">
-              <div className="min-w-0 sm:pr-4"><strong className="text-[11.5px] text-muted-foreground">최초 표현</strong><p className="mt-2 break-words font-zh leading-relaxed">{latestRevision.firstResponse || "기록 없음"}</p></div>
-              <div className="min-w-0 sm:px-4"><strong className="text-[11.5px] text-muted-foreground">재검토 지점</strong><p className="mt-2">{scopeLabel(latestRevision)}</p></div>
-              <div className="min-w-0 sm:pl-4"><strong className="text-[11.5px] text-muted-foreground">최종 선택</strong><p className="mt-2 break-words font-zh leading-relaxed">{latestRevision.revisedResponse || "기록 없음"}</p></div>
+            <p className="mt-3 text-[13px] font-semibold text-[#5C6A7A]">{recordMeta(latestRevision)}</p>
+            <SourceText text={latestRevision.sourceText} className="mt-1 text-[15px] leading-relaxed" />
+            <div className="mt-4 grid gap-4 text-[15px] sm:grid-cols-[minmax(0,1.15fr)_minmax(150px,.7fr)_minmax(0,1.15fr)] sm:divide-x sm:divide-[#EEE9DC]">
+              <div className="min-w-0 sm:pr-4"><strong className="text-[12.5px] text-muted-foreground">최초 표현</strong><p className="mt-2 break-words font-zh text-[18px] leading-[1.75] text-[#15202B]">{latestRevision.firstResponse || "기록 없음"}</p></div>
+              <div className="min-w-0 sm:px-4"><strong className="text-[12.5px] text-muted-foreground">재검토 지점</strong><p className="mt-2">{scopeLabel(latestRevision)}</p></div>
+              <div className="min-w-0 sm:pl-4"><strong className="text-[12.5px] text-muted-foreground">최종 선택</strong><p className="mt-2 break-words font-zh text-[18px] leading-[1.75] text-[#15202B]">{latestRevision.revisedResponse || "기록 없음"}</p></div>
             </div>
           </>) : (
             <p className="mt-2 text-[12px] text-muted-foreground">최초 표현과 최종 선택이 달라진 기록이 아직 없습니다.</p>
