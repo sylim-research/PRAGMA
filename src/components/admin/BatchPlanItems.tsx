@@ -6,6 +6,9 @@ import type { BatchCell } from "@/lib/pragma/batchPlan";
 
 const PAGE_SIZE = 10;
 
+// 짧은 범주 칸은 고르게 나누고 주제가 나머지를 쓴다 — 글자가 왼쪽에 몰리지 않게.
+const COLUMN_WIDTHS = ["5%", "5%", "8%", "8%", "8%", "8%", "10%", "8%", "8%", "32%"];
+
 export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: {
   plan: BatchCell[];
   selected: readonly number[];
@@ -30,32 +33,33 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={disabled || !indexes.length}
-          onClick={() => onSelect(plan.map((_, index) => index))}>전체 선택</Button>
+          onClick={() => onSelect([...new Set([...selected, ...indexes])].sort((a, b) => a - b))}>이 페이지 선택</Button>
         <Button size="sm" variant="outline" disabled={disabled || !selected.length} onClick={() => onSelect([])}>선택 해제</Button>
       </div>
     </div>
     {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
-      <table className="w-full min-w-[820px] text-left text-[13px]">
+      <table className="w-full min-w-[820px] table-fixed text-[13px]">
+        <colgroup>{COLUMN_WIDTHS.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
           <tr>{["선택", "번호", "화행", "수준", "과업", "도메인", "지위", "거리", "부담"].map(label =>
-            <th key={label} className="px-2 py-2 font-semibold">{label}</th>)}<th className="w-full px-2 py-2 font-semibold">주제</th></tr>
+            <th key={label} className="px-2 py-2 text-center font-semibold">{label}</th>)}<th className="px-3 py-2 text-left font-semibold">주제</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
           const cell = plan[index];
           return <tr key={index} className={selected.includes(index) ? "bg-[#FFFBEA]" : ""}>
-            <td className="px-2 py-1.5"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
+            <td className="px-2 py-1.5 text-center"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
               className="h-4 w-4 accent-[#15202B]" checked={selected.includes(index)} disabled={disabled}
               onChange={() => toggle(index)} /></td>
-            <td className="px-2 py-1.5 tabular-nums">{index + 1}</td>
-            <td className="whitespace-nowrap px-2 py-1.5 font-medium">{SPEECH_ACT_UI[cell.speech_act_ui]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5">{LEVEL[cell.level]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5">{MODE_LABEL[cell.mode]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5">{DOMAIN[cell.domain]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5 text-[#3F4E59]">{PDR_POWER[cell.pdr_power]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5 text-[#3F4E59]">{PDR_DISTANCE[cell.pdr_distance].split(" (")[0]}</td>
-            <td className="whitespace-nowrap px-2 py-1.5 text-[#3F4E59]">{PDR_BURDEN[cell.pdr_burden]}</td>
-            <td className="max-w-0 truncate px-2 py-1.5" title={cell.situation_seed_ko}>{getScenarioTopic(cell.topic_code)?.labelKo ?? cell.situation_seed_ko}</td>
+            <td className="px-2 py-1.5 text-center tabular-nums">{index + 1}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center font-medium">{SPEECH_ACT_UI[cell.speech_act_ui]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{LEVEL[cell.level]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{MODE_LABEL[cell.mode]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{DOMAIN[cell.domain]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_POWER[cell.pdr_power]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_DISTANCE[cell.pdr_distance].split(" (")[0]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_BURDEN[cell.pdr_burden]}</td>
+            <td className="truncate px-3 py-1.5 text-left" title={cell.situation_seed_ko}>{getScenarioTopic(cell.topic_code)?.labelKo ?? cell.situation_seed_ko}</td>
           </tr>;
         })}{!plan.length && <tr><td colSpan={10} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
       </table>
