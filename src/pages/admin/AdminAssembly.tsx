@@ -882,18 +882,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 교수자 최종 승인: 결정하는 화면 ── */}
         {professorScreen && (
           <>
-            {/* 승인 흐름: ① 학생 화면 감수 → ② 자동 점검 결과·지적 판단 → ③ 최종 승인. 누르면 그 자리로 이동한다. */}
-            {st === "generated" && info?.queue === "decision" && (
-              <nav aria-label="승인 흐름" className="flex flex-wrap items-center gap-2 text-[13px]">
-                {([["① 학생 화면 감수", "section[aria-label='학습자 화면 체험 감수']"], ["② 자동 점검 결과·지적 판단", "#professor-review-results"], ["③ 최종 승인", "#professor-final-approval"]] as const).map(([label, selector], index) => (
-                  <span key={label} className="flex items-center gap-2">
-                    {index > 0 && <ChevronRight aria-hidden className="size-3.5 text-[#B7BEC2]" />}
-                    <button type="button" className="rounded-full border border-[#D8D3C4] bg-white px-3 py-1 font-semibold text-[#233542] hover:bg-[#FBF6EA]"
-                      onClick={() => document.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" })}>{label}</button>
-                  </span>
-                ))}
-              </nav>
-            )}
             {st === "generated" && info?.queue !== "decision" && (
               <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>

@@ -116,9 +116,6 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
       <aside className="space-y-4 xl:sticky xl:top-24">
-        <p className="text-sm text-muted-foreground" aria-label="감수 진행">
-          확인 {tally.checked} · 수정 요청 {tally.revision} · 미확인 {tally.open}
-        </p>
         {openSections.length > 0 && <Button variant="outline" className="h-10 w-full border-[#CAB23D] text-sm font-bold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{EXPERIENCE_SECTIONS.map((item, index) => {

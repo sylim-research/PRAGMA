@@ -36,7 +36,7 @@ describe("instructor experience", () => {
     const v6Labels = ["미션 안내", "1. 적절성 판단", "2. 새 장면 판단 · 이유", "3. 선택교정", "4. 자유교정 · 대조", "5. 후보별 적절성 판단", "핵심 정리", "직접 통번역 · DCT"];
     expect(within(nav).getAllByRole("button").map((button) => button.firstElementChild?.textContent)).toEqual(v6Labels);
     for (const old of ["4. 이유 찾기", "5. 여러 초안 비교", "문항별 핵심"]) expect(within(nav).queryByText(old)).not.toBeInTheDocument();
-    expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
+    expect(screen.queryByLabelText("감수 진행")).toBeNull();
     expect(screen.queryByText(/이 부분의 AI·규칙 문제 항목/)).not.toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "현재 문항 감수 메모" })).toHaveAttribute("rows", "3");
   });
@@ -48,7 +48,7 @@ describe("instructor experience", () => {
     expect(screen.queryByRole("button", { name: "보류" })).not.toBeInTheDocument();
     const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
     expect(within(nav).getByText("보류(기존 기록)")).toBeInTheDocument();
-    expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
+    expect(screen.queryByLabelText("감수 진행")).toBeNull();
     fireEvent.change(screen.getByRole("textbox", { name: "현재 문항 감수 메모" }), { target: { value: "도입 문구를 줄이면 좋겠습니다." } });
     expect(onSave).not.toHaveBeenCalled();
     expect(screen.getByText("확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다.")).toBeInTheDocument();

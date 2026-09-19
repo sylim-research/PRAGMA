@@ -261,8 +261,10 @@ describe("professor approval screen (experiential)", () => {
       reason_ko: "", suggestion_ko: "", problem_type_ko: "critic_grounding_failure", needs_professor: false, uncertainty_ko: "" };
     inspection.run!.openai_review = metadata({ verdict: "warning", summary_ko: "격리", findings: [isolated] } as ReviewResult);
     showApprovalScreen();
-    expect(await screen.findByText("자동 점검 결과")).toBeInTheDocument();
-    expect(screen.getByText(/^AI 검토 · /)).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "교수자 최종 승인" })).toBeInTheDocument();
+    // 최종 승인 화면은 점검 요약 줄을 두지 않는다.
+    expect(screen.queryByText("자동 점검 결과")).toBeNull();
+    expect(screen.queryByText(/^AI 검토 · /)).toBeNull();
     // 판정에 쓰이지 않는 격리 지적과 세부 추적 정보는 최종 승인 화면에 두지 않는다.
     expect(screen.queryAllByText(isolated.issue_ko)).toHaveLength(0);
     expect(screen.queryByText(/추가 모델 검토 선택/)).toBeNull();

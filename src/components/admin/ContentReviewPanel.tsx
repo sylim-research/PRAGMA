@@ -335,14 +335,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 새로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
-      {experiential && (run || decisionSlot) && <div id="professor-review-results"><FlowHeading title="자동 점검 결과" /></div>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
-        <ReviewFindings title={compact || experiential ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact || experiential} />
+        {/* 최종 승인 화면은 점검 요약 줄을 두지 않는다. 교수자가 판단할 지적만 아래 판단 카드로 보인다. */}
+        {!experiential && <ReviewFindings title={compact ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact} />}
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
-        {primary && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
+        {primary && !experiential && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
         {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 검토"result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && <ReviewFindings title="교차 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
+        {run.claude_review && !experiential && <ReviewFindings title="교차 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
         {!compact && findings.length > 0 && (() => {
           const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
