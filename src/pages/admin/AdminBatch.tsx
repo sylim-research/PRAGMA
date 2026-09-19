@@ -238,7 +238,9 @@ const AdminBatch = () => {
       toast.error("현재 계획 안의 항목 번호를 쉼표로 입력해 주세요.");
       return;
     }
-    return executeBatch(selectedPlan.indexes.map(index => plan[index]), runMode, selectedPlan.indexes);
+    const indexes = selectedPlan.indexes;
+    setSelectedCellNumbers("");
+    return executeBatch(indexes.map(index => plan[index]), runMode, indexes);
   };
 
   const stop = () => abortRef.current?.abort();
@@ -323,9 +325,15 @@ const AdminBatch = () => {
             <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-lg font-bold"><StepNum n={1} />생성 조건</h2>
-                <div role="group" aria-label="언어 방향" className="order-last flex w-full gap-1.5 sm:order-none sm:w-auto">
-                  <Button size="sm" variant="outline" className={"h-8 px-3 " + (direction === "ko_zh" ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A] hover:bg-[#FBEFD9]" : "border-[#EAE4D2] text-[#3F4E59]")} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
-                  <Button size="sm" variant="outline" className={"h-8 px-3 " + (direction === "zh_ko" ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A] hover:bg-[#FBEFD9]" : "border-[#EAE4D2] text-[#3F4E59]")} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
+                <div className="order-last flex w-full items-center gap-2 sm:order-none sm:ml-auto sm:w-auto">
+                  <span className="text-[13px] font-semibold text-[#3F4E59]">언어 방향</span>
+                  <div role="group" aria-label="언어 방향" className="inline-flex gap-1 rounded-lg bg-[#F3F0E7] p-1">
+                    {(["ko_zh", "zh_ko"] as const).map(d =>
+                      <button key={d} type="button" aria-pressed={direction === d} disabled={busy} onClick={() => switchDirection(d)}
+                        className={"h-8 rounded-md px-4 text-[13px] transition-colors disabled:opacity-60 " + (direction === d ? "bg-white font-semibold text-[#15202B] shadow-sm ring-1 ring-[#D9D2BF]" : "font-medium text-[#3F4E59] hover:bg-white/60")}>
+                        {DIRECTION_LABEL[d]}
+                      </button>)}
+                  </div>
                 </div>
               </div>
 
@@ -396,17 +404,7 @@ const AdminBatch = () => {
               </div>
               </>}
             </section>
-            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes}
-              actions={<div className="flex flex-wrap items-center gap-2">
-                <Label htmlFor="selected-core-cells" className="text-xs">선택 항목 번호</Label>
-                <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="h-8 w-40 text-xs"
-                  onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
-                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                  onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 이어서 생성</Button>
-                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                  onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새로 생성</Button>
-                {selectedPlan.invalid && <p role="alert" className="w-full text-xs text-red-800">1–{plan.length} 사이의 정수 번호를 쉼표로 구분해 주세요.</p>}
-              </div>} />
+            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
           </div>
 
           <section id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5">
@@ -417,9 +415,9 @@ const AdminBatch = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button variant="outline" className="h-10 border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" onClick={startFreshCoreRun} disabled={busy}>새 실행으로 시작</Button>
-                <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={start} disabled={busy || plan.length === 0}>
+                <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={selectedPlan.indexes.length > 0 ? () => startSelected("current") : start} disabled={busy || plan.length === 0}>
                   <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
-                  {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
+                  {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : selectedPlan.indexes.length > 0 ? "선택 " + selectedPlan.indexes.length + "건 생성 시작" : "전체 " + summary.total + "건 생성 시작"}
                 </Button>
                 {running && <Button className="h-10" variant="outline" onClick={stop}>생성 중단</Button>}
               </div>

@@ -47,7 +47,7 @@ describe("배치 생성 작업 화면", () => {
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "중→한" }));
-    expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("");
+    expect(screen.getByRole("button", { name: /^전체 \d+건 생성 시작$/ })).toBeInTheDocument();
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     setNumber("중급 · 총 생성 건수", 45);
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("81건");
@@ -94,8 +94,7 @@ describe("배치 생성 작업 화면", () => {
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "다음 항목" }));
     fireEvent.click(screen.getByLabelText("생성 항목 11 선택"));
-    expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("1, 11");
-    fireEvent.click(screen.getByRole("button", { name: "선택 2건 · 이어서 생성" }));
+    fireEvent.click(screen.getByRole("button", { name: "선택 2건 생성 시작" }));
     await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
     const plan = buildBatchPlan();
     expect(mocks.run).toHaveBeenCalledWith([plan[0], plan[10]], expect.objectContaining({

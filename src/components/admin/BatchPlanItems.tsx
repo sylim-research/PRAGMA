@@ -29,7 +29,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={disabled || !indexes.length}
-          onClick={() => onSelect([...new Set([...selected, ...indexes])].sort((a, b) => a - b))}>이 페이지 선택</Button>
+          onClick={() => onSelect(plan.map((_, index) => index))}>전체 선택</Button>
         <Button size="sm" variant="outline" disabled={disabled || !selected.length} onClick={() => onSelect([])}>선택 해제</Button>
       </div>
     </div>
