@@ -13,7 +13,7 @@
 // 드라마·쇼츠 캡처를 DB에 저장하면 저작권 문제가 생기므로 지켜야 할 설계다.
 
 import { type ReactNode, useRef, useState } from "react";
-import { ImageIcon, PlayCircle, Type } from "lucide-react";
+import { ImageIcon, Loader2, PlayCircle, Sparkles, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -595,9 +595,19 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         <Button
           onClick={() => runAnalyze()}
           disabled={loading || (!text.trim() && !imageDataUrl)}
-          className="h-11 w-full bg-[#FAD338] text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:opacity-50"
+          className="h-12 w-full gap-2 bg-[#FAD338] text-[15px] font-bold text-[#15202B] shadow-[0_2px_0_#D9B51C] transition-all hover:-translate-y-px hover:bg-[#F2C71E] hover:shadow-[0_3px_0_#C9A614] active:translate-y-0 active:shadow-none disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none"
         >
-          {loading ? "분석 중…" : "활용 가능성 분석"}
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+              AI가 자료를 분석하는 중…
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-5 w-5" aria-hidden />
+              AI로 활용 가능성 분석하기
+            </>
+          )}
         </Button>
 
         {error && (
@@ -648,7 +658,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
             </p>
-            <p>왼쪽에 자료를 넣고 「활용 가능성 분석」을 실행하면 여기에 활용 방향과 후보가 표시됩니다.</p>
+            <p>왼쪽에 자료를 넣고 「AI로 활용 가능성 분석하기」를 누르면 여기에 활용 방향과 후보가 표시됩니다.</p>
           </div>
         )}
         {analysis && (
