@@ -14,7 +14,7 @@ interface LearnerJourneyShellProps {
   nav?: boolean;
   /**
    * 본문 캔버스 폭(Tailwind max-w 클래스). 헤더 안쪽도 같은 폭을 써서 로고·메뉴가 본문 가장자리와 맞는다.
-   * 주면 기본 폭(max-w-4xl)·wide보다 우선한다.
+   * 주면 기본 폭(max-w-3xl)·wide보다 우선한다.
    */
   canvas?: string;
 }
@@ -32,8 +32,8 @@ export const LearnerJourneyShell = ({
   nav = false,
   canvas,
 }: LearnerJourneyShellProps) => {
-  // 학습자 화면 폭 기준 하나: 본문 848px(max-w-4xl). 예외는 미션 수행 화면(720px, canvas="max-w-3xl") — 몰입과 캡처 보존.
-  const widthClass = canvas ?? (wide ? "max-w-6xl" : "max-w-4xl");
+  // 학습자 화면 폭 기준 하나: 본문 720px(max-w-3xl) — 미션 수행 화면과 같은 폭. 예외는 wide(세 열 리포트).
+  const widthClass = canvas ?? (wide ? "max-w-6xl" : "max-w-3xl");
   const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-4" : "py-6";
   const headerAlignmentClass = missionLayout
     ? "xl:w-[61rem] xl:max-w-none xl:-translate-x-[6.5rem] xl:px-0"
