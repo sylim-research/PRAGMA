@@ -440,9 +440,9 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
   return (
     // 좌 = 자료 입력(고정폭 썸네일·문구·출처·방향), 우 = 분석·후보. 입력 칼럼은
     // 스크롤해도 따라오게 sticky — 후보를 훑다가 원문을 고치는 왕복이 잦다.
-    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-10">
       {/* ── LEFT: 자료 → 문구 확정 ── */}
-      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4">
+      <section className="space-y-5 rounded-xl border border-[#D9D2BF] bg-white p-5 lg:sticky lg:top-4 lg:col-span-4">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
           <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
@@ -458,13 +458,13 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 onClick={() => setInputTab(k)}
                 aria-pressed={inputTab === k}
                 className={[
-                  "flex h-10 items-center justify-center gap-1.5 rounded-md text-[12.5px] transition-colors",
+                  "flex h-16 flex-col items-center justify-center gap-1 rounded-md text-[12.5px] transition-colors",
                   inputTab === k
                     ? "bg-white font-semibold text-[#15202B] shadow-sm ring-1 ring-[#D9D2BF]"
                     : "font-medium text-[#3F4E59] hover:bg-white/60",
                 ].join(" ")}
               >
-                <Icon className="hidden h-4 w-4 shrink-0 2xl:block" aria-hidden />
+                <Icon className="h-5 w-5 shrink-0" aria-hidden />
                 <span className="truncate">{l}</span>
               </button>
             ))}
@@ -476,9 +476,10 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-24 w-full items-center justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
+                  className="flex h-44 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
-                  + 쇼츠·드라마 캡처 업로드 (jpg·png·webp) · 이미지는 저장하지 않습니다
+                  <span className="text-[13.5px] font-semibold text-[#15202B]">+ 쇼츠·드라마 캡처 업로드</span>
+                  <span className="text-[11.5px] font-normal text-[#5A6670]">jpg·png·webp · 이미지는 저장하지 않습니다</span>
                 </button>
               ) : imgLarge ? (
                 <div className="space-y-1.5">
@@ -528,7 +529,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
           )}
 
           {inputTab === "youtube" && (
-            <div className="mt-2.5">
+            <div className="mt-2.5 flex h-44 flex-col justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] px-4">
               <div className="flex gap-2">
                 <input
                   value={youtubeUrl}
@@ -558,7 +559,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
-              className="mt-2.5 h-28 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="mt-2.5 h-44 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
@@ -641,7 +642,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
       </section>
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
-      <section className="space-y-4">
+      <section className="space-y-4 lg:col-span-6">
         {!analysis && !history && (
           <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
