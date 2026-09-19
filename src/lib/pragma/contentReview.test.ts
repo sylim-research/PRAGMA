@@ -65,6 +65,17 @@ describe("current content five-stage review", () => {
     expect(professorReviewFindings(focused).map(f=>f.id)).toEqual(["openai-1","claude-1"]);
     expect(focused.openai_review.result.findings).toHaveLength(2);
   });
+  it("sends findings the adjudication accepted or refined to the professor regardless of severity", () => {
+    const original = run();
+    const warning = {...audit.findings[0], id: "openai-2", severity: "warning" as const, needs_professor: false};
+    const focused = {...original, approval_policy: "focused_v1" as const, claude_review: null,
+      openai_review: {...original.openai_review!, result: {verdict: "warning" as const, summary_ko: "경고", findings: [warning]}}};
+    expect(professorReviewFindings(focused).map(f => f.id)).toEqual([]);
+    const accepted = {...focused, adjudication: {result: {summary_ko: "수용", decisions: [{finding_id: "openai-2", decision: "accept"}]}} as any};
+    expect(professorReviewFindings(accepted).map(f => f.id)).toEqual(["openai-2"]);
+    const rejected = {...focused, adjudication: {result: {summary_ko: "기각", decisions: [{finding_id: "openai-2", decision: "reject"}]}} as any};
+    expect(professorReviewFindings(rejected).map(f => f.id)).toEqual([]);
+  });
   it("keeps Claude independent and excludes OpenAI's first judgment from adjudication", () => {
     const independent = buildReviewPrompt("claude", snapshot, run());
     expect(independent.user).not.toContain("OPENAI_PRIVATE_VERDICT");

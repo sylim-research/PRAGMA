@@ -335,31 +335,31 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 새로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
-      {experiential && (run || decisionSlot) && <FlowHeading title="자동 점검 결과" note={next === "professor" || next === "approved" ? "자동 점검 완료" : undefined} />}
+      {experiential && (run || decisionSlot) && <div id="professor-review-results"><FlowHeading title="자동 점검 결과" note={next === "professor" || next === "approved" ? "자동 점검 완료" : undefined} /></div>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
-        <ReviewFindings title={compact ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact} />
+        <ReviewFindings title={compact || experiential ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact || experiential} />
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
-        {primary && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact} />}
+        {primary && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
         {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 검토"result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && <ReviewFindings title="AI 독립 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact} />}
+        {run.claude_review && <ReviewFindings title="교차 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
         {!compact && findings.length > 0 && (() => {
           const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
             return <div key={finding.id} className="grid gap-3 rounded border p-3 lg:grid-cols-3">
-              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 단계 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
+              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "교차 검토" : finding.id.startsWith("generation-") ? "생성 단계 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
                 <p className="mt-1 text-xs">유형: {finding.problem_type_ko} · {verdictLabel[finding.severity]}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
                 {finding.uncertainty_ko && <p className="mt-1 text-xs">불확실성: {finding.uncertainty_ko}</p>}
                 {finding.quote && <blockquote className="my-2 border-l-2 pl-2">{finding.quote}</blockquote>}
                 <p className="text-xs">제안: {finding.suggestion_ko}</p><code className="break-all text-[10px]">{finding.where}</code></div>
               <div className="rounded bg-[#F8F7F3] p-3">{decision ? <>
-                <strong>AI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                <strong>의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                 <p className="mt-1">{decision.rationale_ko}</p>
                 {decision.proposed_change_ko && <p className="mt-2 text-xs">제안: {decision.proposed_change_ko}</p>}
                 {decision.evidence_quote && <blockquote className="mt-2 border-l-2 pl-2">{decision.evidence_quote}</blockquote>}
-              </> : focused ? "추가 AI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "AI 재검토 전"}</div>
+              </> : focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</div>
               <div className="space-y-2 rounded bg-amber-50 p-3">
                 {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}{saved?.mode === "bulk_signal" ? " (묶음 확인)" : ""}</strong><p>{saved?.rationale_ko}</p></>
                   : focused || run.adjudication ? <>
@@ -372,7 +372,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft?.rationale_ko ?? ""} disabled={busy}
                       onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
                     {draft?.mode === "bulk_signal" && <p className="text-xs text-muted-foreground">묶음 확인으로 채워진 항목입니다. 결정이나 근거를 고치면 개별 판정이 됩니다.</p>}
-                  </> : <p>AI 재검토 후 교수자 결정을 기록합니다.</p>}
+                  </> : <p>의견 대조 후 교수자 결정을 기록합니다.</p>}
               </div>
             </div>;
           };
@@ -395,7 +395,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {substantiveFindings.map(findingCard)}
             </section>}
             {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 AI 독립 검토 의견도 보존합니다. AI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
+            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 교차 검토 의견도 보존합니다. 의견 대조에는 1차 검토 결과를 제공하지 않습니다.</p>
             {next === "professor" && <>
               <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
                 || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장</Button>
@@ -439,7 +439,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
         <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
-        <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
+        <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
       {next !== "approved" && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
@@ -460,7 +460,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
-      {experiential && <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>}
       <details><summary className="cursor-pointer text-xs">{experiential ? "자동 점검 내역 · 세부 추적 정보" : "콘텐츠 원본·승인 이력"}</summary>
         {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[11px] text-[#5D6970]">
           <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 지적 {isolatedGrounding(primary).length}건 — 판정에 쓰이지 않습니다.</p>

@@ -710,7 +710,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
-    if (!professorScreen) {
+    {
       return (
         <span className="flex flex-wrap items-center gap-1.5">
           <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
@@ -792,7 +792,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
     const metaLine = aiReview ? [] : reviewMode
-      ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
+      ? [info?.placement === "편성 전" ? null : info?.placement]
       : [];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
@@ -862,11 +862,18 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 교수자 최종 승인: 결정하는 화면 ── */}
         {professorScreen && (
           <>
-            {/* 감수 대상은 아래 학생 화면이다. 코어 원문은 필요할 때만 펼친다. */}
-            <details>
-              <summary className="cursor-pointer text-[12.5px] font-semibold text-[#5D6970]">시나리오 전문</summary>
-              <div className="mt-1.5">{scenarioText}</div>
-            </details>
+            {/* 승인 흐름: ① 학생 화면 감수 → ② 자동 점검 결과·지적 판단 → ③ 최종 승인. 누르면 그 자리로 이동한다. */}
+            {st === "generated" && info?.queue === "decision" && (
+              <nav aria-label="승인 흐름" className="flex flex-wrap items-center gap-2 text-[13px]">
+                {([["① 학생 화면 감수", "section[aria-label='학습자 화면 체험 감수']"], ["② 자동 점검 결과·지적 판단", "#professor-review-results"], ["③ 최종 승인", "#professor-final-approval"]] as const).map(([label, selector], index) => (
+                  <span key={label} className="flex items-center gap-2">
+                    {index > 0 && <ChevronRight aria-hidden className="size-3.5 text-[#B7BEC2]" />}
+                    <button type="button" className="rounded-full border border-[#D8D3C4] bg-white px-3 py-1 font-semibold text-[#233542] hover:bg-[#FBF6EA]"
+                      onClick={() => document.querySelector(selector)?.scrollIntoView({ behavior: "smooth", block: "start" })}>{label}</button>
+                  </span>
+                ))}
+              </nav>
+            )}
             {st === "generated" && info?.queue !== "decision" && (
               <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>
@@ -891,11 +898,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         )}
 
         {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
-        {professorScreen && (
-          <footer className="flex justify-end pt-1">
-            <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
-          </footer>
-        )}
+
         </div>
       </div>
     );

@@ -118,7 +118,7 @@ export function ProfessorMissionWorkbench({
   const editor = (
       <details className="mt-3 rounded-lg border border-[#E3E6E7] bg-[#FAFBFB] p-3">
         <summary className="cursor-pointer font-medium text-[#34444D]">
-          {approvalHref ? "문항 block 직접 수정" : "원본 수정하기 · 문항 block 직접 수정"}
+          {approvalHref ? "문항 직접 수정" : "원본 수정하기"}
         </summary>
         {!approvalHref && (
           <p className="mt-2 text-[12px] text-muted-foreground">

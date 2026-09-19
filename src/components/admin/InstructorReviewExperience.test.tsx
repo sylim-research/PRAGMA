@@ -21,9 +21,8 @@ describe("instructor experience", () => {
     const onSave = vi.fn().mockResolvedValue(undefined); const onReady = vi.fn();
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={onReady} /></MemoryRouter>);
     fireEvent.click(screen.getByRole("button", { name: /3. 판단하고 고쳐보기/ }));
-    fireEvent.click(screen.getByRole("button", { name: "참고 판정·해설 바로 보기" }));
-    await screen.findAllByText("정답");
-    for (const correction of SAMPLE_MISSION_V5_NATIVE.mpj_items[2].corrections) expect(screen.getByText(correction.note_ko)).toBeInTheDocument();
+    // 참고 판정을 한꺼번에 여는 버튼은 두지 않는다 — 교수자도 학생과 같은 순서로 감수한다.
+    expect(screen.queryByRole("button", { name: "참고 판정·해설 바로 보기" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [{ section: "mjt-2", status: "revision_required", note: "" }] })));
     expect(onReady).not.toHaveBeenCalledWith(true);
