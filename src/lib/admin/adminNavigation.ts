@@ -51,7 +51,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     // 생기면 맨 앞에 붙인다.
     header: "3. 학습 미션 제작·품질 관리",
     items: [
-      { to: "/admin/assembly", label: "학습 미션 조립" },
+      { to: "/admin/assembly", label: "학습 미션 제작 현황" },
       { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
       {
         to: "/admin/review",

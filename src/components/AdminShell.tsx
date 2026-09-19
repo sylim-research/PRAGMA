@@ -2,7 +2,6 @@ import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
-import { ReviewPreparationStatus } from "@/components/admin/ReviewPreparationStatus";
 import {
   ADMIN_DASHBOARD_ITEM,
   ADMIN_NAV_GROUPS,
@@ -145,7 +144,6 @@ export const AdminShell = ({ title, description, children, compact = false, hide
         </aside>
 
         <main className="min-w-0 flex-1 print:w-full">
-          <ReviewPreparationStatus />
           <div className="mb-5 print:hidden md:hidden">
             <label
               htmlFor="admin-mobile-navigation"

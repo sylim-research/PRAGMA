@@ -93,7 +93,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
 
         <div className="mt-5 flex flex-wrap gap-3">
           <Link to="/admin/assembly" className="inline-flex items-center gap-2 rounded-md bg-[#15202B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#263747]">
-            학습 미션 조립 열기 <ArrowRight className="h-4 w-4" aria-hidden />
+            학습 미션 제작 현황 열기 <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
           <Link to="/admin/composer" className="inline-flex items-center gap-2 rounded-md border border-[#D9D4C8] bg-white px-4 py-2 text-sm font-semibold transition hover:bg-[#F7F4EC]">
             주차별 수업 편성 <ArrowRight className="h-4 w-4" aria-hidden />

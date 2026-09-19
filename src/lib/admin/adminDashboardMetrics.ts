@@ -4,8 +4,15 @@ import { libraryMissionIsReady } from "./missionLibrary";
 export const DASHBOARD_ROW_CAP = 4000;
 export const DASHBOARD_REVIEW_CRITERIA_VERSION = CONTENT_REVIEW_VERSION;
 
+/** 더 새 판이 대체한 옛 판(다른 행의 supersedes_scenario_id가 가리키는 행)을 뺀다. 대시보드·제작 현황·점검·승인이 같은 기준을 쓴다. */
+export function excludeSupersededRows<T extends { scenario_id: string; supersedes_scenario_id?: string | null }>(rows: readonly T[], keepId?: string | null): T[] {
+  const replaced = new Set(rows.map((row) => row.supersedes_scenario_id).filter(Boolean));
+  return rows.filter((row) => !replaced.has(row.scenario_id) || row.scenario_id === keepId);
+}
+
 export type DashboardScenarioRow = {
   scenario_id: string;
+  supersedes_scenario_id?: string | null;
   content_format: string;
   review_status: string | null;
   mission_status: string | null;
