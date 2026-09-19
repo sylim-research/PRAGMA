@@ -733,13 +733,13 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     const facet = (label: string, value: string) => (
-      <span className="inline-flex items-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 py-1 text-[13px] font-bold text-[#233542]">
+      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 text-[13px] font-bold text-[#233542]">
         <span className="text-[11px] font-medium text-[#8C969B]">{label}</span>{value}
       </span>
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
-        <span className={["rounded-md px-2.5 py-1 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
+        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
         {facet("과제", MODE_LABEL[mode])}
