@@ -95,7 +95,7 @@ describe("배치 생성 작업 화면", () => {
     fireEvent.click(screen.getByRole("button", { name: "다음 항목" }));
     fireEvent.click(screen.getByLabelText("생성 항목 11 선택"));
     expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("1, 11");
-    fireEvent.click(screen.getByRole("button", { name: "선택 2건 · 현재 ID 재개" }));
+    fireEvent.click(screen.getByRole("button", { name: "선택 2건 · 이어서 생성" }));
     await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
     const plan = buildBatchPlan();
     expect(mocks.run).toHaveBeenCalledWith([plan[0], plan[10]], expect.objectContaining({
