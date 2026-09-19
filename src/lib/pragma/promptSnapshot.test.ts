@@ -28,7 +28,7 @@ function prompt(key: string) {
 describe("prompt snapshot integrity", () => {
   it("shares plausibility across translation and interpreting generation and review in both directions", () => {
     const shared = PROMPT_SNAPSHOT.prompts.filter(({ key }) =>
-      /^(core\.system\.|mission\.system|quality\.system|core_quality\.system|legacy\.(individual|outline)\.system)/.test(key));
+      /^(core\.system\.|mission\.system|quality\.system|mission_v6_quality\.system|core_quality\.system|legacy\.(individual|outline)\.system)/.test(key));
     expect(shared.length).toBeGreaterThanOrEqual(12);
     for (const entry of shared) {
       expect(entry.text, entry.key).toContain(SCENE_PLAUSIBILITY_RULE);

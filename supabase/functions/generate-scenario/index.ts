@@ -3275,6 +3275,8 @@ MJT4는 학습자가 직접 고친다. 참고안은 원문 의도·사실을 보
 MJT5는 네 후보 각각의 band를 독립 판단한다. 복수 적절을 허용하며 적절 후보 수·band 분포·BEST/WORST·후보 간 우열을 강제하지 않는다.
 공유 Anchor, relation-pair, diagnostic_dimensions, v5 주원인 문항을 요구하지 않는다.
 장면·관계·매체의 개연성, 원문과 목표어의 자연성, 판단·수정안·해설·참고 표현의 정합을 해당 문항 원문에서 확인하라.
+${SCENE_PLAUSIBILITY_RULE}
+장면 개연성 위반은 implausible_scene으로 보고한다.
 DCT는 코어 원문·PDR·usable_facts를 따른다. 통역이면 실제 발화 상황과 spoken 원문을 확인한다.
 취향·변이를 결함으로 세지 말고 학습자가 잘못 배우게 되는 경우만 보고하라. 확신이 없으면 warning으로 남겨라.
 기존 결과 형식의 JSON만 출력:
