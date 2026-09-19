@@ -25,7 +25,7 @@ vi.mock("@/components/learner/LearnerJourneyShell", () => ({
 vi.mock("@/components/learner/LearnerBottomNav", () => ({ LearnerBottomNav: () => <nav /> }));
 
 const ownLog = {
-  id: "own-log", speech_act: "request", task_type: "translation",
+  id: "own-log", mission_id: "3cde65a4-173c-4bc2-b5af-85d806c1bacb", speech_act: "request", task_type: "translation",
   first_response: "请确认时间。", revised_response: "如果方便，请确认时间。",
   revision_target_selected: "feature", completed_at: "2026-09-05T10:00:00Z",
   created_at: "2026-09-05T10:00:00Z",
@@ -99,6 +99,29 @@ describe("learner report record sources", () => {
     expect(completionValue()).toBe("1");
     expect(screen.queryByText("localhost 시연 데이터")).not.toBeInTheDocument();
     expect(screen.getByText(ownLog.revised_response)).toBeInTheDocument();
+  });
+
+  it("excludes prototype rows without a mission or speech act from every count, keeping v5 rows", async () => {
+    const prototype = { ...ownLog, id: "proto", mission_id: "sample:request_mitigation_optionality", speech_act: null };
+    const noAct = { ...ownLog, id: "no-act", speech_act: null };
+    const v5 = { ...ownLog, id: "v5", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", revised_response: ownLog.first_response, revision_target_selected: null };
+    mocks.order.mockResolvedValue({ data: [ownLog, prototype, noAct, v5], error: null });
+    renderReport();
+    await screen.findByRole("region", { name: "수업 이수 범위" });
+    expect(completionValue()).toBe("2");
+    expect(screen.getByText("미션·화행 연결을 확인할 수 없는 이전 시험 기록 2건은 집계에서 제외했습니다.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /요청\s*2건 완료/ })).toBeInTheDocument();
+  });
+
+  it("shows no type label or guessed review point, only counts and a shared reflection question", async () => {
+    mocks.order.mockResolvedValue({ data: [{ ...ownLog, revision_target_selected: null }], error: null });
+    renderReport();
+    await screen.findByRole("region", { name: "수업 이수 범위" });
+    expect(screen.getByRole("heading", { name: /나의 학습 기록/ })).toHaveTextContent("전체 교과목");
+    expect(screen.queryByText(/배려 우선형|시그니처|수업 확장 연습|조건 간 비교/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/주차/)).not.toBeInTheDocument();
+    expect(screen.getByText("회고 질문 · 모든 학습자에게 같은 질문입니다")).toBeInTheDocument();
+    expect(screen.getByText("미기록")).toBeInTheDocument();
   });
 
   it("keeps a failed query distinct from no records and allows retry", async () => {

@@ -1,18 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  ArrowRight,
-  BookOpen,
-  Check,
-  FilePenLine,
-  Fingerprint,
-  Languages,
-  MessageCircleMore,
-  RefreshCw,
-  Search,
-  Sparkles,
-  Target,
-} from "lucide-react";
+import { FilePenLine } from "lucide-react";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import {
   Dialog,
@@ -22,11 +9,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { getPublishedCourse, type LearnerCourse } from "@/lib/curriculum/learnerCourse";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
-import { COURSE_WEEKS } from "@/lib/mission/mockLearnerCourse";
 import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
+import { REVISION_SCOPES, SCOPE_LABEL, type RevisionScope } from "@/lib/pragma/feedbackSchema";
 import { supabase } from "@/integrations/supabase/client";
+
+// 학습자 본인의 완료 기록을 전체 교과목에 걸쳐 다시 보는 화면.
+// 기록을 요약할 뿐 유형·성향·능력을 판정하지 않는다(2026-09-19 설계 판정).
 
 type ReportRecord = {
   id: string;
@@ -34,12 +23,14 @@ type ReportRecord = {
   taskType: "translation" | "interpreting" | "other";
   firstResponse: string;
   revisedResponse: string;
-  revisionFocus: string | null;
+  /** 저장된 재검토 지점 코드(피드백의 revision_scope). 없으면 null — 기본 문구로 채우지 않는다. */
+  revisionScope: RevisionScope | null;
   completedAt: string;
 };
 
 type MissionLogRecord = {
   id: string;
+  mission_id: string | null;
   speech_act: string | null;
   task_type: string | null;
   first_response: string | null;
@@ -61,6 +52,7 @@ const ACTS: SpeechActUI[] = [
   "opposition",
 ];
 
+/** 모든 학습자에게 같은 회고 질문의 화행별 초점. 개인 진단이 아니다. */
 const ACT_FOCUS: Record<SpeechActUI, string> = {
   request: "직접성·완화·선택 여지",
   apology: "책임 인정·수리 제안",
@@ -73,22 +65,23 @@ const ACT_FOCUS: Record<SpeechActUI, string> = {
   opposition: "이견 명확성·관계 조정",
 };
 
-const SIGNATURE: Record<SpeechActUI, { name: string; qualifier: string; next: string }> = {
-  request: { name: "배려 우선형", qualifier: "신중한 조정", next: "같은 요청을 다른 완곡 표현으로 구성" },
-  apology: { name: "수리 중심형", qualifier: "책임과 해결 조정", next: "책임 인정과 수리 제안의 비중 비교" },
-  thanks: { name: "관계 구체화형", qualifier: "이유를 남기는 감사", next: "관계에 따른 감사 이유의 구체성 비교" },
-  compliment: { name: "초점 포착형", qualifier: "대상과 이유 구체화", next: "칭찬 초점과 대응 방식 비교" },
-  agreement: { name: "선택권 보존형", qualifier: "참여 부담 조정", next: "상대와 일정에 따른 초대 강도 비교" },
-  refusal: { name: "관계 유지형", qualifier: "명확성과 완화 조정", next: "거절 이유와 대안의 비중 비교" },
-  complaint: { name: "해결 지향형", qualifier: "문제와 요구 분리", next: "문제 제기와 해결 요청의 강도 비교" },
-  proposal: { name: "협의 지향형", qualifier: "제안과 선택 여지 조정", next: "관계에 따른 제안 강도 비교" },
-  opposition: { name: "근거 제시형", qualifier: "이견과 관계 조정", next: "동의 표지와 반대 근거의 순서 비교" },
-};
-
-const REPEATED_MARKERS = ["酌情", "如果方便", "是否", "能否", "烦请", "恳请", "还请", "理解"];
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const isSpeechAct = (value: string | null): value is SpeechActUI =>
   value !== null && ACTS.includes(value as SpeechActUI);
+
+const isRevisionScope = (value: string | null): value is RevisionScope =>
+  value !== null && (REVISION_SCOPES as readonly string[]).includes(value);
+
+/**
+ * 모든 숫자·지도·돌아보기·수정 노트가 함께 쓰는 집계 기준(한 곳에서만 정의).
+ * 완료(조회 조건) + 9화행 중 하나 + 실제 미션에 연결(미션 id가 시나리오 UUID).
+ * 프로토타입 시기의 `sample:` 시험 기록처럼 미션·화행 연결을 확인할 수 없는 행은 원자료로 남기되
+ * 현행 요약에서는 뺀다. 과거 v5 미션의 정상 기록은 구버전이어도 포함한다.
+ */
+function isCountableLog(row: Pick<MissionLogRecord, "mission_id" | "speech_act">) {
+  return isSpeechAct(row.speech_act) && typeof row.mission_id === "string" && UUID.test(row.mission_id);
+}
 
 function localRecord(session: LearningSession): ReportRecord {
   const key = session.selected_translation as keyof LearningSession["ai_translations"];
@@ -99,7 +92,7 @@ function localRecord(session: LearningSession): ReportRecord {
     taskType: session.mode === "interpretation" ? "interpreting" : "translation",
     firstResponse: first,
     revisedResponse: session.final_translation,
-    revisionFocus: session.speech_act === "refusal" ? "거절 명확성·관계 유지" : "직접성·완화·선택 여지",
+    revisionScope: null,
     completedAt: session.timestamp,
   };
 }
@@ -116,7 +109,7 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
           : "other",
     firstResponse: row.first_response ?? "",
     revisedResponse: row.revised_response ?? row.first_response ?? "",
-    revisionFocus: row.revision_target_selected,
+    revisionScope: isRevisionScope(row.revision_target_selected) ? row.revision_target_selected : null,
     completedAt: row.completed_at ?? row.created_at,
   };
 }
@@ -129,42 +122,24 @@ function changed(record: ReportRecord) {
   );
 }
 
-function findRepeatedMarker(records: ReportRecord[]) {
-  return REPEATED_MARKERS.map((marker) => ({
-    marker,
-    count: records.filter((record) => record.revisedResponse.includes(marker)).length,
-  })).sort((a, b) => b.count - a.count)[0];
-}
-
-function actWeek(act: SpeechActUI, course: LearnerCourse | null) {
-  const liveWeek = course?.weeks.find((week) => week.speech_act === act)?.week_no;
-  if (liveWeek) return liveWeek;
-  const label = SPEECH_ACT_UI[act];
-  return COURSE_WEEKS.find((week) => week.title.startsWith(label))?.weekNo ?? null;
-}
-
-function focusLabel(record: ReportRecord) {
-  const focus = record.revisionFocus?.trim();
-  // 저장값이 내부 코드(예: "feature")면 학습자에게 보이지 않게 기본 문구로 대신한다.
-  if (focus && !/^[a-z0-9_-]+$/i.test(focus)) return focus;
-  return record.speechAct ? ACT_FOCUS[record.speechAct] : "표현 선택과 맥락 적합성";
+/** 저장된 재검토 지점만 보여 준다. 없으면 「미기록」 — 화행별 기본 문구로 대신하지 않는다. */
+function scopeLabel(record: ReportRecord) {
+  return record.revisionScope ? SCOPE_LABEL[record.revisionScope] : "미기록";
 }
 
 const panel = "rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_8px_24px_rgba(21,32,43,0.04)]";
 
 const LearnerRecords = () => {
-  const navigate = useNavigate();
   const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
   const localRecords = useMemo(
     () => (isLocalHost ? getSessions().map(localRecord) : []),
     [isLocalHost],
   );
   const [remoteRecords, setRemoteRecords] = useState<ReportRecord[] | null>(null);
+  const [excludedCount, setExcludedCount] = useState(0);
   const [recordsError, setRecordsError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
-  const [course, setCourse] = useState<LearnerCourse | null>(null);
   const [selectedAct, setSelectedAct] = useState<SpeechActUI>("request");
-  const [showEvidence, setShowEvidence] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -172,12 +147,8 @@ const LearnerRecords = () => {
     setRecordsError(false);
     void (async () => {
       try {
-        const [{ data: auth, error: authError }, courseResult] = await Promise.all([
-          supabase.auth.getSession(),
-          getPublishedCourse().catch(() => null),
-        ]);
+        const { data: auth, error: authError } = await supabase.auth.getSession();
         if (authError) throw authError;
-        if (!cancelled) setCourse(courseResult);
         const userId = auth.session?.user?.id;
         if (!userId) {
           if (!cancelled) setRemoteRecords([]);
@@ -186,14 +157,17 @@ const LearnerRecords = () => {
         const { data, error } = await supabase
           .from("learner_mission_logs")
           .select(
-            "id,speech_act,task_type,first_response,revised_response,revision_target_selected,completed_at,created_at",
+            "id,mission_id,speech_act,task_type,first_response,revised_response,revision_target_selected,completed_at,created_at",
           )
           .eq("auth_user_id", userId)
           .eq("mission_completed", true)
           .order("completed_at", { ascending: false, nullsFirst: false });
         if (error) throw error;
         if (!cancelled) {
-          setRemoteRecords(((data ?? []) as MissionLogRecord[]).map(missionLogRecord));
+          const rows = (data ?? []) as MissionLogRecord[];
+          const countable = rows.filter(isCountableLog);
+          setExcludedCount(rows.length - countable.length);
+          setRemoteRecords(countable.map(missionLogRecord));
         }
       } catch {
         if (!cancelled) setRecordsError(true);
@@ -213,46 +187,14 @@ const LearnerRecords = () => {
   const interpretingCount = records.filter((record) => record.taskType === "interpreting").length;
   const selectedRecords = records.filter((record) => record.speechAct === selectedAct);
   const selectedRevisions = selectedRecords.filter(changed).length;
-  const marker = findRepeatedMarker(selectedRecords);
-  const signature = SIGNATURE[selectedAct];
-  const selectedWeek = actWeek(selectedAct, course);
-  const latestRevision = revisions[0] ?? records[0] ?? null;
-
-  const insight = useMemo(() => {
-    const actLabel = SPEECH_ACT_UI[selectedAct];
-    if (selectedRecords.length === 0) {
-      return {
-        title: `${actLabel} 수행 기록은 아직 없습니다.`,
-        body: `${selectedWeek ? `${selectedWeek}주차` : "해당"} 수업을 마치면 최초 표현과 최종 선택을 바탕으로 패턴을 보여드립니다.`,
-        evidence: "관찰 전",
-      };
-    }
-    if (marker && marker.count >= 2) {
-      return {
-        title: `${actLabel}에서 “${marker.marker}” 표현을 반복해 활용했습니다.`,
-        body: `${selectedRecords.length}건 중 ${marker.count}건의 최종 표현에서 확인되었습니다. 같은 기능을 다른 표현으로 구성해 선택 폭을 비교해 보세요.`,
-        evidence: `비교 가능한 기록 ${selectedRecords.length}건`,
-      };
-    }
-    if (selectedRevisions > 0) {
-      return {
-        title: `${actLabel}에서 최초 표현을 다시 검토하는 경향이 확인됩니다.`,
-        body: `${selectedRecords.length}건 중 ${selectedRevisions}건에서 표현을 조정했습니다. 다음 비교 초점은 ${signature.next}입니다.`,
-        evidence: `수정 기록 ${selectedRevisions}건`,
-      };
-    }
-    return {
-      title: `${actLabel} 기록이 ${selectedRecords.length}건 쌓였습니다.`,
-      body: `현재 기록에서는 반복된 수정 패턴이 확인되지 않았습니다. 다음 비교 초점은 ${signature.next}입니다.`,
-      evidence: `비교 가능한 기록 ${selectedRecords.length}건`,
-    };
-  }, [marker, selectedAct, selectedRecords.length, selectedRevisions, selectedWeek, signature.next]);
+  const latestRevision = revisions[0] ?? null;
+  const actLabel = SPEECH_ACT_UI[selectedAct];
 
   if (recordsError || remoteRecords === null) {
     return (
       <LearnerJourneyShell nav>
         <div className="pb-24">
-          <h1 className="text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">나의 통번역 학습 프로필</h1>
+          <h1 className="text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">나의 학습 기록</h1>
           <div className={`${panel} mt-5 p-5`} role={recordsError ? "alert" : "status"}>
             <p className="text-[13px] text-muted-foreground">
               {recordsError ? "학습 기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." : "학습 기록을 불러오는 중…"}
@@ -272,14 +214,10 @@ const LearnerRecords = () => {
     <LearnerJourneyShell nav>
       <div className="pb-24">
         <header className="flex flex-wrap items-end justify-between gap-5">
-          <div>
-            <p className="text-[12px] font-semibold text-[#857653]">
-              {course?.outline.title ?? "한·중 통번역 화용 학습"} · {course?.outline.week_count ?? 15}주 과정
-            </p>
-            <h1 className="mt-1 text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">
-              나의 통번역 학습 프로필
-            </h1>
-          </div>
+          <h1 className="text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">
+            나의 학습 기록
+            <span className="ml-2 text-[16px] font-semibold text-[#857653] sm:text-[18px]">· 전체 교과목</span>
+          </h1>
           {usingLocalPreview && (
             <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[11px] font-semibold text-[#756D5E]">
               localhost 시연 데이터
@@ -300,133 +238,83 @@ const LearnerRecords = () => {
             </div>
           ))}
         </section>
+        {!usingLocalPreview && excludedCount > 0 && (
+          <p className="mt-2 text-[11.5px] text-muted-foreground">
+            미션·화행 연결을 확인할 수 없는 이전 시험 기록 {excludedCount}건은 집계에서 제외했습니다.
+          </p>
+        )}
 
         <section className={`${panel} mt-5 p-5 sm:p-6`}>
           <div className="flex items-end justify-between gap-4">
-            <div>
-              <p className="text-[12px] font-semibold text-[#857653]">1–15주 수업 이력</p>
-              <h2 className="mt-1 text-[19px] font-bold">9개 화행 학습 지도</h2>
-            </div>
+            <h2 className="text-[19px] font-bold">9개 화행 학습 지도</h2>
             <span className="text-[12.5px] font-medium text-muted-foreground">{actsCovered.size}/9 화행 수행</span>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3" aria-label="화행별 학습 이력">
             {ACTS.map((act) => {
               const count = records.filter((record) => record.speechAct === act).length;
-              const week = actWeek(act, course);
               const active = selectedAct === act;
               return (
                 <button
                   key={act}
                   type="button"
                   aria-pressed={active}
-                  onClick={() => {
-                    setSelectedAct(act);
-                    setShowEvidence(false);
-                  }}
+                  onClick={() => setSelectedAct(act)}
                   className={[
-                    "relative min-h-[84px] min-w-0 rounded-xl border px-4 py-3 text-left transition-all",
+                    "relative min-h-[76px] min-w-0 rounded-xl border px-4 py-3 text-left transition-all",
                     active
-                      ? "border-[#15202B] bg-[#F6F8FC] ring-2 ring-[#15202B] ring-offset-1"
-                      : count >= 2
-                        ? "border-[#CFE1D4] bg-[#EEF6F0] hover:-translate-y-0.5 hover:border-[#78A485]"
-                        : count === 1
-                          ? "border-[#D8E0F0] bg-[#F1F4FA] hover:-translate-y-0.5 hover:border-[#7A91B9]"
-                          : "border-[#E6E2D8] bg-[#F4F2EC] text-[#777368] hover:border-[#BDB6A5]",
+                      ? "border-[#15202B] bg-[#F3F5F9] ring-2 ring-[#15202B] ring-offset-1"
+                      : count > 0
+                        ? "border-[#D3DAE6] bg-[#F3F5F9] hover:-translate-y-0.5 hover:border-[#6A7C96]"
+                        : "border-[#E4DFD0] bg-[#FBF9F3] hover:border-[#C9BFA6]",
                   ].join(" ")}
                 >
                   <span
                     className={[
                       "absolute right-3 top-3 h-2.5 w-2.5 rounded-full",
-                      count >= 2 ? "bg-[#5D9270]" : count === 1 ? "bg-[#6580AF]" : "bg-[#D9D4C7]",
+                      count > 0 ? "bg-[#344F63]" : "border border-[#B9A77A] bg-transparent",
                     ].join(" ")}
                     aria-hidden
                   />
-                  <span className="block pr-5 text-[16px] font-bold">{SPEECH_ACT_UI[act]}</span>
-                  <span className="mt-2 block text-[12px] text-muted-foreground">
-                    {week ? `${week}주차` : "주차 미정"} · {count ? `${count}건 수행` : "수행 전"}
+                  <span className="block pr-5 text-[16px] font-bold text-[#15202B]">{SPEECH_ACT_UI[act]}</span>
+                  <span className="mt-2 block text-[12px] text-[#4F6070]">
+                    {count ? `${count}건 완료` : "아직 기록 없음"}
                   </span>
                 </button>
               );
             })}
           </div>
-          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px] text-muted-foreground">
-            <span>초록 · 반복 관찰</span><span>파랑 · 첫 수행</span><span>회색 · 수행 전</span>
+          <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[11.5px] text-[#4F6070]">
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-[#344F63]" aria-hidden />완료 기록 있음</span>
+            <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full border border-[#B9A77A]" aria-hidden />아직 기록 없음</span>
           </div>
         </section>
 
-        <section className={`${panel} mt-5 border-l-4 border-l-[#70A17E] p-5 sm:p-6`} aria-live="polite">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#EEF6F0] px-3 py-1.5 text-[12px] font-semibold text-[#426C50]">
-                <Sparkles className="h-3.5 w-3.5" /> 최근 수행의 선택 패턴
-              </span>
-              <span className="text-[12px] text-muted-foreground">{insight.evidence}</span>
-            </div>
-            <h2 className="mt-4 text-[22px] font-bold leading-snug sm:text-[24px]">{insight.title}</h2>
-            <p className="mt-2 text-[14px] leading-7 text-muted-foreground">{insight.body}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px] font-medium text-[#5C6A7A]">
-              <span className="inline-flex items-center gap-1.5"><MessageCircleMore className="h-4 w-4" />{SPEECH_ACT_UI[selectedAct]}</span>
-              <span className="inline-flex items-center gap-1.5"><Languages className="h-4 w-4" />한↔중</span>
-              <span className="inline-flex items-center gap-1.5"><BookOpen className="h-4 w-4" />{selectedWeek ? `${selectedWeek}주차` : "수업 기록"}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowEvidence((value) => !value)}
-              className="mt-4 rounded-lg border border-[#D8D2C2] px-3.5 py-2 text-[12px] font-semibold hover:bg-[#FAF8F2]"
-            >
-              {showEvidence ? "근거 접기" : "근거 기록"}
-            </button>
-            {showEvidence && (
-              <p className="mt-3 rounded-lg bg-[#F7F5EE] px-4 py-3 text-[12.5px] leading-relaxed text-[#5C665F]">
-                {selectedRecords.length
-                  ? `${SPEECH_ACT_UI[selectedAct]} 수행 ${selectedRecords.length}건 · 실제 수정 ${selectedRevisions}건${marker?.count ? ` · “${marker.marker}” 포함 ${marker.count}건` : ""}`
-                  : "해당 화행의 완료 기록이 없어 패턴을 산출하지 않았습니다."}
-              </p>
-            )}
-        </section>
-
-        <aside className={`${panel} mt-4 bg-gradient-to-br from-white to-[#F1F4FA] p-5 sm:p-6`}>
-          <div className="grid gap-5 sm:grid-cols-[minmax(220px,.7fr)_minmax(0,1.3fr)] sm:items-center">
-            <div>
-              <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[#6C7480]">
-              <Fingerprint className="h-4 w-4" /> 화용 시그니처 · 현재 기록
-              </p>
-              <h2 className="mt-3 text-[22px] font-bold leading-tight">
-                {selectedRecords.length >= 2 ? signature.name : "패턴 형성 중"}
-                <span className="mt-1 block text-[16px] font-semibold text-[#405164]">
-                  {selectedRecords.length >= 2 ? signature.qualifier : `${SPEECH_ACT_UI[selectedAct]} 근거 ${selectedRecords.length}건`}
-                </span>
-              </h2>
-            </div>
-            <div className="space-y-3 text-[13px] text-[#485663]">
-              <p className="flex gap-3 rounded-xl bg-white/70 px-4 py-3"><Check className="mt-0.5 h-4 w-4 shrink-0" />관찰 범위 · {SPEECH_ACT_UI[selectedAct]} {selectedRecords.length}건</p>
-              <p className="flex gap-3 rounded-xl bg-white/70 px-4 py-3"><RefreshCw className="mt-0.5 h-4 w-4 shrink-0" />재검토 경로 · 수정 {selectedRevisions}건</p>
-              <p className="flex gap-3 rounded-xl bg-white/70 px-4 py-3"><Target className="mt-0.5 h-4 w-4 shrink-0" />다음 초점 · {ACT_FOCUS[selectedAct]}</p>
-            </div>
+        <section className={`${panel} mt-5 p-5 sm:p-6`} aria-live="polite" aria-label="선택한 화행 돌아보기">
+          <p className="text-[12px] font-semibold text-[#857653]">선택한 화행 돌아보기</p>
+          <h2 className="mt-1 text-[22px] font-bold">{actLabel}</h2>
+          {selectedRecords.length === 0 ? (
+            <p className="mt-3 text-[14px] text-muted-foreground">{actLabel} 완료 기록이 아직 없습니다.</p>
+          ) : (
+            <dl className="mt-4 grid grid-cols-2 gap-3 text-[13px] sm:grid-cols-3">
+              {[
+                ["완료 기록", `${selectedRecords.length}건`],
+                ["최초·최종 표현이 달라진 기록", `${selectedRevisions}건`],
+                ["번역 · 통역", `${selectedRecords.filter((r) => r.taskType === "translation").length} · ${selectedRecords.filter((r) => r.taskType === "interpreting").length}`],
+              ].map(([label, value]) => (
+                <div key={label} className="rounded-xl bg-[#F7F5EE] px-4 py-3">
+                  <dt className="text-[12px] text-[#5C6A7A]">{label}</dt>
+                  <dd className="mt-1 text-[18px] font-bold text-[#15202B]">{value}</dd>
+                </div>
+              ))}
+            </dl>
+          )}
+          <div className="mt-4 rounded-xl border border-[#E4DFD0] px-4 py-3">
+            <p className="text-[12px] font-semibold text-[#5C6A7A]">회고 질문 · 모든 학습자에게 같은 질문입니다</p>
+            <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-[#26323D]">
+              <li>· 최종 표현에서도 원문의 의미와 {actLabel}의 목적이 유지되었나요?</li>
+              <li>· 관계와 부담에 맞게 표현을 어떻게 조정했나요? <span className="text-[#5C6A7A]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
+            </ul>
           </div>
-        </aside>
-
-        <section className={`${panel} mt-4 p-5 sm:p-6`}>
-            <p className="text-[12px] font-semibold text-[#857653]">수업 확장 연습 · 선택 사항</p>
-            <h2 className="mt-1.5 text-[18px] font-bold">{SPEECH_ACT_UI[selectedAct]} 표현을 한 번 더 비교해 보세요.</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => navigate("/scenario")}
-                className="flex min-h-[72px] items-center justify-between gap-4 rounded-xl bg-[#15202B] px-5 py-3.5 text-left text-white hover:bg-[#22303C]"
-              >
-                <span><strong className="block text-[14px]">동일 조건 재확인</strong><span className="mt-1 block text-[12px] text-[#B9C4CE]">다른 표현으로 다시 구성</span></span>
-                <ArrowRight className="h-4 w-4 shrink-0" />
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/scenario?mode=transfer")}
-                className="flex min-h-[72px] items-center justify-between gap-4 rounded-xl border border-[#D8D2C2] px-5 py-3.5 text-left hover:bg-[#FAF8F2]"
-              >
-                <span><strong className="block text-[14px]">조건 간 비교</strong><span className="mt-1 block text-[12px] text-muted-foreground">상대·매체를 바꾸어 확인</span></span>
-                <Search className="h-4 w-4 shrink-0" />
-              </button>
-            </div>
-            <p className="mt-3 text-[11.5px] text-muted-foreground">정규 수업 미션과 별개이며, 학습 기록을 더 비교하고 싶을 때 선택합니다.</p>
         </section>
 
         <section className={`${panel} mt-4 p-5 sm:p-6`}>
@@ -450,9 +338,9 @@ const LearnerRecords = () => {
                           <span>{new Date(record.completedAt).toLocaleDateString("ko-KR")}</span>
                         </div>
                         <div className="grid gap-3 text-[12px] md:grid-cols-3">
-                          <div><strong className="text-[11px] text-muted-foreground">최초 표현</strong><p className="mt-1 font-zh leading-relaxed">{record.firstResponse || "기록 없음"}</p></div>
-                          <div><strong className="text-[11px] text-muted-foreground">재검토 지점</strong><p className="mt-1 leading-relaxed">{focusLabel(record)}</p></div>
-                          <div><strong className="text-[11px] text-muted-foreground">최종 선택</strong><p className="mt-1 font-zh leading-relaxed">{record.revisedResponse || "기록 없음"}</p></div>
+                          <div><strong className="text-[11px] text-muted-foreground">최초 표현</strong><p className="mt-1 break-words font-zh leading-relaxed">{record.firstResponse || "기록 없음"}</p></div>
+                          <div><strong className="text-[11px] text-muted-foreground">재검토 지점</strong><p className="mt-1 leading-relaxed">{scopeLabel(record)}</p></div>
+                          <div><strong className="text-[11px] text-muted-foreground">최종 선택</strong><p className="mt-1 break-words font-zh leading-relaxed">{record.revisedResponse || "기록 없음"}</p></div>
                         </div>
                       </article>
                     ))}
@@ -462,10 +350,10 @@ const LearnerRecords = () => {
             )}
           </div>
           {latestRevision ? (
-            <div className="mt-4 grid gap-4 text-[13px] sm:grid-cols-[minmax(0,1.15fr)_minmax(170px,.8fr)_minmax(0,1.15fr)] sm:divide-x sm:divide-[#EEE9DC]">
-              <div className="min-w-0 sm:pr-4"><strong className="text-[11.5px] text-muted-foreground">최초 표현</strong><p className="mt-2 truncate font-zh" title={latestRevision.firstResponse}>{latestRevision.firstResponse || "기록 없음"}</p></div>
-              <div className="min-w-0 sm:px-4"><strong className="text-[11.5px] text-muted-foreground">재검토 지점</strong><p className="mt-2 truncate" title={focusLabel(latestRevision)}>{focusLabel(latestRevision)}</p></div>
-              <div className="min-w-0 sm:pl-4"><strong className="text-[11.5px] text-muted-foreground">최종 선택</strong><p className="mt-2 truncate font-zh" title={latestRevision.revisedResponse}>{latestRevision.revisedResponse || "기록 없음"}</p></div>
+            <div className="mt-4 grid gap-4 text-[13px] sm:grid-cols-[minmax(0,1.15fr)_minmax(150px,.7fr)_minmax(0,1.15fr)] sm:divide-x sm:divide-[#EEE9DC]">
+              <div className="min-w-0 sm:pr-4"><strong className="text-[11.5px] text-muted-foreground">최초 표현</strong><p className="mt-2 break-words font-zh leading-relaxed">{latestRevision.firstResponse || "기록 없음"}</p></div>
+              <div className="min-w-0 sm:px-4"><strong className="text-[11.5px] text-muted-foreground">재검토 지점</strong><p className="mt-2">{scopeLabel(latestRevision)}</p></div>
+              <div className="min-w-0 sm:pl-4"><strong className="text-[11.5px] text-muted-foreground">최종 선택</strong><p className="mt-2 break-words font-zh leading-relaxed">{latestRevision.revisedResponse || "기록 없음"}</p></div>
             </div>
           ) : (
             <p className="mt-2 text-[12px] text-muted-foreground">최초 표현과 최종 선택이 달라진 기록이 아직 없습니다.</p>
