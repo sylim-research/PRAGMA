@@ -60,6 +60,8 @@ const AdminAuthentic = () => {
     setLoadingList(true);
     const res = await listAuthenticAnalyses();
     setRows(res.rows);
+    // 최근 분석 1건은 펼친 채로 연다 — 접혀 있으면 이 화면이 무엇을 만들어 내는지 보이지 않는다.
+    setOpenId((current) => current ?? res.rows[0]?.id ?? null);
     setPending(res.pending);
     setListError(res.error);
     setLoadingList(false);
@@ -90,7 +92,7 @@ const AdminAuthentic = () => {
       setSaveNote(res.reason);
       return;
     }
-    setSaveNote(`보관함에 저장했습니다 · 후보 ${a.candidates.length}건`);
+    setSaveNote(`분석 기록에 저장했습니다 · 후보 ${a.candidates.length}건`);
     const saved = await getAnalysisById(res.analysisId);
     setJustSaved(saved);
     void refresh();
@@ -119,10 +121,166 @@ const AdminAuthentic = () => {
     void refresh();
   };
 
+  const archive = (
+    <section className="mt-8 rounded-lg border border-border bg-card p-5">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="text-[15px] font-semibold text-foreground">분석 기록</h2>
+        <span className="text-[12px] text-muted-foreground">
+          분석한 자료와 후보가 그대로 남습니다 · 최근 30건
+        </span>
+      </div>
+
+      {pending && (
+        <p className="mt-3 rounded-md border border-[#FDE68A] bg-[#FFFBEB] px-3 py-2 text-[12.5px] text-[#92400E]">
+          {AUTHENTIC_STORE_PENDING} 지금은 분석과 생성기 전달만 됩니다.
+        </p>
+      )}
+      {listError && (
+        <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[12.5px] text-[#991B1B]">
+          분석 기록을 읽지 못했습니다 · {listError}
+        </p>
+      )}
+
+      {loadingList ? (
+        <div className="mt-4 space-y-2">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-12 animate-pulse rounded-md bg-muted" />
+          ))}
+        </div>
+      ) : rows.length === 0 && !pending && !listError ? (
+        <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
+          분석한 자료가 아직 없습니다. 위에서 자료를 분석해 보세요.
+        </p>
+      ) : (
+        <div className="mt-4 flex flex-col gap-2">
+          {rows.map((row) => {
+            const open = openId === row.id;
+            return (
+              <div key={row.id} className="rounded-md border border-border">
+                <button
+                  type="button"
+                  onClick={() => setOpenId(open ? null : row.id)}
+                  className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
+                >
+                  <span className="rounded-full bg-[#EDE9DD] px-2 py-[2px] text-[10.5px] text-[#5B5446]">
+                    {row.source_type === "image" ? "이미지" : "문구"}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
+                    {excerpt(row.source_original)}
+                  </span>
+                  <span className="shrink-0 text-[11.5px] text-muted-foreground">
+                    후보 {row.candidates.length}건 ·{" "}
+                    {new Date(row.created_at).toLocaleDateString("ko-KR")}
+                  </span>
+                </button>
+
+                {open && (
+                  <div className="border-t border-border px-3 py-3">
+                    {(row.scene_ko || row.linguistic_features_ko) && (
+                      <div className="mb-3 space-y-0.5 text-[12px] leading-relaxed text-muted-foreground">
+                        {row.scene_ko && (
+                          <p>
+                            <b className="text-foreground">담화 상황 · </b>
+                            {row.scene_ko}
+                          </p>
+                        )}
+                        {row.linguistic_features_ko && (
+                          <p>
+                            <b className="text-foreground">표현 특징 · </b>
+                            {row.linguistic_features_ko}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
+                      {row.candidates.map((c) => {
+                        const status = STATUS_LABEL[c.status];
+                        const cond = c.conditions;
+                        return (
+                          <div
+                            key={c.id}
+                            className="flex flex-col gap-1.5 rounded-md border border-border bg-background p-2.5"
+                          >
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              <span className="rounded-full border border-border px-1.5 py-[1px] text-[10.5px]">
+                                {USAGE_LABEL[c.usage_type] ?? c.usage_type}
+                              </span>
+                              {cond?.speech_act_ui && (
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                  {SPEECH_ACT_UI[cond.speech_act_ui]}
+                                </span>
+                              )}
+                              {cond?.level && (
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                  {LEVEL[cond.level]}
+                                </span>
+                              )}
+                              {cond?.language_direction && (
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                  {DIRECTION_LABEL[cond.language_direction]}
+                                </span>
+                              )}
+                              <span
+                                className={`ml-auto rounded-full px-1.5 py-[1px] text-[10.5px] ${status.tone}`}
+                              >
+                                {status.text}
+                              </span>
+                            </div>
+
+                            {c.label_ko && (
+                              <p className="text-[12.5px] font-semibold text-foreground">
+                                {c.label_ko}
+                              </p>
+                            )}
+                            {c.source_text && (
+                              <p className="text-[12px] leading-relaxed text-muted-foreground">
+                                {c.source_text}
+                              </p>
+                            )}
+
+                            <div className="mt-1 flex flex-wrap gap-1.5">
+                              {c.source_text && c.usage_type !== "expression_resource" && (
+                                <Button
+                                  onClick={() => void sendStoredToGenerator(c, row)}
+                                  className="h-7 bg-[#15202B] px-2.5 text-[11.5px] text-white hover:bg-[#15202B]/90"
+                                >
+                                  상황 시나리오 만들기
+                                </Button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={() => void mark(c, c.status === "held" ? "stored" : "held")}
+                                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
+                              >
+                                {c.status === "held" ? "보류 해제" : "보류"}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => void mark(c, "discarded")}
+                                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
+                              >
+                                버리기
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+
   return (
     <AdminShell
       title="실제 자료 활용 분석"
-      description="쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 활용 후보를 제안합니다. 분석한 자료는 후보까지 보관함에 남아 나중에 다시 꺼내 쓸 수 있습니다."
+      description="쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 상황 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 분석 기록에 남습니다."
     >
       {saveNote && (
         <p
@@ -139,160 +297,8 @@ const AdminAuthentic = () => {
 
       <AuthenticImportPanel onApply={handleApply} onAnalyzed={handleAnalyzed} />
 
-      {/* ── 보관함 ─────────────────────────────────────────────────────── */}
-      <section className="mt-8 rounded-lg border border-border bg-card p-5">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-[15px] font-semibold text-foreground">보관함</h2>
-          <span className="text-[12px] text-muted-foreground">
-            분석한 자료와 후보가 그대로 남습니다 · 최근 30건
-          </span>
-        </div>
-
-        {pending && (
-          <p className="mt-3 rounded-md border border-[#FDE68A] bg-[#FFFBEB] px-3 py-2 text-[12.5px] text-[#92400E]">
-            {AUTHENTIC_STORE_PENDING} 지금은 분석과 생성기 전달만 됩니다.
-          </p>
-        )}
-        {listError && (
-          <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[12.5px] text-[#991B1B]">
-            보관함을 읽지 못했습니다 · {listError}
-          </p>
-        )}
-
-        {loadingList ? (
-          <div className="mt-4 space-y-2">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-12 animate-pulse rounded-md bg-muted" />
-            ))}
-          </div>
-        ) : rows.length === 0 && !pending && !listError ? (
-          <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
-            분석한 자료가 아직 없습니다. 위에서 자료를 분석해 보세요.
-          </p>
-        ) : (
-          <div className="mt-4 flex flex-col gap-2">
-            {rows.map((row) => {
-              const open = openId === row.id;
-              return (
-                <div key={row.id} className="rounded-md border border-border">
-                  <button
-                    type="button"
-                    onClick={() => setOpenId(open ? null : row.id)}
-                    className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
-                  >
-                    <span className="rounded-full bg-[#EDE9DD] px-2 py-[2px] text-[10.5px] text-[#5B5446]">
-                      {row.source_type === "image" ? "이미지" : "문구"}
-                    </span>
-                    <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
-                      {excerpt(row.source_original)}
-                    </span>
-                    <span className="shrink-0 text-[11.5px] text-muted-foreground">
-                      후보 {row.candidates.length}건 ·{" "}
-                      {new Date(row.created_at).toLocaleDateString("ko-KR")}
-                    </span>
-                  </button>
-
-                  {open && (
-                    <div className="border-t border-border px-3 py-3">
-                      {(row.scene_ko || row.linguistic_features_ko) && (
-                        <div className="mb-3 space-y-0.5 text-[12px] leading-relaxed text-muted-foreground">
-                          {row.scene_ko && (
-                            <p>
-                              <b className="text-foreground">담화 상황 · </b>
-                              {row.scene_ko}
-                            </p>
-                          )}
-                          {row.linguistic_features_ko && (
-                            <p>
-                              <b className="text-foreground">표현 특징 · </b>
-                              {row.linguistic_features_ko}
-                            </p>
-                          )}
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                        {row.candidates.map((c) => {
-                          const status = STATUS_LABEL[c.status];
-                          const cond = c.conditions;
-                          return (
-                            <div
-                              key={c.id}
-                              className="flex flex-col gap-1.5 rounded-md border border-border bg-background p-2.5"
-                            >
-                              <div className="flex flex-wrap items-center gap-1.5">
-                                <span className="rounded-full border border-border px-1.5 py-[1px] text-[10.5px]">
-                                  {USAGE_LABEL[c.usage_type] ?? c.usage_type}
-                                </span>
-                                {cond?.speech_act_ui && (
-                                  <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
-                                    {SPEECH_ACT_UI[cond.speech_act_ui]}
-                                  </span>
-                                )}
-                                {cond?.level && (
-                                  <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
-                                    {LEVEL[cond.level]}
-                                  </span>
-                                )}
-                                {cond?.language_direction && (
-                                  <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
-                                    {DIRECTION_LABEL[cond.language_direction]}
-                                  </span>
-                                )}
-                                <span
-                                  className={`ml-auto rounded-full px-1.5 py-[1px] text-[10.5px] ${status.tone}`}
-                                >
-                                  {status.text}
-                                </span>
-                              </div>
-
-                              {c.label_ko && (
-                                <p className="text-[12.5px] font-semibold text-foreground">
-                                  {c.label_ko}
-                                </p>
-                              )}
-                              {c.source_text && (
-                                <p className="text-[12px] leading-relaxed text-muted-foreground">
-                                  {c.source_text}
-                                </p>
-                              )}
-
-                              <div className="mt-1 flex flex-wrap gap-1.5">
-                                {c.source_text && c.usage_type !== "expression_resource" && (
-                                  <Button
-                                    onClick={() => void sendStoredToGenerator(c, row)}
-                                    className="h-7 bg-[#BA7517] px-2.5 text-[11.5px] text-white hover:bg-[#BA7517]/90"
-                                  >
-                                    → 시나리오 만들기
-                                  </Button>
-                                )}
-                                <button
-                                  type="button"
-                                  onClick={() => void mark(c, c.status === "held" ? "stored" : "held")}
-                                  className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
-                                >
-                                  {c.status === "held" ? "보류 해제" : "보류"}
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => void mark(c, "discarded")}
-                                  className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
-                                >
-                                  버림
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
+      {/* ── 보관함 ── */}
+      {archive}
     </AdminShell>
   );
 };

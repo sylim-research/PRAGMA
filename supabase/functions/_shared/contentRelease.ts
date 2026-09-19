@@ -37,4 +37,5 @@ export const CURRENT_MISSION_QUALITY_PROMPT_VERSION = CURRENT_CONTENT_RELEASE.qu
 // Same critic/result contract; v6 has different instructional semantics.
 // v2: the header names the mission's own speech act instead of assuming request;
 // the judgment axis was already the feature block passed with the request.
-export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_act_general_v2";
+// v3: carries the shared scene-plausibility rule that every v5 generation/review prompt has.
+export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_act_general_v3_scene_plausibility";

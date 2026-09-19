@@ -96,7 +96,7 @@ export function reusableGenerationQuality(raw: Record<string, any>): GenerationQ
   // The six request missions approved before 2026-09-17 carry the v1 critic version; its
   // judgment axis was the same feature block, so their evidence stays reusable.
   const qualityVersions = raw.schema_version === "mission_v6"
-    ? [MISSION_V6_QUALITY_PROMPT_VERSION, "quality_mission_v6_request_reason_contrast_v1"]
+    ? [MISSION_V6_QUALITY_PROMPT_VERSION, "quality_mission_v6_act_general_v2", "quality_mission_v6_request_reason_contrast_v1"]
     : [CURRENT_MISSION_QUALITY_PROMPT_VERSION];
   if (!quality || !/^[0-9a-f]{64}$/.test(hash ?? "") || quality.mission_content_hash !== hash
     || !["pass", "warning", "fail"].includes(quality.verdict) || !Array.isArray(quality.findings)

@@ -12,12 +12,20 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "상황 시나리오 생성",
-  mission: "학습 미션 조립 (MJT + DCT)",
+  mission: "학습 미션 조립 (v5 형식 · v6 전환의 원본)",
   review: "프롬프트 통제 기반 검토",
   runtime: "학습자 피드백",
   authoring: "실제 자료 활용",
 };
 const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
+// 화면 조작으로 호출될 수 없는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
+// 집중 구간 없는 피드백은 편성된 4문항 미션이 학습자에게 열리지 않아 호출 경로가 없다.
+const HIDDEN_PROMPT_KEYS = new Set([
+  "feedback.system",
+  "feedback.system.zh_ko",
+  "feedback.system.zh_ko.spoken",
+  "feedback.system.spoken",
+]);
 
 function HarnessOverview() {
   return (
@@ -27,13 +35,13 @@ function HarnessOverview() {
     >
       <div className="max-w-[48rem]">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">
-          품질관리 구조
+          품질 관리 구조
         </p>
         <h2 id="harness-overview-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
-          자동 점검은 두 방식으로, 최종 권한은 교수자에게 둡니다
+          자동 점검은 근거를 제시하고, 승인은 교수자가 합니다
         </h2>
         <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
-          규칙 검사와 AI 검토가 근거를 제시하고, 교수자가 감수해 최종 승인합니다.
+          규칙 검사와 AI 검토, 두 갈래의 자동 점검을 거친 뒤 교수자가 감수해 최종 승인합니다.
         </p>
       </div>
 
@@ -78,25 +86,31 @@ function HarnessOverview() {
 function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card>
+    <Card className={open ? "md:col-span-2" : undefined}>
       <CardHeader className="p-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="flex items-center gap-1 text-left"
+            className="flex min-w-0 flex-1 items-center gap-1 text-left"
           >
-            {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-            <CardTitle className="text-base">{entry.label}</CardTitle>
+            {open ? (
+              <ChevronDown className="h-4 w-4 shrink-0" />
+            ) : (
+              <ChevronRight className="h-4 w-4 shrink-0" />
+            )}
+            <CardTitle className="truncate text-[15px]">{entry.label}</CardTitle>
           </button>
-          <Badge variant="outline" className="font-mono text-[11px]">
+          <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
             {entry.sha256.slice(0, 10)}
           </Badge>
-          <Badge variant="secondary" className="font-normal">
+          <Badge variant="secondary" className="shrink-0 font-normal">
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">{entry.note}</p>
+        <p className="mt-1 truncate pl-5 text-xs text-muted-foreground" title={entry.note}>
+          {entry.note}
+        </p>
       </CardHeader>
       {open && (
         <CardContent className="p-4 pt-0">
@@ -122,12 +136,12 @@ const AdminPromptHarness = () => {
 
       <div className="mt-6 space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
-          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g);
+          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
             <div key={g}>
               <h3 className="mb-2 text-[15px] font-bold">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="space-y-2">
+              <div className="grid grid-flow-row-dense gap-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
                 ))}
