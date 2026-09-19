@@ -101,17 +101,21 @@ const Section = ({
 );
 
 /** 소속/신분·동의는 신·구 컬럼이 공존한다 — 마법사가 쓰는 쪽을 우선하고 없으면 구 값. */
-/** 목록용 동의 표시. 미확인은 호박색, 미동의는 적색 — 회색으로 흐리게 두지 않는다. */
-function ConsentChip({ label, value }: { label: string; value: boolean | null | undefined }) {
-  const tone = value === true
+/** 목록용 동의 요약 한 칸. 둘 다 동의면 초록, 미동의가 있으면 적색, 그 밖에는 호박색(회색 금지). */
+function ConsentSummary({ research, sharing }: { research: boolean | null | undefined; sharing: boolean | null | undefined }) {
+  const word = (value: boolean | null | undefined) => (value === true ? "✓" : value === false ? "✕" : "?");
+  const tone = research === true && sharing === true
     ? "border-[#9CC7B0] bg-[#F4FAF6] text-[#245E44]"
-    : value === false
+    : research === false || sharing === false
       ? "border-[#E8B4AE] bg-[#FFF3F1] text-[#8B3531]"
       : "border-[#E3C77A] bg-[#FFFBEF] text-[#8A5A14]";
-  const state = value === true ? "동의" : value === false ? "미동의" : "미확인";
+  const state = (value: boolean | null | undefined) => (value === true ? "동의" : value === false ? "미동의" : "미확인");
   return (
-    <span title={`${label} ${state}`} className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold ${tone}`}>
-      {label} {value === true ? "✓" : state}
+    <span
+      title={`연구 활용 ${state(research)} · 학습 기록 공유 ${state(sharing)}`}
+      className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] font-semibold ${tone}`}
+    >
+      연구 {word(research)} · 공유 {word(sharing)}
     </span>
   );
 }
@@ -240,39 +244,38 @@ const Page = () => {
                 const primaryLanguage = labelOf(PRIMARY_LANGUAGE_OPTIONS, r.language_background);
                 const testLevel = labelOf(languageTestOptions(r.language_background), r.chinese_level);
                 return (
-                <TableRow key={r.id} className="h-[72px] hover:bg-[#FBFAF5]">
-                  <TableCell className="px-5 py-4">
-                    <div className="min-w-0">
+                <TableRow key={r.id} className="h-[52px] hover:bg-[#FBFAF5]">
+                  <TableCell className="px-5 py-2.5">
+                    <div className="flex min-w-0 items-baseline gap-2">
                       <button
                         type="button"
                         aria-label={`${r.full_name ?? r.email ?? "학습자"} 프로필 보기`}
                         onClick={() => setSelectedId(r.id)}
-                        className="block max-w-full truncate text-left font-semibold leading-5 text-[#1F3A5F] underline decoration-[#9FB0C6] underline-offset-4 hover:decoration-[#1F3A5F] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="shrink-0 whitespace-nowrap text-left font-semibold leading-5 text-[#1F3A5F] underline decoration-[#9FB0C6] underline-offset-4 hover:decoration-[#1F3A5F] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {r.full_name ?? "—"} <span className="text-[11.5px] font-medium no-underline">· 상세</span>
                       </button>
-                      <div className="mt-0.5 truncate text-xs leading-5 text-muted-foreground" title={r.email ?? undefined}>{r.email ?? "—"}</div>
+                      <span className="min-w-0 truncate text-xs leading-5 text-[#46515A]" title={r.email ?? undefined}>{r.email ?? "—"}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm leading-5 text-[#343B42]">
-                    <div>{firstOf(r.affiliation, r.affiliation_or_status) ?? "—"}</div>
-                    {firstOf(r.grade_or_program, r.academic_year_or_program) && (
-                      <div className="text-xs text-[#46515A]">{firstOf(r.grade_or_program, r.academic_year_or_program)}</div>
-                    )}
+                  <TableCell className="px-3 py-2.5 text-sm leading-5 text-[#343B42]">
+                    <div className="truncate" title={[firstOf(r.affiliation, r.affiliation_or_status), firstOf(r.grade_or_program, r.academic_year_or_program)].filter(Boolean).join(" · ")}>
+                      {firstOf(r.affiliation, r.affiliation_or_status) ?? "—"}
+                      {firstOf(r.grade_or_program, r.academic_year_or_program) && (
+                        <span className="text-xs text-[#46515A]"> · {firstOf(r.grade_or_program, r.academic_year_or_program)}</span>
+                      )}
+                    </div>
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm font-medium text-[#343B42]">
+                  <TableCell className="px-3 py-2.5 text-sm font-medium text-[#343B42]">
                     {primaryLanguage ?? <span className="text-xs font-normal text-amber-700">미입력</span>}
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm font-medium text-[#343B42]">
+                  <TableCell className="px-3 py-2.5 text-sm font-medium text-[#343B42]">
                     {testLevel ?? <span className="text-xs font-normal text-amber-700">미입력</span>}
                   </TableCell>
-                  <TableCell className="px-3 py-4">
-                    <div className="flex flex-wrap gap-1">
-                      <ConsentChip label="연구 활용" value={firstOf(r.consent_data_use, r.research_use_consent)} />
-                      <ConsentChip label="기록 공유" value={r.consent_class_record_sharing} />
-                    </div>
+                  <TableCell className="px-3 py-2.5">
+                    <ConsentSummary research={firstOf(r.consent_data_use, r.research_use_consent)} sharing={r.consent_class_record_sharing} />
                   </TableCell>
-                  <TableCell className="px-3 py-4">
+                  <TableCell className="px-3 py-2.5">
                     <Badge
                       variant="outline"
                       className={`min-w-[76px] justify-center whitespace-nowrap ${STATUS_TONE[r.approval_status]}`}
@@ -280,7 +283,7 @@ const Page = () => {
                       {STATUS_LABEL[r.approval_status]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-right">
+                  <TableCell className="px-5 py-2.5 text-right">
                     {traceQueryFor(r) && (
                       <Button
                         size="sm"
