@@ -543,7 +543,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   type="button"
                   onClick={fetchCaption}
                   disabled={ytLoading || !youtubeUrl.trim()}
-                  className="h-10 shrink-0 rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:bg-[#C9CED2]"
+                  className="h-10 shrink-0 rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D]"
                 >
                   {ytLoading ? "가져오는 중…" : "자막 가져오기"}
                 </button>
@@ -595,7 +595,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         <Button
           onClick={() => runAnalyze()}
           disabled={loading || (!text.trim() && !imageDataUrl)}
-          className="h-12 w-full gap-2 bg-[#FAD338] text-[15px] font-bold text-[#15202B] shadow-[0_2px_0_#D9B51C] transition-all hover:-translate-y-px hover:bg-[#F2C71E] hover:shadow-[0_3px_0_#C9A614] active:translate-y-0 active:shadow-none disabled:translate-y-0 disabled:opacity-50 disabled:shadow-none"
+          className="h-12 w-full gap-2 bg-[#FAD338] text-[15px] font-bold text-[#15202B] shadow-[0_2px_0_#D9B51C] transition-all hover:-translate-y-px hover:bg-[#F2C71E] hover:shadow-[0_3px_0_#C9A614] active:translate-y-0 active:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[#F7E08A] disabled:text-[#15202B]/80 disabled:opacity-100 disabled:shadow-[0_2px_0_#E6CF6E]"
         >
           {loading ? (
             <>
