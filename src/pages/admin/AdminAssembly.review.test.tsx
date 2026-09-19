@@ -91,12 +91,14 @@ describe("professor final approval workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     expect(await within(bench).findByText("교수자 작업대")).toBeInTheDocument();
-    expect(within(bench).getByText(/^Mission v6 · 비즈니스 중국어 3주차 · 수정 .* · Trace a84f21c$/)).toBeInTheDocument();
+    // 머리에는 편성 위치만 둔다(버전·수정 시각·Trace는 세부 추적 정보로).
+    expect(within(bench).getByText("비즈니스 중국어 3주차")).toBeInTheDocument();
+    expect(within(bench).queryByText(/Trace a84f21c/)).toBeNull();
     expect(within(bench).queryByText(/규칙 통과|AI 검토 완료|교수자 결정 대기/)).not.toBeInTheDocument();
     // 교수자 최종 승인은 대기열을 옆에 두지 않는다. 목록은 머리의 버튼으로 연다.
     expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
     fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
-    expect(screen.getByRole("button", { name: /결정 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /승인 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /검토 완료 상태\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "정렬" })).toHaveValue("oldest");
@@ -118,7 +120,7 @@ describe("professor final approval workbench", () => {
     // 승인 후에도 같은 미션이 남고, 결과(승인 이력 패널)를 보여 준다.
     expect(await within(workbench()).findByText(/점검 패널/)).toBeInTheDocument();
     expect(within(workbench()).getByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
-    fireEvent.click(within(workbench()).getByRole("button", { name: "다음 결정 대기 미션 ▶" }));
+    fireEvent.click(within(workbench()).getByRole("button", { name: "다음" }));
     expect(await within(workbench()).findByRole("heading", { name: "나중에 올라온 결정 미션" })).toBeInTheDocument();
     expect(within(workbench()).getByRole("button", { name: "이전" })).toBeDisabled();
   });

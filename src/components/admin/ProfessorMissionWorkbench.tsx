@@ -108,7 +108,7 @@ export function ProfessorMissionWorkbench({
                   ...current,
                   [issueIndex]: event.target.value,
                 }))}
-                placeholder="수정하지 않고 승인한다면 교수자 판단 근거를 10자 이상 기록하세요. 수정할 경우 먼저 아래 수정본을 저장해 critic을 다시 실행하세요."
+                placeholder="수정하지 않고 승인한다면 교수자 판단 근거를 10자 이상 기록하세요."
               />
             </label>
           ))}
@@ -118,7 +118,7 @@ export function ProfessorMissionWorkbench({
   const editor = (
       <details className="mt-3 rounded-lg border border-[#E3E6E7] bg-[#FAFBFB] p-3">
         <summary className="cursor-pointer font-medium text-[#34444D]">
-          {approvalHref ? "문항 block 직접 수정" : "원본 수정하기 · 문항 block 직접 수정"}
+          {approvalHref ? "문항 직접 수정" : "원본 수정하기"}
         </summary>
         {!approvalHref && (
           <p className="mt-2 text-[12px] text-muted-foreground">
@@ -192,7 +192,6 @@ export function ProfessorMissionWorkbench({
         missionContentHash={traceHash ?? mission.provenance?.mission_content_hash}
         decisionSlot={failFindingsBlock || undefined}
         onApprove={(approval) => onReview(overrides, approval)} />
-      {editor}
     </section>
   );
 }

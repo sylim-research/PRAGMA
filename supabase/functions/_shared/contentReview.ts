@@ -126,7 +126,9 @@ export function professorReviewFindings(run: ContentReviewRun | null): ReviewFin
   const primary = primaryReviewResult(run)?.findings ?? [];
   const generation = run.openai_review && run.generation_quality ? generationQualityResult(run.generation_quality).findings : [];
   return [...ruleSignals, ...primary, ...generation, ...(run.claude_review?.result.findings ?? [])]
-    .filter(f => f.severity === "fail" || f.needs_professor || run.professor_decisions.some(d => d.finding_id === f.id));
+    .filter(f => f.severity === "fail" || f.needs_professor || run.professor_decisions.some(d => d.finding_id === f.id)
+      // 의견 대조가 수용·보완한 지적은 수준과 무관하게 교수자가 판단한다(2026-09-19).
+      || Boolean(run.adjudication?.result.decisions.some(d => d.finding_id === f.id && (d.decision === "accept" || d.decision === "refine"))));
 }
 /** 묶음 확인의 저장 문구. 교수자가 타이핑하지 않아도 결정의 성격이 기록에 남는다. */
 export const BULK_SIGNAL_RATIONALE = "자동 품질 점검 신호 묶음 확인 · 현재 버전 그대로 사용";

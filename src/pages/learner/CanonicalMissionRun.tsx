@@ -66,6 +66,8 @@ const useCanonicalMission = () => useContext(CanonicalMissionContext);
 const RuntimeMissionContext = createContext<RunnableMission | null>(null);
 const useRuntimeMission = () => useContext(RuntimeMissionContext);
 const LocalPilotContext = createContext(false);
+/** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
+const ReviewHostContext = createContext(false);
 
 type QuestResponse = Record<string, unknown>;
 // deferred = 의미 충실성이 무너져 뒤 층을 아직 보지 않음(DEC-20260918-04). 판정 원자료(verdicts)는 그대로 저장된다.
@@ -1776,9 +1778,10 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
 }) {
   const mission = useCanonicalMission();
   const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
+  const reviewHost = useContext(ReviewHostContext);
   return (
     <div className="space-y-3">
-      {quest.id === "A1" && (
+      {quest.id === "A1" && !reviewHost && (
         <h1 className="px-1 text-xl font-bold tracking-[-0.01em] text-[#15202B]">적절성 판단하기</h1>
       )}
       {pilotContext !== undefined
@@ -1930,7 +1933,7 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
   const feedbackQuest = mission.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback");
   const draft = quest?.kind === "dct" ? responses[quest.id] as DctResponse | undefined : undefined;
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
-  return <RuntimeMissionContext.Provider value={null}><CanonicalMissionContext.Provider value={mission}>
+  return <ReviewHostContext.Provider value={true}><RuntimeMissionContext.Provider value={null}><CanonicalMissionContext.Provider value={mission}>
     <div className="space-y-5">
       {section === "scene" ? <SceneIntroFlow config={buildSceneIntroConfig(mission)} onNext={onNext} />
         : section === "recap" ? <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={onNext} />
@@ -1963,7 +1966,7 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
           </section>}
         </> : <p role="alert">이 문항을 학습자 화면으로 표시할 수 없습니다.</p>}
     </div>
-  </CanonicalMissionContext.Provider></RuntimeMissionContext.Provider>;
+  </CanonicalMissionContext.Provider></RuntimeMissionContext.Provider></ReviewHostContext.Provider>;
 }
 
 /**

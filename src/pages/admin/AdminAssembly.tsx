@@ -19,7 +19,7 @@ import { GenerationJobsPanel } from '@/components/admin/GenerationJobsPanel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -424,7 +424,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const chipLabel = (chip: StateChip) => {
     if (chip === "all") return "전체";
     if (!reviewMode && chip in PRODUCTION_KO) return PRODUCTION_KO[chip as ProductionState];
-    if (chip === "decision") return aiReview ? "교수자 승인 대기" : "결정 대기";
+    if (chip === "decision") return aiReview ? "교수자 승인 대기" : "승인 대기";
     if (chip === "in_progress") return "검수 진행 중";
     // 대시보드와 같은 집합은 같은 이름으로 부른다.
     if (chip === "needs_check") return "품질 점검 대기";
@@ -710,7 +710,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
-    if (!professorScreen) {
+    {
       return (
         <span className="flex flex-wrap items-center gap-1.5">
           <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
@@ -724,6 +724,27 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         <span className={["rounded border font-bold", cls, DIRECTION_TONE[direction]].join(" ")}>{DIRECTION_LABEL[direction]}</span>
         <span className={["rounded border font-semibold", cls, LEVEL_TONE[r.learner_level]].join(" ")}>{LEVEL[r.learner_level]}</span>
         <span className={["rounded border font-semibold", cls, MODE_TONE[mode]].join(" ")}>{MODE_LABEL[mode]}</span>
+      </span>
+    );
+  };
+
+  // 작업대 머리의 핵심 정보 네 가지. 각각 이름표를 붙여 하나씩 읽히게 한다.
+  const headerBadges = (r: CoreRow) => {
+    const direction = coreDirection(r.core_content);
+    const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
+    const facet = (label: string, value: string) => (
+      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 text-[13px] font-bold text-[#233542]">
+        <span className="text-[11px] font-medium text-[#8C969B]">{label}</span>{value}
+      </span>
+    );
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
+          <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
+        </span>
+        {facet("방향", DIRECTION_LABEL[direction])}
+        {facet("수준", LEVEL[r.learner_level])}
+        {facet("과제", MODE_LABEL[mode])}
       </span>
     );
   };
@@ -778,8 +799,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   const queueButton = (
     <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
-      className="h-8 shrink-0 gap-1.5 px-2.5 text-[12.5px]" onClick={() => setQueueOpen(true)}>
-      <span aria-hidden>☰</span>{chipLabel(fState)}<span className="tabular-nums text-[#66727A]">{dash[fState]}</span>
+      className="h-10 shrink-0 gap-2 border-[#233542] bg-[#233542] px-3.5 text-[13.5px] font-bold text-white shadow-sm hover:bg-[#15202B] hover:text-white" onClick={() => setQueueOpen(true)}>
+      <ListChecks aria-hidden className="size-4 text-[#FAD338]" />{chipLabel(fState)} 목록
+      <span className="rounded-full bg-[#FAD338] px-2 py-0.5 text-[12px] font-bold tabular-nums text-[#15202B]">{dash[fState]}</span>
     </Button>
   );
 
@@ -792,7 +814,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
     const metaLine = aiReview ? [] : reviewMode
-      ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
+      ? [info?.placement === "편성 전" ? null : info?.placement]
       : [];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
@@ -806,19 +828,19 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     return (
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
-        <header className="sticky top-16 z-10 flex items-start justify-between gap-3 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        <header className="sticky top-16 z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85">
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
-              <span className="shrink-0 [&>span]:flex-nowrap">{badges(r, "sm")}</span>
+              <span className="shrink-0">{headerBadges(r)}</span>
               {metaLine.some(Boolean) && (
                 <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
                   {metaLine.filter(Boolean).join(" · ")}
                 </p>
               )}
             </div>
-            <h2 className="line-clamp-2 text-[16px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <h2 className="line-clamp-2 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
             {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
@@ -862,11 +884,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 교수자 최종 승인: 결정하는 화면 ── */}
         {professorScreen && (
           <>
-            {/* 감수 대상은 아래 학생 화면이다. 코어 원문은 필요할 때만 펼친다. */}
-            <details>
-              <summary className="cursor-pointer text-[12.5px] font-semibold text-[#5D6970]">시나리오 전문</summary>
-              <div className="mt-1.5">{scenarioText}</div>
-            </details>
             {st === "generated" && info?.queue !== "decision" && (
               <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>
@@ -891,11 +908,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         )}
 
         {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
-        {professorScreen && (
-          <footer className="flex justify-end pt-1">
-            <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
-          </footer>
-        )}
+
         </div>
       </div>
     );
