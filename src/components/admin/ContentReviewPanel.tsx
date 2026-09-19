@@ -439,13 +439,19 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
         <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0 bg-white" value={note} onChange={(event) => setNote(event.target.value)} />
-        <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+          <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
+            className={experiential ? "h-12 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
+            {busy ? "처리 중…" : "교수자 최종 승인"}
+          </Button>
+        </div>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
-      {next !== "approved" && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
-        || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}
-        className={experiential && next === "professor" ? "h-12 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
-        {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : next === "professor" ? "교수자 최종 승인" : `${vendorFree(steps[stepIndex].label)} 실행`}
+      {/* 최종 승인 버튼은 승인 상자 안(확인 체크 오른쪽)에 둔다. 그 밖의 단계 실행 버튼만 여기 남는다. */}
+      {next !== "approved" && !(next === "professor" && !handoffHref) && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)}
+        onClick={() => void runNext()}>
+        {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
       {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
           단계와 무관하게 넘어갈 수 있고, 넘어가는 것만으로 승인 상태가 바뀌지 않는다. */}
