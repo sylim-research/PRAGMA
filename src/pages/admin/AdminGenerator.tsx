@@ -798,7 +798,7 @@ const AdminGenerator = () => {
           두었던 적이 있으나(2026-09-09 오전), 분석 결과가 저장되지 않고 사라지는 문제가
           화면 위치와는 무관해 다시 분리했다. 이 화면은 넘어온 후보를 받기만 한다. */}
       <p className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-2.5 text-[12.5px] text-[#7A4A0A]">
-        실제 자료(쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면{" "}
+        실제 자료(YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면{" "}
         <Link to="/admin/authentic" className="font-semibold underline">
           실제 자료 활용 분석
         </Link>
