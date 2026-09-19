@@ -284,7 +284,7 @@ export const CurriculumEditor = ({
       <div className="max-w-[58rem] space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">새 교과목 빠르게 만들기</h2>
+            <h2 className="text-lg font-semibold">교과목 추가</h2>
             <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
               세 가지만 정하면 표준 15주 계획을 자동으로 준비하고 바로 미션 편성으로 이어집니다.
             </p>

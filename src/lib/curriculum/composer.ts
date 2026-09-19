@@ -46,7 +46,7 @@ export interface ComposerCore {
   target_feature: string | null;
   /** 편성 가능한 v5/v6 완전 미션: 독립 MJT가 정확히 5개다. */
   is_native_mpj5: boolean;
-  /** mission_content.schema_version (mission_v5 | mission_v6). 편성 화면의 「이전 형식」 표시용. */
+  /** mission_content.schema_version (mission_v5 | mission_v6). 편성 화면의 「교체 필요」 표시용. */
   schema_version?: string | null;
   /** 이 행이 대체한 이전 판. 다른 행이 이 행을 가리키면 이 행은 새 판이 있는 옛 판이다. */
   supersedes_scenario_id?: string | null;

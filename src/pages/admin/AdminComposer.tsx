@@ -119,6 +119,7 @@ const AdminComposer = () => {
 
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [conditionsOpen, setConditionsOpen] = useState(true);
   const [confirmAction, setConfirmAction] = useState<"unpublish" | "delete" | null>(null);
 
   const [outline, setOutline] = useState<CurriculumOutlineRow | null>(null);
@@ -707,7 +708,7 @@ const AdminComposer = () => {
   return (
     <AdminShell
       title="15주 수업 편성"
-      description="강좌 일정에 따라 주차별 학습 주제와 승인된 학습 미션을 편성합니다."
+      description="주차별 주제를 정하고 승인된 미션을 배치합니다."
       compact
     >
       <div className="w-full max-w-[960px]">
@@ -769,8 +770,8 @@ const AdminComposer = () => {
             </Badge>
           )}
           <div className="ml-auto flex items-center gap-1.5">
-            <Button className="h-9" variant="ghost" onClick={() => setStructureEditor("new")}>
-              + 새 교과목
+            <Button className="h-9 border-[#1F3A5F] text-[#1F3A5F] hover:bg-[#EEF2F7]" variant="outline" onClick={() => setStructureEditor("new")}>
+              + 교과목 추가
             </Button>
             <div
               className="relative"
@@ -866,20 +867,25 @@ const AdminComposer = () => {
               </AlertDialogContent>
             </AlertDialog>
 
-        {/* 지금 편성 중인 교과목과, 편성의 일상 업무 세 가지. 저장만 채운 버튼으로 둔다. */}
+        {/* 편성 조건(기본 펼침)과 일상 업무. 저장만 채운 버튼으로 둔다. */}
         <div className="mt-4 rounded-xl border border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-start justify-between gap-4 px-5 py-4">
-            <div className="min-w-0">
-              <p className="text-[11.5px] font-semibold tracking-[0.06em] text-[#8A9299]">지금 편성 중</p>
-              <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                <h2 className="text-[18px] font-bold leading-snug text-[#15202B]">
-                  {selectedOutline ? courseDisplayTitle(selectedOutline) : loading ? "교과목을 불러오는 중…" : "선택한 교과목 없음"}
-                </h2>
-                {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
-              </div>
-              <p className="mt-1 text-[12.5px] text-muted-foreground">
-                {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
-              </p>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <button
+                type="button"
+                aria-expanded={conditionsOpen}
+                onClick={() => setConditionsOpen((open) => !open)}
+                className="flex items-center gap-1.5 text-[16px] font-bold text-[#15202B]"
+              >
+                편성 조건
+                <span aria-hidden className="text-[12px] text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+              </button>
+              {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
+              {!conditionsOpen && (
+                <span className="text-[12.5px] text-muted-foreground">
+                  {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
+                </span>
+              )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {/* 강의계획서 보기는 숨김(2026-09-19). 교수자 항목이 브라우저에만 저장돼 운영에 쓰기 어렵다. 코드는 되살릴 수 있게 둔다. */}
@@ -891,19 +897,19 @@ const AdminComposer = () => {
               </Button>
             </div>
           </div>
-          <details className="border-t border-[#EAE4D2]">
-            <summary className="cursor-pointer px-4 py-3 text-[13px] font-semibold">편성 조건 조정</summary>
-            <div className="space-y-3 px-4 pb-4 text-[13px]">
+          {conditionsOpen && (
+          <div className="border-t border-[#EAE4D2]">
+            <div className="space-y-3 px-4 pb-4 pt-3 text-[13px]">
                 <label className="flex items-center gap-2">
                   <span className="whitespace-nowrap text-[11.5px] font-semibold text-muted-foreground">
-                    프리셋 · 빠른 시작
+                    빠른 설정
                   </span>
                   <select
                     value={presetCode}
                     onChange={(event) => applyPreset(event.target.value)}
                     className="h-9 min-w-[210px] rounded-md border border-border bg-white px-2 text-[15px] text-[#15202B]"
                   >
-                    <option value="">— 직접 설정 —</option>
+                    <option value="">직접 설정</option>
                     {COURSE_PRESETS.map((item) => (
                       <option key={item.preset_code} value={item.preset_code}>
                         {item.label}
@@ -945,7 +951,7 @@ const AdminComposer = () => {
               <div className="rounded-lg border border-[#E2DED2] bg-[#FAF9F5] p-3 sm:col-span-2 lg:col-span-1">
                 <span className="flex items-center gap-2 font-semibold text-[#15202B]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E5E7E8] text-[11px]">3</span>
-                  강좌 수행모드
+                  번역·통역 비율
                 </span>
                 <select
                   value={courseMode}
@@ -957,8 +963,7 @@ const AdminComposer = () => {
                   ))}
                 </select>
                 <p className="mt-2 text-[12px] leading-5 text-[#766C54]">
-                  화행 학습 주차마다 {missionModesSummary(expectedMissionModesForWeek({ courseMode }, 2))}
-                  {courseMode === "mixed" ? " · 각 역할에 맞는 별도의 상황으로 진행합니다." : " · 서로 다른 상황으로 진행합니다."}
+                  주차마다 {courseMode === "mixed" ? "번역·통역 미션을 1개씩" : courseMode === "interpreting" ? "통역 미션 2개를" : "번역 미션 2개를"}, 서로 다른 상황으로 배치합니다.
                 </p>
               </div>
             </div>
@@ -971,9 +976,6 @@ const AdminComposer = () => {
                   <span className="font-normal text-[#766C54]">
                     {themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${themes.length}개`}
                   </span>
-                </span>
-                <span className="text-[11.5px] text-muted-foreground">
-                  여러 주제를 함께 선택해 강의 맥락을 넓힐 수 있습니다.
                 </span>
               </div>
               <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -1007,7 +1009,7 @@ const AdminComposer = () => {
             <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-[#EAE4D2] pt-2.5 text-[11.5px] text-muted-foreground">
               {outline ? (
                 <span>
-                  현재 편성 · 번역 {assignedModeWeekCounts.translation}개 / 통역 {assignedModeWeekCounts.interpreting}개
+                  배치됨 · 번역 {assignedModeWeekCounts.translation} · 통역 {assignedModeWeekCounts.interpreting}
                 </span>
               ) : (
                 <span className="font-medium text-[#365F58]">교과목 생성 전 편성 조건</span>
@@ -1019,18 +1021,15 @@ const AdminComposer = () => {
                     : "bg-amber-50 text-amber-900"
                 }`}
               >
-                자동 편성 가능 {availableMissionCount}개
+                편성할 수 있는 미션 {availableMissionCount}개
               </span>
-              <span>
-                {outline
-                  ? "각 주차 미션은 아래에서 직접 교체할 수 있습니다."
-                  : "현재 설정은 새 교과목에 그대로 적용됩니다."}
-              </span>
+              {!outline && <span>현재 설정은 새 교과목에 그대로 적용됩니다.</span>}
             </div>
 
 
             </div>
-          </details>
+          </div>
+          )}
             {autoFillShortages.length > 0 && (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
                 <span>
@@ -1061,7 +1060,7 @@ const AdminComposer = () => {
         !loading && outlines.length === 0 ? (
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-[#CFC9B9] bg-white/60 px-5 py-4">
             <p className="text-[13px] text-[#46515A]">아직 교과목이 없습니다. 새 교과목을 만들면 표준 15주 계획이 준비됩니다.</p>
-            <Button className="h-9" onClick={() => setStructureEditor("new")}>+ 새 교과목</Button>
+            <Button className="h-9" onClick={() => setStructureEditor("new")}>+ 교과목 추가</Button>
           </div>
         ) : (
           <p className="mt-4 text-[13px] text-muted-foreground">교과목을 불러오는 중…</p>
@@ -1210,14 +1209,9 @@ function WeekRow({
         <Link to={weeklyMaterialsPath(week.outline_id, week.week_no)} className="text-[11.5px] font-semibold text-[#2F6F63] hover:underline">
           주차 수업자료
         </Link>
-        {items.length > 0 && (
-          <div className="ml-auto flex items-center gap-2 text-[11.5px]">
-            <span className="text-muted-foreground">미션 {items.length}개</span>
-          </div>
-        )}
         {isAssignable ? (
           <Button
-            className={`${items.length > 0 ? "" : "ml-auto"} h-7 px-2 text-[12px] font-normal text-[#59636B] hover:bg-[#F3F1EA]`}
+            className="ml-auto h-7 px-2 text-[12px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
             variant="ghost"
             size="sm"
             onClick={onToggleAdd}
@@ -1277,8 +1271,8 @@ function WeekRow({
                   <span className="rounded-full bg-[#F3E9D2] px-2 py-0.5 text-[#8A5A14]">
                     {featureLabel}
                   </span>
-                  {core && core.schema_version !== "mission_v6" && (
-                    <span className="rounded-full bg-[#F6EFE1] px-2 py-0.5 font-semibold text-[#8A5A14]">이전 형식</span>
+                  {core && core.schema_version !== "mission_v6" && !replaced?.has(item.scenario_id) && (
+                    <span className="rounded-full bg-[#F6EFE1] px-2 py-0.5 font-semibold text-[#8A5A14]">교체 필요</span>
                   )}
                   {replaced?.has(item.scenario_id) && (
                     <span className="rounded-full bg-[#FBE3D6] px-2 py-0.5 font-semibold text-[#9A3F1C]">새 판 있음 · 교체 필요</span>
