@@ -78,25 +78,31 @@ function HarnessOverview() {
 function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card>
+    <Card className={open ? "md:col-span-2" : undefined}>
       <CardHeader className="p-4">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="flex items-center gap-1 text-left"
+            className="flex min-w-0 flex-1 items-center gap-1 text-left"
           >
-            {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-            <CardTitle className="text-base">{entry.label}</CardTitle>
+            {open ? (
+              <ChevronDown className="h-4 w-4 shrink-0" />
+            ) : (
+              <ChevronRight className="h-4 w-4 shrink-0" />
+            )}
+            <CardTitle className="truncate text-[15px]">{entry.label}</CardTitle>
           </button>
-          <Badge variant="outline" className="font-mono text-[11px]">
+          <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
             {entry.sha256.slice(0, 10)}
           </Badge>
-          <Badge variant="secondary" className="font-normal">
+          <Badge variant="secondary" className="shrink-0 font-normal">
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">{entry.note}</p>
+        <p className="mt-1 truncate text-xs text-muted-foreground" title={entry.note}>
+          {entry.note}
+        </p>
       </CardHeader>
       {open && (
         <CardContent className="p-4 pt-0">
@@ -127,7 +133,7 @@ const AdminPromptHarness = () => {
           return (
             <div key={g}>
               <h3 className="mb-2 text-[15px] font-bold">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="space-y-2">
+              <div className="grid grid-flow-row-dense gap-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
                 ))}
