@@ -287,6 +287,8 @@ const AdminGenerator = () => {
     error?: string;
   };
   const [coreResults, setCoreResults] = useState<CoreResult[] | null>(null);
+  // 결과가 어떤 조건에서 나왔는지 보여 준다 — 생성 뒤 폼을 바꿔도 결과 쪽 조건은 그대로다.
+  const [coreConditions, setCoreConditions] = useState<string[]>([]);
 
   // v9 UI-only — source acquisition mode. "ai" keeps current flow.
   // "manual" swaps the LLM-generated source_text with the user's own text
@@ -485,6 +487,15 @@ const AdminGenerator = () => {
     if (!outlines || selectedOutlines.size === 0 || finalizing) return;
     setFinalizing(true);
     setCoreResults(null);
+    setCoreConditions([
+      SPEECH_ACT_UI[form.speech_act_ui],
+      PDR_POWER_SHORT[form.pdr_power],
+      PDR_DISTANCE_SHORT[form.pdr_distance],
+      PDR_BURDEN_SHORT[form.pdr_burden],
+      DIRECTION_LABEL[form.language_direction],
+      LEVEL[form.level],
+      CHANNEL_UI[form.channel],
+    ]);
     const indices = [...selectedOutlines].sort((a, b) => a - b);
     const results: CoreResult[] = [];
     // 같은 조건을 다시 생성하는 것은 이전 실행 재개가 아니라 새 실행이다. 내용 기반
@@ -1200,22 +1211,16 @@ const AdminGenerator = () => {
 
             {coreResults && (
               <div className="mt-2.5 space-y-1">
-                {coreResults.map((r, i) => (
-                  <div
-                    key={i}
-                    className={[
-                      "rounded-md border px-3 py-2 text-[11.5px]",
-                      r.ok
-                        ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
-                        : "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
-                    ].join(" ")}
-                  >
-                    <span className="font-medium">
-                      {r.ok ? "✓" : "✗"} {r.title}
-                      {r.ok && r.rule === "warning" && <span className="ml-1 text-[10px] text-[#92400E]">(경고)</span>}
-                    </span>
-                    {!r.ok && r.error && <span className="mt-0.5 block text-[10.5px]">{r.error}</span>}
-                  </div>
+                {coreResults.some((r) => r.ok) && (
+                  <p className="rounded-md border border-[#6EE7B7] bg-[#D1FAE5] px-3 py-2 text-[12px] font-medium text-[#065F46]">
+                    ✓ 초안 {coreResults.filter((r) => r.ok).length}건 저장 · 오른쪽에서 확인하세요
+                  </p>
+                )}
+                {coreResults.filter((r) => !r.ok).map((r, i) => (
+                  <p key={i} className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[11.5px] text-[#991B1B]">
+                    <span className="font-medium">✗ {r.title}</span>
+                    {r.error && <span className="mt-0.5 block text-[10.5px]">{r.error}</span>}
+                  </p>
                 ))}
               </div>
             )}
@@ -1225,7 +1230,7 @@ const AdminGenerator = () => {
 
 
         {/* RIGHT — preview */}
-        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
+        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
           <h2 className="text-[15px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
@@ -1264,8 +1269,16 @@ const AdminGenerator = () => {
 
             {!finalizing && coreResults && (
               <div className="space-y-4">
+                {coreConditions.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
+                    <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
+                    {coreConditions.map((c) => (
+                      <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
+                    ))}
+                  </div>
+                )}
                 {coreResults.map((r, i) => (
-                  <div key={i} className="space-y-2.5 rounded-lg border border-border bg-background p-3.5">
+                  <div key={i} className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
                         className={[
