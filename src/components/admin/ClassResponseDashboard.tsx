@@ -7,16 +7,18 @@ type Props = {
   selectedItemId: number | null;
   onSelectItem: (itemId: number) => void;
   projector?: boolean;
+  /** 그림만 보이기 — 집계 요약·문항 선택 줄을 숨긴다(논문 도판 시연용). 운영 화면은 기본값 false. */
+  figureOnly?: boolean;
 };
 
 /** 기존 익명 집계만 시각화한다. 선택 비율의 분모는 각 응답 축의 선택 건수다. */
-export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, projector = false }: Props) {
+export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, projector = false, figureOnly = false }: Props) {
   const selected = pattern.items.find((item) => item.itemId === selectedItemId) ?? pattern.items[0];
   const compactJudgment = selected?.groups.length === 1 && Boolean(selected.targetPreview)
     && (selected.itemId === 1 || selected.itemId === 2);
 
   return <div className="space-y-3" aria-label="학급 응답 대시보드">
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    {!figureOnly && <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <p className="flex items-center gap-2 text-sm font-bold text-[#15202B]"><BarChart3 className="h-4 w-4" aria-hidden="true" />문항별 응답 살펴보기</p>
       <dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#65737D]">
         {[
@@ -28,12 +30,12 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
           <dd className="font-semibold tabular-nums text-[#334653]">{value}{unit}</dd>
         </div>)}
       </dl>
-    </div>
+    </div>}
 
     {!selected ? <p className="rounded-xl border border-dashed p-5 text-sm text-muted-foreground">
       {pattern.learners > 0 ? "집계된 기록에 문항별 선택 응답이 없습니다." : "아직 이 주차 미션의 수행 기록이 없습니다."}
     </p> : <>
-      <div>
+      {!figureOnly && <div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-5" aria-label="판단 문항 선택">
           {pattern.items.map((item) => <button
             key={item.itemId}
@@ -52,7 +54,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
             <span className="mt-1 block break-keep text-sm font-bold leading-5">{item.title.replace(/^판단 \d+\s*·\s*/, "")}</span>
           </button>)}
         </div>
-      </div>
+      </div>}
 
       <section aria-label={selected.title} className="overflow-hidden rounded-2xl border border-[#E0E3E5] bg-white shadow-sm">
         {!compactJudgment && <div className="border-b border-[#E9EBEC] bg-[#F6F8F8] px-4 py-3 sm:px-6">
