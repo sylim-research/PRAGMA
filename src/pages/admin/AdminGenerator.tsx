@@ -231,6 +231,35 @@ interface BatchItem {
 
 const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
 
+// 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
+const HOLD_STAGE_LABEL = {
+  preflight: "장면 사전 검토에서 보류",
+  rule: "규칙 검사에서 보류",
+  semantic: "시나리오 조건 검토에서 보류",
+  system: "생성 오류",
+} as const;
+
+function humanizeHoldReason(text: string): string {
+  const length = text.match(/최대 유효 글자 (\d+)자 초과\(공백·문장부호 제외 실측 (\d+)자\)/);
+  if (length) return `원문이 최대 길이 ${length[1]}자를 넘었습니다(공백·문장부호 제외 ${length[2]}자).`;
+  return text
+    .replace(/p\s*=\s*'?speaker_higher'?/gi, "P「내가 높음」")
+    .replace(/p\s*=\s*'?speaker_lower'?/gi, "P「내가 낮음」")
+    .replace(/speaker_higher/g, "「내가 높음」")
+    .replace(/speaker_lower/g, "「내가 낮음」")
+    .replace(/\bacquaintance\b/g, "「지인」")
+    .replace(/\bdistant\b/g, "「초면」")
+    .replace(/\bclose\b/g, "「친밀」")
+    .replace(/\bhigh\b/g, "「높음」")
+    .replace(/\bmid\b/g, "「중간」")
+    .replace(/\blow\b/g, "「낮음」")
+    .replace(/\bscene_ko\b/g, "상황")
+    .replace(/\brelation_ko\b/g, "관계")
+    .replace(/\bsource_text\b/g, "원문")
+    .replace(/\bPDR\b/g, "P·D·R")
+    .replace(/^코어\s*/, "");
+}
+
 const AdminGenerator = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -285,6 +314,8 @@ const AdminGenerator = () => {
     rule?: "pass" | "warning" | "fail";
     scenarioId?: string;
     error?: string;
+    /** 어느 관문에서 멈췄는가 — 품질 관문의 보류는 오류가 아니다. */
+    stage?: "preflight" | "rule" | "semantic" | "system";
   };
   const [coreResults, setCoreResults] = useState<CoreResult[] | null>(null);
   // 결과가 어떤 조건에서 나왔는지 보여 준다 — 생성 뒤 폼을 바꿔도 결과 쪽 조건은 그대로다.
@@ -541,6 +572,11 @@ const AdminGenerator = () => {
           },
         });
         if (error) throw error;
+        if (data?.stop_code === "CORE_PREFLIGHT_HOLD") {
+          results.push({ title: label, ok: false, stage: "preflight", error: data.error ?? "장면 사전 검토 보류" });
+          setCoreResults([...results]);
+          continue;
+        }
         if (!data?.core_content) throw new Error(data?.error ?? "빈 응답");
         const core = data.core_content as Record<string, unknown> & { channel?: string; situation_ko?: string; brief_note_ko?: string };
         const meta = data.meta;
@@ -564,6 +600,7 @@ const AdminGenerator = () => {
             ok: false,
             core,
             rule: "fail",
+            stage: "rule",
             error: ruleResult.violations.find((v) => v.level === "fail")?.message ?? "규칙검사 실패(저장 안 함)",
           });
           setCoreResults([...results]);
@@ -592,12 +629,12 @@ const AdminGenerator = () => {
             itemKey,
           );
           if ("error" in checked) {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 실패: ${checked.error}` });
+            results.push({ title: label, ok: false, core, stage: "system", error: `시나리오 조건 검토 호출 실패: ${checked.error}` });
             setCoreResults([...results]);
             continue;
           }
           if (checked.result.verdict !== "pass") {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 보류: ${checked.result.reason}` });
+            results.push({ title: label, ok: false, core, stage: "semantic", error: checked.result.reason });
             setCoreResults([...results]);
             continue;
           }
@@ -644,7 +681,7 @@ const AdminGenerator = () => {
           scenarioId: savedId as string,
         });
       } catch (e) {
-        results.push({ title: label, ok: false, error: (e as Error).message ?? "실패" });
+        results.push({ title: label, ok: false, stage: "system", error: (e as Error).message ?? "실패" });
       }
       setCoreResults([...results]);
     }
@@ -806,16 +843,6 @@ const AdminGenerator = () => {
         </div>
       )}
 
-      {/* 실제 자료에서 시작하는 일은 「실제 자료 활용 분석」이 한다. 여기에 접이식으로
-          두었던 적이 있으나(2026-09-09 오전), 분석 결과가 저장되지 않고 사라지는 문제가
-          화면 위치와는 무관해 다시 분리했다. 이 화면은 넘어온 후보를 받기만 한다. */}
-      <p className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-2.5 text-[12.5px] text-[#7A4A0A]">
-        실제 자료(YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면{" "}
-        <Link to="/admin/authentic" className="font-semibold underline">
-          실제 자료 활용 분석
-        </Link>
-        에서 분석하고 후보를 이 화면으로 넘기세요.
-      </p>
       {/* 적용된 원문이 보이지 않으면 무엇이 반영됐는지 알 수 없다 —
           manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
       {authenticProv && manualSourceText.trim() && (
@@ -1209,21 +1236,20 @@ const AdminGenerator = () => {
               </div>
             )}
 
-            {coreResults && (
-              <div className="mt-2.5 space-y-1">
-                {coreResults.some((r) => r.ok) && (
-                  <p className="rounded-md border border-[#6EE7B7] bg-[#D1FAE5] px-3 py-2 text-[12px] font-medium text-[#065F46]">
-                    ✓ 초안 {coreResults.filter((r) => r.ok).length}건 저장 · 오른쪽에서 확인하세요
-                  </p>
-                )}
-                {coreResults.filter((r) => !r.ok).map((r, i) => (
-                  <p key={i} className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[11.5px] text-[#991B1B]">
-                    <span className="font-medium">✗ {r.title}</span>
-                    {r.error && <span className="mt-0.5 block text-[10.5px]">{r.error}</span>}
-                  </p>
-                ))}
-              </div>
-            )}
+            {coreResults && (() => {
+              const saved = coreResults.filter((r) => r.ok).length;
+              const held = coreResults.length - saved;
+              return (
+                <p
+                  className={[
+                    "mt-2.5 rounded-md border px-3 py-2 text-[12px] font-medium",
+                    saved > 0 ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
+                  ].join(" ")}
+                >
+                  {saved > 0 ? "✓ " : ""}초안 {saved}건 저장{held > 0 ? ` · ${held}건 보류` : ""} · 오른쪽에서 확인하세요
+                </p>
+              );
+            })()}
           </div>
 
         </section>
@@ -1283,12 +1309,16 @@ const AdminGenerator = () => {
                       <span
                         className={[
                           "inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-medium",
-                          r.ok ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
+                          r.ok
+                            ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
+                            : r.stage === "system"
+                              ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
+                              : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
                         ].join(" ")}
                       >
-                        {r.ok ? "✓ 초안 저장" : "✗ 저장 안 됨"}
+                        {r.ok ? "✓ 초안 저장" : HOLD_STAGE_LABEL[r.stage ?? "system"]}
                       </span>
-                      {r.rule && (
+                      {r.ok && r.rule && (
                         <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
                           규칙 검사 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
@@ -1296,7 +1326,16 @@ const AdminGenerator = () => {
                       <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
                     </div>
                     {r.error && (
-                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-2.5 py-1.5 text-[11.5px] text-[#991B1B]">{r.error}</div>
+                      <div
+                        className={[
+                          "rounded-md border px-3 py-2 text-[12.5px] leading-relaxed",
+                          r.stage === "system"
+                            ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
+                            : "border-[#FCD34D] bg-[#FFFBEB] text-[#78350F]",
+                        ].join(" ")}
+                      >
+                        {humanizeHoldReason(r.error)}
+                      </div>
                     )}
                     {r.core && typeof r.core.situation_ko === "string" && (
                       <div>
