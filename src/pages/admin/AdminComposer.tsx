@@ -757,7 +757,7 @@ const AdminComposer = () => {
           ))}
         </div>
 
-        {tab === "new" && <div className="mt-4"><NewCoursePanel cores={cores} onCreated={handleCourseCreated} /></div>}
+        {tab === "new" && <div className="mt-4"><NewCoursePanel cores={cores} courses={outlines} onCreated={handleCourseCreated} /></div>}
 
         {tab === "existing" && outlines.length > 0 && (
           <div role="radiogroup" aria-label="교과목 선택" className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
