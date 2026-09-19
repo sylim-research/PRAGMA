@@ -131,9 +131,9 @@ function recordMeta(record: ReportRecord) {
 // 글자 체계: 한국어 본문 14px · 보조 12~13px · 중국어 표현 16px(줄간격 1.75). 한 화면에서 이 값만 쓴다.
 const eyebrow = "text-[12.5px] font-semibold text-[#857653]";
 const sectionTitle = "text-[17px] font-bold text-[#15202B]";
-const rowGrid = "grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 gap-y-1.5";
-const rowLabel = "pt-[3px] text-[12px] font-semibold text-[#8C8471]";
-const zhText = "min-w-0 break-words font-zh text-[16px] leading-7 text-[#15202B]";
+const rowGrid = "grid grid-cols-[4rem_minmax(0,1fr)] gap-x-3 gap-y-1";
+const rowLabel = "pt-[2px] text-[12px] font-semibold text-[#8C8471]";
+const zhText = "min-w-0 break-words font-zh text-[16px] leading-[1.65] text-[#15202B]";
 
 /** 원문 — 길면 두 줄까지만 보이고 「펼치기」로 전체를 연다. */
 function SourceText({ text }: { text: string }) {
@@ -141,7 +141,7 @@ function SourceText({ text }: { text: string }) {
   if (!text) return null;
   const long = text.length > 70;
   return (
-    <div className="break-words text-[14px] leading-7 text-[#4F6070]">
+    <div className="break-words text-[14px] leading-6 text-[#4F6070]">
       <p className={long && !open ? "line-clamp-2" : ""}>{text}</p>
       {long && (
         <button type="button" onClick={() => setOpen((v) => !v)} className="text-[12px] font-semibold text-[#344F63] hover:underline">
@@ -272,21 +272,21 @@ const LearnerRecords = () => {
           )}
         </header>
 
-        <section className={`${panel} mt-5 grid grid-cols-2 divide-x divide-y divide-[#EEE9DC] overflow-hidden sm:grid-cols-4 sm:divide-y-0`} aria-label="수업 이수 범위">
+        <section className={`${panel} mt-4 grid grid-cols-2 divide-x divide-y divide-[#EEE9DC] overflow-hidden sm:grid-cols-4 sm:divide-y-0`} aria-label="수업 이수 범위">
           {[
             [String(completedCount), "완료 학습 기록"],
             [String(revisions.length), "고쳐 쓴 기록"],
             [`${actsCovered.size}/9`, "수행 화행"],
             [`${translationCount} · ${interpretingCount}`, "번역 · 통역"],
           ].map(([value, label]) => (
-            <div key={label} className="px-5 py-4">
-              <div className="text-[22px] font-bold leading-none tabular-nums text-[#15202B]">{value}</div>
-              <div className="mt-2 text-[12.5px] text-[#5C6A7A]">{label}</div>
+            <div key={label} className="px-5 py-3">
+              <div className="text-[20px] font-bold leading-none tabular-nums text-[#15202B]">{value}</div>
+              <div className="mt-1.5 text-[12.5px] text-[#5C6A7A]">{label}</div>
             </div>
           ))}
         </section>
         {completedCount === 0 && (
-          <section className={`${panel} mt-5 flex flex-wrap items-center justify-between gap-4 p-6`}>
+          <section className={`${panel} mt-4 flex flex-wrap items-center justify-between gap-4 p-5`}>
             <div>
               <h2 className="text-[16px] font-bold">아직 완료한 미션이 없습니다.</h2>
               <p className="mt-1 text-[13.5px] text-[#5C6A7A]">미션을 마치면 내가 쓴 표현과 고쳐 쓴 과정이 여기에 쌓입니다.</p>
@@ -297,7 +297,7 @@ const LearnerRecords = () => {
           </section>
         )}
 
-        <section className={`${panel} mt-6 p-6`}>
+        <section className={`${panel} mt-4 p-5`}>
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
               <h2 className={sectionTitle}>9개 화행 학습 지도</h2>
@@ -305,7 +305,7 @@ const LearnerRecords = () => {
             </div>
             <span className="text-[12.5px] text-[#5C6A7A]">{actsCovered.size}/9 화행 수행</span>
           </div>
-          <div className="mt-5 grid grid-cols-2 gap-2.5 sm:grid-cols-3" aria-label="화행별 학습 이력">
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="화행별 학습 이력">
             {ACTS.map((act) => {
               const count = records.filter((record) => record.speechAct === act).length;
               const active = selectedAct === act;
@@ -316,7 +316,7 @@ const LearnerRecords = () => {
                   aria-pressed={active}
                   onClick={() => selectAct(act)}
                   className={[
-                    "flex min-h-[64px] min-w-0 items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors",
+                    "flex min-h-[48px] min-w-0 items-center justify-between gap-3 rounded-lg border px-4 py-2 text-left transition-colors",
                     active
                       ? "border-[#15202B] bg-[#15202B] text-white"
                       : count > 0
@@ -334,7 +334,7 @@ const LearnerRecords = () => {
           </div>
         </section>
 
-        <section ref={reviewRef} className={`${panel} mt-6 scroll-mt-24 p-6`} aria-live="polite" aria-label="선택한 화행 돌아보기">
+        <section ref={reviewRef} className={`${panel} mt-4 scroll-mt-24 p-5`} aria-live="polite" aria-label="선택한 화행 돌아보기">
           <p className={eyebrow}>선택한 화행 돌아보기</p>
           <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h2 className="text-[20px] font-bold text-[#15202B]">{actLabel}</h2>
@@ -345,18 +345,18 @@ const LearnerRecords = () => {
             )}
           </div>
           {selectedRecords.length === 0 ? (
-            <p className="mt-4 text-[14px] text-[#5C6A7A]">{actLabel} 완료 기록이 아직 없습니다.</p>
+            <p className="mt-3 text-[14px] text-[#5C6A7A]">{actLabel} 완료 기록이 아직 없습니다.</p>
           ) : (
-            <ol className="mt-4 divide-y divide-[#EEE9DC] border-y border-[#EEE9DC]" aria-label={`${actLabel} 완료 기록`}>
+            <ol className="mt-3 divide-y divide-[#EEE9DC] border-y border-[#EEE9DC]" aria-label={`${actLabel} 완료 기록`}>
               {selectedRecords.map((record) => (
-                <li key={record.id} className="py-4">
+                <li key={record.id} className="py-3">
                   <p className="text-[12px] font-semibold text-[#8C8471]">{recordMeta(record)}</p>
                   <dl className={`mt-2 ${rowGrid}`}>
                     {record.sourceText && <><dt className={rowLabel}>원문</dt><dd className="min-w-0"><SourceText text={record.sourceText} /></dd></>}
                     <dt className={rowLabel}>내 {TASK_LABEL[record.taskType]}</dt>
                     <dd className={zhText}>{record.firstResponse || "기록 없음"}</dd>
                     <dt className={rowLabel}>고친 {TASK_LABEL[record.taskType]}</dt>
-                    <dd className={changed(record) ? zhText : "text-[13.5px] leading-7 text-[#7A8590]"}>
+                    <dd className={changed(record) ? zhText : "text-[13.5px] leading-6 text-[#7A8590]"}>
                       {changed(record) ? record.revisedResponse : "고치지 않음"}
                     </dd>
                   </dl>
@@ -364,16 +364,16 @@ const LearnerRecords = () => {
               ))}
             </ol>
           )}
-          <div className="mt-5 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-4 py-3">
+          <div className="mt-4 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-4 py-2.5">
             <p className="text-[12.5px] font-semibold text-[#8A5A14]">회고 질문 · 모든 학습자에게 같은 질문입니다 — 위 기록을 보며 답해 보세요</p>
-            <ul className="mt-1.5 space-y-1 text-[14px] leading-relaxed text-[#26323D]">
+            <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
               <li>최종 표현에서도 원문의 의미와 {actLabel}의 목적이 유지되었나요?</li>
               <li>표현을 그대로 유지하거나 바꾼 이유는 무엇인가요? <span className="text-[#7A8590]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
             </ul>
           </div>
         </section>
 
-        <section className={`${panel} mt-6 p-6`}>
+        <section className={`${panel} mt-4 p-5`}>
           <div className="flex items-center justify-between gap-3">
             <h2 className={`flex items-center gap-2 ${sectionTitle}`}><FilePenLine className="h-[18px] w-[18px]" />전체 화행의 최근 수정 노트</h2>
             {revisions.length > 0 && (
@@ -394,7 +394,7 @@ const LearnerRecords = () => {
             )}
           </div>
           {latestRevision ? (
-            <div className="mt-4"><RevisionNote record={latestRevision} plain /></div>
+            <div className="mt-3"><RevisionNote record={latestRevision} plain /></div>
           ) : (
             <p className="mt-3 text-[13.5px] text-[#5C6A7A]">최초 표현과 최종 선택이 달라진 기록이 아직 없습니다.</p>
           )}
