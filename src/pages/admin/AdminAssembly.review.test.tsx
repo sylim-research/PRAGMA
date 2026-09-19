@@ -120,7 +120,7 @@ describe("professor final approval workbench", () => {
     expect(within(workbench()).getByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     fireEvent.click(within(workbench()).getByRole("button", { name: "다음 결정 대기 미션 ▶" }));
     expect(await within(workbench()).findByRole("heading", { name: "나중에 올라온 결정 미션" })).toBeInTheDocument();
-    expect(within(workbench()).getByRole("button", { name: "◀ 이전" })).toBeDisabled();
+    expect(within(workbench()).getByRole("button", { name: "이전" })).toBeDisabled();
   });
 
   it("opens the queue drawer, switches missions from a card and returns to the wide review", async () => {
@@ -178,15 +178,19 @@ describe("quality check workbench", () => {
 });
 
 describe("assembly workbench", () => {
-  it("opens the newest scenario with the model choice beside the assemble button and never assembles on open", async () => {
-    mocks.tables.scenarios = [scenario("c-new", "새 시나리오", null), scenario("c-old", "오래된 시나리오", null)];
+  it("shows only current v6 missions read-only, hiding superseded drafts and scenario-only rows", async () => {
+    mocks.tables.scenarios = [
+      { ...scenario("v6-new", "새 v6 미션"), supersedes_scenario_id: "v6-old" },
+      scenario("v6-old", "옛 v6 초안"),
+      scenario("core", "시나리오만", null),
+    ];
     show({}, "/admin/assembly");
     const bench = await screen.findByRole("region", { name: "작업대" });
-    expect(within(bench).getByRole("heading", { name: "새 시나리오" })).toBeInTheDocument();
-    expect(within(bench).getByRole("combobox", { name: "미션 생성 모델" })).toBeInTheDocument();
-    expect(within(bench).getByRole("button", { name: "미션 조립" })).toBeInTheDocument();
-    expect(screen.getByRole("combobox", { name: "정렬" })).toHaveValue("newest");
+    expect(within(bench).getByRole("heading", { name: "새 v6 미션" })).toBeInTheDocument();
+    expect(within(bench).getByRole("region", { name: "제작 경로" })).toBeInTheDocument();
+    expect(within(bench).queryByRole("button", { name: "미션 조립" })).not.toBeInTheDocument();
+    expect(within(queue()).queryByText("옛 v6 초안")).not.toBeInTheDocument();
+    expect(within(queue()).queryByText("시나리오만")).not.toBeInTheDocument();
     expect(mocks.promoteCore).not.toHaveBeenCalled();
-    expect(mocks.fetchMission).not.toHaveBeenCalled();
   });
 });

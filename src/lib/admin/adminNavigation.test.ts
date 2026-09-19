@@ -76,8 +76,8 @@ describe("admin navigation reachability", () => {
       "utf8",
     );
     expect(assembly).toContain("handoffHref={`/admin/review?scenarioId=${r.scenario_id}`}");
-    // 조립 화면은 승인하지 않고 같은 미션을 품질 점검 화면으로 넘긴다.
-    expect(assembly).toContain("approvalHref={`/admin/ai-review?scenarioId=${r.scenario_id}`}");
+    // 제작 현황 화면은 읽기만 하고 같은 미션을 품질 점검 화면으로 넘긴다.
+    expect(assembly).toContain('"/admin/ai-review"}?scenarioId=${r.scenario_id}');
   });
 
   it("keeps a route or compatibility route for every restored entry", () => {

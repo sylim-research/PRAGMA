@@ -31,6 +31,7 @@ import {
   type DashboardScenarioRow,
   countRulesFailures,
   countUnconvertedV5Missions,
+  excludeSupersededRows,
   summarizeAssignmentApproval,
   summarizeCourses,
   type DashboardCourseRow,
@@ -365,10 +366,10 @@ const AdminDashboard = () => {
     refreshInFlightRef.current = true;
 
     try {
-      const [scenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
+      const [allScenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
-          .select("scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
+          .select("scenario_id,supersedes_scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
           .eq("content_format", "scenario_core_v1")
           .is("archived_at", null)
           .order("scenario_id", { ascending: true })
@@ -408,6 +409,8 @@ const AdminDashboard = () => {
         db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
         db.from("learner_mission_logs").select("id", { count: "exact" }).not("course_id", "is", null).limit(1),
       ]);
+
+      const scenarioRows = excludeSupersededRows(allScenarioRows);
 
       const results = [
         ["승인 학습자", learnerResult],
@@ -574,7 +577,7 @@ const AdminDashboard = () => {
           {[
             // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
             { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount },
-            { to: "/admin/assembly", stage: "학습 미션", screen: "조립", value: snapshot?.content.generatedMissionCount },
+            { to: "/admin/assembly", stage: "학습 미션", screen: "제작 현황", value: snapshot?.content.generatedMissionCount },
             // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
             // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
             { to: "/admin/ai-review", stage: "검수·승인 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },

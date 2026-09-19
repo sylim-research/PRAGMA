@@ -61,6 +61,7 @@ import { fetchAllPages } from "@/lib/pragma/paginatedRows";
 import {
   DASHBOARD_REVIEW_CRITERIA_VERSION,
   DASHBOARD_REVIEW_RUN_SELECT,
+  excludeSupersededRows,
   type DashboardAssignmentRow,
   type DashboardReviewRunRow,
   type DashboardScenarioRow,
@@ -340,8 +341,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       let loaded = (data ?? []) as CoreRow[];
       const linkedId = searchParams.get("scenarioId");
       // 더 새 판이 대체한 옛 판(다른 행의 supersedes_scenario_id가 가리키는 행)은 목록·숫자에서 뺀다. DB는 그대로다.
-      const replaced = new Set(loaded.map((row) => row.supersedes_scenario_id).filter(Boolean));
-      loaded = loaded.filter((row) => !replaced.has(row.scenario_id) || row.scenario_id === linkedId);
+      loaded = excludeSupersededRows(loaded, linkedId);
       if (linkedId && !loaded.some((row) => row.scenario_id === linkedId)) {
         const { data: linked } = await db.from("scenarios").select(select).eq("scenario_id", linkedId).maybeSingle();
         if (linked) loaded = [linked as CoreRow, ...loaded];
@@ -1243,6 +1243,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
 const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
   const v6 = mission as MissionV6;
   const task = v6.production_task;
+  if (!Array.isArray(v6.mpj_items) || !task) return null;
   return (
     <section aria-label="학습 미션 설계" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
       <h3 className="mb-2 text-[13px] font-bold text-[#233542]">학습 미션 설계</h3>
