@@ -33,27 +33,37 @@ describe("representative v6 reason / contrast rhythm", () => {
   });
   afterEach(cleanup);
 
-  it("shows the judgment O/X right after committing, then marks the reason, and carries both into the serializer", () => {
+  it("locks the judgment without revealing it, then reveals judgment and reason together after the reason is committed", () => {
     toSecondJudgment();
     const reason = mission.mpj_items[1].reason_choice.options[1];
     expect(mission.mpj_items[1].reason_choice.accepted_id).toBe(reason.id);
     expect(screen.queryByText(reason.text)).not.toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
-    click("매우 적절"); click("판단 확인하기");
-    // 판정은 선택지 위 배지로만 보이고(하단 배너 없음), 스크린리더에는 같은 내용이 문장으로 간다.
-    expect(screen.getByText(/^기준 판단과 다릅니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("인정 범위")).toBeInTheDocument();
-    // 네 선지는 그대로 남고 잠긴다.
+    click("매우 적절"); click("판단 확정하기");
+    // 판단 확정 직후: 네 선지와 내 선택은 남고 잠기지만, 결과는 배지·색상·스크린리더 어디에도 없다.
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: new RegExp(`^${label}`) })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /^매우 적절/ }).className).toContain("ring-[#15202B]");
+    for (const leak of ["내 선택", "기준 판단", "인정 범위"]) expect(screen.queryByText(leak)).not.toBeInTheDocument();
+    for (const label of ["다소 적절", "다소 부적절", "매우 부적절"]) {
+      const cls = screen.getByRole("button", { name: new RegExp(`^${label}`) }).className;
+      expect(cls).toContain("border-[#D8D4C8]");
+      expect(cls).not.toMatch(/4D8568|C86E68|E0DDD5/);
+    }
+    expect(screen.queryByText(/맞았습니다|기준 판단과 다릅니다/)).not.toBeInTheDocument();
+    expect(screen.getByText(/^판단을 확정했습니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "가능한 수정 예시" })).not.toBeInTheDocument();
     const reasons = screen.getByRole("radiogroup", { name: "판단 이유" });
     expect(within(reasons).getAllByRole("radio")).toHaveLength(3);
-    expect(screen.getByRole("button", { name: "이유 확인하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "이유 확정하기" })).toBeDisabled();
     fireEvent.click(within(reasons).getByRole("radio", { name: reason.text }));
-    click("이유 확인하기");
+    expect(screen.queryByText("기준 판단")).not.toBeInTheDocument();
+    click("이유 확정하기");
+    // 이유 확정 후: 판단과 이유의 결과·해설을 함께 공개한다.
+    expect(screen.getByText(/^기준 판단과 다릅니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("인정 범위")).toBeInTheDocument();
     expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
     expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("정답")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
@@ -91,9 +101,9 @@ describe("representative v6 reason / contrast rhythm", () => {
   it("marks a reason that differs from the reference and names the reference reason", () => {
     toSecondJudgment();
     const [picked, accepted] = mission.mpj_items[1].reason_choice.options;
-    click("다소 적절"); click("판단 확인하기");
+    click("다소 적절"); click("판단 확정하기");
     fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
-    click("이유 확인하기");
+    click("이유 확정하기");
     expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
