@@ -12,7 +12,7 @@
 // 업로드 이미지는 분석에만 쓰이고 저장/학습자 노출하지 않는다(전송 후 폐기) —
 // 드라마·쇼츠 캡처를 DB에 저장하면 저작권 문제가 생기므로 지켜야 할 설계다.
 
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { ImageIcon, PlayCircle, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -245,6 +245,8 @@ interface Props {
   onApply: (a: AuthenticApply, index: number) => void;
   /** 분석 성공 직후 1회. 호스트가 보관함에 저장한다(고르지 않은 후보도 남기려고). */
   onAnalyzed?: (a: AuthenticAnalyzed) => void;
+  /** 오른쪽 칼럼 아래(분석 전에는 맨 위)에 둘 생성 결과 목록 */
+  history?: ReactNode;
 }
 
 // YouTube 자막 탭: 2026-08-05에 뺐다가 2026-09-19 복원했다(youtube-transcript·SUPADATA_API_KEY 운영 확인).
@@ -274,7 +276,7 @@ async function fetchCaptionTrack(url: string, lang: "zh" | "ko"): Promise<Captio
   return { lang: String(data.lang), text: caption.replace(/\s+/g, " ").trim(), available };
 }
 
-const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
+const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
   const [inputTab, setInputTab] = useState<InputTab>("image");
   const [imgLarge, setImgLarge] = useState(false);
   const [text, setText] = useState("");
@@ -438,9 +440,9 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
   return (
     // 좌 = 자료 입력(고정폭 썸네일·문구·출처·방향), 우 = 분석·후보. 입력 칼럼은
     // 스크롤해도 따라오게 sticky — 후보를 훑다가 원문을 고치는 왕복이 잦다.
-    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
       {/* ── LEFT: 자료 → 문구 확정 ── */}
-      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4 lg:col-span-2">
+      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4 lg:col-span-5">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
           <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
@@ -639,8 +641,8 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
       </section>
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
-      <section className="space-y-4 lg:col-span-3">
-        {!analysis && (
+      <section className="space-y-4 lg:col-span-7">
+        {!analysis && !history && (
           <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
@@ -852,6 +854,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
               </div>
             </div>
           )}
+        {history}
       </section>
     </div>
   );

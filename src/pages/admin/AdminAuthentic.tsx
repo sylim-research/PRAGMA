@@ -92,7 +92,7 @@ const AdminAuthentic = () => {
       setSaveNote(res.reason);
       return;
     }
-    setSaveNote(`분석 기록에 저장했습니다 · 후보 ${a.candidates.length}건`);
+    setSaveNote(`생성 결과에 저장했습니다 · 후보 ${a.candidates.length}건`);
     const saved = await getAnalysisById(res.analysisId);
     setJustSaved(saved);
     void refresh();
@@ -122,11 +122,11 @@ const AdminAuthentic = () => {
   };
 
   const archive = (
-    <section className="mt-8 rounded-lg border border-border bg-card p-5">
+    <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[15px] font-semibold text-foreground">분석 기록</h2>
+        <h2 className="text-[16px] font-bold text-[#15202B]">생성 결과</h2>
         <span className="text-[12px] text-muted-foreground">
-          분석한 자료와 후보가 그대로 남습니다 · 최근 30건
+          자료별 분석과 콘텐츠 후보 · 최근 30건
         </span>
       </div>
 
@@ -137,7 +137,7 @@ const AdminAuthentic = () => {
       )}
       {listError && (
         <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[12.5px] text-[#991B1B]">
-          분석 기록을 읽지 못했습니다 · {listError}
+          생성 결과를 읽지 못했습니다 · {listError}
         </p>
       )}
 
@@ -280,7 +280,7 @@ const AdminAuthentic = () => {
   return (
     <AdminShell
       title="실제 자료 활용 분석"
-      description="YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 상황 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 분석 기록에 남습니다."
+      description="YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 상황 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 생성 결과에 남습니다."
     >
       {saveNote && (
         <p
@@ -295,10 +295,7 @@ const AdminAuthentic = () => {
         </p>
       )}
 
-      <AuthenticImportPanel onApply={handleApply} onAnalyzed={handleAnalyzed} />
-
-      {/* ── 보관함 ── */}
-      {archive}
+      <AuthenticImportPanel onApply={handleApply} onAnalyzed={handleAnalyzed} history={archive} />
     </AdminShell>
   );
 };
