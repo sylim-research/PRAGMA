@@ -28,10 +28,12 @@ const row = (id: string, status: string | null, release: string = CURRENT_CONTEN
   scenario_id: id, mission_status: status, speech_act: "request", learner_level: "intermediate",
   mode: "translation", domain: "daily", theme_code: null, mission_schema_version: status ? "mission_v5" : null,
   mission_mpj_items: status ? Array.from({ length: count }, () => ({})) : null,
+  supersedes_scenario_id: null,
+  authoring_stage: status === "reviewed" || status === "released" ? "professor_finalized" : null,
   core_content: { situation_ko: `상황 ${id}`, direction: "ko_zh", generation: { content_release_id: release } },
 });
 beforeEach(() => {
-  mocks.rows = [row("reviewed", "reviewed"), row("released", "released"), row("draft", "generated"),
+  mocks.rows = [row("reviewed", "reviewed"), row("released", "released"), { ...row("draft", "generated"), mission_schema_version: "mission_v6" },
     row("old", "reviewed", "pre_lock"), row("legacy-four", "reviewed", CURRENT_CONTENT_RELEASE_ID, 4), row("core", null)];
   mocks.ranges = []; mocks.failPage = false; mocks.preview.mockReset();
   mocks.preview.mockResolvedValue({ mission: {} });

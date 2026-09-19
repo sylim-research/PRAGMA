@@ -48,6 +48,10 @@ interface CoreRow {
   archive_note: string | null;
   mission_schema_version: string | null;
   mission_mpj_items: unknown;
+  /** 이 행이 대체한 이전 판. 다른 행이 이 행을 가리키면 이 행은 옛 판이다. */
+  supersedes_scenario_id: string | null;
+  /** professor_finalized = 교수자 최종 승인 기록이 있는 현재본. */
+  authoring_stage: string | null;
   generation_run_id: string | null;
   generation_item_key: string | null;
   prompt_snapshot_hash: string | null;
@@ -83,7 +87,7 @@ const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
   advanced: { rgb: "220, 232, 240", text: "#4B6575" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
-const LIST_PAGE_SIZE = 30;
+const LIST_PAGE_SIZE = 10;
 /**
  * 보관 상태 축. 기본은 현재 콘텐츠만 본다 — 보관분은 제작·검토·편성 대상이 아니다.
  * 별도 「보관함」 메뉴를 만들지 않고 이 필터 한 축으로만 다시 볼 수 있게 한다(2026-09-10 연구자 결정).
@@ -120,6 +124,7 @@ const AdminBrowser = () => {
   const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
   const [fSource, setFSource] = useState<"all" | "ai" | "authentic">("all");
   const [fArchive, setFArchive] = useState<ArchiveView>("current");
+  const [fFormat, setFFormat] = useState<"all" | "v6" | "v5">("all");
   const [sel, setSel] = useState<{ act: SpeechActUI; level: LearnerLevel } | null>(null);
   // 눈검사 미리보기 — scenario_id → {mission, warnings}. openId = 펼친 행.
   const [preview, setPreview] = useState<Record<string, { mission: MissionRuntime; warnings: string[] }>>({});
@@ -153,7 +158,7 @@ const AdminBrowser = () => {
         let request = libraryDb
         .from("scenarios")
         .select(
-          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, archived_at, archive_note, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
+          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, archived_at, archive_note, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items, supersedes_scenario_id, authoring_stage:mission_content->authoring->>stage",
         )
         .eq("content_format", "scenario_core_v1");
         // 보관(archived_at) 행은 기본적으로 제외한다. 보관분은 이 축을 바꿔야만 보인다.
@@ -197,10 +202,23 @@ const AdminBrowser = () => {
     void loadRows();
   }, [loadRows]);
 
+  // 더 새 판이 대체한 옛 판. 편성되지 않았으면 숨기고, 아직 편성돼 있으면 「교체 필요」로 남긴다.
+  const replaced = useMemo(() => new Set(rows.map((row) => row.supersedes_scenario_id).filter(Boolean) as string[]), [rows]);
+  const placedCount = (id: string) => assignments?.[id] ?? 0;
+  const isFinalized = (row: CoreRow) => row.authoring_stage === "professor_finalized";
+  // 대시보드와 같은 기준: 편성 가능 = 교수자 최종 승인 기록이 있는 현재본(v5·v6),
+  // 승인 전 = 검수 중인 v6 초안(v5 미승인 초안은 승인하지 않고 v6로 전환한다).
+  const matchesView = (row: CoreRow, target: LibraryView) => {
+    if (target === "ready") return libraryMissionIsReady(row) && isFinalized(row) && !replaced.has(row.scenario_id);
+    if (target === "pending") return libraryMatchesView(row, "pending") && row.mission_schema_version === "mission_v6";
+    return libraryMatchesView(row, target);
+  };
   const matching = useMemo(
     () =>
       rows.filter(
         (r) =>
+          (!replaced.has(r.scenario_id) || placedCount(r.scenario_id) > 0) &&
+          (fFormat === "all" || (fFormat === "v6" ? r.mission_schema_version === "mission_v6" : r.mission_schema_version !== "mission_v6")) &&
           (fMode === "all" || r.mode === fMode) &&
           (fDomain === "all" || r.domain === fDomain) &&
           (fTheme === "all" || r.theme_code === fTheme) &&
@@ -208,10 +226,12 @@ const AdminBrowser = () => {
           (fSource === "all" ||
             (fSource === "authentic" ? isAuthentic(r.core_content) : !isAuthentic(r.core_content))),
       ),
-    [rows, fMode, fDomain, fTheme, fDirection, fSource],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, fMode, fDomain, fTheme, fDirection, fSource, fFormat, replaced, assignments],
   );
 
-  const filtered = useMemo(() => matching.filter((row) => libraryMatchesView(row, view)), [matching, view]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const filtered = useMemo(() => matching.filter((row) => matchesView(row, view)), [matching, view, replaced]);
   useEffect(() => { setVisibleCount(LIST_PAGE_SIZE); setOpenId(null); }, [filtered, sel]);
 
   // (act|level) → { total, translation, interpreting } (54셀 감사 대응 — 계약 0-j·73)
@@ -240,6 +260,7 @@ const AdminBrowser = () => {
     fTheme !== "all" ||
     fDirection !== "all" ||
     fSource !== "all" ||
+    fFormat !== "all" ||
     fArchive !== "current";
   const maxCellCount = Math.max(0, ...Object.values(counts).map((count) => count.total));
 
@@ -255,7 +276,7 @@ const AdminBrowser = () => {
             {LIBRARY_VIEWS.map((item) => (
               <button key={item.value} type="button" aria-pressed={view === item.value} onClick={() => setView(item.value)}
                 className={`rounded-lg border px-3 py-2 text-[13px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
-                {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => libraryMatchesView(row, item.value)).length}</span>
+                {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
               </button>
             ))}
           </div>
@@ -291,6 +312,8 @@ const AdminBrowser = () => {
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[126px]" label="생성 소스" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
+              <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
+                opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
               <Filter className="w-full sm:w-[96px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
                 opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
@@ -399,9 +422,18 @@ const AdminBrowser = () => {
                 {cellRows.slice(0, visibleCount).map((r) => (
                   <li key={r.scenario_id} className="bg-[#FCFBF8] px-4 py-2.5">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <Badge variant="secondary" className={libraryMissionIsReady(r) ? "bg-emerald-50 text-emerald-800" : "bg-[#EDE9DD] text-[#625A49]"}>
-                        {libraryMissionLabel(r)}
+                      <Badge variant="secondary" className={matchesView(r, "ready") ? "bg-[#E6ECF2] text-[#233542]" : "bg-[#EDE9DD] text-[#625A49]"}>
+                        {matchesView(r, "ready") ? "편성 가능" : libraryMissionLabel(r) === "편성 가능" ? "현재 편성 대상 아님" : libraryMissionLabel(r)}
                       </Badge>
+                      {libraryHasMission(r) && r.mission_schema_version !== "mission_v6" && (
+                        <Badge variant="secondary" className="bg-[#F3E9D2] font-semibold text-[#8A5A14]">이전 형식</Badge>
+                      )}
+                      {replaced.has(r.scenario_id) && (
+                        <Badge variant="secondary" className="bg-[#FBE3D6] font-semibold text-[#9A3F1C]">새 판 있음 · 교체 필요</Badge>
+                      )}
+                      {["reviewed", "released"].includes(r.mission_status ?? "") && !isFinalized(r) && (
+                        <Badge variant="secondary" className="bg-[#FBE3D6] font-semibold text-[#9A3F1C]">승인 기록 없음</Badge>
+                      )}
                       {r.archived_at && (
                         <Badge variant="secondary" className="bg-[#F0EEE7] font-normal text-[#6C747A]"
                           title={r.archive_note ?? undefined}>
