@@ -41,7 +41,7 @@ beforeEach(() => {
 afterEach(cleanup);
 const show = () => render(<MemoryRouter><AdminBrowser /></MemoryRouter>);
 
-describe("콘텐츠 현황(학습 미션 라이브러리)", () => {
+describe("학습 미션 라이브러리", () => {
   it("현재 편성 범위의 reviewed와 released MJT5만 기본 표시하고 미션 ID를 인계한다", async () => {
     show();
     await screen.findByText("상황 released");

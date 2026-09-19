@@ -267,8 +267,8 @@ const AdminBrowser = () => {
 
   return (
     <AdminShell
-      title="콘텐츠 현황"
-      description="수업에 쓸 수 있는 학습 미션이 화행·수준별로 얼마나 있는지 봅니다."
+      title="학습 미션 라이브러리"
+      description="수업에 쓸 수 있는 학습 미션을 화행·수준별로 봅니다."
     >
       <div className="max-w-[1080px]">
         {/* ── 요약 ── */}

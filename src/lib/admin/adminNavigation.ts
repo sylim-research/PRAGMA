@@ -58,7 +58,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
         label: "교수자 최종 승인",
         activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
       },
-      { to: "/admin/library", label: "콘텐츠 현황" },
+      { to: "/admin/library", label: "학습 미션 라이브러리" },
     ],
   },
   {
