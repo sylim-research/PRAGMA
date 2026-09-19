@@ -245,6 +245,8 @@ function humanizeHoldReason(text: string): string {
   return text
     .replace(/p\s*=\s*'?speaker_higher'?/gi, "P「내가 높음」")
     .replace(/p\s*=\s*'?speaker_lower'?/gi, "P「내가 낮음」")
+    .replace(/p\s*=\s*'?equal'?/gi, "P「동등」")
+    .replace(/\bequal\b/g, "「동등」")
     .replace(/speaker_higher/g, "「내가 높음」")
     .replace(/speaker_lower/g, "「내가 낮음」")
     .replace(/\bacquaintance\b/g, "「지인」")
