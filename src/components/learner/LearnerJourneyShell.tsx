@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { HomeBrand } from "@/components/HomeBrand";
+import { LearnerBottomNav, LearnerTopNav } from "@/components/learner/LearnerBottomNav";
 
 interface LearnerJourneyShellProps {
   children: ReactNode;
@@ -9,6 +10,8 @@ interface LearnerJourneyShellProps {
   wide?: boolean;
   /** 데스크톱 미션 화면에서 세로 단계표와 본문을 아우르는 축에 헤더를 맞춘다. */
   missionLayout?: boolean;
+  /** 학습자 최상위 화면(수업·기록)의 두 탭. PC는 헤더 안, 모바일은 화면 아래에 둔다. */
+  nav?: boolean;
 }
 
 /**
@@ -21,6 +24,7 @@ export const LearnerJourneyShell = ({
   headerRight,
   wide = false,
   missionLayout = false,
+  nav = false,
 }: LearnerJourneyShellProps) => {
   const widthClass = wide ? "max-w-6xl" : missionLayout ? "max-w-4xl" : "max-w-3xl";
   const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-4" : "py-6";
@@ -33,10 +37,16 @@ export const LearnerJourneyShell = ({
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
         <div className={`mx-auto flex ${widthClass} items-center justify-between gap-4 px-6 py-4 ${headerAlignmentClass}`}>
           <HomeBrand />
-          {headerRight}
+          {nav ? (
+            <div className="flex items-center gap-4">
+              {headerRight}
+              <LearnerTopNav />
+            </div>
+          ) : headerRight}
         </div>
       </header>
       <div className={`mx-auto ${widthClass} px-6 ${verticalPaddingClass}`}>{children}</div>
+      {nav && <LearnerBottomNav />}
     </div>
   );
 };

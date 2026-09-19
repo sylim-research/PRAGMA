@@ -3,11 +3,17 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { CurriculumOutlineRow } from "@/lib/curriculum/types";
-import { useLearnerCourses } from "@/lib/curriculum/useLearnerCourse";
+import { useLearnerCourse, useLearnerCourses } from "@/lib/curriculum/useLearnerCourse";
+import { summarizeLearnerProgress, useLearnerHomeProgress } from "@/lib/curriculum/learnerHomeProgress";
+import type { LearnerCourse } from "@/lib/curriculum/learnerCourse";
 import { COURSE_PRESETS, courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import LearnerCourseList from "@/pages/learner/LearnerCourseList";
 
-vi.mock("@/lib/curriculum/useLearnerCourse", () => ({ useLearnerCourses: vi.fn() }));
+vi.mock("@/lib/curriculum/useLearnerCourse", () => ({ useLearnerCourses: vi.fn(), useLearnerCourse: vi.fn() }));
+vi.mock("@/lib/curriculum/learnerHomeProgress", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/curriculum/learnerHomeProgress")>()),
+  useLearnerHomeProgress: vi.fn(),
+}));
 
 const courses = COURSE_PRESETS.map((preset) => ({
   id: preset.outline_id,
@@ -35,7 +41,11 @@ function renderCourses() {
   );
 }
 
-beforeEach(() => mockCourses(courses));
+beforeEach(() => {
+  mockCourses(courses);
+  vi.mocked(useLearnerHomeProgress).mockReturnValue({ data: undefined } as ReturnType<typeof useLearnerHomeProgress>);
+  vi.mocked(useLearnerCourse).mockReturnValue({ data: undefined } as ReturnType<typeof useLearnerCourse>);
+});
 afterEach(() => cleanup());
 
 describe("LearnerCourseList", () => {
@@ -43,7 +53,7 @@ describe("LearnerCourseList", () => {
     const originalOrder = courses.map((course) => course.id);
     renderCourses();
 
-    expect(screen.getByRole("heading", { level: 1, name: "교과목 선택" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "내 수업" })).toBeInTheDocument();
     const list = within(screen.getByRole("list", { name: "교과목 목록" }));
     expect(list.getAllByRole("listitem")).toHaveLength(3);
     expect(list.getAllByText("중급")).toHaveLength(2);
@@ -108,7 +118,7 @@ describe("LearnerCourseList", () => {
     renderCourses();
 
     const list = within(screen.getByRole("list", { name: "교과목 목록" }));
-    expect(list.getAllByText("주차별 학습계획 보기")).toHaveLength(3);
+    expect(list.getAllByText("수업 들어가기")).toHaveLength(3);
     for (const course of courses) {
       const link = list.getByRole("link", { name: course.title });
       expect(link).toHaveAttribute("href", `/learner/course/${course.id}`);
@@ -129,5 +139,41 @@ describe("LearnerCourseList", () => {
 
     expect(screen.getByText(message)).toBeInTheDocument();
     expect(screen.queryByRole("list", { name: "교과목 목록" })).not.toBeInTheDocument();
+  });
+
+  it("shows my progress per course and resumes at the current week of the last course", () => {
+    const [first, second] = courses;
+    const progress = summarizeLearnerProgress([
+      { course_id: first.id, mission_id: "m-a", mission_completed: true, updated_at: "2026-09-18T10:00:00Z" },
+      { course_id: first.id, mission_id: "m-b", mission_completed: true, updated_at: "2026-09-18T10:30:00Z" },
+      { course_id: first.id, mission_id: "m-c", mission_completed: true, updated_at: "2026-09-19T09:00:00Z" },
+      { course_id: null, mission_id: "outside", mission_completed: true, updated_at: "2026-09-19T11:00:00Z" },
+    ]);
+    vi.mocked(useLearnerHomeProgress).mockReturnValue({ data: progress } as ReturnType<typeof useLearnerHomeProgress>);
+    const scenario = (id: string) => ({ scenario_id: id, situation_ko: id, runnable: true, mission_status: "reviewed", target_feature: null, mode: "translation" as const });
+    const week = (week_no: number, speech_act: string, ids: string[]) => ({
+      week_no, title: `${week_no}주차`, type: "regular", can_do: [], speech_act, channel: null, pdr_power: null, pdr_distance: null,
+      pdr_imposition: null, review_released: true, competency_focus: null, domain: null, scenarios: ids.map(scenario),
+      expected_mission_modes: ["translation", "stt_interpreting"],
+    });
+    vi.mocked(useLearnerCourse).mockReturnValue({
+      data: { outline: first, weeks: [week(2, "request", ["m-a", "m-b"]), week(3, "thanks", ["m-c", "m-d"])] } as unknown as LearnerCourse,
+    } as ReturnType<typeof useLearnerCourse>);
+    renderCourses();
+
+    const resume = screen.getByRole("link", { name: /이어서 하기/ });
+    expect(resume).toHaveAttribute("href", `/learner/course/${first.id}/week/3`);
+    expect(within(resume).getByText(/3주차 감사 화행/)).toBeInTheDocument();
+    expect(within(resume).getByText("이번 주차 미션 1/2 완료")).toBeInTheDocument();
+    expect(screen.getByText("미션 3/20 완료")).toBeInTheDocument();
+    expect(screen.getAllByText("아직 시작 전")).toHaveLength(courses.length - 1);
+    expect(second).toBeDefined();
+  });
+
+  it("hides the resume card when there is no course activity", () => {
+    vi.mocked(useLearnerHomeProgress).mockReturnValue({ data: summarizeLearnerProgress([]) } as ReturnType<typeof useLearnerHomeProgress>);
+    renderCourses();
+    expect(screen.queryByRole("link", { name: /이어서 하기/ })).not.toBeInTheDocument();
+    expect(screen.getAllByText("아직 시작 전")).toHaveLength(courses.length);
   });
 });

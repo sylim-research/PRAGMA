@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { WEEK_REQUEST, getWeekProgress } from "@/lib/mission/mockWeek";
 import { getProgress, getFeatureState } from "@/lib/mission/learnerState";
 import { hasPracticeSession } from "@/lib/mission/practiceSession";
@@ -50,7 +49,7 @@ const WeekDetail = () => {
   const transferDone = progress.completedMissionIds.includes(w.stages.transfer.item.missionId);
 
   return (
-    <LearnerJourneyShell
+    <LearnerJourneyShell nav
       headerRight={<span className="text-[12px] text-[#8899A6]">{w.weekNo}주차 · {w.title}</span>}
     >
       <div className="space-y-3 pb-20">
@@ -175,7 +174,6 @@ const WeekDetail = () => {
           status={w.stages.anchor.lockedNote}
         />
       </div>
-      <LearnerBottomNav />
     </LearnerJourneyShell>
   );
 };

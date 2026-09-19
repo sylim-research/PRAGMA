@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { LearnerBottomNav } from "@/components/learner/LearnerBottomNav";
 import { COURSE_WEEKS } from "@/lib/mission/mockLearnerCourse";
 import { getWeekProgress, WEEK_REQUEST } from "@/lib/mission/mockWeek";
 
@@ -11,7 +10,7 @@ const CourseOverview = () => {
   const weekProg = getWeekProgress();
 
   return (
-    <LearnerJourneyShell
+    <LearnerJourneyShell nav
       headerRight={<span className="text-[12px] text-[#8899A6]">과정 데모</span>}
     >
       <div className="pb-20">
@@ -86,7 +85,6 @@ const CourseOverview = () => {
           })}
         </ol>
       </div>
-      <LearnerBottomNav />
     </LearnerJourneyShell>
   );
 };
