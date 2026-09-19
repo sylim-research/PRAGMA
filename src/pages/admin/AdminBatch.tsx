@@ -55,9 +55,9 @@ import { toast } from "sonner";
 
 const LEVEL_ORDER: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 const LEVEL_CARD_CLASS: Record<LearnerLevel, string> = {
-  beginner_intermediate: "bg-[#EDF4FA]",
-  intermediate: "bg-[#EEF5F0]",
-  advanced: "bg-[#EDF3F4]",
+  beginner_intermediate: "border border-[#EAE4D2] bg-[#FAF8F2]",
+  intermediate: "border border-[#EAE4D2] bg-[#FAF8F2]",
+  advanced: "border border-[#EAE4D2] bg-[#FAF8F2]",
 };
 // summarizePlan의 조합 라벨(speechAct·level·과업)은 내부 코드라 화면에서 우리말로 옮긴다.
 const humanizeCell = (label: string) => {
@@ -324,15 +324,15 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-lg font-bold"><StepNum n={1} />생성 조건</h2>
                 <div role="group" aria-label="언어 방향" className="order-last flex w-full gap-1.5 sm:order-none sm:w-auto">
-                  <Button size="sm" className="h-8 px-3" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
-                  <Button size="sm" className="h-8 px-3" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
+                  <Button size="sm" variant="outline" className={"h-8 px-3 " + (direction === "ko_zh" ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A] hover:bg-[#FBEFD9]" : "border-[#EAE4D2] text-[#3F4E59]")} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
+                  <Button size="sm" variant="outline" className={"h-8 px-3 " + (direction === "zh_ko" ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A] hover:bg-[#FBEFD9]" : "border-[#EAE4D2] text-[#3F4E59]")} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
                 </div>
               </div>
 
               <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
                   const counts = modeCounts[level];
-                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + (settings[level].total > 0 ? " ring-1 ring-[#D9B51C]/50" : "")}>
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + ""}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
                       <span className="text-sm">{LEVEL[level]}</span>
                       <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
@@ -362,8 +362,8 @@ const AdminBatch = () => {
               <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
-                <PlanMetric label="통역" value={summary.interpreting} className="bg-[#EEF5F0]" />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" className="bg-[#EDF3F4]" />
+                <PlanMetric label="통역" value={summary.interpreting} />
+                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
@@ -378,16 +378,16 @@ const AdminBatch = () => {
               <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
                   description="화행 × 수준 × 번역/통역" />
-                <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
                   description="화행 × P × D × R" />
               </div>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
-                <Dist title="도메인별" className="bg-[#EEF5F0]" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
+                <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="직장 도메인 · 산업별" className="bg-[#EEF5F0]" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
               </div>
               <div className="mt-4">
                 <h3 className="text-sm font-semibold">화행별</h3>
@@ -536,12 +536,12 @@ const AdminBatch = () => {
 const StepNum = ({ n }: { n: number }) =>
   <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
 
-const PlanMetric = ({ label, value, unit = "건", primary = false, className = "bg-[#EDF4FA]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
     <p className="text-xs">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
   </div>;
 
-const CoverageCard = ({ title, filled, total, description, className = "border-[#D6E2EB] bg-[#F6F9FC]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
+const CoverageCard = ({ title, filled, total, description, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
   <div className={"rounded-lg border px-3 py-2 " + className}>
     <div className="flex flex-wrap items-center justify-between gap-2 text-xs"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
     <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
@@ -549,14 +549,14 @@ const CoverageCard = ({ title, filled, total, description, className = "border-[
   </div>;
 
 
-const Dist = ({ title, rows, className = "bg-[#EDF4FA]" }: { title: string; rows: [string, number][]; className?: string }) => (
+const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
   <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[12.5px] font-semibold">{title}</div>
     <ul className="mt-1.5 space-y-0.5">
       {rows.map(([label, n]) => (
         <li key={label} className="flex items-baseline justify-between gap-3 text-[12.5px]">
           <span className="text-muted-foreground">{label}</span>
-          <span className={n === 0 ? "font-semibold text-amber-700" : "font-semibold"}>{n}</span>
+          <span className={n === 0 ? "font-semibold text-[#B9AF97]" : "font-semibold text-[#15202B]"}>{n}</span>
         </li>
       ))}
     </ul>

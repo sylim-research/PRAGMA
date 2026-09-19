@@ -35,21 +35,21 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
     </div>
     {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
-      <table className="w-full min-w-[620px] text-left text-xs">
+      <table className="w-full min-w-[720px] text-left text-[13px]">
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
           <tr><th className="w-10 px-2 py-2">선택</th><th className="w-10 px-2 py-2">번호</th><th className="w-20 px-2 py-2">화행·수준</th><th className="w-24 px-2 py-2">과업·도메인</th><th className="w-24 px-2 py-2">P·D·R</th><th className="px-2 py-2">장면 시드</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
           const cell = plan[index];
           return <tr key={index} className={selected.includes(index) ? "bg-[#FFFBEA]" : ""}>
-            <td className="p-2"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
+            <td className="px-2 py-1.5"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
               className="h-4 w-4 accent-[#15202B]" checked={selected.includes(index)} disabled={disabled}
               onChange={() => toggle(index)} /></td>
-            <td className="p-2 tabular-nums">{index + 1}</td>
-            <td className="whitespace-nowrap p-2">{SPEECH_ACT_UI[cell.speech_act_ui]}<span className="mt-1 block text-muted-foreground">{LEVEL[cell.level]}</span></td>
-            <td className="whitespace-nowrap p-2">{MODE_LABEL[cell.mode]}<span className="mt-1 block text-muted-foreground">{DOMAIN[cell.domain]}</span></td>
-            <td className="whitespace-nowrap p-2 leading-5 text-[#3F4E59]">{PDR_POWER_SHORT[cell.pdr_power]}<span className="block">{PDR_DISTANCE_SHORT[cell.pdr_distance]}</span><span className="block">{PDR_BURDEN_SHORT[cell.pdr_burden]}</span></td>
-            <td className="min-w-[200px] p-2 leading-5">{cell.situation_seed_ko}</td>
+            <td className="px-2 py-1.5 tabular-nums">{index + 1}</td>
+            <td className="whitespace-nowrap px-2 py-1.5">{SPEECH_ACT_UI[cell.speech_act_ui]} <span className="text-muted-foreground">· {LEVEL[cell.level]}</span></td>
+            <td className="whitespace-nowrap px-2 py-1.5">{MODE_LABEL[cell.mode]} <span className="text-muted-foreground">· {DOMAIN[cell.domain]}</span></td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-[#3F4E59]">{[PDR_POWER_SHORT[cell.pdr_power], PDR_DISTANCE_SHORT[cell.pdr_distance], PDR_BURDEN_SHORT[cell.pdr_burden]].join(" · ")}</td>
+            <td className="min-w-[240px] px-2 py-1.5 leading-5">{cell.situation_seed_ko}</td>
           </tr>;
         })}{!plan.length && <tr><td colSpan={6} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
       </table>
