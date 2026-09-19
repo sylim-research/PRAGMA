@@ -177,7 +177,6 @@ const LearnerRecords = () => {
     [isLocalHost],
   );
   const [remoteRecords, setRemoteRecords] = useState<ReportRecord[] | null>(null);
-  const [excludedCount, setExcludedCount] = useState(0);
   const [recordsError, setRecordsError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [selectedAct, setSelectedAct] = useState<SpeechActUI>("request");
@@ -215,9 +214,7 @@ const LearnerRecords = () => {
         if (error) throw error;
         if (!cancelled) {
           const rows = (data ?? []) as MissionLogRecord[];
-          const countable = rows.filter(isCountableLog);
-          setExcludedCount(rows.length - countable.length);
-          setRemoteRecords(countable.map(missionLogRecord));
+          setRemoteRecords(rows.filter(isCountableLog).map(missionLogRecord));
         }
       } catch {
         if (!cancelled) setRecordsError(true);
@@ -288,11 +285,6 @@ const LearnerRecords = () => {
             </div>
           ))}
         </section>
-        {!usingLocalPreview && excludedCount > 0 && (
-          <p className="mt-2 text-[12px] text-[#7A8590]">
-            미션·화행 연결을 확인할 수 없는 이전 시험 기록 {excludedCount}건은 집계에서 제외했습니다.
-          </p>
-        )}
         {completedCount === 0 && (
           <section className={`${panel} mt-5 flex flex-wrap items-center justify-between gap-4 p-6`}>
             <div>

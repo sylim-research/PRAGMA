@@ -109,7 +109,7 @@ describe("learner report record sources", () => {
     renderReport();
     await screen.findByRole("region", { name: "수업 이수 범위" });
     expect(completionValue()).toBe("2");
-    expect(screen.getByText("미션·화행 연결을 확인할 수 없는 이전 시험 기록 2건은 집계에서 제외했습니다.")).toBeInTheDocument();
+    expect(screen.queryByText(/이전 시험 기록/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /요청\s*2건 완료/ })).toBeInTheDocument();
   });
 
