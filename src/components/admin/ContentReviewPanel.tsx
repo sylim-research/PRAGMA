@@ -444,7 +444,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       </div>}
       {next !== "approved" && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
         || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}
-        className={experiential && next === "professor" ? "h-12 bg-[#233542] px-8 text-[15.5px] font-bold hover:bg-[#15202B]" : undefined}>
+        className={experiential && next === "professor" ? "h-12 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : next === "professor" ? "교수자 최종 승인" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
       {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
