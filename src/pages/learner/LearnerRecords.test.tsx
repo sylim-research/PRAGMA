@@ -98,7 +98,7 @@ describe("learner report record sources", () => {
     expect(mocks.eq).toHaveBeenCalledWith("mission_completed", true);
     expect(completionValue()).toBe("1");
     expect(screen.queryByText("localhost 시연 데이터")).not.toBeInTheDocument();
-    expect(screen.getByText(ownLog.revised_response)).toBeInTheDocument();
+    expect(screen.getAllByText(ownLog.revised_response).length).toBeGreaterThan(0);
   });
 
   it("excludes prototype rows without a mission or speech act from every count, keeping v5 rows", async () => {
@@ -120,8 +120,29 @@ describe("learner report record sources", () => {
     expect(screen.getByRole("heading", { name: /나의 학습 기록/ })).toHaveTextContent("전체 교과목");
     expect(screen.queryByText(/배려 우선형|시그니처|수업 확장 연습|조건 간 비교/)).not.toBeInTheDocument();
     expect(screen.queryByText(/주차/)).not.toBeInTheDocument();
-    expect(screen.getByText("회고 질문 · 모든 학습자에게 같은 질문입니다")).toBeInTheDocument();
+    expect(screen.getByText(/회고 질문 · 모든 학습자에게 같은 질문입니다/)).toBeInTheDocument();
     expect(screen.getByText("미기록")).toBeInTheDocument();
+  });
+
+  it("lists the selected act's own records with source, first and final expressions", async () => {
+    const withSource = { ...ownLog, source_text: "시간 확인 부탁드립니다." };
+    const unchanged = { ...ownLog, id: "same", source_text: "자료 보내 주세요.", revised_response: ownLog.first_response };
+    mocks.order.mockResolvedValue({ data: [withSource, unchanged], error: null });
+    renderReport();
+    const list = await screen.findByRole("list", { name: "요청 완료 기록" });
+    const items = within(list).getAllByRole("listitem");
+    expect(items).toHaveLength(2);
+    expect(items[0]).toHaveTextContent("원문시간 확인 부탁드립니다.");
+    expect(items[0]).toHaveTextContent(`처음${ownLog.first_response}`);
+    expect(items[0]).toHaveTextContent(`최종${ownLog.revised_response}`);
+    expect(items[1]).toHaveTextContent("처음 표현을 그대로 유지");
+    expect(screen.getByText("화행을 누르면 아래에서 내 기록을 볼 수 있습니다.")).toBeInTheDocument();
+  });
+
+  it("offers the course link when there are no completed records", async () => {
+    renderReport();
+    await screen.findByRole("region", { name: "수업 이수 범위" });
+    expect(screen.getByRole("link", { name: /이번 주 미션 하러 가기/ })).toHaveAttribute("href", "/learner/course");
   });
 
   it("keeps a failed query distinct from no records and allows retry", async () => {
