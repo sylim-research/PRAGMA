@@ -12,20 +12,15 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "상황 시나리오 생성",
-  mission: "학습 미션 조립 (MJT + DCT)",
+  mission: "학습 미션 조립 (v5 형식 · v6 전환의 원본)",
   review: "프롬프트 통제 기반 검토",
   runtime: "학습자 피드백",
   authoring: "실제 자료 활용",
 };
 const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
-// 지금 호출되지 않는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
+// 화면 조작으로 호출될 수 없는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
+// 집중 구간 없는 피드백은 편성된 4문항 미션이 학습자에게 열리지 않아 호출 경로가 없다.
 const HIDDEN_PROMPT_KEYS = new Set([
-  "mission.system.legacy_v4",
-  "quality.system.legacy_v4",
-  // 현행 v6 미션 검토·집중 구간 피드백으로 대체된 v5·일반 경로
-  "quality.system",
-  "quality.system.zh_ko",
-  "quality.system.zh_ko.spoken",
   "feedback.system",
   "feedback.system.zh_ko",
   "feedback.system.zh_ko.spoken",
