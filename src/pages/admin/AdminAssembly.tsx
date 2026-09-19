@@ -19,6 +19,7 @@ import { GenerationJobsPanel } from '@/components/admin/GenerationJobsPanel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -53,7 +54,7 @@ import { MissionPreview } from "@/components/admin/MissionPreview";
 import { ProfessorMissionWorkbench } from "@/components/admin/ProfessorMissionWorkbench";
 import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import type { ContentReviewApproval } from "@/lib/pragma/contentReviewApi";
-import type { LearnerMissionRuntime } from "@/lib/pragma/missionV6";
+import type { LearnerMissionRuntime, MissionV6 } from "@/lib/pragma/missionV6";
 import { toast } from "sonner";
 import { startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
 import { fetchAllPages } from "@/lib/pragma/paginatedRows";
@@ -91,6 +92,8 @@ interface CoreRow {
   generation_run_id: string | null;
   generation_item_key: string | null;
   prompt_snapshot_hash: string | null;
+  supersedes_scenario_id?: string | null;
+  created_at?: string | null;
   core_content: {
     /** 명사구 한 줄 요약. 학습자 메뉴 제목과 같은 필드이며 목록에서 미션을 판별하는 이름으로 쓴다. */
     brief_note_ko?: string;
@@ -138,8 +141,17 @@ const STATE_KO: Record<AssemblyState, string> = {
 };
 
 // 상태 칩. 점검 화면의 칩은 DB 상태가 아니라 같은 generated 미션을 검수 단계로 나눈 보기다.
-type StateChip = "all" | AssemblyState | ProfessorQueue | Exclude<QualityCheckQueue, "decision">;
-const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "failed", "generated", "reviewed", "all"];
+// 2026-09-19: 「학습 미션 조립」을 v6 제작 현황판으로 바꿨다. v6 미션은 화면이 아니라 변환 스크립트로
+// 등록되므로(v5 승인본 → v6 변환·집필 → 자동 검사·AI 검토 → 교수자 승인 → 편성) 이 화면은 읽기만 한다.
+type ProductionState = "v6_review" | "v6_done" | "v5_only" | "core_only";
+type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Exclude<QualityCheckQueue, "decision">;
+const ASSEMBLY_CHIPS: StateChip[] = ["v6_review", "v6_done", "v5_only", "core_only", "all"];
+const PRODUCTION_KO: Record<ProductionState, string> = {
+  v6_review: "v6 검토 중",
+  v6_done: "v6 승인 완료",
+  v5_only: "v5 · 변환 전",
+  core_only: "시나리오만",
+};
 const QUALITY_CHIPS: StateChip[] = ["needs_check", "rules_error", "decision", "all"];
 const PROFESSOR_CHIPS: StateChip[] = ["decision", "in_progress", "reviewed", "all"];
 
@@ -186,7 +198,7 @@ const LIST_CAP = 20;
 // (2026-07-31 실측 1299건) — 상한에 닿으면 화면에 알린다.
 const ROW_CAP = 4000;
 const CORE_ROW_SELECT =
-  "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content";
+  "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, supersedes_scenario_id, created_at, core_content";
 
 const PROGRESS_STEPS = ["초안 생성", "구조 검사", "AI 품질", "격리 저장", "문항 수리"] as const;
 
@@ -288,7 +300,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       // scenarios의 신규 조립 메타 컬럼이 생성 타입보다 앞서 배포돼 임시 query builder cast가 필요하다.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as unknown as { from: (t: string) => any };
-      const select = reviewMode ? CORE_ROW_SELECT + REVIEW_META_SELECT : CORE_ROW_SELECT;
+      const select = CORE_ROW_SELECT + REVIEW_META_SELECT;
       let request = db
         .from("scenarios")
         .select(select)
@@ -305,8 +317,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       // 대시보드와 같은 조회 조건이어야 두 화면의 「교수자 차례」 수가 같다.
       const page = <T,>(query: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>) =>
         fetchAllPages<T>(async (from, to) => await query(from, to));
-      const metaRequest: Promise<ReviewMeta | null> = reviewMode
-        ? Promise.all([
+      const metaRequest: Promise<ReviewMeta | null> = Promise.all([
           page<DashboardReviewRunRow>((from, to) => db.from("content_review_runs").select(DASHBOARD_REVIEW_RUN_SELECT)
             .eq("kind", "mission").eq("criteria_version", DASHBOARD_REVIEW_CRITERIA_VERSION).is("superseded_by", null)
             .order("created_at", { ascending: false }).range(from, to)),
@@ -316,8 +327,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             .order("id", { ascending: true }).range(from, to)),
         ]).then(([runs, assignments, outlines]) => ({
           runs, assignments, outlineTitles: new Map(outlines.map((outline) => [outline.id, outline.title])),
-        }))
-        : Promise.resolve(null);
+        }));
       const [{ data, error: queryError }, meta] = await Promise.race([
         Promise.all([
           request as PromiseLike<{ data: unknown[] | null; error: { message: string } | null }>,
@@ -328,6 +338,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       if (queryError) throw new Error(queryError.message);
       let loaded = (data ?? []) as CoreRow[];
       const linkedId = searchParams.get("scenarioId");
+      // 더 새 판이 대체한 옛 판(다른 행의 supersedes_scenario_id가 가리키는 행)은 목록·숫자에서 뺀다. DB는 그대로다.
+      const replaced = new Set(loaded.map((row) => row.supersedes_scenario_id).filter(Boolean));
+      loaded = loaded.filter((row) => !replaced.has(row.scenario_id) || row.scenario_id === linkedId);
       if (linkedId && !loaded.some((row) => row.scenario_id === linkedId)) {
         const { data: linked } = await db.from("scenarios").select(select).eq("scenario_id", linkedId).maybeSingle();
         if (linked) loaded = [linked as CoreRow, ...loaded];
@@ -357,6 +370,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     [failures],
   );
 
+  const productionOf = useCallback((r: CoreRow): ProductionState => {
+    if (!r.mission_status) return "core_only";
+    if (r.mission_schema_version !== "mission_v6") return "v5_only";
+    return r.mission_status === "reviewed" || r.mission_status === "released" ? "v6_done" : "v6_review";
+  }, []);
+
   // 줄마다 검수 이력·편성 전체를 다시 훑지 않도록 scenario_id별로 한 번 묶어 판정해 둔다.
   const reviewInfo = useMemo(() => {
     const info = new Map<string, ReviewInfo>();
@@ -384,6 +403,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const matchesState = useCallback(
     (r: CoreRow, state: StateChip) => {
       if (state === "all") return true;
+      if (!reviewMode) return productionOf(r) === state;
       if (state === "decision" || state === "in_progress") {
         return stateOf(r) === "generated" && (reviewInfo.get(r.scenario_id)?.queue ?? "in_progress") === state;
       }
@@ -392,11 +412,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       }
       return stateOf(r) === state;
     },
-    [reviewInfo, stateOf],
+    [reviewInfo, stateOf, reviewMode, productionOf],
   );
 
   const chipLabel = (chip: StateChip) => {
     if (chip === "all") return "전체";
+    if (!reviewMode && chip in PRODUCTION_KO) return PRODUCTION_KO[chip as ProductionState];
     if (chip === "decision") return aiReview ? "교수자 승인 대기" : "결정 대기";
     if (chip === "in_progress") return "검수 진행 중";
     // 대시보드와 같은 집합은 같은 이름으로 부른다.
@@ -670,6 +691,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
+    if (!reviewMode) {
+      return (
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
+          <span className="text-[12px] text-[#66727A]">{[DIRECTION_LABEL[direction], LEVEL[r.learner_level], MODE_LABEL[mode]].join(" · ")}</span>
+        </span>
+      );
+    }
     return (
       <span className="flex flex-wrap items-center gap-1">
         <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
@@ -685,8 +714,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const info = reviewInfo.get(r.scenario_id);
     const st = stateOf(r);
     if (!reviewMode) {
-      if (busy === r.scenario_id && assemblyProgress?.id === r.scenario_id) return ["조립 중"];
-      return [fState === "all" ? STATE_KO[st] : null, failures[r.scenario_id] && st === "failed" ? "조립 실패 · 사유 확인" : null];
+      const production = productionOf(r);
+      return [fState === "all" ? PRODUCTION_KO[production] : null,
+        production === "v6_review" ? info?.progress : production === "v6_done" ? info?.placement : null];
     }
     if (aiReview) return [info?.progress, traceLabel(r.mission_content_hash)];
     return [info?.placement, missionVersionLabel(r.mission_schema_version),
@@ -744,7 +774,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
     const metaLine = reviewMode
       ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
-      : [STATE_KO[st], ...context];
+      : [PRODUCTION_KO[productionOf(r)], ...context];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
@@ -770,73 +800,25 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           </div>
           <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
             {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
-            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}>◀ 이전</Button>
-            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음 ▶</Button>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}><ChevronLeft className="size-3.5" />이전</Button>
+            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음<ChevronRight className="size-3.5" /></Button>
           </div>
         </header>
         <div className="space-y-3 px-4 py-3 xl:px-5">
 
-        {/* ── 학습 미션 조립: 만드는 화면 ── */}
+        {/* ── 학습 미션 제작 현황: 읽기만 하는 화면 ── */}
         {!reviewMode && (
           <>
             {scenarioText}
-            {(st === "core_only" || st === "failed") && (
-              <section aria-label="조립" className="space-y-2 rounded-lg border border-[#E2DED2] bg-[#FBFAF6] px-3 py-2.5">
-                {DEFAULT_FEATURE_BY_ACT[r.speech_act] ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <select aria-label="미션 생성 모델" value={generationModel} disabled={!!busy}
-                      onChange={e => setGenerationModel(e.target.value as "existing" | "astra")} className="h-9 rounded-md border bg-white px-2 text-sm">
-                      <option value="existing">기존 모델</option><option value="astra">Astra · 결과 보존 생성</option>
-                    </select>
-                    <Button disabled={busy === r.scenario_id} onClick={() => onAssemble(r)}>
-                      {isAssembling && <span className="mr-1.5 size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
-                      {isAssembling ? "조립 중" : st === "failed" ? "다시 조립" : "미션 조립"}
-                    </Button>
-                    <span className="text-[12px] text-muted-foreground">
-                      MJT 5 + DCT 1 · 누를 때만 생성 비용{generationModel === "astra" ? " · Astra는 수 분 걸릴 수 있음" : ""}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="text-[13px] text-muted-foreground">화용 초점 카탈로그 없음 — 조립 불가</p>
-                )}
-                {isAssembling && rowMsg[r.scenario_id] && <p className="text-xs" role="status">{rowMsg[r.scenario_id]}</p>}
-                {isAssembling && assemblyProgress && <AssemblyProgressView stage={assemblyProgress.stage} />}
-                {failures[r.scenario_id] && st === "failed" && (
-                  <p className="rounded-md border border-[#E5CFCC] bg-[#F7EFEE] px-3 py-2 text-[12px] leading-relaxed text-[#7B453F]">
-                    {failures[r.scenario_id]}
-                  </p>
-                )}
-              </section>
-            )}
-            {(st === "generated" || st === "reviewed") && (
-              <section aria-label="조립 결과" className="space-y-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="text-[14px] font-bold text-[#233542]">조립 결과</h3>
-                  {st === "generated" && (
-                    <Button size="sm" variant="ghost" disabled={busy === r.scenario_id}
-                      title="현재 생성물은 이력에 보존하고 같은 시나리오로 새 미션을 조립합니다." onClick={() => onRework(r)}>
-                      반려·재조립
-                    </Button>
-                  )}
-                </div>
-                {rowMsg[r.scenario_id] && <p className="text-[12.5px] text-muted-foreground">{rowMsg[r.scenario_id]}</p>}
-                {!loaded ? loadingMission : (
-                  <>
-                    {loaded.mission.schema_version !== "mission_v6" && <MissionPreview mission={loaded.mission} warnings={loaded.warnings} />}
-                    {st === "generated" && (
-                      <ProfessorMissionWorkbench
-                        scenarioId={r.scenario_id}
-                        key={`${loaded.mission.provenance?.mission_content_hash ?? "draft"}-${loaded.mission.quality_check?.verdict ?? "none"}`}
-                        mission={loaded.mission}
-                        busy={busy === r.scenario_id}
-                        onSave={(edits) => onSaveEdits(r, edits)}
-                        onReview={(overrides, approval) => onReview(r, overrides, approval)}
-                        approvalHref={`/admin/ai-review?scenarioId=${r.scenario_id}`}
-                      />
-                    )}
-                  </>
-                )}
-              </section>
+            <ProductionPath production={productionOf(r)} row={r} info={info} />
+            {productionOf(r) !== "core_only" && productionOf(r) !== "v5_only" && (!loaded ? loadingMission : (
+              loaded.mission.schema_version === "mission_v6" && <MissionOutline mission={loaded.mission} />
+            ))}
+            {(productionOf(r) === "v6_review" || productionOf(r) === "v6_done") && (
+              <Link to={`${productionOf(r) === "v6_done" ? "/admin/review" : "/admin/ai-review"}?scenarioId=${r.scenario_id}`}
+                className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#15202B] underline underline-offset-4">
+                {productionOf(r) === "v6_done" ? "교수자 최종 승인 화면에서 보기" : "품질 점검 화면에서 열기"}<ChevronRight className="size-3.5" />
+              </Link>
             )}
           </>
         )}
@@ -887,9 +869,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         )}
 
         {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
-        <footer className="flex justify-end pt-1">
-          <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
-        </footer>
+        {reviewMode && (
+          <footer className="flex justify-end pt-1">
+            <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
+          </footer>
+        )}
         </div>
       </div>
     );
@@ -897,12 +881,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   return (
     <AdminShell
-      title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 조립"}
+      title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작 현황"}
       description={aiReview
         ? "자동 점검·AI 검토로 감수 자료를 준비합니다. 승인은 하지 않습니다."
         : reviewMode
           ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
-          : "시나리오를 MJT 5문항·직접 산출 과제 미션으로 조립합니다."}
+          : "v6 학습 미션이 제작 경로의 어느 단계에 있는지 봅니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -933,7 +917,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
               <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
-                {chips.map((s) => (
+                {chips.filter((s) => reviewMode || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
                     key={s}
                     type="button"
@@ -974,7 +958,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </select>
               </div>
               <div className="flex gap-1.5 text-[12px]">
-                {([["axis", "필터 · 학습설계 4축", axisFilterActive], ["advanced", "고급 필터 (연구자용)", fRun !== "all" || fHash !== "all"]] as const).map(([key, label, active]) => (
+                {([["axis", "필터", axisFilterActive], ["advanced", "고급",  fRun !== "all" || fHash !== "all"]] as const).map(([key, label, active]) => (
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
                     className={[
@@ -1069,21 +1053,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
                   })))}>{reviewSelection.size}건 감수 자료 준비</Button>
                 <p className="text-[12px] text-muted-foreground">저장 결과 재사용 · 없을 때만 유료 AI 검토</p>
-              </div>
-            )}
-            {!reviewMode && (
-              // 진행 중인 생성 작업이 없으면 패널이 비어 이 자리도 사라진다.
-              <div className="border-t border-[#E2DED2] px-2.5 empty:hidden [&>section]:my-2 [&>section]:p-2.5">
-                <GenerationJobsPanel busy={!!busy} savedIds={new Set(rows.filter(r => r.mission_status).map(r => r.scenario_id))}
-                  onResume={async (id, jobId) => {
-                    const { data, error } = await supabase.from("scenarios").select("*").eq("scenario_id", id).single();
-                    if (error || !data) { toast.error("시나리오를 불러오지 못했습니다."); return; }
-                    if (data.mission_status) { toast.info("이미 생성된 미션입니다. 품질 점검 화면에서 확인해 주세요."); return; }
-                    const row = data as unknown as CoreRow;
-                    setRows((prev) => (prev.some((candidate) => candidate.scenario_id === id) ? prev : [row, ...prev]));
-                    setSelectedId(id);
-                    setGenerationModel("astra"); void onAssemble(row, true, jobId);
-                  }} />
               </div>
             )}
           </aside>
@@ -1197,6 +1166,78 @@ const AssemblyProgressView = ({
         })}
       </ol>
     </div>
+  );
+};
+
+type StepStatus = "done" | "current" | "todo";
+
+/** v6 제작 경로 5단계. 단계 판정은 대시보드·점검·승인 화면과 같은 검수 이력·편성 조회를 쓴다. */
+const ProductionPath = ({ production, row, info }: { production: ProductionState; row: CoreRow; info: ReviewInfo | undefined }) => {
+  const v6 = production === "v6_review" || production === "v6_done";
+  const approved = production === "v6_done";
+  const decision = production === "v6_review" && info?.queue === "decision";
+  const placed = Boolean(info?.placement && info.placement !== "편성 전");
+  const created = row.created_at
+    ? `${new Date(row.created_at).getMonth() + 1}/${new Date(row.created_at).getDate()}`
+    : null;
+  const steps: { label: string; status: StepStatus; detail?: string | null }[] = [
+    { label: "v5 원본", status: production === "core_only" ? "todo" : "done", detail: production === "core_only" ? "미션 없음" : null },
+    { label: "v6 변환·집필", status: v6 ? "done" : production === "v5_only" ? "current" : "todo", detail: v6 ? created : production === "v5_only" ? "변환 전" : null },
+    { label: "자동 검사·AI 검토", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? info?.progress : null },
+    { label: "교수자 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
+    { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
+  ];
+  return (
+    <section aria-label="제작 경로" className="rounded-lg border border-[#E7E2D4] bg-[#FBFAF6] px-4 py-3">
+      <h3 className="mb-2.5 text-[13px] font-bold text-[#233542]">제작 경로</h3>
+      <ol className="grid grid-cols-5 gap-2">
+        {steps.map((step, index) => (
+          <li key={step.label} className="relative min-w-0">
+            {index > 0 && (
+              <span aria-hidden className={["absolute right-[calc(50%+14px)] top-[11px] h-px w-[calc(100%-20px)]",
+                step.status === "todo" ? "bg-[#DDD8CB]" : "bg-[#233542]"].join(" ")} />
+            )}
+            <span className="flex flex-col items-center text-center">
+              <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[11.5px] font-bold tabular-nums",
+                step.status === "done" ? "bg-[#233542] text-white"
+                  : step.status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
+                    : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                {step.status === "done" ? "✓" : index + 1}
+              </span>
+              <span className={["mt-1.5 text-[12.5px] leading-tight",
+                step.status === "todo" ? "text-[#9AA2A6]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
+              {step.detail && (
+                <span className={["mt-0.5 line-clamp-2 text-[11.5px] leading-snug",
+                  step.status === "current" ? "text-[#8A5A14]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
+              )}
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+};
+
+/** v6 미션 구조 — 판단 문항 5개의 제목과 직접 산출 과제. 문항 본문은 품질 점검·승인 화면에서 본다. */
+const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
+  const v6 = mission as MissionV6;
+  const task = v6.production_task;
+  return (
+    <section aria-label="미션 구조" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
+      <h3 className="mb-2 text-[13px] font-bold text-[#233542]">미션 구조</h3>
+      <ol className="divide-y divide-[#F0EDE4] text-[13px]">
+        {v6.mpj_items.map((item, index) => (
+          <li key={index} className="flex gap-3 py-1.5">
+            <span className="w-12 shrink-0 font-semibold tabular-nums text-[#66727A]">MJT {index + 1}</span>
+            <span className="min-w-0 text-[#202B33]">{item.title}</span>
+          </li>
+        ))}
+        <li className="flex gap-3 py-1.5">
+          <span className="w-12 shrink-0 font-semibold text-[#66727A]">DCT</span>
+          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} 산출 1회 · AI 피드백 후 다듬기</span>
+        </li>
+      </ol>
+    </section>
   );
 };
 
