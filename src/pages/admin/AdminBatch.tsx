@@ -381,15 +381,11 @@ const AdminBatch = () => {
               </div>
               </>}
             </section>
-            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
-          </div>
-
-          <section id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
-                <p className="mt-1 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-              </div>
+            {/* 생성 실행은 따로 단계를 두지 않는다 — 항목을 고른 표 바로 아래에서 시작한다. */}
+            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} footer={
+          <div id="batch-execution" aria-label="생성 실행" className="scroll-mt-20">
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              <p className="text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
               <div className="flex flex-wrap items-center gap-2">
                 <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={selectedPlan.indexes.length > 0 ? () => startSelected("current") : start} disabled={busy || plan.length === 0}>
                   <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
@@ -409,7 +405,8 @@ const AdminBatch = () => {
                 <div><dt className="text-muted-foreground">실패</dt><dd className="mt-1 font-bold">{failCount}건</dd></div>
               </dl>
             </div>}
-          </section>
+          </div>} />
+          </div>
         </div>
 
         {failures.length > 0 && <section aria-label="배치 생성 실패" className="rounded-xl border border-red-200 bg-red-50 p-5">

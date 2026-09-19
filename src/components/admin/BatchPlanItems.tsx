@@ -9,12 +9,14 @@ const PAGE_SIZE = 10;
 // 짧은 범주 칸은 고르게 나누고 주제가 나머지를 쓴다 — 글자가 왼쪽에 몰리지 않게.
 const COLUMN_WIDTHS = ["5%", "5%", "8%", "8%", "8%", "8%", "10%", "8%", "8%", "32%"];
 
-export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: {
+export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, footer }: {
   plan: BatchCell[];
   selected: readonly number[];
   disabled: boolean;
   onSelect: (indexes: number[]) => void;
   actions?: React.ReactNode;
+  /** 표 아래 실행 영역(생성 시작 버튼·진행 상황). 항목을 고른 자리에서 바로 실행한다. */
+  footer?: React.ReactNode;
 }) {
   const [page, setPage] = useState(0);
   useEffect(() => setPage(0), [plan]);
@@ -29,7 +31,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
   return <section aria-labelledby="batch-items-heading" className="rounded-xl border bg-white p-5">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
-        <h2 id="batch-items-heading" className="font-bold">생성 항목 확인·선택</h2>
+        <h2 id="batch-items-heading" className="flex items-center gap-2 text-lg font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">3</span>생성 항목 확인·실행</h2>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={disabled || !indexes.length}
@@ -72,5 +74,6 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: 
         <Button size="sm" variant="outline" disabled={currentPage >= pages - 1} onClick={() => setPage(currentPage + 1)}>다음 항목</Button>
       </div>
     </div>
+    {footer && <div className="mt-4 border-t pt-4">{footer}</div>}
   </section>;
 }
