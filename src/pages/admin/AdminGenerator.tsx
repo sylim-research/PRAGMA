@@ -510,7 +510,7 @@ const AdminGenerator = () => {
     resetOutlines();
     try {
       const { data, error } = await supabase.functions.invoke("generate-scenario", {
-        body: { ...baseGenBody(), action: "outline", outline_count: outlineCount },
+        body: { ...baseGenBody(), action: "outline", outline_count: outlineCount, topic_seed_ko: topic?.situationSeedKo ?? null },
       });
       if (error) throw error;
       const list = (data?.outlines ?? []) as { title: string; situation: string }[];
@@ -537,11 +537,16 @@ const AdminGenerator = () => {
   // (예: digital_content = daily+work) 개별 topic은 그중 하나만 허용할 수 있으므로
   // (예: collab_dm_request = work만), theme의 무조건 첫 항목이 아니라 **현재 도메인을
   // 허용하는 첫 topic**을 고른다 — 안 그러면 theme은 유효한데 topic 불일치로 실패한다.
-  const topicCode =
-    topicsForTheme(themeCode).find((t) => t.allowedDomains.includes(form.domain))?.code ??
-    topicsForTheme(themeCode)[0]?.code ??
-    topicsForTheme(THEME_CODES[0])[0]?.code ??
-    "";
+  // 화행도 맞춰 고른다 — 화행과 무관한 첫 topic(예: 일상생활 = 이웃 소음)을 고르면 개요·원문이
+  // 그 주제를 벗어나 뒤 단계의 주제 검토(topic_seed)에서 보류된다. 명시 화행 topic을 먼저, 없으면 화행 중립 topic.
+  const themeTopicsInDomain = topicsForTheme(themeCode).filter((t) => t.allowedDomains.includes(form.domain));
+  const topic =
+    themeTopicsInDomain.find((t) => t.allowedSpeechActs?.includes(form.speech_act_ui)) ??
+    themeTopicsInDomain.find((t) => !t.allowedSpeechActs) ??
+    themeTopicsInDomain[0] ??
+    topicsForTheme(themeCode)[0] ??
+    topicsForTheme(THEME_CODES[0])[0];
+  const topicCode = topic?.code ?? "";
 
   const modalityOf = (m: GenMode) => (m === "stt_interpreting" ? "spoken" : "written");
   const legacyChannelOf = (m: GenMode) => (m === "stt_interpreting" ? "facetoface" : "messenger");

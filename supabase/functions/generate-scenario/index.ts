@@ -225,6 +225,8 @@ interface GenInput {
   // single-shot full-scenario generation.
   action?: 'outline' | 'final' | 'core' | 'mission_topology' | 'mission' | 'mission_repair' | 'mission_candidate_regenerate' | 'finalize_mission' | 'authentic_analyze' | 'quality_check' | 'core_quality_check' | 'feedback'
   outline_count?: number
+  /** 개별 생성의 세부 주제 시드. 개요가 이 사건을 벗어나면 뒤 단계의 주제 검토에서 막힌다. */
+  topic_seed_ko?: string | null
   selected_outline?: { title?: string; situation?: string } | null
   // v1.4 (2026-07-23): scenario_core_v1 / mission_v1 생성. 카탈로그는 클라가 전달.
   core?: CoreGenBody
@@ -534,6 +536,9 @@ function buildUserPrompt(input: GenInput, candidateCount: number, variant: 'full
   // Outline variant: shares all the conditions above, but asks for N lightweight
   // outlines (title + situation only) instead of one full scenario.
   if (variant === 'outline') {
+    if (input.topic_seed_ko && input.topic_seed_ko.trim()) {
+      parts.push(`- 주제 시드(모든 개요가 이 사건을 구체화): ${input.topic_seed_ko.trim()}`)
+    }
     parts.push(
       '',
       `위 조건에 정확히 부합하는 서로 다른 상황 개요를 정확히 ${candidateCount}개 생성하세요.`,
