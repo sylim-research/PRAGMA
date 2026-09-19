@@ -377,14 +377,14 @@ const LearnerRecords = () => {
             <p className="text-[12px] font-semibold text-[#5C6A7A]">회고 질문 · 모든 학습자에게 같은 질문입니다 — 위 기록을 보며 답해 보세요</p>
             <ul className="mt-2 space-y-1.5 text-[13.5px] leading-relaxed text-[#26323D]">
               <li>· 최종 표현에서도 원문의 의미와 {actLabel}의 목적이 유지되었나요?</li>
-              <li>· 관계와 부담에 맞게 표현을 어떻게 조정했나요? <span className="text-[#5C6A7A]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
+              <li>· 표현을 그대로 유지하거나 바꾼 이유는 무엇인가요? <span className="text-[#5C6A7A]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
             </ul>
           </div>
         </section>
 
         <section className={`${panel} mt-4 p-5 sm:p-6`}>
           <div className="flex items-center justify-between gap-3">
-            <h2 className="flex items-center gap-2 text-[18px] font-bold"><FilePenLine className="h-5 w-5" />최근 수정 노트</h2>
+            <h2 className="flex items-center gap-2 text-[18px] font-bold"><FilePenLine className="h-5 w-5" />전체 화행의 최근 수정 노트</h2>
             {revisions.length > 0 && (
               <Dialog>
                 <DialogTrigger asChild>
