@@ -64,8 +64,9 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   {
     header: "4. 수업 운영",
     items: [
-      { to: "/admin/composer", label: "15주 수업 편성", activePaths: ["/admin/data-backup"] },
+      { to: "/admin/composer", label: "15주 수업 편성" },
       { to: "/admin/learners", label: "학습자 관리" },
+      { to: "/admin/data-backup", label: "수업 데이터 백업·복원" },
     ],
   },
   {

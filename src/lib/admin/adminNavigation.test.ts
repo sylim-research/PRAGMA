@@ -46,7 +46,7 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/library")).toBe("/admin/library");
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/composer", "/admin/learners",
+      "/admin/composer", "/admin/learners", "/admin/data-backup",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 활용");
     expect(research?.items.map((item) => item.to)).toEqual([
@@ -139,7 +139,7 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/package")).toBe("/admin/decision-traces");
     expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/decision-traces");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
-    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/composer");
+    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
     expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");
     expect(adminMobileNavValue("/admin/export")).toBe("/admin/export");
   });
