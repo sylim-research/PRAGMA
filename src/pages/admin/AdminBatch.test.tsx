@@ -109,12 +109,12 @@ describe("배치 생성 작업 화면", () => {
     const runId = localStorage.getItem("pragma:admin-core-batch-run:ko_zh");
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "다음 항목" }));
-    fireEvent.click(screen.getByLabelText("생성 항목 11 선택"));
+    fireEvent.click(screen.getByLabelText("생성 항목 21 선택"));
     fireEvent.click(screen.getByRole("button", { name: "선택 2건 생성 시작" }));
     await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
     const plan = buildBatchPlan();
-    expect(mocks.run).toHaveBeenCalledWith([plan[0], plan[10]], expect.objectContaining({
-      runId, itemIndexes: [0, 10], existingItems: existing, concurrency: 3,
+    expect(mocks.run).toHaveBeenCalledWith([plan[0], plan[20]], expect.objectContaining({
+      runId, itemIndexes: [0, 20], existingItems: existing, concurrency: 3,
     }));
     await waitFor(() => expect(start()).toBeEnabled());
   });
