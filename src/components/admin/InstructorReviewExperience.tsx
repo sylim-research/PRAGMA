@@ -9,15 +9,16 @@ const ReviewStage = lazy(() => import("@/pages/learner/CanonicalMissionRun").the
 const statusLabel = { checked: "확인", revision_required: "수정 요청", defer: "보류(기존 기록)" };
 const empty = (): InstructorExperience => ({ version: "instructor_experience_v1", active_seconds: 0, decisions: [] });
 // mission_v6 roles for the same section ids; v5 keeps the fixed labels in EXPERIENCE_SECTIONS.
-const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], string> = {
-  scene: "미션 안내",
-  "mjt-0": "1. 적절성 판단",
-  "mjt-1": "2. 새 장면 판단 · 이유",
-  "mjt-2": "3. 선택교정",
-  "mjt-3": "4. 자유교정 · 대조",
-  "mjt-4": "5. 후보별 적절성 판단",
-  recap: "핵심 정리",
-  dct: "직접 통번역 · DCT",
+// 꼬리표(단계) + 학생 화면과 같은 이름. DCT 이름은 번역·통역에 따라 정한다.
+const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], { tag: string; name: string }> = {
+  scene: { tag: "도입", name: "미션 안내" },
+  "mjt-0": { tag: "MJT 1", name: "상황에 맞는지 판단하기" },
+  "mjt-1": { tag: "MJT 2", name: "판단하고 이유 고르기" },
+  "mjt-2": { tag: "MJT 3", name: "고친 표현 고르기" },
+  "mjt-3": { tag: "MJT 4", name: "직접 고치고 비교하기" },
+  "mjt-4": { tag: "MJT 5", name: "여러 표현 비교하기" },
+  recap: { tag: "중간 정리", name: "핵심 정리" },
+  dct: { tag: "DCT", name: "직접 번역하기" },
 };
 
 export function InstructorReviewExperience({ inspection, onSave, onReady, disabled = false }: {
@@ -42,7 +43,16 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     try { return { value: viewModelFromReview(inspection), error: null }; }
     catch (cause) { return { value: null, error: cause instanceof Error ? cause.message : "학습 화면을 구성하지 못했습니다." }; }
   }, [inspection.snapshot]);
-  const labelOf = (item: (typeof EXPERIENCE_SECTIONS)[number]) => model.value?.missionFormat === "mission_v6" ? V6_SECTION_LABELS[item.id] : item.label;
+  const interpreting = (inspection.snapshot as { content?: { mission?: { production_task?: { mode?: string } } } } | null)?.content?.mission?.production_task?.mode === "interpreting";
+  const partsOf = (item: (typeof EXPERIENCE_SECTIONS)[number]) => {
+    if (model.value?.missionFormat !== "mission_v6") return { tag: null, name: item.label };
+    const parts = V6_SECTION_LABELS[item.id];
+    return item.id === "dct" && interpreting ? { ...parts, name: "직접 통역하기" } : parts;
+  };
+  const labelOf = (item: (typeof EXPERIENCE_SECTIONS)[number]) => {
+    const { tag, name } = partsOf(item);
+    return tag ? `${tag} · ${name}` : name;
+  };
   const tally = EXPERIENCE_SECTIONS.reduce((counts, item) => {
     const status = draft.decisions.find((entry) => entry.section === item.id)?.status;
     if (status === "checked") counts.checked += 1;
@@ -113,23 +123,26 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
       <aside className="space-y-4 xl:sticky xl:top-24">
-        {openSections.length > 0 && <Button variant="outline" className="h-10 w-full border-[#CAB23D] text-sm font-bold" disabled={disabled || saving || approved || !model.value}
+        {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{EXPERIENCE_SECTIONS.map((item, index) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
-            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2.5 text-left text-[15px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
-            <span>{labelOf(item)}</span>
-            <span className={`shrink-0 text-sm font-semibold ${decision?.status === "checked" ? "text-emerald-700" : decision?.status === "revision_required" ? "text-amber-800" : "text-[#8C969B]"}`}>{decision ? statusLabel[decision.status] : "미확인"}</span>
+            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
+            <span className="flex min-w-0 items-center gap-2">
+              {partsOf(item).tag && <span className="w-[4.5rem] shrink-0 rounded bg-[#EEF0EC] px-1.5 py-0.5 text-center text-[11.5px] font-semibold text-[#53656F]">{partsOf(item).tag}</span>}
+              <span className="min-w-0 truncate">{partsOf(item).name}</span>
+            </span>
+            <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-emerald-700" : decision?.status === "revision_required" ? "text-amber-800" : "text-[#8C969B]"}`}>{decision ? statusLabel[decision.status] : "미확인"}</span>
           </button>;
         })}</nav>
         <div className="space-y-3 rounded-xl bg-white p-4">
-          <p className="text-lg font-bold">{labelOf(section)}</p>
+          <p className="text-[15px] font-bold">{labelOf(section)}</p>
           <div className="grid grid-cols-2 gap-2">
-            <Button className="h-11 text-base" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
-            <Button className="h-11 text-base" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 요청</Button>
+            <Button size="sm" className="h-9 text-[13.5px]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
+            <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 요청</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y text-[15px] leading-7" value={noteValue} disabled={disabled || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })

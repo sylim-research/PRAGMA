@@ -33,7 +33,8 @@ describe("instructor experience", () => {
       mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
     render(<MemoryRouter><InstructorReviewExperience inspection={v6} onSave={vi.fn()} onReady={vi.fn()} /></MemoryRouter>);
     const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
-    const v6Labels = ["미션 안내", "1. 적절성 판단", "2. 새 장면 판단 · 이유", "3. 선택교정", "4. 자유교정 · 대조", "5. 후보별 적절성 판단", "핵심 정리", "직접 통번역 · DCT"];
+    // 꼬리표(단계) + 학생 화면과 같은 이름.
+    const v6Labels = ["도입미션 안내", "MJT 1상황에 맞는지 판단하기", "MJT 2판단하고 이유 고르기", "MJT 3고친 표현 고르기", "MJT 4직접 고치고 비교하기", "MJT 5여러 표현 비교하기", "중간 정리핵심 정리", "DCT직접 번역하기"];
     expect(within(nav).getAllByRole("button").map((button) => button.firstElementChild?.textContent)).toEqual(v6Labels);
     for (const old of ["4. 이유 찾기", "5. 여러 초안 비교", "문항별 핵심"]) expect(within(nav).queryByText(old)).not.toBeInTheDocument();
     expect(screen.queryByLabelText("감수 진행")).toBeNull();
