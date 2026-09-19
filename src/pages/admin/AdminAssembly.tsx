@@ -896,7 +896,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
-        <div className={professorScreen ? "grid items-start" : "grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]"}>
+        <div className={professorScreen ? "grid items-start"
+          : reviewMode ? "grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]"
+            : "grid items-start gap-4 xl:grid-cols-2"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
@@ -1218,22 +1220,22 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   );
 };
 
-/** v6 미션 구조 — 판단 문항 5개의 제목과 직접 산출 과제. 문항 본문은 품질 점검·승인 화면에서 본다. */
+/** 학습 미션 설계 — 판단 문항 5개의 제목과 직접 산출 과제. 문항 본문은 품질 점검·승인 화면에서 본다. */
 const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
   const v6 = mission as MissionV6;
   const task = v6.production_task;
   return (
-    <section aria-label="미션 구조" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
-      <h3 className="mb-2 text-[13px] font-bold text-[#233542]">미션 구조</h3>
+    <section aria-label="학습 미션 설계" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
+      <h3 className="mb-2 text-[13px] font-bold text-[#233542]">학습 미션 설계</h3>
       <ol className="divide-y divide-[#F0EDE4] text-[13px]">
         {v6.mpj_items.map((item, index) => (
           <li key={index} className="flex gap-3 py-1.5">
-            <span className="w-12 shrink-0 font-semibold tabular-nums text-[#66727A]">MJT {index + 1}</span>
+            <span className="w-[4.5rem] shrink-0 font-semibold tabular-nums text-[#66727A]">MJT 문항 {index + 1}</span>
             <span className="min-w-0 text-[#202B33]">{item.title}</span>
           </li>
         ))}
         <li className="flex gap-3 py-1.5">
-          <span className="w-12 shrink-0 font-semibold text-[#66727A]">DCT</span>
+          <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT 문항</span>
           <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} 산출 1회 · AI 피드백 후 다듬기</span>
         </li>
       </ol>
