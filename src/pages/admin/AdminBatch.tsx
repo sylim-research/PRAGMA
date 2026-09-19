@@ -342,11 +342,18 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
+              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
                 <PlanMetric label="통역" value={summary.interpreting} />
                 <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
+                {summary.total > 0 && <>
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
+                    description="화행 × 수준 × 번역/통역" />
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                    description="화행 × P × D × R" />
+                </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
@@ -358,15 +365,9 @@ const AdminBatch = () => {
                   <p className="text-sm font-medium text-[#3F4E59]">① 에서 건수를 정하면 화행·관계 분포가 여기에 채워집니다.</p>
                 </div>
               ) : <>
-              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description="화행 × 수준 × 번역/통역" />
-                <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                  description="화행 × P × D × R" />
-              </div>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />

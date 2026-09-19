@@ -225,14 +225,14 @@ const Page = () => {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
         <Table className="min-w-[920px] table-fixed">
           <colgroup>
-            <col style={{ width: "22%" }} />
+            <col style={{ width: "21%" }} />
             <col style={{ width: "14%" }} />
             <col style={{ width: "9%" }} />
             <col style={{ width: "9%" }} />
             <col style={{ width: "17%" }} />
             <col style={{ width: "9%" }} />
             <col style={{ width: "9%" }} />
-            <col style={{ width: "11%" }} />
+            <col style={{ width: "12%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>

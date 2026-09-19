@@ -91,7 +91,7 @@ describe("학습자 관리 목록", () => {
     const table = screen.getByRole("table");
     expect(table).toHaveClass("table-fixed", "min-w-[920px]");
     expect(Array.from(table.querySelectorAll("col")).map((col) => col.style.width)).toEqual([
-      "22%", "14%", "9%", "9%", "17%", "9%", "9%", "11%",
+      "21%", "14%", "9%", "9%", "17%", "9%", "9%", "12%",
     ]);
     expect(screen.getAllByRole("link", { name: "수행 기록 →" })[0]).toHaveAttribute(
       "href",
