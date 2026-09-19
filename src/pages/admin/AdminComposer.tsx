@@ -1084,9 +1084,13 @@ function WeekRow({
     ? getTargetFeature(plannedFeatureCode)?.learner_label ?? plannedFeatureCode
     : null;
   // 화행 주차는 「요청 화행」처럼 네 글자로 보인다.
+  // 7·14주는 미션 없이 누적 수행 기록으로 성찰·정리하는 주차다(2026-09-19 GPT 교차검증 A안 수정).
   const displayTitle = week.type === "orientation"
     ? "오리엔테이션"
-    : act && !reinforcement ? `${SPEECH_ACT_UI[act]} 화행` : weekActivityLabel(week);
+    : act && !reinforcement ? `${SPEECH_ACT_UI[act]} 화행`
+    : week.type === "regular" && week.week_no === 7 ? "전반부 성찰·정리"
+    : week.type === "regular" && week.week_no === 14 ? "종합 성찰·정리"
+    : weekActivityLabel(week);
 
   const cands = filterManualCandidates(candidates.filter((candidate) => !replaced?.has(candidate.scenario_id)), {
     act,
@@ -1102,7 +1106,7 @@ function WeekRow({
   return (
     <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. */}
-      <div className="grid min-h-9 grid-cols-[3.5rem_7.5rem_7rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
+      <div className="grid min-h-9 grid-cols-[3.5rem_10rem_7rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
@@ -1110,12 +1114,15 @@ function WeekRow({
           <>
             <span className="flex min-w-0 flex-col">
               <span className="truncate text-[14px] font-bold text-[#15202B]" title={reinforcement ? REINFORCEMENT_DESCRIPTION : displayTitle}>
-                {reinforcement ? (act ? `보완 · ${SPEECH_ACT_UI[act]} 화행` : "선택 화행 보완") : displayTitle}
+                {reinforcement ? "선택 화행 집중 보완" : displayTitle}
               </span>
               {reinforcement && (
-                <button type="button" onClick={onEditWeek} className="w-fit text-[11.5px] font-semibold text-[#1F3A5F] hover:underline">
-                  {act ? "화행 변경" : "화행 선택"}
-                </button>
+                <span className="flex items-center gap-1.5 text-[11.5px]">
+                  <span className="font-semibold text-[#15202B]">{act ? `${SPEECH_ACT_UI[act]} 화행` : "화행 미정"}</span>
+                  <button type="button" onClick={onEditWeek} className="font-semibold text-[#1F3A5F] underline-offset-2 hover:underline">
+                    {act ? "바꾸기" : "고르기"}
+                  </button>
+                </span>
               )}
             </span>
             <span className="text-[13px] font-semibold text-[#1F3A5F]">{missionModesSummary(expectedModes)}</span>
