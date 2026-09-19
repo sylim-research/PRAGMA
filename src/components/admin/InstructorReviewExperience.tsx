@@ -145,7 +145,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
             <Button size="sm" className="h-9 text-[13.5px]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
             <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y bg-white text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
