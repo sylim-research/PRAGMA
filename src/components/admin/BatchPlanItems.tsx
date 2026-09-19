@@ -4,7 +4,7 @@ import { DOMAIN, LEVEL, MODE_LABEL, PDR_BURDEN, PDR_DISTANCE, PDR_POWER, SPEECH_
 import { getScenarioTopic } from "@/lib/pragma/scenarioTopics";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 20;
 
 // 짧은 범주 칸은 고르게 나누고 주제가 나머지를 쓴다 — 글자가 왼쪽에 몰리지 않게.
 const COLUMN_WIDTHS = ["5%", "5%", "8%", "8%", "8%", "8%", "10%", "8%", "8%", "32%"];
