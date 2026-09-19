@@ -18,8 +18,19 @@ const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   authoring: "실제 자료 활용",
 };
 const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
-// 초기 4문항 형식 전용 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
-const HIDDEN_PROMPT_KEYS = new Set(["mission.system.legacy_v4", "quality.system.legacy_v4"]);
+// 지금 호출되지 않는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
+const HIDDEN_PROMPT_KEYS = new Set([
+  "mission.system.legacy_v4",
+  "quality.system.legacy_v4",
+  // 현행 v6 미션 검토·집중 구간 피드백으로 대체된 v5·일반 경로
+  "quality.system",
+  "quality.system.zh_ko",
+  "quality.system.zh_ko.spoken",
+  "feedback.system",
+  "feedback.system.zh_ko",
+  "feedback.system.zh_ko.spoken",
+  "feedback.system.spoken",
+]);
 
 function HarnessOverview() {
   return (
