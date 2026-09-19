@@ -142,6 +142,25 @@ function recordMeta(record: ReportRecord) {
     .filter(Boolean).join(" · ");
 }
 
+/** 원문 한 줄 — 길면 두 줄까지만 보이고 「펼치기」로 전체를 연다. */
+function SourceText({ text, className = "" }: { text: string; className?: string }) {
+  const [open, setOpen] = useState(false);
+  if (!text) return null;
+  const long = text.length > 70;
+  return (
+    <div className={`break-words text-[#4F6070] ${className}`}>
+      <p className={long && !open ? "line-clamp-2" : ""}>
+        <span className="mr-2 text-[11.5px] font-semibold">원문</span>{text}
+      </p>
+      {long && (
+        <button type="button" onClick={() => setOpen((v) => !v)} className="mt-0.5 text-[11.5px] font-semibold text-[#344F63] hover:underline">
+          {open ? "접기" : "펼치기"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 const panel = "rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_8px_24px_rgba(21,32,43,0.04)]";
 
 const LearnerRecords = () => {
@@ -344,7 +363,7 @@ const LearnerRecords = () => {
               {selectedRecords.map((record) => (
                 <li key={record.id} className="rounded-xl bg-[#F7F5EE] px-4 py-3 text-[13px]">
                   <p className="text-[11.5px] font-semibold text-[#5C6A7A]">{recordMeta(record)}</p>
-                  {record.sourceText && <p className="mt-1.5 break-words text-[#4F6070]"><span className="mr-2 text-[11.5px] font-semibold">원문</span>{record.sourceText}</p>}
+                  <SourceText text={record.sourceText} className="mt-1.5" />
                   <p className="mt-1.5 break-words font-zh leading-relaxed"><span className="mr-2 font-sans text-[11.5px] font-semibold text-[#5C6A7A]">처음</span>{record.firstResponse || "기록 없음"}</p>
                   <p className="mt-1 break-words font-zh leading-relaxed">
                     <span className="mr-2 font-sans text-[11.5px] font-semibold text-[#5C6A7A]">최종</span>
@@ -379,10 +398,8 @@ const LearnerRecords = () => {
                   <div className="space-y-3">
                     {revisions.map((record) => (
                       <article key={record.id} className="rounded-xl border border-[#E4DFD0] bg-white p-4">
-                        <div className="mb-3 flex items-center justify-between text-[11px] text-muted-foreground">
-                          <span>{recordMeta(record)}</span>
-                          {record.sourceText && <span className="ml-3 min-w-0 truncate" title={record.sourceText}>원문 · {record.sourceText}</span>}
-                        </div>
+                        <p className="text-[11px] font-semibold text-muted-foreground">{recordMeta(record)}</p>
+                        <SourceText text={record.sourceText} className="mb-3 mt-1 text-[12px]" />
                         <div className="grid gap-3 text-[12px] md:grid-cols-3">
                           <div><strong className="text-[11px] text-muted-foreground">최초 표현</strong><p className="mt-1 break-words font-zh leading-relaxed">{record.firstResponse || "기록 없음"}</p></div>
                           <div><strong className="text-[11px] text-muted-foreground">재검토 지점</strong><p className="mt-1 leading-relaxed">{scopeLabel(record)}</p></div>
@@ -396,7 +413,8 @@ const LearnerRecords = () => {
             )}
           </div>
           {latestRevision ? (<>
-            <p className="mt-3 break-words text-[12px] text-[#5C6A7A]">{recordMeta(latestRevision)}{latestRevision.sourceText ? ` · 원문 「${latestRevision.sourceText}」` : ""}</p>
+            <p className="mt-3 text-[12px] font-semibold text-[#5C6A7A]">{recordMeta(latestRevision)}</p>
+            <SourceText text={latestRevision.sourceText} className="mt-1 text-[12.5px]" />
             <div className="mt-3 grid gap-4 text-[13px] sm:grid-cols-[minmax(0,1.15fr)_minmax(150px,.7fr)_minmax(0,1.15fr)] sm:divide-x sm:divide-[#EEE9DC]">
               <div className="min-w-0 sm:pr-4"><strong className="text-[11.5px] text-muted-foreground">최초 표현</strong><p className="mt-2 break-words font-zh leading-relaxed">{latestRevision.firstResponse || "기록 없음"}</p></div>
               <div className="min-w-0 sm:px-4"><strong className="text-[11.5px] text-muted-foreground">재검토 지점</strong><p className="mt-2">{scopeLabel(latestRevision)}</p></div>
