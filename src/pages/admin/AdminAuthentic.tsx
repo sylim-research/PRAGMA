@@ -148,7 +148,7 @@ const AdminAuthentic = () => {
           ))}
         </div>
       ) : rows.length === 0 && !pending && !listError ? (
-        <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[13px] text-muted-foreground">
+        <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[14.5px] text-muted-foreground">
           분석한 자료가 아직 없습니다. 위에서 자료를 분석해 보세요.
         </p>
       ) : (
@@ -162,13 +162,13 @@ const AdminAuthentic = () => {
                   onClick={() => setOpenId(open ? null : row.id)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
                 >
-                  <span className="rounded-full bg-[#EDE9DD] px-2 py-[2px] text-[10.5px] text-[#5B5446]">
+                  <span className="rounded-full bg-[#EDE9DD] px-2 py-[2px] text-[11.5px] text-[#5B5446]">
                     {row.source_type === "image" ? "이미지" : "문구"}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-[13px] text-foreground">
+                  <span className="min-w-0 flex-1 truncate text-[14.5px] text-foreground">
                     {excerpt(row.source_original)}
                   </span>
-                  <span className="shrink-0 text-[11.5px] text-muted-foreground">
+                  <span className="shrink-0 text-[12.5px] text-muted-foreground">
                     후보 {row.candidates.length}건 ·{" "}
                     {new Date(row.created_at).toLocaleDateString("ko-KR")}
                   </span>
@@ -177,7 +177,7 @@ const AdminAuthentic = () => {
                 {open && (
                   <div className="border-t border-border px-3 py-3">
                     {(row.scene_ko || row.linguistic_features_ko) && (
-                      <div className="mb-3 space-y-0.5 text-[12px] leading-relaxed text-muted-foreground">
+                      <div className="mb-3 space-y-0.5 text-[13.5px] leading-relaxed text-[#3F4E59]">
                         {row.scene_ko && (
                           <p>
                             <b className="text-foreground">담화 상황 · </b>
@@ -203,38 +203,38 @@ const AdminAuthentic = () => {
                             className="flex flex-col gap-1.5 rounded-md border border-border bg-background p-2.5"
                           >
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="rounded-full border border-border px-1.5 py-[1px] text-[10.5px]">
+                              <span className="rounded-full border border-border px-1.5 py-[1px] text-[11.5px]">
                                 {USAGE_LABEL[c.usage_type] ?? c.usage_type}
                               </span>
                               {cond?.speech_act_ui && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
                                   {SPEECH_ACT_UI[cond.speech_act_ui]}
                                 </span>
                               )}
                               {cond?.level && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
                                   {LEVEL[cond.level]}
                                 </span>
                               )}
                               {cond?.language_direction && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[10.5px]">
+                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
                                   {DIRECTION_LABEL[cond.language_direction]}
                                 </span>
                               )}
                               <span
-                                className={`ml-auto rounded-full px-1.5 py-[1px] text-[10.5px] ${status.tone}`}
+                                className={`ml-auto rounded-full px-1.5 py-[1px] text-[11.5px] ${status.tone}`}
                               >
                                 {status.text}
                               </span>
                             </div>
 
                             {c.label_ko && (
-                              <p className="text-[12.5px] font-semibold text-foreground">
+                              <p className="text-[14px] font-semibold text-foreground">
                                 {c.label_ko}
                               </p>
                             )}
                             {c.source_text && (
-                              <p className="text-[12px] leading-relaxed text-muted-foreground">
+                              <p className="text-[13.5px] leading-relaxed text-[#3F4E59]">
                                 {c.source_text}
                               </p>
                             )}
@@ -243,7 +243,7 @@ const AdminAuthentic = () => {
                               {c.source_text && c.usage_type !== "expression_resource" && (
                                 <Button
                                   onClick={() => void sendStoredToGenerator(c, row)}
-                                  className="h-7 bg-[#15202B] px-2.5 text-[11.5px] text-white hover:bg-[#15202B]/90"
+                                  className="h-8 bg-[#15202B] px-2.5 text-[12.5px] text-white hover:bg-[#15202B]/90"
                                 >
                                   상황 시나리오 만들기
                                 </Button>
@@ -251,14 +251,14 @@ const AdminAuthentic = () => {
                               <button
                                 type="button"
                                 onClick={() => void mark(c, c.status === "held" ? "stored" : "held")}
-                                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
+                                className="rounded-md border border-border px-2.5 py-1 text-[12.5px] text-muted-foreground hover:bg-muted"
                               >
                                 {c.status === "held" ? "보류 해제" : "보류"}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => void mark(c, "discarded")}
-                                className="rounded-md border border-border px-2.5 py-1 text-[11.5px] text-muted-foreground hover:bg-muted"
+                                className="rounded-md border border-border px-2.5 py-1 text-[12.5px] text-muted-foreground hover:bg-muted"
                               >
                                 버리기
                               </button>
