@@ -1122,9 +1122,7 @@ const AdminGenerator = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="mt-1 text-[10.5px] text-muted-foreground">
-                    산업 배경 안에서 학습자가 수행할 실제 업무를 구체화합니다.
-                  </p>
+                  
                 </div>
               )}
             </div>
@@ -1561,12 +1559,12 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-2 text-[14.5px] font-bold text-[#15202B]",
+      "flex items-center gap-2 text-[14px] font-semibold text-[#15202B]",
     ].join(" ")}
   >
     <span
       className={[
-        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12px] font-bold text-[#15202B]",
+        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12px] font-semibold text-[#15202B]",
       ].join(" ")}
     >
       {n}
