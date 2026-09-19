@@ -145,10 +145,11 @@ const STATE_KO: Record<AssemblyState, string> = {
 // 등록되므로(v5 승인본 → v6 변환·집필 → 자동 검사·AI 검토 → 교수자 승인 → 편성) 이 화면은 읽기만 한다.
 type ProductionState = "v6_review" | "v6_done" | "v5_only" | "core_only";
 type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Exclude<QualityCheckQueue, "decision">;
-const ASSEMBLY_CHIPS: StateChip[] = ["v6_review", "v6_done", "v5_only", "core_only", "all"];
+// 이 화면은 v6만 본다 — 이전 형식(v5)과 미션 없는 시나리오는 학습 미션 라이브러리에서 본다.
+const ASSEMBLY_CHIPS: StateChip[] = ["v6_review", "v6_done", "all"];
 const PRODUCTION_KO: Record<ProductionState, string> = {
-  v6_review: "v6 검토 중",
-  v6_done: "v6 승인 완료",
+  v6_review: "검토 중",
+  v6_done: "승인 완료",
   v5_only: "v5 · 변환 전",
   core_only: "시나리오만",
 };
@@ -402,8 +403,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   const matchesState = useCallback(
     (r: CoreRow, state: StateChip) => {
+      if (!reviewMode) {
+        const production = productionOf(r);
+        return state === "all" ? production === "v6_review" || production === "v6_done" : production === state;
+      }
       if (state === "all") return true;
-      if (!reviewMode) return productionOf(r) === state;
       if (state === "decision" || state === "in_progress") {
         return stateOf(r) === "generated" && (reviewInfo.get(r.scenario_id)?.queue ?? "in_progress") === state;
       }
@@ -716,7 +720,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     if (!reviewMode) {
       const production = productionOf(r);
       return [fState === "all" ? PRODUCTION_KO[production] : null,
-        production === "v6_review" ? info?.progress : production === "v6_done" ? info?.placement : null];
+        production === "v6_review" ? currentStageLabel(info?.progress) : production === "v6_done" ? info?.placement : null];
     }
     if (aiReview) return [info?.progress, traceLabel(r.mission_content_hash)];
     return [info?.placement, missionVersionLabel(r.mission_schema_version),
@@ -774,11 +778,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
     const metaLine = reviewMode
       ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
-      : [PRODUCTION_KO[productionOf(r)], ...context];
+      : [];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
         {reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
+        {!reviewMode && context.length > 0 && <span className="mt-1 block text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
       </p>
     );
     const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
@@ -792,9 +797,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0 [&>span]:flex-nowrap">{badges(r, "sm")}</span>
-              <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
-                {metaLine.filter(Boolean).join(" · ")}
-              </p>
+              {metaLine.some(Boolean) && (
+                <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
+                  {metaLine.filter(Boolean).join(" · ")}
+                </p>
+              )}
             </div>
             <h2 className="line-clamp-2 text-[16px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
@@ -886,7 +893,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         ? "자동 점검·AI 검토로 감수 자료를 준비합니다. 승인은 하지 않습니다."
         : reviewMode
           ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
-          : "v6 학습 미션이 제작 경로의 어느 단계에 있는지 봅니다."}
+          : "학습 미션이 제작 경로의 어느 단계에 있는지 봅니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -943,7 +950,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="제목·상황·Trace 검색"
+                  placeholder={reviewMode ? "제목·상황·Trace 검색" : "제목·상황 검색"}
                   aria-label="대기열 검색"
                   className="h-7 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[12.5px]"
                 />
@@ -960,7 +967,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </select>
               </div>
               <div className="flex gap-1.5 text-[12px]">
-                {([["axis", "필터", axisFilterActive], ["advanced", "고급",  fRun !== "all" || fHash !== "all"]] as const).map(([key, label, active]) => (
+                {([["axis", "필터", axisFilterActive], ["advanced", "고급", fRun !== "all" || fHash !== "all"]] as const).filter(([key]) => reviewMode || key === "axis").map(([key, label, active]) => (
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
                     className={[
@@ -1173,6 +1180,18 @@ const AssemblyProgressView = ({
 
 type StepStatus = "done" | "current" | "todo";
 
+/** 제작 현황 화면용 한 구절 — 검수 진행 문구에서 지금 단계만 남기고 서비스 이름을 뺀다. */
+const currentStageLabel = (progress: string | undefined) => {
+  if (!progress) return null;
+  if (progress.includes("교수자 결정 대기")) return "교수자 승인 대기";
+  if (progress.includes("규칙 검사 오류")) return "규칙 검사 · 수정 필요";
+  if (progress.includes("규칙 검사 전")) return "규칙 검사 전";
+  if (progress.includes("재검토 전")) return "AI 재검토 전";
+  if (progress.includes("Claude 검토 전")) return "AI 교차 검토 전";
+  if (progress.includes("OpenAI 검토 전")) return "AI 검토 전";
+  return progress;
+};
+
 /** v6 제작 경로 5단계. 단계 판정은 대시보드·점검·승인 화면과 같은 검수 이력·편성 조회를 쓴다. */
 const ProductionPath = ({ production, row, info }: { production: ProductionState; row: CoreRow; info: ReviewInfo | undefined }) => {
   const v6 = production === "v6_review" || production === "v6_done";
@@ -1183,9 +1202,9 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     ? `${new Date(row.created_at).getMonth() + 1}/${new Date(row.created_at).getDate()}`
     : null;
   const steps: { label: string; status: StepStatus; detail?: string | null }[] = [
-    { label: "v5 원본", status: production === "core_only" ? "todo" : "done", detail: production === "core_only" ? "미션 없음" : null },
-    { label: "v6 변환·집필", status: v6 ? "done" : production === "v5_only" ? "current" : "todo", detail: v6 ? created : production === "v5_only" ? "변환 전" : null },
-    { label: "자동 검사·AI 검토", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? info?.progress : null },
+    { label: "원본 미션", status: production === "core_only" ? "todo" : "done", detail: production === "core_only" ? "미션 없음" : null },
+    { label: "변환·집필", status: v6 ? "done" : production === "v5_only" ? "current" : "todo", detail: v6 ? created : production === "v5_only" ? "변환 전" : null },
+    { label: "품질 점검", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
     { label: "교수자 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
@@ -1236,7 +1255,7 @@ const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
         ))}
         <li className="flex gap-3 py-1.5">
           <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT 문항</span>
-          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} 산출 1회 · AI 피드백 후 다듬기</span>
+          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 다듬기</span>
         </li>
       </ol>
     </section>
