@@ -42,7 +42,7 @@ describe("배치 생성 작업 화면", () => {
   it("과거 프리셋 없이 양방향 모두 입력한 수량으로 계획하고 방향 변경 시 선택을 초기화한다", async () => {
     mount(false);
     expect(screen.queryByRole("button", { name: /기본 72건|495건 본배치|30건 검증/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "전체 0건 생성 시작" })).toBeDisabled();
+    expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("45건");
     enterExample();
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));

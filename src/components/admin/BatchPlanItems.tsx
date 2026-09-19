@@ -25,7 +25,6 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 id="batch-items-heading" className="font-bold">생성 항목 확인·선택</h2>
-        <p className="mt-1 text-xs text-muted-foreground">조건과 장면 시드를 확인하고, 일부만 생성하거나 재개할 항목을 선택합니다.</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={disabled || !indexes.length}

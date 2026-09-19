@@ -103,10 +103,12 @@ const parseSelectedPlanIndexes = (raw: string, total: number) => {
 };
 
 const AdminBatch = () => {
+  // 처음 열면 예시 계획을 채워 둔다(9의 배수 → 화행마다 5건, 수준·과업 36조합 모두 채움).
+  // 생성은 「전체 N건 생성 시작」을 눌러야만 시작된다.
   const [settings, setSettings] = useState<Record<LearnerLevel, ProductionSetting>>({
-    beginner_intermediate: { total: 0, interpretingPercent: 0 },
-    intermediate: { total: 0, interpretingPercent: 0 },
-    advanced: { total: 0, interpretingPercent: 0 },
+    beginner_intermediate: { total: 18, interpretingPercent: 0 },
+    intermediate: { total: 18, interpretingPercent: 50 },
+    advanced: { total: 9, interpretingPercent: 100 },
   });
   const [direction, setDirection] = useState<LanguageDirection>("ko_zh");
   const [running, setRunning] = useState(false);
@@ -327,8 +329,7 @@ const AdminBatch = () => {
                 </div>
               </div>
 
-              <p className="mt-3 text-xs text-muted-foreground">수준별 총 생성 건수와 그중 통역 비율을 설정합니다.</p>
-              <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
                   const counts = modeCounts[level];
                   return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + (settings[level].total > 0 ? " ring-1 ring-[#D9B51C]/50" : "")}>
@@ -352,13 +353,11 @@ const AdminBatch = () => {
                   </div>;
                 })}
               </div>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 건수는 반올림하고 나머지는 번역으로 만듭니다. {targetActCount}개 화행에 균등 배분하며, 교과목의 미션 구성은 수업 편성에서 따로 정합니다.</p>
             </section>
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
-                <span className="text-xs text-muted-foreground">아래 수치는 생성 예정 건수입니다.</span>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
@@ -378,9 +377,9 @@ const AdminBatch = () => {
               ) : <>
               <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description={"화행 × 수준 × 번역/통역 중 채워진 조합 · 가장 적은 조합 " + summary.minActLevelModeCount + "건"} />
+                  description="화행 × 수준 × 번역/통역" />
                 <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                  description={"화행 × P × D × R 중 채워진 조합 · 가장 적은 조합 " + summary.minActPdrCount + "건"} />
+                  description="화행 × P × D × R" />
               </div>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
@@ -425,11 +424,9 @@ const AdminBatch = () => {
               <div className="mt-3 rounded-lg bg-[#FAF8F2] p-3">
                 <p className="text-xs font-semibold">지금 실행 번호</p>
                 <code className="mt-1.5 block break-all text-[11px] text-[#5A6670]">{coreRunId}</code>
-                <p className="mt-1.5 text-xs leading-5 text-muted-foreground">이미 저장된 항목은 다시 만들지 않고 건너뜁니다.</p>
               </div>
             <div className="mt-4 border-t pt-4">
               <h3 className="text-sm font-semibold">고른 항목만 생성</h3>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">② 의 항목 표에서 고르거나 번호를 입력하세요.</p>
               <Label htmlFor="selected-core-cells" className="mt-3 block text-xs">선택 항목 번호</Label>
               <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="mt-2"
                 onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
@@ -438,7 +435,6 @@ const AdminBatch = () => {
                 onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 이어서 생성</Button>
               <Button className="mt-2 w-full border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
                 onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새로 생성</Button>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">중단됐던 항목은 「이어서 생성」, 이미 저장된 항목을 다시 만들 때는 「새로 생성」.</p>
             </div>
 
             <div className="mt-4 border-t pt-4">
