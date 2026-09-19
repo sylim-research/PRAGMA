@@ -426,8 +426,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
-        <h4 className="text-[14px] font-bold text-[#233542]">교수자 최종 승인</h4>
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-5">
+        <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">교수자 최종 승인</h4>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
@@ -438,9 +438,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0 bg-white" value={note} onChange={(event) => setNote(event.target.value)} />
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+        <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0 bg-white px-4 py-3 text-[14.5px] leading-6" value={note} onChange={(event) => setNote(event.target.value)} />
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
           <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-12 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
             {busy ? "처리 중…" : "교수자 최종 승인"}
