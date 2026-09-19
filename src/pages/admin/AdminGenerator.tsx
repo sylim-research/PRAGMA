@@ -230,6 +230,11 @@ interface BatchItem {
 
 const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
 
+// 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
+const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
+const EXAMPLE_D: Record<string, string> = { close: "D: 친밀", acquaintance: "D: 지인", distant: "D: 초면" };
+const EXAMPLE_R: Record<string, string> = { low: "R: 낮음", mid: "R: 중간", high: "R: 높음" };
+
 // 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
 const HOLD_STAGE_LABEL = {
   preflight: "장면 사전 검토에서 보류",
@@ -321,6 +326,41 @@ const AdminGenerator = () => {
   const [coreResults, setCoreResults] = useState<CoreResult[] | null>(null);
   // 결과가 어떤 조건에서 나왔는지 보여 준다 — 생성 뒤 폼을 바꿔도 결과 쪽 조건은 그대로다.
   const [coreConditions, setCoreConditions] = useState<string[]>([]);
+  // 아무것도 생성하기 전에는 실제 편성된 시나리오 1건을 결과 예시로 보여 준다(지어낸 예시가 아니다).
+  const [example, setExample] = useState<{ title: string; conditions: string[]; situation: string; source: string } | null>(null);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: links } = await supabase
+        .from("curriculum_week_scenarios")
+        .select("scenario_id, created_at")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      const ids = (links ?? []).map((row) => row.scenario_id).filter(Boolean) as string[];
+      if (!ids.length) return;
+      const { data: rows } = await supabase
+        .from("scenarios")
+        .select("scenario_id, title, speech_act, learner_level, language_direction, mode, core_content")
+        .in("scenario_id", ids);
+      const byId = new Map((rows ?? []).map((row) => [row.scenario_id, row]));
+      for (const id of ids) {
+        const row = byId.get(id);
+        const core = row?.core_content as Record<string, unknown> | null | undefined;
+        if (!row || !core || typeof core.situation_ko !== "string" || typeof core.source_text !== "string") continue;
+        const pdr = (core.pdr ?? {}) as { p?: string; d?: string; r?: string };
+        const conditions = [
+          SPEECH_ACT_UI[row.speech_act as keyof typeof SPEECH_ACT_UI],
+          EXAMPLE_P[pdr.p ?? ""], EXAMPLE_D[pdr.d ?? ""], EXAMPLE_R[pdr.r ?? ""],
+          DIRECTION_LABEL[row.language_direction as keyof typeof DIRECTION_LABEL],
+          LEVEL[row.learner_level as keyof typeof LEVEL],
+          MODE_LABEL[row.mode as keyof typeof MODE_LABEL],
+        ].filter(Boolean) as string[];
+        if (alive) setExample({ title: (row.title ?? "").replace(/^\s*\[[^\]]*\]\s*/, ""), conditions, situation: core.situation_ko, source: core.source_text });
+        return;
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
 
   // v9 UI-only — source acquisition mode. "ai" keeps current flow.
   // "manual" swaps the LLM-generated source_text with the user's own text
@@ -1277,6 +1317,31 @@ const AdminGenerator = () => {
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
                 <p className="mt-3 text-[12px] text-muted-foreground">시나리오 생성 중...</p>
+              </div>
+            )}
+
+            {!loading && !finalizing && !coreResults && !aiResult && example && (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
+                  <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
+                  {example.conditions.map((c) => (
+                    <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
+                  ))}
+                </div>
+                <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">편성된 생성 예시</span>
+                    <span className="text-[13.5px] font-semibold text-foreground">{example.title}</span>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">상황</div>
+                    <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[13px] leading-relaxed text-[#3F4E59]">{example.situation}</div>
+                  </div>
+                  <div>
+                    <div className="mb-1 text-[11px] font-semibold text-[#6D5C1F]">원문</div>
+                    <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[14px] leading-relaxed text-[#15202B]">{example.source}</div>
+                  </div>
+                </div>
               </div>
             )}
 
