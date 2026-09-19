@@ -12,7 +12,8 @@
 // 업로드 이미지는 분석에만 쓰이고 저장/학습자 노출하지 않는다(전송 후 폐기) —
 // 드라마·쇼츠 캡처를 DB에 저장하면 저작권 문제가 생기므로 지켜야 할 설계다.
 
-import { useRef, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
+import { ImageIcon, Loader2, PlayCircle, Sparkles, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -244,19 +245,45 @@ interface Props {
   onApply: (a: AuthenticApply, index: number) => void;
   /** 분석 성공 직후 1회. 호스트가 보관함에 저장한다(고르지 않은 후보도 남기려고). */
   onAnalyzed?: (a: AuthenticAnalyzed) => void;
+  /** 오른쪽 칼럼 아래(분석 전에는 맨 위)에 둘 생성 결과 목록 */
+  history?: ReactNode;
 }
 
-// YouTube 자막 탭 제거(2026-08-05): supadata 연동이 배포 환경에 없어 동작하지 않았고,
-// 실제 원자료 취득은 이미지 추출·문구 입력으로 수행해 왔다. 기존에 저장된
-// provenance `authentic_youtube`는 읽기 위해 스키마·라벨에 그대로 남긴다.
-type InputTab = "image" | "text";
+// YouTube 자막 탭: 2026-08-05에 뺐다가 2026-09-19 복원했다(youtube-transcript·SUPADATA_API_KEY 운영 확인).
+type InputTab = "image" | "text" | "youtube";
 
-const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
+// YouTube 자막(CC)만 쓴다(mode=native) — AI 받아쓰기는 실제 자료가 아니다.
+// 중국어를 먼저 찾고, 없으면 한국어를 찾는다. 가져온 자막 언어가 곧 원문 언어다.
+type CaptionResult = { lang: string; text: string } | { missing: true } | { error: string };
+const isZh = (lang: unknown) => typeof lang === "string" && /^zh/i.test(lang);
+const isKo = (lang: unknown) => typeof lang === "string" && /^ko/i.test(lang);
+
+async function fetchCaptionTrack(url: string, lang: "zh" | "ko"): Promise<CaptionResult & { available?: string[] }> {
+  const { data, error } = await supabase.functions.invoke("youtube-transcript", {
+    body: { url, lang, mode: "native", text: false },
+  });
+  if (error) return { error: error.message };
+  if (data?.error) return { error: typeof data.error === "string" ? data.error : JSON.stringify(data.error) };
+  const available = Array.isArray(data?.availableLangs) ? (data.availableLangs as string[]) : [];
+  const match = lang === "zh" ? isZh(data?.lang) : isKo(data?.lang);
+  const content = (data?.raw as { content?: unknown } | undefined)?.content;
+  const caption = typeof content === "string"
+    ? content
+    : Array.isArray(content)
+      ? content.map((seg: { text?: string }) => seg?.text ?? "").join(" ")
+      : "";
+  if (!match || !caption.trim()) return { missing: true, available };
+  return { lang: String(data.lang), text: caption.replace(/\s+/g, " ").trim(), available };
+}
+
+const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
   const [inputTab, setInputTab] = useState<InputTab>("image");
   const [imgLarge, setImgLarge] = useState(false);
   const [text, setText] = useState("");
-  // 출처·메모 입력 칸은 화면에서 뺐다(2026-09-19). 저장 형식은 그대로 두고 빈 값으로 보낸다.
-  const sourceRef = "";
+  // 출처·메모 입력 칸은 화면에서 뺐다(2026-09-19). 출처는 YouTube 자막을 가져올 때만 영상 주소로 자동 기록한다.
+  const [sourceRef, setSourceRef] = useState("");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [ytLoading, setYtLoading] = useState(false);
   const note = "";
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
@@ -290,6 +317,35 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
       setInputOrigin("authentic_image");
     };
     reader.readAsDataURL(file);
+  };
+
+  const fetchCaption = async () => {
+    const url = youtubeUrl.trim();
+    if (!/^https?:\/\/(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(url)) {
+      setError("YouTube 영상 주소를 넣어 주세요.");
+      return;
+    }
+    setYtLoading(true);
+    setError(null);
+    try {
+      let result = await fetchCaptionTrack(url, "zh");
+      if ("missing" in result) result = await fetchCaptionTrack(url, "ko");
+      if ("error" in result) {
+        setError(`자막을 가져오지 못했습니다: ${result.error}`);
+        return;
+      }
+      if ("missing" in result) {
+        setError("이 영상에는 중국어·한국어 자막(CC)이 없습니다. 다른 영상을 찾아 주세요.");
+        return;
+      }
+      setText(result.text);
+      setInputTab("text");
+      setInputOrigin("authentic_youtube");
+      setSourceRef(url);
+      setDirection(isZh(result.lang) ? "zh_ko" : "ko_zh");
+    } finally {
+      setYtLoading(false);
+    }
   };
 
   const clearImage = () => {
@@ -384,31 +440,34 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
   return (
     // 좌 = 자료 입력(고정폭 썸네일·문구·출처·방향), 우 = 분석·후보. 입력 칼럼은
     // 스크롤해도 따라오게 sticky — 후보를 훑다가 원문을 고치는 왕복이 잦다.
-    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
+    <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[9fr_11fr]">
       {/* ── LEFT: 자료 → 문구 확정 ── */}
-      <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4 lg:col-span-2">
+      <section className="space-y-5 rounded-xl border border-[#D9D2BF] bg-white p-5 lg:sticky lg:top-4">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="text-[12.5px] font-bold text-[#15202B]">① 원자료 가져오기</span>
-            <span className="text-[10.5px] text-[#5A6670]">이미지는 분석에만 쓰고 저장하지 않습니다</span>
-          </div>
-          <div className="mt-2 grid grid-cols-2 gap-1 rounded-lg bg-[#F3F0E7] p-1 text-[12px]">
-            {([["image", "이미지에서 추출"], ["text", "문구 직접 입력"]] as [InputTab, string][]).map(
-              ([k, l]) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => setInputTab(k)}
-                  className={[
-                    "h-8 rounded-md font-medium transition-colors",
-                    inputTab === k ? "bg-white text-[#1d2336] shadow-sm" : "text-[#3F4E59] hover:bg-white/60",
-                  ].join(" ")}
-                >
-                  {l}
-                </button>
-              ),
-            )}
+          <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
+          <div className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-[#F3F0E7] p-1">
+            {([
+              ["image", "이미지에서 추출", ImageIcon],
+              ["text", "텍스트 직접 입력", Type],
+              ["youtube", "YouTube 자막", PlayCircle],
+            ] as const).map(([k, l, Icon]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setInputTab(k)}
+                aria-pressed={inputTab === k}
+                className={[
+                  "flex h-16 flex-col items-center justify-center gap-1 rounded-md text-[12.5px] transition-colors",
+                  inputTab === k
+                    ? "bg-white font-semibold text-[#15202B] shadow-sm ring-1 ring-[#D9D2BF]"
+                    : "font-medium text-[#3F4E59] hover:bg-white/60",
+                ].join(" ")}
+              >
+                <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                <span className="truncate">{l}</span>
+              </button>
+            ))}
           </div>
 
           {inputTab === "image" && (
@@ -417,9 +476,10 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-24 w-full items-center justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
+                  className="flex h-44 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
-                  + 쇼츠·드라마 캡처 업로드 (jpg·png·webp)
+                  <span className="text-[13.5px] font-semibold text-[#15202B]">+ 쇼츠·드라마 캡처 업로드</span>
+                  <span className="text-[11.5px] font-normal text-[#5A6670]">jpg·png·webp · 이미지는 저장하지 않습니다</span>
                 </button>
               ) : imgLarge ? (
                 <div className="space-y-1.5">
@@ -468,34 +528,65 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
             </div>
           )}
 
+          {inputTab === "youtube" && (
+            <div className="mt-2.5 flex h-44 flex-col justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] px-4">
+              <div className="flex gap-2">
+                <input
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !ytLoading && youtubeUrl.trim()) fetchCaption(); }}
+                  placeholder="https://www.youtube.com/watch?v=…"
+                  aria-label="YouTube 영상 주소"
+                  className="h-10 min-w-0 flex-1 rounded-md border border-[#D9D2BF] bg-white px-3 text-[13px] text-[#15202B] placeholder:text-[#8A949C] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+                />
+                <button
+                  type="button"
+                  onClick={fetchCaption}
+                  disabled={ytLoading || !youtubeUrl.trim()}
+                  className="h-10 shrink-0 rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D]"
+                >
+                  {ytLoading ? "가져오는 중…" : "자막 가져오기"}
+                </button>
+              </div>
+              <p className="mt-1.5 truncate text-[11.5px] text-[#5A6670]">
+                중국어·한국어 CC 자막을 가져와 텍스트 칸에 채웁니다.
+              </p>
+            </div>
+          )}
+
           {inputTab === "text" && (
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="짧은 중국어 또는 한국어 문구 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구 등"
-              className="mt-2.5 h-24 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
+              className="mt-2.5 h-44 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
         </div>
 
-        {/* 기본 언어 방향 */}
-        <div>
-          <label className="text-[12.5px] font-medium text-[#3F4E59]">기본 언어 방향</label>
-          <div className="mt-1.5 flex gap-1.5">
+        {/* 만들 콘텐츠의 언어 방향 — 자료(영상·이미지)의 언어가 아니라 학습 과제의 방향 */}
+        <div className="border-t border-[#EFEAE0] pt-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="text-[13px] font-semibold text-[#15202B]">만들 콘텐츠의 언어 방향</label>
+            <span className="text-[11px] text-[#5A6670]">자료의 언어와 다를 수 있습니다</span>
+          </div>
+          <div className="mt-2 flex gap-2">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setDirection(d)}
+                aria-pressed={direction === d}
                 className={[
-                  "h-9 flex-1 rounded-md text-[12.5px] font-medium transition-colors",
+                  "flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md text-[13px] transition-colors",
                   direction === d
-                    ? "border-2 border-[#15202B] bg-white text-[#15202B]"
-                    : "border border-[#D9D2BF] bg-white text-[#3F4E59] hover:bg-[#F3F0E7]",
+                    ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
+                    : "border border-[#D9D2BF] bg-white font-medium text-[#3F4E59] hover:bg-[#F3F0E7]",
                 ].join(" ")}
               >
                 {d === "zh_ko" ? "중→한" : "한→중"}
+                <span className="text-[11px] font-normal text-[#5A6670]">{d === "zh_ko" ? "중국어 원문" : "한국어 원문"}</span>
               </button>
             ))}
           </div>
@@ -504,9 +595,19 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
         <Button
           onClick={() => runAnalyze()}
           disabled={loading || (!text.trim() && !imageDataUrl)}
-          className="w-full bg-[#FAD338] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:opacity-50"
+          className="h-12 w-full gap-2 bg-[#FAD338] text-[15px] font-bold text-[#15202B] shadow-[0_2px_0_#D9B51C] transition-all hover:-translate-y-px hover:bg-[#F2C71E] hover:shadow-[0_3px_0_#C9A614] active:translate-y-0 active:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-[#F7E08A] disabled:text-[#15202B]/80 disabled:opacity-100 disabled:shadow-[0_2px_0_#E6CF6E]"
         >
-          {loading ? "분석 중…" : "활용 가능성 분석"}
+          {loading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
+              AI가 자료를 분석하는 중…
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-5 w-5" aria-hidden />
+              AI로 활용 가능성 분석하기
+            </>
+          )}
         </Button>
 
         {error && (
@@ -551,13 +652,13 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
       </section>
 
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
-      <section className="space-y-4 lg:col-span-3">
-        {!analysis && (
+      <section className="min-w-0 space-y-4">
+        {!analysis && !history && (
           <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[13px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
             </p>
-            <p>왼쪽에 자료를 넣고 「활용 가능성 분석」을 실행하면 여기에 활용 방향과 후보가 표시됩니다.</p>
+            <p>왼쪽에 자료를 넣고 「AI로 활용 가능성 분석하기」를 누르면 여기에 활용 방향과 후보가 표시됩니다.</p>
           </div>
         )}
         {analysis && (
@@ -637,7 +738,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                       <span className="block border-l-[3px] border-[#FAD338] pl-2.5 text-[12.5px] font-bold text-[#1d2336]">
                         ④ {title} · {items.length}개
                       </span>
-                      <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2.5">
                 {items.map(({ c, i }, k) => {
                   const spanFull = items.length % 2 === 1 && k === items.length - 1;
                   const ut = asUsageType(c.usage_type);
@@ -764,6 +865,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
               </div>
             </div>
           )}
+        {history}
       </section>
     </div>
   );

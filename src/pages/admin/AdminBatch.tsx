@@ -33,7 +33,6 @@ import {
 } from "@/lib/pragma/coreBatchRun";
 import {
   createCoreRunId,
-  isCoreRunIdForDirection,
 } from "@/lib/pragma/coreRunIdentity";
 import {
   CORE_AXIS_LABEL,
@@ -42,6 +41,7 @@ import {
   type CoreQualityPilotResult,
 } from "@/lib/pragma/coreQualityAudit";
 import { THEME_LABEL } from "@/lib/pragma/scenarioTopics";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 // 배치 생성 — 셀 목록을 순회하며 기존 생성기를 반복 호출한다.
@@ -54,9 +54,14 @@ import { toast } from "sonner";
 
 const LEVEL_ORDER: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 const LEVEL_CARD_CLASS: Record<LearnerLevel, string> = {
-  beginner_intermediate: "bg-[#EDF4FA]",
-  intermediate: "bg-[#EEF5F0]",
-  advanced: "bg-[#EDF3F4]",
+  beginner_intermediate: "border border-[#EAE4D2] bg-[#FAF8F2]",
+  intermediate: "border border-[#EAE4D2] bg-[#FAF8F2]",
+  advanced: "border border-[#EAE4D2] bg-[#FAF8F2]",
+};
+// summarizePlan의 조합 라벨(speechAct·level·과업)은 내부 코드라 화면에서 우리말로 옮긴다.
+const humanizeCell = (label: string) => {
+  const [act, level, mode] = label.split("·");
+  return [SPEECH_ACT_UI[act as keyof typeof SPEECH_ACT_UI] ?? act, LEVEL[level as keyof typeof LEVEL] ?? level, mode].join(" · ");
 };
 const EMPTY_LEVEL_COUNTS = { beginner_intermediate: 0, intermediate: 0, advanced: 0 };
 type ProductionSetting = { total: number; interpretingPercent: number };
@@ -97,10 +102,12 @@ const parseSelectedPlanIndexes = (raw: string, total: number) => {
 };
 
 const AdminBatch = () => {
+  // 처음 열면 예시 계획을 채워 둔다(9의 배수 → 화행마다 5건, 수준·과업 36조합 모두 채움).
+  // 생성은 「전체 N건 생성 시작」을 눌러야만 시작된다.
   const [settings, setSettings] = useState<Record<LearnerLevel, ProductionSetting>>({
-    beginner_intermediate: { total: 0, interpretingPercent: 0 },
-    intermediate: { total: 0, interpretingPercent: 0 },
-    advanced: { total: 0, interpretingPercent: 0 },
+    beginner_intermediate: { total: 18, interpretingPercent: 0 },
+    intermediate: { total: 18, interpretingPercent: 50 },
+    advanced: { total: 9, interpretingPercent: 100 },
   });
   const [direction, setDirection] = useState<LanguageDirection>("ko_zh");
   const [running, setRunning] = useState(false);
@@ -112,7 +119,6 @@ const AdminBatch = () => {
   const [auditResults, setAuditResults] = useState<CoreQualityPilotResult[]>([]);
   const [auditDone, setAuditDone] = useState(0);
   const [coreRunId, setCoreRunId] = useState(() => getOrCreateCoreRunId("ko_zh"));
-  const [resumeRunId, setResumeRunId] = useState("");
   const [selectedCellNumbers, setSelectedCellNumbers] = useState("");
   const [activeTotal, setActiveTotal] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
@@ -134,7 +140,6 @@ const AdminBatch = () => {
     resetExecutionDisplay();
     setDirection(d);
     setCoreRunId(getOrCreateCoreRunId(d));
-    setResumeRunId("");
   };
 
   const targetActCount = Object.keys(SPEECH_ACT_UI).length;
@@ -211,6 +216,13 @@ const AdminBatch = () => {
       });
       setResults(out);
       setDone(out.length);
+      // 전체 계획이 실패 없이 끝나면 다음 실행 번호로 넘긴다. 같은 번호로 다시 누르면 모두
+      // 「이미 저장됨」으로 건너뛰기 때문이다. 끊겼거나 실패가 남으면 번호를 유지해 이어서 돌린다.
+      if (!itemIndexes && !ctrl.signal.aborted && out.length === cells.length && out.every(result => result.ok)) {
+        const next = createCoreRunId(direction);
+        persistCoreRunId(direction, next);
+        setCoreRunId(next);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "배치 실행 상태를 확인하지 못했습니다. 연결과 관리자 세션을 확인한 뒤 같은 ID로 재개해 주세요.";
       setExecutionError(message);
@@ -230,39 +242,12 @@ const AdminBatch = () => {
       toast.error("현재 계획 안의 항목 번호를 쉼표로 입력해 주세요.");
       return;
     }
-    return executeBatch(selectedPlan.indexes.map(index => plan[index]), runMode, selectedPlan.indexes);
+    const indexes = selectedPlan.indexes;
+    setSelectedCellNumbers("");
+    return executeBatch(indexes.map(index => plan[index]), runMode, indexes);
   };
 
   const stop = () => abortRef.current?.abort();
-
-  const startFreshCoreRun = () => {
-    if (busy) return;
-    if (
-      results.length > 0
-      && !window.confirm("새 배치 ID를 만들면 다음 실행은 기존 저장분을 건너뛰지 않습니다. 계속할까요?")
-    ) {
-      return;
-    }
-    const next = createCoreRunId(direction);
-    persistCoreRunId(direction, next);
-    setCoreRunId(next);
-    resetExecutionDisplay();
-    toast.success("새 배치 ID를 만들었습니다.");
-  };
-
-  const loadCoreRunId = () => {
-    if (busy) return;
-    const next = resumeRunId.trim();
-    if (!isCoreRunIdForDirection(next, direction)) {
-      toast.error(`${DIRECTION_LABEL[direction]} 방향의 시나리오 배치 ID를 입력해 주세요.`);
-      return;
-    }
-    persistCoreRunId(direction, next);
-    setCoreRunId(next);
-    setResumeRunId("");
-    resetExecutionDisplay();
-    toast.success("기존 배치 ID를 불러왔습니다.");
-  };
 
   const okCount = results.filter((r) => r.ok).length;
   const failCount = results.filter((r) => !r.ok).length;
@@ -310,22 +295,27 @@ const AdminBatch = () => {
     <AdminShell title="시나리오 배치 생성"
       description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
       <div className="space-y-5">
-        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_310px]">
+        <div className="space-y-5">
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <h2 id="batch-config-heading" className="shrink-0 text-lg font-bold">1. 생성 조건</h2>
-                <div role="group" aria-label="언어 방향" className="order-last flex w-full gap-1.5 sm:order-none sm:w-auto">
-                  <Button size="sm" className="h-8 px-3" variant={direction === "ko_zh" ? "default" : "outline"} aria-pressed={direction === "ko_zh"} disabled={busy} onClick={() => switchDirection("ko_zh")}>한→중</Button>
-                  <Button size="sm" className="h-8 px-3" variant={direction === "zh_ko" ? "default" : "outline"} aria-pressed={direction === "zh_ko"} disabled={busy} onClick={() => switchDirection("zh_ko")}>중→한</Button>
+                <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-lg font-bold"><StepNum n={1} />생성 조건</h2>
+                <div className="order-last flex w-full items-center gap-2 sm:order-none sm:ml-4 sm:w-auto">
+                  <span className="text-[13px] font-semibold text-[#3F4E59]">언어 방향</span>
+                  <div role="group" aria-label="언어 방향" className="inline-flex gap-1.5">
+                    {(["ko_zh", "zh_ko"] as const).map(d =>
+                      <button key={d} type="button" aria-pressed={direction === d} disabled={busy} onClick={() => switchDirection(d)}
+                        className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A]" : "border border-[#EAE4D2] bg-white font-medium text-[#3F4E59] hover:bg-[#FAF8F2]")}>
+                        {DIRECTION_LABEL[d]}
+                      </button>)}
+                  </div>
                 </div>
               </div>
 
-              <p className="mt-3 text-xs text-muted-foreground">수준별 총 생성 건수와 그중 통역 비율을 설정합니다.</p>
-              <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
+              <div className="mt-3 grid gap-2.5 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
                   const counts = modeCounts[level];
-                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 " + LEVEL_CARD_CLASS[level]}>
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + ""}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
                       <span className="text-sm">{LEVEL[level]}</span>
                       <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
@@ -346,96 +336,78 @@ const AdminBatch = () => {
                   </div>;
                 })}
               </div>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">통역 건수는 반올림하고 나머지는 번역으로 만듭니다. {targetActCount}개 화행에 균등 배분하며, 교과목의 미션 구성은 수업 편성에서 따로 정합니다.</p>
             </section>
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 id="batch-plan-heading" className="text-lg font-bold">2. 생성 계획·분포</h2>
-                <span className="text-xs text-muted-foreground">아래 수치는 생성 예정 건수입니다.</span>
+                <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-4">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
-                <PlanMetric label="통역" value={summary.interpreting} className="bg-[#EEF5F0]" />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" className="bg-[#EDF3F4]" />
+                <PlanMetric label="통역" value={summary.interpreting} />
+                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
               {topicCoverage.wildcardOnly.length > 0 && <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">화행 중립 시드를 사용하는 조건: {topicCoverage.wildcardOnly.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 생성 결과에서 화행 적합성을 확인해 주세요.</p>}
 
+              {summary.total === 0 ? (
+                <div className="mt-3 flex items-center gap-3 rounded-lg border border-dashed border-[#D9D2BF] bg-[#FAF8F2] px-4 py-5">
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-[#7A4A0A]"><Sparkles className="h-4 w-4" aria-hidden /></span>
+                  <p className="text-sm font-medium text-[#3F4E59]">① 에서 건수를 정하면 화행·관계 분포가 여기에 채워집니다.</p>
+                </div>
+              ) : <>
               <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description={"선택한 수준·과업의 화행 조합 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
-                <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                  description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
+                  description="화행 × 수준 × 번역/통역" />
+                <CoverageCard title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                  description="화행 × P × D × R" />
               </div>
-              {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">비어 있는 전달 조합: {summary.emptyActLevelModeCells.join(", ")}</p>}
+              {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
-                <Dist title="도메인별" className="bg-[#EEF5F0]" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
+                <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="직장 도메인 · 산업별" className="bg-[#EEF5F0]" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
               </div>
               <div className="mt-4">
                 <h3 className="text-sm font-semibold">화행별</h3>
                 <div className="mt-2 flex flex-wrap gap-2">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
                   <Badge key={key} variant="outline" className="gap-2 py-1 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
               </div>
+              </>}
             </section>
             <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
           </div>
 
-          <aside id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5 xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
-            <h2 id="batch-execution-heading" className="text-lg font-bold">3. 생성 실행</h2>
-            <p className="mt-2 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-            <div className="mt-4 rounded-lg bg-[#FAF8F2] p-3">
-              <p className="text-xs font-semibold">현재 배치 ID</p>
-              <code className="mt-2 block break-all text-xs">{coreRunId}</code>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">같은 ID로 다시 실행하면 저장 완료 항목은 AI 호출 없이 건너뜁니다.</p>
+          <section id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={selectedPlan.indexes.length > 0 ? () => startSelected("current") : start} disabled={busy || plan.length === 0}>
+                  <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
+                  {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : selectedPlan.indexes.length > 0 ? "선택 " + selectedPlan.indexes.length + "건 생성 시작" : "전체 " + summary.total + "건 생성 시작"}
+                </Button>
+                {running && <Button className="h-10" variant="outline" onClick={stop}>생성 중단</Button>}
+              </div>
             </div>
-            <Button className="mt-4 w-full" onClick={start} disabled={busy || plan.length === 0}>
-              {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
-            </Button>
-            {running && <Button className="mt-2 w-full" variant="outline" onClick={stop}>생성 중단</Button>}
             {executionError && <p role="alert" className="mt-3 text-xs leading-5 text-red-800">{executionError}</p>}
             {activeTotal > 0 && <div className="mt-4" aria-live="polite">
               <div className="mb-2 flex justify-between text-xs"><span>{running ? "생성·저장 진행" : done < activeTotal ? "중단된 실행" : "실행 완료"}</span><span>{done} / {activeTotal}</span></div>
               <Progress value={(done / Math.max(1, activeTotal)) * 100} aria-label="배치 생성 진행률" />
-              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                 <div><dt className="text-muted-foreground">새로 저장</dt><dd className="mt-1 font-bold">{okCount - reusedCount}건</dd></div>
                 <div><dt className="text-muted-foreground">기존 저장 재사용</dt><dd className="mt-1 font-bold">{reusedCount}건</dd></div>
                 <div><dt className="text-muted-foreground">경고 포함</dt><dd className="mt-1 font-bold">{warnCount}건</dd></div>
                 <div><dt className="text-muted-foreground">실패</dt><dd className="mt-1 font-bold">{failCount}건</dd></div>
               </dl>
             </div>}
-
-            <div className="mt-5 border-t pt-4">
-              <h3 className="text-sm font-semibold">선택 항목 생성·재개</h3>
-              <p className="mt-1 text-xs leading-5 text-muted-foreground">생성 항목 목록에서 고르거나 번호를 입력하세요.</p>
-              <Label htmlFor="selected-core-cells" className="mt-3 block text-xs">선택 항목 번호</Label>
-              <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="mt-2"
-                onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
-              {selectedPlan.invalid && <p role="alert" className="mt-2 text-xs text-red-800">1–{plan.length} 사이의 정수 번호를 쉼표로 구분해 주세요.</p>}
-              <Button className="mt-3 w-full" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 현재 ID 재개</Button>
-              <Button className="mt-2 w-full" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새 ID로 생성</Button>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">중단된 항목은 현재 ID로 재개합니다. 저장된 항목을 다시 만들 때는 새 ID를 사용합니다.</p>
-            </div>
-
-            <div className="mt-5 border-t pt-4">
-              <h3 className="text-sm font-semibold">배치 불러오기·새로 시작</h3>
-              <Label htmlFor="resume-core-run-id" className="mt-3 block text-xs">기존 배치 ID</Label>
-              <Input id="resume-core-run-id" value={resumeRunId} disabled={busy} className="mt-2 min-w-0 font-mono text-xs"
-                onChange={event => setResumeRunId(event.target.value)} placeholder={"core_" + direction + "_…"} />
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" onClick={loadCoreRunId} disabled={busy || !resumeRunId.trim()}>불러오기</Button>
-                <Button size="sm" variant="outline" onClick={startFreshCoreRun} disabled={busy}>새 배치 ID</Button>
-              </div>
-            </div>
-          </aside>
+          </section>
         </div>
 
         {failures.length > 0 && <section aria-label="배치 생성 실패" className="rounded-xl border border-red-200 bg-red-50 p-5">
@@ -533,12 +505,15 @@ const AdminBatch = () => {
   );
 };
 
-const PlanMetric = ({ label, value, unit = "건", primary = false, className = "bg-[#EDF4FA]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+const StepNum = ({ n }: { n: number }) =>
+  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
+
+const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
     <p className="text-xs">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
   </div>;
 
-const CoverageCard = ({ title, filled, total, description, className = "border-[#D6E2EB] bg-[#F6F9FC]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
+const CoverageCard = ({ title, filled, total, description, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
   <div className={"rounded-lg border px-3 py-2 " + className}>
     <div className="flex flex-wrap items-center justify-between gap-2 text-xs"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
     <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
@@ -546,14 +521,14 @@ const CoverageCard = ({ title, filled, total, description, className = "border-[
   </div>;
 
 
-const Dist = ({ title, rows, className = "bg-[#EDF4FA]" }: { title: string; rows: [string, number][]; className?: string }) => (
+const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
   <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[12.5px] font-semibold">{title}</div>
     <ul className="mt-1.5 space-y-0.5">
       {rows.map(([label, n]) => (
         <li key={label} className="flex items-baseline justify-between gap-3 text-[12.5px]">
           <span className="text-muted-foreground">{label}</span>
-          <span className={n === 0 ? "font-semibold text-amber-700" : "font-semibold"}>{n}</span>
+          <span className={n === 0 ? "font-semibold text-[#B9AF97]" : "font-semibold text-[#15202B]"}>{n}</span>
         </li>
       ))}
     </ul>

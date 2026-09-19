@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Search, Sparkles } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
@@ -17,7 +18,6 @@ import {
   SPEECH_ACT_UI,
   SPEECH_ACT_UI_EN,
   LEVEL,
-  HSK_REFERENCE_CEILING,
   CHANNEL_TO_MODE,
   PDR_POWER,
   PDR_DISTANCE,
@@ -230,6 +230,37 @@ interface BatchItem {
 
 const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
 
+// 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
+const HOLD_STAGE_LABEL = {
+  preflight: "장면 사전 검토에서 보류",
+  rule: "규칙 검사에서 보류",
+  semantic: "시나리오 조건 검토에서 보류",
+  system: "생성 오류",
+} as const;
+
+function humanizeHoldReason(text: string): string {
+  const length = text.match(/최대 유효 글자 (\d+)자 초과\(공백·문장부호 제외 실측 (\d+)자\)/);
+  if (length) return `원문이 최대 길이 ${length[1]}자를 넘었습니다(공백·문장부호 제외 ${length[2]}자).`;
+  return text
+    .replace(/p\s*=\s*'?speaker_higher'?/gi, "P「내가 높음」")
+    .replace(/p\s*=\s*'?speaker_lower'?/gi, "P「내가 낮음」")
+    .replace(/p\s*=\s*'?equal'?/gi, "P「동등」")
+    .replace(/\bequal\b/g, "「동등」")
+    .replace(/speaker_higher/g, "「내가 높음」")
+    .replace(/speaker_lower/g, "「내가 낮음」")
+    .replace(/\bacquaintance\b/g, "「지인」")
+    .replace(/\bdistant\b/g, "「초면」")
+    .replace(/\bclose\b/g, "「친밀」")
+    .replace(/\bhigh\b/g, "「높음」")
+    .replace(/\bmid\b/g, "「중간」")
+    .replace(/\blow\b/g, "「낮음」")
+    .replace(/\bscene_ko\b/g, "상황")
+    .replace(/\brelation_ko\b/g, "관계")
+    .replace(/\bsource_text\b/g, "원문")
+    .replace(/\bPDR\b/g, "P·D·R")
+    .replace(/^코어\s*/, "");
+}
+
 const AdminGenerator = () => {
   const [searchParams] = useSearchParams();
   const location = useLocation();
@@ -284,8 +315,12 @@ const AdminGenerator = () => {
     rule?: "pass" | "warning" | "fail";
     scenarioId?: string;
     error?: string;
+    /** 어느 관문에서 멈췄는가 — 품질 관문의 보류는 오류가 아니다. */
+    stage?: "preflight" | "rule" | "semantic" | "system";
   };
   const [coreResults, setCoreResults] = useState<CoreResult[] | null>(null);
+  // 결과가 어떤 조건에서 나왔는지 보여 준다 — 생성 뒤 폼을 바꿔도 결과 쪽 조건은 그대로다.
+  const [coreConditions, setCoreConditions] = useState<string[]>([]);
 
   // v9 UI-only — source acquisition mode. "ai" keeps current flow.
   // "manual" swaps the LLM-generated source_text with the user's own text
@@ -484,6 +519,15 @@ const AdminGenerator = () => {
     if (!outlines || selectedOutlines.size === 0 || finalizing) return;
     setFinalizing(true);
     setCoreResults(null);
+    setCoreConditions([
+      SPEECH_ACT_UI[form.speech_act_ui],
+      PDR_POWER_SHORT[form.pdr_power],
+      PDR_DISTANCE_SHORT[form.pdr_distance],
+      PDR_BURDEN_SHORT[form.pdr_burden],
+      DIRECTION_LABEL[form.language_direction],
+      LEVEL[form.level],
+      CHANNEL_UI[form.channel],
+    ]);
     const indices = [...selectedOutlines].sort((a, b) => a - b);
     const results: CoreResult[] = [];
     // 같은 조건을 다시 생성하는 것은 이전 실행 재개가 아니라 새 실행이다. 내용 기반
@@ -529,6 +573,11 @@ const AdminGenerator = () => {
           },
         });
         if (error) throw error;
+        if (data?.stop_code === "CORE_PREFLIGHT_HOLD") {
+          results.push({ title: label, ok: false, stage: "preflight", error: data.error ?? "장면 사전 검토 보류" });
+          setCoreResults([...results]);
+          continue;
+        }
         if (!data?.core_content) throw new Error(data?.error ?? "빈 응답");
         const core = data.core_content as Record<string, unknown> & { channel?: string; situation_ko?: string; brief_note_ko?: string };
         const meta = data.meta;
@@ -552,6 +601,7 @@ const AdminGenerator = () => {
             ok: false,
             core,
             rule: "fail",
+            stage: "rule",
             error: ruleResult.violations.find((v) => v.level === "fail")?.message ?? "규칙검사 실패(저장 안 함)",
           });
           setCoreResults([...results]);
@@ -580,12 +630,12 @@ const AdminGenerator = () => {
             itemKey,
           );
           if ("error" in checked) {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 실패: ${checked.error}` });
+            results.push({ title: label, ok: false, core, stage: "system", error: `시나리오 조건 검토 호출 실패: ${checked.error}` });
             setCoreResults([...results]);
             continue;
           }
           if (checked.result.verdict !== "pass") {
-            results.push({ title: label, ok: false, core, rule: "warning", error: `코어 의미 검토 보류: ${checked.result.reason}` });
+            results.push({ title: label, ok: false, core, stage: "semantic", error: checked.result.reason });
             setCoreResults([...results]);
             continue;
           }
@@ -632,7 +682,7 @@ const AdminGenerator = () => {
           scenarioId: savedId as string,
         });
       } catch (e) {
-        results.push({ title: label, ok: false, error: (e as Error).message ?? "실패" });
+        results.push({ title: label, ok: false, stage: "system", error: (e as Error).message ?? "실패" });
       }
       setCoreResults([...results]);
     }
@@ -794,16 +844,6 @@ const AdminGenerator = () => {
         </div>
       )}
 
-      {/* 실제 자료에서 시작하는 일은 「실제 자료 활용 분석」이 한다. 여기에 접이식으로
-          두었던 적이 있으나(2026-09-09 오전), 분석 결과가 저장되지 않고 사라지는 문제가
-          화면 위치와는 무관해 다시 분리했다. 이 화면은 넘어온 후보를 받기만 한다. */}
-      <p className="mt-5 rounded-lg border border-[#BA7517]/50 bg-[#FFF6E2] px-4 py-2.5 text-[12.5px] text-[#7A4A0A]">
-        실제 자료(쇼츠 캡처·소설 구절·메신저 문구)에서 시작하려면{" "}
-        <Link to="/admin/authentic" className="font-semibold underline">
-          실제 자료 활용 분석
-        </Link>
-        에서 분석하고 후보를 이 화면으로 넘기세요.
-      </p>
       {/* 적용된 원문이 보이지 않으면 무엇이 반영됐는지 알 수 없다 —
           manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
       {authenticProv && manualSourceText.trim() && (
@@ -815,12 +855,12 @@ const AdminGenerator = () => {
       )}
 
       {/* 2-col layout */}
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
         {/* LEFT — settings */}
         <section className="lg:col-span-2 space-y-5 rounded-lg border border-border bg-card p-5">
           {/* 1. 과제 모드 */}
           <div>
-            <SectionTitle n={1} label="과제 모드" accent="정본" />
+            <SectionTitle n={1} label="과제 모드" />
             <div className="mt-2 grid grid-cols-2 gap-2">
               {(["translation", "stt_interpreting"] as const).map((m) => {
                 const on = taskMode === m;
@@ -897,8 +937,9 @@ const AdminGenerator = () => {
           {/* 4. P-D-R 관계 조건 + 5. 예상 화용 부담도 */}
           <div className="rounded-md bg-[#FBEFD9]/40 border border-[#EAE4D2] p-3.5">
             <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
+            <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="Power (P) · 지위" tone="accent">
+              <Field label="지위 · P" tone="accent">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -911,12 +952,12 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Distance (D) · 거리" tone="accent">
+              <Field label="거리 · D" tone="accent">
                 <Select
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
                 >
-                  <SelectTrigger className={formField}><SelectValue /></SelectTrigger>
+                  <SelectTrigger className={formField}><SelectValue>{PDR_DISTANCE[form.pdr_distance].split(" (")[0]}</SelectValue></SelectTrigger>
                   <SelectContent>
                     {Object.entries(PDR_DISTANCE).map(([k, v]) => (
                       <SelectItem key={k} value={k}>{v}</SelectItem>
@@ -924,7 +965,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="Imposition (R) · 부담" tone="accent">
+              <Field label="부담 · R" tone="accent">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -964,7 +1005,7 @@ const AdminGenerator = () => {
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
           <div>
-            <SectionTitle n={4} label="언어 · 학습 · 상황 조건" />
+            <SectionTitle n={4} label="언어 · 수준 · 채널" />
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="언어 방향">
                 <Select
@@ -989,7 +1030,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="채널 · 파생">
+              <Field label="채널">
                 <Select
                   value={form.channel}
                   onValueChange={(v) => update("channel", v as ChannelUI)}
@@ -1004,20 +1045,14 @@ const AdminGenerator = () => {
               </Field>
             </div>
 
-            {/* HSK는 숙달도 등가가 아니라 중국어 생성물의 누적 어휘 참고 상한이다. */}
-            <div className="mt-3 rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[11.5px] leading-relaxed text-[#5B5446]">
-              <span className="font-medium text-foreground">
-                중국어 어휘 참고 상한 · HSK 1–{HSK_REFERENCE_CEILING[form.level]}급 누적
-              </span>
-            </div>
           </div>
 
           {/* 7. 도메인 · 산업 · 직무 */}
           <div>
             <SectionTitle n={5} label="도메인 · 산업 · 직무" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-2">
-                <label className="text-[12px] text-muted-foreground">도메인</label>
+              <div>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
                 <div className="mt-1.5 flex h-9 items-center gap-3">
                   {(Object.keys(DOMAIN) as Domain[]).map((d) => (
                     <label key={d} className="flex items-center gap-1.5 text-[13px] cursor-pointer">
@@ -1046,10 +1081,23 @@ const AdminGenerator = () => {
                   ))}
                 </div>
               </div>
+              <div>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">주제</label>
+                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
+                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
+                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
+                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
+                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {form.domain === "work" && (
                 <div>
-                  <label className="text-[12px] text-muted-foreground">
-                    산업 분야 <span className="text-muted-foreground/70">· 직장만</span>
+                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
+                    산업 분야
                   </label>
                   <Select
                     value={form.industry}
@@ -1066,8 +1114,8 @@ const AdminGenerator = () => {
               )}
               {form.domain === "work" && (
                 <div>
-                  <label className="text-[12px] text-muted-foreground">
-                    직무 기능 <span className="text-muted-foreground/70">· 직장만</span>
+                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
+                    직무 기능
                   </label>
                   <Select
                     value={form.func}
@@ -1080,32 +1128,10 @@ const AdminGenerator = () => {
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="mt-1 text-[10.5px] text-muted-foreground">
-                    산업 배경 안에서 학습자가 수행할 실제 업무를 구체화합니다.
-                  </p>
+                  
                 </div>
               )}
             </div>
-          </div>
-
-          {/* 7b. 주제(theme) — 편성 메타(코어 CHECK 필수) */}
-          <div>
-            <div className="text-[12px] font-medium text-muted-foreground">주제 · theme (편성 필터 축)</div>
-            {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
-                (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
-            <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
-              <SelectTrigger className="mt-1.5 h-9 text-[13px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
-                  <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="mt-1 text-[10.5px] text-muted-foreground">
-              현재 도메인({DOMAIN[form.domain]})에서 고를 수 있는 주제만 표시됩니다.
-            </p>
           </div>
 
           {/* 8. 개요 후보 수 */}
@@ -1139,7 +1165,10 @@ const AdminGenerator = () => {
               disabled={outlineLoading || finalizing}
               className="mt-2.5 w-full h-10 rounded-md border border-[#EAE4D2] bg-transparent text-[13px] text-[#1d2336] hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
             >
-              🔎 {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
+              <span className="inline-flex items-center justify-center gap-1.5">
+                <Search className="h-4 w-4" aria-hidden />
+                {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
+              </span>
             </button>
             <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">
               개요를 먼저 확인하고, 선택한 것만 전체 시나리오로 생성됩니다
@@ -1188,51 +1217,41 @@ const AdminGenerator = () => {
                   disabled={finalizing || selectedOutlines.size === 0}
                   className="w-full bg-[#1d2336] text-white hover:bg-[#1d2336]/90 disabled:opacity-60"
                 >
-                  ✨ {finalizing ? "시나리오 생성·저장 중..." : `선택한 ${selectedOutlines.size}개 개요로 시나리오 생성`}
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                  {finalizing ? "시나리오 생성·저장 중..." : `선택한 ${selectedOutlines.size}개 개요로 시나리오 생성`}
                 </Button>
               </div>
             )}
 
-            {coreResults && (
-              <div className="mt-2.5 space-y-1">
-                {coreResults.map((r, i) => (
-                  <div
-                    key={i}
-                    className={[
-                      "rounded-md border px-3 py-2 text-[11.5px]",
-                      r.ok
-                        ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
-                        : "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
-                    ].join(" ")}
-                  >
-                    <span className="font-medium">
-                      {r.ok ? "✓" : "✗"} {r.title}
-                      {r.ok && r.rule === "warning" && <span className="ml-1 text-[10px] text-[#92400E]">(경고)</span>}
-                    </span>
-                    {!r.ok && r.error && <span className="mt-0.5 block text-[10.5px]">{r.error}</span>}
-                    {r.ok && r.scenarioId && (
-                      <span className="mt-0.5 block font-mono text-[10px] opacity-80">{r.scenarioId}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+            {coreResults && (() => {
+              const saved = coreResults.filter((r) => r.ok).length;
+              const held = coreResults.length - saved;
+              return (
+                <p
+                  className={[
+                    "mt-2.5 rounded-md border px-3 py-2 text-[12px] font-medium",
+                    saved > 0 ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
+                  ].join(" ")}
+                >
+                  {saved > 0 ? "✓ " : ""}초안 {saved}건 저장{held > 0 ? ` · ${held}건 보류` : ""} · 오른쪽에서 확인하세요
+                </p>
+              );
+            })()}
           </div>
 
         </section>
 
 
         {/* RIGHT — preview */}
-        <section className="lg:col-span-3 rounded-lg border border-border bg-card p-5">
-          <h2 className="text-[14px] font-medium text-[#1d2336]">생성 결과 미리보기</h2>
+        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
+          <h2 className="text-[15px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[12.5px] font-medium text-[#065F46]">
                 ✓ 시나리오가 교수자 감수 대기 상태로 저장되었습니다.
               </p>
               <p className="mt-1 text-[11.5px] text-[#065F46]/85">
-                scenario_id: <code className="font-mono">{savedScenarioId}</code>
-                &nbsp;/&nbsp; 승인 상태: needs_review &nbsp;/&nbsp; 용도: archived_only
+                다음 단계: 자동 품질 점검·AI 검토 → 교수자 최종 승인
               </p>
             </div>
           )}
@@ -1263,47 +1282,65 @@ const AdminGenerator = () => {
 
             {!finalizing && coreResults && (
               <div className="space-y-4">
+                {coreConditions.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
+                    <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
+                    {coreConditions.map((c) => (
+                      <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
+                    ))}
+                  </div>
+                )}
                 {coreResults.map((r, i) => (
-                  <div key={i} className="space-y-2.5 rounded-lg border border-border bg-background p-3.5">
+                  <div key={i} className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
                         className={[
                           "inline-flex items-center rounded border px-1.5 py-0.5 text-[11px] font-medium",
-                          r.ok ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
+                          r.ok
+                            ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
+                            : r.stage === "system"
+                              ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
+                              : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
                         ].join(" ")}
                       >
-                        {r.ok ? "✓ 저장됨(draft)" : "✗ 실패"}
+                        {r.ok ? "✓ 초안 저장" : HOLD_STAGE_LABEL[r.stage ?? "system"]}
                       </span>
-                      {r.rule && (
+                      {r.ok && r.rule && (
                         <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
-                          규칙검사 {r.rule}
+                          규칙 검사 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
-                      <span className="text-[12.5px] font-medium text-foreground">{r.title}</span>
+                      <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
                     </div>
                     {r.error && (
-                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-2.5 py-1.5 text-[11.5px] text-[#991B1B]">{r.error}</div>
+                      <div
+                        className={[
+                          "rounded-md border px-3 py-2 text-[12.5px] leading-relaxed",
+                          r.stage === "system"
+                            ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
+                            : "border-[#FCD34D] bg-[#FFFBEB] text-[#78350F]",
+                        ].join(" ")}
+                      >
+                        {humanizeHoldReason(r.error)}
+                      </div>
                     )}
                     {r.core && typeof r.core.situation_ko === "string" && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">상황</div>
-                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-2.5 text-[12.5px] leading-relaxed">{r.core.situation_ko as string}</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">상황</div>
+                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[13px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.source_text === "string" && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">원문 · source_text</div>
-                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[12.5px] leading-relaxed">{r.core.source_text as string}</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#6D5C1F]">원문</div>
+                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[14px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">선행 발화</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">선행 발화</div>
                         <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[12px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
                       </div>
-                    )}
-                    {r.ok && r.scenarioId && (
-                      <div className="font-mono text-[10px] text-muted-foreground">scenario_id: {r.scenarioId}</div>
                     )}
                   </div>
                 ))}
@@ -1485,8 +1522,8 @@ const Field = ({
   <div>
     <label
       className={[
-        "text-[12px] font-medium",
-        tone === "accent" ? "text-[#7A4A0A]" : "text-muted-foreground",
+        "text-[12.5px] font-semibold",
+        tone === "accent" ? "text-[#7A4A0A]" : "text-[#3F4E59]",
       ].join(" ")}
     >
       {label}
@@ -1508,22 +1545,18 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-1.5 text-[12px] font-medium",
-      tone === "accent" ? "text-[#7A4A0A]" : "text-muted-foreground",
+      "flex items-center gap-2 text-[14px] font-semibold text-[#15202B]",
     ].join(" ")}
   >
     <span
       className={[
-        "inline-flex h-[18px] w-[18px] items-center justify-center rounded-full text-[10.5px] font-semibold",
-        tone === "accent"
-          ? "bg-background text-[#7A4A0A]"
-          : "bg-[#FBEFD9] text-[#7A4A0A]",
+        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12px] font-semibold text-[#15202B]",
       ].join(" ")}
     >
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="text-[#7A4A0A] font-normal">· {accent}</span>}
+    {accent && <span className="rounded-full bg-[#FBEFD9] px-2 py-0.5 text-[11px] font-semibold text-[#7A4A0A]">{accent}</span>}
   </h3>
 );
 

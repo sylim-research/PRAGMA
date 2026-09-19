@@ -386,10 +386,15 @@ export function buildBatchPlan(
     for (const [actPosition, speech_act_ui] of acts.entries()) {
       // 일반 제작은 모드별 절대 수량을 화행에 가능한 균등하게 분배한다.
       // 과거 quota 호출은 화행당 수량을 유지한다. 도메인·theme·산업·P/D/R은 2차 회전이다.
-      const perAct = (count: number) => Math.floor(count / acts.length) + (actPosition < count % acts.length ? 1 : 0);
+      // 나머지는 화행 순서를 따라 이어서 배정한다. 번역·통역 나머지를 둘 다 앞 화행부터 주면
+      // 앞 화행에 몰린다(18건 = 3·3·3·3·2·1·1·1·1). 통역 나머지는 번역 나머지가 끝난 자리부터 준다.
+      const perAct = (count: number, offset = 0) =>
+        Math.floor(count / acts.length) +
+        ((actPosition - offset + acts.length) % acts.length < count % acts.length ? 1 : 0);
+      const transOffset = requested ? requested.translation % acts.length : 0;
       const modeSlots: { mode: GenMode; count: number }[] = [
         { mode: "translation", count: requested ? perAct(requested.translation) : nTrans },
-        { mode: "stt_interpreting", count: requested ? perAct(requested.stt_interpreting) : nInterp },
+        { mode: "stt_interpreting", count: requested ? perAct(requested.stt_interpreting, transOffset) : nInterp },
       ];
       for (const slot of modeSlots) {
         for (let i = 0; i < slot.count; i += 1) {

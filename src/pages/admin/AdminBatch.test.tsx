@@ -39,15 +39,31 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("배치 생성 작업 화면", () => {
+  it("전체 계획이 실패 없이 끝나면 다음 실행 번호로 넘기고, 실패가 남으면 번호를 유지한다", async () => {
+    mocks.run.mockImplementation(async (cells: unknown[]) => cells.map((cell, index) => ({ ok: true, cell, index })));
+    mount();
+    const first = localStorage.getItem("pragma:admin-core-batch-run:ko_zh");
+    fireEvent.click(start());
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
+    await waitFor(() => expect(localStorage.getItem("pragma:admin-core-batch-run:ko_zh")).not.toBe(first));
+    const second = localStorage.getItem("pragma:admin-core-batch-run:ko_zh");
+    mocks.run.mockImplementation(async (cells: unknown[]) => cells.map((cell, index) => ({ ok: index !== 0, cell, index, error: index === 0 ? "실패" : undefined })));
+    await waitFor(() => expect(start()).toBeEnabled());
+    fireEvent.click(start());
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(start()).toBeEnabled());
+    expect(localStorage.getItem("pragma:admin-core-batch-run:ko_zh")).toBe(second);
+  });
+
   it("과거 프리셋 없이 양방향 모두 입력한 수량으로 계획하고 방향 변경 시 선택을 초기화한다", async () => {
     mount(false);
     expect(screen.queryByRole("button", { name: /기본 72건|495건 본배치|30건 검증/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "전체 0건 생성 시작" })).toBeDisabled();
+    expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("45건");
     enterExample();
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "중→한" }));
-    expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("");
+    expect(screen.getByRole("button", { name: /^전체 \d+건 생성 시작$/ })).toBeInTheDocument();
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("72건");
     setNumber("중급 · 총 생성 건수", 45);
     expect(screen.getByText("총 생성 예정").parentElement).toHaveTextContent("81건");
@@ -94,8 +110,7 @@ describe("배치 생성 작업 화면", () => {
     fireEvent.click(screen.getByLabelText("생성 항목 1 선택"));
     fireEvent.click(screen.getByRole("button", { name: "다음 항목" }));
     fireEvent.click(screen.getByLabelText("생성 항목 11 선택"));
-    expect(screen.getByLabelText("선택 항목 번호")).toHaveValue("1, 11");
-    fireEvent.click(screen.getByRole("button", { name: "선택 2건 · 현재 ID 재개" }));
+    fireEvent.click(screen.getByRole("button", { name: "선택 2건 생성 시작" }));
     await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
     const plan = buildBatchPlan();
     expect(mocks.run).toHaveBeenCalledWith([plan[0], plan[10]], expect.objectContaining({

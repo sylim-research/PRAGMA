@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DOMAIN, LEVEL, MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
+import { DOMAIN, LEVEL, MODE_LABEL, PDR_BURDEN, PDR_DISTANCE, PDR_POWER, SPEECH_ACT_UI } from "@/lib/pragma/enums";
+import { getScenarioTopic } from "@/lib/pragma/scenarioTopics";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
 
 const PAGE_SIZE = 10;
 
-export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
+// 짧은 범주 칸은 고르게 나누고 주제가 나머지를 쓴다 — 글자가 왼쪽에 몰리지 않게.
+const COLUMN_WIDTHS = ["5%", "5%", "8%", "8%", "8%", "8%", "10%", "8%", "8%", "32%"];
+
+export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: {
   plan: BatchCell[];
   selected: readonly number[];
   disabled: boolean;
   onSelect: (indexes: number[]) => void;
+  actions?: React.ReactNode;
 }) {
   const [page, setPage] = useState(0);
   useEffect(() => setPage(0), [plan]);
@@ -25,7 +30,6 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div>
         <h2 id="batch-items-heading" className="font-bold">생성 항목 확인·선택</h2>
-        <p className="mt-1 text-xs text-muted-foreground">조건과 장면 시드를 확인하고, 일부만 생성하거나 재개할 항목을 선택합니다.</p>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button size="sm" variant="outline" disabled={disabled || !indexes.length}
@@ -33,23 +37,31 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
         <Button size="sm" variant="outline" disabled={disabled || !selected.length} onClick={() => onSelect([])}>선택 해제</Button>
       </div>
     </div>
+    {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
-      <table className="w-full min-w-[540px] text-left text-xs">
+      <table className="w-full min-w-[820px] table-fixed text-[13px]">
+        <colgroup>{COLUMN_WIDTHS.map((width, index) => <col key={index} style={{ width }} />)}</colgroup>
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
-          <tr><th className="w-10 px-2 py-2">선택</th><th className="w-10 px-2 py-2">번호</th><th className="w-20 px-2 py-2">화행·수준</th><th className="w-24 px-2 py-2">과업·도메인</th><th className="px-2 py-2">장면 시드</th></tr>
+          <tr>{["선택", "번호", "화행", "수준", "과업", "도메인", "지위", "거리", "부담"].map(label =>
+            <th key={label} className="px-2 py-2 text-center font-semibold">{label}</th>)}<th className="px-3 py-2 text-left font-semibold">주제</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
           const cell = plan[index];
           return <tr key={index} className={selected.includes(index) ? "bg-[#FFFBEA]" : ""}>
-            <td className="p-2"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
+            <td className="px-2 py-1.5 text-center"><input type="checkbox" aria-label={"생성 항목 " + (index + 1) + " 선택"}
               className="h-4 w-4 accent-[#15202B]" checked={selected.includes(index)} disabled={disabled}
               onChange={() => toggle(index)} /></td>
-            <td className="p-2 tabular-nums">{index + 1}</td>
-            <td className="whitespace-nowrap p-2">{SPEECH_ACT_UI[cell.speech_act_ui]}<span className="mt-1 block text-muted-foreground">{LEVEL[cell.level]}</span></td>
-            <td className="whitespace-nowrap p-2">{MODE_LABEL[cell.mode]}<span className="mt-1 block text-muted-foreground">{DOMAIN[cell.domain]}</span></td>
-            <td className="min-w-[200px] p-2 leading-5">{cell.situation_seed_ko}</td>
+            <td className="px-2 py-1.5 text-center tabular-nums">{index + 1}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center font-medium">{SPEECH_ACT_UI[cell.speech_act_ui]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{LEVEL[cell.level]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{MODE_LABEL[cell.mode]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center">{DOMAIN[cell.domain]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_POWER[cell.pdr_power]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_DISTANCE[cell.pdr_distance].split(" (")[0]}</td>
+            <td className="whitespace-nowrap px-2 py-1.5 text-center text-[#3F4E59]">{PDR_BURDEN[cell.pdr_burden]}</td>
+            <td className="truncate px-3 py-1.5 text-left" title={cell.situation_seed_ko}>{getScenarioTopic(cell.topic_code)?.labelKo ?? cell.situation_seed_ko}</td>
           </tr>;
-        })}{!plan.length && <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
+        })}{!plan.length && <tr><td colSpan={10} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
       </table>
     </div>
     <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
