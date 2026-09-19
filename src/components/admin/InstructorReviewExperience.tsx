@@ -117,6 +117,8 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     return () => window.clearTimeout(timer);
   }, [dirty, saving, approved, disabled, error, draft]);
   return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
+    {/* 교수자가 학습자 경험을 그대로 거치며 감수한다는 것이 이 화면의 뜻이다. */}
+    <h3 className="mb-4 text-[16px] font-bold text-[#233542]">학습자 화면 보기</h3>
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20.5rem,22.5rem)]">
       <div className="min-w-0">
@@ -130,7 +132,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className="w-[4.5rem] shrink-0 rounded border border-[#233542]/30 bg-[#EEF2F6] px-1.5 py-0.5 text-center text-[11.5px] font-bold text-[#233542]">{partsOf(item).tag}</span>}
+              {partsOf(item).tag && <span className="w-[4.25rem] shrink-0 rounded-full bg-[#233542] px-2 py-[3px] text-center text-[11px] font-bold tracking-wide text-white shadow-[0_1px_0_rgba(21,32,43,0.15)]">{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
             <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-emerald-700" : decision?.status === "revision_required" ? "text-amber-800" : "text-[#8C969B]"}`}>{decision ? statusLabel[decision.status] : "미확인"}</span>
