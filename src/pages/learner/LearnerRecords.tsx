@@ -250,9 +250,7 @@ const LearnerRecords = () => {
 
   if (recordsError || remoteRecords === null) {
     return (
-      <LearnerJourneyShell nav
-        headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
-      >
+      <LearnerJourneyShell nav>
         <div className="pb-24">
           <h1 className="text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">나의 통번역 학습 프로필</h1>
           <div className={`${panel} mt-5 p-5`} role={recordsError ? "alert" : "status"}>
@@ -271,9 +269,7 @@ const LearnerRecords = () => {
   }
 
   return (
-    <LearnerJourneyShell nav
-      headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
-    >
+    <LearnerJourneyShell nav>
       <div className="pb-24">
         <header className="flex flex-wrap items-end justify-between gap-5">
           <div>
