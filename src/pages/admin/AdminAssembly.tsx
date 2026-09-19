@@ -849,7 +849,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {aiReview && (
           <>
             {(st === "generated" || st === "reviewed") && (
-              <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }}
+              <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
                 handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
             )}
             <details>
