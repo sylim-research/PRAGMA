@@ -68,7 +68,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
         </div>
       </header>
 
-      <div className={`flex gap-6 pl-5 pr-8 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+      <div className={`flex gap-6 px-5 md:pr-6 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
         <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-6rem)] md:self-start md:overflow-y-auto print:hidden">
           <nav className="-mt-1 flex flex-col pl-6 pr-1">
             <Link
