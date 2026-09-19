@@ -42,7 +42,7 @@ import {
   type CoreQualityPilotResult,
 } from "@/lib/pragma/coreQualityAudit";
 import { THEME_LABEL } from "@/lib/pragma/scenarioTopics";
-import { Check, Minus, Plus, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 // 배치 생성 — 셀 목록을 순회하며 기존 생성기를 반복 호출한다.
@@ -316,13 +316,6 @@ const AdminBatch = () => {
     <AdminShell title="시나리오 배치 생성"
       description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
       <div className="space-y-5">
-        <BatchStepper
-          steps={[
-            { label: "건수 정하기", done: summary.total > 0, active: summary.total === 0 },
-            { label: "계획·항목 확인", done: activeTotal > 0, active: summary.total > 0 && activeTotal === 0 },
-            { label: "생성 실행", done: activeTotal > 0 && done >= activeTotal && !running, active: running || (activeTotal > 0 && done < activeTotal) },
-          ]}
-        />
         <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
@@ -338,7 +331,7 @@ const AdminBatch = () => {
               <div className="mt-2 grid gap-2.5 sm:grid-cols-3">
                 {LEVEL_ORDER.map(level => {
                   const counts = modeCounts[level];
-                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + (settings[level].total > 0 ? " ring-2 ring-[#FAD338]" : "")}>
+                  return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + (settings[level].total > 0 ? " ring-1 ring-[#D9B51C]/50" : "")}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
                       <span className="text-sm">{LEVEL[level]}</span>
                       <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
@@ -355,21 +348,7 @@ const AdminBatch = () => {
                           disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                     </div>
-                    <div className="mt-2 flex items-center justify-between gap-2">
-                      <p className="text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
-                      <div className="flex gap-1">
-                        <button type="button" aria-label={LEVEL[level] + " 9건 빼기"} disabled={busy || settings[level].total === 0}
-                          onClick={() => setProductionSetting(level, "total", settings[level].total - targetActCount)}
-                          className="inline-flex h-7 items-center gap-0.5 rounded-md border border-[#D9D2BF] bg-white px-1.5 text-xs font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:opacity-40">
-                          <Minus className="h-3 w-3" aria-hidden />{targetActCount}
-                        </button>
-                        <button type="button" aria-label={LEVEL[level] + " 9건 더하기"} disabled={busy}
-                          onClick={() => setProductionSetting(level, "total", settings[level].total + targetActCount)}
-                          className="inline-flex h-7 items-center gap-0.5 rounded-md bg-[#15202B] px-1.5 text-xs font-semibold text-white hover:bg-[#15202B]/90 disabled:opacity-40">
-                          <Plus className="h-3 w-3" aria-hidden />{targetActCount}
-                        </button>
-                      </div>
-                    </div>
+                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
               </div>
@@ -393,7 +372,7 @@ const AdminBatch = () => {
 
               {summary.total === 0 ? (
                 <div className="mt-3 flex items-center gap-3 rounded-lg border border-dashed border-[#D9D2BF] bg-[#FAF8F2] px-4 py-5">
-                  <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[#15202B]"><Sparkles className="h-4 w-4" aria-hidden /></span>
+                  <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-[#7A4A0A]"><Sparkles className="h-4 w-4" aria-hidden /></span>
                   <p className="text-sm font-medium text-[#3F4E59]">① 에서 건수를 정하면 화행·관계 분포가 여기에 채워집니다.</p>
                 </div>
               ) : <>
@@ -424,8 +403,8 @@ const AdminBatch = () => {
           <aside id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5 xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
             <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
             <p className="mt-2 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-            <Button className="mt-4 h-12 w-full gap-2 bg-[#FAD338] text-[15px] font-bold text-[#15202B] shadow-[0_2px_0_#D9B51C] hover:bg-[#F2C71E] disabled:cursor-not-allowed disabled:bg-[#F7E08A] disabled:text-[#15202B]/80 disabled:opacity-100 disabled:shadow-[0_2px_0_#E6CF6E]" onClick={start} disabled={busy || plan.length === 0}>
-              <Sparkles className="h-5 w-5" aria-hidden />
+            <Button className="mt-4 h-10 w-full gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={start} disabled={busy || plan.length === 0}>
+              <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
               {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
             </Button>
             {running && <Button className="mt-2 w-full" variant="outline" onClick={stop}>생성 중단</Button>}
@@ -572,19 +551,7 @@ const AdminBatch = () => {
 };
 
 const StepNum = ({ n }: { n: number }) =>
-  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-sm font-bold text-[#15202B]">{n}</span>;
-
-const BatchStepper = ({ steps }: { steps: { label: string; done: boolean; active: boolean }[] }) =>
-  <ol aria-label="배치 생성 단계" className="flex flex-wrap items-center gap-2 rounded-xl border bg-white px-4 py-3">
-    {steps.map((step, index) => <li key={step.label} className="flex items-center gap-2">
-      {index > 0 && <span aria-hidden className={"h-px w-8 sm:w-14 " + (steps[index - 1].done ? "bg-[#15202B]" : "bg-[#D9D2BF]")} />}
-      <span className={[
-        "inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold",
-        step.done ? "bg-[#15202B] text-white" : step.active ? "bg-[#FAD338] text-[#15202B] ring-4 ring-[#FAD338]/30" : "bg-[#F3F0E7] text-[#8A949C]",
-      ].join(" ")}>{step.done ? <Check className="h-4 w-4" aria-hidden /> : index + 1}</span>
-      <span className={"text-sm " + (step.active ? "font-bold text-[#15202B]" : step.done ? "font-semibold text-[#15202B]" : "text-[#8A949C]")}>{step.label}</span>
-    </li>)}
-  </ol>;
+  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
 
 const PlanMetric = ({ label, value, unit = "건", primary = false, className = "bg-[#EDF4FA]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
