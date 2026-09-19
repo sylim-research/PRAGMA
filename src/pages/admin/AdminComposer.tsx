@@ -1083,7 +1083,10 @@ function WeekRow({
   const plannedLabel = plannedFeatureCode
     ? getTargetFeature(plannedFeatureCode)?.learner_label ?? plannedFeatureCode
     : null;
-  const displayTitle = week.type === "orientation" ? "오리엔테이션" : weekActivityLabel(week);
+  // 화행 주차는 「요청 화행」처럼 네 글자로 보인다.
+  const displayTitle = week.type === "orientation"
+    ? "오리엔테이션"
+    : act && !reinforcement ? `${SPEECH_ACT_UI[act]} 화행` : weekActivityLabel(week);
 
   const cands = filterManualCandidates(candidates.filter((candidate) => !replaced?.has(candidate.scenario_id)), {
     act,
@@ -1097,7 +1100,7 @@ function WeekRow({
   });
 
   return (
-    <div role="group" aria-label={`${week.week_no}주차 편성`} className={`px-3 py-2 ${isAssignable ? "bg-white" : "bg-[#FAF8F2]"}`}>
+    <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. */}
       <div className="grid min-h-9 grid-cols-[3.5rem_7.5rem_7rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
@@ -1107,7 +1110,7 @@ function WeekRow({
           <>
             <span className="flex min-w-0 flex-col">
               <span className="truncate text-[14px] font-bold text-[#15202B]" title={reinforcement ? REINFORCEMENT_DESCRIPTION : displayTitle}>
-                {reinforcement ? (act ? `보완 · ${SPEECH_ACT_UI[act]}` : "선택 화행 보완") : displayTitle}
+                {reinforcement ? (act ? `보완 · ${SPEECH_ACT_UI[act]} 화행` : "선택 화행 보완") : displayTitle}
               </span>
               {reinforcement && (
                 <button type="button" onClick={onEditWeek} className="w-fit text-[11.5px] font-semibold text-[#1F3A5F] hover:underline">
@@ -1167,7 +1170,7 @@ function WeekRow({
             ) : <span />}
           </>
         ) : (
-          <span className="col-span-4 text-[13.5px] font-semibold text-[#46515A]">{displayTitle}</span>
+          <span className="col-span-4 text-[14px] font-bold text-[#15202B]">{displayTitle}</span>
         )}
       </div>
 
