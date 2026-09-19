@@ -112,7 +112,8 @@ describe("admin navigation reachability", () => {
       resolve(process.cwd(), "src/pages/admin/AdminExport.tsx"),
       "utf8",
     );
-    expect(exportPage).toContain("동의·가명화 필터");
+    expect(exportPage).toContain("가명화");
+    expect(exportPage).toContain("동의 버전이 유효한");
     expect(exportPage).not.toContain("약 40명");
   });
 
