@@ -23,7 +23,7 @@ describe("instructor experience", () => {
     fireEvent.click(screen.getByRole("button", { name: /3. 판단하고 고쳐보기/ }));
     // 참고 판정을 한꺼번에 여는 버튼은 두지 않는다 — 교수자도 학생과 같은 순서로 감수한다.
     expect(screen.queryByRole("button", { name: "참고 판정·해설 바로 보기" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [{ section: "mjt-2", status: "revision_required", note: "" }] })));
     expect(onReady).not.toHaveBeenCalledWith(true);
     expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled(); expect(effects.feedback).not.toHaveBeenCalled();
@@ -52,8 +52,8 @@ describe("instructor experience", () => {
     expect(screen.queryByLabelText("감수 진행")).toBeNull();
     fireEvent.change(screen.getByRole("textbox", { name: "현재 문항 감수 메모" }), { target: { value: "도입 문구를 줄이면 좋겠습니다." } });
     expect(onSave).not.toHaveBeenCalled();
-    expect(screen.getByText("확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다.")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    expect(screen.getByText("확인 또는 수정 필요를 누르면 메모가 자동 저장됩니다.")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [
       { section: "mjt-0", status: "defer", note: "예전 메모" },
       { section: "scene", status: "revision_required", note: "도입 문구를 줄이면 좋겠습니다." },
@@ -145,7 +145,7 @@ describe("instructor experience", () => {
     let release: () => void = () => {};
     const onSave = vi.fn().mockImplementationOnce(() => new Promise<void>((resolve) => { release = resolve; })).mockResolvedValue(undefined);
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
     const memo = screen.getByRole("textbox", { name: "현재 문항 감수 메모" });
     // The first save is still pending: the professor must be able to keep writing.
@@ -159,7 +159,7 @@ describe("instructor experience", () => {
   });
   it("retains and exposes an unsaved decision after a save failure", async () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={vi.fn().mockRejectedValue(new Error("保存失敗"))} onReady={vi.fn()} /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await screen.findByRole("alert");
     expect(screen.getByText("저장하지 않은 감수 기록이 있습니다.")).toBeInTheDocument();
   });
@@ -172,14 +172,14 @@ describe("instructor experience", () => {
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(current()).not.toBe(first));
     const second = current();
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
     expect(current()).toBe(second);
   });
   it("checks every open section at once and leaves 수정 요청 untouched", async () => {
     const onSave = vi.fn().mockResolvedValue(undefined);
     render(<MemoryRouter><InstructorReviewExperience inspection={inspection()} onSave={onSave} onReady={vi.fn()} /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
+    fireEvent.click(screen.getByRole("button", { name: "✗ 수정 필요" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
     fireEvent.click(screen.getByRole("button", { name: `남은 ${EXPERIENCE_SECTIONS.length - 1}개 모두 확인` }));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));

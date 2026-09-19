@@ -6,7 +6,7 @@ import type { InstructorExperience, ReviewInspection } from "../../../supabase/f
 
 const ReviewStage = lazy(() => import("@/pages/learner/CanonicalMissionRun").then((module) => ({ default: module.CanonicalReviewStage })));
 // New reviews choose only 확인 or 수정 요청. Earlier 보류 records stay stored as they are and are shown read-only.
-const statusLabel = { checked: "확인", revision_required: "수정 요청", defer: "보류(기존 기록)" };
+const statusLabel = { checked: "확인", revision_required: "수정 필요", defer: "보류(기존 기록)" };
 const empty = (): InstructorExperience => ({ version: "instructor_experience_v1", active_seconds: 0, decisions: [] });
 // mission_v6 roles for the same section ids; v5 keeps the fixed labels in EXPERIENCE_SECTIONS.
 // 꼬리표(단계) + 학생 화면과 같은 이름. DCT 이름은 번역·통역에 따라 정한다.
@@ -130,17 +130,16 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className="w-[4.5rem] shrink-0 rounded bg-[#EEF0EC] px-1.5 py-0.5 text-center text-[11.5px] font-semibold text-[#53656F]">{partsOf(item).tag}</span>}
+              {partsOf(item).tag && <span className="w-[4.5rem] shrink-0 rounded border border-[#233542]/30 bg-[#EEF2F6] px-1.5 py-0.5 text-center text-[11.5px] font-bold text-[#233542]">{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
             <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-emerald-700" : decision?.status === "revision_required" ? "text-amber-800" : "text-[#8C969B]"}`}>{decision ? statusLabel[decision.status] : "미확인"}</span>
           </button>;
         })}</nav>
         <div className="space-y-3 rounded-xl bg-white p-4">
-          <p className="text-[15px] font-bold">{labelOf(section)}</p>
           <div className="grid grid-cols-2 gap-2">
             <Button size="sm" className="h-9 text-[13.5px]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
-            <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 요청</Button>
+            <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
           <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
@@ -148,10 +147,10 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
               : setPendingNotes((notes) => ({ ...notes, [section.id]: event.target.value }))} />
           {error && dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
-          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
+          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 필요를 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
           {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
-          {current?.status === "revision_required" && <p className="text-sm text-amber-800">수정 요청이 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
-          {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 요청으로 다시 판정하세요.</p>}
+          {current?.status === "revision_required" && <p className="text-sm text-amber-800">수정 필요가 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
+          {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 필요로 다시 판정하세요.</p>}
         </div>
       </aside>
     </div>
