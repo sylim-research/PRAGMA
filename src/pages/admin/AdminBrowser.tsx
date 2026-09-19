@@ -48,11 +48,16 @@ interface CoreRow {
   archive_note: string | null;
   mission_schema_version: string | null;
   mission_mpj_items: unknown;
+  /** 이 행이 대체한 이전 판. 다른 행이 이 행을 가리키면 이 행은 옛 판이다. */
+  supersedes_scenario_id: string | null;
+  /** professor_finalized = 교수자 최종 승인 기록이 있는 현재본. */
+  authoring_stage: string | null;
   generation_run_id: string | null;
   generation_item_key: string | null;
   prompt_snapshot_hash: string | null;
   core_content: {
     generation?: { content_release_id?: string };
+    brief_note_ko?: string;
     situation_ko?: string;
     relation_ko?: string;
     source_text?: string;
@@ -83,7 +88,7 @@ const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
   advanced: { rgb: "220, 232, 240", text: "#4B6575" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
-const LIST_PAGE_SIZE = 30;
+const LIST_PAGE_SIZE = 10;
 /**
  * 보관 상태 축. 기본은 현재 콘텐츠만 본다 — 보관분은 제작·검토·편성 대상이 아니다.
  * 별도 「보관함」 메뉴를 만들지 않고 이 필터 한 축으로만 다시 볼 수 있게 한다(2026-09-10 연구자 결정).
@@ -120,6 +125,7 @@ const AdminBrowser = () => {
   const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
   const [fSource, setFSource] = useState<"all" | "ai" | "authentic">("all");
   const [fArchive, setFArchive] = useState<ArchiveView>("current");
+  const [fFormat, setFFormat] = useState<"all" | "v6" | "v5">("all");
   const [sel, setSel] = useState<{ act: SpeechActUI; level: LearnerLevel } | null>(null);
   // 눈검사 미리보기 — scenario_id → {mission, warnings}. openId = 펼친 행.
   const [preview, setPreview] = useState<Record<string, { mission: MissionRuntime; warnings: string[] }>>({});
@@ -153,7 +159,7 @@ const AdminBrowser = () => {
         let request = libraryDb
         .from("scenarios")
         .select(
-          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, archived_at, archive_note, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
+          "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, scenario_p, scenario_d, scenario_r, review_status, mission_status, archived_at, archive_note, generation_run_id, generation_item_key, prompt_snapshot_hash, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items, supersedes_scenario_id, authoring_stage:mission_content->authoring->>stage",
         )
         .eq("content_format", "scenario_core_v1");
         // 보관(archived_at) 행은 기본적으로 제외한다. 보관분은 이 축을 바꿔야만 보인다.
@@ -197,10 +203,23 @@ const AdminBrowser = () => {
     void loadRows();
   }, [loadRows]);
 
+  // 더 새 판이 대체한 옛 판. 편성되지 않았으면 숨기고, 아직 편성돼 있으면 「교체 필요」로 남긴다.
+  const replaced = useMemo(() => new Set(rows.map((row) => row.supersedes_scenario_id).filter(Boolean) as string[]), [rows]);
+  const placedCount = (id: string) => assignments?.[id] ?? 0;
+  const isFinalized = (row: CoreRow) => row.authoring_stage === "professor_finalized";
+  // 대시보드와 같은 기준: 편성 가능 = 교수자 최종 승인 기록이 있는 현재본(v5·v6),
+  // 승인 전 = 검수 중인 v6 초안(v5 미승인 초안은 승인하지 않고 v6로 전환한다).
+  const matchesView = (row: CoreRow, target: LibraryView) => {
+    if (target === "ready") return libraryMissionIsReady(row) && isFinalized(row) && !replaced.has(row.scenario_id);
+    if (target === "pending") return libraryMatchesView(row, "pending") && row.mission_schema_version === "mission_v6";
+    return libraryMatchesView(row, target);
+  };
   const matching = useMemo(
     () =>
       rows.filter(
         (r) =>
+          (!replaced.has(r.scenario_id) || placedCount(r.scenario_id) > 0) &&
+          (fFormat === "all" || (fFormat === "v6" ? r.mission_schema_version === "mission_v6" : r.mission_schema_version !== "mission_v6")) &&
           (fMode === "all" || r.mode === fMode) &&
           (fDomain === "all" || r.domain === fDomain) &&
           (fTheme === "all" || r.theme_code === fTheme) &&
@@ -208,10 +227,12 @@ const AdminBrowser = () => {
           (fSource === "all" ||
             (fSource === "authentic" ? isAuthentic(r.core_content) : !isAuthentic(r.core_content))),
       ),
-    [rows, fMode, fDomain, fTheme, fDirection, fSource],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [rows, fMode, fDomain, fTheme, fDirection, fSource, fFormat, replaced, assignments],
   );
 
-  const filtered = useMemo(() => matching.filter((row) => libraryMatchesView(row, view)), [matching, view]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const filtered = useMemo(() => matching.filter((row) => matchesView(row, view)), [matching, view, replaced]);
   useEffect(() => { setVisibleCount(LIST_PAGE_SIZE); setOpenId(null); }, [filtered, sel]);
 
   // (act|level) → { total, translation, interpreting } (54셀 감사 대응 — 계약 0-j·73)
@@ -240,13 +261,14 @@ const AdminBrowser = () => {
     fTheme !== "all" ||
     fDirection !== "all" ||
     fSource !== "all" ||
+    fFormat !== "all" ||
     fArchive !== "current";
   const maxCellCount = Math.max(0, ...Object.values(counts).map((count) => count.total));
 
   return (
     <AdminShell
       title="학습 미션 라이브러리"
-      description="수업에 사용할 미션을 찾아 내용을 확인하고, 검토와 주차 편성으로 이어갑니다."
+      description="수업에 쓸 수 있는 학습 미션을 화행·수준별로 봅니다."
     >
       <div className="max-w-[1080px]">
         {/* ── 요약 ── */}
@@ -255,29 +277,11 @@ const AdminBrowser = () => {
             {LIBRARY_VIEWS.map((item) => (
               <button key={item.value} type="button" aria-pressed={view === item.value} onClick={() => setView(item.value)}
                 className={`rounded-lg border px-3 py-2 text-[13px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
-                {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => libraryMatchesView(row, item.value)).length}</span>
+                {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
               </button>
             ))}
           </div>
           <div className="flex flex-wrap items-end gap-3">
-            <div
-              className="flex flex-wrap items-center gap-x-3.5 gap-y-1 rounded-lg bg-[#F5F5F2] px-3.5 py-2"
-              aria-label="현재 보기 현황"
-            >
-              <div className="flex items-baseline gap-2">
-                <span className="text-[13.5px] font-semibold text-[#42505A]">{LIBRARY_VIEWS.find((item) => item.value === view)?.label}</span>
-                <span className="text-[24px] font-bold tabular-nums text-[#15202B]">{loading || error ? "—" : filtered.length}</span>
-                {hasActiveFilters && (
-                  <span className="text-[11.5px] text-muted-foreground">필터 적용 중</span>
-                )}
-              </div>
-              <span className="h-6 w-px bg-[#D8D8D2]" aria-hidden="true" />
-              <div className="grid gap-1 leading-none">
-                <span className="text-[11.5px] font-medium text-[#7A8288]">모드 구성</span>
-                <span className="text-[12.5px] font-semibold text-[#4E5A62]">{loading || error ? "—" : `번역 ${translated} · 통역 ${interp}`}</span>
-              </div>
-            </div>
-
             {/* ── 필터 ── */}
             <div className="flex flex-wrap items-end gap-2 text-[12px]" aria-label="라이브러리 필터">
               <span className="mb-1.5 mr-0.5 text-[11px] font-bold tracking-[0.08em] text-[#6C747A]">필터</span>
@@ -291,11 +295,12 @@ const AdminBrowser = () => {
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[126px]" label="생성 소스" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
+              <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
+                opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
               <Filter className="w-full sm:w-[96px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
                 opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
-          <p className="mt-3 text-[12px] text-muted-foreground">편성 가능 미션은 현재 편성 기준을 충족한 MJT5+DCT1입니다. 실제 배정은 교과목·주차 조건에 따라 선택합니다.</p>
         </section>
 
       {loading ? (
@@ -397,99 +402,35 @@ const AdminBrowser = () => {
               {cellRows.length === 0 && <p className="py-6 text-[13px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오 재료가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
               <ul className="mt-2.5 divide-y divide-[#EAE4D2] overflow-hidden rounded-lg border border-[#EAE4D2]">
                 {cellRows.slice(0, visibleCount).map((r) => (
-                  <li key={r.scenario_id} className="bg-[#FCFBF8] px-4 py-2.5">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <Badge variant="secondary" className={libraryMissionIsReady(r) ? "bg-emerald-50 text-emerald-800" : "bg-[#EDE9DD] text-[#625A49]"}>
-                        {libraryMissionLabel(r)}
-                      </Badge>
-                      {r.archived_at && (
-                        <Badge variant="secondary" className="bg-[#F0EEE7] font-normal text-[#6C747A]"
-                          title={r.archive_note ?? undefined}>
-                          보관
-                        </Badge>
-                      )}
-                      {libraryHasMission(r) && <span className="text-[11.5px] text-muted-foreground">
-                        {assignmentError ? "편성 현황 확인 실패" : assignments === null ? "편성 현황 확인 중…" : assignments[r.scenario_id] ? `${assignments[r.scenario_id]}곳에 편성됨` : "미편성"}
-                      </span>}
-                      <Badge variant="secondary" className="font-normal">{SPEECH_ACT_UI[r.speech_act]} · {LEVEL[r.learner_level]}</Badge>
-                      <Badge variant="secondary" className="font-normal">
-                        {r.domain ? DOMAIN[r.domain] : "—"}
-                      </Badge>
-                      {r.industry_sector && (
-                        <Badge variant="secondary" className="font-normal">
-                          {INDUSTRY[r.industry_sector as keyof typeof INDUSTRY] ?? r.industry_sector}
-                        </Badge>
-                      )}
-                      <Badge variant="secondary" className="font-normal">
-                        {r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
-                      </Badge>
-                      {r.theme_code && THEME_LABEL[r.theme_code] && (
-                        <Badge variant="secondary" className="font-normal">{THEME_LABEL[r.theme_code]}</Badge>
-                      )}
-                      <Badge variant="secondary" className="font-normal">{DIRECTION_LABEL[coreDirection(r.core_content)]}</Badge>
-                      {isAuthentic(r.core_content) && (
-                        <Badge className="bg-[#FBEFD9] font-normal text-[#7A4A0A] hover:bg-[#FBEFD9]"
-                          title={`세부 출처: ${AUTHENTIC_SOURCE_KO[r.core_content?.provenance?.source_type ?? ""] ?? r.core_content?.provenance?.source_type}${r.core_content?.provenance?.source_ref ? ` · ${r.core_content.provenance.source_ref}` : ""}`}>
-                          실제 자료 기반
-                        </Badge>
-                      )}
-                    </div>
-                    {/* 상황·관계·발화·원문은 줄글이다 — 전폭이면 한 줄 90자가 넘는다. */}
-                    <p className="mt-1 max-w-[78ch] text-[13px] font-medium leading-relaxed line-clamp-2">
-                      {r.core_content?.situation_ko ?? "—"}
-                    </p>
-                    {r.core_content?.relation_ko && (
-                      <p className="mt-0.5 max-w-[78ch] text-[12px] text-muted-foreground line-clamp-1">
-                        관계 · {r.core_content.relation_ko}
-                      </p>
-                    )}
-                    {(r.core_content?.preceding_turn ?? r.core_content?.preceding_turn_zh) && (
-                      <p className="mt-1 max-w-[78ch] whitespace-pre-wrap rounded-md border border-[#E5E0D5] bg-white px-2.5 py-1.5 text-[12.5px] leading-relaxed text-foreground">
-                        <span className="mr-1 font-medium text-muted-foreground">상대의 직전 발화 ·</span>
-                        {r.core_content?.preceding_turn ?? r.core_content?.preceding_turn_zh}
-                      </p>
-                    )}
-                    <details className="mt-1 max-w-[78ch] text-[10.5px] text-muted-foreground">
-                      <summary className="w-fit cursor-pointer select-none font-medium text-[#68737B] hover:text-[#15202B]">
-                        세부 정보
-                      </summary>
-                      <div className="mt-1.5 space-y-1.5 rounded-md border border-[#E5E0D5] bg-white px-2.5 py-2">
-                        <p className="text-[12px] leading-relaxed">
-                          원문 · {r.core_content?.source_text ?? r.core_content?.source_text_ko ?? "—"}
-                        </p>
-                        <p className="font-mono leading-relaxed">
-                          topic {r.topic_code ?? "—"} · P {r.scenario_p ?? "—"} · D {r.scenario_d ?? "—"} · R {r.scenario_r ?? "—"}
-                        </p>
-                        {(r.generation_run_id || r.prompt_snapshot_hash) && (
-                          <p className="break-all font-mono leading-relaxed">
-                          run {r.generation_run_id ?? "—"} · item {r.generation_item_key ?? "—"} · prompt{" "}
-                          {r.prompt_snapshot_hash ?? "—"}
-                          </p>
+                  <li key={r.scenario_id} className="bg-white">
+                    {/* 한 줄 표: 화행·수준 / 제목 / 방향 / 과제 / 상태. 누르면 미션을 펼친다. */}
+                    <button type="button" disabled={!libraryHasMission(r)} onClick={() => togglePreview(r)} aria-expanded={openId === r.scenario_id}
+                      className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)_3.5rem_3rem_minmax(0,11rem)] items-center gap-3 px-4 py-2.5 text-left text-[13px] hover:bg-[#FBFAF6] disabled:cursor-default">
+                      <span className="font-bold text-[#233542]">{SPEECH_ACT_UI[r.speech_act]} · {LEVEL[r.learner_level]}</span>
+                      <span className="min-w-0 truncate text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
+                        {r.core_content?.brief_note_ko?.trim() || r.core_content?.situation_ko || "—"}
+                      </span>
+                      <span className="text-[#3F4E57]">{DIRECTION_LABEL[coreDirection(r.core_content)]}</span>
+                      <span className="text-[#3F4E57]">{r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}</span>
+                      <span className="flex min-w-0 flex-wrap items-center justify-end gap-1 text-[11.5px]">
+                        {libraryHasMission(r) && r.mission_schema_version !== "mission_v6" && (
+                          <span className="rounded bg-[#F3E9D2] px-1.5 py-0.5 font-semibold text-[#8A5A14]">이전 형식</span>
                         )}
-                      </div>
-                    </details>
-
-                    <div className="mt-1.5 flex max-w-[78ch] flex-wrap items-center gap-2">
-                      {libraryHasMission(r) && (
-                        <Button size="sm" variant="ghost" onClick={() => togglePreview(r)}>
-                          {openId === r.scenario_id ? "미션 접기 ▴" : "미션 보기 ▾"}
-                        </Button>
-                      )}
-                      <Button asChild size="sm" variant="outline" className="ml-auto h-8 px-2.5 text-[12px]">
-                        <Link to={`/admin/${libraryHasMission(r) ? "review" : "assembly"}?scenarioId=${encodeURIComponent(r.scenario_id)}`}>
-                          {libraryHasMission(r) ? "감수·승인 확인" : "이 재료로 조립"} →
-                        </Link>
-                      </Button>
-                      {libraryMissionIsReady(r) && <Button asChild size="sm" className="h-8 px-2.5 text-[12px]">
-                        <Link to={`/admin/composer?scenarioId=${encodeURIComponent(r.scenario_id)}`}>수업에 편성 →</Link>
-                      </Button>}
-                    </div>
-
+                        {replaced.has(r.scenario_id) && <span className="rounded bg-[#FBE3D6] px-1.5 py-0.5 font-semibold text-[#9A3F1C]">교체 필요</span>}
+                        {["reviewed", "released"].includes(r.mission_status ?? "") && !isFinalized(r) && (
+                          <span className="rounded bg-[#FBE3D6] px-1.5 py-0.5 font-semibold text-[#9A3F1C]">승인 기록 없음</span>
+                        )}
+                        {isAuthentic(r.core_content) && <span className="rounded bg-[#FBEFD9] px-1.5 py-0.5 text-[#7A4A0A]">실제 자료</span>}
+                        {r.archived_at && <span className="rounded bg-[#F0EEE7] px-1.5 py-0.5 text-[#6C747A]" title={r.archive_note ?? undefined}>보관</span>}
+                        {libraryHasMission(r) && <span className="text-[#5D6970]">
+                          {assignmentError ? "편성 확인 실패" : assignments === null ? "…" : assignments[r.scenario_id] ? `${assignments[r.scenario_id]}곳 편성` : "미편성"}
+                        </span>}
+                      </span>
+                    </button>
                     {openId === r.scenario_id && preview[r.scenario_id] && (
-                      <MissionPreview
-                        mission={preview[r.scenario_id].mission}
-                        warnings={preview[r.scenario_id].warnings}
-                      />
+                      <div className="border-t border-[#EAE4D2] px-4 py-3">
+                        <MissionPreview mission={preview[r.scenario_id].mission} warnings={preview[r.scenario_id].warnings} />
+                      </div>
                     )}
                   </li>
                 ))}

@@ -55,7 +55,7 @@ describe("LearnerCourseList", () => {
     expect(list.getByText("중국어 → 한국어")).toBeInTheDocument();
     expect(list.queryByText("영역")).not.toBeInTheDocument();
     expect(list.getAllByText("|")).toHaveLength(3);
-    expect(list.getAllByText("통번역 반반", { exact: true })).toHaveLength(3);
+    expect(list.getAllByText("번역·통역", { exact: true })).toHaveLength(3);
     expect(list.queryByText(/번역 \d+주|통역 \d+주/)).not.toBeInTheDocument();
     expect(list.getByText("대학생활, 유학·교류, 대인관계, 일상생활")).toBeInTheDocument();
     expect(list.getByText("콘텐츠·SNS, 취업·직장, 거래·고객응대, 대학생활 등")).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe("LearnerCourseList", () => {
     renderCourses();
 
     const card = within(screen.getByRole("link", { name: courses[0].title }));
-    expect(card.getByText("통번역 반반", { exact: true })).toBeInTheDocument();
+    expect(card.getByText("번역·통역", { exact: true })).toBeInTheDocument();
     expect(card.getByText("일상생활")).toBeInTheDocument();
     expect(card.queryByText(/유학·교류| 등$/)).not.toBeInTheDocument();
   });

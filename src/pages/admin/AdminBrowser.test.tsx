@@ -28,10 +28,12 @@ const row = (id: string, status: string | null, release: string = CURRENT_CONTEN
   scenario_id: id, mission_status: status, speech_act: "request", learner_level: "intermediate",
   mode: "translation", domain: "daily", theme_code: null, mission_schema_version: status ? "mission_v5" : null,
   mission_mpj_items: status ? Array.from({ length: count }, () => ({})) : null,
+  supersedes_scenario_id: null,
+  authoring_stage: status === "reviewed" || status === "released" ? "professor_finalized" : null,
   core_content: { situation_ko: `상황 ${id}`, direction: "ko_zh", generation: { content_release_id: release } },
 });
 beforeEach(() => {
-  mocks.rows = [row("reviewed", "reviewed"), row("released", "released"), row("draft", "generated"),
+  mocks.rows = [row("reviewed", "reviewed"), row("released", "released"), { ...row("draft", "generated"), mission_schema_version: "mission_v6" },
     row("old", "reviewed", "pre_lock"), row("legacy-four", "reviewed", CURRENT_CONTENT_RELEASE_ID, 4), row("core", null)];
   mocks.ranges = []; mocks.failPage = false; mocks.preview.mockReset();
   mocks.preview.mockResolvedValue({ mission: {} });
@@ -46,12 +48,12 @@ describe("학습 미션 라이브러리", () => {
     expect(screen.getByText("상황 reviewed")).toBeInTheDocument();
     for (const id of ["draft", "old", "legacy-four", "core"]) expect(screen.queryByText(`상황 ${id}`)).not.toBeInTheDocument();
     const item = screen.getByText("상황 released").closest("li")!;
-    expect(within(item).getByText("1곳에 편성됨")).toBeInTheDocument();
-    expect(within(item).getByRole("link", { name: /수업에 편성/ })).toHaveAttribute("href", "/admin/composer?scenarioId=released");
-    expect(within(item).getByRole("link", { name: /감수·승인 확인/ })).toHaveAttribute("href", "/admin/review?scenarioId=released");
+    expect(within(item).getByText("1곳 편성")).toBeInTheDocument();
+    // 한 줄 표에서는 작업 화면 이동 버튼을 두지 않는다(편성·승인은 각 화면에서 한다).
+    expect(within(item).queryByRole("link")).toBeNull();
     // Let the post-load effect that collapses previews settle first; otherwise it can run after the click and close it.
     await act(async () => {});
-    fireEvent.click(within(item).getByRole("button", { name: /미션 보기/ }));
+    fireEvent.click(within(item).getByRole("button"));
     await screen.findByText("검증용 미션 본문");
     expect(mocks.preview).toHaveBeenCalledWith("released");
   });
@@ -65,7 +67,7 @@ describe("학습 미션 라이브러리", () => {
     expect(screen.getByText("상황 old")).toBeInTheDocument();
     expect(screen.queryByText("상황 core")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /시나리오 재료/ }));
-    expect(screen.getByRole("link", { name: /이 재료로 조립/ })).toHaveAttribute("href", "/admin/assembly?scenarioId=core");
+    expect(screen.getByText("상황 core")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /거절 · 중급 재료 0개 보기/ }));
     expect(screen.getByRole("status")).toHaveTextContent("이 조건의 시나리오 재료가 없습니다");
   });

@@ -66,11 +66,18 @@ export function missionModesSummary(modes: readonly GenMode[]): string {
 }
 
 export const COURSE_MODE_LABEL: Record<CourseMode, string> = {
+  translation: "번역 100%",
+  interpreting: "통역 100%",
+  mixed: "번역 50% · 통역 50%",
+};
+
+/** 학습자 화면용 — 비율(%) 없이 수행 유형만 보인다. */
+export const LEARNER_COURSE_MODE_LABEL: Record<CourseMode, string> = {
   translation: "번역",
   interpreting: "통역",
-  mixed: "통번역 반반",
+  mixed: "번역·통역",
 };
 
 export function courseModeSummary(policy: CourseModePolicy): string {
-  return COURSE_MODE_LABEL[policy.courseMode] ?? "수행 유형 확인 필요";
+  return LEARNER_COURSE_MODE_LABEL[policy.courseMode] ?? "수행 유형 확인 필요";
 }

@@ -46,6 +46,10 @@ export interface ComposerCore {
   target_feature: string | null;
   /** 편성 가능한 v5/v6 완전 미션: 독립 MJT가 정확히 5개다. */
   is_native_mpj5: boolean;
+  /** mission_content.schema_version (mission_v5 | mission_v6). 편성 화면의 「교체 필요」 표시용. */
+  schema_version?: string | null;
+  /** 이 행이 대체한 이전 판. 다른 행이 이 행을 가리키면 이 행은 새 판이 있는 옛 판이다. */
+  supersedes_scenario_id?: string | null;
   situation_ko: string;
   /** 저장된 상황 요약. 학습자 미션 선택 카드에도 같은 문구를 사용한다. */
   brief_note_ko?: string;
@@ -80,7 +84,7 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
   const data = await fetchAllPages<Record<string, any>>(async (from, to) => await releaseDb
     .from("scenarios")
     .select(
-      "scenario_id, speech_act, learner_level, domain, mode, theme_code, topic_code, mission_status, release_gate_mode, target_feature, scenario_p, scenario_d, scenario_r, source_modality, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items",
+      "scenario_id, speech_act, learner_level, domain, mode, theme_code, topic_code, mission_status, release_gate_mode, target_feature, scenario_p, scenario_d, scenario_r, source_modality, core_content, mission_schema_version:mission_content->>schema_version, mission_mpj_items:mission_content->mpj_items, supersedes_scenario_id",
     )
     .eq("content_format", "scenario_core_v1")
     // 보관(archived_at) 코어는 편성 후보·학습자 투영 대상이 아니다.
@@ -135,6 +139,8 @@ export async function listCoreScenarios(): Promise<ComposerCore[]> {
         (r.mission_schema_version === "mission_v5" || r.mission_schema_version === "mission_v6") &&
         Array.isArray(r.mission_mpj_items) &&
         r.mission_mpj_items.length === 5,
+      schema_version: r.mission_schema_version ?? null,
+      supersedes_scenario_id: r.supersedes_scenario_id ?? null,
       situation_ko: typeof content.situation_ko === "string" ? content.situation_ko : "",
       brief_note_ko: typeof content.brief_note_ko === "string" ? content.brief_note_ko : undefined,
       source_text_ko:
