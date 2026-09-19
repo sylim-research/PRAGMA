@@ -132,6 +132,22 @@ describe("absolute production counts", () => {
     expect(productionModeCounts(3, 50)).toEqual({ translation: 1, stt_interpreting: 2 });
     expect(productionModeCounts(0, 100)).toEqual({ translation: 0, stt_interpreting: 0 });
   });
+
+  it("spreads translation and interpreting remainders so speech acts stay even", () => {
+    const plan = buildBatchPlan({
+      perLevel: { beginner_intermediate: 0, intermediate: 0, advanced: 0 },
+      interpretingRatio: 0,
+      perLevelModeCounts: {
+        beginner_intermediate: productionModeCounts(0, 0),
+        intermediate: productionModeCounts(18, 30),
+        advanced: productionModeCounts(0, 0),
+      },
+    });
+    const perAct = new Map<string, number>();
+    for (const cell of plan) perAct.set(cell.speech_act_ui, (perAct.get(cell.speech_act_ui) ?? 0) + 1);
+    expect(plan).toHaveLength(18);
+    expect([...perAct.values()]).toEqual(Array(9).fill(2));
+  });
 });
 
 describe("construct matrix coverage", () => {
