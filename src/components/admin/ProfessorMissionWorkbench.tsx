@@ -108,7 +108,7 @@ export function ProfessorMissionWorkbench({
                   ...current,
                   [issueIndex]: event.target.value,
                 }))}
-                placeholder="수정하지 않고 승인한다면 교수자 판단 근거를 10자 이상 기록하세요. 수정할 경우 먼저 아래 수정본을 저장해 critic을 다시 실행하세요."
+                placeholder="수정하지 않고 승인한다면 교수자 판단 근거를 10자 이상 기록하세요."
               />
             </label>
           ))}
@@ -192,7 +192,6 @@ export function ProfessorMissionWorkbench({
         missionContentHash={traceHash ?? mission.provenance?.mission_content_hash}
         decisionSlot={failFindingsBlock || undefined}
         onApprove={(approval) => onReview(overrides, approval)} />
-      {editor}
     </section>
   );
 }

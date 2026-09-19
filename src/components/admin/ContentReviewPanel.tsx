@@ -429,7 +429,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-2 rounded-lg border border-[#D8D3C4] bg-[#FBFAF6] p-3">
         <h4 className="text-[14px] font-bold text-[#233542]">교수자 최종 승인</h4>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
-        {!experienceClear && <p className="text-amber-800">체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다.</p>}
+        {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 요청이 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
           <Textarea aria-label="AI 검토의 중대 문제 항목 사용 근거" value={openaiFailOverride}
@@ -438,9 +438,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <label className="block text-[13px] font-semibold text-[#233542]">교수자 승인 메모
-          <Textarea aria-label="교수자 승인 근거" rows={2} className="mt-1.5 min-h-0 font-normal" value={note} onChange={(event) => setNote(event.target.value)} />
-        </label>
+        <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
         <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}

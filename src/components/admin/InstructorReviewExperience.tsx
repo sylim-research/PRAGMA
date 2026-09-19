@@ -107,9 +107,6 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     return () => window.clearTimeout(timer);
   }, [dirty, saving, approved, disabled, error, draft]);
   return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <h3 className="text-lg font-bold">학생 화면으로 감수하기</h3>
-    </div>
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20.5rem,22.5rem)]">
       <div className="min-w-0">
@@ -140,7 +137,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           {error && dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
           <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
           {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
-          {current?.status === "revision_required" && <p className="text-sm text-amber-800">현재 미션의 최종 승인을 보류합니다. 아래 원본 수정 도구에서 수정하거나, 판단을 재검토하고 확인으로 바꾸세요.</p>}
+          {current?.status === "revision_required" && <p className="text-sm text-amber-800">수정 요청이 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
           {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 요청으로 다시 판정하세요.</p>}
         </div>
       </aside>
