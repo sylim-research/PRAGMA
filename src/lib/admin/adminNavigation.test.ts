@@ -46,7 +46,7 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/library")).toBe("/admin/library");
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/composer", "/admin/learners", "/admin/data-backup",
+      "/admin/composer", "/admin/data-backup", "/admin/learners",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 학습 기록·연구 활용");
     expect(research?.items.map((item) => item.to)).toEqual([
