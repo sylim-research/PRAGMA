@@ -101,6 +101,21 @@ const Section = ({
 );
 
 /** 소속/신분·동의는 신·구 컬럼이 공존한다 — 마법사가 쓰는 쪽을 우선하고 없으면 구 값. */
+/** 목록용 동의 표시. 미확인은 호박색, 미동의는 적색 — 회색으로 흐리게 두지 않는다. */
+function ConsentChip({ label, value }: { label: string; value: boolean | null | undefined }) {
+  const tone = value === true
+    ? "border-[#9CC7B0] bg-[#F4FAF6] text-[#245E44]"
+    : value === false
+      ? "border-[#E8B4AE] bg-[#FFF3F1] text-[#8B3531]"
+      : "border-[#E3C77A] bg-[#FFFBEF] text-[#8A5A14]";
+  const state = value === true ? "동의" : value === false ? "미동의" : "미확인";
+  return (
+    <span title={`${label} ${state}`} className={`whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold ${tone}`}>
+      {label} {value === true ? "✓" : state}
+    </span>
+  );
+}
+
 const firstOf = <T,>(...vals: (T | null | undefined)[]) =>
   vals.find((v) => v !== null && v !== undefined) ?? null;
 
@@ -186,19 +201,23 @@ const Page = () => {
         {rows === null ? "불러오는 중…" : `총 ${rows.length}명`}
       </div>
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
-        <Table className="min-w-[820px] table-fixed">
+        <Table className="min-w-[980px] table-fixed">
           <colgroup>
-            <col style={{ width: "28%" }} />
-            <col style={{ width: "20%" }} />
             <col style={{ width: "22%" }} />
-            <col style={{ width: "13%" }} />
             <col style={{ width: "17%" }} />
+            <col style={{ width: "11%" }} />
+            <col style={{ width: "11%" }} />
+            <col style={{ width: "17%" }} />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "13%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
               <TableHead className="h-12 px-5 text-xs font-bold text-[#5F625F]">학습자</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">소속/신분</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">주 언어·공인 급수</TableHead>
+              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">소속 · 학년/과정</TableHead>
+              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">사용 언어</TableHead>
+              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">공인 급수</TableHead>
+              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">연구 동의</TableHead>
               <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">상태</TableHead>
               <TableHead className="h-12 px-5 text-right text-xs font-bold text-[#5F625F]">관리</TableHead>
             </TableRow>
@@ -206,13 +225,13 @@ const Page = () => {
           <TableBody>
             {rows === null ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
                   불러오는 중…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
                   표시할 학습자가 없습니다.
                 </TableCell>
               </TableRow>
@@ -236,19 +255,22 @@ const Page = () => {
                     </div>
                   </TableCell>
                   <TableCell className="px-3 py-4 text-sm leading-5 text-[#343B42]">
-                    {firstOf(r.affiliation, r.affiliation_or_status) ?? "—"}
+                    <div>{firstOf(r.affiliation, r.affiliation_or_status) ?? "—"}</div>
+                    {firstOf(r.grade_or_program, r.academic_year_or_program) && (
+                      <div className="text-xs text-[#46515A]">{firstOf(r.grade_or_program, r.academic_year_or_program)}</div>
+                    )}
+                  </TableCell>
+                  <TableCell className="px-3 py-4 text-sm font-medium text-[#343B42]">
+                    {primaryLanguage ?? <span className="text-xs font-normal text-amber-700">미입력</span>}
+                  </TableCell>
+                  <TableCell className="px-3 py-4 text-sm font-medium text-[#343B42]">
+                    {testLevel ?? <span className="text-xs font-normal text-amber-700">미입력</span>}
                   </TableCell>
                   <TableCell className="px-3 py-4">
-                    {primaryLanguage || testLevel ? (
-                      <div className="leading-5">
-                        <div className="font-medium text-[#343B42]">{primaryLanguage || testLevel}</div>
-                        {primaryLanguage && testLevel && (
-                          <div className="text-xs text-muted-foreground">{testLevel}</div>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-amber-700">학습 배경 미입력</span>
-                    )}
+                    <div className="flex flex-wrap gap-1">
+                      <ConsentChip label="연구 활용" value={firstOf(r.consent_data_use, r.research_use_consent)} />
+                      <ConsentChip label="기록 공유" value={r.consent_class_record_sharing} />
+                    </div>
                   </TableCell>
                   <TableCell className="px-3 py-4">
                     <Badge
