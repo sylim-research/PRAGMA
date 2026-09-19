@@ -644,7 +644,7 @@ const AdminComposer = () => {
   if (structureEditor) {
     return (
       <AdminShell
-        title="15주 수업 편성·강의계획서"
+        title="15주 수업 편성"
         compact
         description={
           structureEditor === "new"
@@ -706,7 +706,7 @@ const AdminComposer = () => {
 
   return (
     <AdminShell
-      title="15주 수업 편성·강의계획서"
+      title="15주 수업 편성"
       description="강좌 일정에 따라 주차별 학습 주제와 승인된 학습 미션을 편성합니다."
       compact
     >
@@ -882,9 +882,7 @@ const AdminComposer = () => {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button className="h-9" variant="ghost" onClick={openSyllabus} disabled={!outlineId || loadingOutline}>
-                강의계획서
-              </Button>
+              {/* 강의계획서 보기는 숨김(2026-09-19). 교수자 항목이 브라우저에만 저장돼 운영에 쓰기 어렵다. 코드는 되살릴 수 있게 둔다. */}
               <Button className="h-9" variant="outline" onClick={() => autoFill(false)} disabled={!outline || loadingOutline}>
                 미션 자동 채우기
               </Button>
