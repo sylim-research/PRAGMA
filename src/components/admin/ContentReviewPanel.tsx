@@ -335,7 +335,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 새로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
-      {experiential && (run || decisionSlot) && <div id="professor-review-results"><FlowHeading title="자동 점검 결과" note={next === "professor" || next === "approved" ? "자동 점검 완료" : undefined} /></div>}
+      {experiential && (run || decisionSlot) && <div id="professor-review-results"><FlowHeading title="자동 점검 결과" /></div>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         <ReviewFindings title={compact || experiential ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact || experiential} />
@@ -438,12 +438,15 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" rows={2} className="min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
-        <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+        <details className="text-xs"><summary className="cursor-pointer text-[#5D6970]">승인 메모 (선택)</summary>
+          <Textarea aria-label="교수자 승인 근거" rows={2} className="mt-1.5 min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
+        </details>
+        <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
       {next !== "approved" && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
-        || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}>
+        || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}
+        className={experiential && next === "professor" ? "h-10 bg-[#233542] px-6 text-[14px] font-bold hover:bg-[#15202B]" : undefined}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : next === "professor" ? "교수자 최종 승인" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
       {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
@@ -460,7 +463,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
-      <details><summary className="cursor-pointer text-xs">{experiential ? "자동 점검 내역 · 세부 추적 정보" : "콘텐츠 원본·승인 이력"}</summary>
+      {!experiential && <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
         {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[11px] text-[#5D6970]">
           <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 지적 {isolatedGrounding(primary).length}건 — 판정에 쓰이지 않습니다.</p>
           <ul className="mt-1 list-disc pl-4">{isolatedGrounding(primary).map((finding) => <li key={finding.id}>{finding.issue_ko}</li>)}</ul>
@@ -482,7 +485,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </dl>}
         <pre className="max-h-72 overflow-auto rounded bg-[#F7F7F5] p-3 text-[11px]">{JSON.stringify(state.snapshot, null, 2)}</pre>
         <ul className="mt-2 space-y-1 text-xs">{state.history.map((item) => <li key={item.id}>{item.created_at} · {experiential ? item.content_hash : item.content_hash.slice(0, 12)} · {item.approved_at ? "당시 승인" : "점검·승인 이력"}</li>)}</ul>
-      </details>
+      </details>}
     </>}
     {error && <p role="alert" className="text-red-800">{error}</p>}
   </section>;

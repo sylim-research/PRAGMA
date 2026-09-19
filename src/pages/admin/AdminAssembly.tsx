@@ -19,7 +19,7 @@ import { GenerationJobsPanel } from '@/components/admin/GenerationJobsPanel';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -424,7 +424,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const chipLabel = (chip: StateChip) => {
     if (chip === "all") return "전체";
     if (!reviewMode && chip in PRODUCTION_KO) return PRODUCTION_KO[chip as ProductionState];
-    if (chip === "decision") return aiReview ? "교수자 승인 대기" : "결정 대기";
+    if (chip === "decision") return aiReview ? "교수자 승인 대기" : "승인 대기";
     if (chip === "in_progress") return "검수 진행 중";
     // 대시보드와 같은 집합은 같은 이름으로 부른다.
     if (chip === "needs_check") return "품질 점검 대기";
@@ -728,6 +728,25 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     );
   };
 
+  // 작업대 머리의 핵심 정보 네 가지. 각각 이름표를 붙여 하나씩 읽히게 한다.
+  const headerBadges = (r: CoreRow) => {
+    const direction = coreDirection(r.core_content);
+    const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
+    const facet = (label: string, value: string) => (
+      <span className="inline-flex items-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 py-1 text-[13px] font-bold text-[#233542]">
+        <span className="text-[11px] font-medium text-[#8C969B]">{label}</span>{value}
+      </span>
+    );
+    return (
+      <span className="flex flex-wrap items-center gap-1.5">
+        <span className={["rounded-md px-2.5 py-1 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
+        {facet("방향", DIRECTION_LABEL[direction])}
+        {facet("수준", LEVEL[r.learner_level])}
+        {facet("과제", MODE_LABEL[mode])}
+      </span>
+    );
+  };
+
   // 대기열 카드에는 고르는 데 필요한 것만. 전체 해시·run ID·원본은 작업대의 세부 추적 정보에 둔다.
   const cardMeta = (r: CoreRow) => {
     const info = reviewInfo.get(r.scenario_id);
@@ -778,8 +797,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   const queueButton = (
     <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
-      className="h-8 shrink-0 gap-1.5 px-2.5 text-[12.5px]" onClick={() => setQueueOpen(true)}>
-      <span aria-hidden>☰</span>{chipLabel(fState)}<span className="tabular-nums text-[#66727A]">{dash[fState]}</span>
+      className="h-10 shrink-0 gap-2 border-[#233542] px-3 text-[13.5px] font-bold text-[#233542] hover:bg-[#F3F0E6]" onClick={() => setQueueOpen(true)}>
+      <ListChecks aria-hidden className="size-4" />{chipLabel(fState)} 목록
+      <span className="rounded-full bg-[#233542] px-2 py-0.5 text-[12px] tabular-nums text-white">{dash[fState]}</span>
     </Button>
   );
 
@@ -811,7 +831,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <div className="min-w-0 flex-1 space-y-0.5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
-              <span className="shrink-0 [&>span]:flex-nowrap">{badges(r, "sm")}</span>
+              <span className="shrink-0">{headerBadges(r)}</span>
               {metaLine.some(Boolean) && (
                 <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
                   {metaLine.filter(Boolean).join(" · ")}

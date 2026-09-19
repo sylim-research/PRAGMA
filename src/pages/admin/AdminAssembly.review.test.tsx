@@ -98,7 +98,7 @@ describe("professor final approval workbench", () => {
     // 교수자 최종 승인은 대기열을 옆에 두지 않는다. 목록은 머리의 버튼으로 연다.
     expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
     fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
-    expect(screen.getByRole("button", { name: /결정 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /승인 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /검토 완료 상태\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "정렬" })).toHaveValue("oldest");
