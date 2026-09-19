@@ -24,17 +24,10 @@ const Landing = () => {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* 브랜드는 앱 전체와 같은 고정 헤더로만 세운다 — hero 중앙에 다시 두면 같은
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
-      {/* 기준선은 워드마크의 **구분선**이다. 헤더를 본문과 같은 칼럼에 올린 뒤
-          구분선까지의 거리(112px)만큼 왼쪽으로 당기면, 「|」가 카드·푸터의 좌측 선에
-          정확히 서고 「PRAGMA」만 그 선 밖으로 돌출한다 — 정렬은 지키면서 워드마크만
-          눈에 띄게 하는 방법이다.
-          당기기는 lg 이상에서만 건다. 좁은 화면에서는 칼럼 여백이 112px보다 작아
-          워드마크가 화면 밖으로 밀려난다. */}
+      {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
         <div className="mx-auto flex max-w-3xl items-center px-6 py-4">
-          <span className="lg:-ml-[112px]">
-            <HomeBrand />
-          </span>
+          <HomeBrand />
         </div>
       </header>
 
@@ -165,11 +158,7 @@ const Landing = () => {
 
       <footer className="mx-auto w-full max-w-3xl px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
-          <strong className="font-semibold text-[#3E4C57]">PRAGMA · AI 기반 한·중 통번역 학습</strong>
-          {" | "}
-          <span className="inline-block">한국외국어대학교 중어중문학과 · 임소영</span>
-          {" | "}
-          <span className="inline-block text-[11px] text-[#6B7280]">© 2026 임소영. All rights reserved.</span>
+          한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
         </p>
       </footer>
     </div>
