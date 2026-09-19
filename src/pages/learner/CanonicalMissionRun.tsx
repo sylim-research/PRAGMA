@@ -642,11 +642,14 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
 function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ScaleQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
   const [pick, setPick] = useState<string | null>(() => devAutofill || revealAnswers ? quest.referenceAnswer : null);
   const [answered, setAnswered] = useState(revealAnswers);
-  // 이유를 묻는 문항(MJT2)은 판정을 확정하면 곧바로 판정의 O/X를 보이고, 그 다음에 이유를 고른다.
+  // 이유를 묻는 문항(MJT2): 판단 확정 → 이유 선택·확정 → 판단과 이유의 결과·해설 공개(2026-09-19).
+  // 판단을 확정하면 네 선택지와 내 선택은 그대로 두고 변경만 잠근다. 이유를 확정하기 전에는
+  // 정답 배지·색상·스크린리더 안내 어디에도 판단 결과를 드러내지 않는다.
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
   const [reasonId, setReasonId] = useState<string | null>(() => revealAnswers ? quest.reasonChoice?.acceptedId ?? null : null);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
-  const judgmentShown = answered || (Boolean(quest.reasonChoice) && judgmentCommitted);
+  const judgmentLocked = answered || (Boolean(quest.reasonChoice) && judgmentCommitted);
+  const judgmentShown = answered;
   const judgmentOk = pick !== null && acceptedIds.includes(pick);
   // 대표 판정은 하나다. 같은 방향의 인접 응답도 허용 범위라는 사실은 **답한 뒤에만** 알린다
   // (답하기 전에 알리면 4점 판단 자체를 무력화한다).
@@ -665,13 +668,15 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <h3 className="text-base font-bold">{quest.prompt}</h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
-            <OptionButton key={option.id} option={option} value={pick} disabled={judgmentShown} answered={judgmentShown} acceptedIds={acceptedIds}
+            <OptionButton key={option.id} option={option} value={pick} disabled={judgmentLocked} answered={judgmentShown} acceptedIds={acceptedIds}
               acceptedLabel="기준 판단" referenceId={quest.referenceAnswer} onSelect={setPick} />
           ))}
         </div>
         {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
         <p className="sr-only" aria-live="polite">
-          {judgmentShown ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 인정 범위 ${alsoAcceptedLabels.join(", ")}.` : ""}` : ""}
+          {judgmentShown
+            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 인정 범위 ${alsoAcceptedLabels.join(", ")}.` : ""}`
+            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 가장 큰 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
           <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
@@ -696,7 +701,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
             if (!judgmentCommitted) setJudgmentCommitted(true);
             else setAnswered(true);
-          }}>{judgmentCommitted ? "이유 확인하기" : pick ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
+          }}>{judgmentCommitted ? "이유 확정하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "답안 확인하기" : "답을 선택해 주세요"}</Button>
         ) : (

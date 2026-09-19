@@ -81,11 +81,12 @@ describe("instructor experience", () => {
     const v6: ReviewInspection = { ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level: "intermediate" },
       mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
     render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="mjt-1" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
-    fireEvent.click(screen.getByRole("button", { name: "다소 적절" })); fireEvent.click(screen.getByRole("button", { name: "판단 확인하기" }));
-    expect(within(screen.getByRole("button", { name: /^다소 적절/ })).getByText("내 선택")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "다소 적절" })); fireEvent.click(screen.getByRole("button", { name: "판단 확정하기" }));
+    expect(screen.queryByText("내 선택")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^다소 부적절/ })).toBeDisabled();
     fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
-    fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "이유 확정하기" }));
+    expect(within(screen.getByRole("button", { name: /^다소 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
   });
   it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
