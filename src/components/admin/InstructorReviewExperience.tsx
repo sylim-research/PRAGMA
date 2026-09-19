@@ -141,7 +141,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
               : setPendingNotes((notes) => ({ ...notes, [section.id]: event.target.value }))} />
           {error && dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
-          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 함께 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
+          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
           {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
           {current?.status === "revision_required" && <p className="text-sm text-amber-800">현재 미션의 최종 승인을 보류합니다. 아래 원본 수정 도구에서 수정하거나, 판단을 재검토하고 확인으로 바꾸세요.</p>}
           {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 요청으로 다시 판정하세요.</p>}

@@ -438,9 +438,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <details className="text-xs"><summary className="cursor-pointer text-[#5D6970]">승인 메모 (선택)</summary>
-          <Textarea aria-label="교수자 승인 근거" rows={2} className="mt-1.5 min-h-0" value={note} onChange={(event) => setNote(event.target.value)} />
-        </details>
+        <label className="block text-[13px] font-semibold text-[#233542]">교수자 승인 메모
+          <Textarea aria-label="교수자 승인 근거" rows={2} className="mt-1.5 min-h-0 font-normal" value={note} onChange={(event) => setNote(event.target.value)} />
+        </label>
         <label className="flex items-center gap-2 text-[13px] font-medium text-[#233542]"><input type="checkbox" className="size-4" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}

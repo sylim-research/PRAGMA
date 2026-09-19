@@ -738,7 +738,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       </span>
     );
     return (
-      <span className="flex flex-wrap items-center gap-1.5">
+      <span className="flex flex-wrap items-center gap-2">
         <span className={["rounded-md px-2.5 py-1 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
@@ -826,9 +826,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     return (
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
-        <header className="sticky top-16 z-10 flex items-start justify-between gap-3 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-4 py-2 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        <header className="sticky top-16 z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85">
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0">{headerBadges(r)}</span>
@@ -838,7 +838,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            <h2 className="line-clamp-2 text-[16px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <h2 className="line-clamp-2 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
           <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
             {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}

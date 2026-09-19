@@ -51,7 +51,7 @@ describe("instructor experience", () => {
     expect(screen.getByLabelText("감수 진행")).toHaveTextContent("확인 0 · 수정 요청 0 · 미확인 8");
     fireEvent.change(screen.getByRole("textbox", { name: "현재 문항 감수 메모" }), { target: { value: "도입 문구를 줄이면 좋겠습니다." } });
     expect(onSave).not.toHaveBeenCalled();
-    expect(screen.getByText("확인 또는 수정 요청을 누르면 메모가 함께 저장됩니다.")).toBeInTheDocument();
+    expect(screen.getByText("확인 또는 수정 요청을 누르면 메모가 자동 저장됩니다.")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "✗ 수정 요청" }));
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ decisions: [
       { section: "mjt-0", status: "defer", note: "예전 메모" },
