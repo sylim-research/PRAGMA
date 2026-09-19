@@ -39,6 +39,9 @@ const STEP_LABEL: Record<string, string> = {
   "OpenAI 검토": "AI 검토", "Claude 독립 검토": "교차 검토", "OpenAI 재검토": "의견 대조", "최종 검수 자료": "승인용 최종본",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
+const CONTENT_REVIEW_STEP_LABELS: Record<string, string> = {
+  rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
+};
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
   /** false면 바깥 테두리 상자를 그리지 않는다(이미 작업대 상자 안에 놓일 때). */
@@ -162,6 +165,130 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     } catch (cause) { setError(cause instanceof Error ? cause.message : "콘텐츠 승인 처리 실패"); }
     finally { setBusy(false); }
   };
+  // 품질 점검 화면: 단계·결과·진행을 세로 타임라인 한 줄씩으로 읽힌다. 선택 단계(교차 검토·의견 대조)도 늘 보인다.
+  if (compact) {
+    const prepLabel = target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료`;
+    const runningLabel = queuedStatus === "running" ? vendorFree(queued?.message ?? "") : null;
+    const crossRequested = Boolean(run?.independent_review_requested);
+    const canRun = Boolean(state) && !historicalApproval && next !== "professor" && next !== "approved" && !blocked && !locked && !queue.active && !busy;
+    const canCross = Boolean(state && run && primary && focused && !run.approved_at && !crossRequested && !historicalApproval && !locked && !queue.active && !busy && !blocked);
+    const startCross = () => {
+      if (!state) return;
+      setBusy(true); setError(null);
+      void contentReviewRequest(target, "request_independent", state)
+        .then((result) => { queryClient.setQueryData(key, result); return startReviewPreparation([{ target, label: prepLabel }]); })
+        .catch((cause) => setError(cause instanceof Error ? cause.message : "교차 검토 요청 실패"))
+        .finally(() => setBusy(false));
+    };
+    const rowStatus = (stepKey: string): "done" | "running" | "current" | "todo" | "failed" => {
+      const label = vendorFree(CONTENT_REVIEW_STEP_LABELS[stepKey] ?? "");
+      if (runningLabel && runningLabel === label) return "running";
+      if (stepKey === "rules" && blocked) return "failed";
+      const index = steps.findIndex((step) => step.key === stepKey);
+      if (index < 0) return "todo";
+      if (next === "approved" || index < stepIndex) return "done";
+      return index === stepIndex ? "current" : "todo";
+    };
+    const count = (list: { length: number } | undefined) => list?.length ?? 0;
+    const resultOf = (list: ReviewFinding[] | undefined) => (count(list) ? `지적 ${count(list)}건` : "문제 없음");
+    const decisions = run?.adjudication?.result.decisions ?? [];
+    const adjudicationResult = run?.adjudication
+      ? `대조 완료 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
+          .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "판정 없음"}`
+      : null;
+    type Row = { key: string; label: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
+    const rows: Row[] = [
+      { key: "rules", label: "규칙 검사", items: run?.rules.findings, result: run ? resultOf(run.rules.findings) : null },
+      { key: "openai", label: "AI 검토", items: primary?.findings, result: primary ? resultOf(primary.findings) : null },
+      { key: "claude", label: "교차 검토", optional: true, items: run?.claude_review?.result.findings,
+        result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
+        note: crossRequested ? null : "다른 AI가 독립 검토합니다",
+        action: !crossRequested && !run?.claude_review
+          ? <Button size="sm" variant="outline" className="h-7 px-2.5 text-[12.5px]" disabled={!canCross} onClick={startCross}>교차 검토 실행</Button>
+          : null },
+      { key: "adjudication", label: "의견 대조", optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
+        note: crossRequested ? null : "교차 검토 뒤 두 의견을 대조합니다" },
+      ...(steps.some((step) => step.key === "finalization")
+        ? [{ key: "finalization", label: "승인용 최종본", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
+        : []),
+    ];
+    const professorDone = next === "approved" || historicalApproval;
+    const professorCurrent = next === "professor" && !historicalApproval;
+    return <section aria-label="자동 점검" className="space-y-3 text-sm">
+      {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
+      {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
+      {state && <div className="rounded-xl border border-[#E2DED2]">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE8DE] bg-[#FBFAF6] px-4 py-2.5">
+          <h3 className="text-[14px] font-bold text-[#233542]">자동 점검</h3>
+          {runningLabel
+            ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[#233542] px-3.5 py-1.5 text-[13px] font-semibold text-white">
+                <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
+                <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
+              </div>
+            : professorDone || professorCurrent
+              ? <span className="text-[13px] font-semibold text-[#233542]">✓ 완료</span>
+              : <Button size="sm" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>자동 점검 실행</Button>}
+        </div>
+        <ol className="divide-y divide-[#F0EDE4]">
+          {rows.map((row, index) => {
+            const status = rowStatus(row.key);
+            const skipped = Boolean(row.optional) && !crossRequested && status === "todo";
+            return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#FBF3E3]" : ""].join(" ")}>
+              {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#C08A2E]" />}
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
+                  status === "done" ? "bg-[#233542] text-white"
+                    : status === "running" ? "bg-[#C08A2E] text-white"
+                      : status === "failed" ? "bg-red-700 text-white"
+                        : status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
+                          : skipped ? "border border-dashed border-[#B9C0C4] bg-white text-[#7A868D]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                  {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
+                </span>
+                <span className={["w-28 shrink-0 font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
+                  {row.label}{row.optional && <span className="ml-1 text-[11.5px] font-normal text-[#8C969B]">선택</span>}
+                </span>
+                <span className={["min-w-0 flex-1", status === "running" ? "font-semibold text-[#8A5A14]"
+                  : row.result?.startsWith("지적") ? "text-[#8A5A14]" : "text-[#5D6970]"].join(" ")}>
+                  {status === "running" ? "진행 중…" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
+                </span>
+                {row.action}
+              </div>
+              {row.detail && <details className="ml-9 mt-1.5">
+                <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
+                <p className="mt-1.5 border-l-2 border-[#E7E2D4] pl-3 text-[#3F4E57]">{row.detail}</p>
+              </details>}
+              {row.items && row.items.length > 0 && <details className="ml-9 mt-1.5">
+                <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
+                <ul className="mt-1.5 space-y-2">{row.items.map((finding) => <li key={finding.id} className="border-l-2 border-[#E7E2D4] pl-3">
+                  <p className="font-semibold text-[#202B33]">{plainIssue(finding.issue_ko)}</p>
+                  {plainIssue(finding.reason_ko) !== plainIssue(finding.issue_ko) && <p className="text-[#3F4E57]">{plainIssue(finding.reason_ko)}</p>}
+                  {finding.quote && <blockquote className="mt-1 border-l-2 pl-2 text-[#5D6970]">{finding.quote}</blockquote>}
+                </li>)}</ul>
+              </details>}
+            </li>;
+          })}
+          <li className={["flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
+            <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
+              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+              {professorDone ? "✓" : rows.length + 1}
+            </span>
+            <span className={["w-28 shrink-0 font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
+            <span className="min-w-0 flex-1 text-[#5D6970]">
+              {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
+                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건` : "지적을 확인하고 승인합니다") : "자동 점검을 마치면 넘어갑니다"}
+            </span>
+            {handoffHref && <Link to={handoffHref} className={professorCurrent
+              ? "inline-flex items-center rounded-md bg-[#233542] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#15202B]"
+              : "text-[12.5px] font-semibold text-[#15202B] underline underline-offset-4"}>교수자 최종 승인으로 →</Link>}
+          </li>
+        </ol>
+      </div>}
+      {state && !run && !historicalApproval && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다." : "아직 점검 기록이 없습니다."}</p>}
+      {queued?.status === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
+      {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error}</p>}
+      {error && <p role="alert" className="text-red-800">{error}</p>}
+    </section>;
+  }
   return <section aria-label="콘텐츠 승인" className={framed ? "my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm" : "space-y-3 text-sm"}>
     {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. 최종 승인 화면은 이 줄 없이 감수부터 시작한다. */}
     {!experiential && <div className="flex flex-wrap items-center justify-between gap-2">
@@ -380,7 +507,10 @@ function withoutIsolatedGrounding(result: ReviewResult): ReviewResult {
 }
 
 // 규칙 신호의 내부 코드 머리(예: 「R32/unattributed_present: 」)는 화면 문장에서 뗀다.
-const plainIssue = (text: string) => text.replace(/^R\d+\/[A-Za-z_]+:\s*/, "").replace("model_unattributed claim", "출처 표시 없는 AI 생성 문장");
+const plainIssue = (text: string) => text.replace(/^R\d+\/[A-Za-z_]+:\s*/, "").replace("model_unattributed claim", "출처 표시 없는 AI 생성 문장")
+  .replace(/mpj_items\[(\d)\]/g, (_m, n) => `MJT 문항 ${Number(n) + 1}`)
+  .replace(/\.candidates\[(\d)\]/g, (_m, n) => ` · 후보 ${Number(n) + 1}`)
+  .replace(/production_task/g, "DCT 문항");
 
 function ReviewFindings({ title, result, metadata, compact = false }: { title: string; result: ReviewResult; metadata?: ModelReview<ReviewResult>; compact?: boolean }) {
   if (compact) {
