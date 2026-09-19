@@ -18,6 +18,8 @@ const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   authoring: "실제 자료 활용",
 };
 const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
+// 초기 4문항 형식 전용 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
+const HIDDEN_PROMPT_KEYS = new Set(["mission.system.legacy_v4", "quality.system.legacy_v4"]);
 
 function HarnessOverview() {
   return (
@@ -128,7 +130,7 @@ const AdminPromptHarness = () => {
 
       <div className="mt-6 space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
-          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g);
+          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
             <div key={g}>
