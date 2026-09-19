@@ -71,7 +71,7 @@ import {
 import { getTargetFeature, DEFAULT_FEATURE_BY_ACT } from "@/lib/pragma/targetFeatures";
 import { weeklyMaterialsPath } from "@/lib/curriculum/weeklyMaterials";
 import { CurriculumEditor } from "./CurriculumEditor";
-import { CENTRAL_QUESTION_GUIDANCE, isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel, weekCentralQuestion } from "@/lib/curriculum/weekGuidance";
+import { isReinforcementWeek, REINFORCEMENT_DESCRIPTION, weekActivityLabel } from "@/lib/curriculum/weekGuidance";
 import {
   COURSE_MODE_LABEL,
   COURSE_MODES,
@@ -84,6 +84,8 @@ import {
 
 // 이 브라우저에서 마지막으로 연 교과목(편의 기능). 서버 상태가 아니다.
 const LAST_OUTLINE_KEY = "pragma.admin.composer.lastOutline";
+const CONDITION_LABEL = "text-[11.5px] font-semibold text-[#46515A]";
+const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#D8D4C8] bg-white px-2 text-[13.5px] text-[#15202B]";
 const SETTINGS_MENU_ITEM =
   "flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[13px] text-[#26333B] hover:bg-[#F6F5F1] disabled:pointer-events-none disabled:opacity-50";
 
@@ -867,18 +869,18 @@ const AdminComposer = () => {
               </AlertDialogContent>
             </AlertDialog>
 
-        {/* 편성 조건(기본 펼침)과 일상 업무. 저장만 채운 버튼으로 둔다. */}
+        {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         <div className="mt-4 rounded-xl border border-[#E2DED2] bg-white">
-          <div className="flex flex-wrap items-start justify-between gap-4 px-5 py-4">
-            <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <button
                 type="button"
                 aria-expanded={conditionsOpen}
                 onClick={() => setConditionsOpen((open) => !open)}
-                className="flex items-center gap-1.5 text-[16px] font-bold text-[#15202B]"
+                className="flex items-center gap-1.5 text-[15px] font-bold text-[#15202B]"
               >
                 편성 조건
-                <span aria-hidden className="text-[12px] text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+                <span aria-hidden className="text-[11.5px] font-semibold text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
               </button>
               {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
               {!conditionsOpen && (
@@ -886,6 +888,18 @@ const AdminComposer = () => {
                   {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
                 </span>
               )}
+              <span className="text-[12px] text-[#46515A]">
+                {outline
+                  ? `배치됨 · 번역 ${assignedModeWeekCounts.translation} · 통역 ${assignedModeWeekCounts.interpreting}`
+                  : "현재 설정은 새 교과목에 그대로 적용됩니다."}
+              </span>
+              <span
+                className={`inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
+                  availableMissionCount > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
+                }`}
+              >
+                편성할 수 있는 미션 {availableMissionCount}개
+              </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {/* 강의계획서 보기는 숨김(2026-09-19). 교수자 항목이 브라우저에만 저장돼 운영에 쓰기 어렵다. 코드는 되살릴 수 있게 둔다. */}
@@ -898,16 +912,14 @@ const AdminComposer = () => {
             </div>
           </div>
           {conditionsOpen && (
-          <div className="border-t border-[#EAE4D2]">
-            <div className="space-y-3 px-4 pb-4 pt-3 text-[13px]">
-                <label className="flex items-center gap-2">
-                  <span className="whitespace-nowrap text-[11.5px] font-semibold text-muted-foreground">
-                    빠른 설정
-                  </span>
+            <div className="space-y-2.5 border-t border-[#EAE4D2] px-4 py-3 text-[13px]">
+              <div className="grid gap-x-4 gap-y-2 sm:grid-cols-2 lg:grid-cols-[minmax(150px,1fr)_minmax(110px,0.8fr)_minmax(110px,0.8fr)_minmax(190px,1.3fr)]">
+                <label className="flex flex-col gap-1">
+                  <span className={CONDITION_LABEL}>빠른 설정</span>
                   <select
                     value={presetCode}
                     onChange={(event) => applyPreset(event.target.value)}
-                    className="h-9 min-w-[210px] rounded-md border border-border bg-white px-2 text-[15px] text-[#15202B]"
+                    className={CONDITION_SELECT}
                   >
                     <option value="">직접 설정</option>
                     {COURSE_PRESETS.map((item) => (
@@ -917,72 +929,53 @@ const AdminComposer = () => {
                     ))}
                   </select>
                 </label>
-            <div className="grid max-w-[900px] gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(180px,210px)_minmax(180px,210px)_minmax(300px,420px)]">
-              <label className="rounded-lg border border-[#E2DED2] bg-[#FAF9F5] p-3">
-                <span className="flex items-center gap-2 font-semibold text-[#15202B]">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E5E7E8] text-[11px]">1</span>
-                  수준
-                </span>
-                <select
-                  value={level}
-                  onChange={(event) => setLevel(event.target.value as LearnerLevel)}
-                  className="mt-1.5 h-8 w-full rounded-md border border-[#D8D4C8] bg-white px-2"
-                >
-                  {LEVELS.map((item) => (
-                    <option key={item} value={item}>{LEVEL[item]}</option>
-                  ))}
-                </select>
-              </label>
-              <label className="rounded-lg border border-[#E2DED2] bg-[#FAF9F5] p-3">
-                <span className="flex items-center gap-2 font-semibold text-[#15202B]">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E5E7E8] text-[11px]">2</span>
-                  언어방향
-                </span>
-                <select
-                  value={direction}
-                  onChange={(event) => setDirection(event.target.value as LanguageDirection)}
-                  className="mt-1.5 h-8 w-full rounded-md border border-[#D8D4C8] bg-white px-2"
-                >
-                  {DIRECTIONS.map((item) => (
-                    <option key={item} value={item}>{DIRECTION_LABEL[item]}</option>
-                  ))}
-                </select>
-              </label>
-              <div className="rounded-lg border border-[#E2DED2] bg-[#FAF9F5] p-3 sm:col-span-2 lg:col-span-1">
-                <span className="flex items-center gap-2 font-semibold text-[#15202B]">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E5E7E8] text-[11px]">3</span>
-                  번역·통역 비율
-                </span>
-                <select
-                  value={courseMode}
-                  onChange={(event) => changeCourseMode(event.target.value as CourseMode)}
-                  className="mt-1.5 h-8 w-full rounded-md border border-[#D8D4C8] bg-white px-2"
-                >
-                  {COURSE_MODES.map((mode) => (
-                    <option key={mode} value={mode}>{COURSE_MODE_LABEL[mode]}</option>
-                  ))}
-                </select>
-                <p className="mt-2 text-[12px] leading-5 text-[#766C54]">
-                  주차마다 {courseMode === "mixed" ? "번역·통역 미션을 1개씩" : courseMode === "interpreting" ? "통역 미션 2개를" : "번역 미션 2개를"}, 서로 다른 상황으로 배치합니다.
-                </p>
+                <label className="flex flex-col gap-1">
+                  <span className={CONDITION_LABEL}>수준</span>
+                  <select
+                    value={level}
+                    onChange={(event) => setLevel(event.target.value as LearnerLevel)}
+                    className={CONDITION_SELECT}
+                  >
+                    {LEVELS.map((item) => (
+                      <option key={item} value={item}>{LEVEL[item]}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className={CONDITION_LABEL}>언어방향</span>
+                  <select
+                    value={direction}
+                    onChange={(event) => setDirection(event.target.value as LanguageDirection)}
+                    className={CONDITION_SELECT}
+                  >
+                    {DIRECTIONS.map((item) => (
+                      <option key={item} value={item}>{DIRECTION_LABEL[item]}</option>
+                    ))}
+                  </select>
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className={CONDITION_LABEL}>번역·통역 비율</span>
+                  <select
+                    value={courseMode}
+                    onChange={(event) => changeCourseMode(event.target.value as CourseMode)}
+                    title={`주차마다 ${courseMode === "mixed" ? "번역·통역 미션을 1개씩" : courseMode === "interpreting" ? "통역 미션 2개를" : "번역 미션 2개를"}, 서로 다른 상황으로 배치합니다.`}
+                    className={CONDITION_SELECT}
+                  >
+                    {COURSE_MODES.map((mode) => (
+                      <option key={mode} value={mode}>{COURSE_MODE_LABEL[mode]}</option>
+                    ))}
+                  </select>
+                </label>
               </div>
-            </div>
 
-            <div className="mt-2.5 rounded-lg border border-[#D8D3C6] border-t-2 border-t-[#FAD338] bg-[#FBFAF6] p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="flex items-center gap-2 font-semibold text-[#15202B]">
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E5E7E8] text-[11px]">4</span>
-                  주제
-                  <span className="font-normal text-[#766C54]">
-                    {themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${themes.length}개`}
-                  </span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className={`${CONDITION_LABEL} mr-1.5`}>
+                  주제 <span className="font-normal">{themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${themes.length}개`}</span>
                 </span>
-              </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setThemes([])}
-                  className={`rounded-md border px-3 py-1 transition ${
+                  className={`rounded-md border px-2.5 py-0.5 transition ${
                     themes.length === 0
                       ? "border-[#15202B] bg-[#15202B] text-white"
                       : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
@@ -995,7 +988,7 @@ const AdminComposer = () => {
                     key={theme}
                     type="button"
                     onClick={() => toggleTheme(theme)}
-                    className={`rounded-md border px-3 py-1 transition ${
+                    className={`rounded-md border px-2.5 py-0.5 transition ${
                       themes.includes(theme)
                         ? "border-[#FAD338] bg-[#FFF3C4] text-[#15202B]"
                         : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
@@ -1006,29 +999,6 @@ const AdminComposer = () => {
                 ))}
               </div>
             </div>
-            <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-[#EAE4D2] pt-2.5 text-[11.5px] text-muted-foreground">
-              {outline ? (
-                <span>
-                  배치됨 · 번역 {assignedModeWeekCounts.translation} · 통역 {assignedModeWeekCounts.interpreting}
-                </span>
-              ) : (
-                <span className="font-medium text-[#365F58]">교과목 생성 전 편성 조건</span>
-              )}
-              <span
-                className={`inline-flex rounded-full px-3 py-0.5 font-medium ${
-                  availableMissionCount > 0
-                    ? "bg-emerald-50 text-emerald-800"
-                    : "bg-amber-50 text-amber-900"
-                }`}
-              >
-                편성할 수 있는 미션 {availableMissionCount}개
-              </span>
-              {!outline && <span>현재 설정은 새 교과목에 그대로 적용됩니다.</span>}
-            </div>
-
-
-            </div>
-          </div>
           )}
             {autoFillShortages.length > 0 && (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
@@ -1071,10 +1041,10 @@ const AdminComposer = () => {
         <>
           <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2 border-l-4 border-[#FAD338] pl-3">
             <div>
-              <h2 className="text-[18px] font-semibold">주차별 미션 조정</h2>
+              <h2 className="text-[18px] font-semibold">주차별 미션 배치</h2>
             </div>
             <span className="text-[12px] text-muted-foreground">
-              현재 {assignedMissionCount}개 배정
+              배치 {assignedMissionCount}개
             </span>
           </div>
 
@@ -1173,7 +1143,6 @@ function WeekRow({
   const act = week.speech_act as SpeechActUI | null;
   const reinforcement = isReinforcementWeek(week);
   const isAssignable = week.type === "regular" && expectedModes.length > 0 && Boolean(act);
-  const centralQuestion = weekCentralQuestion(week);
   // 미션에 확정된 초점이 없을 때만 주차 화행의 기본 초점을 보조값으로 사용한다.
   // 교수자 화면에서는 연구 구현 단계명 대신 실제 학습 초점만 보여준다.
   const plannedFeatureCode = act ? DEFAULT_FEATURE_BY_ACT[act] : undefined;
@@ -1195,38 +1164,36 @@ function WeekRow({
 
   return (
     <div role="group" aria-label={`${week.week_no}주차 편성`} className={`px-3 py-2 ${isAssignable ? "bg-white" : "bg-[#FAF8F2]"}`}>
-      <div className="flex min-h-8 flex-wrap items-center gap-2">
-        <span className="inline-flex h-6 min-w-[3rem] items-center justify-center rounded-md bg-[#ECEFF1] px-2 text-[12px] font-semibold text-[#46515A]">
+      {/* 주차 머리줄은 열 너비를 고정해 모든 주차의 칸이 세로로 맞도록 한다. */}
+      <div className="grid min-h-8 grid-cols-[3.5rem_7.5rem_7.5rem_minmax(0,1fr)_auto] items-center gap-x-3">
+        <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
-        <span className="text-[13.5px] font-medium">{displayTitle}</span>
-        {expectedModes.length > 0 && <span className="text-[11.5px] text-muted-foreground">{missionModesSummary(expectedModes)}</span>}
-        {reinforcement && (
-          <Button variant="outline" size="sm" className="h-7 text-[12px]" onClick={onEditWeek}>
-            {act ? `${SPEECH_ACT_UI[act]} · 화행 변경` : "화행 선택"}
-          </Button>
-        )}
-        <Link to={weeklyMaterialsPath(week.outline_id, week.week_no)} className="text-[11.5px] font-semibold text-[#2F6F63] hover:underline">
-          주차 수업자료
-        </Link>
-        {isAssignable ? (
+        <span className="truncate text-[13.5px] font-semibold" title={displayTitle}>{displayTitle}</span>
+        <span className="text-[11.5px] text-muted-foreground">{expectedModes.length > 0 ? missionModesSummary(expectedModes) : ""}</span>
+        <span className="flex min-w-0 items-center gap-2">
+          {reinforcement && (
+            <Button variant="outline" size="sm" className="h-7 text-[12px]" onClick={onEditWeek}>
+              {act ? `${SPEECH_ACT_UI[act]} · 화행 변경` : "화행 선택"}
+            </Button>
+          )}
+          <Link to={weeklyMaterialsPath(week.outline_id, week.week_no)} className="text-[11.5px] font-semibold text-[#2F6F63] hover:underline">
+            주차 수업자료
+          </Link>
+        </span>
+        {/* 자리가 다 찼으면 추가 버튼을 숨긴다(흐린 비활성 버튼 금지). 교체는 「제거」 후 추가. */}
+        {isAssignable && (items.length < expectedModes.length || adding) ? (
           <Button
-            className="ml-auto h-7 px-2 text-[12px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
+            className="h-7 px-2 text-[12px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
             variant="ghost"
             size="sm"
             onClick={onToggleAdd}
-            disabled={items.length >= expectedModes.length && !adding}
           >
             {adding ? "닫기" : "+ 미션"}
           </Button>
-        ) : null}
+        ) : <span />}
       </div>
 
-      {centralQuestion && (
-        <p className="mt-1 text-[12px] leading-5 text-[#52616B]" title={CENTRAL_QUESTION_GUIDANCE}>
-          <span className="font-semibold">중심 질문 · </span>{centralQuestion}
-        </p>
-      )}
       {reinforcement && <p className="mt-1 text-[11.5px] leading-5 text-muted-foreground">{REINFORCEMENT_DESCRIPTION}</p>}
 
       {/* 주차 흐름을 끊지 않도록 배정 미션은 별도 카드가 아닌 구분선 목록으로 표시한다. */}
