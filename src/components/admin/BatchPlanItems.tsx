@@ -5,11 +5,12 @@ import type { BatchCell } from "@/lib/pragma/batchPlan";
 
 const PAGE_SIZE = 10;
 
-export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
+export function BatchPlanItems({ plan, selected, disabled, onSelect, actions }: {
   plan: BatchCell[];
   selected: readonly number[];
   disabled: boolean;
   onSelect: (indexes: number[]) => void;
+  actions?: React.ReactNode;
 }) {
   const [page, setPage] = useState(0);
   useEffect(() => setPage(0), [plan]);
@@ -32,6 +33,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
         <Button size="sm" variant="outline" disabled={disabled || !selected.length} onClick={() => onSelect([])}>선택 해제</Button>
       </div>
     </div>
+    {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
       <table className="w-full min-w-[620px] text-left text-xs">
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">

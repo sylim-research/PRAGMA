@@ -318,7 +318,7 @@ const AdminBatch = () => {
     <AdminShell title="시나리오 배치 생성"
       description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
       <div className="space-y-5">
-        <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="space-y-5">
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -396,59 +396,46 @@ const AdminBatch = () => {
               </div>
               </>}
             </section>
-            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes} />
+            <BatchPlanItems plan={plan} selected={selectedPlan.indexes} disabled={busy} onSelect={selectPlanIndexes}
+              actions={<div className="flex flex-wrap items-center gap-2">
+                <Label htmlFor="selected-core-cells" className="text-xs">선택 항목 번호</Label>
+                <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="h-8 w-40 text-xs"
+                  onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
+                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
+                  onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 이어서 생성</Button>
+                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
+                  onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새로 생성</Button>
+                {selectedPlan.invalid && <p role="alert" className="w-full text-xs text-red-800">1–{plan.length} 사이의 정수 번호를 쉼표로 구분해 주세요.</p>}
+              </div>} />
           </div>
 
-          <aside id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5 xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
-            <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
-            <p className="mt-2 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-            <Button className="mt-4 h-10 w-full gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={start} disabled={busy || plan.length === 0}>
-              <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
-              {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
-            </Button>
-            {running && <Button className="mt-2 w-full" variant="outline" onClick={stop}>생성 중단</Button>}
+          <section id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 id="batch-execution-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={3} />생성 실행</h2>
+                <p className="mt-1 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button variant="outline" className="h-10 border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" onClick={startFreshCoreRun} disabled={busy}>새 실행으로 시작</Button>
+                <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={start} disabled={busy || plan.length === 0}>
+                  <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
+                  {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
+                </Button>
+                {running && <Button className="h-10" variant="outline" onClick={stop}>생성 중단</Button>}
+              </div>
+            </div>
             {executionError && <p role="alert" className="mt-3 text-xs leading-5 text-red-800">{executionError}</p>}
             {activeTotal > 0 && <div className="mt-4" aria-live="polite">
               <div className="mb-2 flex justify-between text-xs"><span>{running ? "생성·저장 진행" : done < activeTotal ? "중단된 실행" : "실행 완료"}</span><span>{done} / {activeTotal}</span></div>
               <Progress value={(done / Math.max(1, activeTotal)) * 100} aria-label="배치 생성 진행률" />
-              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs">
+              <dl className="mt-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
                 <div><dt className="text-muted-foreground">새로 저장</dt><dd className="mt-1 font-bold">{okCount - reusedCount}건</dd></div>
                 <div><dt className="text-muted-foreground">기존 저장 재사용</dt><dd className="mt-1 font-bold">{reusedCount}건</dd></div>
                 <div><dt className="text-muted-foreground">경고 포함</dt><dd className="mt-1 font-bold">{warnCount}건</dd></div>
                 <div><dt className="text-muted-foreground">실패</dt><dd className="mt-1 font-bold">{failCount}건</dd></div>
               </dl>
             </div>}
-
-            <details open className="mt-5 border-t pt-4">
-              <summary className="cursor-pointer text-sm font-semibold">이어서 하기·불러오기</summary>
-              <div className="mt-3 rounded-lg bg-[#FAF8F2] p-3">
-                <p className="text-xs font-semibold">지금 실행 번호</p>
-                <code className="mt-1.5 block break-all text-[11px] text-[#5A6670]">{coreRunId}</code>
-              </div>
-            <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-semibold">고른 항목만 생성</h3>
-              <Label htmlFor="selected-core-cells" className="mt-3 block text-xs">선택 항목 번호</Label>
-              <Input id="selected-core-cells" value={selectedCellNumbers} disabled={busy} className="mt-2"
-                onChange={event => setSelectedCellNumbers(event.target.value)} placeholder="예: 13, 14, 17" aria-invalid={selectedPlan.invalid} />
-              {selectedPlan.invalid && <p role="alert" className="mt-2 text-xs text-red-800">1–{plan.length} 사이의 정수 번호를 쉼표로 구분해 주세요.</p>}
-              <Button className="mt-3 w-full border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                onClick={() => startSelected("current")}>선택 {selectedPlan.indexes.length}건 · 이어서 생성</Button>
-              <Button className="mt-2 w-full border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" variant="outline" disabled={busy || selectedPlan.invalid || !selectedPlan.indexes.length}
-                onClick={() => startSelected("fresh")}>선택 {selectedPlan.indexes.length}건 · 새로 생성</Button>
-            </div>
-
-            <div className="mt-4 border-t pt-4">
-              <h3 className="text-sm font-semibold">지난 실행 불러오기</h3>
-              <Label htmlFor="resume-core-run-id" className="mt-3 block text-xs">지난 실행 번호</Label>
-              <Input id="resume-core-run-id" value={resumeRunId} disabled={busy} className="mt-2 min-w-0 font-mono text-xs"
-                onChange={event => setResumeRunId(event.target.value)} placeholder={"core_" + direction + "_…"} />
-              <div className="mt-2 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" onClick={loadCoreRunId} disabled={busy || !resumeRunId.trim()}>불러오기</Button>
-                <Button size="sm" variant="outline" className="border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" onClick={startFreshCoreRun} disabled={busy}>새 실행 시작</Button>
-              </div>
-            </div>
-            </details>
-          </aside>
+          </section>
         </div>
 
         {failures.length > 0 && <section aria-label="배치 생성 실패" className="rounded-xl border border-red-200 bg-red-50 p-5">
