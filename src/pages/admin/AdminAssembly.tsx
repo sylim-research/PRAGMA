@@ -842,11 +842,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
             <h2 className="line-clamp-2 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
-          <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
-            {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
-            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}><ChevronLeft className="size-3.5" />이전</Button>
-            <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음<ChevronRight className="size-3.5" /></Button>
-          </div>
+          {/* 제작 현황은 왼쪽 목록에서 고른다 — 이전·다음은 승인 후 다음 미션으로 넘어가는 교수자 작업대에만 둔다. */}
+          {reviewMode && (
+            <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
+              {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
+              <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}><ChevronLeft className="size-3.5" />이전</Button>
+              <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!nextRow} onClick={() => selectRow(nextRow)}>다음<ChevronRight className="size-3.5" /></Button>
+            </div>
+          )}
         </header>
         <div className="space-y-3 px-4 py-3 xl:px-5">
 
