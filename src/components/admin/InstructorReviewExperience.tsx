@@ -132,9 +132,9 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className={["w-[4.25rem] shrink-0 rounded-full border bg-white py-[2px] text-center text-[11px] font-bold text-[#233542]",
-                // 흰 알약 + 머리카락 테두리. 지금 보는 단계만 남색 테두리로 또렷하게.
-                sectionIndex === index ? "border-[#233542]" : "border-[#CFC9B8]"].join(" ")}>{partsOf(item).tag}</span>}
+              {partsOf(item).tag && <span className={["w-[4.5rem] shrink-0 border-r border-[#E2DED2] pr-2 text-[11.5px] font-bold tracking-[0.06em]",
+                // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
+                sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
             <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
