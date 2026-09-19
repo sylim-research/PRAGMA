@@ -54,8 +54,11 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <HomeBrand />
+        {/* 본문과 같은 좌우 여백을 쓴다 — 로고가 사이드바 「운영 워크플로우」 상자 왼쪽 선과, 오른쪽 링크가 본문 오른쪽 끝과 맞는다. */}
+        <div className="flex items-center justify-between px-5 py-4 md:pr-6">
+          <div className="md:pl-9">
+            <HomeBrand />
+          </div>
           <Link
             to="/learner/course"
             target="_blank"
