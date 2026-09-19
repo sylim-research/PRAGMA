@@ -3909,7 +3909,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           domain: coreDomainCode(b), industry: b.industry ?? null, level: b.level_ko,
           mode: coreLengthMode(b), topic_code: b.topic_code, situation_seed_ko: b.situation_seed_ko,
         }), 0.2, {
-          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v2', promptSnapshotHash }),
+          telemetry: telemetryFor('core_critic', true, { promptVersion: 'core_scene_preflight_v3_response_act_power', promptSnapshotHash }),
         })
       if (!preflight.ok) {
         return new Response(JSON.stringify({ error: '장면 사전 검토 호출 실패', stop_code: 'CORE_PREFLIGHT_UNAVAILABLE' }), { status: 502, headers: jsonHeaders })
