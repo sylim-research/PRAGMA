@@ -124,19 +124,19 @@ describe("admin dashboard", () => {
     expect(professor.textContent).not.toContain("보류");
   });
 
-  it("keeps unconverted v5 missions out of the waiting counts without a separate label", async () => {
+  it("keeps every v5 mission out of the waiting counts without a separate label", async () => {
     mocks.tables.scenarios = [
       ...(mocks.tables.scenarios as unknown[]),
       // 현재 기준 run이 없는 v5 2건 — 검수 대신 v6로 전환한다.
       scenario("v5-a", { mission_schema_version: "mission_v5" }),
       scenario("v5-b", { mission_schema_version: "mission_v5" }),
-      // 현재 기준 run이 있는 v5는 원래대로 센다.
+      // 현재 기준 run이 있는 v5도 검수 대기열에 넣지 않는다(v6로 전환).
       scenario("v5-ready", { mission_schema_version: "mission_v5" }),
     ];
     mocks.tables.content_review_runs = [...(mocks.tables.content_review_runs as unknown[]), run("v5-ready")];
     show();
     const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 2개"));
+    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 1개"));
     expect(band.textContent).toContain("품질 점검 대기 1개");
     const stages = screen.getByRole("group", { name: "품질 검수 단계" });
     const rules = within(stages).getByRole("link", { name: /규칙 검사 완료/ });

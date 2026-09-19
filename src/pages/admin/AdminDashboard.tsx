@@ -30,8 +30,8 @@ import {
   type DashboardReviewStageCounts,
   type DashboardScenarioRow,
   countRulesFailures,
-  countUnconvertedV5Missions,
   excludeSupersededRows,
+  isDashboardReviewTarget,
   summarizeAssignmentApproval,
   summarizeCourses,
   type DashboardCourseRow,
@@ -420,17 +420,18 @@ const AdminDashboard = () => {
         if (result.error) throw new Error(`${label} 집계 실패: ${result.error.message}`);
       }
 
-      const unconvertedV5Count = countUnconvertedV5Missions(scenarioRows, reviewRows);
+      // v5 미션은 검수하지 않고 v6로 전환한다 — 검수 대기열·단계별 대기는 v6만 센다(점검·승인 화면과 같은 기준).
+      const v5ReviewTarget = (row: DashboardScenarioRow) => isDashboardReviewTarget(row) && row.mission_schema_version !== "mission_v6";
+      const reviewScopeRows = scenarioRows.filter((row) => !v5ReviewTarget(row));
       const content = summarizeDashboardContent(scenarioRows);
-      const review = summarizeDashboardReviewStages(scenarioRows, reviewRows);
+      const review = summarizeDashboardReviewStages(reviewScopeRows, reviewRows);
       const next: DashboardSnapshot = {
-        // v5 미전환 미션은 검수하지 않고 v6로 전환한다 — 대기·검수 중 수에서 뺀다.
-        content: { ...content, reviewTargetCount: content.reviewTargetCount - unconvertedV5Count },
-        review: { ...review, rules: review.rules - unconvertedV5Count },
+        content: { ...content, reviewTargetCount: content.reviewTargetCount - scenarioRows.filter(v5ReviewTarget).length },
+        review,
         assignments: summarizeDashboardAssignments(assignmentRows),
         assignmentApproval: summarizeAssignmentApproval(assignmentRows, scenarioRows),
         courses: summarizeCourses(courseRows),
-        rulesFailCount: countRulesFailures(scenarioRows, reviewRows),
+        rulesFailCount: countRulesFailures(reviewScopeRows, reviewRows),
         approvedLearnerCount: learnerResult.count ?? 0,
         learnerRecordCount: learnerRecordResult.count ?? 0,
         cumulative: cumulativeRows ? summarizeCumulativeReviewCompletion(scenarioRows, cumulativeRows) : null,

@@ -342,6 +342,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       const linkedId = searchParams.get("scenarioId");
       // 더 새 판이 대체한 옛 판(다른 행의 supersedes_scenario_id가 가리키는 행)은 목록·숫자에서 뺀다. DB는 그대로다.
       loaded = excludeSupersededRows(loaded, linkedId);
+      // 점검·승인 대기열은 v6만 다룬다. v5는 검수하지 않고 v6로 전환한다(대시보드와 같은 기준).
+      if (reviewMode) loaded = loaded.filter((row) => row.mission_schema_version === "mission_v6" || row.scenario_id === linkedId);
       if (linkedId && !loaded.some((row) => row.scenario_id === linkedId)) {
         const { data: linked } = await db.from("scenarios").select(select).eq("scenario_id", linkedId).maybeSingle();
         if (linked) loaded = [linked as CoreRow, ...loaded];
@@ -475,6 +477,17 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     for (const chip of chips) d[chip] = matchedExceptState.filter((r) => matchesState(r, chip)).length;
     return d;
   }, [chips, matchedExceptState, matchesState]);
+
+  // 첫 칩이 비어 있으면 빈 화면 대신 실제 미션이 있는 다음 칩으로 연다(진입 시 한 번, 링크로 연 미션이 없을 때만).
+  const initialChipChecked = useRef(false);
+  useEffect(() => {
+    if (loading || initialChipChecked.current) return;
+    initialChipChecked.current = true;
+    // 최종 승인 화면은 「지금 결정할 미션이 없습니다」 안내가 따로 있어 그대로 둔다.
+    if (professorScreen || pendingScenarioId.current || dash[fState] > 0) return;
+    const firstFilled = chips.find((chip) => chip !== "all" && dash[chip] > 0);
+    if (firstFilled) setFState(firstFilled);
+  }, [loading, chips, dash, fState, professorScreen]);
 
   // 진입·필터 변경 시에만 대기열 첫 미션을 연다. 작업을 마쳐 대기열이 바뀌어도 선택은 그대로 둔다.
   const filteredRef = useRef(filtered);
@@ -687,6 +700,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   };
 
   const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
+  // 일괄 감수 자료 준비는 준비할 미션이 있는 칩에서만 보인다(교수자 차례·전체에서는 할 일이 없다).
+  const bulkPrep = aiReview && (fState === "needs_check" || fState === "rules_error");
   // 접혀 있어도 필터가 걸려 있는지 알 수 있어야 한다.
   const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
   const nextLabel = professorScreen && fState === "decision" ? "다음 결정 대기 미션 ▶" : "다음 미션 ▶";
@@ -695,7 +710,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
-    if (!reviewMode) {
+    if (!professorScreen) {
       return (
         <span className="flex flex-wrap items-center gap-1.5">
           <span className={["rounded font-bold", cls, ACT_TONE[r.speech_act]].join(" ")}>{SPEECH_ACT_UI[r.speech_act]}</span>
@@ -722,7 +737,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       return [fState === "all" ? PRODUCTION_KO[production] : null,
         production === "v6_review" ? currentStageLabel(info?.progress) : production === "v6_done" ? info?.placement : null];
     }
-    if (aiReview) return [info?.progress, traceLabel(r.mission_content_hash)];
+    if (aiReview) return [currentStageLabel(info?.progress)];
     return [info?.placement, missionVersionLabel(r.mission_schema_version),
       fState === "decision" ? null : info?.progress, traceLabel(r.mission_content_hash)];
   };
@@ -776,7 +791,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const loaded = preview[r.scenario_id];
     // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
-    const metaLine = reviewMode
+    const metaLine = aiReview ? [] : reviewMode
       ? [missionVersionLabel(r.mission_schema_version), info?.placement === "편성 전" ? null : info?.placement, updatedAtLabel(r.updated_at), traceLabel(r.mission_content_hash)]
       : [];
     const scenarioText = (
@@ -876,7 +891,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         )}
 
         {/* 작업을 마쳐도 저절로 넘어가지 않는다. 결과를 확인한 뒤 교수자가 넘긴다. */}
-        {reviewMode && (
+        {professorScreen && (
           <footer className="flex justify-end pt-1">
             <Button size="sm" variant="outline" disabled={!nextRow} onClick={() => selectRow(nextRow)}>{nextLabel}</Button>
           </footer>
@@ -890,7 +905,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작 현황"}
       description={aiReview
-        ? "자동 점검·AI 검토로 감수 자료를 준비합니다. 승인은 하지 않습니다."
+        ? "규칙 검사와 AI 검토로 감수 자료를 준비합니다. 승인은 교수자가 합니다."
         : reviewMode
           ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
           : "학습 미션이 제작 경로의 어느 단계에 있는지 봅니다."}
@@ -904,8 +919,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div className={professorScreen ? "grid items-start"
-          : reviewMode ? "grid items-start gap-4 xl:grid-cols-[320px_minmax(0,1fr)] 2xl:grid-cols-[360px_minmax(0,1fr)]"
-            : "grid items-start gap-4 xl:grid-cols-2"}>
+          : "grid items-start gap-4 xl:grid-cols-2"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
@@ -926,7 +940,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
               <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
-                {chips.filter((s) => reviewMode || s === "all" || s === fState || dash[s] > 0).map((s) => (
+                {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
                     key={s}
                     type="button"
@@ -950,7 +964,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder={reviewMode ? "제목·상황·Trace 검색" : "제목·상황 검색"}
+                  placeholder={professorScreen ? "제목·상황·Trace 검색" : "제목·상황 검색"}
                   aria-label="대기열 검색"
                   className="h-7 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[12.5px]"
                 />
@@ -967,7 +981,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </select>
               </div>
               <div className="flex gap-1.5 text-[12px]">
-                {([["axis", "필터", axisFilterActive], ["advanced", "고급", fRun !== "all" || fHash !== "all"]] as const).filter(([key]) => reviewMode || key === "axis").map(([key, label, active]) => (
+                {([["axis", "필터", axisFilterActive], ["advanced", "고급", fRun !== "all" || fHash !== "all"]] as const).filter(([key]) => professorScreen || key === "axis").map(([key, label, active]) => (
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
                     className={[
@@ -1018,7 +1032,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                       "flex gap-2 rounded-md border px-2 py-1.5",
                       selected ? "border-[#233542] bg-white shadow-[inset_3px_0_0_#233542]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
                     ].join(" ")}>
-                    {aiReview && st === "generated" && (
+                    {bulkPrep && st === "generated" && (
                       <input type="checkbox" className="mt-1 shrink-0" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
                         checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
                           const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
@@ -1048,7 +1062,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </ul>
 
             {/* 일괄 감수 자료 준비는 늘 보인다. 실행은 버튼으로만. 진행 상황은 AdminShell 상단 표시가 따로 보여 준다. */}
-            {aiReview && (
+            {bulkPrep && (
               <div className="space-y-1 border-t border-[#E2DED2] bg-white px-2.5 py-2">
                 <div className="flex flex-wrap items-center gap-1 text-[12px]">
                   <span className="font-semibold text-[#202B33]">{reviewSelection.size}건 선택</span>
@@ -1061,7 +1075,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     target: { kind: "mission" as const, targetId: row.scenario_id },
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
                   })))}>{reviewSelection.size}건 감수 자료 준비</Button>
-                <p className="text-[12px] text-muted-foreground">저장 결과 재사용 · 없을 때만 유료 AI 검토</p>
               </div>
             )}
           </aside>

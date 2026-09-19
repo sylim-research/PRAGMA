@@ -34,6 +34,9 @@ function signalSummary(findings: ReviewFinding[]): string {
 const DEFAULT_APPROVAL_NOTE = "이 학습 미션을 수업에 사용합니다.";
 const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
+/** 화면에 보이는 단계 이름에서 서비스 이름을 뺀다. 저장·추적 정보의 모델명은 세부 추적 정보에 그대로 둔다. */
+const vendorFree = (label: string) => label.replace(/^OpenAI /, "AI ").replace(/^Claude 독립/, "AI 독립");
+
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
   /** false면 바깥 테두리 상자를 그리지 않는다(이미 작업대 상자 안에 놓일 때). */
   framed?: boolean;
@@ -166,9 +169,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           return <li key={step.key} aria-current={index === stepIndex ? "step" : undefined} className="flex items-center gap-1.5">
             {index > 0 && <span aria-hidden className="text-[#B7BEC2]">›</span>}
             <span className={failed ? "rounded-full bg-red-50 px-2 py-0.5 font-semibold text-red-800"
-              : current ? "rounded-full bg-[#FFF3B8] px-2 py-0.5 font-semibold text-[#5C4A0B]"
-              : done ? "text-emerald-800" : "text-[#8C969B]"}>
-              {done ? "✓ " : ""}{step.label}{!state ? " · 확인 중" : failed ? " · 오류" : current ? " · 현재" : ""}
+              : current ? "rounded-full border border-[#C08A2E] px-2 py-0.5 font-semibold text-[#8A5A14]"
+              : done ? "text-[#233542]" : "text-[#8C969B]"}>
+              {done ? "✓ " : ""}{vendorFree(step.label)}{!state ? " · 확인 중" : failed ? " · 오류" : ""}
             </span>
           </li>;
         })}
@@ -185,34 +188,34 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {experiential && <p className="text-[13px] text-[#5D6970]">이 버전은 자동 점검이 아직 끝나지 않았습니다.</p>}
         <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
           onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "자동 점검 중…" : "자동 점검 마치기") : "감수 자료 준비"}</Button>
-        {!experiential && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 유료로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
+        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 유료로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
-      {!experiential && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사 무료 · 최종 검수 자료는 문항별 근거 생성 비용 발생</p>}
+      {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사 무료 · 최종 검수 자료는 문항별 근거 생성 비용 발생</p>}
       {experiential && (run || decisionSlot) && <FlowHeading title="자동 점검 결과" note={next === "professor" || next === "approved" ? "자동 점검 완료" : undefined} />}
       {!run && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
-        {primary && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "OpenAI 검토" : "저장된 OpenAI 검토 재사용 · 추가 호출 없음"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential ? undefined : run.openai_review ?? undefined} />}
-        {run.openai_review && run.generation_quality && <ReviewFindings title="기존 생성 단계 OpenAI 검토"result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && <ReviewFindings title="저장된 Claude 독립 검토"result={run.claude_review.result} metadata={experiential ? undefined : run.claude_review} />}
+        {primary && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential ? undefined : run.openai_review ?? undefined} />}
+        {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 검토"result={generationQualityResult(run.generation_quality)} />}
+        {run.claude_review && <ReviewFindings title="AI 독립 검토"result={run.claude_review.result} metadata={experiential ? undefined : run.claude_review} />}
         {findings.length > 0 && (() => {
           const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
             return <div key={finding.id} className="grid gap-3 rounded border p-3 lg:grid-cols-3">
-              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "Claude 독립 검토" : finding.id.startsWith("generation-") ? "생성 단계 OpenAI 검토" : "OpenAI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
+              <div><strong>{finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "AI 독립 검토" : finding.id.startsWith("generation-") ? "생성 단계 AI 검토" : "AI 검토"} · {finding.issue_ko}</strong><p className="mt-1">{finding.reason_ko}</p>
                 <p className="mt-1 text-xs">유형: {finding.problem_type_ko} · {verdictLabel[finding.severity]}{finding.needs_professor ? " · 교수자 확인 필요" : ""}</p>
                 {finding.uncertainty_ko && <p className="mt-1 text-xs">불확실성: {finding.uncertainty_ko}</p>}
                 {finding.quote && <blockquote className="my-2 border-l-2 pl-2">{finding.quote}</blockquote>}
                 <p className="text-xs">제안: {finding.suggestion_ko}</p><code className="break-all text-[10px]">{finding.where}</code></div>
               <div className="rounded bg-[#F8F7F3] p-3">{decision ? <>
-                <strong>OpenAI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                <strong>AI 재검토 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                 <p className="mt-1">{decision.rationale_ko}</p>
                 {decision.proposed_change_ko && <p className="mt-2 text-xs">제안: {decision.proposed_change_ko}</p>}
                 {decision.evidence_quote && <blockquote className="mt-2 border-l-2 pl-2">{decision.evidence_quote}</blockquote>}
-              </> : focused ? "추가 OpenAI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "OpenAI 재검토 전"}</div>
+              </> : focused ? "추가 AI 재검토 없음 · 교수자가 직접 판단할 수 있습니다." : "AI 재검토 전"}</div>
               <div className="space-y-2 rounded bg-amber-50 p-3">
                 {run.approved_at ? <><strong>교수자 · {saved ? PROFESSOR_DECISION_LABELS[saved.decision] : "판단 없음"}{saved?.mode === "bulk_signal" ? " (묶음 확인)" : ""}</strong><p>{saved?.rationale_ko}</p></>
                   : focused || run.adjudication ? <>
@@ -225,7 +228,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft?.rationale_ko ?? ""} disabled={busy}
                       onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
                     {draft?.mode === "bulk_signal" && <p className="text-xs text-muted-foreground">묶음 확인으로 채워진 항목입니다. 결정이나 근거를 고치면 개별 판정이 됩니다.</p>}
-                  </> : <p>OpenAI 재검토 후 교수자 결정을 기록합니다.</p>}
+                  </> : <p>AI 재검토 후 교수자 결정을 기록합니다.</p>}
               </div>
             </div>;
           };
@@ -248,7 +251,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {substantiveFindings.map(findingCard)}
             </section>}
             {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 Claude 독립 검토 의견도 보존합니다. OpenAI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
+            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 AI 독립 검토 의견도 보존합니다. AI 재검토에는 1차 검토 결과를 제공하지 않습니다.</p>
             {next === "professor" && <>
               <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
                 || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장 · 무료</Button>
@@ -294,7 +297,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <label className="flex gap-2 text-xs"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />현재 원본과 저장된 품질점검·미해결 쟁점을 확인했습니다.</label>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
       </div>}
-      {next !== "approved" && !(handoffHref && next === "professor") && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
+      {next !== "approved" && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)
         || (next === "professor" && (!ready || !confirmed))} onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작 · 무료" : next === "professor" ? "교수자 최종 승인" : `${steps[stepIndex].label} 실행 · 유료`}
       </Button>}
@@ -328,7 +331,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             ["승인 정책", run?.approval_policy],
             ["OpenAI 검토 모델", run?.openai_review ? `${run.openai_review.model} · ${run.openai_review.checked_at}` : null],
             ["Claude 독립 검토 모델", run?.claude_review ? `${run.claude_review.model} · ${run.claude_review.checked_at}` : null],
-            ["OpenAI 재검토 모델",run?.adjudication ? `${run.adjudication.model} · ${run.adjudication.checked_at}` : null],
+            ["AI 재검토 모델",run?.adjudication ? `${run.adjudication.model} · ${run.adjudication.checked_at}` : null],
           ] as Array<[string, string | null | undefined]>).filter(([, value]) => value).map(([label, value]) => <div key={label} className="contents">
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>
           </div>)}

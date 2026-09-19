@@ -68,7 +68,7 @@ describe("admin navigation reachability", () => {
     );
     // handoffHref가 주어지면 승인 절과 승인 버튼이 렌더되지 않는다.
     expect(panel).toContain('next === "professor" && !handoffHref');
-    expect(panel).toContain('!(handoffHref && next === "professor")');
+    expect(panel).toContain('!(handoffHref && (next === "professor" || next === "rules" || next === "openai"))');
     expect(panel).toContain("교수자 최종 승인에서 이 미션 열기");
 
     const assembly = readFileSync(
