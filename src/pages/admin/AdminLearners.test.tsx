@@ -89,9 +89,9 @@ describe("학습자 관리 목록", () => {
     expect(learnerCell?.querySelector('[aria-hidden="true"]')).toBeNull();
 
     const table = screen.getByRole("table");
-    expect(table).toHaveClass("table-fixed", "min-w-[1180px]");
+    expect(table).toHaveClass("table-fixed", "min-w-[1040px]");
     expect(Array.from(table.querySelectorAll("col")).map((col) => col.style.width)).toEqual([
-      "21%", "13%", "8%", "8%", "15%", "8%", "10%", "8%", "9%",
+      "20%", "13%", "8%", "8%", "15%", "8%", "10%", "8%", "10%",
     ]);
     expect(screen.getAllByRole("link", { name: "수행 기록 →" })[0]).toHaveAttribute(
       "href",

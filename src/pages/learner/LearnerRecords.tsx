@@ -251,7 +251,6 @@ const LearnerRecords = () => {
   if (recordsError || remoteRecords === null) {
     return (
       <LearnerJourneyShell nav
-        canvas="max-w-4xl"
         headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
       >
         <div className="pb-24">
@@ -273,7 +272,6 @@ const LearnerRecords = () => {
 
   return (
     <LearnerJourneyShell nav
-      canvas="max-w-4xl"
       headerRight={<span className="text-[12px] font-semibold text-[#B9C4CE]">학습 리포트</span>}
     >
       <div className="pb-24">

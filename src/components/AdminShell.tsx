@@ -55,7 +55,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
         {/* 본문과 같은 좌우 여백을 쓴다 — 로고가 사이드바 「운영 워크플로우」 상자 왼쪽 선과, 오른쪽 링크가 본문 오른쪽 끝과 맞는다. */}
-        <div className="flex items-center justify-between px-5 py-4 md:pr-6">
+        <div className="mx-auto flex max-w-[1553px] items-center justify-between px-5 py-4 md:pr-6">
           <div className="md:pl-9">
             <HomeBrand />
           </div>
@@ -70,7 +70,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
         </div>
       </header>
 
-      <div className={`flex gap-6 px-5 md:pr-6 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+      {/* 관리자 화면 폭 기준 하나: 사이드바 285 + 간격 24 + 본문 최대 1,200px. 넓은 모니터에서는 가운데 정렬한다. */}
+      <div className={`mx-auto flex max-w-[1553px] gap-6 px-5 md:pr-6 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
         <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:self-start md:overflow-y-auto print:hidden">
           <nav className="-mt-1 flex flex-col pl-6 pr-1">
             <Link

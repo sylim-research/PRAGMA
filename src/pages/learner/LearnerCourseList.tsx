@@ -74,7 +74,7 @@ const LearnerCourseList = () => {
   );
 
   return (
-    <LearnerJourneyShell nav canvas="max-w-[868px]">
+    <LearnerJourneyShell nav>
       <main className="pb-[4.5rem] pt-1 md:pb-8" aria-labelledby="course-list-title">
         <section className="mb-6">
           <h1 id="course-list-title" className="border-l-4 border-[#FAD338] pl-3 text-[26px] font-bold leading-9 tracking-[-0.04em] text-[#15202B]">

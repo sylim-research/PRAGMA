@@ -261,14 +261,14 @@ const LegacyMissionRun = () => {
 
   if (scenarioId && loading) {
     return (
-      <LearnerJourneyShell>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <p className="py-10 text-center text-[13px] text-muted-foreground">미션을 불러오는 중…</p>
       </LearnerJourneyShell>
     );
   }
   if (scenarioId && error) {
     return (
-      <LearnerJourneyShell>
+      <LearnerJourneyShell canvas="max-w-3xl">
         <div className="my-6 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">{error}</div>
       </LearnerJourneyShell>
     );
@@ -1096,7 +1096,7 @@ function MissionRunner({
   };
 
   return (
-    <LearnerJourneyShell headerRight={<span className="text-[12px] text-[#8899A6]">{headerRight}</span>}>
+    <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="text-[12px] text-[#8899A6]">{headerRight}</span>}>
       <div>
         {/* 샘플 배너는 헤더 라벨(「샘플 · 예문 검토 전」)로 옮겼다 — 첫 화면 자리를
             문항에 내준다. 미검수(generated) 경고는 성격이 달라 배너로 남긴다. */}

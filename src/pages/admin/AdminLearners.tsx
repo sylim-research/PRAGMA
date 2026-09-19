@@ -242,9 +242,9 @@ const Page = () => {
         {rows === null ? "불러오는 중…" : `총 ${rows.length}명`}
       </div>
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
-        <Table className="min-w-[1180px] table-fixed">
+        <Table className="min-w-[1040px] table-fixed">
           <colgroup>
-            <col style={{ width: "21%" }} />
+            <col style={{ width: "20%" }} />
             <col style={{ width: "13%" }} />
             <col style={{ width: "8%" }} />
             <col style={{ width: "8%" }} />
@@ -252,7 +252,7 @@ const Page = () => {
             <col style={{ width: "8%" }} />
             <col style={{ width: "10%" }} />
             <col style={{ width: "8%" }} />
-            <col style={{ width: "9%" }} />
+            <col style={{ width: "10%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
