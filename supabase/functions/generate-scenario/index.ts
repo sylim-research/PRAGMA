@@ -2427,6 +2427,22 @@ function applyCandidateReplacementsToItems(
   return items
 }
 
+function buildCandidateGenerationSystemPrompt(direction: Direction): string {
+  const zhKoDirectionRule = direction === 'zh_ko'
+    ? `
+중→한 산출에서는 중국어 원문의 명제·화행 목적·태도·화용적 힘을 보존하면서 실제 관계·채널·장르에 자연스러운 한국어 후보를 만든다. 중국어 어순·불필요한 주어 반복·명사화·직역 결합을 남기지 말고, 존대·사과·감사 표지의 누적이나 길이 증가로 대역을 구현하지 마라.`
+    : ''
+  return `너는 mission_v5의 MJT3·MJT5 후보 표현만 생성한다. 전체 문항이나 metadata를 다시 쓰지 마라.
+각 packet의 blueprint가 정한 의미·발화 의도·화행 기능을 보존하고 target feature 하나만 조절한다.
+within_anchor는 해당 P·D·R에서 실제 within band인 자연스러운 후보로 만든다.
+relative_boundary는 verified_within_anchor와 의미·의도·화행 기능을 유지한 최소대조로 만들되,
+blueprint의 intended_band 방향이 실제 경계를 분명히 통과해야 한다. 단순 공손표지 중첩이나 길이 변화만으로
+경계를 구현하지 말고, 실제 발화 가능한 인접 경계 표현을 만든다. 특정 상투 표현에 의존하지 마라.
+immutable_peer_texts와 같은 문장, current_candidate와 같은 문장, 새 사실·이유·대안 추가는 금지한다.
+${zhKoDirectionRule}
+출력은 {"operations":[{"path":"정확한 packet path","candidate":{"text":"목표어 완전 문장","note_ko":"실제 조절 자원·관계 효과·대역 방향"}}]} JSON뿐이다.`
+}
+
 async function generateMissionCandidates(args: {
   apiKey: string
   items: unknown[]
@@ -2453,19 +2469,7 @@ async function generateMissionCandidates(args: {
   if (packets.length !== args.references.length) {
     return { ok: false, failure_kind: 'packet', error: 'candidate packet 구성 실패' }
   }
-  const zhKoDirectionRule = args.direction === 'zh_ko'
-    ? `
-중→한 산출에서는 중국어 원문의 명제·화행 목적·태도·화용적 힘을 보존하면서 실제 관계·채널·장르에 자연스러운 한국어 후보를 만든다. 중국어 어순·불필요한 주어 반복·명사화·직역 결합을 남기지 말고, 존대·사과·감사 표지의 누적이나 길이 증가로 대역을 구현하지 마라.`
-    : ''
-  const system = `너는 mission_v5의 MJT3·MJT5 후보 표현만 생성한다. 전체 문항이나 metadata를 다시 쓰지 마라.
-각 packet의 blueprint가 정한 의미·발화 의도·화행 기능을 보존하고 target feature 하나만 조절한다.
-within_anchor는 해당 P·D·R에서 실제 within band인 자연스러운 후보로 만든다.
-relative_boundary는 verified_within_anchor와 의미·의도·화행 기능을 유지한 최소대조로 만들되,
-blueprint의 intended_band 방향이 실제 경계를 분명히 통과해야 한다. 단순 공손표지 중첩이나 길이 변화만으로
-경계를 구현하지 말고, 실제 발화 가능한 인접 경계 표현을 만든다. 특정 상투 표현에 의존하지 마라.
-immutable_peer_texts와 같은 문장, current_candidate와 같은 문장, 새 사실·이유·대안 추가는 금지한다.
-${zhKoDirectionRule}
-출력은 {"operations":[{"path":"정확한 packet path","candidate":{"text":"목표어 완전 문장","note_ko":"실제 조절 자원·관계 효과·대역 방향"}}]} JSON뿐이다.`
+  const system = buildCandidateGenerationSystemPrompt(args.direction)
   const user = `[화행] ${args.speechActKo}
 [언어 방향] ${LANG_DIR_KO[args.direction]}
 [화용 초점] ${args.feature.code}: ${args.feature.operational_definition}
@@ -2526,6 +2530,20 @@ ${JSON.stringify(packets, null, 2)}`
   }
 }
 
+function buildCandidateCheckSystemPrompt(direction: Direction): string {
+  const zhKoDirectionRule = direction === 'zh_ko'
+    ? `
+중→한 산출 후보는 중국어 원문의 명제·화행 목적·태도·화용적 힘을 보존하고 실제 한국어 담화로 자연스러워야 한다. 다른 화행으로 바뀌면 speech_act_shift, 번역투면 unnatural로 판정한다. 존대 표지 수나 길이를 적정성의 긍정 증거로 쓰지 마라.`
+    : ''
+  return `너는 MJT3·MJT5 후보 하나의 의미 보존과 화용 대역만 검사한다. 문장을 수정하지 마라.
+within_anchor는 해당 P·D·R에서 within인지 판정한다. relative_boundary는 verified_within_anchor 대비
+조정 방향이 보이는지와 intended_band 경계를 실제로 통과했는지를 별도로 판정한다.
+의미·발화 의도·화행 기능이 바뀌면 fail이다. 실제 대역 경계가 불확실하면 fail이 아니라 warning이며
+actual_band_code="uncertain", boundary_crossed=null로 쓴다. 공손표지 개수나 길이만으로 판정하지 마라.
+${zhKoDirectionRule}
+출력은 {"results":[{"path":"packet path","severity":"pass|warning|fail","actual_band_code":"정본 코드 또는 uncertain","direction_from_anchor":"within|toward_lower|toward_upper|uncertain","boundary_crossed":true|false|null,"semantic_defect":"none|meaning_shift|intent_shift|speech_act_shift|unnatural|focus_contamination|uncertain","note_ko":"근거"}]} JSON뿐이다.`
+}
+
 async function checkMissionCandidates(args: {
   apiKey: string
   items: unknown[]
@@ -2540,17 +2558,7 @@ async function checkMissionCandidates(args: {
     .map((reference) => candidatePacket(args.items, reference, args.feature))
     .filter((packet): packet is Record<string, unknown> => Boolean(packet))
   if (packets.length !== args.references.length) return { ok: false, error: 'candidate 검사 packet 구성 실패' }
-  const zhKoDirectionRule = args.direction === 'zh_ko'
-    ? `
-중→한 산출 후보는 중국어 원문의 명제·화행 목적·태도·화용적 힘을 보존하고 실제 한국어 담화로 자연스러워야 한다. 다른 화행으로 바뀌면 speech_act_shift, 번역투면 unnatural로 판정한다. 존대 표지 수나 길이를 적정성의 긍정 증거로 쓰지 마라.`
-    : ''
-  const system = `너는 MJT3·MJT5 후보 하나의 의미 보존과 화용 대역만 검사한다. 문장을 수정하지 마라.
-within_anchor는 해당 P·D·R에서 within인지 판정한다. relative_boundary는 verified_within_anchor 대비
-조정 방향이 보이는지와 intended_band 경계를 실제로 통과했는지를 별도로 판정한다.
-의미·발화 의도·화행 기능이 바뀌면 fail이다. 실제 대역 경계가 불확실하면 fail이 아니라 warning이며
-actual_band_code="uncertain", boundary_crossed=null로 쓴다. 공손표지 개수나 길이만으로 판정하지 마라.
-${zhKoDirectionRule}
-출력은 {"results":[{"path":"packet path","severity":"pass|warning|fail","actual_band_code":"정본 코드 또는 uncertain","direction_from_anchor":"within|toward_lower|toward_upper|uncertain","boundary_crossed":true|false|null,"semantic_defect":"none|meaning_shift|intent_shift|speech_act_shift|unnatural|focus_contamination|uncertain","note_ko":"근거"}]} JSON뿐이다.`
+  const system = buildCandidateCheckSystemPrompt(args.direction)
   const user = `[화행] ${args.speechActKo}
 [언어 방향] ${LANG_DIR_KO[args.direction]}
 [화용 초점] ${args.feature.code}: ${args.feature.operational_definition}
@@ -2611,13 +2619,7 @@ ${JSON.stringify(packets, null, 2)}`
     : { ok: false, error: `candidate 검사 결과 누락: ${results.length}/${args.references.length}` }
 }
 
-async function refreshCandidateFeedback(args: {
-  apiKey: string; before: unknown[]; items: unknown[]; feature: FeatureForGen;
-  telemetryFor: TelemetryFactory;
-}): Promise<{ ok: true; items: unknown[]; updates: CandidateFeedbackUpdate[] } | { ok: false; error: string }> {
-  const packets = candidateFeedbackPackets(args.before, args.items)
-  if (packets.length === 0) return { ok: true, items: args.items, updates: [] }
-  const system = `수정이 끝난 MJT3·MJT5의 최종 후보를 보고 해설과 참고 표현만 갱신한다.
+const CANDIDATE_FEEDBACK_SYSTEM_PROMPT = `수정이 끝난 MJT3·MJT5의 최종 후보를 보고 해설과 참고 표현만 갱신한다.
 원문·장면·PDR·후보·is_valid·accepted_band_codes와 정답은 바꾸지 않는다. 이전 후보는 근거가 아니다.
 explanation_ko는 2~3문장으로 현재 상황 단서 → 최종 표현 자원·기능 → 관계 효과 → 유지/조정할 지점을 연결한다.
 인용은 final_item.source·target·corrections.text·candidates.text에 실제로 있는 표현만 사용한다.
@@ -2625,6 +2627,14 @@ explanation_ko는 2~3문장으로 현재 상황 단서 → 최종 표현 자원�
 recommended_example은 fix_choice의 is_valid=true 후보 또는 multi_judge의 적정 대역 후보의 text를 그대로 복사한다.
 multi_judge의 적정 후보 2개 사이에 숨은 우열을 만들지 않는다. 대상 문항마다 정확히 1개를 반환한다.
 출력 JSON: {"items":[{"item_index":0,"explanation_ko":"최종 후보에 맞춘 해설","recommended_example":"최종 권장/적정 후보 원문"}]}`
+
+async function refreshCandidateFeedback(args: {
+  apiKey: string; before: unknown[]; items: unknown[]; feature: FeatureForGen;
+  telemetryFor: TelemetryFactory;
+}): Promise<{ ok: true; items: unknown[]; updates: CandidateFeedbackUpdate[] } | { ok: false; error: string }> {
+  const packets = candidateFeedbackPackets(args.before, args.items)
+  if (packets.length === 0) return { ok: true, items: args.items, updates: [] }
+  const system = CANDIDATE_FEEDBACK_SYSTEM_PROMPT
   // The validator is the contract; a quote that is not verbatim gets one bounded retry with the
   // validator's own message, instead of discarding the whole generated mission on the first miss.
   let lastError = ''
