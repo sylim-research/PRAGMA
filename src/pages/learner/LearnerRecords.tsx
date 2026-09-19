@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
 import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
-import { REVISION_SCOPES, SCOPE_LABEL, type RevisionScope } from "@/lib/pragma/feedbackSchema";
 import { supabase } from "@/integrations/supabase/client";
 
 // 학습자 본인의 완료 기록을 전체 교과목에 걸쳐 다시 보는 화면.
@@ -26,8 +25,6 @@ type ReportRecord = {
   sourceText: string;
   firstResponse: string;
   revisedResponse: string;
-  /** 저장된 재검토 지점 코드(피드백의 revision_scope). 없으면 null — 기본 문구로 채우지 않는다. */
-  revisionScope: RevisionScope | null;
   completedAt: string;
 };
 
@@ -39,7 +36,6 @@ type MissionLogRecord = {
   source_text: string | null;
   first_response: string | null;
   revised_response: string | null;
-  revision_target_selected: string | null;
   completed_at: string | null;
   created_at: string;
 };
@@ -74,9 +70,6 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isSpeechAct = (value: string | null): value is SpeechActUI =>
   value !== null && ACTS.includes(value as SpeechActUI);
 
-const isRevisionScope = (value: string | null): value is RevisionScope =>
-  value !== null && (REVISION_SCOPES as readonly string[]).includes(value);
-
 /**
  * 모든 숫자·지도·돌아보기·수정 노트가 함께 쓰는 집계 기준(한 곳에서만 정의).
  * 완료(조회 조건) + 9화행 중 하나 + 실제 미션에 연결(미션 id가 시나리오 UUID).
@@ -97,7 +90,6 @@ function localRecord(session: LearningSession): ReportRecord {
     sourceText: "",
     firstResponse: first,
     revisedResponse: session.final_translation,
-    revisionScope: null,
     completedAt: session.timestamp,
   };
 }
@@ -115,7 +107,6 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     sourceText: row.source_text ?? "",
     firstResponse: row.first_response ?? "",
     revisedResponse: row.revised_response ?? row.first_response ?? "",
-    revisionScope: isRevisionScope(row.revision_target_selected) ? row.revision_target_selected : null,
     completedAt: row.completed_at ?? row.created_at,
   };
 }
@@ -126,11 +117,6 @@ function changed(record: ReportRecord) {
       record.revisedResponse.trim() &&
       record.firstResponse.trim() !== record.revisedResponse.trim(),
   );
-}
-
-/** 저장된 재검토 지점만 보여 준다. 없으면 「미기록」 — 화행별 기본 문구로 대신하지 않는다. */
-function scopeLabel(record: ReportRecord) {
-  return record.revisionScope ? SCOPE_LABEL[record.revisionScope] : "미기록";
 }
 
 const TASK_LABEL: Record<ReportRecord["taskType"], string> = { translation: "번역", interpreting: "통역", other: "통번역" };
@@ -145,7 +131,7 @@ function recordMeta(record: ReportRecord) {
 // 글자 체계: 한국어 본문 14px · 보조 12~13px · 중국어 표현 16px(줄간격 1.75). 한 화면에서 이 값만 쓴다.
 const eyebrow = "text-[12.5px] font-semibold text-[#857653]";
 const sectionTitle = "text-[17px] font-bold text-[#15202B]";
-const rowGrid = "grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-3 gap-y-1.5";
+const rowGrid = "grid grid-cols-[4.25rem_minmax(0,1fr)] gap-x-3 gap-y-1.5";
 const rowLabel = "pt-[3px] text-[12px] font-semibold text-[#8C8471]";
 const zhText = "min-w-0 break-words font-zh text-[16px] leading-7 text-[#15202B]";
 
@@ -166,18 +152,16 @@ function SourceText({ text }: { text: string }) {
   );
 }
 
-/** 수정 노트 한 건 — 머리 줄, 원문, 처음 → 재검토 지점 → 최종. */
+/** 수정 노트 한 건 — 머리 줄, 원문, 내 번역 → 고친 번역. */
 function RevisionNote({ record, plain = false }: { record: ReportRecord; plain?: boolean }) {
   return (
     <article className={plain ? "" : "rounded-xl border border-[#E4DFD0] bg-white p-4"}>
       <p className="text-[12px] font-semibold text-[#8C8471]">{recordMeta(record)}</p>
       <dl className={`mt-2 ${rowGrid}`}>
         {record.sourceText && <><dt className={rowLabel}>원문</dt><dd className="min-w-0"><SourceText text={record.sourceText} /></dd></>}
-        <dt className={rowLabel}>처음</dt>
+        <dt className={rowLabel}>내 {TASK_LABEL[record.taskType]}</dt>
         <dd className={zhText}>{record.firstResponse || "기록 없음"}</dd>
-        <dt className={rowLabel}>지점</dt>
-        <dd className="text-[13.5px] leading-7 text-[#344F63]">재검토 지점 · {scopeLabel(record)}</dd>
-        <dt className={rowLabel}>최종</dt>
+        <dt className={rowLabel}>고친 {TASK_LABEL[record.taskType]}</dt>
         <dd className={zhText}>{record.revisedResponse || "기록 없음"}</dd>
       </dl>
     </article>
@@ -223,7 +207,7 @@ const LearnerRecords = () => {
         const { data, error } = await supabase
           .from("learner_mission_logs")
           .select(
-            "id,mission_id,speech_act,task_type,source_text,first_response,revised_response,revision_target_selected,completed_at,created_at",
+            "id,mission_id,speech_act,task_type,source_text,first_response,revised_response,completed_at,created_at",
           )
           .eq("auth_user_id", userId)
           .eq("mission_completed", true)
@@ -377,11 +361,11 @@ const LearnerRecords = () => {
                   <p className="text-[12px] font-semibold text-[#8C8471]">{recordMeta(record)}</p>
                   <dl className={`mt-2 ${rowGrid}`}>
                     {record.sourceText && <><dt className={rowLabel}>원문</dt><dd className="min-w-0"><SourceText text={record.sourceText} /></dd></>}
-                    <dt className={rowLabel}>처음</dt>
+                    <dt className={rowLabel}>내 {TASK_LABEL[record.taskType]}</dt>
                     <dd className={zhText}>{record.firstResponse || "기록 없음"}</dd>
-                    <dt className={rowLabel}>최종</dt>
+                    <dt className={rowLabel}>고친 {TASK_LABEL[record.taskType]}</dt>
                     <dd className={changed(record) ? zhText : "text-[13.5px] leading-7 text-[#7A8590]"}>
-                      {changed(record) ? record.revisedResponse : "처음 표현을 그대로 유지"}
+                      {changed(record) ? record.revisedResponse : "고치지 않음"}
                     </dd>
                   </dl>
                 </li>

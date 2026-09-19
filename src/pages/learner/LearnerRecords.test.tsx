@@ -122,7 +122,7 @@ describe("learner report record sources", () => {
     expect(screen.queryByText(/배려 우선형|시그니처|수업 확장 연습|조건 간 비교/)).not.toBeInTheDocument();
     expect(screen.queryByText(/주차/)).not.toBeInTheDocument();
     expect(screen.getByText(/회고 질문 · 모든 학습자에게 같은 질문입니다/)).toBeInTheDocument();
-    expect(screen.getByText("재검토 지점 · 미기록")).toBeInTheDocument();
+    expect(screen.queryByText(/재검토 지점|미기록/)).not.toBeInTheDocument();
   });
 
   it("lists the selected act's own records with source, first and final expressions", async () => {
@@ -134,9 +134,9 @@ describe("learner report record sources", () => {
     const items = within(list).getAllByRole("listitem");
     expect(items).toHaveLength(2);
     expect(items[0]).toHaveTextContent("원문시간 확인 부탁드립니다.");
-    expect(items[0]).toHaveTextContent(`처음${ownLog.first_response}`);
-    expect(items[0]).toHaveTextContent(`최종${ownLog.revised_response}`);
-    expect(items[1]).toHaveTextContent("처음 표현을 그대로 유지");
+    expect(items[0]).toHaveTextContent(`내 번역${ownLog.first_response}`);
+    expect(items[0]).toHaveTextContent(`고친 번역${ownLog.revised_response}`);
+    expect(items[1]).toHaveTextContent("고치지 않음");
     expect(screen.getByText("화행을 누르면 아래에서 내 기록을 볼 수 있습니다.")).toBeInTheDocument();
   });
 
