@@ -38,7 +38,7 @@ const EXPOSE = `
   buildCoreSourceRepairPrompt, buildCoreOutputRepairPrompt,
   buildMissionSystemPrompt, buildMissionUserPrompt, buildItemLineageSystemPrompt, buildFeedbackSystemPrompt, buildQualitySystemPrompt,
   buildCoreQualitySystemPrompt, CORE_SCENE_PREFLIGHT_PROMPT,
-  buildAuthenticSystemPrompt,
+  buildAuthenticSystemPrompt, buildAuthenticUserPrompt,
   buildMissionTopologyPrompt, buildMissionRepairPrompt,
   buildCandidateGenerationSystemPrompt, buildCandidateCheckSystemPrompt, CANDIDATE_FEEDBACK_SYSTEM_PROMPT,
   buildRelationalFeedbackAuditSystemPrompt,
@@ -328,6 +328,9 @@ const prompts = [
   entry("authentic.system", "자료 분석 지시문", "authoring",
     "실제 중·한 자료에서 화용 학습 후보를 제안합니다.",
     S.buildAuthenticSystemPrompt()),
+  entry("authentic.user", "자료 분석 요청서", "authoring",
+    "문구 입력 기준. 이미지는 읽기 지시 한 줄만 다릅니다.",
+    S.buildAuthenticUserPrompt({ language_direction: "zh_ko", text: "PROBE_SOURCE_TEXT" })),
 ];
 
 const coreSurfaceHash = await S.corePromptSnapshotHash();
