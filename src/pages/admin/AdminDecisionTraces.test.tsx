@@ -22,8 +22,8 @@ const log = (id: string, name: string, email: string, missionId: string, complet
 });
 
 const LOGS = [
-  log("1", "김학생", "kim@example.com", "m-1"),
-  log("2", "이학생", "lee@example.com", "m-2", false),
+  log("1", "김학생", "kim@example.com", "00000000-0000-4000-8000-000000000001"),
+  log("2", "이학생", "lee@example.com", "00000000-0000-4000-8000-000000000002", false),
 ];
 
 /** select()를 그대로 await 하는 호출과 .order()로 잇는 호출을 모두 받는다. */
@@ -41,8 +41,8 @@ beforeEach(() => {
     select: () => {
       if (table === "learner_mission_logs") return result(LOGS);
       if (table === "curriculum_outlines") return result([{ id: "course-a", title: "2026-2 통번역" }]);
-      if (table === "scenarios") return { in: () => result([{ scenario_id: "m-1", core_content: { brief_note_ko: "교수님께 논문 개요 면담 요청 이메일을 작성한다" } }]) };
-      return result([{ outline_id: "course-a", scenario_id: "m-1" }]);
+      if (table === "scenarios") return { in: () => result([{ scenario_id: "00000000-0000-4000-8000-000000000001", core_content: { brief_note_ko: "교수님께 논문 개요 면담 요청 이메일을 작성한다" } }]) };
+      return result([{ outline_id: "course-a", scenario_id: "00000000-0000-4000-8000-000000000001" }]);
     },
   }));
 });

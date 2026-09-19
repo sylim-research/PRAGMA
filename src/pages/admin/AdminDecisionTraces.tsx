@@ -22,6 +22,7 @@ type ProfileSummary = {
   full_name: string | null;
   email: string | null;
   anonymous_participant_id: string | null;
+  role: string | null;
 };
 type MissionLogRow = MissionLog & { profiles: ProfileSummary | null };
 type CourseOption = { id: string; title: string };
@@ -73,8 +74,12 @@ const missionLabel = (brief: string | undefined, missionId: string) => {
   if (title) return title;
   const text = brief?.replace(/\s+/g, " ").trim().replace(/[.。]$/, "");
   if (text) return text.length > 26 ? `${text.slice(0, 26).trimEnd()}…` : text;
+  if (missionId.startsWith("sample:")) return "예시 미션(개발용)";
   return `미션 ${missionId.slice(0, 8)}`;
 };
+
+// 시나리오 ID(uuid)만 조회한다. 「sample:…」 같은 개발용 ID가 섞이면 조회 전체가 실패해 모든 제목이 ID로 보였다.
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const learnerLabel = (row: MissionLogRow) =>
   row.profiles?.full_name ?? row.profiles?.anonymous_participant_id ?? `${row.profile_id.slice(0, 8)}…`;
@@ -122,7 +127,7 @@ const IndividualRecords = () => {
       const { data, error: queryError } = await supabase
         .from("learner_mission_logs")
         .select(
-          "*, profiles!learner_mission_logs_profile_id_fkey(full_name,email,anonymous_participant_id)",
+          "*, profiles!learner_mission_logs_profile_id_fkey(full_name,email,anonymous_participant_id,role)",
         )
         .order("updated_at", { ascending: false });
       if (cancelled) return;
@@ -167,7 +172,10 @@ const IndividualRecords = () => {
 
   // 미션 제목은 로그에 없으므로 시나리오의 짧은 설명에서 가져온다. 실패하면 짧은 ID로 둔다.
   const [missionBriefs, setMissionBriefs] = useState<Map<string, string>>(new Map());
-  const missionIds = useMemo(() => [...new Set((rows ?? []).map((row) => row.mission_id))], [rows]);
+  const missionIds = useMemo(
+    () => [...new Set((rows ?? []).map((row) => row.mission_id).filter((id) => UUID_PATTERN.test(id)))],
+    [rows],
+  );
   useEffect(() => {
     if (missionIds.length === 0) return;
     let cancelled = false;
@@ -193,9 +201,16 @@ const IndividualRecords = () => {
     };
   }, [missionIds]);
 
+  // 관리자 계정의 시험 수행은 기본으로 빼고 본다(학급 응답 분포와 같은 기준: 학습자 계정만).
+  const [includeTestRecords, setIncludeTestRecords] = useState(false);
+  const testRecordCount = useMemo(() => (rows ?? []).filter((row) => row.profiles?.role === "admin").length, [rows]);
+  const baseRows = useMemo(
+    () => (rows ?? []).filter((row) => includeTestRecords || row.profiles?.role !== "admin"),
+    [rows, includeTestRecords],
+  );
   const visibleRows = useMemo(
-    () => (rows ? filterMissionLogs(rows, filters, courseIndex) : []),
-    [rows, filters, courseIndex],
+    () => filterMissionLogs(baseRows, filters, courseIndex),
+    [baseRows, filters, courseIndex],
   );
   const completedCount = useMemo(
     () => visibleRows.filter((row) => row.mission_completed).length,
@@ -283,6 +298,15 @@ const IndividualRecords = () => {
               <option value="in_progress">진행 중</option>
             </select>
           </label>
+          <label className="flex h-9 items-center gap-2 rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
+            <input
+              type="checkbox"
+              checked={includeTestRecords}
+              onChange={(event) => setIncludeTestRecords(event.target.checked)}
+              className="accent-[#1F3A5F]"
+            />
+            관리자 테스트 기록 포함 ({testRecordCount})
+          </label>
           {filtered && (
             <button
               type="button"
@@ -302,10 +326,12 @@ const IndividualRecords = () => {
             : error
               ? "조회 실패"
               : filtered
-                ? `${visibleRows.length}건 표시 · 전체 ${rows.length}건`
-                : `총 ${rows.length}건`}
+                ? `${visibleRows.length}건 표시 · 전체 ${baseRows.length}건`
+                : `총 ${baseRows.length}건`}
         </span>
-        {!loading && !error && <span>완료 {completedCount}건</span>}
+        {!loading && !error && visibleRows.length > completedCount && (
+          <span className="font-medium text-amber-800">진행 중 {visibleRows.length - completedCount}건</span>
+        )}
       </div>
 
       {error && (
@@ -338,7 +364,7 @@ const IndividualRecords = () => {
                 <th className="px-3 py-2 font-medium">화행</th>
                 <th className="px-3 py-2 font-medium">미션</th>
                 <th className="px-3 py-2 font-medium">교과목·주차</th>
-                <th className="px-3 py-2 font-medium">과업</th>
+                <th className="px-3 py-2 font-medium">방식</th>
                 <th className="px-3 py-2 font-medium">상태</th>
                 <th className="px-3 py-2 text-right font-medium">내용</th>
               </tr>
@@ -349,12 +375,12 @@ const IndividualRecords = () => {
                 return (
                   <Fragment key={row.id}>
                     <tr className="border-t border-border">
-                      <td className="whitespace-nowrap px-3 py-2">{fmtKst(row.updated_at)}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-[13px] tabular-nums text-[#46515A]">{fmtKst(row.updated_at)}</td>
                       <td className="px-3 py-2" title={row.profiles?.email ?? undefined}>
                         {learnerLabel(row)}
                       </td>
                       <td className="whitespace-nowrap px-3 py-2">{speechActLabel(row.speech_act)}</td>
-                      <td className="max-w-56 truncate px-3 py-2" title={row.mission_id}>
+                      <td className="max-w-56 truncate px-3 py-2 font-semibold text-[#15202B]" title={row.mission_id}>
                         {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
                       </td>
                       <td className="max-w-52 px-3 py-2 text-xs">
