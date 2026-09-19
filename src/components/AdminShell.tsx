@@ -37,7 +37,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-1.5 pl-4 pr-3 text-[14.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
       active
         ? "bg-[#FAD338] text-[#15202B]"
         : "bg-[#F7F2DF] text-[#15202B] hover:bg-[#FFF1B8]",
@@ -45,7 +45,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2.5px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-muted text-foreground font-normal"
         : "text-foreground font-normal hover:bg-muted hover:text-foreground",
@@ -68,7 +68,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
       </header>
 
       <div className={`flex gap-6 px-5 md:pr-6 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
-        <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5.5rem)] md:self-start md:overflow-y-auto print:hidden">
+        <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:self-start md:overflow-y-auto print:hidden">
           <nav className="-mt-1 flex flex-col pl-6 pr-1">
             <Link
               to={ADMIN_DASHBOARD_ITEM.to}
@@ -95,7 +95,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-7 items-center gap-2 px-2.5 py-1 text-left text-[14px] font-semibold transition-colors",
+                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14px] font-semibold transition-colors",
                       groupActive
                         ? "rounded-md bg-[#15202B] text-white shadow-sm"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",
@@ -117,7 +117,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                   <div
                     id={panelId}
                     className={[
-                      "mt-0.5 flex flex-col gap-px border-l pl-3",
+                      "mt-1 flex flex-col gap-px border-l pl-3",
                       expanded ? "" : "hidden",
                       groupActive ? "border-[#D6BC40]" : "border-[#e5e1d8]",
                     ].join(" ")}
