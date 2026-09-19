@@ -39,6 +39,22 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("배치 생성 작업 화면", () => {
+  it("전체 계획이 실패 없이 끝나면 다음 실행 번호로 넘기고, 실패가 남으면 번호를 유지한다", async () => {
+    mocks.run.mockImplementation(async (cells: unknown[]) => cells.map((cell, index) => ({ ok: true, cell, index })));
+    mount();
+    const first = localStorage.getItem("pragma:admin-core-batch-run:ko_zh");
+    fireEvent.click(start());
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledOnce());
+    await waitFor(() => expect(localStorage.getItem("pragma:admin-core-batch-run:ko_zh")).not.toBe(first));
+    const second = localStorage.getItem("pragma:admin-core-batch-run:ko_zh");
+    mocks.run.mockImplementation(async (cells: unknown[]) => cells.map((cell, index) => ({ ok: index !== 0, cell, index, error: index === 0 ? "실패" : undefined })));
+    await waitFor(() => expect(start()).toBeEnabled());
+    fireEvent.click(start());
+    await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(start()).toBeEnabled());
+    expect(localStorage.getItem("pragma:admin-core-batch-run:ko_zh")).toBe(second);
+  });
+
   it("과거 프리셋 없이 양방향 모두 입력한 수량으로 계획하고 방향 변경 시 선택을 초기화한다", async () => {
     mount(false);
     expect(screen.queryByRole("button", { name: /기본 72건|495건 본배치|30건 검증/ })).not.toBeInTheDocument();

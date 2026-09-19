@@ -33,7 +33,6 @@ import {
 } from "@/lib/pragma/coreBatchRun";
 import {
   createCoreRunId,
-  isCoreRunIdForDirection,
 } from "@/lib/pragma/coreRunIdentity";
 import {
   CORE_AXIS_LABEL,
@@ -120,7 +119,6 @@ const AdminBatch = () => {
   const [auditResults, setAuditResults] = useState<CoreQualityPilotResult[]>([]);
   const [auditDone, setAuditDone] = useState(0);
   const [coreRunId, setCoreRunId] = useState(() => getOrCreateCoreRunId("ko_zh"));
-  const [resumeRunId, setResumeRunId] = useState("");
   const [selectedCellNumbers, setSelectedCellNumbers] = useState("");
   const [activeTotal, setActiveTotal] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
@@ -142,7 +140,6 @@ const AdminBatch = () => {
     resetExecutionDisplay();
     setDirection(d);
     setCoreRunId(getOrCreateCoreRunId(d));
-    setResumeRunId("");
   };
 
   const targetActCount = Object.keys(SPEECH_ACT_UI).length;
@@ -219,6 +216,13 @@ const AdminBatch = () => {
       });
       setResults(out);
       setDone(out.length);
+      // 전체 계획이 실패 없이 끝나면 다음 실행 번호로 넘긴다. 같은 번호로 다시 누르면 모두
+      // 「이미 저장됨」으로 건너뛰기 때문이다. 끊겼거나 실패가 남으면 번호를 유지해 이어서 돌린다.
+      if (!itemIndexes && !ctrl.signal.aborted && out.length === cells.length && out.every(result => result.ok)) {
+        const next = createCoreRunId(direction);
+        persistCoreRunId(direction, next);
+        setCoreRunId(next);
+      }
     } catch (error) {
       const message = error instanceof Error ? error.message : "배치 실행 상태를 확인하지 못했습니다. 연결과 관리자 세션을 확인한 뒤 같은 ID로 재개해 주세요.";
       setExecutionError(message);
@@ -244,35 +248,6 @@ const AdminBatch = () => {
   };
 
   const stop = () => abortRef.current?.abort();
-
-  const startFreshCoreRun = () => {
-    if (busy) return;
-    if (
-      results.length > 0
-      && !window.confirm("새 배치 ID를 만들면 다음 실행은 기존 저장분을 건너뛰지 않습니다. 계속할까요?")
-    ) {
-      return;
-    }
-    const next = createCoreRunId(direction);
-    persistCoreRunId(direction, next);
-    setCoreRunId(next);
-    resetExecutionDisplay();
-    toast.success("새 배치 ID를 만들었습니다.");
-  };
-
-  const loadCoreRunId = () => {
-    if (busy) return;
-    const next = resumeRunId.trim();
-    if (!isCoreRunIdForDirection(next, direction)) {
-      toast.error(`${DIRECTION_LABEL[direction]} 방향의 시나리오 배치 ID를 입력해 주세요.`);
-      return;
-    }
-    persistCoreRunId(direction, next);
-    setCoreRunId(next);
-    setResumeRunId("");
-    resetExecutionDisplay();
-    toast.success("기존 배치 ID를 불러왔습니다.");
-  };
 
   const okCount = results.filter((r) => r.ok).length;
   const failCount = results.filter((r) => !r.ok).length;
@@ -414,7 +389,6 @@ const AdminBatch = () => {
                 <p className="mt-1 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" className="h-10 border-[#15202B]/30 font-semibold text-[#15202B] hover:bg-[#F3F0E7] disabled:border-[#D9D2BF] disabled:text-[#56636D] disabled:opacity-100" onClick={startFreshCoreRun} disabled={busy}>새 실행으로 시작</Button>
                 <Button className="h-10 min-w-[220px] gap-1.5 bg-[#15202B] text-[14px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D] disabled:opacity-100" onClick={selectedPlan.indexes.length > 0 ? () => startSelected("current") : start} disabled={busy || plan.length === 0}>
                   <Sparkles className="h-4 w-4 text-[#FAD338]" aria-hidden />
                   {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : selectedPlan.indexes.length > 0 ? "선택 " + selectedPlan.indexes.length + "건 생성 시작" : "전체 " + summary.total + "건 생성 시작"}
