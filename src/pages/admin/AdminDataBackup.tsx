@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { Check, ShieldCheck, Upload } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
@@ -315,16 +315,14 @@ const Page = () => {
     <AdminShell
       title="수업 데이터 백업·복원"
       description="현재 수업 구성을 백업 파일로 저장하고, 필요할 때 백업 시점의 구성으로 복원할 수 있습니다."
+      compact
     >
-      <Button className="mb-4" variant="ghost" asChild>
-        <Link to={selectedId ? `/admin/composer?outline=${encodeURIComponent(selectedId)}` : "/admin/composer"}>수업 편성으로 돌아가기 →</Link>
-      </Button>
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
         {/* 기본 흐름 = 교과목 선택 → 백업. 그래서 이쪽이 주(主)다. */}
         <section className="flex h-full flex-col overflow-hidden rounded-xl border border-primary/40 bg-card shadow-sm ring-1 ring-primary/5">
           <div className="h-1 bg-accent" />
-          <div className="flex flex-1 flex-col p-6">
+          <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="brand">수업 백업</RoleBadge>
               <h2 className="text-lg font-semibold">데이터 백업</h2>
@@ -334,7 +332,7 @@ const Page = () => {
               {COURSE_BACKUP_SUMMARY.included}
             </p>
 
-            <label className="mb-1.5 mt-5 block text-sm font-medium" htmlFor="backup-course">
+            <label className="mb-1.5 mt-3.5 block text-sm font-medium" htmlFor="backup-course">
               백업할 교과목
             </label>
             <select
@@ -354,14 +352,10 @@ const Page = () => {
             </select>
 
             {selectedCourse && (
-              <div className="mt-3 border-l-[3px] border-accent bg-accent/10 px-4 py-3">
-                <p className="text-[11px] font-medium text-muted-foreground">선택됨</p>
-                <p className="mt-0.5 text-sm font-semibold">{selectedCourse.title}</p>
-                <p className="mt-0.5 text-sm text-muted-foreground">{courseTraits(selectedCourse).join(" · ")}</p>
-              </div>
+              <p className="mt-1.5 text-[12.5px] font-medium text-[#1F3A5F]">{courseTraits(selectedCourse).join(" · ")}</p>
             )}
 
-            <Button className="mt-5 w-full sm:w-auto" size="lg" onClick={runBackup} disabled={!selectedId || backingUp}>
+            <Button className="mt-3.5 w-full" onClick={runBackup} disabled={!selectedId || backingUp}>
               {backingUp ? "백업하는 중…" : "백업하기"}
             </Button>
 
@@ -386,8 +380,8 @@ const Page = () => {
             )}
 
             {counts && (
-              <div className="mt-5">
-                <p className="mb-2 text-sm font-medium">이번 백업에 담길 내용</p>
+              <div className="mt-3.5">
+                <p className="mb-1.5 text-sm font-medium">이번 백업에 담길 내용</p>
                 <div className="grid grid-cols-3 gap-2">
                   <StatTile label="주차 편성" value={`${counts.weeks}주`} />
                   <StatTile label="미션 배정" value={`${counts.assignments}건`} />
@@ -408,7 +402,7 @@ const Page = () => {
         {/* 복원은 보조 동작이지만 배경을 죽이지 않는다 — 위계는 배지와 테두리로만 준다. */}
         <section className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
           <div className="h-1 bg-primary/15" />
-          <div className="flex flex-1 flex-col p-6">
+          <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="ink">수업 복원</RoleBadge>
               <h2 className="text-lg font-semibold">데이터 복원</h2>
@@ -425,14 +419,14 @@ const Page = () => {
               }}
               onDragLeave={() => setDragActive(false)}
               onDrop={onDrop}
-              className={`mt-5 flex cursor-pointer flex-col items-center rounded-lg border border-dashed px-4 py-6 text-center transition-colors ${
+              className={`mt-3.5 flex cursor-pointer flex-col items-center rounded-lg border border-dashed px-4 py-4 text-center transition-colors ${
                 dragActive ? "border-primary bg-primary/5" : "border-input hover:border-primary/50 hover:bg-muted/40"
               }`}
             >
               <Upload className="mb-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
               <span className="text-sm font-medium">{pendingFileName ?? "백업 파일 올리기"}</span>
               <span className="mt-1 text-xs text-muted-foreground">
-                {pendingFileName ? "다른 파일을 올리려면 다시 선택하세요" : ".json 파일을 끌어다 놓아도 됩니다"}
+                {pendingFileName ? "다른 파일을 올리려면 다시 선택하세요" : ".json 파일을 끌어다 놓아도 됩니다 · 복원 전에 내용을 먼저 보여 줍니다"}
               </span>
             </label>
             <input
@@ -490,16 +484,11 @@ const Page = () => {
                   다른 교과목과 학습자 수행기록은 변경하지 않습니다.
                 </p>
               </div>
-            ) : (
-              // 파일을 고르기 전 무엇이 일어날지 먼저 알려 준다(빈 화면 방지).
-              <p className="mt-4 rounded-lg border border-dashed border-border px-4 py-3 text-sm leading-6 text-muted-foreground">
-                파일을 올리면 교과목·주차 편성·미션 수를 먼저 확인한 뒤 복원합니다.
-              </p>
-            )}
+            ) : null}
 
             {/* 파일이 준비되기 전에는 테두리만 — 준비되면 solid로 승격해 상태를 무게로 알린다. */}
             <Button
-              className="mt-4 w-full sm:w-auto"
+              className={`mt-3.5 w-full ${pendingFile ? "" : "border-[#1F3A5F] text-[#1F3A5F]"}`}
               variant={pendingFile ? "default" : "outline"}
               onClick={runRestore}
               disabled={!pendingFile || restoring}
@@ -513,16 +502,11 @@ const Page = () => {
               </p>
             )}
 
-            <div className="mt-auto pt-5">
-              <div className="flex gap-3 rounded-lg border border-emerald-200 bg-emerald-50/60 px-4 py-3">
+            <div className="mt-auto pt-3.5">
+              <p className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-[12.5px] leading-5 text-emerald-900">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold text-emerald-900">복원 전 자동 백업</p>
-                  <p className="mt-0.5 text-sm leading-6 text-emerald-900/80">
-                    현재 수업 구성을 먼저 저장한 뒤 복원합니다. 필요하면 이 파일로 다시 이전 상태로 되돌릴 수 있습니다.
-                  </p>
-                </div>
-              </div>
+                <span><b>복원 전 자동 백업</b> · 현재 구성을 먼저 저장하므로 언제든 이전 상태로 되돌릴 수 있습니다.</span>
+              </p>
             </div>
           </div>
         </section>

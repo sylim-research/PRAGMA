@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { APPROVAL_STATUS, type ApprovalStatus } from "@/lib/auth/constants";
 import {
   PRIMARY_LANGUAGE_OPTIONS,
@@ -101,6 +102,36 @@ const Section = ({
 );
 
 /** 소속/신분·동의는 신·구 컬럼이 공존한다 — 마법사가 쓰는 쪽을 우선하고 없으면 구 값. */
+/** 목록용 동의 요약 한 칸. 둘 다 동의면 초록, 미동의가 있으면 적색, 그 밖에는 호박색(회색 금지). */
+function ConsentSummary({ research, sharing }: { research: boolean | null | undefined; sharing: boolean | null | undefined }) {
+  const word = (value: boolean | null | undefined) => (value === true ? "✓" : value === false ? "✕" : "?");
+  const tone = research === true && sharing === true
+    ? "border-[#9CC7B0] bg-[#F4FAF6] text-[#245E44]"
+    : research === false || sharing === false
+      ? "border-[#E8B4AE] bg-[#FFF3F1] text-[#8B3531]"
+      : "border-[#E3C77A] bg-[#FFFBEF] text-[#8A5A14]";
+  const state = (value: boolean | null | undefined) => (value === true ? "동의" : value === false ? "미동의" : "미확인");
+  return (
+    <span
+      title={`연구 활용 ${state(research)} · 학습 기록 공유 ${state(sharing)}`}
+      className={`inline-flex whitespace-nowrap rounded-full border px-2 py-0.5 text-[11.5px] font-semibold ${tone}`}
+    >
+      연구 {word(research)} · 공유 {word(sharing)}
+    </span>
+  );
+}
+
+/** 표 머리글과 칸이 같은 좌우 여백·정렬을 쓰도록 한곳에서 정한다. */
+const TH = "h-11 px-3 text-left align-middle text-xs font-bold text-[#46515A]";
+const TD = "px-3 py-2 align-middle text-sm text-[#343B42]";
+
+type LearnerActivity = { courses: string[]; last: string | null };
+
+const formatActivityDate = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear() % 100}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+};
+
 const firstOf = <T,>(...vals: (T | null | undefined)[]) =>
   vals.find((v) => v !== null && v !== undefined) ?? null;
 
@@ -128,6 +159,8 @@ const Page = () => {
   const [rows, setRows] = useState<LearnerRow[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // 수강 등록 데이터는 없으므로, 실제 미션 수행 기록에서 학습한 교과목과 최근 활동을 읽는다.
+  const [activity, setActivity] = useState<Record<string, LearnerActivity>>({});
 
   const fetchRows = async () => {
     const { data, error } = await supabase
@@ -140,7 +173,30 @@ const Page = () => {
       setRows([]);
       return;
     }
-    setRows((data ?? []) as LearnerRow[]);
+    const learners = (data ?? []) as LearnerRow[];
+    setRows(learners);
+    if (learners.length === 0) return;
+    // 활동 요약은 보조 정보다 — 조회가 실패해도 학습자 목록은 그대로 보인다.
+    try {
+      const [{ data: logs }, { data: courses }] = await Promise.all([
+        supabase
+          .from("learner_mission_logs")
+          .select("profile_id, course_id, updated_at")
+          .in("profile_id", learners.map((learner) => learner.id)),
+        supabase.from("curriculum_outlines").select("id, title"),
+      ]);
+      const titleById = new Map((courses ?? []).map((course) => [course.id, courseDisplayTitle(course)]));
+      const next: Record<string, LearnerActivity> = {};
+      for (const log of logs ?? []) {
+        const entry = (next[log.profile_id] ??= { courses: [], last: null });
+        const title = log.course_id ? titleById.get(log.course_id) : undefined;
+        if (title && !entry.courses.includes(title)) entry.courses.push(title);
+        if (!entry.last || log.updated_at > entry.last) entry.last = log.updated_at;
+      }
+      setActivity(next);
+    } catch {
+      setActivity({});
+    }
   };
 
   useEffect(() => {
@@ -186,35 +242,41 @@ const Page = () => {
         {rows === null ? "불러오는 중…" : `총 ${rows.length}명`}
       </div>
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
-        <Table className="min-w-[820px] table-fixed">
+        <Table className="min-w-[1180px] table-fixed">
           <colgroup>
-            <col style={{ width: "23%" }} />
+            <col style={{ width: "21%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "8%" }} />
             <col style={{ width: "15%" }} />
-            <col style={{ width: "20%" }} />
-            <col style={{ width: "15%" }} />
-            <col style={{ width: "11%" }} />
-            <col style={{ width: "16%" }} />
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "9%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
-              <TableHead className="h-12 px-5 text-xs font-bold text-[#5F625F]">학습자</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">소속/신분</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">주 언어·공인 급수</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">통번역 경험</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">상태</TableHead>
-              <TableHead className="h-12 px-5 text-right text-xs font-bold text-[#5F625F]">관리</TableHead>
+              <TableHead className={`${TH} pl-5`}>학습자</TableHead>
+              <TableHead className={TH}>소속 · 학년/과정</TableHead>
+              <TableHead className={TH}>사용 언어</TableHead>
+              <TableHead className={TH}>공인 급수</TableHead>
+              <TableHead className={TH}>학습한 교과목</TableHead>
+              <TableHead className={TH}>최근 활동</TableHead>
+              <TableHead className={TH}>연구 동의</TableHead>
+              <TableHead className={TH}>상태</TableHead>
+              <TableHead className={`${TH} pr-5 text-right`}>관리</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows === null ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
                   불러오는 중…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={9} className="text-center text-sm text-muted-foreground">
                   표시할 학습자가 없습니다.
                 </TableCell>
               </TableRow>
@@ -222,53 +284,67 @@ const Page = () => {
               rows.map((r) => {
                 const primaryLanguage = labelOf(PRIMARY_LANGUAGE_OPTIONS, r.language_background);
                 const testLevel = labelOf(languageTestOptions(r.language_background), r.chinese_level);
+                const affiliation = firstOf(r.affiliation, r.affiliation_or_status);
+                const program = firstOf(r.grade_or_program, r.academic_year_or_program);
+                const act = activity[r.id];
                 return (
-                <TableRow key={r.id} className="h-[72px] hover:bg-[#FBFAF5]">
-                  <TableCell className="px-5 py-4">
-                    <div className="min-w-0">
+                <TableRow key={r.id} className="h-[52px] hover:bg-[#FBFAF5]">
+                  <TableCell className={`${TD} pl-5`}>
+                    <div className="flex min-w-0 items-baseline gap-2">
                       <button
                         type="button"
                         aria-label={`${r.full_name ?? r.email ?? "학습자"} 프로필 보기`}
                         onClick={() => setSelectedId(r.id)}
-                        className="block max-w-full truncate text-left font-semibold leading-5 text-foreground underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="shrink-0 whitespace-nowrap text-left font-semibold text-[#1F3A5F] underline decoration-[#9FB0C6] underline-offset-4 hover:decoration-[#1F3A5F] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {r.full_name ?? "—"}
                       </button>
-                      <div className="mt-0.5 truncate text-xs leading-5 text-muted-foreground" title={r.email ?? undefined}>{r.email ?? "—"}</div>
+                      <span className="min-w-0 truncate text-xs text-[#46515A]" title={r.email ?? undefined}>{r.email ?? "—"}</span>
                     </div>
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm leading-5 text-[#343B42]">
-                    {firstOf(r.affiliation, r.affiliation_or_status) ?? "—"}
+                  <TableCell className={TD}>
+                    <div className="truncate" title={[affiliation, program].filter(Boolean).join(" · ")}>
+                      {affiliation ?? "—"}
+                      {program && <span className="text-xs text-[#46515A]"> · {program}</span>}
+                    </div>
                   </TableCell>
-                  <TableCell className="px-3 py-4">
-                    {primaryLanguage || testLevel ? (
-                      <div className="leading-5">
-                        <div className="font-medium text-[#343B42]">{primaryLanguage || testLevel}</div>
-                        {primaryLanguage && testLevel && (
-                          <div className="text-xs text-muted-foreground">{testLevel}</div>
-                        )}
+                  <TableCell className={TD}>
+                    {primaryLanguage ?? <span className="text-xs text-amber-700">미입력</span>}
+                  </TableCell>
+                  <TableCell className={TD}>
+                    {testLevel ?? <span className="text-xs text-amber-700">미입력</span>}
+                  </TableCell>
+                  <TableCell className={TD}>
+                    {act && act.courses.length > 0 ? (
+                      <div className="truncate" title={act.courses.join(", ")}>
+                        {act.courses[0]}
+                        {act.courses.length > 1 && <span className="text-xs font-semibold text-[#1F3A5F]"> 외 {act.courses.length - 1}</span>}
                       </div>
                     ) : (
-                      <span className="text-xs text-amber-700">학습 배경 미입력</span>
+                      <span className="text-xs text-amber-700">아직 없음</span>
                     )}
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm text-[#343B42]">
-                    {labelOf(TI_EXPERIENCE_OPTIONS, r.ti_experience_level) ?? "—"}
+                  <TableCell className={`${TD} tabular-nums`}>
+                    {act?.last ? formatActivityDate(act.last) : <span className="text-xs text-amber-700">—</span>}
                   </TableCell>
-                  <TableCell className="px-3 py-4">
+                  <TableCell className={TD}>
+                    <ConsentSummary research={firstOf(r.consent_data_use, r.research_use_consent)} sharing={r.consent_class_record_sharing} />
+                  </TableCell>
+                  <TableCell className={TD}>
                     <Badge
                       variant="outline"
-                      className={`min-w-[76px] justify-center whitespace-nowrap ${STATUS_TONE[r.approval_status]}`}
+                      className={`whitespace-nowrap ${STATUS_TONE[r.approval_status]}`}
                     >
                       {STATUS_LABEL[r.approval_status]}
                     </Badge>
                   </TableCell>
-                  <TableCell className="px-5 py-4 text-right">
+                  <TableCell className={`${TD} pr-5 text-right`}>
                     {traceQueryFor(r) && (
                       <Button
                         size="sm"
+                        variant="outline"
                         asChild
-                        className="whitespace-nowrap bg-[#15202B] text-white hover:bg-[#243447]"
+                        className="h-8 whitespace-nowrap border-[#1F3A5F] px-3 text-[#1F3A5F] hover:bg-[#EEF2F7]"
                       >
                         <Link to={`/admin/decision-traces?q=${encodeURIComponent(traceQueryFor(r)!)}`}>
                           수행 기록 →

@@ -11,6 +11,9 @@ vi.mock("@/integrations/supabase/client", () => ({
     from: () => ({
       select: () => ({
         eq: () => ({ order: mocks.order }),
+        // 학습한 교과목·최근 활동 조회(learner_mission_logs·curriculum_outlines)
+        in: () => Promise.resolve({ data: [], error: null }),
+        then: (resolve: (value: { data: unknown[]; error: null }) => unknown) => resolve({ data: [], error: null }),
       }),
     }),
   },
@@ -74,7 +77,7 @@ describe("학습자 관리 목록", () => {
     expect(screen.getByText("교강사/연구자")).toBeVisible();
     expect(screen.getAllByText("한국어")).toHaveLength(2);
     expect(screen.getByText("HSK 6급")).toBeVisible();
-    expect(screen.getByText("1학기 이상 수업")).toBeVisible();
+    expect(screen.queryByText("1학기 이상 수업")).not.toBeInTheDocument(); // 통번역 경험은 상세 창에서만 보인다
     expect(screen.getAllByText("승인 완료").find((node) => node.tagName === "DIV")).toHaveClass("bg-emerald-50");
     expect(screen.queryByText("학습자 목록")).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
@@ -86,9 +89,9 @@ describe("학습자 관리 목록", () => {
     expect(learnerCell?.querySelector('[aria-hidden="true"]')).toBeNull();
 
     const table = screen.getByRole("table");
-    expect(table).toHaveClass("table-fixed", "min-w-[820px]");
+    expect(table).toHaveClass("table-fixed", "min-w-[1180px]");
     expect(Array.from(table.querySelectorAll("col")).map((col) => col.style.width)).toEqual([
-      "23%", "15%", "20%", "15%", "11%", "16%",
+      "21%", "13%", "8%", "8%", "15%", "8%", "10%", "8%", "9%",
     ]);
     expect(screen.getAllByRole("link", { name: "수행 기록 →" })[0]).toHaveAttribute(
       "href",
