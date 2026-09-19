@@ -197,7 +197,7 @@ const AdminCorpus = () => {
       title="HSK 3.0 어휘 코퍼스"
       description="생성된 중국어를 수준별 HSK 누적 어휘와 대조하고, 확인이 필요한 단어는 교수자 감수로 넘깁니다."
     >
-      <div className="mx-auto max-w-[1060px] space-y-4">
+      <div className="w-full space-y-4">
         <DatasetOverview
           loading={loading}
           ready={referenceReady}

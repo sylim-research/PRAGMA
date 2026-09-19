@@ -74,8 +74,8 @@ const LearnerCourseList = () => {
   );
 
   return (
-    <LearnerJourneyShell nav wide>
-      <main className="mx-auto max-w-[820px] pb-[4.5rem] pt-4 sm:pt-5" aria-labelledby="course-list-title">
+    <LearnerJourneyShell nav canvas="max-w-[868px]">
+      <main className="pb-[4.5rem] pt-1 md:pb-8" aria-labelledby="course-list-title">
         <section className="mb-6">
           <h1 id="course-list-title" className="border-l-4 border-[#FAD338] pl-3 text-[26px] font-bold leading-9 tracking-[-0.04em] text-[#15202B]">
             내 수업

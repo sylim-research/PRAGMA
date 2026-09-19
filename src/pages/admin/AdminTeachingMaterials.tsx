@@ -250,7 +250,7 @@ const AdminTeachingMaterials = () => {
   const selectedMaterialState = week ? weeklyReviewStates.data?.get(week.week_no) : undefined;
 
   return <AdminShell title="주차별 수업 운영" description={materialsOn ? "선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다." : "선택한 주차의 편성 미션을 열어 수업에 쓰고, 학급 응답과 운영 현황을 확인합니다."}>
-    <div className="max-w-[1080px] space-y-5">
+    <div className="w-full space-y-5">
       {/* 이 화면의 주인공은 지금 고른 주차다. 15주 전체 현황은 맨 아래 개요로 둔다. */}
       <section aria-label="선택 주차 작업대" className="rounded-2xl border border-[#E2DED2] bg-white">
         <div className="flex flex-wrap items-end gap-3 border-b border-[#EFEBE1] px-5 py-3">

@@ -12,6 +12,11 @@ interface LearnerJourneyShellProps {
   missionLayout?: boolean;
   /** 학습자 최상위 화면(수업·기록)의 두 탭. PC는 헤더 안, 모바일은 화면 아래에 둔다. */
   nav?: boolean;
+  /**
+   * 본문 캔버스 폭(Tailwind max-w 클래스). 헤더 안쪽도 같은 폭을 써서 로고·메뉴가 본문 가장자리와 맞는다.
+   * 주면 wide·missionLayout의 폭보다 우선한다.
+   */
+  canvas?: string;
 }
 
 /**
@@ -25,8 +30,9 @@ export const LearnerJourneyShell = ({
   wide = false,
   missionLayout = false,
   nav = false,
+  canvas,
 }: LearnerJourneyShellProps) => {
-  const widthClass = wide ? "max-w-6xl" : missionLayout ? "max-w-4xl" : "max-w-3xl";
+  const widthClass = canvas ?? (wide ? "max-w-6xl" : missionLayout ? "max-w-4xl" : "max-w-3xl");
   const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-4" : "py-6";
   const headerAlignmentClass = missionLayout
     ? "xl:w-[61rem] xl:max-w-none xl:-translate-x-[6.5rem] xl:px-0"
