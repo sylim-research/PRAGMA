@@ -180,6 +180,8 @@ const AdminComposer = () => {
     [cores, courseMode, direction, level, themes],
   );
 
+  // 새 판이 있는 옛 판. 편성에는 「교체 필요」로 표시하고, 새로 추가할 후보에서는 뺀다.
+  const replacedIds = useMemo(() => new Set(cores.map((core) => core.supersedes_scenario_id).filter(Boolean) as string[]), [cores]);
   const coreById = useMemo(() => {
     const m: Record<string, ComposerCore> = {};
     for (const c of cores) m[c.scenario_id] = c;
@@ -1073,20 +1075,17 @@ const AdminComposer = () => {
           <div className="mt-5 flex flex-wrap items-baseline justify-between gap-2 border-l-4 border-[#FAD338] pl-3">
             <div>
               <h2 className="text-[18px] font-semibold">주차별 미션 조정</h2>
-              <p className="mt-0.5 text-[11.5px] text-muted-foreground">
-                편성 결과를 확인하고, 필요한 주차에서 미션을 추가하거나 제거하세요.
-              </p>
             </div>
             <span className="text-[12px] text-muted-foreground">
               현재 {assignedMissionCount}개 배정
             </span>
           </div>
 
-          <p className="mt-2 text-[12px] leading-5 text-muted-foreground">{CENTRAL_QUESTION_GUIDANCE}</p>
-          <div className="mt-2.5 grid items-start gap-3 xl:grid-cols-2">
-            {[weeks.slice(0, weekColumnBreak), weeks.slice(weekColumnBreak)].map((column, columnIndex) => (
+          {/* 15주 흐름이 끊기지 않도록 1주부터 15주까지 한 줄에 한 주씩 세로로 둔다. */}
+          <div className="mt-3 grid max-w-[1080px] items-start gap-3">
+            {[weeks].map((column, columnIndex) => (
               <div
-                key={columnIndex === 0 ? "weeks-1-8" : "weeks-9-15"}
+                key={columnIndex === 0 ? "weeks-1-15" : "weeks"}
                 className="overflow-hidden rounded-xl border border-[#EAE4D2] bg-white shadow-[0_4px_16px_rgba(21,32,43,0.04)] divide-y divide-[#EAE4D2]"
               >
                 {column.map((w) => (
@@ -1096,6 +1095,7 @@ const AdminComposer = () => {
                     items={assign[w.week_no] ?? []}
                     assignments={assign}
                     coreById={coreById}
+                    replaced={replacedIds}
                     candidates={cores}
                     level={level}
                     themes={themes}
@@ -1154,6 +1154,7 @@ function WeekRow({
   onAdd,
   onRemove,
   onEditWeek,
+  replaced,
 }: {
   week: CurriculumWeekRow;
   items: AssignedItem[];
@@ -1170,6 +1171,7 @@ function WeekRow({
   onAdd: (c: ComposerCore) => void;
   onRemove: (scenarioId: string) => void;
   onEditWeek: () => void;
+  replaced?: ReadonlySet<string>;
 }) {
   const act = week.speech_act as SpeechActUI | null;
   const reinforcement = isReinforcementWeek(week);
@@ -1183,7 +1185,7 @@ function WeekRow({
     : null;
   const displayTitle = week.type === "orientation" ? "오리엔테이션" : weekActivityLabel(week);
 
-  const cands = filterManualCandidates(candidates, {
+  const cands = filterManualCandidates(candidates.filter((candidate) => !replaced?.has(candidate.scenario_id)), {
     act,
     level,
     direction,
@@ -1251,10 +1253,10 @@ function WeekRow({
               >
                 <div className="flex items-start gap-3">
                   <p
-                    className="line-clamp-2 min-w-0 flex-1 text-[12.5px] leading-relaxed"
+                    className="min-w-0 flex-1 truncate text-[13px] font-medium text-[#202B33]"
                     title={core?.situation_ko ?? "누락된 시나리오"}
                   >
-                    {core?.situation_ko ?? "(누락된 시나리오)"}
+                    {core ? core.brief_note_ko?.trim() || core.situation_ko : "(누락된 시나리오)"}
                   </p>
                   <div className="flex shrink-0 items-center gap-2">
                     <button
@@ -1274,9 +1276,15 @@ function WeekRow({
                         : MODE_LABEL.translation
                       : "모드 미지정"}
                   </span>
-                  <span className="rounded-full bg-[#EAF5F1] px-2 py-0.5 text-[#2F6F63]">
+                  <span className="rounded-full bg-[#F3E9D2] px-2 py-0.5 text-[#8A5A14]">
                     {featureLabel}
                   </span>
+                  {core && core.schema_version !== "mission_v6" && (
+                    <span className="rounded-full bg-[#F6EFE1] px-2 py-0.5 font-semibold text-[#8A5A14]">이전 형식</span>
+                  )}
+                  {replaced?.has(item.scenario_id) && (
+                    <span className="rounded-full bg-[#FBE3D6] px-2 py-0.5 font-semibold text-[#9A3F1C]">새 판 있음 · 교체 필요</span>
+                  )}
                 </div>
               </div>
             );
@@ -1303,7 +1311,7 @@ function WeekRow({
                   className="flex items-center gap-2 rounded-md bg-white px-3 py-1.5"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px]">{c.situation_ko || "(상황 없음)"}</p>
+                    <p className="truncate text-[13px]" title={c.situation_ko}>{c.brief_note_ko?.trim() || c.situation_ko || "(상황 없음)"}</p>
                     <p className="text-[11.5px] text-muted-foreground">
                       {c.theme_code ? THEME_LABEL[c.theme_code] : "—"} ·{" "}
                       {c.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
