@@ -173,7 +173,7 @@ describe("quality check workbench", () => {
     expect(screen.getByRole("button", { name: /교수자 승인 대기\s*2/ })).toBeInTheDocument();
     expect(within(bench).getByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
     expect(within(bench).getByText("점검 패널 /admin/review?scenarioId=m-rules")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "0건 감수 자료 준비" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "0건 자동 점검 실행" })).toBeDisabled();
   });
 });
 

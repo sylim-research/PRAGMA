@@ -56,7 +56,7 @@ import { ContentReviewPanel } from "@/components/admin/ContentReviewPanel";
 import type { ContentReviewApproval } from "@/lib/pragma/contentReviewApi";
 import type { LearnerMissionRuntime, MissionV6 } from "@/lib/pragma/missionV6";
 import { toast } from "sonner";
-import { startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
+import { startReviewPreparation, stopReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
 import { fetchAllPages } from "@/lib/pragma/paginatedRows";
 import {
   DASHBOARD_REVIEW_CRITERIA_VERSION,
@@ -700,7 +700,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   };
 
   const visible = showAll ? filtered : filtered.slice(0, LIST_CAP);
-  // 일괄 감수 자료 준비는 준비할 미션이 있는 칩에서만 보인다(교수자 차례·전체에서는 할 일이 없다).
+  // 일괄 자동 점검은 점검할 미션이 있는 칩에서만 보인다(교수자 차례·전체에서는 할 일이 없다).
   const bulkPrep = aiReview && (fState === "needs_check" || fState === "rules_error");
   // 접혀 있어도 필터가 걸려 있는지 알 수 있어야 한다.
   const axisFilterActive = fAct !== "all" || fLevel !== "all" || fMode !== "all" || fDirection !== "all";
@@ -1033,7 +1033,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                       selected ? "border-[#233542] bg-white shadow-[inset_3px_0_0_#233542]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
                     ].join(" ")}>
                     {bulkPrep && st === "generated" && (
-                      <input type="checkbox" className="mt-1 shrink-0" aria-label={`감수 자료 준비 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
+                      <input type="checkbox" className="mt-1 shrink-0" aria-label={`자동 점검 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
                         checked={reviewSelection.has(r.scenario_id)} onChange={(event) => setReviewSelection((current) => {
                           const next = new Set(current); if (event.target.checked) next.add(r.scenario_id); else next.delete(r.scenario_id); return next;
                         })} />
@@ -1061,7 +1061,13 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               )}
             </ul>
 
-            {/* 일괄 감수 자료 준비는 늘 보인다. 실행은 버튼으로만. 진행 상황은 AdminShell 상단 표시가 따로 보여 준다. */}
+            {/* 일괄 자동 점검. 실행은 버튼으로만. 진행 상황도 이 자리에서 보인다. */}
+            {aiReview && reviewQueue.entries.length > 1 && (
+              <div className="flex items-center justify-between gap-2 border-t border-[#E2DED2] bg-[#FBFAF6] px-2.5 py-2 text-[12.5px]" role="status">
+                <span className="text-[#233542]">자동 점검 {reviewQueue.entries.filter((entry) => !["waiting", "running"].includes(entry.status)).length}/{reviewQueue.entries.length}건 {reviewQueue.active ? "진행 중" : "완료"}</span>
+                {reviewQueue.active && <Button size="sm" variant="ghost" className="h-6 px-1.5 text-[12px]" disabled={reviewQueue.stopping} onClick={stopReviewPreparation}>{reviewQueue.stopping ? "중단 중…" : "중단"}</Button>}
+              </div>
+            )}
             {bulkPrep && (
               <div className="space-y-1 border-t border-[#E2DED2] bg-white px-2.5 py-2">
                 <div className="flex flex-wrap items-center gap-1 text-[12px]">
@@ -1074,7 +1080,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
                     target: { kind: "mission" as const, targetId: row.scenario_id },
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
-                  })))}>{reviewSelection.size}건 감수 자료 준비</Button>
+                  })))}>{reviewSelection.size}건 자동 점검 실행</Button>
               </div>
             )}
           </aside>

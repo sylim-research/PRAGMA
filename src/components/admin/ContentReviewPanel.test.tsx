@@ -125,7 +125,7 @@ describe("professor finding decisions", () => {
     inspection = { ...inspection, contentHash: "hash-revised", sourceHash: "source-revised", run: null,
       history: [{ id: "review-1", content_hash: "hash-current", approved_at: null, created_at: "2026-08-27" }] };
     fireEvent.click(screen.getByRole("button", { name: "결과 새로고침" }));
-    await screen.findByText(/내용 또는 기준이 달라져 재검토가 필요합니다/);
+    await screen.findByText(/내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다/);
     expect(screen.getByRole("button", { name: "규칙 검사 시작 · 무료" })).toBeEnabled();
     expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "교수자 최종 승인" })).not.toBeInTheDocument();

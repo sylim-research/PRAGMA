@@ -35,7 +35,10 @@ const DEFAULT_APPROVAL_NOTE = "이 학습 미션을 수업에 사용합니다.";
 const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
 /** 화면에 보이는 단계 이름에서 서비스 이름을 뺀다. 저장·추적 정보의 모델명은 세부 추적 정보에 그대로 둔다. */
-const vendorFree = (label: string) => label.replace(/^OpenAI /, "AI ").replace(/^Claude 독립/, "AI 독립");
+const STEP_LABEL: Record<string, string> = {
+  "OpenAI 검토": "AI 검토", "Claude 독립 검토": "교차 검토", "OpenAI 재검토": "의견 대조", "최종 검수 자료": "승인용 최종본",
+};
+const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
   /** false면 바깥 테두리 상자를 그리지 않는다(이미 작업대 상자 안에 놓일 때). */
@@ -174,7 +177,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {done ? "✓ " : ""}{vendorFree(step.label)}{!state ? " · 확인 중" : failed ? " · 오류" : ""}
             </span>
           </li>;
-        })}
+        }).flatMap((item, index) => index === 1 && handoffHref && !steps.some((step) => step.key === "claude")
+          ? [item, <li key="optional-cross-check" className="flex items-center gap-1.5">
+              <span aria-hidden className="text-[#B7BEC2]">›</span>
+              <span className="rounded-full border border-dashed border-[#C9CFD2] px-2 py-0.5 text-[#8C969B]">선택 · 교차 검토</span>
+            </li>]
+          : [item])}
       </ol>}
       <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>
     </div>}
@@ -187,12 +195,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {/* 승인 화면은 최종 인간 판단 화면이다. 자동 단계의 이름·비용은 보이지 않고, 점검이 덜 끝난 버전에서만 한 버튼으로 마친다. */}
         {experiential && <p className="text-[13px] text-[#5D6970]">이 버전은 자동 점검이 아직 끝나지 않았습니다.</p>}
         <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
-          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "자동 점검 중…" : "자동 점검 마치기") : "감수 자료 준비"}</Button>
+          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "자동 점검 중…" : "자동 점검 마치기") : queuedStatus === "running" ? "자동 점검 중…" : "자동 점검 실행"}</Button>
+        {!experiential && queuedStatus === "running" && <p role="status" className="text-[13px] text-[#8A5A14]">{vendorFree(queued?.message ?? "")} 진행 중</p>}
+        {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 유료로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)} · 규칙 검사 무료 · 최종 검수 자료는 문항별 근거 생성 비용 발생</p>}
       {experiential && (run || decisionSlot) && <FlowHeading title="자동 점검 결과" note={next === "professor" || next === "approved" ? "자동 점검 완료" : undefined} />}
-      {!run && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용 또는 기준이 달라져 재검토가 필요합니다. 이전 결과는 이력에 보존됩니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
+      {!run && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         <ReviewFindings title="1. 규칙 검사" result={run.rules} />
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
@@ -271,12 +281,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 검토"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && (() => {
         const body = <>
-          <p className="text-xs">판단이 엇갈리는 사례에 한해 독립 모델 검토를 추가할 수 있습니다. 교수자 직접 판단도 가능합니다.</p>
+          <h4 className="text-[13.5px] font-bold text-[#233542]">교차 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
+          <p className="mt-0.5 text-xs text-[#5D6970]">AI 판단이 의심스러울 때, 다른 AI가 독립 검토하고 두 의견을 대조합니다.</p>
           <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
             setBusy(true); setError(null);
             void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
               .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
-          }}>추가 모델 검토 선택</Button>
+          }}>교차 검토 요청</Button>
         </>;
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
@@ -307,8 +318,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <p className="text-[#5D6970]">{next === "approved"
           ? "이 버전은 교수자 승인을 마쳤습니다."
           : next === "professor"
-            ? "점검이 끝났습니다. AI 의견은 판단 자료이며 승인은 교수자가 합니다."
-            : "점검을 마치면 교수자 최종 승인의 「결정 대기」로 넘어갑니다."}</p>
+            ? "✓ 자동 점검 완료 · 교수자 승인 대기"
+            : "자동 점검을 마치면 교수자 최종 승인으로 넘어갑니다."}</p>
         <Link to={handoffHref} className="font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인에서 이 미션 열기 →</Link>
       </div>}
       {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
