@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Search, Sparkles } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
@@ -815,12 +816,12 @@ const AdminGenerator = () => {
       )}
 
       {/* 2-col layout */}
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
         {/* LEFT — settings */}
         <section className="lg:col-span-2 space-y-5 rounded-lg border border-border bg-card p-5">
           {/* 1. 과제 모드 */}
           <div>
-            <SectionTitle n={1} label="과제 모드" accent="정본" />
+            <SectionTitle n={1} label="과제 모드" />
             <div className="mt-2 grid grid-cols-2 gap-2">
               {(["translation", "stt_interpreting"] as const).map((m) => {
                 const on = taskMode === m;
@@ -916,7 +917,7 @@ const AdminGenerator = () => {
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
                 >
-                  <SelectTrigger className={formField}><SelectValue /></SelectTrigger>
+                  <SelectTrigger className={formField}><SelectValue>{PDR_DISTANCE[form.pdr_distance].split(" (")[0]}</SelectValue></SelectTrigger>
                   <SelectContent>
                     {Object.entries(PDR_DISTANCE).map(([k, v]) => (
                       <SelectItem key={k} value={k}>{v}</SelectItem>
@@ -989,7 +990,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="채널 · 파생">
+              <Field label="채널">
                 <Select
                   value={form.channel}
                   onValueChange={(v) => update("channel", v as ChannelUI)}
@@ -1090,7 +1091,7 @@ const AdminGenerator = () => {
 
           {/* 7b. 주제(theme) — 편성 메타(코어 CHECK 필수) */}
           <div>
-            <div className="text-[12px] font-medium text-muted-foreground">주제 · theme (편성 필터 축)</div>
+            <div className="text-[12px] font-medium text-muted-foreground">주제</div>
             {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
                 (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
             <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
@@ -1139,7 +1140,10 @@ const AdminGenerator = () => {
               disabled={outlineLoading || finalizing}
               className="mt-2.5 w-full h-10 rounded-md border border-[#EAE4D2] bg-transparent text-[13px] text-[#1d2336] hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
             >
-              🔎 {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
+              <span className="inline-flex items-center justify-center gap-1.5">
+                <Search className="h-4 w-4" aria-hidden />
+                {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
+              </span>
             </button>
             <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">
               개요를 먼저 확인하고, 선택한 것만 전체 시나리오로 생성됩니다
@@ -1188,7 +1192,8 @@ const AdminGenerator = () => {
                   disabled={finalizing || selectedOutlines.size === 0}
                   className="w-full bg-[#1d2336] text-white hover:bg-[#1d2336]/90 disabled:opacity-60"
                 >
-                  ✨ {finalizing ? "시나리오 생성·저장 중..." : `선택한 ${selectedOutlines.size}개 개요로 시나리오 생성`}
+                  <Sparkles className="h-4 w-4" aria-hidden />
+                  {finalizing ? "시나리오 생성·저장 중..." : `선택한 ${selectedOutlines.size}개 개요로 시나리오 생성`}
                 </Button>
               </div>
             )}
@@ -1210,9 +1215,6 @@ const AdminGenerator = () => {
                       {r.ok && r.rule === "warning" && <span className="ml-1 text-[10px] text-[#92400E]">(경고)</span>}
                     </span>
                     {!r.ok && r.error && <span className="mt-0.5 block text-[10.5px]">{r.error}</span>}
-                    {r.ok && r.scenarioId && (
-                      <span className="mt-0.5 block font-mono text-[10px] opacity-80">{r.scenarioId}</span>
-                    )}
                   </div>
                 ))}
               </div>
@@ -1223,16 +1225,15 @@ const AdminGenerator = () => {
 
 
         {/* RIGHT — preview */}
-        <section className="lg:col-span-3 rounded-lg border border-border bg-card p-5">
-          <h2 className="text-[14px] font-medium text-[#1d2336]">생성 결과 미리보기</h2>
+        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto">
+          <h2 className="text-[15px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[12.5px] font-medium text-[#065F46]">
                 ✓ 시나리오가 교수자 감수 대기 상태로 저장되었습니다.
               </p>
               <p className="mt-1 text-[11.5px] text-[#065F46]/85">
-                scenario_id: <code className="font-mono">{savedScenarioId}</code>
-                &nbsp;/&nbsp; 승인 상태: needs_review &nbsp;/&nbsp; 용도: archived_only
+                다음 단계: 자동 품질 점검·AI 검토 → 교수자 최종 승인
               </p>
             </div>
           )}
@@ -1272,38 +1273,35 @@ const AdminGenerator = () => {
                           r.ok ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
                         ].join(" ")}
                       >
-                        {r.ok ? "✓ 저장됨(draft)" : "✗ 실패"}
+                        {r.ok ? "✓ 초안 저장" : "✗ 저장 안 됨"}
                       </span>
                       {r.rule && (
                         <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
-                          규칙검사 {r.rule}
+                          규칙 검사 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
-                      <span className="text-[12.5px] font-medium text-foreground">{r.title}</span>
+                      <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
                     </div>
                     {r.error && (
                       <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-2.5 py-1.5 text-[11.5px] text-[#991B1B]">{r.error}</div>
                     )}
                     {r.core && typeof r.core.situation_ko === "string" && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">상황</div>
-                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-2.5 text-[12.5px] leading-relaxed">{r.core.situation_ko as string}</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">상황</div>
+                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[13px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.source_text === "string" && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">원문 · source_text</div>
-                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[12.5px] leading-relaxed">{r.core.source_text as string}</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#6D5C1F]">원문</div>
+                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[14px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
-                        <div className="mb-1 text-[10.5px] font-medium uppercase tracking-wide text-[#8a857c]">선행 발화</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">선행 발화</div>
                         <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[12px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
                       </div>
-                    )}
-                    {r.ok && r.scenarioId && (
-                      <div className="font-mono text-[10px] text-muted-foreground">scenario_id: {r.scenarioId}</div>
                     )}
                   </div>
                 ))}
