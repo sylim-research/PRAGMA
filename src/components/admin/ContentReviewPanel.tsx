@@ -204,7 +204,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
         note: crossRequested ? null : "다른 AI가 독립 검토합니다",
         action: !crossRequested && !run?.claude_review
-          ? <Button size="sm" variant="outline" className="h-7 px-2.5 text-[12.5px]" disabled={!canCross} onClick={startCross}>교차 검토 실행</Button>
+          ? <Button size="sm" variant="outline" className="h-7 border-[#C08A2E] px-2.5 text-[12.5px] font-semibold text-[#8A5A14] hover:bg-[#FBF3E3] hover:text-[#6F4710]" disabled={!canCross} onClick={startCross}>교차 검토 실행</Button>
           : null },
       { key: "adjudication", label: "의견 대조", optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
         note: crossRequested ? null : "교차 검토 뒤 두 의견을 대조합니다" },
@@ -241,14 +241,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     : status === "running" ? "bg-[#C08A2E] text-white"
                       : status === "failed" ? "bg-red-700 text-white"
                         : status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                          : skipped ? "border border-dashed border-[#B9C0C4] bg-white text-[#7A868D]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                          : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
                 <span className={["w-28 shrink-0 font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
-                  {row.label}{row.optional && <span className="ml-1 text-[11.5px] font-normal text-[#8C969B]">선택</span>}
+                  {row.label}{row.optional && <span className="ml-1.5 rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
                 </span>
                 <span className={["min-w-0 flex-1", status === "running" ? "font-semibold text-[#8A5A14]"
-                  : row.result?.startsWith("지적") ? "text-[#8A5A14]" : "text-[#5D6970]"].join(" ")}>
+                  : row.result?.startsWith("지적") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
                   {status === "running" ? "진행 중…" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
                 </span>
                 {row.action}

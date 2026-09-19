@@ -919,7 +919,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div className={professorScreen ? "grid items-start"
-          : aiReview ? "grid items-start gap-4 xl:grid-cols-[2fr_3fr]" : "grid items-start gap-4 xl:grid-cols-2"}>
+          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-2"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
