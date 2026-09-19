@@ -58,6 +58,11 @@ const LEVEL_CARD_CLASS: Record<LearnerLevel, string> = {
   intermediate: "bg-[#EEF5F0]",
   advanced: "bg-[#EDF3F4]",
 };
+// summarizePlan의 조합 라벨(speechAct·level·과업)은 내부 코드라 화면에서 우리말로 옮긴다.
+const humanizeCell = (label: string) => {
+  const [act, level, mode] = label.split("·");
+  return [SPEECH_ACT_UI[act as keyof typeof SPEECH_ACT_UI] ?? act, LEVEL[level as keyof typeof LEVEL] ?? level, mode].join(" · ");
+};
 const EMPTY_LEVEL_COUNTS = { beginner_intermediate: 0, intermediate: 0, advanced: 0 };
 type ProductionSetting = { total: number; interpretingPercent: number };
 const coreRunStorageKey = (direction: LanguageDirection) =>
@@ -366,11 +371,11 @@ const AdminBatch = () => {
 
               <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
                 <CoverageCard title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                  description={"선택한 수준·과업의 화행 조합 · 조합당 최소 " + summary.minActLevelModeCount + "건"} />
+                  description={"화행 × 수준 × 번역/통역 중 채워진 조합 · 가장 적은 조합 " + summary.minActLevelModeCount + "건"} />
                 <CoverageCard title="관계·거리·부담 분포" className="border-[#D8E5DC] bg-[#F6FAF7]" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                  description={"화행 × P × D × R · 조합당 최소 " + summary.minActPdrCount + "건"} />
+                  description={"화행 × P × D × R 중 채워진 조합 · 가장 적은 조합 " + summary.minActPdrCount + "건"} />
               </div>
-              {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">비어 있는 전달 조합: {summary.emptyActLevelModeCells.join(", ")}</p>}
+              {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
@@ -390,11 +395,6 @@ const AdminBatch = () => {
           <aside id="batch-execution" aria-labelledby="batch-execution-heading" className="min-w-0 scroll-mt-20 rounded-xl border bg-white p-5 xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
             <h2 id="batch-execution-heading" className="text-lg font-bold">3. 생성 실행</h2>
             <p className="mt-2 text-xs text-muted-foreground">{DIRECTION_LABEL[direction]} · 총 {summary.total}건 계획</p>
-            <div className="mt-4 rounded-lg bg-[#FAF8F2] p-3">
-              <p className="text-xs font-semibold">현재 배치 ID</p>
-              <code className="mt-2 block break-all text-xs">{coreRunId}</code>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">같은 ID로 다시 실행하면 저장 완료 항목은 AI 호출 없이 건너뜁니다.</p>
-            </div>
             <Button className="mt-4 w-full" onClick={start} disabled={busy || plan.length === 0}>
               {preparing ? "실행 준비 중…" : running ? "AI 생성 중…" : "전체 " + summary.total + "건 생성 시작"}
             </Button>
@@ -411,7 +411,14 @@ const AdminBatch = () => {
               </dl>
             </div>}
 
-            <div className="mt-5 border-t pt-4">
+            <details className="mt-5 border-t pt-4">
+              <summary className="cursor-pointer text-sm font-semibold">재개·불러오기</summary>
+              <div className="mt-3 rounded-lg bg-[#FAF8F2] p-3">
+                <p className="text-xs font-semibold">현재 배치 ID</p>
+                <code className="mt-2 block break-all text-xs">{coreRunId}</code>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">같은 ID로 다시 실행하면 저장 완료 항목은 AI 호출 없이 건너뜁니다.</p>
+              </div>
+            <div className="mt-4 border-t pt-4">
               <h3 className="text-sm font-semibold">선택 항목 생성·재개</h3>
               <p className="mt-1 text-xs leading-5 text-muted-foreground">생성 항목 목록에서 고르거나 번호를 입력하세요.</p>
               <Label htmlFor="selected-core-cells" className="mt-3 block text-xs">선택 항목 번호</Label>
@@ -425,7 +432,7 @@ const AdminBatch = () => {
               <p className="mt-2 text-xs leading-5 text-muted-foreground">중단된 항목은 현재 ID로 재개합니다. 저장된 항목을 다시 만들 때는 새 ID를 사용합니다.</p>
             </div>
 
-            <div className="mt-5 border-t pt-4">
+            <div className="mt-4 border-t pt-4">
               <h3 className="text-sm font-semibold">배치 불러오기·새로 시작</h3>
               <Label htmlFor="resume-core-run-id" className="mt-3 block text-xs">기존 배치 ID</Label>
               <Input id="resume-core-run-id" value={resumeRunId} disabled={busy} className="mt-2 min-w-0 font-mono text-xs"
@@ -435,6 +442,7 @@ const AdminBatch = () => {
                 <Button size="sm" variant="outline" onClick={startFreshCoreRun} disabled={busy}>새 배치 ID</Button>
               </div>
             </div>
+            </details>
           </aside>
         </div>
 

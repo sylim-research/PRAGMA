@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { DOMAIN, LEVEL, MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
+import { DOMAIN, LEVEL, MODE_LABEL, PDR_BURDEN_SHORT, PDR_DISTANCE_SHORT, PDR_POWER_SHORT, SPEECH_ACT_UI } from "@/lib/pragma/enums";
 import type { BatchCell } from "@/lib/pragma/batchPlan";
 
 const PAGE_SIZE = 10;
@@ -34,9 +34,9 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
       </div>
     </div>
     <div className="mt-4 max-w-full overflow-x-auto">
-      <table className="w-full min-w-[540px] text-left text-xs">
+      <table className="w-full min-w-[620px] text-left text-xs">
         <thead className="whitespace-nowrap border-y bg-[#FAF8F2] text-muted-foreground">
-          <tr><th className="w-10 px-2 py-2">선택</th><th className="w-10 px-2 py-2">번호</th><th className="w-20 px-2 py-2">화행·수준</th><th className="w-24 px-2 py-2">과업·도메인</th><th className="px-2 py-2">장면 시드</th></tr>
+          <tr><th className="w-10 px-2 py-2">선택</th><th className="w-10 px-2 py-2">번호</th><th className="w-20 px-2 py-2">화행·수준</th><th className="w-24 px-2 py-2">과업·도메인</th><th className="w-24 px-2 py-2">P·D·R</th><th className="px-2 py-2">장면 시드</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {
           const cell = plan[index];
@@ -47,9 +47,10 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect }: {
             <td className="p-2 tabular-nums">{index + 1}</td>
             <td className="whitespace-nowrap p-2">{SPEECH_ACT_UI[cell.speech_act_ui]}<span className="mt-1 block text-muted-foreground">{LEVEL[cell.level]}</span></td>
             <td className="whitespace-nowrap p-2">{MODE_LABEL[cell.mode]}<span className="mt-1 block text-muted-foreground">{DOMAIN[cell.domain]}</span></td>
+            <td className="whitespace-nowrap p-2 leading-5 text-[#3F4E59]">{PDR_POWER_SHORT[cell.pdr_power]}<span className="block">{PDR_DISTANCE_SHORT[cell.pdr_distance]}</span><span className="block">{PDR_BURDEN_SHORT[cell.pdr_burden]}</span></td>
             <td className="min-w-[200px] p-2 leading-5">{cell.situation_seed_ko}</td>
           </tr>;
-        })}{!plan.length && <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
+        })}{!plan.length && <tr><td colSpan={6} className="p-4 text-center text-muted-foreground">생성 조건과 수량을 설정하면 항목이 표시됩니다.</td></tr>}</tbody>
       </table>
     </div>
     <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
