@@ -13,6 +13,7 @@
 // 드라마·쇼츠 캡처를 DB에 저장하면 저작권 문제가 생기므로 지켜야 할 설계다.
 
 import { useRef, useState } from "react";
+import { ImageIcon, PlayCircle, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -442,26 +443,29 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
       <section className="space-y-4 rounded-xl border border-[#D9D2BF] bg-white p-4 lg:sticky lg:top-4 lg:col-span-2">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
-          <div className="flex items-baseline justify-between gap-2">
-            <span className="text-[12.5px] font-bold text-[#15202B]">① 원자료 가져오기</span>
-            <span className="text-[10.5px] text-[#5A6670]">이미지는 분석에만 쓰고 저장하지 않습니다</span>
-          </div>
-          <div className="mt-2 grid grid-cols-3 gap-1 rounded-lg bg-[#F3F0E7] p-1 text-[12px]">
-            {([["image", "이미지에서 추출"], ["text", "문구 직접 입력"], ["youtube", "YouTube 자막"]] as [InputTab, string][]).map(
-              ([k, l]) => (
-                <button
-                  key={k}
-                  type="button"
-                  onClick={() => setInputTab(k)}
-                  className={[
-                    "h-8 rounded-md font-medium transition-colors",
-                    inputTab === k ? "bg-white text-[#1d2336] shadow-sm" : "text-[#3F4E59] hover:bg-white/60",
-                  ].join(" ")}
-                >
-                  {l}
-                </button>
-              ),
-            )}
+          <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
+          <div className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-[#F3F0E7] p-1">
+            {([
+              ["image", "이미지에서 추출", ImageIcon],
+              ["text", "텍스트 직접 입력", Type],
+              ["youtube", "YouTube 자막", PlayCircle],
+            ] as const).map(([k, l, Icon]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setInputTab(k)}
+                aria-pressed={inputTab === k}
+                className={[
+                  "flex h-10 items-center justify-center gap-1.5 rounded-md text-[12.5px] transition-colors",
+                  inputTab === k
+                    ? "bg-white font-semibold text-[#15202B] shadow-sm ring-1 ring-[#D9D2BF]"
+                    : "font-medium text-[#3F4E59] hover:bg-white/60",
+                ].join(" ")}
+              >
+                <Icon className="hidden h-4 w-4 shrink-0 2xl:block" aria-hidden />
+                <span className="truncate">{l}</span>
+              </button>
+            ))}
           </div>
 
           {inputTab === "image" && (
@@ -472,7 +476,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                   onClick={() => fileRef.current?.click()}
                   className="flex h-24 w-full items-center justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
-                  + 쇼츠·드라마 캡처 업로드 (jpg·png·webp)
+                  + 쇼츠·드라마 캡처 업로드 (jpg·png·webp) · 이미지는 저장하지 않습니다
                 </button>
               ) : imgLarge ? (
                 <div className="space-y-1.5">
@@ -527,20 +531,22 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
                 <input
                   value={youtubeUrl}
                   onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !ytLoading && youtubeUrl.trim()) fetchCaption(); }}
                   placeholder="https://www.youtube.com/watch?v=…"
-                  className="h-9 min-w-0 flex-1 rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 text-[13px] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+                  aria-label="YouTube 영상 주소"
+                  className="h-10 min-w-0 flex-1 rounded-md border border-[#D9D2BF] bg-white px-3 text-[13px] text-[#15202B] placeholder:text-[#8A949C] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
                 />
                 <button
                   type="button"
                   onClick={fetchCaption}
                   disabled={ytLoading || !youtubeUrl.trim()}
-                  className="h-9 shrink-0 rounded-md bg-[#15202B] px-3 text-[12.5px] font-medium text-white hover:bg-[#15202B]/90 disabled:opacity-50"
+                  className="h-10 shrink-0 rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:bg-[#C9CED2]"
                 >
                   {ytLoading ? "가져오는 중…" : "자막 가져오기"}
                 </button>
               </div>
-              <p className="mt-1.5 text-[11px] leading-relaxed text-[#5A6670]">
-                중국어 자막을 먼저, 없으면 한국어 자막을 가져옵니다. 가져온 자막은 문구 칸에 채워지니 필요한 대사만 남기고 분석하세요.
+              <p className="mt-1.5 truncate text-[11.5px] text-[#5A6670]">
+                중국어·한국어 CC 자막을 가져와 텍스트 칸에 채웁니다.
               </p>
             </div>
           )}
@@ -549,30 +555,35 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="짧은 중국어 또는 한국어 문구 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구 등"
-              className="mt-2.5 h-24 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
+              className="mt-2.5 h-28 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
         </div>
 
-        {/* 기본 언어 방향 */}
-        <div>
-          <label className="text-[12.5px] font-medium text-[#3F4E59]">기본 언어 방향</label>
-          <div className="mt-1.5 flex gap-1.5">
+        {/* 만들 콘텐츠의 언어 방향 — 자료(영상·이미지)의 언어가 아니라 학습 과제의 방향 */}
+        <div className="border-t border-[#EFEAE0] pt-4">
+          <div className="flex items-baseline justify-between gap-2">
+            <label className="text-[13px] font-semibold text-[#15202B]">만들 콘텐츠의 언어 방향</label>
+            <span className="text-[11px] text-[#5A6670]">자료의 언어와 다를 수 있습니다</span>
+          </div>
+          <div className="mt-2 flex gap-2">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (
               <button
                 key={d}
                 type="button"
                 onClick={() => setDirection(d)}
+                aria-pressed={direction === d}
                 className={[
-                  "h-9 flex-1 rounded-md text-[12.5px] font-medium transition-colors",
+                  "flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md text-[13px] transition-colors",
                   direction === d
-                    ? "border-2 border-[#15202B] bg-white text-[#15202B]"
-                    : "border border-[#D9D2BF] bg-white text-[#3F4E59] hover:bg-[#F3F0E7]",
+                    ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
+                    : "border border-[#D9D2BF] bg-white font-medium text-[#3F4E59] hover:bg-[#F3F0E7]",
                 ].join(" ")}
               >
                 {d === "zh_ko" ? "중→한" : "한→중"}
+                <span className="text-[11px] font-normal text-[#5A6670]">{d === "zh_ko" ? "중국어 원문" : "한국어 원문"}</span>
               </button>
             ))}
           </div>
@@ -581,7 +592,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed }: Props) => {
         <Button
           onClick={() => runAnalyze()}
           disabled={loading || (!text.trim() && !imageDataUrl)}
-          className="w-full bg-[#FAD338] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:opacity-50"
+          className="h-11 w-full bg-[#FAD338] text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E] disabled:opacity-50"
         >
           {loading ? "분석 중…" : "활용 가능성 분석"}
         </Button>
