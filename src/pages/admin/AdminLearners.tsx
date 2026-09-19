@@ -188,19 +188,17 @@ const Page = () => {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[0_8px_30px_rgba(21,32,43,0.05)]">
         <Table className="min-w-[820px] table-fixed">
           <colgroup>
-            <col style={{ width: "23%" }} />
-            <col style={{ width: "15%" }} />
+            <col style={{ width: "28%" }} />
             <col style={{ width: "20%" }} />
-            <col style={{ width: "15%" }} />
-            <col style={{ width: "11%" }} />
-            <col style={{ width: "16%" }} />
+            <col style={{ width: "22%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "17%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
               <TableHead className="h-12 px-5 text-xs font-bold text-[#5F625F]">학습자</TableHead>
               <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">소속/신분</TableHead>
               <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">주 언어·공인 급수</TableHead>
-              <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">통번역 경험</TableHead>
               <TableHead className="h-12 px-3 text-xs font-bold text-[#5F625F]">상태</TableHead>
               <TableHead className="h-12 px-5 text-right text-xs font-bold text-[#5F625F]">관리</TableHead>
             </TableRow>
@@ -208,13 +206,13 @@ const Page = () => {
           <TableBody>
             {rows === null ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
                   불러오는 중…
                 </TableCell>
               </TableRow>
             ) : rows.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
                   표시할 학습자가 없습니다.
                 </TableCell>
               </TableRow>
@@ -230,9 +228,9 @@ const Page = () => {
                         type="button"
                         aria-label={`${r.full_name ?? r.email ?? "학습자"} 프로필 보기`}
                         onClick={() => setSelectedId(r.id)}
-                        className="block max-w-full truncate text-left font-semibold leading-5 text-foreground underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="block max-w-full truncate text-left font-semibold leading-5 text-[#1F3A5F] underline decoration-[#9FB0C6] underline-offset-4 hover:decoration-[#1F3A5F] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
-                        {r.full_name ?? "—"}
+                        {r.full_name ?? "—"} <span className="text-[11.5px] font-medium no-underline">· 상세</span>
                       </button>
                       <div className="mt-0.5 truncate text-xs leading-5 text-muted-foreground" title={r.email ?? undefined}>{r.email ?? "—"}</div>
                     </div>
@@ -252,9 +250,6 @@ const Page = () => {
                       <span className="text-xs text-amber-700">학습 배경 미입력</span>
                     )}
                   </TableCell>
-                  <TableCell className="px-3 py-4 text-sm text-[#343B42]">
-                    {labelOf(TI_EXPERIENCE_OPTIONS, r.ti_experience_level) ?? "—"}
-                  </TableCell>
                   <TableCell className="px-3 py-4">
                     <Badge
                       variant="outline"
@@ -267,8 +262,9 @@ const Page = () => {
                     {traceQueryFor(r) && (
                       <Button
                         size="sm"
+                        variant="outline"
                         asChild
-                        className="whitespace-nowrap bg-[#15202B] text-white hover:bg-[#243447]"
+                        className="whitespace-nowrap border-[#1F3A5F] text-[#1F3A5F] hover:bg-[#EEF2F7]"
                       >
                         <Link to={`/admin/decision-traces?q=${encodeURIComponent(traceQueryFor(r)!)}`}>
                           수행 기록 →
