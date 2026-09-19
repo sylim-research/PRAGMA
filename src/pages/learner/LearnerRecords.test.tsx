@@ -117,11 +117,12 @@ describe("learner report record sources", () => {
     mocks.order.mockResolvedValue({ data: [{ ...ownLog, revision_target_selected: null }], error: null });
     renderReport();
     await screen.findByRole("region", { name: "수업 이수 범위" });
-    expect(screen.getByRole("heading", { name: /나의 학습 기록/ })).toHaveTextContent("전체 교과목");
+    expect(screen.getByRole("heading", { name: "나의 학습 기록" })).toBeInTheDocument();
+    expect(screen.getByText("전체 교과목")).toBeInTheDocument();
     expect(screen.queryByText(/배려 우선형|시그니처|수업 확장 연습|조건 간 비교/)).not.toBeInTheDocument();
     expect(screen.queryByText(/주차/)).not.toBeInTheDocument();
     expect(screen.getByText(/회고 질문 · 모든 학습자에게 같은 질문입니다/)).toBeInTheDocument();
-    expect(screen.getByText("미기록")).toBeInTheDocument();
+    expect(screen.getByText("재검토 지점 · 미기록")).toBeInTheDocument();
   });
 
   it("lists the selected act's own records with source, first and final expressions", async () => {
