@@ -24,6 +24,10 @@ if (!prefix) throw new Error("사용법: vite-node scripts/v6-assemble-candidate
 const source = JSON.parse(readFileSync(`${prefix}.v5.json`, "utf8"));
 const authored = JSON.parse(readFileSync(`${prefix}.authored.json`, "utf8"));
 const row = source.row ?? {};
+// 뼈대(v6-skeleton-authored)의 빈칸 표시가 남았으면 조립하지 않는다. 「_」로 시작하는 메모 필드는 제외.
+const todoLeft = Object.entries(authored).filter(([key]) => !key.startsWith("_")).map(([key, value]) => [key, JSON.stringify(value)] as const)
+  .filter(([, text]) => text.includes("⟪TODO") || text.includes("\"_todo\"")).map(([key]) => key);
+if (todoLeft.length) throw new Error(`집필분에 ⟪TODO⟫가 남아 있음: ${todoLeft.join(", ")}`);
 
 const { draft, gaps } = convertMissionV5ToV6(source.content);
 const items = draft.mpj_items as Record<string, unknown>[];
