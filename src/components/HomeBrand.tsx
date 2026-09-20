@@ -32,7 +32,7 @@ export const HomeBrand = () => {
       <span className="text-[16px] font-bold tracking-[0.18em] sm:text-[17px]">PRAGMA</span>
       {/* 공식 설명어(= 논문 제목의 앞부분). 좁은 화면에서는 제품명만 남긴다. */}
       <span aria-hidden className="hidden h-[11px] w-px self-center bg-[#3E4C5A] sm:inline-block" />
-      <span className="hidden text-[13px] font-normal text-[#95A2B0] transition-colors group-hover:text-[#B7C1CC] sm:inline">
+      <span className="hidden text-[14px] font-normal text-[#A9B6C4] transition-colors group-hover:text-[#D3DBE3] sm:inline">
         AI 기반 한·중 통번역 학습
       </span>
     </button>
