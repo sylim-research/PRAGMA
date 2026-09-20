@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, BookOpen, CheckCircle2, Layers3, MessagesSquare } from "lucide-react";
+import { ArrowUpRight, BookOpen, CheckCircle2, MessagesSquare } from "lucide-react";
 import { RESOURCE_DIMENSIONS, resourceLibraryHref, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
 
 const number = (value: number | undefined) => value == null ? "—" : value.toLocaleString("ko-KR");
@@ -13,7 +13,6 @@ export function DashboardResourceOverview({ resources, error, status }: {
   const [scope, setScope] = useState<ResourceScope>("all");
   const selected = resources?.[scope];
   const cards = [
-    { label: "학습 미션", value: resources?.all.missionCount, unit: "개", note: "승인 전 자료 포함", icon: Layers3, to: resourceLibraryHref("all") },
     { label: "판단형 MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 판단 문항", icon: BookOpen, to: resourceLibraryHref("all") },
     { label: "통번역 산출 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 DCT형 과제", icon: MessagesSquare, to: resourceLibraryHref("all") },
     { label: "현재 편성 가능", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, to: resourceLibraryHref("ready"), ready: true },
@@ -29,29 +28,25 @@ export function DashboardResourceOverview({ resources, error, status }: {
         </div>
         {status}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {cards.map(({ label, value, unit, note, icon: Icon, to, ready }) => (
           <Link key={label} to={to} className={[
-            "group flex min-h-[168px] flex-col rounded-2xl border p-5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
+            "group flex min-h-[144px] flex-col rounded-2xl border px-5 py-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
             ready ? "border-[#15202B] bg-[#15202B] text-white hover:bg-[#233440]" : "border-[#E6E1D5] bg-white text-[#15202B] hover:border-[#C5B05F]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
               <Icon aria-hidden className={ready ? "h-5 w-5 text-[#EFD65B]" : "h-5 w-5 text-[#8B825F]"} />
             </div>
-            <div className="mt-5 flex flex-wrap items-baseline gap-2">
-              <span className="text-[42px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
+            <div className="mt-4 flex flex-wrap items-baseline gap-2">
+              <span className="text-[40px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
               <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
             </div>
-            <div className={"mt-auto flex items-center justify-between gap-1 pt-4 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
+            <div className={"mt-auto flex items-center justify-between gap-1 pt-3 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
               <span>{note}</span><ArrowUpRight aria-hidden className="h-4 w-4 shrink-0" />
             </div>
           </Link>
         ))}
-      </div>
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 text-xs text-[#647079]">
-        <p>현재 보유본 기준 · 문항·과제는 미션의 구성요소이며, 서로 합산하지 않습니다.</p>
-        {resources && <p>편성 가능 자료 안에 판단 <b className="font-semibold text-[#334D40]">{number(resources.ready.judgmentCount)}문항</b> · 산출 <b className="font-semibold text-[#334D40]">{number(resources.ready.productionCount)}과제</b></p>}
       </div>
       {!!resources?.all.incompleteCount && <p className="mt-1 text-xs text-amber-800">문항·산출 정보 확인이 필요한 미션 {resources.all.incompleteCount}개 · 확인된 구성요소만 집계</p>}
     </section>
@@ -69,20 +64,20 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.3fr_0.85fr_0.85fr_0.85fr]">
+      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.7fr_0.85fr_0.85fr_0.85fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));
           const unknown = Object.entries(counts).filter(([code]) => !(code in labels)).reduce((sum, [, count]) => sum + count, 0);
           return <div key={key}>
             <h3 className="mb-3 text-xs font-semibold text-[#647079]">{title}</h3>
-            <div className={key === 'speech_act' ? "grid grid-cols-3 gap-1.5" : "space-y-3"}>
+            <div className={key === 'speech_act' ? "grid grid-cols-3 gap-2" : "space-y-3"}>
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceLibraryHref(scope, key, code)}
-                  className="rounded-lg bg-[#F8F6EE] px-2 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
-                  <span className="block text-xs text-[#59656D]">{label}</span>
-                  <span className="mt-1 block text-lg font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
+                  className="rounded-xl bg-[#F8F6EE] px-3 py-2.5 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  <span className="block text-sm text-[#59656D]">{label}</span>
+                  <span className="mt-1 block text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceLibraryHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#4E5C64] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#F1F0E9]"><div className="h-full rounded-full bg-[#D9C45C]" style={{ width: `${count / max * 100}%` }} /></div>

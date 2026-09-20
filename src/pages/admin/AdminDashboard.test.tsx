@@ -65,24 +65,14 @@ afterEach(cleanup);
 const show = () => render(<MemoryRouter><AdminDashboard /></MemoryRouter>);
 
 describe("admin dashboard", () => {
-  it("shows the professor approval queue as the pending task, not the approved total", async () => {
+  it("keeps approval totals and review navigation without the removed action banner", async () => {
     show();
-    const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 1개"));
-    // 품질 점검 대기 = 교수자 차례가 아닌 미션 중 규칙 검사 불통과를 뺀 것(규칙 검사 전 1건).
-    expect(band.textContent).toContain("품질 점검 대기 1개");
-    expect(band.textContent).toContain("규칙 검사 불통과 1개");
-    expect(band.textContent).not.toContain("보류");
-    // 제목을 되풀이하는 설명문은 두지 않는다.
-    expect(band.textContent).not.toContain("기다리는 미션입니다");
-    expect(within(band).getByRole("link", { name: "승인하러 가기 →" })).toHaveAttribute("href", "/admin/review");
-    expect(within(band).getByRole("link", { name: "품질 점검 →" })).toHaveAttribute("href", "/admin/ai-review");
-
-    // 승인 완료 누적 수(2)는 「교수자 승인 완료」로만 보이고, 대기·결정으로 부르지 않는다.
+    expect(screen.queryByRole("region", { name: "지금 할 일" })).not.toBeInTheDocument();
     const approvedLink = screen.getAllByRole("link", { name: /교수자 승인 완료/ })[0];
-    expect(approvedLink.textContent).toContain("2");
+    await waitFor(() => expect(approvedLink.textContent).toContain("2"));
     expect(approvedLink).toHaveAttribute("href", "/admin/review");
-    expect(screen.queryByText("교수자 결정")).not.toBeInTheDocument();
+    expect(screen.queryByText(/현재 보유본 기준/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/편성 가능 자료 안에 판단/)).not.toBeInTheDocument();
   });
 
   it("keeps the number-first overall flow with accurate labels and no helper sentence", async () => {
@@ -135,12 +125,9 @@ describe("admin dashboard", () => {
     ];
     mocks.tables.content_review_runs = [...(mocks.tables.content_review_runs as unknown[]), run("v5-ready")];
     show();
-    const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("교수자 승인 대기 1개"));
-    expect(band.textContent).toContain("품질 점검 대기 1개");
     const stages = screen.getByRole("group", { name: "품질 검수 단계" });
     const rules = within(stages).getByRole("link", { name: /규칙 검사 완료/ });
-    expect(rules).toHaveAttribute("title", "지금 대기 2개");
+    await waitFor(() => expect(rules).toHaveAttribute("title", "지금 대기 2개"));
     expect(rules.textContent).not.toContain("v5");
   });
 
@@ -162,15 +149,6 @@ describe("admin dashboard", () => {
     const records = screen.getByRole("link", { name: /교과목 수업 기록/ });
     expect(records.textContent).toMatch(/교과목 수업 기록\s*1\s*건/);
     expect(records.textContent).toMatch(/시범 수행 2건 별도$/);
-  });
-
-  it("hides the rule-failure line when no mission failed the rule check", async () => {
-    mocks.tables.content_review_runs = [run("ready")];
-    mocks.tables.scenarios = mocks.tables.scenarios.filter((row) => (row as { scenario_id: string }).scenario_id !== "rule-fail");
-    show();
-    const band = screen.getByRole("region", { name: "지금 할 일" });
-    await waitFor(() => expect(band.textContent).toContain("품질 점검 대기 1개"));
-    expect(band.textContent).not.toContain("규칙 검사 불통과");
   });
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {

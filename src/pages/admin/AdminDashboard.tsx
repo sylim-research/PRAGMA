@@ -124,7 +124,7 @@ const PanelHeader = ({
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
 // 카드 숫자는 그 단계를 마친 서로 다른 미션 수(누적)다 — 대기는 대부분 0이라 흐름이 보이지 않는다.
-// 지금 기다리는 수는 위 「지금 할 일」과 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
+// 지금 기다리는 수는 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
@@ -194,7 +194,7 @@ const ReviewPipeline = ({
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
           <div key={stage.key} className="relative min-w-0">
-            {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
+            {/* 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
@@ -495,10 +495,6 @@ const AdminDashboard = () => {
   const displayError = snapshot ? null : dashboardError;
   // 지표 묶음마다 제목 옆에 붙인다. 알림 영역은 첫 묶음 하나만 두어 보조기기가 같은 말을 세 번 읽지 않게 한다.
   const liveStatus = (announce = false) => <LiveDatabaseStatus delayed={Boolean(dashboardError)} announce={announce} />;
-  // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
-  const needsCheckCount = snapshot
-    ? snapshot.review.rules + snapshot.review.openai + snapshot.review.claude + snapshot.review.adjudication - snapshot.rulesFailCount
-    : null;
 
   const handleReset = async () => {
     setResetting(true);
@@ -538,17 +534,6 @@ const AdminDashboard = () => {
       )}
 
       <DashboardResourceOverview resources={snapshot?.resources ?? null} error={displayError} status={liveStatus(true)} />
-
-      <section aria-label="지금 할 일" className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-xl border border-[#E8E0C0] bg-[#F7F2DF] px-4 py-3 text-sm text-[#48545A]">
-        <span className="font-semibold text-[#77611F]">지금 할 일</span>
-        <span>교수자 승인 대기 <b className="tabular-nums text-[#15202B]">{displayError ? "—" : snapshot?.review.professor ?? "—"}</b>개</span>
-        {!displayError && (needsCheckCount ?? 0) > 0 && <span>품질 점검 대기 <b className="tabular-nums">{needsCheckCount}</b>개</span>}
-        {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && <span>규칙 검사 불통과 <b className="tabular-nums">{snapshot?.rulesFailCount}</b>개</span>}
-        <div className="ml-auto flex items-center gap-4 text-xs font-semibold">
-          <Link to="/admin/ai-review" className="hover:underline">품질 점검 →</Link>
-          <Link to="/admin/review" className="text-[#15202B] hover:underline">승인하러 가기 →</Link>
-        </div>
-      </section>
 
       <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
