@@ -425,12 +425,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                         className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${draft?.decision === value
                           ? "bg-[#C08A2E] text-white" : "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#F3ECD9]"}`}>{label}</button>)}
                     </div>
-                    {draft?.decision && <>
-                      <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft.rationale_ko} disabled={busy} rows={2}
-                        onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />
-                      <p className="text-[11px] text-[#7A5A12]">근거를 결정에 맞춰 채워 두었습니다 — 고쳐서 남기실 수 있습니다.</p>
-                    </>}
-                    {draft?.mode === "bulk_signal" && <p className="text-xs text-[#5D6970]">묶음 확인으로 채워진 항목입니다. 결정이나 근거를 고치면 개별 판정이 됩니다.</p>}
+                    {draft?.decision && <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft.rationale_ko} disabled={busy} rows={2}
+                      onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />}
                   </div> : <p className="text-[13px]">의견 대조 후 교수자 결정을 기록합니다.</p>}
             </div>;
           };
@@ -451,14 +447,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <h4 className="text-[14px] font-bold text-[#233542]">의미 쟁점 판정 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
-            {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-            <details className="text-xs text-[#5D6970]"><summary className="cursor-pointer">AI 제안은 자동으로 반영되지 않습니다.</summary>
-              <p className="mt-1">기각된 교차 검토 의견도 보존합니다. 의견 대조에는 1차 검토 결과를 제공하지 않습니다.</p></details>
             {next === "professor" && <>
               <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
                 || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장</Button>
-              <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : professorDecisionsComplete(findings, run.professor_decisions) ? "교수자 판단이 현재 버전에 저장되어 있습니다." : "모든 문제 항목의 결정과 근거를 입력한 뒤 저장하세요."}</p>
-              <p className="text-xs">판단 저장은 승인이 아닙니다. ‘수정 필요’·‘판단 보류’가 남으면 최종 승인할 수 없습니다. 수정한 콘텐츠는 새 버전의 규칙·품질점검을 연결합니다. 추가 모델 전수 검토를 반복하지 않습니다.</p>
+              {/* 저장 상태만 한 줄. 계약 설명·모델명·재서술은 화면에 두지 않는다. */}
+              {(decisionsDirty || professorDecisionsComplete(findings, run.professor_decisions))
+                && <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}
             </>}
           </div>;
         })()}
