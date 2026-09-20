@@ -50,6 +50,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   approvalDisabled?: boolean; refreshKey?: string; historicalApproval?: boolean;
   /** 교수자 최종 승인 화면. ① 내용 확인 → ② 판정 → ③ 승인 순서로 보이고 기술 정보는 접는다. */
   experiential?: boolean;
+  handoffHref?: string;
   /** ② 판정 자리에 함께 둘 교수자 입력(예: 생성 AI 결함의 사용 근거). */
   decisionSlot?: ReactNode;
   /** 미션 콘텐츠 해시 전체. 세부 추적 정보에만 보인다. */
@@ -58,7 +59,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
    * 승인이 이 화면의 일이 아닐 때 넘긴다. 자동 점검과 AI 검토까지만 실행하고,
    * 교수자 감수·최종 승인 자리에는 그 화면으로 가는 인계 링크를 둔다.
    */
-  handoffHref?: string;
 }) {
   const queryClient = useQueryClient();
   const key = ["content-review", target.kind, target.targetId, target.weekNo ?? 0, refreshKey];
@@ -275,11 +275,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             <span className={["w-28 shrink-0 font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
             <span className="min-w-0 flex-1 text-[#5D6970]">
               {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
-                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건` : "지적을 확인하고 승인합니다") : "자동 점검을 마치면 넘어갑니다"}
+                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건 · 「교수자 최종 승인」 메뉴에서 합니다` : "「교수자 최종 승인」 메뉴에서 합니다")
+                : "자동 점검을 마치면 「교수자 최종 승인」 메뉴에서 합니다"}
             </span>
-            {handoffHref && <Link to={handoffHref} className={professorCurrent
-              ? "inline-flex items-center rounded-md bg-[#233542] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#15202B]"
-              : "text-[12.5px] font-semibold text-[#15202B] underline underline-offset-4"}>교수자 최종 승인으로 →</Link>}
           </li>
         </ol>
       </div>}

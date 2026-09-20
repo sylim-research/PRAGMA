@@ -881,10 +881,6 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
                 handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
             )}
-            <details>
-              <summary className="cursor-pointer text-[12.5px] font-semibold text-[#5D6970]">시나리오 전문</summary>
-              <div className="mt-1.5">{scenarioText}</div>
-            </details>
           </>
         )}
 
