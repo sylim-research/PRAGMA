@@ -730,7 +730,7 @@ const AdminComposer = () => {
       <section>
         {error && (
           <p className="mb-3 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
-            {error} (관리자 로그인이 필요합니다)
+            {error} (교수자 로그인이 필요합니다)
           </p>
         )}
 

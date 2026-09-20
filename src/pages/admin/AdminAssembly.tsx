@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+import { MissionOutline } from "@/components/admin/MissionOutline";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -930,7 +931,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
       ) : error ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
-          <p>{error} 관리자 로그인 상태를 확인해 주세요.</p>
+          <p>{error} 교수자 로그인 상태를 확인해 주세요.</p>
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
@@ -1275,27 +1276,5 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
 };
 
 /** 학습 미션 설계 — 판단 문항 5개의 제목과 직접 산출 과제. 문항 본문은 품질 점검·승인 화면에서 본다. */
-const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
-  const v6 = mission as MissionV6;
-  const task = v6.production_task;
-  if (!Array.isArray(v6.mpj_items) || !task) return null;
-  return (
-    <section aria-label="학습 미션 설계" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
-      <h3 className="mb-2 text-[13px] font-bold text-[#233542]">학습 미션 설계</h3>
-      <ol className="divide-y divide-[#F0EDE4] text-[13px]">
-        {v6.mpj_items.map((item, index) => (
-          <li key={index} className="flex gap-3 py-1.5">
-            <span className="w-[4.5rem] shrink-0 font-semibold tabular-nums text-[#66727A]">MJT 문항 {index + 1}</span>
-            <span className="min-w-0 text-[#202B33]">{item.title}</span>
-          </li>
-        ))}
-        <li className="flex gap-3 py-1.5">
-          <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT 문항</span>
-          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 다듬기</span>
-        </li>
-      </ol>
-    </section>
-  );
-};
 
 export default AdminAssembly;

@@ -313,7 +313,7 @@ const AdminTeachingMaterials = () => {
         </div>}
       </section>
       {outlines.isError && <p role="alert">교과목 목록을 불러오지 못했습니다.</p>}
-      {outlines.isSuccess && outlines.data.length === 0 && <p className="text-sm">조회 가능한 교과목이 없습니다. 관리자 로그인과 <Link className="underline" to="/admin/composer">저장된 교과목</Link>을 확인해 주세요.</p>}
+      {outlines.isSuccess && outlines.data.length === 0 && <p className="text-sm">조회 가능한 교과목이 없습니다. 교수자 로그인과 <Link className="underline" to="/admin/composer">저장된 교과목</Link>을 확인해 주세요.</p>}
       {!courseId && <div className="rounded-xl border border-dashed p-5 text-sm">
         교과목과 주차를 선택해 주세요.{materialsOn && " 미편성 주차는 계획만 미리 보고, 편성 후 해당 미션에 맞춰 자료를 구성합니다."}
         {params.get("mission") && <p className="mt-2">미션 단독 주소로 들어왔습니다. 이 미션을 사용할 교과목과 주차를 선택해 주세요.</p>}

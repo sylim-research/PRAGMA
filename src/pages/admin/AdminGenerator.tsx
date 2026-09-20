@@ -921,7 +921,7 @@ const AdminGenerator = () => {
                         : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
                     ].join(" ")}
                   >
-                    {m === "translation" ? "번역 · Translation" : "통역 · Interpreting"}
+                    {m === "translation" ? "번역" : "통역"}
                   </button>
                 );
               })}
@@ -938,7 +938,7 @@ const AdminGenerator = () => {
 
           {/* 3. 목표 화행 — 3x3 카드 */}
           <div>
-            <SectionTitle n={2} label="목표 화행 · Speech Act" accent="핵심 변수" />
+            <SectionTitle n={2} label="목표 화행" accent="핵심 변수" />
             <div className="mt-2 grid grid-cols-3 gap-1.5">
               {(Object.keys(SPEECH_ACT_UI) as SpeechActUI[]).map((sa) => {
                 const on = form.speech_act_ui === sa;

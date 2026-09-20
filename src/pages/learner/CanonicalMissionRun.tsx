@@ -233,7 +233,7 @@ function v6IntroSteps(outputName: string) {
       // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
       title: outputName === "통역" ? "다른 상황의 원발화를 직접 통역하기" : "다른 상황의 원문을 직접 번역하기",
       // 산출 뒤에 무엇이 오는지 한 줄씩 — 오른쪽 칸의 높이를 채우면서 흐름의 끝을 보여 준다.
-      flow: ["AI 참고 피드백 확인", "피드백 보고 다듬기", "내 최종안 확정"],
+      flow: ["AI 피드백 확인", "피드백 보고 다듬기", "내 최종안 확정"],
     },
   };
 }
@@ -1950,7 +1950,7 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
             <div><p className="text-xs font-bold text-[#697386]">첫 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
             <div><p className="text-xs font-bold text-[#697386]">확정한 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
           </section> : <>
-            <p className="rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs leading-5 text-[#6B5518]">실제 학습자 화면에서는 이 단계에서 AI 참고 피드백을 받습니다. 감수 화면은 AI를 호출하지 않고, 미리 작성한 확인 기준으로 같은 피드백·다듬기·확정 순서를 보여 줍니다.</p>
+            <p className="rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs leading-5 text-[#6B5518]">실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다. 감수 화면은 AI를 호출하지 않고, 미리 작성한 확인 기준으로 같은 피드백·다듬기·확정 순서를 보여 줍니다.</p>
             <LocalPilotContext.Provider value={true}>
               <DctFeedbackView quest={feedbackQuest} response={draft} onDone={setFinalDct} />
             </LocalPilotContext.Provider>

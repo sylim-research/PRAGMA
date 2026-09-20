@@ -165,7 +165,7 @@ export async function fetchElevenLabsStatus(token: string, deps: Deps = {}): Pro
       return classifyElevenLabs(usage, latencyMs);
     }
     if (response.status === 401 || response.status === 403) {
-      return { id: "elevenlabs", tone: "fail", summary: "관리자 로그인을 확인해 주세요", latencyMs };
+      return { id: "elevenlabs", tone: "fail", summary: "교수자 로그인을 확인해 주세요", latencyMs };
     }
     const code = await readCode(response);
     if (code === "elevenlabs_key_missing") return { id: "elevenlabs", tone: "fail", summary: "ELEVENLABS_API_KEY가 등록되지 않았습니다", latencyMs };
@@ -230,7 +230,7 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
       signal: timeoutSignal(20_000),
     });
     // 권한 문제는 우리가 고칠 수 있는 실제 문제다 — 이것만 빨간불.
-    if (response.status === 401 || response.status === 403) return bothFail("관리자 로그인을 확인해 주세요");
+    if (response.status === 401 || response.status === 403) return bothFail("교수자 로그인을 확인해 주세요");
     // 그 밖의 응답(미배포 404 포함)은 「제공자가 죽었다」가 아니라 「우리가 못 물어봤다」이다.
     if (!response.ok) return bothManual();
     const payload = (await response.json()) as { providers?: ProviderHealth[] };
@@ -249,7 +249,7 @@ export async function runServiceHealthCheck(deps: Deps = {}): Promise<ServiceHea
   const token = await resolveToken(deps);
   const app: ServiceStatus = { id: "app", tone: "ok", summary: "정상", detail: "이 화면이 열려 있습니다" };
   if (!token) {
-    const summary = "관리자 로그인이 필요합니다";
+    const summary = "교수자 로그인이 필요합니다";
     return {
       checkedAt: new Date().toISOString(),
       authenticated: false,

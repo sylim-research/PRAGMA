@@ -125,7 +125,7 @@ describe("fetchProviderStatuses", () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({ error: "forbidden" }, 403));
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(statuses.every((s) => s.tone === "fail")).toBe(true);
-    expect(statuses[0].summary).toContain("관리자 로그인");
+    expect(statuses[0].summary).toContain("교수자 로그인");
   });
 });
 

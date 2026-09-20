@@ -10,12 +10,13 @@ import type {
   ProfessorMissionEdits,
 } from "@/lib/pragma/promoteMission";
 
+// 학습자·검수 화면과 같은 v6 문항 이름을 쓴다(InstructorReviewExperience의 이름이 정본).
 const ITEM_LABELS = [
-  "첫인상 판단",
-  "맥락 대비 판단",
-  "판단하고 고쳐보기",
-  "이유 찾기",
-  "여러 초안 비교",
+  "상황에 맞는지 판단하기",
+  "판단하고 이유 고르기",
+  "고친 표현 고르기",
+  "직접 고치고 비교하기",
+  "여러 표현 비교하기",
 ];
 
 export function ProfessorMissionWorkbench({
