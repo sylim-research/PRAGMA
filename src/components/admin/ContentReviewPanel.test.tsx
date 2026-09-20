@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ContentReviewPanel } from "./ContentReviewPanel";
-import { BULK_SIGNAL_RATIONALE, CONTENT_REVIEW_VERSION, type ModelReview, type ProfessorFindingDecision, type ReviewFinding, type ReviewInspection, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
+import { BULK_SIGNAL_RATIONALE, CONTENT_REVIEW_VERSION, PROFESSOR_DECISION_LABELS, type ModelReview, type ProfessorFindingDecision, type ReviewFinding, type ReviewInspection, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 
 const mocks = vi.hoisted(() => ({ inspect: vi.fn(), save: vi.fn(), approve: vi.fn() }));
 vi.mock("@/lib/pragma/contentReviewApi", () => ({ contentReviewRequest: mocks.inspect, saveProfessorDecisions: mocks.save, approveContentReview: mocks.approve }));
@@ -51,13 +51,38 @@ function showPanel() {
   </QueryClientProvider>);
 }
 async function enterDecision(decision: ProfessorFindingDecision["decision"]) {
-  fireEvent.change(await screen.findByRole("combobox", { name: "교수자 결정 · claude-1" }), { target: { value: decision } });
+  fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS[decision]} · claude-1` }));
   fireEvent.change(screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" }), { target: { value: rationale } });
   fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: "원본과 양쪽 의견을 확인하여 수업 사용을 판단함" } });
   fireEvent.click(screen.getByRole("checkbox"));
 }
 
 describe("professor finding decisions", () => {
+  it("두 검토가 같은 결론이면 재서술을 접어 두고 판단할 두 줄만 남긴다", async () => {
+    inspection.run!.claude_review = { ...metadata({ verdict: "warning", summary_ko: "관계 맥락 확인", findings: [{ ...finding, needs_professor: false }] } as ReviewResult), provider: "anthropic" };
+    inspection.run!.adjudication = metadata({ summary_ko: "지적 수용", decisions: [{ finding_id: finding.id, decision: "accept",
+      rationale_ko: "상황문·원문과 대조한 결과 같은 결론에 이르렀습니다.", proposed_change_ko: "해설의 책임 주체를 화자로 맞추십시오.",
+      needs_professor: false, evidence_path: finding.where, evidence_quote: finding.quote }] });
+    showPanel();
+    expect(await screen.findByText("두 검토 합의")).toBeInTheDocument();
+    // 재서술은 지우지 않고 근거 안으로 접는다.
+    const details = screen.getByText("근거 자세히").closest("details");
+    expect(details).not.toHaveAttribute("open");
+    expect(details).toHaveTextContent("같은 결론에 이르렀습니다.");
+    // 판단에 필요한 제안은 펼치지 않아도 보인다.
+    expect(screen.getByText("해설의 책임 주체를 화자로 맞추십시오.")).toBeInTheDocument();
+  });
+  it("결정 버튼을 누르면 근거가 채워지고, 교수자가 쓴 근거는 덮지 않는다", async () => {
+    showPanel();
+    const note = () => screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" });
+    fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
+    expect(note()).toHaveValue("원문·장면에 맞아 이대로 사용합니다.");
+    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · claude-1` }));
+    expect(note()).toHaveValue("추가 확인이 필요해 판단을 보류합니다.");
+    fireEvent.change(note(), { target: { value: rationale } });
+    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.revision_required} · claude-1` }));
+    expect(note()).toHaveValue(rationale);
+  });
   it("allows explicit human approval with primary evidence and keeps extra model review optional", async () => {
     inspection.run!.approval_policy = "focused_v1";
     inspection.run!.claude_review = null;
@@ -77,7 +102,7 @@ describe("professor finding decisions", () => {
   it.each(["revision_required", "defer"] as const)("preserves rejected Claude findings and saves %s without approval", async (decision) => {
     showPanel();
     await enterDecision(decision);
-    expect(screen.getByText("교차 검토 · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.getByText("교차 검토 · 화용적 적절성")).toBeInTheDocument();
     expect(screen.getByText(/의견 대조 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
@@ -91,7 +116,7 @@ describe("professor finding decisions", () => {
 
   it("approves with a recorded default rationale when the professor types nothing", async () => {
     showPanel();
-    fireEvent.change(await screen.findByRole("combobox", { name: "교수자 결정 · claude-1" }), { target: { value: "no_change" } });
+    fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
     fireEvent.change(screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" }), { target: { value: rationale } });
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
@@ -114,8 +139,8 @@ describe("professor finding decisions", () => {
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     await screen.findByText("교수자 · 수정 없이 사용 가능");
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
-    expect(screen.getByText("교차 검토 · 초대의 선택권 확인")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).not.toBeInTheDocument();
+    expect(screen.getByText("교차 검토 · 화용적 적절성")).toBeInTheDocument();
   });
 
   it("does not carry professor decisions into changed content", async () => {
@@ -127,7 +152,7 @@ describe("professor finding decisions", () => {
     fireEvent.click(screen.getByRole("button", { name: "결과 새로고침" }));
     await screen.findByText(/내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다/);
     expect(screen.getByRole("button", { name: "규칙 검사 시작" })).toBeEnabled();
-    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "교수자 최종 승인" })).not.toBeInTheDocument();
     expect(mocks.save).not.toHaveBeenCalled();
     expect(mocks.approve).not.toHaveBeenCalled();
@@ -158,7 +183,7 @@ describe("professor finding decisions", () => {
 describe("automated quality signals", () => {
   const bundleButton = (count: number) => screen.findByRole("button", { name: `미결 자동 품질 점검 신호 ${count}건 확인 · 현재 버전 그대로 사용` });
   const setDecision = (id: string, decision: ProfessorFindingDecision["decision"], rationale_ko: string) => {
-    fireEvent.change(screen.getByRole("combobox", { name: `교수자 결정 · ${id}` }), { target: { value: decision } });
+    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS[decision]} · ${id}` }));
     fireEvent.change(screen.getByRole("textbox", { name: `교수자 판단 근거 · ${id}` }), { target: { value: rationale_ko } });
   };
 
@@ -179,7 +204,7 @@ describe("automated quality signals", () => {
     withSignals(signal("rule-1", "R32"));
     showPanel();
     fireEvent.click(await bundleButton(1));
-    await waitFor(() => expect(screen.getByRole("combobox", { name: "교수자 결정 · claude-1" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).toBeInTheDocument());
     setDecision("claude-1", "no_change", rationale);
     fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
@@ -218,7 +243,7 @@ describe("automated quality signals", () => {
     fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
     // 계약 위반은 묶이지 않고 개별 판정 자리에 남는다.
-    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-2" })).toHaveValue("");
+    expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · rule-2` })).toHaveAttribute("aria-pressed", "false");
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
   });
 
@@ -229,9 +254,9 @@ describe("automated quality signals", () => {
     // 이미 결정된 1건은 대상에서 빠진다.
     fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
-    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-1" })).toHaveValue("defer");
+    expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · rule-1` })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-1" })).toHaveValue("현장 확인 뒤 판단합니다.");
-    expect(screen.getByRole("combobox", { name: "교수자 결정 · rule-2" })).toHaveValue("no_change");
+    expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · rule-2` })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-2" })).toHaveValue(BULK_SIGNAL_RATIONALE);
   });
 });
