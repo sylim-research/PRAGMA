@@ -44,6 +44,10 @@ const Home = lazy(() => import("./pages/Home.tsx"));
 const Roadmap = lazy(() => import("./pages/Roadmap.tsx"));
 const WorkflowPreview = lazy(() => import("./pages/WorkflowPreview.tsx"));
 const MissionShell = lazy(() => import("./pages/MissionShell.tsx"));
+// 논문 도판용 가상 응답 시연 — 개발 모드에서만 번들에 들어간다(운영 빌드는 import 자체가 빠진다).
+const VirtualResponseDiscussionDemo = import.meta.env.DEV
+  ? lazy(() => import("./pages/dev/VirtualResponseDiscussionDemo.tsx"))
+  : null;
 const CourseOverview = lazy(() => import("./pages/learner/CourseOverview.tsx"));
 const WeekDetail = lazy(() => import("./pages/learner/WeekDetail.tsx"));
 const IntroArc = lazy(() => import("./pages/learner/IntroArc.tsx"));
@@ -121,6 +125,9 @@ const App = () => (
             path="/workflow-preview"
             element={import.meta.env.DEV ? <WorkflowPreview /> : <Navigate to="/learner/course" replace />}
           />
+          {VirtualResponseDiscussionDemo && (
+            <Route path="/dev/virtual-response-demo" element={<VirtualResponseDiscussionDemo />} />
+          )}
           {/* 홈은 폐지 — 학습자 착지 화면은 수업이다(2026-08-01). 옛 링크·북마크는 그대로 잇는다. */}
           <Route path="/learner/home" element={<Navigate to="/learner/course" replace />} />
           {/* 라운지는 논문 버전에서 제외하며 과거 북마크는 수업으로 연결한다. */}
