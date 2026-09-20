@@ -296,7 +296,7 @@ const Architecture = () => (
             label="품질 관문 · 승인분만 통과"
             steps={[
               { title: "자동 품질 점검", detail: "규칙 기반 · 같은 입력에 같은 결과" },
-              { title: "AI 검토", detail: "1차 → 독립 교차 → 재검토 · 판정 권한 없음" },
+              { title: "AI 검토", detail: "1차 검토 · 필요할 때 교차 검토 · 판정 권한 없음" },
               { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 자격 결정" },
             ]}
           />
@@ -315,13 +315,11 @@ const Architecture = () => (
 
           <Node lane="learn" title="교과목 선택 · 주차 학습 진입" desc="이번 주차 미션 · 학습 자료 · 진행 상태" />
           <Down />
-          <Node lane="learn" title="주차 도입 활동" desc="장면 제시 → 차이 인식 → 원리 이해" />
-          <Down />
           <Chain
             tone="core"
             label="한 미션의 흐름 · 매 미션 반복"
             steps={[
-              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "첫인상 · 맥락 대비 · 고쳐보기 · 이유 찾기 · 초안 비교" },
+              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "상황 판단 · 이유 고르기 · 고친 표현 고르기 · 직접 고치기 · 여러 표현 비교" },
               { title: "DCT형 통번역 산출", detail: "번역 · 통역(음성 STT/TTS) · 한→중 / 중→한" },
               { title: "AI 피드백 검토", detail: "의미 · 언어 · 화용 3층 피드백 · 유지/수정은 학습자 결정" },
             ]}
@@ -354,16 +352,10 @@ const Architecture = () => (
             desc="교과목 · 주차 주제 · 승인 미션 배치 · 자동 채우기"
           />
           <Down />
-          <Node
-            lane="class"
-            title="주차별 수업 운영"
-            desc="수업·토론 자료 생성·승인 · 교실 화면 · 진행 메모"
-          />
-          <Down />
           {/* 「조건 대비」(미션 1 vs 미션 2)는 폐기한 개념이다(연구자 결정 2026-09-17) —
               한 주차 두 미션이지만 조건은 이미 미션 하나 안에 들어 있다. 학급 응답은
               화면만 있고 아직 자료가 쌓이지 않았으므로 점선 배지로 둔다. */}
-          <Node lane="class" title="학급 응답 집계" desc="익명 학급 집계 · 이견 건수" status="준비 중" />
+          <Node lane="class" title="학급 응답 분포" desc="학습 수행 기록 안 탭 · 익명 집계 · 이견 건수" status="준비 중" />
           <Down />
           <Node
             lane="class"

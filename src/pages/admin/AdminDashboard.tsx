@@ -313,7 +313,7 @@ const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; a
       {!delayed && <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-50 motion-safe:animate-ping" />}
       <span className={["relative inline-flex h-2 w-2 rounded-full", delayed ? "bg-amber-500" : "bg-emerald-500"].join(" ")} />
     </span>
-    {delayed ? "갱신 지연" : "DB 실시간"}
+    {delayed ? "갱신 지연" : "최근 조회"}
   </span>
 );
 

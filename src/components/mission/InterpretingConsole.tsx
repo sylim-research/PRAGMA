@@ -151,7 +151,7 @@ export function InterpretingConsole({
     <div className="space-y-3" data-scene-skin="oral-console">
       <section className="overflow-hidden rounded-2xl border border-[#CBD4DC] bg-white shadow-[0_8px_22px_rgba(21,32,43,0.07)]">
         <div className="flex items-center justify-between gap-3 border-b border-[#E1E6EA] bg-[#F7F9FA] px-4 py-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#40515F]"><Mic className="h-4 w-4" />통역 수행 콘솔</div>
+          <div className="flex items-center gap-2 text-xs font-bold text-[#40515F]"><Mic className="h-4 w-4" />직접 통역하기</div>
           <span className="text-[10.5px] text-[#7B8994]">듣기 → 녹음 → 전사 확인</span>
         </div>
         <div className="space-y-4 p-4">
