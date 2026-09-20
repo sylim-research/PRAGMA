@@ -309,7 +309,7 @@ const AdminBrowser = () => {
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
       ) : error ? (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-[13px] text-red-900">
-          <p>조회 실패: {error} 관리자 로그인 상태를 확인해 주세요.</p>
+          <p>조회 실패: {error} 교수자 로그인 상태를 확인해 주세요.</p>
           <Button type="button" variant="outline" size="sm" onClick={() => void loadRows()}>
             다시 불러오기
           </Button>

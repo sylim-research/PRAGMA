@@ -48,7 +48,7 @@ const AdminLogin = () => {
 
     if (profile?.role !== APP_ROLE.ADMIN) {
       await supabase.auth.signOut();
-      setError("이 계정은 관리자 권한이 없습니다.");
+      setError("이 계정은 교수자 권한이 없습니다.");
       setBusy(false);
       return;
     }
@@ -67,9 +67,9 @@ const AdminLogin = () => {
         <div className="flex items-stretch gap-3">
           <span aria-hidden className="mt-1 w-[5px] shrink-0 self-stretch rounded-sm bg-[#FAD338]" />
           <div>
-            <h1 className="text-2xl font-bold leading-tight">관리자 로그인</h1>
+            <h1 className="text-2xl font-bold leading-tight">교수자 로그인</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              발급받은 아이디로 로그인하세요. 관리자 권한이 있는 계정만 입장할 수 있습니다.
+              발급받은 아이디로 로그인하세요. 교수자 권한이 있는 계정만 입장할 수 있습니다.
             </p>
           </div>
         </div>

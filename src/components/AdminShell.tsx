@@ -156,7 +156,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
               htmlFor="admin-mobile-navigation"
               className="mb-1.5 block text-[12px] font-medium text-muted-foreground"
             >
-              관리자 메뉴
+              교수자 메뉴
             </label>
             <select
               id="admin-mobile-navigation"
