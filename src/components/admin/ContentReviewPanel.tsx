@@ -451,16 +451,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
-      {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
-          단계와 무관하게 넘어갈 수 있고, 넘어가는 것만으로 승인 상태가 바뀌지 않는다. */}
-      {handoffHref && <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#ECE8DE] pt-3 text-[13px]">
-        <p className="text-[#5D6970]">{next === "approved" || (compact && historicalApproval)
-          ? "이 버전은 교수자 승인을 마쳤습니다."
-          : next === "professor"
-            ? "✓ 자동 점검 완료 · 교수자 승인 대기"
-            : "자동 점검을 마치면 교수자 최종 승인으로 넘어갑니다."}</p>
-        <Link to={handoffHref} className="font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인에서 이 미션 열기 →</Link>
-      </div>}
       {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
