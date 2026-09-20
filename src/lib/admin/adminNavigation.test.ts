@@ -57,7 +57,8 @@ describe("admin navigation reachability", () => {
 
   it("keeps approving out of the AI review screen", () => {
     // AI 검토와 교수자 최종 승인은 같은 미션 목록을 보되 권한이 다르다. 화면을 나눈 뒤에도
-    // AI 쪽에 승인 경로가 생기지 않아야 하고, 같은 미션으로 건너갈 길이 있어야 한다.
+    // AI 쪽에 승인 경로가 생기지 않아야 한다. 2026-09-20: 미션 하나를 들고 다음 단계 화면으로
+    // 건너가는 인계 링크는 없앴다 — 승인은 여러 건을 모아 한 번에 하고, 화면 사이 이동은 사이드바로만 한다.
     const app = readFileSync(resolve(process.cwd(), "src/App.tsx"), "utf8");
     expect(app).toContain('path="/admin/ai-review"');
     expect(app).toContain("reviewMode aiReview");
@@ -69,7 +70,11 @@ describe("admin navigation reachability", () => {
     // handoffHref가 주어지면 승인 절과 승인 버튼이 렌더되지 않는다.
     expect(panel).toContain('next === "professor" && !handoffHref');
     expect(panel).toContain('!(handoffHref && (next === "professor" || next === "rules" || next === "openai"))');
-    expect(panel).toContain("교수자 최종 승인에서 이 미션 열기");
+    expect(panel).not.toContain("교수자 최종 승인에서 이 미션 열기");
+    expect(panel).not.toContain("교수자 최종 승인으로 →");
+    // 인계 링크를 없앤 대신 사이드바에 승인 메뉴가 있어야 길이 끊기지 않는다.
+    const nav = readFileSync(resolve(process.cwd(), "src/lib/admin/adminNavigation.ts"), "utf8");
+    expect(nav).toContain('to: "/admin/review"');
 
     const assembly = readFileSync(
       resolve(process.cwd(), "src/pages/admin/AdminAssembly.tsx"),

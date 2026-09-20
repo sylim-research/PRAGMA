@@ -50,19 +50,20 @@ export const LearnerBottomNav = () => (
 
 /** PC 헤더 안의 같은 두 탭. 현재 탭은 노란 밑줄로 표시한다. */
 export const LearnerTopNav = () => (
-  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
+  // 밑줄은 글자 폭에만 긋는다 — 좌우 여백까지 덮으면 무엇을 가리키는지 흐려진다(2026-09-20).
+  // 탭이 둘뿐이고 이름이 두 글자라 아이콘은 구분에 기여하지 않아 PC 헤더에서는 뺀다(모바일 하단 탭은 유지).
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-5 md:flex">
     {TABS.map((t) => (
       <NavLink
         key={t.to}
         to={t.to}
         className={({ isActive }) =>
           [
-            "flex items-center gap-1.5 border-b-2 px-3 py-1.5 text-[14px] font-bold transition-colors",
+            "border-b-2 pb-1 text-[14px] font-bold transition-colors",
             isActive ? "border-[#FAD338] text-white" : "border-transparent text-[#B9C4CE] hover:text-white",
           ].join(" ")
         }
       >
-        <t.icon className="h-4 w-4" aria-hidden />
         {t.label}
       </NavLink>
     ))}

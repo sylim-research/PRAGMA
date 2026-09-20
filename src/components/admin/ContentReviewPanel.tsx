@@ -50,6 +50,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   approvalDisabled?: boolean; refreshKey?: string; historicalApproval?: boolean;
   /** 교수자 최종 승인 화면. ① 내용 확인 → ② 판정 → ③ 승인 순서로 보이고 기술 정보는 접는다. */
   experiential?: boolean;
+  handoffHref?: string;
   /** ② 판정 자리에 함께 둘 교수자 입력(예: 생성 AI 결함의 사용 근거). */
   decisionSlot?: ReactNode;
   /** 미션 콘텐츠 해시 전체. 세부 추적 정보에만 보인다. */
@@ -58,7 +59,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
    * 승인이 이 화면의 일이 아닐 때 넘긴다. 자동 점검과 AI 검토까지만 실행하고,
    * 교수자 감수·최종 승인 자리에는 그 화면으로 가는 인계 링크를 둔다.
    */
-  handoffHref?: string;
 }) {
   const queryClient = useQueryClient();
   const key = ["content-review", target.kind, target.targetId, target.weekNo ?? 0, refreshKey];
@@ -275,11 +275,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             <span className={["w-28 shrink-0 font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
             <span className="min-w-0 flex-1 text-[#5D6970]">
               {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
-                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건` : "지적을 확인하고 승인합니다") : "자동 점검을 마치면 넘어갑니다"}
+                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건 · 「교수자 최종 승인」 메뉴에서 합니다` : "「교수자 최종 승인」 메뉴에서 합니다")
+                : "자동 점검을 마치면 「교수자 최종 승인」 메뉴에서 합니다"}
             </span>
-            {handoffHref && <Link to={handoffHref} className={professorCurrent
-              ? "inline-flex items-center rounded-md bg-[#233542] px-3 py-1.5 text-[12.5px] font-semibold text-white hover:bg-[#15202B]"
-              : "text-[12.5px] font-semibold text-[#15202B] underline underline-offset-4"}>교수자 최종 승인으로 →</Link>}
           </li>
         </ol>
       </div>}
@@ -453,16 +451,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
-      {/* 인계는 늘 열어 둔다. 화면을 나눈 탓에 같은 미션을 다시 찾게 만들지 않는다.
-          단계와 무관하게 넘어갈 수 있고, 넘어가는 것만으로 승인 상태가 바뀌지 않는다. */}
-      {handoffHref && <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#ECE8DE] pt-3 text-[13px]">
-        <p className="text-[#5D6970]">{next === "approved" || (compact && historicalApproval)
-          ? "이 버전은 교수자 승인을 마쳤습니다."
-          : next === "professor"
-            ? "✓ 자동 점검 완료 · 교수자 승인 대기"
-            : "자동 점검을 마치면 교수자 최종 승인으로 넘어갑니다."}</p>
-        <Link to={handoffHref} className="font-semibold text-[#15202B] underline underline-offset-4">교수자 최종 승인에서 이 미션 열기 →</Link>
-      </div>}
       {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}

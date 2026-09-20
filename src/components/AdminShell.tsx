@@ -49,8 +49,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
     [
       "mr-2 rounded-md px-3 py-[2.5px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
       active
-        ? "bg-muted text-foreground font-normal"
-        : "text-foreground font-normal hover:bg-muted hover:text-foreground",
+        ? "bg-[#F3ECD9] text-foreground font-normal"
+        : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
     ].join(" ");
 
   return (
@@ -104,7 +104,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     className={[
                       "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14px] font-semibold transition-colors",
                       groupActive
-                        ? "rounded-md bg-[#15202B] text-white shadow-sm"
+                        ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",
                     ].join(" ")}
                   >
@@ -116,7 +116,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                       aria-hidden
                       className={[
                         "h-3.5 w-3.5 shrink-0 transition-transform",
-                        groupActive ? "text-[#D8DEE4]" : "text-[#7D858C]",
+                        groupActive ? "text-[#15202B]" : "text-[#7D858C]",
                         expanded ? "rotate-180" : "",
                       ].join(" ")}
                     />
