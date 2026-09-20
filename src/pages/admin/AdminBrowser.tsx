@@ -109,8 +109,11 @@ const libraryDb = supabase as unknown as { from: (table: string) => any };
 const AdminBrowser = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const view = LIBRARY_VIEWS.find((item) => item.value === searchParams.get("view"))?.value ?? "ready";
+  const currentOnly = searchParams.get("current") === "1";
   const setView = (next: LibraryView) => {
-    setSearchParams(next === "ready" ? {} : { view: next }, { replace: true });
+    const params = new URLSearchParams(searchParams);
+    params.set("view", next);
+    setSearchParams(params, { replace: true });
     setOpenId(null);
     setVisibleCount(LIST_PAGE_SIZE);
   };
@@ -121,10 +124,18 @@ const AdminBrowser = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [fMode, setFMode] = useState<"all" | GenMode>("all");
+  const [fMode, setFMode] = useState<"all" | GenMode>(() => {
+    const value = searchParams.get("mode");
+    return value === "translation" || value === "stt_interpreting" ? value : "all";
+  });
   const [fDomain, setFDomain] = useState<"all" | Domain>("all");
   const [fTheme, setFTheme] = useState<"all" | ThemeCode>("all");
-  const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
+  const [fDirection, setFDirection] = useState<"all" | LanguageDirection>(() => {
+    const value = searchParams.get("direction");
+    return value === "ko_zh" || value === "zh_ko" ? value : "all";
+  });
+  const [fAct, setFAct] = useState(() => ACTS.includes(searchParams.get("act") as SpeechActUI) ? searchParams.get("act") as SpeechActUI : "all");
+  const [fLevel, setFLevel] = useState(() => LEVELS.includes(searchParams.get("level") as LearnerLevel) ? searchParams.get("level") as LearnerLevel : "all");
   const [fSource, setFSource] = useState<"all" | "ai" | "authentic">("all");
   const [fArchive, setFArchive] = useState<ArchiveView>("current");
   const [fFormat, setFFormat] = useState<"all" | "v6" | "v5">("all");
@@ -214,13 +225,16 @@ const AdminBrowser = () => {
   const matchesView = (row: CoreRow, target: LibraryView) => {
     if (target === "ready") return libraryMissionIsReady(row) && isFinalized(row) && !replaced.has(row.scenario_id);
     if (target === "pending") return libraryMatchesView(row, "pending") && row.mission_schema_version === "mission_v6";
+    if (target === "missions" && currentOnly) return Boolean(row.mission_schema_version) && ["generated", "reviewed", "released"].includes(row.mission_status ?? "");
     return libraryMatchesView(row, target);
   };
   const matching = useMemo(
     () =>
       rows.filter(
         (r) =>
-          (!replaced.has(r.scenario_id) || placedCount(r.scenario_id) > 0) &&
+          (!replaced.has(r.scenario_id) || (!currentOnly && placedCount(r.scenario_id) > 0)) &&
+          (fAct === "all" || r.speech_act === fAct) &&
+          (fLevel === "all" || r.learner_level === fLevel) &&
           (fFormat === "all" || (fFormat === "v6" ? r.mission_schema_version === "mission_v6" : r.mission_schema_version !== "mission_v6")) &&
           (fMode === "all" || r.mode === fMode) &&
           (fDomain === "all" || r.domain === fDomain) &&
@@ -230,11 +244,11 @@ const AdminBrowser = () => {
             (fSource === "authentic" ? isAuthentic(r.core_content) : !isAuthentic(r.core_content))),
       ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rows, fMode, fDomain, fTheme, fDirection, fSource, fFormat, replaced, assignments],
+    [rows, fMode, fDomain, fTheme, fDirection, fSource, fFormat, fAct, fLevel, currentOnly, replaced, assignments],
   );
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const filtered = useMemo(() => matching.filter((row) => matchesView(row, view)), [matching, view, replaced]);
+  const filtered = useMemo(() => matching.filter((row) => matchesView(row, view)), [matching, view, replaced, currentOnly]);
   useEffect(() => { setVisibleCount(LIST_PAGE_SIZE); setOpenId(null); }, [filtered, sel]);
 
   // (act|level) → { total, translation, interpreting } (54셀 감사 대응 — 계약 0-j·73)
@@ -258,6 +272,7 @@ const AdminBrowser = () => {
   const interp = filtered.filter((r) => r.mode === "stt_interpreting").length;
   const translated = filtered.length - interp;
   const hasActiveFilters =
+    fAct !== "all" || fLevel !== "all" ||
     fMode !== "all" ||
     fDomain !== "all" ||
     fTheme !== "all" ||
@@ -287,6 +302,10 @@ const AdminBrowser = () => {
             {/* ── 필터 ── */}
             <div className="flex flex-wrap items-end gap-2 text-[12px]" aria-label="라이브러리 필터">
               <span className="mb-1.5 mr-0.5 text-[11px] font-bold tracking-[0.08em] text-[#6C747A]">필터</span>
+              <Filter className="w-full sm:w-[96px]" label="화행" value={fAct} onChange={setFAct}
+                opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
+              <Filter className="w-full sm:w-[96px]" label="수준" value={fLevel} onChange={setFLevel}
+                opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
               <Filter className="w-full sm:w-[96px]" label="모드" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
               <Filter className="w-full sm:w-[92px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
