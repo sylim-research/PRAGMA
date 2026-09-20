@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+import { MissionOutline } from "@/components/admin/MissionOutline";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -1275,27 +1276,5 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
 };
 
 /** 학습 미션 설계 — 판단 문항 5개의 제목과 직접 산출 과제. 문항 본문은 품질 점검·승인 화면에서 본다. */
-const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) => {
-  const v6 = mission as MissionV6;
-  const task = v6.production_task;
-  if (!Array.isArray(v6.mpj_items) || !task) return null;
-  return (
-    <section aria-label="학습 미션 설계" className="rounded-lg border border-[#ECE8DE] px-4 py-3">
-      <h3 className="mb-2 text-[13px] font-bold text-[#233542]">학습 미션 설계</h3>
-      <ol className="divide-y divide-[#F0EDE4] text-[13px]">
-        {v6.mpj_items.map((item, index) => (
-          <li key={index} className="flex gap-3 py-1.5">
-            <span className="w-[4.5rem] shrink-0 font-semibold tabular-nums text-[#66727A]">MJT 문항 {index + 1}</span>
-            <span className="min-w-0 text-[#202B33]">{item.title}</span>
-          </li>
-        ))}
-        <li className="flex gap-3 py-1.5">
-          <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT 문항</span>
-          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 다듬기</span>
-        </li>
-      </ol>
-    </section>
-  );
-};
 
 export default AdminAssembly;

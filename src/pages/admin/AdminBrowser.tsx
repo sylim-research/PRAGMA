@@ -19,8 +19,10 @@ import {
 import { coreDirection } from "@/lib/pragma/coreSchema";
 import { THEME_LABEL, type ThemeCode } from "@/lib/pragma/scenarioTopics";
 import { fetchMissionForReview } from "@/lib/mission/missionDb";
+import { MissionOutline } from "@/components/admin/MissionOutline";
 import { MissionPreview } from "@/components/admin/MissionPreview";
 import type { MissionRuntime } from "@/lib/pragma/missionSchema";
+import type { LearnerMissionRuntime } from "@/lib/pragma/missionV6";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { fetchAllPages } from "@/lib/pragma/paginatedRows";
@@ -128,7 +130,7 @@ const AdminBrowser = () => {
   const [fFormat, setFFormat] = useState<"all" | "v6" | "v5">("all");
   const [sel, setSel] = useState<{ act: SpeechActUI; level: LearnerLevel } | null>(null);
   // 눈검사 미리보기 — scenario_id → {mission, warnings}. openId = 펼친 행.
-  const [preview, setPreview] = useState<Record<string, { mission: MissionRuntime; warnings: string[] }>>({});
+  const [preview, setPreview] = useState<Record<string, { mission: LearnerMissionRuntime; warnings: string[] }>>({});
   const [openId, setOpenId] = useState<string | null>(null);
 
   const togglePreview = async (r: CoreRow) => {
@@ -139,7 +141,7 @@ const AdminBrowser = () => {
     setOpenId(r.scenario_id);
     if (!preview[r.scenario_id]) {
       try {
-        const res = await fetchMissionForReview(r.scenario_id);
+        const res = await fetchMissionForReview(r.scenario_id, { includeV6: true });
         if (!res) throw new Error("미션 본문을 찾지 못했습니다.");
         setPreview((m) => ({ ...m, [r.scenario_id]: { mission: res.mission, warnings: [] } }));
       } catch (e) {
@@ -429,7 +431,9 @@ const AdminBrowser = () => {
                     </button>
                     {openId === r.scenario_id && preview[r.scenario_id] && (
                       <div className="border-t border-[#EAE4D2] px-4 py-3">
-                        <MissionPreview mission={preview[r.scenario_id].mission} warnings={preview[r.scenario_id].warnings} />
+                        {preview[r.scenario_id].mission.schema_version === "mission_v6"
+                          ? <MissionOutline mission={preview[r.scenario_id].mission} />
+                          : <MissionPreview mission={preview[r.scenario_id].mission as MissionRuntime} warnings={preview[r.scenario_id].warnings} />}
                       </div>
                     )}
                   </li>

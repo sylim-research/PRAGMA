@@ -55,7 +55,8 @@ describe("학습 미션 라이브러리", () => {
     await act(async () => {});
     fireEvent.click(within(item).getByRole("button"));
     await screen.findByText("검증용 미션 본문");
-    expect(mocks.preview).toHaveBeenCalledWith("released");
+    // v6 저장본도 읽어야 상세가 열린다(2026-09-20).
+    expect(mocks.preview).toHaveBeenCalledWith("released", { includeV6: true });
   });
 
   it("승인 전·과거 미션·재료를 분리하고 빈 셀은 생성기로 보내지 않는다", async () => {
