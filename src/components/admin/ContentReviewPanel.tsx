@@ -392,18 +392,16 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               ...(!draft?.rationale_ko.trim() || isDefaultRationale(draft.rationale_ko) ? { rationale_ko: DEFAULT_FINDING_RATIONALE[value] } : {}) });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <span className="text-[12px] text-[#5D6970]">{source} · {finding.problem_type_ko}</span>
+                <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
                 {badge && <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-semibold ${badge.cls}`}>{badge.text}</span>}
               </div>
-              <p className="text-[14px] font-semibold leading-snug text-[#233542]">{plainIssue(finding.issue_ko)}</p>
-              <dl className="space-y-1 text-[13.5px]">
-                <div className="flex gap-2"><dt className="shrink-0 font-semibold text-[#5D6970]">고칠 곳</dt><dd className="text-[#233542]">{whereLabel(finding.where)}</dd></div>
-                <div className="flex gap-2"><dt className="shrink-0 font-semibold text-[#5D6970]">제안</dt><dd className="text-[#233542]">{plainIssue(change)}</dd></div>
-              </dl>
+              {/* 결정에 필요한 것은 「어디를 · 어떻게」 둘뿐이다. 지적 전문·이유는 근거 안에 둔다. */}
+              <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
               {/* 논증·인용·저장 경로는 판단 자료가 아니라 추적 자료다. 삭제하지 않고 이 안으로 옮긴다. */}
               <details open={!agreed && Boolean(decision) && decision?.decision !== "accept"} className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">근거 자세히</summary>
+                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">지적 전문·근거</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
+                  <p className="font-semibold">{plainIssue(finding.issue_ko)}</p>
                   <p>{finding.reason_ko}</p>
                   {finding.quote && <blockquote className="border-l-2 border-[#C08A2E] pl-2">{finding.quote}</blockquote>}
                   {finding.uncertainty_ko && <p className="text-xs">불확실성: {finding.uncertainty_ko}</p>}
@@ -451,11 +449,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </section>}
             {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="의미 쟁점 판정">
               <h4 className="text-[14px] font-bold text-[#233542]">의미 쟁점 판정 {substantiveFindings.length}건</h4>
-              <p className="text-xs">AI 검토가 근거를 들어 제기한 의미·화용·콘텐츠 쟁점입니다. 항목마다 교수자가 판정하고 근거를 남깁니다.</p>
               {substantiveFindings.map(findingCard)}
             </section>}
             {run.adjudication && <p className="text-xs">{run.adjudication.result.summary_ko} · {run.adjudication.model}</p>}
-            <p className="text-xs text-muted-foreground">AI의 수용·보완은 수정 제안이며 자동 수정되지 않습니다. 기각된 교차 검토 의견도 보존합니다. 의견 대조에는 1차 검토 결과를 제공하지 않습니다.</p>
+            <details className="text-xs text-[#5D6970]"><summary className="cursor-pointer">AI 제안은 자동으로 반영되지 않습니다.</summary>
+              <p className="mt-1">기각된 교차 검토 의견도 보존합니다. 의견 대조에는 1차 검토 결과를 제공하지 않습니다.</p></details>
             {next === "professor" && <>
               <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
                 || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장</Button>

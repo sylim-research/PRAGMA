@@ -66,7 +66,7 @@ describe("professor finding decisions", () => {
     showPanel();
     expect(await screen.findByText("두 검토 합의")).toBeInTheDocument();
     // 재서술은 지우지 않고 근거 안으로 접는다.
-    const details = screen.getByText("근거 자세히").closest("details");
+    const details = screen.getByText("지적 전문·근거").closest("details");
     expect(details).not.toHaveAttribute("open");
     expect(details).toHaveTextContent("같은 결론에 이르렀습니다.");
     // 판단에 필요한 제안은 펼치지 않아도 보인다.
@@ -102,7 +102,7 @@ describe("professor finding decisions", () => {
   it.each(["revision_required", "defer"] as const)("preserves rejected Claude findings and saves %s without approval", async (decision) => {
     showPanel();
     await enterDecision(decision);
-    expect(screen.getByText("교차 검토 · 화용적 적절성")).toBeInTheDocument();
+    expect(screen.getByText("원문 · 화용적 적절성")).toBeInTheDocument();
     expect(screen.getByText(/의견 대조 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
@@ -140,7 +140,7 @@ describe("professor finding decisions", () => {
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     await screen.findByText("교수자 · 수정 없이 사용 가능");
     expect(screen.queryByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).not.toBeInTheDocument();
-    expect(screen.getByText("교차 검토 · 화용적 적절성")).toBeInTheDocument();
+    expect(screen.getByText("원문 · 화용적 적절성")).toBeInTheDocument();
   });
 
   it("does not carry professor decisions into changed content", async () => {
