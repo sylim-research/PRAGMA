@@ -30,18 +30,18 @@ export function DashboardResourceOverview({ resources, error, status }: {
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {cards.map(({ label, value, unit, note, icon: Icon, to, ready }) => (
           <Link key={label} to={to} className={[
-            "group flex min-h-[128px] flex-col rounded-2xl border px-5 py-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
+            "group flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
             ready ? "border-[#15202B] bg-[#15202B] text-white hover:bg-[#233440]" : "border-[#E6E1D5] bg-white text-[#15202B] hover:border-[#C5B05F]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
               <Icon aria-hidden className={ready ? "h-5 w-5 text-[#EFD65B]" : "h-5 w-5 text-[#8B825F]"} />
             </div>
-            <div className="mt-3 flex flex-wrap items-baseline gap-2">
-              <span className="text-[34px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
+            <div className="mt-2 flex flex-wrap items-baseline gap-2">
+              <span className="text-[30px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
               <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
             </div>
-            <div className={"mt-auto flex items-center justify-between gap-1 pt-3 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
+            <div className={"mt-auto flex items-center justify-between gap-1 pt-2 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
               <span>{note}</span><ArrowUpRight aria-hidden className="h-4 w-4 shrink-0" />
             </div>
           </Link>
@@ -74,9 +74,9 @@ export function DashboardResourceOverview({ resources, error, status }: {
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceLibraryHref(scope, key, code)}
-                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-3 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <span className="text-sm text-[#59656D]">{label}</span>
-                  <span className="text-lg font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
+                  <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceLibraryHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#4E5C64] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#F1F0E9]"><div className="h-full rounded-full bg-[#D9C45C]" style={{ width: `${count / max * 100}%` }} /></div>
