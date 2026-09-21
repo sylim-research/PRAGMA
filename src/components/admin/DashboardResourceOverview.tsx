@@ -24,22 +24,21 @@ export function DashboardResourceOverview({ resources, error, status }: {
         <div>
           <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">PRAGMA · RESOURCE LIBRARY</p>
           <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
-          <p className="mt-1 text-sm text-[#647079]">하나의 미션 안에, 표현을 판단하고 직접 옮기는 학습이 담겨 있습니다.</p>
         </div>
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         {cards.map(({ label, value, unit, note, icon: Icon, to, ready }) => (
           <Link key={label} to={to} className={[
-            "group flex min-h-[144px] flex-col rounded-2xl border px-5 py-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
+            "group flex min-h-[128px] flex-col rounded-2xl border px-5 py-4 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
             ready ? "border-[#15202B] bg-[#15202B] text-white hover:bg-[#233440]" : "border-[#E6E1D5] bg-white text-[#15202B] hover:border-[#C5B05F]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
               <Icon aria-hidden className={ready ? "h-5 w-5 text-[#EFD65B]" : "h-5 w-5 text-[#8B825F]"} />
             </div>
-            <div className="mt-4 flex flex-wrap items-baseline gap-2">
-              <span className="text-[40px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
+            <div className="mt-3 flex flex-wrap items-baseline gap-2">
+              <span className="text-[34px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
               <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
             </div>
             <div className={"mt-auto flex items-center justify-between gap-1 pt-3 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
@@ -64,7 +63,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.7fr_0.85fr_0.85fr_0.85fr]">
+      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.4fr_0.85fr_0.85fr_0.85fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));
