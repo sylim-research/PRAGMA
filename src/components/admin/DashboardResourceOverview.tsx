@@ -54,7 +54,6 @@ export function DashboardResourceOverview({ resources, error, status }: {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 자료 구성</h2>
-          <span className="text-xs text-[#647079]">{scope === "all" ? "전체 보유" : "현재 편성 가능"} {number(selected?.missionCount)}개 미션</span>
         </div>
         <div aria-label="자료 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
           {([['all', '전체 보유'], ['ready', '편성 가능']] as const).map(([value, label]) => <button
