@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { ServiceHealthPanel } from "@/components/admin/ServiceHealthPanel";
+import { DashboardResourceOverview } from "@/components/admin/DashboardResourceOverview";
+import { DASHBOARD_SCENARIO_SELECT, summarizeDashboardResources } from "@/lib/admin/adminDashboardResources";
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
@@ -51,6 +53,7 @@ import { toast } from "sonner";
 const db = supabase as unknown as { from: (table: string) => any };
 
 type DashboardSnapshot = {
+  resources: ReturnType<typeof summarizeDashboardResources>;
   content: ReturnType<typeof summarizeDashboardContent>;
   review: DashboardReviewStageCounts;
   assignments: ReturnType<typeof summarizeDashboardAssignments>;
@@ -121,7 +124,7 @@ const PanelHeader = ({
 // 용어대장 기준: 규칙은 「검사」, AI는 「검토」(의견 제시, 판정 아님), 뒤따르는 AI는 「재검토」,
 // 교수자는 「최종 승인」. 「지적」은 산출물 이름으로 쓰지 않고 「판정」은 연구자 몫이라 여기 쓰지 않는다.
 // 카드 숫자는 그 단계를 마친 서로 다른 미션 수(누적)다 — 대기는 대부분 0이라 흐름이 보이지 않는다.
-// 지금 기다리는 수는 위 「지금 할 일」과 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
+// 지금 기다리는 수는 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
@@ -191,7 +194,7 @@ const ReviewPipeline = ({
         const changed = changedKeys.has(`review.${stage.key}`);
         return (
           <div key={stage.key} className="relative min-w-0">
-            {/* 강조색은 위 「지금 할 일」에만 쓴다. 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
+            {/* 단계 카드는 중립색으로 두고 가장 많이 쌓인 단계만 표시해 둔다. */}
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
@@ -369,7 +372,7 @@ const AdminDashboard = () => {
       const [allScenarioRows, reviewRows, cumulativeRows, assignmentRows, courseRows, learnerResult, learnerRecordResult, courseLinkedResult] = await Promise.all([
         fetchAllDashboardRows<DashboardScenarioRow>("시나리오", (from, to) => db
           .from("scenarios")
-          .select("scenario_id,supersedes_scenario_id,content_format,review_status,mission_status,updated_at,mission_schema_version:mission_content->>schema_version,authoring_stage:mission_content->authoring->>stage")
+          .select(DASHBOARD_SCENARIO_SELECT)
           .eq("content_format", "scenario_core_v1")
           .is("archived_at", null)
           .order("scenario_id", { ascending: true })
@@ -405,9 +408,9 @@ const AdminDashboard = () => {
           .select("status")
           .order("id", { ascending: true })
           .range(from, to)),
-        db.from("profiles").select("id", { count: "exact" }).eq("role", "learner").eq("approval_status", "approved").limit(1),
-        db.from("learner_mission_logs").select("id", { count: "exact" }).limit(1),
-        db.from("learner_mission_logs").select("id", { count: "exact" }).not("course_id", "is", null).limit(1),
+        db.from("profiles").select("id", { count: "exact", head: true }).eq("role", "learner").eq("approval_status", "approved"),
+        db.from("learner_mission_logs").select("id", { count: "exact", head: true }),
+        db.from("learner_mission_logs").select("id", { count: "exact", head: true }).not("course_id", "is", null),
       ]);
 
       const scenarioRows = excludeSupersededRows(allScenarioRows);
@@ -426,6 +429,7 @@ const AdminDashboard = () => {
       const content = summarizeDashboardContent(scenarioRows);
       const review = summarizeDashboardReviewStages(reviewScopeRows, reviewRows);
       const next: DashboardSnapshot = {
+        resources: summarizeDashboardResources(scenarioRows),
         content: { ...content, reviewTargetCount: content.reviewTargetCount - scenarioRows.filter(v5ReviewTarget).length },
         review,
         assignments: summarizeDashboardAssignments(assignmentRows),
@@ -491,10 +495,6 @@ const AdminDashboard = () => {
   const displayError = snapshot ? null : dashboardError;
   // 지표 묶음마다 제목 옆에 붙인다. 알림 영역은 첫 묶음 하나만 두어 보조기기가 같은 말을 세 번 읽지 않게 한다.
   const liveStatus = (announce = false) => <LiveDatabaseStatus delayed={Boolean(dashboardError)} announce={announce} />;
-  // 품질 점검 화면의 「점검 필요」와 같은 집합: 교수자 차례가 아닌 미션 중 규칙 오류를 뺀 것.
-  const needsCheckCount = snapshot
-    ? snapshot.review.rules + snapshot.review.openai + snapshot.review.claude + snapshot.review.adjudication - snapshot.rulesFailCount
-    : null;
 
   const handleReset = async () => {
     setResetting(true);
@@ -533,78 +533,7 @@ const AdminDashboard = () => {
         </p>
       )}
 
-      {/* 연동이 끊겨 있으면 아래 지표를 보기 전에 알아야 한다 — 스크롤 없이 보이는 자리에 둔다.
-          평소에는 한 줄로 접혀 있고, 정상이 아닌 항목이 있으면 스스로 펼쳐진다.
-          이 라우트는 RequireAdmin이 이미 막고, 조회 함수도 is_admin()으로 다시 막는다. */}
-      {/* 사이드바에 흩어진 화면들이 실제로는 하나의 흐름이다. 그 흐름을 한 줄로 두되
-          구간마다 지금의 수를 달아 둔다 — 정적 도식이면 이틀 만에 눈이 지나친다.
-          숫자는 전부 기존 snapshot 필드이고 새로 계산하는 것이 없다. */}
-
-      {/* 첫 화면의 주인공은 지금 교수자를 기다리는 일이다. 수는 품질 점검·최종 승인 화면과 같은 검수 단계 판정으로 센다.
-          이 화면에서 승인하지 않고, 결정은 교수자 최종 승인 화면에서 한다. */}
-      {/* 숫자마다 「무엇의 몇 개인지」를 붙인다 — 설명문을 읽기 전에 뜻이 서야 한다.
-          「품질 점검 대기」는 규칙 검사 전과 AI 검토 진행 중을 함께 센다(규칙 검사 불통과는 따로). 그래서 「시작 전」이라 부르지 않는다. */}
-      <section aria-label="지금 할 일" className="rounded-2xl bg-[#15202B] px-6 py-2.5 text-white">
-        <p className="text-[12px] font-semibold tracking-[0.08em] text-[#FAD338]">지금 할 일</p>
-        <div className="mt-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <div className="min-w-0">
-            <p className="text-[22px] font-bold leading-tight">
-              교수자 승인 대기{" "}
-              <span className="tabular-nums">{displayError ? "—" : snapshot?.review.professor ?? "—"}</span>개
-            </p>
-          </div>
-          <Button asChild className="h-10 bg-[#FAD338] px-5 text-[14px] font-semibold text-[#15202B] hover:bg-[#F2C71E]">
-            <Link to="/admin/review">승인하러 가기 →</Link>
-          </Button>
-        </div>
-        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-white/10 pt-2 text-[13px] text-[#B9C3CA]">
-          {/* 0건은 할 일이 아니라 소음이라 생겼을 때만 보인다(아래 불통과도 같다). */}
-          {!displayError && (needsCheckCount ?? 0) > 0 && (
-            <span>품질 점검 대기 <b className="font-semibold tabular-nums text-white">{needsCheckCount}</b>개</span>
-          )}
-          {!displayError && (snapshot?.rulesFailCount ?? 0) > 0 && (
-            <span>
-              규칙 검사 불통과 <b className="font-semibold tabular-nums text-[#FAD338]">{snapshot?.rulesFailCount}</b>개
-            </span>
-          )}
-          <Link to="/admin/ai-review" className="ml-auto font-medium text-white underline-offset-4 hover:underline">품질 점검 →</Link>
-        </div>
-      </section>
-
-      {/* 흐름 전체의 누적 수. 참고용이라 할 일보다 조용하게 둔다. 숫자는 전부 기존 snapshot 필드다. */}
-      <PanelHeader title="전체 흐름" action={liveStatus(true)} />
-      <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
-        <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          {[
-            // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
-            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount },
-            { to: "/admin/assembly", stage: "학습 미션", screen: "제작 현황", value: snapshot?.content.generatedMissionCount },
-            // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
-            // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
-            { to: "/admin/ai-review", stage: "검수·승인 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
-            // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
-            { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
-            // 사람에게 준 과제가 아니라 교과목·주차에 놓인 미션 건수다 — 사이드바 「수업 편성」과 같은 말로 부른다.
-            { to: "/admin/composer", stage: "미션 편성", screen: "수업 편성", value: snapshot?.assignments.assignmentCount },
-            // 계정·기간으로 거르지 않은 전체 행이라 실제 수업 수행으로 단정하지 않는다.
-            { to: "/admin/decision-traces", stage: "수행 기록", screen: "기록 목록", value: snapshot?.learnerRecordCount },
-          ].map((step, index) => (
-            <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
-                <span className="text-[12px] font-medium text-[#5A6670]">{step.stage}</span>
-                {step.value == null && !displayError ? (
-                  <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
-                ) : (
-                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
-                    {displayError ? "—" : step.value}
-                  </span>
-                )}
-                <span className="mt-auto pt-1.5 text-[11.5px] text-[#6F7B83]">{step.screen} →</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </section>
+      <DashboardResourceOverview resources={snapshot?.resources ?? null} error={displayError} status={liveStatus(true)} />
 
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
@@ -638,7 +567,7 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          // 편성 건수는 위 전체 흐름에 이미 있다 — 같은 수를 되풀이하지 않고 주차를 큰 수로 둔다.
+          // 주차를 큰 수로 둔다(편성 건수는 수업 편성 화면에서 본다).
           label="편성 주차"
           value={snapshot?.assignments.weekCount ?? null}
           unit="개"
@@ -663,7 +592,7 @@ const AdminDashboard = () => {
             시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          // 전체 수행 기록은 위 전체 흐름에 이미 있다. 여기서는 교과목 맥락에서 나온 기록을 큰 수로 둔다
+          // 교과목 맥락에서 나온 기록을 큰 수로 둔다
           // (실제 수업 기록과 시범 수행을 가르는 유일한 단서 — 교과목 맥락 없는 실행은 연결되지 않는다).
           label="교과목 수업 기록"
           value={snapshot?.courseLinkedRecordCount ?? null}

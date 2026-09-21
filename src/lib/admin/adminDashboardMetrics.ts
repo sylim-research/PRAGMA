@@ -24,6 +24,12 @@ export type DashboardScenarioRow = {
   /** mission_content.mpj_items[4]·[5]의 type — 문항 전체를 읽지 않고 「정확히 5문항」만 확인한다. */
   mpj_item_5_type?: string | null;
   mpj_item_6_type?: string | null;
+  mission_mpj_items?: unknown;
+  production_task_source?: string | null;
+  speech_act?: string | null;
+  learner_level?: string | null;
+  mode?: string | null;
+  direction?: string | null;
 };
 
 export type DashboardReviewRunRow = {
@@ -100,7 +106,7 @@ export function isDashboardReviewTarget(row: DashboardScenarioRow): boolean {
 }
 
 /** 대시보드 「학습 미션」 칸의 집합: 현재 코어에서 미션 내용이 만들어진 것. */
-function isGeneratedMission(row: DashboardScenarioRow): boolean {
+export function isGeneratedMission(row: DashboardScenarioRow): boolean {
   return row.content_format === "scenario_core_v1"
     && ["generated", "reviewed", "released"].includes(row.mission_status ?? "")
     && hasMissionContent(row);
@@ -130,11 +136,11 @@ export function summarizeDashboardContent(rows: readonly DashboardScenarioRow[])
  * 라이브러리 「편성 가능 미션」과 같은 판정(libraryMissionIsReady — 현재 release·mission_v5/v6·MJT 5문항).
  * 교수자 승인 완료의 부분집합이며, 새 편성은 이 집합에서만 고른다.
  */
-function isComposerReadyMission(row: DashboardScenarioRow): boolean {
-  return libraryMissionIsReady({
+export function isComposerReadyMission(row: DashboardScenarioRow): boolean {
+  return isFinalizedMission(row) && libraryMissionIsReady({
     mission_status: row.mission_status,
     mission_schema_version: row.mission_schema_version,
-    mission_mpj_items: row.mpj_item_5_type && !row.mpj_item_6_type ? [0, 0, 0, 0, 0] : [],
+    mission_mpj_items: row.mission_mpj_items ?? (row.mpj_item_5_type && !row.mpj_item_6_type ? [0, 0, 0, 0, 0] : []),
     core_content: { generation: { content_release_id: row.content_release_id ?? undefined } },
   });
 }
