@@ -1783,12 +1783,8 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
 }) {
   const mission = useCanonicalMission();
   const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
-  const reviewHost = useContext(ReviewHostContext);
   return (
     <div className="space-y-3">
-      {quest.id === "A1" && !reviewHost && (
-        <h1 className="px-1 text-xl font-bold tracking-[-0.01em] text-[#15202B]">적절성 판단하기</h1>
-      )}
       {pilotContext !== undefined
         ? pilotContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{pilotContext}</p>
         : <ContextCard context={quest.context} />}
