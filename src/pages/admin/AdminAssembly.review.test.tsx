@@ -180,7 +180,21 @@ describe("quality check workbench", () => {
 });
 
 describe("assembly workbench", () => {
-  it("shows only current v6 missions read-only, hiding superseded drafts and scenario-only rows", async () => {
+  it("opens on generatable scenarios with the draft button, leaving legacy cores out", async () => {
+    mocks.tables.scenarios = [
+      scenario("v6-new", "새 v6 미션"),
+      { ...scenario("core-new", "생성할 시나리오", null), core_content: { brief_note_ko: "생성할 시나리오", situation_ko: "상황", direction: "ko_zh", focal_segments: [{ role: "head", text: "원문" }] } },
+      scenario("core-legacy", "옛 코어", null),
+    ];
+    show({}, "/admin/assembly");
+    const bench = await screen.findByRole("region", { name: "작업대" });
+    expect(screen.getByRole("button", { name: /초안 생성 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
+    expect(within(bench).getByRole("heading", { name: "생성할 시나리오" })).toBeInTheDocument();
+    expect(within(bench).getByRole("button", { name: "초안 자동 생성" })).toBeEnabled();
+    expect(within(queue()).queryByText("옛 코어")).not.toBeInTheDocument();
+  });
+
+  it("hides superseded drafts and legacy scenario-only rows from the v6 lists", async () => {
     mocks.tables.scenarios = [
       { ...scenario("v6-new", "새 v6 미션"), supersedes_scenario_id: "v6-old" },
       scenario("v6-old", "옛 v6 초안"),
