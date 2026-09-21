@@ -1027,19 +1027,20 @@ export function checkMission(
       }
       if (!coverage) {
         add(v, "R31", "fail", "item_lineage.coverage_summary 누락");
-      } else if (coverage.unattributed_count > 0) {
+      } else if (coverage.total_count > 0
+        && coverage.unattributed_count / coverage.total_count > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO) {
         // 미귀속 비율은 구조 모순이 아니라 교수자 확인 우선순위 신호다. 20% 상한의
         // 경험적 근거가 확인되기 전까지 비율 초과도 차단하지 않는다(2026-09-09 연구자 결정).
-        const ratio = coverage.total_count > 0 ? coverage.unattributed_count / coverage.total_count : 0;
-        const overReference = ratio > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO;
+        // 1개만 있어도 뜨던 신호가 검수 대부분에 붙어 우선순위 구실을 못 해, 참조 상한을 넘을 때만 남긴다(2026-09-21 연구자 결정).
+        const ratio = coverage.unattributed_count / coverage.total_count;
         add(
           v,
           "R32",
           "warning",
           `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개` +
-            (overReference ? ` — 참조 상한 ${Math.round(ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO * 100)}% 초과 (${coverage.unattributed_count}/${coverage.total_count})` : ""),
+            ` — 참조 상한 ${Math.round(ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO * 100)}% 초과 (${coverage.unattributed_count}/${coverage.total_count})`,
           {
-            subrule: overReference ? "unattributed_over_reference_ratio" : "unattributed_present",
+            subrule: "unattributed_over_reference_ratio",
             actual: ratio,
             threshold: ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO,
             direction: dir,
@@ -1176,11 +1177,12 @@ function checkV6Mission(missionInput: unknown, ctx: CheckContext, coreInput?: un
         || (coverage && attribution.calls.reduce((sum, call) => sum + call.target_count, 0) !== coverage.total_count)) {
         add(v, "R31", "fail", "item_lineage attribution provenance가 기존 최종화 계약과 다름");
       }
-      if (coverage?.unattributed_count > 0) {
-        const ratio = coverage.unattributed_count / coverage.total_count;
-        add(v, "R32", "warning", `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개`,
-          { subrule: ratio > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO ? "unattributed_over_reference_ratio" : "unattributed_present",
-            actual: ratio, threshold: ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO, direction: dir });
+      // 참조 상한(20%)을 넘을 때만 신호를 남긴다(2026-09-21 연구자 결정 — 1개만 있어도 뜨면 우선순위 신호가 되지 못함).
+      const ratio = coverage?.total_count ? coverage.unattributed_count / coverage.total_count : 0;
+      if (coverage && ratio > ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO) {
+        add(v, "R32", "warning",
+          `교수자가 우선 확인할 model_unattributed claim ${coverage.unattributed_count}개 — 참조 상한 ${Math.round(ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO * 100)}% 초과 (${coverage.unattributed_count}/${coverage.total_count})`,
+          { subrule: "unattributed_over_reference_ratio", actual: ratio, threshold: ITEM_LINEAGE_MAX_UNATTRIBUTED_RATIO, direction: dir });
       }
     }
   }
