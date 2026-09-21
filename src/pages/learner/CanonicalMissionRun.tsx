@@ -1694,7 +1694,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
-          {!localPilot && <MissionDissentPanel onSubmit={setDissent} />}
+          {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}
+          {!localPilot && needsChange && <MissionDissentPanel onSubmit={setDissent} />}
 
           {revisionOpen ? (
             <>
