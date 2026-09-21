@@ -112,8 +112,8 @@ const ctx: CheckContext = {
 };
 
 type Finding = { source: "schema" | "rules" | "authoring"; level: string; path: string; message: string };
-function evaluate(raw: unknown, attempt: number, repaired: boolean) {
-  const { draft, issues } = assembleMissionV6Draft({
+async function evaluate(raw: unknown, attempt: number, repaired: boolean) {
+  const { draft, issues } = await assembleMissionV6Draft({
     raw, core, act, direction, mode, featureCode, model, generationAttempt: attempt, repaired,
     sha256Hex: text => createHash("sha256").update(text).digest("hex"),
   });
@@ -133,7 +133,7 @@ const first = await callModel(user);
 calls.push({ kind: "draft", finish: first.finish, usage: first.usage, ms: first.ms });
 if (first.finish === "length") throw new Error("출력 절단(finish_reason=length) — 저장하지 않음");
 const firstRaw = JSON.parse(first.content);
-let result = evaluate(firstRaw, 1, false);
+let result = await evaluate(firstRaw, 1, false);
 const firstResult = result;
 let finalRaw = firstRaw;
 if (result.fails.length) {
@@ -142,7 +142,7 @@ if (result.fails.length) {
   calls.push({ kind: "repair", finish: repair.finish, usage: repair.usage, ms: repair.ms });
   if (repair.finish !== "length") {
     finalRaw = JSON.parse(repair.content);
-    result = evaluate(finalRaw, 2, true);
+    result = await evaluate(finalRaw, 2, true);
   }
 }
 

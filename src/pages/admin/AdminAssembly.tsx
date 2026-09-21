@@ -50,6 +50,7 @@ import {
   type PromotableCore,
   type PromoteStage,
 } from "@/lib/pragma/promoteMission";
+import { promoteCoreV6, type PromoteV6Stage } from "@/lib/pragma/promoteMissionV6";
 import { fetchMissionForReview } from "@/lib/mission/missionDb";
 import { MissionPreview } from "@/components/admin/MissionPreview";
 import { ProfessorMissionWorkbench } from "@/components/admin/ProfessorMissionWorkbench";
@@ -148,7 +149,12 @@ const STATE_KO: Record<AssemblyState, string> = {
 type ProductionState = "v6_review" | "v6_done" | "v5_only" | "core_only";
 type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Exclude<QualityCheckQueue, "decision">;
 // 이 화면은 v6만 본다 — 이전 형식(v5)과 미션 없는 시나리오는 학습 미션 라이브러리에서 본다.
-const ASSEMBLY_CHIPS: StateChip[] = ["v6_review", "v6_done", "all"];
+// 2026-09-21: 미션 없는 시나리오에서 v6 초안을 만드는 버튼을 붙였다(설계안 v2 최소 경로). 초안은 검수 대기로만 저장된다.
+const ASSEMBLY_CHIPS: StateChip[] = ["v6_review", "v6_done", "core_only", "all"];
+const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
+  preparing: "코어 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
+  repairing: "지적된 곳 고치는 중", quality: "AI 점검 중", saving: "저장 중",
+};
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
   v6_done: "승인 완료",
@@ -551,6 +557,30 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
 
+  const [v6Stage, setV6Stage] = useState<{ id: string; stage: PromoteV6Stage } | null>(null);
+  const onGenerateV6 = async (r: CoreRow) => {
+    setBusy(r.scenario_id);
+    setRowMsg((m) => ({ ...m, [r.scenario_id]: "" }));
+    setFailures((f) => { const { [r.scenario_id]: _drop, ...rest } = f; return rest; });
+    try {
+      const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
+      if (res.ok) {
+        const qLabel = res.qualityVerdict ? { pass: "AI 점검 통과", warning: "AI 점검 주의", fail: "AI 점검 결함" }[res.qualityVerdict] : "AI 점검 미실행";
+        toast.success(`v6 초안 저장 · 규칙 ${res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검으로 넘어갑니다`);
+        await loadRows();
+      } else {
+        const msg = res.error ?? "생성 실패";
+        setFailures((f) => ({ ...f, [r.scenario_id]: msg }));
+        toast.error(msg);
+      }
+    } catch (e) {
+      setFailures((f) => ({ ...f, [r.scenario_id]: `오류: ${e instanceof Error ? e.message : e}` }));
+    } finally {
+      setBusy(null);
+      setV6Stage(null);
+    }
+  };
+
   const onAssemble = async (r: CoreRow, resumeAstra = false, generationJobId?: string) => {
     setBusy(r.scenario_id);
     setAssemblyProgress({ id: r.scenario_id, stage: { phase: "preparing" } });
@@ -866,6 +896,18 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             {productionOf(r) !== "core_only" && productionOf(r) !== "v5_only" && (!loaded ? loadingMission : (
               loaded.mission.schema_version === "mission_v6" && <MissionOutline mission={loaded.mission} />
             ))}
+            {productionOf(r) === "core_only" && (
+              <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
+                <p className="text-[#3F4E57]">이 시나리오로 v6 학습 미션 초안을 자동 생성합니다. 초안은 품질 점검과 교수자 승인을 거쳐야 편성할 수 있습니다.</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}>
+                    {busy === r.scenario_id ? "생성 중…" : "v6 초안 생성"}
+                  </Button>
+                  {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
+                </div>
+                {failures[r.scenario_id] && <p className="mt-2 text-[12.5px] text-red-800" role="alert">{failures[r.scenario_id]}</p>}
+              </div>
+            )}
             {(productionOf(r) === "v6_review" || productionOf(r) === "v6_done") && (
               <Link to={`${productionOf(r) === "v6_done" ? "/admin/review" : "/admin/ai-review"}?scenarioId=${r.scenario_id}`}
                 className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#15202B] underline underline-offset-4">

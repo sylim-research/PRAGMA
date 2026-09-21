@@ -21,6 +21,10 @@ describe("OpenAI request contract", () => {
         primary: "gpt-4o",
         fallback: null,
       },
+      mission_v6: {
+        primary: "gpt-5.5",
+        fallback: null,
+      },
       critic: {
         primary: "gpt-4.1",
         fallback: null,
@@ -30,6 +34,13 @@ describe("OpenAI request contract", () => {
         fallback: "gpt-4o-mini",
       },
     });
+  });
+
+  it("omits temperature only for reasoning models", () => {
+    const base = { system: "s", user: "u", temperature: 0.4 };
+    expect(buildOpenAIChatRequest({ ...base, model: "gpt-5.5" })).not.toHaveProperty("temperature");
+    expect(buildOpenAIChatRequest({ ...base, model: "o3" })).not.toHaveProperty("temperature");
+    expect(buildOpenAIChatRequest({ ...base, model: "gpt-4.1" }).temperature).toBe(0.4);
   });
 
   it("extracts usage without retaining prompt or response content", () => {

@@ -59,8 +59,8 @@ export interface V6AssembleInput {
   model: string;
   generationAttempt: number;
   repaired: boolean;
-  /** 브라우저·Node 공용이 되도록 해시 함수는 호출자가 준다. */
-  sha256Hex: (text: string) => string;
+  /** 브라우저(crypto.subtle, 비동기)·Node 공용이 되도록 해시 함수는 호출자가 준다. */
+  sha256Hex: (text: string) => string | Promise<string>;
 }
 
 export interface V6AuthoringIssue {
@@ -80,7 +80,7 @@ const scene = (item: AnyRecord) => ({
   preceding_turn: null,
 });
 
-export function assembleMissionV6Draft(input: V6AssembleInput): { draft: AnyRecord; issues: V6AuthoringIssue[] } {
+export async function assembleMissionV6Draft(input: V6AssembleInput): Promise<{ draft: AnyRecord; issues: V6AuthoringIssue[] }> {
   const { raw, core, act, direction, mode, featureCode } = input;
   const issues: V6AuthoringIssue[] = [];
   const out = (raw ?? {}) as AnyRecord;
@@ -181,7 +181,7 @@ export function assembleMissionV6Draft(input: V6AssembleInput): { draft: AnyReco
     model: input.model,
     prompt_version: MISSION_V6_GENERATION_PROMPT_VERSION,
     content_release_id: CURRENT_CONTENT_RELEASE_ID,
-    mission_content_hash: input.sha256Hex(JSON.stringify(hashPayload)),
+    mission_content_hash: await input.sha256Hex(JSON.stringify(hashPayload)),
     generated_at: new Date().toISOString(),
     generation_attempt: input.generationAttempt,
   };

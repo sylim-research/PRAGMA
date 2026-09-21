@@ -322,7 +322,7 @@ export function repairFindingsForRuleViolations(
  * 관리자 품질관리 장치이며 학습자에게 노출되지 않는다. 호출·스키마 검증이 실패해도
  * 구조상 유효한 초안은 generated 격리 상태로 저장해 교수자가 이어서 처리한다.
  */
-async function runQualityCheck(args: {
+export async function runQualityCheck(args: {
   missionContent: unknown;
   feature: TargetFeature;
   direction: LanguageDirection;
