@@ -75,13 +75,13 @@ describe("admin dashboard", () => {
     expect(screen.queryByText(/편성 가능 자료 안에 판단/)).not.toBeInTheDocument();
   });
 
-  it("keeps the number-first overall flow with accurate labels and no helper sentence", async () => {
+  it("drops the duplicated production flow row and keeps no helper sentence", async () => {
     show();
-    const inProgress = await screen.findByRole("link", { name: /검수·승인 중/ });
-    await waitFor(() => expect(inProgress.textContent).toContain("3"));
-    expect(inProgress).toHaveAttribute("href", "/admin/ai-review");
+    await screen.findByRole("group", { name: "품질 검수 단계" });
+    expect(screen.queryByText("제작·승인 현황")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /검수·승인 중/ })).not.toBeInTheDocument();
     expect(screen.queryByText("승인 전 미션")).not.toBeInTheDocument();
-    const records = screen.getAllByRole("link", { name: /수행 기록/ })[0];
+    const records = screen.getByRole("link", { name: /교과목 수업 기록/ });
     expect(records).toHaveAttribute("href", "/admin/decision-traces");
     expect(screen.queryByText(/단계별 누적 수입니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/각 미션을 다음에 처리할 단계/)).not.toBeInTheDocument();
