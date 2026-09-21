@@ -544,7 +544,8 @@ function FeedbackBox({ verdict, feedback, action, highlights = [] }: {
   return (
     <div className="break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[14px] leading-7 text-[#3F4A59]">
       {verdict && <p className="mb-2 font-black text-[#4A5568]">{verdict}</p>}
-      <SentenceLines text={feedback} highlights={highlights} />
+      {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
+      <SentenceLines text={withoutExpressionMemo(feedback)} highlights={highlights} />
       {action && (
         <div className="mt-3 rounded-lg border border-[#E5E1D8] bg-white px-3 py-2.5 font-semibold text-[#3F4A59]">
           <RichLine text={action} highlights={highlights} />
@@ -693,7 +694,6 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
           <h4 className="font-bold">가능한 수정 예시</h4>
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
-          <p className="text-xs leading-5 text-[#697386]">원문의 뜻을 지키며 옮기는 방식은 여러 가지입니다. 이 문장만 정답이라는 뜻은 아닙니다.</p>
         </section>}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
@@ -804,10 +804,8 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
             </div>
           </div>
         )}
-        {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감추고 표현 메모만 남긴다. 저장된 콘텐츠는 그대로다. */}
-        {answered && (correctionOnly
-          ? <ExpressionMemoSection feedback={quest.feedback} />
-          : <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>)}
+        {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감춘다. 저장된 콘텐츠는 그대로다. */}
+        {answered && !correctionOnly && <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
@@ -840,7 +838,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
   // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
-  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락 → 표현 메모.
+  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락. 표현 메모는 보이지 않는다.
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
@@ -850,7 +848,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#697386]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
-        <p className="mt-1 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
@@ -862,14 +859,12 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
         <h4 className="font-bold">참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
-        <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 표현입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
       </section>}
       {submitted && quest.contrast && <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label="다른 맥락에서는?">
         <h4 className="font-bold">다른 맥락에서는?</h4>
         <p className="text-[15px] leading-7">{quest.contrast.context}</p>
         <p className={`${targetFont} text-[16.5px] leading-8`}>{quest.contrast.target}</p>
       </section>}
-      {submitted && <ExpressionMemoSection feedback={quest.feedback} />}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
       {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
@@ -878,19 +873,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   </QuestScaffold>;
 }
 
-/** 해설 문자열 끝의 「표현 메모」만 따로 보여 준다. 메모가 없으면 아무것도 그리지 않는다. */
-function ExpressionMemoSection({ feedback }: { feedback: string }) {
-  const { memo } = useMemo(() => splitExpressionMemo(feedback), [feedback]);
-  if (memo.length === 0) return null;
-  return (
-    <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label={EXPRESSION_MEMO_LABEL}>
-      <h4 className="font-bold">{EXPRESSION_MEMO_LABEL}</h4>
-      <ul className="space-y-1.5">
-        {memo.map(line => <li key={line} className="text-[15px] leading-7 text-[#3F4A59]"><RichLine text={line} /></li>)}
-      </ul>
-    </section>
-  );
-}
 function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (response: QuestResponse) => void }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
@@ -1712,7 +1694,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
-          {!localPilot && <MissionDissentPanel onSubmit={setDissent} />}
+          {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}
+          {!localPilot && needsChange && <MissionDissentPanel onSubmit={setDissent} />}
 
           {revisionOpen ? (
             <>
@@ -1783,12 +1766,8 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
 }) {
   const mission = useCanonicalMission();
   const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
-  const reviewHost = useContext(ReviewHostContext);
   return (
     <div className="space-y-3">
-      {quest.id === "A1" && !reviewHost && (
-        <h1 className="px-1 text-xl font-bold tracking-[-0.01em] text-[#15202B]">적절성 판단하기</h1>
-      )}
       {pilotContext !== undefined
         ? pilotContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{pilotContext}</p>
         : <ContextCard context={quest.context} />}
@@ -2025,6 +2004,13 @@ export function splitExpressionMemo(feedback: string): { paragraphs: string[]; m
   return { paragraphs: body, memo };
 }
 
+/** 해설 문자열에서 「표현 메모」 줄부터 끝까지를 떼고 화용 해설만 돌려준다(원래 줄바꿈 유지). */
+export function withoutExpressionMemo(feedback: string): string {
+  const lines = feedback.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === EXPRESSION_MEMO_LABEL);
+  return start < 0 ? feedback : lines.slice(0, start).join("\n").trimEnd();
+}
+
 function MpjLessonBridge({ lessonPoints, onContinue }: {
   lessonPoints: MissionLessonPoint[];
   onContinue: () => void;
@@ -2158,8 +2144,7 @@ function CompletedQuestReview({ quest, response }: {
   );
 }
 
-export function CompletionRecord({ label, source, response, alternatives = [] }: {
-  label: string;
+export function CompletionRecord({ source, response, alternatives = [] }: {
   source?: string;
   response?: DctResponse;
   alternatives?: DctQuest["feedback"]["alternatives"];
@@ -2169,33 +2154,22 @@ export function CompletionRecord({ label, source, response, alternatives = [] }:
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
-  const finalText = response.reflected ? response.revised : response.first;
-  // 읽는 순서대로 세로 정렬: 원문 → 첫 번역 → 최종안 → 참고 답안. 첫 안을 유지했으면 한 칸으로 합친다.
+  const outputLabel = `${mission.targetLanguage.label} ${outputName}`;
+  // 읽는 순서대로 세로 정렬: 원문 → 내 초안·수정안(한 카드) → 참고 답안. 초안을 유지했으면 초안만 둔다.
   return (
     <article className={`${panel} space-y-4 p-5 sm:p-6`}>
-      <p className="text-xs font-bold text-[#6B5518]">{label}</p>
       {source && <section className="rounded-xl border border-[#E4CB50] bg-[#FFFBEA] p-4">
         <h2 className="text-sm font-bold text-[#6B5518]">{mission.sourceLanguage.label} 원문</h2>
         <p className={`${sourceFont} mt-2 whitespace-pre-wrap break-keep text-[17px] leading-8`}>{source}</p>
       </section>}
-      {response.reflected ? (
-        <>
-          <section className="rounded-xl border border-[#E5E1D8] bg-[#FAF9F5] p-4">
-            <h2 className="text-sm font-bold">첫 {outputName}</h2>
-            <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
-          </section>
-          <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
-            <h2 className="text-sm font-bold">내가 확정한 최종안</h2>
-            <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{finalText}</p>
-          </section>
-        </>
-      ) : (
-        <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
-          <h2 className="text-sm font-bold">내가 확정한 최종안</h2>
-          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{finalText}</p>
-          <p className="mt-2 text-xs text-[#697386]">첫 {outputName}을 유지했습니다.</p>
-        </section>
-      )}
+      <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
+        <h2 className="text-sm font-bold">{outputLabel} (초안)</h2>
+        <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
+        {response.reflected ? <div className="mt-4 border-t border-[#D5DCE3] pt-4">
+          <h2 className="text-sm font-bold">{outputLabel} (수정)</h2>
+          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.revised}</p>
+        </div> : <p className="mt-2 text-xs text-[#697386]">초안을 그대로 유지했습니다.</p>}
+      </section>
       {alternatives.length > 0 && <section className="rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
         <h2 className="text-sm font-bold">참고 답안</h2>
         <div className="mt-3 space-y-3">{alternatives.map((alternative) => <div key={alternative.text} className="rounded-xl bg-white p-4">
@@ -2800,7 +2774,6 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             </section>
             <div className="space-y-4">
               <CompletionRecord
-                label={primaryDct?.title ?? `${mission.activityMode === "interpreting" ? "통역" : "번역"} 실습`}
                 source={primaryDct?.source}
                 response={aDct}
                 alternatives={primaryDct?.feedback.alternatives}

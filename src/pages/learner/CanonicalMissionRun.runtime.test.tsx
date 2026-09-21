@@ -256,11 +256,12 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(await screen.findByRole("heading", { name: SAMPLE_MISSION_V5.production_task.situation_ko })).toBeInTheDocument();
     expect(screen.getByText("요청 화행 · 한국어 → 중국어")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "적절성 판단하기" })).not.toBeInTheDocument();
+    expect(screen.queryByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /학습 미션 시작하기/ }));
 
-    expect(await screen.findByRole("heading", { name: "적절성 판단하기" })).toBeInTheDocument();
+    expect(await screen.findByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "적절성 판단하기" })).not.toBeInTheDocument();
     expect(screen.getByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).toBeInTheDocument();
     expect(screen.getByText(/^상대적 지위 · /)).toBeInTheDocument();
     expect(screen.getByText(/^친숙도 · /)).toBeInTheDocument();
@@ -291,7 +292,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       eventType: "mission_session_opened", taskMode: mode, payload: { entry_mode: "full_mission" },
     }));
     fireEvent.click(screen.getByRole("button", { name: /학습 미션 시작하기/ }));
-    expect(screen.getByRole("heading", { name: "적절성 판단하기" })).toBeInTheDocument();
+    expect(screen.getByText(mission.mpj_items[0].situation_ko)).toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
   });
 
@@ -332,7 +333,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await screen.findByRole("heading", { name: mission.production_task.situation_ko });
     fireEvent.click(screen.getByRole("button", { name: /학습 미션 시작하기/ }));
 
-    expect(await screen.findByRole("heading", { name: "적절성 판단하기" })).toBeInTheDocument();
+    expect(await screen.findByText(mission.mpj_items[0].situation_ko)).toBeInTheDocument();
     expect(screen.queryByText("상대의 말")).not.toBeInTheDocument();
     expect(screen.queryByText("UI에 표시하면 안 되는 legacy 값")).not.toBeInTheDocument();
   });

@@ -88,7 +88,7 @@ describe("local learner UX pilot", () => {
     click("수정안 제출하기");
     expect(screen.getByRole("textbox", { name: "내가 고친 표현" })).toHaveValue(freeAnswer);
     expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
-    expect(screen.getByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).toBeInTheDocument();
+    expect(screen.queryByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/기준 판단과 같아요|기준 판단과 달라요/)).not.toBeInTheDocument();
     click("다음: 표현 비교하기");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
