@@ -8,6 +8,11 @@ export const OPENAI_MODEL_ROUTES = {
     primary: 'gpt-4o',
     fallback: null,
   },
+  // mission_v6 초안 생성기(2026-09-21 파일럿: gpt-4o·4.1보다 원문 충실성·사건 다양성이 확연히 나음).
+  mission_v6: {
+    primary: 'gpt-5.5',
+    fallback: null,
+  },
   critic: {
     primary: 'gpt-4.1',
     fallback: null,
@@ -137,11 +142,16 @@ interface OpenAIChatRequestInput {
   responseFormat?: OpenAIResponseFormat
 }
 
+/** 추론 모델(gpt-5·o 계열)은 temperature를 받지 않는다(기본값만 허용). */
+export function isReasoningModel(model: string): boolean {
+  return /^(gpt-5|o\d)/.test(model)
+}
+
 export function buildOpenAIChatRequest(input: OpenAIChatRequestInput) {
   return {
     model: input.model,
     response_format: input.responseFormat ?? OPENAI_JSON_OBJECT_RESPONSE_FORMAT,
-    temperature: input.temperature,
+    ...(isReasoningModel(input.model) ? {} : { temperature: input.temperature }),
     ...(input.maxCompletionTokens
       ? { max_completion_tokens: input.maxCompletionTokens }
       : {}),

@@ -1,6 +1,10 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
+import {
+  buildMissionV6RepairUserPrompt, buildMissionV6SystemPrompt, buildMissionV6UserPrompt, MISSION_V6_GENERATION_PROMPT_VERSION,
+  type V6CoreForPrompt, type V6Direction, type V6FeatureForPrompt, type V6Mode, type V6RowContext, type V6SpeechAct,
+} from '../_shared/missionV6Generation.ts'
 import { naturalLearnerScene, NATURAL_INTERPRETING_SCENE_RULE, SCENE_PLAUSIBILITY_RULE } from "../_shared/learnerScene.ts"
 import { CORE_SCENE_PREFLIGHT_PROMPT, readCoreScenePlan, coreSemanticGate, coreSemanticContent } from '../_shared/sceneGrounding.ts'
 import { SCENE_ROLE_PDR_RULE, REASON_DISCRIMINATION_RULE, buildMissionConsistencyAuditPrompt, missionCriticContent, MISSION_CONSISTENCY_RESPONSE_FORMAT, MISSION_CONSISTENCY_SECTIONS } from "../_shared/missionConsistency.ts"
@@ -223,7 +227,7 @@ interface GenInput {
   // Two-step outline → final flow. Backward compatible:
   // when `action` is absent the handler behaves exactly like the legacy
   // single-shot full-scenario generation.
-  action?: 'outline' | 'final' | 'core' | 'mission_topology' | 'mission' | 'mission_repair' | 'mission_candidate_regenerate' | 'finalize_mission' | 'authentic_analyze' | 'quality_check' | 'core_quality_check' | 'feedback'
+  action?: 'outline' | 'final' | 'core' | 'mission_topology' | 'mission' | 'mission_v6' | 'mission_repair' | 'mission_candidate_regenerate' | 'finalize_mission' | 'authentic_analyze' | 'quality_check' | 'core_quality_check' | 'feedback'
   outline_count?: number
   /** 개별 생성의 세부 주제 시드. 개요가 이 사건을 벗어나면 뒤 단계의 주제 검토에서 막힌다. */
   topic_seed_ko?: string | null
@@ -231,6 +235,7 @@ interface GenInput {
   // v1.4 (2026-07-23): scenario_core_v1 / mission_v1 생성. 카탈로그는 클라가 전달.
   core?: CoreGenBody
   mission?: MissionGenBody
+  mission_v6?: MissionV6GenBody
   mission_repair?: MissionRepairBody
   mission_candidate_regenerate?: MissionCandidateRegenerationBody
   finalize_mission?: FinalizeMissionBody
@@ -249,6 +254,34 @@ interface GenInput {
     generation_item_key?: string | null
     invocation_attempt?: number | null
   }
+}
+
+// mission_v6 초안 생성(설계안 v2). 카탈로그·코어는 클라이언트가 넣고, 프롬프트는 공유 모듈이 만든다.
+// 서버 주입 필드·검사·저장은 클라이언트(promoteMissionV6)가 기존 경로로 한다.
+interface MissionV6GenBody {
+  act: V6SpeechAct
+  direction: V6Direction
+  mode: V6Mode
+  feature: V6FeatureForPrompt
+  core: V6CoreForPrompt
+  row: V6RowContext
+  exemplar?: unknown
+  /** 수리 1회: 이전 모델 출력과 위반 목록. 지적된 곳만 고친다. */
+  repair?: { previous_draft: unknown; violations: { path: string; message: string }[] }
+}
+
+/** 호출자 JWT로 is_admin()을 확인한다. 유료 생성 액션을 UI 가드만으로 열지 않는다. */
+async function callerIsAdmin(req: Request): Promise<boolean> {
+  const url = Deno.env.get('SUPABASE_URL')
+  const anon = Deno.env.get('SUPABASE_ANON_KEY')
+  const authorization = req.headers.get('Authorization')
+  if (!url || !anon || !authorization?.startsWith('Bearer ')) return false
+  const res = await fetch(`${url}/rest/v1/rpc/is_admin`, {
+    method: 'POST',
+    headers: { apikey: anon, Authorization: authorization, 'Content-Type': 'application/json' },
+    body: '{}',
+  })
+  return res.ok && (await res.json()) === true
 }
 
 // ── feedback_v1 (계약 §4) ──────────────────────────────────────────────
@@ -4203,6 +4236,42 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           content_release_id: CURRENT_CONTENT_RELEASE_ID,
           generated_at: new Date().toISOString(),
         },
+      }), { status: 200, headers: jsonHeaders })
+    }
+
+    // ── mission_v6 action: v6 초안 생성(관리자 전용, 초안 1 + 수리 1은 클라이언트가 센다) ──
+    if (input.action === 'mission_v6') {
+      if (!(await callerIsAdmin(req))) {
+        return new Response(JSON.stringify({ error: '관리자만 미션을 생성할 수 있습니다.' }), { status: 403, headers: jsonHeaders })
+      }
+      const b = input.mission_v6
+      if (!b?.feature || !b?.core?.source_text || !b.act || !b.direction || !b.mode) {
+        return new Response(JSON.stringify({ error: 'mission_v6 body required' }), { status: 400, headers: jsonHeaders })
+      }
+      const model = OPENAI_MODEL_ROUTES.mission_v6.primary
+      const system = buildMissionV6SystemPrompt({ act: b.act, direction: b.direction, mode: b.mode, feature: b.feature, exemplar: b.exemplar })
+      const user = b.repair
+        ? buildMissionV6RepairUserPrompt({ core: b.core, row: b.row, previousDraft: b.repair.previous_draft, violations: b.repair.violations })
+        : buildMissionV6UserPrompt({ core: b.core, row: b.row })
+      const call = await callOpenAI(model, apiKey, system, user, 0.4, {
+        telemetry: telemetryFor(b.repair ? 'mission_repair' : 'mission_generate', true),
+        maxCompletionTokens: 40000,
+      })
+      if (!call.ok) {
+        return new Response(JSON.stringify({ error: `mission_v6 생성 실패 (${call.status})` }), { status: 502, headers: jsonHeaders })
+      }
+      const outer = JSON.parse(call.raw)
+      if (outer?.choices?.[0]?.finish_reason === 'length') {
+        return new Response(JSON.stringify({ error: '출력이 잘려 저장하지 않습니다.', stop_code: 'truncated' }), { status: 200, headers: jsonHeaders })
+      }
+      let draft: unknown
+      try {
+        draft = parseOpenAIContent(call.raw)
+      } catch {
+        return new Response(JSON.stringify({ error: '생성 응답을 읽을 수 없습니다.', stop_code: 'unparseable' }), { status: 200, headers: jsonHeaders })
+      }
+      return new Response(JSON.stringify({
+        draft, model: outer?.model ?? model, prompt_version: MISSION_V6_GENERATION_PROMPT_VERSION,
       }), { status: 200, headers: jsonHeaders })
     }
 
