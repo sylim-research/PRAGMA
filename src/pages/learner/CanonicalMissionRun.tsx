@@ -544,7 +544,8 @@ function FeedbackBox({ verdict, feedback, action, highlights = [] }: {
   return (
     <div className="break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[14px] leading-7 text-[#3F4A59]">
       {verdict && <p className="mb-2 font-black text-[#4A5568]">{verdict}</p>}
-      <SentenceLines text={feedback} highlights={highlights} />
+      {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
+      <SentenceLines text={withoutExpressionMemo(feedback)} highlights={highlights} />
       {action && (
         <div className="mt-3 rounded-lg border border-[#E5E1D8] bg-white px-3 py-2.5 font-semibold text-[#3F4A59]">
           <RichLine text={action} highlights={highlights} />
@@ -804,10 +805,8 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
             </div>
           </div>
         )}
-        {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감추고 표현 메모만 남긴다. 저장된 콘텐츠는 그대로다. */}
-        {answered && (correctionOnly
-          ? <ExpressionMemoSection feedback={quest.feedback} />
-          : <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>)}
+        {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감춘다. 저장된 콘텐츠는 그대로다. */}
+        {answered && !correctionOnly && <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
@@ -840,7 +839,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
   // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
-  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락 → 표현 메모.
+  // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락. 표현 메모는 보이지 않는다.
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
@@ -869,7 +868,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
         <p className="text-[15px] leading-7">{quest.contrast.context}</p>
         <p className={`${targetFont} text-[16.5px] leading-8`}>{quest.contrast.target}</p>
       </section>}
-      {submitted && <ExpressionMemoSection feedback={quest.feedback} />}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
       {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
@@ -878,19 +876,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   </QuestScaffold>;
 }
 
-/** 해설 문자열 끝의 「표현 메모」만 따로 보여 준다. 메모가 없으면 아무것도 그리지 않는다. */
-function ExpressionMemoSection({ feedback }: { feedback: string }) {
-  const { memo } = useMemo(() => splitExpressionMemo(feedback), [feedback]);
-  if (memo.length === 0) return null;
-  return (
-    <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label={EXPRESSION_MEMO_LABEL}>
-      <h4 className="font-bold">{EXPRESSION_MEMO_LABEL}</h4>
-      <ul className="space-y-1.5">
-        {memo.map(line => <li key={line} className="text-[15px] leading-7 text-[#3F4A59]"><RichLine text={line} /></li>)}
-      </ul>
-    </section>
-  );
-}
 function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (response: QuestResponse) => void }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
@@ -2019,6 +2004,13 @@ export function splitExpressionMemo(feedback: string): { paragraphs: string[]; m
     if (entry) memo.push(entry);
   }
   return { paragraphs: body, memo };
+}
+
+/** 해설 문자열에서 「표현 메모」 줄부터 끝까지를 떼고 화용 해설만 돌려준다(원래 줄바꿈 유지). */
+export function withoutExpressionMemo(feedback: string): string {
+  const lines = feedback.split(/\r?\n/);
+  const start = lines.findIndex((line) => line.trim() === EXPRESSION_MEMO_LABEL);
+  return start < 0 ? feedback : lines.slice(0, start).join("\n").trimEnd();
 }
 
 function MpjLessonBridge({ lessonPoints, onContinue }: {

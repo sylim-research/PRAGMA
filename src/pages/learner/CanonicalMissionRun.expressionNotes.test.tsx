@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { collectExpressionNotes, splitExpressionMemo } from "./CanonicalMissionRun";
+import { collectExpressionNotes, splitExpressionMemo, withoutExpressionMemo } from "./CanonicalMissionRun";
 import type { MissionQuest } from "@/lib/mission/canonicalMissionPreview";
 
 const quest = (feedback: string) => ({ id: "A1", kind: "scale", feedback } as unknown as MissionQuest);
@@ -61,5 +61,16 @@ describe("splitExpressionMemo", () => {
   it("메모 블록 뒤에 불릿이 아닌 줄이 오면 거기서 멈춘다", () => {
     expect(splitExpressionMemo("해설.\n표현 메모\n· 「이따」 — 조금 뒤에.\n덧붙임\n· 「캡처」 — 읽히면 안 됩니다.").memo)
       .toEqual(["「이따」 — 조금 뒤에."]);
+  });
+});
+
+describe("withoutExpressionMemo", () => {
+  it("keeps the pragmatic explanation and drops the expression memo block", () => {
+    expect(withoutExpressionMemo("원문은 가능 여부를 묻습니다.\n\n번역은 수락을 전제합니다.\n표현 메모\n· `封` — 양사입니다.\n메신저 문맥에서 群은 단체방입니다."))
+      .toBe("원문은 가능 여부를 묻습니다.\n\n번역은 수락을 전제합니다.");
+  });
+
+  it("returns the explanation unchanged when there is no memo", () => {
+    expect(withoutExpressionMemo("해설만 있습니다.")).toBe("해설만 있습니다.");
   });
 });
