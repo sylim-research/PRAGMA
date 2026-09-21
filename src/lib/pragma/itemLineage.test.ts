@@ -245,9 +245,8 @@ describe("item-level realization lineage", () => {
     };
     const withUnattributed = checkMission(current, context).violations;
     expect(withUnattributed.filter((violation) => violation.id === "R31")).toEqual([]);
-    expect(withUnattributed.some(
-      (violation) => violation.id === "R32" && violation.level === "warning",
-    )).toBe(true);
+    // 2026-09-21 연구자 결정: 참조 상한(20%) 이하의 미귀속은 신호를 남기지 않는다.
+    expect(withUnattributed.some((violation) => violation.id === "R32")).toBe(false);
 
     // 2026-09-09 연구자 결정: 참조 상한(20%) 초과도 구조 모순이 아니므로 R31 fail이 아니라
     // R32 warning(subrule unattributed_over_reference_ratio)으로 교수자 확인에 넘긴다.

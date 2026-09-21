@@ -210,7 +210,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R32: {
     category: "생성 기록·계승·근거 귀속",
     nature: "signal",
-    summary_ko: "model_unattributed claim 개수를 교수자 확인 우선순위 신호로 남긴다(warning). 참조 상한 20% 초과도 차단하지 않는다.",
+    summary_ko: "model_unattributed claim 비율이 참조 상한 20%를 넘을 때만 교수자 확인 우선순위 신호로 남긴다(warning, 차단 없음). 상한 이하는 신호를 남기지 않는다(2026-09-21).",
     applicability_ko: "R31과 같은 조건에서 coverage가 covered일 때만 실행된다.",
   },
   R33: {
