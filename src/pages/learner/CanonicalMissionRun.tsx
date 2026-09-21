@@ -694,7 +694,6 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
           <h4 className="font-bold">가능한 수정 예시</h4>
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
-          <p className="text-xs leading-5 text-[#697386]">원문의 뜻을 지키며 옮기는 방식은 여러 가지입니다. 이 문장만 정답이라는 뜻은 아닙니다.</p>
         </section>}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
@@ -849,7 +848,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#697386]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
-        <p className="mt-1 text-xs leading-5 text-[#697386]">한 가지 정답 문장에 맞추는 활동이 아닙니다. 제출 후 참고 표현을 확인합니다.</p>
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
@@ -861,7 +859,6 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
       {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
         <h4 className="font-bold">참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
-        <p className="text-xs leading-5 text-[#697386]">미리 작성한 참고 표현입니다. 내 수정안의 맞음·틀림을 자동 판정한 결과가 아닙니다.</p>
       </section>}
       {submitted && quest.contrast && <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label="다른 맥락에서는?">
         <h4 className="font-bold">다른 맥락에서는?</h4>
@@ -2146,8 +2143,7 @@ function CompletedQuestReview({ quest, response }: {
   );
 }
 
-export function CompletionRecord({ label, source, response, alternatives = [] }: {
-  label: string;
+export function CompletionRecord({ source, response, alternatives = [] }: {
   source?: string;
   response?: DctResponse;
   alternatives?: DctQuest["feedback"]["alternatives"];
@@ -2157,33 +2153,22 @@ export function CompletionRecord({ label, source, response, alternatives = [] }:
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
-  const finalText = response.reflected ? response.revised : response.first;
-  // 읽는 순서대로 세로 정렬: 원문 → 첫 번역 → 최종안 → 참고 답안. 첫 안을 유지했으면 한 칸으로 합친다.
+  const outputLabel = `${mission.targetLanguage.label} ${outputName}`;
+  // 읽는 순서대로 세로 정렬: 원문 → 내 초안·수정안(한 카드) → 참고 답안. 초안을 유지했으면 초안만 둔다.
   return (
     <article className={`${panel} space-y-4 p-5 sm:p-6`}>
-      <p className="text-xs font-bold text-[#6B5518]">{label}</p>
       {source && <section className="rounded-xl border border-[#E4CB50] bg-[#FFFBEA] p-4">
         <h2 className="text-sm font-bold text-[#6B5518]">{mission.sourceLanguage.label} 원문</h2>
         <p className={`${sourceFont} mt-2 whitespace-pre-wrap break-keep text-[17px] leading-8`}>{source}</p>
       </section>}
-      {response.reflected ? (
-        <>
-          <section className="rounded-xl border border-[#E5E1D8] bg-[#FAF9F5] p-4">
-            <h2 className="text-sm font-bold">첫 {outputName}</h2>
-            <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
-          </section>
-          <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
-            <h2 className="text-sm font-bold">내가 확정한 최종안</h2>
-            <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{finalText}</p>
-          </section>
-        </>
-      ) : (
-        <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
-          <h2 className="text-sm font-bold">내가 확정한 최종안</h2>
-          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{finalText}</p>
-          <p className="mt-2 text-xs text-[#697386]">첫 {outputName}을 유지했습니다.</p>
-        </section>
-      )}
+      <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
+        <h2 className="text-sm font-bold">{outputLabel} (초안)</h2>
+        <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
+        {response.reflected ? <div className="mt-4 border-t border-[#D5DCE3] pt-4">
+          <h2 className="text-sm font-bold">{outputLabel} (수정)</h2>
+          <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.revised}</p>
+        </div> : <p className="mt-2 text-xs text-[#697386]">초안을 그대로 유지했습니다.</p>}
+      </section>
       {alternatives.length > 0 && <section className="rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
         <h2 className="text-sm font-bold">참고 답안</h2>
         <div className="mt-3 space-y-3">{alternatives.map((alternative) => <div key={alternative.text} className="rounded-xl bg-white p-4">
@@ -2788,7 +2773,6 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             </section>
             <div className="space-y-4">
               <CompletionRecord
-                label={primaryDct?.title ?? `${mission.activityMode === "interpreting" ? "통역" : "번역"} 실습`}
                 source={primaryDct?.source}
                 response={aDct}
                 alternatives={primaryDct?.feedback.alternatives}

@@ -11,7 +11,7 @@ afterEach(() => vi.useRealTimers());
 
 describe("CanonicalMissionRun completion connections", () => {
   it("preserves the actual feedback category when no phrase is highlighted", () => {
-    render(<CompletionRecord label="번역 실습" response={{
+    render(<CompletionRecord response={{
       first: "请帮我收一下快递。", revised: "您方便帮我收一下快递吗？", reflected: true,
       evaluation: {
         available: true, highlights: [], feedback: "원문의 선택 여지를 다시 살펴보세요.",
@@ -27,7 +27,9 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.queryByText(/다시 살펴본 기준/)).not.toBeInTheDocument();
     expect(screen.queryByText(/원문의 핵심 내용이 빠졌습니다/)).not.toBeInTheDocument();
     expect(screen.getByText("请帮我收一下快递。")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "내가 확정한 최종안" })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /번역 \(초안\)/ })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /번역 \(수정\)/ })).toBeVisible();
+    expect(screen.queryByText("상황 번역하기")).not.toBeInTheDocument();
     expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
     expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();
     expect(screen.getByText("您方便帮我收一下快递吗？")).toBeInTheDocument();
@@ -162,7 +164,7 @@ describe("CanonicalMissionRun completion connections", () => {
     }
     unmount();
 
-    render(<CompletionRecord label="번역 실습" response={response} alternatives={quest.feedback.alternatives} />);
+    render(<CompletionRecord response={response} alternatives={quest.feedback.alternatives} />);
     for (const alternative of quest.feedback.alternatives) {
       expect(screen.getByText(alternative.text)).toBeInTheDocument();
     }
