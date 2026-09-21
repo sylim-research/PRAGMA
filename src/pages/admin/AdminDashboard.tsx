@@ -535,6 +535,21 @@ const AdminDashboard = () => {
 
       <DashboardResourceOverview resources={snapshot?.resources ?? null} error={displayError} status={liveStatus(true)} />
 
+      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
+      <PanelHeader
+        title="검수 단계별 현황"
+        action={liveStatus()}
+      />
+      <ReviewPipeline
+        review={snapshot?.review ?? null}
+        cumulative={snapshot?.cumulative ?? null}
+        professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
+        dominant={dominantReviewStage}
+        rulesFailCount={snapshot?.rulesFailCount ?? 0}
+        error={displayError}
+        changedKeys={changedKeys}
+      />
+
       <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
@@ -552,7 +567,7 @@ const AdminDashboard = () => {
             새 편성은 승인·현행 릴리스 미션으로 제한된다. 학습자 노출은 승인 외 조건도 있어 여기서 판정하지 않는다. */}
         <OperationMetric
           to="/admin/composer"
-          // 편성 건수는 위 전체 흐름에 이미 있다 — 같은 수를 되풀이하지 않고 주차를 큰 수로 둔다.
+          // 주차를 큰 수로 둔다(편성 건수는 수업 편성 화면에서 본다).
           label="편성 주차"
           value={snapshot?.assignments.weekCount ?? null}
           unit="개"
@@ -577,7 +592,7 @@ const AdminDashboard = () => {
             시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
         <OperationMetric
           to="/admin/decision-traces"
-          // 전체 수행 기록은 위 전체 흐름에 이미 있다. 여기서는 교과목 맥락에서 나온 기록을 큰 수로 둔다
+          // 교과목 맥락에서 나온 기록을 큰 수로 둔다
           // (실제 수업 기록과 시범 수행을 가르는 유일한 단서 — 교과목 맥락 없는 실행은 연결되지 않는다).
           label="교과목 수업 기록"
           value={snapshot?.courseLinkedRecordCount ?? null}
@@ -589,56 +604,6 @@ const AdminDashboard = () => {
           changed={changedKeys.has("records")}
         />
       </div>
-
-      {/* 제작 상태와 검토 누적을 분리한다. 서로 중첩되는 단계는 합산하지 않는다. */}
-      <PanelHeader title="제작·승인 현황" description="현재 보유본의 상태 · 검토 완료는 단계별 서로 다른 미션의 누적 수" />
-      <section className="overflow-hidden rounded-xl border border-[#E6E1D5] bg-white">
-        <ol className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
-          {[
-            // 라이브러리 「전체 미션」+「시나리오 재료」(미션 미생성)의 합이다 — 탭 이름과 겹치지 않게 「상황 시나리오」로 부른다.
-            { to: "/admin/library", stage: "상황 시나리오", screen: "라이브러리", value: snapshot?.content.coreCount },
-            { to: "/admin/assembly", stage: "학습 미션", screen: "제작 현황", value: snapshot?.content.generatedMissionCount },
-            // 규칙 검사 대기부터 교수자 승인 대기까지 다섯 단계 대기의 합이다(수정 요청 제외 — 라이브러리 「승인 전 미션」 220 = 이 수 + 수정 요청).
-            // 교수자 승인 대기가 들어 있으므로 「검수」만으로 부르지 않는다.
-            { to: "/admin/ai-review", stage: "검수·승인 중", screen: "품질 점검", value: snapshot?.content.reviewTargetCount },
-            // 누적 완료 수다. 할 일(대기)로 읽히지 않도록 「승인 완료」라고 부른다.
-            { to: "/admin/review", stage: "교수자 승인 완료", screen: "최종 승인", value: snapshot?.content.professorFinalizedCount },
-            // 사람에게 준 과제가 아니라 교과목·주차에 놓인 미션 건수다 — 사이드바 「수업 편성」과 같은 말로 부른다.
-            { to: "/admin/composer", stage: "미션 편성", screen: "수업 편성", value: snapshot?.assignments.assignmentCount },
-            // 계정·기간으로 거르지 않은 전체 행이라 실제 수업 수행으로 단정하지 않는다.
-            { to: "/admin/decision-traces", stage: "수행 기록", screen: "기록 목록", value: snapshot?.learnerRecordCount },
-          ].map((step, index) => (
-            <li key={step.to} className={index > 0 ? "border-t border-[#EFEBE1] sm:border-t-0 sm:border-l" : ""}>
-              <Link to={step.to} className="flex h-full flex-col px-4 py-2.5 hover:bg-[#FBFAF6]">
-                <span className="text-[12px] font-medium text-[#5A6670]">{step.stage}</span>
-                {step.value == null && !displayError ? (
-                  <span aria-label="불러오는 중" className="mt-1.5 h-6 w-12 rounded bg-muted motion-safe:animate-pulse" />
-                ) : (
-                  <span className="mt-1 text-[20px] font-semibold leading-none tabular-nums text-[#2B3A45]">
-                    {displayError ? "—" : step.value}
-                  </span>
-                )}
-                <span className="mt-auto pt-1.5 text-[11.5px] text-[#6F7B83]">{step.screen} →</span>
-              </Link>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
-      <PanelHeader
-        title="검수 단계별 현황"
-        action={liveStatus()}
-      />
-      <ReviewPipeline
-        review={snapshot?.review ?? null}
-        cumulative={snapshot?.cumulative ?? null}
-        professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
-        dominant={dominantReviewStage}
-        rulesFailCount={snapshot?.rulesFailCount ?? 0}
-        error={displayError}
-        changedKeys={changedKeys}
-      />
 
       {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
       <div className="mt-3">
