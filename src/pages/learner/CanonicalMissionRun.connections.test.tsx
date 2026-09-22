@@ -27,8 +27,8 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.queryByText(/다시 살펴본 기준/)).not.toBeInTheDocument();
     expect(screen.queryByText(/원문의 핵심 내용이 빠졌습니다/)).not.toBeInTheDocument();
     expect(screen.getByText("请帮我收一下快递。")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: /번역 \(초안\)/ })).toBeVisible();
-    expect(screen.getByRole("heading", { name: /번역 \(수정\)/ })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /번역 · 최초안/ })).toBeVisible();
+    expect(screen.getByRole("heading", { name: /번역 · 최종안/ })).toBeVisible();
     expect(screen.queryByText("상황 번역하기")).not.toBeInTheDocument();
     expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
     expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();

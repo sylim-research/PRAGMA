@@ -7,75 +7,42 @@ export type AdminNavItem = {
 
 export type AdminNavGroup = {
   header: string;
+  wideCanvas?: boolean;
   items: readonly AdminNavItem[];
 };
 
 export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
   to: "/admin/dashboard",
-  label: "PRAGMA 운영 워크플로우",
+  label: "PRAGMA 대시보드",
 };
 
-// 관리자 메뉴·모바일 선택기·대시보드 바로가기가 함께 쓰는 단일 정본이다.
-//
-// 그룹은 콘텐츠가 지나는 순서를 따른다: 생성 기준 → 미션 재료 → 미션 제작·품질 관리 →
-// 수업 운영 → 기록.
-//
-// 1번과 3번 머리의 「기준」이 겹쳐 보이므로 가르는 규칙을 적어 둔다. 1번은 생성기가
-// 소비하는 제약이고(프롬프트 계약이 생성에 들어가고 HSK가 어휘 상한을 건다), 3번의
-// 「미션 설계 기준」은 사람이 읽는 구조라 아무것도 소비하지 않는다.
-//
-// 시나리오는 상황문과 원문만 가진 재료이고 학습 콘텐츠가 아니므로 미션과 같은 층에
-// 두지 않는다 — 그룹명 「학습 미션 재료」가 그 지위를 이름으로 말한다.
-//
-// 3번은 같은 미션의 연속된 생애다 — 조립에서 자동 점검·AI 검토를 거쳐 교수자 승인으로
-// 간다. 항목 순서가 그 순서다. 그 안에서 AI 검토와 교수자의 결정은 갈라 놓는다 —
-// AI 화면에는 승인 기능이 없고, 승인은 교수자 화면에서만 일어난다.
+// 생성 기준 → 재료 → 제작·검수 → 수업 운영 순서로 모든 그룹을 기본 펼침한다.
+// 기존 경로와 권한은 유지한다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
-  {
-    header: "1. 생성 기준",
-    items: [
-      { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
-      { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
-    ],
-  },
-  {
-    header: "2. 학습 미션 재료",
-    items: [
-      { to: "/admin/authentic", label: "실제 자료 활용 분석" },
-      { to: "/admin/generator", label: "시나리오 개별 생성" },
-      { to: "/admin/batch", label: "시나리오 배치 생성" },
-    ],
-  },
-  {
-    // 「미션 설계 기준」 화면은 아직 없다. 만들기 전에는 죽은 항목을 두지 않고,
-    // 생기면 맨 앞에 붙인다.
-    header: "3. 학습 미션 제작·품질 관리",
-    items: [
-      { to: "/admin/assembly", label: "학습 미션 제작" },
-      { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
-      {
-        to: "/admin/review",
-        label: "교수자 최종 승인",
-        activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"],
-      },
-      { to: "/admin/library", label: "학습 미션 라이브러리" },
-    ],
-  },
-  {
-    header: "4. 수업 운영",
-    items: [
-      { to: "/admin/composer", label: "15주 수업 편성" },
-      { to: "/admin/data-backup", label: "수업 데이터 백업·복원" },
-      { to: "/admin/learners", label: "학습자 관리" },
-    ],
-  },
-  {
-    header: "5. 학습 기록·연구 활용",
-    items: [
-      { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
-      { to: "/admin/export", label: "연구 데이터 내보내기" },
-    ],
-  },
+  { header: "1. 콘텐츠 생성 기준", items: [
+    { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
+    { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
+  ]},
+  { header: "2. 시나리오 생성", wideCanvas: true, items: [
+    { to: "/admin/authentic", label: "실제 자료 활용 분석" },
+    { to: "/admin/generator", label: "시나리오 개별 생성" },
+    { to: "/admin/batch", label: "시나리오 배치 생성" },
+  ]},
+  { header: "3. 학습 미션 제작·검수", wideCanvas: true, items: [
+    { to: "/admin/assembly", label: "학습 미션 제작" },
+    { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
+    { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
+    { to: "/admin/library", label: "학습 미션 라이브러리" },
+  ]},
+  { header: "4. 수업 운영", items: [
+    { to: "/admin/composer", label: "15주 수업 편성" },
+    { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
+  ]},
+  { header: "5. 관리 도구", items: [
+    { to: "/admin/learners", label: "학습자 관리" },
+    { to: "/admin/data-backup", label: "수업 데이터 백업·복원" },
+    { to: "/admin/export", label: "연구 데이터 내보내기" },
+  ]},
 ] as const;
 
 const PRIORITY_PATHS = [
@@ -97,8 +64,8 @@ export function adminNavItemIsActive(item: AdminNavItem, pathname: string) {
   return item.to === pathname || item.activePaths?.includes(pathname) === true;
 }
 
-// 관리자 화면 폭 기준 2개: 시나리오·검토 내용이 빽빽한 2·3번 묶음만 넓은 본문(1,200px), 나머지는 1,040px.
-const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS.slice(1, 3)
+// 메뉴 순서가 바뀌어도 기존 시나리오·검토 화면의 폭을 유지한다.
+const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS.filter((group) => group.wideCanvas)
   .flatMap((group) => group.items)
   .flatMap((item) => [item.to, ...(item.activePaths ?? [])]);
 

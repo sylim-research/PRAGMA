@@ -1728,8 +1728,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <ActionBar>
               {needsChange ? (
                 <div className="grid gap-2">
-                  <Button className="h-12 w-full" onClick={() => setRevisionOpen(true)}>한 번 다듬어보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                  <Button variant="outline" className="h-11 w-full" disabled={!canRetainWithDissent} onClick={retainFirstResponse}>내 {outputName}을 유지하고 확정하기</Button>
+                  <Button variant="outline" className="h-12 w-full" onClick={() => setRevisionOpen(true)}>한 번 다듬어보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button variant="outline" className="h-12 w-full" disabled={!canRetainWithDissent} onClick={retainFirstResponse}>내 {outputName}을 유지하고 확정하기</Button>
                   {!canRetainWithDissent && <p className="px-1 text-center text-[12px] leading-5 text-[#6D7788]">첫 {outputName}을 유지하려면 위의 「내 판단 남기기」에 이유를 적어 주세요.</p>}
                 </div>
               ) : (
@@ -2155,18 +2155,22 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   const outputLabel = `${mission.targetLanguage.label} ${outputName}`;
-  // 읽는 순서대로 세로 정렬: 원문 → 내 초안·수정안(한 카드) → 참고 답안. 초안을 유지했으면 초안만 둔다.
+  // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
   return (
     <article className={`${panel} space-y-4 p-5 sm:p-6`}>
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-base font-bold">내 최종 결정</h2>
+        <span className="rounded-full bg-[#F3ECD9] px-3 py-1.5 text-sm font-semibold">{response.reflected ? "수정안으로 확정" : "최초안 유지"}</span>
+      </header>
       {source && <section className="rounded-xl border border-[#E4CB50] bg-[#FFFBEA] p-4">
         <h2 className="text-sm font-bold text-[#6B5518]">{mission.sourceLanguage.label} 원문</h2>
         <p className={`${sourceFont} mt-2 whitespace-pre-wrap break-keep text-[17px] leading-8`}>{source}</p>
       </section>}
       <section className="rounded-xl border border-[#B9C4CE] bg-[#F4F6F8] p-4">
-        <h2 className="text-sm font-bold">{outputLabel} (초안)</h2>
+        <h2 className="text-sm font-bold">{outputLabel} · {response.reflected ? "최초안" : "최초안 = 최종안"}</h2>
         <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.first}</p>
         {response.reflected ? <div className="mt-4 border-t border-[#D5DCE3] pt-4">
-          <h2 className="text-sm font-bold">{outputLabel} (수정)</h2>
+          <h2 className="text-sm font-bold">{outputLabel} · 최종안</h2>
           <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.revised}</p>
         </div> : <p className="mt-2 text-xs text-[#697386]">초안을 그대로 유지했습니다.</p>}
       </section>

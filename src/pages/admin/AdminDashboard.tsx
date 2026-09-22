@@ -524,7 +524,7 @@ const AdminDashboard = () => {
 
   return (
     <AdminShell
-      title="PRAGMA 운영 워크플로우"
+      title="PRAGMA 대시보드"
       hideTitle
     >
       {displayError && (
