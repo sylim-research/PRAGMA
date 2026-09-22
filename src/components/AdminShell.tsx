@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
@@ -27,6 +27,11 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );
+
+  useEffect(() => {
+    const activeIndex = ADMIN_NAV_GROUPS.findIndex((group) => group.items.some((item) => adminNavItemIsActive(item, pathname)));
+    if (activeIndex >= 0) setExpandedGroups((current) => new Set([...current, activeIndex]));
+  }, [pathname]);
 
   const toggleGroup = (groupIndex: number) => {
     setExpandedGroups((current) => {

@@ -94,8 +94,8 @@ const Landing = () => {
               학습자 영역
             </span>
             <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
-              표현을 비교해 판단하고 직접 번역·통역한 뒤, 피드백을 보고 다듬습니다.
-              그 과정이 학습 기록에 쌓입니다.
+              화용적 판단을 바탕으로 통번역을 산출합니다.<br />
+              AI 피드백을 검토하고 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
@@ -116,16 +116,16 @@ const Landing = () => {
               교수자 영역
             </span>
             <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
-              AI 학습 미션을 생성·검수해 15주 강좌로 편성하고,
-              게시한 뒤 학습 수행 기록까지 관리합니다.
+              학습 미션을 제작하고 자동 검사·AI 검토를 거칩니다.<br />
+              교수자가 최종 승인하고 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
-                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 수업 운영하기.
+                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 콘텐츠 제작·검수하기.
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-4">
               <span className="inline-flex items-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-4 py-1.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
-                수업 운영하기
+                콘텐츠 제작·검수하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
             </span>
