@@ -1,88 +1,31 @@
-// Google Identity Services(GIS) 로그인. Google이 이 페이지 안에서 계정 선택 창을 열고
-// ID 토큰을 돌려주면 supabase.auth.signInWithIdToken으로 세션을 만든다. Supabase
-// 콜백 도메인을 거치지 않으므로 Google 계정 선택 화면에 supabase.co 주소가 나오지 않는다.
-// 클라이언트 ID는 공개값이다. Google 콘솔의 「승인된 JavaScript 원본」에 앱 주소가 있어야 한다.
+// 학습자 Google 로그인. 앱이 Google OpenID Connect 인증 화면으로 직접 이동하고
+// (response_type=id_token), Google이 ID 토큰을 붙여 /student-login으로 돌려보내면
+// supabase.auth.signInWithIdToken으로 세션을 만든다. Supabase 콜백 도메인을 거치지 않으므로
+// Google 화면에 supabase.co 주소가 나오지 않는다.
+// 필요 설정: Google 콘솔 웹 클라이언트의 「승인된 리디렉션 URI」에 `<앱 주소>/student-login`.
 
 export const GOOGLE_CLIENT_ID: string =
   import.meta.env.VITE_GOOGLE_CLIENT_ID ||
   "854690972640-h4k3mosev40pa0blorpmkkpb2h8am0gn.apps.googleusercontent.com";
 
-const GIS_SRC = "https://accounts.google.com/gsi/client";
+const GOOGLE_AUTH_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth";
+const PENDING_KEY = "pragma.googleLogin";
 
-export type GoogleCredentialResponse = { credential?: string };
+export const GOOGLE_CALLBACK_PATH = "/student-login";
 
-type GoogleButtonOptions = {
-  type?: "standard" | "icon";
-  theme?: "outline" | "filled_blue" | "filled_black";
-  size?: "large" | "medium" | "small";
-  text?: "signin_with" | "signup_with" | "continue_with" | "signin";
-  shape?: "rectangular" | "pill" | "circle" | "square";
-  logo_alignment?: "left" | "center";
-  width?: number;
-  locale?: string;
-};
+type PendingLogin = { state: string; nonce: string; next: string };
 
-type GoogleAccountsId = {
-  initialize: (config: {
-    client_id: string;
-    callback: (response: GoogleCredentialResponse) => void;
-    nonce?: string;
-    ux_mode?: "popup" | "redirect";
-    auto_select?: boolean;
-    itp_support?: boolean;
-  }) => void;
-  renderButton: (parent: HTMLElement, options: GoogleButtonOptions) => void;
-  cancel: () => void;
-};
-
-declare global {
-  interface Window {
-    google?: { accounts?: { id?: GoogleAccountsId } };
-  }
+function randomToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
-let loading: Promise<GoogleAccountsId> | null = null;
-
-/** GIS 스크립트를 한 번만 불러온다. 차단·네트워크 오류·시간 초과면 거부된다. */
-export function loadGoogleIdentity(timeoutMs = 8000): Promise<GoogleAccountsId> {
-  const ready = window.google?.accounts?.id;
-  if (ready) return Promise.resolve(ready);
-  if (loading) return loading;
-
-  loading = new Promise<GoogleAccountsId>((resolve, reject) => {
-    const timer = window.setTimeout(() => reject(new Error("gis-timeout")), timeoutMs);
-    const done = () => {
-      window.clearTimeout(timer);
-      const api = window.google?.accounts?.id;
-      if (api) resolve(api);
-      else reject(new Error("gis-missing"));
-    };
-    const existing = document.querySelector<HTMLScriptElement>(`script[src="${GIS_SRC}"]`);
-    const script = existing ?? document.createElement("script");
-    script.addEventListener("load", done, { once: true });
-    script.addEventListener(
-      "error",
-      () => {
-        window.clearTimeout(timer);
-        reject(new Error("gis-error"));
-      },
-      { once: true },
-    );
-    if (!existing) {
-      script.src = GIS_SRC;
-      script.async = true;
-      script.defer = true;
-      document.head.appendChild(script);
-    }
-  }).catch((error) => {
-    loading = null;
-    throw error;
-  });
-  return loading;
-}
-
-function toHex(buffer: ArrayBuffer): string {
-  return Array.from(new Uint8Array(buffer))
+async function sha256Hex(value: string): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest))
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
 }
@@ -92,8 +35,53 @@ function toHex(buffer: ArrayBuffer): string {
  * Supabase가 원문을 해시해 ID 토큰 안의 nonce와 대조한다.
  */
 export async function createLoginNonce(): Promise<{ raw: string; hashed: string }> {
-  const bytes = crypto.getRandomValues(new Uint8Array(32));
-  const raw = btoa(String.fromCharCode(...bytes));
-  const hashed = toHex(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(raw)));
-  return { raw, hashed };
+  const raw = randomToken();
+  return { raw, hashed: await sha256Hex(raw) };
+}
+
+/** Google 인증 화면 주소를 만들고, 복귀 때 대조할 state·nonce를 이 탭에 보관한다. */
+export async function buildGoogleSignInUrl(origin: string, next: string): Promise<string> {
+  const nonce = await createLoginNonce();
+  const state = randomToken();
+  const pending: PendingLogin = { state, nonce: nonce.raw, next };
+  sessionStorage.setItem(PENDING_KEY, JSON.stringify(pending));
+
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: origin + GOOGLE_CALLBACK_PATH,
+    response_type: "id_token",
+    scope: "openid email profile",
+    nonce: nonce.hashed,
+    state,
+    prompt: "select_account",
+  });
+  return `${GOOGLE_AUTH_ENDPOINT}?${params.toString()}`;
+}
+
+export type GoogleCallback =
+  | { kind: "none" }
+  | { kind: "error"; reason: "denied" | "state" | "failed" }
+  | { kind: "token"; idToken: string; nonce: string; next: string };
+
+/** URL 해시에서 Google 응답을 읽고 보관해 둔 state와 대조한다. 보관값은 한 번 쓰고 지운다. */
+export function readGoogleCallback(hash: string): GoogleCallback {
+  const params = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash);
+  const idToken = params.get("id_token");
+  const error = params.get("error");
+  if (!idToken && !error) return { kind: "none" };
+
+  const stored = sessionStorage.getItem(PENDING_KEY);
+  sessionStorage.removeItem(PENDING_KEY);
+  if (error) return { kind: "error", reason: error === "access_denied" ? "denied" : "failed" };
+
+  let pending: PendingLogin | null = null;
+  try {
+    pending = stored ? (JSON.parse(stored) as PendingLogin) : null;
+  } catch {
+    pending = null;
+  }
+  if (!pending || !idToken || params.get("state") !== pending.state) {
+    return { kind: "error", reason: "state" };
+  }
+  return { kind: "token", idToken, nonce: pending.nonce, next: pending.next };
 }

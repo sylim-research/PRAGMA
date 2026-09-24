@@ -1,12 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import {
-  GOOGLE_CLIENT_ID,
-  createLoginNonce,
-  loadGoogleIdentity,
-  type GoogleCredentialResponse,
-} from "@/lib/auth/googleIdentity";
+import { buildGoogleSignInUrl, readGoogleCallback } from "@/lib/auth/googleIdentity";
 import { HomeBrand } from "@/components/HomeBrand";
 import { useProfile } from "@/lib/auth/useProfile";
 import { safeLoginReturnPath } from "@/lib/auth/loginReturn";
@@ -21,86 +16,47 @@ const StudentLogin = () => {
   const requestedPath = new URLSearchParams(location.search).get("next");
   const afterLoginPath = safeLoginReturnPath(requestedPath);
 
-  // 기본 경로는 Google Identity Services 버튼이다(googleIdentity.ts). 스크립트를 불러오지
-  // 못하면 "fallback"으로 바꿔 아래 Supabase 리다이렉트 버튼을 보인다.
-  const [gisState, setGisState] = useState<"loading" | "ready" | "fallback">("loading");
-  const gisButtonRef = useRef<HTMLDivElement>(null);
-  const showLogin = !loading && !session && !isDevStub;
+  // Google이 ID 토큰을 붙여 이 페이지로 돌려보낸 경우 세션으로 교환한다(googleIdentity.ts).
+  // 개발 모드의 effect 이중 실행에서 보관값을 두 번 읽지 않도록 ref로 한 번만 처리한다.
+  const [callbackNext, setCallbackNext] = useState<string | null>(null);
+  const callbackHandled = useRef(false);
 
   useEffect(() => {
-    if (!showLogin) return;
-    let cancelled = false;
+    if (callbackHandled.current) return;
+    callbackHandled.current = true;
 
-    const mountButton = async () => {
-      try {
-        const [gis, nonce] = await Promise.all([loadGoogleIdentity(), createLoginNonce()]);
-        const parent = gisButtonRef.current;
-        if (cancelled || !parent) return;
+    const callback = readGoogleCallback(window.location.hash);
+    if (callback.kind === "none") return;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
 
-        const onCredential = async (response: GoogleCredentialResponse) => {
-          if (!response.credential) return;
-          setBusy(true);
-          const { error } = await supabase.auth.signInWithIdToken({
-            provider: "google",
-            token: response.credential,
-            nonce: nonce.raw,
-          });
-          if (error) {
-            toast.error("Google 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-            setBusy(false);
-            // nonce는 한 번만 쓸 수 있으므로 새 nonce로 버튼을 다시 만든다.
-            if (!cancelled) void mountButton();
-          }
-          // 성공하면 useProfile이 세션 변화를 받아 아래 Navigate가 다음 화면으로 보낸다.
-        };
-
-        gis.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: (response) => void onCredential(response),
-          nonce: nonce.hashed,
-          ux_mode: "popup",
-          auto_select: false,
-          itp_support: true,
-        });
-        parent.replaceChildren();
-        gis.renderButton(parent, {
-          type: "standard",
-          theme: "filled_black",
-          size: "large",
-          text: "signin_with",
-          shape: "rectangular",
-          logo_alignment: "center",
-          width: Math.min(400, Math.max(200, Math.round(parent.clientWidth))),
-          locale: "ko",
-        });
-        setGisState("ready");
-      } catch {
-        if (!cancelled) setGisState("fallback");
+    if (callback.kind === "error") {
+      if (callback.reason !== "denied") {
+        toast.error("Google 로그인에 실패했습니다. 다시 시도해 주세요.");
       }
-    };
+      return;
+    }
 
-    void mountButton();
-    return () => {
-      cancelled = true;
-      window.google?.accounts?.id?.cancel();
-    };
-  }, [showLogin]);
+    setBusy(true);
+    setCallbackNext(safeLoginReturnPath(callback.next));
+    void supabase.auth
+      .signInWithIdToken({ provider: "google", token: callback.idToken, nonce: callback.nonce })
+      .then(({ error }) => {
+        if (error) {
+          toast.error("Google 로그인에 실패했습니다. 다시 시도해 주세요.");
+          setCallbackNext(null);
+          setBusy(false);
+        }
+        // 성공하면 useProfile이 세션 변화를 받아 아래 Navigate가 다음 화면으로 보낸다.
+      });
+  }, []);
 
-  // 예비 경로: Supabase가 Google OAuth 리다이렉트를 수행한다. 이 경로에서는 Google 화면에
-  // Supabase 콜백 주소가 표시된다. 성공하면 이 탭이 Google로 이동한다.
   const handleGoogle = async () => {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin + afterLoginPath },
-      });
-      if (error) {
-        toast.error("Google 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-        setBusy(false);
-      }
+      const next = requestedPath ? afterLoginPath : "/home";
+      window.location.assign(await buildGoogleSignInUrl(window.location.origin, next));
     } catch {
-      toast.error("Google 로그인 중 오류가 발생했습니다.");
+      toast.error("Google 로그인 화면을 열지 못했습니다. 다시 시도해 주세요.");
       setBusy(false);
     }
   };
@@ -112,7 +68,7 @@ const StudentLogin = () => {
   }
 
   if (!loading && (session || isDevStub)) {
-    return <Navigate to={requestedPath ? afterLoginPath : "/home"} replace />;
+    return <Navigate to={callbackNext ?? (requestedPath ? afterLoginPath : "/home")} replace />;
   }
 
   return (
@@ -141,31 +97,15 @@ const StudentLogin = () => {
                   기록을 저장해 다음에 이어서 할 수 있습니다.
                 </p>
 
-                {gisState !== "fallback" && (
-                  <div className="mt-6">
-                    <div
-                      ref={gisButtonRef}
-                      aria-busy={gisState === "loading" || busy}
-                      className={`flex min-h-11 w-full justify-center ${busy ? "pointer-events-none opacity-60" : ""}`}
-                    />
-                    {(gisState === "loading" || busy) && (
-                      <p className="mt-2 text-center text-[12.5px] text-[#8A8578]" role="status">
-                        {busy ? "로그인하는 중…" : "Google 로그인 버튼을 불러오는 중…"}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {gisState === "fallback" && (
                 <button
                   type="button"
                   onClick={handleGoogle}
                   disabled={busy}
                   aria-busy={busy}
-                  className="mt-6 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-[10px] bg-[#15202B] px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#22303E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                  className="mt-6 flex h-[54px] w-full items-center justify-center gap-3 rounded-xl bg-[#101318] px-5 text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_-14px_rgba(16,19,24,0.7)] transition-[background-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:bg-[#1B2028] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_14px_28px_-14px_rgba(16,19,24,0.75)] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101318] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
                 >
                   <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
-                    <svg viewBox="0 0 48 48" className="h-5 w-5">
+                    <svg viewBox="0 0 48 48" className="h-[19px] w-[19px]">
                       <path
                         fill="#EA4335"
                         d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -184,12 +124,13 @@ const StudentLogin = () => {
                       />
                     </svg>
                   </span>
-                  <span>{busy ? "Google로 이동하는 중…" : "Google 계정으로 로그인"}</span>
+                  <span>
+                    {busy ? (callbackNext ? "로그인하는 중…" : "Google로 이동하는 중…") : "Google 계정으로 로그인"}
+                  </span>
                 </button>
-                )}
 
                 <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
-                  {["학교·개인 Google 계정 모두 사용할 수 있습니다.", "같은 계정으로 로그인해야 기록이 이어집니다."].map((note) => (
+                  {["학교·개인 Google 계정 모두 사용할 수 있습니다."].map((note) => (
                     <li key={note} className="flex items-start gap-2 break-keep">
                       <Check aria-hidden size={15} strokeWidth={2.2} className="mt-[1px] shrink-0 text-[#2F6B4F]" />
                       {note}
