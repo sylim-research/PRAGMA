@@ -153,7 +153,7 @@ const StudentLogin = () => {
 
             <Link
               to="/"
-              className="group mt-6 inline-flex min-h-11 items-center gap-2 rounded-full border border-[#D6D0C2] bg-white/70 px-5 text-[14px] font-semibold text-[#3E4C57] shadow-sm transition-colors hover:border-[#15202B] hover:bg-white hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
+              className="group mt-6 inline-flex min-h-11 items-center gap-2 rounded-full px-4 text-[14px] font-medium text-[#6B665C] transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
             >
               <span aria-hidden className="transition-transform group-hover:-translate-x-0.5">
                 ←
