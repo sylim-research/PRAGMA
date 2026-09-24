@@ -3,6 +3,7 @@
 </p>
 
 [![Live](https://img.shields.io/badge/live-pragma.up.railway.app-2ea44f?style=flat-square)](https://pragma.up.railway.app)
+[![CI](https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml)
 ![Status](https://img.shields.io/badge/status-research_in_progress-blue?style=flat-square)
 ![Stack](https://img.shields.io/badge/React_18-TypeScript-3178c6?style=flat-square)
 ![Backend](https://img.shields.io/badge/Supabase-PostgreSQL-3ecf8e?style=flat-square)
@@ -127,6 +128,29 @@ PRAGMA는 결과물뿐 아니라 결과가 만들어지고 검토된 조건을 �
 | 설계 연구 | 설계 추적, 결정, 반복 개발, 증거 색인 |
 
 > 학습 기록은 수업 운영을 위한 것이며, 별도 동의 없이 연구 자료로 사용하지 않습니다.
+
+<br>
+
+## 논문과 코드의 대응
+
+학위논문 제4장(워크플로우 개발)과 부록이 서술하는 구현은 다음 경로에서 확인할 수 있습니다.
+
+| 논문 | 내용 | 주요 경로 |
+|---|---|---|
+| 4.1 | 개발 환경, 프롬프트·코드·문서의 변경 추적 | [`docs/research-trail/`](docs/research-trail/) · [`docs/dev-log/`](docs/dev-log/) |
+| 4.2 | 시스템 구성, 접근 권한, 데이터 구조 | [`supabase/migrations/`](supabase/migrations/) (RLS 포함) · [`src/App.tsx`](src/App.tsx) (화면 경로·권한) |
+| 4.2.3 | 콘텐츠·프롬프트·버전 추적 | [`src/lib/pragma/promptSnapshot.generated.ts`](src/lib/pragma/promptSnapshot.generated.ts) · [`src/lib/pragma/missionLineage.ts`](src/lib/pragma/missionLineage.ts) |
+| 4.3.1–4.3.2 | 근거 자료 관리, 시나리오·학습 미션 생성 | [`AdminGenerator.tsx`](src/pages/admin/AdminGenerator.tsx) · [`AdminAssembly.tsx`](src/pages/admin/AdminAssembly.tsx) · [`supabase/functions/generate-scenario/`](supabase/functions/generate-scenario/) |
+| 4.3.3 | 자동 품질 점검과 AI 검토 | [`src/lib/pragma/missionRules.ts`](src/lib/pragma/missionRules.ts) · [`supabase/functions/content-review/`](supabase/functions/content-review/) |
+| 4.3.4 | 콘텐츠 감수·승인과 공개 | [`AdminAssembly.tsx`](src/pages/admin/AdminAssembly.tsx) (검수 모드) · [`ContentReviewPanel.tsx`](src/components/admin/ContentReviewPanel.tsx) |
+| 4.4 | 학습자 워크플로우 (판단 → 통번역 산출 → AI 피드백 → 유지/수정) | [`CanonicalMissionRun.tsx`](src/pages/learner/CanonicalMissionRun.tsx) · [`src/lib/mission/missionFeedback.ts`](src/lib/mission/missionFeedback.ts) |
+| 4.4.5 | 개인별 학습 기록 조회 | [`LearnerRecords.tsx`](src/pages/learner/LearnerRecords.tsx) |
+| 4.5 | 교과목 편성, 학급 응답 집계, 수행 기록 관리 | [`AdminComposer.tsx`](src/pages/admin/AdminComposer.tsx) · [`AdminClassResponses.tsx`](src/pages/admin/AdminClassResponses.tsx) · [`AdminLearners.tsx`](src/pages/admin/AdminLearners.tsx) |
+| 4.6 | 회귀 시험과 릴리스 점검 | [`.github/workflows/`](.github/workflows/) · [`tests/`](tests/) · [`scripts/verify-production-source.mjs`](scripts/verify-production-source.mjs) |
+| 부록 A | 운영 프롬프트 | [`src/lib/pragma/promptSnapshot.generated.ts`](src/lib/pragma/promptSnapshot.generated.ts) (Edge 실행 정본의 스냅숏) |
+| 부록 C | 자동 품질 점검 규칙 | [`src/lib/pragma/missionRules.ts`](src/lib/pragma/missionRules.ts) (실행 정본) · [`src/lib/pragma/qualityRuleCatalog.ts`](src/lib/pragma/qualityRuleCatalog.ts) (설명) |
+
+문서 폴더의 구성과 각 문서의 지위는 [`docs/README.md`](docs/README.md)에 정리했습니다.
 
 <br>
 
