@@ -1,6 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  GOOGLE_CLIENT_ID,
+  createLoginNonce,
+  loadGoogleIdentity,
+  type GoogleCredentialResponse,
+} from "@/lib/auth/googleIdentity";
 import { HomeBrand } from "@/components/HomeBrand";
 import { useProfile } from "@/lib/auth/useProfile";
 import { safeLoginReturnPath } from "@/lib/auth/loginReturn";
@@ -15,9 +21,73 @@ const StudentLogin = () => {
   const requestedPath = new URLSearchParams(location.search).get("next");
   const afterLoginPath = safeLoginReturnPath(requestedPath);
 
-  // Supabase가 Google OAuth를 직접 수행한다(Lovable 브로커 경유 없음) —
-  // 그래서 로컬·Railway 어디서 열어도 동작한다. 성공하면 이 탭이 Google로
-  // 이동하므로 호출 이후 코드는 실행되지 않는다.
+  // 기본 경로는 Google Identity Services 버튼이다(googleIdentity.ts). 스크립트를 불러오지
+  // 못하면 "fallback"으로 바꿔 아래 Supabase 리다이렉트 버튼을 보인다.
+  const [gisState, setGisState] = useState<"loading" | "ready" | "fallback">("loading");
+  const gisButtonRef = useRef<HTMLDivElement>(null);
+  const showLogin = !loading && !session && !isDevStub;
+
+  useEffect(() => {
+    if (!showLogin) return;
+    let cancelled = false;
+
+    const mountButton = async () => {
+      try {
+        const [gis, nonce] = await Promise.all([loadGoogleIdentity(), createLoginNonce()]);
+        const parent = gisButtonRef.current;
+        if (cancelled || !parent) return;
+
+        const onCredential = async (response: GoogleCredentialResponse) => {
+          if (!response.credential) return;
+          setBusy(true);
+          const { error } = await supabase.auth.signInWithIdToken({
+            provider: "google",
+            token: response.credential,
+            nonce: nonce.raw,
+          });
+          if (error) {
+            toast.error("Google 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
+            setBusy(false);
+            // nonce는 한 번만 쓸 수 있으므로 새 nonce로 버튼을 다시 만든다.
+            if (!cancelled) void mountButton();
+          }
+          // 성공하면 useProfile이 세션 변화를 받아 아래 Navigate가 다음 화면으로 보낸다.
+        };
+
+        gis.initialize({
+          client_id: GOOGLE_CLIENT_ID,
+          callback: (response) => void onCredential(response),
+          nonce: nonce.hashed,
+          ux_mode: "popup",
+          auto_select: false,
+          itp_support: true,
+        });
+        parent.replaceChildren();
+        gis.renderButton(parent, {
+          type: "standard",
+          theme: "filled_black",
+          size: "large",
+          text: "signin_with",
+          shape: "rectangular",
+          logo_alignment: "center",
+          width: Math.min(400, Math.max(200, Math.round(parent.clientWidth))),
+          locale: "ko",
+        });
+        setGisState("ready");
+      } catch {
+        if (!cancelled) setGisState("fallback");
+      }
+    };
+
+    void mountButton();
+    return () => {
+      cancelled = true;
+      window.google?.accounts?.id?.cancel();
+    };
+  }, [showLogin]);
+
+  // 예비 경로: Supabase가 Google OAuth 리다이렉트를 수행한다. 이 경로에서는 Google 화면에
+  // Supabase 콜백 주소가 표시된다. 성공하면 이 탭이 Google로 이동한다.
   const handleGoogle = async () => {
     setBusy(true);
     try {
@@ -71,6 +141,22 @@ const StudentLogin = () => {
                   기록을 저장해 다음에 이어서 할 수 있습니다.
                 </p>
 
+                {gisState !== "fallback" && (
+                  <div className="mt-6">
+                    <div
+                      ref={gisButtonRef}
+                      aria-busy={gisState === "loading" || busy}
+                      className={`flex min-h-11 w-full justify-center ${busy ? "pointer-events-none opacity-60" : ""}`}
+                    />
+                    {(gisState === "loading" || busy) && (
+                      <p className="mt-2 text-center text-[12.5px] text-[#8A8578]" role="status">
+                        {busy ? "로그인하는 중…" : "Google 로그인 버튼을 불러오는 중…"}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {gisState === "fallback" && (
                 <button
                   type="button"
                   onClick={handleGoogle}
@@ -100,6 +186,7 @@ const StudentLogin = () => {
                   </span>
                   <span>{busy ? "Google로 이동하는 중…" : "Google 계정으로 로그인"}</span>
                 </button>
+                )}
 
                 <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
                   {["학교·개인 Google 계정 모두 사용할 수 있습니다.", "같은 계정으로 로그인해야 기록이 이어집니다."].map((note) => (
