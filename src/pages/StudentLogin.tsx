@@ -102,7 +102,7 @@ const StudentLogin = () => {
                   onClick={handleGoogle}
                   disabled={busy}
                   aria-busy={busy}
-                  className="mt-6 flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-[#101318] px-5 text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_-14px_rgba(16,19,24,0.7)] transition-[background-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:bg-[#1B2028] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_14px_28px_-14px_rgba(16,19,24,0.75)] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101318] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
+                  className="mt-5 flex h-10 w-full items-center justify-center gap-2.5 rounded-lg bg-[#101318] px-5 text-[14.5px] font-semibold tracking-[-0.01em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_-14px_rgba(16,19,24,0.7)] transition-[background-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:bg-[#1B2028] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_14px_28px_-14px_rgba(16,19,24,0.75)] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101318] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
                 >
                   <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
                     <svg viewBox="0 0 48 48" className="h-[19px] w-[19px]">
