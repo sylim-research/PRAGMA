@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { buildGoogleSignInUrl, readGoogleCallback } from "@/lib/auth/googleIdentity";
 import { HomeBrand } from "@/components/HomeBrand";
 import { useProfile } from "@/lib/auth/useProfile";
 import { safeLoginReturnPath } from "@/lib/auth/loginReturn";
@@ -15,22 +16,47 @@ const StudentLogin = () => {
   const requestedPath = new URLSearchParams(location.search).get("next");
   const afterLoginPath = safeLoginReturnPath(requestedPath);
 
-  // Supabase가 Google OAuth를 직접 수행한다(Lovable 브로커 경유 없음) —
-  // 그래서 로컬·Railway 어디서 열어도 동작한다. 성공하면 이 탭이 Google로
-  // 이동하므로 호출 이후 코드는 실행되지 않는다.
+  // Google이 ID 토큰을 붙여 이 페이지로 돌려보낸 경우 세션으로 교환한다(googleIdentity.ts).
+  // 개발 모드의 effect 이중 실행에서 보관값을 두 번 읽지 않도록 ref로 한 번만 처리한다.
+  const [callbackNext, setCallbackNext] = useState<string | null>(null);
+  const callbackHandled = useRef(false);
+
+  useEffect(() => {
+    if (callbackHandled.current) return;
+    callbackHandled.current = true;
+
+    const callback = readGoogleCallback(window.location.hash);
+    if (callback.kind === "none") return;
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+
+    if (callback.kind === "error") {
+      if (callback.reason !== "denied") {
+        toast.error("Google 로그인에 실패했습니다. 다시 시도해 주세요.");
+      }
+      return;
+    }
+
+    setBusy(true);
+    setCallbackNext(safeLoginReturnPath(callback.next));
+    void supabase.auth
+      .signInWithIdToken({ provider: "google", token: callback.idToken, nonce: callback.nonce })
+      .then(({ error }) => {
+        if (error) {
+          toast.error("Google 로그인에 실패했습니다. 다시 시도해 주세요.");
+          setCallbackNext(null);
+          setBusy(false);
+        }
+        // 성공하면 useProfile이 세션 변화를 받아 아래 Navigate가 다음 화면으로 보낸다.
+      });
+  }, []);
+
   const handleGoogle = async () => {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: { redirectTo: window.location.origin + afterLoginPath },
-      });
-      if (error) {
-        toast.error("Google 로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
-        setBusy(false);
-      }
+      const next = requestedPath ? afterLoginPath : "/home";
+      window.location.assign(await buildGoogleSignInUrl(window.location.origin, next));
     } catch {
-      toast.error("Google 로그인 중 오류가 발생했습니다.");
+      toast.error("Google 로그인 화면을 열지 못했습니다. 다시 시도해 주세요.");
       setBusy(false);
     }
   };
@@ -42,7 +68,7 @@ const StudentLogin = () => {
   }
 
   if (!loading && (session || isDevStub)) {
-    return <Navigate to={requestedPath ? afterLoginPath : "/home"} replace />;
+    return <Navigate to={callbackNext ?? (requestedPath ? afterLoginPath : "/home")} replace />;
   }
 
   return (
@@ -62,7 +88,7 @@ const StudentLogin = () => {
           <>
             {/* 로그인은 학습의 목적이 아니라 입구다. 역할 → 학습 가치 → 인증 행동의
                 순서로 읽히게 하고, 인증 우회는 접근 정책에 따라 제공하지 않는다. */}
-            <section className="w-full max-w-[420px] overflow-hidden rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white shadow-sm">
+            <section className="w-full max-w-[400px] overflow-hidden rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white shadow-sm">
               <div className="px-7 pb-6 pt-7 sm:px-8 sm:pt-8">
                 <h1 className="break-keep text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">
                   학습 시작하기
@@ -76,10 +102,10 @@ const StudentLogin = () => {
                   onClick={handleGoogle}
                   disabled={busy}
                   aria-busy={busy}
-                  className="mt-6 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-[10px] bg-[#15202B] px-5 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-[#22303E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60"
+                  className="mt-6 flex h-[54px] w-full items-center justify-center gap-3 rounded-xl bg-[#101318] px-5 text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_10px_24px_-14px_rgba(16,19,24,0.7)] transition-[background-color,box-shadow,transform] duration-150 hover:-translate-y-px hover:bg-[#1B2028] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_14px_28px_-14px_rgba(16,19,24,0.75)] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101318] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
                 >
                   <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
-                    <svg viewBox="0 0 48 48" className="h-5 w-5">
+                    <svg viewBox="0 0 48 48" className="h-[19px] w-[19px]">
                       <path
                         fill="#EA4335"
                         d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -98,11 +124,13 @@ const StudentLogin = () => {
                       />
                     </svg>
                   </span>
-                  <span>{busy ? "Google로 이동하는 중…" : "Google 계정으로 로그인"}</span>
+                  <span>
+                    {busy ? (callbackNext ? "로그인하는 중…" : "Google로 이동하는 중…") : "Google 계정으로 로그인"}
+                  </span>
                 </button>
 
                 <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
-                  {["학교·개인 Google 계정 모두 사용할 수 있습니다.", "같은 계정으로 로그인해야 기록이 이어집니다."].map((note) => (
+                  {["학교·개인 Google 계정 모두 사용할 수 있습니다."].map((note) => (
                     <li key={note} className="flex items-start gap-2 break-keep">
                       <Check aria-hidden size={15} strokeWidth={2.2} className="mt-[1px] shrink-0 text-[#2F6B4F]" />
                       {note}
