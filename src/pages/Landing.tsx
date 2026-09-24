@@ -13,7 +13,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[168px] items-center justify-center gap-1.5 rounded-lg border border-[#C4BCA8] bg-white px-3.5 py-[9px] text-[13px] font-semibold text-[#2F3D48] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#C4BCA8] bg-white px-3 py-[9px] text-[13px] font-semibold text-[#2F3D48] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 const Landing = () => {
   useEffect(() => {
@@ -100,7 +100,7 @@ const Landing = () => {
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
             <span className="mt-auto pt-4">
-              <span className="inline-flex min-w-[172px] items-center justify-center gap-1.5 rounded-md border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
+              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-md border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
                 학습 시작하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -124,7 +124,7 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-4">
-              <span className="inline-flex min-w-[172px] items-center justify-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
+              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
                 제작·검수하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
