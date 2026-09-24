@@ -623,7 +623,7 @@ export const CurriculumEditor = ({
                               <div>
                                 <p className="text-[13px] font-semibold">상황 중심 Can-do 작성 틀</p>
                                 <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
-                                  [상황·관계]에서 [소통 행동]을 [맥락 조건]에 맞게 수행할 수 있다.
+                                  [관계·상황]에서 [소통 행동]을 [맥락 조건]에 맞게 수행할 수 있다.
                                 </p>
                               </div>
                               <div className="space-y-2">
