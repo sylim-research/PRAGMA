@@ -13,7 +13,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[180px] items-center justify-center gap-2 rounded-lg border border-[#C4BCA8] bg-white px-4 py-[9px] text-[13.5px] font-semibold text-[#2F3D48] shadow-sm transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[168px] items-center justify-center gap-1.5 rounded-lg border border-[#C4BCA8] bg-white px-3.5 py-[9px] text-[13px] font-semibold text-[#2F3D48] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 const Landing = () => {
   useEffect(() => {
@@ -36,7 +36,7 @@ const Landing = () => {
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:py-8">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
-              ("같은 뜻인데 다르게 전해진다")를 활자로 시연하는 장치라 장식이 아니다.
+              ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
               모션을 끈 환경에서는 최종 상태로 즉시 표시된다. */}
           <h1 className="text-[27px] font-bold leading-[1.35] tracking-tight text-[#15202B] sm:text-[33px] lg:text-[36px]">
             <span className="block animate-rise-in motion-reduce:animate-none">
@@ -53,7 +53,7 @@ const Landing = () => {
               에 따라
             </span>
             <span className="block animate-rise-in [animation-delay:600ms] motion-reduce:animate-none">
-              다르게 전해집니다.
+              다르게 표현합니다.
             </span>
           </h1>
 
@@ -69,10 +69,10 @@ const Landing = () => {
                 「원문의 의미와 화행 목적을 유지하면서」로 늘리는 안은 기각 — 1행이 568.5px가
                 되어 폭(489px)을 80px 넘고, 3행에 짧은 꼬리가 남는다(2026-09-17 실측). */}
             <span className="block">
-              PRAGMA는 한·중 통번역에서 원문의 의미는 유지하면서 상황과 관계에 맞게
+              PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              판단·산출하고 피드백으로 다듬는 수업 연계형 AI 플랫폼입니다.
+              상황과 관계에 맞는 표현을 판단하고 산출하는 학습 플랫폼입니다.
             </span>
           </p>
         </section>
@@ -82,10 +82,10 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        <section className="mt-5 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="mx-auto mt-5 grid w-full max-w-[704px] grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
-            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -94,13 +94,13 @@ const Landing = () => {
               학습자 영역
             </span>
             <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
-              화용적 판단을 바탕으로 통번역을 산출합니다.<br />
-              AI 피드백을 검토하고 최종안을 결정합니다.
+              상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
+              AI 피드백을 검토한 뒤, 자신의 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
-            <span className="mt-auto pt-4">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
+            <span className="mt-auto pl-2 pt-4">
+              <span className="inline-flex min-w-[172px] items-center justify-center gap-1.5 rounded-md border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
                 학습 시작하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -109,23 +109,23 @@ const Landing = () => {
 
           <Link
             to="/admin-login"
-            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             <span className="flex items-center gap-2 text-[19px] font-bold text-[#15202B]">
               <SlidersHorizontal aria-hidden size={19} strokeWidth={1.75} className="text-[#3E4C57]" />
               교수자 영역
             </span>
             <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
-              학습 미션을 제작하고 자동 검사·AI 검토를 거칩니다.<br />
-              교수자가 최종 승인하고 수업에 활용합니다.
+              콘텐츠를 생성하고, 규칙 점검과 AI 검토를 거칩니다.<br />
+              교수자가 최종 검수·승인해 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
-                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 콘텐츠 제작·검수하기.
+                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·검수하기.
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
-            <span className="mt-auto pt-4">
-              <span className="inline-flex items-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
-                콘텐츠 제작·검수하기
+            <span className="mt-auto pl-2 pt-4">
+              <span className="inline-flex min-w-[172px] items-center justify-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
+                제작·검수하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
             </span>
