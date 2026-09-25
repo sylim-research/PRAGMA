@@ -89,7 +89,7 @@ const StudentLogin = () => {
             {/* 로그인은 학습의 목적이 아니라 입구다. 역할 → 학습 가치 → 인증 행동의
                 순서로 읽히게 하고, 인증 우회는 접근 정책에 따라 제공하지 않는다. */}
             <section className="w-full max-w-[400px] overflow-hidden rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white shadow-sm">
-              <div className="px-7 pb-6 pt-7 sm:px-8 sm:pt-8">
+              <div className="px-7 pb-5 pt-7 sm:px-8">
                 <h1 className="break-keep text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">
                   학습 시작하기
                 </h1>
