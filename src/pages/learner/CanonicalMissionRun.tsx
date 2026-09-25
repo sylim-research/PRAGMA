@@ -397,7 +397,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
-      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-[#FBF7EA] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-5"
+      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-[#FBF7EA] px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-3.5"
       : "rounded-xl border border-[#EDE4C8] bg-[#FBF7EA] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
@@ -413,8 +413,8 @@ function ContextCard({ context, headerRight, title = "상황" }: {
             const action = index === actionIndex;
             return (
               <span key={line} className={action
-                ? `${index > 0 ? "mt-1.5 " : ""}block text-[17px] font-bold leading-8 tracking-[-0.01em] text-[#16222E]`
-                : `${index > 0 ? "mt-1.5 " : ""}block text-[15.5px] font-normal leading-7 text-[#5A6673]`}>
+                ? `${index > 0 ? "mt-1 " : ""}block text-[16px] font-medium leading-7 tracking-[-0.01em] text-[#2B2A26]`
+                : `${index > 0 ? "mt-1 " : ""}block text-[15px] font-normal leading-6 text-[#4A4538]`}>
                 {action && <span aria-hidden className="mr-2 inline-block h-px w-4 align-middle bg-[#C9A62E]" />}
                 {line}
               </span>
