@@ -79,7 +79,7 @@ const StudentLogin = () => {
         </div>
       </header>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-5 py-10 sm:pb-[6vh] sm:pt-14">
+      <main className="flex w-full flex-1 flex-col items-center justify-center px-5 py-10 sm:pb-0 sm:pt-14">
         {loading ? (
           <p className="text-[13.5px] text-muted-foreground" role="status">
             로그인 상태를 확인하는 중…
@@ -93,9 +93,6 @@ const StudentLogin = () => {
                 <h1 className="break-keep text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">
                   학습 시작하기
                 </h1>
-                <p className="mt-2 break-keep text-[13.5px] leading-relaxed text-[#6B665C]">
-                  로그인하면 하던 학습을 이어서 할 수 있습니다.
-                </p>
 
                 <button
                   type="button"
