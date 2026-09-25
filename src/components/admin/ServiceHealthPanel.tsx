@@ -89,7 +89,7 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
   const meta = SERVICE_META[status.id];
   const tone = TONE[pending ? "idle" : status.tone];
   return (
-    <li className="flex gap-3 py-2" data-testid={`service-${status.id}`}>
+    <li className="flex gap-3 px-5 py-3" data-testid={`service-${status.id}`}>
       <span
         className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
         role="img"
@@ -161,14 +161,15 @@ export const ServiceHealthPanel = () => {
   const tone = TONE[pending ? "idle" : summary.tone];
 
   return (
-    <section aria-labelledby="service-health-title" className="mt-4">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-2">
+    // 요약 줄·항목 목록·잔액 안내를 한 장의 카드로 묶는다 — 따로 떨어진 상자 둘로 읽히지 않게.
+    <section aria-labelledby="service-health-title" className="overflow-hidden rounded-2xl border border-[#E6E1D5] bg-white">
+      <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5 ${open ? "border-b border-[#EEEAE0] bg-[#FAF8F2]" : ""}`}>
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
           data-testid="summary-dot"
           aria-hidden="true"
         />
-        <h2 id="service-health-title" className="text-sm font-semibold text-[#1B2A36]">
+        <h2 id="service-health-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">
           외부 서비스 연동
         </h2>
         <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>
@@ -196,12 +197,12 @@ export const ServiceHealthPanel = () => {
 
       {open && (
         <div id="service-health-list">
-          <ul className="mt-2 divide-y divide-border rounded-lg border border-border bg-card px-4">
+          <ul className="divide-y divide-[#EEEAE0]">
             {statuses.map((status) => (
               <StatusRow key={status.id} status={status} pending={pending} />
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-muted-foreground">
+          <p className="border-t border-[#EEEAE0] px-5 py-2.5 text-[11px] text-muted-foreground">
             OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
             {CONSOLES.map((item, index) => (
               <span key={item.href}>

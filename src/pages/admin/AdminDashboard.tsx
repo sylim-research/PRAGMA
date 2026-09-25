@@ -112,9 +112,9 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2 mt-5">
+  <div className="mb-3 mt-8">
     <div className="flex flex-wrap items-center gap-2">
-      <h2 className="text-[15px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
+      <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
     </div>
     {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
@@ -182,7 +182,7 @@ const ReviewPipeline = ({
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
   <div role="group" aria-label="품질 검수 단계">
-  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3 lg:grid-cols-5">
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
     {(() => {
       const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
         // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
@@ -198,7 +198,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
+                "group flex min-h-[84px] flex-col rounded-xl border bg-white px-4 py-3",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -217,7 +217,7 @@ const ReviewPipeline = ({
                 {value === null && !error && !unavailable ? (
                   <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
                 ) : (
-                  <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
@@ -282,7 +282,7 @@ const OperationMetric = ({
     to={to}
     title={title}
     className={[
-      "group flex min-h-[64px] flex-col rounded-lg border bg-white px-3 py-2",
+      "group flex min-h-[84px] flex-col rounded-xl border bg-white px-4 py-3",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
@@ -292,7 +292,7 @@ const OperationMetric = ({
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
       <span className="mt-1.5 flex items-end gap-1.5">
-        <span className="text-[22px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+        <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
         {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">{unit}</span>}
@@ -551,7 +551,7 @@ const AdminDashboard = () => {
       />
 
       <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
         <OperationMetric
@@ -605,8 +605,8 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* 정상일 때는 한 줄로 접혀 있고 이상이 있으면 스스로 펼쳐진다 — 그 성질에 맞게 맨 아래 둔다. */}
-      <div className="mt-3">
+      {/* 운영 수치가 아니라 연동 점검이라 맨 아래 둔다. */}
+      <div className="mt-8">
         <ServiceHealthPanel />
       </div>
 
