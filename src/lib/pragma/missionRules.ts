@@ -392,13 +392,13 @@ export function checkCore(coreInput: unknown, ctx: CheckContext): RuleResult {
   const v: RuleViolation[] = [];
   const parsed = normalizeCore(coreInput);
   if (!parsed.ok) {
-    add(v, "R1c", "fail", `코어 스키마 위반: ${parsed.error.issues[0]?.message ?? "형식 오류"}`);
+    add(v, "R1c", "fail", `시나리오 스키마 위반: ${parsed.error.issues[0]?.message ?? "형식 오류"}`);
     return finalize(v);
   }
   const core = parsed.data;
   checkDirectionMatch(v, core.direction, ctx);
   if (ctx.require_context_spec && !core.context_spec) {
-    add(v, "R25", "fail", "신규 코어에 서버 주입 context_spec이 없음");
+    add(v, "R25", "fail", "신규 시나리오에 서버 주입 context_spec이 없음");
   }
   if (
     ctx.require_context_spec &&
@@ -409,7 +409,7 @@ export function checkCore(coreInput: unknown, ctx: CheckContext): RuleResult {
       core.context_spec.interpreter_role_contract.learner_interpreter !== "C" ||
       core.context_spec.interpreter_role_contract.pdr_relation !== "A_to_B")
   ) {
-    add(v, "R25", "fail", "신규 통역 코어의 context_spec에 A/B/C 및 P·D·R=A↔B 역할 계약이 없음");
+    add(v, "R25", "fail", "신규 통역 시나리오의 context_spec에 A/B/C 및 P·D·R=A↔B 역할 계약이 없음");
   }
 
   // theme↔domain 허용 매핑(R1c 확장)
@@ -433,7 +433,7 @@ export function checkCore(coreInput: unknown, ctx: CheckContext): RuleResult {
 
   // R29 — scenario_core_v3(미니 담화형)만 대상. legacy v1·v2 단문 코어는 면제.
   if (core.focal_segments !== undefined) {
-    checkFocalDiscourse(v, core.source_text, core.focal_segments, "코어 source_text", ctx);
+    checkFocalDiscourse(v, core.source_text, core.focal_segments, "시나리오 source_text", ctx);
   }
   return finalize(v);
 }
@@ -456,7 +456,7 @@ function checkCoreCommon(
   }
   // R10 source·선행발화 방향 언어
   checkSourceLang(v, dir, core.source_text, "source_text");
-  checkPrecedingLang(v, dir, core.preceding_turn, "코어");
+  checkPrecedingLang(v, dir, core.preceding_turn, "시나리오");
   // R16 ① 구조: 요청 조건끼리(mode↔source_modality) — fail
   const modeEvidence = { subrule: "mode_modality_mismatch", modality: ctx.mode, direction: ctx.direction };
   if (ctx.mode === "stt_interpreting" && ctx.source_modality !== "spoken") {
@@ -472,7 +472,7 @@ function checkCoreCommon(
       v,
       "R16",
       "fail",
-      `코어 source_modality(${core.source_modality}) ≠ 요청 조건(${ctx.source_modality})`,
+      `시나리오 source_modality(${core.source_modality}) ≠ 요청 조건(${ctx.source_modality})`,
       { subrule: "payload_modality_mismatch", actual: core.source_modality, threshold: ctx.source_modality, modality: ctx.mode },
     );
   }
@@ -1584,17 +1584,17 @@ function checkRecommendedConsistency(v: RuleViolation[], m: MissionRuntime, with
 function checkInheritance(v: RuleViolation[], m: Pick<MissionRuntime, "direction" | "production_task">, core: ScenarioCoreRuntime) {
   const pt = m.production_task;
   if (pt.source_text !== core.source_text) {
-    add(v, "R23", "fail", "production_task.source_text가 코어를 계승하지 않음");
+    add(v, "R23", "fail", "production_task.source_text가 시나리오를 계승하지 않음");
   }
   // channel 폐기(2026-07-25): production_task.channel ↔ core.channel 계승 검사 제거.
   if (!samePdrBand(pt.pdr, core.pdr)) {
-    add(v, "R23", "fail", "production_task.pdr가 코어를 계승하지 않음");
+    add(v, "R23", "fail", "production_task.pdr가 시나리오를 계승하지 않음");
   }
   if (pt.source_modality !== core.source_modality) {
-    add(v, "R23", "fail", `production_task.source_modality(${pt.source_modality}) ≠ 코어(${core.source_modality})`);
+    add(v, "R23", "fail", `production_task.source_modality(${pt.source_modality}) ≠ 시나리오(${core.source_modality})`);
   }
   if (m.direction !== core.direction) {
-    add(v, "R23", "fail", `미션 방향(${m.direction}) ≠ 코어 방향(${core.direction})`);
+    add(v, "R23", "fail", `미션 방향(${m.direction}) ≠ 시나리오 방향(${core.direction})`);
   }
   const missionFacts = pt.usable_facts ?? [];
   const coreFacts = core.usable_facts ?? [];
@@ -1602,7 +1602,7 @@ function checkInheritance(v: RuleViolation[], m: Pick<MissionRuntime, "direction
     missionFacts.length !== coreFacts.length ||
     missionFacts.some((fact, index) => fact !== coreFacts[index])
   ) {
-    add(v, "R23", "fail", "production_task.usable_facts가 코어의 서버 승인 사실 목록을 계승하지 않음");
+    add(v, "R23", "fail", "production_task.usable_facts가 시나리오의 서버 승인 사실 목록을 계승하지 않음");
   }
 }
 

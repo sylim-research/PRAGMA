@@ -386,7 +386,7 @@ export function assertContentFunnelPlan(): void {
   if (LOCK_PILOT_CORE_PLAN.length !== 30) throw new Error("파일럿 계획은 정확히 30개여야 합니다.");
   if (LOCK_COURSE_PRIORITY_CORE_PLAN.length !== 300) throw new Error("교과목 우선 계획은 정확히 300개여야 합니다.");
   if (LOCK_EXPANSION_CORE_PLAN.length !== 200) throw new Error("범위 확장 계획은 정확히 200개여야 합니다.");
-  if (LOCK_FULL_CORE_PLAN.length !== VALID_LOCK_CANDIDATE_TARGET) throw new Error("전체 코어 계획은 정확히 500개여야 합니다.");
+  if (LOCK_FULL_CORE_PLAN.length !== VALID_LOCK_CANDIDATE_TARGET) throw new Error("전체 시나리오 계획은 정확히 500개여야 합니다.");
   for (const quota of VALID_LOCK_CANDIDATE_QUOTAS) {
     const actual = LOCK_FULL_CORE_PLAN.filter(
       (item) => item.cell.direction === quota.direction && item.cell.mode === quota.mode,

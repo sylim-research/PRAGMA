@@ -204,7 +204,7 @@ export function checkV6Authoring(draft: AnyRecord, core: V6CoreForPrompt): V6Aut
   if (valid !== 1) issues.push({ level: "fail", path: "mpj_items[2].corrections", message: `적절 교정안 ${valid}개 — 새 생성은 적절 정확히 1개(나머지 2개는 결함이 남은 선택지)` });
   const sources = items.map(item => str(item.source).trim());
   if (new Set(sources).size !== sources.length) issues.push({ level: "fail", path: "mpj_items[].source", message: "문항 원문이 중복됨" });
-  if (sources.some(source => source === core.source_text.trim())) issues.push({ level: "fail", path: "mpj_items[].source", message: "문항 원문이 DCT 코어 원문과 같음" });
+  if (sources.some(source => source === core.source_text.trim())) issues.push({ level: "fail", path: "mpj_items[].source", message: "문항 원문이 DCT 시나리오 원문과 같음" });
   const fixTarget = str(items[2]?.target).trim();
   if ((items[2]?.corrections ?? []).some((c: AnyRecord) => str(c.text).trim() === fixTarget)) {
     issues.push({ level: "fail", path: "mpj_items[2].corrections", message: "선택지에 교정 대상 문장(target)이 그대로 들어 있음" });
@@ -221,7 +221,7 @@ export function checkV6Authoring(draft: AnyRecord, core: V6CoreForPrompt): V6Aut
   const head = core.focal_segments.find(segment => segment.role === "head")?.text ?? "";
   if (head && str(task.situation_ko).includes(head)) issues.push({ level: "fail", path: "production_task.situation_ko", message: "DCT 상황문에 원문 문장을 옮겨 적음" });
   if (task.source_text !== core.source_text || JSON.stringify(task.focal_segments) !== JSON.stringify(core.focal_segments)) {
-    issues.push({ level: "fail", path: "production_task", message: "DCT 원문·핵심 구간이 코어와 다름" });
+    issues.push({ level: "fail", path: "production_task", message: "DCT 원문·핵심 구간이 시나리오와 다름" });
   }
   if ((task.reference_alternatives ?? []).length !== 2) issues.push({ level: "warning", path: "production_task.reference_alternatives", message: "참고안 2개 목표" });
   if (items[0]?.title === items[1]?.title) issues.push({ level: "warning", path: "mpj_items[].title", message: "제목 중복" });

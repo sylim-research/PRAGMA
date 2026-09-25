@@ -877,7 +877,7 @@ export async function promoteCore(
   // (라운드2 엣지가 방향·중립 이름을 읽도록 갱신되면 함께 재조정한다.)
   const nc = normalizeCore(core.core_content ?? {});
   const normCore = nc.ok ? nc.data : undefined;
-  if (!normCore) return { ok: false, error: '코어를 읽을 수 없어 미션 생성을 중단합니다.' };
+  if (!normCore) return { ok: false, error: '시나리오를 읽을 수 없어 미션 생성을 중단합니다.' };
   const grounded = await checkCoreSemanticFit({
     direction, speech_act_ui: core.speech_act, level: core.learner_level,
     domain: core.domain ?? 'daily', industry: (core.industry_sector ?? null) as Parameters<typeof checkCoreSemanticFit>[0]['industry'],
@@ -887,7 +887,7 @@ export async function promoteCore(
     pdr_distance: PDR_DISTANCE_JSON_TO_ENUM[normCore.pdr.d], pdr_burden: normCore.pdr.r,
   }, core.core_content!, core.generation_run_id ?? '', core.generation_item_key ?? core.scenario_id);
   if ('error' in grounded || grounded.result.verdict !== 'pass') {
-    return { ok: false, error: '코어 의미 검토 후 생성할 수 있습니다: ' + ('error' in grounded ? grounded.error : grounded.result.reason),
+    return { ok: false, error: '시나리오 의미 검토 후 생성할 수 있습니다: ' + ('error' in grounded ? grounded.error : grounded.result.reason),
       terminal: promotionTerminal({ terminalStage: 'preparing', finalOutcome: 'terminal_dropout' }) };
   }
   const missionCore = {
@@ -936,7 +936,7 @@ export async function promoteCore(
         message: violation.message,
       })),
       attempts: 0,
-      error: "코어 규칙검사 실패 — 미션 생성은 실행하지 않았습니다.",
+      error: "시나리오 규칙검사 실패 — 미션 생성은 실행하지 않았습니다.",
       terminal: promotionTerminal({
         terminalStage: "deterministic",
         deterministicFailureCodes: coreCheck.violations.filter((violation) => violation.level === "fail").map((violation) => violation.id),
@@ -1703,6 +1703,6 @@ export async function supersedeMissionForRework(
   if (error) {
     return { ok: false, error: (error as { message?: string }).message ?? String(error) };
   }
-  if (typeof data !== "string") return { ok: false, error: "재작업 코어 ID를 받지 못했습니다." };
+  if (typeof data !== "string") return { ok: false, error: "재작업 시나리오 ID를 받지 못했습니다." };
   return { ok: true, scenarioId: data };
 }

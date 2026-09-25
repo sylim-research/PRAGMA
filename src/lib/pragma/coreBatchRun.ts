@@ -174,11 +174,11 @@ export async function checkCoreSemanticFit(
     },
   });
   if (error) {
-    return { ok: false, error: error.message ?? "코어 의미 검토 호출 실패", providerStatus: statusOf(error) };
+    return { ok: false, error: error.message ?? "시나리오 의미 검토 호출 실패", providerStatus: statusOf(error) };
   }
   const check = data?.core_quality_check as Record<string, unknown> | undefined;
   if (!check || check.prompt_version !== CURRENT_CORE_QUALITY_PROMPT_VERSION) {
-    return { ok: false, error: data?.error ?? "현행 코어 의미 검토 결과 없음", providerStatus: "UNKNOWN" };
+    return { ok: false, error: data?.error ?? "현행 시나리오 의미 검토 결과 없음", providerStatus: "UNKNOWN" };
   }
   const gate = coreSemanticGate(check);
   return {
@@ -375,7 +375,7 @@ export async function runCoreCell(
           semanticFailureCodes: industryCritic.issues,
           industryCritic,
           stopCode: "CORE_SEMANTIC_HOLD",
-          error: "코어 의미 검토 보류: " + industryCritic.reason,
+          error: "시나리오 의미 검토 보류: " + industryCritic.reason,
         };
       }
     }
