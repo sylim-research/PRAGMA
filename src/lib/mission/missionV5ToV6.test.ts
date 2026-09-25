@@ -38,7 +38,7 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
   it("승인본에서 상수로 굳은 자리는 규칙으로 채운다", () => {
     expect(items.map((entry: any) => entry.short_label)).toEqual(["첫인상 판단", "맥락 판단", "선택교정", "직접 고쳐 보기", "네 표현 비교"]);
     expect(items[0].prompt).toBe(items[1].prompt);
-    expect(items[1].reason_choice.prompt).toBe("가장 큰 이유는 무엇인가요?");
+    expect(items[1].reason_choice.prompt).toBe("그렇게 판단한 이유는 무엇인가요?");
     // v5 topology X→A→A→A→Y: judge3는 within 밖이므로 승인본 여섯 건과 같은 척도.
     expect(item("judge3").accepted_band_codes).not.toContain("within_band");
     expect(items[1].accepted_scale_codes).toEqual(["somewhat_inappropriate", "very_inappropriate"]);
@@ -75,7 +75,7 @@ describe("v5 native → v6 변환이 옮기는 것과 남기는 것", () => {
     });
     filled.mpj_items[1].accepted_scale_codes = ["somewhat_inappropriate"];
     filled.mpj_items[1].reference_scale_code = "somewhat_inappropriate";
-    filled.mpj_items[1].reason_choice.prompt = "가장 큰 이유는 무엇인가요?";
+    filled.mpj_items[1].reason_choice.prompt = "그렇게 판단한 이유는 무엇인가요?";
     const third = filled.mpj_items[2];
     third.situation_ko = "새로 쓴 3번 장면";
     third.relation_ko = "새로 쓴 3번 관계";

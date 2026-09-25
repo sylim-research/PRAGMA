@@ -57,7 +57,7 @@ export const SAMPLE_MISSION_V6 = MissionV6Schema.parse({
 // Separate local candidate: the frozen sample and public scenario IDs stay intact.
 const reasonContrastCandidate = structuredClone(SAMPLE_MISSION_V6);
 reasonContrastCandidate.mpj_items[1].reason_choice = {
-  prompt: "가장 큰 이유는 무엇인가요?",
+  prompt: "그렇게 판단한 이유는 무엇인가요?",
   options: [
     { id: "request-and-deadline", text: "추천서 요청 내용과 필요한 시점이 분명하게 전달되기 때문입니다." },
     { id: "assumed-acceptance", text: "작성 가능 여부를 묻기보다, 이미 맡긴 일처럼 전달을 요구하기 때문입니다." },

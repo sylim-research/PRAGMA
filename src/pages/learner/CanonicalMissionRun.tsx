@@ -492,6 +492,20 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
+// 문항의 질문 표지(2026-09-25). 회색 「지금 할 일」 대신 남색 칩으로 「이게 질문」임을 먼저 보이고,
+// 질문이 둘인 문항(MJT2)은 「질문 1」「질문 2」로 번호를 붙인다.
+const questionTitle = "break-keep text-[17px] font-bold leading-snug text-[#15202B]";
+function QuestionChip({ n }: { n?: number }) {
+  return (
+    <span aria-hidden className="mr-2 inline-flex -translate-y-px items-center rounded-md bg-[#15202B] px-2 py-[3px] align-middle text-[11.5px] font-bold leading-none tracking-[0.02em] text-white">
+      {n ? `질문 ${n}` : "질문"}
+    </span>
+  );
+}
+// MJT2 이유 질문은 미션마다 같은 문장이라 화면 문구로 고정한다. 저장된 reason_choice.prompt는
+// 콘텐츠 지문·승인 기록과 묶여 있어 고치지 않는다.
+const REASON_PROMPT = "그렇게 판단한 이유는 무엇인가요?";
+
 // 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
 // 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「인정 범위」, 키가 있는 선택형 = 「정답」.
 function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "정답", referenceId, onSelect }: {
@@ -665,8 +679,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} />{quest.prompt}</h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
             <OptionButton key={option.id} option={option} value={pick} disabled={judgmentLocked} answered={judgmentShown} acceptedIds={acceptedIds}
@@ -677,10 +690,10 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <p className="sr-only" aria-live="polite">
           {judgmentShown
             ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 인정 범위 ${alsoAcceptedLabels.join(", ")}.` : ""}`
-            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 가장 큰 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
+            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
-          <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
+          <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} />{REASON_PROMPT}</legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
@@ -696,7 +709,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
         </section>}
       </section>
-      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
+      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
             if (!judgmentCommitted) setJudgmentCommitted(true);
@@ -739,8 +752,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
         {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
             <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} acceptedLabel="기준 판단" onSelect={setJudgment} />
@@ -842,8 +854,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
-      <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-      <h3 className="text-base font-bold">{freeCorrectionInstruction(output)}</h3>
+      <h3 className={questionTitle}><QuestionChip />{freeCorrectionInstruction(output)}</h3>
       <p className="mt-1 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
@@ -884,8 +895,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
   const total = quest.candidates.length;
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
-      <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-      <h3 className="text-base font-bold">{quest.prompt}</h3>
+      <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
       {submitted && <div className="mt-4">
         <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 기준 판단과 같아요`} />
       </div>}
@@ -947,8 +957,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
+        <h3 className={questionTitle}><QuestionChip />이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
             <div role="radiogroup" aria-label="가장 큰 이유 하나" className={optionGrid}>
               {reasonOrder.map((reason) => (
                 <OptionButton
@@ -1003,8 +1012,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
   return (
     <QuestScaffold quest={quest}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg bg-[#15202B] px-2.5 text-xs font-black text-white">{mission.targetLanguage.badge}</span>
           <span className="text-sm font-bold text-[#5D6980]">비교할 표현</span>

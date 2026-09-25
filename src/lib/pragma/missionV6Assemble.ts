@@ -22,7 +22,7 @@ const PROMPTS = {
   fix_choice: "원문의 핵심 의미와 화행 목적을 지키면서 이 상황에 맞게 고친 표현을 골라보세요.",
   free_correction: "원문의 핵심 의미와 화행 목적을 지키면서 필요한 부분을 직접 고쳐 보세요.",
   multi_judge: "각 표현을 읽고, 이 상황에서 어떻게 들리는지 판단해 보세요.",
-  reason: "가장 큰 이유는 무엇인가요?",
+  reason: "그렇게 판단한 이유는 무엇인가요?",
 } as const;
 const MJT5_TITLE = "각 표현은 어디쯤에 놓일까요?";
 const SCALES = {
