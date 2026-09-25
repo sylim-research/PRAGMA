@@ -1814,7 +1814,7 @@ function macroProgressIndex(activeIndex: number, completed: boolean | undefined,
   return revisionOpen ? 4 : 3;
 }
 
-function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest }: {
+function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest, freeJump = false, onJumpStage }: {
   activeIndex: number;
   completed?: boolean;
   reviewIndex?: number | null;
@@ -1825,6 +1825,10 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   skipIntro?: boolean;
   /** 마친 판단 문항의 점을 눌러 그 기록으로 간다. 없으면 점은 표시만 한다. */
   onJumpQuest?: (index: number) => void;
+  /** 대표 미션 시연 전용(2026-09-25): 아직 풀지 않은 문항 점도 눌러 바로 연다. 학습자 화면에는 켜지 않는다. */
+  freeJump?: boolean;
+  /** 시연 전용: 「적절성 판단」·「번역하기」 단계 막대를 눌러 MJT1·DCT로 바로 간다. */
+  onJumpStage?: (stage: "judge" | "produce") => void;
 }) {
   const mission = useCanonicalMission();
   const quests = mission.quests;
@@ -1856,12 +1860,21 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
           {stages.map((label, index) => {
             const done = Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
-            return (
-              <li key={label} className="min-w-0 flex-1">
+            const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
+            const body = (
+              <>
                 <span aria-hidden className={`block h-1.5 rounded-full ${done ? "bg-[#F3D248]" : active ? "bg-[#15202B]" : "bg-[#E4E0D5]"}`} />
                 <span className={`mt-1.5 hidden truncate text-center text-[11.5px] leading-4 sm:block ${active ? "font-black text-[#15202B]" : done ? "font-bold text-[#96812A]" : "font-bold text-[#A8ADB5]"}`}>
                   {label}
                 </span>
+              </>
+            );
+            return (
+              <li key={label} className="min-w-0 flex-1">
+                {onJumpStage && jumpStage
+                  ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
+                      className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">{body}</button>
+                  : body}
               </li>
             );
           })}
@@ -1876,8 +1889,9 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               {[0, 1, 2, 3, 4].map((index) => {
                 const done = index < activeIndex;
                 const dot = `h-2.5 w-2.5 rounded-full border ${done ? "border-[#D3B62D] bg-[#F3D248]" : index === activeIndex ? "border-[#15202B] bg-[#15202B]" : "border-[#CFCBC0] bg-white"}`;
-                return done && onJumpQuest
-                  ? <button key={index} type="button" aria-label={`${index + 1}번째 문항 기록 보기`} onClick={() => onJumpQuest(index)}
+                const clickable = Boolean(onJumpQuest) && (freeJump ? index !== activeIndex : done);
+                return clickable && onJumpQuest
+                  ? <button key={index} type="button" aria-label={freeJump ? `${index + 1}번째 문항으로 이동` : `${index + 1}번째 문항 기록 보기`} onClick={() => onJumpQuest(index)}
                       className={`${dot} transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1`} />
                   : <span key={index} className={dot} aria-hidden />;
               })}
@@ -2720,7 +2734,28 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const reviewedQuest = reviewIndex === null ? undefined : mission.quests[reviewIndex];
   const reviewedResponse = reviewedQuest ? responses[reviewedQuest.id] : undefined;
   const currentProgressIndex = completed ? mission.quests.length : questIndex;
+  // 대표 미션 시연 전용 자유 이동(2026-09-25). 고른 문항을 새로 연다 — 앞 문항을 풀지 않아도 된다.
+  // 학습자 미션에는 켜지 않는다(판단 → 산출 순서가 설계의 핵심). 수행 기록은 시연에서 저장되지 않는다.
+  const openDemoQuest = (index: number) => {
+    setSceneIntroStep(null);
+    setMpjRecapOpen(false);
+    setReviewIndex(null);
+    setCompleted(false);
+    setFeedbackRevisionOpen(false);
+    setDevAutofillQuestId(null);
+    setQuestIndex(index);
+    setRenderNonce((current) => current + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const jumpDemoStage = (stage: "judge" | "produce") => {
+    const index = stage === "judge" ? 0 : mission.quests.findIndex((item) => item.kind === "dct");
+    if (index >= 0) openDemoQuest(index);
+  };
   const navigateProgress = (index: number) => {
+    if (demoMode) {
+      openDemoQuest(index);
+      return;
+    }
     if (isDevPreview) {
       jumpToDevPreview(mission.quests[index].id);
       return;
@@ -2760,7 +2795,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         </p>}
         {sceneIntroStep !== null ? (
           <div className="space-y-5">
-            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} />
+            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <SceneIntroFlow
               config={sceneIntroConfig}
               onNext={advanceSceneIntro}
@@ -2768,7 +2803,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : mpjRecapOpen ? (
           <div className="space-y-5">
-            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} />
+            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={continueFromMpjRecap} />
           </div>
         ) : reviewedQuest && reviewedResponse ? (
@@ -2779,7 +2814,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : completed ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
+            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
               <h1 className="mt-2 text-xl font-black">이번 미션에서 확정한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
@@ -2806,7 +2841,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : (
           <div className="space-y-4">
-            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} />
+            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} freeJump={demoMode} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}
