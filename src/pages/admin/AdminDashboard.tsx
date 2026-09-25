@@ -112,7 +112,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-3 mt-8">
+  <div className="mb-3 mt-6">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
       {action}
@@ -198,7 +198,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[84px] flex-col rounded-xl border bg-white px-4 py-3",
+                "group flex min-h-[78px] flex-col rounded-xl border bg-white px-4 py-2.5",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E6E1D5]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -282,7 +282,7 @@ const OperationMetric = ({
     to={to}
     title={title}
     className={[
-      "group flex min-h-[84px] flex-col rounded-xl border bg-white px-4 py-3",
+      "group flex min-h-[78px] flex-col rounded-xl border bg-white px-4 py-2.5",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
