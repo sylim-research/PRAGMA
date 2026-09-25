@@ -492,13 +492,13 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
-// 문항의 질문 표지(2026-09-25). 회색 「지금 할 일」 대신 남색 칩으로 「이게 질문」임을 먼저 보이고,
-// 질문이 둘인 문항(MJT2)은 「질문 1」「질문 2」로 번호를 붙인다.
-const questionTitle = "break-keep text-[17px] font-bold leading-snug text-[#15202B]";
+// 문항의 질문 표지(2026-09-25). 회색 「지금 할 일」 대신 노란 원형 「Q」로 「이게 질문」임을 먼저 보인다.
+// 네이비는 바로 위 원문·번역안 배지(KO·ZH)와 겹쳐 쓰지 않는다. 질문이 둘인 MJT2는 「Q1」「Q2」.
+const questionTitle = "flex items-start gap-2.5 break-keep text-[17px] font-bold leading-snug text-[#15202B]";
 function QuestionChip({ n }: { n?: number }) {
   return (
-    <span aria-hidden className="mr-2 inline-flex -translate-y-px items-center rounded-md bg-[#15202B] px-2 py-[3px] align-middle text-[11.5px] font-bold leading-none tracking-[0.02em] text-white">
-      {n ? `질문 ${n}` : "질문"}
+    <span aria-hidden className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#FAD338] text-[13px] font-extrabold leading-none text-[#15202B]">
+      {n ? `Q${n}` : "Q"}
     </span>
   );
 }
@@ -679,7 +679,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} />{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
             <OptionButton key={option.id} option={option} value={pick} disabled={judgmentLocked} answered={judgmentShown} acceptedIds={acceptedIds}
@@ -693,7 +693,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
-          <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} />{REASON_PROMPT}</legend>
+          <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
@@ -752,7 +752,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
             <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} acceptedLabel="기준 판단" onSelect={setJudgment} />
@@ -854,7 +854,7 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
-      <h3 className={questionTitle}><QuestionChip />{freeCorrectionInstruction(output)}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span></h3>
       <p className="mt-1 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
@@ -895,7 +895,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
   const total = quest.candidates.length;
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
-      <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
       {submitted && <div className="mt-4">
         <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 기준 판단과 같아요`} />
       </div>}
@@ -957,7 +957,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip />이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</span></h3>
             <div role="radiogroup" aria-label="가장 큰 이유 하나" className={optionGrid}>
               {reasonOrder.map((reason) => (
                 <OptionButton
@@ -1012,7 +1012,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
   return (
     <QuestScaffold quest={quest}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip />{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg bg-[#15202B] px-2.5 text-xs font-black text-white">{mission.targetLanguage.badge}</span>
           <span className="text-sm font-bold text-[#5D6980]">비교할 표현</span>
