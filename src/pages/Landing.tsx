@@ -33,7 +33,7 @@ const Landing = () => {
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[88px]">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
