@@ -139,7 +139,7 @@ const StudentLogin = () => {
                 </ul>
               </div>
 
-              <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE0] bg-[#FBFAF6] px-7 py-3 text-[12.5px] text-[#8A8578] sm:px-8">
+              <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE0] bg-[#FBFAF6] px-7 py-2 text-[12.5px] text-[#8A8578] sm:px-8">
                 <span>개인정보처리방침</span>
                 <Link
                   to="/privacy"
