@@ -40,7 +40,7 @@ const isDefaultRationale = (text: string) => Object.values(DEFAULT_FINDING_RATIO
 
 /** 저장 경로를 교수자가 읽는 자리 이름으로. 모르는 조각은 그대로 두고, 원래 경로는 근거 안에 남긴다. */
 const WHERE_PART: Record<string, string> = {
-  core: "코어", scenario: "시나리오", criteria: "판정 기준", features: "화행 기준",
+  core: "시나리오", scenario: "시나리오", criteria: "판정 기준", features: "화행 기준",
   title: "제목", source: "원문", target: "번역·통역안", situation_ko: "상황문", relation_ko: "관계 설명",
   explanation_ko: "해설", corrections: "교정안", candidates: "후보", note_ko: "근거", reason_choice: "이유 선택",
   reference_alternatives: "참고안", learner_context_ko: "안내문", lesson_points: "핵심 정리", contrast: "대조",
@@ -324,7 +324,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. 최종 승인 화면은 이 줄 없이 감수부터 시작한다. */}
     {!experiential && <div className="flex flex-wrap items-center justify-between gap-2">
       {/* The final-approval screen already shows its own ①②③ flow; the stage line stays on the quality-check screen. */}
-      {experiential ? <span /> : <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px]" aria-label={target.kind === "mission" ? "점검 단계 · 코어·MJT5·DCT1 전체" : "점검 단계 · 편성 후 공통 수업자료·교수자 고유 메모"}>
+      {experiential ? <span /> : <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px]" aria-label={target.kind === "mission" ? "점검 단계 · 시나리오·MJT5·DCT1 전체" : "점검 단계 · 편성 후 공통 수업자료·교수자 고유 메모"}>
         {steps.map((step, index) => {
           const failed = Boolean(state) && index === 0 && blocked;
           const done = Boolean(state) && index < stepIndex && !failed;
