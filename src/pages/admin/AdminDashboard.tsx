@@ -614,7 +614,7 @@ const AdminDashboard = () => {
       {isAdmin && IS_DEV && (
         <div className="mt-4 flex justify-end">
           <AlertDialog>
-            <AlertDialogTrigger asChild><Button variant="ghost" size="sm" className="text-xs text-[#4F5D68]" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
+            <AlertDialogTrigger asChild><Button variant="outline" size="sm" className="border-[#D9CB8F] bg-[#FBF6E1] text-xs font-semibold text-[#6B5A1E] hover:border-[#C5B05F] hover:bg-[#F6ECC0] hover:text-[#4F4213]" disabled={resetting}>프로필 초기화 테스트</Button></AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>내 프로필을 초기화하시겠습니까?</AlertDialogTitle>
