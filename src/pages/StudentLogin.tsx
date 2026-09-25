@@ -79,7 +79,7 @@ const StudentLogin = () => {
         </div>
       </header>
 
-      <main className="flex w-full flex-1 flex-col items-center justify-center px-5 py-10 sm:pb-[13vh] sm:pt-14">
+      <main className="flex w-full flex-1 flex-col items-center justify-center px-5 py-10 sm:pb-[6vh] sm:pt-14">
         {loading ? (
           <p className="text-[13.5px] text-muted-foreground" role="status">
             로그인 상태를 확인하는 중…
