@@ -109,7 +109,7 @@ type DevPreviewPreset = "all_good" | "direct" | "over_mitigated" | "mixed";
 const SHOW_PEER_RESPONSES = false;
 
 const panel = "rounded-2xl border border-[#DDD8CB] bg-white";
-const taskPanel = "rounded-2xl border-2 border-[#C9D0DA] bg-white shadow-[0_8px_24px_rgba(21,32,43,0.05)]";
+const taskPanel = "rounded-2xl border border-[#E2DCCB] bg-white";
 const taskPanelBody = `${taskPanel} px-4 py-3 sm:px-5`;
 const optionGrid = "mt-3 grid gap-1.5";
 // break-keep — 없으면 한국어 낱말 중간에서 줄이 끊긴다(좁은 화면에서 특히).
@@ -212,7 +212,7 @@ function nextActionLabel(quest: MissionQuest) {
 function ActionBar({ hint, children }: { hint?: string; children: React.ReactNode }) {
   return (
     // 일반 문서 흐름에 둔다 — 하단에 고정하면 첫 화면부터 뷰포트 바닥을 가려, 자료를 읽기 전에 판단을 요구하게 된다.
-    <div className="mt-3 rounded-2xl border border-[#D8D4C8] bg-white p-2.5 shadow-[0_2px_10px_rgba(21,32,43,0.05)]">
+    <div className="mt-3 rounded-2xl border border-[#E3DDCF] bg-white p-2.5 shadow-[0_2px_10px_rgba(21,32,43,0.05)]">
       {hint && <p className="mb-2 break-keep px-2 text-xs font-bold text-[#647084]" aria-live="polite">{hint}</p>}
       {children}
     </div>
@@ -298,19 +298,19 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
           <ol className="grid gap-3 sm:grid-cols-2">
             <li className="rounded-xl bg-[#F8F6EE] p-4">
               <h2 className="font-bold">1. 표현 판단 연습</h2>
-              <p className="mt-1 text-sm leading-6 text-[#596579]">{config.practiceDescription ?? "여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다."}</p>
+              <p className="mt-1 text-sm leading-6 text-[#635E52]">{config.practiceDescription ?? "여러 상황의 표현을 살펴보며 다섯 문항에 답합니다. 같은 상황을 이어서 살펴보는 문항도 있습니다."}</p>
             </li>
             <li className="rounded-xl bg-[#F8F6EE] p-4">
               <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
-              <p className="mt-1 text-sm leading-6 text-[#596579]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
+              <p className="mt-1 text-sm leading-6 text-[#635E52]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
             </li>
           </ol>
         )}
         {!config.briefingOnly && <>
           <ContextCard context={config.context} title={`직접 ${config.outputName}할 상황`} />
           <dl className="grid gap-3 text-sm sm:grid-cols-[1fr_auto]">
-            <div><dt className="text-xs font-bold text-[#697386]">상대·관계</dt><dd className="mt-1 leading-6">{config.context.relation}</dd></div>
-            <div><dt className="text-xs font-bold text-[#697386]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
+            <div><dt className="text-xs font-bold text-[#7A7466]">상대·관계</dt><dd className="mt-1 leading-6">{config.context.relation}</dd></div>
+            <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
         <Button className="h-12 w-full" onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
@@ -397,11 +397,11 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
-      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-gradient-to-b from-[#FAF8F1] to-[#F2EFE4] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-5"
-      : "rounded-xl border border-[#E2DED4] bg-[#F4F2EC] px-4 py-3.5 sm:px-5"}>
+      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-[#FBF7EA] px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-3.5"
+      : "rounded-xl border border-[#EDE4C8] bg-[#FBF7EA] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
-          <p className="text-xs font-bold text-[#5D6980]">{title}</p>
+          <p className="text-xs font-bold text-[#6B665C]">{title}</p>
           {headerRight}
         </div>
       )}
@@ -413,8 +413,8 @@ function ContextCard({ context, headerRight, title = "상황" }: {
             const action = index === actionIndex;
             return (
               <span key={line} className={action
-                ? `${index > 0 ? "mt-1.5 " : ""}block text-[17px] font-bold leading-8 tracking-[-0.01em] text-[#16222E]`
-                : `${index > 0 ? "mt-1.5 " : ""}block text-[15.5px] font-normal leading-7 text-[#5A6673]`}>
+                ? `${index > 0 ? "mt-1 " : ""}block text-[16px] font-medium leading-7 tracking-[-0.01em] text-[#2B2A26]`
+                : `${index > 0 ? "mt-1 " : ""}block text-[15px] font-normal leading-6 text-[#4A4538]`}>
                 {action && <span aria-hidden className="mr-2 inline-block h-px w-4 align-middle bg-[#C9A62E]" />}
                 {line}
               </span>
@@ -425,7 +425,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
         <h2 className="mt-1.5 break-keep text-[17px] font-bold leading-8 text-[#101B2B]">{context.situation}</h2>
       )}      {context.precedingTurn && (
         <div className="mt-3 rounded-xl border-l-4 border-[#F0D34F] bg-[#F7F5EF] px-4 py-2.5">
-          <p className="text-[12px] font-bold text-[#697386]">상대의 말</p>
+          <p className="text-[12px] font-bold text-[#7A7466]">상대의 말</p>
           <p className="mt-1 break-keep text-[15px] leading-6">{context.precedingTurn}</p>
         </div>
       )}
@@ -436,7 +436,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
             ["친숙도", context.pdr.d],
             ["부담", context.pdr.r.replace(/^부담\s*/, "")],
           ].map(([label, value]) => (
-            <span key={label} className="rounded-full border border-[#D3D8E1] bg-white px-2.5 py-1 text-xs font-bold text-[#4D5A70]">
+            <span key={label} className="rounded-full border border-[#E2DCCB] bg-white px-2.5 py-1 text-xs font-bold text-[#5C574C]">
               {label} · {value}
             </span>
           ))}
@@ -458,19 +458,19 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-[#E2DCCB] bg-white shadow-sm">
       <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
-        <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
+        <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] font-bold text-[#697386]">원문</p>
+          <p className="text-[11.5px] font-bold text-[#7A7466]">원문</p>
           <p className={`${sourceFont} break-keep text-[16px] font-semibold leading-7 text-[#101B2B]`}>{source}</p>
         </div>
       </div>
       {target && (
-        <div className="flex items-start gap-4 border-t border-dashed border-[#D8D4C8] px-4 py-3 sm:px-5">
+        <div className="flex items-start gap-4 border-t border-dashed border-[#E3DDCF] px-4 py-3 sm:px-5">
           <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-bold text-[#697386]">{mission.targetLanguage.label} {outputName}</p>
+            <p className="text-[12px] font-bold text-[#7A7466]">{mission.targetLanguage.label} {outputName}</p>
             <p className={`${targetFont} mt-0.5 text-[16.5px] font-normal leading-8 text-[#101B2B]`}>
               <HighlightedText text={target} highlights={targetHighlights} target />
             </p>
@@ -485,12 +485,26 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
   if (!answered) {
     return picked
       ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-1 ring-[#15202B]"
-      : "border-[#D8D4C8] bg-white hover:bg-[#FAF8F2]";
+      : "border-[#E3DDCF] bg-white hover:bg-[#FAF8F2]";
   }
   if (correct) return "border-[#4D8568] bg-white text-[#245E44]";
   if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531]";
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
+
+// 문항의 질문 표지(2026-09-25). 회색 「지금 할 일」 대신 노란 원형 「Q」로 「이게 질문」임을 먼저 보인다.
+// 네이비는 바로 위 원문·번역안 배지(KO·ZH)와 겹쳐 쓰지 않는다. 질문이 둘인 MJT2는 「Q1」「Q2」.
+const questionTitle = "flex items-start gap-2.5 break-keep text-[17px] font-bold leading-snug text-[#15202B]";
+function QuestionChip({ n }: { n?: number }) {
+  return (
+    <span aria-hidden className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#FAD338] text-[13px] font-extrabold leading-none text-[#15202B]">
+      {n ? `Q${n}` : "Q"}
+    </span>
+  );
+}
+// MJT2 이유 질문은 미션마다 같은 문장이라 화면 문구로 고정한다. 저장된 reason_choice.prompt는
+// 콘텐츠 지문·승인 기록과 묶여 있어 고치지 않는다.
+const REASON_PROMPT = "그렇게 판단한 이유는 무엇인가요?";
 
 // 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
 // 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「인정 범위」, 키가 있는 선택형 = 「정답」.
@@ -581,8 +595,8 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 /** 후보 문장 아래에 붙는 해설 — 문제집처럼 꼬리표·작은 글씨·구분선으로 문장과 층을 나눈다. */
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
-    <span className="mt-2 block border-t border-dashed border-[#DDD8CB] pt-2 text-[13.5px] font-normal leading-6 text-[#5D6980]">
-      <span className="mr-1.5 inline-block rounded bg-[#EEECE6] px-1.5 py-px align-[1px] text-[11px] font-black text-[#5D6980]">해설</span>
+    <span className="mt-2 block border-t border-dashed border-[#DDD8CB] pt-2 text-[13.5px] font-normal leading-6 text-[#6B665C]">
+      <span className="mr-1.5 inline-block rounded bg-[#EEECE6] px-1.5 py-px align-[1px] text-[11px] font-black text-[#6B665C]">해설</span>
       {children}
     </span>
   );
@@ -665,8 +679,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
             <OptionButton key={option.id} option={option} value={pick} disabled={judgmentLocked} answered={judgmentShown} acceptedIds={acceptedIds}
@@ -677,10 +690,10 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <p className="sr-only" aria-live="polite">
           {judgmentShown
             ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 인정 범위 ${alsoAcceptedLabels.join(", ")}.` : ""}`
-            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 가장 큰 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
+            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
-          <legend className="pt-4 font-bold">{quest.reasonChoice.prompt}</legend>
+          <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
@@ -688,7 +701,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           <p className="sr-only" aria-live="polite">
             {answered && reasonAcceptedId ? `${reasonOk ? "정답입니다" : "오답입니다"}. 정답 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
           </p>
-          {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#596579]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
+          {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
         {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
@@ -696,7 +709,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
         </section>}
       </section>
-      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
+      <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
           <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
             if (!judgmentCommitted) setJudgmentCommitted(true);
@@ -739,8 +752,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
             <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} acceptedLabel="기준 판단" onSelect={setJudgment} />
@@ -781,7 +793,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         : "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]"
                     : picked
                       ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-1 ring-[#15202B]"
-                      : "border-[#D8D4C8] bg-white";
+                      : "border-[#E3DDCF] bg-white";
                   return (
                     <button key={correction.id} type="button" disabled={answered} aria-pressed={picked} onClick={() => setCorrectionId(correction.id)} className={`${optionBase} min-w-0 [overflow-wrap:anywhere] ${state} disabled:cursor-default`}>
                       <span className="flex flex-col items-start gap-1.5 sm:flex-row sm:justify-between sm:gap-3">
@@ -842,16 +854,15 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
-      <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-      <h3 className="text-base font-bold">{freeCorrectionInstruction(output)}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span></h3>
       <p className="mt-1 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
-        {!submitted && <p className="mt-2 text-xs leading-5 text-[#697386]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
+        {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
-        <h4 className="text-[13px] font-black text-[#5D6980]">해설</h4>
+        <h4 className="text-[13px] font-black text-[#6B665C]">해설</h4>
         <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[14.5px] leading-7 text-[#3F4A59] marker:text-[#C9A62E]">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
@@ -884,8 +895,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
   const total = quest.candidates.length;
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
-      <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-      <h3 className="text-base font-bold">{quest.prompt}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
       {submitted && <div className="mt-4">
         <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 기준 판단과 같아요`} />
       </div>}
@@ -899,7 +909,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
             // MJT1·2와 같은 색 규칙: 답한 뒤 참고 답안은 초록 테두리, 내가 고른 오답은 연한 빨강.
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
-              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] bg-white"}`}>
+              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] bg-white"}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
@@ -947,8 +957,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</span></h3>
             <div role="radiogroup" aria-label="가장 큰 이유 하나" className={optionGrid}>
               {reasonOrder.map((reason) => (
                 <OptionButton
@@ -1003,11 +1012,10 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
   return (
     <QuestScaffold quest={quest}>
       <section className={taskPanelBody}>
-        <p className="mb-1 text-[12px] font-black text-[#6B7280]">지금 할 일</p>
-        <h3 className="text-base font-bold">{quest.prompt}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg bg-[#15202B] px-2.5 text-xs font-black text-white">{mission.targetLanguage.badge}</span>
-          <span className="text-sm font-bold text-[#5D6980]">비교할 표현</span>
+          <span className="text-sm font-bold text-[#6B665C]">비교할 표현</span>
         </div>
         <div className="mt-2 grid gap-2">
           {order.map((candidate) => {
@@ -1020,9 +1028,9 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
               ? "border-[#4D8568] bg-[#EEF7F2]"
               : isWorstRole
                 ? "border-[#B96B67] bg-[#FFF1EF]"
-                : "border-[#D8D4C8] bg-[#FAF9F6]";
+                : "border-[#E3DDCF] bg-[#FAF9F6]";
             return (
-              <div key={candidate.id} className={`rounded-xl border px-4 py-2 ${answered ? answeredStyle : "border-[#D8D4C8] bg-white"}`}>
+              <div key={candidate.id} className={`rounded-xl border px-4 py-2 ${answered ? answeredStyle : "border-[#E3DDCF] bg-white"}`}>
                 {answered ? (
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_max-content] sm:items-start sm:gap-4">
                     <div className="min-w-0">
@@ -1040,8 +1048,8 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
                     <p className={`${targetFont} min-w-0 text-[17px] leading-7`}>{candidate.text}</p>
                     <div className="flex shrink-0 gap-2">
-                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>적절한 표현</button>
-                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D8D4C8] hover:bg-[#F8F7F2]"}`}>조정할 표현</button>
+                    <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] hover:bg-[#F8F7F2]"}`}>적절한 표현</button>
+                    <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] hover:bg-[#F8F7F2]"}`}>조정할 표현</button>
                     </div>
                   </div>
                 )}
@@ -1080,12 +1088,12 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   return (
     // 펼친 힌트가 아래로 밀지 않도록 요약 오른쪽에 붙는다.
     <details className="mt-3 flex flex-wrap items-center gap-2">
-      <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-[#D8D4C8] bg-white px-3 py-1.5 text-[12.5px] font-bold text-[#5D6980] transition-colors hover:bg-[#FAF8F2] [&::-webkit-details-marker]:hidden">
+      <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-[#E3DDCF] bg-white px-3 py-1.5 text-[12.5px] font-bold text-[#6B665C] transition-colors hover:bg-[#FAF8F2] [&::-webkit-details-marker]:hidden">
         <Lightbulb aria-hidden className="h-3.5 w-3.5 text-[#C9A62E]" />단어 힌트 {hints.length}개
       </summary>
       <div className="flex flex-wrap gap-2">
         {hints.map((hint) => (
-          <span key={hint.source} className="rounded-full border border-[#D8D4C8] bg-[#FAF8F2] px-3 py-1.5 text-[15px] leading-6">
+          <span key={hint.source} className="rounded-full border border-[#E3DDCF] bg-[#FAF8F2] px-3 py-1.5 text-[15px] leading-6">
             <b className={sourceFont}>{hint.source}</b> · <span className={targetFont}>{hint.target}</span>
           </span>
         ))}
@@ -1113,21 +1121,21 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   // 원문을 읽고 옮기는 한 벌 — 카드 전체에 금색 띠를 둘러 두 칸이 한 과제임을 보인다.
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-[#E2DCCB] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
       <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-3 sm:px-5">
-        <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
+        <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-bold text-[#697386]">{mission.sourceLanguage.label} 원문</p>
+          <p className="text-[12px] font-bold text-[#7A7466]">{mission.sourceLanguage.label} 원문</p>
           <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-8 text-[#101B2B]`}>{quest.source}</p>
         </div>
       </div>
-      <div className="border-t border-dashed border-[#D8D4C8] bg-white px-4 py-3.5 sm:px-5">
+      <div className="border-t border-dashed border-[#E3DDCF] bg-white px-4 py-3.5 sm:px-5">
         <div className="flex items-center gap-4">
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div>
             <label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label>
             {/* P·D·R 칩을 뺐으므로 말투의 근거가 위 상황문이라는 것만 한 줄로 알린다. */}
-            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#697386]">위 상황의 상대와 관계에 맞는 말투로.</p>
+            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">위 상황의 상대와 관계에 맞는 말투로.</p>
           </div>
         </div>
         <Textarea
@@ -1135,7 +1143,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={sourceAlignedRows(quest.source)}
-          className={`${targetFont} mt-3 resize-y border-[#C9D0DA] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
+          className={`${targetFont} mt-3 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
         />
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
@@ -1158,7 +1166,7 @@ const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
   very_good: "bg-[#EAF4ED] text-[#286247]",
   recommend: "bg-[#FFF2B8] text-[#725B12]",
   required: "bg-[#FCE7E4] text-[#8D3B36]",
-  deferred: "bg-[#EEECE6] text-[#596579]",
+  deferred: "bg-[#EEECE6] text-[#635E52]",
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
@@ -1496,7 +1504,7 @@ function FeedbackLoading() {
     <section className={`${panel} overflow-hidden`} aria-live="polite">
       <div className="flex items-center justify-between bg-[#F8F7F2] px-5 py-4">
         <div>
-          <p className="text-xs font-black text-[#596579]">AI 피드백 준비 중</p>
+          <p className="text-xs font-black text-[#635E52]">AI 피드백 준비 중</p>
           <p className="mt-1 text-base font-black">세 기준으로 답안을 살펴보고 있습니다</p>
         </div>
         <LoaderCircle className="h-6 w-6 animate-spin text-[#C6A521]" />
@@ -1528,18 +1536,18 @@ function SourceAnswerCompare({ source, answer, highlights = [] }: {
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
-    <section className="overflow-hidden rounded-2xl border border-[#C9D0DA] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
+    <section className="overflow-hidden rounded-2xl border border-[#E2DCCB] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
       <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
-        <span className={`mt-0.5 ${languageBadge} border-[#C9D0DA] bg-white text-[#41506A]`}>{mission.sourceLanguage.badge}</span>
+        <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] font-bold text-[#697386]">원문</p>
+          <p className="text-[11.5px] font-bold text-[#7A7466]">원문</p>
           <p className={`${sourceFont} break-keep text-[16px] font-semibold leading-7 text-[#101B2B]`}>{source}</p>
         </div>
       </div>
-      <div className="flex items-start gap-3.5 border-t border-dashed border-[#D8D4C8] px-4 py-2.5 sm:px-5">
+      <div className="flex items-start gap-3.5 border-t border-dashed border-[#E3DDCF] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] font-bold text-[#697386]">내 {outputName}</p>
+          <p className="text-[11.5px] font-bold text-[#7A7466]">내 {outputName}</p>
           <p className={`${targetFont} break-keep text-[16px] leading-7 text-[#101B2B]`}>
             <HighlightedText text={answer} highlights={highlights} target />
           </p>
@@ -1662,7 +1670,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <div className="space-y-1.5 p-3 sm:p-3.5">
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
               {(localPilot || feedbackUnavailable) && (
-                <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#596579]">
+                <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#635E52]">
                   {localPilot ? "AI 미실행" : "자동 피드백을 확인하지 못했습니다."}
                 </p>
               )}
@@ -1806,7 +1814,7 @@ function macroProgressIndex(activeIndex: number, completed: boolean | undefined,
   return revisionOpen ? 4 : 3;
 }
 
-function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest }: {
+function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest, freeJump = false, onJumpStage }: {
   activeIndex: number;
   completed?: boolean;
   reviewIndex?: number | null;
@@ -1817,6 +1825,10 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   skipIntro?: boolean;
   /** 마친 판단 문항의 점을 눌러 그 기록으로 간다. 없으면 점은 표시만 한다. */
   onJumpQuest?: (index: number) => void;
+  /** 대표 미션 시연 전용(2026-09-25): 아직 풀지 않은 문항 점도 눌러 바로 연다. 학습자 화면에는 켜지 않는다. */
+  freeJump?: boolean;
+  /** 시연 전용: 「적절성 판단」·「번역하기」 단계 막대를 눌러 MJT1·DCT로 바로 간다. */
+  onJumpStage?: (stage: "judge" | "produce") => void;
 }) {
   const mission = useCanonicalMission();
   const quests = mission.quests;
@@ -1848,12 +1860,21 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
           {stages.map((label, index) => {
             const done = Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
-            return (
-              <li key={label} className="min-w-0 flex-1">
+            const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
+            const body = (
+              <>
                 <span aria-hidden className={`block h-1.5 rounded-full ${done ? "bg-[#F3D248]" : active ? "bg-[#15202B]" : "bg-[#E4E0D5]"}`} />
                 <span className={`mt-1.5 hidden truncate text-center text-[11.5px] leading-4 sm:block ${active ? "font-black text-[#15202B]" : done ? "font-bold text-[#96812A]" : "font-bold text-[#A8ADB5]"}`}>
                   {label}
                 </span>
+              </>
+            );
+            return (
+              <li key={label} className="min-w-0 flex-1">
+                {onJumpStage && jumpStage
+                  ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
+                      className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">{body}</button>
+                  : body}
               </li>
             );
           })}
@@ -1868,8 +1889,9 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               {[0, 1, 2, 3, 4].map((index) => {
                 const done = index < activeIndex;
                 const dot = `h-2.5 w-2.5 rounded-full border ${done ? "border-[#D3B62D] bg-[#F3D248]" : index === activeIndex ? "border-[#15202B] bg-[#15202B]" : "border-[#CFCBC0] bg-white"}`;
-                return done && onJumpQuest
-                  ? <button key={index} type="button" aria-label={`${index + 1}번째 문항 기록 보기`} onClick={() => onJumpQuest(index)}
+                const clickable = Boolean(onJumpQuest) && (freeJump ? index !== activeIndex : done);
+                return clickable && onJumpQuest
+                  ? <button key={index} type="button" aria-label={freeJump ? `${index + 1}번째 문항으로 이동` : `${index + 1}번째 문항 기록 보기`} onClick={() => onJumpQuest(index)}
                       className={`${dot} transition-transform hover:scale-125 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1`} />
                   : <span key={index} className={dot} aria-hidden />;
               })}
@@ -1926,8 +1948,8 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
             <p className="text-xs font-black text-[#776727]">최종 확정</p>
             <h3 className="font-bold">학습자는 여기서 최종 {outputName}을 확정하고, 학습 기록이 저장됩니다.</h3>
             <p className="text-sm text-muted-foreground">감수 화면에서는 저장하지 않습니다.</p>
-            <div><p className="text-xs font-bold text-[#697386]">첫 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
-            <div><p className="text-xs font-bold text-[#697386]">확정한 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
+            <div><p className="text-xs font-bold text-[#7A7466]">첫 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
+            <div><p className="text-xs font-bold text-[#7A7466]">확정한 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
           </section> : <>
             <p className="rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs leading-5 text-[#6B5518]">실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다. 감수 화면은 AI를 호출하지 않고, 미리 작성한 확인 기준으로 같은 피드백·다듬기·확정 순서를 보여 줍니다.</p>
             <LocalPilotContext.Provider value={true}>
@@ -2080,7 +2102,7 @@ function questFeedback(quest: MissionQuest) {
 
 function ReviewModeBanner({ index, completed, onExit }: { index: number; completed: boolean; onExit: () => void }) {
   return (
-    <section className="flex flex-col gap-3 rounded-xl border border-[#C9D0DA] bg-[#F2F4F7] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+    <section className="flex flex-col gap-3 rounded-xl border border-[#E2DCCB] bg-[#F2F4F7] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
       <div>
         <p className="text-xs font-black text-[#526075]">{index + 1}단계 기록을 다시 보는 중</p>
         <p className="mt-1 break-keep text-xs leading-5 text-[#6A7485]">완료한 답과 피드백을 확인하고 있습니다. 새로운 문제를 푸는 화면이 아닙니다.</p>
@@ -2172,7 +2194,7 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         {response.reflected ? <div className="mt-4 border-t border-[#D5DCE3] pt-4">
           <h2 className="text-sm font-bold">{outputLabel} · 최종안</h2>
           <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.revised}</p>
-        </div> : <p className="mt-2 text-xs text-[#697386]">초안을 그대로 유지했습니다.</p>}
+        </div> : <p className="mt-2 text-xs text-[#7A7466]">초안을 그대로 유지했습니다.</p>}
       </section>
       {alternatives.length > 0 && <section className="rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
         <h2 className="text-sm font-bold">참고 답안</h2>
@@ -2712,7 +2734,28 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const reviewedQuest = reviewIndex === null ? undefined : mission.quests[reviewIndex];
   const reviewedResponse = reviewedQuest ? responses[reviewedQuest.id] : undefined;
   const currentProgressIndex = completed ? mission.quests.length : questIndex;
+  // 대표 미션 시연 전용 자유 이동(2026-09-25). 고른 문항을 새로 연다 — 앞 문항을 풀지 않아도 된다.
+  // 학습자 미션에는 켜지 않는다(판단 → 산출 순서가 설계의 핵심). 수행 기록은 시연에서 저장되지 않는다.
+  const openDemoQuest = (index: number) => {
+    setSceneIntroStep(null);
+    setMpjRecapOpen(false);
+    setReviewIndex(null);
+    setCompleted(false);
+    setFeedbackRevisionOpen(false);
+    setDevAutofillQuestId(null);
+    setQuestIndex(index);
+    setRenderNonce((current) => current + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const jumpDemoStage = (stage: "judge" | "produce") => {
+    const index = stage === "judge" ? 0 : mission.quests.findIndex((item) => item.kind === "dct");
+    if (index >= 0) openDemoQuest(index);
+  };
   const navigateProgress = (index: number) => {
+    if (demoMode) {
+      openDemoQuest(index);
+      return;
+    }
     if (isDevPreview) {
       jumpToDevPreview(mission.quests[index].id);
       return;
@@ -2747,12 +2790,12 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         />
       )}
       <div className="mx-auto max-w-3xl">
-        {localPilot && <p className="mb-3 text-xs leading-5 text-[#697386]">
+        {localPilot && <p className="mb-3 text-xs leading-5 text-[#7A7466]">
           로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
         </p>}
         {sceneIntroStep !== null ? (
           <div className="space-y-5">
-            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} />
+            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <SceneIntroFlow
               config={sceneIntroConfig}
               onNext={advanceSceneIntro}
@@ -2760,7 +2803,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : mpjRecapOpen ? (
           <div className="space-y-5">
-            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} />
+            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={continueFromMpjRecap} />
           </div>
         ) : reviewedQuest && reviewedResponse ? (
@@ -2771,7 +2814,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : completed ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} />
+            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
               <h1 className="mt-2 text-xl font-black">이번 미션에서 확정한 내 {mission.activityMode === "interpreting" ? "통역" : "번역"}</h1>
@@ -2798,7 +2841,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : (
           <div className="space-y-4">
-            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} />
+            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} freeJump={demoMode} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}

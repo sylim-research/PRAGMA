@@ -46,7 +46,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     for (const leak of ["내 선택", "기준 판단", "인정 범위"]) expect(screen.queryByText(leak)).not.toBeInTheDocument();
     for (const label of ["다소 적절", "다소 부적절", "매우 부적절"]) {
       const cls = screen.getByRole("button", { name: new RegExp(`^${label}`) }).className;
-      expect(cls).toContain("border-[#D8D4C8]");
+      expect(cls).toContain("border-[#E3DDCF]");
       expect(cls).not.toMatch(/4D8568|C86E68|E0DDD5/);
     }
     expect(screen.queryByText(/맞았습니다|기준 판단과 다릅니다/)).not.toBeInTheDocument();
