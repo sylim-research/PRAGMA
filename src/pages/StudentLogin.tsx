@@ -94,7 +94,7 @@ const StudentLogin = () => {
                   학습 시작하기
                 </h1>
                 <p className="mt-2 break-keep text-[13.5px] leading-relaxed text-[#6B665C]">
-                  기록을 저장해 다음에 이어서 할 수 있습니다.
+                  로그인하면 하던 학습을 이어서 할 수 있습니다.
                 </p>
 
                 <button
