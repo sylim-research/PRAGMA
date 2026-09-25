@@ -33,7 +33,7 @@ const Landing = () => {
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
+      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[88px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -64,7 +64,7 @@ const Landing = () => {
               🔴 글자 크기는 올릴 수 없다: 이 단락의 폭은 h1이 정하고(489px),
               1행 실측이 488.9px로 여유가 0.1px다. 16.5→17px만 해도 503.7px가 되어
               2행 구조가 3행으로 깨진다(2026-09-17 실측). */}
-          <p className="mx-auto mt-4 max-w-[620px] sm:mt-5 break-keep text-[15.5px] leading-relaxed text-[#4E5F6C] sm:text-[16.5px]">
+          <p className="mx-auto mt-4 max-w-[620px] break-keep text-[15.5px] leading-relaxed text-[#4E5F6C] sm:text-[16.5px]">
             {/* 의미 단위 2행. 각 행이 max-w를 넘지 않아야 짧은 꼬리 줄이 생기지 않는다(2026-08-06 실측).
                 「원문의 의미와 화행 목적을 유지하면서」로 늘리는 안은 기각 — 1행이 568.5px가
                 되어 폭(489px)을 80px 넘고, 3행에 짧은 꼬리가 남는다(2026-09-17 실측). */}
@@ -82,7 +82,7 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        <section className="mx-auto mt-5 grid w-full max-w-[692px] sm:mt-8 grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="mx-auto mt-5 grid w-full max-w-[692px] grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
             className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
@@ -135,7 +135,7 @@ const Landing = () => {
         {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
             학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
         {IS_DEMO && (
-          <section className="mt-6 flex flex-wrap items-center justify-center gap-3 sm:mt-7" aria-label="구조·대표 미션 살펴보기">
+          <section className="mt-6 flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to="/architecture"
               className={secondaryLink}
