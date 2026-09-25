@@ -154,7 +154,7 @@ type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Excl
 // 화면을 열면 바로 만들 수 있게 「초안 생성 대기」를 맨 앞(기본 칩)에 둔다.
 const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "v6_review", "v6_done", "all"];
 const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
-  preparing: "코어 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
+  preparing: "시나리오 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
   repairing: "지적된 곳 고치는 중", quality: "AI 점검 중", saving: "저장 중",
 };
 const PRODUCTION_KO: Record<ProductionState, string> = {

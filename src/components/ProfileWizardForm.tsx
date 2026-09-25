@@ -322,7 +322,7 @@ export const ProfileWizardForm = ({ onCompleted }: Props) => {
 
       {step === 2 && (
         <div className="space-y-5">
-          <Field label="주 사용 언어" required>
+          <Field label="모국어" required>
             <CodedRadioGroup
               name="primary_language"
               value={primaryLanguage}
@@ -357,7 +357,7 @@ export const ProfileWizardForm = ({ onCompleted }: Props) => {
             />
           </Field>
 
-          <Field label="한중 통번역 학습·수행 경험" required>
+          <Field label="한↔중 통번역 경험" required>
             <CodedRadioGroup
               name="ti_experience"
               value={tiExperience}

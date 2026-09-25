@@ -379,7 +379,7 @@ const Page = () => {
 
                 <Section title="학습 배경">
                   <Field
-                    label="주 사용 언어"
+                    label="모국어"
                     value={labelOf(PRIMARY_LANGUAGE_OPTIONS, selected.language_background)}
                   />
                   <Field
@@ -401,7 +401,7 @@ const Page = () => {
                     )}
                   />
                   <Field
-                    label="한중 통번역 경험"
+                    label="한↔중 통번역 경험"
                     value={labelOf(TI_EXPERIENCE_OPTIONS, selected.ti_experience_level)}
                   />
                 </Section>

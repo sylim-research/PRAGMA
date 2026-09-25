@@ -49,7 +49,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R1c: {
     category: "요청 조건·카탈로그 정합",
     nature: "structural",
-    summary_ko: "코어 스키마와 theme·topic·domain 카탈로그 조합의 허용 여부를 확인한다.",
+    summary_ko: "시나리오 스키마와 theme·topic·domain 카탈로그 조합의 허용 여부를 확인한다.",
   },
   R2: {
     category: "문항 구성·판정 데이터",
@@ -86,8 +86,8 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R8: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "응답형 화행 코어의 preceding_turn 존재, legacy 미션의 preceding_turn 존재, native MJT5의 preceding_turn 부재를 확인한다.",
-    applicability_ko: "코어·legacy·native 계약별로 조건이 다르다.",
+    summary_ko: "응답형 화행 시나리오의 preceding_turn 존재, legacy 미션의 preceding_turn 존재, native MJT5의 preceding_turn 부재를 확인한다.",
+    applicability_ko: "시나리오·legacy·native 계약별로 조건이 다르다.",
   },
   R9: {
     category: "일반화·사전 정보 노출 위험",
@@ -127,7 +127,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R16: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "요청 mode↔source_modality, 코어 payload의 source_modality, 미션 production_task.mode의 정합을 확인한다(fail). situation_ko가 반대 수행 장면을 명시한 것으로 보이는 경우는 정규식 신호라 warning.",
+    summary_ko: "요청 mode↔source_modality, 시나리오 payload의 source_modality, 미션 production_task.mode의 정합을 확인한다(fail). situation_ko가 반대 수행 장면을 명시한 것으로 보이는 경우는 정규식 신호라 warning.",
   },
   R17: {
     category: "요청 조건·카탈로그 정합",
@@ -157,8 +157,8 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R23: {
     category: "생성 기록·계승·근거 귀속",
     nature: "governance",
-    summary_ko: "production_task의 source_text·pdr·source_modality·direction·usable_facts가 코어와 정확히 같은지 확인한다.",
-    applicability_ko: "유효한 코어가 함께 전달된 경우에만 실행된다.",
+    summary_ko: "production_task의 source_text·pdr·source_modality·direction·usable_facts가 시나리오와 정확히 같은지 확인한다.",
+    applicability_ko: "유효한 시나리오가 함께 전달된 경우에만 실행된다.",
   },
   R24: {
     category: "요청 조건·카탈로그 정합",
@@ -169,14 +169,14 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R25: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "신규 코어의 서버 주입 context_spec과 통역 A/B/C·PDR 역할 계약 값의 존재를 확인한다.",
+    summary_ko: "신규 시나리오의 서버 주입 context_spec과 통역 A/B/C·PDR 역할 계약 값의 존재를 확인한다.",
     applicability_ko: "require_context_spec=true인 신규 생성 경로에서만 실행된다.",
   },
   R26: {
     category: "장면·원문 구성",
     nature: "signal",
     summary_ko: "지정 산업을 보여 주는 제한된 어휘 증거가 있는지 찾는다(warning). 배치 경로는 이 warning에 한해 industry AI 검토를 1회 붙인다.",
-    applicability_ko: "domain='work'이고 industry가 지정된 코어에서만 실행된다.",
+    applicability_ko: "domain='work'이고 industry가 지정된 시나리오에서만 실행된다.",
   },
   R27: {
     category: "장면·원문 구성",
@@ -193,13 +193,13 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
     category: "장면·원문 구성",
     nature: "structural",
     summary_ko: "원문의 유효 글자 상한(fail)·하한과 문장 수(warning), focal_segments의 head 1·support ≤2·부분문자열, 참고 산출의 길이 비율(warning)을 확인한다.",
-    applicability_ko: "focal_segments가 있는 코어(v3)와 mission_v5에서 실행된다.",
+    applicability_ko: "focal_segments가 있는 시나리오(v3)와 mission_v5에서 실행된다.",
   },
   R30: {
     category: "일반화·사전 정보 노출 위험",
     nature: "signal",
-    summary_ko: "코어·MJT·DCT situation_ko에서 정중·완화·선택권·강도류 평가 단서의 정형 조합을 찾는다(warning). 단어 금지나 자동 삭제 규칙이 아니며 교수자가 맥락을 확인한다.",
-    applicability_ko: "코어 및 저장 계약으로 읽은 미션의 각 MJT·DCT situation_ko가 대상이다.",
+    summary_ko: "시나리오·MJT·DCT situation_ko에서 정중·완화·선택권·강도류 평가 단서의 정형 조합을 찾는다(warning). 단어 금지나 자동 삭제 규칙이 아니며 교수자가 맥락을 확인한다.",
+    applicability_ko: "시나리오 및 저장 계약으로 읽은 미션의 각 MJT·DCT situation_ko가 대상이다.",
   },
   R31: {
     category: "생성 기록·계승·근거 귀속",

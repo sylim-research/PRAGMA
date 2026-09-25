@@ -41,13 +41,13 @@ export async function promoteCoreV6(core: PromotableCore, onStage?: (stage: Prom
   const feature = featureCode ? getTargetFeature(featureCode) : undefined;
   if (!feature) return { ok: false, error: "이 화행은 화용 초점 카탈로그가 없어 생성할 수 없습니다." };
   const normalized = normalizeCore(core.core_content ?? {});
-  if (!normalized.ok) return { ok: false, error: "코어를 읽을 수 없어 생성하지 않았습니다." };
+  if (!normalized.ok) return { ok: false, error: "시나리오를 읽을 수 없어 생성하지 않았습니다." };
   const coreData = normalized.data;
   const direction = coreData.direction === "zh_ko" ? "zh_ko" : "ko_zh";
   // 행 mode는 통역을 stt_interpreting으로 저장한다(미션 DCT는 interpreting). 코어의 원문 형태와 어긋나면 생성 전에 멈춘다.
   const mode = core.mode === "stt_interpreting" ? "interpreting" : "translation";
   if ((mode === "interpreting") !== (coreData.source_modality === "spoken")) {
-    return { ok: false, error: "행의 수행 방식과 코어의 원문 형태가 맞지 않아 생성하지 않았습니다." };
+    return { ok: false, error: "행의 수행 방식과 시나리오의 원문 형태가 맞지 않아 생성하지 않았습니다." };
   }
   const ctx: CheckContext = {
     speech_act: core.speech_act,
@@ -63,7 +63,7 @@ export async function promoteCoreV6(core: PromotableCore, onStage?: (stage: Prom
   };
   // DCT는 코어를 그대로 계승하므로 코어가 규칙을 못 넘으면 미션 생성으로 고칠 수 없다(유료 호출 전 차단).
   const coreCheck = checkCore(core.core_content ?? {}, ctx);
-  if (coreCheck.result === "fail") return { ok: false, ruleResult: "fail", error: "코어 규칙검사 실패 — 생성하지 않았습니다." };
+  if (coreCheck.result === "fail") return { ok: false, ruleResult: "fail", error: "시나리오 규칙검사 실패 — 생성하지 않았습니다." };
 
   const promptCore: V6CoreForPrompt = {
     source_text: coreData.source_text,
@@ -76,7 +76,7 @@ export async function promoteCoreV6(core: PromotableCore, onStage?: (stage: Prom
     context_spec: (core.core_content as { context_spec?: unknown } | null)?.context_spec,
   };
   if (!promptCore.focal_segments.some(segment => segment.role === "head")) {
-    return { ok: false, error: "핵심 구간(head)이 없는 옛 코어라 v6로 생성할 수 없습니다." };
+    return { ok: false, error: "핵심 구간(head)이 없는 옛 시나리오라 v6로 생성할 수 없습니다." };
   }
   const row = {
     learner_level: core.learner_level,

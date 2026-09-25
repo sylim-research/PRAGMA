@@ -68,7 +68,7 @@ export async function loadLockMissionBatchCores(runId: string): Promise<MissionB
     .is("archived_at", null)
     .order("generation_item_key", { ascending: true })
     .limit(4000);
-  if (error) throw new Error(`미션 배치 코어 조회 실패: ${error.message}`);
+  if (error) throw new Error(`미션 배치 시나리오 조회 실패: ${error.message}`);
 
   return (data ?? [])
     .filter((row: Record<string, unknown>) =>
