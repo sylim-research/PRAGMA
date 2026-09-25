@@ -16,8 +16,7 @@ import {
 //
 // - 화면을 열면 마지막 결과를 먼저 보여 주고, 오래됐을 때만 조용히 다시 확인한다.
 //   빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
-// - 모두 정상이면 접어 둔다. 매일 보는 운영 지표를 밀어내지 않기 위해서다.
-//   대신 정상이 아닌 항목이 하나라도 있으면 스스로 펼쳐 눈에 걸리게 한다.
+// - 기본은 펼쳐 둔다(연구자 요청 2026-09-26). 항목별 상태·모델명을 한눈에 본다. 접기는 그대로 둔다.
 // - 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 토큰·글자 수를 쓰지 않는다.
 // - 각 줄에는 상태만 둔다. 잔액 관리 안내는 목록 아래 한 줄로 모았다 —
 //   같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
@@ -129,8 +128,8 @@ export const ServiceHealthPanel = () => {
   const [statuses, setStatuses] = useState<ServiceStatus[]>(stored?.statuses ?? IDLE_STATUSES);
   const [checkedAt, setCheckedAt] = useState<string | null>(stored?.checkedAt ?? null);
   const [pending, setPending] = useState(false);
-  // 기본은 접어 둔다 — 첫 화면의 주인공은 아래 콘텐츠 수치다. 문제는 접힌 줄의 색과 이름으로 드러난다.
-  const [open, setOpen] = useState(false);
+  // 기본은 펼쳐 둔다. 접어도 문제는 요약 줄의 색과 이름으로 드러난다.
+  const [open, setOpen] = useState(true);
 
   const summary = useMemo(() => summarizeStatuses(statuses), [statuses]);
 
