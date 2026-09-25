@@ -16,8 +16,7 @@ import {
 //
 // - 화면을 열면 마지막 결과를 먼저 보여 주고, 오래됐을 때만 조용히 다시 확인한다.
 //   빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
-// - 모두 정상이면 접어 둔다. 매일 보는 운영 지표를 밀어내지 않기 위해서다.
-//   대신 정상이 아닌 항목이 하나라도 있으면 스스로 펼쳐 눈에 걸리게 한다.
+// - 기본은 펼쳐 둔다(연구자 요청 2026-09-26). 항목별 상태·모델명을 한눈에 본다. 접기는 그대로 둔다.
 // - 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 토큰·글자 수를 쓰지 않는다.
 // - 각 줄에는 상태만 둔다. 잔액 관리 안내는 목록 아래 한 줄로 모았다 —
 //   같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
@@ -90,7 +89,7 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
   const meta = SERVICE_META[status.id];
   const tone = TONE[pending ? "idle" : status.tone];
   return (
-    <li className="flex gap-3 py-2" data-testid={`service-${status.id}`}>
+    <li className="flex gap-3 px-5 py-3" data-testid={`service-${status.id}`}>
       <span
         className={`mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
         role="img"
@@ -129,8 +128,8 @@ export const ServiceHealthPanel = () => {
   const [statuses, setStatuses] = useState<ServiceStatus[]>(stored?.statuses ?? IDLE_STATUSES);
   const [checkedAt, setCheckedAt] = useState<string | null>(stored?.checkedAt ?? null);
   const [pending, setPending] = useState(false);
-  // 기본은 접어 둔다 — 첫 화면의 주인공은 아래 콘텐츠 수치다. 문제는 접힌 줄의 색과 이름으로 드러난다.
-  const [open, setOpen] = useState(false);
+  // 기본은 펼쳐 둔다. 접어도 문제는 요약 줄의 색과 이름으로 드러난다.
+  const [open, setOpen] = useState(true);
 
   const summary = useMemo(() => summarizeStatuses(statuses), [statuses]);
 
@@ -162,14 +161,15 @@ export const ServiceHealthPanel = () => {
   const tone = TONE[pending ? "idle" : summary.tone];
 
   return (
-    <section aria-labelledby="service-health-title" className="mt-4">
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-md border border-border bg-card px-3 py-2">
+    // 요약 줄·항목 목록·잔액 안내를 한 장의 카드로 묶는다 — 따로 떨어진 상자 둘로 읽히지 않게.
+    <section aria-labelledby="service-health-title" className="overflow-hidden rounded-2xl border border-[#E6E1D5] bg-white">
+      <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5 ${open ? "border-b border-[#EEEAE0] bg-[#FAF8F2]" : ""}`}>
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
           data-testid="summary-dot"
           aria-hidden="true"
         />
-        <h2 id="service-health-title" className="text-sm font-semibold text-[#1B2A36]">
+        <h2 id="service-health-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">
           외부 서비스 연동
         </h2>
         <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>
@@ -197,12 +197,12 @@ export const ServiceHealthPanel = () => {
 
       {open && (
         <div id="service-health-list">
-          <ul className="mt-2 divide-y divide-border rounded-lg border border-border bg-card px-4">
+          <ul className="divide-y divide-[#EEEAE0]">
             {statuses.map((status) => (
               <StatusRow key={status.id} status={status} pending={pending} />
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-muted-foreground">
+          <p className="border-t border-[#EEEAE0] px-5 py-2.5 text-[11px] text-muted-foreground">
             OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
             {CONSOLES.map((item, index) => (
               <span key={item.href}>

@@ -50,7 +50,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
       {!!resources?.all.incompleteCount && <p className="mt-1 text-xs text-amber-800">문항·산출 정보 확인이 필요한 미션 {resources.all.incompleteCount}개 · 확인된 구성요소만 집계</p>}
     </section>
 
-    <section aria-labelledby="resource-distribution-title" className="mt-4 rounded-2xl border border-[#E6E1D5] bg-white px-5 py-4">
+    <section aria-labelledby="resource-distribution-title" className="mt-3 rounded-2xl border border-[#E6E1D5] bg-white px-5 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 자료 구성</h2>
@@ -62,18 +62,18 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.6fr_0.85fr_0.85fr_0.85fr]">
+      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.6fr_0.85fr_0.85fr_0.85fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));
           const unknown = Object.entries(counts).filter(([code]) => !(code in labels)).reduce((sum, [, count]) => sum + count, 0);
           return <div key={key}>
-            <h3 className="mb-3 text-xs font-semibold text-[#647079]">{title}</h3>
+            <h3 className="mb-2 text-xs font-semibold text-[#647079]">{title}</h3>
             <div className={key === 'speech_act' ? "grid grid-cols-3 gap-2" : "space-y-3"}>
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceLibraryHref(scope, key, code)}
-                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-3 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <span className="text-sm text-[#59656D]">{label}</span>
                   <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceLibraryHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
