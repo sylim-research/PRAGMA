@@ -44,7 +44,7 @@ const Page = () => {
 
   return (
   <AdminShell
-    title="연구용 학습 기록 내보내기"
+    title="연구용 기록 내보내기"
     description="동의한 학습자의 학습 수행 기록을 가명 처리해 연구용 파일로 내려받습니다."
     compact
   >
