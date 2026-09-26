@@ -1111,19 +1111,18 @@ function WeekRow({
         </span>
         {isAssignable || reinforcement ? (
           <>
-            <span className="flex min-w-0 flex-col">
-              <span className="truncate text-[14px] font-bold text-[#15202B]" title={reinforcement ? REINFORCEMENT_DESCRIPTION : displayTitle}>
-                {reinforcement ? "선택 화행 집중 보완" : displayTitle}
+            {reinforcement ? (
+              // 보완 주차 = 한 줄. 「집중 보완」 + 고른 화행을 누르면 바꿀 수 있는 작은 선택 단추.
+              <span className="flex min-w-0 items-center gap-2" title={REINFORCEMENT_DESCRIPTION}>
+                <span className="shrink-0 text-[14px] font-bold text-[#15202B]">집중 보완</span>
+                <button type="button" onClick={onEditWeek} aria-label={act ? `집중 보완 화행 바꾸기 · 현재 ${SPEECH_ACT_UI[act]}` : "집중 보완 화행 고르기"}
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#C9C3B4] bg-white px-2.5 py-0.5 text-[12.5px] font-semibold text-[#233542] hover:border-[#1F3A5F]">
+                  {act ? SPEECH_ACT_UI[act] : "화행 고르기"}<span aria-hidden className="text-[10px] text-[#66727A]">▾</span>
+                </button>
               </span>
-              {reinforcement && (
-                <span className="flex items-center gap-1.5 text-[11.5px]">
-                  <span className="font-semibold text-[#15202B]">{act ? `${SPEECH_ACT_UI[act]} 화행` : "화행 미정"}</span>
-                  <button type="button" onClick={onEditWeek} className="font-semibold text-[#1F3A5F] underline-offset-2 hover:underline">
-                    {act ? "바꾸기" : "고르기"}
-                  </button>
-                </span>
-              )}
-            </span>
+            ) : (
+              <span className="truncate text-[14px] font-bold text-[#15202B]" title={displayTitle}>{displayTitle}</span>
+            )}
             <span className="grid min-w-0 grid-cols-2 gap-2">
               {expectedModes.map((mode, index) => {
                 const item = items[index];
