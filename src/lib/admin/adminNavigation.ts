@@ -44,7 +44,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   ]},
   { header: "5. 관리 도구", items: [
     { to: "/admin/learners", label: "학습자 관리" },
-    { to: "/admin/data-backup", label: "수업 데이터 백업·복원" },
+    { to: "/admin/data-backup", label: "수업 편성 백업·복원" },
     { to: "/admin/export", label: "연구 데이터 내보내기" },
   ]},
 ] as const;
