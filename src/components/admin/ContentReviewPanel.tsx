@@ -282,17 +282,16 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     : status === "running" ? "bg-[#C08A2E] text-white"
                       : status === "failed" ? "bg-red-700 text-white"
                         : status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                          : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                          : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
-                <span className={["w-[16.5rem] shrink-0 whitespace-nowrap font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
-                  {row.label}{row.optional && <span className="ml-1.5 rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
+                <span className="flex w-[16.5rem] shrink-0 items-center justify-between gap-2 whitespace-nowrap font-semibold text-[#233542]">
+                  {row.label}{row.optional && <span className="rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
                 </span>
-                <span className={["min-w-0 flex-1 whitespace-nowrap", status === "running" ? "font-semibold text-[#8A5A14]"
+                {row.action ? <span className="flex min-w-0 flex-1 justify-end">{row.action}</span> : <span className={["min-w-0 flex-1 whitespace-nowrap text-right", status === "running" ? "font-semibold text-[#8A5A14]"
                   : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
                   {status === "running" ? "진행 중" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
-                </span>
-                {row.action}
+                </span>}
               </div>
               {row.detail && <details className="ml-9 mt-1.5">
                 <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
@@ -310,11 +309,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           })}
           <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
             <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
-            <span className={["w-[16.5rem] shrink-0 whitespace-nowrap font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
-            <span className="min-w-0 flex-1 whitespace-nowrap text-[#5D6970]">
+            <span className="w-[16.5rem] shrink-0 whitespace-nowrap font-semibold text-[#233542]">교수자 최종 승인</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-right text-[#5D6970]">
               {professorDone ? "승인 완료"
                 : professorCurrent ? (findings.length ? `감수 대기 · 의견 ${findings.length}건` : "감수 대기")
                 : "대기"}
@@ -322,7 +321,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           </li>
         </ol>
       </div>}
-      {state && !run && !historicalApproval && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다." : "아직 점검 기록이 없습니다."}</p>}
+      {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}
       {queued?.status === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error}</p>}
       {error && <p role="alert" className="text-red-800">{error}</p>}
