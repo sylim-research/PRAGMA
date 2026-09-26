@@ -342,13 +342,13 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 색은 의미로 나눈다: 번역=호박, 통역=하늘, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=옅은 회청, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
+              {/* 색은 의미로 나눈다: 번역=호박, 통역=옅은 초록, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=옅은 회청, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
               {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
                   「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
               <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric className="border border-[#E8DFCB] bg-[#FAF7EF]" label="번역" value={summary.translation} />
-                <PlanMetric className="border border-[#DCE3EA] bg-[#F3F6F9]" label="통역" value={summary.interpreting} />
+                <PlanMetric className="border border-[#D9E4DB] bg-[#F3F7F3]" label="통역" value={summary.interpreting} />
                 {summary.total > 0 && <>
                   {/* 제목과 설명이 같은 말을 되풀이해서, 조합 식 하나를 제목으로 쓴다. */}
                   <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
