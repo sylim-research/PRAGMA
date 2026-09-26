@@ -177,7 +177,7 @@ describe("quality check workbench", () => {
     show({ reviewMode: true, aiReview: true }, "/admin/ai-review");
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(screen.getByRole("button", { name: /품질 점검 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: /자동 품질 점검 불통과\s*1/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /점검 실패\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /교수자 승인 대기\s*2/ })).toBeInTheDocument();
     expect(within(bench).getByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
     expect(within(bench).getByText("점검 패널 /admin/review?scenarioId=m-rules")).toBeInTheDocument();
