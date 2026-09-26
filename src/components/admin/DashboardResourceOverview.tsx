@@ -17,7 +17,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
     { label: "시나리오", value: resources?.scenarioCount, unit: "개", note: "생성된 학습 상황 설정", icon: Layers },
     { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen },
     { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare },
-    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, ready: true },
+    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2 },
   ];
 
   return <>
@@ -31,20 +31,20 @@ export function DashboardResourceOverview({ resources, error, status }: {
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 위 카드 세 개는 요약이라 누르지 않는다. 아래 화행·수준·방향·수행 방식 숫자는 학습 미션 제작 목록으로 연결한다. */}
-        {cards.map(({ label, value, unit, note, icon: Icon, ready }) => (
+        {cards.map(({ label, value, unit, note, icon: Icon }) => (
           <div key={label} className={[
             "flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5",
-            ready ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E6E1D5] bg-white text-[#15202B]",
+            "border-[#E6E1D5] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
-              <Icon aria-hidden className={ready ? "h-5 w-5 text-[#EFD65B]" : "h-5 w-5 text-[#8B825F]"} />
+              <Icon aria-hidden className="h-5 w-5 text-[#8B825F]" />
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-2">
               <span className="text-[30px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
-              <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
+              <span className="text-sm text-[#647079]">{unit}</span>
             </div>
-            <div className={"mt-auto flex items-center justify-between gap-1 pt-2 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
+            <div className="mt-auto flex items-center justify-between gap-1 pt-2 text-xs text-[#647079]">
               <span>{note}</span>
             </div>
           </div>
