@@ -342,16 +342,17 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
+              {/* 색은 의미로 나눈다: 번역=호박, 통역=하늘, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=옅은 회청, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
               {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
                   「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
               <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
-                <PlanMetric label="번역" value={summary.translation} />
-                <PlanMetric label="통역" value={summary.interpreting} />
+                <PlanMetric className="border border-[#EBD9AE] bg-[#FBF4E2]" label="번역" value={summary.translation} />
+                <PlanMetric className="border border-[#CFDFF0] bg-[#EEF4FB]" label="통역" value={summary.interpreting} />
                 {summary.total > 0 && <>
                   {/* 제목과 설명이 같은 말을 되풀이해서, 조합 식 하나를 제목으로 쓴다. */}
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행 × P × D × R" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27} />
+                  <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
+                  <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × P × D × R" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27} />
                 </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
@@ -370,10 +371,10 @@ const AdminBatch = () => {
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-[0.75fr_0.75fr_1fr_1fr] lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#DCE3E8] bg-[#F5F8FA] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#DCE3E8] bg-[#F5F8FA] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
-                <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
+                <div className="rounded-lg border border-[#E6DECB] border-l-4 border-l-[#FAD338] bg-white px-3 py-2 sm:col-span-2">
                   <h3 className="text-[13.5px] font-semibold">화행별</h3>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
                     <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 text-[13px] font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
