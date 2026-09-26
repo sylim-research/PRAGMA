@@ -986,7 +986,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div className={professorScreen ? "grid items-start"
-          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-2"}>
+          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
@@ -1109,7 +1109,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     <button type="button" className="min-w-0 flex-1 space-y-0.5 text-left" aria-current={selected ? "true" : undefined}
                       onClick={() => { selectRow(r); if (professorScreen) setQueueOpen(false); }}>
                       {badges(r, "sm")}
-                      <span className="line-clamp-2 block text-[14px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
+                      <span className={[(professorScreen || aiReview) ? "line-clamp-2" : "truncate", "block text-[14px] font-medium leading-snug text-[#202B33]"].join(" ")} title={titleOf(r)}>{titleOf(r)}</span>
                       {meta.length > 0 && (
                         <span className="block truncate text-[12px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
                       )}
@@ -1313,10 +1313,10 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
                 {step.status === "done" ? "✓" : index + 1}
               </span>
               {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}
-              <span className={["mt-1.5 text-[12.5px] leading-tight",
+              <span className={["mt-1.5 whitespace-nowrap text-[12.5px] leading-tight",
                 step.status === "todo" ? "text-[#5B6770]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
               {step.detail && (
-                <span className={["mt-0.5 line-clamp-2 text-[11.5px] leading-snug",
+                <span className={["mt-0.5 max-w-full truncate text-[11.5px] leading-snug",
                   step.status === "current" ? "text-[#8A5A14]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
               )}
             </span>
