@@ -110,6 +110,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
     click("다른 표현도 시도해보기");
+    expect(screen.getByRole("list", { name: "미션 안내, 적절성 판단, 번역하기, 피드백, 재검토" })).toBeInTheDocument();
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.
@@ -118,6 +119,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
     expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
+    expect(input.mpjResponses?.map(response => response.item_id)).toEqual([1, 2, 3, 4, 5]);
     expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
     expect(requestFeedback).toHaveBeenCalledTimes(1);
   });

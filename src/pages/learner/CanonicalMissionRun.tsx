@@ -698,10 +698,10 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
-              answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} onSelect={setReasonId} />)}
+              answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} acceptedLabel="핵심 이유" onSelect={setReasonId} />)}
           </div>
           <p className="sr-only" aria-live="polite">
-            {answered && reasonAcceptedId ? `${reasonOk ? "정답입니다" : "오답입니다"}. 정답 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
+            {answered && reasonAcceptedId ? `${reasonOk ? "핵심 이유를 골랐습니다" : "핵심 이유와 다릅니다"}. 핵심 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
           </p>
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
@@ -1806,7 +1806,7 @@ function progressLabel(quest: MissionQuest, outputName = "번역") {
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
 
-const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "피드백", "다듬기"] as const;
+const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "피드백", "재검토"] as const;
 /** 학습자에게는 「산출」·「옮기기」 대신 미션 방식 그대로 「번역하기」·「통역하기」로 읽힌다. */
 function macroStages(outputName: string): string[] {
   return MACRO_PROGRESS.map((label) => label === "직접 옮기기" ? `${outputName}하기` : label);
@@ -1856,7 +1856,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
         : activeIndex === 5
           ? { phase: `${outputName}하기`, activity: progressLabel(quests[activeIndex], outputName) }
           : revisionOpen
-            ? { phase: "다듬기", activity: `내 ${outputName} 다듬기` }
+            ? { phase: "재검토", activity: `내 ${outputName} 재검토` }
             : { phase: "피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
@@ -2204,8 +2204,8 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
           <p className={`${targetFont} mt-2 whitespace-pre-wrap text-[17px] leading-8`}>{response.revised}</p>
         </div> : <p className="mt-2 text-xs text-[#7A7466]">초안을 그대로 유지했습니다.</p>}
       </section>
-      {alternatives.length > 0 && <section className="rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 답안">
-        <h2 className="text-sm font-bold">참고 답안</h2>
+      {alternatives.length > 0 && <section className="rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
+        <h2 className="text-sm font-bold">참고 표현</h2>
         <div className="mt-3 space-y-3">{alternatives.map((alternative) => <div key={alternative.text} className="rounded-xl bg-white p-4">
           <p className={`${targetFont} text-[16.5px] leading-8`}>{alternative.text}</p>
           <p className="mt-1.5 break-keep text-[15px] leading-7 text-[#3F4A59]">{alternative.note}</p>

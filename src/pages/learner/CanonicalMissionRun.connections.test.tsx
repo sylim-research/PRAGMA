@@ -165,6 +165,8 @@ describe("CanonicalMissionRun completion connections", () => {
     unmount();
 
     render(<CompletionRecord response={response} alternatives={quest.feedback.alternatives} />);
+    expect(screen.getByRole("region", { name: "참고 표현" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
     for (const alternative of quest.feedback.alternatives) {
       expect(screen.getByText(alternative.text)).toBeInTheDocument();
     }

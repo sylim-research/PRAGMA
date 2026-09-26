@@ -64,8 +64,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("인정 범위")).toBeInTheDocument();
-    expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
-    expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("정답")).toBeInTheDocument();
+    expect(screen.getByText(/^핵심 이유를 골랐습니다\./)).toBeInTheDocument();
+    expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("핵심 이유")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
     click("다음: 여러 표현 비교하기");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
@@ -104,7 +104,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다소 적절"); click("판단 확정하기");
     fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
     click("이유 확정하기");
-    expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
+    expect(screen.getByText(`핵심 이유와 다릅니다. 핵심 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
     click("다음: 여러 표현 비교하기");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
