@@ -92,7 +92,7 @@ function isProfessorFinalized(row: DashboardScenarioRow): boolean {
   return row.authoring_stage === "professor_finalized";
 }
 
-/** 교수자 최종 승인을 마친 현재본(논문 4.3.4: 수업 사용 후보 자격, 노출 자체는 아님). */
+/** 교수자 최종 승인을 마친 현재본(수업 사용 후보 자격, 노출 자체는 아님). */
 export function isFinalizedMission(row: DashboardScenarioRow): boolean {
   return ["reviewed", "released"].includes(row.mission_status ?? "") && isProfessorFinalized(row);
 }

@@ -67,7 +67,7 @@ type DashboardSnapshot = {
   learnerRecordCount: number;
   /** 단계별 누적 완료(서로 다른 미션 수). 메인에는 대기량을 두고, 누적은 카드에 마우스를 올릴 때 보인다. 읽지 못하면 null. */
   cumulative: DashboardCumulativeReviewCounts | null;
-  /** 교과목(course_id)에 연결된 수행 기록 수 — 수업 운영 기록과 시범 수행을 가른다. 읽지 못하면 null. */
+  /** 교과목(course_id)에 연결된 수행 기록 수 — 교과목 연결 여부만 가른다(실제 수업·시범 구분은 아님). 읽지 못하면 null. */
   courseLinkedRecordCount: number | null;
 };
 
@@ -126,7 +126,7 @@ const PanelHeader = ({
 // 카드 숫자는 그 단계를 마친 서로 다른 미션 수(누적)다 — 대기는 대부분 0이라 흐름이 보이지 않는다.
 // 지금 기다리는 수는 카드 툴팁에 둔다. 누가 무엇을 검토하는지도 이름에 둔다 —
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
-// (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
+// (focused_v1: 자동 품질 점검 → AI 검토(OpenAI, 저장된 생성 품질점검 재사용) → 선택 시에만 Claude 교차 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   // 표제는 역할 중심(용어대장 2026-09-26): 자동 품질 점검 → AI 검토 → 필요 시 교차 점검 → 교수자 최종 승인.
   // 「독립 검토」는 쓰지 않는다 — 다른 AI 사용이 독립성·검증을 보장하는 것으로 읽히지 않게.
@@ -148,7 +148,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "OpenAI 의미·자연성 검토",
   claude: "교수자가 요청할 때",
-  // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
+  // Claude 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
   adjudication: "Claude 의견이 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
@@ -539,7 +539,7 @@ const AdminDashboard = () => {
 
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
-        title="검수 단계별 현황"
+        title="콘텐츠 품질관리 현황"
         action={liveStatus()}
       />
       <ReviewPipeline
@@ -591,16 +591,16 @@ const AdminDashboard = () => {
           changed={changedKeys.has("learners")}
         />
         {/* 표 전체 행 수다 — 계정 역할·기간으로 거르지 않는다. 시험 기록과 실제 학습을 나누려면
-            시험 계정 식별 근거가 먼저 있어야 한다(논문 3.1.4·5.4.2). */}
+            시험 계정 식별 근거가 먼저 있어야 한다. */}
         <OperationMetric
           to="/admin/decision-traces"
           // 교과목 맥락에서 나온 기록을 큰 수로 둔다
-          // (실제 수업 기록과 시범 수행을 가르는 유일한 단서 — 교과목 맥락 없는 실행은 연결되지 않는다).
-          label="교과목 수업 기록"
+          // (교과목 연결 여부만 가른다 — 실제 수업과 시범을 나누는 근거는 아니다).
+          label="교과목 연결 수행 기록"
           value={snapshot?.courseLinkedRecordCount ?? null}
           unit="건"
           description={snapshot && snapshot.courseLinkedRecordCount !== null
-            ? `시범 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
+            ? `교과목 미연결 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
             : "교과목에 연결된 수행"}
           error={displayError ?? (snapshot && snapshot.courseLinkedRecordCount === null ? "교과목 연결 조회 실패" : null)}
           changed={changedKeys.has("records")}
