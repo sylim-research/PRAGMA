@@ -26,14 +26,14 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-[816px] items-center px-6 py-4">
+        <div className="mx-auto flex max-w-[836px] items-center px-6 py-4">
           <HomeBrand />
         </div>
       </header>
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-[816px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
+      <main className="mx-auto flex w-full max-w-[836px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -85,10 +85,10 @@ const Landing = () => {
         {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 가장 긴 행(교수자 1행)이 14px에서 약 338px라
             카드 안쪽 폭(약 338px)을 그 길이에 딱 맞췄다 — 카드가 양옆으로 퍼져 보이지 않게. PC(lg 이상)에서는 줄바꿈을 막아 3행으로 밀리지 않게 한다.
             헤더·본문·푸터 칼럼은 같은 816px을 써서 왼쪽 선을 맞춘다(2026-09-26). */}
-        <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-5 sm:grid-cols-2">
           <Link
             to="/student-login"
-            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-4 pb-[17px] pt-[18px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-6 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -98,14 +98,14 @@ const Landing = () => {
               </span>
               학습자 영역
             </span>
-            <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
+            <span className="mt-2.5 break-keep text-[13.5px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
               AI 피드백을 참고해 표현을 검토한 뒤, 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
             <span className="mt-auto pt-5">
-              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
+              <span className="inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#FAD338] px-5 py-2 text-[13.5px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
                 학습 시작하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -114,7 +114,7 @@ const Landing = () => {
 
           <Link
             to="/admin-login"
-            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-4 pb-[17px] pt-[18px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-6 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             <span className="flex items-center gap-2.5 text-[19px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -122,7 +122,7 @@ const Landing = () => {
               </span>
               교수자 영역
             </span>
-            <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
+            <span className="mt-2.5 break-keep text-[13.5px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               AI 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
               교수자가 감수하고 최종 승인한 콘텐츠를 수업에 활용합니다.
             </span>
@@ -131,7 +131,7 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-5">
-              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#2A3B48]">
+              <span className="inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2 text-[13.5px] font-bold text-white transition-colors group-hover:bg-[#2A3B48]">
                 제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -163,7 +163,7 @@ const Landing = () => {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-[816px] px-6 pb-6">
+      <footer className="mx-auto w-full max-w-[836px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
           한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
         </p>
