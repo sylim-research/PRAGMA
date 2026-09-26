@@ -23,7 +23,7 @@ const snapshot = () => JSON.parse(sessionStorage.getItem(storageKey)!);
 const feedbackSentence = mission.mpj_items[1].explanation_ko.split(". ")[1];
 const toSecondJudgment = () => {
   render(<MemoryRouter><CanonicalMissionRun /></MemoryRouter>);
-  click("다소 적절"); click("답안 확인하기"); click("다음: 상황에 맞는지 판단하기");
+  click("다소 적절"); click("답안 확인하기"); click("다음: 판단하고 이유 고르기");
 };
 describe("representative v6 reason / contrast rhythm", () => {
   beforeEach(() => {
@@ -67,9 +67,13 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.getByText(/^정답입니다\./)).toBeInTheDocument();
     expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("정답")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
-    click("다음: 판단하고 고쳐 보기");
+    click("다음: 여러 표현 비교하기");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
-    click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기"); click("다음: 직접 고쳐 보기");
+    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
+      fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
+    });
+    click("네 표현 확인하기"); click("다음: 고친 표현 고르기");
+    click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기"); click("다음: 직접 고치고 비교하기");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: revisedText } });
@@ -77,12 +81,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     const contrast = screen.getByRole("region", { name: "다른 맥락에서는?" });
     expect(within(contrast).getByText(mission.mpj_items[3].contrast.target)).toBeInTheDocument();
     expect(within(contrast).queryByRole("button")).not.toBeInTheDocument();
-    click("다음: 표현 비교하기");
+    click("다음: 핵심 정리");
     expect(snapshot().responses.A4).toEqual({ revisedText });
-    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
-      fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
-    });
-    click("네 표현 확인하기"); click("다음: 번역하기");
     const traces = buildMissionV6Responses(mission, snapshot().responses, "2026-09-14T12:00:00.000Z");
     expect(traces[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
     expect(traces[1]).not.toHaveProperty("revised_scale_code");
@@ -106,7 +106,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("이유 확정하기");
     expect(screen.getByText(`오답입니다. 정답 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
-    click("다음: 판단하고 고쳐 보기");
+    click("다음: 여러 표현 비교하기");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
   });
 });
