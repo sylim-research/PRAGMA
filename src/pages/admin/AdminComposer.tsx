@@ -968,7 +968,7 @@ const AdminComposer = () => {
       ) : (
         <>
           <div className="mt-5 overflow-hidden rounded-2xl border border-[#D8D3C4] bg-white">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#EAE4D2] bg-[#FBFAF6] px-5 py-3.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#EAE4D2] bg-[#FBFAF6] px-5 py-2">
             <h3 className="text-[17px] font-semibold text-[#233542]">주차별 미션 배치</h3>
             <span className="text-[12.5px] text-[#66727A]">
               배치 {assignedMissionCount}개
