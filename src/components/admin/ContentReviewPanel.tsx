@@ -425,14 +425,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <details open={!agreed && Boolean(decision) && decision?.decision !== "accept"} className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
                 <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">검토 의견 전문·근거</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
-                  <p className="font-semibold">{plainIssue(finding.issue_ko)}</p>
-                  <p>{finding.reason_ko}</p>
+                  <p className="font-semibold">{noPaths(plainIssue(finding.issue_ko))}</p>
+                  <p>{noPaths(finding.reason_ko)}</p>
                   {finding.quote && <blockquote className="border-l-2 border-[#C08A2E] pl-2">{finding.quote}</blockquote>}
                   {finding.uncertainty_ko && <p className="text-xs">불확실성: {finding.uncertainty_ko}</p>}
-                  <p className="text-xs">{verdictLabel[finding.severity]} · <code className="break-all text-[10px]">{finding.where}</code></p>
+                  <p className="text-xs">{verdictLabel[finding.severity]}</p>
                   {decision ? <div className="rounded bg-white p-2">
                     <strong className="text-[12px]">AI 의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
-                    <p className="mt-1">{decision.rationale_ko}</p>
+                    <p className="mt-1">{noPaths(decision.rationale_ko)}</p>
                     {decision.evidence_quote && <blockquote className="mt-1 border-l-2 border-[#C08A2E] pl-2">{decision.evidence_quote}</blockquote>}
                   </div> : <p className="text-xs">{focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</p>}
                 </div>
@@ -577,6 +577,11 @@ function withoutIsolatedGrounding(result: ReviewResult): ReviewResult {
 }
 
 // 규칙 신호의 내부 코드 머리(예: 「R32/unattributed_present: 」)는 화면 문장에서 뗀다.
+/** 교수자에게 의미 없는 저장 경로 표기(/content/mission/…, /criteria/…)를 문장에서 뺀다. 원문 기록은 그대로 남는다. */
+const noPaths = (text: string) => text
+  .replace(/\s*\((?:\s*\/[\w./\[\]-]+\s*,?)+\)/g, "")
+  .replace(/\s*\/(?:content|criteria|mission)\/[\w./\[\]-]+/g, "")
+  .replace(/\s{2,}/g, " ");
 const plainIssue = (text: string) => text.replace(/^R\d+\/[A-Za-z_]+:\s*/, "").replace("model_unattributed claim", "출처 표시 없는 AI 생성 문장")
   .replace(/mpj_items\[(\d)\]/g, (_m, n) => `MJT 문항 ${Number(n) + 1}`)
   .replace(/\.candidates\[(\d)\]/g, (_m, n) => ` · 후보 ${Number(n) + 1}`)
