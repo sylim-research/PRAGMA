@@ -1329,8 +1329,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 경로" className="rounded-lg border border-[#E7E2D4] bg-[#FBFAF6] px-4 py-3">
-      <h3 className="mb-2.5 text-[13px] font-bold text-[#233542]">제작 경로</h3>
+    <section aria-label="제작 워크플로우" className="rounded-lg border border-[#E7E2D4] bg-[#FBFAF6] px-4 py-3">
+      <h3 className="mb-2.5 text-[13px] font-bold text-[#233542]">제작 워크플로우</h3>
       <ol className="grid grid-cols-5 gap-2">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">
