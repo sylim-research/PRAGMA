@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
 import { BatchPlanItems } from "@/components/admin/BatchPlanItems";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -141,6 +142,7 @@ const AdminBatch = () => {
     setCoreRunId(getOrCreateCoreRunId(d));
   };
 
+  const targetActCount = Object.keys(SPEECH_ACT_UI).length;
   const topicCoverage = useMemo(() => auditTopicCoverage(), []);
   const topicCompatibility = useMemo(() => auditTopicCompatibility(), []);
   const modeCounts = useMemo(() => Object.fromEntries(LEVEL_ORDER.map(level => [
@@ -164,6 +166,7 @@ const AdminBatch = () => {
     () => parseSelectedPlanIndexes(selectedCellNumbers, plan.length),
     [selectedCellNumbers, plan.length],
   );
+  const deliveryCellCount = deliveryCells.length;
   const selectPlanIndexes = (indexes: number[]) =>
     setSelectedCellNumbers([...new Set(indexes)].sort((a, b) => a - b).map(index => index + 1).join(", "));
 
@@ -302,7 +305,7 @@ const AdminBatch = () => {
                   <div role="group" aria-label="언어 방향" className="inline-flex gap-1.5">
                     {(["ko_zh", "zh_ko"] as const).map(d =>
                       <button key={d} type="button" aria-pressed={direction === d} disabled={busy} onClick={() => switchDirection(d)}
-                        className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]" : "border border-[#E6DECB] bg-[#FFFDF8] font-medium text-[#4E5A63] hover:border-[#CDBB8A]")}>
+                        className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A]" : "border border-[#EAE4D2] bg-white font-medium text-[#3F4E59] hover:bg-[#FAF8F2]")}>
                         {DIRECTION_LABEL[d]}
                       </button>)}
                   </div>
@@ -319,17 +322,17 @@ const AdminBatch = () => {
                     </p>
                     <div className="mt-1.5 grid grid-cols-2 gap-2">
                       <div className="min-w-0">
-                        <Label htmlFor={"batch-total-" + level} className="text-[13px] text-[#3F4E59]">생성 건수</Label>
+                        <Label htmlFor={"batch-total-" + level} className="text-[13px]">생성 건수</Label>
                         <Input id={"batch-total-" + level} aria-label={LEVEL[level] + " · 총 생성 건수"} type="number" min={0} step={1} value={settings[level].total}
                           disabled={busy} onChange={event => setProductionSetting(level, "total", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                       <div className="min-w-0">
-                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-[13px] text-[#3F4E59]">통역 비율(%)</Label>
+                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-[13px]">통역(%)</Label>
                         <Input id={"batch-percent-" + level} aria-label={LEVEL[level] + " · 통역 비율"} type="number" min={0} max={100} step={1} value={settings[level].interpretingPercent}
                           disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                     </div>
-                    <p className="mt-1.5 text-[12.5px] font-semibold tabular-nums text-[#3F4E59]">→ 번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
+                    <p className="mt-1 text-[12.5px] tabular-nums text-[#4E5A63]">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
               </div>
@@ -337,22 +340,20 @@ const AdminBatch = () => {
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 구성</h2>
-                <p className="w-full pl-8 text-[13px] text-[#4E5A63]">① 조건으로 만들어질 시나리오가 어떻게 나뉘는지 보여 줍니다.</p>
+                <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 첫 줄 = 건수 3장 + 화행별(한 줄 9칸). 분포 충족도 막대는 뺐다(2026-09-26 — 의미가 약하다는 연구자 판단). */}
-              <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-12">
-                <PlanMetric className="border border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" label="총 생성 예정" value={summary.total} primary />
-                <PlanMetric className="border border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" label="번역" value={summary.translation} />
-                <PlanMetric className="border border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" label="통역" value={summary.interpreting} />
-                {summary.total > 0 && <div className="col-span-3 rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-4 py-3 lg:col-span-6">
-                  <h3 className="text-[14px] font-semibold text-[#15202B]">화행별</h3>
-                  <div className="mt-2 grid grid-cols-5 gap-1.5 sm:grid-cols-9">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
-                    <div key={key} className="rounded-md border border-[#E6DECB] bg-white px-1 py-1.5 text-center">
-                      <div className="text-[13px] text-[#4E5A63]">{label}</div>
-                      <div className="text-[16px] font-bold tabular-nums text-[#15202B]">{summary.bySpeechAct[key] ?? 0}</div>
-                    </div>)}</div>
-                </div>}
+              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
+              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
+                <PlanMetric label="총 생성 예정" value={summary.total} primary />
+                <PlanMetric label="번역" value={summary.translation} />
+                <PlanMetric label="통역" value={summary.interpreting} />
+                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
+                {summary.total > 0 && <>
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·수행 방식 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
+                    description="화행 × 수준 × 번역/통역" />
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="권력·거리·부담도 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                    description="화행 × P × D × R" />
+                </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
               {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
@@ -366,12 +367,17 @@ const AdminBatch = () => {
               ) : <>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              {/* 둘째 줄 = 장면 조건 4가지를 같은 폭으로. 화행별은 첫 줄로 올렸다. */}
-              <div className="mt-2.5 grid items-stretch gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
+                <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
+                  <h3 className="text-[13.5px] font-semibold">화행별</h3>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
+                    <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 text-[13px] font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                </div>
               </div>
               </>}
             </section>
@@ -502,15 +508,22 @@ const StepNum = ({ n }: { n: number }) =>
   <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
 
 const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
-  <div className={"rounded-lg px-4 py-3 " + (primary ? "bg-[#15202B] text-white" : className)}>
-    <p className="text-[13px] font-medium">{label}</p><p className="mt-1 text-[28px] font-bold leading-8 tabular-nums">{value}<span className="ml-1 text-[13px] font-normal">{unit}</span></p>
+  <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
+    <p className="text-[13px] font-medium">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
+  </div>;
+
+const CoverageCard = ({ title, filled, total, description, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
+  <div className={"rounded-lg border px-3 py-2 " + className}>
+    <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
+    <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
+    <p className="mt-1 text-[12.5px] leading-5 text-[#4E5A63]">{description}</p>
   </div>;
 
 
 const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
-  <div className={"rounded-lg px-4 py-3 " + className}>
-    <div className="text-[14px] font-semibold text-[#15202B]">{title}</div>
-    <ul className="mt-2 space-y-1">
+  <div className={"rounded-lg px-3 py-2 " + className}>
+    <div className="text-[13.5px] font-semibold">{title}</div>
+    <ul className="mt-1.5 space-y-0.5">
       {rows.map(([label, n]) => (
         <li key={label} className="flex items-baseline justify-between gap-3 text-[13.5px]">
           <span className="text-[#4E5A63]">{label}</span>
