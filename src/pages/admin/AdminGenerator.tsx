@@ -533,7 +533,14 @@ const AdminGenerator = () => {
     resetOutlines();
     try {
       const { data, error } = await supabase.functions.invoke("generate-scenario", {
-        body: { ...baseGenBody(), action: "outline", outline_count: outlineCount, topic_seed_ko: topic?.situationSeedKo ?? null },
+        // 채널을 고르지 않으므로 번역은 특정 매체(이메일)로 못 박지 않고 「서면」으로만 알린다 —
+        // 이어지는 시나리오 생성(action:core)도 원문을 글/말(written/spoken)로만 구분한다.
+        // 서버는 모르는 channel_ui 값을 그대로 프롬프트에 넣는다(CHANNEL_UI_KO[x] ?? x). 2026-09-26
+        body: {
+          ...baseGenBody(),
+          ...(taskMode === "translation" ? { channel_ui: "서면(이메일·메신저 등 장면에 맞는 글)" } : {}),
+          action: "outline", outline_count: outlineCount, topic_seed_ko: topic?.situationSeedKo ?? null,
+        },
       });
       if (error) throw error;
       const list = (data?.outlines ?? []) as { title: string; situation: string }[];
