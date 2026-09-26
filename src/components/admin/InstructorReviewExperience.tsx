@@ -124,13 +124,14 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
       <div className="min-w-0">
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
-      <aside className="space-y-4 xl:sticky xl:top-24">
+      {/* 확인 목록은 촘촘하게 둔다 — 상자 높이가 이 목록이 아니라 왼쪽 문항 길이를 따르도록. */}
+      <aside className="space-y-3 xl:sticky xl:top-24">
         {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{EXPERIENCE_SECTIONS.map((item, index) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
-            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
+            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.5px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
               {partsOf(item).tag && <span className={["w-[4.5rem] shrink-0 border-r border-[#E2DED2] pr-2 text-[11.5px] font-bold tracking-[0.06em]",
                 // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
@@ -140,12 +141,12 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
             <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
           </button>;
         })}</nav>
-        <div className="space-y-3 rounded-xl bg-white p-4">
+        <div className="space-y-2.5 rounded-xl bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
             <Button size="sm" className="h-9 text-[13.5px]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
             <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={3} className="resize-y bg-white text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
