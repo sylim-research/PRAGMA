@@ -126,7 +126,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
 const AdminPromptHarness = () => {
   return (
     <AdminShell
-      title="생성 계약과 운영 프롬프트"
+      title="생성 계약 · 운영 프롬프트"
       description="생성 계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
       <HarnessOverview />
