@@ -463,8 +463,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
-            {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="교수자 감수 검토 의견">
-              <h4 className="text-[14px] font-bold text-[#233542]">② 교수자 감수 · AI 검토 의견 {substantiveFindings.length}건</h4>
+            {substantiveFindings.length > 0 && <section className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
+              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교수자 감수 · AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
@@ -496,8 +496,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-4">
-        <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">③ 최종 승인</h4>
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
+        <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>최종 승인</h4>
         {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
         {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
