@@ -305,31 +305,31 @@ function OperationsSection({
               {cleanTitle(audit.title) ?? axes.join(" · ")}
             </h2>
             <p className="mt-1 text-[13.5px] text-[#655F55]">
-              {axes.join(" · ")}{audit.createdAt && ` · ${formatShortDate(audit.createdAt)}`}
+              {[speechAct, mode, direction].filter(Boolean).join(" · ")}
             </p>
           </div>
           {/* 흐름 = 뽑은 단어 → 이 미션의 기준 → 대조 결과(비율 막대). 목록 밖 단어는 아래에 예시로. */}
-          <ol className="grid overflow-hidden rounded-lg border border-[#DED8CB] sm:grid-cols-[1fr_1fr_1.6fr] sm:divide-x sm:divide-[#DED8CB]">
+          <ol className="grid overflow-hidden rounded-lg border border-[#DED8CB] sm:grid-cols-[1fr_1fr_1.7fr] sm:divide-x sm:divide-[#DED8CB]">
+            {/* 핵심 대응: 미션 수준(PRAGMA) → 그 수준의 HSK 대조 범위 → 결과. */}
             <li className="bg-white px-4 py-3">
-              <p className="text-[13px] font-medium text-[#8A7423]">1 · 중국어 단어</p>
-              <p className="mt-1.5 text-[28px] font-semibold leading-none tabular-nums text-[#15202B]">
-                {fmt(audit.distinctTokenCount ?? 0)}<span className="ml-0.5 text-[14px] font-normal text-[#655F55]">개</span>
-              </p>
-              <p className="mt-1.5 text-[13.5px] text-[#655F55]">이 {kind}에서 추출 · 중복 제외</p>
+              <p className="text-[13px] font-medium text-[#8A7423]">1 · 미션 수준</p>
+              <p className="mt-1.5 text-[24px] font-semibold leading-tight text-[#15202B]">{level ?? "—"}</p>
             </li>
-            <li className="bg-white px-4 py-3">
-              <p className="text-[13px] font-medium text-[#8A7423]">2 · 대조 기준</p>
-              <p className="mt-1.5 text-[20px] font-semibold leading-tight text-[#15202B]">HSK 1–{audit.referenceCeiling}급</p>
-              <p className="mt-1.5 text-[13.5px] text-[#655F55]">PRAGMA {pragmaLevel ?? "수준"} 누적 목록{referenceEntries != null && ` · ${fmt(referenceEntries)}개`}</p>
+            <li className="relative bg-white px-4 py-3">
+              <span aria-hidden className="absolute -left-2.5 top-1/2 hidden -translate-y-1/2 rounded-full bg-white px-0.5 text-[16px] text-[#B5AC98] sm:block">→</span>
+              <p className="text-[13px] font-medium text-[#8A7423]">2 · 대조 범위</p>
+              <p className="mt-1.5 text-[24px] font-semibold leading-tight text-[#15202B]">HSK 1–{audit.referenceCeiling}급</p>
+              <p className="mt-1 text-[13.5px] text-[#655F55]">누적 어휘{referenceEntries != null && ` ${fmt(referenceEntries)}개`}</p>
             </li>
-            <li className="bg-[#FBFAF6] px-4 py-3">
-              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과</p>
+            <li className="relative bg-[#FBFAF6] px-4 py-3">
+              <span aria-hidden className="absolute -left-2.5 top-1/2 hidden -translate-y-1/2 rounded-full bg-[#FBFAF6] px-0.5 text-[16px] text-[#B5AC98] sm:block">→</span>
+              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과 <span className="font-normal text-[#655F55]">· 중국어 단어 {fmt(audit.distinctTokenCount ?? 0)}개 중</span></p>
               <div className="mt-1.5 grid grid-cols-2 gap-2">
                 <div className="rounded-md bg-[#EEF1F2] px-3 py-2">
                   <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
                     {fmt(audit.matchedTokenCount ?? 0)}<span className="ml-1 text-[14px] font-semibold text-[#33495A]">{pct(audit.distinctTokenCount ? (audit.matchedTokenCount ?? 0) / audit.distinctTokenCount : null)}</span>
                   </p>
-                  <p className="mt-1 text-[13px] font-medium text-[#33495A]">목록 일치</p>
+                  <p className="mt-1 text-[13px] font-medium text-[#33495A]">HSK 1–{audit.referenceCeiling}급 목록에 있음</p>
                 </div>
                 <div className="rounded-md bg-[#FFF4BE] px-3 py-2">
                   <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
