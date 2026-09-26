@@ -52,7 +52,7 @@ describe("실제 자료 활용 분석 화면", () => {
 
   it("억지 화행화 금지 원칙은 그대로다", () => {
     // 참고 표현 후보에 시나리오 버튼은 없으며 보관함에는 남는다.
-    expect(PANEL).toContain("이 유형은 독립 미션으로 억지 변환하지 않습니다");
+    expect(PANEL).toContain("참고만 · 독립 미션으로 만들지 않음");
     expect(SCREEN).toContain("canMakeScenarioFromAuthentic(c.usage_type, c.source_text)");
   });
 

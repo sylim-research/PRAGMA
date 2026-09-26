@@ -26,15 +26,20 @@ import {
   type StoredCandidate,
 } from "@/lib/admin/authenticStore";
 import { SPEECH_ACT_UI, LEVEL, DIRECTION_LABEL } from "@/lib/pragma/enums";
-import { authenticUsageLabel, canMakeScenarioFromAuthentic } from "@/lib/admin/authenticUsage";
+import { authenticUsageLabel, canMakeScenarioFromAuthentic, splitAuthenticPhrases } from "@/lib/admin/authenticUsage";
 
 
+// 상태는 글자색만 달리한다 — 바탕은 흰색으로 통일(색 절제).
 const STATUS_LABEL: Record<StoredCandidate["status"], { text: string; tone: string }> = {
-  stored: { text: "보관 중", tone: "bg-[#EDE9DD] text-[#5B5446]" },
-  used: { text: "시나리오로 사용", tone: "bg-[#D1FAE5] text-[#065F46]" },
-  held: { text: "보류", tone: "bg-[#FEF3C7] text-[#92400E]" },
-  discarded: { text: "버림", tone: "bg-[#FEE2E2] text-[#991B1B]" },
+  stored: { text: "보관 중", tone: "text-[#6B645A]" },
+  used: { text: "시나리오로 사용", tone: "text-[#1F3A5F]" },
+  held: { text: "보류", tone: "text-[#8A6A0E]" },
+  discarded: { text: "버림", tone: "text-[#9A938A] line-through" },
 };
+
+const Chip = ({ children }: { children: React.ReactNode }) => (
+  <span className="whitespace-nowrap rounded-md bg-[#F5F2EA] px-1.5 py-[1px] text-[11.5px] text-[#3F4E59]">{children}</span>
+);
 
 const excerpt = (s: string, n = 90) => (s.length > n ? `${s.slice(0, n)}…` : s);
 
@@ -120,9 +125,7 @@ const AdminAuthentic = () => {
     <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-[16px] font-bold text-[#15202B]">분석 기록</h2>
-        <span className="text-[12px] text-muted-foreground">
-          자료별 분석과 콘텐츠 후보 · 최근 30건
-        </span>
+        <span className="whitespace-nowrap text-[12px] text-muted-foreground">최근 30건</span>
       </div>
 
       {pending && (
@@ -157,13 +160,13 @@ const AdminAuthentic = () => {
                   onClick={() => setOpenId(open ? null : row.id)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
                 >
-                  <span className="rounded-full bg-[#EDE9DD] px-2 py-[2px] text-[11.5px] text-[#5B5446]">
+                  <span className="shrink-0 whitespace-nowrap rounded-full border border-[#E2DED2] px-2 py-[1px] text-[11.5px] text-[#5B5446]">
                     {row.source_type === "image" ? "이미지" : "문구"}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-[14.5px] text-foreground">
                     {excerpt(row.source_original)}
                   </span>
-                  <span className="shrink-0 text-[12.5px] text-muted-foreground">
+                  <span className="shrink-0 whitespace-nowrap text-[12.5px] tabular-nums text-muted-foreground">
                     후보 {row.candidates.length}건 ·{" "}
                     {new Date(row.created_at).toLocaleDateString("ko-KR")}
                   </span>
@@ -172,18 +175,20 @@ const AdminAuthentic = () => {
                 {open && (
                   <div className="border-t border-border px-3 py-3">
                     {(row.scene_ko || row.linguistic_features_ko) && (
-                      <div className="mb-3 space-y-0.5 text-[13.5px] leading-relaxed text-[#3F4E59]">
+                      <div className="mb-3 space-y-1.5 text-[13px] leading-relaxed">
                         {row.scene_ko && (
-                          <p>
-                            <b className="text-foreground">담화 상황 · </b>
-                            {row.scene_ko}
-                          </p>
+                          <div className="flex gap-3">
+                            <span className="w-16 shrink-0 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">담화 상황</span>
+                            <p className="min-w-0 flex-1 text-[#15202B]">{row.scene_ko}</p>
+                          </div>
                         )}
                         {row.linguistic_features_ko && (
-                          <p>
-                            <b className="text-foreground">표현 특징 · </b>
-                            {row.linguistic_features_ko}
-                          </p>
+                          <div className="flex gap-3">
+                            <span className="w-16 shrink-0 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">표현 특징</span>
+                            <div className="flex min-w-0 flex-1 flex-wrap gap-1">
+                              {splitAuthenticPhrases(row.linguistic_features_ko).map((phrase) => <Chip key={phrase}>{phrase}</Chip>)}
+                            </div>
+                          </div>
                         )}
                       </div>
                     )}
@@ -198,38 +203,26 @@ const AdminAuthentic = () => {
                             className="flex flex-col gap-1.5 rounded-md border border-border bg-background p-2.5"
                           >
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="rounded-full border border-border px-1.5 py-[1px] text-[11.5px]">
+                              <span className="whitespace-nowrap rounded-full border border-[#E2DED2] bg-white px-2 py-[1px] text-[11.5px] font-semibold text-[#15202B]">
                                 {authenticUsageLabel(c.usage_type)}
                               </span>
-                              {cond?.speech_act_ui && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
-                                  {SPEECH_ACT_UI[cond.speech_act_ui]}
-                                </span>
-                              )}
-                              {cond?.level && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
-                                  {LEVEL[cond.level]}
-                                </span>
-                              )}
-                              {cond?.language_direction && (
-                                <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
-                                  {DIRECTION_LABEL[cond.language_direction]}
-                                </span>
-                              )}
+                              {cond?.speech_act_ui && <Chip>{SPEECH_ACT_UI[cond.speech_act_ui]}</Chip>}
+                              {cond?.level && <Chip>{LEVEL[cond.level]}</Chip>}
+                              {cond?.language_direction && <Chip>{DIRECTION_LABEL[cond.language_direction]}</Chip>}
                               <span
-                                className={`ml-auto rounded-full px-1.5 py-[1px] text-[11.5px] ${status.tone}`}
+                                className={`ml-auto whitespace-nowrap text-[12px] font-semibold ${status.tone}`}
                               >
                                 {status.text}
                               </span>
                             </div>
 
                             {c.label_ko && (
-                              <p className="text-[14px] font-semibold text-foreground">
+                              <p className="text-[14px] font-semibold text-[#15202B]">
                                 {c.label_ko}
                               </p>
                             )}
                             {c.source_text && (
-                              <p className="text-[13.5px] leading-relaxed text-[#3F4E59]">
+                              <p className="rounded-md bg-[#FBF8F0] px-2.5 py-1.5 text-[13.5px] leading-relaxed text-[#15202B]">
                                 {c.source_text}
                               </p>
                             )}

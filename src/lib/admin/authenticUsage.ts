@@ -48,3 +48,11 @@ export const canMakeScenarioFromAuthentic = (usageType: string, sourceText: stri
   isAuthenticUsageType(usageType)
   && AUTHENTIC_GENERATABLE_TYPES.includes(usageType)
   && !!(sourceText ?? "").trim();
+
+/** AI 분석의 긴 서술(표현 특징 등)을 짧은 구절 칩으로 나눈다. 나눌 수 없으면 한 덩어리로 둔다. */
+export const splitAuthenticPhrases = (text: string | null | undefined, max = 6): string[] =>
+  (text ?? "")
+    .split(/[,，、;；]|\s+및\s+/)
+    .map((part) => part.trim().replace(/[.。]$/, ""))
+    .filter(Boolean)
+    .slice(0, max);

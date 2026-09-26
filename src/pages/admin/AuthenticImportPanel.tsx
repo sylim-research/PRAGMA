@@ -45,6 +45,7 @@ import {
   AUTHENTIC_USAGE_LABEL,
   canMakeScenarioFromAuthentic,
   isAuthenticUsageType,
+  splitAuthenticPhrases,
   type AuthenticUsageType,
 } from "@/lib/admin/authenticUsage";
 
@@ -52,14 +53,38 @@ import {
 // 내부 분류값은 그대로 두고 화면 이름·생성 gate는 authenticUsage에서 함께 정한다.
 type UsageType = AuthenticUsageType;
 const USAGE_KO = AUTHENTIC_USAGE_LABEL;
-const USAGE_TONE: Record<UsageType, string> = {
-  scenario_seed: "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]",
-  preceding_turn: "border-[#93C5FD] bg-[#DBEAFE] text-[#1E40AF]",
-  translation_source: "border-[#C4B5FD] bg-[#EDE9FE] text-[#5B21B6]",
-  response_task: "border-[#FCD34D] bg-[#FEF3C7] text-[#92400E]",
-  expression_resource: "border-[#EAE4D2] bg-[#FAF7EE] text-[#5B5446]",
-  unsuitable: "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
+// 유형 구분은 작은 색 점 하나로만 한다 — 칩 바탕은 모두 같은 흰색(색 절제).
+const USAGE_DOT: Record<UsageType, string> = {
+  scenario_seed: "bg-[#1F3A5F]",
+  translation_source: "bg-[#1F3A5F]",
+  preceding_turn: "bg-[#C8AA2F]",
+  response_task: "bg-[#C8AA2F]",
+  expression_resource: "bg-[#B5AC98]",
+  unsuitable: "bg-[#B5AC98]",
 };
+
+function UsageChip({ type, prefix }: { type: UsageType; prefix?: string }) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#E2DED2] bg-white px-2 py-0.5 text-[11.5px] font-semibold text-[#15202B]">
+      <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${USAGE_DOT[type]}`} />
+      {prefix}{USAGE_KO[type]}
+    </span>
+  );
+}
+
+/** 라벨 | 값 한 줄. 라벨 폭을 고정해 여러 줄이 한 기둥으로 읽히게 한다. */
+function Fact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex gap-3 text-[13px] leading-relaxed">
+      <span className="w-16 shrink-0 whitespace-nowrap pt-px text-[12px] font-semibold text-[#6B645A]">{label}</span>
+      <div className="min-w-0 flex-1 text-[#15202B]">{children}</div>
+    </div>
+  );
+}
+
+const Tag = ({ children }: { children: ReactNode }) => (
+  <span className="inline-block whitespace-nowrap rounded-md bg-[#F5F2EA] px-2 py-0.5 text-[12px] text-[#3F4E59]">{children}</span>
+);
 // 생성기로 전달 가능한 유형. 상황·응답 맥락 참고와 억지 화행화 금지 유형은 전달 버튼이 없다.
 const GENERATABLE = AUTHENTIC_GENERATABLE_TYPES;
 
@@ -644,21 +669,21 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
             </p>
-            <p>왼쪽에 자료를 넣고 「AI로 활용 가능성 분석하기」를 누르면 여기에 활용 방향과 후보가 표시됩니다.</p>
+            <p>자료를 분석하면 활용 방향과 후보가 여기에 나옵니다.</p>
           </div>
         )}
         {analysis && (
           <div className="space-y-4">
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/60 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[12px] font-bold text-emerald-800">교수자가 확인한 원자료</span>
-                  {sourceRef.trim() && <span className="max-w-full truncate text-[10.5px] text-emerald-700">출처 · {sourceRef.trim()}</span>}
+              <div className="rounded-xl border border-[#E2DED2] bg-white p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 whitespace-nowrap text-[12.5px] font-bold text-[#15202B]">
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                    확정 원자료
+                  </span>
+                  {sourceRef.trim() && <span className="min-w-0 truncate text-[11.5px] text-[#6B645A]">출처 · {sourceRef.trim()}</span>}
                 </div>
-                <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-[#19372D]">
+                <p className="mt-2 whitespace-pre-wrap text-[14px] leading-relaxed text-[#15202B]">
                   {editedOriginal || analysis.source_original || "확정 원자료가 없습니다."}
-                </p>
-                <p className="mt-2 text-[10.5px] leading-4 text-emerald-700">
-                  아래의 상황·활용 방향은 AI 제안입니다. 원자료 활용과 AI 변형 설명을 확인한 뒤 교수자가 전달 여부를 결정합니다.
                 </p>
               </div>
               {/* ③ 활용 방향 분석 — 확정된 문구가 어떤 콘텐츠가 될 수 있는가 */}
@@ -667,48 +692,36 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   <span className="text-[13.5px] font-bold text-[#1d2336]">③ 활용 방향 분석</span>
                   <span className="rounded-full bg-[#EAE4D2] px-2 py-0.5 text-[10px] font-medium text-[#5B5446]">AI 제안</span>
                 </div>
-                {analysis.scene_ko && (
-                  <p className="text-[12.5px] text-foreground">
-                    <b className="text-[#1d2336]">담화 상황 · </b>{analysis.scene_ko}
-                  </p>
-                )}
-                {analysis.linguistic_features_ko && (
-                  <p className="text-[12px] text-muted-foreground">
-                    <b className="text-[#1d2336]">표현 특징 · </b>{analysis.linguistic_features_ko}
-                  </p>
-                )}
-                {analysis.recommended_uses && analysis.recommended_uses.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
-                    <span className="text-[11.5px] font-medium text-[#1d2336]">추천 활용 ·</span>
-                    {analysis.recommended_uses.map((u, i) => {
-                      const ut = asUsageType(u);
-                      return (
-                        <span key={i} className={["rounded border px-1.5 py-0.5 text-[11px]", USAGE_TONE[ut]].join(" ")}>
-                          {i + 1}. {USAGE_KO[ut]}
-                        </span>
-                      );
-                    })}
-                  </div>
-                )}
+                <div className="space-y-2 pt-1">
+                  {analysis.scene_ko && <Fact label="담화 상황">{analysis.scene_ko}</Fact>}
+                  {analysis.linguistic_features_ko && (
+                    <Fact label="표현 특징">
+                      <div className="flex flex-wrap gap-1">
+                        {splitAuthenticPhrases(analysis.linguistic_features_ko).map((phrase) => <Tag key={phrase}>{phrase}</Tag>)}
+                      </div>
+                    </Fact>
+                  )}
+                  {analysis.recommended_uses && analysis.recommended_uses.length > 0 && (
+                    <Fact label="추천 활용">
+                      <div className="flex flex-wrap gap-1">
+                        {analysis.recommended_uses.map((u, i) => <UsageChip key={i} type={asUsageType(u)} prefix={`${i + 1}. `} />)}
+                      </div>
+                    </Fact>
+                  )}
+                  {analysis.connectable_speech_acts && analysis.connectable_speech_acts.length > 0 && (
+                    <Fact label="적용 화행">
+                      <div className="flex flex-wrap gap-1">
+                        {analysis.connectable_speech_acts.map((s, i) => <Tag key={i}>{SPEECH_ACT_UI[asSpeechAct(s)]}</Tag>)}
+                      </div>
+                    </Fact>
+                  )}
+                  {analysis.unsuitable_reason_ko && <Fact label="주의">{analysis.unsuitable_reason_ko}</Fact>}
+                </div>
                 {analysis.recommendation_reason_ko && (
-                  <p className="text-[12px] text-muted-foreground">
-                    <b className="text-[#1d2336]">추천 근거 · </b>{analysis.recommendation_reason_ko}
-                  </p>
-                )}
-                {analysis.connectable_speech_acts && analysis.connectable_speech_acts.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[11.5px] font-medium text-[#1d2336]">적용 가능한 화행 ·</span>
-                    {analysis.connectable_speech_acts.map((s, i) => (
-                      <span key={i} className="rounded bg-[#FAF7EE] px-1.5 py-0.5 text-[11px] text-[#5B5446]">
-                        {SPEECH_ACT_UI[asSpeechAct(s)]}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {analysis.unsuitable_reason_ko && (
-                  <p className="rounded border border-[#FCA5A5] bg-[#FEE2E2] px-2 py-1 text-[11.5px] text-[#991B1B]">
-                    독립 미션화 주의 · {analysis.unsuitable_reason_ko}
-                  </p>
+                  <details className="border-t border-[#F0ECE2] pt-2 text-[12.5px] text-[#3F4E59]">
+                    <summary className="cursor-pointer font-semibold text-[#6B645A]">추천 근거 보기</summary>
+                    <p className="mt-1.5 leading-relaxed">{analysis.recommendation_reason_ko}</p>
+                  </details>
                 )}
               </div>
 
@@ -721,8 +734,8 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   if (items.length === 0) return null;
                   return (
                     <div key={title} className="space-y-2">
-                      <span className="block border-l-[3px] border-[#FAD338] pl-2.5 text-[12.5px] font-bold text-[#1d2336]">
-                        ④ {title} · {items.length}개
+                      <span className="block whitespace-nowrap border-l-[3px] border-[#FAD338] pl-2.5 text-[13px] font-bold text-[#1d2336]">
+                        ④ {title} <span className="font-normal text-[#6B645A]">· {items.length}개</span>
                       </span>
                       <div className="grid grid-cols-1 gap-2.5">
                 {items.map(({ c, i }, k) => {
@@ -740,29 +753,23 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                         spanFull ? "xl:col-span-2" : "",
                       ].join(" ")}
                     >
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className={["rounded border px-1.5 py-0.5 text-[11px] font-medium", USAGE_TONE[ut]].join(" ")}>
-                          {USAGE_KO[ut]}
-                        </span>
-                        <span className="text-[12.5px] font-medium text-foreground">{c.label_ko ?? "(제목 없음)"}</span>
+                      <div className="flex items-center gap-2">
+                        <UsageChip type={ut} />
+                        <span className="min-w-0 text-[13.5px] font-semibold text-[#15202B]">{c.label_ko ?? "(제목 없음)"}</span>
                       </div>
 
                       {/* AI 재구성 내용 */}
                       {c.situation_seed_ko && (
-                        <p className="text-[12px] leading-relaxed text-foreground">
-                          <span className="text-[#5B21B6]">AI 상황 · </span>{c.situation_seed_ko}
-                        </p>
+                        <Fact label="AI 상황">{c.situation_seed_ko}</Fact>
                       )}
                       {c.source_text && (
-                        <div className="rounded border border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[12.5px] leading-relaxed">
-                          <span className="text-[10.5px] text-[#8a857c]">출발 텍스트 · </span>
-                          {c.source_text}
+                        <div className="rounded-md border border-[#EAE4D2] bg-[#FBF8F0] px-3 py-2">
+                          <div className="text-[11.5px] font-semibold text-[#6B645A]">출발 텍스트</div>
+                          <p className="mt-0.5 text-[14px] leading-relaxed text-[#15202B]">{c.source_text}</p>
                         </div>
                       )}
                       {c.preceding_turn && (
-                        <div className="rounded border border-[#DBEAFE] bg-[#EFF6FF] px-2.5 py-1.5 text-[12px] leading-relaxed text-[#1E40AF]">
-                          <span className="text-[10.5px]">상황 맥락 참고 · </span>{c.preceding_turn}
-                        </div>
+                        <Fact label="맥락 발화">{c.preceding_turn}</Fact>
                       )}
 
                       {/* 표현 자원(비생성 후보) — 후속 「오늘의 살아 있는 표현」 카드 후보 */}
@@ -798,7 +805,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                             PDR_DISTANCE_SHORT[norm.pdr_distance],
                             PDR_BURDEN_SHORT[norm.pdr_burden],
                           ].map((t) => (
-                            <span key={t} className="rounded bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
+                            <span key={t} className="whitespace-nowrap rounded bg-[#F5F2EA] px-1.5 py-0.5 text-[11px] text-[#5B5446]">
                               {t}
                             </span>
                           ))}
@@ -807,13 +814,9 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
 
                       {/* 원자료 활용 / AI 변형 설명 */}
                       {(c.source_usage_note_ko || c.ai_adaptation_note_ko) && (
-                        <div className="space-y-0.5 border-t border-border pt-1.5 text-[11px] leading-relaxed">
-                          {c.source_usage_note_ko && (
-                            <p className="text-muted-foreground"><b className="text-[#065F46]">원자료 활용 · </b>{c.source_usage_note_ko}</p>
-                          )}
-                          {c.ai_adaptation_note_ko && (
-                            <p className="text-muted-foreground"><b className="text-[#5B21B6]">AI 변형 · </b>{c.ai_adaptation_note_ko}</p>
-                          )}
+                        <div className="space-y-1 border-t border-[#F0ECE2] pt-2">
+                          {c.source_usage_note_ko && <Fact label="원자료 활용">{c.source_usage_note_ko}</Fact>}
+                          {c.ai_adaptation_note_ko && <Fact label="AI 변형">{c.ai_adaptation_note_ko}</Fact>}
                         </div>
                       )}
 
@@ -831,12 +834,12 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                           {appliedIdx === i ? "✓ 근거와 함께 전달 중…" : "이 자료로 시나리오 만들기"}
                         </Button>
                       ) : (
-                        <p className="mt-auto rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                        <p className="mt-auto whitespace-nowrap rounded-md border border-dashed border-[#E2DED2] px-2.5 py-1.5 text-[12px] text-[#6B645A]">
                           {contextReference
-                            ? "참고 자료 · 관계·상황을 이해하는 데만 씁니다. 출발 텍스트 없이 응답하게 하는 과제로 만들지 않습니다."
+                            ? "참고 자료 · 관계·상황 이해용, 과제로 만들지 않음"
                             : generatableType
-                              ? "근거 부족 · 생성기로 전달할 출발 텍스트가 없습니다. 원문을 수정해 다시 분석하세요."
-                              : "이 유형은 독립 미션으로 억지 변환하지 않습니다. 표현 자원·상황 배경으로만 참고하세요."}
+                              ? "출발 텍스트 없음 · 원문을 고쳐 다시 분석"
+                              : "참고만 · 독립 미션으로 만들지 않음"}
                         </p>
                       )}
                     </div>
