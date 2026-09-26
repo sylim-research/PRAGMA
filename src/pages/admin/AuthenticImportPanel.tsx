@@ -55,7 +55,7 @@ import {
 // 채도를 낮춘 차분한 색(슬레이트 블루·세이지). YouTube만 실제 브랜드 표식을 쓴다.
 const SOURCE_STYLE = {
   image: { bubble: "bg-[#EDF1F7] text-[#4A6591]" },
-  text: { bubble: "bg-[#EDF3EF] text-[#4F7563]" },
+  text: { bubble: "bg-[#F1EFEA] text-[#15202B]" },
   youtube: { bubble: "" },
 } as const;
 
@@ -491,7 +491,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 onClick={() => setInputTab(k)}
                 aria-pressed={inputTab === k}
                 className={[
-                  "flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-lg text-[12.5px] transition-colors",
+                  "flex h-[92px] flex-col items-center justify-center gap-1.5 rounded-lg text-[12.5px] transition-colors",
                   inputTab === k
                     ? "border-[1.5px] border-[#15202B] bg-[#FFFDF8] font-semibold text-[#15202B]"
                     : "border border-[#E7E2D6] bg-white font-medium text-[#3F4E59] hover:border-[#CFC8B8]",
@@ -515,7 +515,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-44 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
+                  className="flex h-40 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
                   <span className="whitespace-nowrap text-[13.5px] font-semibold text-[#15202B]">+ 쇼츠·드라마 캡처 업로드</span>
                   <span className="whitespace-nowrap text-[11.5px] font-normal text-[#5A6670]">jpg·png·webp · 이미지는 저장하지 않습니다</span>
@@ -568,7 +568,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
           )}
 
           {inputTab === "youtube" && (
-            <div className="mt-2.5 flex h-44 flex-col justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] px-4">
+            <div className="mt-2.5 flex h-40 flex-col justify-center rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] px-4">
               <div className="flex gap-2">
                 <input
                   value={youtubeUrl}
@@ -598,7 +598,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
-              className="mt-2.5 h-44 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="mt-2.5 h-40 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[13px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
