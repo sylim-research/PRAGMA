@@ -285,7 +285,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                           : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
-                <span className={["w-[17rem] shrink-0 whitespace-nowrap font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
+                <span className={["w-[16.5rem] shrink-0 whitespace-nowrap font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
                   {row.label}{row.optional && <span className="ml-1.5 rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
                 </span>
                 <span className={["min-w-0 flex-1 whitespace-nowrap", status === "running" ? "font-semibold text-[#8A5A14]"
@@ -313,11 +313,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
-            <span className={["w-[17rem] shrink-0 whitespace-nowrap font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
+            <span className={["w-[16.5rem] shrink-0 whitespace-nowrap font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
             <span className="min-w-0 flex-1 whitespace-nowrap text-[#5D6970]">
-              {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
-                : professorCurrent ? (findings.length ? `검토 의견 ${findings.length}건 · 교수자가 감수하고 승인합니다` : "교수자가 감수하고 승인합니다")
-                : "점검 뒤 교수자가 감수하고 승인합니다"}
+              {professorDone ? "승인 완료"
+                : professorCurrent ? (findings.length ? `감수 대기 · 의견 ${findings.length}건` : "감수 대기")
+                : "대기"}
             </span>
           </li>
         </ol>
