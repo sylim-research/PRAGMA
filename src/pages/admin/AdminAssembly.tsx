@@ -1046,6 +1046,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
+              {/* 상태 칩 줄과 검색 줄의 전체 폭을 맞춘다 — 둘을 한 틀에 넣고 검색칸이 남는 폭을 채운다. */}
+              <div className="flex w-fit max-w-full flex-col gap-1.5">
               <div className="flex flex-wrap gap-1.5" role="group" aria-label="상태">
                 {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
@@ -1073,7 +1075,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder={professorScreen ? "제목·상황·Trace 검색" : "제목·상황 검색"}
                   aria-label="대기열 검색"
-                  className="h-9 w-40 min-w-0 rounded-md border border-[#D9D7CF] bg-white px-2.5 text-[13px]"
+                  className="h-9 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2.5 text-[13px]"
                 />
                 <select
                   id="queue-sort"
@@ -1101,6 +1103,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   </button>
                 ))}
                 </div>
+              </div>
               </div>
               {openFilter === "axis" && (
                 <div className="grid grid-cols-2 gap-1.5">
