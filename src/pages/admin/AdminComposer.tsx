@@ -776,7 +776,7 @@ const AdminComposer = () => {
                   onClick={() => setOutlineId(item.id)}
                   className={`flex flex-col gap-2 rounded-xl border bg-white px-4 py-4 text-left transition ${
                     selected
-                      ? "border-[#1F3A5F] shadow-[0_0_0_1px_#1F3A5F] bg-[#F7F9FC]"
+                      ? "border-[#7D90A8] shadow-[0_0_0_1px_#7D90A8] bg-[#F7F9FC]"
                       : "border-[#E2DED2] hover:border-[#9FB0C6]"
                   }`}
                 >
@@ -1013,6 +1013,7 @@ const AdminComposer = () => {
                     }
                     onAdd={(c) => addItem(w.week_no, c)}
                     onRemove={(sid) => removeItem(w.week_no, sid)}
+                    onReplace={(sid) => { removeItem(w.week_no, sid); setAddingWeek(w.week_no); }}
                   />
                 ))}
               </div>
@@ -1055,6 +1056,7 @@ function WeekRow({
   onToggleAdd,
   onAdd,
   onRemove,
+  onReplace,
   onEditWeek,
   replaced,
 }: {
@@ -1072,6 +1074,8 @@ function WeekRow({
   onToggleAdd: () => void;
   onAdd: (c: ComposerCore) => void;
   onRemove: (scenarioId: string) => void;
+  /** 옛 판 미션을 빼고 같은 자리의 후보 목록을 바로 연다. */
+  onReplace: (scenarioId: string) => void;
   onEditWeek: () => void;
   replaced?: ReadonlySet<string>;
 }) {
@@ -1105,9 +1109,9 @@ function WeekRow({
   });
 
   return (
-    <div role="group" aria-label={`${week.week_no}주차 편성`} className={["bg-white px-3", isAssignable || reinforcement ? "py-2" : "py-1"].join(" ")}>
+    <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-3">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. 주차마다 같은 「번역 1개 · 통역 1개」 열은 두지 않는다 — 그 폭을 미션 제목에 준다. */}
-      <div className={["grid grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3", isAssignable || reinforcement ? "min-h-9" : "min-h-7"].join(" ")}>
+      <div className="grid min-h-10 grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
@@ -1151,7 +1155,8 @@ function WeekRow({
                       {core ? (core.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation) : "?"}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#202B33]">{title}</span>
-                    {needsReplace && <span className="shrink-0 text-[11px] font-bold text-[#9A3F1C]">교체 필요</span>}
+                    {needsReplace && <button type="button" onClick={() => onReplace(item.scenario_id)} aria-label={`${title} 교체하기`}
+                      className="shrink-0 rounded-full border border-[#D98A5C] bg-white px-2 py-0.5 text-[11px] font-bold text-[#9A3F1C] hover:bg-[#9A3F1C] hover:text-white">교체하기 →</button>}
                     {/* 제거 ×는 평소 숨기고 칩에 마우스를 올리거나 키보드로 닿을 때만 보인다 — 배치표가 삭제 목록처럼 보이지 않게. */}
                     <button
                       type="button"
