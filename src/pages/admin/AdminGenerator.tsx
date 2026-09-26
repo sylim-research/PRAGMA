@@ -212,11 +212,63 @@ const EXAMPLE_R: Record<string, string> = { low: "R: 낮음", mid: "R: 중간", 
 
 // 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
 const HOLD_STAGE_LABEL = {
-  preflight: "장면 사전 검토에서 보류",
-  rule: "규칙 검사에서 보류",
-  semantic: "시나리오 조건 검토에서 보류",
+  preflight: "보류 · 장면 사전 검토",
+  rule: "보류 · 자동 품질 점검",
+  semantic: "보류 · 시나리오 조건 검토",
   system: "생성 오류",
 } as const;
+
+// 보류 카드 맨 위의 고정 안내. 아래 사유 원문을 끝까지 읽지 않아도 무엇이 일어났는지 알 수 있게 한다.
+const HOLD_STAGE_SUMMARY = {
+  preflight: "지정한 관계 조건과 장면이 맞지 않아 시나리오를 만들지 않았습니다.",
+  rule: "자동 품질 점검 규칙에 걸려 보류했습니다.",
+  semantic: "생성된 시나리오가 요청한 조건과 맞지 않아 보류했습니다.",
+} as const;
+
+// 사유 원문의 출처. 장면 사전 검토·시나리오 조건 검토는 AI 의견, 자동 품질 점검은 규칙 결과다.
+const HOLD_REASON_SOURCE = {
+  preflight: "AI 검토 의견",
+  rule: "점검 결과",
+  semantic: "AI 검토 의견",
+} as const;
+
+// 생성 조건 줄: 핵심 변수(화행·P·D·R)와 부가 조건(방향·수준·채널)을 묶음으로 나눠 보여 준다.
+// 입력은 [화행, "P: …", "D: …", "R: …", 방향, 수준, 채널] 순서의 짧은 표기다.
+const PDR_AXIS_NAME: Record<string, string> = { P: "권력(P)", D: "거리(D)", R: "부담도(R)" };
+
+function ConditionSummary({ conditions }: { conditions: string[] }) {
+  const [act, ...rest] = conditions;
+  const pdr: { name: string; value: string }[] = [];
+  const others: string[] = [];
+  for (const c of rest) {
+    const m = c.match(/^([PDR]):\s*(.+)$/);
+    if (m) pdr.push({ name: PDR_AXIS_NAME[m[1]], value: m[2] });
+    else others.push(c);
+  }
+  const heading = "text-[10.5px] font-semibold tracking-[0.04em] text-[#8A7621]";
+  return (
+    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_1fr_auto]">
+      <div className="min-w-0">
+        <div className={heading}>화행</div>
+        <div className="mt-1 text-[14px] font-bold text-[#15202B]">{act}</div>
+      </div>
+      <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
+        <div className={heading}>관계 조건 (P·D·R)</div>
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          {pdr.map(({ name, value }) => (
+            <span key={name} className="whitespace-nowrap text-[12.5px] text-[#5B6770]">
+              {name} <b className="text-[13.5px] font-bold text-[#15202B]">{value}</b>
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
+        <div className={heading}>언어 · 수준 · 채널</div>
+        <div className="mt-1 whitespace-nowrap text-[12.5px] text-[#4E5A63]">{others.join(" · ")}</div>
+      </div>
+    </div>
+  );
+}
 
 function humanizeHoldReason(text: string): string {
   const length = text.match(/최대 유효 글자 (\d+)자 초과\(공백·문장부호 제외 실측 (\d+)자\)/);
@@ -238,6 +290,10 @@ function humanizeHoldReason(text: string): string {
     .replace(/\brelation_ko\b/g, "관계")
     .replace(/\bsource_text\b/g, "원문")
     .replace(/\bPDR\b/g, "P·D·R")
+    .replace(/\bfeasible\s*=\s*false\b/g, "장면 성립 불가")
+    .replace(/\bfeasible\s*=\s*true\b/g, "장면 성립 가능")
+    .replace(/\bscene_seed_ko\b/g, "장면 초안")
+    .replace(/(?<![A-Za-z])([pdr])(?=[이가은는을를의와과도로「\s=])/g, (m) => m.toUpperCase())
     .replace(/^코어\s*/, "");
 }
 
@@ -1278,12 +1334,7 @@ const AdminGenerator = () => {
 
             {!loading && !finalizing && !coreResults && !aiResult && example && (
               <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
-                  <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
-                  {example.conditions.map((c) => (
-                    <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
-                  ))}
-                </div>
+                <ConditionSummary conditions={example.conditions} />
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">생성 예시</span>
@@ -1304,15 +1355,15 @@ const AdminGenerator = () => {
             {!finalizing && coreResults && (
               <div className="space-y-4">
                 {coreConditions.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
-                    <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
-                    {coreConditions.map((c) => (
-                      <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
-                    ))}
-                  </div>
+                  <ConditionSummary conditions={coreConditions} />
                 )}
-                {coreResults.map((r, i) => (
-                  <div key={i} className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
+                {coreResults.map((r, i) => {
+                  const heldStage = !r.ok && r.stage && r.stage !== "system" ? r.stage : null;
+                  return (
+                  <div key={i} className={[
+                    "space-y-2.5 rounded-lg border bg-white p-4 shadow-sm",
+                    heldStage ? "border-[#E6E1D5] border-l-4 border-l-[#D9A441]" : "border-[#D9D2BF]",
+                  ].join(" ")}>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
                         className={[
@@ -1321,7 +1372,7 @@ const AdminGenerator = () => {
                             ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
                             : r.stage === "system"
                               ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
-                              : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
+                              : "border-[#EBCB8B] bg-[#FBF3E0] text-[#7A4A0A]",
                         ].join(" ")}
                       >
                         {r.ok ? "✓ 초안 저장" : HOLD_STAGE_LABEL[r.stage ?? "system"]}
@@ -1333,15 +1384,17 @@ const AdminGenerator = () => {
                       )}
                       <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
                     </div>
-                    {r.error && (
-                      <div
-                        className={[
-                          "rounded-md border px-3 py-2 text-[12.5px] leading-relaxed",
-                          r.stage === "system"
-                            ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
-                            : "border-[#FCD34D] bg-[#FFFBEB] text-[#78350F]",
-                        ].join(" ")}
-                      >
+                    {r.error && heldStage && (
+                      <div>
+                        <p className="text-[13px] font-medium text-[#15202B]">{HOLD_STAGE_SUMMARY[heldStage]}</p>
+                        <div className="mt-2.5 border-t border-[#EEEAE0] pt-2.5">
+                          <div className="text-[10.5px] font-semibold tracking-[0.04em] text-[#8A7621]">{HOLD_REASON_SOURCE[heldStage]}</div>
+                          <p className="mt-1 max-w-[64ch] text-[13px] leading-[1.75] text-[#3F4E59]">{humanizeHoldReason(r.error)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {r.error && !heldStage && (
+                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[12.5px] leading-relaxed text-[#991B1B]">
                         {humanizeHoldReason(r.error)}
                       </div>
                     )}
@@ -1364,7 +1417,8 @@ const AdminGenerator = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
