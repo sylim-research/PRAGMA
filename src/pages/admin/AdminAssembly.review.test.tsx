@@ -190,7 +190,7 @@ describe("assembly workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(screen.getByRole("button", { name: /초안 생성 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
     expect(within(bench).getByRole("heading", { name: "생성할 시나리오" })).toBeInTheDocument();
-    expect(within(bench).getByRole("button", { name: "초안 자동 생성" })).toBeEnabled();
+    expect(within(bench).getByRole("button", { name: "미션 자동 생성" })).toBeEnabled();
     expect(within(queue()).queryByText("옛 코어")).not.toBeInTheDocument();
   });
 

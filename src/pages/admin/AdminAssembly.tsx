@@ -937,7 +937,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <Button disabled={busy !== null} onClick={() => void onGenerateV6(r)}
                     className={["h-11 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]", busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : ""].join(" ")}>
                     {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" />}
-                    {busy === r.scenario_id ? "생성 중" : "초안 자동 생성"}
+                    {busy === r.scenario_id ? "생성 중" : "미션 자동 생성"}
                   </Button>
                 </div>
                 {failures[r.scenario_id] && <p className="mt-2 text-[12.5px] text-red-800" role="alert">{failures[r.scenario_id]}</p>}
