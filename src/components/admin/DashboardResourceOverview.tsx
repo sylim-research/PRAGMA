@@ -22,9 +22,11 @@ export function DashboardResourceOverview({ resources, error, status }: {
 
   return <>
     <section aria-labelledby="resource-overview-title" className="mt-5">
-      {/* 대시보드 세 구역 제목을 같은 모양·같은 짜임(「○○ 현황」)으로: 콘텐츠 보유 / 콘텐츠 품질관리 / 수업 운영·학습 수행. */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h2 id="resource-overview-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">콘텐츠 보유 현황</h2>
+      <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING CONTENT</p>
+          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 콘텐츠</h2>
+        </div>
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
