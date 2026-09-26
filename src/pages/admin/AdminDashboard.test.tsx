@@ -81,7 +81,7 @@ describe("admin dashboard", () => {
     expect(screen.queryByText("제작·승인 현황")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /검수·승인 중/ })).not.toBeInTheDocument();
     expect(screen.queryByText("승인 전 미션")).not.toBeInTheDocument();
-    const records = screen.getByRole("link", { name: /교과목 수업 기록/ });
+    const records = screen.getByRole("link", { name: /교과목 연결 수행 기록/ });
     expect(records).toHaveAttribute("href", "/admin/decision-traces");
     expect(screen.queryByText(/단계별 누적 수입니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/각 미션을 다음에 처리할 단계/)).not.toBeInTheDocument();
@@ -146,9 +146,9 @@ describe("admin dashboard", () => {
     expect(assignments.textContent).not.toContain("승인");
     expect(assignments).toHaveAttribute("title", "승인 전 미션 1개 포함(게이트 이전 편성)");
     expect(screen.getByRole("link", { name: /승인 학습자 계정/ })).toHaveAttribute("href", "/admin/learners");
-    const records = screen.getByRole("link", { name: /교과목 수업 기록/ });
-    expect(records.textContent).toMatch(/교과목 수업 기록\s*1\s*건/);
-    expect(records.textContent).toMatch(/시범 수행 2건 별도$/);
+    const records = screen.getByRole("link", { name: /교과목 연결 수행 기록/ });
+    expect(records.textContent).toMatch(/교과목 연결 수행 기록\s*1\s*건/);
+    expect(records.textContent).toMatch(/교과목 미연결 수행 2건 별도$/);
   });
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {

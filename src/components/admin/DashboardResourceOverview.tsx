@@ -13,8 +13,8 @@ export function DashboardResourceOverview({ resources, error, status }: {
   const [scope, setScope] = useState<ResourceScope>("all");
   const selected = resources?.[scope];
   const cards = [
-    { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 판단 문항", icon: BookOpen, to: resourceLibraryHref("all") },
-    { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 DCT형 과제", icon: MessagesSquare, to: resourceLibraryHref("all") },
+    { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen, to: resourceLibraryHref("all") },
+    { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare, to: resourceLibraryHref("all") },
     { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, to: resourceLibraryHref("ready"), ready: true },
   ];
 
@@ -62,7 +62,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.95fr_0.8fr_0.8fr_0.8fr]">
+      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[2.06fr_0.8fr_0.8fr_0.8fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));

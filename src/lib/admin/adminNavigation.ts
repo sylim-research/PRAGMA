@@ -18,7 +18,7 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
   label: "PRAGMA 대시보드",
 };
 
-// 생성 기준 → 재료 → 제작·검수 → 수업 운영 순서로 모든 그룹을 기본 펼침한다.
+// 제작 기준 → 재료 → 제작·승인 → 수업 운영 순서로 모든 그룹을 기본 펼침한다.
 // 기존 경로와 권한은 유지한다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   { header: "1. 콘텐츠 제작 기준", items: [
@@ -33,7 +33,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   { header: "3. 학습 미션 제작·승인", wideCanvas: true, items: [
     { to: "/admin/assembly", label: "학습 미션 제작" },
     { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
-    // 제작·검수 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
+    // 제작·승인 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
     { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
   ]},
   { header: "4. 수업 운영", items: [
