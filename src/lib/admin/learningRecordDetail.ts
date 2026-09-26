@@ -5,17 +5,42 @@
 // 미션 본문은 버전마다 모양이 달라 필요한 필드만 느슨하게 읽는다(없으면 코드·번호로 남긴다).
 
 import { GRAMMAR_LABEL, SCOPE_LABEL, SEMANTIC_LABEL } from "@/lib/pragma/feedbackSchema";
+import { withinBandCodeFor } from "@/lib/pragma/missionV6";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
 
-export interface RecordDetailLine {
-  label: string;
+/** 학습자가 고른 값 하나. label이 있으면 값 위에 작게, MJT 후보 비교에서는 후보 문장이다. */
+export interface RecordChoice {
+  label: string | null;
   value: string;
 }
 
-export interface RecordDetailSection {
-  key: "context" | "mjt" | "task" | "dissent" | "meta";
-  title: string;
-  lines: RecordDetailLine[];
+export interface MjtCard {
+  id: number | null;
+  activity: string;
+  target: string | null;
+  choices: RecordChoice[];
+  /** 여러 표현 비교처럼 「표현 → 판단」 줄로 보여 줄 문항 */
+  rows: RecordChoice[];
+}
+
+export interface LearningRecordDetail {
+  context: {
+    relation: string | null;
+    situation: string | null;
+    mode: string | null;
+    sourceLabel: string;
+    source: string | null;
+  };
+  mjt: MjtCard[];
+  task: {
+    first: string | null;
+    feedback: string[];
+    decision: "최초 산출 유지" | "수정" | null;
+    final: string | null;
+    hintOpened: boolean | null;
+  };
+  dissent: { conditions: string[]; reason: string | null } | null;
+  meta: string[];
 }
 
 /** 펼침에 필요한 learner_mission_logs 열. */
@@ -66,66 +91,83 @@ const DISSENT_LABELS: Record<string, string> = {
 
 const LANG_LABEL: Record<string, string> = { ko: "한국어", zh: "중국어" };
 
-function mjtLines(row: RecordDetailRow, mission: Obj | null): RecordDetailLine[] {
+function bandLabeler(featureId: string | null) {
+  const feature = getTargetFeature(featureId ?? "");
+  const labels = new Map(
+    (feature?.band_schema ?? []).map((band) => [band.code, band.label_ko.replace(/\s*\([^)]*\)\s*$/, "")]),
+  );
+  // 요청 화행은 가운데 대역을 「appropriate」로 저장한다(동결 예외) — 화면 이름은 같은 가운데 대역이다.
+  const within = featureId ? withinBandCodeFor(featureId) : null;
+  return (code: unknown) => {
+    if (typeof code !== "string") return "—";
+    return labels.get(code)
+      ?? (code === within && feature ? labels.get(feature.within_band_code) : undefined)
+      ?? code;
+  };
+}
+
+function mjtCards(row: RecordDetailRow, mission: Obj | null): MjtCard[] {
   const envelope = obj(row.context_judgment);
   const responses = arr(envelope?.responses).map(obj).filter((item): item is Obj => item !== null);
   const items = arr(mission?.mpj_items).map(obj);
-  const bands = new Map(
-    (getTargetFeature(row.feature_id ?? "")?.band_schema ?? []).map((band) => [
-      band.code,
-      band.label_ko.replace(/\s*\([^)]*\)\s*$/, ""),
-    ]),
-  );
-  const band = (code: unknown) => (typeof code === "string" ? bands.get(code) ?? code : "—");
+  const band = bandLabeler(row.feature_id);
 
   return responses.map((trace) => {
     const id = typeof trace.item_id === "number" ? trace.item_id : null;
     const type = str(trace.item_type) ?? "";
     const item = items.find((candidate) => candidate?.id === id) ?? null;
-    const parts: string[] = [];
-    const target = str(item?.target);
-    if (target) parts.push(`제시 표현: ${target}`);
+    const choices: RecordChoice[] = [];
     if (typeof trace.scale_code === "string") {
-      const revised = typeof trace.revised_scale_code === "string" ? ` → 이유 확인 후 ${SCALE_LABELS[trace.revised_scale_code] ?? trace.revised_scale_code}` : "";
-      parts.push(`판단: ${SCALE_LABELS[trace.scale_code] ?? trace.scale_code}${revised}`);
+      choices.push({ label: "판단", value: SCALE_LABELS[trace.scale_code] ?? trace.scale_code });
     }
     if (typeof trace.initial_judgment === "string") {
-      parts.push(`최초 판단: ${trace.initial_judgment === "appropriate" ? "적절하다" : "적절하지 않다"}`);
+      choices.push({ label: "판단", value: trace.initial_judgment === "appropriate" ? "적절하다" : "적절하지 않다" });
     }
-    if (typeof trace.band_code === "string") parts.push(`조절 정도: ${band(trace.band_code)}`);
+    if (typeof trace.band_code === "string") choices.push({ label: "조절 정도", value: band(trace.band_code) });
     if (typeof trace.reason_id === "string") {
       const options = arr(obj(item?.reason_choice)?.options ?? item?.reasons).map(obj);
       const option = options.find((candidate) => candidate?.id === trace.reason_id);
-      parts.push(`고른 이유: ${str(option?.text) ?? str(option?.text_ko) ?? trace.reason_id}`);
+      choices.push({ label: "고른 이유", value: str(option?.text) ?? str(option?.text_ko) ?? trace.reason_id });
+    }
+    if (typeof trace.revised_scale_code === "string") {
+      choices.push({ label: "이유를 본 뒤 바꾼 판단", value: SCALE_LABELS[trace.revised_scale_code] ?? trace.revised_scale_code });
     }
     for (const index of arr(trace.correction_indexes)) {
       if (typeof index !== "number") continue;
-      const text = str(obj(arr(item?.corrections)[index])?.text);
-      parts.push(`고른 수정안: ${text ?? `${index + 1}번`}`);
+      choices.push({ label: "고른 수정안", value: str(obj(arr(item?.corrections)[index])?.text) ?? `${index + 1}번` });
     }
-    if (typeof trace.revised_text === "string") parts.push(`고쳐 쓴 표현: ${trace.revised_text}`);
-    const candidates = arr(item?.candidates).map(obj);
-    arr(trace.candidate_band_codes).forEach((code, index) => {
-      parts.push(`${str(candidates[index]?.text) ?? `표현 ${index + 1}`} → ${band(code)}`);
-    });
-    if (typeof trace.best_candidate_index === "number") parts.push(`BEST: ${str(candidates[trace.best_candidate_index]?.text) ?? `${trace.best_candidate_index + 1}번`}`);
-    if (typeof trace.worst_candidate_index === "number") parts.push(`WORST: ${str(candidates[trace.worst_candidate_index]?.text) ?? `${trace.worst_candidate_index + 1}번`}`);
+    if (typeof trace.revised_text === "string") choices.push({ label: "고쳐 쓴 표현", value: trace.revised_text });
 
-    const activity = str(item?.short_label) ?? ITEM_TITLES[type] ?? type;
-    return { label: `MJT${id ?? "?"} · ${activity}`, value: parts.join("\n") || "—" };
+    const candidates = arr(item?.candidates).map(obj);
+    const candidateText = (index: number) => str(candidates[index]?.text) ?? `표현 ${index + 1}`;
+    const rows: RecordChoice[] = arr(trace.candidate_band_codes).map((code, index) => ({
+      label: candidateText(index),
+      value: band(code),
+    }));
+    if (typeof trace.best_candidate_index === "number") rows.push({ label: candidateText(trace.best_candidate_index), value: "BEST" });
+    if (typeof trace.worst_candidate_index === "number") rows.push({ label: candidateText(trace.worst_candidate_index), value: "WORST" });
+
+    return {
+      id,
+      activity: str(item?.short_label) ?? ITEM_TITLES[type] ?? type,
+      target: str(item?.target),
+      choices,
+      rows,
+    };
   });
 }
 
-function feedbackSummary(raw: unknown): string | null {
+function feedbackLines(raw: unknown): string[] {
   const feedback = obj(raw);
   const verdicts = obj(feedback?.verdicts);
-  if (!verdicts) return null;
-  const parts = [
-    typeof verdicts.semantic_fidelity === "string" ? `의미 전달: ${SEMANTIC_LABEL[verdicts.semantic_fidelity] ?? verdicts.semantic_fidelity}` : null,
-    typeof verdicts.grammatical_accuracy === "string" ? `언어 형식: ${GRAMMAR_LABEL[verdicts.grammatical_accuracy] ?? verdicts.grammatical_accuracy}` : null,
-    typeof feedback?.revision_scope === "string" ? `다시 볼 곳: ${SCOPE_LABEL[feedback.revision_scope as keyof typeof SCOPE_LABEL] ?? feedback.revision_scope}` : null,
-  ].filter((part): part is string => part !== null);
-  return parts.length ? parts.join("\n") : null;
+  if (!verdicts) return [];
+  return [
+    typeof verdicts.semantic_fidelity === "string" ? SEMANTIC_LABEL[verdicts.semantic_fidelity] ?? verdicts.semantic_fidelity : null,
+    typeof verdicts.grammatical_accuracy === "string" ? GRAMMAR_LABEL[verdicts.grammatical_accuracy] ?? verdicts.grammatical_accuracy : null,
+    typeof feedback?.revision_scope === "string"
+      ? `다시 볼 곳: ${SCOPE_LABEL[feedback.revision_scope as keyof typeof SCOPE_LABEL] ?? feedback.revision_scope}`
+      : null,
+  ].filter((line): line is string => line !== null);
 }
 
 export function buildLearningRecordDetail(
@@ -133,7 +175,7 @@ export function buildLearningRecordDetail(
   mission: unknown,
   placement: string,
   formatTime: (iso: string | null) => string,
-): RecordDetailSection[] {
+): LearningRecordDetail {
   const content = obj(mission);
   const task = obj(content?.production_task);
   const envelope = obj(row.context_judgment);
@@ -144,54 +186,45 @@ export function buildLearningRecordDetail(
     ? `${LANG_LABEL[row.source_lang] ?? row.source_lang} → ${LANG_LABEL[row.target_lang] ?? row.target_lang}`
     : null;
 
-  const context: RecordDetailLine[] = [
-    { label: "관계", value: str(task?.relation_ko) ?? "" },
-    { label: "상황", value: str(task?.situation_ko) ?? "" },
-    { label: "수행 방식", value: [interpreting ? "통역" : row.task_type ? "번역" : null, direction].filter(Boolean).join(" · ") },
-    { label: interpreting ? "출발텍스트(통역 음성 전사)" : "출발텍스트", value: row.source_text ?? "" },
-  ];
-
-  const first = row.first_response ?? "";
-  const final = row.revised_response ?? "";
+  const first = str(row.first_response);
+  const final = str(row.revised_response);
   const decision = dissent?.final_decision === "retained_first_response"
     ? "최초 산출 유지"
     : dissent?.final_decision === "revised_response"
       ? "수정"
       : first && final
         ? (first.trim() === final.trim() ? "최초 산출 유지" : "수정")
-        : "";
+        : null;
   const support = obj(envelope?.production_support);
-  const taskLines: RecordDetailLine[] = [
-    { label: "최초 산출", value: first },
-    { label: "AI 피드백", value: feedbackSummary(row.target_feature_observed) ?? "" },
-    { label: "학습자의 결정", value: decision },
-    { label: "최종 산출", value: final },
-    { label: "어휘 힌트", value: support?.available ? (support.opened ? "열어 봄" : "열지 않음") : "" },
-  ];
 
-  const dissentLines: RecordDetailLine[] = dissent
-    ? [{
-        label: "AI 피드백에 대한 이견",
-        value: [
-          arr(dissent.conditions).map((code) => (typeof code === "string" ? DISSENT_LABELS[code] ?? code : "")).filter(Boolean).join(", "),
-          str(dissent.reason_ko),
-        ].filter(Boolean).join("\n"),
-      }]
-    : [];
-
-  const meta: RecordDetailLine[] = [
-    { label: "교과목·주차", value: placement },
-    { label: "콘텐츠 버전", value: [row.content_ver, row.content_hash ? `#${row.content_hash.slice(0, 8)}` : null].filter(Boolean).join(" · ") },
-    { label: "수행 시각", value: [row.started_at ? `시작 ${formatTime(row.started_at)}` : null, row.completed_at ? `완료 ${formatTime(row.completed_at)}` : null].filter(Boolean).join(" · ") },
-  ];
-
-  const keep = (lines: RecordDetailLine[]) => lines.filter((line) => line.value.trim() !== "");
-  const sections: RecordDetailSection[] = [
-    { key: "context", title: "상황과 출발텍스트", lines: keep(context) },
-    { key: "mjt", title: "MJT 판단", lines: keep(mjtLines(row, content)) },
-    { key: "task", title: "DCT형 통번역 과제", lines: keep(taskLines) },
-    { key: "dissent", title: "이견", lines: keep(dissentLines) },
-    { key: "meta", title: "기록 정보", lines: keep(meta) },
-  ];
-  return sections.filter((section) => section.lines.length > 0);
+  return {
+    context: {
+      relation: str(task?.relation_ko),
+      situation: str(task?.situation_ko),
+      mode: [interpreting ? "통역" : row.task_type ? "번역" : null, direction].filter(Boolean).join(" · ") || null,
+      sourceLabel: interpreting ? "출발텍스트(통역 음성 전사)" : "출발텍스트",
+      source: str(row.source_text),
+    },
+    mjt: mjtCards(row, content),
+    task: {
+      first,
+      feedback: feedbackLines(row.target_feature_observed),
+      decision,
+      final,
+      hintOpened: support?.available ? Boolean(support.opened) : null,
+    },
+    dissent: dissent
+      ? {
+          conditions: arr(dissent.conditions)
+            .map((code) => (typeof code === "string" ? DISSENT_LABELS[code] ?? code : ""))
+            .filter(Boolean),
+          reason: str(dissent.reason_ko),
+        }
+      : null,
+    meta: [
+      placement,
+      [row.content_ver ? `콘텐츠 ${row.content_ver}` : null, row.content_hash ? `#${row.content_hash.slice(0, 8)}` : null].filter(Boolean).join(" "),
+      [row.started_at ? formatTime(row.started_at) : null, row.completed_at ? formatTime(row.completed_at) : null].filter(Boolean).join(" → "),
+    ].filter(Boolean),
+  };
 }

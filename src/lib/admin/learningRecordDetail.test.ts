@@ -14,6 +14,7 @@ const row: RecordDetailRow = {
     responses: [
       { item_id: 2, item_type: "scale4", scale_code: "very_appropriate", revised_scale_code: "somewhat_inappropriate", reason_id: "r1" },
       { item_id: 3, item_type: "fix_choice", correction_indexes: [1] },
+      { item_id: 5, item_type: "multi_judge", candidate_band_codes: ["x", "y"] },
     ],
     learner_dissent: { kind: "learner_dissent", conditions: ["relationship"], reason_ko: "이유", final_decision: "revised_response" },
   },
@@ -27,27 +28,27 @@ const mission = {
   mpj_items: [
     { id: 2, short_label: "이유 보기", target: "T2", reason_choice: { options: [{ id: "r1", text: "관계가 멀다" }] } },
     { id: 3, target: "T3", corrections: [{ text: "x" }, { text: "고친 문장" }, { text: "z" }] },
+    { id: 5, candidates: [{ text: "후보1" }, { text: "후보2" }] },
   ],
 };
 
 describe("buildLearningRecordDetail", () => {
-  it("orders sections by the learning flow and spells out saved choices", () => {
-    const sections = buildLearningRecordDetail(row, mission, "편성 외 수행", (iso) => iso ?? "");
-    expect(sections.map((section) => section.title)).toEqual(["상황과 출발텍스트", "MJT 판단", "DCT형 통번역 과제", "이견", "기록 정보"]);
-    const mjt = sections[1].lines;
-    expect(mjt[0].label).toBe("MJT2 · 이유 보기");
-    expect(mjt[0].value).toContain("판단: 매우 적절 → 이유 확인 후 다소 부적절");
-    expect(mjt[0].value).toContain("고른 이유: 관계가 멀다");
-    expect(mjt[1].value).toContain("고른 수정안: 고친 문장");
-    const task = Object.fromEntries(sections[2].lines.map((line) => [line.label, line.value]));
-    expect(task["최초 산출"]).toBe("A");
-    expect(task["최종 산출"]).toBe("C");
-    expect(task["학습자의 결정"]).toBe("수정");
-    expect(sections[3].lines[0].value).toContain("관계·친밀도에 대한 다른 판단");
+  it("spells out saved choices in learning-flow order", () => {
+    const detail = buildLearningRecordDetail(row, mission, "편성 외 수행", (iso) => iso ?? "");
+    expect(detail.context.relation).toBe("처음 거래");
+    expect(detail.mjt[0].activity).toBe("이유 보기");
+    expect(detail.mjt[0].choices.map((choice) => choice.value)).toEqual(["매우 적절", "관계가 멀다", "다소 부적절"]);
+    expect(detail.mjt[1].choices[0].value).toBe("고친 문장");
+    expect(detail.mjt[2].rows.map((r) => r.label)).toEqual(["후보1", "후보2"]);
+    expect(detail.task).toMatchObject({ first: "A", final: "C", decision: "수정" });
+    expect(detail.dissent?.conditions).toEqual(["관계·친밀도에 대한 다른 판단"]);
   });
 
-  it("drops empty sections instead of showing placeholders", () => {
-    const sections = buildLearningRecordDetail({ ...row, context_judgment: null }, null, "편성 외 수행", () => "");
-    expect(sections.map((section) => section.key)).toEqual(["context", "task", "meta"]);
+  it("labels the frozen request middle band like the learner screen", () => {
+    const detail = buildLearningRecordDetail(
+      { ...row, feature_id: "request_mitigation_optionality", context_judgment: { responses: [{ item_id: 5, item_type: "multi_judge", candidate_band_codes: ["appropriate"] }] } },
+      null, "", () => "",
+    );
+    expect(detail.mjt[0].rows[0].value).not.toBe("appropriate");
   });
 });

@@ -2,6 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { ClassResponsePanel } from "@/components/admin/ClassResponsePanel";
+import { LearningRecordDetailView } from "@/components/admin/LearningRecordDetailView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
@@ -59,34 +60,9 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const learnerLabel = (row: MissionLogRow) =>
   row.profiles?.full_name ?? row.profiles?.anonymous_participant_id ?? `${row.profile_id.slice(0, 8)}…`;
 
-// 한 번의 수행을 학습 흐름 순서(상황 → MJT → 통번역 과제 → 이견 → 기록 정보)로 보여 준다.
-const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission: unknown; placement: string }) => {
-  const sections = buildLearningRecordDetail(row, mission, placement, fmtKst);
-
-  return (
-    <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
-      {sections.length === 0 ? (
-        <p className="text-sm text-muted-foreground">표시할 수행 내용이 없습니다.</p>
-      ) : (
-        sections.map((section) => (
-          <section key={section.key} aria-label={section.title}>
-            <h3 className="text-[13px] font-bold text-[#15202B]">{section.title}</h3>
-            <div className={`mt-1.5 grid gap-2 ${section.key === "meta" ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
-              {section.lines.map((line, index) => (
-                <div key={`${line.label}-${index}`} className="min-w-0">
-                  <div className="text-xs font-semibold text-muted-foreground">{line.label}</div>
-                  <p className="mt-1 whitespace-pre-wrap break-words rounded-md bg-background p-2 text-[13px] leading-relaxed text-foreground">
-                    {line.value}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))
-      )}
-    </div>
-  );
-};
+const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission: unknown; placement: string }) => (
+  <LearningRecordDetailView detail={buildLearningRecordDetail(row, mission, placement, fmtKst)} />
+);
 
 const IndividualRecords = () => {
   const [rows, setRows] = useState<MissionLogRow[] | null>(null);
@@ -369,7 +345,7 @@ const IndividualRecords = () => {
                       <td className="max-w-56 truncate px-3 py-2 font-semibold text-[#15202B]" title={row.mission_id}>
                         {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
                       </td>
-                      <td className="max-w-52 px-3 py-2 text-xs">{placement}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-xs">{placement}</td>
                       <td className="whitespace-nowrap px-3 py-2">{taskLabel(row.task_type)}</td>
                       <td className="px-3 py-2">
                         <span
