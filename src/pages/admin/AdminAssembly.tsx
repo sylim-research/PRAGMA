@@ -1164,7 +1164,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           </>}
 
           {/* ── 오른쪽 작업대 ── */}
-          <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
+          {/* 학습 미션 제작에서는 작업대를 왼쪽 대기열과 같은 높이로 채운다 — 짧으면 화면 가운데 떠 보인다. */}
+          <section aria-label="작업대" className={["min-w-0 rounded-xl border border-[#E2DED2] bg-white",
+            !professorScreen && !aiReview ? "xl:sticky xl:top-20 xl:min-h-[calc(100dvh-6rem)]" : ""].join(" ")}>
             {selectedRow ? renderWorkbench(selectedRow) : (
               <div className="space-y-3 py-10 text-center text-[13.5px] text-[#46515A]">
                 {professorScreen && <div className="flex justify-center">{queueButton}</div>}
