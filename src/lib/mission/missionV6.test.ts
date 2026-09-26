@@ -226,13 +226,13 @@ describe("v6 beyond request — the skeleton is act-neutral, the judgment axis i
     expect(MissionV6Schema.safeParse(onItem).success).toBe(false);
   });
 
-  it("reads MJT5 choices off the catalog without moving the approved request screen", () => {
+  it("uses request-specific learner labels while preserving band codes and other feature labels", () => {
     const requestView = adaptRunnableMissionToCanonical(runnable());
     const requestSpectrum = requestView.quests.find(q => q.kind === "spectrum")!;
     expect(requestSpectrum.kind === "spectrum" && requestSpectrum.options).toEqual([
-      { id: "too_direct", label: "너무 직접적" },
+      { id: "too_direct", label: "상대의 선택권이 부족함" },
       { id: "appropriate", label: "상황에 맞음" },
-      { id: "too_indirect", label: "지나치게 우회적" },
+      { id: "too_indirect", label: "우회해 요청이 흐려짐" },
     ]);
     const thanksView = adaptRunnableMissionToCanonical({
       ...runnable(asThanks() as MissionV6), speech_act: "thanks" as const,

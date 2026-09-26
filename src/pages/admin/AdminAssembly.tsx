@@ -588,8 +588,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const qLabel = res.qualityVerdict ? { pass: "AI 검토 통과", warning: "AI 검토 주의", fail: "AI 검토 결함" }[res.qualityVerdict] : "AI 검토 미실행";
-        toast.success(`초안 저장 · 자동 품질 점검 ${({ pass: "통과", warning: "경고", fail: "실패" } as Record<string, string>)[res.ruleResult] ?? res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 「자동 품질 점검·AI 검토」로 넘어갑니다`);
+        const ruleLabel = res.ruleResult ? { pass: "규칙 기반 검사 통과", warning: "규칙 기반 검사 주의", fail: "규칙 기반 검사 실패" }[res.ruleResult] : "규칙 기반 검사 결과 확인 필요";
+        const qLabel = res.qualityVerdict ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.qualityVerdict] : "AI 검토 미실행";
+        toast.success(`초안 저장 · ${ruleLabel} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검 단계에서 확인해 주세요`);
         await loadRows();
       } else {
         const msg = res.error ?? "생성 실패";
