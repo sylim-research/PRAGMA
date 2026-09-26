@@ -3,6 +3,8 @@ export type AdminNavItem = {
   label: string;
   pending?: boolean;
   activePaths?: readonly string[];
+  /** 그룹이 좁은 폭이어도 이 화면만 넓은 폭을 쓴다. */
+  wideCanvas?: boolean;
 };
 
 export type AdminNavGroup = {
@@ -31,10 +33,11 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   { header: "3. 학습 미션 제작·검수", wideCanvas: true, items: [
     { to: "/admin/assembly", label: "학습 미션 제작" },
     { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
+    // 제작·검수 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
     { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
-    { to: "/admin/library", label: "학습 미션 라이브러리" },
   ]},
   { header: "4. 수업 운영", items: [
+    { to: "/admin/library", label: "학습 미션 라이브러리", wideCanvas: true },
     { to: "/admin/composer", label: "15주 수업 편성" },
     { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},
@@ -65,8 +68,8 @@ export function adminNavItemIsActive(item: AdminNavItem, pathname: string) {
 }
 
 // 메뉴 순서가 바뀌어도 기존 시나리오·검토 화면의 폭을 유지한다.
-const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS.filter((group) => group.wideCanvas)
-  .flatMap((group) => group.items)
+const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS
+  .flatMap((group) => group.items.filter((item) => group.wideCanvas || ("wideCanvas" in item && item.wideCanvas)))
   .flatMap((item) => [item.to, ...(item.activePaths ?? [])]);
 
 export function adminUsesWideCanvas(pathname: string) {

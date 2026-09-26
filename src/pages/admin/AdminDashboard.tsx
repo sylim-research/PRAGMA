@@ -242,11 +242,11 @@ const ReviewPipeline = ({
           {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
           <div
             role="group"
-            aria-label="선택 검토"
-            className="relative -my-1.5 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] p-1.5 pt-3 sm:col-span-2 sm:grid-cols-2"
+            aria-label="정밀 검토"
+            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              선택 검토
+              정밀 검토
             </span>
             {optional.map(renderStage)}
           </div>

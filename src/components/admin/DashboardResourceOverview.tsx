@@ -22,7 +22,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">PRAGMA · RESOURCE LIBRARY</p>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">RESOURCE LIBRARY</p>
           <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
         </div>
         {status}
@@ -62,7 +62,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.6fr_0.85fr_0.85fr_0.85fr]">
+      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.95fr_0.8fr_0.8fr_0.8fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));
@@ -74,10 +74,10 @@ export function DashboardResourceOverview({ resources, error, status }: {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceLibraryHref(scope, key, code)}
                   className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
-                  <span className="text-sm text-[#59656D]">{label}</span>
+                  <span className="text-sm text-[#3F4C55]">{label}</span>
                   <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceLibraryHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
-                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#4E5C64] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
+                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#3A4750] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#F1F0E9]"><div className="h-full rounded-full bg-[#D9C45C]" style={{ width: `${count / max * 100}%` }} /></div>
                 </Link>;
               })}
