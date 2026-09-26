@@ -1002,7 +1002,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <aside aria-label="대기열"
             className={professorScreen
               ? "fixed inset-y-0 left-0 z-50 flex w-[380px] max-w-[90vw] flex-col overflow-hidden border-r border-[#E2DED2] bg-[#F7F6F1] shadow-xl"
-              : "flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]"}>
+              : ["flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20",
+                // 학습 미션 제작: 대기열과 작업대를 같은 높이(화면 높이)로 고정해 두 칸의 아래 끝을 맞춘다.
+                aiReview ? "xl:max-h-[calc(100dvh-6rem)]" : "xl:h-[calc(100dvh-6rem)]"].join(" ")}>
             {professorScreen && (
               <div className="flex items-center justify-between border-b border-[#E2DED2] bg-white px-3 py-2">
                 <span className="text-[13.5px] font-bold text-[#233542]">미션 목록</span>
@@ -1166,7 +1168,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {/* ── 오른쪽 작업대 ── */}
           {/* 학습 미션 제작에서는 작업대를 왼쪽 대기열과 같은 높이로 채운다 — 짧으면 화면 가운데 떠 보인다. */}
           <section aria-label="작업대" className={["min-w-0 rounded-xl border border-[#E2DED2] bg-white",
-            !professorScreen && !aiReview ? "xl:sticky xl:top-20 xl:min-h-[calc(100dvh-6rem)]" : ""].join(" ")}>
+            !professorScreen && !aiReview ? "xl:sticky xl:top-20 xl:h-[calc(100dvh-6rem)] xl:overflow-y-auto" : ""].join(" ")}>
             {selectedRow ? renderWorkbench(selectedRow) : (
               <div className="space-y-3 py-10 text-center text-[13.5px] text-[#46515A]">
                 {professorScreen && <div className="flex justify-center">{queueButton}</div>}
