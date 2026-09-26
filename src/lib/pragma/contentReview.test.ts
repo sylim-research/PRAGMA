@@ -322,6 +322,16 @@ describe("current content five-stage review", () => {
     expect(() => materializeReviewEvidence({ ...raw, findings: [{ ...finding, where: "/missing" }] }, source, false)).toThrow("콘텐츠에 없는 근거 경로");
   });
 
+  it.each(["", "  \n "])("keeps blank-field findings grounded at their actual path (%j)", blank => {
+    const source = { content: { learner_context_ko: blank } };
+    const wireFinding = { ...finding, where: "/content/learner_context_ko" };
+    const raw = { verdict: "warning", summary_ko: "빈 보조 맥락 확인", findings: [wireFinding] };
+    const result = validateReviewResult(materializeReviewEvidence(raw, source, false), source, "claude");
+    expect(result.findings[0]).toMatchObject({ where: wireFinding.where, quote: null, issue_ko: finding.issue_ko });
+    expect(() => validateReviewResult({ ...raw, findings: [{ ...wireFinding, quote: "없는 내용" }] }, source, "claude"))
+      .toThrow("검수 근거 인용이 저장된 콘텐츠와 일치하지 않습니다.");
+  });
+
   it.each(["connection", "body"])("reports a %s timeout without retrying the provider", async (phase) => {
     const controller = new AbortController();
     vi.stubGlobal("AbortSignal", { timeout: () => controller.signal });
