@@ -36,3 +36,14 @@
 1. 수치: 로컬 관련 테스트 4개 통과. 콘텐츠 v3·운영 배포 상태는 그대로이며 새 배포 없음.
 2. 화면: 상단 재검토, 완료 화면 참고 표현, 이유 선택 핵심 이유 표시가 로컬에서 변경됨.
 3. 프롬프트·계약: 변경 없음. 콘텐츠 동결본 재발행·교수자 재승인 불필요.
+
+## 후속 화면 batch — learner-facing label 정합화
+
+- 기준 로컬 커밋 `489fd8aab7631a81d74bd2fc1048d499b057ceea`의 이전 P1(재검토·참고 표현·핵심 이유)은 유지했다. 새 설계나 콘텐츠 revision이 아닌 표시 보정이다.
+- MJT5 선택지는 target_feature 카탈로그에서 유래한다. `mission_v6`의 `request_mitigation_optionality`·한→중·번역에 한해 표시층에서 `너무 직접적 → 상대의 선택권이 부족함`, `지나치게 우회적 → 우회해 요청이 흐려짐`으로 바꿨다. `상황에 맞음`은 유지했다. 선택권과 요청 명료성이라는 기존 목표 의미를 드러내며, 내부 `too_direct / appropriate / too_indirect` 및 카탈로그·계약은 그대로다.
+- 승인콘텐츠 JSON(`C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-26_택배주대표_승인콘텐츠.json`)의 MJT5에는 relation_ko `한 학년 위 여자 선배`, learner_context_ko `활동 중 몇 번 이야기한 한 학년 위 여자 선배와의 메신저 대화입니다.`가 이미 있다. 기존 화면은 상황만 표시해 이 관계 조건이 드러나지 않았다. 대표 mission ID의 spectrum 화면에 저장된 learner_context를 표시하고, 없으면 기존 relation을 표시하도록 했다. 콘텐츠 필드와 중국어 学姐는 수정하지 않았다.
+- MJT3 수정안 결과 배지 `정답 → 기준 선택` 및 대응 접근성 안내만 변경했다. accepted candidate와 valid 판정은 그대로다. MJT5 결과 배너는 `내 판단 N개 중 M개가 기준 판정과 같아요`로 정렬했다.
+- 내부 ID, MJT1→MJT2→MJT5→MJT3→MJT4→DCT 제시 순서, 중국어 후보·해설·reference_alternatives, serializer·응답 매핑·DB/schema 변경 없음. 콘텐츠 파일·DB 쓰기 없이 기존 승인 hash를 유지하므로 재승인 불필요.
+- 최소 검증: 기존 테스트 4파일에서 6개만 선택 실행, **6 passed / 59 filtered out(skipped)**. reasonContrast 2개, runtime 1개, connections 1개, missionV6의 표시 매핑·동결 원문 검사 2개. 새 라벨·관계 표시·기존 순서와 저장 매핑·band code·참고 표현 보존을 확인했다. 기존 비요청 fixture의 라벨 보존 단언도 통과했으며 다른 미션 조사·수정은 하지 않았다.
+- 명령: `npm.cmd test -- src/pages/learner/CanonicalMissionRun.reasonContrast.test.tsx src/pages/learner/CanonicalMissionRun.runtime.test.tsx src/pages/learner/CanonicalMissionRun.connections.test.tsx src/lib/mission/missionV6.test.ts -t 'locks the judgment|marks a reason|runs a v6 runtime from|withholds reference answers|uses request-specific learner labels|keeps frozen sources'`
+- CI용 더미 환경값과 mock만 사용했다. 실제 AI·DB 호출, 전체 테스트·E2E·자동 캡처 없음. 단순 표시 보정이므로 research-trail 추가 갱신 없음. 로컬 커밋 후 대기하며 푸시·배포하지 않는다.

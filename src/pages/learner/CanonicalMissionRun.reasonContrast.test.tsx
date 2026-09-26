@@ -69,11 +69,16 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
     click("다음: 여러 표현 비교하기");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
-    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
+    ["상황에 맞음", "상대의 선택권이 부족함", "우회해 요청이 흐려짐", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
-    click("네 표현 확인하기"); click("다음: 고친 표현 고르기");
-    click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기"); click("다음: 직접 고치고 비교하기");
+    click("네 표현 확인하기");
+    expect(screen.getByText(/^내 판단 4개 중 \d개가 기준 판정과 같아요$/)).toBeInTheDocument();
+    click("다음: 고친 표현 고르기");
+    click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기");
+    const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
+    expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("기준 선택")).toBeInTheDocument();
+    click("다음: 직접 고치고 비교하기");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: revisedText } });

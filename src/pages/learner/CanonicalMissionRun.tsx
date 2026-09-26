@@ -803,7 +803,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
                             {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
-                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />정답</span>}
+                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />기준 선택</span>}
                           </span>
                         )}
                       </span>
@@ -813,7 +813,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                 })}
               </div>
               <p className="sr-only" aria-live="polite">
-                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "정답입니다." : "오답입니다. 정답 표현에 정답 표시가 있습니다.") : ""}
+                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "기준 선택과 같습니다." : "기준 선택과 다릅니다. 해당 후보에 기준 선택 표시가 있습니다.") : ""}
               </p>
             </div>
           </div>
@@ -900,7 +900,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
       {submitted && <div className="mt-4">
-        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`${total}개 중 ${matched}개가 기준 판단과 같아요`} />
+        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={`내 판단 ${total}개 중 ${matched}개가 기준 판정과 같아요`} />
       </div>}
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
@@ -1777,8 +1777,13 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
 }) {
   const mission = useCanonicalMission();
   const pilotContext = mission === LEARNER_UX_PILOT ? PILOT_CONTEXT_COPY[quest.id] : undefined;
+  // 대표 MJT5의 学姐를 해석할 관계 조건은 승인 콘텐츠에 이미 저장돼 있다.
+  const storedRelationContext = mission.scenarioId === REPRESENTATIVE_MISSION_ID && quest.kind === "spectrum"
+    ? mission.learnerContextCopy?.[quest.id] || quest.context.relation
+    : undefined;
   return (
     <div className="space-y-3">
+      {storedRelationContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{storedRelationContext}</p>}
       {pilotContext !== undefined
         ? pilotContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{pilotContext}</p>
         : <ContextCard context={quest.context} />}

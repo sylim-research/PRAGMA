@@ -81,7 +81,7 @@ describe("CanonicalMissionRun live CTA route", () => {
   it("runs a v6 runtime from the DCT draft through feedback, revision and final confirmation, then saves both responses", async () => {
     window.scrollTo = vi.fn(); Element.prototype.scrollIntoView = vi.fn();
     const mission = SAMPLE_MISSION_V6_REASON_CONTRAST;
-    const runtime = { scenario_id: scenarioId, speech_act: "request" as const, learner_level: "intermediate" as const,
+    const runtime = { scenario_id: REPRESENTATIVE_MISSION_ID, speech_act: "request" as const, learner_level: "intermediate" as const,
       mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh" as const, mission };
     vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
     vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "log-1" });
@@ -93,7 +93,9 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("매우 적절"); click("판단 확정하기");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
     click("이유 확정하기"); click(/^다음:/);
-    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
+    expect(screen.getByText(mission.mpj_items[4].learner_context_ko)).toBeInTheDocument();
+    expect(screen.getByText(/한 학년 위 여자 선배/)).toBeInTheDocument();
+    ["상황에 맞음", "상대의 선택권이 부족함", "우회해 요청이 흐려짐", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기"); click(/^다음:/);

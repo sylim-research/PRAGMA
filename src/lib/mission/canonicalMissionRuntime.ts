@@ -300,18 +300,22 @@ function bandChoiceOption(
 
 /**
  * v6 MJT5 대역 선택지. 축 이름은 화행마다 다르므로 카탈로그에서 가져오되,
- * 화면 문구는 요청 3건에서 고정된 형태(짧은 이름만, 보조 문구 없음)를 유지한다.
+ * 요청의 선택권·명료성 문구는 표시층에만 적용하고 카탈로그·저장 코드는 유지한다.
  */
 function v6BandOptions(
   bands: { code: string; label_ko: string }[],
   catalogWithinBand: string,
   contentWithinBand: string,
+  requestOptionalityLabels = false,
 ): ChoiceOption[] {
   return bands.map((band) => {
     const isWithinBand = band.code === catalogWithinBand;
+    const requestLabel = requestOptionalityLabels && band.code === "too_direct"
+      ? "상대의 선택권이 부족함"
+      : requestOptionalityLabels && band.code === "too_indirect" ? "우회해 요청이 흐려짐" : undefined;
     return {
       id: isWithinBand ? contentWithinBand : band.code,
-      label: isWithinBand ? "상황에 맞음" : band.label_ko.match(/^(.+?)(?:\s*\([^)]+\))?$/)?.[1]?.trim() || band.label_ko,
+      label: requestLabel ?? (isWithinBand ? "상황에 맞음" : band.label_ko.match(/^(.+?)(?:\s*\([^)]+\))?$/)?.[1]?.trim() || band.label_ko),
     };
   });
 }
@@ -454,7 +458,9 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
           ...(item.contrast ? { contrast: { context: item.contrast.context_ko,
             target: item.contrast.target, explanation: item.contrast.explanation_ko } } : {}) };
         case "multi_judge": return { ...base, kind: "spectrum",
-          options: v6BandOptions(feature.band_schema, feature.within_band_code, withinBandCodeFor(mission.unit.target_feature)),
+          options: v6BandOptions(feature.band_schema, feature.within_band_code, withinBandCodeFor(mission.unit.target_feature),
+            mission.unit.target_feature === "request_mitigation_optionality"
+              && mission.direction === "ko_zh" && mission.production_task.mode === "translation"),
           candidates: item.candidates.map((candidate, i) => ({ id: `A5-${i}`, text: candidate.text,
             acceptedAnswers: candidate.accepted_band_codes, note: candidate.note_ko })) };
       }
