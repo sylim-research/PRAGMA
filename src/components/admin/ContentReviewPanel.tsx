@@ -255,12 +255,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     ];
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
-    return <section aria-label="점검 단계" className="space-y-3 text-sm">
+    return <section aria-label="품질 점검 워크플로우" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE8DE] bg-[#FBFAF6] px-4 py-2.5">
-          <h3 className="text-[14px] font-bold text-[#233542]">점검 단계</h3>
+          <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[#233542] px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
