@@ -265,12 +265,12 @@ function OperationsSection({
   const caseAxes = [speechAct, level, mode, direction].filter((item): item is string => Boolean(item));
   const referenceEntries = referenceEntriesForCeiling(audit?.referenceCeiling ?? null);
   const emptyTitle = lookupFailed || audit?.status === "unavailable"
-    ? "최근 점검 기록을 확인할 수 없습니다."
+    ? "최근 대조 기록을 확인할 수 없습니다."
     : audit?.status === "not_applicable"
-      ? "최신 점검 대상에는 점검할 중국어가 없습니다."
-      : "아직 표시할 최근 점검이 없습니다.";
+      ? "최신 대조 대상에는 대조할 중국어가 없습니다."
+      : "아직 표시할 최근 대조 기록이 없습니다.";
   const emptyDescription = lookupFailed || audit?.status === "unavailable"
-    ? "잠시 뒤 다시 확인해 주세요. 점검 결과는 콘텐츠의 참고 기록으로 저장됩니다."
+    ? "잠시 뒤 다시 확인해 주세요. 대조 결과는 콘텐츠의 참고 기록으로 저장됩니다."
     : "다음 콘텐츠 생성부터 수준·추출 단어·대조 결과가 이곳에 기록됩니다.";
 
   return (
