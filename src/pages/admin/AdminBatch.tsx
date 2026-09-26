@@ -349,10 +349,9 @@ const AdminBatch = () => {
                 <PlanMetric label="번역" value={summary.translation} />
                 <PlanMetric label="통역" value={summary.interpreting} />
                 {summary.total > 0 && <>
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·수행 방식 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                    description="화행 × 수준 × 번역/통역" />
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="권력·거리·부담도 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                    description="화행 × P × D × R" />
+                  {/* 제목과 설명이 같은 말을 되풀이해서, 조합 식 하나를 제목으로 쓴다. */}
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행 × P × D × R" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27} />
                 </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
@@ -512,11 +511,10 @@ const PlanMetric = ({ label, value, unit = "건", primary = false, className = "
     <p className="text-[13px] font-medium">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
   </div>;
 
-const CoverageCard = ({ title, filled, total, description, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
-  <div className={"rounded-lg border px-3 py-2 " + className}>
-    <div className="flex flex-wrap items-center justify-between gap-2 text-[13px]"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
-    <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
-    <p className="mt-1 text-[12.5px] leading-5 text-[#4E5A63]">{description}</p>
+const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; className?: string }) =>
+  <div className={"flex flex-col justify-center rounded-lg border px-3 py-2 " + className}>
+    <div className="flex flex-wrap items-baseline justify-between gap-2"><h3 className="text-[14px] font-semibold text-[#15202B]">{title}</h3><span className="text-[14px] font-semibold tabular-nums text-[#15202B]">{filled} / {total}<span className="ml-0.5 text-[12.5px] font-normal text-[#4E5A63]">조합</span></span></div>
+    <Progress className="mt-2.5 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
   </div>;
 
 
