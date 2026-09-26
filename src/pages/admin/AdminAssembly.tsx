@@ -776,8 +776,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
-        {/* 네 칩을 같은 모양으로 둔다. 화행만 채운 색이면 「선택됨」이나 「비활성」처럼 읽힌다. */}
-        {facet("화행", SPEECH_ACT_UI[r.speech_act])}
+        {/* 화행은 목록 꼬리표와 같은 화행 색으로 채워 핵심 변수임을 보인다(연구자 선호, 2026-09-26). */}
+        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
+          <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
+        </span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
         {facet("수행 방식", MODE_LABEL[mode])}
@@ -986,7 +988,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div className={professorScreen ? "grid items-start"
-          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"}>
+          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
