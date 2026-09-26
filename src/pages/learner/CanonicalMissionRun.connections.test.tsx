@@ -20,7 +20,7 @@ describe("CanonicalMissionRun completion connections", () => {
         criteria: [
           { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "핵심 내용 유지" },
           { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "문법 안정" },
-          { key: "pragmatics", label: "화용 적절성", question: "", level: "recommend", body: "선택 여지 확인" },
+          { key: "pragmatics", label: "화용적 적절성", question: "", level: "recommend", body: "선택 여지 확인" },
         ],
       },
     }} />);
@@ -42,7 +42,7 @@ describe("CanonicalMissionRun completion connections", () => {
     render(<DctFeedbackView quest={quest} response={{ first: "你必须改时间。", revised: "你必须改时间。", reflected: false }} onDone={vi.fn()} />);
     act(() => vi.advanceTimersByTime(1300));
     // 세 기준이 모두 보이고, 우선 기준의 본문은 화면마다 한 번만 나온다.
-    ["의미 충실성", "문법 정확성", "화용 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
+    ["의미 충실성", "문법 정확성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
     const point = screen.getByRole("heading", { name: "의미 충실성" }).closest("article")!.querySelector("p")!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));

@@ -104,6 +104,8 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("수정안 제출하기"); click(/^다음:/);
     click("번역하기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
+    expect(screen.getByText("원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.")).toBeInTheDocument();
+    expect(screen.getByText("제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.")).toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
     click("번역 제출하기");
     // Stage 2: feedback for the submitted draft (live request, not a preview).

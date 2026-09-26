@@ -1105,7 +1105,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   );
 }
 /** 학습자에게 보이는 피드백 기준 세 가지. 쓰기 전에도 같은 이름으로 미리 알린다. */
-const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "문법 정확성", "화용 적절성"] as const;
+const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "문법 정확성", "화용적 적절성"] as const;
 
 /**
  * 빈칸은 기준 문장보다 딱 한 줄만 크다. 크게 벌어진 칸은 「이만큼 써야 한다」로 읽힌다.
@@ -1137,8 +1137,8 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div>
             <label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label>
-            {/* P·D·R 칩을 뺐으므로 말투의 근거가 위 상황문이라는 것만 한 줄로 알린다. */}
-            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">위 상황의 상대와 관계에 맞는 말투로.</p>
+            {/* 콘텐츠와 분리된 공통 안내로 의미 보존과 맥락 조건을 알린다. */}
+            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.</p>
           </div>
         </div>
         <Textarea
@@ -1151,7 +1151,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
         <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#8A939F]">
-          제출하면 참고 피드백을 받고 다시 다듬습니다. 한 번에 완성하지 않아도 됩니다.
+          제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.
         </p>
       </div>
     </section>
@@ -1237,7 +1237,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
     {
       key: "language",
       label: "문법 정확성",
-      question: "중국어 표현이 자연스러운가요?",
+      question: "중국어 표현에 이해를 방해하는 오류가 있나요?",
       level: languageLevel,
       body: languageLevel === "very_good"
         ? "의미를 이해하는 데 방해가 되는 표현 문제는 없습니다."
@@ -1245,7 +1245,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
     },
     {
       key: "pragmatics",
-      label: "화용 적절성",
+      label: "화용적 적절성",
       question: "이 관계와 상황에 잘 맞나요?",
       level: pragmaticLevel,
       body: pragmaticLevel === "very_good"
@@ -1321,7 +1321,7 @@ export function evaluationFromRuntimeFeedback(
     {
       key: "language",
       label: "문법 정확성",
-      question: `${targetLanguage} 표현이 자연스러운가요?`,
+      question: `${targetLanguage} 표현에 이해를 방해하는 오류가 있나요?`,
       level: grammarLevel,
       // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
       body: fidelityFirst ? FIDELITY_FIRST_NOTE : [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
@@ -1331,7 +1331,7 @@ export function evaluationFromRuntimeFeedback(
     },
     {
       key: "pragmatics",
-      label: "화용 적절성",
+      label: "화용적 적절성",
       question: "이 관계와 상황에 잘 맞나요?",
       level: pragmaticLevel,
       body: fidelityFirst ? FIDELITY_FIRST_NOTE : feedback.blocks.feature_ko || (pragmaticOk
@@ -1371,8 +1371,8 @@ function unavailableRuntimeEvaluation(
     available: false,
     criteria: [
       { key: "meaning", label: "의미 충실성", question: "뜻이 제대로 전달됐나요?", level: "recommend", body },
-      { key: "language", label: "문법 정확성", question: `${targetLanguage} 표현이 자연스러운가요?`, level: "recommend", body },
-      { key: "pragmatics", label: "화용 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
+      { key: "language", label: "문법 정확성", question: `${targetLanguage} 표현에 이해를 방해하는 오류가 있나요?`, level: "recommend", body },
+      { key: "pragmatics", label: "화용적 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
     ],
     headline: "자동 피드백을 불러오지 못했습니다.",
     body,
@@ -1508,7 +1508,7 @@ function FeedbackLoading() {
       <div className="flex items-center justify-between bg-[#F8F7F2] px-5 py-4">
         <div>
           <p className="text-xs font-black text-[#635E52]">AI 피드백 준비 중</p>
-          <p className="mt-1 text-base font-black">세 기준으로 답안을 살펴보고 있습니다</p>
+          <p className="mt-1 text-base font-black">번역안을 세 기준으로 살펴보고 있습니다</p>
         </div>
         <LoaderCircle className="h-6 w-6 animate-spin text-[#C6A521]" />
       </div>
@@ -1702,7 +1702,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               })}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI가 생성한 참고 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
           {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}

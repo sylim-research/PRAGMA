@@ -47,3 +47,13 @@
 - 최소 검증: 기존 테스트 4파일에서 6개만 선택 실행, **6 passed / 59 filtered out(skipped)**. reasonContrast 2개, runtime 1개, connections 1개, missionV6의 표시 매핑·동결 원문 검사 2개. 새 라벨·관계 표시·기존 순서와 저장 매핑·band code·참고 표현 보존을 확인했다. 기존 비요청 fixture의 라벨 보존 단언도 통과했으며 다른 미션 조사·수정은 하지 않았다.
 - 명령: `npm.cmd test -- src/pages/learner/CanonicalMissionRun.reasonContrast.test.tsx src/pages/learner/CanonicalMissionRun.runtime.test.tsx src/pages/learner/CanonicalMissionRun.connections.test.tsx src/lib/mission/missionV6.test.ts -t 'locks the judgment|marks a reason|runs a v6 runtime from|withholds reference answers|uses request-specific learner labels|keeps frozen sources'`
 - CI용 더미 환경값과 mock만 사용했다. 실제 AI·DB 호출, 전체 테스트·E2E·자동 캡처 없음. 단순 표시 보정이므로 research-trail 추가 갱신 없음. 로컬 커밋 후 대기하며 푸시·배포하지 않는다.
+
+## DCT·AI 피드백 UI-only 보정
+
+- 핵심 정리 05와 독립적인 UI-only 항목은 진행하라는 연구자 후속 지시에 따라 처리했다. DCT 안내를 `제출하면 AI 피드백을 확인하고 다시 검토합니다.`로, 로딩을 `번역안을 세 기준으로 살펴보고 있습니다`로, 준비·결과의 기준명을 `화용적 적절성`으로 정렬했다. 결과 하단 고지도 `AI 피드백입니다.`로 맞췄다.
+- `문법 정확성` 유지 근거: `supabase/functions/generate-scenario/index.ts`의 실제 피드백 프롬프트는 ② 이해 가능성(문법)에서 이해를 방해하는 오류만 보고 사소한 부자연스러움·문체 취향을 제외한다. `src/lib/pragma/feedbackSchema.ts`는 lexical_choice/collocation도 오류 유형으로 허용하지만 판정은 clean/impeding_errors이며, 담화 자연성은 별도 discourse_ko다. runtime의 language는 grammatical_accuracy와 blocks.grammar를 표시한다. 포괄적 자연성 평가가 아니므로 라벨을 자연성으로 확대하지 않았다. UI 보조 질문만 `표현에 이해를 방해하는 오류가 있나요?`로 정렬했다. 프롬프트·schema·내부 key·판정 로직은 미수정.
+- DctDraftCard의 기존 목표 언어 지시문 아래 공통 UI copy를 `원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.`로 변경했다. production_task 및 source_text와 무관한 표시 문구다.
+- 보류: 핵심 정리 05는 승인 mission_content.lesson_points의 item_id=4 text를 그대로 표시한 것이다. 인용 조각만으로 이유까지 보존한다고 읽히는 설명 문제는 확인했지만, 이 필드 수정은 콘텐츠 해시 변경을 수반하므로 미수정. 핵심 정리 01~05 전체·중국어 후보·해설·단어 힌트·reference_alternatives·학습자 산출을 보존했다.
+- 변경 diff는 화면 코드·기존 테스트·이 기록뿐이다. 콘텐츠 데이터·DB/schema·feedback/저장 serializer 변경 없음. 기존 승인 hash `bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095` 유지(운영 DB 재조회나 새 hash 검증을 실행했다는 뜻은 아님).
+- focused test: runtime의 `runs a v6 runtime from` 1개, connections의 `shows the priority feedback`·`withholds reference answers` 2개만 실행하여 **3 passed / 22 filtered out(skipped)**. DCT 안내·기준 헤더·기존 수행/저장 매핑·최종 참고 표현 노출 확인. 로딩 문구는 코드 diff로 확인했다. 더미 환경값·mock 사용, 실제 AI/DB 호출·전체 테스트·운영 E2E 없음.
+- 논문 영향: 로컬 화면 문구만 보정, 콘텐츠 버전·배포 상태·프롬프트·계약 변경 없음. 단순 UI copy이므로 research-trail 추가 갱신 없음. 로컬 커밋 후 대기.
