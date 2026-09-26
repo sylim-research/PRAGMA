@@ -101,8 +101,8 @@ export default {
         // 한 문장씩 여유를 두고 내려앉는 속도로 맞춘다.
         // 2026-09-26: 빠르면 경박해 보인다는 연구자 판단으로 1.8s → 2.6s.
         "rise-in": "rise-in 2.6s cubic-bezier(0.22,1,0.36,1) both",
-        // 형광펜은 문장이 자리 잡은 뒤 천천히 그어진다 — 진중하게 짚는 획(0.75s → 1.2s, 2026-09-26).
-        "marker-sweep": "marker-sweep 1.2s cubic-bezier(0.65,0,0.35,1) both",
+        // 형광펜은 문장이 자리 잡은 뒤 천천히 그어진다 — 진중하게 짚는 획(0.75s → 1s, 2026-09-26).
+        "marker-sweep": "marker-sweep 1s cubic-bezier(0.65,0,0.35,1) both",
       },
     },
   },
