@@ -314,7 +314,9 @@ export function materializeReviewEvidence(raw: unknown, snapshot: unknown, adjud
     const path = item[adjudication ? "evidence_path" : "where"];
     if (typeof path !== "string") throw new Error("검수 근거 경로 누락");
     const source = evidenceAt(snapshot, path);
-    const quote = source === null || typeof source === "object" ? null : String(source);
+    // A present but blank field is absence evidence: retain its exact path, without
+    // manufacturing an empty quotation that the validator correctly rejects.
+    const quote = source === null || typeof source === "object" || (typeof source === "string" && !source.trim()) ? null : String(source);
     return { ...item, [adjudication ? "evidence_quote" : "quote"]: quote };
   }) };
 }
