@@ -20,6 +20,7 @@ export function CompositionConditionFields({
   onThemes,
   leading,
   hideThemes = false,
+  compact = false,
 }: {
   value: CompositionConditions;
   onLevel: (level: LearnerLevel) => void;
@@ -30,12 +31,14 @@ export function CompositionConditionFields({
   leading?: React.ReactNode;
   /** true면 편성 주제 줄을 그리지 않는다(ThemePicker를 따로 크게 둘 때). */
   hideThemes?: boolean;
+  /** true면 좁은 칸(새 교과목 개설 왼쪽 열)용 — 2열로 둔다. */
+  compact?: boolean;
 }) {
   const toggleTheme = (theme: ThemeCode) =>
     onThemes(value.themes.includes(theme) ? value.themes.filter((item) => item !== theme) : [...value.themes, theme]);
   return (
     <div className="space-y-2.5 text-[13px]">
-      <div className={`grid gap-x-4 gap-y-2 sm:grid-cols-2 ${leading ? "lg:grid-cols-[minmax(200px,1.4fr)_minmax(110px,0.8fr)_minmax(110px,0.8fr)_minmax(190px,1.2fr)]" : "lg:grid-cols-[minmax(110px,1fr)_minmax(110px,1fr)_minmax(190px,1.4fr)]"}`}>
+      <div className={`grid gap-x-4 gap-y-2 sm:grid-cols-2 ${compact ? "" : leading ? "lg:grid-cols-[minmax(200px,1.4fr)_minmax(110px,0.8fr)_minmax(110px,0.8fr)_minmax(190px,1.2fr)]" : "lg:grid-cols-[minmax(110px,1fr)_minmax(110px,1fr)_minmax(190px,1.4fr)]"}`}>
         {leading}
         <label className="flex flex-col gap-1">
           <span className={LABEL}>수준</span>
