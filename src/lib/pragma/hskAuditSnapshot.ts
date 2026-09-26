@@ -116,3 +116,23 @@ export function summarizeMissionAudits(snapshots: AuditSnapshot[]) {
     byCeiling: ([4, 5, 6] as const).map((ceiling) => ({ ceiling, ...bucket(missions.filter((item) => item.referenceCeiling === ceiling)) })),
   };
 }
+
+/**
+ * 자주 나온 HSK 목록 밖 어휘 — 탐색용. 판정 라벨을 붙이지 않는다.
+ * 저장된 기록은 미션마다 목록 밖 단어를 중복 없이 남기므로, 셀 수 있는 값은 「그 단어가 나온 미션 수」다.
+ * 각 미션은 자기 수준의 누적 목록(입문 1–4급·중급 1–5급·고급 1–6급)과 대조된 결과다.
+ */
+export function topOutOfListWords(snapshots: AuditSnapshot[], limit = 20) {
+  const missions = completedAuditsNewestFirst(snapshots).filter((item) => item.contentKind === "mission");
+  const counts = new Map<string, number>();
+  for (const mission of missions) {
+    for (const word of new Set(mission.candidates)) counts.set(word, (counts.get(word) ?? 0) + 1);
+  }
+  return {
+    missionCount: missions.length,
+    words: [...counts.entries()]
+      .sort((left, right) => right[1] - left[1] || left[0].localeCompare(right[0], "zh"))
+      .slice(0, limit)
+      .map(([word, missionCount]) => ({ word, missionCount })),
+  };
+}

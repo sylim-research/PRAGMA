@@ -11,6 +11,7 @@ import {
   completedAuditsNewestFirst,
   selectRecentAudit,
   summarizeMissionAudits,
+  topOutOfListWords,
   type AuditSnapshot,
 } from "@/lib/pragma/hskAuditSnapshot";
 import { HSK3_REFERENCE_SOURCE_ID } from "@/lib/pragma/hskReference";
@@ -224,6 +225,8 @@ const AdminCorpus = () => {
           <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
         )}
 
+        {!loading && !auditLookupFailed && <TopOutOfListWords audits={allAudits} />}
+
         <OperationsSection
           loading={loading}
           audit={selectedAudit ?? recentAudit}
@@ -421,6 +424,33 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
             </li>
           );
         })}
+      </ol>
+    </section>
+  );
+}
+
+/** 자주 나온 HSK 목록 밖 어휘 Top 20 — 탐색용 목록. 해석·판정 라벨은 두지 않는다(범주 판정은 따로 한다). */
+function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
+  const top = useMemo(() => topOutOfListWords(audits, 20), [audits]);
+  if (top.words.length === 0) return null;
+  const max = top.words[0].missionCount;
+  return (
+    <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
+        <h2 id="top-outside-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
+        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
+      </div>
+      <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
+        {top.words.map(({ word, missionCount }, index) => (
+          <li key={word} className="flex items-center gap-2.5 py-1 text-[14px]">
+            <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
+            <span className="w-16 shrink-0 font-medium text-[#15202B]" lang="zh">{word}</span>
+            <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F4F1E8]">
+              <span className="block h-full rounded-full bg-[#E3C44E]" style={{ width: `${(missionCount / max) * 100}%` }} />
+            </span>
+            <span className="w-16 shrink-0 text-right tabular-nums text-[#514C44]">미션 {fmt(missionCount)}</span>
+          </li>
+        ))}
       </ol>
     </section>
   );
