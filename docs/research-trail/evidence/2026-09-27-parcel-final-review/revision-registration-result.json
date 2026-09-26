@@ -1,0 +1,66 @@
+{
+  "checked_at": "2026-09-26T15:59:45.889Z",
+  "operation": "append_only_pending_revision",
+  "old": {
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "version_id": "980571d6-8852-48c4-9cde-233713360b5f",
+    "version_no": 3,
+    "hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095",
+    "approval_id": "adfb82ee-84e3-416d-8625-50ce0b2037f1"
+  },
+  "created": {
+    "id": "dbb99548-a93c-4d85-9659-c5e880f39c87",
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "version_no": 4,
+    "parent_version_id": "980571d6-8852-48c4-9cde-233713360b5f",
+    "stage": "generated",
+    "mission_content_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
+    "created_at": "2026-09-26T15:59:45.125134+00:00",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "ai_quality_result": null,
+    "content_review_run_id": null
+  },
+  "assignment_before": {
+    "id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+    "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+    "week_no": 2,
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "position": 0,
+    "slot_role": "primary",
+    "created_at": "2026-09-16T16:54:34.205753+00:00",
+    "updated_at": "2026-09-26T07:42:35.609268+00:00",
+    "pair_contract_version": null,
+    "mission_role": null,
+    "changed_context_axes": [],
+    "diagnostic_dimensions": []
+  },
+  "assignment_after": {
+    "id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+    "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+    "week_no": 2,
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "position": 0,
+    "slot_role": "primary",
+    "created_at": "2026-09-16T16:54:34.205753+00:00",
+    "updated_at": "2026-09-26T07:42:35.609268+00:00",
+    "pair_contract_version": null,
+    "mission_role": null,
+    "changed_context_axes": [],
+    "diagnostic_dimensions": []
+  },
+  "old_scenario_unchanged": true,
+  "old_lineage_unchanged": true,
+  "old_approval_unchanged": true,
+  "candidate_exact_match": true,
+  "allowed_field_count": 9,
+  "outside_allowed_semantic_diff": 0,
+  "learner_current": {
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "mission_status": "reviewed",
+    "content_hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095"
+  },
+  "approval": "pending",
+  "assignment_replaced": false,
+  "blocker": "Standard finalization regenerates item_lineage.attribution_provenance.attributed_at, which is inside the FINAL LOCK content hash."
+}

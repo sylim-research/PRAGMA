@@ -125,3 +125,20 @@
 1. 수치: 최종 후보 hash 갱신, focused 12개 통과; 운영 revision/배포 변화 없음.
 2. 화면: 요청한 MJT1 문구만 후보에서 최종 보정. 복원한 표현 메모는 learner 화면에 노출되지 않음.
 3. 프롬프트·계약: 모델 prompt/schema 변경 없음. 새 콘텐츠는 교수자 재승인 전 상태이며 논문 구조도 불변.
+
+## 후속 — FINAL LOCK revision 승인·지정 편성 교체 완료
+
+- 연구자가 새 revision/승인/편성 교체와 정상 최종화 metadata에 따른 새 hash를 허용했다. 기존 v3와 9필드 candidate는 불변으로 보존했다.
+- pending v4 `dbb99548-a93c-4d85-9659-c5e880f39c87` → 별도 scenario `051532cc-c3a2-4440-9a5e-efc54e9ac481` → 최종 승인 version `6610c6c6-1a25-4cc6-a584-5d372c8224e4`로 연결했다. DB version_no는 scenario별이므로 새 scenario의 최종 번호는 2이며, 기존 scenario의 v4를 in-place 승인한 것이 아니다.
+- `6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af`는 pre-finalization candidate hash다. 최종 승인 hash는 `3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764`.
+- 새 규칙/기본 AI 검토 PASS, 정상 최종화 후 교수자 승인 run `f8f60e0e-0b20-4648-82e1-7342bb8c20f9`. 사용자 위임에 따른 정적 JSON 확인으로 기록했으며 실제 UI 체험으로 꾸미지 않았다.
+- course week2 position0의 지정 assignment `9a44e362-8bed-4a40-9d65-f50961e3a026`만 새 scenario로 교체했다. learner와 같은 편성→scenario 읽기 경로를 관리자 세션으로 재조회해 새 hash를 확인했다. 운영 learner E2E는 미실행.
+- 최종화 전후 semantic content 변경 0. hash 변화는 item_lineage 재산출과 provenance/authoring/HSK metadata에서만 발생했다. 기존 hash 함수/finalize/API/schema/제품 코드는 수정하지 않았다.
+- 예상 밖 처리: Codex의 첫 초안 authoring.repair_attempts=0 초기화 누락으로 첫 최종화 자료가 schema fail. 승인 gate가 실제 차단했으며 실패 초안은 미승인·미편성으로 보존했다. 로컬 schema validator로 누락 한 곳을 확인하고, 연구자가 추가 실행을 명시 허용한 뒤 새 초안으로 완료했다. 기본 AI 검토/최종화는 각각 총 2회이며 독립 AI 재검토·learner AI·전체 테스트 반복 없음.
+- 전체 식별정보/실패 이력/직접 JSON 근거는 `evidence/2026-09-27-parcel-final-review/revision-registration.md`, `revision-release-result.json`, `professor-approval-result.json`, `finalization-diff.json`을 따른다. 앞선 미실행 기록은 당시 상태다.
+- UI push/PR/merge/deploy, 과거 저장 실패 RCA 재개, 다른 미션 조사 없음.
+
+[논문 영향 3줄]
+1. 수치: 새 최종 승인 hash·scenario·편성 연결 확정. UI 코드 배포와 운영 learner E2E는 없음.
+2. 화면: 승인한 9필드 콘텐츠가 대표 편성에서 읽힘. 새 캡처/실제 수행 성공으로 확대하지 않음.
+3. 프롬프트·계약: 변경 없음. 후보 hash와 최종 승인 hash를 구별해 기록함.

@@ -1,12 +1,19 @@
 {
-  "status": "researcher_accepted_local_candidate_pending_new_revision_and_professor_approval",
+  "status": "v4_candidate_finalized_approved_and_assigned_via_separate_scenario",
   "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
   "parent_version_id": "980571d6-8852-48c4-9cde-233713360b5f",
   "parent_version_no": 3,
   "old_hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095",
   "candidate_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
-  "new_version_id": null,
-  "new_version_no": null,
+  "new_version_id": "dbb99548-a93c-4d85-9659-c5e880f39c87",
+  "new_version_no": 4,
+  "candidate_hash_stage": "pre_finalization",
+  "approved_scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
+  "approved_version_id": "6610c6c6-1a25-4cc6-a584-5d372c8224e4",
+  "approved_version_no_within_new_scenario": 2,
+  "approved_content_hash": "3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764",
+  "approval_run_id": "f8f60e0e-0b20-4648-82e1-7342bb8c20f9",
+  "assignment_id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
   "hash_contract": "SHA-256 of recursively key-sorted JSON excluding provenance, quality_check, hsk_lexical_audit, authoring (generate-scenario canonicalJson/finalize)",
   "changed_content_fields": [
     "mpj_items[0].situation_ko",
@@ -20,7 +27,7 @@
     "mpj_items[4].candidates[3].note_ko"
   ],
   "metadata_note": "Original generation provenance/item lineage retained as source ancestry; finalized_at and old quality/HSK/authoring audit removed. This is not a finalized/import-ready revision. Fresh version/item lineage and hash-bound review are required before approval.",
-  "next_gate": "Create a separate generated/pending lineage snapshot only after authorization; preserve approved v3/current scenario and assignment. Fresh professor approval required. No automatic quality/finalization/approval inheritance.",
+  "next_gate": "Approval, assignment replacement and read-only learner-path data verification completed. Normal finalization metadata/hash changes were explicitly permitted; semantic content changes remain zero. UI deployment and learner E2E are not executed or authorized here.",
   "unchanged": [
     "item IDs/types/order",
     "source/target/correction/candidate Chinese text",

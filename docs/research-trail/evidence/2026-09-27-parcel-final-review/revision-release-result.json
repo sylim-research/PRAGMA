@@ -1,0 +1,100 @@
+{
+  "checked_at": "2026-09-26T16:13:25.765Z",
+  "old": {
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "version_id": "980571d6-8852-48c4-9cde-233713360b5f",
+    "version_no": 3,
+    "hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095",
+    "approval_id": "adfb82ee-84e3-416d-8625-50ce0b2037f1"
+  },
+  "pending_candidate": {
+    "id": "dbb99548-a93c-4d85-9659-c5e880f39c87",
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "version_no": 4,
+    "parent_version_id": "980571d6-8852-48c4-9cde-233713360b5f",
+    "stage": "generated",
+    "mission_content_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
+    "created_at": "2026-09-26T15:59:45.125134+00:00",
+    "reviewed_by": null,
+    "reviewed_at": null,
+    "ai_quality_result": null,
+    "content_review_run_id": null
+  },
+  "new_revision": {
+    "scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
+    "draft_version_id": "497c1652-a979-4671-86d8-e47a373072e2",
+    "source_pending_id": "dbb99548-a93c-4d85-9659-c5e880f39c87",
+    "created_at": "2026-09-26T16:11:12.664Z",
+    "final_hash": "3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764",
+    "review_id": "f8f60e0e-0b20-4648-82e1-7342bb8c20f9",
+    "review_hash": "98a050c0ee0a76765e14bc82414c854dd11bd6f92910f302b883ab95552c03fc",
+    "source_hash": "9e493a0300282c0d15845bdbd4d02ffec0e4665176e59fd8c92fda87b925566a",
+    "final_version_id": "6610c6c6-1a25-4cc6-a584-5d372c8224e4",
+    "final_version_no": 2,
+    "approved_at": "2026-09-26T16:13:09.365669+00:00"
+  },
+  "assignment_before": {
+    "id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+    "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+    "week_no": 2,
+    "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+    "position": 0,
+    "slot_role": "primary",
+    "created_at": "2026-09-16T16:54:34.205753+00:00",
+    "updated_at": "2026-09-26T07:42:35.609268+00:00",
+    "pair_contract_version": null,
+    "mission_role": null,
+    "changed_context_axes": [],
+    "diagnostic_dimensions": []
+  },
+  "assignment_after": {
+    "id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+    "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+    "week_no": 2,
+    "scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
+    "position": 0,
+    "slot_role": "primary",
+    "created_at": "2026-09-16T16:54:34.205753+00:00",
+    "updated_at": "2026-09-26T16:13:24.682578+00:00",
+    "pair_contract_version": null,
+    "mission_role": null,
+    "changed_context_axes": [],
+    "diagnostic_dimensions": []
+  },
+  "learner_read": {
+    "verification": "actual production SELECTs matching learner assignment and fetchMissionByScenario; administrator read session, no learner E2E",
+    "course": {
+      "id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+      "status": "published"
+    },
+    "scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
+    "mission_status": "reviewed",
+    "content_release_id": "pragma_zhko_bidirectional_candidate_20260904_02",
+    "content_hash": "3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764",
+    "semantic_content_changes": [],
+    "item_ids": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "display_order": [
+      1,
+      2,
+      5,
+      3,
+      4
+    ],
+    "ui_order_code_unchanged": true
+  },
+  "old_scenario_and_v3_exactly_preserved": true,
+  "unexpected_semantic_changes": 0,
+  "changed_assignment_fields": [
+    "scenario_id",
+    "updated_at"
+  ],
+  "product_code_schema_api_changes": false,
+  "push_pr_merge_deploy": false,
+  "learner_e2e": false
+}

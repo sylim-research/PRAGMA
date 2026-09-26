@@ -1,5 +1,7 @@
 # 최종 후보의 새 revision 생성 절차 — 아직 실행하지 않음
 
+> **후속 최종 상태 (2026-09-27 KST):** 아래는 준비 당시 절차다. pending v4 등록 후 연구자가 정상 최종화 metadata에 따른 새 hash를 허용했다. 별도 scenario `051532cc-c3a2-4440-9a5e-efc54e9ac481`의 최종 승인·지정 편성 교체까지 완료했다. [실행 기록](revision-registration.md), [승인·편성·읽기 결과](revision-release-result.json)를 따른다. 아래 INSERT를 다시 실행하지 않는다.
+
 ## 입력과 경계
 
 - 파일: 같은 폴더의 `local-revision-candidate.json` 및 `revision-manifest.json`.

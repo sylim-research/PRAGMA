@@ -1,0 +1,41 @@
+{
+  "checked_at": "2026-09-26T16:08:14.672Z",
+  "candidate_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
+  "final_hash": "3e9cd0857626dfaff4de61f288bdc227e0d321858bc862447e25d4daef999841",
+  "semantic_content_changes": [],
+  "changed_top_level_metadata": [
+    "provenance",
+    "item_lineage",
+    "authoring",
+    "hsk_lexical_audit"
+  ],
+  "all_changed_paths": [
+    "provenance.mission_content_hash",
+    "provenance.finalized_at",
+    "item_lineage.claims[0].note_ko",
+    "item_lineage.claims[1].note_ko",
+    "item_lineage.claims[1].risk_ids[1]",
+    "item_lineage.claims[1].evidence_ids[1]",
+    "item_lineage.claims[2].note_ko",
+    "item_lineage.claims[3].note_ko",
+    "item_lineage.claims[4].note_ko",
+    "item_lineage.claims[5].note_ko",
+    "item_lineage.claims[7].note_ko",
+    "item_lineage.claims[8].note_ko",
+    "item_lineage.claims[9].note_ko",
+    "item_lineage.claims[10].note_ko",
+    "item_lineage.claims[10].risk_ids[0]",
+    "item_lineage.claims[10].evidence_ids[0]",
+    "item_lineage.claims[11].note_ko",
+    "item_lineage.claims[12].note_ko",
+    "item_lineage.claims[12].rule_ids[0]",
+    "item_lineage.claims[12].rule_ids[1]",
+    "item_lineage.attribution_provenance.calls[1].prompt_instance_hash",
+    "item_lineage.attribution_provenance.calls[2].prompt_instance_hash",
+    "item_lineage.attribution_provenance.attributed_at",
+    "item_lineage.attribution_provenance.prompt_instance_hash",
+    "authoring",
+    "hsk_lexical_audit"
+  ],
+  "approved_nine_field_content_unchanged": true
+}
