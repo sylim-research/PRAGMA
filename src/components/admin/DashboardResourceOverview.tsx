@@ -24,8 +24,8 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING CONTENT</p>
-          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 콘텐츠</h2>
+          {/* 큰 한글 제목은 빼고 영문 머리말을 제목으로 둔다(2026-09-26). 화면 읽기용 이름은 한글로. */}
+          <h2 id="resource-overview-title" aria-label="보유 학습 콘텐츠" className="text-[16px] font-bold tracking-[0.14em] text-[#8B7324]">LEARNING CONTENT</h2>
         </div>
         {status}
       </div>
