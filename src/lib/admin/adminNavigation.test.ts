@@ -43,10 +43,11 @@ describe("admin navigation reachability", () => {
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly", "/admin/ai-review", "/admin/review",
     ]);
-    expect(adminMobileNavValue("/admin/library")).toBe("/admin/library");
+    // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
+    expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(false);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/library", "/admin/composer", "/admin/decision-traces",
+      "/admin/composer", "/admin/decision-traces",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
     expect(research?.items.map((item) => item.to)).toEqual([

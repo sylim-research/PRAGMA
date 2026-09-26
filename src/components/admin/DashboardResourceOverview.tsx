@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ArrowUpRight, BookOpen, CheckCircle2, MessagesSquare } from "lucide-react";
-import { RESOURCE_DIMENSIONS, resourceLibraryHref, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
+import { BookOpen, CheckCircle2, MessagesSquare } from "lucide-react";
+import { RESOURCE_DIMENSIONS, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
 
 const number = (value: number | undefined) => value == null ? "—" : value.toLocaleString("ko-KR");
 
@@ -13,25 +12,26 @@ export function DashboardResourceOverview({ resources, error, status }: {
   const [scope, setScope] = useState<ResourceScope>("all");
   const selected = resources?.[scope];
   const cards = [
-    { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen, to: resourceLibraryHref("all") },
-    { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare, to: resourceLibraryHref("all") },
-    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, to: resourceLibraryHref("ready"), ready: true },
+    { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen },
+    { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare },
+    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, ready: true },
   ];
 
   return <>
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">RESOURCE LIBRARY</p>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING RESOURCES</p>
           <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
         </div>
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        {cards.map(({ label, value, unit, note, icon: Icon, to, ready }) => (
-          <Link key={label} to={to} className={[
-            "group flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B3932F]",
-            ready ? "border-[#15202B] bg-[#15202B] text-white hover:bg-[#233440]" : "border-[#E6E1D5] bg-white text-[#15202B] hover:border-[#C5B05F]",
+        {/* 숫자는 보여 주기만 한다 — 학습 미션 라이브러리를 메뉴에서 뺐으므로 누르는 연결도 두지 않는다(2026-09-26). */}
+        {cards.map(({ label, value, unit, note, icon: Icon, ready }) => (
+          <div key={label} className={[
+            "flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5",
+            ready ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E6E1D5] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
@@ -42,9 +42,9 @@ export function DashboardResourceOverview({ resources, error, status }: {
               <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
             </div>
             <div className={"mt-auto flex items-center justify-between gap-1 pt-2 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
-              <span>{note}</span><ArrowUpRight aria-hidden className="h-4 w-4 shrink-0" />
+              <span>{note}</span>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
       {!!resources?.all.incompleteCount && <p className="mt-1 text-xs text-amber-800">문항·산출 정보 확인이 필요한 미션 {resources.all.incompleteCount}개 · 확인된 구성요소만 집계</p>}
@@ -72,14 +72,14 @@ export function DashboardResourceOverview({ resources, error, status }: {
             <div className={key === 'speech_act' ? "grid grid-cols-3 gap-2" : "space-y-3"}>
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
-                return key === 'speech_act' ? <Link key={code} to={resourceLibraryHref(scope, key, code)}
-                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                return key === 'speech_act' ? <div key={code}
+                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2">
                   <span className="text-sm text-[#3F4C55]">{label}</span>
                   <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
-                </Link> : <Link key={code} to={resourceLibraryHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
-                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#3A4750] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
+                </div> : <div key={code} className="block rounded">
+                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#3A4750]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#F1F0E9]"><div className="h-full rounded-full bg-[#D9C45C]" style={{ width: `${count / max * 100}%` }} /></div>
-                </Link>;
+                </div>;
               })}
             </div>
             {unknown > 0 && <p className="mt-2 text-xs text-amber-800">미분류 {unknown}개</p>}
