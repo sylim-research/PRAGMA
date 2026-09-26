@@ -170,9 +170,9 @@ describe("배치 생성 작업 화면", () => {
     mocks.audit.mockRejectedValue(new Error("비평 연결 실패"));
     mount();
     fireEvent.click(start());
-    fireEvent.click(await screen.findByRole("button", { name: "1건 비평 실행" }));
+    fireEvent.click(await screen.findByRole("button", { name: "1건 검토 실행" }));
     await screen.findByText("비평 연결 실패");
     expect(start()).toBeEnabled();
-    expect(screen.getByRole("button", { name: "1건 비평 실행" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "1건 검토 실행" })).toBeEnabled();
   });
 });
