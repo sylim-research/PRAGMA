@@ -200,7 +200,7 @@ interface BatchItem {
   auto_check: "pass" | "warning";
 }
 
-const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
+const formField = "h-9 text-[13px] bg-white border-[#E1DCCD]";
 
 // 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
 const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
@@ -927,9 +927,10 @@ const AdminGenerator = () => {
       )}
 
       {/* 2-col layout */}
-      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
+      {/* 왼쪽 조건 폼을 기존 2:3에서 약 8% 넓혔다(40% → 43%). 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,23fr)_minmax(0,30fr)]">
         {/* LEFT — settings */}
-        <section className="lg:col-span-2 space-y-5 rounded-lg border border-border bg-card p-5">
+        <section className="space-y-5 rounded-lg border border-border bg-card p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
             <SectionTitle n={1} label="과제 모드" />
@@ -944,8 +945,8 @@ const AdminGenerator = () => {
                     className={[
                       "h-10 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9] text-[#7A4A0A]"
-                        : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
+                        ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
+                        : "border border-[#E1DCCD] bg-white text-[#4E5A63] hover:border-[#B9C3CA]",
                     ].join(" ")}
                   >
                     {m === "translation" ? "번역" : "통역"}
@@ -980,14 +981,14 @@ const AdminGenerator = () => {
                     className={[
                       "rounded-md py-2 px-1.5 text-center transition-colors leading-tight",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9]"
-                        : "border border-[#EAE4D2] bg-transparent hover:bg-muted",
+                        ? "border-2 border-[#15202B] bg-white"
+                        : "border border-[#E1DCCD] bg-white hover:border-[#B9C3CA]",
                     ].join(" ")}
                   >
                     <div
                       className={[
-                        "text-[13.5px] font-medium",
-                        on ? "text-[#7A4A0A]" : "text-foreground",
+                        "text-[13.5px]",
+                        on ? "font-bold text-[#15202B]" : "font-medium text-foreground",
                       ].join(" ")}
                     >
                       {SPEECH_ACT_UI[sa]}
@@ -995,7 +996,7 @@ const AdminGenerator = () => {
                     <div
                       className={[
                         "text-[10px] mt-0.5",
-                        on ? "text-[#7A4A0A]" : "text-muted-foreground",
+                        on ? "text-[#4E5A63]" : "text-muted-foreground",
                       ].join(" ")}
                     >
                       {SPEECH_ACT_UI_EN[sa]}
@@ -1007,11 +1008,12 @@ const AdminGenerator = () => {
           </div>
 
           {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
-          <div className="rounded-md bg-[#FBEFD9]/40 border border-[#EAE4D2] p-3.5">
-            <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
-            <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
+          {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
+          <div>
+            <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" />
+            <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="권력 · P" tone="accent">
+              <Field label="권력 · P">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -1024,7 +1026,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="거리 · D" tone="accent">
+              <Field label="거리 · D">
                 <Select
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
@@ -1037,7 +1039,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="부담도 · R" tone="accent">
+              <Field label="부담도 · R">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -1114,7 +1116,7 @@ const AdminGenerator = () => {
                             if (next) setThemeCode(next);
                           }
                         }}
-                        className="accent-[#BA7517]"
+                        className="accent-[#15202B]"
                       />
                       {DOMAIN[d]}
                     </label>
@@ -1174,8 +1176,8 @@ const AdminGenerator = () => {
                     className={[
                       "flex-1 h-9 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9] text-[#7A4A0A]"
-                        : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
+                        ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
+                        : "border border-[#E1DCCD] bg-white text-[#4E5A63] hover:border-[#B9C3CA]",
                     ].join(" ")}
                   >
                     {n}개
@@ -1189,7 +1191,7 @@ const AdminGenerator = () => {
               type="button"
               onClick={generateOutlines}
               disabled={outlineLoading || finalizing}
-              className="mt-2.5 w-full h-10 rounded-md border border-[#EAE4D2] bg-transparent text-[13px] text-[#1d2336] hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-white text-[13px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="inline-flex items-center justify-center gap-1.5">
                 <Search className="h-4 w-4" aria-hidden />
@@ -1209,7 +1211,7 @@ const AdminGenerator = () => {
             {outlines && outlines.length > 0 && (
               <div className="mt-2.5 space-y-1.5">
                 <div className="text-[11px] text-muted-foreground">
-                  목표 화행 <b className="text-[#7A4A0A]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
+                  목표 화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
                 </div>
                 {outlines.map((o, i) => {
                   const on = selectedOutlines.has(i);
@@ -1218,7 +1220,7 @@ const AdminGenerator = () => {
                       key={i}
                       className={[
                         "flex items-start gap-2 rounded-md border px-3 py-2 text-[12.5px] cursor-pointer",
-                        on ? "border-[#BA7517] bg-[#FBEFD9]" : "border-[#EAE4D2] bg-transparent",
+                        on ? "border-[#15202B] bg-white ring-1 ring-[#15202B]/10" : "border-[#E1DCCD] bg-white",
                       ].join(" ")}
                     >
                       <input
@@ -1269,7 +1271,7 @@ const AdminGenerator = () => {
 
 
         {/* RIGHT — preview */}
-        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
+        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
           <h2 className="text-[15px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
@@ -1311,7 +1313,7 @@ const AdminGenerator = () => {
                 <ConditionSummary conditions={example.conditions} />
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">생성 예시</span>
+                    <span className="inline-flex items-center rounded border border-[#D9D2BF] bg-white px-1.5 py-0.5 text-[11px] font-medium text-[#4E5A63]">생성 예시</span>
                     <span className="text-[13.5px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>
@@ -1605,7 +1607,7 @@ const SectionTitle = ({
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="rounded-full bg-[#FBEFD9] px-2 py-0.5 text-[11px] font-semibold text-[#7A4A0A]">{accent}</span>}
+    {accent && <span className="rounded-full border border-[#15202B]/20 bg-white px-2 py-0.5 text-[11px] font-semibold text-[#15202B]">{accent}</span>}
   </h3>
 );
 
