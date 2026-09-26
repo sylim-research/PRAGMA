@@ -1144,7 +1144,7 @@ function WeekRow({
                 return (
                   <span
                     key={item.scenario_id}
-                    className={`flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1 ${needsReplace ? "border-[#F0C9A8] bg-[#FFF7F0]" : "border-[#E6E1D4] bg-[#FCFBF8]"}`}
+                    className={`group flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1 ${needsReplace ? "border-[#F0C9A8] bg-[#FFF7F0]" : "border-[#E6E1D4] bg-[#FCFBF8]"}`}
                     title={[title, `초점 · ${featureLabel}`, needsReplace ? (replaced?.has(item.scenario_id) ? "새 판 있음 · 교체 필요" : "교체 필요") : ""].filter(Boolean).join("\n")}
                   >
                     <span className={`shrink-0 rounded px-1.5 py-px text-[11px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
@@ -1152,11 +1152,12 @@ function WeekRow({
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#202B33]">{title}</span>
                     {needsReplace && <span className="shrink-0 text-[11px] font-bold text-[#9A3F1C]">교체 필요</span>}
+                    {/* 제거 ×는 평소 숨기고 칩에 마우스를 올리거나 키보드로 닿을 때만 보인다 — 배치표가 삭제 목록처럼 보이지 않게. */}
                     <button
                       type="button"
                       aria-label={`${title} 제거`}
                       onClick={() => onRemove(item.scenario_id)}
-                      className="shrink-0 px-0.5 text-[13px] font-bold leading-none text-red-700 hover:text-red-900"
+                      className="shrink-0 px-0.5 text-[13px] font-bold leading-none text-red-700 opacity-0 transition-opacity hover:text-red-900 focus-visible:opacity-100 group-hover:opacity-100"
                     >
                       ×
                     </button>
