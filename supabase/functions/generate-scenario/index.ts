@@ -98,6 +98,7 @@ const MISSION_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.mission.primary
 const missionModel = () => backgroundContext.getStore() ? ASTRA_GENERATION_MODEL : MISSION_PRIMARY_MODEL
 const CRITIC_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.critic.primary
 const FEEDBACK_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.feedback.primary
+const FEEDBACK_FALLBACK_MODEL = OPENAI_MODEL_ROUTES.feedback.fallback
 
 /** SHA-256 16진 — 미션 provenance의 mission_content_hash용(v1.5 0-h·56). */
 async function sha256Hex(s: string): Promise<string> {
@@ -4686,14 +4687,25 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         : CURRENT_FEEDBACK_PROMPT_VERSIONS[1]
       const sys = buildFeedbackSystemPrompt(dir, isSpoken, feedbackFocal)
       const usr = buildFeedbackUserPrompt(b)
-      const model = FEEDBACK_PRIMARY_MODEL
-      // DCT 재확인: 한 회차에는 유료 호출 한 번만. 오류 시 재호출 대신 학습자 최종 결정으로 넘긴다.
-      const att = await callOpenAI(FEEDBACK_PRIMARY_MODEL, apiKey, sys, usr, 0.2, {
+      let model = FEEDBACK_PRIMARY_MODEL
+      let att = await callOpenAI(FEEDBACK_PRIMARY_MODEL, apiKey, sys, usr, 0.2, {
         maxCompletionTokens: FEEDBACK_MAX_COMPLETION_TOKENS,
         telemetry: telemetryFor('learner_feedback', false, {
           promptVersion: feedbackPromptVersion,
         }),
       })
+      if (!att.ok && (att.status === 404 || att.status === 400)) {
+        model = FEEDBACK_FALLBACK_MODEL
+        att = await callOpenAI(FEEDBACK_FALLBACK_MODEL, apiKey, sys, usr, 0.2, {
+          maxCompletionTokens: FEEDBACK_MAX_COMPLETION_TOKENS,
+          telemetry: telemetryFor('learner_feedback', false, {
+            invocationAttempt: 2,
+            isModelFallback: true,
+            fallbackFrom: FEEDBACK_PRIMARY_MODEL,
+            promptVersion: feedbackPromptVersion,
+          }),
+        })
+      }
       if (!att.ok) {
         return new Response(JSON.stringify({ error: 'OpenAI 호출 실패', detail: att.raw.slice(0, 400) }), { status: 502, headers: jsonHeaders })
       }
