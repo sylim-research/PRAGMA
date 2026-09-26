@@ -874,8 +874,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
-        {reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
-        {!reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
+        {professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
+        {!professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
       </p>
     );
     const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
@@ -911,7 +911,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
         </header>
-        <div className={[reviewMode ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
+        <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
         {/* ── 학습 미션 제작: 초안 생성 + 제작 경로 보기 ── */}
         {!reviewMode && (
@@ -955,6 +955,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 자동 품질 점검·AI 검토: 검사하고 넘기는 화면 ── */}
         {aiReview && (
           <>
+            {scenarioText}
             {(st === "generated" || st === "reviewed") && (
               <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
                 handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
