@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { CompositionConditionFields, ThemePicker } from "@/components/admin/CompositionConditionFields";
+import { NewCoursePreview } from "@/components/admin/NewCoursePreview";
 import { countAvailableMissions, type CompositionConditions } from "@/lib/curriculum/compositionConditions";
 import { createCurriculumOutline, type CurriculumOutlineWithWeeks } from "@/lib/curriculum/api";
 import type { ComposerCore } from "@/lib/curriculum/composer";
@@ -107,6 +108,8 @@ export function NewCoursePanel({
   };
 
   return (
+    // 왼쪽 = 입력(1·2·3), 오른쪽 = 조건을 바꿀 때마다 바뀌는 15주 미리보기.
+    <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.15fr)_minmax(22rem,0.85fr)]">
     <div className="space-y-4">
       {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
       <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3.5">
@@ -186,6 +189,8 @@ export function NewCoursePanel({
           </Button>
         </div>
       </section>
+    </div>
+    <NewCoursePreview cores={cores} conditions={conditions} />
     </div>
   );
 }
