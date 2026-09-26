@@ -416,7 +416,6 @@ function AuditMethodSection() {
           </li>
         ))}
       </ol>
-      <p className="text-[13.5px] text-[#655F55] lg:ml-auto">판정하지 않음 · 난이도 · 목록 밖 단어의 적절성 · 재생성 여부</p>
     </section>
   );
 }
