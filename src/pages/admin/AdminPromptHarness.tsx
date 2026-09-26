@@ -12,7 +12,7 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "시나리오 생성",
-  mission: "학습 미션 생성 (v5 형식 · v6 전환의 원본)",
+  mission: "학습 미션 생성 (v5 지시문 · v6 변환의 기반)",
   review: "AI 검토와 교차 점검",
   runtime: "학습자 AI 피드백",
   authoring: "실제 자료 활용",
