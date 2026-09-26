@@ -246,7 +246,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       { key: "claude", label: `${modelName(run?.claude_review?.model ?? state?.models.claude)} 교차 점검`.trim(), optional: true, items: run?.claude_review?.result.findings,
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
         action: !crossRequested && !run?.claude_review
-          ? <Button size="sm" variant="outline" className="h-7 border-[#C08A2E] px-2.5 text-[12.5px] font-semibold text-[#8A5A14] hover:bg-[#FBF3E3] hover:text-[#6F4710]" disabled={!canCross} onClick={startCross}>교차 점검 실행</Button>
+          ? <Button size="sm" variant="outline" className="h-7 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" disabled={!canCross} onClick={startCross}>교차 점검 실행</Button>
           : null },
       { key: "adjudication", label: `${modelName(run?.adjudication?.model ?? state?.models.openai)} 의견 대조`.trim(), optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null },
       ...(steps.some((step) => step.key === "finalization")
@@ -274,21 +274,21 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           {rows.map((row, index) => {
             const status = rowStatus(row.key);
             const skipped = Boolean(row.optional) && !crossRequested && status === "todo";
-            return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#FBF3E3]" : ""].join(" ")}>
-              {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#C08A2E]" />}
+            return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#EEF1F4]" : ""].join(" ")}>
+              {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
               <div className="flex items-center gap-x-3">
                 <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
                   status === "done" ? "bg-[#233542] text-white"
-                    : status === "running" ? "bg-[#C08A2E] text-white"
+                    : status === "running" ? "bg-[#233542] text-white"
                       : status === "failed" ? "bg-red-700 text-white"
-                        : status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                          : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
+                        : status === "current" ? "border-2 border-[#233542] bg-white text-[#233542]"
+                          : skipped ? "border border-[#8C98A3] bg-white text-[#233542]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
                 <span className="flex w-[16.5rem] shrink-0 items-center justify-between gap-2 whitespace-nowrap font-semibold text-[#233542]">
-                  {row.label}{row.optional && <span className="rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
+                  {row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[11px] font-semibold text-[#233542]">선택</span>}
                 </span>
-                {row.action ? <span className="flex min-w-0 flex-1 justify-end">{row.action}</span> : <span className={["min-w-0 flex-1 whitespace-nowrap text-right", status === "running" ? "font-semibold text-[#8A5A14]"
+                {row.action ? <span className="flex min-w-0 flex-1 justify-end">{row.action}</span> : <span className={["min-w-0 flex-1 whitespace-nowrap text-right", status === "running" ? "font-semibold text-[#233542]"
                   : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
                   {status === "running" ? "진행 중" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
                 </span>}
@@ -307,9 +307,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               </details>}
             </li>;
           })}
-          <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
+          <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#EEF1F4]" : ""].join(" ")}>
             <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
+              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#233542] bg-white text-[#233542]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
             <span className="w-[16.5rem] shrink-0 whitespace-nowrap font-semibold text-[#233542]">교수자 최종 승인</span>
