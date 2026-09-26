@@ -31,7 +31,6 @@ describe("admin navigation reachability", () => {
     const criteria = ADMIN_NAV_GROUPS.find((group) => group.header === "1. 콘텐츠 제작 기준");
     expect(criteria?.items.map((item) => item.to)).toEqual([
       "/admin/prompt-harness",
-      "/admin/corpus",
     ]);
     const material = ADMIN_NAV_GROUPS.find((group) => group.header === "2. 시나리오 생성");
     expect(material?.items.map((item) => item.to)).toEqual([
@@ -41,7 +40,7 @@ describe("admin navigation reachability", () => {
     ]);
     const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·승인");
     expect(production?.items.map((item) => item.to)).toEqual([
-      "/admin/assembly", "/admin/ai-review", "/admin/review",
+      "/admin/assembly", "/admin/corpus", "/admin/ai-review", "/admin/review",
     ]);
     // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
     expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(false);
@@ -133,6 +132,7 @@ describe("admin navigation reachability", () => {
     );
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly",
+      "/admin/corpus",
       "/admin/ai-review",
       "/admin/review",
     ]);
