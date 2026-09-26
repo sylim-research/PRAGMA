@@ -154,12 +154,12 @@ type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Excl
 // 화면을 열면 바로 만들 수 있게 「초안 생성 대기」를 맨 앞(기본 칩)에 둔다.
 const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "v6_review", "v6_done", "all"];
 const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
-  preparing: "시나리오 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
-  repairing: "지적된 곳 고치는 중", quality: "AI 점검 중", saving: "저장 중",
+  preparing: "시나리오 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 품질 점검 중",
+  repairing: "지적된 곳 고치는 중", quality: "AI 검토 중", saving: "저장 중",
 };
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
-  v6_done: "승인 완료",
+  v6_done: "최종 승인 완료",
   v5_only: "v5 · 변환 전",
   core_only: "초안 생성 대기",
 };
@@ -571,8 +571,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const qLabel = res.qualityVerdict ? { pass: "AI 점검 통과", warning: "AI 점검 주의", fail: "AI 점검 결함" }[res.qualityVerdict] : "AI 점검 미실행";
-        toast.success(`초안 저장 · 규칙 ${res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검으로 넘어갑니다`);
+        const qLabel = res.qualityVerdict ? { pass: "AI 검토 통과", warning: "AI 검토 주의", fail: "AI 검토 결함" }[res.qualityVerdict] : "AI 검토 미실행";
+        toast.success(`초안 저장 · 자동 품질 점검 ${({ pass: "통과", warning: "경고", fail: "실패" } as Record<string, string>)[res.ruleResult] ?? res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 「자동 품질 점검·AI 검토」로 넘어갑니다`);
         await loadRows();
       } else {
         const msg = res.error ?? "생성 실패";
@@ -781,7 +781,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
-        {facet("과제", MODE_LABEL[mode])}
+        {facet("수행 방식", MODE_LABEL[mode])}
       </span>
     );
   };
@@ -904,7 +904,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             ))}
             {productionOf(r) === "core_only" && (
               <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
-                <p className="text-[#3F4E57]">이 시나리오로 학습 미션 초안을 자동으로 만듭니다(1분 남짓). 초안은 품질 점검과 교수자 승인을 거쳐야 편성할 수 있습니다.</p>
+                <p className="text-[#3F4E57]">이 시나리오로 학습 미션 초안을 자동으로 만듭니다(1분 남짓). 초안은 자동 품질 점검·AI 검토와 교수자 최종 승인을 거쳐야 편성할 수 있습니다.</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}>
                     {busy === r.scenario_id ? "생성 중…" : "초안 자동 생성"}
@@ -973,7 +973,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         ? "규칙 검사와 AI 검토로 감수 자료를 준비합니다. 승인은 교수자가 합니다."
         : reviewMode
           ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
-          : "시나리오로 학습 미션 초안을 만들고, 품질 점검·승인·편성 중 어디에 있는지 봅니다."}
+          : "시나리오로 학습 미션 초안을 만들고, 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -1288,8 +1288,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   const steps: { label: string; status: StepStatus; detail?: string | null }[] = [
     { label: "시나리오", status: "done" },
     { label: "초안 작성", status: v6 ? "done" : "current", detail: v6 ? created : production === "v5_only" ? "변환 전" : "생성 대기" },
-    { label: "품질 점검", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
-    { label: "교수자 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
+    { label: "품질 점검·AI 검토", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
+    { label: "교수자 최종 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
