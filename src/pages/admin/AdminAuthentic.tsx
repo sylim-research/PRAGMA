@@ -26,7 +26,7 @@ import {
   type StoredCandidate,
 } from "@/lib/admin/authenticStore";
 import { SPEECH_ACT_UI, LEVEL, DIRECTION_LABEL } from "@/lib/pragma/enums";
-import { authenticUsageLabel, canMakeScenarioFromAuthentic, splitAuthenticPhrases } from "@/lib/admin/authenticUsage";
+import { authenticUsageLabel, canMakeScenarioFromAuthentic } from "@/lib/admin/authenticUsage";
 
 
 // 상태는 글자색만 달리한다 — 바탕은 흰색으로 통일(색 절제).
@@ -160,11 +160,11 @@ const AdminAuthentic = () => {
                   onClick={() => setOpenId(open ? null : row.id)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
                 >
-                  <span className="shrink-0 whitespace-nowrap rounded-full border border-[#E2DED2] px-2 py-[1px] text-[11.5px] text-[#5B5446]">
+                  <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FBF5E6] px-2 py-[1px] text-[11.5px] font-semibold text-[#8A6A0E]">
                     {row.source_type === "image" ? "이미지" : "문구"}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-[14.5px] text-foreground">
-                    {excerpt(row.source_original)}
+                    {open ? "원자료" : excerpt(row.source_original)}
                   </span>
                   <span className="shrink-0 whitespace-nowrap text-[12.5px] tabular-nums text-muted-foreground">
                     후보 {row.candidates.length}건 ·{" "}
@@ -173,26 +173,17 @@ const AdminAuthentic = () => {
                 </button>
 
                 {open && (
-                  <div className="border-t border-border px-3 py-3">
-                    {(row.scene_ko || row.linguistic_features_ko) && (
-                      <div className="mb-3 space-y-1.5 text-[13px] leading-relaxed">
-                        {row.scene_ko && (
-                          <div className="flex gap-3">
-                            <span className="w-16 shrink-0 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">담화 상황</span>
-                            <p className="min-w-0 flex-1 text-[#15202B]">{row.scene_ko}</p>
-                          </div>
-                        )}
-                        {row.linguistic_features_ko && (
-                          <div className="flex gap-3">
-                            <span className="w-16 shrink-0 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">표현 특징</span>
-                            <div className="flex min-w-0 flex-1 flex-wrap gap-1">
-                              {splitAuthenticPhrases(row.linguistic_features_ko).map((phrase) => <Chip key={phrase}>{phrase}</Chip>)}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                  <div className="px-3 pb-3">
+                    {/* 원자료 = 출발점. 금색 띠·미색 바탕으로 파생 후보(흰 카드)와 구분한다. */}
+                    <blockquote className="whitespace-pre-wrap rounded-md border-l-[3px] border-[#FAD338] bg-[#FBF5E6] px-3.5 py-2.5 text-[14.5px] leading-relaxed text-[#15202B]">
+                      {row.source_original}
+                    </blockquote>
 
+                    {/* 파생 후보 — 원자료 아래로 들여 쓰고 세로선으로 이어, 「이 문구에서 나온 것」임을 모양으로 보인다. */}
+                    <div className="ml-3 mt-2 border-l-2 border-[#E2DED2] pl-4 pt-1">
+                    <p className="mb-2 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">
+                      이 자료에서 나온 후보 {row.candidates.length}건
+                    </p>
                     <div className="grid grid-cols-1 gap-2">
                       {row.candidates.map((c) => {
                         const status = STATUS_LABEL[c.status];
@@ -200,7 +191,7 @@ const AdminAuthentic = () => {
                         return (
                           <div
                             key={c.id}
-                            className="flex flex-col gap-1.5 rounded-md border border-border bg-background p-2.5"
+                            className="flex flex-col gap-1.5 rounded-md border border-[#E2DED2] bg-white p-3"
                           >
                             <div className="flex flex-wrap items-center gap-1.5">
                               <span className="whitespace-nowrap rounded-full border border-[#E2DED2] bg-white px-2 py-[1px] text-[11.5px] font-semibold text-[#15202B]">
@@ -254,6 +245,7 @@ const AdminAuthentic = () => {
                           </div>
                         );
                       })}
+                    </div>
                     </div>
                   </div>
                 )}
