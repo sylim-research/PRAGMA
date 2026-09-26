@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { CurriculumSyllabus } from "@/components/admin/CurriculumSyllabus";
@@ -123,9 +123,14 @@ const AdminComposer = () => {
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [conditionsOpen, setConditionsOpen] = useState(true);
-  const [tab, setTab] = useState<"existing" | "new">("existing");
+  // 「새 교과목 개설」(/admin/composer/new)과 「15주 수업 편성」(/admin/composer)은 메뉴가 따로다(2026-09-26 연구자 결정).
+  const location = useLocation();
+  const navigate = useNavigate();
+  const tab: "existing" | "new" = location.pathname === "/admin/composer/new" ? "new" : "existing";
+  const setTab = (next: "existing" | "new") => navigate(next === "new" ? "/admin/composer/new" : "/admin/composer");
   // 새 교과목을 만든 직후, 그 교과목이 다 불러와지면 미션 자동 채우기를 한 번 실행한다.
-  const [pendingAutoFillId, setPendingAutoFillId] = useState<string | null>(null);
+  // 새 교과목을 만든 뒤 편성 화면으로 넘어오면(주소가 바뀌어 화면이 새로 그려져도) 자동 채우기를 이어서 한다.
+  const [pendingAutoFillId, setPendingAutoFillId] = useState<string | null>(() => (location.state as { autoFillId?: string } | null)?.autoFillId ?? null);
   const [confirmAction, setConfirmAction] = useState<"unpublish" | "delete" | null>(null);
 
   const [outline, setOutline] = useState<CurriculumOutlineRow | null>(null);
@@ -604,8 +609,8 @@ const AdminComposer = () => {
   const handleCourseCreated = (saved: { outline: CurriculumOutlineRow; weeks: CurriculumWeekRow[] }) => {
     setLoadedAssignments(null);
     setPendingAutoFillId(saved.outline.id);
-    setTab("existing");
     handleStructureSaved(saved);
+    navigate(`/admin/composer?outline=${saved.outline.id}`, { state: { autoFillId: saved.outline.id } });
   };
 
   useEffect(() => {
@@ -700,8 +705,10 @@ const AdminComposer = () => {
 
   return (
     <AdminShell
-      title="15주 수업 편성"
-      description="교수자가 최종 승인한 학습 미션을 교과목의 15주에 배치합니다."
+      title={tab === "new" ? "새 교과목 개설" : "15주 수업 편성"}
+      description={tab === "new"
+        ? "수준·방향·수행 방식과 편성 주제를 정하면 승인된 학습 미션으로 15주를 자동 편성합니다."
+        : "교수자가 최종 승인한 학습 미션을 교과목의 15주에 배치합니다."}
       compact
     >
       <div className="w-full">
@@ -734,34 +741,10 @@ const AdminComposer = () => {
           </p>
         )}
 
-        {/* 두 갈래를 누를 수 있는 배너로 — 기존 교과목(공개·비공개 모두) 편성 / 새 교과목 편성. */}
-        <div role="tablist" aria-label="편성 대상" className="grid gap-3 sm:grid-cols-2">
-          {([
-            ["existing", "기존 교과목", "개설한 교과목의 15주 배치를 보고 고칩니다"],
-            ["new", "+ 새 교과목 편성", "수준·방향·수행 방식을 정해 새 교과목을 만듭니다"],
-          ] as const).map(([key, label, note]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={tab === key}
-              onClick={() => setTab(key)}
-              className={`flex flex-col gap-0.5 rounded-xl border px-5 py-3 text-left transition ${
-                tab === key
-                  ? "border-[#1F3A5F] bg-[#FFFDF8] text-[#15202B] shadow-[inset_0_-3px_0_#1F3A5F]"
-                  : "border-[#E8E2D3] bg-[#FBF9F3] text-[#46515A] hover:border-[#9FB0C6] hover:bg-[#FFFDF8]"
-              }`}
-            >
-              <span className="text-[15px] font-bold">{label}</span>
-              <span className="text-[12.5px] text-[#66727A]">{note}</span>
-            </button>
-          ))}
-        </div>
-
-        {tab === "new" && <div className="mt-4"><NewCoursePanel cores={cores} courses={outlines} onCreated={handleCourseCreated} /></div>}
+        {tab === "new" && <div><NewCoursePanel cores={cores} courses={outlines} onCreated={handleCourseCreated} /></div>}
 
         {tab === "existing" && outlines.length > 0 && (
-          <div role="radiogroup" aria-label="교과목 선택" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div role="radiogroup" aria-label="교과목 선택" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {outlines.map((item) => {
               const selected = item.id === outlineId;
               const published = item.status === "published";
