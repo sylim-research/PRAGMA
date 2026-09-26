@@ -1329,9 +1329,9 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 워크플로우" className="rounded-lg border border-[#E7E2D4] bg-[#FBFAF6] px-4 py-3">
-      <h3 className="mb-2.5 flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
-      <ol className="grid grid-cols-5 gap-2">
+    <section aria-label="제작 워크플로우" className="overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
+      <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
+      <ol className="grid grid-cols-5 gap-2 px-4 py-3">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">
             {index > 0 && (
@@ -1340,9 +1340,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
             )}
             <span className="flex flex-col items-center text-center">
               <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[11.5px] font-bold tabular-nums",
-                step.status === "done" ? "bg-[#233542] text-white"
-                  : step.status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                    : "border border-[#C9C2B0] bg-white text-[#6B757B]"].join(" ")}>
+                "bg-[#233542] text-white", step.status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
               {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}
@@ -1350,7 +1348,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
                 step.status === "todo" ? "text-[#5B6770]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
               {step.detail && (
                 <span className={["mt-0.5 max-w-full truncate text-[11.5px] leading-snug",
-                  step.status === "current" ? "text-[#8A5A14]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
+                  step.status === "current" ? "font-semibold text-[#233542]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
               )}
             </span>
           </li>

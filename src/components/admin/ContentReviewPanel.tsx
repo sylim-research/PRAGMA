@@ -258,16 +258,16 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     return <section aria-label="품질 점검 워크플로우" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
-      {state && <div className="rounded-xl border border-[#E2DED2]">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE8DE] bg-[#FBFAF6] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
+      {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
+          <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
           {runningLabel
-            ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[#233542] px-3.5 py-1.5 text-[13px] font-semibold text-white">
+            ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
                 <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
               </div>
             : professorDone || professorCurrent
-              ? <span className="text-[13px] font-semibold text-[#233542]">✓ 완료</span>
+              ? <span className="text-[13px] font-semibold text-white">✓ 완료</span>
               : null}
         </div>
         <ol className="divide-y divide-[#F0EDE4]">
@@ -278,11 +278,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
               <div className="flex items-center gap-x-3">
                 <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-                  status === "done" ? "bg-[#233542] text-white"
-                    : status === "running" ? "bg-[#233542] text-white"
-                      : status === "failed" ? "bg-red-700 text-white"
-                        : status === "current" ? "border-2 border-[#233542] bg-white text-[#233542]"
-                          : skipped ? "border border-[#8C98A3] bg-white text-[#233542]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
+                  status === "failed" ? "bg-red-700 text-white" : "bg-[#233542] text-white",
+                  status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
                 <span className="flex w-[16.5rem] shrink-0 items-center justify-between gap-2 whitespace-nowrap font-semibold text-[#233542]">
@@ -309,7 +306,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           })}
           <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#EEF1F4]" : ""].join(" ")}>
             <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#233542] bg-white text-[#233542]" : "border border-[#C9C3B4] bg-white text-[#5D6970]"].join(" ")}>
+              "bg-[#233542] text-white", professorCurrent ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
             <span className="w-[16.5rem] shrink-0 whitespace-nowrap font-semibold text-[#233542]">교수자 최종 승인</span>
