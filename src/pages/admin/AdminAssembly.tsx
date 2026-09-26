@@ -905,12 +905,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             ))}
             {productionOf(r) === "core_only" && (
               <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
-                {/* 한 줄에 한 문장. 소요 시간은 실행마다 달라 숫자로 약속하지 않는다. */}
-                <ul className="space-y-0.5 text-[#3F4E57]">
-                  <li>이 시나리오로 학습 미션 초안을 자동으로 만듭니다.</li>
-                  <li>생성에는 몇 분이 걸릴 수 있습니다.</li>
-                  <li>초안은 자동 품질 점검·AI 검토와 교수자 최종 승인을 거쳐야 편성할 수 있습니다.</li>
-                </ul>
+                <p className="text-[#3F4E57]">이 시나리오로 학습 미션 초안을 자동으로 만듭니다.</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {/* 생성 중에도 남색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
                   <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}
