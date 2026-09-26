@@ -8,6 +8,7 @@ import type { Database } from "@/integrations/supabase/types";
 import { MODE_LABEL, SPEECH_ACT_UI, type GenMode, type SpeechActUI } from "@/lib/pragma/enums";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
 import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
+import { buildLearningRecordDetail } from "@/lib/admin/learningRecordDetail";
 import {
   buildMissionCourseIndex,
   EMPTY_FILTERS,
@@ -27,24 +28,6 @@ type ProfileSummary = {
 type MissionLogRow = MissionLog & { profiles: ProfileSummary | null };
 type CourseOption = { id: string; title: string };
 
-const DETAIL_FIELDS: Array<{ key: keyof MissionLog; label: string }> = [
-  { key: "source_text", label: "출발어 원문·전사" },
-  { key: "first_response", label: "최초 응답" },
-  { key: "context_judgment", label: "화행 판단·피드백 기록" },
-  { key: "revision_target_selected", label: "선택한 수정 지점" },
-  { key: "revision_target_source", label: "수정 지점 출처" },
-  { key: "revised_response", label: "수정 응답" },
-  { key: "transfer_response", label: "전이 응답" },
-  { key: "target_feature_observed", label: "목표 특징 관찰" },
-  { key: "semantic_fidelity_status", label: "의미 충실도" },
-  { key: "self_confidence_rating", label: "자신감" },
-  { key: "content_ver", label: "콘텐츠 버전" },
-  { key: "policy_ver", label: "정책 버전" },
-  { key: "attempt_id", label: "수행 attempt ID" },
-  { key: "assignment_id", label: "주차 배치 ID" },
-  { key: "content_hash", label: "실행 콘텐츠 해시" },
-];
-
 const fmtKst = (iso: string | null) => {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("ko-KR", {
@@ -56,14 +39,6 @@ const fmtKst = (iso: string | null) => {
     minute: "2-digit",
     hour12: false,
   });
-};
-
-const renderValue = (value: unknown): string => {
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  return JSON.stringify(value, null, 2);
 };
 
 // 표에는 사람이 읽는 이름만 둔다. 원래 코드값·ID는 행의 title과 「보기」 상세, 연구 데이터 내보내기에 그대로 남는다.
@@ -84,24 +59,29 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const learnerLabel = (row: MissionLogRow) =>
   row.profiles?.full_name ?? row.profiles?.anonymous_participant_id ?? `${row.profile_id.slice(0, 8)}…`;
 
-const DetailPanel = ({ row }: { row: MissionLogRow }) => {
-  const fields = DETAIL_FIELDS.filter(({ key }) => {
-    const value = row[key];
-    return value !== null && value !== undefined && value !== "";
-  });
+// 한 번의 수행을 학습 흐름 순서(상황 → MJT → 통번역 과제 → 이견 → 기록 정보)로 보여 준다.
+const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission: unknown; placement: string }) => {
+  const sections = buildLearningRecordDetail(row, mission, placement, fmtKst);
 
   return (
-    <div className="grid gap-3 rounded-lg border border-border bg-muted/20 p-4 md:grid-cols-2">
-      {fields.length === 0 ? (
+    <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-4">
+      {sections.length === 0 ? (
         <p className="text-sm text-muted-foreground">표시할 수행 내용이 없습니다.</p>
       ) : (
-        fields.map(({ key, label }) => (
-          <div key={key} className="min-w-0">
-            <div className="text-xs font-semibold text-muted-foreground">{label}</div>
-            <pre className="mt-1 whitespace-pre-wrap break-words rounded-md bg-background p-2 text-[13px] leading-relaxed text-foreground">
-              {renderValue(row[key])}
-            </pre>
-          </div>
+        sections.map((section) => (
+          <section key={section.key} aria-label={section.title}>
+            <h3 className="text-[13px] font-bold text-[#15202B]">{section.title}</h3>
+            <div className={`mt-1.5 grid gap-2 ${section.key === "meta" ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+              {section.lines.map((line, index) => (
+                <div key={`${line.label}-${index}`} className="min-w-0">
+                  <div className="text-xs font-semibold text-muted-foreground">{line.label}</div>
+                  <p className="mt-1 whitespace-pre-wrap break-words rounded-md bg-background p-2 text-[13px] leading-relaxed text-foreground">
+                    {line.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
         ))
       )}
     </div>
@@ -172,6 +152,8 @@ const IndividualRecords = () => {
 
   // 미션 제목은 로그에 없으므로 시나리오의 짧은 설명에서 가져온다. 실패하면 짧은 ID로 둔다.
   const [missionBriefs, setMissionBriefs] = useState<Map<string, string>>(new Map());
+  // 「보기」에서 MJT 제시 표현·선택지 문구를 풀어 쓰려고 미션 본문도 함께 읽는다.
+  const [missionContents, setMissionContents] = useState<Map<string, unknown>>(new Map());
   const missionIds = useMemo(
     () => [...new Set((rows ?? []).map((row) => row.mission_id).filter((id) => UUID_PATTERN.test(id)))],
     [rows],
@@ -182,9 +164,10 @@ const IndividualRecords = () => {
     void (async () => {
       const { data, error: briefError } = await supabase
         .from("scenarios")
-        .select("scenario_id,core_content")
+        .select("scenario_id,core_content,mission_content")
         .in("scenario_id", missionIds);
       if (cancelled || briefError) return;
+      setMissionContents(new Map((data ?? []).map((item) => [item.scenario_id, item.mission_content] as [string, unknown])));
       setMissionBriefs(new Map((data ?? []).flatMap((item) => {
         // 짧은 설명(brief)이 없는 미션(v6 전환분 일부)은 상황 설명의 첫 문장으로 대신한다.
         const content = item.core_content as { brief_note_ko?: unknown; situation_ko?: unknown } | null;
@@ -372,6 +355,9 @@ const IndividualRecords = () => {
             <tbody>
               {visibleRows.map((row) => {
                 const open = !!expanded[row.id];
+                const placement = row.course_id
+                  ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
+                  : "편성 외 수행";
                 return (
                   <Fragment key={row.id}>
                     <tr className="border-t border-border">
@@ -383,11 +369,7 @@ const IndividualRecords = () => {
                       <td className="max-w-56 truncate px-3 py-2 font-semibold text-[#15202B]" title={row.mission_id}>
                         {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
                       </td>
-                      <td className="max-w-52 px-3 py-2 text-xs">
-                        {row.course_id
-                          ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
-                          : "편성 외 수행"}
-                      </td>
+                      <td className="max-w-52 px-3 py-2 text-xs">{placement}</td>
                       <td className="whitespace-nowrap px-3 py-2">{taskLabel(row.task_type)}</td>
                       <td className="px-3 py-2">
                         <span
@@ -415,7 +397,7 @@ const IndividualRecords = () => {
                     {open && (
                       <tr className="border-t border-border bg-background">
                         <td colSpan={8} className="px-3 py-3">
-                          <DetailPanel row={row} />
+                          <DetailPanel row={row} mission={missionContents.get(row.mission_id)} placement={placement} />
                         </td>
                       </tr>
                     )}
