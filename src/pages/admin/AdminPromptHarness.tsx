@@ -12,7 +12,7 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "시나리오 생성",
-  mission: "학습 미션 생성 (v5 기준 · v6 변환)",
+  mission: "학습 미션 생성",
   review: "AI 검토와 교차 점검",
   runtime: "학습자 AI 피드백",
   authoring: "실제 자료 활용",
@@ -35,7 +35,7 @@ function HarnessOverview() {
     >
       <div className="max-w-[48rem]">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">
-          품질 관리 구조
+          품질관리 구조
         </p>
         <h2 id="harness-overview-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
           자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다.
@@ -50,8 +50,8 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[14px] font-bold">규칙 기반 검사</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            같은 입력에는 같은 결과를 냅니다. HSK 어휘 참고 범위 점검과 현행 규칙 {ACTIVE_RULE_IDS.length}개가
-            여기에 속합니다.
+            {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
+            같은 입력에는 같은 결과를 냅니다. 현행 규칙 {ACTIVE_RULE_IDS.length}개가 여기에 속합니다.
           </p>
         </div>
         <div className="rounded-lg border border-[#D8E0E5] bg-[#F7FAFB] p-3">
@@ -61,7 +61,8 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[14px] font-bold">프롬프트 통제 기반 검토</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            생성과 분리된 AI가 버전이 관리되는 지시문에 따라 의미·자연성·후보 자격을 검토합니다.
+            생성과 분리된 AI가 버전이 관리되는 지시문에 따라 의미·자연성·후보 자격을 검토합니다. 필요하면 다른
+            AI가 교차 점검합니다.
           </p>
         </div>
         <div className="rounded-lg border border-[#E1DDD4] bg-[#FAF9F7] p-3">
@@ -71,8 +72,7 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[14px] font-bold">교수자 최종 승인</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            자동 품질 점검·AI 검토 근거를 보고 더 쉽게 또는 더 도전적으로 조정할지와 학습자 공개 여부를
-            결정합니다.
+            자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
         </div>
       </div>
@@ -126,8 +126,8 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
 const AdminPromptHarness = () => {
   return (
     <AdminShell
-      title="생성 계약·프롬프트"
-      description="생성 계약과 버전이 관리되는 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
+      title="생성 계약·운영 프롬프트"
+      description="생성 계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
       <HarnessOverview />
 

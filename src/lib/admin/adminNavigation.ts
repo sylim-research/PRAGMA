@@ -22,7 +22,7 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
 // 기존 경로와 권한은 유지한다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   { header: "1. 콘텐츠 제작 기준", items: [
-    { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
+    { to: "/admin/prompt-harness", label: "생성 계약·운영 프롬프트" },
     { to: "/admin/corpus", label: "HSK 3.0 어휘 참조" },
   ]},
   { header: "2. 시나리오 생성", wideCanvas: true, items: [
