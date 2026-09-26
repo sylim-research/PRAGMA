@@ -1,0 +1,54 @@
+{
+  "baseline_hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095",
+  "candidate_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
+  "changed_paths": [
+    "mpj_items[0].situation_ko",
+    "mpj_items[0].explanation_ko",
+    "mpj_items[1].explanation_ko",
+    "mpj_items[2].prompt",
+    "mpj_items[3].explanation_ko",
+    "mpj_items[4].candidates[0].note_ko",
+    "mpj_items[4].candidates[1].note_ko",
+    "mpj_items[4].candidates[2].note_ko",
+    "mpj_items[4].candidates[3].note_ko"
+  ],
+  "allowed_field_count": 9,
+  "outside_allowed_semantic_diff": 0,
+  "memo_checks": [
+    {
+      "item_id": 1,
+      "utf8_bytes": 282,
+      "identical": true,
+      "sha256": "3231d612a1a2bf8adcfd1ed1b3d7ccd99848c713303dbe4954c4da8a20fd229e"
+    },
+    {
+      "item_id": 2,
+      "utf8_bytes": 180,
+      "identical": true,
+      "sha256": "4a6ca5180cd251432c324f192e3ad6f40d69a72a234d51935a94c3179b755080"
+    },
+    {
+      "item_id": 4,
+      "utf8_bytes": 226,
+      "identical": true,
+      "sha256": "6eca71d325fdfb2ef6bb2d58991a003bdc7893c0e728dc8d214fc5403bb070ee"
+    }
+  ],
+  "metadata_excluded": [
+    "provenance",
+    "quality_check",
+    "hsk_lexical_audit",
+    "authoring"
+  ],
+  "not_created": [
+    "DB revision",
+    "approval",
+    "assignment"
+  ],
+  "schema_check": "passed: MissionV6Schema for baseline/candidate",
+  "focused_tests": {
+    "files": 2,
+    "passed": 12,
+    "scope": "candidate schema/hash/allowlist and expression memo preservation/display helpers"
+  }
+}

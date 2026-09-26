@@ -109,3 +109,19 @@
 1. 화면/콘텐츠: 로컬 learner copy와 복구 화면 변경, 콘텐츠 9필드 후보 준비; 현재 운영 콘텐츠/배포는 그대로다.
 2. 구현/검증: focused 63개·typecheck·build 통과. 운영 저장 오류·실제 화용 피드백 원인·캡처 육안 확인은 미완료다.
 3. 논문 구조/RQ/contribution/목차/용어대장/철학/Narrative Gold는 변경하지 않았다. 콘텐츠 후보의 검토·재승인 전에는 새 운영 증거로 인용하지 않는다.
+
+## 후속 — 연구자 최종 보정 수용: 표현 메모 보존
+
+- 앞선 후보 `965bd395…915df`의 표현 메모 삭제는 연구자가 과잉 변경으로 판정했다. 압축한 해설 본문을 유지하되 MJT1·2·4의 기존 표현 메모를 승인 v3에서 UTF-8 바이트 그대로 복원했다(구분자 포함 각각 282/180/226 bytes). 기존 UI helper는 메모 이전의 본문만 반환한다.
+- MJT1 상황문은 `메신저로 다시 부탁합니다.`, 해설 첫 문장은 `이미 파일을 올리기로 한 친한 조원에게 다시 부탁하는 상황이라,`로 연구자가 지정한 그대로 반영했다. 나머지 후보 rewrite 없음.
+- 최종 후보 hash: `6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af`. 앞선 후보 hash는 당시 기록으로 남긴다.
+- `parcelFinalReview.test.ts` 3개 + 기존 `CanonicalMissionRun.expressionNotes.test.tsx` 9개 = focused 12개 통과. schema/hash/승인 v3 대비 9필드 제한/표현 메모 byte 보존/실제 UI helper의 본문 분리를 확인했다. 앱 코드 변경이 없어 typecheck·build·전체 테스트는 반복하지 않았다.
+- 허용 9필드 외 semantic diff=0. provenance/quality_check/hsk_lexical_audit/authoring은 기존 해시 계약의 제외 metadata이며, 이 표현은 raw JSON 전체가 같다는 뜻이 아니다. 기존 approved snapshot과 모든 다른 콘텐츠는 불변이다.
+- 전문 diff와 다음 절차: `docs/research-trail/evidence/2026-09-27-parcel-final-review/final-9-field-diff.md`, `final-candidate-integrity.json`, `revision-creation-procedure.md`.
+- 기존 generated 수정 RPC는 reviewed v3에 적용하지 않는다. 현재 scenario/편성을 보존하는 별도 generated lineage snapshot의 INSERT 절차만 준비했다. 새 DB revision·교수자 승인·편성·push/PR/merge/deploy는 미실행.
+- 과거 저장 RCA 추가 추적은 연구자 지시에 따라 종료한다. 최종 새 release의 운영 E2E는 저장 성공+재조회로 검증하고, 재실패할 때만 Network Preserve Log 절차를 적용한다.
+
+[논문 영향 3줄]
+1. 수치: 최종 후보 hash 갱신, focused 12개 통과; 운영 revision/배포 변화 없음.
+2. 화면: 요청한 MJT1 문구만 후보에서 최종 보정. 복원한 표현 메모는 learner 화면에 노출되지 않음.
+3. 프롬프트·계약: 모델 prompt/schema 변경 없음. 새 콘텐츠는 교수자 재승인 전 상태이며 논문 구조도 불변.

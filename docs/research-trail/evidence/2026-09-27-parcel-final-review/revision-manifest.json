@@ -1,10 +1,10 @@
 {
-  "status": "local_candidate_only_not_approved_not_assigned",
+  "status": "researcher_accepted_local_candidate_pending_new_revision_and_professor_approval",
   "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
   "parent_version_id": "980571d6-8852-48c4-9cde-233713360b5f",
   "parent_version_no": 3,
   "old_hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095",
-  "candidate_hash": "965bd395d6f77d9931e11107a5e9edd247ba729d4303a256a2645c8505d915df",
+  "candidate_hash": "6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af",
   "new_version_id": null,
   "new_version_no": null,
   "hash_contract": "SHA-256 of recursively key-sorted JSON excluding provenance, quality_check, hsk_lexical_audit, authoring (generate-scenario canonicalJson/finalize)",
@@ -20,7 +20,7 @@
     "mpj_items[4].candidates[3].note_ko"
   ],
   "metadata_note": "Original generation provenance/item lineage retained as source ancestry; finalized_at and old quality/HSK/authoring audit removed. This is not a finalized/import-ready revision. Fresh version/item lineage and hash-bound review are required before approval.",
-  "next_gate": "Researcher reviews candidate; separately authorize revision creation/review/approval/assignment. No production writes performed.",
+  "next_gate": "Create a separate generated/pending lineage snapshot only after authorization; preserve approved v3/current scenario and assignment. Fresh professor approval required. No automatic quality/finalization/approval inheritance.",
   "unchanged": [
     "item IDs/types/order",
     "source/target/correction/candidate Chinese text",
@@ -31,5 +31,16 @@
     "contrast (hidden explanation only)",
     "lesson_points",
     "production_task"
-  ]
+  ],
+  "previous_candidate_hash": "965bd395d6f77d9931e11107a5e9edd247ba729d4303a256a2645c8505d915df",
+  "expression_memo_restoration": {
+    "item_ids": [
+      1,
+      2,
+      4
+    ],
+    "source": "approved-v3.snapshot.json",
+    "comparison": "Exact UTF-8 bytes from the original delimiter through end of each explanation_ko",
+    "learner_display": "unchanged: only body before expression memo"
+  }
 }

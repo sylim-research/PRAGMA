@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { MissionV6Schema, type MissionV6 } from "@/lib/pragma/missionV6";
 import { adaptRunnableMissionToCanonical } from "./canonicalMissionRuntime";
+import { splitExpressionMemo, withoutExpressionMemo } from "@/pages/learner/CanonicalMissionRun";
 
 const root = "docs/research-trail/evidence/2026-09-27-parcel-final-review/";
 const read = (name: string) => JSON.parse(readFileSync(root + name, "utf8"));
@@ -27,7 +28,26 @@ describe("representative local content candidate", () => {
     expect(manifest.candidate_hash).not.toBe(manifest.old_hash);
     expect(manifest.new_version_id).toBeNull();
     expect(candidate.quality_check).toBeUndefined();
+    expect(candidate.authoring).toBeUndefined();
+    expect(candidate.hsk_lexical_audit).toBeUndefined();
     expect(candidate.provenance.finalized_at).toBeUndefined();
+  });
+
+  it("preserves the approved memo bytes while existing learner helpers expose only the new body", () => {
+    const marker = "\n\n표현 메모\n";
+    for (const index of [0, 1, 3]) {
+      const before = base.mpj_items[index].explanation_ko as string;
+      const after = candidate.mpj_items[index].explanation_ko as string;
+      expect(before.indexOf(marker)).toBeGreaterThan(0);
+      expect(after.indexOf(marker)).toBeGreaterThan(0);
+      expect(Buffer.from(after.slice(after.indexOf(marker)), "utf8")
+        .equals(Buffer.from(before.slice(before.indexOf(marker)), "utf8"))).toBe(true);
+      const body = after.slice(0, after.indexOf(marker));
+      expect(withoutExpressionMemo(after)).toBe(body);
+      expect(splitExpressionMemo(after).paragraphs.join("\n")).toBe(body);
+    }
+    expect(candidate.mpj_items[0].situation_ko).toBe("친한 팀플 조원이 최종 발표 파일을 단톡방에 올리기로 했습니다. 발표 전날인데 아직 파일이 올라오지 않아 메신저로 다시 부탁합니다.");
+    expect(withoutExpressionMemo(candidate.mpj_items[0].explanation_ko)).toBe("이미 파일을 올리기로 한 친한 조원에게 다시 부탁하는 상황이라, `把最终版PPT发到群里吧。`처럼 把자문으로 짧게 부탁해도 자연스럽습니다.");
   });
 
   it("changes only the nine authorized fields and preserves content/ID/order contracts", () => {

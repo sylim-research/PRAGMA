@@ -563,3 +563,4 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - `evidence/2026-09-27-parcel-final-review/`: 기존 승인 v3 snapshot, 9필드만 변경한 로컬 후보, revision manifest. 기존 hash `bbf072ba…11095`, 후보 `965bd395…915df`; 운영 revision 생성/교수자 재승인/편성 교체는 미실행.
 - 학습자 판단 배너를 accepted 범위에 맞게 정정하고 저장 실패 시 복구 행동을 먼저 배치했다. A/B/C 최대 2회·fallback·저장 계약은 변경하지 않았다.
 - 운영 DB 쓰기·AI 실행·push/PR/merge/deploy 없음. 사용자 후속 지시로 실제 오류 조사는 보류. 이전 운영 성공 증거와 이번 미확정 실패 보고를 합치거나 새 후보의 운영 성공으로 주장하지 않는다.
+- 연구자 후속 보정: 표현 메모 3개를 승인 v3 원문 그대로 복원하고 MJT1 두 문구만 지정대로 보정했다. 최종 후보 hash `6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af`, 허용 필드 외 semantic diff=0, focused 12개 통과. 같은 evidence 폴더의 `final-9-field-diff.md`에 9필드 BEFORE/AFTER 전문, `final-candidate-integrity.json`에 메모 byte/hash 대조, `revision-creation-procedure.md`에 미실행 pending revision 생성 절차를 보존한다. 운영 v3/승인/편성은 그대로다.
