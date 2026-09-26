@@ -5,7 +5,7 @@ export const LIBRARY_VIEWS: { value: LibraryView; label: string }[] = [
   { value: "ready", label: "편성 가능 미션" },
   { value: "pending", label: "승인 전 미션" },
   { value: "missions", label: "전체 미션" },
-  { value: "materials", label: "시나리오 재료" },
+  { value: "materials", label: "미션 생성 전 시나리오" },
 ];
 
 export interface LibraryMissionState {
