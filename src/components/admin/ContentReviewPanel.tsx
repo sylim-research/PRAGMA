@@ -260,7 +260,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
+          <h3 className="flex items-center gap-2 text-[15.5px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
@@ -319,7 +319,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </ol>
         {/* 주 실행 버튼은 학습 미션 제작 화면의 「초안 자동 생성」과 같이 상자 아래 오른쪽, 브랜드 노랑으로 둔다. */}
         {!runningLabel && !professorDone && !professorCurrent && <div className="flex justify-end border-t border-[#ECE8DE] px-4 py-3">
-          <Button className="h-11 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 점검 실행</Button>
+          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 점검 실행</Button>
         </div>}
       </div>}
       {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}

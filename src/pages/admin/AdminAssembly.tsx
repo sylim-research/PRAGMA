@@ -875,7 +875,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
         {reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
-        {!reviewMode && context.length > 0 && <span className="mt-1 block text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
+        {!reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
       </p>
     );
     const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
@@ -886,7 +886,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* 학습 미션 제작에서는 작업대가 자기 안에서 스크롤하므로 머리를 칸 맨 위(top-0)에 붙인다. */}
         <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="min-w-0 flex-1 space-y-3.5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0">{headerBadges(r)}</span>
@@ -911,7 +911,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
         </header>
-        <div className="space-y-3 px-4 py-3 xl:px-5">
+        <div className={[reviewMode ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
         {/* ── 학습 미션 제작: 초안 생성 + 제작 경로 보기 ── */}
         {!reviewMode && (
@@ -922,20 +922,20 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               loaded.mission.schema_version === "mission_v6" && <MissionOutline mission={loaded.mission} />
             ))}
             {productionOf(r) === "core_only" && (
-              <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-4 text-[13.5px]">
+              <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-3.5 text-[13.5px]">
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
                 <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
-                <dl className="mt-2.5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-3 text-[13px]">
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
                   <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">출발텍스트의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
-                <div className="mt-3 flex flex-wrap items-center justify-end gap-3">
+                <div className="mt-2.5 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
                   {/* 주 실행 버튼 = 브랜드 노랑. 생성 중에도 색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
                   <Button disabled={busy !== null} onClick={() => void onGenerateV6(r)}
-                    className={["h-11 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]", busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : ""].join(" ")}>
+                    className={["h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]", busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : ""].join(" ")}>
                     {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" />}
                     {busy === r.scenario_id ? "생성 중" : "미션 자동 생성"}
                   </Button>
@@ -1330,8 +1330,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   ];
   return (
     <section aria-label="제작 워크플로우" className="overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
-      <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
-      <ol className="grid grid-cols-5 gap-2 px-4 py-3">
+      <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
+      <ol className="grid grid-cols-5 gap-2 px-4 py-2.5">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">
             {index > 0 && (
