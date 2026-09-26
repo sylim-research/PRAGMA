@@ -69,9 +69,19 @@ const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
 /** 화면에 보이는 단계 이름에서 서비스 이름을 뺀다. 저장·추적 정보의 모델명은 세부 추적 정보에 그대로 둔다. */
 const STEP_LABEL: Record<string, string> = {
-  "OpenAI 검토": "AI 검토", "Claude 독립 검토": "교차 검토", "OpenAI 재검토": "의견 대조", "최종 검수 자료": "승인용 최종본",
+  "규칙 검사": "자동 품질 점검", "OpenAI 검토": "AI 검토", "Claude 독립 검토": "교차 점검", "OpenAI 재검토": "의견 대조", "최종 검수 자료": "감수 자료 준비",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
+/** 모델 ID를 사람이 읽는 이름으로: gpt-4.1 → GPT-4.1, claude-opus-5 → Claude Opus 5, claude-sonnet-4-5 → Claude Sonnet 4.5. */
+const modelName = (id: string | null | undefined) => {
+  if (!id) return "";
+  if (/^gpt-/i.test(id)) return `GPT-${id.slice(4)}`;
+  const [family, ...rest] = id.split("-");
+  const words = rest.filter((part) => !/^\d{8}$/.test(part));
+  const firstNum = words.findIndex((part) => /^\d/.test(part));
+  const name = firstNum < 0 ? words : [...words.slice(0, firstNum), words.slice(firstNum).join(".")];
+  return [family, ...name].map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+};
 const CONTENT_REVIEW_STEP_LABELS: Record<string, string> = {
   rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
 };
@@ -210,7 +220,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       setBusy(true); setError(null);
       void contentReviewRequest(target, "request_independent", state)
         .then((result) => { queryClient.setQueryData(key, result); return startReviewPreparation([{ target, label: prepLabel }]); })
-        .catch((cause) => setError(cause instanceof Error ? cause.message : "교차 검토 요청 실패"))
+        .catch((cause) => setError(cause instanceof Error ? cause.message : "교차 점검 요청 실패"))
         .finally(() => setBusy(false));
     };
     const rowStatus = (stepKey: string): "done" | "running" | "current" | "todo" | "failed" => {
@@ -223,68 +233,62 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       return index === stepIndex ? "current" : "todo";
     };
     const count = (list: { length: number } | undefined) => list?.length ?? 0;
-    const resultOf = (list: ReviewFinding[] | undefined) => (count(list) ? `지적 ${count(list)}건` : "문제 없음");
+    const resultOf = (list: ReviewFinding[] | undefined, noun = "검토 의견") => (count(list) ? `${noun} ${count(list)}건` : "문제 없음");
     const decisions = run?.adjudication?.result.decisions ?? [];
     const adjudicationResult = run?.adjudication
-      ? `대조 완료 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
+      ? `AI 의견 대조 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
           .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "판정 없음"}`
       : null;
     type Row = { key: string; label: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
     const rows: Row[] = [
-      { key: "rules", label: "규칙 검사", items: run?.rules.findings, result: run ? resultOf(run.rules.findings) : null },
-      { key: "openai", label: "AI 검토", items: primary?.findings, result: primary ? resultOf(primary.findings) : null },
-      { key: "claude", label: "교차 검토", optional: true, items: run?.claude_review?.result.findings,
+      { key: "rules", label: "자동 품질 점검", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
+      { key: "openai", label: `${modelName(run?.openai_review?.model ?? state?.models.openai)} AI 검토`.trim(), items: primary?.findings, result: primary ? resultOf(primary.findings) : null },
+      { key: "claude", label: `${modelName(run?.claude_review?.model ?? state?.models.claude)} 교차 점검`.trim(), optional: true, items: run?.claude_review?.result.findings,
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
-        note: crossRequested ? null : "다른 AI가 독립 검토합니다",
         action: !crossRequested && !run?.claude_review
-          ? <Button size="sm" variant="outline" className="h-7 border-[#C08A2E] px-2.5 text-[12.5px] font-semibold text-[#8A5A14] hover:bg-[#FBF3E3] hover:text-[#6F4710]" disabled={!canCross} onClick={startCross}>교차 검토 실행</Button>
+          ? <Button size="sm" variant="outline" className="h-7 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" disabled={!canCross} onClick={startCross}>교차 점검 실행</Button>
           : null },
-      { key: "adjudication", label: "의견 대조", optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
-        note: crossRequested ? null : "교차 검토 뒤 두 의견을 대조합니다" },
+      { key: "adjudication", label: `${modelName(run?.adjudication?.model ?? state?.models.openai)} 의견 대조`.trim(), optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null },
       ...(steps.some((step) => step.key === "finalization")
-        ? [{ key: "finalization", label: "승인용 최종본", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
+        ? [{ key: "finalization", label: "감수 자료 준비", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
         : []),
     ];
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
-    return <section aria-label="자동 점검" className="space-y-3 text-sm">
+    return <section aria-label="품질 점검 워크플로우" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
-      {state && <div className="rounded-xl border border-[#E2DED2]">
-        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#ECE8DE] bg-[#FBFAF6] px-4 py-2.5">
-          <h3 className="text-[14px] font-bold text-[#233542]">자동 점검</h3>
+      {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
+          <h3 className="flex items-center gap-2 text-[15.5px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
           {runningLabel
-            ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-[#233542] px-3.5 py-1.5 text-[13px] font-semibold text-white">
+            ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
                 <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
               </div>
             : professorDone || professorCurrent
-              ? <span className="text-[13px] font-semibold text-[#233542]">✓ 완료</span>
-              : <Button size="sm" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>자동 점검 실행</Button>}
+              ? <span className="text-[13px] font-semibold text-white">✓ 완료</span>
+              : null}
         </div>
         <ol className="divide-y divide-[#F0EDE4]">
           {rows.map((row, index) => {
             const status = rowStatus(row.key);
             const skipped = Boolean(row.optional) && !crossRequested && status === "todo";
-            return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#FBF3E3]" : ""].join(" ")}>
-              {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#C08A2E]" />}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#EEF1F4]" : ""].join(" ")}>
+              {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
+              <div className="flex items-center gap-x-3">
                 <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-                  status === "done" ? "bg-[#233542] text-white"
-                    : status === "running" ? "bg-[#C08A2E] text-white"
-                      : status === "failed" ? "bg-red-700 text-white"
-                        : status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                          : skipped ? "border border-[#D9C08E] bg-[#FBF6EA] text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                  status === "failed" ? "bg-red-700 text-white" : "bg-[#233542] text-white",
+                  status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
-                <span className={["w-28 shrink-0 font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
-                  {row.label}{row.optional && <span className="ml-1.5 rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
+                <span className="flex w-[16.5rem] shrink-0 items-center justify-between gap-2 whitespace-nowrap font-semibold text-[#233542]">
+                  {row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[11px] font-semibold text-[#233542]">선택</span>}
                 </span>
-                <span className={["min-w-0 flex-1", status === "running" ? "font-semibold text-[#8A5A14]"
-                  : row.result?.startsWith("지적") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
-                  {status === "running" ? "진행 중…" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
-                </span>
-                {row.action}
+                {row.action ? <span className="flex min-w-0 flex-1 justify-end">{row.action}</span> : <span className={["min-w-0 flex-1 whitespace-nowrap text-right", status === "running" ? "font-semibold text-[#233542]"
+                  : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
+                  {status === "running" ? "진행 중" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
+                </span>}
               </div>
               {row.detail && <details className="ml-9 mt-1.5">
                 <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
@@ -300,21 +304,25 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               </details>}
             </li>;
           })}
-          <li className={["flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
+          <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#EEF1F4]" : ""].join(" ")}>
             <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
-              professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+              "bg-[#233542] text-white", professorCurrent ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
-            <span className={["w-28 shrink-0 font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
-            <span className="min-w-0 flex-1 text-[#5D6970]">
-              {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
-                : professorCurrent ? (findings.length ? `교수자 판단 필요 ${findings.length}건 · 「교수자 최종 승인」 메뉴에서 합니다` : "「교수자 최종 승인」 메뉴에서 합니다")
-                : "자동 점검을 마치면 「교수자 최종 승인」 메뉴에서 합니다"}
+            <span className="w-[16.5rem] shrink-0 whitespace-nowrap font-semibold text-[#233542]">교수자 최종 승인</span>
+            <span className="min-w-0 flex-1 whitespace-nowrap text-right text-[#5D6970]">
+              {professorDone ? "승인 완료"
+                : professorCurrent ? (findings.length ? `감수 대기 · 의견 ${findings.length}건` : "감수 대기")
+                : "대기"}
             </span>
           </li>
         </ol>
+        {/* 주 실행 버튼은 학습 미션 제작 화면의 「초안 자동 생성」과 같이 상자 아래 오른쪽, 브랜드 노랑으로 둔다. */}
+        {!runningLabel && !professorDone && !professorCurrent && <div className="flex justify-end border-t border-[#ECE8DE] px-4 py-3">
+          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 점검 실행</Button>
+        </div>}
       </div>}
-      {state && !run && !historicalApproval && <p className="text-[13px] text-[#7A5A12]">{state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다." : "아직 점검 기록이 없습니다."}</p>}
+      {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}
       {queued?.status === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error}</p>}
       {error && <p role="alert" className="text-red-800">{error}</p>}

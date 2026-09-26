@@ -245,7 +245,7 @@ const AdminAuthentic = () => {
                                   onClick={() => void sendStoredToGenerator(c, row)}
                                   className="h-8 bg-[#15202B] px-2.5 text-[12.5px] text-white hover:bg-[#15202B]/90"
                                 >
-                                  상황 시나리오 만들기
+                                  시나리오 만들기
                                 </Button>
                               )}
                               <button
@@ -280,7 +280,7 @@ const AdminAuthentic = () => {
   return (
     <AdminShell
       title="실제 자료 활용 분석"
-      description="YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 상황 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 생성 결과에 남습니다."
+      description="YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 생성 결과에 남습니다."
     >
       {saveNote && (
         <p

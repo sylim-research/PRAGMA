@@ -293,7 +293,7 @@ const AdminBatch = () => {
 
   return (
     <AdminShell title="시나리오 배치 생성"
-      description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
+      description="조건별 생성 계획을 세우고 AI로 시나리오의 상황·원문을 생성합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
       <div className="space-y-5">
         <div className="space-y-5">
           <div className="min-w-0 space-y-5">
@@ -317,22 +317,22 @@ const AdminBatch = () => {
                   const counts = modeCounts[level];
                   return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + ""}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
-                      <span className="text-sm">{LEVEL[level]}</span>
-                      <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
+                      <span className="text-[16px]">{LEVEL[level]}</span>
+                      <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-[13px] font-medium">건</span></span>
                     </p>
                     <div className="mt-1.5 grid grid-cols-2 gap-2">
                       <div className="min-w-0">
-                        <Label htmlFor={"batch-total-" + level} className="text-xs">생성 건수</Label>
+                        <Label htmlFor={"batch-total-" + level} className="text-[13px]">생성 건수</Label>
                         <Input id={"batch-total-" + level} aria-label={LEVEL[level] + " · 총 생성 건수"} type="number" min={0} step={1} value={settings[level].total}
                           disabled={busy} onChange={event => setProductionSetting(level, "total", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                       <div className="min-w-0">
-                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-xs">통역(%)</Label>
+                        <Label htmlFor={"batch-percent-" + level} className="whitespace-nowrap text-[13px]">통역(%)</Label>
                         <Input id={"batch-percent-" + level} aria-label={LEVEL[level] + " · 통역 비율"} type="number" min={0} max={100} step={1} value={settings[level].interpretingPercent}
                           disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                     </div>
-                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
+                    <p className="mt-1 text-[12.5px] tabular-nums text-[#4E5A63]">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
               </div>
@@ -342,17 +342,17 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
-              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
+              {/* 상자는 흰색으로 통일하고, 번역·통역은 이름 앞 색 점(호박·세이지)으로, 핵심 변수인 화행별은 금색 띠로만 구분한다. 2026-09-26 */}
+              {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
+                  「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
+              <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
-                <PlanMetric label="번역" value={summary.translation} />
-                <PlanMetric label="통역" value={summary.interpreting} />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
+                <PlanMetric dot="#C9A55A" label="번역" value={summary.translation} />
+                <PlanMetric dot="#7E9E88" label="통역" value={summary.interpreting} />
                 {summary.total > 0 && <>
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
-                    description="화행 × 수준 × 번역/통역" />
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
-                    description="화행 × P × D × R" />
+                  {/* 제목과 설명이 같은 말을 되풀이해서, 조합 식 하나를 제목으로 쓴다. */}
+                  <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
+                  <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × P × D × R" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27} />
                 </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
@@ -367,16 +367,17 @@ const AdminBatch = () => {
               ) : <>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
+              {/* 수준별·도메인별은 항목이 짧아 좁게 둔다(이름과 숫자가 멀어지면 짝이 안 읽힌다). */}
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-[0.75fr_0.75fr_1fr_1fr] lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
-                <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
-                  <h3 className="text-[12.5px] font-semibold">화행별</h3>
+                <div className="rounded-lg border border-[#E6DECB] border-l-4 border-l-[#D8C07A] bg-white px-3 py-2 sm:col-span-2">
+                  <h3 className="text-[13.5px] font-semibold">화행별</h3>
                   <div className="mt-1.5 flex flex-wrap gap-1.5">{Object.entries(SPEECH_ACT_UI).map(([key, label]) =>
-                    <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
+                    <Badge key={key} variant="outline" className="gap-2 bg-white py-0.5 text-[13px] font-normal">{label}<span className="font-semibold tabular-nums">{summary.bySpeechAct[key] ?? 0}</span></Badge>)}</div>
                 </div>
               </div>
               </>}
@@ -507,26 +508,28 @@ const AdminBatch = () => {
 const StepNum = ({ n }: { n: number }) =>
   <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
 
-const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+// 상자 바탕은 모두 흰색 + 같은 가는 테두리로 통일하고, 차이는 이름 앞 작은 색 점과 화행별의 금색 띠로만 준다.
+// 옅은 바탕색을 여러 개 섞으면 명도가 비슷해 탁해 보인다(2026-09-26 디자인 판단).
+const PlanMetric = ({ label, value, unit = "건", primary = false, dot, className = "border border-[#E6DECB] bg-white" }: { label: string; value: number; unit?: string; primary?: boolean; dot?: string; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
-    <p className="text-xs">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
+    <p className="flex items-center gap-1.5 text-[16px] font-semibold">{dot && <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-[13px] font-medium">{unit}</span></p>
   </div>;
 
-const CoverageCard = ({ title, filled, total, description, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; description: string; className?: string }) =>
-  <div className={"rounded-lg border px-3 py-2 " + className}>
-    <div className="flex flex-wrap items-center justify-between gap-2 text-xs"><h3 className="font-semibold">{title}</h3><span className="tabular-nums">{filled} / {total}조합</span></div>
-    <Progress className="mt-2 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
-    <p className="mt-1 text-xs leading-5 text-muted-foreground">{description}</p>
+const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; className?: string }) =>
+  <div className={"flex flex-col justify-center rounded-lg border px-3 py-2 " + className}>
+    <div className="flex flex-wrap items-baseline justify-between gap-2"><h3 className="text-[14px] font-semibold text-[#15202B]">{title}</h3><span className="text-[14px] font-semibold tabular-nums text-[#15202B]">{filled} / {total}<span className="ml-0.5 text-[12.5px] font-normal text-[#4E5A63]">조합</span></span></div>
+    <Progress className="mt-2.5 h-1.5" value={total ? filled / total * 100 : 0} aria-label={title} />
   </div>;
 
 
-const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
+const Dist = ({ title, rows, className = "border border-[#E6DECB] bg-white" }: { title: string; rows: [string, number][]; className?: string }) => (
   <div className={"rounded-lg px-3 py-2 " + className}>
-    <div className="text-[12.5px] font-semibold">{title}</div>
-    <ul className="mt-1.5 space-y-0.5">
+    <div className="text-[13.5px] font-semibold">{title}</div>
+    {/* 칸이 넓어도 이름과 숫자가 한눈에 짝지어지도록 목록 폭을 제한한다. */}
+    <ul className="mt-1.5 max-w-[220px] space-y-0.5">
       {rows.map(([label, n]) => (
-        <li key={label} className="flex items-baseline justify-between gap-3 text-[12.5px]">
-          <span className="text-muted-foreground">{label}</span>
+        <li key={label} className="flex items-baseline justify-between gap-3 text-[13.5px]">
+          <span className="text-[#4E5A63]">{label}</span>
           <span className={n === 0 ? "font-semibold text-[#B9AF97]" : "font-semibold text-[#15202B]"}>{n}</span>
         </li>
       ))}

@@ -190,7 +190,7 @@ describe("assembly workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(screen.getByRole("button", { name: /초안 생성 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
     expect(within(bench).getByRole("heading", { name: "생성할 시나리오" })).toBeInTheDocument();
-    expect(within(bench).getByRole("button", { name: "초안 자동 생성" })).toBeEnabled();
+    expect(within(bench).getByRole("button", { name: "미션 자동 생성" })).toBeEnabled();
     expect(within(queue()).queryByText("옛 코어")).not.toBeInTheDocument();
   });
 
@@ -204,7 +204,7 @@ describe("assembly workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     // 기본 칩(초안 생성 대기)이 비어 있으면 화면이 채워진 칩으로 넘어간다 — 그 전환을 기다린다.
     expect(await within(bench).findByRole("heading", { name: "새 v6 미션" })).toBeInTheDocument();
-    expect(within(bench).getByRole("region", { name: "제작 경로" })).toBeInTheDocument();
+    expect(within(bench).getByRole("region", { name: "제작 워크플로우" })).toBeInTheDocument();
     expect(within(bench).queryByRole("button", { name: "미션 조립" })).not.toBeInTheDocument();
     expect(within(queue()).queryByText("옛 v6 초안")).not.toBeInTheDocument();
     expect(within(queue()).queryByText("시나리오만")).not.toBeInTheDocument();

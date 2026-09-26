@@ -854,7 +854,7 @@ const AdminComposer = () => {
               {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
               {!conditionsOpen && (
                 <span className="text-[12.5px] text-muted-foreground">
-                  {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "주제 " + themes.length + "개" : "전체 주제"}
+                  {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "편성 주제 " + themes.length + "개" : "편성 주제 전체"}
                 </span>
               )}
               <span className="text-[12px] text-[#46515A]">

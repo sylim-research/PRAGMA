@@ -28,9 +28,6 @@ import {
   DIRECTION_LABEL,
   DOMAIN,
   INDUSTRY,
-  BUSINESS_FUNCTION,
-  BUSINESS_FUNCTION_PRIMARY,
-  CHANNEL_UI,
   CHANNEL_TO_GENRE,
   MODE_LABEL,
   COMPLEX_TASK_TO_CONTEXT,
@@ -116,31 +113,6 @@ const CHALLENGE_KO: Record<string, string> = {
   imposition: "부담도",
 };
 
-// Speech-act pragmatic burden weight (0=low, 1=mid, 2=high). Reference only.
-const SPEECH_ACT_WEIGHT: Record<SpeechActUI, number> = {
-  request: 1, refusal: 2, apology: 1, thanks: 0,
-  proposal: 1, agreement: 1, opposition: 2, compliment: 0, complaint: 2,
-};
-
-// Derived pragmatic burden (참고용). Combines speech act weight + P/D/R.
-type BurdenLevel = "low" | "medium" | "high";
-function computePragmaticBurden(
-  sa: SpeechActUI, p: PdrPower, d: PdrDistance, r: PdrBurden
-): { level: BurdenLevel; label: string; reasons: string[] } {
-  const pw = p === "equal" ? 0 : 1;
-  const dw = d === "formal" ? 1 : d === "acquaintance" ? 0.5 : 0;
-  const rw = r === "high" ? 1 : r === "mid" ? 0.5 : 0;
-  const score = SPEECH_ACT_WEIGHT[sa] + pw + dw + rw;
-  const level: BurdenLevel = score <= 1 ? "low" : score <= 3 ? "medium" : "high";
-  const label = level === "low" ? "낮음" : level === "medium" ? "보통" : "높음";
-  const reasons: string[] = [`${SPEECH_ACT_UI[sa]} 화행`];
-  if (pw) reasons.push("지위 차 있음");
-  if (d === "formal") reasons.push("초면 관계");
-  else if (d === "acquaintance") reasons.push("지인 수준 관계");
-  if (r === "high") reasons.push("부담 높음");
-  else if (r === "mid") reasons.push("부담 중간");
-  return { level, label, reasons };
-}
 
 
 // CHANNEL_UI · CHANNEL_TO_GENRE · MODE_LABEL · COMPLEX_TASK_TO_CONTEXT는
@@ -228,7 +200,7 @@ interface BatchItem {
   auto_check: "pass" | "warning";
 }
 
-const formField = "h-9 text-[13px] bg-[#FAF7EE] border-[#EAE4D2]";
+const formField = "h-9 text-[13px] bg-[#FFFDF8] border-[#E6DECB]";
 
 // 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
 const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
@@ -237,11 +209,63 @@ const EXAMPLE_R: Record<string, string> = { low: "R: 낮음", mid: "R: 중간", 
 
 // 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
 const HOLD_STAGE_LABEL = {
-  preflight: "장면 사전 검토에서 보류",
-  rule: "규칙 검사에서 보류",
-  semantic: "시나리오 조건 검토에서 보류",
+  preflight: "보류 · 장면 사전 검토",
+  rule: "보류 · 자동 품질 점검",
+  semantic: "보류 · 시나리오 조건 검토",
   system: "생성 오류",
 } as const;
+
+// 보류 카드 맨 위의 고정 안내. 아래 사유 원문을 끝까지 읽지 않아도 무엇이 일어났는지 알 수 있게 한다.
+const HOLD_STAGE_SUMMARY = {
+  preflight: "지정한 관계 조건과 장면이 맞지 않아 시나리오를 만들지 않았습니다.",
+  rule: "자동 품질 점검 규칙에 걸려 보류했습니다.",
+  semantic: "생성된 시나리오가 요청한 조건과 맞지 않아 보류했습니다.",
+} as const;
+
+// 사유 원문의 출처. 장면 사전 검토·시나리오 조건 검토는 AI 의견, 자동 품질 점검은 규칙 결과다.
+const HOLD_REASON_SOURCE = {
+  preflight: "AI 검토 의견",
+  rule: "점검 결과",
+  semantic: "AI 검토 의견",
+} as const;
+
+// 생성 조건 줄: 핵심 변수(화행·P·D·R)와 부가 조건(방향·수준·수행 방식)을 묶음으로 나눠 보여 준다.
+// 입력은 [화행, "P: …", "D: …", "R: …", 방향, 수준, 수행 방식] 순서의 짧은 표기다.
+const PDR_AXIS_NAME: Record<string, string> = { P: "권력(P)", D: "거리(D)", R: "부담도(R)" };
+
+function ConditionSummary({ conditions }: { conditions: string[] }) {
+  const [act, ...rest] = conditions;
+  const pdr: { name: string; value: string }[] = [];
+  const others: string[] = [];
+  for (const c of rest) {
+    const m = c.match(/^([PDR]):\s*(.+)$/);
+    if (m) pdr.push({ name: PDR_AXIS_NAME[m[1]], value: m[2] });
+    else others.push(c);
+  }
+  const heading = "text-[10.5px] font-semibold tracking-[0.04em] text-[#8A7621]";
+  return (
+    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_1fr_auto]">
+      <div className="min-w-0">
+        <div className={heading}>화행</div>
+        <div className="mt-1 text-[14px] font-bold text-[#15202B]">{act}</div>
+      </div>
+      <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
+        <div className={heading}>관계 조건 (P·D·R)</div>
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          {pdr.map(({ name, value }) => (
+            <span key={name} className="whitespace-nowrap text-[12.5px] text-[#5B6770]">
+              {name} <b className="text-[13.5px] font-bold text-[#15202B]">{value}</b>
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
+        <div className={heading}>언어 · 수준 · 수행 방식</div>
+        <div className="mt-1 whitespace-nowrap text-[12.5px] text-[#4E5A63]">{others.join(" · ")}</div>
+      </div>
+    </div>
+  );
+}
 
 function humanizeHoldReason(text: string): string {
   const length = text.match(/최대 유효 글자 (\d+)자 초과\(공백·문장부호 제외 실측 (\d+)자\)/);
@@ -263,6 +287,10 @@ function humanizeHoldReason(text: string): string {
     .replace(/\brelation_ko\b/g, "관계")
     .replace(/\bsource_text\b/g, "원문")
     .replace(/\bPDR\b/g, "P·D·R")
+    .replace(/\bfeasible\s*=\s*false\b/g, "장면 성립 불가")
+    .replace(/\bfeasible\s*=\s*true\b/g, "장면 성립 가능")
+    .replace(/\bscene_seed_ko\b/g, "장면 초안")
+    .replace(/(?<![A-Za-z])([pdr])(?=[이가은는을를의와과도로「\s=])/g, (m) => m.toUpperCase())
     .replace(/^코어\s*/, "");
 }
 
@@ -377,11 +405,6 @@ const AdminGenerator = () => {
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((p) => ({ ...p, [k]: v }));
 
-  // Channels filtered by task mode.
-  // phone hidden per media-3 LOCK (대면구어·위챗·이메일). Enum key kept for stored data.
-  const channelsForMode: ChannelUI[] =
-    taskMode === "translation" ? ["email", "messenger"] : ["facetoface"];
-
   // Clear any stale outline candidates when generation conditions change.
   const resetOutlines = () => {
     setOutlines(null);
@@ -473,7 +496,7 @@ const AdminGenerator = () => {
     context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
     domain: form.domain,
     industry: form.domain === "work" ? form.industry : null,
-    func: form.domain === "work" ? form.func : null,
+    func: null,
     pdr_power: form.pdr_power,
     pdr_distance: form.pdr_distance,
     pdr_burden: form.pdr_burden,
@@ -510,7 +533,14 @@ const AdminGenerator = () => {
     resetOutlines();
     try {
       const { data, error } = await supabase.functions.invoke("generate-scenario", {
-        body: { ...baseGenBody(), action: "outline", outline_count: outlineCount, topic_seed_ko: topic?.situationSeedKo ?? null },
+        // 채널을 고르지 않으므로 번역은 특정 매체(이메일)로 못 박지 않고 「서면」으로만 알린다 —
+        // 이어지는 시나리오 생성(action:core)도 원문을 글/말(written/spoken)로만 구분한다.
+        // 서버는 모르는 channel_ui 값을 그대로 프롬프트에 넣는다(CHANNEL_UI_KO[x] ?? x). 2026-09-26
+        body: {
+          ...baseGenBody(),
+          ...(taskMode === "translation" ? { channel_ui: "서면(이메일·메신저 등 장면에 맞는 글)" } : {}),
+          action: "outline", outline_count: outlineCount, topic_seed_ko: topic?.situationSeedKo ?? null,
+        },
       });
       if (error) throw error;
       const list = (data?.outlines ?? []) as { title: string; situation: string }[];
@@ -571,7 +601,7 @@ const AdminGenerator = () => {
       PDR_BURDEN_SHORT[form.pdr_burden],
       DIRECTION_LABEL[form.language_direction],
       LEVEL[form.level],
-      CHANNEL_UI[form.channel],
+      MODE_LABEL[taskMode],
     ]);
     const indices = [...selectedOutlines].sort((a, b) => a - b);
     const results: CoreResult[] = [];
@@ -600,7 +630,7 @@ const AdminGenerator = () => {
               domain: form.domain,
               domain_ko: DOMAIN[form.domain],
               industry: form.domain === "work" ? form.industry : null,
-              func: form.domain === "work" ? form.func : null,
+              func: null,
               topic_code: topicCode,
               mode,
               channel: legacyChannelOf(mode),
@@ -700,7 +730,7 @@ const AdminGenerator = () => {
           learner_level: form.level,
           domain: form.domain,
           industry_sector: form.domain === "work" ? form.industry : null,
-          business_function: form.domain === "work" ? form.func : null,
+          business_function: null,
           mode,
           source_modality: modalityOf(mode),
           theme_code: themeCode,
@@ -734,9 +764,6 @@ const AdminGenerator = () => {
     setFinalizing(false);
   };
 
-  const burden = computePragmaticBurden(
-    form.speech_act_ui, form.pdr_power, form.pdr_distance, form.pdr_burden,
-  );
 
 
   const generate = async () => {
@@ -758,7 +785,7 @@ const AdminGenerator = () => {
           context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
           domain: form.domain,
           industry: form.domain === "work" ? form.industry : null,
-          func: form.domain === "work" ? form.func : null,
+          func: null,
           pdr_power: form.pdr_power,
           pdr_distance: form.pdr_distance,
           pdr_burden: form.pdr_burden,
@@ -820,7 +847,7 @@ const AdminGenerator = () => {
             level: form.level,
             context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
             industry: form.domain === "work" ? form.industry : null,
-            func: form.domain === "work" ? form.func : null,
+            func: null,
             pdr_power: form.pdr_power,
             pdr_distance: form.pdr_distance,
             pdr_burden: form.pdr_burden,
@@ -847,11 +874,11 @@ const AdminGenerator = () => {
   const tags = aiResult
     ? [
         SPEECH_ACT_UI[form.speech_act_ui],
-        CHANNEL_UI[form.channel],
+        MODE_LABEL[taskMode],
         LEVEL[form.level],
         DOMAIN[form.domain],
         ...(form.domain === "work"
-          ? [INDUSTRY[form.industry], BUSINESS_FUNCTION[form.func]]
+          ? [INDUSTRY[form.industry]]
           : []),
         COMPLEX_TASK_UI[form.complex_task],
         `${PDR_POWER_SHORT[form.pdr_power]} / ${PDR_DISTANCE_SHORT[form.pdr_distance]} / ${PDR_BURDEN_SHORT[form.pdr_burden]}`,
@@ -900,9 +927,10 @@ const AdminGenerator = () => {
       )}
 
       {/* 2-col layout */}
-      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-5">
+      {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* LEFT — settings */}
-        <section className="lg:col-span-2 space-y-5 rounded-lg border border-border bg-card p-5">
+        <section className="space-y-5 rounded-lg border border-[#E6DECB] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
             <SectionTitle n={1} label="과제 모드" />
@@ -917,8 +945,8 @@ const AdminGenerator = () => {
                     className={[
                       "h-10 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9] text-[#7A4A0A]"
-                        : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {m === "translation" ? "번역" : "통역"}
@@ -953,14 +981,14 @@ const AdminGenerator = () => {
                     className={[
                       "rounded-md py-2 px-1.5 text-center transition-colors leading-tight",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9]"
-                        : "border border-[#EAE4D2] bg-transparent hover:bg-muted",
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     <div
                       className={[
-                        "text-[13.5px] font-medium",
-                        on ? "text-[#7A4A0A]" : "text-foreground",
+                        "text-[13.5px]",
+                        on ? "font-bold text-[#15202B]" : "font-medium text-foreground",
                       ].join(" ")}
                     >
                       {SPEECH_ACT_UI[sa]}
@@ -968,7 +996,7 @@ const AdminGenerator = () => {
                     <div
                       className={[
                         "text-[10px] mt-0.5",
-                        on ? "text-[#7A4A0A]" : "text-muted-foreground",
+                        on ? "text-[#4E5A63]" : "text-muted-foreground",
                       ].join(" ")}
                     >
                       {SPEECH_ACT_UI_EN[sa]}
@@ -979,12 +1007,13 @@ const AdminGenerator = () => {
             </div>
           </div>
 
-          {/* 4. P-D-R 관계 조건 + 5. 예상 화용 부담도 */}
-          <div className="rounded-md bg-[#FBEFD9]/40 border border-[#EAE4D2] p-3.5">
-            <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
-            <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
+          {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
+          {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
+          <div>
+            <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" />
+            <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="지위 · P" tone="accent">
+              <Field label="권력 · P">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -997,7 +1026,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="거리 · D" tone="accent">
+              <Field label="거리 · D">
                 <Select
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
@@ -1010,7 +1039,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="부담 · R" tone="accent">
+              <Field label="부담도 · R">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -1025,33 +1054,14 @@ const AdminGenerator = () => {
               </Field>
             </div>
 
-            {/* 5. 예상 화용 부담도 (파생 배지) */}
-            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-[#EAE4D2] bg-background px-3 py-2">
-              <span className="text-[11.5px] text-muted-foreground">↘ 참고</span>
-              <span className="text-[11.5px] text-muted-foreground">
-                <span className="mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#FBEFD9] text-[10px] font-medium text-[#7A4A0A]">5</span>
-                예상 화용 부담도
-              </span>
-              <span
-                className={[
-                  "rounded-full px-3 py-0.5 text-[11.5px] font-medium",
-                  burden.level === "low" && "bg-[#EAF3DE] text-[#3B6D11]",
-                  burden.level === "medium" && "bg-[#FAEEDA] text-[#854F0B]",
-                  burden.level === "high" && "bg-[#FCEBEB] text-[#A32D2D]",
-                ].filter(Boolean).join(" ")}
-              >
-                {burden.label}
-              </span>
-              <span className="ml-auto text-right text-[10.5px] leading-tight text-muted-foreground">
-                근거: {burden.reasons.join(" · ")}
-              </span>
-            </div>
           </div>
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
           <div>
-            <SectionTitle n={4} label="언어 · 수준 · 채널" />
-            <div className="mt-2 grid grid-cols-3 gap-3">
+            {/* 채널(매체)은 연구 변수가 아니다(시나리오 매트릭스 LOCK, 2026-07-25 매체 축 폐기). 화면에서 고르지 않고
+                과제 모드에서 정한다: 번역 = 이메일, 통역 = 대면(setTaskModeSafe). 2026-09-26 */}
+            <SectionTitle n={4} label="언어 · 수준" />
+            <div className="mt-2 grid grid-cols-2 gap-3">
               <Field label="언어 방향">
                 <Select
                   value={form.language_direction}
@@ -1075,26 +1085,13 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="채널">
-                <Select
-                  value={form.channel}
-                  onValueChange={(v) => update("channel", v as ChannelUI)}
-                >
-                  <SelectTrigger className={formField}><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {channelsForMode.map((c) => (
-                      <SelectItem key={c} value={c}>{CHANNEL_UI[c]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
             </div>
 
           </div>
 
           {/* 7. 도메인 · 산업 · 직무 */}
           <div>
-            <SectionTitle n={5} label="도메인 · 산업 · 직무" />
+            <SectionTitle n={5} label="도메인 · 업종 · 편성 주제" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
@@ -1119,30 +1116,19 @@ const AdminGenerator = () => {
                             if (next) setThemeCode(next);
                           }
                         }}
-                        className="accent-[#BA7517]"
+                        className="accent-[#15202B]"
                       />
                       {DOMAIN[d]}
                     </label>
                   ))}
                 </div>
               </div>
-              <div>
-                <label className="text-[12.5px] font-semibold text-[#3F4E59]">주제</label>
-                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
-                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
-                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
-                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
-                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* 순서 = 장면 조건(도메인 → 업종 배경) 다음에 편성 꼬리표(편성 주제). 편성 주제는 화용 변인이 아니라
+                  15주 수업 편성·검색에 쓰는 소재 영역이다(scenarioTopics.ts). 2026-09-26 */}
               {form.domain === "work" && (
                 <div>
                   <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    산업 분야
+                    업종 배경 <span className="font-normal text-[#7A858C]">· 직장 장면에만</span>
                   </label>
                   <Select
                     value={form.industry}
@@ -1157,25 +1143,22 @@ const AdminGenerator = () => {
                   </Select>
                 </div>
               )}
-              {form.domain === "work" && (
-                <div>
-                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    직무 기능
-                  </label>
-                  <Select
-                    value={form.func}
-                    onValueChange={(v) => update("func", v as BusinessFunction)}
-                  >
-                    <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
-                    <SelectContent className="max-h-72 overflow-y-auto z-50">
-                      {BUSINESS_FUNCTION_PRIMARY.map((code) => (
-                        <SelectItem key={code} value={code}>{BUSINESS_FUNCTION[code]}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                </div>
-              )}
+              <div>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">
+                  편성 주제 <span className="font-normal text-[#7A858C]">· 수업 편성에서 쓰는 소재 영역</span>
+                </label>
+                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
+                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
+                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
+                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
+                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* 직무 기능은 뺐다(2026-09-26): 설계 층위는 도메인 → 산업까지이며, 조건을 더 좁히면 장면 사전 검토 보류만 늘어난다. */}
             </div>
           </div>
 
@@ -1193,8 +1176,8 @@ const AdminGenerator = () => {
                     className={[
                       "flex-1 h-9 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#BA7517] bg-[#FBEFD9] text-[#7A4A0A]"
-                        : "border border-[#EAE4D2] bg-transparent text-muted-foreground hover:bg-muted",
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {n}개
@@ -1208,14 +1191,14 @@ const AdminGenerator = () => {
               type="button"
               onClick={generateOutlines}
               disabled={outlineLoading || finalizing}
-              className="mt-2.5 w-full h-10 rounded-md border border-[#EAE4D2] bg-transparent text-[13px] text-[#1d2336] hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-[#FFFDF8] text-[13px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="inline-flex items-center justify-center gap-1.5">
                 <Search className="h-4 w-4" aria-hidden />
                 {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
               </span>
             </button>
-            <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">
+            <p className="mt-1.5 text-center text-[11.5px] text-[#5B6770]">
               개요를 먼저 확인하고, 선택한 것만 전체 시나리오로 생성됩니다
             </p>
 
@@ -1227,8 +1210,8 @@ const AdminGenerator = () => {
 
             {outlines && outlines.length > 0 && (
               <div className="mt-2.5 space-y-1.5">
-                <div className="text-[11px] text-muted-foreground">
-                  목표 화행 <b className="text-[#7A4A0A]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
+                <div className="text-[12px] text-[#4E5A63]">
+                  목표 화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
                 </div>
                 {outlines.map((o, i) => {
                   const on = selectedOutlines.has(i);
@@ -1236,20 +1219,20 @@ const AdminGenerator = () => {
                     <label
                       key={i}
                       className={[
-                        "flex items-start gap-2 rounded-md border px-3 py-2 text-[12.5px] cursor-pointer",
-                        on ? "border-[#BA7517] bg-[#FBEFD9]" : "border-[#EAE4D2] bg-transparent",
+                        "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[13px] cursor-pointer transition-colors",
+                        on ? "border-[#CDBB8A] bg-[#FBF5E6]" : "border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                       ].join(" ")}
                     >
                       <input
                         type="checkbox"
                         checked={on}
                         onChange={() => toggleOutline(i)}
-                        className="mt-0.5"
+                        className="mt-1 accent-[#15202B]"
                       />
                       <span>
-                        <span className="font-medium text-[#1d2336]">{o.title || "(제목 없음)"}</span>
+                        <span className="font-semibold text-[#15202B]">{o.title || "(제목 없음)"}</span>
                         {o.situation && (
-                          <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-foreground">
+                          <span className="mt-1 block text-[12.5px] leading-[1.65] text-[#3F4E59]">
                             {o.situation}
                           </span>
                         )}
@@ -1288,7 +1271,7 @@ const AdminGenerator = () => {
 
 
         {/* RIGHT — preview */}
-        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24 lg:col-span-3 lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
+        <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
           <h2 className="text-[15px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
@@ -1327,15 +1310,10 @@ const AdminGenerator = () => {
 
             {!loading && !finalizing && !coreResults && !aiResult && example && (
               <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
-                  <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
-                  {example.conditions.map((c) => (
-                    <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
-                  ))}
-                </div>
+                <ConditionSummary conditions={example.conditions} />
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">편성된 생성 예시</span>
+                    <span className="inline-flex items-center rounded border border-[#E3D3A0] bg-[#FDF8EA] px-1.5 py-0.5 text-[11px] font-medium text-[#6D5C1F]">생성 예시</span>
                     <span className="text-[13.5px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>
@@ -1353,15 +1331,15 @@ const AdminGenerator = () => {
             {!finalizing && coreResults && (
               <div className="space-y-4">
                 {coreConditions.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-1.5 rounded-md bg-[#F3F0E7] px-3 py-2">
-                    <span className="mr-1 text-[11.5px] font-semibold text-[#15202B]">생성 조건</span>
-                    {coreConditions.map((c) => (
-                      <span key={c} className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11.5px] text-[#3F4E59]">{c}</span>
-                    ))}
-                  </div>
+                  <ConditionSummary conditions={coreConditions} />
                 )}
-                {coreResults.map((r, i) => (
-                  <div key={i} className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
+                {coreResults.map((r, i) => {
+                  const heldStage = !r.ok && r.stage && r.stage !== "system" ? r.stage : null;
+                  return (
+                  <div key={i} className={[
+                    "space-y-2.5 rounded-lg border bg-white p-4 shadow-sm",
+                    heldStage ? "border-[#E6E1D5] border-l-4 border-l-[#D9A441]" : "border-[#D9D2BF]",
+                  ].join(" ")}>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
                         className={[
@@ -1370,27 +1348,34 @@ const AdminGenerator = () => {
                             ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
                             : r.stage === "system"
                               ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
-                              : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
+                              : "border-[#EBCB8B] bg-[#FBF3E0] text-[#7A4A0A]",
                         ].join(" ")}
                       >
                         {r.ok ? "✓ 초안 저장" : HOLD_STAGE_LABEL[r.stage ?? "system"]}
                       </span>
                       {r.ok && r.rule && (
-                        <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
-                          규칙 검사 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
+                        <span className={[
+                          "inline-flex items-center rounded border bg-white px-1.5 py-0.5 text-[11px] font-medium",
+                          r.rule === "pass" ? "border-[#9FD3B5] text-[#1F6B45]"
+                            : r.rule === "warning" ? "border-[#EBCB8B] text-[#7A4A0A]"
+                              : "border-[#FCA5A5] text-[#991B1B]",
+                        ].join(" ")}>
+                          자동 품질 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
                       <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
                     </div>
-                    {r.error && (
-                      <div
-                        className={[
-                          "rounded-md border px-3 py-2 text-[12.5px] leading-relaxed",
-                          r.stage === "system"
-                            ? "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]"
-                            : "border-[#FCD34D] bg-[#FFFBEB] text-[#78350F]",
-                        ].join(" ")}
-                      >
+                    {r.error && heldStage && (
+                      <div>
+                        <p className="text-[13px] font-medium text-[#15202B]">{HOLD_STAGE_SUMMARY[heldStage]}</p>
+                        <div className="mt-2.5 border-t border-[#EEEAE0] pt-2.5">
+                          <div className="text-[10.5px] font-semibold tracking-[0.04em] text-[#8A7621]">{HOLD_REASON_SOURCE[heldStage]}</div>
+                          <p className="mt-1 max-w-[64ch] text-[13px] leading-[1.75] text-[#3F4E59]">{humanizeHoldReason(r.error)}</p>
+                        </div>
+                      </div>
+                    )}
+                    {r.error && !heldStage && (
+                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[12.5px] leading-relaxed text-[#991B1B]">
                         {humanizeHoldReason(r.error)}
                       </div>
                     )}
@@ -1413,7 +1398,8 @@ const AdminGenerator = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -1626,7 +1612,7 @@ const SectionTitle = ({
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="rounded-full bg-[#FBEFD9] px-2 py-0.5 text-[11px] font-semibold text-[#7A4A0A]">{accent}</span>}
+    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[11px] font-semibold text-[#6D5C1F]">{accent}</span>}
   </h3>
 );
 

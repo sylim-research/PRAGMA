@@ -2,8 +2,7 @@
 // Extracted verbatim from AdminGenerator.tsx — values/keys/labels unchanged.
 //
 // Generator-only helpers intentionally REMAIN in AdminGenerator.tsx and are NOT
-// moved here: SPEECH_ACT_UI_TO_INTERNAL, SPEECH_ACT_WEIGHT,
-// computePragmaticBurden, and the scenario prompt/save mappings.
+// moved here: SPEECH_ACT_UI_TO_INTERNAL and the scenario prompt/save mappings.
 //
 // 2026-07-22: CHANNEL_TO_GENRE·COMPLEX_TASK_TO_CONTEXT는 여기로 올렸다.
 // "생성기 전용"이라는 원래 판단은 소비자가 하나였을 때의 것이고, 배치 러너가

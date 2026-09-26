@@ -261,7 +261,7 @@ function OperationsSection({
   const contentKind = audit?.contentKind === "mission"
     ? "학습 미션 1건"
     : audit?.contentKind === "core"
-      ? "상황 시나리오 1건"
+      ? "시나리오 1건"
       : "콘텐츠 1건";
   const caseTitle = audit?.title?.replace(/^\s*\[[^\]]*\]\s*/, "") || null;
   const caseAxes = [speechAct, level, mode, direction].filter((item): item is string => Boolean(item));
@@ -392,7 +392,7 @@ function AuditMethodSection() {
       <div className="border-b border-[#E5DEC9] px-4 py-4 sm:px-5">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A7621]">
-            규칙 기반 검사
+            자동 품질 점검
           </p>
           <span className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11px] font-medium text-[#5A6670]">
             실제 콘텐츠·감수 연결

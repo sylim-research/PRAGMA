@@ -154,12 +154,12 @@ type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Excl
 // 화면을 열면 바로 만들 수 있게 「초안 생성 대기」를 맨 앞(기본 칩)에 둔다.
 const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "v6_review", "v6_done", "all"];
 const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
-  preparing: "시나리오 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
-  repairing: "지적된 곳 고치는 중", quality: "AI 점검 중", saving: "저장 중",
+  preparing: "시나리오 확인 중", generating: "초안 생성 중", checking: "자동 품질 점검 중",
+  repairing: "지적된 곳 고치는 중", quality: "AI 검토 중", saving: "저장 중",
 };
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
-  v6_done: "승인 완료",
+  v6_done: "최종 승인 완료",
   v5_only: "v5 · 변환 전",
   core_only: "초안 생성 대기",
 };
@@ -252,6 +252,23 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [reviewMeta, setReviewMeta] = useState<ReviewMeta | null>(null);
   const [generationModel, setGenerationModel] = useState<"existing" | "astra">("existing");
   const [loading, setLoading] = useState(true);
+  // 학습 미션 제작(넓은 화면): 대기열·작업대를 창 아래 끝까지 딱 맞춰 페이지 스크롤이 생기지 않게 한다.
+  // 제목 영역 높이가 글꼴·폭에 따라 달라 CSS 계산식 대신 실제 위치를 잰다. 각 칸 안에서만 스크롤한다.
+  const fitScreen = !professorScreen && !aiReview;
+  const splitRef = useRef<HTMLDivElement>(null);
+  const [splitHeight, setSplitHeight] = useState<number | null>(null);
+  useEffect(() => {
+    if (!fitScreen) return;
+    const fit = () => {
+      const el = splitRef.current;
+      if (!el || window.innerWidth < 1280) { setSplitHeight(null); return; }
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      setSplitHeight(Math.max(420, Math.floor(window.innerHeight - top - 20)));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [fitScreen, loading]);
   const [error, setError] = useState<string | null>(null);
 
   // 라이브러리 「조립에서 열기」가 넘긴 초기 필터.
@@ -272,8 +289,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [fRun, setFRun] = useState<string>("all");
   const [fHash, setFHash] = useState<string>("all");
   const [search, setSearch] = useState("");
-  // 조립은 방금 만든 것을 확인하는 일이 많아 최신순, 점검·승인은 밀린 일부터 줄이도록 오래 기다린 순.
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode ? "oldest" : "newest");
+  // 제작·품질 점검은 최신 순이 기본, 교수자 승인은 밀린 일부터 줄이도록 오래 기다린 순.
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode && !aiReview ? "oldest" : "newest");
   const [showAll, setShowAll] = useState(false);
   // 대기열 상단의 두 필터는 한 줄짜리 토글로 두고, 펼친 쪽만 아래에 연다(기본 접힘).
   const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
@@ -571,8 +588,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const qLabel = res.qualityVerdict ? { pass: "AI 점검 통과", warning: "AI 점검 주의", fail: "AI 점검 결함" }[res.qualityVerdict] : "AI 점검 미실행";
-        toast.success(`초안 저장 · 규칙 ${res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검으로 넘어갑니다`);
+        const qLabel = res.qualityVerdict ? { pass: "AI 검토 통과", warning: "AI 검토 주의", fail: "AI 검토 결함" }[res.qualityVerdict] : "AI 검토 미실행";
+        toast.success(`초안 저장 · 자동 품질 점검 ${({ pass: "통과", warning: "경고", fail: "실패" } as Record<string, string>)[res.ruleResult] ?? res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 「자동 품질 점검·AI 검토」로 넘어갑니다`);
         await loadRows();
       } else {
         const msg = res.error ?? "생성 실패";
@@ -770,18 +787,19 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     const facet = (label: string, value: string) => (
-      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 text-[13px] font-bold text-[#233542]">
-        <span className="text-[11px] font-medium text-[#8C969B]">{label}</span>{value}
+      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#E6DECB] bg-[#FFFDF8] px-2.5 text-[13px] font-bold text-[#233542]">
+        <span className="text-[11.5px] font-medium text-[#6B757B]">{label}</span>{value}
       </span>
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
+        {/* 화행은 목록 꼬리표와 같은 화행 색으로 채워 핵심 변수임을 보인다(연구자 선호, 2026-09-26). */}
         <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
           <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
         </span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
-        {facet("과제", MODE_LABEL[mode])}
+        {facet("수행 방식", MODE_LABEL[mode])}
       </span>
     );
   };
@@ -856,8 +874,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
-        {reviewMode && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
-        {!reviewMode && context.length > 0 && <span className="mt-1 block text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
+        {professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
+        {!professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
       </p>
     );
     const loadingMission = <p className="text-[13px] text-muted-foreground" role="status">미션을 불러오는 중…</p>;
@@ -865,9 +883,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     return (
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
-        <header className="sticky top-16 z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        {/* 학습 미션 제작에서는 작업대가 자기 안에서 스크롤하므로 머리를 칸 맨 위(top-0)에 붙인다. */}
+        <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-2.5">
+          <div className="min-w-0 flex-1 space-y-5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0">{headerBadges(r)}</span>
@@ -877,7 +896,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            <h2 className="line-clamp-2 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -892,7 +911,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
         </header>
-        <div className="space-y-3 px-4 py-3 xl:px-5">
+        <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
         {/* ── 학습 미션 제작: 초안 생성 + 제작 경로 보기 ── */}
         {!reviewMode && (
@@ -903,13 +922,23 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               loaded.mission.schema_version === "mission_v6" && <MissionOutline mission={loaded.mission} />
             ))}
             {productionOf(r) === "core_only" && (
-              <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
-                <p className="text-[#3F4E57]">이 시나리오로 학습 미션 초안을 자동으로 만듭니다(1분 남짓). 초안은 품질 점검과 교수자 승인을 거쳐야 편성할 수 있습니다.</p>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}>
-                    {busy === r.scenario_id ? "생성 중…" : "초안 자동 생성"}
-                  </Button>
+              <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-3.5 text-[13.5px]">
+                {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
+                <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
+                  <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
+                  <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
+                  <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
+                  <dd className="text-[#4E5A63]">출발텍스트의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
+                </dl>
+                <div className="mt-2.5 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
+                  {/* 주 실행 버튼 = 브랜드 노랑. 생성 중에도 색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
+                  <Button disabled={busy !== null} onClick={() => void onGenerateV6(r)}
+                    className={["h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]", busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : ""].join(" ")}>
+                    {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" />}
+                    {busy === r.scenario_id ? "생성 중" : "미션 자동 생성"}
+                  </Button>
                 </div>
                 {failures[r.scenario_id] && <p className="mt-2 text-[12.5px] text-red-800" role="alert">{failures[r.scenario_id]}</p>}
               </div>
@@ -926,9 +955,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* ── 자동 품질 점검·AI 검토: 검사하고 넘기는 화면 ── */}
         {aiReview && (
           <>
+            {scenarioText}
             {(st === "generated" || st === "reviewed") && (
-              <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
-                handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+              <div className="!mt-5">
+                <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
+                  handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+              </div>
             )}
           </>
         )}
@@ -970,10 +1002,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작"}
       description={aiReview
-        ? "규칙 검사와 AI 검토로 감수 자료를 준비합니다. 승인은 교수자가 합니다."
+        ? "자동 품질 점검과 AI 검토를 거친 콘텐츠를 교수자가 감수하고 최종 승인합니다."
         : reviewMode
           ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
-          : "시나리오로 학습 미션 초안을 만들고, 품질 점검·승인·편성 중 어디에 있는지 봅니다."}
+          : "시나리오로 학습 미션 초안을 만들고, 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -983,15 +1015,18 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
-        <div className={professorScreen ? "grid items-start"
-          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-2"}>
+        <div ref={fitScreen ? splitRef : undefined} className={professorScreen ? "grid items-start"
+          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
           <aside aria-label="대기열"
             className={professorScreen
               ? "fixed inset-y-0 left-0 z-50 flex w-[380px] max-w-[90vw] flex-col overflow-hidden border-r border-[#E2DED2] bg-[#F7F6F1] shadow-xl"
-              : "flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]"}>
+              : ["flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1]",
+                // 학습 미션 제작은 splitHeight(창 높이에 맞춘 값)로, 품질 점검은 기존대로 sticky.
+                fitScreen ? "" : "xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]"].join(" ")}
+            style={fitScreen && splitHeight ? { height: splitHeight } : undefined}>
             {professorScreen && (
               <div className="flex items-center justify-between border-b border-[#E2DED2] bg-white px-3 py-2">
                 <span className="text-[13.5px] font-bold text-[#233542]">미션 목록</span>
@@ -1040,12 +1075,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
                   className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[12px] text-[#46515A]"
                 >
-                  {reviewMode
+                  {professorScreen
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
-                    : <><option value="newest">최신순</option><option value="oldest">오래된 순</option></>}
+                    : <><option value="newest">최신 순</option><option value="oldest">오래된 순</option></>}
                 </select>
-              </div>
-              <div className="flex gap-1.5 text-[12px]">
+                {/* 필터 버튼을 검색 줄에 붙인다 — 따로 한 줄을 쓰면 목록이 아래로 밀린다. */}
+                <div className="flex shrink-0 gap-1.5 text-[12px]">
                 {([["axis", "필터", axisFilterActive], ["advanced", "고급", fRun !== "all" || fHash !== "all"]] as const).filter(([key]) => professorScreen || key === "axis").map(([key, label, active]) => (
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
@@ -1058,6 +1093,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     <span aria-hidden className="shrink-0 text-[#8C969B]">{openFilter === key ? "▴" : "▾"}</span>
                   </button>
                 ))}
+                </div>
               </div>
               {openFilter === "axis" && (
                 <div className="grid grid-cols-2 gap-1.5">
@@ -1095,7 +1131,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <li key={r.scenario_id} id={`queue-${r.scenario_id}`}
                     className={[
                       "flex gap-2 rounded-md border px-2 py-1.5",
-                      selected ? "border-[#233542] bg-white shadow-[inset_3px_0_0_#233542]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
+                      selected ? "border-[#2F3D48]/60 bg-[#FBF5E6] shadow-[inset_3px_0_0_#2F3D48]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
                     ].join(" ")}>
                     {bulkPrep && st === "generated" && (
                       <input type="checkbox" className="mt-1 shrink-0" aria-label={`자동 점검 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
@@ -1106,7 +1142,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     <button type="button" className="min-w-0 flex-1 space-y-0.5 text-left" aria-current={selected ? "true" : undefined}
                       onClick={() => { selectRow(r); if (professorScreen) setQueueOpen(false); }}>
                       {badges(r, "sm")}
-                      <span className="line-clamp-2 block text-[14px] font-medium leading-snug text-[#202B33]">{titleOf(r)}</span>
+                      <span className={[(professorScreen || aiReview) ? "line-clamp-2" : "truncate", "block text-[14px] font-medium leading-snug text-[#202B33]"].join(" ")} title={titleOf(r)}>{titleOf(r)}</span>
                       {meta.length > 0 && (
                         <span className="block truncate text-[12px] text-[#7A868D]" title={meta.join(" · ")}>{meta.join(" · ")}</span>
                       )}
@@ -1152,7 +1188,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           </>}
 
           {/* ── 오른쪽 작업대 ── */}
-          <section aria-label="작업대" className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
+          {/* 학습 미션 제작에서는 작업대를 왼쪽 대기열과 같은 높이로 채운다 — 짧으면 화면 가운데 떠 보인다. */}
+          <section aria-label="작업대" className={["min-w-0 rounded-xl border border-[#E2DED2] bg-white",
+            fitScreen && splitHeight ? "overflow-y-auto" : ""].join(" ")}
+            style={fitScreen && splitHeight ? { height: splitHeight } : undefined}>
             {selectedRow ? renderWorkbench(selectedRow) : (
               <div className="space-y-3 py-10 text-center text-[13.5px] text-[#46515A]">
                 {professorScreen && <div className="flex justify-center">{queueButton}</div>}
@@ -1268,10 +1307,10 @@ type StepStatus = "done" | "current" | "todo";
 const currentStageLabel = (progress: string | undefined) => {
   if (!progress) return null;
   if (progress.includes("교수자 결정 대기")) return "교수자 승인 대기";
-  if (progress.includes("규칙 검사 오류")) return "규칙 검사 · 수정 필요";
-  if (progress.includes("규칙 검사 전")) return "규칙 검사 전";
-  if (progress.includes("재검토 전")) return "AI 재검토 전";
-  if (progress.includes("Claude 검토 전")) return "AI 교차 검토 전";
+  if (progress.includes("규칙 검사 오류")) return "자동 품질 점검 · 수정 필요";
+  if (progress.includes("규칙 검사 전")) return "자동 품질 점검 전";
+  if (progress.includes("재검토 전")) return "의견 대조 전";
+  if (progress.includes("Claude 검토 전")) return "교차 점검 전";
   if (progress.includes("OpenAI 검토 전")) return "AI 검토 전";
   return progress;
 };
@@ -1288,14 +1327,14 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   const steps: { label: string; status: StepStatus; detail?: string | null }[] = [
     { label: "시나리오", status: "done" },
     { label: "초안 작성", status: v6 ? "done" : "current", detail: v6 ? created : production === "v5_only" ? "변환 전" : "생성 대기" },
-    { label: "품질 점검", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
-    { label: "교수자 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
+    { label: "품질 점검·AI 검토", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
+    { label: "교수자 최종 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 경로" className="rounded-lg border border-[#E7E2D4] bg-[#FBFAF6] px-4 py-3">
-      <h3 className="mb-2.5 text-[13px] font-bold text-[#233542]">제작 경로</h3>
-      <ol className="grid grid-cols-5 gap-2">
+    <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
+      <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
+      <ol className="grid grid-cols-5 gap-2 px-4 py-2.5">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">
             {index > 0 && (
@@ -1304,16 +1343,15 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
             )}
             <span className="flex flex-col items-center text-center">
               <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[11.5px] font-bold tabular-nums",
-                step.status === "done" ? "bg-[#233542] text-white"
-                  : step.status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                    : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                "bg-[#233542] text-white", step.status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
-              <span className={["mt-1.5 text-[12.5px] leading-tight",
-                step.status === "todo" ? "text-[#9AA2A6]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
+              {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}
+              <span className={["mt-1.5 whitespace-nowrap text-[12.5px] leading-tight",
+                step.status === "todo" ? "text-[#5B6770]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
               {step.detail && (
-                <span className={["mt-0.5 line-clamp-2 text-[11.5px] leading-snug",
-                  step.status === "current" ? "text-[#8A5A14]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
+                <span className={["mt-0.5 max-w-full truncate text-[11.5px] leading-snug",
+                  step.status === "current" ? "font-semibold text-[#233542]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
               )}
             </span>
           </li>

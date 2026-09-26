@@ -841,7 +841,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                               : "bg-[#15202B] text-white hover:bg-[#15202B]/90",
                           ].join(" ")}
                         >
-                          {appliedIdx === i ? "✓ 근거와 함께 전달 중…" : "이 자료로 상황 시나리오 만들기"}
+                          {appliedIdx === i ? "✓ 근거와 함께 전달 중…" : "이 자료로 시나리오 만들기"}
                         </Button>
                       ) : (
                         <p className="mt-auto rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[11px] text-muted-foreground">
