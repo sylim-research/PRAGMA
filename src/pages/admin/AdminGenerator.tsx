@@ -945,7 +945,7 @@ const AdminGenerator = () => {
                     className={[
                       "h-10 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
                         : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
@@ -981,7 +981,7 @@ const AdminGenerator = () => {
                     className={[
                       "rounded-md py-2 px-1.5 text-center transition-colors leading-tight",
                       on
-                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6]"
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6]"
                         : "border border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
@@ -1176,7 +1176,7 @@ const AdminGenerator = () => {
                     className={[
                       "flex-1 h-9 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
                         : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
@@ -1313,7 +1313,7 @@ const AdminGenerator = () => {
                 <ConditionSummary conditions={example.conditions} />
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded border border-[#D9D2BF] bg-white px-1.5 py-0.5 text-[11px] font-medium text-[#4E5A63]">생성 예시</span>
+                    <span className="inline-flex items-center rounded border border-[#E3D3A0] bg-[#FDF8EA] px-1.5 py-0.5 text-[11px] font-medium text-[#6D5C1F]">생성 예시</span>
                     <span className="text-[13.5px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>
