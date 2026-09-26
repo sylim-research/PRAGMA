@@ -36,7 +36,7 @@ export function NewCoursePreview({ cores, conditions }: { cores: ComposerCore[];
         <span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />
         <h3 className="text-[15.5px] font-bold">이렇게 만들어집니다</h3>
       </div>
-      <p className="border-b border-[#EFEAE0] px-5 py-2.5 text-[12.5px] leading-relaxed text-[#46515A]">
+      <p className="whitespace-nowrap border-b border-[#EFEAE0] px-5 py-2.5 text-[12.5px] leading-relaxed text-[#46515A]">
         {LEVEL[conditions.level]} · {DIRECTION_LABEL[conditions.direction]} · {COURSE_MODE_LABEL[conditions.courseMode]} · 편성 주제 {themeCount}개 · 편성 가능 미션 <b className="text-[#15202B]">{eligible.length}개</b>
       </p>
       <ol className="divide-y divide-[#F2EEE5] px-3 py-1">
