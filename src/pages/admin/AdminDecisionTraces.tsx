@@ -348,7 +348,7 @@ const IndividualRecords = () => {
         </div>
       ) : rows.length === 0 && !error ? (
         <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-sm text-muted-foreground">
-          아직 학습미션 수행 기록이 없습니다.
+          아직 학습 미션 수행 기록이 없습니다.
         </div>
       ) : visibleRows.length === 0 && !error ? (
         <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-sm text-muted-foreground">
