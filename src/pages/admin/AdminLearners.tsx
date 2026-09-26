@@ -75,9 +75,10 @@ type LearnerRow = {
 };
 
 const STATUS_LABEL: Record<ApprovalStatus, string> = {
-  pending_approval: "승인 대기",
-  approved: "승인 완료",
-  rejected: "반려 처리",
+  // 「승인」만 쓰면 콘텐츠의 교수자 최종 승인과 섞여 읽힌다 — 학습자 쪽은 가입 승인이다.
+  pending_approval: "가입 승인 대기",
+  approved: "가입 승인됨",
+  rejected: "가입 반려",
   inactive: "비활성",
 };
 
@@ -106,7 +107,9 @@ const Section = ({
 const TH = "h-11 px-3 text-left align-middle text-xs font-bold text-[#46515A]";
 const TD = "px-3 py-2 align-middle text-sm text-[#343B42]";
 
-type LearnerActivity = { courses: string[]; last: string | null };
+type LearnerActivity = { courses: string[]; count: number; last: string | null };
+
+const Empty = () => <span className="text-[#8A8378]">—</span>;
 
 const formatActivityDate = (iso: string) => {
   const d = new Date(iso);
@@ -169,7 +172,8 @@ const Page = () => {
       const titleById = new Map((courses ?? []).map((course) => [course.id, courseDisplayTitle(course)]));
       const next: Record<string, LearnerActivity> = {};
       for (const log of logs ?? []) {
-        const entry = (next[log.profile_id] ??= { courses: [], last: null });
+        const entry = (next[log.profile_id] ??= { courses: [], count: 0, last: null });
+        entry.count += 1;
         const title = log.course_id ? titleById.get(log.course_id) : undefined;
         if (title && !entry.courses.includes(title)) entry.courses.push(title);
         if (!entry.last || log.updated_at > entry.last) entry.last = log.updated_at;
@@ -217,7 +221,7 @@ const Page = () => {
   return (
     <AdminShell
       title="학습자 관리"
-      description="학습자 기본 정보와 학습 배경을 확인하고 수행 기록으로 이동합니다."
+      description="학습자의 가입 상태와 학습 배경을 확인하고 수행 이력으로 이동합니다."
     >
       <div className="mb-2 text-right text-sm text-muted-foreground">
         {rows === null ? "불러오는 중…" : `총 ${rows.length}명`}
@@ -227,22 +231,22 @@ const Page = () => {
           <colgroup>
             <col style={{ width: "21%" }} />
             <col style={{ width: "14%" }} />
+            <col style={{ width: "8%" }} />
             <col style={{ width: "9%" }} />
-            <col style={{ width: "9%" }} />
-            <col style={{ width: "17%" }} />
-            <col style={{ width: "9%" }} />
-            <col style={{ width: "9%" }} />
+            <col style={{ width: "18%" }} />
+            <col style={{ width: "8%" }} />
+            <col style={{ width: "10%" }} />
             <col style={{ width: "12%" }} />
           </colgroup>
           <TableHeader className="bg-[#F7F5EE]">
             <TableRow>
               <TableHead className={`${TH} pl-5`}>학습자</TableHead>
               <TableHead className={TH}>소속 · 학년/과정</TableHead>
-              <TableHead className={TH}>사용 언어</TableHead>
+              <TableHead className={TH}>모국어</TableHead>
               <TableHead className={TH}>공인 급수</TableHead>
-              <TableHead className={TH}>학습한 교과목</TableHead>
+              <TableHead className={TH}>수행 이력</TableHead>
               <TableHead className={TH}>최근 활동</TableHead>
-              <TableHead className={TH}>상태</TableHead>
+              <TableHead className={TH}>가입 상태</TableHead>
               <TableHead className={`${TH} pr-5 text-right`}>관리</TableHead>
             </TableRow>
           </TableHeader>
@@ -288,23 +292,28 @@ const Page = () => {
                     </div>
                   </TableCell>
                   <TableCell className={TD}>
-                    {primaryLanguage ?? <span className="text-xs text-amber-700">미입력</span>}
+                    {primaryLanguage ?? <Empty />}
                   </TableCell>
                   <TableCell className={TD}>
-                    {testLevel ?? <span className="text-xs text-amber-700">미입력</span>}
+                    {testLevel ?? <Empty />}
                   </TableCell>
                   <TableCell className={TD}>
-                    {act && act.courses.length > 0 ? (
-                      <div className="truncate" title={act.courses.join(", ")}>
-                        {act.courses[0]}
-                        {act.courses.length > 1 && <span className="text-xs font-semibold text-[#1F3A5F]"> 외 {act.courses.length - 1}</span>}
+                    {act && act.count > 0 ? (
+                      <div className="truncate" title={act.courses.length > 0 ? act.courses.join(", ") : "교과목 편성 밖에서 수행"}>
+                        <span className="font-semibold tabular-nums">{act.count}건</span>
+                        <span className="text-xs text-[#46515A]">
+                          {" · "}
+                          {act.courses.length > 0
+                            ? `${act.courses[0]}${act.courses.length > 1 ? ` 외 ${act.courses.length - 1}` : ""}`
+                            : "편성 외 수행"}
+                        </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-amber-700">아직 없음</span>
+                      <Empty />
                     )}
                   </TableCell>
                   <TableCell className={`${TD} tabular-nums`}>
-                    {act?.last ? formatActivityDate(act.last) : <span className="text-xs text-amber-700">—</span>}
+                    {act?.last ? formatActivityDate(act.last) : <Empty />}
                   </TableCell>
                   <TableCell className={TD}>
                     <Badge
@@ -368,7 +377,7 @@ const Page = () => {
                     value={firstOf(selected.grade_or_program, selected.academic_year_or_program)}
                   />
                   <Field
-                    label="승인 상태"
+                    label="가입 상태"
                     value={
                       <Badge variant="outline" className={STATUS_TONE[selected.approval_status]}>
                         {STATUS_LABEL[selected.approval_status]}
@@ -463,13 +472,13 @@ const Page = () => {
                     disabled={busy || selected.approval_status === APPROVAL_STATUS.REJECTED}
                     onClick={() => updateStatus(selected, APPROVAL_STATUS.REJECTED)}
                   >
-                    반려
+                    가입 반려
                   </Button>
                   <Button
                     disabled={busy || selected.approval_status === APPROVAL_STATUS.APPROVED}
                     onClick={() => updateStatus(selected, APPROVAL_STATUS.APPROVED)}
                   >
-                    승인
+                    가입 승인
                   </Button>
                 </div>
               </DialogFooter>

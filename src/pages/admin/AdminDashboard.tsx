@@ -539,7 +539,7 @@ const AdminDashboard = () => {
 
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
-        title="콘텐츠 품질관리 현황"
+        title="콘텐츠 제작 현황"
         action={liveStatus()}
       />
       <ReviewPipeline
@@ -577,13 +577,13 @@ const AdminDashboard = () => {
           error={displayError}
           changed={changedKeys.has("assignments")}
           title={snapshot && snapshot.assignmentApproval.unapprovedMissionCount > 0
-            ? `승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함(게이트 이전 편성)`
+            ? `승인 전 미션 ${snapshot.assignmentApproval.unapprovedMissionCount}개 포함(승인 절차 도입 전 편성)`
             : undefined}
         />
         {/* 계정 이용 승인이지 교과목별 수강 등록이 아니다 — 「수강생」으로 부르지 않는다. */}
         <OperationMetric
           to="/admin/learners"
-          label="승인 학습자 계정"
+          label="가입 승인 학습자"
           value={snapshot?.approvedLearnerCount ?? null}
           unit="개"
           description="전체 교과목 공통"
@@ -596,12 +596,12 @@ const AdminDashboard = () => {
           to="/admin/decision-traces"
           // 교과목 맥락에서 나온 기록을 큰 수로 둔다
           // (교과목 연결 여부만 가른다 — 실제 수업과 시범을 나누는 근거는 아니다).
-          label="교과목 연결 수행 기록"
+          label="편성 안 학습 수행 기록"
           value={snapshot?.courseLinkedRecordCount ?? null}
           unit="건"
           description={snapshot && snapshot.courseLinkedRecordCount !== null
-            ? `교과목 미연결 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
-            : "교과목에 연결된 수행"}
+            ? `편성 외 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
+            : "교과목 편성 안의 학습 수행"}
           error={displayError ?? (snapshot && snapshot.courseLinkedRecordCount === null ? "교과목 연결 조회 실패" : null)}
           changed={changedKeys.has("records")}
         />

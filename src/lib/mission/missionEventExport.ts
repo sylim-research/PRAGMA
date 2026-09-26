@@ -17,7 +17,7 @@ export async function fetchMissionEventExport(args: {
     p_from: args.from || null,
     p_to: args.to || null,
   });
-  if (error) throw new Error(error.message ?? "연구 데이터 내보내기 실패");
+  if (error) throw new Error(error.message ?? "연구용 기록 내보내기 실패");
   if (!Array.isArray(data)) throw new Error("연구 데이터 응답 형식이 배열이 아닙니다.");
   return data.filter(
     (row): row is MissionEventExportRow => !!row && typeof row === "object" && !Array.isArray(row),

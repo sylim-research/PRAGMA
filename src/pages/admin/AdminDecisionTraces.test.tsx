@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import AdminDecisionTraces from "./AdminDecisionTraces";
@@ -55,8 +55,8 @@ describe("학습 수행 기록", () => {
   it("파라미터가 없으면 전체 기록을 보여 준다", async () => {
     mountAt("/admin/decision-traces");
     expect(await screen.findByText("총 2건")).toBeVisible();
-    expect(screen.getByText("김학생")).toBeVisible();
-    expect(screen.getByText("이학생")).toBeVisible();
+    expect(within(screen.getByRole("table")).getByText("김학생")).toBeVisible();
+    expect(within(screen.getByRole("table")).getByText("이학생")).toBeVisible();
   });
 
   it("표에는 코드값 대신 사람이 읽는 화행·과업·미션 이름을 보여 준다", async () => {
@@ -70,10 +70,10 @@ describe("학습 수행 기록", () => {
 
   it("학습자 승인·관리에서 넘어온 ?q= 검색어로 목록이 좁혀진 채 열린다", async () => {
     mountAt("/admin/decision-traces?q=lee%40example.com");
-    await waitFor(() => expect(screen.getByLabelText("학습자 검색")).toHaveValue("lee@example.com"));
+    await waitFor(() => expect(screen.getByLabelText("학습자 필터")).toHaveValue("이학생"));
     expect(await screen.findByText("1건 표시 · 전체 2건")).toBeVisible();
-    expect(screen.getByText("이학생")).toBeVisible();
-    expect(screen.queryByText("김학생")).not.toBeInTheDocument();
+    expect(within(screen.getByRole("table")).getByText("이학생")).toBeVisible();
+    expect(within(screen.getByRole("table")).queryByText("김학생")).not.toBeInTheDocument();
   });
 
   it("조건에 맞는 기록이 없으면 안내를 보여 준다", async () => {

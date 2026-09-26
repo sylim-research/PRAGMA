@@ -289,11 +289,11 @@ const Page = () => {
         ? ` 없던 학습 미션 ${outcome.scenariosInserted}건을 새로 넣었습니다.`
         : " 학습 미션 본문은 그대로 두었습니다.";
       const cleanupNote = outcome.assignmentsRemoved > 0
-        ? ` 백업 시점에 없던 배정 ${outcome.assignmentsRemoved}건을 정리했습니다.`
+        ? ` 백업 시점에 없던 배치 ${outcome.assignmentsRemoved}건을 정리했습니다.`
         : "";
       setRestoreNotice({
         tone: "ok",
-        text: `복원했습니다 — 주차 ${outcome.weeksRestored}개 · 미션 배정 ${outcome.assignmentsRestored}건.${cleanupNote}${scenarioNote}${outcome.safetyBackup ? " 복원 직전 상태도 파일로 내려받았습니다." : ""}`,
+        text: `복원했습니다 — 주차 ${outcome.weeksRestored}개 · 미션 배치 ${outcome.assignmentsRestored}건.${cleanupNote}${scenarioNote}${outcome.safetyBackup ? " 복원 직전 상태도 파일로 내려받았습니다." : ""}`,
       });
       setPendingFile(null);
       setPendingFileName(null);
@@ -313,8 +313,8 @@ const Page = () => {
 
   return (
     <AdminShell
-      title="수업 데이터 백업·복원"
-      description="현재 수업 구성을 백업 파일로 저장하고, 필요할 때 백업 시점의 구성으로 복원할 수 있습니다."
+      title="수업 편성 백업·복원"
+      description="교과목의 15주 편성과 미션 배치를 파일로 저장하고 복원합니다. 학습 수행 기록은 포함하지 않습니다."
       compact
     >
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
@@ -372,7 +372,7 @@ const Page = () => {
                   <p className="text-sm font-semibold text-emerald-900">백업 완료</p>
                   <p className="mt-0.5 text-sm text-emerald-900">{lastBackup.title}</p>
                   <p className="text-sm text-emerald-900/80">
-                    {lastBackup.weeks}주 · 미션 배정 {lastBackup.assignments}건 · 학습 미션 {lastBackup.scenarios}건
+                    {lastBackup.weeks}주 · 미션 배치 {lastBackup.assignments}건 · 학습 미션 {lastBackup.scenarios}건
                   </p>
                   <p className="mt-1 break-all text-xs text-emerald-900/70">{lastBackup.filename}</p>
                 </div>
@@ -384,7 +384,7 @@ const Page = () => {
                 <p className="mb-1.5 text-sm font-medium">이번 백업에 담길 내용</p>
                 <div className="grid grid-cols-3 gap-2">
                   <StatTile label="주차 편성" value={`${counts.weeks}주`} />
-                  <StatTile label="미션 배정" value={`${counts.assignments}건`} />
+                  <StatTile label="미션 배치" value={`${counts.assignments}건`} />
                   <StatTile label="학습 미션" value={`${counts.scenarios}건`} />
                 </div>
                 <p className="mt-2 break-all text-xs text-muted-foreground">
@@ -453,7 +453,7 @@ const Page = () => {
                     }
                   />
                   <PreviewRow label="주차 편성" value={`${preview.weekCount}주`} />
-                  <PreviewRow label="미션 배정" value={`${preview.assignmentCount}건`} />
+                  <PreviewRow label="미션 배치" value={`${preview.assignmentCount}건`} />
                   <PreviewRow label="학습 미션" value={`${preview.scenarioCount}건`} />
                 </dl>
                 {impact && (
@@ -467,9 +467,9 @@ const Page = () => {
                             ? `${impact.fileWeeks}주 유지`
                             : `${impact.currentWeeks}주 → ${impact.fileWeeks}주`}
                         </li>
-                        <li>미션 배정 {impact.added > 0 ? `${impact.added}건 추가` : "추가 없음"}</li>
+                        <li>미션 배치 {impact.added > 0 ? `${impact.added}건 추가` : "추가 없음"}</li>
                         {impact.keptOnly > 0 && (
-                          <li>백업 시점에 없던 배정 {impact.keptOnly}건이 정리됩니다</li>
+                          <li>백업 시점에 없던 배치 {impact.keptOnly}건이 정리됩니다</li>
                         )}
                       </ul>
                     ) : (
@@ -505,7 +505,7 @@ const Page = () => {
             <div className="mt-auto pt-3.5">
               <p className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-[12.5px] leading-5 text-emerald-900">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
-                <span><b>복원 전 자동 백업</b> · 현재 구성을 먼저 저장하므로 언제든 이전 상태로 되돌릴 수 있습니다.</span>
+                <span><b>복원 전 자동 백업</b> · 현재 구성을 먼저 저장해 되돌릴 수 있습니다.</span>
               </p>
             </div>
           </div>

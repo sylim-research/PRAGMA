@@ -2,12 +2,14 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { ClassResponsePanel } from "@/components/admin/ClassResponsePanel";
+import { LearningRecordDetailView } from "@/components/admin/LearningRecordDetailView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import { MODE_LABEL, SPEECH_ACT_UI, type GenMode, type SpeechActUI } from "@/lib/pragma/enums";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
 import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
+import { buildLearningRecordDetail } from "@/lib/admin/learningRecordDetail";
 import {
   buildMissionCourseIndex,
   EMPTY_FILTERS,
@@ -27,24 +29,6 @@ type ProfileSummary = {
 type MissionLogRow = MissionLog & { profiles: ProfileSummary | null };
 type CourseOption = { id: string; title: string };
 
-const DETAIL_FIELDS: Array<{ key: keyof MissionLog; label: string }> = [
-  { key: "source_text", label: "출발어 원문·전사" },
-  { key: "first_response", label: "최초 응답" },
-  { key: "context_judgment", label: "화행 판단·피드백 기록" },
-  { key: "revision_target_selected", label: "선택한 수정 지점" },
-  { key: "revision_target_source", label: "수정 지점 출처" },
-  { key: "revised_response", label: "수정 응답" },
-  { key: "transfer_response", label: "전이 응답" },
-  { key: "target_feature_observed", label: "목표 특징 관찰" },
-  { key: "semantic_fidelity_status", label: "의미 충실도" },
-  { key: "self_confidence_rating", label: "자신감" },
-  { key: "content_ver", label: "콘텐츠 버전" },
-  { key: "policy_ver", label: "정책 버전" },
-  { key: "attempt_id", label: "수행 attempt ID" },
-  { key: "assignment_id", label: "주차 배치 ID" },
-  { key: "content_hash", label: "실행 콘텐츠 해시" },
-];
-
 const fmtKst = (iso: string | null) => {
   if (!iso) return "—";
   return new Date(iso).toLocaleString("ko-KR", {
@@ -56,14 +40,6 @@ const fmtKst = (iso: string | null) => {
     minute: "2-digit",
     hour12: false,
   });
-};
-
-const renderValue = (value: unknown): string => {
-  if (value === null || value === undefined || value === "") return "—";
-  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
-    return String(value);
-  }
-  return JSON.stringify(value, null, 2);
 };
 
 // 표에는 사람이 읽는 이름만 둔다. 원래 코드값·ID는 행의 title과 「보기」 상세, 연구 데이터 내보내기에 그대로 남는다.
@@ -84,33 +60,14 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
 const learnerLabel = (row: MissionLogRow) =>
   row.profiles?.full_name ?? row.profiles?.anonymous_participant_id ?? `${row.profile_id.slice(0, 8)}…`;
 
-const DetailPanel = ({ row }: { row: MissionLogRow }) => {
-  const fields = DETAIL_FIELDS.filter(({ key }) => {
-    const value = row[key];
-    return value !== null && value !== undefined && value !== "";
-  });
-
-  return (
-    <div className="grid gap-3 rounded-lg border border-border bg-muted/20 p-4 md:grid-cols-2">
-      {fields.length === 0 ? (
-        <p className="text-sm text-muted-foreground">표시할 수행 내용이 없습니다.</p>
-      ) : (
-        fields.map(({ key, label }) => (
-          <div key={key} className="min-w-0">
-            <div className="text-xs font-semibold text-muted-foreground">{label}</div>
-            <pre className="mt-1 whitespace-pre-wrap break-words rounded-md bg-background p-2 text-[13px] leading-relaxed text-foreground">
-              {renderValue(row[key])}
-            </pre>
-          </div>
-        ))
-      )}
-    </div>
-  );
-};
+const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission: unknown; placement: string }) => (
+  <LearningRecordDetailView detail={buildLearningRecordDetail(row, mission, placement, fmtKst)} />
+);
 
 const IndividualRecords = () => {
   const [rows, setRows] = useState<MissionLogRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 직접 펼치거나 접은 행만 기록한다. 나머지는 아래 defaultOpenId 규칙을 따른다.
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   // 학습자 승인·관리에서 「수행 기록」으로 넘어오면 ?q=… 로 검색어를 받는다.
   const [params] = useSearchParams();
@@ -172,6 +129,8 @@ const IndividualRecords = () => {
 
   // 미션 제목은 로그에 없으므로 시나리오의 짧은 설명에서 가져온다. 실패하면 짧은 ID로 둔다.
   const [missionBriefs, setMissionBriefs] = useState<Map<string, string>>(new Map());
+  // 「보기」에서 MJT 제시 표현·선택지 문구를 풀어 쓰려고 미션 본문도 함께 읽는다.
+  const [missionContents, setMissionContents] = useState<Map<string, unknown>>(new Map());
   const missionIds = useMemo(
     () => [...new Set((rows ?? []).map((row) => row.mission_id).filter((id) => UUID_PATTERN.test(id)))],
     [rows],
@@ -182,9 +141,10 @@ const IndividualRecords = () => {
     void (async () => {
       const { data, error: briefError } = await supabase
         .from("scenarios")
-        .select("scenario_id,core_content")
+        .select("scenario_id,core_content,mission_content")
         .in("scenario_id", missionIds);
       if (cancelled || briefError) return;
+      setMissionContents(new Map((data ?? []).map((item) => [item.scenario_id, item.mission_content] as [string, unknown])));
       setMissionBriefs(new Map((data ?? []).flatMap((item) => {
         // 짧은 설명(brief)이 없는 미션(v6 전환분 일부)은 상황 설명의 첫 문장으로 대신한다.
         const content = item.core_content as { brief_note_ko?: unknown; situation_ko?: unknown } | null;
@@ -212,10 +172,28 @@ const IndividualRecords = () => {
     () => filterMissionLogs(baseRows, filters, courseIndex),
     [baseRows, filters, courseIndex],
   );
+  // 화면에 들어오면 한 건은 펼쳐 둔다 — 현행(mission_v6) 수행 중 가장 최근 것, 없으면 맨 위 행.
+  const defaultOpenId = useMemo(() => {
+    const isCurrent = (row: MissionLogRow) =>
+      (row.context_judgment as { mission_schema_version?: unknown } | null)?.mission_schema_version === "mission_v6";
+    return (visibleRows.find(isCurrent) ?? visibleRows[0])?.id ?? null;
+  }, [visibleRows]);
   const completedCount = useMemo(
     () => visibleRows.filter((row) => row.mission_completed).length,
     [visibleRows],
   );
+  // 학습자 필터는 이름으로 고른다. 학습자 관리에서 이메일(?q=)로 넘어오면 그 사람의 이름으로 바꿔 선택해 둔다.
+  const learnerNames = useMemo(() => {
+    const names = [...new Set(baseRows.map(learnerLabel))].sort((a, b) => a.localeCompare(b, "ko"));
+    return filters.query && !names.includes(filters.query) ? [filters.query, ...names] : names;
+  }, [baseRows, filters.query]);
+  useEffect(() => {
+    const query = filters.query.trim().toLowerCase();
+    if (!query || !rows) return;
+    const match = rows.find((row) =>
+      row.profiles?.email?.toLowerCase() === query || row.profiles?.anonymous_participant_id?.toLowerCase() === query);
+    if (match) setFilters((current) => ({ ...current, query: learnerLabel(match) }));
+  }, [rows, filters.query]);
   const speechActs = useMemo(
     () => [...new Set((rows ?? []).map((row) => row.speech_act).filter((act): act is string => !!act))].sort(),
     [rows],
@@ -227,17 +205,20 @@ const IndividualRecords = () => {
   return (
     <>
       {!loading && !error && rows.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-end gap-2">
+        <div className="mb-3 flex flex-wrap items-end gap-2 xl:flex-nowrap">
           <label className="text-xs font-medium text-muted-foreground">
-            학습자 검색
-            <input
-              type="search"
+            학습자
+            <select
+              aria-label="학습자 필터"
               value={filters.query}
               onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
-              placeholder="이름·이메일·참여자 ID"
-              aria-label="학습자 검색"
-              className="mt-1 block h-9 w-56 rounded-md border border-border bg-white px-2.5 text-sm font-normal text-foreground"
-            />
+              className={`mt-1 block w-36 font-normal text-foreground ${selectClass}`}
+            >
+              <option value="">전체</option>
+              {learnerNames.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
           </label>
           <label className="text-xs font-medium text-muted-foreground">
             교과목
@@ -246,7 +227,7 @@ const IndividualRecords = () => {
               value={filters.courseId}
               disabled={courses.length === 0}
               onChange={(event) => setFilters((current) => ({ ...current, courseId: event.target.value }))}
-              className={`mt-1 block w-56 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-52 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {courses.map((course) => (
@@ -261,7 +242,7 @@ const IndividualRecords = () => {
               aria-label="주차 필터"
               value={filters.weekNo}
               onChange={(event) => setFilters((current) => ({ ...current, weekNo: event.target.value }))}
-              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {Array.from({ length: 15 }, (_, index) => index + 1).map((week) => (
@@ -275,7 +256,7 @@ const IndividualRecords = () => {
               aria-label="화행 필터"
               value={filters.speechAct}
               onChange={(event) => setFilters((current) => ({ ...current, speechAct: event.target.value }))}
-              className={`mt-1 block w-40 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {speechActs.map((act) => (
@@ -291,14 +272,14 @@ const IndividualRecords = () => {
               onChange={(event) =>
                 setFilters((current) => ({ ...current, completion: event.target.value as MissionLogFilters["completion"] }))
               }
-              className={`mt-1 block w-32 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               <option value="completed">완료</option>
               <option value="in_progress">진행 중</option>
             </select>
           </label>
-          <label className="flex h-9 items-center gap-2 rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
+          <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
             <input
               type="checkbox"
               checked={includeTestRecords}
@@ -311,7 +292,7 @@ const IndividualRecords = () => {
             <button
               type="button"
               onClick={() => setFilters(EMPTY_FILTERS)}
-              className="h-9 rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
+              className="h-9 whitespace-nowrap rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
             >
               필터 해제
             </button>
@@ -348,7 +329,7 @@ const IndividualRecords = () => {
         </div>
       ) : rows.length === 0 && !error ? (
         <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-sm text-muted-foreground">
-          아직 학습미션 수행 기록이 없습니다.
+          아직 학습 미션 수행 기록이 없습니다.
         </div>
       ) : visibleRows.length === 0 && !error ? (
         <div className="rounded-xl border border-dashed border-border bg-card px-6 py-10 text-center text-sm text-muted-foreground">
@@ -362,16 +343,19 @@ const IndividualRecords = () => {
                 <th className="px-3 py-2 font-medium">최근 저장</th>
                 <th className="px-3 py-2 font-medium">학습자</th>
                 <th className="px-3 py-2 font-medium">화행</th>
-                <th className="px-3 py-2 font-medium">미션</th>
+                <th className="px-3 py-2 font-medium">학습 미션</th>
                 <th className="px-3 py-2 font-medium">교과목·주차</th>
-                <th className="px-3 py-2 font-medium">방식</th>
+                <th className="px-3 py-2 font-medium">수행 방식</th>
                 <th className="px-3 py-2 font-medium">상태</th>
                 <th className="px-3 py-2 text-right font-medium">내용</th>
               </tr>
             </thead>
             <tbody>
               {visibleRows.map((row) => {
-                const open = !!expanded[row.id];
+                const open = expanded[row.id] ?? row.id === defaultOpenId;
+                const placement = row.course_id
+                  ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
+                  : "편성 외 수행";
                 return (
                   <Fragment key={row.id}>
                     <tr className="border-t border-border">
@@ -383,11 +367,7 @@ const IndividualRecords = () => {
                       <td className="max-w-56 truncate px-3 py-2 font-semibold text-[#15202B]" title={row.mission_id}>
                         {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
                       </td>
-                      <td className="max-w-52 px-3 py-2 text-xs">
-                        {row.course_id
-                          ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
-                          : "편성 외 수행"}
-                      </td>
+                      <td className="whitespace-nowrap px-3 py-2 text-xs">{placement}</td>
                       <td className="whitespace-nowrap px-3 py-2">{taskLabel(row.task_type)}</td>
                       <td className="px-3 py-2">
                         <span
@@ -415,7 +395,7 @@ const IndividualRecords = () => {
                     {open && (
                       <tr className="border-t border-border bg-background">
                         <td colSpan={8} className="px-3 py-3">
-                          <DetailPanel row={row} />
+                          <DetailPanel row={row} mission={missionContents.get(row.mission_id)} placement={placement} />
                         </td>
                       </tr>
                     )}
@@ -442,7 +422,7 @@ const Page = () => {
   return (
     <AdminShell
       title="학습 수행 기록"
-      description="학습 미션 수행 기록을 개별 학습자 단위와 익명 학급 집계 단위로 확인합니다."
+      description="학습자가 수행한 학습 미션을 개별 수행 기록과 익명 학급 응답 분포로 확인합니다."
     >
       <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
         {TABS.map((item) => (

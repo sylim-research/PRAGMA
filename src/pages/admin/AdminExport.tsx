@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,11 +10,13 @@ import {
   type MissionEventExportFormat,
 } from "@/lib/mission/missionEventExport";
 
-// 내려받기가 이 화면의 일이므로 맨 위에 두고, 포함 기준은 그 아래 세 칸으로 한눈에 읽게 한다.
+// 내려받기가 이 화면의 일이므로 맨 위에 두고, 그 아래에는 학습 수행 기록이 연구 자료가 되기까지의
+// 순서(동의 확인 → 가명 처리 → 연구자의 선별·구성)를 번호와 화살표로 보여 준다.
+// 내려받은 파일은 아직 「학습 데이터(연구 자료)」가 아니다 — 선별·구성은 연구자의 몫이다.
 const RULES: Array<[string, string]> = [
-  ["포함 대상", "데이터 이용·가명 분석에 동의했고 동의 버전이 유효한 학습자의 기록만 자동으로 담습니다."],
-  ["가명화", "이름·이메일·사용자 ID를 연구용 번호로 바꿉니다. 원자료와 연결될 수 있으므로 연구자료 보안 기준에 따라 보관합니다."],
-  ["연구자가 따로 확인", "필수 활동 완료·응답 누락 같은 분석 포함 기준과 여러 학습자 비교는 내려받은 뒤 분석 단계에서 확인합니다."],
+  ["동의한 기록만", "데이터 이용·가명 분석에 동의했고 동의 버전이 유효한 학습자의 기록만 자동으로 담습니다."],
+  ["가명 처리", "이름·이메일·사용자 ID를 연구용 번호로 바꿉니다. 원자료와 연결될 수 있으므로 연구자료 보안 기준에 따라 보관합니다."],
+  ["연구자의 선별·구성", "필수 활동 완료·응답 누락 같은 포함 기준으로 선별·구성한 뒤에 학습 데이터(연구 자료)가 됩니다."],
 ];
 
 const Page = () => {
@@ -41,8 +44,8 @@ const Page = () => {
 
   return (
   <AdminShell
-    title="연구 데이터 내보내기"
-    description="학기가 끝난 뒤, 동의한 학습자의 수행 기록을 직접 식별정보를 뺀 연구용 파일로 내려받습니다."
+    title="연구용 기록 내보내기"
+    description="동의한 학습자의 학습 수행 기록을 가명 처리해 연구용 파일로 내려받습니다."
     compact
   >
     <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
@@ -77,12 +80,23 @@ const Page = () => {
       {message && <p role="status" className="mt-2 text-sm font-semibold text-[#1F3A5F]">{message}</p>}
     </section>
 
-    <section className="mt-4 grid gap-3 md:grid-cols-3" aria-label="포함 기준">
-      {RULES.map(([title, body]) => (
-        <div key={title} className="rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5">
-          <h3 className="text-[13.5px] font-bold text-[#15202B]">{title}</h3>
-          <p className="mt-1.5 text-[12.5px] leading-[1.6] text-[#46515A]">{body}</p>
-        </div>
+    <section className="mt-4 flex flex-col items-stretch gap-2 md:flex-row" aria-label="포함 기준">
+      {RULES.map(([title, body], index) => (
+        <Fragment key={title}>
+          {index > 0 && (
+            <span aria-hidden className="flex items-center justify-center text-[#B8A780]">
+              <ArrowDown className="h-4 w-4 md:hidden" />
+              <ArrowRight className="hidden h-4 w-4 md:block" />
+            </span>
+          )}
+          <div className="min-w-0 flex-1 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5">
+            <h3 className="flex items-center gap-2 text-[13.5px] font-bold text-[#15202B]">
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1F2A44] text-[11px] text-white">{index + 1}</span>
+              {title}
+            </h3>
+            <p className="mt-1.5 text-[12.5px] leading-[1.6] text-[#46515A]">{body}</p>
+          </div>
+        </Fragment>
       ))}
     </section>
   </AdminShell>
