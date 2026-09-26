@@ -35,3 +35,4 @@
 - 최신 `origin/main` `011874cb1481156469b5dd82421a94fb53b82102`에서 별도 clean worktree/`codex/parcel-recheck-release-20260926`을 만들고 로컬 브랜치를 merge했다. 포함 대상: `489fd8aa`, `376be3a3`, `075a3e4d`, `0c4f9553`, `c6ea1580`, `46e74de6`, `22f877fb`.
 - `AdminAssembly.tsx`의 문구 충돌 두 곳은 main의 `초안 생성 중`·`자동 품질 점검 중`과 로컬의 `AI 검토 의견 저장`·품질 점검 단계 확인 안내를 함께 보존했다. 실제 이동 없는 이동 완료 안내를 되살리지 않았다. 관리자 구조·API·데이터 변경 없음.
 - 공용 feedback 서버는 main과 차이가 없어 Edge 재배포 대상이 아니다. 프런트엔드 변경만 GitHub PR의 필수 CI(typecheck·전체 테스트·production build 등)를 통과한 뒤 main 트리거로 배포한다. 기존 focused test를 별도로 반복하지 않는다. PR/CI/배포 SHA 및 운영 반영 결과는 후속 완료 기록으로 구분한다.
+- PR #248 최초 CI `36241679792`: typecheck 통과, 테스트 1,057 passed / 4 failed / 9 skipped. 실패 네 건은 공유 화면의 옛 `정답입니다`·`정답`·`수정안 확정하기`와 main에서 바뀐 `미션 자동 생성` 버튼을 반영하지 못한 테스트 기대값이었다. 세 테스트 파일의 문자열만 현행 UI에 정렬하고 제품 코드는 추가 수정하지 않았다. 해당 네 건만 로컬 재실행하여 4 passed / 21 filtered out을 확인했다.

@@ -203,7 +203,7 @@ describe("assembly workbench", () => {
       onStage("quality");
       return new Promise(resolve => { finish = resolve; });
     });
-    fireEvent.click(within(bench).getByRole("button", { name: "초안 자동 생성" }));
+    fireEvent.click(within(bench).getByRole("button", { name: "미션 자동 생성" }));
     expect(await screen.findByText("AI 검토 중")).toBeInTheDocument();
     finish({ ok: true, ruleResult: "pass", qualityVerdict: "pass", repaired: false });
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("초안 저장 · 규칙 기반 검사 통과 · AI 검토 의견 저장 — 품질 점검 단계에서 확인해 주세요"));

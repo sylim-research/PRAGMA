@@ -65,8 +65,8 @@ describe("local learner UX pilot", () => {
     const inventedCause = screen.getByRole("button", { name: /助教您好，不好意思，我上周忘了签到/ });
     expect(inventedCause).toHaveTextContent("원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다.");
     expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
-    expect(within(inventedCause).queryByText("정답")).not.toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("정답")).toBeInTheDocument();
+    expect(within(inventedCause).queryByText("기준 선택")).not.toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("기준 선택")).toBeInTheDocument();
     click("다음: 직접 고쳐 보기");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
     expect(screen.queryByRole("heading", { name: "참고 표현" })).not.toBeInTheDocument();
