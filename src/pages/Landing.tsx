@@ -26,14 +26,14 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-[944px] items-center px-6 py-4">
+        <div className="mx-auto flex max-w-[872px] items-center px-6 py-4">
           <HomeBrand />
         </div>
       </header>
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-[944px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
+      <main className="mx-auto flex w-full max-w-[872px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -82,8 +82,9 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 가장 긴 행(학습자 2행)이 14px에서 약 374px라
-            카드 안쪽 폭이 그보다 넓어야 한다 — 그래서 헤더·본문·푸터 칼럼을 944px로 함께 넓혔다(2026-09-26). */}
+        {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 가장 긴 행(교수자 1행)이 14px에서 약 338px라
+            카드 안쪽 폭(약 350px)이 그보다 넓어야 한다. 그 이상은 넓히지 않는다 — 카드가 양옆으로 퍼져 보인다.
+            헤더·본문·푸터 칼럼은 같은 872px을 써서 왼쪽 선을 맞춘다(2026-09-26). */}
         <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
@@ -99,7 +100,7 @@ const Landing = () => {
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
               관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
-              AI 피드백을 확인하고 자신의 표현을 검토한 뒤, 최종안을 결정합니다.
+              AI 피드백을 참고해 초안을 검토한 뒤, 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
@@ -123,7 +124,7 @@ const Landing = () => {
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
               AI로 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
-              교수자가 콘텐츠를 감수한 뒤 최종 승인해 수업에 활용합니다.
+              교수자가 감수하고 최종 승인한 콘텐츠를 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
                 버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·승인하기.
@@ -162,7 +163,7 @@ const Landing = () => {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-[944px] px-6 pb-6">
+      <footer className="mx-auto w-full max-w-[872px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
           한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
         </p>
