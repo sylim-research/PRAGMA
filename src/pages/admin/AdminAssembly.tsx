@@ -1046,9 +1046,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
-              {/* 상태 칩 줄과 검색 줄의 전체 폭을 맞춘다 — 둘을 한 틀에 넣고 검색칸이 남는 폭을 채운다. */}
-              <div className="flex w-fit max-w-full flex-col gap-1.5">
-              <div className="flex flex-wrap gap-1.5" role="group" aria-label="상태">
+              {/* 상태 칩은 한 줄로 두고(넘치면 가로 스크롤), 검색 줄은 목록 폭을 모두 쓴다. */}
+              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="상태">
                 {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
                     key={s}
@@ -1056,7 +1056,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     onClick={() => setFState(s)}
                     aria-pressed={fState === s}
                     className={[
-                      "whitespace-nowrap rounded-full border px-3 py-1 text-[13px] transition-colors",
+                      "shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-[13px] transition-colors",
                       fState === s
                         ? "border-[#233542] bg-[#233542] font-semibold text-white"
                         : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
