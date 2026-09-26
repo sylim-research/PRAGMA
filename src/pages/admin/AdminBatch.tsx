@@ -366,7 +366,8 @@ const AdminBatch = () => {
               ) : <>
               {summary.emptyActLevelModeCells.length > 0 && <p className="mt-2 break-words text-xs leading-5 text-amber-800">아직 비어 있는 조합: {summary.emptyActLevelModeCells.map(humanizeCell).join(", ")}</p>}
 
-              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
+              {/* 수준별·도메인별은 항목이 짧아 좁게 둔다(이름과 숫자가 멀어지면 짝이 안 읽힌다). */}
+              <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-[0.75fr_0.75fr_1fr_1fr] lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
@@ -521,7 +522,8 @@ const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[
 const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
   <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[13.5px] font-semibold">{title}</div>
-    <ul className="mt-1.5 space-y-0.5">
+    {/* 칸이 넓어도 이름과 숫자가 한눈에 짝지어지도록 목록 폭을 제한한다. */}
+    <ul className="mt-1.5 max-w-[220px] space-y-0.5">
       {rows.map(([label, n]) => (
         <li key={label} className="flex items-baseline justify-between gap-3 text-[13.5px]">
           <span className="text-[#4E5A63]">{label}</span>
