@@ -305,7 +305,7 @@ const AdminBatch = () => {
                   <div role="group" aria-label="언어 방향" className="inline-flex gap-1.5">
                     {(["ko_zh", "zh_ko"] as const).map(d =>
                       <button key={d} type="button" aria-pressed={direction === d} disabled={busy} onClick={() => switchDirection(d)}
-                        className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A]" : "border border-[#EAE4D2] bg-white font-medium text-[#3F4E59] hover:bg-[#FAF8F2]")}>
+                        className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]" : "border border-[#E6DECB] bg-[#FFFDF8] font-medium text-[#4E5A63] hover:border-[#CDBB8A]")}>
                         {DIRECTION_LABEL[d]}
                       </button>)}
                   </div>
@@ -332,7 +332,7 @@ const AdminBatch = () => {
                           disabled={busy} onChange={event => setProductionSetting(level, "interpretingPercent", Number(event.target.value))} className="mt-1 h-8 bg-white px-2" />
                       </div>
                     </div>
-                    <p className="mt-1 text-xs tabular-nums text-muted-foreground">번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
+                    <p className="mt-1.5 text-[12.5px] font-semibold tabular-nums text-[#3F4E59]">→ 번역 {counts.translation} · 통역 {counts.stt_interpreting}</p>
                   </div>;
                 })}
               </div>
@@ -342,12 +342,12 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
-              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
+              {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
+                  「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
+              <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
                 <PlanMetric label="통역" value={summary.interpreting} />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
                 {summary.total > 0 && <>
                   <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·수행 방식 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
                     description="화행 × 수준 × 번역/통역" />
@@ -370,8 +370,8 @@ const AdminBatch = () => {
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-4 lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="테마별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="직장 도메인 · 산업별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#EAE4D2] bg-[#FAF8F2] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
                 <div className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 sm:col-span-2">
                   <h3 className="text-[12.5px] font-semibold">화행별</h3>
