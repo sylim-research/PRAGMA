@@ -746,14 +746,14 @@ const AdminComposer = () => {
               role="tab"
               aria-selected={tab === key}
               onClick={() => setTab(key)}
-              className={`flex flex-col gap-1 rounded-xl border px-5 py-3.5 text-left transition ${
+              className={`flex flex-col gap-0.5 rounded-xl border px-5 py-3 text-left transition ${
                 tab === key
-                  ? "border-[#15202B] bg-[#15202B] text-white shadow-[0_6px_16px_rgba(21,32,43,0.14)]"
-                  : "border-[#D8D3C4] bg-white text-[#15202B] hover:border-[#1F3A5F] hover:bg-[#F7F9FC]"
+                  ? "border-[#1F3A5F] bg-white text-[#15202B] shadow-[inset_0_-3px_0_#1F3A5F]"
+                  : "border-[#E2DED2] bg-white/70 text-[#46515A] hover:border-[#9FB0C6] hover:bg-white"
               }`}
             >
-              <span className="text-[16px] font-bold">{label}</span>
-              <span className={`text-[12.5px] ${tab === key ? "text-[#C5CFD4]" : "text-[#5D6970]"}`}>{note}</span>
+              <span className="text-[15px] font-bold">{label}</span>
+              <span className="text-[12.5px] text-[#66727A]">{note}</span>
             </button>
           ))}
         </div>
@@ -840,7 +840,9 @@ const AdminComposer = () => {
 
         {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
-        <div className="mt-5 rounded-xl border border-[#E2DED2] bg-white">
+        <div className="mt-6 overflow-hidden rounded-xl border border-[#D8D3C4] bg-white shadow-[0_6px_18px_rgba(21,32,43,0.05)]">
+          {/* 작업 머리 = 지금 고친 교과목 이름. 카드 줄(고르기) 아래에서 「이 교과목을 편성한다」가 먼저 읽히게. */}
+          {outline && <h2 className="border-b border-[#EAE4D2] bg-[#FBFAF6] px-4 py-3 text-[18px] font-bold text-[#15202B]">{courseDisplayTitle(outline)}</h2>}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <button
