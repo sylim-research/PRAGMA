@@ -984,7 +984,7 @@ const AdminGenerator = () => {
             <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
             <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="지위 · P" tone="accent">
+              <Field label="권력 · P" tone="accent">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -1010,7 +1010,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="부담 · R" tone="accent">
+              <Field label="부담도 · R" tone="accent">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -1335,7 +1335,7 @@ const AdminGenerator = () => {
                 </div>
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">편성된 생성 예시</span>
+                    <span className="inline-flex items-center rounded border border-[#EAD9A0] bg-[#FBEFD9] px-1.5 py-0.5 text-[11px] font-medium text-[#7A4A0A]">생성 예시</span>
                     <span className="text-[13.5px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>

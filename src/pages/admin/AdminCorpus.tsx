@@ -261,7 +261,7 @@ function OperationsSection({
   const contentKind = audit?.contentKind === "mission"
     ? "학습 미션 1건"
     : audit?.contentKind === "core"
-      ? "상황 시나리오 1건"
+      ? "시나리오 1건"
       : "콘텐츠 1건";
   const caseTitle = audit?.title?.replace(/^\s*\[[^\]]*\]\s*/, "") || null;
   const caseAxes = [speechAct, level, mode, direction].filter((item): item is string => Boolean(item));

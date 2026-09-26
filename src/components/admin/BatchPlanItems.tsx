@@ -48,7 +48,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, fo
               onChange={() => onSelect(pageAllSelected
                 ? selected.filter(value => !indexes.includes(value))
                 : [...new Set([...selected, ...indexes])].sort((a, b) => a - b))} />
-          </th>{["번호", "화행", "수준", "과업", "도메인", "지위", "거리", "부담"].map(label =>
+          </th>{["번호", "화행", "수준", "수행 방식", "도메인", "권력", "거리", "부담도"].map(label =>
             <th key={label} className="px-2 py-2 text-center font-semibold">{label}</th>)}<th className="px-3 py-2 text-left font-semibold">주제</th></tr>
         </thead>
         <tbody className="divide-y">{indexes.map(index => {

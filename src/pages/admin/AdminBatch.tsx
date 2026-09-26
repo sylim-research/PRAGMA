@@ -293,7 +293,7 @@ const AdminBatch = () => {
 
   return (
     <AdminShell title="시나리오 배치 생성"
-      description="조건별 생성 계획을 세우고 AI로 상황·원문을 자동 제작합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 조립으로 연결합니다.">
+      description="조건별 생성 계획을 세우고 AI로 시나리오의 상황·원문을 생성합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
       <div className="space-y-5">
         <div className="space-y-5">
           <div className="min-w-0 space-y-5">
@@ -349,9 +349,9 @@ const AdminBatch = () => {
                 <PlanMetric label="통역" value={summary.interpreting} />
                 <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
                 {summary.total > 0 && <>
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·과업 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·수행 방식 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
                     description="화행 × 수준 × 번역/통역" />
-                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="관계·거리·부담 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
+                  <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="권력·거리·부담도 분포" filled={targetActCount * 27 - summary.emptyActPdrCells.length} total={targetActCount * 27}
                     description="화행 × P × D × R" />
                 </>}
               </div>
