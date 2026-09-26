@@ -34,7 +34,10 @@ const AdminLogin = () => {
     const { data: signIn, error: signInError } =
       await supabase.auth.signInWithPassword({ email: toEmail(account), password: pw });
     if (signInError || !signIn.user) {
-      setError(signInError?.message ?? "로그인에 실패했습니다.");
+      // Supabase의 영문 메시지를 그대로 보이지 않는다.
+      setError(signInError?.message === "Invalid login credentials"
+        ? "아이디 또는 비밀번호가 맞지 않습니다."
+        : "로그인에 실패했습니다. 잠시 후 다시 시도해 주세요.");
       setBusy(false);
       return;
     }
@@ -63,46 +66,43 @@ const AdminLogin = () => {
           <HomeBrand />
         </div>
       </header>
-      <main className="mx-auto flex max-w-md flex-col px-6 py-16">
-        <div className="flex items-stretch gap-3">
-          <span aria-hidden className="mt-1 w-[5px] shrink-0 self-stretch rounded-sm bg-[#FAD338]" />
-          <div>
-            <h1 className="text-2xl font-bold leading-tight">교수자 로그인</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              발급받은 아이디로 로그인하세요. 교수자 권한이 있는 계정만 입장할 수 있습니다.
-            </p>
-          </div>
-        </div>
+      {/* 학습자 로그인 카드와 같은 틀: 제목과 입력을 한 장의 카드에 담고 화면 가운데에 둔다. */}
+      <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-4 pb-20 pt-12">
         <form
-          className="mt-8 flex flex-col gap-3 rounded-xl border border-border bg-card p-6"
+          className="w-full max-w-[400px] rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white px-7 pb-7 pt-7 shadow-[0_24px_60px_-28px_rgba(21,32,43,0.35)] sm:px-8"
           onSubmit={handleSubmit}
         >
-          <label className="text-sm font-medium">아이디</label>
-          <input
-            type="text"
-            value={account}
-            onChange={(e) => setAccount(e.target.value)}
-            autoComplete="off"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="admin"
-          />
-          <label className="mt-1 text-sm font-medium">비밀번호</label>
-          <input
-            type="password"
-            value={pw}
-            onChange={(e) => setPw(e.target.value)}
-            autoComplete="off"
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
-            placeholder="••••••••"
-          />
+          <h1 className="text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">교수자 로그인</h1>
+          <div className="mt-6 flex flex-col gap-2">
+            <label htmlFor="admin-account" className="text-sm font-medium text-[#253441]">아이디</label>
+            <input
+              id="admin-account"
+              type="text"
+              value={account}
+              onChange={(e) => setAccount(e.target.value)}
+              autoComplete="off"
+              className="h-11 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
+              placeholder="admin"
+            />
+            <label htmlFor="admin-password" className="mt-2 text-sm font-medium text-[#253441]">비밀번호</label>
+            <input
+              id="admin-password"
+              type="password"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              autoComplete="off"
+              className="h-11 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
+              placeholder="••••••••"
+            />
+          </div>
           <button
             type="submit"
             disabled={busy || !account.trim() || !pw}
-            className="mt-2 rounded-md bg-[#FAD338] px-4 py-2 text-sm font-medium text-[#15202B] hover:brightness-95 disabled:opacity-60"
+            className="mt-6 h-12 w-full rounded-xl bg-[#FAD338] px-4 text-[15px] font-semibold text-[#15202B] transition-[filter,transform] hover:brightness-95 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:opacity-60"
           >
             {busy ? "로그인 중…" : "입장"}
           </button>
-          {error && <p className="text-[12px] text-destructive">{error}</p>}
+          {error && <p role="alert" className="mt-3 text-[13px] text-destructive">{error}</p>}
         </form>
       </main>
     </div>
