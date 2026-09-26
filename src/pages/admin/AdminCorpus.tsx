@@ -368,7 +368,7 @@ function OperationsSection({
 
 /**
  * 대조 기록 — [미션 자동 생성] 때마다 서버가 남긴 HSK 대조 기록을 모아 보여 준다.
- * 새로 대조하지 않고 저장된 기록만 읽는다. 일치율은 난이도 판정이 아니다.
+ * 새로 대조하지 않고 저장된 기록만 읽는다. 목록 포함률은 난이도·적절성 판정이 아니다.
  */
 function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[]; selected: AuditSnapshot | null; onSelect: (audit: AuditSnapshot) => void }) {
   const summary = useMemo(() => summarizeMissionAudits(audits), [audits]);
@@ -381,7 +381,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
         <div className="flex items-baseline gap-3">
           <h2 id="audit-history-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
-            학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · 평균 일치율 <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
+            학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · 평균 HSK 목록 포함률 <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -391,9 +391,11 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
             </span>
           ))}
         </div>
+        {/* 76% 같은 평균 바로 곁에서 해석의 경계를 한 번 보인다(목록 밖 = 수준 부적합이 아님). */}
+        <p className="basis-full text-[13px] text-[#7A746A]">목록 밖 단어는 곧바로 수준 부적합을 뜻하지 않습니다. 필요 어휘·전문용어·단어 분절 등이 섞여 있습니다.</p>
       </div>
       <div className={`${grid} border-y border-[#EFEAE0] bg-[#FBFAF6] px-5 py-1.5 text-[12.5px] text-[#7A746A]`}>
-        <span>일시</span><span>콘텐츠</span><span>조건</span><span className="text-right">일치 / 밖</span><span className="text-right">일치율</span>
+        <span>일시</span><span>콘텐츠</span><span>조건</span><span className="text-right">일치 / 밖</span><span className="text-right">목록 포함률</span>
       </div>
       <ol className="divide-y divide-[#F2EEE6]">
         {recent.map((audit, index) => {
