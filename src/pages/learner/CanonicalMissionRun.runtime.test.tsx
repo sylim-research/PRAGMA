@@ -81,7 +81,7 @@ describe("CanonicalMissionRun live CTA route", () => {
   it("runs a v6 runtime from the DCT draft through feedback, revision and final confirmation, then saves both responses", async () => {
     window.scrollTo = vi.fn(); Element.prototype.scrollIntoView = vi.fn();
     const mission = SAMPLE_MISSION_V6_REASON_CONTRAST;
-    const runtime = { scenario_id: scenarioId, speech_act: "request" as const, learner_level: "intermediate" as const,
+    const runtime = { scenario_id: REPRESENTATIVE_MISSION_ID, speech_act: "request" as const, learner_level: "intermediate" as const,
       mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh" as const, mission };
     vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
     vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "log-1" });
@@ -93,7 +93,9 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("매우 적절"); click("판단 확정하기");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
     click("이유 확정하기"); click(/^다음:/);
-    ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
+    expect(screen.getByText(mission.mpj_items[4].learner_context_ko)).toBeInTheDocument();
+    expect(screen.getByText(/한 학년 위 여자 선배/)).toBeInTheDocument();
+    ["상황에 맞음", "상대의 선택권이 부족함", "우회해 요청이 흐려짐", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기"); click(/^다음:/);
@@ -102,6 +104,8 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("수정안 제출하기"); click(/^다음:/);
     click("번역하기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
+    expect(screen.getByText("원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.")).toBeInTheDocument();
+    expect(screen.getByText("제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.")).toBeInTheDocument();
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
     click("번역 제출하기");
     // Stage 2: feedback for the submitted draft (live request, not a preview).
@@ -110,19 +114,25 @@ describe("CanonicalMissionRun live CTA route", () => {
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
     click("다른 표현도 시도해보기");
+    expect(screen.getByRole("list", { name: "미션 안내, 적절성 판단, 번역하기, 피드백, 재검토" })).toBeInTheDocument();
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.
-    click("수정안 확정하기");
+    click("수정안 다시 확인하기");
+    await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
+    click("최종안 확정하기");
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
     expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
+    expect(input.mpjResponses?.map(response => response.item_id)).toEqual([1, 2, 3, 4, 5]);
     expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
-    expect(requestFeedback).toHaveBeenCalledTimes(1);
+    expect(requestFeedback).toHaveBeenCalledTimes(2);
+    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, revised);
   });
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear(); sessionStorage.clear();
     window.scrollTo = vi.fn();
     window.history.replaceState({}, "", "/");
     fetchMissionByScenario.mockResolvedValue({
@@ -195,7 +205,11 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByRole("textbox")).toHaveValue(alternate);
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(requestFeedback).toHaveBeenCalledWith(mission, reference);
-    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "수정안 확정하기" }));
+    if (alternate !== reference) {
+      fireEvent.click(screen.getByRole("button", { name: "수정안 다시 확인하기" }));
+      await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
+    }
+    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();

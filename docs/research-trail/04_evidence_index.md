@@ -542,3 +542,10 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - EVD-20260926-02 종단 완료: 최종 v3 980571d6-8852-48c4-9cde-233713360b5f, 승인 run adfb82ee-84e3-416d-8625-50ce0b2037f1, 지정 슬롯 교체. PR #242/main a23564a5, CI 1,054 pass/9 skip, Railway deployment 6676237672 success. 운영 learner 수행 log 017fa099-6e0f-48be-b21d-190b9e77571e의 최초·최종 번역·피드백·내부 문항 매핑·승인 hash를 DB와 새로고침한 기록 화면에서 확인했다.
 - 완결 보고서: `C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-26_택배주대표_제출완료증거.md`. 전체 ID·콘텐츠·의견 처리·실제 실행·직접 입증 범위와 한계를 포함한다. 연구자 계정의 대행 시험이고 사람 원어민 검수나 실제 학생 효과 검증은 아니다.
 - 제4장 집필 인계: `docs/handoff/2026-09-26_thesis_ch4_parcel_vertical_slice_evidence_handoff.md`. 승인 v3와 동일 콘텐츠 해시의 week2/position0 편성, 실제 AI 피드백·수정 결정·저장·reload 후 재조회를 기존 근거에 연결한다. 유지 분기 live 저장은 입증하지 않는다. 신규 테스트·AI 검토·DB 조회 없이 기록을 정리했다.
+
+### EVD-20260926-03 · DCT 수정안 재확인 1회 — 로컬 구현 근거
+
+- `docs/dev-log/2026-09-26-dct-revision-recheck.md`, DEC-20260926-03. 사용자 수행 중 발견한 A 피드백/B 미확인 문제, 기존 함수 재사용, 최대 2회·최종 결정권 유지의 변경 사슬을 기록한다.
+- `CanonicalMissionRun.recheck.test.tsx`, `dctFeedbackSession.test.ts` 및 기존 관련 검사: 서로 다른 focused 10개 통과, 앱 typecheck 통과. A/B 입력 분리·중복/3차 방지·유지/수정/실패·최종 C·reference 지연 공개·1차 provenance와 두 회차 이벤트 payload 보존을 mock으로 확인했다.
+- fallback 복원 후속: 위 10개는 초기 구현 당시 기록이다. 단일 공급자 호출 강제 검사를 HTTP 400/404 fallback 동작 검사로 교체하고, 세션 4개+UI 3개 **focused 7개 및 typecheck**를 통과했다. 실제 서버 호출 구간의 mock 실행에서 내부 4호출이 학습자 A/B 2회차로 처리됨을 확인했다. 유지 1회·수정 2회·B 입력·3차 없음·2차 실패 뒤 최종 C 저장도 재확인했다. 세부 실행과 환경 제약은 위 dev-log의 후속 정정을 따른다.
+- 운영 AI·DB·E2E·배포 없음. EVD-20260926-02의 기존 운영 종단 증거와 구분한다. 콘텐츠 hash 불변은 콘텐츠 미수정과 fixture 전달 검사 범위이며 운영 재해시가 아니다. 2차 영속화는 기존 연구 이벤트 저장 조건에 의존한다.
