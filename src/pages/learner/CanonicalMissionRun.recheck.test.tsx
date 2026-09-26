@@ -34,6 +34,7 @@ const feedback = (round: number): RuntimeFeedback => ({
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 beforeEach(() => {
   vi.clearAllMocks(); localStorage.clear(); sessionStorage.clear();
+  vi.mocked(requestFeedback).mockReset();
   window.scrollTo = vi.fn(); Element.prototype.scrollIntoView = vi.fn();
   vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "saved" });
 });
@@ -47,21 +48,44 @@ function openDraft() {
   window.history.replaceState({}, "", "/");
   render(<StrictMode><MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)}
     runtime={runtime} isDevPreview={false} /></MemoryRouter></StrictMode>);
-  click(/학습 미션 시작하기/);
-  click("다소 적절"); click("답안 확인하기"); click(/^다음:/);
+  click(/미션 시작하기/);
+  click("다소 적절"); click("판단 확인하기"); click(/^다음:/);
   click("매우 적절"); click("판단 확정하기");
   fireEvent.click(screen.getByRole("radio", { name: mission.mpj_items[1].reason_choice.options[1].text }));
   click("이유 확정하기"); click(/^다음:/);
   screen.getAllByRole("radio", { name: "상황에 맞음" }).forEach(button => fireEvent.click(button));
-  click("네 표현 확인하기"); click(/^다음:/);
+  click("판단 확인하기"); click(/^다음:/);
   click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
   fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
-  click("수정안 제출하기"); click(/^다음:/); click("번역하기");
+  click("수정안 제출하기"); click(/^다음:/); click("직접 번역해 보기");
   fireEvent.change(screen.getByRole("textbox"), { target: { value: A } });
   click("번역 제출하기");
   return { mission, before };
 }
 describe("one DCT revision recheck", () => {
+  it.each([false, true])("allows all-good A to be kept or voluntarily revised (revise=%s)", async revise => {
+    const clear = feedback(1);
+    clear.revision_scope = "clear";
+    clear.verdicts.pragmatic_appropriateness.band_code = "within_band";
+    vi.mocked(requestFeedback).mockResolvedValueOnce({ ok: true, feedback: clear })
+      .mockResolvedValueOnce({ ok: true, feedback: feedback(2) });
+    const { mission } = openDraft();
+    await screen.findByText("1차 선택권 재검토");
+    expect(screen.getByRole("button", { name: "다른 표현도 시도해보기" })).toBeEnabled();
+    if (revise) {
+      click("다른 표현도 시도해보기");
+      fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
+      click("수정안 다시 확인하기");
+      await screen.findByRole("heading", { name: "수정안 AI 피드백" });
+      expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
+      fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
+      click("최종안 확정하기");
+    } else click("이 번역으로 확정하기");
+    await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
+    expect(requestFeedback).toHaveBeenCalledTimes(revise ? 2 : 1);
+    expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: revise ? C : A, feedback: clear });
+  });
+
   it("keeps A with dissent, one feedback request and the original save mapping", async () => {
     vi.mocked(requestFeedback).mockResolvedValue({ ok: true, feedback: feedback(1) });
     openDraft();

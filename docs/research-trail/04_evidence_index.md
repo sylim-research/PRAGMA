@@ -556,3 +556,10 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - attempt-entry-lock.json: 실제 KEEP 완료·기록 reload·재진입 후 동일 attempt ID로 저장된 두 entry 이벤트. attempt-regression-before-configured.log 및 attempt-regression-after.log: 원인 확인과 최소 수정의 red/green 검사.
 - main/deployment·동일 mission/content hash·시간순 화면 및 두 경로의 저장/이벤트 대조는 같은 폴더의 최종 README.md와 capture-manifest.json으로 연결한다. 이 항목의 작성 시점에는 배포 후 두 경로 재수행이 아직 완료되지 않았다.
 - local 테스트·UI 관찰·운영 영속화의 입증 범위를 구분한다. 콘텐츠 승인·학습효과·전 교과목 검증으로 확대하지 않는다.
+
+### EVD-20260927-01 · 대표 미션 최종 화면 감수 — 로컬 후보
+
+- `docs/dev-log/2026-09-27-parcel-final-review-local.md`: 사용자 피드백 1~16 처리표, UI/content 구분, 보류된 운영 저장/AI 원응답 RCA, focused 10파일/63개·typecheck·build 결과.
+- `evidence/2026-09-27-parcel-final-review/`: 기존 승인 v3 snapshot, 9필드만 변경한 로컬 후보, revision manifest. 기존 hash `bbf072ba…11095`, 후보 `965bd395…915df`; 운영 revision 생성/교수자 재승인/편성 교체는 미실행.
+- 학습자 판단 배너를 accepted 범위에 맞게 정정하고 저장 실패 시 복구 행동을 먼저 배치했다. A/B/C 최대 2회·fallback·저장 계약은 변경하지 않았다.
+- 운영 DB 쓰기·AI 실행·push/PR/merge/deploy 없음. 사용자 후속 지시로 실제 오류 조사는 보류. 이전 운영 성공 증거와 이번 미확정 실패 보고를 합치거나 새 후보의 운영 성공으로 주장하지 않는다.

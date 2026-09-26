@@ -10,6 +10,23 @@ import { CompletionActions, CompletionRecord, DctFeedbackView, MissionDissentPan
 afterEach(() => vi.useRealTimers());
 
 describe("CanonicalMissionRun completion connections", () => {
+  it("puts retry inside the error region before secondary navigation and blocks navigation while saving", () => {
+    window.history.replaceState({}, "", "/?courseId=course&weekNo=2");
+    const retry = vi.fn();
+    const { rerender } = render(<MemoryRouter><CompletionActions runtime saveState="error" onRetrySave={retry} onRestart={vi.fn()} /></MemoryRouter>);
+    const alert = screen.getByRole("alert");
+    const button = screen.getByRole("button", { name: "학습 기록 저장 다시 시도" });
+    expect(alert).toContainElement(button);
+    const link = screen.getByRole("link", { name: "이번 주 학습으로 돌아가기" });
+    expect(alert.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    fireEvent.click(button);
+    expect(retry).toHaveBeenCalledTimes(1);
+    rerender(<MemoryRouter><CompletionActions runtime saveState="saving" onRetrySave={retry} onRestart={vi.fn()} /></MemoryRouter>);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    for (const nav of screen.getAllByRole("link")) expect(nav).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByRole("button", { name: "처음부터 다시 보기" })).toBeDisabled();
+    window.history.replaceState({}, "", "/");
+  });
   it("preserves the actual feedback category when no phrase is highlighted", () => {
     render(<CompletionRecord response={{
       first: "请帮我收一下快递。", revised: "您方便帮我收一下快递吗？", reflected: true,

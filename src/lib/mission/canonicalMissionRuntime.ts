@@ -311,8 +311,8 @@ function v6BandOptions(
   return bands.map((band) => {
     const isWithinBand = band.code === catalogWithinBand;
     const requestLabel = requestOptionalityLabels && band.code === "too_direct"
-      ? "상대의 선택권이 부족함"
-      : requestOptionalityLabels && band.code === "too_indirect" ? "우회해 요청이 흐려짐" : undefined;
+      ? "너무 직접적"
+      : requestOptionalityLabels && band.code === "too_indirect" ? "너무 우회적" : undefined;
     return {
       id: isWithinBand ? contentWithinBand : band.code,
       label: requestLabel ?? (isWithinBand ? "상황에 맞음" : band.label_ko.match(/^(.+?)(?:\s*\([^)]+\))?$/)?.[1]?.trim() || band.label_ko),
@@ -470,7 +470,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
     const nextLabels: Record<string, string> = {
       A1: "다음: 판단하고 이유 고르기", A2: "다음: 여러 표현 비교하기",
-      A5: "다음: 고친 표현 고르기", A3: "다음: 직접 고치고 비교하기", A4: "다음: 핵심 정리",
+      A5: "다음: 수정안 고르기", A3: "다음: 직접 고쳐 보기", A4: "다음: 핵심 정리",
     };
     quests = quests.map(quest => ({ ...quest, nextLabel: nextLabels[quest.id] }));
     contrastBefore = mission.mpj_items[0].situation_ko;
