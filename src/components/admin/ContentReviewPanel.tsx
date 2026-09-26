@@ -496,8 +496,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
-        <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>최종 승인</h4>
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] px-4 py-3 sm:px-6">
         {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
         {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
@@ -509,11 +508,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
-          <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
+        {/* 한 줄: 번호·제목 | 확인 체크 | 승인 버튼. 화면의 유일한 주 CTA다. */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>교수자 최종 승인</h4>
+          <label className="flex min-w-0 flex-1 cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
+          <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-11 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
-            {busy ? "처리 중…" : "교수자 최종 승인"}
+            {busy ? "처리 중…" : "승인하기"}
           </Button>
         </div>
         {approvalDisabled && <p className="text-amber-800">저장하지 않은 수정 또는 기존 결함의 교수자 판단 근거를 먼저 확인하세요.</p>}
