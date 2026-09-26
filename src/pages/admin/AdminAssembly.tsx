@@ -1009,7 +1009,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작"}
       description={aiReview
-        ? "자동 품질 점검과 AI 검토를 거친 콘텐츠를 교수자가 감수하고 최종 승인합니다."
+        ? "자동 품질 점검과 AI 검토로 교수자 감수에 쓸 판단 자료를 준비합니다."
         : reviewMode
           ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
           : "시나리오로 학습 미션 초안을 만들고, 자동 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}

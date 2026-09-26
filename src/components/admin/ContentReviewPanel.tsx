@@ -48,9 +48,9 @@ const WHERE_PART: Record<string, string> = {
   core: "시나리오", scenario: "시나리오", criteria: "판정 기준", features: "화행 기준",
   title: "제목", source: "원문", target: "번역·통역안", situation_ko: "상황문", relation_ko: "관계 설명",
   explanation_ko: "해설", corrections: "교정안", candidates: "후보", note_ko: "근거", reason_choice: "이유 선택",
-  reference_alternatives: "참고안", learner_context_ko: "안내문", lesson_points: "핵심 정리", contrast: "대조",
-  dct_item: "산출 문항", dct: "산출 문항", pdr: "PDR", preceding_turn: "앞 발화",
-  operational_definition: "운영 정의", fidelity_note: "충실성 기준", band_schema: "대역 구분", text: "본문",
+  reference_alternatives: "참고 표현", learner_context_ko: "안내문", lesson_points: "핵심 정리", contrast: "대조",
+  dct_item: "통번역 과제", dct: "통번역 과제", pdr: "P·D·R", preceding_turn: "상황 맥락 참고",
+  operational_definition: "운영 정의", fidelity_note: "충실성 기준", band_schema: "적절성 판단 범주", text: "본문",
 };
 function whereLabel(where: string): string {
   const parts = where.replace(/^\//, "").split("/").filter(Boolean);
@@ -252,7 +252,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     const decisions = run?.adjudication?.result.decisions ?? [];
     const adjudicationResult = run?.adjudication
       ? `AI 의견 대조 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
-          .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "판정 없음"}`
+          .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "분류 없음"}`
       : null;
     type Row = { key: string; label: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
     const rows: Row[] = [
@@ -392,7 +392,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         {/* 최종 승인 화면은 점검 요약 줄을 두지 않는다. 교수자가 판단할 지적만 아래 판단 카드로 보인다. */}
-        {!experiential && <ReviewFindings title={compact ? "규칙 검사" : "1. 규칙 검사"} result={run.rules} compact={compact} />}
+        {!experiential && <ReviewFindings title={compact ? "자동 품질 점검" : "1. 자동 품질 점검"} result={run.rules} compact={compact} />}
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
         {primary && !experiential && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
         {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 검토"result={generationQualityResult(run.generation_quality)} />}
@@ -402,7 +402,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
-            const source = finding.id.startsWith("rule-") ? "규칙 검사" : finding.id.startsWith("claude-") ? "교차 검토"
+            const source = finding.id.startsWith("rule-") ? "자동 품질 점검" : finding.id.startsWith("claude-") ? "교차 검토"
               : finding.id.startsWith("generation-") ? "생성 단계 AI 검토" : "AI 검토";
             /* 두 검토가 같은 결론이면 재서술을 읽을 이유가 없다. 갈리거나 교수자 확인이 필요할 때만 펼친 채로 둔다. */
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
@@ -480,13 +480,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <p className="mt-1 text-xs">주차 자료 승인 전 연결 미션의 현재 버전 승인도 완료해야 합니다. 같은 해설을 출력 형식별로 중복 검토하지 않습니다.</p>
         <ul className="mt-2 space-y-1">{state.dependencies.map((item, index) => <li key={item.id}><Link className="underline" to={`/admin/review?scenarioId=${item.id}`}>미션 {index + 1} 승인 확인</Link> · {item.approved ? "현재 버전 승인" : "승인 필요"}</li>)}</ul>
       </div>}
-      {blocked && <p className="text-red-800">규칙 오류를 수정·저장해야 AI 검토를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
+      {blocked && <p className="text-red-800">자동 품질 점검 오류를 수정·저장해야 AI 검토를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error} </p>}
       {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 검토"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && !(compact && historicalApproval) && (() => {
         const body = <>
           <h4 className="text-[13.5px] font-bold text-[#233542]">교차 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
-          <p className="mt-0.5 text-xs text-[#5D6970]">AI 판단이 의심스러울 때, 다른 AI가 독립 검토하고 두 의견을 대조합니다.</p>
+          <p className="mt-0.5 text-xs text-[#5D6970]">AI 판단이 의심스러울 때, 다른 AI가 교차 검토하고 두 의견을 대조합니다.</p>
           <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
             setBusy(true); setError(null);
             void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
@@ -521,27 +521,27 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {/* 최종 승인 버튼은 승인 상자 안(확인 체크 오른쪽)에 둔다. 그 밖의 단계 실행 버튼만 여기 남는다. */}
       {next !== "approved" && !(next === "professor" && !handoffHref) && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)}
         onClick={() => void runNext()}>
-        {busy ? "처리 중…" : next === "rules" ? "규칙 검사 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
+        {busy ? "처리 중…" : next === "rules" ? "자동 품질 점검 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
-      {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 독립 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
+      {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 교차 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
       {!experiential && <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
         {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[11px] text-[#5D6970]">
-          <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 지적 {isolatedGrounding(primary).length}건 — 판정에 쓰이지 않습니다.</p>
+          <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 검토 의견 {isolatedGrounding(primary).length}건 — 승인 판단에 쓰이지 않습니다.</p>
           <ul className="mt-1 list-disc pl-4">{isolatedGrounding(primary).map((finding) => <li key={finding.id}>{finding.issue_ko}</li>)}</ul>
         </div>}
         {experiential && <dl className="my-2 grid gap-x-3 gap-y-1 break-all text-[11px] sm:grid-cols-[10rem_1fr]">
           {([
             ["미션 콘텐츠 해시", missionContentHash],
-            ["검수 버전 해시", state.contentHash],
+            ["점검 버전 해시", state.contentHash],
             ["원본 해시", state.sourceHash],
-            ["검수 run ID", run?.id],
-            ["검수 기준", run?.criteria_version],
+            ["점검 실행 ID", run?.id],
+            ["점검 기준", run?.criteria_version],
             ["승인 정책", run?.approval_policy],
             ["OpenAI 검토 모델", run?.openai_review ? `${run.openai_review.model} · ${run.openai_review.checked_at}` : null],
-            ["Claude 독립 검토 모델", run?.claude_review ? `${run.claude_review.model} · ${run.claude_review.checked_at}` : null],
+            ["Claude 교차 검토 모델", run?.claude_review ? `${run.claude_review.model} · ${run.claude_review.checked_at}` : null],
             ["AI 재검토 모델",run?.adjudication ? `${run.adjudication.model} · ${run.adjudication.checked_at}` : null],
           ] as Array<[string, string | null | undefined]>).filter(([, value]) => value).map(([label, value]) => <div key={label} className="contents">
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>
@@ -581,7 +581,7 @@ const noPaths = (text: string) => text
 const plainIssue = (text: string) => text.replace(/^R\d+\/[A-Za-z_]+:\s*/, "").replace("model_unattributed claim", "출처 표시 없는 AI 생성 문장")
   .replace(/mpj_items\[(\d)\]/g, (_m, n) => `MJT 문항 ${Number(n) + 1}`)
   .replace(/\.candidates\[(\d)\]/g, (_m, n) => ` · 후보 ${Number(n) + 1}`)
-  .replace(/production_task/g, "DCT 문항");
+  .replace(/production_task/g, "통번역 과제");
 
 function ReviewFindings({ title, result, metadata, compact = false }: { title: string; result: ReviewResult; metadata?: ModelReview<ReviewResult>; compact?: boolean }) {
   if (compact) {
