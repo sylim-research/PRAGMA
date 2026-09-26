@@ -160,7 +160,7 @@ const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
   v6_done: "최종 승인 완료",
-  v5_only: "v5 · 변환 전",
+  v5_only: "이전 형식 · 변환 전",
   core_only: "초안 생성 대기",
 };
 const QUALITY_CHIPS: StateChip[] = ["needs_check", "rules_error", "decision", "all"];
@@ -211,7 +211,7 @@ const ROW_CAP = 4000;
 const CORE_ROW_SELECT =
   "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, supersedes_scenario_id, created_at, core_content";
 
-const PROGRESS_STEPS = ["초안 생성", "구조 검사", "AI 품질", "격리 저장", "문항 수리"] as const;
+const PROGRESS_STEPS = ["초안 생성", "자동 품질 점검", "AI 검토", "초안 저장", "문항 보완"] as const;
 
 const progressIndex = (stage: PromoteStage) => {
   if (stage.phase === "generating" || stage.phase === "preparing") return 0;
@@ -224,11 +224,11 @@ const progressIndex = (stage: PromoteStage) => {
 const progressLabel = (stage: PromoteStage) => {
   if (stage.phase === "preparing") return "조립 조건 확인";
   if (stage.phase === "generating") return `미션 생성 · ${stage.attempt}/${stage.maxAttempts}차`;
-  if (stage.phase === "checking") return `규칙 검사 · ${stage.attempt}/${stage.maxAttempts}차`;
+  if (stage.phase === "checking") return `자동 품질 점검 · ${stage.attempt}/${stage.maxAttempts}차`;
   if (stage.phase === "quality") return "AI 검토";
-  if (stage.phase === "saving") return "유효 초안 격리 저장";
-  if (stage.phase === "repairing") return "지목 문항 1회 수리";
-  return "수리본 재검사";
+  if (stage.phase === "saving") return "초안 저장";
+  if (stage.phase === "repairing") return "지적된 문항 1회 보완";
+  return "보완본 재점검";
 };
 
 const hasHeadSegment = (r: CoreRow) =>
@@ -300,6 +300,15 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
   // 교수자 최종 승인은 한 미션을 깊게 읽는 화면이라 대기열을 옆에 두지 않고 필요할 때만 서랍으로 연다.
   const [queueOpen, setQueueOpen] = useState(false);
+  // 목록 버튼을 한 번도 열지 않은 동안만 버튼 둘레에 파동을 둔다. 한 번 열면 이 세션에서는 다시 보이지 않는다.
+  const [queueSeen, setQueueSeen] = useState(() => {
+    try { return sessionStorage.getItem("pragma.reviewQueueSeen") === "1"; } catch { return false; }
+  });
+  const openQueue = () => {
+    setQueueOpen(true);
+    setQueueSeen(true);
+    try { sessionStorage.setItem("pragma.reviewQueueSeen", "1"); } catch { /* 저장 불가여도 이번 화면에서는 꺼진다 */ }
+  };
   useEffect(() => {
     if (!queueOpen) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setQueueOpen(false); };
@@ -459,10 +468,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     if (chip === "all") return "전체";
     if (!reviewMode && chip in PRODUCTION_KO) return PRODUCTION_KO[chip as ProductionState];
     if (chip === "decision") return aiReview ? "교수자 승인 대기" : "승인 대기";
-    if (chip === "in_progress") return "검수 진행 중";
+    if (chip === "in_progress") return "점검 진행 중";
     // 대시보드와 같은 집합은 같은 이름으로 부른다.
     if (chip === "needs_check") return "품질 점검 대기";
-    if (chip === "rules_error") return "규칙 검사 불통과";
+    if (chip === "rules_error") return "점검 실패";
     // reviewed·released 상태 전체라 교수자 최종 승인 기록이 없는 옛 미션도 들어 있다 — 대시보드 「교수자 승인 완료」(최종 승인 기록 기준)와 다른 집합이다.
     if (chip === "reviewed" && professorScreen) return "검토 완료 상태";
     return STATE_KO[chip];
@@ -592,7 +601,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const ruleLabel = res.ruleResult ? { pass: "규칙 기반 검사 통과", warning: "규칙 기반 검사 주의", fail: "규칙 기반 검사 실패" }[res.ruleResult] : "규칙 기반 검사 결과 확인 필요";
+        const ruleLabel = res.ruleResult ? { pass: "자동 품질 점검 통과", warning: "자동 품질 점검 주의", fail: "자동 품질 점검 실패" }[res.ruleResult] : "자동 품질 점검 결과 확인 필요";
         const qLabel = res.qualityVerdict ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.qualityVerdict] : "AI 검토 미실행";
         toast.success(`초안 저장 · ${ruleLabel} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검 단계에서 확인해 주세요`);
         await loadRows();
@@ -618,7 +627,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         generationModel: resumeAstra ? "astra" : generationModel,
         generationJobId,
         onGenerationJob: (job) => setRowMsg(m => ({ ...m, [r.scenario_id]: job.status === "completed"
-          ? "Astra 생성 완료 · AI 검토 시작" : "Astra 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
+          ? "백그라운드 생성 완료 · AI 검토 시작" : "백그라운드 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
         onProgress: (stage) =>
           setAssemblyProgress((current) =>
             current?.id === r.scenario_id ? { ...current, stage } : current,
@@ -632,11 +641,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         });
         // 검증②(0-n·94) 결과가 있으면 함께 알린다 — 없으면(호출 실패) 침묵하지 않고 표기.
         const qLabel = res.quality
-          ? { pass: "AI점검 통과", warning: "AI점검 주의", fail: "AI점검 결함" }[res.quality.verdict]
-          : "AI점검 미실행";
+          ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.quality.verdict]
+          : "AI 검토 미실행";
         setRowMsg((m) => ({
           ...m,
-          [r.scenario_id]: `유효 초안 저장(${res.ruleResult}, 전체 생성 ${res.attempts}회) · ${qLabel}${res.repaired ? " · 지목 문항 수리 완료" : ""}${res.repairError ? ` · 자동 수리 보류: ${res.repairError}` : ""}`,
+          [r.scenario_id]: `초안 저장(${res.ruleResult}, 전체 생성 ${res.attempts}회) · ${qLabel}${res.repaired ? " · 지적된 문항 보완 완료" : ""}${res.repairError ? ` · 자동 보완 보류: ${res.repairError}` : ""}`,
         }));
         if (res.mission) {
           const warnings = (res.violations ?? [])
@@ -693,9 +702,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       }));
       setRowMsg((current) => ({
         ...current,
-        [r.scenario_id]: `교수자 수정본 저장 · AI 품질 ${res.quality?.verdict ?? "미확인"}`,
+        [r.scenario_id]: `교수자 수정본 저장 · ${res.quality ? "AI 검토 의견 저장" : "AI 검토 미확인"}`,
       }));
-      toast.success("수정한 문항을 구조검사·AI 재점검 후 새 이력으로 저장했습니다.");
+      toast.success("수정한 문항을 자동 품질 점검·AI 재검토 후 새 이력으로 저장했습니다.");
     } finally {
       setBusy(null);
     }
@@ -836,7 +845,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <p>지금 결정할 미션이 없습니다.</p>
           {dash.in_progress > 0 && (
             <Link className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4" to="/admin/ai-review">
-              검수 진행 중인 {dash.in_progress}개는 품질 점검 화면에서 확인하세요 →
+              점검 진행 중인 {dash.in_progress}개는 품질 점검 화면에서 확인하세요 →
             </Link>
           )}
         </>
@@ -858,11 +867,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   };
 
   const queueButton = (
+    <span className="relative inline-flex shrink-0">
+    {!queueSeen && dash[fState] > 1 && <span aria-hidden className="pointer-events-none absolute -inset-[3px] rounded-[10px] border border-[#E9C94A]/70 motion-safe:animate-pulse" />}
     <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
-      className="h-10 shrink-0 gap-2 border-[#233542] bg-[#233542] px-3.5 text-[13.5px] font-bold text-white shadow-sm hover:bg-[#15202B] hover:text-white" onClick={() => setQueueOpen(true)}>
-      <ListChecks aria-hidden className="size-4 text-[#FAD338]" />{chipLabel(fState)} 목록
-      <span className="rounded-full bg-[#FAD338] px-2 py-0.5 text-[12px] font-bold tabular-nums text-[#15202B]">{dash[fState]}</span>
+      className="relative h-10 shrink-0 gap-2 border-[#FAD338] bg-[#FAD338] px-3.5 text-[13.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] hover:text-[#15202B]" onClick={openQueue}>
+      <ListChecks aria-hidden className="size-4 text-[#15202B]" />{chipLabel(fState)} 목록
+      <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#233542] px-1.5 text-[12px] font-bold tabular-nums text-white">{dash[fState]}</span>
     </Button>
+    </span>
   );
 
   const renderWorkbench = (r: CoreRow) => {
@@ -936,7 +948,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
                   <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
-                  <dd className="text-[#4E5A63]">출발텍스트의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
+                  <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
                 <div className="mt-2.5 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
@@ -977,7 +989,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <>
             {st === "generated" && info?.queue !== "decision" && (
               <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
-                <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "검수 상태 확인 중"}</p>
+                <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "진행 상태 확인 중"}</p>
                 <Link to={`/admin/ai-review?scenarioId=${r.scenario_id}`} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
                   품질 점검 화면에서 이 미션 열기 →
                 </Link>
@@ -1009,10 +1021,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작"}
       description={aiReview
-        ? "자동 품질 점검과 AI 검토를 거친 콘텐츠를 교수자가 감수하고 최종 승인합니다."
+        ? "자동 품질 점검과 AI 검토로 교수자 감수에 쓸 판단 자료를 준비합니다."
         : reviewMode
           ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
-          : "시나리오로 학습 미션 초안을 만들고, 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}
+          : "시나리오로 학습 미션 초안을 만들고, 자동 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -1046,7 +1058,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
-              <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
+              {/* 상태 칩은 한 줄로 두고(넘치면 가로 스크롤), 검색 줄은 목록 폭을 모두 쓴다. */}
+              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="상태">
                 {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
                     key={s}
@@ -1054,7 +1068,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     onClick={() => setFState(s)}
                     aria-pressed={fState === s}
                     className={[
-                      "rounded-full border px-2 py-0.5 text-[12px] transition-colors",
+                      "shrink-0 whitespace-nowrap rounded-full border px-2.5 py-1 text-[13px] transition-colors",
                       fState === s
                         ? "border-[#233542] bg-[#233542] font-semibold text-white"
                         : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
@@ -1073,14 +1087,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   onChange={(event) => setSearch(event.target.value)}
                   placeholder={professorScreen ? "제목·상황·Trace 검색" : "제목·상황 검색"}
                   aria-label="대기열 검색"
-                  className="h-7 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2 text-[12.5px]"
+                  className="h-9 min-w-0 flex-1 rounded-md border border-[#D9D7CF] bg-white px-2.5 text-[13px]"
                 />
                 <select
                   id="queue-sort"
                   aria-label="정렬"
                   value={sortOrder}
                   onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
-                  className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[12px] text-[#46515A]"
+                  className="h-9 rounded-md border border-[#D9D7CF] bg-white px-1.5 text-[13px] text-[#46515A]"
                 >
                   {professorScreen
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
@@ -1092,7 +1106,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
                     className={[
-                      "flex h-7 min-w-0 items-center gap-1 rounded-md border px-2 font-semibold",
+                      "flex h-9 min-w-0 items-center gap-1 rounded-md border px-2.5 text-[13px] font-semibold",
                       openFilter === key ? "border-[#233542] bg-white text-[#233542]" : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
                     ].join(" ")}>
                     <span className="truncate">{label}</span>
@@ -1102,15 +1116,16 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 ))}
                 </div>
               </div>
+              </div>
               {openFilter === "axis" && (
                 <div className="grid grid-cols-2 gap-1.5">
                   <AxisSel index="1" label="화행" value={fAct} onChange={(v) => setFAct(v as typeof fAct)}
                     opts={[["all", "전체"], ...ACTS.map((a) => [a, SPEECH_ACT_UI[a]] as [string, string])]} />
                   <AxisSel index="2" label="수준" value={fLevel} onChange={(v) => setFLevel(v as typeof fLevel)}
                     opts={[["all", "전체"], ...LEVELS.map((l) => [l, LEVEL[l]] as [string, string])]} />
-                  <AxisSel index="3" label="모드" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+                  <AxisSel index="3" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                     opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-                  <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+                  <AxisSel index="4" label="언어 방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                     opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
                 </div>
               )}

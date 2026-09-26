@@ -143,7 +143,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
         })}</nav>
         <div className="space-y-2.5 rounded-xl bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" className="h-9 text-[13.5px]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
+            <Button size="sm" variant="outline" className="h-9 border-[#233542] text-[13.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
             <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
           <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14px] leading-6" value={noteValue} disabled={disabled || approved}

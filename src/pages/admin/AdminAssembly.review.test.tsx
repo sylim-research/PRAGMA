@@ -105,7 +105,7 @@ describe("professor final approval workbench", () => {
     expect(screen.queryByRole("list", { name: "미션 목록" })).not.toBeInTheDocument();
     fireEvent.click(within(bench).getByRole("button", { name: "미션 목록 열기" }));
     expect(screen.getByRole("button", { name: /승인 대기\s*2/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: /검수 진행 중\s*2/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /점검 진행 중\s*2/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /검토 완료 상태\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "정렬" })).toHaveValue("oldest");
 
@@ -148,7 +148,7 @@ describe("professor final approval workbench", () => {
     show();
     await within(await screen.findByRole("region", { name: "작업대" })).findByRole("heading", { name: "결정할 미션" });
     fireEvent.click(within(workbench()).getByRole("button", { name: "미션 목록 열기" }));
-    fireEvent.click(await screen.findByRole("button", { name: /검수 진행 중/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /점검 진행 중/ }));
     const bench = workbench();
     expect(await within(bench).findByRole("link", { name: "품질 점검 화면에서 이 미션 열기 →" }))
       .toHaveAttribute("href", expect.stringMatching(/^\/admin\/ai-review\?scenarioId=m-(rules|fail)$/));
@@ -159,7 +159,7 @@ describe("professor final approval workbench", () => {
     show({ reviewMode: true }, "/admin/review?scenarioId=m-rules");
     expect(await within(await screen.findByRole("region", { name: "작업대" })).findByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
     fireEvent.click(within(workbench()).getByRole("button", { name: "미션 목록 열기" }));
-    expect(screen.getByRole("button", { name: /검수 진행 중/ })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: /점검 진행 중/ })).toHaveAttribute("aria-pressed", "true");
     expect(within(queue()).getByText("규칙 검사 전 미션").closest("button")).toHaveAttribute("aria-current", "true");
   });
 
@@ -167,7 +167,7 @@ describe("professor final approval workbench", () => {
     mocks.tables.content_review_runs = [];
     show();
     expect(await screen.findByText(/지금 결정할 미션이 없습니다/)).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /검수 진행 중인 4개는 품질 점검 화면에서 확인하세요/ }))
+    expect(screen.getByRole("link", { name: /점검 진행 중인 4개는 품질 점검 화면에서 확인하세요/ }))
       .toHaveAttribute("href", "/admin/ai-review");
   });
 });
@@ -177,7 +177,7 @@ describe("quality check workbench", () => {
     show({ reviewMode: true, aiReview: true }, "/admin/ai-review");
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(screen.getByRole("button", { name: /품질 점검 대기\s*1/ })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("button", { name: /규칙 검사 불통과\s*1/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /점검 실패\s*1/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /교수자 승인 대기\s*2/ })).toBeInTheDocument();
     expect(within(bench).getByRole("heading", { name: "규칙 검사 전 미션" })).toBeInTheDocument();
     expect(within(bench).getByText("점검 패널 /admin/review?scenarioId=m-rules")).toBeInTheDocument();
@@ -206,7 +206,7 @@ describe("assembly workbench", () => {
     fireEvent.click(within(bench).getByRole("button", { name: "미션 자동 생성" }));
     expect(await screen.findByText("AI 검토 중")).toBeInTheDocument();
     finish({ ok: true, ruleResult: "pass", qualityVerdict: "pass", repaired: false });
-    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("초안 저장 · 규칙 기반 검사 통과 · AI 검토 의견 저장 — 품질 점검 단계에서 확인해 주세요"));
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("초안 저장 · 자동 품질 점검 통과 · AI 검토 의견 저장 — 품질 점검 단계에서 확인해 주세요"));
     expect(mocks.promoteCoreV6).toHaveBeenCalledTimes(1);
   });
 

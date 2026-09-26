@@ -282,7 +282,7 @@ const AdminBatch = () => {
       });
       setAuditResults(out);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "AI 비평 결과를 불러오지 못했습니다.";
+      const message = error instanceof Error ? error.message : "AI 검토 결과를 불러오지 못했습니다.";
       setExecutionError(message);
       toast.error(message);
     } finally {
@@ -293,7 +293,7 @@ const AdminBatch = () => {
 
   return (
     <AdminShell title="시나리오 배치 생성"
-      description="조건별 생성 계획을 세우고 AI로 시나리오의 상황·원문을 생성합니다. 생성·점검·저장 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
+      description="관계·상황 조건별 생성 계획을 세우고 시나리오를 한꺼번에 만듭니다. 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
       <div className="space-y-5">
         <div className="space-y-5">
           <div className="min-w-0 space-y-5">
@@ -356,7 +356,7 @@ const AdminBatch = () => {
                 </>}
               </div>
               {topicCoverage.missing.length > 0 && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-xs leading-5 text-red-900">생성 시드가 없는 조건: {topicCoverage.missing.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 조건을 보완한 뒤 실행할 수 있습니다.</p>}
-              {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·모드와 호환되는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
+              {topicCompatibility.length > 0 && <p role="alert" className="mt-3 rounded-lg bg-red-50 p-3 text-xs text-red-900">관계·거리·수행 방식과 맞는 생성 시드가 없는 조합 {topicCompatibility.length}개가 있습니다. 시드 조건을 먼저 조정해 주세요.</p>}
               {topicCoverage.wildcardOnly.length > 0 && <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-900">화행 중립 시드를 사용하는 조건: {topicCoverage.wildcardOnly.map(({ speechAct, domain }) => SPEECH_ACT_UI[speechAct] + " · " + DOMAIN[domain]).join(", ")}. 생성 결과에서 화행 적합성을 확인해 주세요.</p>}
 
               {summary.total === 0 ? (
@@ -424,7 +424,7 @@ const AdminBatch = () => {
           <div className="mt-4 rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="text-[13px] font-semibold">설계 기준 준수 AI 비평 파일럿</div>
+                <div className="text-[13px] font-semibold">설계 기준 준수 AI 검토 (시범)</div>
               </div>
               <Button
                 variant="outline"
@@ -432,15 +432,15 @@ const AdminBatch = () => {
                 disabled={busy}
               >
                 {auditRunning
-                  ? `비평 중 ${auditDone}/${auditableCoreResults.length}`
-                  : `${auditableCoreResults.length}건 비평 실행`}
+                  ? `검토 중 ${auditDone}/${auditableCoreResults.length}`
+                  : `${auditableCoreResults.length}건 검토 실행`}
               </Button>
             </div>
 
             {auditResults.length > 0 && (
               <div className="mt-3">
                 <p className="text-[12.5px] font-semibold">
-                  pass {auditPass} · warning {auditWarning} · fail {auditFail} · 호출 실패 {auditErrors}
+                  통과 {auditPass} · 경고 {auditWarning} · 실패 {auditFail} · 호출 실패 {auditErrors}
                 </p>
                 <ul className="mt-2 max-h-80 space-y-2 overflow-auto text-[11.5px]">
                   {auditResults.map((result) => {
@@ -479,7 +479,7 @@ const AdminBatch = () => {
                           <div className="mt-2 space-y-0.5 rounded bg-[#FAF8F2] px-2.5 py-2 text-[11px] leading-relaxed">
                             <div>상황 · {core.situation_ko ?? "—"}</div>
                             <div>관계 · {core.relation_ko ?? "—"}</div>
-                            {core.preceding_turn && <div>상대의 직전 발화 · {core.preceding_turn}</div>}
+                            {core.preceding_turn && <div>상황 맥락 참고 · {core.preceding_turn}</div>}
                             <div>원문 · {core.source_text ?? "—"}</div>
                             {core.context_spec?.role_pair && (
                               <div>

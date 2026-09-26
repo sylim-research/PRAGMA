@@ -251,7 +251,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
         <div className="mt-1 text-[14px] font-bold text-[#15202B]">{act}</div>
       </div>
       <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
-        <div className={heading}>관계 조건 (P·D·R)</div>
+        <div className={heading}>관계·상황 조건 (P·D·R)</div>
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
           {pdr.map(({ name, value }) => (
             <span key={name} className="whitespace-nowrap text-[12.5px] text-[#5B6770]">
@@ -897,13 +897,13 @@ const AdminGenerator = () => {
   return (
     <AdminShell
       title="시나리오 개별 생성"
-      description="한 건씩 조건을 정해 AI 생성 학습 콘텐츠의 상황과 원문을 만들고 내부 확인 대기 상태로 저장합니다."
+      description="관계·상황 조건을 정해 시나리오를 한 건씩 만들고, 교수자 감수 대기 상태로 저장합니다."
     >
       {gridPrefill && (
         <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-[12px] text-amber-950">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <b>미션 조립 Grid 조건을 불러왔습니다.</b>
+              <b>현황표에서 고른 조건을 불러왔습니다.</b>
               <span className="ml-2">
                 {SPEECH_ACT_UI[gridPrefill.speechAct]} · {LEVEL[gridPrefill.level]}
                 {gridPrefill.mode ? ` · ${MODE_LABEL[gridPrefill.mode]}` : ""}
@@ -915,11 +915,11 @@ const AdminGenerator = () => {
               </span>
             </div>
             <Link className="font-semibold underline underline-offset-2" to="/admin/library">
-              라이브러리로 돌아가기
+              현황표로 돌아가기
             </Link>
           </div>
           <p className="mt-1">
-            조건만 자동 입력되었습니다. 개요를 확인하고 생성 버튼을 눌러야 API 호출이 시작됩니다.
+            조건만 자동 입력되었습니다. 개요를 확인하고 생성 버튼을 눌러야 생성이 시작됩니다.
           </p>
         </div>
       )}
@@ -974,7 +974,7 @@ const AdminGenerator = () => {
 
           {/* 3. 목표 화행 — 3x3 카드 */}
           <div>
-            <SectionTitle n={2} label="목표 화행" accent="핵심 변수" />
+            <SectionTitle n={2} label="목표 화행" accent="핵심 조건" />
             <div className="mt-2 grid grid-cols-3 gap-1.5">
               {(Object.keys(SPEECH_ACT_UI) as SpeechActUI[]).map((sa) => {
                 const on = form.speech_act_ui === sa;
@@ -1018,10 +1018,10 @@ const AdminGenerator = () => {
           {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
           {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
           <div>
-            <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" />
+            <SectionTitle n={3} label="관계·상황 조건 (P·D·R)" accent="핵심 조건" />
             <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
-              <Field label="권력 · P">
+              <Field label="권력(P)">
                 <Select
                   value={form.pdr_power}
                   onValueChange={(v) => update("pdr_power", v as PdrPower)}
@@ -1034,7 +1034,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="거리 · D">
+              <Field label="거리(D)">
                 <Select
                   value={form.pdr_distance}
                   onValueChange={(v) => update("pdr_distance", v as PdrDistance)}
@@ -1047,7 +1047,7 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="부담도 · R">
+              <Field label="부담도(R)">
                 <Select
                   value={form.pdr_burden}
                   onValueChange={(v) => update("pdr_burden", v as PdrBurden)}
@@ -1401,7 +1401,7 @@ const AdminGenerator = () => {
                     )}
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
-                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">선행 발화</div>
+                        <div className="mb-1 text-[11px] font-semibold text-[#8a857c]">상황 맥락 참고</div>
                         <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[12px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
                       </div>
                     )}

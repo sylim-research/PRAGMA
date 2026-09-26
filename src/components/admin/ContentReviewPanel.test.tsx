@@ -141,7 +141,7 @@ describe("professor finding decisions", () => {
       history: [{ id: "review-1", content_hash: "hash-current", approved_at: null, created_at: "2026-08-27" }] };
     fireEvent.click(screen.getByRole("button", { name: "결과 새로고침" }));
     await screen.findByText(/내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다/);
-    expect(screen.getByRole("button", { name: "규칙 검사 시작" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "자동 품질 점검 시작" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "교수자 최종 승인" })).not.toBeInTheDocument();
     expect(mocks.save).not.toHaveBeenCalled();
