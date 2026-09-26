@@ -252,6 +252,23 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [reviewMeta, setReviewMeta] = useState<ReviewMeta | null>(null);
   const [generationModel, setGenerationModel] = useState<"existing" | "astra">("existing");
   const [loading, setLoading] = useState(true);
+  // 학습 미션 제작(넓은 화면): 대기열·작업대를 창 아래 끝까지 딱 맞춰 페이지 스크롤이 생기지 않게 한다.
+  // 제목 영역 높이가 글꼴·폭에 따라 달라 CSS 계산식 대신 실제 위치를 잰다. 각 칸 안에서만 스크롤한다.
+  const fitScreen = !professorScreen && !aiReview;
+  const splitRef = useRef<HTMLDivElement>(null);
+  const [splitHeight, setSplitHeight] = useState<number | null>(null);
+  useEffect(() => {
+    if (!fitScreen) return;
+    const fit = () => {
+      const el = splitRef.current;
+      if (!el || window.innerWidth < 1280) { setSplitHeight(null); return; }
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      setSplitHeight(Math.max(420, Math.floor(window.innerHeight - top - 20)));
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [fitScreen, loading]);
   const [error, setError] = useState<string | null>(null);
 
   // 라이브러리 「조립에서 열기」가 넘긴 초기 필터.
@@ -866,7 +883,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     return (
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
-        <header className="sticky top-16 z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85">
+        {/* 학습 미션 제작에서는 작업대가 자기 안에서 스크롤하므로 머리를 칸 맨 위(top-0)에 붙인다. */}
+        <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
           <div className="min-w-0 flex-1 space-y-2.5">
             <div className="flex min-w-0 items-center gap-2">
@@ -994,7 +1012,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <Button size="sm" variant="outline" onClick={() => void loadRows()}>다시 불러오기</Button>
         </div>
       ) : (
-        <div className={professorScreen ? "grid items-start"
+        <div ref={fitScreen ? splitRef : undefined} className={professorScreen ? "grid items-start"
           : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
@@ -1002,9 +1020,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <aside aria-label="대기열"
             className={professorScreen
               ? "fixed inset-y-0 left-0 z-50 flex w-[380px] max-w-[90vw] flex-col overflow-hidden border-r border-[#E2DED2] bg-[#F7F6F1] shadow-xl"
-              : ["flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1] xl:sticky xl:top-20",
-                // 학습 미션 제작: 대기열과 작업대를 같은 높이(화면 높이)로 고정해 두 칸의 아래 끝을 맞춘다.
-                aiReview ? "xl:max-h-[calc(100dvh-6rem)]" : "xl:h-[calc(100dvh-6rem)]"].join(" ")}>
+              : ["flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-[#F7F6F1]",
+                // 학습 미션 제작은 splitHeight(창 높이에 맞춘 값)로, 품질 점검은 기존대로 sticky.
+                fitScreen ? "" : "xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)]"].join(" ")}
+            style={fitScreen && splitHeight ? { height: splitHeight } : undefined}>
             {professorScreen && (
               <div className="flex items-center justify-between border-b border-[#E2DED2] bg-white px-3 py-2">
                 <span className="text-[13.5px] font-bold text-[#233542]">미션 목록</span>
@@ -1168,7 +1187,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {/* ── 오른쪽 작업대 ── */}
           {/* 학습 미션 제작에서는 작업대를 왼쪽 대기열과 같은 높이로 채운다 — 짧으면 화면 가운데 떠 보인다. */}
           <section aria-label="작업대" className={["min-w-0 rounded-xl border border-[#E2DED2] bg-white",
-            !professorScreen && !aiReview ? "xl:sticky xl:top-20 xl:h-[calc(100dvh-6rem)] xl:overflow-y-auto" : ""].join(" ")}>
+            fitScreen && splitHeight ? "overflow-y-auto" : ""].join(" ")}
+            style={fitScreen && splitHeight ? { height: splitHeight } : undefined}>
             {selectedRow ? renderWorkbench(selectedRow) : (
               <div className="space-y-3 py-10 text-center text-[13.5px] text-[#46515A]">
                 {professorScreen && <div className="flex justify-center">{queueButton}</div>}
