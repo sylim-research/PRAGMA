@@ -274,18 +274,22 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   // 라이브러리 「조립에서 열기」가 넘긴 초기 필터.
   const initAct = searchParams.get("act");
   const initLevel = searchParams.get("level");
+  // 대시보드 「보유 학습 자료」 숫자가 넘긴 초기 조건(상태·수행 방식·방향).
+  const initState = searchParams.get("state");
+  const initMode = searchParams.get("mode");
+  const initDirection = searchParams.get("direction");
 
   // 각 화면이 맡은 일부터 띄운다 — 조립은 아직 미션이 없는 코어, 점검은 점검이 필요한 미션,
   // 최종 승인은 교수자 차례가 된 미션(결정 대기).
-  const [fState, setFState] = useState<StateChip>(chips[0]);
+  const [fState, setFState] = useState<StateChip>(chips.includes(initState as StateChip) ? (initState as StateChip) : chips[0]);
   const [fAct, setFAct] = useState<"all" | SpeechActUI>(
     ACTS.includes(initAct as SpeechActUI) ? (initAct as SpeechActUI) : "all",
   );
   const [fLevel, setFLevel] = useState<"all" | LearnerLevel>(
     LEVELS.includes(initLevel as LearnerLevel) ? (initLevel as LearnerLevel) : "all",
   );
-  const [fMode, setFMode] = useState<"all" | GenMode>("all");
-  const [fDirection, setFDirection] = useState<"all" | LanguageDirection>("all");
+  const [fMode, setFMode] = useState<"all" | GenMode>(initMode === "translation" || initMode === "stt_interpreting" ? initMode : "all");
+  const [fDirection, setFDirection] = useState<"all" | LanguageDirection>(initDirection === "ko_zh" || initDirection === "zh_ko" ? initDirection : "all");
   const [fRun, setFRun] = useState<string>("all");
   const [fHash, setFHash] = useState<string>("all");
   const [search, setSearch] = useState("");

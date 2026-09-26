@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { BookOpen, CheckCircle2, MessagesSquare } from "lucide-react";
-import { RESOURCE_DIMENSIONS, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
+import { RESOURCE_DIMENSIONS, resourceAssemblyHref, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
 
 const number = (value: number | undefined) => value == null ? "—" : value.toLocaleString("ko-KR");
 
@@ -27,7 +28,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-        {/* 숫자는 보여 주기만 한다 — 학습 미션 라이브러리를 메뉴에서 뺐으므로 누르는 연결도 두지 않는다(2026-09-26). */}
+        {/* 위 카드 세 개는 요약이라 누르지 않는다. 아래 화행·수준·방향·수행 방식 숫자는 학습 미션 제작 목록으로 연결한다. */}
         {cards.map(({ label, value, unit, note, icon: Icon, ready }) => (
           <div key={label} className={[
             "flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5",
@@ -72,14 +73,14 @@ export function DashboardResourceOverview({ resources, error, status }: {
             <div className={key === 'speech_act' ? "grid grid-cols-3 gap-2" : "space-y-3"}>
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
-                return key === 'speech_act' ? <div key={code}
-                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2">
+                return key === 'speech_act' ? <Link key={code} to={resourceAssemblyHref(scope, key, code)} title={`${label} 학습 미션 보기`}
+                  className="flex items-baseline justify-between gap-2 rounded-xl bg-[#F8F6EE] px-3.5 py-2 transition-colors hover:bg-[#F2E9BB] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <span className="text-sm text-[#3F4C55]">{label}</span>
                   <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
-                </div> : <div key={code} className="block rounded">
-                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#3A4750]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
+                </Link> : <Link key={code} to={resourceAssemblyHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  <div className="flex items-center justify-between gap-2 text-sm"><span className="text-[#3A4750] group-hover:text-[#15202B]">{label}</span><span className="font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span></div>
                   <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-[#F1F0E9]"><div className="h-full rounded-full bg-[#D9C45C]" style={{ width: `${count / max * 100}%` }} /></div>
-                </div>;
+                </Link>;
               })}
             </div>
             {unknown > 0 && <p className="mt-2 text-xs text-amber-800">미분류 {unknown}개</p>}
