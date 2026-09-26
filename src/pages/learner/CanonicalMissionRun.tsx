@@ -40,7 +40,7 @@ import {
   adaptRunnableMissionToCanonical,
   UnsupportedCanonicalMissionRuntimeError,
 } from "@/lib/mission/canonicalMissionRuntime";
-import { requestFeedback } from "@/lib/mission/missionFeedback";
+import { createDctFeedbackSession, type DctFeedbackSession, type DctFeedbackSnapshot } from "@/lib/mission/dctFeedbackSession";
 import { saveMissionAttempt, type MpjResponseTrace, type SaveAttemptInput } from "@/lib/mission/missionLog";
 import { learnerChoiceMapFromTraces } from "@/lib/mission/classResponsePatterns";
 import {
@@ -67,6 +67,7 @@ const useCanonicalMission = () => useContext(CanonicalMissionContext);
 const RuntimeMissionContext = createContext<RunnableMission | null>(null);
 const useRuntimeMission = () => useContext(RuntimeMissionContext);
 const LocalPilotContext = createContext(false);
+const DctFeedbackSessionContext = createContext<DctFeedbackSession | null>(null);
 /** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
 const ReviewHostContext = createContext(false);
 
@@ -102,6 +103,8 @@ type DctResponse = {
   reflected: boolean;
   evaluation?: DctEvaluation;
   runtimeFeedback?: RuntimeFeedback;
+  /** A/B의 입력·피드백을 기존 수행 이벤트 JSON에 보존한다. 최종안은 revised다. */
+  feedbackRounds?: DctFeedbackSnapshot[];
   dissent?: DissentResponse;
 };
 type DevPreviewPreset = "all_good" | "direct" | "over_mitigated" | "mixed";
@@ -1575,6 +1578,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const first = response?.first ?? "";
+  const sharedSession = useContext(DctFeedbackSessionContext);
+  const [localSession] = useState(() => createDctFeedbackSession());
+  const feedbackSession = sharedSession ?? localSession;
   const [ready, setReady] = useState(localPilot);
   const previewEvaluation = useMemo<DctEvaluation>(() => localPilot ? {
     // Authored display guidance only. Never inspect the answer or persist this as an evaluation.
@@ -1592,6 +1598,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const [revised, setRevised] = useState(() => devAutofill ? quest.referenceAnswer : first);
   const [revisionOpen, setRevisionOpen] = useState(devAutofill);
   const [dissent, setDissent] = useState<DissentResponse | undefined>(response?.dissent);
+  const [recheckRequested, setRecheckRequested] = useState(false);
+  const [recheck, setRecheck] = useState<DctFeedbackSnapshot>();
+  const recheckStarted = useRef(false);
   const revisionRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!demoFillRequest) return;
@@ -1609,7 +1618,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     }
     setReady(false);
     if (runtime) {
-      void requestFeedback(runtime.mission, first).then((result) => {
+      void feedbackSession.request(1, runtime.mission, first).then((result) => {
         if (cancelled) return;
         if (result.ok && result.feedback) {
           setRuntimeFeedback(result.feedback);
@@ -1623,13 +1632,24 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             outputName,
           ));
         }
+        const savedRecheck = feedbackSession.snapshot().find(round => round.round === 2);
+        if (savedRecheck && feedbackSession.snapshot()[0]?.answer === first) {
+          recheckStarted.current = true;
+          setRecheckRequested(true);
+          setRecheck(savedRecheck);
+          setRevised(savedRecheck.answer);
+          setRevisionOpen(true);
+          setEvaluation(savedRecheck.result.ok && savedRecheck.result.feedback
+            ? evaluationFromRuntimeFeedback(runtime, quest, savedRecheck.result.feedback)
+            : unavailableRuntimeEvaluation(quest, savedRecheck.result.error ?? "AI 재확인 실패", mission.targetLanguage.label, outputName));
+        }
         setReady(true);
       });
       return () => { cancelled = true; };
     }
     const timer = window.setTimeout(() => setReady(true), 1250);
     return () => window.clearTimeout(timer);
-  }, [first, localPilot, mission.targetLanguage.label, outputName, previewEvaluation, quest, runtime]);
+  }, [feedbackSession, first, localPilot, mission.targetLanguage.label, outputName, previewEvaluation, quest, runtime]);
   useEffect(() => {
     if (!revisionOpen) return;
     const timer = window.setTimeout(() => revisionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
@@ -1643,15 +1663,32 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const needsChange = feedbackNeedsRevision(evaluation);
   const primaryCriterion = primaryFeedbackCriterion(evaluation.criteria);
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
-  const canConfirmRevision = devMode || (revisionValidation.valid && (!needsChange || reflected));
+  const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 「내 판단 남기기」에 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 「내 판단 남기기」에 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
+  const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
+  const confirmRevision = () => onDone({ first, revised: revised.trim(), reflected,
+    evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
+  const checkRevision = async () => {
+    if (!runtime || !ready || !canConfirmRevision || !reflected || recheckStarted.current) return;
+    recheckStarted.current = true;
+    const answer = revised.trim();
+    setRecheckRequested(true);
+    setReady(false);
+    const result = await feedbackSession.request(2, runtime.mission, answer);
+    setRecheck({ round: 2, answer, result });
+    setEvaluation(result.ok && result.feedback
+      ? evaluationFromRuntimeFeedback(runtime, quest, result.feedback)
+      : unavailableRuntimeEvaluation(quest, result.error ?? "AI 재확인 실패", mission.targetLanguage.label, outputName));
+    setReady(true);
+  };
   const retainFirstResponse = () => onDone({
     first,
     revised: first.trim(),
     reflected: false,
     evaluation: localPilot ? undefined : evaluation,
     runtimeFeedback,
+    feedbackRounds,
     dissent,
   });
   if (!isMeaningfulDraft(first, mission.targetLanguage.label, outputName)) {
@@ -1664,17 +1701,17 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-2.5">
-      <h1 className="px-1 text-lg font-bold">{outputName} 피드백</h1>
-      <SourceAnswerCompare source={quest.source} answer={first} highlights={ready ? evaluation.highlights : []} />
+      <h1 className="px-1 text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : `${outputName} 피드백`}</h1>
+      <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
           {/* 판정 한 줄 요약과 배지는 두지 않는다 — 세 기준 각각이 이미 등급과 이유를 말한다. */}
-          {!revisionOpen && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
+          {(!revisionOpen || recheckRequested) && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
             <div className="space-y-1.5 p-3 sm:p-3.5">
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
               {(localPilot || feedbackUnavailable) && (
                 <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#635E52]">
-                  {localPilot ? "AI 미실행" : "자동 피드백을 확인하지 못했습니다."}
+                  {localPilot ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
                 </p>
               )}
               {/* 세 기준은 늘 보이되, 펼쳐 읽는 것은 의미→언어→화용 순서에서 처음 걸린 하나뿐이다(한 번에 한 초점). */}
@@ -1706,30 +1743,31 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
           </section>}
 
           {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}
-          {!localPilot && needsChange && <MissionDissentPanel onSubmit={setDissent} />}
+          {!localPilot && !recheckRequested && needsChange && <MissionDissentPanel onSubmit={setDissent} />}
 
           {revisionOpen ? (
             <>
               <section ref={revisionRef} className={`${panel} scroll-mt-24 p-5 sm:p-6`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-black text-[#776727]">다시 다듬기</p>
+                    <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "다시 다듬기"}</p>
                     <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
                   {needsChange && <span className={`rounded-full px-2.5 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[primaryCriterion.level]}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</span>}
                 </div>
-                {(needsChange || localPilot) && (
+                {!recheckRequested && (needsChange || localPilot) && (
                   <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     <FeedbackRemainder text={primaryCriterion.body} />
                   </div>
                 )}
-                <Textarea id={`${quest.id}-revise`} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                {recheckRequested && <p className="mt-2 text-[12.5px] leading-5 text-[#6D7788]">추가 수정에는 AI 피드백을 다시 실행하지 않습니다. 최종 표현은 직접 결정하세요.</p>}
               </section>
               <ActionBar hint={actionHint}>
                 <div className="grid gap-2">
-                  <Button className={`h-12 ${actionButton}`} disabled={!canConfirmRevision} onClick={() => onDone({ first, revised: revised.trim(), reflected, evaluation: localPilot ? undefined : evaluation, runtimeFeedback, dissent })}>{reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                  {needsChange && !reflected && canRetainWithDissent && (
+                  <Button className={`h-12 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 다시 확인하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  {!recheckRequested && needsChange && !reflected && canRetainWithDissent && (
                     <Button variant="outline" className="h-11 w-full" onClick={retainFirstResponse}>수정하지 않고 첫 {outputName} 유지하기</Button>
                   )}
                 </div>
@@ -1745,7 +1783,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 </div>
               ) : (
                 <div className="grid gap-2">
-                  <Button className="h-12 w-full" onClick={() => onDone({ first, revised: first.trim(), reflected: false, evaluation: localPilot ? undefined : evaluation, runtimeFeedback, dissent })}>이 {outputName}으로 확정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className="h-12 w-full" onClick={retainFirstResponse}>이 {outputName}으로 확정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   <Button variant="outline" className="h-11 w-full" onClick={() => setRevisionOpen(true)}>{localPilot ? "한 번 다듬어보기" : "다른 표현도 시도해보기"}</Button>
                 </div>
               )}
@@ -2500,6 +2538,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     ? `pragma:mission-attempt:${runtime.scenario_id}:${courseContext?.assignmentId ?? "direct"}`
     : "pragma:mission-attempt:preview";
   const [attemptId, setAttemptId] = useState(() => getOrCreateMissionAttemptId(attemptStorageKey));
+  const feedbackSession = useMemo(() => createDctFeedbackSession(runtime
+    ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined), [attemptId, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
 
   useEffect(() => {
@@ -2655,6 +2695,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         emitMissionEvent("feedback_received", {
           feedback_available: Boolean(finalResponse.runtimeFeedback),
           revision_scope: finalResponse.runtimeFeedback?.revision_scope ?? null,
+          // 1차 snapshot은 기존 완료 로그에 유지하고 A/B 원문·결과는 이벤트 JSON에 보존한다.
+          feedback_rounds: finalResponse.feedbackRounds ?? [],
         });
         if (finalResponse.revised !== finalResponse.first) {
           emitMissionEvent("revision_submitted", { revised_response: finalResponse.revised });
@@ -2783,6 +2825,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   return (
     <LocalPilotContext.Provider value={localPilot}>
     <RuntimeMissionContext.Provider value={runtime ?? null}>
+    <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
     <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>}>
       {isDevPreview && (
@@ -2889,6 +2932,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       </div>
     </LearnerJourneyShell>
     </CanonicalMissionContext.Provider>
+    </DctFeedbackSessionContext.Provider>
     </RuntimeMissionContext.Provider>
     </LocalPilotContext.Provider>
   );

@@ -118,6 +118,8 @@ describe("CanonicalMissionRun live CTA route", () => {
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.
+    click("수정안 다시 확인하기");
+    await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     click("최종안 확정하기");
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
@@ -125,10 +127,12 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
     expect(input.mpjResponses?.map(response => response.item_id)).toEqual([1, 2, 3, 4, 5]);
     expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
-    expect(requestFeedback).toHaveBeenCalledTimes(1);
+    expect(requestFeedback).toHaveBeenCalledTimes(2);
+    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, revised);
   });
   beforeEach(() => {
     vi.clearAllMocks();
+    localStorage.clear(); sessionStorage.clear();
     window.scrollTo = vi.fn();
     window.history.replaceState({}, "", "/");
     fetchMissionByScenario.mockResolvedValue({
@@ -201,6 +205,10 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByRole("textbox")).toHaveValue(alternate);
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(requestFeedback).toHaveBeenCalledWith(mission, reference);
+    if (alternate !== reference) {
+      fireEvent.click(screen.getByRole("button", { name: "수정안 다시 확인하기" }));
+      await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
+    }
     fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
