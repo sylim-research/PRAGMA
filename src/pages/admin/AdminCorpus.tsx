@@ -522,15 +522,13 @@ function OfficialSource({ status }: { status: ReferenceStatus | null }) {
     : fallback;
 
   return (
-    <section className="rounded-xl border border-[#D9D3C4] bg-[#F8F6EF] px-4 py-3.5 sm:px-5" aria-labelledby="official-source-title">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 items-start gap-3">
-          <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#806D22]" aria-hidden />
-          <div className="min-w-0">
-            <p className="text-[13.5px] font-semibold tracking-[0.08em] text-[#8A7423]">공식 출처</p>
-            <h2 id="official-source-title" className="mt-0.5 truncate text-[13px] font-medium text-[#15202B]">{status?.title ?? fallback}</h2>
-            <p className="mt-0.5 text-[13.5px] leading-5 text-[#5B564D]">{status?.publisher ?? fallback} · {release}</p>
-          </div>
+    <section className="rounded-xl border border-[#D9D3C4] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
+      {/* 공식 출처는 한 줄: 「공식 출처 · 제목 · 발행처 · 발표·시행」 + 오른쪽 PDF 링크. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 text-[13.5px]">
+          <span className="font-semibold tracking-[0.08em] text-[#8A7423]">공식 출처</span>
+          <h2 id="official-source-title" className="font-semibold text-[#15202B]">{status?.title ?? fallback}</h2>
+          <span className="text-[#5B564D]">{status?.publisher ?? fallback} · {release}</span>
         </div>
         {status?.official_url && (
           <a
