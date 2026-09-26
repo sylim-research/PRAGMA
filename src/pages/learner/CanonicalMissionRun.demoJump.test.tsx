@@ -7,6 +7,11 @@ import { describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST } from "@/lib/mission/missionV6Sample";
 import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
 
+vi.mock("@/lib/mission/missionDb", () => ({ fetchMissionByScenario: vi.fn().mockResolvedValue({
+  scenario_id: "1b44d36e-c1bc-4bc3-98f3-cbc74a7ac3ea", speech_act: "request", learner_level: "intermediate",
+  mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh", mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
+}) }));
+
 vi.mock("@/lib/mission/missionFeedback", () => ({ requestFeedback: vi.fn() }));
 vi.mock("@/lib/mission/missionLog", () => ({ saveMissionAttempt: vi.fn() }));
 vi.mock("@/lib/mission/missionEvents", async (importOriginal) => ({
@@ -18,11 +23,11 @@ vi.mock("@/components/learner/PeerResponsesPanel", () => ({ PeerResponsesPanel: 
 import CanonicalMissionRun, { CanonicalMissionRunner } from "@/pages/learner/CanonicalMissionRun";
 
 describe("representative mission demo: free navigation", () => {
-  it("jumps from the briefing to any MJT item and to the production task without answering", () => {
+  it("jumps from the briefing to any MJT item and to the production task without answering", async () => {
     window.scrollTo = vi.fn();
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
 
-    fireEvent.click(screen.getByRole("button", { name: "적절성 판단 단계로 이동" }));
+    fireEvent.click(await screen.findByRole("button", { name: "적절성 판단 단계로 이동" }));
     expect(screen.getByText("1/5")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "3번째 문항으로 이동" }));

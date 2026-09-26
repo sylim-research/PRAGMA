@@ -9,6 +9,7 @@ import { SAMPLE_MISSION_V6_REASON_CONTRAST } from "@/lib/mission/missionV6Sample
 import { adaptRunnableMissionToCanonical } from "@/lib/mission/canonicalMissionRuntime";
 import { requestFeedback } from "@/lib/mission/missionFeedback";
 import { saveMissionAttempt } from "@/lib/mission/missionLog";
+import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
 import { appendMissionEvent } from "@/lib/mission/missionEvents";
 
 const scenarioId = "86d738b0-1891-4bfe-9b12-f8643ebbb45f";
@@ -38,15 +39,17 @@ import CanonicalMissionRun, {
 } from "@/pages/learner/CanonicalMissionRun";
 
 describe("demo route", () => {
-  it("runs the v6 sample without reading a saved mission, so approval and assignment do not gate it", () => {
+  it("loads the designated approved representative and keeps demo responses unsaved", async () => {
+    vi.clearAllMocks();
+    fetchMissionByScenario.mockResolvedValue({ scenario_id: REPRESENTATIVE_MISSION_ID, speech_act: "request", learner_level: "intermediate", mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh", mission: SAMPLE_MISSION_V6_REASON_CONTRAST });
     window.scrollTo = vi.fn();
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
-    const briefing = screen.getByRole("list", { name: "적절성 판단 활동" });
+    const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
     expect(within(briefing).getByText("상황에 맞는지 판단하기")).toBeInTheDocument();
     expect(screen.getByText("다른 상황의 원문을 직접 번역하기")).toBeInTheDocument();
     expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
-    expect(fetchMissionByScenario).not.toHaveBeenCalled();
+    expect(fetchMissionByScenario).toHaveBeenCalledWith(REPRESENTATIVE_MISSION_ID, { includeV6: true });
     expect(appendMissionEvent).not.toHaveBeenCalled();
   });
 });
@@ -90,13 +93,13 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("매우 적절"); click("판단 확정하기");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
     click("이유 확정하기"); click(/^다음:/);
-    click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
-    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
-    click("수정안 제출하기"); click(/^다음:/);
     ["상황에 맞음", "너무 직접적", "지나치게 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 위치` })).getByRole("radio", { name: band }));
     });
     click("네 표현 확인하기"); click(/^다음:/);
+    click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
+    fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
+    click("수정안 제출하기"); click(/^다음:/);
     click("번역하기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });

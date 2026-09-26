@@ -112,9 +112,10 @@ describe("mission_v6 format and backward compatibility", () => {
   });
   it("keeps frozen sources, targets, references and explanations in the new adapter", () => {
     const view = adaptRunnableMissionToCanonical(runnable());
-    expect(view.quests.map(q => q.kind)).toEqual(["scale", "scale", "fix_choice", "free_correction", "spectrum", "dct", "dct_feedback"]);
-    view.quests.slice(0, 5).forEach((quest, index) => {
-      const original = LEARNER_UX_PILOT.quests[index];
+    expect(view.quests.map(q => q.kind)).toEqual(["scale", "scale", "spectrum", "fix_choice", "free_correction", "dct", "dct_feedback"]);
+    expect(view.quests.slice(0, 5).map(q => q.id)).toEqual(["A1", "A2", "A5", "A3", "A4"]);
+    view.quests.slice(0, 5).forEach(quest => {
+      const original = LEARNER_UX_PILOT.quests.find(q => q.id === quest.id)!;
       expect(quest.source).toBe(original.source);
       if ("target" in quest && "target" in original) expect(quest.target).toBe(original.target);
       if ("feedback" in quest && "feedback" in original) expect(quest.feedback).toEqual(original.feedback);
@@ -122,7 +123,7 @@ describe("mission_v6 format and backward compatibility", () => {
       if (quest.kind === "spectrum" && original.kind === "spectrum") expect(quest.candidates.map(({ id, ...rest }) => rest)).toEqual(original.candidates.map(({ id, ...rest }) => rest));
     });
     expect(view.quests[5].source).toBe(LEARNER_UX_PILOT.quests[5].source);
-    expect(view.lessonPoints).toEqual(LEARNER_UX_PILOT.lessonPoints);
+    expect(view.lessonPoints).toEqual([0, 1, 4, 2, 3].map(i => LEARNER_UX_PILOT.lessonPoints[i]));
     expect(view.learnerContextCopy.A3).toBe("");
   });
   it.each(["ko_zh", "zh_ko"] as const)("adapts language and interpreting metadata for %s", direction => {
@@ -227,7 +228,7 @@ describe("v6 beyond request — the skeleton is act-neutral, the judgment axis i
 
   it("reads MJT5 choices off the catalog without moving the approved request screen", () => {
     const requestView = adaptRunnableMissionToCanonical(runnable());
-    const requestSpectrum = requestView.quests[4];
+    const requestSpectrum = requestView.quests.find(q => q.kind === "spectrum")!;
     expect(requestSpectrum.kind === "spectrum" && requestSpectrum.options).toEqual([
       { id: "too_direct", label: "너무 직접적" },
       { id: "appropriate", label: "상황에 맞음" },
@@ -236,7 +237,7 @@ describe("v6 beyond request — the skeleton is act-neutral, the judgment axis i
     const thanksView = adaptRunnableMissionToCanonical({
       ...runnable(asThanks() as MissionV6), speech_act: "thanks" as const,
     });
-    const thanksSpectrum = thanksView.quests[4];
+    const thanksSpectrum = thanksView.quests.find(q => q.kind === "spectrum")!;
     expect(thanksSpectrum.kind === "spectrum" && thanksSpectrum.options).toEqual([
       { id: "insufficient", label: "부족함" },
       { id: "within_band", label: "상황에 맞음" },

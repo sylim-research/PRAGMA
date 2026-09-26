@@ -76,7 +76,7 @@ describe("local learner UX pilot", () => {
     expect(input.value).not.toBe("");
     expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
     expect(screen.queryByText(/원래 표현을 그대로 제출할 수 없습니다/)).not.toBeInTheDocument();
-    expect(screen.getByText("원문의 뜻은 바꾸지 마세요.")).toBeInTheDocument();
+    expect(screen.getByText("새로운 사실·이유·약속을 덧붙이거나, 아직 없는 합의를 있는 것처럼 바꾸지는 마세요.")).toBeInTheDocument();
     expect(screen.getByText(/미리 넣어 두었습니다\. 필요한 부분만 고쳐 주세요\./)).toBeInTheDocument();
     fireEvent.change(input, { target: { value: "  " } });
     expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
