@@ -431,8 +431,8 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
   let lessonPoints: CanonicalMissionViewModel["lessonPoints"];
 
   if (mission.schema_version === "mission_v6") {
-    quests = mission.mpj_items.map((item, index): MissionQuest => {
-      const base = { id: `A${index + 1}`, module: "A" as const, shortLabel: item.short_label,
+    quests = mission.mpj_items.map((item): MissionQuest => {
+      const base = { id: `A${item.id}`, module: "A" as const, shortLabel: item.short_label,
         title: item.title, prompt: item.prompt, source: item.source,
         context: contextFrom({ situation_ko: item.situation_ko, relation_ko: item.relation_ko, channel: item.channel, pdr: item.pdr }) };
       switch (item.type) {
@@ -459,9 +459,18 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
             acceptedAnswers: candidate.accepted_band_codes, note: candidate.note_ko })) };
       }
     });
+    // Presentation order is separate from the stored item IDs and response tuple.
+    const presentationOrder = ["A1", "A2", "A5", "A3", "A4"];
+    quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
+    const nextLabels: Record<string, string> = {
+      A1: "다음: 판단하고 이유 고르기", A2: "다음: 여러 표현 비교하기",
+      A5: "다음: 고친 표현 고르기", A3: "다음: 직접 고치고 비교하기", A4: "다음: 핵심 정리",
+    };
+    quests = quests.map(quest => ({ ...quest, nextLabel: nextLabels[quest.id] }));
     contrastBefore = mission.mpj_items[0].situation_ko;
     contrastAfter = mission.mpj_items[1].situation_ko;
-    lessonPoints = mission.lesson_points.map(point => ({ questId: `A${point.item_id}`, label: point.label, text: point.text }));
+    lessonPoints = mission.lesson_points.map(point => ({ questId: `A${point.item_id}`, label: point.label, text: point.text }))
+      .sort((a, b) => presentationOrder.indexOf(a.questId) - presentationOrder.indexOf(b.questId));
   } else if (mission.schema_version === "mission_v2") {
     const [rawScale, rawContrast, rawFixChoice, rawReason, rawMultiJudge] = mission.mpj_items;
     if (

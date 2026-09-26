@@ -59,6 +59,7 @@ import { CONSENT_VERSION, POLICY_VERSION } from "@/lib/research/versions";
 import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
+import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -225,9 +226,9 @@ function v6IntroSteps(outputName: string) {
     judgment: [
       "상황에 맞는지 판단하기",
       "판단하고 이유 고르기",
+      "여러 표현 비교하기",
       "고친 표현 고르기",
       "직접 고치고 비교하기",
-      "여러 표현 비교하기",
     ],
     production: {
       // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
@@ -291,6 +292,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         </h1>
       </div>
       <div className="space-y-5 p-5 sm:p-6">
+        <p className="text-sm leading-6 text-[#635E52]">원문의 내용과 의도를 유지하면서, 관계와 상황에 맞는 표현을 연습합니다. 단어나 문장 구조는 바꿀 수 있으며, 적절한 표현은 여러 가지일 수 있습니다.</p>
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
           <V6IntroOutline outputName={config.outputName} />
@@ -462,7 +464,7 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
       <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] font-bold text-[#7A7466]">원문</p>
+          <p className="text-[11.5px] font-bold text-[#7A7466]">{mission.activityMode === "interpreting" ? "원문 발화" : "원문"}</p>
           <p className={`${sourceFont} break-keep text-[16px] font-semibold leading-7 text-[#101B2B]`}>{source}</p>
         </div>
       </div>
@@ -470,7 +472,7 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
         <div className="flex items-start gap-4 border-t border-dashed border-[#E3DDCF] px-4 py-3 sm:px-5">
           <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-bold text-[#7A7466]">{mission.targetLanguage.label} {outputName}</p>
+            <p className="text-[12px] font-bold text-[#7A7466]">검토할 {outputName}</p>
             <p className={`${targetFont} mt-0.5 text-[16.5px] font-normal leading-8 text-[#101B2B]`}>
               <HighlightedText text={target} highlights={targetHighlights} target />
             </p>
@@ -836,8 +838,8 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
  * v6 자유교정은 결함안에서 출발하는 편집 과제다(DEC-20260918-05). 지시문은 할 일 하나만 말하고,
  * 의미 보존(Gate B)은 바로 아래 한 줄로 따로 둔다. 연구 용어(핵심 의미·화행 목적)는 화면에 쓰지 않는다.
  */
-const freeCorrectionInstruction = (output: string) => `위 ${output}에서 상황에 맞지 않는 부분을 고쳐 보세요.`;
-const FREE_CORRECTION_FIDELITY = "원문의 뜻은 바꾸지 마세요.";
+const freeCorrectionInstruction = (output: string) => `원문이 전달하려는 내용과 의도를 살려, ${output}을 관계와 상황에 맞게 고쳐 보세요.`;
+const FREE_CORRECTION_FIDELITY = "새로운 사실·이유·약속을 덧붙이거나, 아직 없는 합의를 있는 것처럼 바꾸지는 마세요.";
 
 function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
   const mission = useCanonicalMission();
@@ -875,11 +877,12 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
         <h4 className="font-bold">다른 맥락에서는?</h4>
         <p className="text-[15px] leading-7">{quest.contrast.context}</p>
         <p className={`${targetFont} text-[16.5px] leading-8`}>{quest.contrast.target}</p>
+        <p className="text-sm leading-6 text-[#635E52]">{quest.contrast.explanation}</p>
       </section>}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
       {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
-        : <Button className="h-12 w-full" onClick={() => onDone({ revisedText: draft.trim() })}>다음: 표현 비교하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+        : <Button className="h-12 w-full" onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
 }
@@ -931,7 +934,7 @@ function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (respon
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/4개 표현의 위치를 골랐습니다.` : undefined}>
       {!submitted ? <Button className={`h-12 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>네 표현 확인하기</Button>
-        : <Button className="h-12 w-full" onClick={() => onDone({ candidateJudgments: picks })}>다음: {outputName}하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+        : <Button className="h-12 w-full" onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
 }
@@ -1795,7 +1798,10 @@ const PROGRESS_LABELS: Record<string, string> = {
 
 /** 산출 단계의 이름은 진행 바와 같아야 한다 — 미션 방식에 따라 「번역하기」·「통역하기」. */
 function progressLabel(quest: MissionQuest, outputName = "번역") {
-  if (quest.kind === "free_correction" || quest.kind === "spectrum") return quest.shortLabel;
+  if (quest.kind === "scale") return quest.reasonChoice ? "판단하고 이유 고르기" : "상황에 맞는지 판단하기";
+  if (quest.kind === "fix_choice") return "고친 표현 고르기";
+  if (quest.kind === "free_correction") return "직접 고치고 비교하기";
+  if (quest.kind === "spectrum") return "여러 표현 비교하기";
   if (quest.kind === "dct") return `${outputName}하기`;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
@@ -1935,7 +1941,7 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>({});
   const [finalDct, setFinalDct] = useState<DctResponse | null>(null);
   const quest = section === "dct" ? mission.quests.find((item) => item.kind === "dct")
-    : section.startsWith("mjt-") ? mission.quests[Number(section.slice(4))] : undefined;
+    : section.startsWith("mjt-") ? mission.quests.find(quest => quest.id === `A${Number(section.slice(4)) + 1}`) : undefined;
   const feedbackQuest = mission.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback");
   const draft = quest?.kind === "dct" ? responses[quest.id] as DctResponse | undefined : undefined;
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
@@ -2050,7 +2056,9 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
           <li key={point.questId} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-t border-[#E2DED4] py-3 first:border-t-0 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
             <span className="pt-0.5 text-sm font-black tabular-nums text-[#B49A23]">{String(index + 1).padStart(2, "0")}</span>
             <div className="min-w-0">
-              <p className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">{point.label}</p>
+              <p className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">{mission.missionFormat === "mission_v6"
+                ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
+                : point.label}</p>
               <p className="mt-1 break-keep text-[16px] font-semibold leading-7 text-[#263444] [overflow-wrap:anywhere] sm:text-[16.5px]">
                 <HighlightedText text={point.text} highlights={point.highlights} target />
               </p>
@@ -2889,7 +2897,7 @@ const CanonicalMissionRun = ({
   demoMode?: boolean;
 } = {}) => {
   const { scenarioId: routeScenarioId } = useParams<{ scenarioId: string }>();
-  const scenarioId = scenarioIdOverride ?? routeScenarioId;
+  const scenarioId = scenarioIdOverride ?? routeScenarioId ?? (demoMode ? REPRESENTATIVE_MISSION_ID : undefined);
   const localPilot = import.meta.env.DEV && !scenarioId
     && new URLSearchParams(window.location.search).get("preview") === "v5"
     && new URLSearchParams(window.location.search).get("pilot") === "free-correction";
@@ -2899,18 +2907,8 @@ const CanonicalMissionRun = ({
     mission_status: null, release_gate_mode: null,
     direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
   }), metaLabel: "대표 요청 후보" } : null, [reasonContrastPilot]);
-  // 데모는 승인·편성과 무관하게 열려야 하므로 저장된 미션을 조회하지 않고 코드의 v6 샘플로 실행한다.
-  // 수행 기록·이벤트는 demoMode에서 이미 차단되고, runtime이 없어 AI 피드백도 호출하지 않는다.
-  // 시연 경로도 실제 피드백 엔진을 부른다 — 하드코딩된 간이 판정기는 이 견본의 원문을 모른다.
-  // demoMode라 수행 로그·이벤트는 남지 않는다(emitMissionEvent·shouldPersistMissionAttempt가 막는다).
-  const demoRunnable = useMemo<RunnableMission | null>(() => demoMode && !scenarioId ? {
-    scenario_id: "", speech_act: "request", learner_level: "intermediate",
-    mission_status: null, release_gate_mode: null,
-    direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
-  } : null, [demoMode, scenarioId]);
-  const demoPreview = useMemo(() => demoRunnable
-    ? { ...adaptRunnableMissionToCanonical(demoRunnable), metaLabel: "대표 미션 시연" }
-    : null, [demoRunnable]);
+  // 시연도 지정한 승인 미션의 DB 콘텐츠와 실제 피드백 엔진을 사용한다.
+  // demoMode는 시연 응답이 학습 수행 기록에 섞이지 않도록 저장·이벤트만 막는다.
   const pilotStorageKey = reasonContrastPilot ? REASON_CONTRAST_PILOT_STORAGE_KEY : LEARNER_UX_PILOT_STORAGE_KEY;
   const courseLocation = parseMissionCourseLocation(window.location.search);
   const [runtimeMission, setRuntimeMission] = useState<CanonicalMissionViewModel | null>(null);
@@ -3005,12 +3003,12 @@ const CanonicalMissionRun = ({
     );
   }
 
-  const mission = runtimeMission ?? reasonContrastPreview ?? demoPreview ?? (localPilot ? LEARNER_UX_PILOT : CANONICAL_MISSION_PREVIEW);
+  const mission = runtimeMission ?? reasonContrastPreview ?? (localPilot ? LEARNER_UX_PILOT : CANONICAL_MISSION_PREVIEW);
   return (
     <CanonicalMissionRunner
       key={localPilot ? pilotStorageKey : mission.scenarioId ?? "preview"}
       mission={mission}
-      runtime={runtimeRunnable ?? demoRunnable ?? undefined}
+      runtime={runtimeRunnable ?? undefined}
       isDevPreview={import.meta.env.DEV && !scenarioId && !localPilot}
       localPilot={localPilot}
       pilotStorageKey={pilotStorageKey}
