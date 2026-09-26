@@ -13,7 +13,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#C4BCA8] bg-white px-3 py-[9px] text-[13px] font-semibold text-[#2F3D48] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[9px] text-[13px] font-semibold text-[#2F3D48] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 const Landing = () => {
   useEffect(() => {
@@ -82,25 +82,27 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        <section className="mx-auto mt-5 grid w-full max-w-[692px] grid-cols-1 gap-4 sm:grid-cols-2">
+        <section className="mx-auto mt-8 grid w-full max-w-[692px] grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
-            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
-            <span className="flex items-center gap-2 text-[19px] font-bold text-[#15202B]">
-              <GraduationCap aria-hidden size={19} strokeWidth={1.75} className="text-[#3E4C57]" />
+            <span className="flex items-center gap-2.5 text-[19px] font-bold tracking-[-0.01em] text-[#15202B]">
+              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#FDF3C4]">
+                <GraduationCap size={18} strokeWidth={1.75} className="text-[#7A6418]" />
+              </span>
               학습자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
+            <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
               상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
               AI 피드백을 검토한 뒤, 자신의 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
-            <span className="mt-auto pt-4">
-              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-md border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
+            <span className="mt-auto pt-5">
+              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
                 학습 시작하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -109,13 +111,15 @@ const Landing = () => {
 
           <Link
             to="/admin-login"
-            className="group flex flex-col items-start rounded-xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-4 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
-            <span className="flex items-center gap-2 text-[19px] font-bold text-[#15202B]">
-              <SlidersHorizontal aria-hidden size={19} strokeWidth={1.75} className="text-[#3E4C57]" />
+            <span className="flex items-center gap-2.5 text-[19px] font-bold tracking-[-0.01em] text-[#15202B]">
+              <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
+                <SlidersHorizontal size={18} strokeWidth={1.75} className="text-[#3E4C57]" />
+              </span>
               교수자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[14px] leading-relaxed text-muted-foreground">
+            <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
               콘텐츠를 생성하고, 규칙 점검과 AI 검토를 거칩니다.<br />
               교수자가 최종 검수·승인해 수업에 활용합니다.
             </span>
@@ -123,8 +127,8 @@ const Landing = () => {
                 버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·검수하기.
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
-            <span className="mt-auto pt-4">
-              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-md border border-[#3E4C57] bg-[#3E4C57] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#4E5F6C]">
+            <span className="mt-auto pt-5">
+              <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#2A3B48]">
                 제작·검수하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
@@ -135,7 +139,7 @@ const Landing = () => {
         {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
             학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
         {IS_DEMO && (
-          <section className="mt-6 flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
+          <section className="mt-8 flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to="/architecture"
               className={secondaryLink}
