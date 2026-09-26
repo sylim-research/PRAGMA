@@ -88,7 +88,7 @@ const Landing = () => {
         <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
-            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-4 py-[18px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-4 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -98,13 +98,13 @@ const Landing = () => {
               </span>
               학습자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
+            <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
               AI 피드백을 참고해 표현을 검토한 뒤, 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
-            <span className="mt-auto pt-4">
+            <span className="mt-auto pt-5">
               <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[14px] font-bold text-[#15202B] transition-colors group-hover:bg-[#FCE07A]">
                 학습 시작하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
@@ -114,7 +114,7 @@ const Landing = () => {
 
           <Link
             to="/admin-login"
-            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-4 py-[18px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
+            className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-4 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#3E4C57] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
           >
             <span className="flex items-center gap-2.5 text-[19px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -122,7 +122,7 @@ const Landing = () => {
               </span>
               교수자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
+            <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               AI로 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
               교수자가 감수하고 최종 승인한 콘텐츠를 수업에 활용합니다.
             </span>
@@ -130,7 +130,7 @@ const Landing = () => {
                 버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·승인하기.
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
-            <span className="mt-auto pt-4">
+            <span className="mt-auto pt-5">
               <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#2A3B48]">
                 제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
