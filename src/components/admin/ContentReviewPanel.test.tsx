@@ -66,7 +66,7 @@ describe("professor finding decisions", () => {
     showPanel();
     expect(await screen.findByText("AI 검토 일치")).toBeInTheDocument();
     // 재서술은 지우지 않고 근거 안으로 접는다.
-    const details = screen.getByText("지적 전문·근거").closest("details");
+    const details = screen.getByText("검토 의견 전문·근거").closest("details");
     expect(details).not.toHaveAttribute("open");
     expect(details).toHaveTextContent("같은 결론에 이르렀습니다.");
     // 판단에 필요한 제안은 펼치지 않아도 보인다.
