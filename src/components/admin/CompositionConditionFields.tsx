@@ -43,7 +43,7 @@ export function CompositionConditionFields({
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className={LABEL}>언어방향</span>
+          <span className={LABEL}>방향</span>
           <select value={value.direction} onChange={(event) => onDirection(event.target.value as LanguageDirection)} className={SELECT}>
             {COMPOSITION_DIRECTIONS.map((item) => (
               <option key={item} value={item}>{DIRECTION_LABEL[item]}</option>
@@ -51,7 +51,7 @@ export function CompositionConditionFields({
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className={LABEL}>번역·통역 비율</span>
+          <span className={LABEL}>수행 방식</span>
           <select
             value={value.courseMode}
             onChange={(event) => onCourseMode(event.target.value as CourseMode)}

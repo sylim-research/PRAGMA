@@ -84,7 +84,7 @@ export function CurriculumSyllabus({
         {[
           ["수준", levelLabel],
           ["언어 방향", directionLabel],
-          ["번역·통역 비율", courseModeLabel],
+          ["수행 방식", courseModeLabel],
           ["주차·미션", `${outline.week_count}주 · 화행별 ${missionModesSummary(expectedMissionModesForWeek({ courseMode: outline.course_mode as CourseMode }, 2))}`],
           ["영역", DOMAIN[outline.domain as Domain] ?? outline.domain],
           ["핵심 화행", targetActs || "주차 계획 참조"],

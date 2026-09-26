@@ -701,7 +701,7 @@ const AdminComposer = () => {
   return (
     <AdminShell
       title="15주 수업 편성"
-      description="주차별 주제를 정하고 승인된 미션을 배치합니다."
+      description="교수자가 최종 승인한 학습 미션을 교과목의 15주에 배치합니다."
       compact
     >
       <div className="w-full">
@@ -867,7 +867,7 @@ const AdminComposer = () => {
                   availableMissionCount > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
                 }`}
               >
-                편성할 수 있는 미션 {availableMissionCount}개
+                편성 가능 미션 {availableMissionCount}개
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -1151,7 +1151,7 @@ function WeekRow({
                       {core ? (core.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation) : "?"}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#202B33]">{title}</span>
-                    {needsReplace && <span className="shrink-0 text-[11px] font-bold text-[#9A3F1C]">교체</span>}
+                    {needsReplace && <span className="shrink-0 text-[11px] font-bold text-[#9A3F1C]">교체 필요</span>}
                     <button
                       type="button"
                       aria-label={`${title} 제거`}
