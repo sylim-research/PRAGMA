@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
-  ArrowRight,
   Database,
   ExternalLink,
 } from "lucide-react";
@@ -194,8 +192,8 @@ const AdminCorpus = () => {
 
   return (
     <AdminShell
-      title="HSK 3.0 어휘 코퍼스"
-      description="생성된 중국어를 수준별 HSK 누적 어휘와 대조하고, 확인이 필요한 단어는 교수자 감수로 넘깁니다."
+      title="수준별 HSK 3.0 어휘 참조"
+      description="생성된 중국어 어휘를 수준별 HSK 누적 목록과 대조해 참고 기록으로 남깁니다."
     >
       <div className="w-full space-y-4">
         <DatasetOverview
@@ -272,10 +270,8 @@ function OperationsSection({
       ? "최신 점검 대상에는 점검할 중국어가 없습니다."
       : "아직 표시할 최근 점검이 없습니다.";
   const emptyDescription = lookupFailed || audit?.status === "unavailable"
-    ? "교수자 최종 승인 화면에서 원본과 승인 상태를 확인할 수 있습니다."
+    ? "잠시 뒤 다시 확인해 주세요. 점검 결과는 콘텐츠의 참고 기록으로 저장됩니다."
     : "다음 콘텐츠 생성부터 수준·점검 단어·확인 대상이 이곳에 기록됩니다.";
-  const reviewHref = "/admin/review";
-  const reviewLabel = "교수자 최종 승인 열기";
 
   return (
     <section className="overflow-hidden rounded-xl border border-[#CFC9BC] bg-white shadow-[0_10px_30px_rgba(21,32,43,0.05)]" aria-labelledby="lexical-audit-title">
@@ -335,13 +331,13 @@ function OperationsSection({
                   <p className="text-[24px] font-semibold leading-none tabular-nums">
                     {fmt(audit.matchedTokenCount ?? 0)}<span className="ml-0.5 text-[11px] font-normal">개</span>
                   </p>
-                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">목록에서 정확히 확인</p>
+                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">목록 일치</p>
                 </div>
                 <div className="rounded-md bg-[#FFF4BE] px-3 py-2.5 text-[#5B4B0C]">
                   <p className="text-[24px] font-semibold leading-none tabular-nums">
                     {fmt(audit.candidates.length)}<span className="ml-0.5 text-[11px] font-normal">개</span>
                   </p>
-                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">교수자 감수 후보</p>
+                  <p className="mt-1.5 text-[11.5px] font-medium leading-4">목록 밖</p>
                 </div>
               </div>
               <p className="mt-2 text-[11px] leading-4 text-[#716B61]">
@@ -350,18 +346,11 @@ function OperationsSection({
             </li>
           </ol>
 
-          <div className="mt-3 flex flex-col gap-3 rounded-lg bg-[#FFF8D8] px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-3 rounded-lg bg-[#FFF8D8] px-3.5 py-3">
             <p className="text-[12px] leading-5 text-[#5F5A50]">
-              <strong className="font-semibold text-[#3F3A32]">감수 후보 {fmt(audit.candidates.length)}개는 오류가 아닙니다.</strong>{" "}
-              고유명사·전문용어이거나 단어 분리의 결과일 수 있어 교수자가 문맥에서 확인합니다.
+              <strong className="font-semibold text-[#3F3A32]">목록 밖 {fmt(audit.candidates.length)}개는 오류를 뜻하지 않습니다.</strong>{" "}
+              고유명사·전문용어·어절 분리 등의 이유로 HSK 목록과 정확히 일치하지 않을 수 있습니다.
             </p>
-            <Link
-              to={reviewHref}
-              className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md bg-[#FAD338] px-3.5 py-2.5 text-[12px] font-semibold text-[#15202B] transition-colors hover:bg-[#F3C91D] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D6B900] focus-visible:ring-offset-2"
-            >
-              {reviewLabel}
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-            </Link>
           </div>
         </div>
       ) : (
@@ -373,9 +362,6 @@ function OperationsSection({
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 운영 DB 준비됨
             </p>
           )}
-          <Link to={reviewHref} className="mt-4 flex w-fit items-center gap-1.5 text-[12px] font-semibold text-[#15202B] underline decoration-[#D6C65E] decoration-2 underline-offset-4">
-            {reviewLabel} <ArrowRight className="h-3.5 w-3.5" aria-hidden />
-          </Link>
         </div>
       )}
 
@@ -392,10 +378,10 @@ function AuditMethodSection() {
       <div className="border-b border-[#E5DEC9] px-4 py-4 sm:px-5">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[#8A7621]">
-            자동 품질 점검
+            어휘 범위 참고
           </p>
           <span className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[11px] font-medium text-[#5A6670]">
-            실제 콘텐츠·감수 연결
+            실제 콘텐츠 기록
           </span>
         </div>
         <h2 id="audit-method-title" className="mt-1 text-[18px] font-semibold tracking-[-0.02em] text-[#15202B]">
@@ -417,14 +403,14 @@ function AuditMethodSection() {
             <span className="text-[10.5px] font-semibold text-[#8A7621]">02 · 계산</span>
             <p className="mt-1 font-semibold text-[#26333B]">단어 추출 → HSK 목록과 정확 일치</p>
             <p className="mt-1 leading-relaxed text-[#716B61]">
-              목록에 있으면 확인, 없으면 감수 후보로 나눕니다.
+              목록에 있으면 목록 일치, 없으면 목록 밖으로 나눕니다.
             </p>
           </li>
           <li className="rounded-lg border border-[#E5DEC9] bg-white p-3">
-            <span className="text-[10.5px] font-semibold text-[#8A7621]">03 · 기록·연결</span>
-            <p className="mt-1 font-semibold text-[#26333B]">확인 수 + 교수자 감수 후보</p>
+            <span className="text-[10.5px] font-semibold text-[#8A7621]">03 · 기록</span>
+            <p className="mt-1 font-semibold text-[#26333B]">목록 일치 수 + 목록 밖 단어 수</p>
             <p className="mt-1 leading-relaxed text-[#716B61]">
-              결과를 콘텐츠에 저장하고, 감수 후보는 교수자 최종 승인에서 확인합니다.
+              결과를 콘텐츠의 참고 기록으로 저장합니다.
             </p>
           </li>
         </ol>
@@ -433,7 +419,7 @@ function AuditMethodSection() {
           <div className="rounded-lg border border-[#E5DEC9] bg-white px-3 py-3 text-[12px] text-[#26333B]">
             <p className="font-semibold">이 검사가 확인하는 것</p>
             <p className="mt-1 leading-relaxed">
-              뽑은 단어 수, HSK 목록에서 확인된 수, 감수 후보 수를 매번 같은 규칙으로 셉니다.
+              뽑은 단어 수, HSK 목록과 일치한 수, 목록 밖 단어 수를 매번 같은 규칙으로 셉니다.
             </p>
           </div>
           <div className="rounded-lg bg-[#F6F3EA] px-3 py-3 text-[12px] text-[#26333B]">
@@ -507,7 +493,7 @@ function DatasetOverview({
       <div className="px-4 py-4 sm:px-5">
         <div>
           <div>
-            <p className="text-[12px] font-semibold tracking-[0.08em] text-[#8A7423]">PRAGMA 수준별 점검 기준</p>
+            <p className="text-[12px] font-semibold tracking-[0.08em] text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
           </div>
         </div>
 
