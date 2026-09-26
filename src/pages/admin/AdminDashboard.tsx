@@ -128,12 +128,14 @@ const PanelHeader = ({
 // 「AI」만으로는 단계가 구별되지 않아 모델 제공사 이름을 붙인다(모델 버전은 추적 정보라 넣지 않는다)
 // (논문 4.3.3, focused_v1: 규칙 검사 → OpenAI 검토(저장된 생성 품질점검 재사용) → 선택 시에만 Claude 독립 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
-  rules: "규칙 검사 완료",
-  openai: "OpenAI 검토 완료",
-  claude: "Claude 독립 검토 완료",
+  // 표제는 역할 중심(용어대장 2026-09-26): 자동 품질 점검 → AI 검토 → 필요 시 교차 점검 → 교수자 최종 승인.
+  // 「독립 검토」는 쓰지 않는다 — 다른 AI 사용이 독립성·검증을 보장하는 것으로 읽히지 않게.
+  rules: "자동 품질 점검 완료",
+  openai: "AI 검토 완료",
+  claude: "Claude 교차 검토 완료",
   adjudication: "OpenAI 재검토 완료",
-  // 전체 흐름 「교수자 승인 완료」와 같은 수다.
-  professor: "교수자 승인 완료",
+  // 전체 흐름 「교수자 최종 승인 완료」와 같은 수다.
+  professor: "교수자 최종 승인 완료",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -144,7 +146,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
   rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
-  openai: "의미·자연성 검토",
+  openai: "OpenAI 의미·자연성 검토",
   claude: "교수자가 요청할 때",
   // Claude 독립 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
   adjudication: "Claude 의견이 있을 때",
@@ -242,11 +244,11 @@ const ReviewPipeline = ({
           {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
           <div
             role="group"
-            aria-label="정밀 검토"
+            aria-label="필요 시 교차 점검"
             className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              정밀 검토
+              필요 시 교차 점검
             </span>
             {optional.map(renderStage)}
           </div>

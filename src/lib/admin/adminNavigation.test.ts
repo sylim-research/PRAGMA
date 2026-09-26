@@ -28,7 +28,7 @@ describe("admin navigation reachability", () => {
     expect(allPaths).not.toContain("/admin/question-designer");
     expect(allPaths).not.toContain("/admin/research-qa/calibration");
     // 생성 기준(생성기가 소비하는 제약)과 학습 미션 재료(시나리오)는 다른 그룹이다.
-    const criteria = ADMIN_NAV_GROUPS.find((group) => group.header === "1. 콘텐츠 생성 기준");
+    const criteria = ADMIN_NAV_GROUPS.find((group) => group.header === "1. 콘텐츠 제작 기준");
     expect(criteria?.items.map((item) => item.to)).toEqual([
       "/admin/prompt-harness",
       "/admin/corpus",
@@ -39,7 +39,7 @@ describe("admin navigation reachability", () => {
       "/admin/generator",
       "/admin/batch",
     ]);
-    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·검수");
+    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·승인");
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly", "/admin/ai-review", "/admin/review",
     ]);
@@ -128,7 +128,7 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/research-qa/releases")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/calibration")).toBe("");
     const production = ADMIN_NAV_GROUPS.find(
-      (group) => group.header === "3. 학습 미션 제작·검수",
+      (group) => group.header === "3. 학습 미션 제작·승인",
     );
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly",
