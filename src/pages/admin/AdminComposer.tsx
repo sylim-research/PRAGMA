@@ -925,7 +925,7 @@ const AdminComposer = () => {
             </div>
           </div>
           {conditionsOpen && (
-            <div className="border-t border-[#EAE4D2] px-4 py-3">
+            <div className="border-t border-[#EAE4D2] px-4 pb-5 pt-3">
               <CompositionConditionFields
                 value={{ level, direction, courseMode, themes }}
                 onLevel={setLevel}
@@ -968,7 +968,7 @@ const AdminComposer = () => {
       ) : (
         <>
           <div className="overflow-hidden rounded-b-2xl border border-t-0 border-[#D8D3C4] bg-white">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#EAE4D2] px-5 pb-1 pt-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#CFC8B6] px-5 pb-2 pt-5">
             {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
             <h3 className="text-[14px] font-semibold text-[#46515A]">주차별 미션 배치</h3>
             <span className="text-[12.5px] text-[#66727A]">
