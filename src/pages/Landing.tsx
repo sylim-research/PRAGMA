@@ -26,14 +26,14 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-3xl items-center px-6 py-4">
+        <div className="mx-auto flex max-w-[944px] items-center px-6 py-4">
           <HomeBrand />
         </div>
       </header>
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
+      <main className="mx-auto flex w-full max-w-[944px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -72,7 +72,7 @@ const Landing = () => {
               PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              관계와 상황에 맞는 표현을 판단하고 산출하는 학습 플랫폼입니다.
+              관계와 상황에 맞는 표현을 판단하고 직접 통번역하는 학습 플랫폼입니다.
             </span>
           </p>
         </section>
@@ -82,7 +82,9 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        <section className="mx-auto mt-8 grid w-full max-w-[692px] grid-cols-1 gap-4 sm:grid-cols-2">
+        {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 가장 긴 행(학습자 2행)이 14px에서 약 374px라
+            카드 안쪽 폭이 그보다 넓어야 한다 — 그래서 헤더·본문·푸터 칼럼을 944px로 함께 넓혔다(2026-09-26). */}
+        <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           <Link
             to="/student-login"
             className="group flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-[#D5CEBB] hover:border-l-[#FAD338] hover:shadow-[0_1px_2px_rgba(21,32,43,0.05),0_16px_36px_-16px_rgba(21,32,43,0.26)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2"
@@ -96,8 +98,8 @@ const Landing = () => {
               학습자 영역
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
-              상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
-              AI 피드백을 검토한 뒤, 자신의 최종안을 결정합니다.
+              관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
+              AI 피드백을 확인하고 자신의 표현을 검토한 뒤, 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
@@ -120,16 +122,16 @@ const Landing = () => {
               교수자 영역
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed text-[#56636D]">
-              콘텐츠를 생성하고, 규칙 점검과 AI 검토를 거칩니다.<br />
-              교수자가 최종 검수·승인해 수업에 활용합니다.
+              AI로 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
+              교수자가 콘텐츠를 감수한 뒤 최종 승인해 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
-                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·검수하기.
+                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·승인하기.
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-5">
               <span className="inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2.5 text-[14px] font-bold text-white transition-colors group-hover:bg-[#2A3B48]">
-                제작·검수하기
+                제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </span>
             </span>
@@ -145,7 +147,7 @@ const Landing = () => {
               className={secondaryLink}
             >
               <Network aria-hidden size={17} strokeWidth={1.9} className="text-[#5C6A7A]" />
-              통합 구조 보기
+              전체 구조 보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
             </Link>
             <Link
@@ -160,7 +162,7 @@ const Landing = () => {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-3xl px-6 pb-6">
+      <footer className="mx-auto w-full max-w-[944px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
           한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
         </p>
