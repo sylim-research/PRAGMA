@@ -342,13 +342,13 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 색은 의미로 나눈다: 번역=호박, 통역=옅은 살구, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=따뜻한 회갈색, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
+              {/* 상자는 흰색으로 통일하고, 번역·통역은 이름 앞 색 점(호박·세이지)으로, 핵심 변수인 화행별은 금색 띠로만 구분한다. 2026-09-26 */}
               {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
                   「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
               <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
-                <PlanMetric className="border border-[#E8DFCB] bg-[#FAF7EF]" label="번역" value={summary.translation} />
-                <PlanMetric className="border border-[#EBD7C8] bg-[#FBF2EB]" label="통역" value={summary.interpreting} />
+                <PlanMetric dot="#C9A55A" label="번역" value={summary.translation} />
+                <PlanMetric dot="#7E9E88" label="통역" value={summary.interpreting} />
                 {summary.total > 0 && <>
                   {/* 제목과 설명이 같은 말을 되풀이해서, 조합 식 하나를 제목으로 쓴다. */}
                   <CoverageCard className="border-[#E6DECB] bg-white lg:col-span-2" title="화행 × 수준 × 번역/통역" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount} />
@@ -371,8 +371,8 @@ const AdminBatch = () => {
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-[0.75fr_0.75fr_1fr_1fr] lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist className="border border-[#DFDACD] bg-[#F4F2EC] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#DFDACD] bg-[#F4F2EC] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
                 <div className="rounded-lg border border-[#E6DECB] border-l-4 border-l-[#D8C07A] bg-white px-3 py-2 sm:col-span-2">
                   <h3 className="text-[13.5px] font-semibold">화행별</h3>
@@ -508,9 +508,11 @@ const AdminBatch = () => {
 const StepNum = ({ n }: { n: number }) =>
   <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">{n}</span>;
 
-const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
+// 상자 바탕은 모두 흰색 + 같은 가는 테두리로 통일하고, 차이는 이름 앞 작은 색 점과 화행별의 금색 띠로만 준다.
+// 옅은 바탕색을 여러 개 섞으면 명도가 비슷해 탁해 보인다(2026-09-26 디자인 판단).
+const PlanMetric = ({ label, value, unit = "건", primary = false, dot, className = "border border-[#E6DECB] bg-white" }: { label: string; value: number; unit?: string; primary?: boolean; dot?: string; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
-    <p className="text-[16px] font-semibold">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-[13px] font-medium">{unit}</span></p>
+    <p className="flex items-center gap-1.5 text-[16px] font-semibold">{dot && <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-[13px] font-medium">{unit}</span></p>
   </div>;
 
 const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; className?: string }) =>
@@ -520,7 +522,7 @@ const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[
   </div>;
 
 
-const Dist = ({ title, rows, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; rows: [string, number][]; className?: string }) => (
+const Dist = ({ title, rows, className = "border border-[#E6DECB] bg-white" }: { title: string; rows: [string, number][]; className?: string }) => (
   <div className={"rounded-lg px-3 py-2 " + className}>
     <div className="text-[13.5px] font-semibold">{title}</div>
     {/* 칸이 넓어도 이름과 숫자가 한눈에 짝지어지도록 목록 폭을 제한한다. */}
