@@ -26,14 +26,14 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-[836px] items-center px-6 py-4">
+        <div className="mx-auto flex max-w-[804px] items-center px-6 py-4">
           <HomeBrand />
         </div>
       </header>
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-[836px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
+      <main className="mx-auto flex w-full max-w-[804px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[72px]">
         <section className="text-center">
           {/* 후크 — 두 줄이 차례로 올라온 뒤 핵심어에 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -82,9 +82,9 @@ const Landing = () => {
             두 영역은 주·부가 아니라 대등한 두 입구다. 그래서 테두리·그림자·크기는
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
-        {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 가장 긴 행(교수자 1행)이 14px에서 약 338px라
-            카드 안쪽 폭(약 338px)을 그 길이에 딱 맞췄다 — 카드가 양옆으로 퍼져 보이지 않게. PC(lg 이상)에서는 줄바꿈을 막아 3행으로 밀리지 않게 한다.
-            헤더·본문·푸터 칼럼은 같은 816px을 써서 왼쪽 선을 맞춘다(2026-09-26). */}
+        {/* 카드 설명은 문장당 한 줄(2행)을 지킨다. 설명은 13.5px, 가장 긴 행이 약 311px라 카드 안쪽 폭(약 314px)을
+            그 길이에 맞췄다 — 카드가 양옆으로 퍼져 보이지 않게. PC(lg 이상)에서는 줄바꿈을 막아 3행으로 밀리지 않게 한다.
+            헤더·본문·푸터 칼럼은 같은 804px을 써서 왼쪽 선을 맞춘다(2026-09-26). */}
         <section className="mx-auto mt-8 grid w-full grid-cols-1 gap-5 sm:grid-cols-2">
           <Link
             to="/student-login"
@@ -163,7 +163,7 @@ const Landing = () => {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-[836px] px-6 pb-6">
+      <footer className="mx-auto w-full max-w-[804px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.5px] leading-relaxed text-[#5C6A7A]">
           한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
         </p>
