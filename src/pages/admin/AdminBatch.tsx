@@ -342,12 +342,12 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 넓은 화면에서는 건수 4개와 분포 충족도 2개를 한 줄에 둔다(8칸 = 1칸×4 + 2칸×2). */}
-              <div className="mt-3 grid grid-cols-2 gap-2.5 lg:grid-cols-8">
+              {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
+                  「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
+              <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
                 <PlanMetric label="총 생성 예정" value={summary.total} primary />
                 <PlanMetric label="번역" value={summary.translation} />
                 <PlanMetric label="통역" value={summary.interpreting} />
-                <PlanMetric label="화행" value={Object.keys(summary.bySpeechAct).length} unit="개" />
                 {summary.total > 0 && <>
                   <CoverageCard className="border-[#EAE4D2] bg-[#FAF8F2] lg:col-span-2" title="화행·수준·수행 방식 분포" filled={deliveryCellCount - summary.emptyActLevelModeCells.length} total={deliveryCellCount}
                     description="화행 × 수준 × 번역/통역" />
