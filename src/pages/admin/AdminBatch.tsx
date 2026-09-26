@@ -342,7 +342,7 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-lg font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
-              {/* 색은 의미로 나눈다: 번역=호박, 통역=옅은 살구, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=옅은 회청, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
+              {/* 색은 의미로 나눈다: 번역=호박, 통역=옅은 살구, 장면 조건(수준·도메인)=미색, 편성 꼬리표(편성 주제·업종)=따뜻한 회갈색, 핵심 변수(화행)=노란 띠. 2026-09-26 */}
               {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다(7칸 = 1칸×3 + 2칸×2).
                   「화행 N개」 카드는 뺐다 — 생성 건수가 아닌 값이 건수 카드 사이에 섞여 단위가 헷갈렸다. 화행은 아래 화행별이 보여 준다. */}
               <div className="mt-3 grid grid-cols-3 gap-2.5 lg:grid-cols-7">
@@ -371,8 +371,8 @@ const AdminBatch = () => {
               <div className="mt-3 grid items-start gap-2.5 sm:grid-cols-2 lg:grid-cols-[0.75fr_0.75fr_1fr_1fr] lg:items-stretch">
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
-                <Dist className="border border-[#E2E6E9] bg-[#F7F8F9] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#E2E6E9] bg-[#F7F8F9] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#DFDACD] bg-[#F4F2EC] lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
+                <Dist className="border border-[#DFDACD] bg-[#F4F2EC] lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
                 <div className="rounded-lg border border-[#E6DECB] border-l-4 border-l-[#D8C07A] bg-white px-3 py-2 sm:col-span-2">
                   <h3 className="text-[13.5px] font-semibold">화행별</h3>
