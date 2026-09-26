@@ -232,6 +232,7 @@ const HOLD_REASON_SOURCE = {
 // 생성 조건 줄: 핵심 변수(화행·P·D·R)와 부가 조건(방향·수준·수행 방식)을 묶음으로 나눠 보여 준다.
 // 입력은 [화행, "P: …", "D: …", "R: …", 방향, 수준, 수행 방식] 순서의 짧은 표기다.
 const PDR_AXIS_NAME: Record<string, string> = { P: "권력(P)", D: "거리(D)", R: "부담도(R)" };
+const OTHER_AXIS_NAME = ["방향", "수준", "수행 방식"];
 
 function ConditionSummary({ conditions }: { conditions: string[] }) {
   const [act, ...rest] = conditions;
@@ -260,8 +261,15 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
         </div>
       </div>
       <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
-        <div className={heading}>언어 · 수준 · 수행 방식</div>
-        <div className="mt-1 whitespace-nowrap text-[12.5px] text-[#4E5A63]">{others.join(" · ")}</div>
+        <div className={heading}>방향 · 수준 · 수행 방식</div>
+        {/* 교수자 최종 승인 화면의 머리 칩과 같은 「이름 값」 짝으로 보여 준다. */}
+        <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          {others.map((value, index) => (
+            <span key={index} className="whitespace-nowrap text-[12.5px] text-[#5B6770]">
+              {OTHER_AXIS_NAME[index] ?? ""} <b className="text-[13.5px] font-bold text-[#15202B]">{value}</b>
+            </span>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -933,7 +941,7 @@ const AdminGenerator = () => {
         <section className="space-y-5 rounded-lg border border-[#E6DECB] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
-            <SectionTitle n={1} label="과제 모드" />
+            <SectionTitle n={1} label="수행 방식" />
             <div className="mt-2 grid grid-cols-2 gap-2">
               {(["translation", "stt_interpreting"] as const).map((m) => {
                 const on = taskMode === m;
@@ -1060,7 +1068,7 @@ const AdminGenerator = () => {
           <div>
             {/* 채널(매체)은 연구 변수가 아니다(시나리오 매트릭스 LOCK, 2026-07-25 매체 축 폐기). 화면에서 고르지 않고
                 과제 모드에서 정한다: 번역 = 이메일, 통역 = 대면(setTaskModeSafe). 2026-09-26 */}
-            <SectionTitle n={4} label="언어 · 수준" />
+            <SectionTitle n={4} label="방향 · 수준" />
             <div className="mt-2 grid grid-cols-2 gap-3">
               <Field label="언어 방향">
                 <Select
