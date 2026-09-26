@@ -32,6 +32,7 @@ describe("fidelity first", () => {
   it("keeps all three judgments when the meaning is mostly carried over", () => {
     const evaluation = evaluationFromRuntimeFeedback(runtime, quest, feedback("minor_loss"));
     expect(evaluation.criteria.map(c => c.level)).toEqual(["recommend", "very_good", "recommend"]);
+    expect(evaluation.criteria[1]).toMatchObject({ key: "language", label: "문법 정확성", question: "중국어 표현에 문법적인 문제가 없나요?" });
     expect(evaluation.criteria[2].body).toBe("감사가 약하게 들릴 수 있습니다.");
   });
 });

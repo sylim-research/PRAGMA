@@ -19,7 +19,7 @@ describe("CanonicalMissionRun completion connections", () => {
         example: "您方便帮我收一下快递吗？", takeaway: "상대의 선택 여지 확인",
         criteria: [
           { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "핵심 내용 유지" },
-          { key: "language", label: "언어 자연성", question: "", level: "very_good", body: "문법 안정" },
+          { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "문법 안정" },
           { key: "pragmatics", label: "화용적 적절성", question: "", level: "recommend", body: "선택 여지 확인" },
         ],
       },
@@ -43,7 +43,8 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.getByText("번역안을 세 기준으로 살펴보고 있습니다")).toBeInTheDocument();
     act(() => vi.advanceTimersByTime(1300));
     // 세 기준이 모두 보이고, 우선 기준의 본문은 화면마다 한 번만 나온다.
-    ["의미 충실성", "언어 자연성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
+    ["의미 충실성", "문법 정확성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
+    expect(screen.queryByText("언어 자연성")).not.toBeInTheDocument();
     const point = screen.getByRole("heading", { name: "의미 충실성" }).closest("article")!.querySelector("p")!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
@@ -78,7 +79,7 @@ describe("CanonicalMissionRun completion connections", () => {
     render(<MissionDissentPanel onSubmit={onSubmit} />);
 
     fireEvent.click(screen.getByRole("button", { name: /내 판단 남기기/ }));
-    expect(screen.getByRole("heading", { name: "AI 피드백과 생각이 다르다면" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "AI 피드백과 내 생각이 다르다면" })).toBeInTheDocument();
 
     const submit = screen.getByRole("button", { name: "내 판단 남기기" });
     expect(submit).toBeDisabled();

@@ -631,7 +631,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
         onClick={() => setOpen(true)}
         className="w-full rounded-xl border border-dashed border-[#B9C4CE] bg-white px-4 py-3 text-left text-[13px] text-[#3B4A57] transition hover:bg-[#F7F9FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
       >
-        AI 피드백과 생각이 다르다면 <b>내 판단 남기기 →</b>
+        AI 피드백과 내 생각이 다르다면 <b>내 판단 남기기 →</b>
       </button>
     );
   }
@@ -639,7 +639,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
   // 조건 선택지는 두지 않는다 — 한 줄 서술만 받고, 저장 구조의 조건 목록은 비워 둔다.
   return (
     <section className="rounded-xl border border-[#B9C4CE] bg-white px-4 py-4" aria-labelledby="mission-dissent-heading">
-      <h3 id="mission-dissent-heading" className="text-sm font-black">AI 피드백과 생각이 다르다면</h3>
+      <h3 id="mission-dissent-heading" className="text-sm font-black">AI 피드백과 내 생각이 다르다면</h3>
       <Textarea className="mt-3 text-[15px] leading-7" rows={2} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="어떤 점에서 다르게 봤는지 한 줄로 적어 주세요." />
       <div className="mt-3 grid grid-cols-2 gap-2">
         <Button
@@ -1105,7 +1105,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   );
 }
 /** 학습자에게 보이는 피드백 기준 세 가지. 쓰기 전에도 같은 이름으로 미리 알린다. */
-const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "언어 자연성", "화용적 적절성"] as const;
+const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "문법 정확성", "화용적 적절성"] as const;
 
 /**
  * 빈칸은 기준 문장보다 딱 한 줄만 크다. 크게 벌어진 칸은 「이만큼 써야 한다」로 읽힌다.
@@ -1236,8 +1236,8 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
     },
     {
       key: "language",
-      label: "언어 자연성",
-      question: "중국어 표현에 이해를 방해하는 오류가 있나요?",
+      label: "문법 정확성",
+      question: "중국어 표현에 문법적인 문제가 없나요?",
       level: languageLevel,
       body: languageLevel === "very_good"
         ? "의미를 이해하는 데 방해가 되는 표현 문제는 없습니다."
@@ -1320,8 +1320,8 @@ export function evaluationFromRuntimeFeedback(
     },
     {
       key: "language",
-      label: "언어 자연성",
-      question: `${targetLanguage} 표현에 이해를 방해하는 오류가 있나요?`,
+      label: "문법 정확성",
+      question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`,
       level: grammarLevel,
       // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
       body: fidelityFirst ? FIDELITY_FIRST_NOTE : [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
@@ -1371,7 +1371,7 @@ function unavailableRuntimeEvaluation(
     available: false,
     criteria: [
       { key: "meaning", label: "의미 충실성", question: "뜻이 제대로 전달됐나요?", level: "recommend", body },
-      { key: "language", label: "언어 자연성", question: `${targetLanguage} 표현에 이해를 방해하는 오류가 있나요?`, level: "recommend", body },
+      { key: "language", label: "문법 정확성", question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`, level: "recommend", body },
       { key: "pragmatics", label: "화용적 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
     ],
     headline: "자동 피드백을 불러오지 못했습니다.",

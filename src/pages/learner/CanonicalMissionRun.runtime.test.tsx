@@ -359,13 +359,13 @@ describe("CanonicalMissionRun live CTA route", () => {
   it("학습자 원포인트는 심각도와 무관하게 의미→언어→화용 순서의 첫 보완 항목이다", () => {
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "recommend", body: "의미 먼저" },
-      { key: "language", label: "언어 자연성", question: "", level: "very_good", body: "언어" },
+      { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "언어" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "meaning", body: "의미 먼저" });
 
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "의미" },
-      { key: "language", label: "언어 자연성", question: "", level: "required", body: "언어 먼저" },
+      { key: "language", label: "문법 정확성", question: "", level: "required", body: "언어 먼저" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "language", body: "언어 먼저" });
   });
