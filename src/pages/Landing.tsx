@@ -100,7 +100,7 @@ const Landing = () => {
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
-              AI 피드백을 참고해 초안을 검토한 뒤, 최종안을 결정합니다.
+              AI 피드백을 참고해 표현을 검토한 뒤, 최종안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
@@ -123,7 +123,7 @@ const Landing = () => {
               교수자 영역
             </span>
             <span className="mt-3 break-keep text-[14px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
-              학습 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
+              AI로 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
               교수자가 감수하고 최종 승인한 콘텐츠를 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
