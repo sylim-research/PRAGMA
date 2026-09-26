@@ -200,7 +200,7 @@ interface BatchItem {
   auto_check: "pass" | "warning";
 }
 
-const formField = "h-9 text-[13px] bg-white border-[#E1DCCD]";
+const formField = "h-9 text-[13px] bg-[#FFFDF8] border-[#E6DECB]";
 
 // 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
 const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
@@ -930,7 +930,7 @@ const AdminGenerator = () => {
       {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
       <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* LEFT — settings */}
-        <section className="space-y-5 rounded-lg border border-border bg-card p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
+        <section className="space-y-5 rounded-lg border border-[#E6DECB] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
             <SectionTitle n={1} label="과제 모드" />
@@ -945,8 +945,8 @@ const AdminGenerator = () => {
                     className={[
                       "h-10 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
-                        : "border border-[#E1DCCD] bg-white text-[#4E5A63] hover:border-[#B9C3CA]",
+                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {m === "translation" ? "번역" : "통역"}
@@ -981,8 +981,8 @@ const AdminGenerator = () => {
                     className={[
                       "rounded-md py-2 px-1.5 text-center transition-colors leading-tight",
                       on
-                        ? "border-2 border-[#15202B] bg-white"
-                        : "border border-[#E1DCCD] bg-white hover:border-[#B9C3CA]",
+                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     <div
@@ -1176,8 +1176,8 @@ const AdminGenerator = () => {
                     className={[
                       "flex-1 h-9 rounded-md text-[13px] font-medium transition-colors",
                       on
-                        ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
-                        : "border border-[#E1DCCD] bg-white text-[#4E5A63] hover:border-[#B9C3CA]",
+                        ? "border-2 border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
+                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {n}개
@@ -1191,7 +1191,7 @@ const AdminGenerator = () => {
               type="button"
               onClick={generateOutlines}
               disabled={outlineLoading || finalizing}
-              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-white text-[13px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-[#FFFDF8] text-[13px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="inline-flex items-center justify-center gap-1.5">
                 <Search className="h-4 w-4" aria-hidden />
@@ -1220,7 +1220,7 @@ const AdminGenerator = () => {
                       key={i}
                       className={[
                         "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[13px] cursor-pointer transition-colors",
-                        on ? "border-[#15202B]/45 bg-[#F4F6F8]" : "border-[#E1DCCD] bg-white hover:border-[#B9C3CA]",
+                        on ? "border-[#CDBB8A] bg-[#FBF5E6]" : "border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                       ].join(" ")}
                     >
                       <input
@@ -1612,7 +1612,7 @@ const SectionTitle = ({
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="rounded-full border border-[#15202B]/20 bg-white px-2 py-0.5 text-[11px] font-semibold text-[#15202B]">{accent}</span>}
+    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[11px] font-semibold text-[#6D5C1F]">{accent}</span>}
   </h3>
 );
 
