@@ -45,6 +45,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+const DEFAULT_RATIONALE = { no_change: "원문·장면에 맞아 이대로 사용합니다.", defer: "추가 확인이 필요해 판단을 보류합니다.", revision_required: "검토 제안대로 수정하겠습니다." } as const;
 function showPanel() {
   render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
     <MemoryRouter><ContentReviewPanel target={{ kind: "mission", targetId: "mission-1" }} /></MemoryRouter>
@@ -52,8 +53,6 @@ function showPanel() {
 }
 async function enterDecision(decision: ProfessorFindingDecision["decision"]) {
   fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS[decision]} · claude-1` }));
-  fireEvent.change(screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" }), { target: { value: rationale } });
-  fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: "원본과 양쪽 의견을 확인하여 수업 사용을 판단함" } });
   fireEvent.click(screen.getByRole("checkbox"));
 }
 
@@ -64,24 +63,20 @@ describe("professor finding decisions", () => {
       rationale_ko: "상황문·원문과 대조한 결과 같은 결론에 이르렀습니다.", proposed_change_ko: "해설의 책임 주체를 화자로 맞추십시오.",
       needs_professor: false, evidence_path: finding.where, evidence_quote: finding.quote }] });
     showPanel();
-    expect(await screen.findByText("두 검토 합의")).toBeInTheDocument();
+    expect(await screen.findByText("AI 검토 일치")).toBeInTheDocument();
     // 재서술은 지우지 않고 근거 안으로 접는다.
-    const details = screen.getByText("지적 전문·근거").closest("details");
+    const details = screen.getByText("검토 의견 전문·근거").closest("details");
     expect(details).not.toHaveAttribute("open");
     expect(details).toHaveTextContent("같은 결론에 이르렀습니다.");
     // 판단에 필요한 제안은 펼치지 않아도 보인다.
     expect(screen.getByText("해설의 책임 주체를 화자로 맞추십시오.")).toBeInTheDocument();
   });
-  it("결정 버튼을 누르면 근거가 채워지고, 교수자가 쓴 근거는 덮지 않는다", async () => {
+  it("결정 버튼만 누르면 입력 칸 없이 기본 근거로 저장된다", async () => {
     showPanel();
-    const note = () => screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" });
-    fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
-    expect(note()).toHaveValue("원문·장면에 맞아 이대로 사용합니다.");
-    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · claude-1` }));
-    expect(note()).toHaveValue("추가 확인이 필요해 판단을 보류합니다.");
-    fireEvent.change(note(), { target: { value: rationale } });
-    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.revision_required} · claude-1` }));
-    expect(note()).toHaveValue(rationale);
+    fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · claude-1` }));
+    fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
+    expect(screen.queryByRole("textbox", { name: "교수자 판단 근거 · claude-1" })).not.toBeInTheDocument();
+    await waitFor(() => expect(mocks.save).toHaveBeenCalledWith("review-1", "hash-current", [{ finding_id: "claude-1", decision: "no_change", rationale_ko: "원문·장면에 맞아 이대로 사용합니다." }]), { timeout: 3000 });
   });
   it("allows explicit human approval with primary evidence and keeps extra model review optional", async () => {
     inspection.run!.approval_policy = "focused_v1";
@@ -92,8 +87,7 @@ describe("professor finding decisions", () => {
     const approve = await screen.findByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
-    fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
@@ -106,9 +100,8 @@ describe("professor finding decisions", () => {
     expect(screen.getByText(/의견 대조 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
-    expect(mocks.save).toHaveBeenCalledWith("review-1", "hash-current", [{ finding_id: "claude-1", decision, rationale_ko: rationale }]);
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
+    expect(mocks.save).toHaveBeenCalledWith("review-1", "hash-current", [{ finding_id: "claude-1", decision, rationale_ko: DEFAULT_RATIONALE[decision] }]);
     fireEvent.click(screen.getByRole("checkbox"));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
@@ -117,11 +110,9 @@ describe("professor finding decisions", () => {
   it("approves with a recorded default rationale when the professor types nothing", async () => {
     showPanel();
     fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
-    fireEvent.change(screen.getByRole("textbox", { name: "교수자 판단 근거 · claude-1" }), { target: { value: rationale } });
-    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     // 승인 근거를 비워 둔 채 확인 체크만 하고 승인한다 — 타이핑 없이 승인이 열려야 한다.
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     const approve = screen.getByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
@@ -132,8 +123,7 @@ describe("professor finding decisions", () => {
     showPanel();
     await enterDecision("no_change");
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     expect(screen.getByRole("checkbox")).not.toBeChecked();
     fireEvent.click(screen.getByRole("checkbox"));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
@@ -146,7 +136,7 @@ describe("professor finding decisions", () => {
   it("does not carry professor decisions into changed content", async () => {
     inspection = { ...inspection, run: { ...inspection.run!, professor_decisions: [{ finding_id: finding.id, decision: "no_change", rationale_ko: rationale }] } };
     showPanel();
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     inspection = { ...inspection, contentHash: "hash-revised", sourceHash: "source-revised", run: null,
       history: [{ id: "review-1", content_hash: "hash-current", approved_at: null, created_at: "2026-08-27" }] };
     fireEvent.click(screen.getByRole("button", { name: "결과 새로고침" }));
@@ -163,17 +153,17 @@ describe("professor finding decisions", () => {
     inspection.run!.claude_review!.result = { verdict: "pass", summary_ko: "지적 없음", findings: [] };
     inspection.run!.adjudication!.result.decisions = [];
     showPanel();
-    fireEvent.change(await screen.findByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: rationale } });
+    await screen.findByRole("button", { name: "교수자 최종 승인" });
     // Display labels change, while historical model output remains verbatim.
     expect(screen.getByText("중대 지적")).toBeInTheDocument();
     expect(screen.getByText("지적 없음")).toBeInTheDocument();
     expect(screen.getAllByText(/보고된 문제 항목 없음/).length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.change(screen.getByRole("textbox", { name: "AI 검토의 중대 문제 항목 사용 근거" }), { target: { value: rationale } });
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.click(screen.getByRole("checkbox", { name: /AI 검토의 중대 문제 항목을 확인했으며/ }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
     expect(await screen.findByText(`AI 검토의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
@@ -182,9 +172,8 @@ describe("professor finding decisions", () => {
 
 describe("automated quality signals", () => {
   const bundleButton = (count: number) => screen.findByRole("button", { name: `미결 자동 품질 점검 신호 ${count}건 확인 · 현재 버전 그대로 사용` });
-  const setDecision = (id: string, decision: ProfessorFindingDecision["decision"], rationale_ko: string) => {
+  const setDecision = (id: string, decision: ProfessorFindingDecision["decision"]) => {
     fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS[decision]} · ${id}` }));
-    fireEvent.change(screen.getByRole("textbox", { name: `교수자 판단 근거 · ${id}` }), { target: { value: rationale_ko } });
   };
 
   it("bundles pending signals in one decision but still blocks approval on the AI finding", async () => {
@@ -196,7 +185,7 @@ describe("automated quality signals", () => {
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
     // AI 의미 지적이 미결이라 저장도 승인도 되지 않는다.
     expect(mocks.save).not.toHaveBeenCalled();
-    expect(screen.getByText("저장하지 않은 판단이 있습니다.")).toBeInTheDocument();
+    expect(screen.getByText("남은 항목을 판단하면 자동 저장됩니다.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
   });
 
@@ -205,15 +194,13 @@ describe("automated quality signals", () => {
     showPanel();
     fireEvent.click(await bundleButton(1));
     await waitFor(() => expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).toBeInTheDocument());
-    setDecision("claude-1", "no_change", rationale);
-    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    setDecision("claude-1", "no_change");
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     expect(mocks.save).toHaveBeenLastCalledWith("review-1", "hash-current", [
       { finding_id: "rule-1", decision: "no_change", rationale_ko: BULK_SIGNAL_RATIONALE, mode: "bulk_signal" },
-      { finding_id: "claude-1", decision: "no_change", rationale_ko: rationale },
+      { finding_id: "claude-1", decision: "no_change", rationale_ko: DEFAULT_RATIONALE.no_change },
     ]);
-    fireEvent.change(screen.getByRole("textbox", { name: "교수자 승인 근거" }), { target: { value: "원본과 신호를 확인하여 수업 사용을 판단함" } });
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/교수자 · 수정 없이 사용 가능 \(묶음 확인\)/)).toBeInTheDocument();
@@ -224,15 +211,14 @@ describe("automated quality signals", () => {
     showPanel();
     fireEvent.click(await bundleButton(2));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
-    setDecision("rule-2", "defer", "수업 맥락을 더 확인한 뒤 판단합니다.");
-    setDecision("claude-1", "no_change", rationale);
-    fireEvent.click(screen.getByRole("button", { name: "교수자 판단 저장" }));
-    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.");
+    setDecision("rule-2", "defer");
+    setDecision("claude-1", "no_change");
+    await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     // 되돌린 항목은 묶음 표식 없이 개별 판정으로 저장된다.
     expect(mocks.save).toHaveBeenLastCalledWith("review-1", "hash-current", expect.arrayContaining([
-      { finding_id: "rule-2", decision: "defer", rationale_ko: "수업 맥락을 더 확인한 뒤 판단합니다." },
+      { finding_id: "rule-2", decision: "defer", rationale_ko: DEFAULT_RATIONALE.defer },
     ]));
-    fireEvent.click(screen.getByRole("checkbox", { name: "학생 화면과 자동 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
   });
@@ -255,9 +241,7 @@ describe("automated quality signals", () => {
     fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
     expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · rule-1` })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-1" })).toHaveValue("현장 확인 뒤 판단합니다.");
     expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · rule-2` })).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByRole("textbox", { name: "교수자 판단 근거 · rule-2" })).toHaveValue(BULK_SIGNAL_RATIONALE);
   });
 });
 

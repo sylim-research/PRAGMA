@@ -31,12 +31,17 @@ function signalSummary(findings: ReviewFinding[]): string {
  * 결정별 기본 근거. 버튼을 누를 때 빈 근거 칸을 채워 두어 타자 없이 판정을 마칠 수 있게 한다.
  * 교수자가 직접 쓴 근거는 덮지 않고, 기본 문구가 들어 있을 때만 새 결정의 문구로 바꾼다.
  */
+/** 판단 버튼의 무게: 사용 가능 = 남색(진행), 수정 필요 = 호박색(주의), 판단 보류 = 옅은 테두리(미결). */
+const DECISION_TONE: Record<keyof typeof PROFESSOR_DECISION_LABELS, { on: string; off: string }> = {
+  no_change: { on: "bg-[#233542] text-white", off: "border border-[#233542] text-[#233542] hover:bg-[#EEF1F4]" },
+  revision_required: { on: "bg-[#B45309] text-white", off: "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#FBF3E3]" },
+  defer: { on: "bg-[#5D6970] text-white", off: "border border-[#B8B2A3] text-[#46515A] hover:bg-[#F5F3EC]" },
+};
 const DEFAULT_FINDING_RATIONALE: Record<keyof typeof PROFESSOR_DECISION_LABELS, string> = {
   revision_required: "검토 제안대로 수정하겠습니다.",
   no_change: "원문·장면에 맞아 이대로 사용합니다.",
   defer: "추가 확인이 필요해 판단을 보류합니다.",
 };
-const isDefaultRationale = (text: string) => Object.values(DEFAULT_FINDING_RATIONALE).includes(text.trim());
 
 /** 저장 경로를 교수자가 읽는 자리 이름으로. 모르는 조각은 그대로 두고, 원래 경로는 근거 안에 남긴다. */
 const WHERE_PART: Record<string, string> = {
@@ -183,7 +188,17 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     } catch (cause) { setError(cause instanceof Error ? cause.message : "교수자 판단 저장 실패"); }
     finally { setBusy(false); }
   };
-  const saveDecisions = () => persistDecisions(draftDecisions);
+  // 판단은 누르는 즉시(근거를 고치면 잠시 뒤) 저장한다 — 따로 「저장」을 누르게 하지 않는다.
+  const draftDecisionsJson = JSON.stringify(draftDecisions);
+  const canAutoSave = decisionsDirty && next === "professor" && !busy && !locked && !dependencyBlocked && !approvalDisabled
+    && professorDecisionsComplete(findings, draftDecisions);
+  useEffect(() => {
+    if (!canAutoSave) return;
+    const timer = window.setTimeout(() => void persistDecisions(JSON.parse(draftDecisionsJson)), 600);
+    return () => window.clearTimeout(timer);
+    // persistDecisions는 렌더마다 새로 만들어지므로 초안 내용이 바뀔 때만 다시 건다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canAutoSave, draftDecisionsJson]);
   /** 미결 신호만 「수정 없이 사용」으로 채운다. 판정이 전부 갖춰지면 바로 저장하고, AI 쟁점이 남았으면 초안으로 둔다. */
   const confirmSignals = async () => {
     if (pendingSignals.length === 0) return;
@@ -393,11 +408,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
             const change = decision?.proposed_change_ko?.trim() || finding.suggestion_ko;
             const badge = finding.needs_professor || decision?.needs_professor ? { text: "교수자 확인 필요", cls: "bg-[#233542] text-white" }
-              : agreed ? { text: "두 검토 합의", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
-              : decision ? { text: `의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
+              : agreed ? { text: "AI 검토 일치", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
+              : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
               : focused ? { text: "교수자 단독 판단", cls: "border border-[#C08A2E] text-[#8A5A14]" } : null;
-            const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value,
-              ...(!draft?.rationale_ko.trim() || isDefaultRationale(draft.rationale_ko) ? { rationale_ko: DEFAULT_FINDING_RATIONALE[value] } : {}) });
+            const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                 <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
@@ -406,17 +420,17 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {/* 결정에 필요한 것은 「어디를 · 어떻게」 둘뿐이다. 지적 전문·이유는 근거 안에 둔다. */}
               <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
               {/* 논증·인용·저장 경로는 판단 자료가 아니라 추적 자료다. 삭제하지 않고 이 안으로 옮긴다. */}
-              <details open={!agreed && Boolean(decision) && decision?.decision !== "accept"} className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">지적 전문·근거</summary>
+              <details className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
+                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">검토 의견 전문·근거</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
-                  <p className="font-semibold">{plainIssue(finding.issue_ko)}</p>
-                  <p>{finding.reason_ko}</p>
+                  <p className="font-semibold">{noPaths(plainIssue(finding.issue_ko))}</p>
+                  <p>{noPaths(finding.reason_ko)}</p>
                   {finding.quote && <blockquote className="border-l-2 border-[#C08A2E] pl-2">{finding.quote}</blockquote>}
                   {finding.uncertainty_ko && <p className="text-xs">불확실성: {finding.uncertainty_ko}</p>}
-                  <p className="text-xs">{verdictLabel[finding.severity]} · <code className="break-all text-[10px]">{finding.where}</code></p>
+                  <p className="text-xs">{verdictLabel[finding.severity]}</p>
                   {decision ? <div className="rounded bg-white p-2">
-                    <strong className="text-[12px]">의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
-                    <p className="mt-1">{decision.rationale_ko}</p>
+                    <strong className="text-[12px]">AI 의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                    <p className="mt-1">{noPaths(decision.rationale_ko)}</p>
                     {decision.evidence_quote && <blockquote className="mt-1 border-l-2 border-[#C08A2E] pl-2">{decision.evidence_quote}</blockquote>}
                   </div> : <p className="text-xs">{focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</p>}
                 </div>
@@ -431,10 +445,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                         aria-label={`${label} · ${finding.id}`} aria-pressed={draft?.decision === value}
                         onClick={() => decide(value as keyof typeof PROFESSOR_DECISION_LABELS)}
                         className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${draft?.decision === value
-                          ? "bg-[#C08A2E] text-white" : "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#F3ECD9]"}`}>{label}</button>)}
+                          ? DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].on : DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].off}`}>{label}</button>)}
                     </div>
-                    {draft?.decision && <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft.rationale_ko} disabled={busy} rows={2}
-                      onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />}
                   </div> : <p className="text-[13px]">의견 대조 후 교수자 결정을 기록합니다.</p>}
             </div>;
           };
@@ -451,16 +463,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
-            {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="의미 쟁점 판정">
-              <h4 className="text-[14px] font-bold text-[#233542]">의미 쟁점 판정 {substantiveFindings.length}건</h4>
+            {substantiveFindings.length > 0 && <section className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
+              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교수자 감수 · AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
-              <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
-                || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장</Button>
-              {/* 저장 상태만 한 줄. 계약 설명·모델명·재서술은 화면에 두지 않는다. */}
+              {/* 저장 버튼 없이 자동 저장한다. 저장 상태만 한 줄. */}
               {(decisionsDirty || professorDecisionsComplete(findings, run.professor_decisions))
-                && <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}
+                && <p className="text-xs" role="status">{decisionsDirty ? (professorDecisionsComplete(findings, draftDecisions) ? "판단을 저장하는 중…" : "남은 항목을 판단하면 자동 저장됩니다.") : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}
             </>}
           </div>;
         })()}
@@ -486,9 +496,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-4">
-        <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">교수자 최종 승인</h4>
-        {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
+        <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>최종 승인</h4>
+        {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
+        {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
@@ -498,9 +509,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" rows={1} className="min-h-0 bg-white px-4 py-2.5 text-[14.5px] leading-6" value={note} onChange={(event) => setNote(event.target.value)} />
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-11 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
             {busy ? "처리 중…" : "교수자 최종 승인"}
@@ -563,6 +573,11 @@ function withoutIsolatedGrounding(result: ReviewResult): ReviewResult {
 }
 
 // 규칙 신호의 내부 코드 머리(예: 「R32/unattributed_present: 」)는 화면 문장에서 뗀다.
+/** 교수자에게 의미 없는 저장 경로 표기(/content/mission/…, /criteria/…)를 문장에서 뺀다. 원문 기록은 그대로 남는다. */
+const noPaths = (text: string) => text
+  .replace(/\s*\((?:\s*\/[\w./\[\]-]+\s*,?)+\)/g, "")
+  .replace(/\s*\/(?:content|criteria|mission)\/[\w./\[\]-]+/g, "")
+  .replace(/\s{2,}/g, " ");
 const plainIssue = (text: string) => text.replace(/^R\d+\/[A-Za-z_]+:\s*/, "").replace("model_unattributed claim", "출처 표시 없는 AI 생성 문장")
   .replace(/mpj_items\[(\d)\]/g, (_m, n) => `MJT 문항 ${Number(n) + 1}`)
   .replace(/\.candidates\[(\d)\]/g, (_m, n) => ` · 후보 ${Number(n) + 1}`)
