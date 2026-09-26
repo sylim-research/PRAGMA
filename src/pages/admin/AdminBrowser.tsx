@@ -301,8 +301,11 @@ const AdminBrowser = () => {
           <div className="flex flex-wrap items-end gap-3">
             {/* ── 필터 ── */}
             <div className="flex flex-wrap items-end gap-2 text-[12px]" aria-label="라이브러리 필터">
+              {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인·편성 주제) → 관리 정보(생성 출처·미션 형식·상태). */}
               <Filter className="w-full sm:w-[96px]" label="화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
+              <Filter className="w-full sm:w-[96px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+                opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[96px]" label="수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
               <Filter className="w-full sm:w-[96px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
@@ -311,8 +314,6 @@ const AdminBrowser = () => {
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
               <Filter className="w-full sm:w-[148px]" label="편성 주제" value={fTheme} onChange={(v) => setFTheme(v as typeof fTheme)}
                 opts={[["all", "전체"], ...Object.entries(THEME_LABEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
-                opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[126px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
               <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
