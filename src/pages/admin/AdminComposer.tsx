@@ -748,8 +748,8 @@ const AdminComposer = () => {
               onClick={() => setTab(key)}
               className={`flex flex-col gap-0.5 rounded-xl border px-5 py-3 text-left transition ${
                 tab === key
-                  ? "border-[#1F3A5F] bg-white text-[#15202B] shadow-[inset_0_-3px_0_#1F3A5F]"
-                  : "border-[#E2DED2] bg-white/70 text-[#46515A] hover:border-[#9FB0C6] hover:bg-white"
+                  ? "border-[#1F3A5F] bg-[#FFFDF8] text-[#15202B] shadow-[inset_0_-3px_0_#1F3A5F]"
+                  : "border-[#E8E2D3] bg-[#FBF9F3] text-[#46515A] hover:border-[#9FB0C6] hover:bg-[#FFFDF8]"
               }`}
             >
               <span className="text-[15px] font-bold">{label}</span>

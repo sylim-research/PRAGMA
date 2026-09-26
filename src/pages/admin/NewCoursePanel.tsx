@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { CompositionConditionFields } from "@/components/admin/CompositionConditionFields";
+import { CompositionConditionFields, ThemePicker } from "@/components/admin/CompositionConditionFields";
 import { countAvailableMissions, type CompositionConditions } from "@/lib/curriculum/compositionConditions";
 import { createCurriculumOutline, type CurriculumOutlineWithWeeks } from "@/lib/curriculum/api";
 import type { ComposerCore } from "@/lib/curriculum/composer";
@@ -107,11 +107,12 @@ export function NewCoursePanel({
   };
 
   return (
-    <div className="space-y-5">
-      <section className="rounded-2xl border border-[#E2DED2] bg-white px-5 py-4">
+    <div className="space-y-4">
+      {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
+      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3.5">
         <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>시작 방법</h2>
-        <div role="radiogroup" aria-label="시작 방법" className="mt-4 flex flex-wrap items-center gap-3">
-          <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 ${method === "copy" ? "border-[#1F3A5F] bg-[#F7F9FC]" : "border-[#E2DED2] bg-white"}`}>
+        <div role="radiogroup" aria-label="시작 방법" className="flex flex-wrap items-center gap-3">
+          <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "copy" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
             <input type="radio" name="new-course-method" checked={method === "copy"} onChange={() => chooseMethod("copy")} className="accent-[#1F3A5F]" />
             <span className="text-[14px] font-bold text-[#15202B]">기존 교과목 조건 복사</span>
             <select
@@ -129,23 +130,17 @@ export function NewCoursePanel({
               ))}
             </select>
           </label>
-          <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 ${method === "blank" ? "border-[#1F3A5F] bg-[#F7F9FC]" : "border-[#E2DED2] bg-white"}`}>
+          <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "blank" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
             <input type="radio" name="new-course-method" checked={method === "blank"} onChange={() => chooseMethod("blank")} className="accent-[#1F3A5F]" />
             <span className="text-[14px] font-bold text-[#15202B]">처음부터 설정</span>
           </label>
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#E2DED2] bg-white px-5 py-4">
+      <section className="rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 편성 조건</h2>
-            <span
-              className={`inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
-                available > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
-              }`}
-            >
-              편성 가능 미션 {available}개
-            </span>
+            <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 조건</h2>
+
         </div>
         <div className="mt-4">
           <CompositionConditionFields
@@ -154,6 +149,7 @@ export function NewCoursePanel({
             onDirection={(direction) => patch({ direction })}
             onCourseMode={(courseMode) => patch({ courseMode })}
             onThemes={(themes) => patch({ themes })}
+            hideThemes
             leading={
               <label className="flex flex-col gap-1">
                 <span className="text-[11.5px] font-semibold text-[#46515A]">교과목 이름</span>
@@ -168,8 +164,23 @@ export function NewCoursePanel({
             }
           />
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3.5">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>편성 주제</h2>
+          <span
+              className={`inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
+                available > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
+              }`}
+            >
+              편성 가능 미션 {available}개
+            </span>
+        </div>
+        <p className="mt-1 text-[13.5px] text-[#46515A]">주제만 고르면 그 주제의 승인된 학습 미션으로 15주가 자동으로 채워집니다.</p>
+        <div className="mt-3"><ThemePicker themes={conditions.themes} onThemes={(themes) => patch({ themes })} /></div>
         {/* 주 실행 버튼 = 상자 아래 오른쪽, 브랜드 노랑(다른 관리자 화면과 같은 자리·색). */}
-        <div className="mt-4 flex justify-end border-t border-[#EAE4D2] pt-4">
+        <div className="mt-4 flex justify-end">
           <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" onClick={create} disabled={creating}>
             {creating ? "만드는 중" : "교과목 만들고 미션 자동 채우기"}
           </Button>
