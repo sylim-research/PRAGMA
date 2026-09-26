@@ -189,7 +189,17 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     } catch (cause) { setError(cause instanceof Error ? cause.message : "교수자 판단 저장 실패"); }
     finally { setBusy(false); }
   };
-  const saveDecisions = () => persistDecisions(draftDecisions);
+  // 판단은 누르는 즉시(근거를 고치면 잠시 뒤) 저장한다 — 따로 「저장」을 누르게 하지 않는다.
+  const draftDecisionsJson = JSON.stringify(draftDecisions);
+  const canAutoSave = decisionsDirty && next === "professor" && !busy && !locked && !dependencyBlocked && !approvalDisabled
+    && professorDecisionsComplete(findings, draftDecisions);
+  useEffect(() => {
+    if (!canAutoSave) return;
+    const timer = window.setTimeout(() => void persistDecisions(JSON.parse(draftDecisionsJson)), 600);
+    return () => window.clearTimeout(timer);
+    // persistDecisions는 렌더마다 새로 만들어지므로 초안 내용이 바뀔 때만 다시 건다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canAutoSave, draftDecisionsJson]);
   /** 미결 신호만 「수정 없이 사용」으로 채운다. 판정이 전부 갖춰지면 바로 저장하고, AI 쟁점이 남았으면 초안으로 둔다. */
   const confirmSignals = async () => {
     if (pendingSignals.length === 0) return;
@@ -462,11 +472,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
-              <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
-                || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()} className="border-[#233542] font-semibold text-[#233542] hover:bg-[#EEF1F4] disabled:opacity-60">교수자 판단 저장</Button>
-              {/* 저장 상태만 한 줄. 계약 설명·모델명·재서술은 화면에 두지 않는다. */}
+              {/* 저장 버튼 없이 자동 저장한다. 저장 상태만 한 줄. */}
               {(decisionsDirty || professorDecisionsComplete(findings, run.professor_decisions))
-                && <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}
+                && <p className="text-xs" role="status">{decisionsDirty ? (professorDecisionsComplete(findings, draftDecisions) ? "판단을 저장하는 중…" : "남은 항목을 판단하면 자동 저장됩니다.") : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}
             </>}
           </div>;
         })()}
@@ -494,7 +502,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       })()}
       {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-4">
         <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">② 최종 승인</h4>
-        {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
+        {!decisionsClear && <p className="text-amber-800">모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
