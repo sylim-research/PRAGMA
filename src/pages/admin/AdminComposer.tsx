@@ -122,7 +122,8 @@ const AdminComposer = () => {
 
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [conditionsOpen, setConditionsOpen] = useState(true);
+  // 기존 교과목을 열면 조건은 접어 두고 15주 배치표를 먼저 보여 준다(조건은 교과목 카드에 이미 보인다).
+  const [conditionsOpen, setConditionsOpen] = useState(false);
   const [tab, setTab] = useState<"existing" | "new">("existing");
   // 새 교과목을 만든 직후, 그 교과목이 다 불러와지면 미션 자동 채우기를 한 번 실행한다.
   const [pendingAutoFillId, setPendingAutoFillId] = useState<string | null>(null);
@@ -837,7 +838,7 @@ const AdminComposer = () => {
               </AlertDialogContent>
             </AlertDialog>
 
-        {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
+        {/* 편성 조건(기본 접힘)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
         <div className="mt-4 rounded-xl border border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
@@ -1104,9 +1105,9 @@ function WeekRow({
   });
 
   return (
-    <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
-      {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. */}
-      <div className="grid min-h-9 grid-cols-[3.5rem_10rem_7rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
+    <div role="group" aria-label={`${week.week_no}주차 편성`} className={["bg-white px-3", isAssignable || reinforcement ? "py-2" : "py-1"].join(" ")}>
+      {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. 주차마다 같은 「번역 1개 · 통역 1개」 열은 두지 않는다 — 그 폭을 미션 제목에 준다. */}
+      <div className={["grid grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3", isAssignable || reinforcement ? "min-h-9" : "min-h-7"].join(" ")}>
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
@@ -1125,7 +1126,6 @@ function WeekRow({
                 </span>
               )}
             </span>
-            <span className="text-[13px] font-semibold text-[#1F3A5F]">{missionModesSummary(expectedModes)}</span>
             <span className="grid min-w-0 grid-cols-2 gap-2">
               {expectedModes.map((mode, index) => {
                 const item = items[index];
@@ -1178,7 +1178,7 @@ function WeekRow({
             ) : <span />}
           </>
         ) : (
-          <span className="col-span-4 text-[14px] font-bold text-[#15202B]">{displayTitle}</span>
+          <span className="col-span-3 text-[13.5px] font-semibold text-[#46515A]">{displayTitle}</span>
         )}
       </div>
 
