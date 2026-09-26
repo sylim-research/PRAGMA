@@ -927,8 +927,8 @@ const AdminGenerator = () => {
       )}
 
       {/* 2-col layout */}
-      {/* 왼쪽 조건 폼을 기존 2:3에서 약 8% 넓혔다(40% → 43%). 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
-      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,23fr)_minmax(0,30fr)]">
+      {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* LEFT — settings */}
         <section className="space-y-5 rounded-lg border border-border bg-card p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
@@ -1355,7 +1355,7 @@ const AdminGenerator = () => {
                       </span>
                       {r.ok && r.rule && (
                         <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
-                          규칙 검사 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
+                          자동 품질 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
                       <span className="text-[13.5px] font-semibold text-foreground">{r.title}</span>
