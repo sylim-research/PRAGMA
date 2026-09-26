@@ -17,15 +17,15 @@ export function DashboardResourceOverview({ resources, error, status }: {
     { label: "시나리오", value: resources?.scenarioCount, unit: "개", note: "생성된 학습 상황 설정", icon: Layers },
     { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen },
     { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare },
-    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2 },
+    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 학습 미션", icon: CheckCircle2 },
   ];
 
   return <>
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING RESOURCES</p>
-          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING CONTENT</p>
+          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 콘텐츠</h2>
         </div>
         {status}
       </div>
@@ -56,9 +56,9 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-distribution-title" className="mt-3 rounded-2xl border border-[#E6E1D5] bg-white px-5 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 자료 구성</h2>
+          <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 콘텐츠 구성</h2>
         </div>
-        <div aria-label="자료 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
+        <div aria-label="콘텐츠 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
           {([['all', '전체 보유'], ['ready', '편성 가능']] as const).map(([value, label]) => <button
             key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
             className={"rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9B852E] " + (scope === value ? "bg-[#15202B] text-white" : "text-[#5D6971] hover:text-[#15202B]")}
