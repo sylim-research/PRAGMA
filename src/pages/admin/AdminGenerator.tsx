@@ -116,31 +116,6 @@ const CHALLENGE_KO: Record<string, string> = {
   imposition: "부담도",
 };
 
-// Speech-act pragmatic burden weight (0=low, 1=mid, 2=high). Reference only.
-const SPEECH_ACT_WEIGHT: Record<SpeechActUI, number> = {
-  request: 1, refusal: 2, apology: 1, thanks: 0,
-  proposal: 1, agreement: 1, opposition: 2, compliment: 0, complaint: 2,
-};
-
-// Derived pragmatic burden (참고용). Combines speech act weight + P/D/R.
-type BurdenLevel = "low" | "medium" | "high";
-function computePragmaticBurden(
-  sa: SpeechActUI, p: PdrPower, d: PdrDistance, r: PdrBurden
-): { level: BurdenLevel; label: string; reasons: string[] } {
-  const pw = p === "equal" ? 0 : 1;
-  const dw = d === "formal" ? 1 : d === "acquaintance" ? 0.5 : 0;
-  const rw = r === "high" ? 1 : r === "mid" ? 0.5 : 0;
-  const score = SPEECH_ACT_WEIGHT[sa] + pw + dw + rw;
-  const level: BurdenLevel = score <= 1 ? "low" : score <= 3 ? "medium" : "high";
-  const label = level === "low" ? "낮음" : level === "medium" ? "보통" : "높음";
-  const reasons: string[] = [`${SPEECH_ACT_UI[sa]} 화행`];
-  if (pw) reasons.push("지위 차 있음");
-  if (d === "formal") reasons.push("초면 관계");
-  else if (d === "acquaintance") reasons.push("지인 수준 관계");
-  if (r === "high") reasons.push("부담 높음");
-  else if (r === "mid") reasons.push("부담 중간");
-  return { level, label, reasons };
-}
 
 
 // CHANNEL_UI · CHANNEL_TO_GENRE · MODE_LABEL · COMPLEX_TASK_TO_CONTEXT는
@@ -734,9 +709,6 @@ const AdminGenerator = () => {
     setFinalizing(false);
   };
 
-  const burden = computePragmaticBurden(
-    form.speech_act_ui, form.pdr_power, form.pdr_distance, form.pdr_burden,
-  );
 
 
   const generate = async () => {
@@ -979,7 +951,7 @@ const AdminGenerator = () => {
             </div>
           </div>
 
-          {/* 4. P-D-R 관계 조건 + 5. 예상 화용 부담도 */}
+          {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
           <div className="rounded-md bg-[#FBEFD9]/40 border border-[#EAE4D2] p-3.5">
             <SectionTitle n={3} label="P · D · R 관계 조건" accent="핵심 변수" tone="accent" />
             <p className="mt-1 pl-[30px] text-[11.5px] text-[#7A4A0A]/80">Power · Distance · Imposition</p>
@@ -1025,27 +997,6 @@ const AdminGenerator = () => {
               </Field>
             </div>
 
-            {/* 5. 예상 화용 부담도 (파생 배지) */}
-            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-md border border-[#EAE4D2] bg-background px-3 py-2">
-              <span className="text-[11.5px] text-muted-foreground">↘ 참고</span>
-              <span className="text-[11.5px] text-muted-foreground">
-                <span className="mr-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-[#FBEFD9] text-[10px] font-medium text-[#7A4A0A]">5</span>
-                예상 화용 부담도
-              </span>
-              <span
-                className={[
-                  "rounded-full px-3 py-0.5 text-[11.5px] font-medium",
-                  burden.level === "low" && "bg-[#EAF3DE] text-[#3B6D11]",
-                  burden.level === "medium" && "bg-[#FAEEDA] text-[#854F0B]",
-                  burden.level === "high" && "bg-[#FCEBEB] text-[#A32D2D]",
-                ].filter(Boolean).join(" ")}
-              >
-                {burden.label}
-              </span>
-              <span className="ml-auto text-right text-[10.5px] leading-tight text-muted-foreground">
-                근거: {burden.reasons.join(" · ")}
-              </span>
-            </div>
           </div>
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
