@@ -22,7 +22,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">PRAGMA · RESOURCE LIBRARY</p>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">RESOURCE LIBRARY</p>
           <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
         </div>
         {status}
