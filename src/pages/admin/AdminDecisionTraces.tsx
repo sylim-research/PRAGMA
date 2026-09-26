@@ -182,6 +182,18 @@ const IndividualRecords = () => {
     () => visibleRows.filter((row) => row.mission_completed).length,
     [visibleRows],
   );
+  // 학습자 필터는 이름으로 고른다. 학습자 관리에서 이메일(?q=)로 넘어오면 그 사람의 이름으로 바꿔 선택해 둔다.
+  const learnerNames = useMemo(() => {
+    const names = [...new Set(baseRows.map(learnerLabel))].sort((a, b) => a.localeCompare(b, "ko"));
+    return filters.query && !names.includes(filters.query) ? [filters.query, ...names] : names;
+  }, [baseRows, filters.query]);
+  useEffect(() => {
+    const query = filters.query.trim().toLowerCase();
+    if (!query || !rows) return;
+    const match = rows.find((row) =>
+      row.profiles?.email?.toLowerCase() === query || row.profiles?.anonymous_participant_id?.toLowerCase() === query);
+    if (match) setFilters((current) => ({ ...current, query: learnerLabel(match) }));
+  }, [rows, filters.query]);
   const speechActs = useMemo(
     () => [...new Set((rows ?? []).map((row) => row.speech_act).filter((act): act is string => !!act))].sort(),
     [rows],
@@ -193,17 +205,20 @@ const IndividualRecords = () => {
   return (
     <>
       {!loading && !error && rows.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-end gap-2">
+        <div className="mb-3 flex flex-wrap items-end gap-2 xl:flex-nowrap">
           <label className="text-xs font-medium text-muted-foreground">
-            학습자 검색
-            <input
-              type="search"
+            학습자
+            <select
+              aria-label="학습자 필터"
               value={filters.query}
               onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
-              placeholder="이름·이메일·참여자 ID"
-              aria-label="학습자 검색"
-              className="mt-1 block h-9 w-56 rounded-md border border-border bg-white px-2.5 text-sm font-normal text-foreground"
-            />
+              className={`mt-1 block w-36 font-normal text-foreground ${selectClass}`}
+            >
+              <option value="">전체</option>
+              {learnerNames.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
           </label>
           <label className="text-xs font-medium text-muted-foreground">
             교과목
@@ -212,7 +227,7 @@ const IndividualRecords = () => {
               value={filters.courseId}
               disabled={courses.length === 0}
               onChange={(event) => setFilters((current) => ({ ...current, courseId: event.target.value }))}
-              className={`mt-1 block w-56 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-52 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {courses.map((course) => (
@@ -227,7 +242,7 @@ const IndividualRecords = () => {
               aria-label="주차 필터"
               value={filters.weekNo}
               onChange={(event) => setFilters((current) => ({ ...current, weekNo: event.target.value }))}
-              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {Array.from({ length: 15 }, (_, index) => index + 1).map((week) => (
@@ -241,7 +256,7 @@ const IndividualRecords = () => {
               aria-label="화행 필터"
               value={filters.speechAct}
               onChange={(event) => setFilters((current) => ({ ...current, speechAct: event.target.value }))}
-              className={`mt-1 block w-40 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               {speechActs.map((act) => (
@@ -257,14 +272,14 @@ const IndividualRecords = () => {
               onChange={(event) =>
                 setFilters((current) => ({ ...current, completion: event.target.value as MissionLogFilters["completion"] }))
               }
-              className={`mt-1 block w-32 font-normal text-foreground ${selectClass}`}
+              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
             >
               <option value="all">전체</option>
               <option value="completed">완료</option>
               <option value="in_progress">진행 중</option>
             </select>
           </label>
-          <label className="flex h-9 items-center gap-2 rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
+          <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
             <input
               type="checkbox"
               checked={includeTestRecords}
@@ -277,7 +292,7 @@ const IndividualRecords = () => {
             <button
               type="button"
               onClick={() => setFilters(EMPTY_FILTERS)}
-              className="h-9 rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
+              className="h-9 whitespace-nowrap rounded-md border border-border bg-background px-3 text-sm hover:bg-muted"
             >
               필터 해제
             </button>
