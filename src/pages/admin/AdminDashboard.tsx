@@ -243,7 +243,7 @@ const ReviewPipeline = ({
           <div
             role="group"
             aria-label="선택 검토"
-            className="relative -my-1.5 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] p-1.5 pt-3 sm:col-span-2 sm:grid-cols-2"
+            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
               선택 검토
