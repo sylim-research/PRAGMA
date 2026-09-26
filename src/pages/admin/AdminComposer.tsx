@@ -823,8 +823,8 @@ const AdminComposer = () => {
 
         {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[#D8D3C4] bg-white">
-          {/* 교과목 상자 = 이름 머리 + 편성 조건. 주차별 미션 배치는 바로 아래 별도 상자다(2026-09-26). */}
+        <div className={["mt-6 overflow-hidden border border-[#D8D3C4] bg-white", outline ? "rounded-t-2xl border-b-0" : "rounded-2xl"].join(" ")}>
+          {/* 교과목 상자 = 네이비 이름 머리 + 편성 조건 + 주차별 배치. 배치표는 이 교과목에 딸린 아랫부분이다(outline이 있을 때 아래로 이어진다). */}
           {/* 작업 머리 = 지금 고친 교과목 이름. 카드 줄(고르기) 아래에서 「이 교과목을 편성한다」가 먼저 읽히게. */}
           {outline && <h2 className="flex flex-wrap items-center gap-x-3 gap-y-1 bg-[#233542] px-5 py-3.5 text-white">
             {/* 지금 편성하는 교과목이 한눈에 튀도록 네이비 머리띠(제작·품질 점검 워크플로우 머리와 같은 모양). */}
@@ -967,9 +967,10 @@ const AdminComposer = () => {
         <p className="mt-4 text-[13px] text-muted-foreground">주차 골격을 불러오는 중…</p>
       ) : (
         <>
-          <div className="mt-5 overflow-hidden rounded-2xl border border-[#D8D3C4] bg-white">
-          <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#EAE4D2] bg-[#FBFAF6] px-5 py-2">
-            <h3 className="text-[17px] font-semibold text-[#233542]">주차별 미션 배치</h3>
+          <div className="overflow-hidden rounded-b-2xl border border-t-0 border-[#D8D3C4] bg-white">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#EAE4D2] px-5 pb-1 pt-3">
+            {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
+            <h3 className="text-[14px] font-semibold text-[#46515A]">주차별 미션 배치</h3>
             <span className="text-[12.5px] text-[#66727A]">
               배치 {assignedMissionCount}개
             </span>
@@ -1102,9 +1103,9 @@ function WeekRow({
   });
 
   return (
-    <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-3">
+    <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. 주차마다 같은 「번역 1개 · 통역 1개」 열은 두지 않는다 — 그 폭을 미션 제목에 준다. */}
-      <div className="grid min-h-10 grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
+      <div className="grid min-h-9 grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
