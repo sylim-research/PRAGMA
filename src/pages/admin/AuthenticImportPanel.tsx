@@ -478,7 +478,6 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         <div>
           <div className="flex items-baseline justify-between gap-2">
             <h3 className="whitespace-nowrap text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
-            <span className="whitespace-nowrap text-[12px] text-[#6B645A]">캡처 · 글 · 영상, 무엇이든 재료가 됩니다</span>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {([
@@ -609,7 +608,6 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         <div className="border-t border-[#EFEAE0] pt-4">
           <div className="flex items-baseline justify-between gap-2">
             <label className="text-[13px] font-semibold text-[#15202B]">만들 콘텐츠의 언어 방향</label>
-            <span className="text-[11px] text-[#5A6670]">자료의 언어와 다를 수 있습니다</span>
           </div>
           <div className="mt-2 flex gap-2">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (
