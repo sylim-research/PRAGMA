@@ -28,9 +28,6 @@ import {
   DIRECTION_LABEL,
   DOMAIN,
   INDUSTRY,
-  BUSINESS_FUNCTION,
-  BUSINESS_FUNCTION_PRIMARY,
-  CHANNEL_UI,
   CHANNEL_TO_GENRE,
   MODE_LABEL,
   COMPLEX_TASK_TO_CONTEXT,
@@ -232,8 +229,8 @@ const HOLD_REASON_SOURCE = {
   semantic: "AI 검토 의견",
 } as const;
 
-// 생성 조건 줄: 핵심 변수(화행·P·D·R)와 부가 조건(방향·수준·채널)을 묶음으로 나눠 보여 준다.
-// 입력은 [화행, "P: …", "D: …", "R: …", 방향, 수준, 채널] 순서의 짧은 표기다.
+// 생성 조건 줄: 핵심 변수(화행·P·D·R)와 부가 조건(방향·수준·수행 방식)을 묶음으로 나눠 보여 준다.
+// 입력은 [화행, "P: …", "D: …", "R: …", 방향, 수준, 수행 방식] 순서의 짧은 표기다.
 const PDR_AXIS_NAME: Record<string, string> = { P: "권력(P)", D: "거리(D)", R: "부담도(R)" };
 
 function ConditionSummary({ conditions }: { conditions: string[] }) {
@@ -263,7 +260,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
         </div>
       </div>
       <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
-        <div className={heading}>언어 · 수준 · 채널</div>
+        <div className={heading}>언어 · 수준 · 수행 방식</div>
         <div className="mt-1 whitespace-nowrap text-[12.5px] text-[#4E5A63]">{others.join(" · ")}</div>
       </div>
     </div>
@@ -408,11 +405,6 @@ const AdminGenerator = () => {
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
     setForm((p) => ({ ...p, [k]: v }));
 
-  // Channels filtered by task mode.
-  // phone hidden per media-3 LOCK (대면구어·위챗·이메일). Enum key kept for stored data.
-  const channelsForMode: ChannelUI[] =
-    taskMode === "translation" ? ["email", "messenger"] : ["facetoface"];
-
   // Clear any stale outline candidates when generation conditions change.
   const resetOutlines = () => {
     setOutlines(null);
@@ -504,7 +496,7 @@ const AdminGenerator = () => {
     context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
     domain: form.domain,
     industry: form.domain === "work" ? form.industry : null,
-    func: form.domain === "work" ? form.func : null,
+    func: null,
     pdr_power: form.pdr_power,
     pdr_distance: form.pdr_distance,
     pdr_burden: form.pdr_burden,
@@ -602,7 +594,7 @@ const AdminGenerator = () => {
       PDR_BURDEN_SHORT[form.pdr_burden],
       DIRECTION_LABEL[form.language_direction],
       LEVEL[form.level],
-      CHANNEL_UI[form.channel],
+      MODE_LABEL[taskMode],
     ]);
     const indices = [...selectedOutlines].sort((a, b) => a - b);
     const results: CoreResult[] = [];
@@ -631,7 +623,7 @@ const AdminGenerator = () => {
               domain: form.domain,
               domain_ko: DOMAIN[form.domain],
               industry: form.domain === "work" ? form.industry : null,
-              func: form.domain === "work" ? form.func : null,
+              func: null,
               topic_code: topicCode,
               mode,
               channel: legacyChannelOf(mode),
@@ -731,7 +723,7 @@ const AdminGenerator = () => {
           learner_level: form.level,
           domain: form.domain,
           industry_sector: form.domain === "work" ? form.industry : null,
-          business_function: form.domain === "work" ? form.func : null,
+          business_function: null,
           mode,
           source_modality: modalityOf(mode),
           theme_code: themeCode,
@@ -786,7 +778,7 @@ const AdminGenerator = () => {
           context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
           domain: form.domain,
           industry: form.domain === "work" ? form.industry : null,
-          func: form.domain === "work" ? form.func : null,
+          func: null,
           pdr_power: form.pdr_power,
           pdr_distance: form.pdr_distance,
           pdr_burden: form.pdr_burden,
@@ -848,7 +840,7 @@ const AdminGenerator = () => {
             level: form.level,
             context: COMPLEX_TASK_TO_CONTEXT[form.complex_task],
             industry: form.domain === "work" ? form.industry : null,
-            func: form.domain === "work" ? form.func : null,
+            func: null,
             pdr_power: form.pdr_power,
             pdr_distance: form.pdr_distance,
             pdr_burden: form.pdr_burden,
@@ -875,11 +867,11 @@ const AdminGenerator = () => {
   const tags = aiResult
     ? [
         SPEECH_ACT_UI[form.speech_act_ui],
-        CHANNEL_UI[form.channel],
+        MODE_LABEL[taskMode],
         LEVEL[form.level],
         DOMAIN[form.domain],
         ...(form.domain === "work"
-          ? [INDUSTRY[form.industry], BUSINESS_FUNCTION[form.func]]
+          ? [INDUSTRY[form.industry]]
           : []),
         COMPLEX_TASK_UI[form.complex_task],
         `${PDR_POWER_SHORT[form.pdr_power]} / ${PDR_DISTANCE_SHORT[form.pdr_distance]} / ${PDR_BURDEN_SHORT[form.pdr_burden]}`,
@@ -1057,8 +1049,10 @@ const AdminGenerator = () => {
 
           {/* 6. 언어 · 학습 · 상황 조건 */}
           <div>
-            <SectionTitle n={4} label="언어 · 수준 · 채널" />
-            <div className="mt-2 grid grid-cols-3 gap-3">
+            {/* 채널(매체)은 연구 변수가 아니다(시나리오 매트릭스 LOCK, 2026-07-25 매체 축 폐기). 화면에서 고르지 않고
+                과제 모드에서 정한다: 번역 = 이메일, 통역 = 대면(setTaskModeSafe). 2026-09-26 */}
+            <SectionTitle n={4} label="언어 · 수준" />
+            <div className="mt-2 grid grid-cols-2 gap-3">
               <Field label="언어 방향">
                 <Select
                   value={form.language_direction}
@@ -1082,26 +1076,13 @@ const AdminGenerator = () => {
                   </SelectContent>
                 </Select>
               </Field>
-              <Field label="채널">
-                <Select
-                  value={form.channel}
-                  onValueChange={(v) => update("channel", v as ChannelUI)}
-                >
-                  <SelectTrigger className={formField}><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {channelsForMode.map((c) => (
-                      <SelectItem key={c} value={c}>{CHANNEL_UI[c]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </Field>
             </div>
 
           </div>
 
           {/* 7. 도메인 · 산업 · 직무 */}
           <div>
-            <SectionTitle n={5} label="도메인 · 산업 · 직무" />
+            <SectionTitle n={5} label="도메인 · 산업" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
@@ -1164,25 +1145,7 @@ const AdminGenerator = () => {
                   </Select>
                 </div>
               )}
-              {form.domain === "work" && (
-                <div>
-                  <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    직무 기능
-                  </label>
-                  <Select
-                    value={form.func}
-                    onValueChange={(v) => update("func", v as BusinessFunction)}
-                  >
-                    <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
-                    <SelectContent className="max-h-72 overflow-y-auto z-50">
-                      {BUSINESS_FUNCTION_PRIMARY.map((code) => (
-                        <SelectItem key={code} value={code}>{BUSINESS_FUNCTION[code]}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  
-                </div>
-              )}
+              {/* 직무 기능은 뺐다(2026-09-26): 설계 층위는 도메인 → 산업까지이며, 조건을 더 좁히면 장면 사전 검토 보류만 늘어난다. */}
             </div>
           </div>
 
