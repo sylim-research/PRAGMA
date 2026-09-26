@@ -922,16 +922,16 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               loaded.mission.schema_version === "mission_v6" && <MissionOutline mission={loaded.mission} />
             ))}
             {productionOf(r) === "core_only" && (
-              <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
+              <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-5 text-[13.5px]">
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
                 <p className="text-[#3F4E57]">선택한 시나리오를 바탕으로 학습 미션을 구성합니다.</p>
-                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 rounded-lg bg-[#FAF8F2] px-3 py-2 text-[13px]">
+                <dl className="mt-3.5 grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 rounded-lg bg-[#FAF8F2] px-4 py-4 text-[13px] leading-relaxed">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
                   <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">출발텍스트의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
-                <div className="mt-2 flex flex-wrap items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   {/* 생성 중에도 남색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
                   <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}
                     className={busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : undefined}>
