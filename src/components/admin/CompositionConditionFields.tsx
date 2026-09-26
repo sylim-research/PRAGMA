@@ -108,7 +108,7 @@ export function CompositionConditionFields({
 export function ThemePicker({ themes, onThemes }: { themes: ThemeCode[]; onThemes: (themes: ThemeCode[]) => void }) {
   const toggle = (theme: ThemeCode) => onThemes(themes.includes(theme) ? themes.filter((item) => item !== theme) : [...themes, theme]);
   // 고른 주제 = 옅은 브랜드 노랑 바탕 + 진한 테두리 + ✓. 남색 채움은 과해서 쓰지 않는다.
-  const tile = (on: boolean) => `inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-[14px] font-semibold transition ${
+  const tile = (on: boolean) => `inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[14px] font-semibold transition ${
     on ? "border-[#C9A227] bg-[#FFF3C4] text-[#15202B]" : "border-[#E4DDCB] bg-white text-[#3F4E57] hover:border-[#C9A227]"}`;
   return (
     <div className="flex flex-wrap gap-2">
