@@ -1198,7 +1198,7 @@ const AdminGenerator = () => {
                 {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
               </span>
             </button>
-            <p className="mt-1.5 text-center text-[10.5px] text-muted-foreground">
+            <p className="mt-1.5 text-center text-[11.5px] text-[#5B6770]">
               개요를 먼저 확인하고, 선택한 것만 전체 시나리오로 생성됩니다
             </p>
 
@@ -1210,7 +1210,7 @@ const AdminGenerator = () => {
 
             {outlines && outlines.length > 0 && (
               <div className="mt-2.5 space-y-1.5">
-                <div className="text-[11px] text-muted-foreground">
+                <div className="text-[12px] text-[#4E5A63]">
                   목표 화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
                 </div>
                 {outlines.map((o, i) => {
@@ -1219,20 +1219,20 @@ const AdminGenerator = () => {
                     <label
                       key={i}
                       className={[
-                        "flex items-start gap-2 rounded-md border px-3 py-2 text-[12.5px] cursor-pointer",
-                        on ? "border-[#15202B] bg-white ring-1 ring-[#15202B]/10" : "border-[#E1DCCD] bg-white",
+                        "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[13px] cursor-pointer transition-colors",
+                        on ? "border-[#15202B]/45 bg-[#F4F6F8]" : "border-[#E1DCCD] bg-white hover:border-[#B9C3CA]",
                       ].join(" ")}
                     >
                       <input
                         type="checkbox"
                         checked={on}
                         onChange={() => toggleOutline(i)}
-                        className="mt-0.5"
+                        className="mt-1 accent-[#15202B]"
                       />
                       <span>
-                        <span className="font-medium text-[#1d2336]">{o.title || "(제목 없음)"}</span>
+                        <span className="font-semibold text-[#15202B]">{o.title || "(제목 없음)"}</span>
                         {o.situation && (
-                          <span className="mt-0.5 block text-[11px] leading-relaxed text-muted-foreground">
+                          <span className="mt-1 block text-[12.5px] leading-[1.65] text-[#3F4E59]">
                             {o.situation}
                           </span>
                         )}
@@ -1354,7 +1354,12 @@ const AdminGenerator = () => {
                         {r.ok ? "✓ 초안 저장" : HOLD_STAGE_LABEL[r.stage ?? "system"]}
                       </span>
                       {r.ok && r.rule && (
-                        <span className="inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 text-[10.5px] text-muted-foreground">
+                        <span className={[
+                          "inline-flex items-center rounded border bg-white px-1.5 py-0.5 text-[11px] font-medium",
+                          r.rule === "pass" ? "border-[#9FD3B5] text-[#1F6B45]"
+                            : r.rule === "warning" ? "border-[#EBCB8B] text-[#7A4A0A]"
+                              : "border-[#FCA5A5] text-[#991B1B]",
+                        ].join(" ")}>
                           자동 품질 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
