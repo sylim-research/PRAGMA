@@ -1336,7 +1336,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   return (
     <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
       <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
-      <ol className="grid grid-cols-5 gap-2 px-4 py-2.5">
+      <ol className="grid grid-cols-5 gap-2 px-4 pb-3 pt-4">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">
             {index > 0 && (
