@@ -93,3 +93,26 @@ export function selectRecentAudit(snapshots: AuditSnapshot[]) {
   );
   return newestFirst.find((item) => item.status === "complete") ?? newestFirst[0] ?? null;
 }
+
+/** 완료된 대조 기록을 최신 순으로. 화면의 「대조 기록」 목록용. */
+export function completedAuditsNewestFirst(snapshots: AuditSnapshot[]) {
+  return [...snapshots]
+    .filter((item) => item.status === "complete" && (item.distinctTokenCount ?? 0) > 0)
+    .sort((left, right) => timestampValue(right.createdAt) - timestampValue(left.createdAt));
+}
+
+export type AuditSummaryRow = { count: number; matchRatio: number | null };
+
+/** 학습 미션 대조 기록의 누적 요약: 전체와 참조 상한(4·5·6급)별 미션 수·목록 일치율(일치 단어 합 ÷ 추출 단어 합). */
+export function summarizeMissionAudits(snapshots: AuditSnapshot[]) {
+  const missions = completedAuditsNewestFirst(snapshots).filter((item) => item.contentKind === "mission");
+  const bucket = (rows: AuditSnapshot[]): AuditSummaryRow => {
+    const distinct = rows.reduce((sum, item) => sum + (item.distinctTokenCount ?? 0), 0);
+    const matched = rows.reduce((sum, item) => sum + (item.matchedTokenCount ?? 0), 0);
+    return { count: rows.length, matchRatio: distinct > 0 ? matched / distinct : null };
+  };
+  return {
+    all: bucket(missions),
+    byCeiling: ([4, 5, 6] as const).map((ceiling) => ({ ceiling, ...bucket(missions.filter((item) => item.referenceCeiling === ceiling)) })),
+  };
+}

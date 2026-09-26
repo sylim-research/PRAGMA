@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Database,
   ExternalLink,
@@ -8,7 +8,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import {
   auditSnapshotFromContent,
+  completedAuditsNewestFirst,
   selectRecentAudit,
+  summarizeMissionAudits,
   type AuditSnapshot,
 } from "@/lib/pragma/hskAuditSnapshot";
 import { HSK3_REFERENCE_SOURCE_ID } from "@/lib/pragma/hskReference";
@@ -107,6 +109,9 @@ const AdminCorpus = () => {
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<ReferenceStatus | null>(null);
   const [recentAudit, setRecentAudit] = useState<AuditSnapshot | null>(null);
+  // 불러온 모든 대조 기록(미션·시나리오). 목록에서 한 건을 고르면 아래 상세 카드가 그 건으로 바뀐다.
+  const [allAudits, setAllAudits] = useState<AuditSnapshot[]>([]);
+  const [selectedAudit, setSelectedAudit] = useState<AuditSnapshot | null>(null);
   const [auditLookupFailed, setAuditLookupFailed] = useState(false);
   const [referenceCheckedAt, setReferenceCheckedAt] = useState<string | null>(null);
 
@@ -172,6 +177,7 @@ const AdminCorpus = () => {
             })),
         ].filter((item): item is AuditSnapshot => Boolean(item));
         setRecentAudit(selectRecentAudit(snapshots));
+        setAllAudits(snapshots);
         setAuditLookupFailed(false);
       }
 
@@ -214,9 +220,13 @@ const AdminCorpus = () => {
 
         <AuditMethodSection />
 
+        {!loading && !auditLookupFailed && (
+          <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
+        )}
+
         <OperationsSection
           loading={loading}
-          audit={recentAudit}
+          audit={selectedAudit ?? recentAudit}
           lookupFailed={auditLookupFailed}
           referenceReady={referenceReady}
         />
@@ -365,6 +375,56 @@ function OperationsSection({
         </div>
       )}
 
+    </section>
+  );
+}
+
+/**
+ * 대조 기록 — [미션 자동 생성] 때마다 서버가 남긴 HSK 대조 기록을 모아 보여 준다.
+ * 새로 대조하지 않고 저장된 기록만 읽는다. 일치율은 난이도 판정이 아니다.
+ */
+function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[]; selected: AuditSnapshot | null; onSelect: (audit: AuditSnapshot) => void }) {
+  const summary = useMemo(() => summarizeMissionAudits(audits), [audits]);
+  const recent = useMemo(() => completedAuditsNewestFirst(audits).slice(0, 10), [audits]);
+  if (recent.length === 0) return null;
+  const pct = (value: number | null) => (value === null ? "—" : `${Math.round(value * 100)}%`);
+  return (
+    <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#CFC9BC] bg-white">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-[#E4DED1] px-4 py-3.5 sm:px-5">
+        <h2 id="audit-history-title" className="text-[18px] font-semibold tracking-[-0.02em] text-[#15202B]">대조 기록</h2>
+        <p className="text-[13.5px] text-[#514C44]">
+          대조한 학습 미션 <b className="text-[#15202B]">{fmt(summary.all.count)}개</b> · 평균 목록 일치율 <b className="text-[#15202B]">{pct(summary.all.matchRatio)}</b>
+        </p>
+      </div>
+      <div className="flex flex-wrap gap-x-5 gap-y-1 border-b border-[#EFEAE0] bg-[#FBFAF6] px-4 py-2.5 text-[13.5px] text-[#514C44] sm:px-5">
+        {summary.byCeiling.filter((row) => row.count > 0).map((row) => (
+          <span key={row.ceiling}>
+            PRAGMA {pragmaLevelForCeiling(row.ceiling)} <b className="text-[#15202B]">{fmt(row.count)}개</b> · 일치율 <b className="text-[#15202B]">{pct(row.matchRatio)}</b>
+          </span>
+        ))}
+      </div>
+      <ol className="divide-y divide-[#F0ECE3]">
+        {recent.map((audit, index) => {
+          const active = selected === audit || (!selected && index === 0);
+          const matched = audit.matchedTokenCount ?? 0;
+          const outside = audit.candidates.length;
+          const ratio = audit.distinctTokenCount ? matched / audit.distinctTokenCount : null;
+          return (
+            <li key={`${audit.createdAt}-${index}`}>
+              <button type="button" onClick={() => onSelect(audit)} aria-pressed={active}
+                className={`grid w-full grid-cols-[7.5rem_minmax(0,1fr)_10rem_6.5rem_3.5rem] items-center gap-x-3 px-4 py-2 text-left text-[13.5px] sm:px-5 ${active ? "bg-[#FFF8DA]" : "hover:bg-[#FAF8F2]"}`}>
+                <span className="text-[#655F55]">{formatAuditDate(audit.createdAt)}</span>
+                <span className="truncate font-medium text-[#15202B]">{audit.title ?? "제목 없음"}</span>
+                <span className="truncate text-[#655F55]">
+                  {[audit.speechAct ? SPEECH_ACT_LABEL[audit.speechAct] ?? audit.speechAct : null, pragmaLevelForCeiling(audit.referenceCeiling), audit.direction === "zh_ko" ? "중→한" : "한→중"].filter(Boolean).join(" · ")}
+                </span>
+                <span className="tabular-nums text-[#514C44]">일치 {fmt(matched)} · 밖 {fmt(outside)}</span>
+                <span className="text-right font-semibold tabular-nums text-[#15202B]">{pct(ratio)}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
     </section>
   );
 }
