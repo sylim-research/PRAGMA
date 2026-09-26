@@ -229,18 +229,18 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       ? `AI 의견 대조 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
           .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "판정 없음"}`
       : null;
-    type Row = { key: string; label: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
+    type Row = { key: string; label: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; model?: string | null; action?: ReactNode };
     const rows: Row[] = [
       { key: "rules", label: "자동 품질 점검", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
-      { key: "openai", label: "AI 검토", items: primary?.findings, result: primary ? resultOf(primary.findings) : null },
-      { key: "claude", label: "교차 점검", optional: true, items: run?.claude_review?.result.findings,
+      { key: "openai", label: "AI 검토", model: `OpenAI ${run?.openai_review?.model ?? state?.models.openai ?? ""}`.trim(), items: primary?.findings, result: primary ? resultOf(primary.findings) : null },
+      { key: "claude", label: "교차 점검", optional: true, model: (run?.claude_review?.model ?? state?.models.claude) ? `Anthropic ${run?.claude_review?.model ?? state?.models.claude}` : null, items: run?.claude_review?.result.findings,
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
-        note: crossRequested ? null : "다른 AI가 한 번 더 검토합니다",
+        note: crossRequested ? null : "다른 AI가 한 번 더 검토",
         action: !crossRequested && !run?.claude_review
           ? <Button size="sm" variant="outline" className="h-7 border-[#C08A2E] px-2.5 text-[12.5px] font-semibold text-[#8A5A14] hover:bg-[#FBF3E3] hover:text-[#6F4710]" disabled={!canCross} onClick={startCross}>교차 점검 실행</Button>
           : null },
-      { key: "adjudication", label: "의견 대조", optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
-        note: crossRequested ? null : "교차 점검 뒤 AI가 두 의견을 대조합니다" },
+      { key: "adjudication", label: "의견 대조", optional: true, model: `OpenAI ${run?.adjudication?.model ?? state?.models.openai ?? ""}`.trim(), result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
+        note: crossRequested ? null : "교차 점검 뒤 두 의견 대조" },
       ...(steps.some((step) => step.key === "finalization")
         ? [{ key: "finalization", label: "감수 자료 준비", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
         : []),
@@ -268,7 +268,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const skipped = Boolean(row.optional) && !crossRequested && status === "todo";
             return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#FBF3E3]" : ""].join(" ")}>
               {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#C08A2E]" />}
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <div className="flex items-center gap-x-3">
                 <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
                   status === "done" ? "bg-[#233542] text-white"
                     : status === "running" ? "bg-[#C08A2E] text-white"
@@ -280,10 +280,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <span className={["w-28 shrink-0 font-semibold", status === "todo" && !skipped ? "text-[#8C969B]" : "text-[#233542]"].join(" ")}>
                   {row.label}{row.optional && <span className="ml-1.5 rounded-full bg-[#F3E9D2] px-1.5 py-px text-[11px] font-semibold text-[#8A5A14]">선택</span>}
                 </span>
-                <span className={["min-w-0 flex-1", status === "running" ? "font-semibold text-[#8A5A14]"
+                <span className={["min-w-0 flex-1 truncate", status === "running" ? "font-semibold text-[#8A5A14]"
                   : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
                   {status === "running" ? "진행 중…" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (status === "current" ? "실행 전" : "대기")}
                 </span>
+                {row.model && <span className="shrink-0 whitespace-nowrap text-[12px] text-[#7A8489]">{row.model}</span>}
                 {row.action}
               </div>
               {row.detail && <details className="ml-9 mt-1.5">
@@ -300,16 +301,16 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               </details>}
             </li>;
           })}
-          <li className={["flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
+          <li className={["flex items-center gap-x-3 px-4 py-3", professorCurrent ? "bg-[#F6F1E4]" : ""].join(" ")}>
             <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
               professorDone ? "bg-[#233542] text-white" : professorCurrent ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]" : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
             <span className={["w-28 shrink-0 font-bold", professorDone || professorCurrent ? "text-[#233542]" : "text-[#8C969B]"].join(" ")}>교수자 최종 승인</span>
-            <span className="min-w-0 flex-1 text-[#5D6970]">
+            <span className="min-w-0 flex-1 truncate text-[#5D6970]">
               {professorDone ? "승인 완료 · 승인된 미션은 다시 점검하지 않습니다"
-                : professorCurrent ? (findings.length ? `감수할 검토 의견 ${findings.length}건 · 「교수자 최종 승인」 메뉴에서 감수한 뒤 승인합니다` : "「교수자 최종 승인」 메뉴에서 감수한 뒤 승인합니다")
-                : "점검을 마치면 「교수자 최종 승인」 메뉴에서 감수한 뒤 승인합니다"}
+                : professorCurrent ? (findings.length ? `검토 의견 ${findings.length}건 · 교수자가 감수하고 승인합니다` : "교수자가 감수하고 승인합니다")
+                : "점검 뒤 교수자가 감수하고 승인합니다"}
             </span>
           </li>
         </ol>
