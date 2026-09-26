@@ -69,11 +69,11 @@ const AdminLogin = () => {
       {/* 학습자 로그인 카드와 같은 틀: 제목과 입력을 한 장의 카드에 담고 화면 가운데에 둔다. */}
       <main className="flex min-h-[calc(100vh-72px)] items-center justify-center px-4 pb-20 pt-12">
         <form
-          className="w-full max-w-[400px] rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white px-7 pb-7 pt-7 shadow-[0_24px_60px_-28px_rgba(21,32,43,0.35)] sm:px-8"
+          className="w-full max-w-[400px] rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white px-7 pb-6 pt-6 shadow-[0_24px_60px_-28px_rgba(21,32,43,0.35)] sm:px-8"
           onSubmit={handleSubmit}
         >
-          <h1 className="text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">교수자 로그인</h1>
-          <div className="mt-6 flex flex-col gap-2">
+          <h1 className="text-[24px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">교수자 로그인</h1>
+          <div className="mt-4 flex flex-col gap-1.5">
             <label htmlFor="admin-account" className="text-sm font-medium text-[#253441]">아이디</label>
             <input
               id="admin-account"
@@ -81,24 +81,24 @@ const AdminLogin = () => {
               value={account}
               onChange={(e) => setAccount(e.target.value)}
               autoComplete="off"
-              className="h-11 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
+              className="h-10 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
               placeholder="admin"
             />
-            <label htmlFor="admin-password" className="mt-2 text-sm font-medium text-[#253441]">비밀번호</label>
+            <label htmlFor="admin-password" className="mt-1.5 text-sm font-medium text-[#253441]">비밀번호</label>
             <input
               id="admin-password"
               type="password"
               value={pw}
               onChange={(e) => setPw(e.target.value)}
               autoComplete="off"
-              className="h-11 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
+              className="h-10 rounded-lg border border-[#E1DCCD] bg-[#FBFAF6] px-3.5 text-sm focus:border-[#15202B] focus:outline-none focus:ring-2 focus:ring-[#15202B]/15"
               placeholder="••••••••"
             />
           </div>
           <button
             type="submit"
             disabled={busy || !account.trim() || !pw}
-            className="mt-6 h-12 w-full rounded-xl bg-[#FAD338] px-4 text-[15px] font-semibold text-[#15202B] transition-[filter,transform] hover:brightness-95 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:opacity-60"
+            className="mt-5 h-11 w-full rounded-xl bg-[#FAD338] px-4 text-[15px] font-semibold text-[#15202B] transition-[filter,transform] hover:brightness-95 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:opacity-60"
           >
             {busy ? "로그인 중…" : "입장"}
           </button>
