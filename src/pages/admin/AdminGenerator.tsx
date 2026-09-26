@@ -1089,7 +1089,7 @@ const AdminGenerator = () => {
 
           {/* 7. 도메인 · 산업 · 직무 */}
           <div>
-            <SectionTitle n={5} label="도메인 · 산업" />
+            <SectionTitle n={5} label="도메인 · 업종 · 편성 주제" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
               <div>
                 <label className="text-[12.5px] font-semibold text-[#3F4E59]">도메인</label>
@@ -1121,23 +1121,12 @@ const AdminGenerator = () => {
                   ))}
                 </div>
               </div>
-              <div>
-                <label className="text-[12.5px] font-semibold text-[#3F4E59]">주제</label>
-                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
-                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
-                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
-                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
-                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {/* 순서 = 장면 조건(도메인 → 업종 배경) 다음에 편성 꼬리표(편성 주제). 편성 주제는 화용 변인이 아니라
+                  15주 수업 편성·검색에 쓰는 소재 영역이다(scenarioTopics.ts). 2026-09-26 */}
               {form.domain === "work" && (
                 <div>
                   <label className="text-[12.5px] font-semibold text-[#3F4E59]">
-                    산업 분야
+                    업종 배경 <span className="font-normal text-[#7A858C]">· 직장 장면에만</span>
                   </label>
                   <Select
                     value={form.industry}
@@ -1152,6 +1141,21 @@ const AdminGenerator = () => {
                   </Select>
                 </div>
               )}
+              <div>
+                <label className="text-[12.5px] font-semibold text-[#3F4E59]">
+                  편성 주제 <span className="font-normal text-[#7A858C]">· 수업 편성에서 쓰는 소재 영역</span>
+                </label>
+                {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
+                    (theme/domain 불일치, R1c) 조합을 화면에서부터 막는다. */}
+                <Select value={themeCode} onValueChange={(v) => setThemeCode(v as ThemeCode)}>
+                  <SelectTrigger className={`mt-1.5 ${formField}`}><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {THEME_CODES.filter((t) => THEME_ALLOWED_DOMAINS[t].includes(form.domain)).map((t) => (
+                      <SelectItem key={t} value={t}>{THEME_LABEL[t]}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               {/* 직무 기능은 뺐다(2026-09-26): 설계 층위는 도메인 → 산업까지이며, 조건을 더 좁히면 장면 사전 검토 보류만 늘어난다. */}
             </div>
           </div>

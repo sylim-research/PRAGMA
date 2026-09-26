@@ -67,7 +67,7 @@ export function CompositionConditionFields({
 
       <div className="flex flex-wrap items-center gap-1.5">
         <span className={`${LABEL} mr-1.5`}>
-          주제 <span className="font-normal">{value.themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${value.themes.length}개`}</span>
+          편성 주제 <span className="font-normal">{value.themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${value.themes.length}개`}</span>
         </span>
         <button
           type="button"
