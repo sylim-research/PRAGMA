@@ -21,7 +21,7 @@ export const ADMIN_DASHBOARD_ITEM: AdminNavItem = {
 // 생성 기준 → 재료 → 제작·검수 → 수업 운영 순서로 모든 그룹을 기본 펼침한다.
 // 기존 경로와 권한은 유지한다.
 export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
-  { header: "1. 콘텐츠 생성 기준", items: [
+  { header: "1. 콘텐츠 제작 기준", items: [
     { to: "/admin/prompt-harness", label: "생성 계약·프롬프트" },
     { to: "/admin/corpus", label: "HSK 3.0 어휘 코퍼스" },
   ]},
@@ -30,7 +30,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/generator", label: "시나리오 개별 생성" },
     { to: "/admin/batch", label: "시나리오 배치 생성" },
   ]},
-  { header: "3. 학습 미션 제작·검수", wideCanvas: true, items: [
+  { header: "3. 학습 미션 제작·승인", wideCanvas: true, items: [
     { to: "/admin/assembly", label: "학습 미션 제작" },
     { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
     // 제작·검수 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
