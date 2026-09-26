@@ -49,6 +49,15 @@ import {
   type AuthenticUsageType,
 } from "@/lib/admin/authenticUsage";
 
+// ── 원자료 소스별 색 ────────────────────────────────────────────────────
+// 관리자 화면은 대체로 색을 아끼지만, 이 코너는 캡처·글·영상을 재료로 삼는 곳이라 소스마다 밝은 색을 준다.
+// Tailwind가 읽을 수 있게 클래스는 문자열 그대로 둔다.
+const SOURCE_STYLE = {
+  image: { tab: "border-[#A5D8FF]", bubble: "bg-[#E7F5FF] text-[#339AF0]" },
+  text: { tab: "border-[#96F2D7]", bubble: "bg-[#E6FCF5] text-[#20C997]" },
+  youtube: { tab: "border-[#FFC9C9]", bubble: "bg-[#FFF5F5] text-[#FA5252]" },
+} as const;
+
 // ── 활용 유형 라벨 ──────────────────────────────────────────────────────
 // 내부 분류값은 그대로 두고 화면 이름·생성 gate는 authenticUsage에서 함께 정한다.
 type UsageType = AuthenticUsageType;
@@ -456,8 +465,11 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
       <section className="space-y-5 rounded-xl border border-[#D9D2BF] bg-white p-5 lg:sticky lg:top-4">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
-          <h3 className="text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
-          <div className="mt-2.5 grid grid-cols-3 gap-1 rounded-lg bg-[#F3F0E7] p-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <h3 className="whitespace-nowrap text-[14px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
+            <span className="whitespace-nowrap text-[12px] text-[#6B645A]">캡처 · 글 · 영상, 무엇이든 재료가 됩니다</span>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
             {([
               ["image", "이미지에서 추출", ImageIcon],
               ["text", "텍스트 직접 입력", Type],
@@ -469,14 +481,16 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 onClick={() => setInputTab(k)}
                 aria-pressed={inputTab === k}
                 className={[
-                  "flex h-16 flex-col items-center justify-center gap-1 rounded-md text-[12.5px] transition-colors",
+                  "flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 bg-white text-[12.5px] transition-colors",
                   inputTab === k
-                    ? "bg-white font-semibold text-[#15202B] shadow-sm ring-1 ring-[#D9D2BF]"
-                    : "font-medium text-[#3F4E59] hover:bg-white/60",
+                    ? `${SOURCE_STYLE[k].tab} font-semibold text-[#15202B]`
+                    : "border-[#EFEAE0] font-medium text-[#3F4E59] hover:border-[#E2DED2]",
                 ].join(" ")}
               >
-                <Icon className="h-5 w-5 shrink-0" aria-hidden />
-                <span className="truncate">{l}</span>
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full ${SOURCE_STYLE[k].bubble}`}>
+                  <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                </span>
+                <span className="whitespace-nowrap">{l}</span>
               </button>
             ))}
           </div>
@@ -489,8 +503,8 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   onClick={() => fileRef.current?.click()}
                   className="flex h-44 w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed border-[#B9AF97] bg-[#FAF8F2] text-[12.5px] font-medium text-[#3F4E59] hover:bg-[#F3F0E7]"
                 >
-                  <span className="text-[13.5px] font-semibold text-[#15202B]">+ 쇼츠·드라마 캡처 업로드</span>
-                  <span className="text-[11.5px] font-normal text-[#5A6670]">jpg·png·webp · 이미지는 저장하지 않습니다</span>
+                  <span className="whitespace-nowrap text-[13.5px] font-semibold text-[#15202B]">+ 쇼츠·드라마 캡처 업로드</span>
+                  <span className="whitespace-nowrap text-[11.5px] font-normal text-[#5A6670]">jpg·png·webp · 이미지는 저장하지 않습니다</span>
                 </button>
               ) : imgLarge ? (
                 <div className="space-y-1.5">
@@ -554,12 +568,12 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   type="button"
                   onClick={fetchCaption}
                   disabled={ytLoading || !youtubeUrl.trim()}
-                  className="h-10 shrink-0 rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D]"
+                  className="h-10 shrink-0 whitespace-nowrap rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D]"
                 >
                   {ytLoading ? "가져오는 중…" : "자막 가져오기"}
                 </button>
               </div>
-              <p className="mt-1.5 truncate text-[11.5px] text-[#5A6670]">
+              <p className="mt-2 truncate text-[11.5px] text-[#5A6670]">
                 중국어·한국어 CC 자막을 가져와 텍스트 칸에 채웁니다.
               </p>
             </div>
@@ -590,7 +604,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 onClick={() => setDirection(d)}
                 aria-pressed={direction === d}
                 className={[
-                  "flex h-10 flex-1 items-center justify-center gap-1.5 rounded-md text-[13px] transition-colors",
+                  "flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-[13px] transition-colors",
                   direction === d
                     ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
                     : "border border-[#D9D2BF] bg-white font-medium text-[#3F4E59] hover:bg-[#F3F0E7]",
