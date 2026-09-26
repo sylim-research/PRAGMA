@@ -886,7 +886,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {/* 학습 미션 제작에서는 작업대가 자기 안에서 스크롤하므로 머리를 칸 맨 위(top-0)에 붙인다. */}
         <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-3.5">
+          <div className="min-w-0 flex-1 space-y-5">
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0">{headerBadges(r)}</span>
@@ -896,7 +896,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            <h2 className="line-clamp-2 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -957,8 +957,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <>
             {scenarioText}
             {(st === "generated" || st === "reviewed") && (
-              <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
-                handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+              <div className="!mt-5">
+                <ContentReviewPanel framed={false} target={{ kind: "mission", targetId: r.scenario_id }} historicalApproval={st === "reviewed"}
+                  handoffHref={`/admin/review?scenarioId=${r.scenario_id}`} />
+              </div>
             )}
           </>
         )}
@@ -1330,7 +1332,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 워크플로우" className="overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
+    <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
       <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
       <ol className="grid grid-cols-5 gap-2 px-4 py-2.5">
         {steps.map((step, index) => (
