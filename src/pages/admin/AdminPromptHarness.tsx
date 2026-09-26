@@ -38,11 +38,8 @@ function HarnessOverview() {
           품질 관리 구조
         </p>
         <h2 id="harness-overview-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
-          자동 품질 점검과 AI 검토는 근거를 제시하고, 최종 승인은 교수자가 합니다
-        </h2>
-        <p className="mt-1 text-[12.5px] leading-relaxed text-muted-foreground">
           자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다.
-        </p>
+        </h2>
       </div>
 
       <div className="mt-4 grid gap-2 md:grid-cols-3">
