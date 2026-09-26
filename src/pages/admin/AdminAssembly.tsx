@@ -300,6 +300,15 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
   // 교수자 최종 승인은 한 미션을 깊게 읽는 화면이라 대기열을 옆에 두지 않고 필요할 때만 서랍으로 연다.
   const [queueOpen, setQueueOpen] = useState(false);
+  // 목록 버튼을 한 번도 열지 않은 동안만 버튼 둘레에 파동을 둔다. 한 번 열면 이 세션에서는 다시 보이지 않는다.
+  const [queueSeen, setQueueSeen] = useState(() => {
+    try { return sessionStorage.getItem("pragma.reviewQueueSeen") === "1"; } catch { return false; }
+  });
+  const openQueue = () => {
+    setQueueOpen(true);
+    setQueueSeen(true);
+    try { sessionStorage.setItem("pragma.reviewQueueSeen", "1"); } catch { /* 저장 불가여도 이번 화면에서는 꺼진다 */ }
+  };
   useEffect(() => {
     if (!queueOpen) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setQueueOpen(false); };
@@ -858,11 +867,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   };
 
   const queueButton = (
+    <span className="relative inline-flex shrink-0">
+    {!queueSeen && dash[fState] > 1 && <span aria-hidden className="pointer-events-none absolute -inset-[3px] rounded-[10px] border border-[#E9C94A]/70 motion-safe:animate-pulse" />}
     <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
-      className="h-10 shrink-0 gap-2 border-[#FAD338] bg-[#FAD338] px-3.5 text-[13.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] hover:text-[#15202B]" onClick={() => setQueueOpen(true)}>
+      className="relative h-10 shrink-0 gap-2 border-[#FAD338] bg-[#FAD338] px-3.5 text-[13.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] hover:text-[#15202B]" onClick={openQueue}>
       <ListChecks aria-hidden className="size-4 text-[#15202B]" />{chipLabel(fState)} 목록
       <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-[#233542] px-1.5 text-[12px] font-bold tabular-nums text-white">{dash[fState]}</span>
     </Button>
+    </span>
   );
 
   const renderWorkbench = (r: CoreRow) => {
