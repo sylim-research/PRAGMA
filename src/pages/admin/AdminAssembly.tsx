@@ -770,15 +770,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     const facet = (label: string, value: string) => (
-      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#D8D3C4] bg-white px-2.5 text-[13px] font-bold text-[#233542]">
-        <span className="text-[11px] font-medium text-[#8C969B]">{label}</span>{value}
+      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#E6DECB] bg-[#FFFDF8] px-2.5 text-[13px] font-bold text-[#233542]">
+        <span className="text-[11.5px] font-medium text-[#6B757B]">{label}</span>{value}
       </span>
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
-        <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
-          <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
-        </span>
+        {/* 네 칩을 같은 모양으로 둔다. 화행만 채운 색이면 「선택됨」이나 「비활성」처럼 읽힌다. */}
+        {facet("화행", SPEECH_ACT_UI[r.speech_act])}
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
         {facet("수행 방식", MODE_LABEL[mode])}
@@ -906,7 +905,10 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               <div className="rounded-xl border border-[#233542]/20 bg-white px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 시나리오로 학습 미션 초안을 자동으로 만듭니다(1분 남짓). 초안은 자동 품질 점검·AI 검토와 교수자 최종 승인을 거쳐야 편성할 수 있습니다.</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
-                  <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}>
+                  {/* 생성 중에도 남색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
+                  <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}
+                    className={busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : undefined}>
+                    {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
                     {busy === r.scenario_id ? "생성 중…" : "초안 자동 생성"}
                   </Button>
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
@@ -1044,8 +1046,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
                     : <><option value="newest">최신순</option><option value="oldest">오래된 순</option></>}
                 </select>
-              </div>
-              <div className="flex gap-1.5 text-[12px]">
+                {/* 필터 버튼을 검색 줄에 붙인다 — 따로 한 줄을 쓰면 목록이 아래로 밀린다. */}
+                <div className="flex shrink-0 gap-1.5 text-[12px]">
                 {([["axis", "필터", axisFilterActive], ["advanced", "고급", fRun !== "all" || fHash !== "all"]] as const).filter(([key]) => professorScreen || key === "axis").map(([key, label, active]) => (
                   <button key={key} type="button" aria-expanded={openFilter === key}
                     onClick={() => setOpenFilter((current) => (current === key ? null : key))}
@@ -1058,6 +1060,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     <span aria-hidden className="shrink-0 text-[#8C969B]">{openFilter === key ? "▴" : "▾"}</span>
                   </button>
                 ))}
+                </div>
               </div>
               {openFilter === "axis" && (
                 <div className="grid grid-cols-2 gap-1.5">
@@ -1095,7 +1098,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <li key={r.scenario_id} id={`queue-${r.scenario_id}`}
                     className={[
                       "flex gap-2 rounded-md border px-2 py-1.5",
-                      selected ? "border-[#233542] bg-white shadow-[inset_3px_0_0_#233542]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
+                      selected ? "border-[#2F3D48]/60 bg-[#FBF5E6] shadow-[inset_3px_0_0_#2F3D48]" : "border-transparent bg-white/70 hover:border-[#D5D9DB] hover:bg-white",
                     ].join(" ")}>
                     {bulkPrep && st === "generated" && (
                       <input type="checkbox" className="mt-1 shrink-0" aria-label={`자동 점검 선택 ${r.scenario_id}`} disabled={reviewQueue.active}
@@ -1306,11 +1309,12 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
               <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[11.5px] font-bold tabular-nums",
                 step.status === "done" ? "bg-[#233542] text-white"
                   : step.status === "current" ? "border-2 border-[#C08A2E] bg-white text-[#8A5A14]"
-                    : "border border-[#D6D1C3] bg-white text-[#9AA2A6]"].join(" ")}>
+                    : "border border-[#C9C2B0] bg-white text-[#6B757B]"].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
+              {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}
               <span className={["mt-1.5 text-[12.5px] leading-tight",
-                step.status === "todo" ? "text-[#9AA2A6]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
+                step.status === "todo" ? "text-[#5B6770]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
               {step.detail && (
                 <span className={["mt-0.5 line-clamp-2 text-[11.5px] leading-snug",
                   step.status === "current" ? "text-[#8A5A14]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
