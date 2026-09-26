@@ -289,8 +289,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const [fRun, setFRun] = useState<string>("all");
   const [fHash, setFHash] = useState<string>("all");
   const [search, setSearch] = useState("");
-  // 조립은 방금 만든 것을 확인하는 일이 많아 최신순, 점검·승인은 밀린 일부터 줄이도록 오래 기다린 순.
-  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode ? "oldest" : "newest");
+  // 제작·품질 점검은 최신 순이 기본, 교수자 승인은 밀린 일부터 줄이도록 오래 기다린 순.
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest">(reviewMode && !aiReview ? "oldest" : "newest");
   const [showAll, setShowAll] = useState(false);
   // 대기열 상단의 두 필터는 한 줄짜리 토글로 두고, 펼친 쪽만 아래에 연다(기본 접힘).
   const [openFilter, setOpenFilter] = useState<"axis" | "advanced" | null>(null);
@@ -1075,9 +1075,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   onChange={(event) => setSortOrder(event.target.value as "newest" | "oldest")}
                   className="h-7 rounded-md border border-[#D9D7CF] bg-white px-1 text-[12px] text-[#46515A]"
                 >
-                  {reviewMode
+                  {professorScreen
                     ? <><option value="oldest">오래 기다린 순</option><option value="newest">최근 수정순</option></>
-                    : <><option value="newest">최신순</option><option value="oldest">오래된 순</option></>}
+                    : <><option value="newest">최신 순</option><option value="oldest">오래된 순</option></>}
                 </select>
                 {/* 필터 버튼을 검색 줄에 붙인다 — 따로 한 줄을 쓰면 목록이 아래로 밀린다. */}
                 <div className="flex shrink-0 gap-1.5 text-[12px]">
