@@ -31,6 +31,12 @@ function signalSummary(findings: ReviewFinding[]): string {
  * 결정별 기본 근거. 버튼을 누를 때 빈 근거 칸을 채워 두어 타자 없이 판정을 마칠 수 있게 한다.
  * 교수자가 직접 쓴 근거는 덮지 않고, 기본 문구가 들어 있을 때만 새 결정의 문구로 바꾼다.
  */
+/** 판단 버튼의 무게: 사용 가능 = 남색(진행), 수정 필요 = 호박색(주의), 판단 보류 = 옅은 테두리(미결). */
+const DECISION_TONE: Record<keyof typeof PROFESSOR_DECISION_LABELS, { on: string; off: string }> = {
+  no_change: { on: "bg-[#233542] text-white", off: "border border-[#233542] text-[#233542] hover:bg-[#EEF1F4]" },
+  revision_required: { on: "bg-[#B45309] text-white", off: "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#FBF3E3]" },
+  defer: { on: "bg-[#5D6970] text-white", off: "border border-[#B8B2A3] text-[#46515A] hover:bg-[#F5F3EC]" },
+};
 const DEFAULT_FINDING_RATIONALE: Record<keyof typeof PROFESSOR_DECISION_LABELS, string> = {
   revision_required: "검토 제안대로 수정하겠습니다.",
   no_change: "원문·장면에 맞아 이대로 사용합니다.",
@@ -431,7 +437,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                         aria-label={`${label} · ${finding.id}`} aria-pressed={draft?.decision === value}
                         onClick={() => decide(value as keyof typeof PROFESSOR_DECISION_LABELS)}
                         className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${draft?.decision === value
-                          ? "bg-[#C08A2E] text-white" : "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#F3ECD9]"}`}>{label}</button>)}
+                          ? DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].on : DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].off}`}>{label}</button>)}
                     </div>
                     {draft?.decision && <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft.rationale_ko} disabled={busy} rows={2}
                       onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />}
@@ -457,7 +463,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </section>}
             {next === "professor" && <>
               <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled
-                || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()}>교수자 판단 저장</Button>
+                || !decisionsDirty || !professorDecisionsComplete(findings, draftDecisions)} onClick={() => void saveDecisions()} className="border-[#233542] font-semibold text-[#233542] hover:bg-[#EEF1F4] disabled:opacity-60">교수자 판단 저장</Button>
               {/* 저장 상태만 한 줄. 계약 설명·모델명·재서술은 화면에 두지 않는다. */}
               {(decisionsDirty || professorDecisionsComplete(findings, run.professor_decisions))
                 && <p className="text-xs">{decisionsDirty ? "저장하지 않은 판단이 있습니다." : "교수자 판단이 현재 버전에 저장되어 있습니다."}</p>}

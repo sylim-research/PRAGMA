@@ -884,9 +884,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       <div key={r.scenario_id}>
         {/* 긴 작업 중에도 지금 어느 미션을 보는지 잃지 않도록 머리는 두 줄로 줄여 위에 붙인다. */}
         {/* 학습 미션 제작에서는 작업대가 자기 안에서 스크롤하므로 머리를 칸 맨 위(top-0)에 붙인다. */}
-        <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex items-start justify-between gap-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
+        <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex flex-wrap items-start justify-between gap-x-5 gap-y-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
-          <div className="min-w-0 flex-1 space-y-5">
+          <div className={["min-w-0 flex-1", professorScreen ? "self-center" : "space-y-5"].join(" ")}>
             <div className="flex min-w-0 items-center gap-2">
               {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
               <span className="shrink-0">{headerBadges(r)}</span>
@@ -896,7 +896,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -910,6 +910,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               )}
             </div>
           )}
+          {/* 교수자 화면은 왼쪽에 승인 대기 목록 단추가 있어 제목이 가운데로 밀린다 — 제목만 한 줄 아래 왼쪽 끝에서 시작한다. */}
+          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
         </header>
         <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
