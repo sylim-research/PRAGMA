@@ -52,11 +52,22 @@ import {
 // ── 원자료 소스별 색 ────────────────────────────────────────────────────
 // 관리자 화면은 대체로 색을 아끼지만, 이 코너는 캡처·글·영상을 재료로 삼는 곳이라 소스마다 밝은 색을 준다.
 // Tailwind가 읽을 수 있게 클래스는 문자열 그대로 둔다.
+// 채도를 낮춘 차분한 색(슬레이트 블루·세이지). YouTube만 실제 브랜드 표식을 쓴다.
 const SOURCE_STYLE = {
-  image: { tab: "border-[#A5D8FF]", bubble: "bg-[#E7F5FF] text-[#339AF0]" },
-  text: { tab: "border-[#96F2D7]", bubble: "bg-[#E6FCF5] text-[#20C997]" },
-  youtube: { tab: "border-[#FFC9C9]", bubble: "bg-[#FFF5F5] text-[#FA5252]" },
+  image: { bubble: "bg-[#EDF1F7] text-[#4A6591]" },
+  text: { bubble: "bg-[#EDF3EF] text-[#4F7563]" },
+  youtube: { bubble: "" },
 } as const;
+
+/** YouTube 브랜드 표식 — 빨간(#FF0000) 둥근 사각형 안의 흰 재생 삼각형. */
+function YouTubeMark({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 28 20" aria-hidden className={className}>
+      <rect width="28" height="20" rx="5.5" fill="#FF0000" />
+      <path d="M11.2 5.8v8.4l7.2-4.2z" fill="#FFFFFF" />
+    </svg>
+  );
+}
 
 // ── 활용 유형 라벨 ──────────────────────────────────────────────────────
 // 내부 분류값은 그대로 두고 화면 이름·생성 gate는 authenticUsage에서 함께 정한다.
@@ -481,15 +492,19 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 onClick={() => setInputTab(k)}
                 aria-pressed={inputTab === k}
                 className={[
-                  "flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-lg border-2 bg-white text-[12.5px] transition-colors",
+                  "flex h-[76px] flex-col items-center justify-center gap-1.5 rounded-lg text-[12.5px] transition-colors",
                   inputTab === k
-                    ? `${SOURCE_STYLE[k].tab} font-semibold text-[#15202B]`
-                    : "border-[#EFEAE0] font-medium text-[#3F4E59] hover:border-[#E2DED2]",
+                    ? "border-[1.5px] border-[#15202B] bg-[#FFFDF8] font-semibold text-[#15202B]"
+                    : "border border-[#E7E2D6] bg-white font-medium text-[#3F4E59] hover:border-[#CFC8B8]",
                 ].join(" ")}
               >
-                <span className={`flex h-8 w-8 items-center justify-center rounded-full ${SOURCE_STYLE[k].bubble}`}>
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden />
-                </span>
+                {k === "youtube" ? (
+                  <span className="flex h-8 items-center justify-center"><YouTubeMark className="h-[18px] w-[26px]" /></span>
+                ) : (
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full ${SOURCE_STYLE[k].bubble}`}>
+                    <Icon className="h-4 w-4 shrink-0" aria-hidden />
+                  </span>
+                )}
                 <span className="whitespace-nowrap">{l}</span>
               </button>
             ))}
@@ -568,7 +583,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   type="button"
                   onClick={fetchCaption}
                   disabled={ytLoading || !youtubeUrl.trim()}
-                  className="h-10 shrink-0 whitespace-nowrap rounded-md bg-[#15202B] px-4 text-[13px] font-semibold text-white hover:bg-[#15202B]/90 disabled:cursor-not-allowed disabled:bg-[#56636D]"
+                  className="h-10 shrink-0 whitespace-nowrap rounded-md bg-[#FF0000] px-4 text-[13px] font-semibold text-white hover:bg-[#CC0000] disabled:cursor-not-allowed disabled:bg-[#FF0000]/40"
                 >
                   {ytLoading ? "가져오는 중…" : "자막 가져오기"}
                 </button>
