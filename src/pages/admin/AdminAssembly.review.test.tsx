@@ -9,6 +9,8 @@ const mocks = vi.hoisted(() => ({
   selects: [] as string[],
   reviewMission: vi.fn(),
   promoteCore: vi.fn(),
+  promoteCoreV6: vi.fn(),
+  toastSuccess: vi.fn(),
   fetchMission: vi.fn(),
 }));
 
@@ -44,6 +46,8 @@ vi.mock("@/lib/mission/missionDb", () => ({ fetchMissionForReview: mocks.fetchMi
 vi.mock("@/lib/pragma/promoteMission", () => ({
   promoteCore: mocks.promoteCore, reviewMission: mocks.reviewMission, reviseMissionDraft: vi.fn(), supersedeMissionForRework: vi.fn(),
 }));
+vi.mock("@/lib/pragma/promoteMissionV6", () => ({ promoteCoreV6: mocks.promoteCoreV6 }));
+vi.mock("sonner", () => ({ toast: { success: mocks.toastSuccess, error: vi.fn() } }));
 
 const hash = "a84f21c9e0b1".padEnd(64, "0");
 const scenario = (id: string, brief: string, status: string | null = "generated", updated = "2026-09-01T00:00:00Z") => ({
@@ -70,6 +74,8 @@ beforeEach(() => {
   mocks.fetchMission.mockReset().mockResolvedValue({ mission: { schema_version: "mission_v6" } });
   mocks.reviewMission.mockReset().mockResolvedValue({ ok: true });
   mocks.promoteCore.mockReset();
+  mocks.promoteCoreV6.mockReset();
+  mocks.toastSuccess.mockReset();
   mocks.tables = {
     scenarios: [
       scenario("m-ready-new", "나중에 올라온 결정 미션", "generated", "2026-09-05T00:00:00Z"),
@@ -192,6 +198,16 @@ describe("assembly workbench", () => {
     expect(within(bench).getByRole("heading", { name: "생성할 시나리오" })).toBeInTheDocument();
     expect(within(bench).getByRole("button", { name: "초안 자동 생성" })).toBeEnabled();
     expect(within(queue()).queryByText("옛 코어")).not.toBeInTheDocument();
+    let finish!: (result: unknown) => void;
+    mocks.promoteCoreV6.mockImplementation((_core, onStage) => {
+      onStage("quality");
+      return new Promise(resolve => { finish = resolve; });
+    });
+    fireEvent.click(within(bench).getByRole("button", { name: "초안 자동 생성" }));
+    expect(await screen.findByText("AI 검토 중")).toBeInTheDocument();
+    finish({ ok: true, ruleResult: "pass", qualityVerdict: "pass", repaired: false });
+    await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("초안 저장 · 규칙 기반 검사 통과 · AI 검토 의견 저장 — 품질 점검 단계에서 확인해 주세요"));
+    expect(mocks.promoteCoreV6).toHaveBeenCalledTimes(1);
   });
 
   it("hides superseded drafts and legacy scenario-only rows from the v6 lists", async () => {

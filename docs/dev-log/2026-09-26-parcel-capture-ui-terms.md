@@ -57,3 +57,15 @@
 - 변경 diff는 화면 코드·기존 테스트·이 기록뿐이다. 콘텐츠 데이터·DB/schema·feedback/저장 serializer 변경 없음. 기존 승인 hash `bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095` 유지(운영 DB 재조회나 새 hash 검증을 실행했다는 뜻은 아님).
 - focused test: runtime의 `runs a v6 runtime from` 1개, connections의 `shows the priority feedback`·`withholds reference answers` 2개만 실행하여 **3 passed / 22 filtered out(skipped)**. DCT 안내·기준 헤더·기존 수행/저장 매핑·최종 참고 표현 노출 확인. 로딩 문구는 코드 diff로 확인했다. 더미 환경값·mock 사용, 실제 AI/DB 호출·전체 테스트·운영 E2E 없음.
 - 논문 영향: 로컬 화면 문구만 보정, 콘텐츠 버전·배포 상태·프롬프트·계약 변경 없음. 단순 UI copy이므로 research-trail 추가 갱신 없음. 로컬 커밋 후 대기.
+
+## 학습자 최종 결정·관리자 제작 화면 용어 보정
+
+- 연구자의 다음 batch 지시에 따라 `AI 판정과 생각이 다르다면 → AI 피드백과 생각이 다르다면`(버튼·패널 제목), 수정 branch의 `피드백을 반영해 → 피드백을 참고해`, `수정안 확정하기 → 최종안 확정하기`를 표시층에서 변경했다. 해당 버튼의 onDone은 기존 최종 산출 확인·저장으로 연결되며 유지 branch·이견 reason·serializer·활성화 조건은 그대로다.
+- **이전 판정과 후속 지시 구분:** 이번 명시적 지시에 따라 준비·결과 카드의 제목 `문법 정확성 → 언어 자연성`을 변경했다. 이는 평가 범위 확대가 아니다. 실제 prompt/schema/runtime는 여전히 이해를 방해하는 오류 중심이고 사소한 부자연스러움은 제외한다. 이전에 정렬한 보조 질문(이해를 방해하는 오류 여부)도 유지했다. 이 UI 제목만으로 포괄적인 자연성 평가를 구현했다고 논문에 주장하지 않는다. 내부 meaning/language/pragmatics, grammatical_accuracy 및 schema 미수정.
+- 기존 `AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다.`, `화용적 적절성`, 로딩의 `번역안을 세 기준으로 살펴보고 있습니다`는 반영된 상태여서 다시 수정하지 않았다. 누적 P1(재검토·참고 표현·기준 선택·핵심 이유·MJT5 라벨/관계·DCT 안내)도 보존했다. 이 보정들은 로컬 브랜치 상태이며 운영 배포 완료로 주장하지 않는다.
+- 동적 문구: 실제 feedback prompt(`generate-scenario/index.ts`)와 요청 target_feature의 정의·지침에서 `선택권을 완화`라는 고정 문구나 부담 완화와 선택권을 혼동하도록 명시한 지침은 확인되지 않았다. 사용자 관찰 출력은 생성 변동의 사례로 기록하고, 제품의 키워드 치환·프롬프트 수정·추가 AI 호출은 하지 않았다. 대표 캡처 재실행 대상으로만 남긴다.
+- 관리자: V6 quality 단계의 표시를 `AI 검토 중`으로 변경했다. promoteCoreV6는 AI 결과(실패 시 unavailable 표시 포함)를 초안과 함께 저장한 뒤 성공을 반환하므로 정상 toast는 `초안 저장 · 규칙 기반 검사 통과 · AI 검토 의견 저장 — 품질 점검 단계에서 확인해 주세요`로 바꿨다. warning/fail은 각각 주의/확인 필요를 표시하며 AI 검토 성공·교수자 승인을 허위로 뜻하지 않는다. `품질 점검`은 현행 제작 경로의 실제 단계명이다. 자동 route 이동 코드는 없으므로 이동했다고 알리지 않고 해당 단계의 확인을 안내한다. workflow/status enum·제작 경로 노드·저장 함수 미수정.
+- focused test 3파일·5개 실행: connections의 기준/수정 안내·이견 제출·유지 branch 3개, runtime의 v6 수행·수정 확정·최종 저장 1개, AdminAssembly의 기존 생성 작업대 검사에 mock quality 상태·완료 toast 확인을 추가한 1개. **5 passed / 29 filtered out(skipped)**. 더미 환경값·mock만 사용했고 실제 생성·AI 검토·DB 쓰기·운영 E2E는 실행하지 않았다. 다른 기존 테스트의 제목/버튼 기대 문자열도 새 표시와 정렬했다.
+- mission_content·lesson_points(핵심 정리 05 보류 포함)·DCT 원문·후보·해설·참고 표현·content hash·DB/schema·API/저장 계약·학습자 최초/최종 산출 변경 없음. 기존 승인 hash `bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095` 유지. 별도 DB 조회/재해시 검증은 하지 않았다.
+- 재캡처 목록: 연구자가 새 learner attempt를 수행한 뒤 AI 피드백·재검토/최종 결정·완료 화면, 관리자 생성 상태·완료 알림을 수정 배포 후 다시 채취한다. 구버전 다듬기/참고 답안/AI 판정/문법 정확성/화용 적절성/반영해/수정안 확정하기/AI 점검 중/규칙 pass/AI 검토 통과가 나온 캡처는 최종 논문용에서 제외한다. 기존 attempt는 수정하지 않는다.
+- 단순 UI·운영 용어 보정이므로 research-trail 추가 갱신 없음. 로컬 커밋 후 대기, 푸시·배포 없음. 논문 영향은 표시 문구와 향후 캡처 교체에 한하며 콘텐츠 버전·평가 기능·계약은 그대로다.

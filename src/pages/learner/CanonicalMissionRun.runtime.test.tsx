@@ -118,7 +118,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.
-    click("수정안 확정하기");
+    click("최종안 확정하기");
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
@@ -201,7 +201,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(screen.getByRole("textbox")).toHaveValue(alternate);
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(requestFeedback).toHaveBeenCalledWith(mission, reference);
-    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "수정안 확정하기" }));
+    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
@@ -359,13 +359,13 @@ describe("CanonicalMissionRun live CTA route", () => {
   it("학습자 원포인트는 심각도와 무관하게 의미→언어→화용 순서의 첫 보완 항목이다", () => {
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "recommend", body: "의미 먼저" },
-      { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "언어" },
+      { key: "language", label: "언어 자연성", question: "", level: "very_good", body: "언어" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "meaning", body: "의미 먼저" });
 
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "의미" },
-      { key: "language", label: "문법 정확성", question: "", level: "required", body: "언어 먼저" },
+      { key: "language", label: "언어 자연성", question: "", level: "required", body: "언어 먼저" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "language", body: "언어 먼저" });
   });

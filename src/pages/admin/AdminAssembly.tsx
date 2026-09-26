@@ -155,7 +155,7 @@ type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Excl
 const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "v6_review", "v6_done", "all"];
 const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
   preparing: "시나리오 확인 중", generating: "초안 생성 중(1분 남짓)", checking: "자동 검사 중",
-  repairing: "지적된 곳 고치는 중", quality: "AI 점검 중", saving: "저장 중",
+  repairing: "지적된 곳 고치는 중", quality: "AI 검토 중", saving: "저장 중",
 };
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
@@ -571,8 +571,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const qLabel = res.qualityVerdict ? { pass: "AI 점검 통과", warning: "AI 점검 주의", fail: "AI 점검 결함" }[res.qualityVerdict] : "AI 점검 미실행";
-        toast.success(`초안 저장 · 규칙 ${res.ruleResult} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검으로 넘어갑니다`);
+        const ruleLabel = res.ruleResult ? { pass: "규칙 기반 검사 통과", warning: "규칙 기반 검사 주의", fail: "규칙 기반 검사 실패" }[res.ruleResult] : "규칙 기반 검사 결과 확인 필요";
+        const qLabel = res.qualityVerdict ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.qualityVerdict] : "AI 검토 미실행";
+        toast.success(`초안 저장 · ${ruleLabel} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검 단계에서 확인해 주세요`);
         await loadRows();
       } else {
         const msg = res.error ?? "생성 실패";
