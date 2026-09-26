@@ -931,14 +931,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">출발텍스트의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  {/* 생성 중에도 남색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
-                  <Button size="sm" disabled={busy !== null} onClick={() => void onGenerateV6(r)}
-                    className={busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : undefined}>
-                    {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />}
-                    {busy === r.scenario_id ? "생성 중…" : "초안 자동 생성"}
-                  </Button>
+                <div className="mt-3 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
+                  {/* 주 실행 버튼 = 브랜드 노랑. 생성 중에도 색을 유지하고 회전 표시만 붙인다 — 회색이면 꺼진 버튼처럼 보인다. */}
+                  <Button disabled={busy !== null} onClick={() => void onGenerateV6(r)}
+                    className={["h-11 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]", busy === r.scenario_id ? "gap-1.5 disabled:opacity-100" : ""].join(" ")}>
+                    {busy === r.scenario_id && <span aria-hidden className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" />}
+                    {busy === r.scenario_id ? "생성 중" : "초안 자동 생성"}
+                  </Button>
                 </div>
                 {failures[r.scenario_id] && <p className="mt-2 text-[12.5px] text-red-800" role="alert">{failures[r.scenario_id]}</p>}
               </div>
