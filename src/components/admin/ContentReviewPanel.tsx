@@ -268,7 +268,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               </div>
             : professorDone || professorCurrent
               ? <span className="text-[13px] font-semibold text-[#233542]">✓ 완료</span>
-              : <Button size="sm" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>점검 실행</Button>}
+              : null}
         </div>
         <ol className="divide-y divide-[#F0EDE4]">
           {rows.map((row, index) => {
@@ -320,6 +320,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </span>
           </li>
         </ol>
+        {/* 실행 버튼은 학습 미션 제작 화면의 「초안 자동 생성」과 같이 상자 아래 왼쪽에 둔다. */}
+        {!runningLabel && !professorDone && !professorCurrent && <div className="border-t border-[#ECE8DE] px-4 py-3">
+          <Button size="sm" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>점검 실행</Button>
+        </div>}
       </div>}
       {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}
       {queued?.status === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
