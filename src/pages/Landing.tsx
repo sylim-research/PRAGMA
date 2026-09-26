@@ -52,7 +52,7 @@ const Landing = () => {
               </span>
               에 따라
             </span>
-            <span className="block animate-rise-in [animation-delay:900ms] motion-reduce:animate-none">
+            <span className="block animate-rise-in [animation-delay:800ms] motion-reduce:animate-none">
               다르게 표현합니다.
             </span>
           </h1>
