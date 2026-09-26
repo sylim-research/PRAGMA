@@ -924,7 +924,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             {productionOf(r) === "core_only" && (
               <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-4 text-[13.5px]">
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
-                <p className="font-semibold text-[#233542]">학습 미션을 생성합니다.</p>
+                <p className="font-semibold text-[#233542]">다음과 같이 학습 미션을 생성합니다.</p>
                 <dl className="mt-2.5 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-3 text-[13px]">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
                   <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
