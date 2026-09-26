@@ -42,7 +42,6 @@ const DEFAULT_FINDING_RATIONALE: Record<keyof typeof PROFESSOR_DECISION_LABELS, 
   no_change: "원문·장면에 맞아 이대로 사용합니다.",
   defer: "추가 확인이 필요해 판단을 보류합니다.",
 };
-const isDefaultRationale = (text: string) => Object.values(DEFAULT_FINDING_RATIONALE).includes(text.trim());
 
 /** 저장 경로를 교수자가 읽는 자리 이름으로. 모르는 조각은 그대로 두고, 원래 경로는 근거 안에 남긴다. */
 const WHERE_PART: Record<string, string> = {
@@ -412,8 +411,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               : agreed ? { text: "AI 검토 일치", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
               : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
               : focused ? { text: "교수자 단독 판단", cls: "border border-[#C08A2E] text-[#8A5A14]" } : null;
-            const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value,
-              ...(!draft?.rationale_ko.trim() || isDefaultRationale(draft.rationale_ko) ? { rationale_ko: DEFAULT_FINDING_RATIONALE[value] } : {}) });
+            const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                 <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
@@ -422,7 +420,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {/* 결정에 필요한 것은 「어디를 · 어떻게」 둘뿐이다. 지적 전문·이유는 근거 안에 둔다. */}
               <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
               {/* 논증·인용·저장 경로는 판단 자료가 아니라 추적 자료다. 삭제하지 않고 이 안으로 옮긴다. */}
-              <details open={!agreed && Boolean(decision) && decision?.decision !== "accept"} className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
+              <details className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
                 <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">검토 의견 전문·근거</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
                   <p className="font-semibold">{noPaths(plainIssue(finding.issue_ko))}</p>
@@ -449,8 +447,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                         className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${draft?.decision === value
                           ? DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].on : DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].off}`}>{label}</button>)}
                     </div>
-                    {draft?.decision && <Textarea aria-label={`교수자 판단 근거 · ${finding.id}`} value={draft.rationale_ko} disabled={busy} rows={2}
-                      onChange={(event) => updateDecision(finding.id, { rationale_ko: event.target.value })} placeholder="이 문제 항목에 대한 결정과 이유를 10자 이상 기록하세요." />}
                   </div> : <p className="text-[13px]">의견 대조 후 교수자 결정을 기록합니다.</p>}
             </div>;
           };
@@ -502,7 +498,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       })()}
       {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-4">
         <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">② 최종 승인</h4>
-        {!decisionsClear && <p className="text-amber-800">모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
+        {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
+        {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
@@ -512,7 +509,6 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
-        <Textarea aria-label="교수자 승인 근거" rows={1} className="min-h-0 bg-white px-4 py-2.5 text-[14.5px] leading-6" value={note} onChange={(event) => setNote(event.target.value)} />
         <div className="flex flex-wrap items-center justify-between gap-4">
           <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
