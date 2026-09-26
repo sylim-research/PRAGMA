@@ -859,9 +859,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   const queueButton = (
     <Button size="sm" variant="outline" aria-label="미션 목록 열기" aria-expanded={queueOpen}
-      className="h-10 shrink-0 gap-2 border-[#233542] bg-white px-3.5 text-[13.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={() => setQueueOpen(true)}>
-      <ListChecks aria-hidden className="size-4 text-[#233542]" />{chipLabel(fState)} 목록
-      <span className="rounded-full bg-[#F6EDD0] px-2 py-0.5 text-[12px] font-bold tabular-nums text-[#15202B]">{dash[fState]}</span>
+      className="h-10 shrink-0 gap-2 border-[#233542] bg-[#233542] px-3.5 text-[13.5px] font-bold text-white shadow-sm hover:bg-[#15202B] hover:text-white" onClick={() => setQueueOpen(true)}>
+      <ListChecks aria-hidden className="size-4 text-[#FAD338]" />{chipLabel(fState)} 목록
+      <span className="rounded-full bg-[#FAD338] px-2 py-0.5 text-[12px] font-bold tabular-nums text-[#15202B]">{dash[fState]}</span>
     </Button>
   );
 
