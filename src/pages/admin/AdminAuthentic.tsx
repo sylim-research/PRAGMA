@@ -26,15 +26,8 @@ import {
   type StoredCandidate,
 } from "@/lib/admin/authenticStore";
 import { SPEECH_ACT_UI, LEVEL, DIRECTION_LABEL } from "@/lib/pragma/enums";
+import { authenticUsageLabel, canMakeScenarioFromAuthentic } from "@/lib/admin/authenticUsage";
 
-const USAGE_LABEL: Record<string, string> = {
-  scenario_seed: "시나리오",
-  preceding_turn: "선행 발화",
-  translation_source: "번역 출발문",
-  response_task: "응답 과제",
-  expression_resource: "참고 표현 후보",
-  unsuitable: "부적합",
-};
 
 const STATUS_LABEL: Record<StoredCandidate["status"], { text: string; tone: string }> = {
   stored: { text: "보관 중", tone: "bg-[#EDE9DD] text-[#5B5446]" },
@@ -92,7 +85,7 @@ const AdminAuthentic = () => {
       setSaveNote(res.reason);
       return;
     }
-    setSaveNote(`생성 결과에 저장했습니다 · 후보 ${a.candidates.length}건`);
+    setSaveNote(`분석 기록에 저장했습니다 · 후보 ${a.candidates.length}건`);
     const saved = await getAnalysisById(res.analysisId);
     setJustSaved(saved);
     void refresh();
@@ -110,6 +103,8 @@ const AdminAuthentic = () => {
   };
 
   const sendStoredToGenerator = async (c: StoredCandidate, analysis: StoredAnalysis) => {
+    // 상황·응답 맥락 참고 자료는 생성기로 보내지 않는다(버튼이 없어도 한 번 더 막는다).
+    if (!canMakeScenarioFromAuthentic(c.usage_type, c.source_text)) return;
     await setCandidateStatus(c.id, "used");
     navigate(`/admin/generator?candidateId=${c.id}`, {
       state: { authenticApply: storedCandidateToApply(c, analysis) },
@@ -124,7 +119,7 @@ const AdminAuthentic = () => {
   const archive = (
     <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[16px] font-bold text-[#15202B]">생성 결과</h2>
+        <h2 className="text-[16px] font-bold text-[#15202B]">분석 기록</h2>
         <span className="text-[12px] text-muted-foreground">
           자료별 분석과 콘텐츠 후보 · 최근 30건
         </span>
@@ -137,7 +132,7 @@ const AdminAuthentic = () => {
       )}
       {listError && (
         <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[12.5px] text-[#991B1B]">
-          생성 결과를 읽지 못했습니다 · {listError}
+          분석 기록을 읽지 못했습니다 · {listError}
         </p>
       )}
 
@@ -204,7 +199,7 @@ const AdminAuthentic = () => {
                           >
                             <div className="flex flex-wrap items-center gap-1.5">
                               <span className="rounded-full border border-border px-1.5 py-[1px] text-[11.5px]">
-                                {USAGE_LABEL[c.usage_type] ?? c.usage_type}
+                                {authenticUsageLabel(c.usage_type)}
                               </span>
                               {cond?.speech_act_ui && (
                                 <span className="rounded-full bg-[#F2F0E8] px-1.5 py-[1px] text-[11.5px]">
@@ -240,7 +235,7 @@ const AdminAuthentic = () => {
                             )}
 
                             <div className="mt-1 flex flex-wrap gap-1.5">
-                              {c.source_text && c.usage_type !== "expression_resource" && (
+                              {canMakeScenarioFromAuthentic(c.usage_type, c.source_text) && (
                                 <Button
                                   onClick={() => void sendStoredToGenerator(c, row)}
                                   className="h-8 bg-[#15202B] px-2.5 text-[12.5px] text-white hover:bg-[#15202B]/90"
@@ -280,7 +275,7 @@ const AdminAuthentic = () => {
   return (
     <AdminShell
       title="실제 자료 활용 분석"
-      description="YouTube 자막·쇼츠 캡처·소설 구절·메신저 문구를 AI가 분석해 시나리오의 재료 후보를 제안합니다. 분석한 자료와 후보는 생성 결과에 남습니다."
+      description="실제 한·중 자료를 AI가 분석해 시나리오 재료 후보를 제안하고, 교수자가 사용 여부를 정합니다."
     >
       {saveNote && (
         <p

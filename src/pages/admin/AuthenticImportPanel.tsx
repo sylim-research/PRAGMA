@@ -39,25 +39,19 @@ import type {
   ComplexTaskUI,
 } from "@/lib/pragma/enums";
 import type { CoreProvenance, CoreSourceType } from "@/lib/pragma/coreSchema";
+import {
+  AUTHENTIC_CONTEXT_REFERENCE_TYPES,
+  AUTHENTIC_GENERATABLE_TYPES,
+  AUTHENTIC_USAGE_LABEL,
+  canMakeScenarioFromAuthentic,
+  isAuthenticUsageType,
+  type AuthenticUsageType,
+} from "@/lib/admin/authenticUsage";
 
 // ── 활용 유형 라벨 ──────────────────────────────────────────────────────
-type UsageType =
-  | "scenario_seed"
-  | "preceding_turn"
-  | "translation_source"
-  | "response_task"
-  | "expression_resource"
-  | "unsuitable";
-
-// 표현 자원은 참고 후보로 보관한다 — 내부 타입명(expression_resource)은 불변.
-const USAGE_KO: Record<UsageType, string> = {
-  scenario_seed: "시나리오",
-  preceding_turn: "선행 발화",
-  translation_source: "번역 출발문",
-  response_task: "후속 반응 과제",
-  expression_resource: "참고 표현 후보",
-  unsuitable: "미션 부적합",
-};
+// 내부 분류값은 그대로 두고 화면 이름·생성 gate는 authenticUsage에서 함께 정한다.
+type UsageType = AuthenticUsageType;
+const USAGE_KO = AUTHENTIC_USAGE_LABEL;
 const USAGE_TONE: Record<UsageType, string> = {
   scenario_seed: "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]",
   preceding_turn: "border-[#93C5FD] bg-[#DBEAFE] text-[#1E40AF]",
@@ -66,20 +60,15 @@ const USAGE_TONE: Record<UsageType, string> = {
   expression_resource: "border-[#EAE4D2] bg-[#FAF7EE] text-[#5B5446]",
   unsuitable: "border-[#FCA5A5] bg-[#FEE2E2] text-[#991B1B]",
 };
-// 생성기로 전달 가능한 유형(억지 화행화 금지 유형은 전달 버튼 없음).
-const GENERATABLE: UsageType[] = [
-  "scenario_seed",
-  "preceding_turn",
-  "translation_source",
-  "response_task",
-];
+// 생성기로 전달 가능한 유형. 상황·응답 맥락 참고와 억지 화행화 금지 유형은 전달 버튼이 없다.
+const GENERATABLE = AUTHENTIC_GENERATABLE_TYPES;
 
 // 후보를 유형별 섹션으로 묶는다(2026-07-30 수렴안) — 원자료가 어떤 콘텐츠 갈래로
 // 나뉘는지(시나리오/선행 발화/출발문/참고 표현) 화면 구조 자체가 말하게 한다.
 const CANDIDATE_SECTIONS: { title: string; types: UsageType[] }[] = [
   { title: "시나리오", types: ["scenario_seed"] },
-  { title: "선행 발화", types: ["preceding_turn"] },
-  { title: "번역 출발문·반응 과제", types: ["translation_source", "response_task"] },
+  { title: "출발 텍스트", types: ["translation_source"] },
+  { title: "참고 자료 — 상황·응답 맥락", types: ["preceding_turn", "response_task"] },
   { title: "참고 표현 후보", types: ["expression_resource"] },
   { title: "미션 부적합 — 참고만", types: ["unsuitable"] },
 ];
@@ -184,11 +173,7 @@ function asBurden(v?: string | null): PdrBurden {
   return v === "low" || v === "mid" || v === "high" ? v : "mid";
 }
 function asUsageType(v?: string | null): UsageType {
-  return (["scenario_seed", "preceding_turn", "translation_source", "response_task", "expression_resource", "unsuitable"] as UsageType[]).includes(
-    v as UsageType,
-  )
-    ? (v as UsageType)
-    : "unsuitable";
+  return isAuthenticUsageType(v) ? v : "unsuitable";
 }
 
 // provenance는 후보(candidate)가 아니라 패널 입력 상태에서 나오므로 여기서 제외한다.
@@ -245,7 +230,7 @@ interface Props {
   onApply: (a: AuthenticApply, index: number) => void;
   /** 분석 성공 직후 1회. 호스트가 보관함에 저장한다(고르지 않은 후보도 남기려고). */
   onAnalyzed?: (a: AuthenticAnalyzed) => void;
-  /** 오른쪽 칼럼 아래(분석 전에는 맨 위)에 둘 생성 결과 목록 */
+  /** 오른쪽 칼럼 아래(분석 전에는 맨 위)에 둘 분석 기록 목록 */
   history?: ReactNode;
 }
 
@@ -420,6 +405,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
   };
 
   const apply = (c: RawCandidate, i: number) => {
+    if (!canMakeScenarioFromAuthentic(asUsageType(c.usage_type), c.source_text)) return;
     const base = normalizeApply(c);
     // 관리자가 확정한 원문을 우선한다(없으면 모델이 판독한 원문).
     const original = (editedOriginal || analysis?.source_original || "").trim();
@@ -743,7 +729,8 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   const spanFull = items.length % 2 === 1 && k === items.length - 1;
                   const ut = asUsageType(c.usage_type);
                   const generatableType = GENERATABLE.includes(ut);
-                  const canGen = generatableType && !!(c.source_text ?? "").trim();
+                  const canGen = canMakeScenarioFromAuthentic(ut, c.source_text);
+                  const contextReference = AUTHENTIC_CONTEXT_REFERENCE_TYPES.includes(ut);
                   const norm = canGen ? normalizeApply(c) : null;
                   return (
                     <div
@@ -768,13 +755,13 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                       )}
                       {c.source_text && (
                         <div className="rounded border border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[12.5px] leading-relaxed">
-                          <span className="text-[10.5px] text-[#8a857c]">출발문(source_text) · </span>
+                          <span className="text-[10.5px] text-[#8a857c]">출발 텍스트 · </span>
                           {c.source_text}
                         </div>
                       )}
                       {c.preceding_turn && (
                         <div className="rounded border border-[#DBEAFE] bg-[#EFF6FF] px-2.5 py-1.5 text-[12px] leading-relaxed text-[#1E40AF]">
-                          <span className="text-[10.5px]">선행 발화 · </span>{c.preceding_turn}
+                          <span className="text-[10.5px]">상황 맥락 참고 · </span>{c.preceding_turn}
                         </div>
                       )}
 
@@ -845,9 +832,11 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                         </Button>
                       ) : (
                         <p className="mt-auto rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[11px] text-muted-foreground">
-                          {generatableType
-                            ? "근거 부족 · 생성기로 전달할 출발문이 없습니다. 원문을 수정해 다시 분석하세요."
-                            : "이 유형은 독립 미션으로 억지 변환하지 않습니다. 표현 자원·상황 배경으로만 참고하세요."}
+                          {contextReference
+                            ? "참고 자료 · 관계·상황을 이해하는 데만 씁니다. 출발 텍스트 없이 응답하게 하는 과제로 만들지 않습니다."
+                            : generatableType
+                              ? "근거 부족 · 생성기로 전달할 출발 텍스트가 없습니다. 원문을 수정해 다시 분석하세요."
+                              : "이 유형은 독립 미션으로 억지 변환하지 않습니다. 표현 자원·상황 배경으로만 참고하세요."}
                         </p>
                       )}
                     </div>
