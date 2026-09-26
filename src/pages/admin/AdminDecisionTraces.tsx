@@ -67,6 +67,7 @@ const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission:
 const IndividualRecords = () => {
   const [rows, setRows] = useState<MissionLogRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // 직접 펼치거나 접은 행만 기록한다. 나머지는 아래 defaultOpenId 규칙을 따른다.
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   // 학습자 승인·관리에서 「수행 기록」으로 넘어오면 ?q=… 로 검색어를 받는다.
   const [params] = useSearchParams();
@@ -171,6 +172,12 @@ const IndividualRecords = () => {
     () => filterMissionLogs(baseRows, filters, courseIndex),
     [baseRows, filters, courseIndex],
   );
+  // 화면에 들어오면 한 건은 펼쳐 둔다 — 현행(mission_v6) 수행 중 가장 최근 것, 없으면 맨 위 행.
+  const defaultOpenId = useMemo(() => {
+    const isCurrent = (row: MissionLogRow) =>
+      (row.context_judgment as { mission_schema_version?: unknown } | null)?.mission_schema_version === "mission_v6";
+    return (visibleRows.find(isCurrent) ?? visibleRows[0])?.id ?? null;
+  }, [visibleRows]);
   const completedCount = useMemo(
     () => visibleRows.filter((row) => row.mission_completed).length,
     [visibleRows],
@@ -330,7 +337,7 @@ const IndividualRecords = () => {
             </thead>
             <tbody>
               {visibleRows.map((row) => {
-                const open = !!expanded[row.id];
+                const open = expanded[row.id] ?? row.id === defaultOpenId;
                 const placement = row.course_id
                   ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
                   : "편성 외 수행";
