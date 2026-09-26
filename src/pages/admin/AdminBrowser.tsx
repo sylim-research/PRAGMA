@@ -301,20 +301,20 @@ const AdminBrowser = () => {
           <div className="flex flex-wrap items-end gap-3">
             {/* ── 필터 ── */}
             <div className="flex flex-wrap items-end gap-2 text-[12px]" aria-label="라이브러리 필터">
-              <span className="mb-1.5 mr-0.5 text-[11px] font-bold tracking-[0.08em] text-[#6C747A]">필터</span>
+              {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인·편성 주제) → 관리 정보(생성 출처·미션 형식·상태). */}
               <Filter className="w-full sm:w-[96px]" label="화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
+              <Filter className="w-full sm:w-[96px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+                opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
               <Filter className="w-full sm:w-[96px]" label="수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="모드" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+              <Filter className="w-full sm:w-[96px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
               <Filter className="w-full sm:w-[92px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
-              <Filter className="w-full sm:w-[148px]" label="테마" value={fTheme} onChange={(v) => setFTheme(v as typeof fTheme)}
+              <Filter className="w-full sm:w-[148px]" label="편성 주제" value={fTheme} onChange={(v) => setFTheme(v as typeof fTheme)}
                 opts={[["all", "전체"], ...Object.entries(THEME_LABEL)]} />
-              <Filter className="w-full sm:w-[108px]" label="언어 방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
-                opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-              <Filter className="w-full sm:w-[126px]" label="생성 소스" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
+              <Filter className="w-full sm:w-[126px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
               <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
                 opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
@@ -370,7 +370,7 @@ const AdminBrowser = () => {
                             type="button"
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
-                            aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "재료" : "미션"} ${n}개 보기`}
+                            aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
                             className={`flex h-10 w-full cursor-pointer flex-col items-center justify-center rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
@@ -390,14 +390,12 @@ const AdminBrowser = () => {
                             }
                           >
                             <span className="text-[14px] font-semibold">{n}</span>
-                            {n === 0 ? (
-                              <span className="text-[10.5px]">없음</span>
-                            ) : (
+                            {n === 0 ? null : (
                               <span
                                 className={`text-[10.5px] ${active ? "text-white/70" : ""}`}
                                 style={!active ? { color: tone.text } : undefined}
                               >
-                                번{c.t} · 통{c.i}
+                                번역 {c.t} · 통역 {c.i}
                               </span>
                             )}
                           </button>
@@ -413,14 +411,14 @@ const AdminBrowser = () => {
 
           {/* ── 셀 상세 ── */}
           {(
-            <section className="mt-4 max-w-[900px] rounded-xl border border-[#E2DED2] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
+            <section className="mt-4 max-w-[1030px] rounded-xl border border-[#E2DED2] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
               <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-[15px] font-bold text-[#15202B]">
-                {sel ? `${SPEECH_ACT_UI[sel.act]} · ${LEVEL[sel.level]}` : "전체 화행·수준"} — {cellRows.length}개
+                {sel ? `${SPEECH_ACT_UI[sel.act]} · ${LEVEL[sel.level]}` : LIBRARY_VIEWS.find((item) => item.value === view)?.label} {cellRows.length}개
               </h3>
               {sel && <Button size="sm" variant="ghost" onClick={() => setSel(null)}>화행·수준 선택 해제</Button>}
               </div>
-              {cellRows.length === 0 && <p className="py-6 text-[13px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오 재료가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
+              {cellRows.length === 0 && <p className="py-6 text-[13px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
               <ul className="mt-2.5 divide-y divide-[#EAE4D2] overflow-hidden rounded-lg border border-[#EAE4D2]">
                 {cellRows.slice(0, visibleCount).map((r) => (
                   <li key={r.scenario_id} className="bg-white">

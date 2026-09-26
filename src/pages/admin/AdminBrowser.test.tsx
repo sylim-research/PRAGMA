@@ -67,10 +67,10 @@ describe("학습 미션 라이브러리", () => {
     fireEvent.click(screen.getByRole("button", { name: /전체 미션/ }));
     expect(screen.getByText("상황 old")).toBeInTheDocument();
     expect(screen.queryByText("상황 core")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /시나리오 재료/ }));
+    fireEvent.click(screen.getByRole("button", { name: /미션 생성 전 시나리오/ }));
     expect(screen.getByText("상황 core")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /거절 · 중급 재료 0개 보기/ }));
-    expect(screen.getByRole("status")).toHaveTextContent("이 조건의 시나리오 재료가 없습니다");
+    fireEvent.click(screen.getByRole("button", { name: /거절 · 중급 시나리오 0개 보기/ }));
+    expect(screen.getByRole("status")).toHaveTextContent("이 조건의 시나리오가 없습니다");
   });
 
   it("1,000건 뒤에 있는 편성 가능 미션도 조회와 집계에 포함한다", async () => {
