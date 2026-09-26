@@ -62,7 +62,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
           >{label}</button>)}
         </div>
       </div>
-      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.6fr_0.85fr_0.85fr_0.85fr]">
+      <div className="mt-3 grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-[1.95fr_0.8fr_0.8fr_0.8fr]">
         {RESOURCE_DIMENSIONS.map(({ key, title, labels }) => {
           const counts = selected?.counts[key] ?? {};
           const max = Math.max(1, ...Object.values(counts));
