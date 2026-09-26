@@ -317,8 +317,8 @@ const AdminBatch = () => {
                   const counts = modeCounts[level];
                   return <div key={level} role="group" aria-label={LEVEL[level] + " 생성 설정"} className={"min-w-0 rounded-lg px-3 py-2 transition-shadow " + LEVEL_CARD_CLASS[level] + ""}>
                     <p className="flex flex-wrap items-baseline gap-x-2 font-bold">
-                      <span className="text-sm">{LEVEL[level]}</span>
-                      <span className="text-xl leading-6 tabular-nums">{settings[level].total}<span className="ml-1 text-xs font-medium">건</span></span>
+                      <span className="text-[17px]">{LEVEL[level]}</span>
+                      <span className="text-[28px] leading-8 tabular-nums">{settings[level].total}<span className="ml-1 text-[14px] font-medium">건</span></span>
                     </p>
                     <div className="mt-1.5 grid grid-cols-2 gap-2">
                       <div className="min-w-0">
@@ -509,7 +509,7 @@ const StepNum = ({ n }: { n: number }) =>
 
 const PlanMetric = ({ label, value, unit = "건", primary = false, className = "border border-[#EAE4D2] bg-[#FAF8F2]" }: { label: string; value: number; unit?: string; primary?: boolean; className?: string }) =>
   <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
-    <p className="text-[13px] font-medium">{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-xs font-normal">{unit}</span></p>
+    <p className="text-[15px] font-semibold">{label}</p><p className="mt-1 text-[32px] font-bold leading-9 tabular-nums">{value}<span className="ml-1 text-[15px] font-medium">{unit}</span></p>
   </div>;
 
 const CoverageCard = ({ title, filled, total, className = "border-[#EAE4D2] bg-[#FAF8F2]" }: { title: string; filled: number; total: number; className?: string }) =>
