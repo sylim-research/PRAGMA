@@ -38,6 +38,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   ]},
   { header: "4. 수업 운영", items: [
     // 학습 미션 라이브러리(/admin/library)는 메뉴에서 뺐다(2026-09-26 연구자 결정). 화면·주소는 남아 있다.
+    { to: "/admin/composer/new", label: "새 교과목 개설" },
     { to: "/admin/composer", label: "15주 수업 편성" },
     { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},

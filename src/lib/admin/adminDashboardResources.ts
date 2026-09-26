@@ -52,6 +52,14 @@ export function summarizeDashboardResources(rows: readonly DashboardScenarioRow[
 
 export type DashboardResources = ReturnType<typeof summarizeDashboardResources>;
 
+/** 대시보드 숫자 → 학습 미션 제작 화면(같은 조건으로 거른 목록). 라이브러리는 메뉴에서 뺐다(2026-09-26). */
+export function resourceAssemblyHref(scope: ResourceScope, dimension?: ResourceDimension, value?: string) {
+  const params = new URLSearchParams({ state: scope === "ready" ? "v6_done" : "all" });
+  const definition = RESOURCE_DIMENSIONS.find(item => item.key === dimension);
+  if (definition && value) params.set(definition.query, value);
+  return `/admin/assembly?${params}`;
+}
+
 export function resourceLibraryHref(scope: ResourceScope, dimension?: ResourceDimension, value?: string) {
   const params = new URLSearchParams({ view: scope === "ready" ? "ready" : "missions", current: "1" });
   const definition = RESOURCE_DIMENSIONS.find(item => item.key === dimension);

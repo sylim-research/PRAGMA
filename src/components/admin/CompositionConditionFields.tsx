@@ -19,6 +19,8 @@ export function CompositionConditionFields({
   onCourseMode,
   onThemes,
   leading,
+  hideThemes = false,
+  compact = false,
 }: {
   value: CompositionConditions;
   onLevel: (level: LearnerLevel) => void;
@@ -27,12 +29,16 @@ export function CompositionConditionFields({
   onThemes: (themes: ThemeCode[]) => void;
   /** 조건 줄 맨 앞에 붙는 칸(예: 교과목명). */
   leading?: React.ReactNode;
+  /** true면 편성 주제 줄을 그리지 않는다(ThemePicker를 따로 크게 둘 때). */
+  hideThemes?: boolean;
+  /** true면 좁은 칸(새 교과목 개설 왼쪽 열)용 — 2열로 둔다. */
+  compact?: boolean;
 }) {
   const toggleTheme = (theme: ThemeCode) =>
     onThemes(value.themes.includes(theme) ? value.themes.filter((item) => item !== theme) : [...value.themes, theme]);
   return (
     <div className="space-y-2.5 text-[13px]">
-      <div className={`grid gap-x-4 gap-y-2 sm:grid-cols-2 ${leading ? "lg:grid-cols-[minmax(200px,1.4fr)_minmax(110px,0.8fr)_minmax(110px,0.8fr)_minmax(190px,1.2fr)]" : "lg:grid-cols-[minmax(110px,1fr)_minmax(110px,1fr)_minmax(190px,1.4fr)]"}`}>
+      <div className={`grid gap-x-4 gap-y-2 sm:grid-cols-2 ${compact ? "" : leading ? "lg:grid-cols-[minmax(200px,1.4fr)_minmax(110px,0.8fr)_minmax(110px,0.8fr)_minmax(190px,1.2fr)]" : "lg:grid-cols-[minmax(110px,1fr)_minmax(110px,1fr)_minmax(190px,1.4fr)]"}`}>
         {leading}
         <label className="flex flex-col gap-1">
           <span className={LABEL}>수준</span>
@@ -43,7 +49,7 @@ export function CompositionConditionFields({
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className={LABEL}>언어방향</span>
+          <span className={LABEL}>방향</span>
           <select value={value.direction} onChange={(event) => onDirection(event.target.value as LanguageDirection)} className={SELECT}>
             {COMPOSITION_DIRECTIONS.map((item) => (
               <option key={item} value={item}>{DIRECTION_LABEL[item]}</option>
@@ -51,7 +57,7 @@ export function CompositionConditionFields({
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className={LABEL}>번역·통역 비율</span>
+          <span className={LABEL}>수행 방식</span>
           <select
             value={value.courseMode}
             onChange={(event) => onCourseMode(event.target.value as CourseMode)}
@@ -65,7 +71,7 @@ export function CompositionConditionFields({
         </label>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5">
+      {!hideThemes && <div className="flex flex-wrap items-center gap-1.5">
         <span className={`${LABEL} mr-1.5`}>
           편성 주제 <span className="font-normal">{value.themes.length === 0 ? `전체 ${THEME_CODES.length}개` : `선택 ${value.themes.length}개`}</span>
         </span>
@@ -90,7 +96,30 @@ export function CompositionConditionFields({
             {THEME_LABEL[theme]}
           </button>
         ))}
-      </div>
+      </div>}
+    </div>
+  );
+}
+
+/**
+ * 편성 주제 크게 고르기 — 주제만 고르면 그 주제의 승인된 미션으로 15주가 자동으로 채워진다.
+ * 새 교과목 편성에서 이 기능이 한눈에 보이도록 칩 대신 넓은 선택 칸으로 둔다.
+ */
+export function ThemePicker({ themes, onThemes }: { themes: ThemeCode[]; onThemes: (themes: ThemeCode[]) => void }) {
+  const toggle = (theme: ThemeCode) => onThemes(themes.includes(theme) ? themes.filter((item) => item !== theme) : [...themes, theme]);
+  // 고른 주제 = 옅은 브랜드 노랑 바탕 + 진한 테두리 + ✓. 남색 채움은 과해서 쓰지 않는다.
+  const tile = (on: boolean) => `inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[14px] font-semibold transition ${
+    on ? "border-[#C9A227] bg-[#FFF3C4] text-[#15202B]" : "border-[#E4DDCB] bg-white text-[#3F4E57] hover:border-[#C9A227]"}`;
+  return (
+    <div className="flex flex-wrap gap-2">
+      <button type="button" aria-pressed={themes.length === 0} onClick={() => onThemes([])} className={tile(themes.length === 0)}>
+        {themes.length === 0 && <span aria-hidden>✓</span>}전체 주제
+      </button>
+      {THEME_CODES.map((theme) => (
+        <button key={theme} type="button" aria-pressed={themes.includes(theme)} onClick={() => toggle(theme)} className={tile(themes.includes(theme))}>
+          {themes.includes(theme) && <span aria-hidden>✓</span>}{THEME_LABEL[theme]}
+        </button>
+      ))}
     </div>
   );
 }

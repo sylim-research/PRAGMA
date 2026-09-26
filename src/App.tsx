@@ -292,6 +292,7 @@ const App = () => (
           {/* 15주 구조와 미션 편성을 한 화면으로 통합한다. 옛 북마크는 보존. */}
           <Route path="/admin/curriculum" element={<Navigate to="/admin/composer" replace />} />
           <Route path="/admin/composer" element={<RequireAdmin><AdminComposer /></RequireAdmin>} />
+          <Route path="/admin/composer/new" element={<RequireAdmin><AdminComposer /></RequireAdmin>} />
           <Route path="/admin/prompt-harness" element={<RequireAdmin><AdminPromptHarness /></RequireAdmin>} />
           {/* 같은 미션 목록을 목적별로 나눠 본다. AI 화면에는 승인 기능이 없다. */}
           <Route path="/admin/ai-review" element={<RequireAdmin><AdminAssembly key="ai-review" reviewMode aiReview /></RequireAdmin>} />

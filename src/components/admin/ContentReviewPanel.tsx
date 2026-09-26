@@ -285,7 +285,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               ? <span className="text-[13px] font-semibold text-white">✓ 완료</span>
               : null}
         </div>
-        <ol className="divide-y divide-[#F0EDE4]">
+        <ol className="divide-y divide-[#F0EDE4] pt-2">
           {rows.map((row, index) => {
             const status = rowStatus(row.key);
             const skipped = Boolean(row.optional) && !crossRequested && status === "todo";
