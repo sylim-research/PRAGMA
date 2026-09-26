@@ -1004,7 +1004,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       description={aiReview
         ? "자동 품질 점검과 AI 검토를 거친 콘텐츠를 교수자가 감수하고 최종 승인합니다."
         : reviewMode
-          ? "현재 콘텐츠를 감수하고 수업 사용을 최종 승인합니다."
+          ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
           : "시나리오로 학습 미션 초안을 만들고, 품질 점검·AI 검토·교수자 최종 승인·편성 중 어디에 있는지 봅니다."}
     >
       {loading ? (

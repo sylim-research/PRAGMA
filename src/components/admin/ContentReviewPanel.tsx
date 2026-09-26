@@ -393,8 +393,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
             const change = decision?.proposed_change_ko?.trim() || finding.suggestion_ko;
             const badge = finding.needs_professor || decision?.needs_professor ? { text: "교수자 확인 필요", cls: "bg-[#233542] text-white" }
-              : agreed ? { text: "두 검토 합의", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
-              : decision ? { text: `의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
+              : agreed ? { text: "AI 검토 일치", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
+              : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
               : focused ? { text: "교수자 단독 판단", cls: "border border-[#C08A2E] text-[#8A5A14]" } : null;
             const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value,
               ...(!draft?.rationale_ko.trim() || isDefaultRationale(draft.rationale_ko) ? { rationale_ko: DEFAULT_FINDING_RATIONALE[value] } : {}) });
@@ -407,7 +407,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
               {/* 논증·인용·저장 경로는 판단 자료가 아니라 추적 자료다. 삭제하지 않고 이 안으로 옮긴다. */}
               <details open={!agreed && Boolean(decision) && decision?.decision !== "accept"} className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">지적 전문·근거</summary>
+                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">검토 의견 전문·근거</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
                   <p className="font-semibold">{plainIssue(finding.issue_ko)}</p>
                   <p>{finding.reason_ko}</p>
@@ -415,7 +415,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                   {finding.uncertainty_ko && <p className="text-xs">불확실성: {finding.uncertainty_ko}</p>}
                   <p className="text-xs">{verdictLabel[finding.severity]} · <code className="break-all text-[10px]">{finding.where}</code></p>
                   {decision ? <div className="rounded bg-white p-2">
-                    <strong className="text-[12px]">의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                    <strong className="text-[12px]">AI 의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                     <p className="mt-1">{decision.rationale_ko}</p>
                     {decision.evidence_quote && <blockquote className="mt-1 border-l-2 border-[#C08A2E] pl-2">{decision.evidence_quote}</blockquote>}
                   </div> : <p className="text-xs">{focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</p>}
@@ -451,8 +451,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
-            {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="의미 쟁점 판정">
-              <h4 className="text-[14px] font-bold text-[#233542]">의미 쟁점 판정 {substantiveFindings.length}건</h4>
+            {substantiveFindings.length > 0 && <section className="space-y-3 rounded-lg border p-3" aria-label="교수자 감수 검토 의견">
+              <h4 className="text-[14px] font-bold text-[#233542]">① 교수자 감수 · 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
@@ -487,7 +487,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
       {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-6 py-4">
-        <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">교수자 최종 승인</h4>
+        <h4 className="text-[18px] font-bold leading-tight text-[#15202B]">② 최종 승인</h4>
         {!decisionsClear && <p className="text-amber-800">문제 항목별 교수자 판단을 저장하고 수정 필요·판단 보류를 해결해야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
@@ -500,7 +500,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         <Textarea aria-label="교수자 승인 근거" rows={1} className="min-h-0 bg-white px-4 py-2.5 text-[14.5px] leading-6" value={note} onChange={(event) => setNote(event.target.value)} />
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학생 화면과 자동 점검 결과를 확인했습니다.</label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-11 bg-[#FAD338] px-8 text-[15.5px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:bg-[#FBE7A1] disabled:text-[#6B5518] disabled:opacity-100" : undefined}>
             {busy ? "처리 중…" : "교수자 최종 승인"}
