@@ -122,8 +122,7 @@ const AdminComposer = () => {
 
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // 기존 교과목을 열면 조건은 접어 두고 15주 배치표를 먼저 보여 준다(조건은 교과목 카드에 이미 보인다).
-  const [conditionsOpen, setConditionsOpen] = useState(false);
+  const [conditionsOpen, setConditionsOpen] = useState(true);
   const [tab, setTab] = useState<"existing" | "new">("existing");
   // 새 교과목을 만든 직후, 그 교과목이 다 불러와지면 미션 자동 채우기를 한 번 실행한다.
   const [pendingAutoFillId, setPendingAutoFillId] = useState<string | null>(null);
@@ -735,25 +734,26 @@ const AdminComposer = () => {
           </p>
         )}
 
-        {/* 탭 두 개 — 기존 교과목(공개·비공개 모두) 편성 / 새 교과목 편성. */}
-        <div role="tablist" aria-label="편성 대상" className="flex flex-wrap gap-1.5 border-b border-[#E2DED2]">
+        {/* 두 갈래를 누를 수 있는 배너로 — 기존 교과목(공개·비공개 모두) 편성 / 새 교과목 편성. */}
+        <div role="tablist" aria-label="편성 대상" className="grid gap-3 sm:grid-cols-2">
           {([
-            ["existing", `기존 교과목 ${outlines.length}`],
-            ["new", "+ 새 교과목 편성"],
-          ] as const).map(([key, label]) => (
+            ["existing", "기존 교과목", "개설한 교과목의 15주 배치를 보고 고칩니다"],
+            ["new", "+ 새 교과목 편성", "수준·방향·수행 방식을 정해 새 교과목을 만듭니다"],
+          ] as const).map(([key, label, note]) => (
             <button
               key={key}
               type="button"
               role="tab"
               aria-selected={tab === key}
               onClick={() => setTab(key)}
-              className={`-mb-px border-b-[3px] px-4 py-2 text-[15px] transition ${
+              className={`flex flex-col gap-1 rounded-xl border px-5 py-3.5 text-left transition ${
                 tab === key
-                  ? "border-[#1F3A5F] font-bold text-[#15202B]"
-                  : "border-transparent font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
+                  ? "border-[#15202B] bg-[#15202B] text-white shadow-[0_6px_16px_rgba(21,32,43,0.14)]"
+                  : "border-[#D8D3C4] bg-white text-[#15202B] hover:border-[#1F3A5F] hover:bg-[#F7F9FC]"
               }`}
             >
-              {label}
+              <span className="text-[16px] font-bold">{label}</span>
+              <span className={`text-[12.5px] ${tab === key ? "text-[#C5CFD4]" : "text-[#5D6970]"}`}>{note}</span>
             </button>
           ))}
         </div>
@@ -761,7 +761,7 @@ const AdminComposer = () => {
         {tab === "new" && <div className="mt-4"><NewCoursePanel cores={cores} courses={outlines} onCreated={handleCourseCreated} /></div>}
 
         {tab === "existing" && outlines.length > 0 && (
-          <div role="radiogroup" aria-label="교과목 선택" className="mt-2.5 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+          <div role="radiogroup" aria-label="교과목 선택" className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {outlines.map((item) => {
               const selected = item.id === outlineId;
               const published = item.status === "published";
@@ -774,21 +774,21 @@ const AdminComposer = () => {
                   data-course-id={item.id}
                   disabled={loading}
                   onClick={() => setOutlineId(item.id)}
-                  className={`flex flex-col gap-1 rounded-xl border bg-white px-3.5 py-2.5 text-left transition ${
+                  className={`flex flex-col gap-2 rounded-xl border bg-white px-4 py-4 text-left transition ${
                     selected
                       ? "border-[#1F3A5F] shadow-[0_0_0_1px_#1F3A5F] bg-[#F7F9FC]"
                       : "border-[#E2DED2] hover:border-[#9FB0C6]"
                   }`}
                 >
                   <span className="flex items-start justify-between gap-2">
-                    <span className="text-[14px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
+                    <span className="text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                       published ? "bg-[#E8F4EC] text-[#245E44]" : "bg-[#FFF3D6] text-[#8A5A14]"
                     }`}>
                       {published ? "공개" : "비공개"}
                     </span>
                   </span>
-                  <span className="text-[12.5px] font-medium text-[#1F3A5F]">
+                  <span className="text-[13px] font-medium text-[#1F3A5F]">
                     {LEVEL[item.level as LearnerLevel] ?? item.level} · {DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · {COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}
                   </span>
                 </button>
@@ -838,9 +838,9 @@ const AdminComposer = () => {
               </AlertDialogContent>
             </AlertDialog>
 
-        {/* 편성 조건(기본 접힘)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
+        {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
-        <div className="mt-4 rounded-xl border border-[#E2DED2] bg-white">
+        <div className="mt-5 rounded-xl border border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <button
