@@ -43,8 +43,11 @@ function summarizeResources(rows: readonly DashboardScenarioRow[]) {
 }
 
 export function summarizeDashboardResources(rows: readonly DashboardScenarioRow[]) {
-  const missions = excludeSupersededRows(rows).filter(isGeneratedMission);
+  const current = excludeSupersededRows(rows);
+  const missions = current.filter(isGeneratedMission);
   return {
+    // 새 판으로 대체된 옛 판을 뺀 시나리오 수(미션이 아직 없는 시나리오 포함).
+    scenarioCount: current.filter((row) => row.content_format === "scenario_core_v1").length,
     all: summarizeResources(missions),
     ready: summarizeResources(missions.filter(isComposerReadyMission)),
   };

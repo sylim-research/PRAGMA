@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, CheckCircle2, MessagesSquare } from "lucide-react";
+import { BookOpen, CheckCircle2, Layers, MessagesSquare } from "lucide-react";
 import { RESOURCE_DIMENSIONS, resourceAssemblyHref, type DashboardResources, type ResourceScope } from "@/lib/admin/adminDashboardResources";
 
 const number = (value: number | undefined) => value == null ? "—" : value.toLocaleString("ko-KR");
@@ -12,37 +12,39 @@ export function DashboardResourceOverview({ resources, error, status }: {
 }) {
   const [scope, setScope] = useState<ResourceScope>("all");
   const selected = resources?.[scope];
+  // 순서 = 제작 흐름: 시나리오 → 미션에 든 MJT·DCT → 편성 가능 미션.
   const cards = [
+    { label: "시나리오", value: resources?.scenarioCount, unit: "개", note: "생성된 학습 상황 설정", icon: Layers },
     { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen },
     { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare },
-    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 자료", icon: CheckCircle2, ready: true },
+    { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 학습 미션", icon: CheckCircle2 },
   ];
 
   return <>
     <section aria-labelledby="resource-overview-title" className="mt-5">
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING RESOURCES</p>
-          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 자료</h2>
+          <p className="mb-1 text-xs font-semibold tracking-[0.14em] text-[#8B7324]">LEARNING CONTENT</p>
+          <h2 id="resource-overview-title" className="text-[26px] font-bold tracking-tight text-[#15202B]">보유 학습 콘텐츠</h2>
         </div>
         {status}
       </div>
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 위 카드 세 개는 요약이라 누르지 않는다. 아래 화행·수준·방향·수행 방식 숫자는 학습 미션 제작 목록으로 연결한다. */}
-        {cards.map(({ label, value, unit, note, icon: Icon, ready }) => (
+        {cards.map(({ label, value, unit, note, icon: Icon }) => (
           <div key={label} className={[
             "flex min-h-[108px] flex-col rounded-2xl border px-5 py-3.5",
-            ready ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E6E1D5] bg-white text-[#15202B]",
+            "border-[#E6E1D5] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-semibold">{label}</span>
-              <Icon aria-hidden className={ready ? "h-5 w-5 text-[#EFD65B]" : "h-5 w-5 text-[#8B825F]"} />
+              <Icon aria-hidden className="h-5 w-5 text-[#8B825F]" />
             </div>
             <div className="mt-2 flex flex-wrap items-baseline gap-2">
               <span className="text-[30px] font-bold leading-none tracking-[-0.045em] tabular-nums">{error ? "—" : number(value)}</span>
-              <span className={ready ? "text-sm text-[#C5CFD4]" : "text-sm text-[#647079]"}>{unit}</span>
+              <span className="text-sm text-[#647079]">{unit}</span>
             </div>
-            <div className={"mt-auto flex items-center justify-between gap-1 pt-2 text-xs " + (ready ? "text-[#C5CFD4]" : "text-[#647079]")}>
+            <div className="mt-auto flex items-center justify-between gap-1 pt-2 text-xs text-[#647079]">
               <span>{note}</span>
             </div>
           </div>
@@ -54,9 +56,9 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-distribution-title" className="mt-3 rounded-2xl border border-[#E6E1D5] bg-white px-5 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 자료 구성</h2>
+          <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 콘텐츠 구성</h2>
         </div>
-        <div aria-label="자료 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
+        <div aria-label="콘텐츠 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
           {([['all', '전체 보유'], ['ready', '편성 가능']] as const).map(([value, label]) => <button
             key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
             className={"rounded-md px-3 py-1.5 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#9B852E] " + (scope === value ? "bg-[#15202B] text-white" : "text-[#5D6971] hover:text-[#15202B]")}
