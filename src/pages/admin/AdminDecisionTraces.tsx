@@ -362,9 +362,9 @@ const IndividualRecords = () => {
                 <th className="px-3 py-2 font-medium">최근 저장</th>
                 <th className="px-3 py-2 font-medium">학습자</th>
                 <th className="px-3 py-2 font-medium">화행</th>
-                <th className="px-3 py-2 font-medium">미션</th>
+                <th className="px-3 py-2 font-medium">학습 미션</th>
                 <th className="px-3 py-2 font-medium">교과목·주차</th>
-                <th className="px-3 py-2 font-medium">방식</th>
+                <th className="px-3 py-2 font-medium">수행 방식</th>
                 <th className="px-3 py-2 font-medium">상태</th>
                 <th className="px-3 py-2 text-right font-medium">내용</th>
               </tr>
@@ -442,7 +442,7 @@ const Page = () => {
   return (
     <AdminShell
       title="학습 수행 기록"
-      description="학습 미션 수행 기록을 개별 학습자 단위와 익명 학급 집계 단위로 확인합니다."
+      description="학습자가 수행한 학습 미션을 개별 수행 기록과 익명 학급 응답 분포로 확인합니다."
     >
       <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
         {TABS.map((item) => (
