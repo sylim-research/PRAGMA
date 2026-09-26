@@ -380,16 +380,12 @@ function AuditMethodSection() {
           <p className="text-[12.5px] font-semibold uppercase tracking-[0.1em] text-[#8A7621]">
             어휘 참조
           </p>
-          <span className="rounded-full border border-[#D9D2BF] bg-white px-2 py-0.5 text-[12.5px] font-medium text-[#5A6670]">
-            실제 콘텐츠 기록
-          </span>
         </div>
         <h2 id="audit-method-title" className="mt-1 text-[18px] font-semibold tracking-[-0.02em] text-[#15202B]">
           HSK 어휘 목록 대조
         </h2>
         <p className="mt-1 max-w-[50rem] text-[14px] leading-5 text-[#5B564D]">
-          중국어 단어를 뽑아 수준별 HSK 누적 목록과 정확히 일치하는지 셉니다. 같은 입력에는 늘 같은 결과가
-          나오며, 목록 밖 단어를 금지하는 규칙은 아닙니다.
+          같은 입력에는 늘 같은 결과가 나오며, 목록 밖 단어를 막지 않습니다.
         </p>
       </div>
 
@@ -417,16 +413,15 @@ function AuditMethodSection() {
 
         <div className="grid gap-2 sm:grid-cols-2">
           <div className="rounded-lg border border-[#E5DEC9] bg-white px-3 py-3 text-[13.5px] text-[#26333B]">
-            <p className="font-semibold">이 검사가 확인하는 것</p>
+            <p className="font-semibold">이 대조가 확인하는 것</p>
             <p className="mt-1 leading-relaxed">
               뽑은 단어 수, HSK 목록과 일치한 수, 목록 밖 단어 수를 매번 같은 규칙으로 셉니다.
             </p>
           </div>
           <div className="rounded-lg bg-[#F6F3EA] px-3 py-3 text-[13.5px] text-[#26333B]">
-            <p className="font-semibold">이 검사가 판정하지 않는 것</p>
+            <p className="font-semibold">이 대조가 판정하지 않는 것</p>
             <p className="mt-1 leading-relaxed">
-              콘텐츠가 수준에 비해 쉬운지 어려운지, 목록 밖 단어가 부적절한지, 다시 만들어야 하는지는
-              판정하지 않습니다.
+              난이도의 적절성, 목록 밖 단어의 부적절성, 재생성 필요 여부는 판정하지 않습니다.
             </p>
           </div>
         </div>
