@@ -99,10 +99,10 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         // 후크는 서두르지 않고 안정감 있게 드러나야 한다 — 조급해 보이지 않도록
         // 한 문장씩 여유를 두고 내려앉는 속도로 맞춘다.
-        "rise-in": "rise-in 1.8s cubic-bezier(0.22,1,0.36,1) both",
-        // 형광펜은 "이게 중요하다"고 강조하듯 확 긋는 느낌이라야 한다 — 문장이
-        // 자리 잡는 속도(1.8s)와 대비되는 빠르고 단호한 획.
-        "marker-sweep": "marker-sweep 0.75s cubic-bezier(0.45,0.05,0.25,1) both",
+        // 2026-09-26: 빠르면 경박해 보인다는 연구자 판단으로 1.8s → 2.6s.
+        "rise-in": "rise-in 2.6s cubic-bezier(0.22,1,0.36,1) both",
+        // 형광펜은 문장이 자리 잡은 뒤 천천히 그어진다 — 진중하게 짚는 획(0.75s → 1.6s, 2026-09-26).
+        "marker-sweep": "marker-sweep 1.6s cubic-bezier(0.65,0,0.35,1) both",
       },
     },
   },

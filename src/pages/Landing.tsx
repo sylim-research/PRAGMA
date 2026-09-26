@@ -44,7 +44,7 @@ const Landing = () => {
               <span className="relative inline-block">
                 <span
                   aria-hidden
-                  className="absolute inset-x-[-3px] bottom-[3px] h-[32%] origin-left animate-marker-sweep rounded-[2px] bg-[#FAD338] [animation-delay:1200ms] motion-reduce:animate-none"
+                  className="absolute inset-x-[-3px] bottom-[3px] h-[32%] origin-left animate-marker-sweep rounded-[2px] bg-[#FAD338] [animation-delay:2200ms] motion-reduce:animate-none"
                 />
                 {/* 형광펜 위에 얹히도록 텍스트도 위치를 잡아 준다(-z-10은 페이지
                     배경 뒤로 숨어 버린다). */}
@@ -52,7 +52,7 @@ const Landing = () => {
               </span>
               에 따라
             </span>
-            <span className="block animate-rise-in [animation-delay:600ms] motion-reduce:animate-none">
+            <span className="block animate-rise-in [animation-delay:900ms] motion-reduce:animate-none">
               다르게 표현합니다.
             </span>
           </h1>
