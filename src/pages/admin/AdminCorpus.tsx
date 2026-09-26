@@ -308,23 +308,47 @@ function OperationsSection({
               {axes.join(" · ")}{audit.createdAt && ` · ${formatShortDate(audit.createdAt)}`}
             </p>
           </div>
-          <div className="rounded-lg bg-[#FAF8F2] px-4 py-3">
-            <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1 text-[14px] text-[#514C44]">
-              <span>단어 <b className="text-[18px] font-semibold tabular-nums text-[#15202B]">{fmt(audit.distinctTokenCount ?? 0)}</b></span>
-              <span><span className="mr-1 inline-block size-2 rounded-full bg-[#33495A] align-middle" />목록 일치 <b className="text-[18px] font-semibold tabular-nums text-[#15202B]">{fmt(audit.matchedTokenCount ?? 0)}</b></span>
-              <span><span className="mr-1 inline-block size-2 rounded-full bg-[#E3C44E] align-middle" />목록 밖 <b className="text-[18px] font-semibold tabular-nums text-[#15202B]">{fmt(audit.candidates.length)}</b></span>
-              <span className="ml-auto text-[13px] text-[#655F55]">기준 HSK 1–{audit.referenceCeiling}급{referenceEntries != null && ` · ${fmt(referenceEntries)}개`}</span>
-            </div>
-            <RatioBar matched={audit.matchedTokenCount ?? 0} outside={audit.candidates.length} className="mt-2.5" />
-          </div>
-          {audit.candidates.length > 0 && (
-            <div>
-              <p className="text-[13px] text-[#655F55]">목록 밖 단어 · 고유명사·업무 용어·어절 분리 등 (오류 아님)</p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {audit.candidates.map((word) => (
-                  <span key={word} className="rounded-md border border-[#EBDDA2] bg-[#FFF9E3] px-2 py-0.5 text-[14px] text-[#3F3A32]" lang="zh">{word}</span>
-                ))}
+          {/* 흐름 = 뽑은 단어 → 이 미션의 기준 → 대조 결과(비율 막대). 목록 밖 단어는 아래에 예시로. */}
+          <ol className="grid overflow-hidden rounded-lg border border-[#DED8CB] sm:grid-cols-[1fr_1fr_1.6fr] sm:divide-x sm:divide-[#DED8CB]">
+            <li className="bg-white px-4 py-3">
+              <p className="text-[13px] font-medium text-[#8A7423]">1 · 중국어 단어</p>
+              <p className="mt-1.5 text-[28px] font-semibold leading-none tabular-nums text-[#15202B]">
+                {fmt(audit.distinctTokenCount ?? 0)}<span className="ml-0.5 text-[14px] font-normal text-[#655F55]">개</span>
+              </p>
+              <p className="mt-1.5 text-[13.5px] text-[#655F55]">이 {kind}에서 추출 · 중복 제외</p>
+            </li>
+            <li className="bg-white px-4 py-3">
+              <p className="text-[13px] font-medium text-[#8A7423]">2 · 대조 기준</p>
+              <p className="mt-1.5 text-[20px] font-semibold leading-tight text-[#15202B]">HSK 1–{audit.referenceCeiling}급</p>
+              <p className="mt-1.5 text-[13.5px] text-[#655F55]">PRAGMA {pragmaLevel ?? "수준"} 누적 목록{referenceEntries != null && ` · ${fmt(referenceEntries)}개`}</p>
+            </li>
+            <li className="bg-[#FBFAF6] px-4 py-3">
+              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과</p>
+              <div className="mt-1.5 grid grid-cols-2 gap-2">
+                <div className="rounded-md bg-[#EEF1F2] px-3 py-2">
+                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
+                    {fmt(audit.matchedTokenCount ?? 0)}<span className="ml-1 text-[14px] font-semibold text-[#33495A]">{pct(audit.distinctTokenCount ? (audit.matchedTokenCount ?? 0) / audit.distinctTokenCount : null)}</span>
+                  </p>
+                  <p className="mt-1 text-[13px] font-medium text-[#33495A]">목록 일치</p>
+                </div>
+                <div className="rounded-md bg-[#FFF4BE] px-3 py-2">
+                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
+                    {fmt(audit.candidates.length)}<span className="ml-1 text-[14px] font-semibold text-[#8A6A0E]">{pct(audit.distinctTokenCount ? audit.candidates.length / audit.distinctTokenCount : null)}</span>
+                  </p>
+                  <p className="mt-1 text-[13px] font-medium text-[#8A6A0E]">목록 밖</p>
+                </div>
               </div>
+              <RatioBar matched={audit.matchedTokenCount ?? 0} outside={audit.candidates.length} className="mt-2.5" />
+            </li>
+          </ol>
+          {audit.candidates.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 text-[13.5px] font-medium text-[#514C44]">목록 밖 단어 예</span>
+              {audit.candidates.slice(0, 12).map((word) => (
+                <span key={word} className="rounded-md border border-[#EBDDA2] bg-[#FFF9E3] px-2 py-0.5 text-[14px] text-[#3F3A32]" lang="zh">{word}</span>
+              ))}
+              {audit.candidates.length > 12 && <span className="text-[13.5px] text-[#655F55]">외 {fmt(audit.candidates.length - 12)}개</span>}
+              <span className="text-[13px] text-[#7A746A]">· 고유명사·업무 용어·어절 분리 등</span>
             </div>
           )}
         </div>
