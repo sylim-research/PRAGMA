@@ -11,8 +11,8 @@ import { NavLink } from "react-router-dom";
 // 같은 두 탭을 PC에서는 헤더 안(LearnerTopNav)에, 모바일에서는 화면 아래(LearnerBottomNav)에 둔다(2026-09-19).
 // 하단 탭바는 모바일 관례라 PC 화면에서는 빈 공간만 강조했다.
 const TABS = [
-  { to: "/learner/course", label: "수업", icon: BookOpen },
-  { to: "/learner/records", label: "기록", icon: History },
+  { to: "/learner/course", label: "내 수업", icon: BookOpen },
+  { to: "/learner/records", label: "내 기록", icon: History },
 ];
 
 export const LearnerBottomNav = () => (
@@ -48,23 +48,41 @@ export const LearnerBottomNav = () => (
   </nav>
 );
 
-/** PC 헤더 안의 같은 두 탭. 현재 탭은 노란 밑줄로 표시한다. */
+/** PC 헤더 안의 같은 두 탭. 현재 탭은 글자 아래 노란 밑줄로 표시한다. */
 export const LearnerTopNav = () => (
-  // 밑줄은 글자 폭에만 긋는다 — 좌우 여백까지 덮으면 무엇을 가리키는지 흐려진다(2026-09-20).
-  // 탭이 둘뿐이고 이름이 두 글자라 아이콘은 구분에 기여하지 않아 PC 헤더에서는 뺀다(모바일 하단 탭은 유지).
-  <nav aria-label="학습자 메뉴" className="hidden items-center gap-5 md:flex">
+  // 2026-09-28: 탭을 상자·알약으로 감싸면 헤더가 도구 막대처럼 무거워지고 로고보다 튀었다.
+  // 글자만 두고, 현재 탭은 글자 바로 아래 노란 밑줄로 표시한다.
+  // 선은 흐름 밖(absolute)에 그려 글자 높이를 밀지 않는다 — border-b 방식은 옆 「내 계정」과 높이가 어긋났다.
+  // 글자만 있으면 「누르는 메뉴」 신호가 약해 아이콘을 붙이고, 비활성 글자도 흐리게 하지 않는다(회색=꺼진 기능으로 읽힘).
+  // 이름은 「내 수업 · 내 기록 · 내 계정」으로 길이·구조를 맞춘다(2026-09-28). 정본 용어 「학습 기록」은 기록 페이지 제목이 지킨다.
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
     {TABS.map((t) => (
       <NavLink
         key={t.to}
         to={t.to}
         className={({ isActive }) =>
           [
-            "border-b-2 pb-1 text-[14px] font-bold transition-colors",
-            isActive ? "border-[#FAD338] text-white" : "border-transparent text-[#B9C4CE] hover:text-white",
+            "inline-flex h-8 items-center gap-1.5 rounded-md px-2.5 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
+            isActive ? "text-white" : "text-[#DCE3E9] hover:bg-white/[0.07] hover:text-white",
           ].join(" ")
         }
       >
-        {t.label}
+        {({ isActive }) => (
+          <>
+            <t.icon aria-hidden strokeWidth={2} className={["h-[15px] w-[15px]", isActive ? "text-[#FAD338]" : ""].join(" ")} />
+            {/* 밑줄은 아이콘을 빼고 글자 폭에만 긋는다(2026-09-28). */}
+            <span className="relative">
+              {t.label}
+              <span
+                aria-hidden
+                className={[
+                  "absolute inset-x-0 -bottom-[5px] h-[2px] rounded-full bg-[#FAD338] transition-opacity",
+                  isActive ? "opacity-100" : "opacity-0",
+                ].join(" ")}
+              />
+            </span>
+          </>
+        )}
       </NavLink>
     ))}
   </nav>

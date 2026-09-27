@@ -45,10 +45,9 @@ export const LearnerJourneyShell = ({
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
         <div className={`mx-auto flex ${widthClass} items-center justify-between gap-4 px-6 py-4 ${headerAlignmentClass}`}>
           <HomeBrand />
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
             {headerRight}
             {nav && <LearnerTopNav />}
-            {nav && <span aria-hidden className="hidden h-5 w-px bg-white/15 md:block" />}
             <LearnerAccountMenu />
           </div>
         </div>
