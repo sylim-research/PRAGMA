@@ -38,11 +38,11 @@ export function LearnerAccountMenu() {
         <button
           type="button"
           aria-label="내 계정"
-          className="group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-white/15 px-2.5 text-[14px] sm:pl-3 font-semibold tracking-[-0.01em] text-[#DCE3E9] transition-colors hover:border-white/30 hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] data-[state=open]:border-white/30 data-[state=open]:bg-white/[0.06] data-[state=open]:text-white"
+          className="group inline-flex h-9 shrink-0 items-center gap-1.5 rounded-full border border-white/15 px-2.5 text-[14px] sm:pl-4 sm:pr-3 font-semibold tracking-[-0.01em] text-[#DCE3E9] transition-colors hover:border-white/30 hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] data-[state=open]:border-white/30 data-[state=open]:bg-white/[0.06] data-[state=open]:text-white"
         >
-          <UserRound aria-hidden className="h-4 w-4 text-[#9EABB7] transition-colors group-hover:text-white group-data-[state=open]:text-white" strokeWidth={2} />
+          <UserRound aria-hidden className="h-[17px] w-[17px] text-[#B9C4CE] transition-colors group-hover:text-white group-data-[state=open]:text-white" strokeWidth={2} />
           <span className="hidden sm:inline">내 계정</span>
-          <ChevronDown aria-hidden className="hidden h-3.5 w-3.5 text-[#9EABB7] transition-transform group-data-[state=open]:rotate-180 sm:block" />
+          <ChevronDown aria-hidden className="hidden h-4 w-4 text-[#B9C4CE] transition-transform group-data-[state=open]:rotate-180 sm:block" />
         </button>
       </PopoverTrigger>
       <PopoverContent

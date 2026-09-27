@@ -48,12 +48,11 @@ export const LearnerBottomNav = () => (
   </nav>
 );
 
-/** PC 헤더 안의 같은 두 탭. 현재 탭은 노란 밑줄로 표시한다. */
+/** PC 헤더 안의 같은 두 탭. 현재 탭은 밝은 알약 배경으로 표시한다. */
 export const LearnerTopNav = () => (
-  // 밑줄은 글자 폭에만 긋는다 — 좌우 여백까지 덮으면 무엇을 가리키는지 흐려진다(2026-09-20).
-  // 탭이 둘뿐이고 이름이 두 글자라 아이콘은 구분에 기여하지 않아 PC 헤더에서는 뺀다(모바일 하단 탭은 유지).
-  // 밑줄은 흐름 밖(absolute)에 그린다 — border-b로 그리면 글자가 위로 밀려 옆의 「내 계정」과
-  // 높이가 어긋났다(2026-09-28). 세 항목 모두 h-9 안에서 가운데 정렬한다.
+  // 2026-09-28: 가는 밑줄 + 옅은 회청색 글자는 학생이 「누를 수 있는 메뉴」로 읽기 어려웠다.
+  // 세 항목(수업·기록·내 계정)을 같은 높이의 알약 모양으로 통일하고, 아이콘을 다시 붙여
+  // 무엇을 여는지 한눈에 보이게 한다. 현재 탭은 채운 배경 + 노란 아이콘으로 표시한다.
   <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
     {TABS.map((t) => (
       <NavLink
@@ -61,21 +60,19 @@ export const LearnerTopNav = () => (
         to={t.to}
         className={({ isActive }) =>
           [
-            "relative inline-flex h-9 items-center px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] rounded-md",
-            isActive ? "text-white" : "text-[#9EABB7] hover:text-white",
+            "inline-flex h-10 items-center gap-2 rounded-full px-4 text-[15px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
+            isActive ? "bg-white/[0.12] text-white" : "text-[#DCE3E9] hover:bg-white/[0.06] hover:text-white",
           ].join(" ")
         }
       >
         {({ isActive }) => (
           <>
-            {t.label}
-            <span
+            <t.icon
               aria-hidden
-              className={[
-                "absolute inset-x-3 bottom-[3px] h-[2px] rounded-full bg-[#FAD338] transition-opacity",
-                isActive ? "opacity-100" : "opacity-0",
-              ].join(" ")}
+              strokeWidth={2}
+              className={["h-[17px] w-[17px]", isActive ? "text-[#FAD338]" : "text-[#B9C4CE]"].join(" ")}
             />
+            {t.label}
           </>
         )}
       </NavLink>
