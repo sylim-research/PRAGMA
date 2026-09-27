@@ -20,8 +20,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="264" align="left">확인할 내용</th><th width="297" align="left">바로가기</th></tr></thead>
   <tbody>
     <tr><td>🖥️ 웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
-    <tr><td>🗺️ PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
-    <tr><td>▶️ 대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt=""> PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt=""> 대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
     <tr><td>📑 학위논문 장절별 구현 위치</td><td><a href="#6-학위논문과-구현의-대응">6. 학위논문과 구현의 대응</a></td></tr>
   </tbody>
 </table>
@@ -63,7 +63,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="180" align="left">조건</th><th width="492" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&emsp;거절&emsp;사과&emsp;감사&emsp;불만&emsp;칭찬&emsp;초대&emsp;제안&emsp;반대</td></tr>
-    <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R), 각 3수준</td></tr>
+    <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R)</td></tr>
     <tr><td>언어 방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
     <tr><td>학습 수준</td><td>입문 · 중급 · 고급</td></tr>
@@ -77,7 +77,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 5. 추적·감사 가능성
 
 <table>
-  <thead><tr><th width="285" align="left">콘텐츠 이력</th><th width="163" align="left">학습 수행 기록</th></tr></thead>
+  <thead><tr><th width="330" align="left">콘텐츠 이력</th><th width="250" align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 지문 (SHA-256)</td><td>최초 산출</td></tr>
@@ -93,7 +93,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="59" align="left">논문</th><th width="180" align="left">내용</th><th width="407" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="70" align="left">논문</th><th width="250" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1</td><td>개발 환경·변경 추적</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.2</td><td>시스템 아키텍처</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/App.tsx"><code>App.tsx</code></a></td></tr>
