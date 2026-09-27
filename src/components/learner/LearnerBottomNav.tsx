@@ -37,7 +37,7 @@ export const LearnerBottomNav = () => (
                   isActive ? "bg-[#FAD338]" : "",
                 ].join(" ")}
               >
-                <t.icon className="h-[17px] w-[17px]" aria-hidden />
+                <t.icon className="h-[15px] w-[15px]" aria-hidden />
               </span>
               {t.label}
             </>
@@ -51,7 +51,7 @@ export const LearnerBottomNav = () => (
 /** PC 헤더 안의 같은 두 탭. 현재 탭은 밝은 알약 배경으로 표시한다. */
 export const LearnerTopNav = () => (
   // 2026-09-28: 가는 밑줄 + 옅은 회청색 글자는 학생이 「누를 수 있는 메뉴」로 읽기 어려웠다.
-  // 세 항목(수업·기록·내 계정)을 같은 크기(h-10·w-[108px])·같은 테두리의 알약으로 통일하고, 아이콘을 다시 붙여
+  // 세 항목(수업·기록·내 계정)을 같은 크기(h-9·w-[97px])·같은 테두리의 알약으로 통일하고, 아이콘을 다시 붙여
   // 무엇을 여는지 한눈에 보이게 한다. 현재 탭은 채운 배경 + 노란 아이콘으로 표시한다.
   <nav aria-label="학습자 메뉴" className="hidden items-center gap-2 md:flex">
     {TABS.map((t) => (
@@ -60,7 +60,7 @@ export const LearnerTopNav = () => (
         to={t.to}
         className={({ isActive }) =>
           [
-            "inline-flex h-10 w-[108px] shrink-0 items-center justify-center gap-2 rounded-full border text-[15px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
+            "inline-flex h-9 w-[97px] shrink-0 items-center justify-center gap-2 rounded-full border text-[13.5px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
             isActive ? "border-white/30 bg-white/[0.12] text-white" : "border-white/15 text-[#DCE3E9] hover:border-white/30 hover:bg-white/[0.06] hover:text-white",
           ].join(" ")
         }
@@ -70,7 +70,7 @@ export const LearnerTopNav = () => (
             <t.icon
               aria-hidden
               strokeWidth={2}
-              className={["h-[17px] w-[17px]", isActive ? "text-[#FAD338]" : "text-[#B9C4CE]"].join(" ")}
+              className={["h-[15px] w-[15px]", isActive ? "text-[#FAD338]" : "text-[#B9C4CE]"].join(" ")}
             />
             {t.label}
           </>

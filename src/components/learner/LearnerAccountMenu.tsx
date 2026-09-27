@@ -38,9 +38,9 @@ export function LearnerAccountMenu() {
         <button
           type="button"
           aria-label="내 계정"
-          className="group inline-flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full border border-white/15 text-[15px] font-semibold tracking-[-0.01em] text-[#DCE3E9] transition-colors hover:border-white/30 hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] data-[state=open]:border-white/30 data-[state=open]:bg-white/[0.12] data-[state=open]:text-white sm:w-[108px]"
+          className="group inline-flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-full border border-white/15 text-[13.5px] font-semibold tracking-[-0.01em] text-[#DCE3E9] transition-colors hover:border-white/30 hover:bg-white/[0.06] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] data-[state=open]:border-white/30 data-[state=open]:bg-white/[0.12] data-[state=open]:text-white sm:w-[97px]"
         >
-          <UserRound aria-hidden className="h-[17px] w-[17px] text-[#B9C4CE] transition-colors group-hover:text-white group-data-[state=open]:text-white" strokeWidth={2} />
+          <UserRound aria-hidden className="h-[15px] w-[15px] text-[#B9C4CE] transition-colors group-hover:text-white group-data-[state=open]:text-white" strokeWidth={2} />
           <span className="hidden sm:inline">내 계정</span>
         </button>
       </PopoverTrigger>
