@@ -52,19 +52,32 @@ export const LearnerBottomNav = () => (
 export const LearnerTopNav = () => (
   // 밑줄은 글자 폭에만 긋는다 — 좌우 여백까지 덮으면 무엇을 가리키는지 흐려진다(2026-09-20).
   // 탭이 둘뿐이고 이름이 두 글자라 아이콘은 구분에 기여하지 않아 PC 헤더에서는 뺀다(모바일 하단 탭은 유지).
-  <nav aria-label="학습자 메뉴" className="hidden items-center gap-5 md:flex">
+  // 밑줄은 흐름 밖(absolute)에 그린다 — border-b로 그리면 글자가 위로 밀려 옆의 「내 계정」과
+  // 높이가 어긋났다(2026-09-28). 세 항목 모두 h-9 안에서 가운데 정렬한다.
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
     {TABS.map((t) => (
       <NavLink
         key={t.to}
         to={t.to}
         className={({ isActive }) =>
           [
-            "border-b-2 pb-1 text-[14px] font-bold transition-colors",
-            isActive ? "border-[#FAD338] text-white" : "border-transparent text-[#B9C4CE] hover:text-white",
+            "relative inline-flex h-9 items-center px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] rounded-md",
+            isActive ? "text-white" : "text-[#9EABB7] hover:text-white",
           ].join(" ")
         }
       >
-        {t.label}
+        {({ isActive }) => (
+          <>
+            {t.label}
+            <span
+              aria-hidden
+              className={[
+                "absolute inset-x-3 bottom-[3px] h-[2px] rounded-full bg-[#FAD338] transition-opacity",
+                isActive ? "opacity-100" : "opacity-0",
+              ].join(" ")}
+            />
+          </>
+        )}
       </NavLink>
     ))}
   </nav>
