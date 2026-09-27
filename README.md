@@ -17,12 +17,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <br>
 
 <table>
-  <thead><tr><th width="264" align="left">확인할 내용</th><th width="297" align="left">바로가기</th></tr></thead>
+  <thead><tr><th width="290" align="left">항목</th><th width="327" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td>🖥️ 웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt=""> PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
-    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt=""> 대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
-    <tr><td>📑 학위논문 장절별 구현 위치</td><td><a href="#6-학위논문과-구현의-대응">6. 학위논문과 구현의 대응</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt=""> 대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
   </tbody>
 </table>
 
