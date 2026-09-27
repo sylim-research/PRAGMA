@@ -12,7 +12,7 @@ import { NavLink } from "react-router-dom";
 // 하단 탭바는 모바일 관례라 PC 화면에서는 빈 공간만 강조했다.
 const TABS = [
   { to: "/learner/course", label: "수업", icon: BookOpen },
-  { to: "/learner/records", label: "기록", icon: History },
+  { to: "/learner/records", label: "학습 기록", icon: History },
 ];
 
 export const LearnerBottomNav = () => (
@@ -53,7 +53,8 @@ export const LearnerTopNav = () => (
   // 2026-09-28: 탭을 상자·알약으로 감싸면 헤더가 도구 막대처럼 무거워지고 로고보다 튀었다.
   // 글자만 두고, 현재 탭은 헤더 아래 가장자리에 붙은 노란 선(창턱처럼)으로 표시한다.
   // 선은 흐름 밖(absolute)에 그려 글자 높이를 밀지 않는다 — border-b 방식은 옆 「내 계정」과 높이가 어긋났다.
-  // 탭이 둘뿐이고 이름이 두 글자라 아이콘은 구분에 기여하지 않아 PC 헤더에서는 뺀다(모바일 하단 탭은 유지).
+  // 글자만 있으면 「누르는 메뉴」 신호가 약해 아이콘을 붙이고, 비활성 글자도 흐리게 하지 않는다(회색=꺼진 기능으로 읽힘).
+  // 「기록」→「학습 기록」: 용어대장의 「학습 수행 기록」 약칭과 맞춘다(2026-09-28).
   <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
     {TABS.map((t) => (
       <NavLink
@@ -62,12 +63,13 @@ export const LearnerTopNav = () => (
         className={({ isActive }) =>
           [
             "relative inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
-            isActive ? "text-white" : "text-[#AEB9C4] hover:text-white",
+            isActive ? "text-white" : "text-[#DCE3E9] hover:bg-white/[0.07] hover:text-white",
           ].join(" ")
         }
       >
         {({ isActive }) => (
           <>
+            <t.icon aria-hidden strokeWidth={2} className={["h-[15px] w-[15px]", isActive ? "text-[#FAD338]" : ""].join(" ")} />
             {t.label}
             {/* 헤더 py-4(16px)만큼 내려 헤더 아래 가장자리에 붙인다. */}
             <span
