@@ -5,10 +5,10 @@
 - 변경: 내비게이션과 계정 제어 사이에 구분선을 두고 계정을 작은 프로필 pill로 만들었다. 팝오버는 248px 계정 카드로 줄이고 이메일을 중심 정보로, 로그아웃을 하단 보조 행으로 재배치했다. 모바일에서는 아이콘만 남긴다.
 - 변경: 로그인 모달을 얇은 상단 브랜드 선, PRAGMA eyebrow, 제목·설명·전폭 Google 버튼·단일 개인정보 링크 순으로 정리했다. 닫기 버튼을 축소하고 초기 포커스를 제목으로 옮겨 불필요한 포커스 원을 제거했다.
 - 로컬 시각 검수: Chrome 1440×1000, 390×844에서 로그인 모달과 열린 계정 메뉴를 각각 캡처해 간격·정렬·popover 위치·모바일 헤더를 확인했다. 임시 캡처는 `.tmp/auth-ui-visual/`에 있으며 제품 근거로 승격하지 않는다.
-- 검증: 관련 3파일 10개 테스트 PASS, 변경 파일 ESLint PASS, typecheck PASS, production build PASS. 빌드의 기존 CSS syntax/chunk 경고는 이번 변경 전 범위이며 기능 실패가 아니다.
+- 검증: 관련 3파일 10개 테스트 PASS, 전체 159파일 1,072개 PASS·9개 skip, 변경 파일 ESLint PASS, typecheck PASS, production build PASS. 빌드의 기존 CSS syntax/chunk 경고는 이번 변경 전 범위이며 기능 실패가 아니다.
 - 연구 기록: 학습 설계·생성 계약·데이터 구조·평가 방식이 바뀌지 않은 시각 polish이므로 `docs/research-trail`은 갱신하지 않는다.
 
 [논문 영향 3줄]
-1. 바뀐 수치: 관련 테스트 10 PASS, typecheck·production build PASS.
+1. 바뀐 수치: 전체 테스트 1,072 PASS·9 skip, typecheck·production build PASS.
 2. 바뀐 화면: 로그인 모달과 학습자 헤더 계정 메뉴의 정보 위계·간격·초기 포커스.
 3. 바뀐 프롬프트·계약: 없음. 동결본 재발행 없음.
