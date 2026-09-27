@@ -2,7 +2,7 @@
 
 - 날짜: 2026-09-14
 - 분류: [단독 진행 적합] — 현행 코드·SQL 읽기 확인. backend 변경 실행 없음.
-- 작업공간: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.tmp/request-course-pilot-20260914`
+- 작업공간: `.tmp/request-course-pilot-20260914`
 - branch: `codex/request-course-pilot-2026-09-14`
 - 기준 HEAD: `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`
 - 동결 checkpoint: 별도 `learner-ux` 작업공간의 같은 HEAD. 원래 대표 미션·MJT4 해설·후반 부담 검토는 재개하지 않았다.

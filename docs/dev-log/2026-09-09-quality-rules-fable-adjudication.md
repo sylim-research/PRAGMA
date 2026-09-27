@@ -1,8 +1,8 @@
 # Fable「R1~R33 독립 설계 감사」 판정
 
 - 일자: 2026-09-09. 판정: **보완**. [단독 진행 적합].
-- 대상: 사용자가 전달한 [Fable 감사 원문](C:/Users/cnkr/.codex/attachments/be48735c-3a25-4a88-b0da-72ebb165643a/pasted-text.txt). 이 판정은 감사 주장에 대한 검토이며 구현·정책 변경의 승인이 아니다.
-- 대조 작업트리: C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09
+- 대상: 사용자가 전달한 [Fable 감사 원문](~/.codex/attachments/be48735c-3a25-4a88-b0da-72ebb165643a/pasted-text.txt). 이 판정은 감사 주장에 대한 검토이며 구현·정책 변경의 승인이 아니다.
+- 대조 작업트리: .worktrees/admin-declutter-2026-09-09
 - HEAD: admin-absorb-2026-09-09 / 72cb39bf4365da48a78fb71807edf24ade949dc0. missionRules.ts 작업 파일 SHA-256은 선행 Codex 감사와 동일한 73c09ae288dfe648e4485bc1b5a0bed2682435b223572ff9cc5845be8acc665d다.
 - Fable이 적은 b4265d17과 위 HEAD의 validator Git blob은 선행 감사에서 동일함을 확인했다. 이번 판정은 원격·운영 서버의 최신성을 주장하지 않는다.
 - 수용 = 주장·방향에 동의. 보완 = 유효한 지적에 사실·범위·해법 수정 필요. 기각 = 명시한 특정 주장 또는 해법을 채택하지 않음. 한 항목의 문제 진단과 해법은 서로 다르게 판정할 수 있다.
@@ -32,13 +32,13 @@ Fable은 R9·R16 서술부·R30의 의미 판단 대리, R33 적용 조건, 규�
 
 주요 직접 근거:
 
-- R9 / R30: [missionRules.ts:492](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:492), [coreSourceRepair.ts:97](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/_shared/coreSourceRepair.ts:97). 실행 반례는 [2026-09-09-quality-rules-codex-evidence.json](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/evidence/2026-09-09-quality-rules-codex-evidence.json)의 syntheticProbes에 보존했다.
-- R16: [missionRules.ts:435](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:435) 및 [missionRules.ts:872](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:872). 구조적 비교 누락 두 사례는 선행 합성 입력에서 fail 없이 통과했다.
-- R31 / R33: [missionRules.ts:924](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:924) 및 [missionRules.ts:974](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:974). 과거 prompt의 missing-lineage / missing-dimensions 사례가 해당 R규칙 없이 통과한 결과와 일치한다.
-- R27 도입 이유: [2026-08-25-mission-rule-audit.md:68](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-25-mission-rule-audit.md:68), [2026-08-30-rule-design-diet-audit.md:13](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-30-rule-design-diet-audit.md:13), [2026-08-30-design-diet-p0-targeted5.md:3](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-30-design-diet-p0-targeted5.md:3). 역사 기록은 당시 결정 근거로 사용했고 현재 강도는 [missionRules.ts:1239](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1239)에서 별도로 확인했다. 기록의 존재가 현 정책의 모든 사례에 대한 최적성을 입증하는 것은 아니다.
-- R20과 최종화 책임: [missionRules.ts:1023](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1023), [index.ts:4603](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/generate-scenario/index.ts:4603), [20260906100000_focused_content_review.sql:166](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/migrations/20260906100000_focused_content_review.sql:166). 다른 승인 통제가 존재하므로 이 지적을 곧바로 승인 우회 취약점으로 확대하지 않는다.
-- R26 경로: [coreBatchRun.ts:299](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/coreBatchRun.ts:299), [AdminGenerator.tsx:710](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/pages/admin/AdminGenerator.tsx:710), [promoteMission.ts:898](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:898).
-- 대역 표시 경계: [PRAGMA_학습자구조_정본.md:42](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/product/PRAGMA_학습자구조_정본.md:42)는 원시 대역 코드의 사전 노출을 금지하며, [PRAGMA_학습자구조_정본.md:250](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/product/PRAGMA_학습자구조_정본.md:250)는 판단 후 적정·조정 필요 범주를 공개한다.
+- R9 / R30: [missionRules.ts:492](/src/lib/pragma/missionRules.ts:492), [coreSourceRepair.ts:97](/supabase/functions/_shared/coreSourceRepair.ts:97). 실행 반례는 [2026-09-09-quality-rules-codex-evidence.json](/docs/research-trail/evidence/2026-09-09-quality-rules-codex-evidence.json)의 syntheticProbes에 보존했다.
+- R16: [missionRules.ts:435](/src/lib/pragma/missionRules.ts:435) 및 [missionRules.ts:872](/src/lib/pragma/missionRules.ts:872). 구조적 비교 누락 두 사례는 선행 합성 입력에서 fail 없이 통과했다.
+- R31 / R33: [missionRules.ts:924](/src/lib/pragma/missionRules.ts:924) 및 [missionRules.ts:974](/src/lib/pragma/missionRules.ts:974). 과거 prompt의 missing-lineage / missing-dimensions 사례가 해당 R규칙 없이 통과한 결과와 일치한다.
+- R27 도입 이유: [2026-08-25-mission-rule-audit.md:68](/docs/dev-log/2026-08-25-mission-rule-audit.md:68), [2026-08-30-rule-design-diet-audit.md:13](/docs/dev-log/2026-08-30-rule-design-diet-audit.md:13), [2026-08-30-design-diet-p0-targeted5.md:3](/docs/dev-log/2026-08-30-design-diet-p0-targeted5.md:3). 역사 기록은 당시 결정 근거로 사용했고 현재 강도는 [missionRules.ts:1239](/src/lib/pragma/missionRules.ts:1239)에서 별도로 확인했다. 기록의 존재가 현 정책의 모든 사례에 대한 최적성을 입증하는 것은 아니다.
+- R20과 최종화 책임: [missionRules.ts:1023](/src/lib/pragma/missionRules.ts:1023), [index.ts:4603](/supabase/functions/generate-scenario/index.ts:4603), [20260906100000_focused_content_review.sql:166](/supabase/migrations/20260906100000_focused_content_review.sql:166). 다른 승인 통제가 존재하므로 이 지적을 곧바로 승인 우회 취약점으로 확대하지 않는다.
+- R26 경로: [coreBatchRun.ts:299](/src/lib/pragma/coreBatchRun.ts:299), [AdminGenerator.tsx:710](/src/pages/admin/AdminGenerator.tsx:710), [promoteMission.ts:898](/src/lib/pragma/promoteMission.ts:898).
+- 대역 표시 경계: [PRAGMA_학습자구조_정본.md:42](/docs/product/PRAGMA_학습자구조_정본.md:42)는 원시 대역 코드의 사전 노출을 금지하며, [PRAGMA_학습자구조_정본.md:250](/docs/product/PRAGMA_학습자구조_정본.md:250)는 판단 후 적정·조정 필요 범주를 공개한다.
 
 ## 3. 전체 규칙표에서 고쳐야 할 사실
 
@@ -46,16 +46,16 @@ Fable은 R9·R16 서술부·R30의 의미 판단 대리, R33 적용 조건, 규�
 
 | 항목 | 판정과 정확한 보완 |
 |---|---|
-| R4 “PDR 불일치 warning” | **보완.** legacy reason_conf는 warning이지만 현행 reason의 Anchor PDR 불일치는 fail이다. 서로 다른 계약을 한 문장으로 합치지 않는다. [missionRules.ts:676](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:676) |
-| R8 “인접쌍의 preceding 필수” | **보완.** legacy와 코어의 필수 조건 외에 현행 native 미션에서는 문항·DCT preceding_turn을 금지하는 분기가 있다. [missionRules.ts:843](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:843) |
-| R10 “후보는 warning” | **기각.** 중국어 후보의 한글 혼입은 fail이다. 숫자·기호만인 후보가 warning이라는 사실도 그 후보의 내용상 타당성을 허용한다는 뜻은 아니다. 참고 산출안 등 검사 필드 누락은 추가 보완 대상이다. [missionRules.ts:210](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:210) |
+| R4 “PDR 불일치 warning” | **보완.** legacy reason_conf는 warning이지만 현행 reason의 Anchor PDR 불일치는 fail이다. 서로 다른 계약을 한 문장으로 합치지 않는다. [missionRules.ts:676](/src/lib/pragma/missionRules.ts:676) |
+| R8 “인접쌍의 preceding 필수” | **보완.** legacy와 코어의 필수 조건 외에 현행 native 미션에서는 문항·DCT preceding_turn을 금지하는 분기가 있다. [missionRules.ts:843](/src/lib/pragma/missionRules.ts:843) |
+| R10 “후보는 warning” | **기각.** 중국어 후보의 한글 혼입은 fail이다. 숫자·기호만인 후보가 warning이라는 사실도 그 후보의 내용상 타당성을 허용한다는 뜻은 아니다. 참고 산출안 등 검사 필드 누락은 추가 보완 대상이다. [missionRules.ts:210](/src/lib/pragma/missionRules.ts:210) |
 | R11 중복 없음 | **보완.** 선행 스키마/R1과 중복되는 방어다. reference_alternatives=[] 반례는 R11 도달 전에 R1로 차단된다. 중복 방어가 무조건 불필요하다는 의미는 아니다. |
-| R12 “R2를 의도적으로 재확인” | **보완.** 관련 주석은 현행 native에 맞지 않는다. 현행 R2는 하나의 비적정 대역을 요구한다. 분포 검사는 미션 전체 후보를 세며 구조가 다른 R2와 같은 뜻으로 요약할 수 없다. [missionRules.ts:641](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:641), [missionRules.ts:1269](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1269) |
+| R12 “R2를 의도적으로 재확인” | **보완.** 관련 주석은 현행 native에 맞지 않는다. 현행 R2는 하나의 비적정 대역을 요구한다. 분포 검사는 미션 전체 후보를 세며 구조가 다른 R2와 같은 뜻으로 요약할 수 없다. [missionRules.ts:641](/src/lib/pragma/missionRules.ts:641), [missionRules.ts:1269](/src/lib/pragma/missionRules.ts:1269) |
 | R19 전면 유지 | **보완.** exact duplicate 검사는 필요할 수 있으나 의도된 Anchor 표현 재사용도 경고한다. 합성 기준 미션에서도 재사용 경고가 발생했다. 단순한 결함 탐지 건수로 해석하지 않는다. |
-| R23 “계승 통과 시 R10/R16 자동 충족” | **기각.** 같은 값을 계승했다는 것과 그 값이 올바른 언어·요청 mode라는 것은 다르다. R23은 coreInput이 없거나 정규화 실패하면 생략된다. 방향 enum 일치는 실제 텍스트 언어 검사의 대체가 아니다. [missionRules.ts:889](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:889), [missionRules.ts:1371](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1371) |
-| R29 단순 형식 검사 | **보완.** 길이·focal substring/count 외에 DCT 참고안이 원문 길이의 45% 미만이면 의미 누락 가능성을 경고하는 휴리스틱도 있다. 최소 길이 warning / 최대 길이 fail 및 조건별 범위를 함께 써야 한다. [missionRules.ts:895](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:895) |
+| R23 “계승 통과 시 R10/R16 자동 충족” | **기각.** 같은 값을 계승했다는 것과 그 값이 올바른 언어·요청 mode라는 것은 다르다. R23은 coreInput이 없거나 정규화 실패하면 생략된다. 방향 enum 일치는 실제 텍스트 언어 검사의 대체가 아니다. [missionRules.ts:889](/src/lib/pragma/missionRules.ts:889), [missionRules.ts:1371](/src/lib/pragma/missionRules.ts:1371) |
+| R29 단순 형식 검사 | **보완.** 길이·focal substring/count 외에 DCT 참고안이 원문 길이의 45% 미만이면 의미 누락 가능성을 경고하는 휴리스틱도 있다. 최소 길이 warning / 최대 길이 fail 및 조건별 범위를 함께 써야 한다. [missionRules.ts:895](/src/lib/pragma/missionRules.ts:895) |
 | R33 형식 검사이므로 논문 정합성 충분 | **보완.** 진단차원 2~6개·코드·근거 위치·설명 존재를 검사한다. 근거 설명을 “확인.”으로 바꿔도 통과한다. 두 위치는 MJT와 DCT가 각각 하나 이상이라는 뜻도 아니다. 형식 통과를 진단차원 내용의 타당성으로 읽지 않는다. |
-| R22 “등급형 차단 규칙을 폐기하고 HSK로 이관” | **보완.** retired 유지와 비차단 HSK 참고는 수용. 8월 25일 기록은 R22가 실제 구현 없이 오래된 주석에만 남았다고 명시한다. 실행하던 등급 차단기를 제거했다고 서술하면 역사와 어긋난다. HSK는 어휘 참고의 일부를 맡으며 구 R22의 문장·절·전반 난도 전체를 대체하지 않는다. [2026-08-25-mission-rule-audit.md:15](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-25-mission-rule-audit.md:15) |
+| R22 “등급형 차단 규칙을 폐기하고 HSK로 이관” | **보완.** retired 유지와 비차단 HSK 참고는 수용. 8월 25일 기록은 R22가 실제 구현 없이 오래된 주석에만 남았다고 명시한다. 실행하던 등급 차단기를 제거했다고 서술하면 역사와 어긋난다. HSK는 어휘 참고의 일부를 맡으며 구 R22의 문장·절·전반 난도 전체를 대체하지 않는다. [2026-08-25-mission-rule-audit.md:15](/docs/dev-log/2026-08-25-mission-rule-audit.md:15) |
 
 R5 길이 휴리스틱을 warning으로 둔 방향도 수용한다. 다만 극단 길이 경고의 v1.4 이력과 후보 길이 완전 분리 fail을 8월 25일 warning으로 바꾼 이력은 구분해야 한다. “나머지는 모두 형식 검사”라는 결론은 R26·R29의 비차단 휴리스틱을 포함하도록 좁힌다.
 
@@ -84,7 +84,7 @@ Codex 선행 보고서의 7범주도 설명용 제안일 뿐 확정된 정본이
 6. **보완:** “ID·강도·메시지면 지금 그대로 공개 가능”도 무조건 맞지 않는다. R14의 “AI 생성 의심”, R30의 평가 기준 단정처럼 원문 메시지에도 과장이 있다. 감사 증거로 원문을 보존하는 일과 사용자용 설명으로 승인하는 일을 구별한다.
 7. **기각 — 규칙 수·add 수를 절대 표시하면 안 된다는 주장:** 수를 품질 성과로 쓰면 안 된다는 원칙은 수용한다. 그러나 정확한 inventory 수를 감사·버전 관리에 표시하는 것까지 금지할 이유는 없다. 33 active ID / retired 1 / 127 정적 호출 지점은 서로 다른 수다. 이를 메인 UI에 강조할 필요는 없다.
 8. **보완:** “사람이 읽을 요약 33줄 전부 연구자 사전 승인”은 모든 코드 설명을 새 연구 결정으로 만들 위험이 있다. 실제 의미가 달라지는 정책은 판단이 필요하지만, 확인된 실행 조건·중립 문구·오래된 주석의 사실 정정은 구현 범위가 승인되면 통상 유지보수로 처리할 수 있다.
-9. **수용, 범위 제한:** 새 공개 명칭을 MJT로 통일하되 내부 mpj_* 식별자와 역사 기록까지 일괄 치환하지 않는다. 이는 [PRAGMA_학습자구조_정본.md:5](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/product/PRAGMA_학습자구조_정본.md:5)가 명시한 호환 원칙이다.
+9. **수용, 범위 제한:** 새 공개 명칭을 MJT로 통일하되 내부 mpj_* 식별자와 역사 기록까지 일괄 치환하지 않는다. 이는 [PRAGMA_학습자구조_정본.md:5](/docs/product/PRAGMA_학습자구조_정본.md:5)가 명시한 호환 원칙이다.
 
 Fable이 “R\\d+ 패턴으로 R1c를 빠뜨렸다”고 밝힌 부분은 선행 AST 재계수와 부합한다. 정수 ID 122곳 + R1c 5곳 = 127곳이다. 최초 추출 스크립트 자체를 확보한 것은 아니므로 원인에 관한 Fable의 진술과 독립 재계수의 증거 수준은 구분한다.
 
@@ -101,8 +101,8 @@ Fable이 “R\\d+ 패턴으로 R1c를 빠뜨렸다”고 밝힌 부분은 선행
 - 이번 실행: Fable 원문 전체, 관련 validator·Edge·최신 정의의 SQL migration, 현재 학습자 정본, 8월 25일/30일 R27 변경 기록과 git blame을 대조했다. validator 해시가 선행 감사와 동일함을 확인했다.
 - 재사용 근거: 선행 감사에서 실행한 13개 파일 151개 테스트 통과, 합성 입력 21건과 품질관리 진입점 1건. 이번에 새로 실행한 테스트 수로 중복 보고하지 않는다. 보고서만 바뀌어 전체 테스트·빌드를 반복하지 않았다.
 - 한계: 합성 반례는 오탐·누락의 존재를 보이며 실제 corpus 오류율은 아니다. 운영 서버·DB·승인 우회·AI 품질·학습효과는 이번에 실측하지 않았다.
-- dev-log: 이 문서. 선행 [2026-09-09-quality-rules-codex-independent-audit.md](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-09-09-quality-rules-codex-independent-audit.md)에 R27 역사 근거와 Fable의 집계 원인 진술을 후속 보강했다.
-- research-trail: [04_evidence_index.md](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/04_evidence_index.md)의 EVD-20260909-02에 판정 근거를 연결한다. 설계 변경을 채택·구현하지 않았으므로 design_traceability / decision_log / iteration_log는 갱신하지 않는다.
+- dev-log: 이 문서. 선행 [2026-09-09-quality-rules-codex-independent-audit.md](/docs/dev-log/2026-09-09-quality-rules-codex-independent-audit.md)에 R27 역사 근거와 Fable의 집계 원인 진술을 후속 보강했다.
+- research-trail: [04_evidence_index.md](/docs/research-trail/04_evidence_index.md)의 EVD-20260909-02에 판정 근거를 연결한다. 설계 변경을 채택·구현하지 않았으므로 design_traceability / decision_log / iteration_log는 갱신하지 않는다.
 - 확인 필요: 구현 전에 선택할 정책은 위 §6과 선행 보고서 §10에 한정한다. 이번 문서 판정을 완료하는 데 추가 사용자 승인은 필요하지 않다.
 
 [논문 영향 3줄]

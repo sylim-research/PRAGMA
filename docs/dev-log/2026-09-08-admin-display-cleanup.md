@@ -6,7 +6,7 @@
 
 - 승인 범위: Fable 인계·보완에 대한 사용자 “오케이, 수정하자.”. 합의한 문구·노출 변경을 UI 브리프로 삼았다. 메뉴 통합·라우트·데이터·승인 조건·모델·프롬프트를 변경하지 않았다.
 - 판단: **[단독 진행 적합]**. 경미한 표시 수정이며 추가 교차검토·모델 실험은 하지 않는다.
-- 작업공간: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08`, branch `codex/freeze-consistency-2026-09-08`.
+- 작업공간: `.worktrees/learner-e2e-2026-09-08`, branch `codex/freeze-consistency-2026-09-08`.
 - 기준: 착수 직전 원격 main `5ec6ba608a6cea590fc8ad1f432b27b42e2b3b8e`. 로컬 HEAD `57f94f1c8442ba46ef78e9e4c5ee3749b295822a`는 선행 배포 기록 커밋이며 main과 앱 코드가 같았다. 루트·논문 저장소 및 보존 worktree의 상태를 읽기 전용 점검하고 기존 변경을 보존했다.
 - 이번 결과: **로컬 미커밋 수정**. 커밋·푸시·운영 배포 없음. 논문 원고·연구자 편집 HWPX는 수정하지 않았다.
 
@@ -72,88 +72,88 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 
 | 유지 위치 | 사유 |
 |---|---|
-| [src/App.tsx:97](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/App.tsx:97>) | 화면에 보이지 않는 주석 |
-| [src/components/mission/ChatScene.tsx:49](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/mission/ChatScene.tsx:49>) | 화면에 보이지 않는 주석 |
-| [src/lib/admin/adminDashboardMetrics.ts:25](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminDashboardMetrics.ts:25>) | 화면에 보이지 않는 주석 |
-| [src/lib/admin/adminDashboardMetrics.ts:27](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminDashboardMetrics.ts:27>) | 화면에 보이지 않는 주석 |
-| [src/lib/admin/adminDashboardMetrics.ts:77](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminDashboardMetrics.ts:77>) | 화면에 보이지 않는 주석 |
-| [src/lib/admin/adminDashboardMetrics.ts:118](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminDashboardMetrics.ts:118>) | 화면에 보이지 않는 주석 |
-| [src/lib/admin/adminDashboardMetrics.ts:122](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminDashboardMetrics.ts:122>) | 화면에 보이지 않는 주석 |
-| [src/lib/auth/learnerAccess.ts:7](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/auth/learnerAccess.ts:7>) | 화면에 보이지 않는 주석 |
-| [src/lib/backup/courseBackup.ts:14](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/backup/courseBackup.ts:14>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/composer.ts:56](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/composer.ts:56>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/composerEligibility.ts:4](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/composerEligibility.ts:4>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/learnerCourse.ts:8](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/learnerCourse.ts:8>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/learnerProgress.ts:10](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/learnerProgress.ts:10>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/refusalTeachingCase.ts:7](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/refusalTeachingCase.ts:7>) | 공통 수업자료·승인 해시의 원본 문자열 |
-| [src/lib/curriculum/weekGuidance.ts:10](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/weekGuidance.ts:10>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/weeklyInstructorContent.ts:12](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/weeklyInstructorContent.ts:12>) | 화면에 보이지 않는 주석 |
-| [src/lib/curriculum/weeklyOpeningContext.ts:3](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/curriculum/weeklyOpeningContext.ts:3>) | 화면에 보이지 않는 주석 |
-| [src/lib/mission/missionDb.ts:4](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/missionDb.ts:4>) | 화면에 보이지 않는 주석 |
-| [src/lib/mission/missionDb.ts:61](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/missionDb.ts:61>) | 학습자 접근 오류 표시, 이번 범위 밖 |
-| [src/lib/mission/missionDb.ts:83](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/missionDb.ts:83>) | 화면에 보이지 않는 주석 |
-| [src/lib/mission/missionRelease.ts:35](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/missionRelease.ts:35>) | 학습자 공통 상태 표시, 관리자 전용 범위 밖 |
-| [src/lib/mission/missionRelease.ts:37](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/missionRelease.ts:37>) | 학습자 공통 상태 표시, 관리자 전용 범위 밖 |
-| [src/lib/mission/mockIntroArc.ts:21](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/mockIntroArc.ts:21>) | 화면에 보이지 않는 주석 |
-| [src/lib/mission/mockIntroArc.ts:32](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/mockIntroArc.ts:32>) | 화면에 보이지 않는 주석 |
-| [src/lib/mission/mockIntroArc.ts:104](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/mission/mockIntroArc.ts:104>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/contentReviewDomain.ts:55](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/contentReviewDomain.ts:55>) | Edge 규칙 결과 또는 승인 스냅샷 원문 |
-| [src/lib/pragma/contentReviewDomain.ts:64](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/contentReviewDomain.ts:64>) | Edge 규칙 결과 또는 승인 스냅샷 원문 |
-| [src/lib/pragma/coreBatchRun.ts:67](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/coreBatchRun.ts:67>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/missionRules.ts:6](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/missionRules.ts:6>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/missionRules.ts:156](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/missionRules.ts:156>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/missionRules.ts:923](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/missionRules.ts:923>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/missionRules.ts:942](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/missionRules.ts:942>) | R31 검사 결과·스냅샷에 포함되는 원문 |
-| [src/lib/pragma/missionRules.ts:1103](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/missionRules.ts:1103>) | 화면에 보이지 않는 주석 |
-| [src/lib/pragma/promoteMission.ts:609](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/promoteMission.ts:609>) | 저장될 수 있는 품질 결과 summary 원문 |
-| [src/pages/Architecture.tsx:225](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/Architecture.tsx:225>) | 학습자·공개 화면, 이번 범위 밖 |
-| [src/pages/Landing.tsx:115](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/Landing.tsx:115>) | 학습자·공개 화면, 이번 범위 밖 |
-| [src/pages/Privacy.tsx:110](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/Privacy.tsx:110>) | 학습자·공개 화면, 이번 범위 밖 |
-| [src/pages/admin/AdminAssembly.tsx:6](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminAssembly.tsx:6>) | 화면에 보이지 않는 주석 |
-| [src/pages/admin/AdminDashboard.tsx:169](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminDashboard.tsx:169>) | 화면에 보이지 않는 주석 |
-| [src/pages/admin/AdminDashboard.tsx:550](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminDashboard.tsx:550>) | 화면에 보이지 않는 주석 |
-| [src/pages/admin/AdminTeachingMaterials.tsx:265](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminTeachingMaterials.tsx:265>) | 화면에 보이지 않는 주석 |
-| [src/pages/learner/IntroArc.tsx:271](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/learner/IntroArc.tsx:271>) | 학습자·공개 화면, 이번 범위 밖 |
-| [src/pages/learner/LegacyMissionRun.tsx:1103](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/learner/LegacyMissionRun.tsx:1103>) | 화면에 보이지 않는 주석 |
-| [src/pages/learner/WeeklyLearningNote.tsx:35](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/learner/WeeklyLearningNote.tsx:35>) | 학습자·공개 화면, 이번 범위 밖 |
+| [src/App.tsx:97](</src/App.tsx:97>) | 화면에 보이지 않는 주석 |
+| [src/components/mission/ChatScene.tsx:49](</src/components/mission/ChatScene.tsx:49>) | 화면에 보이지 않는 주석 |
+| [src/lib/admin/adminDashboardMetrics.ts:25](</src/lib/admin/adminDashboardMetrics.ts:25>) | 화면에 보이지 않는 주석 |
+| [src/lib/admin/adminDashboardMetrics.ts:27](</src/lib/admin/adminDashboardMetrics.ts:27>) | 화면에 보이지 않는 주석 |
+| [src/lib/admin/adminDashboardMetrics.ts:77](</src/lib/admin/adminDashboardMetrics.ts:77>) | 화면에 보이지 않는 주석 |
+| [src/lib/admin/adminDashboardMetrics.ts:118](</src/lib/admin/adminDashboardMetrics.ts:118>) | 화면에 보이지 않는 주석 |
+| [src/lib/admin/adminDashboardMetrics.ts:122](</src/lib/admin/adminDashboardMetrics.ts:122>) | 화면에 보이지 않는 주석 |
+| [src/lib/auth/learnerAccess.ts:7](</src/lib/auth/learnerAccess.ts:7>) | 화면에 보이지 않는 주석 |
+| [src/lib/backup/courseBackup.ts:14](</src/lib/backup/courseBackup.ts:14>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/composer.ts:56](</src/lib/curriculum/composer.ts:56>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/composerEligibility.ts:4](</src/lib/curriculum/composerEligibility.ts:4>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/learnerCourse.ts:8](</src/lib/curriculum/learnerCourse.ts:8>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/learnerProgress.ts:10](</src/lib/curriculum/learnerProgress.ts:10>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/refusalTeachingCase.ts:7](</src/lib/curriculum/refusalTeachingCase.ts:7>) | 공통 수업자료·승인 해시의 원본 문자열 |
+| [src/lib/curriculum/weekGuidance.ts:10](</src/lib/curriculum/weekGuidance.ts:10>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/weeklyInstructorContent.ts:12](</src/lib/curriculum/weeklyInstructorContent.ts:12>) | 화면에 보이지 않는 주석 |
+| [src/lib/curriculum/weeklyOpeningContext.ts:3](</src/lib/curriculum/weeklyOpeningContext.ts:3>) | 화면에 보이지 않는 주석 |
+| [src/lib/mission/missionDb.ts:4](</src/lib/mission/missionDb.ts:4>) | 화면에 보이지 않는 주석 |
+| [src/lib/mission/missionDb.ts:61](</src/lib/mission/missionDb.ts:61>) | 학습자 접근 오류 표시, 이번 범위 밖 |
+| [src/lib/mission/missionDb.ts:83](</src/lib/mission/missionDb.ts:83>) | 화면에 보이지 않는 주석 |
+| [src/lib/mission/missionRelease.ts:35](</src/lib/mission/missionRelease.ts:35>) | 학습자 공통 상태 표시, 관리자 전용 범위 밖 |
+| [src/lib/mission/missionRelease.ts:37](</src/lib/mission/missionRelease.ts:37>) | 학습자 공통 상태 표시, 관리자 전용 범위 밖 |
+| [src/lib/mission/mockIntroArc.ts:21](</src/lib/mission/mockIntroArc.ts:21>) | 화면에 보이지 않는 주석 |
+| [src/lib/mission/mockIntroArc.ts:32](</src/lib/mission/mockIntroArc.ts:32>) | 화면에 보이지 않는 주석 |
+| [src/lib/mission/mockIntroArc.ts:104](</src/lib/mission/mockIntroArc.ts:104>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/contentReviewDomain.ts:55](</src/lib/pragma/contentReviewDomain.ts:55>) | Edge 규칙 결과 또는 승인 스냅샷 원문 |
+| [src/lib/pragma/contentReviewDomain.ts:64](</src/lib/pragma/contentReviewDomain.ts:64>) | Edge 규칙 결과 또는 승인 스냅샷 원문 |
+| [src/lib/pragma/coreBatchRun.ts:67](</src/lib/pragma/coreBatchRun.ts:67>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/missionRules.ts:6](</src/lib/pragma/missionRules.ts:6>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/missionRules.ts:156](</src/lib/pragma/missionRules.ts:156>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/missionRules.ts:923](</src/lib/pragma/missionRules.ts:923>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/missionRules.ts:942](</src/lib/pragma/missionRules.ts:942>) | R31 검사 결과·스냅샷에 포함되는 원문 |
+| [src/lib/pragma/missionRules.ts:1103](</src/lib/pragma/missionRules.ts:1103>) | 화면에 보이지 않는 주석 |
+| [src/lib/pragma/promoteMission.ts:609](</src/lib/pragma/promoteMission.ts:609>) | 저장될 수 있는 품질 결과 summary 원문 |
+| [src/pages/Architecture.tsx:225](</src/pages/Architecture.tsx:225>) | 학습자·공개 화면, 이번 범위 밖 |
+| [src/pages/Landing.tsx:115](</src/pages/Landing.tsx:115>) | 학습자·공개 화면, 이번 범위 밖 |
+| [src/pages/Privacy.tsx:110](</src/pages/Privacy.tsx:110>) | 학습자·공개 화면, 이번 범위 밖 |
+| [src/pages/admin/AdminAssembly.tsx:6](</src/pages/admin/AdminAssembly.tsx:6>) | 화면에 보이지 않는 주석 |
+| [src/pages/admin/AdminDashboard.tsx:169](</src/pages/admin/AdminDashboard.tsx:169>) | 화면에 보이지 않는 주석 |
+| [src/pages/admin/AdminDashboard.tsx:550](</src/pages/admin/AdminDashboard.tsx:550>) | 화면에 보이지 않는 주석 |
+| [src/pages/admin/AdminTeachingMaterials.tsx:265](</src/pages/admin/AdminTeachingMaterials.tsx:265>) | 화면에 보이지 않는 주석 |
+| [src/pages/learner/IntroArc.tsx:271](</src/pages/learner/IntroArc.tsx:271>) | 학습자·공개 화면, 이번 범위 밖 |
+| [src/pages/learner/LegacyMissionRun.tsx:1103](</src/pages/learner/LegacyMissionRun.tsx:1103>) | 화면에 보이지 않는 주석 |
+| [src/pages/learner/WeeklyLearningNote.tsx:35](</src/pages/learner/WeeklyLearningNote.tsx:35>) | 학습자·공개 화면, 이번 범위 밖 |
 
 저장된 모델 생성 본문 및 generated 프롬프트 스냅샷은 위 소스 재계수와 별개로 보존한다. 관리자 페이지·컴포넌트에 남은 검수 표기는 모두 주석이다. 라이브러리의 R31 등 공유 원본 문자열을 지우기 위해 승인 해시나 검증 버전을 바꾸지 않았다.
 
 ## 수정 파일 전체 경로
 
-- [docs/dev-log/2026-09-08-admin-display-cleanup.md](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/docs/dev-log/2026-09-08-admin-display-cleanup.md>)
-- [docs/product/PRAGMA_관리자구조_정본.md](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/docs/product/PRAGMA_관리자구조_정본.md>)
-- [docs/research-trail/03_iteration_log.md](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/docs/research-trail/03_iteration_log.md>)
-- [docs/research-trail/04_evidence_index.md](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/docs/research-trail/04_evidence_index.md>)
-- [src/components/admin/ContentReviewPanel.test.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/ContentReviewPanel.test.tsx>)
-- [src/components/admin/ContentReviewPanel.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/ContentReviewPanel.tsx>)
-- [src/components/admin/InstructorReviewExperience.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/InstructorReviewExperience.tsx>)
-- [src/components/admin/ServiceHealthPanel.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/ServiceHealthPanel.tsx>)
-- [src/components/research/ResearchWorkflowGuide.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/research/ResearchWorkflowGuide.tsx>)
-- [src/lib/admin/adminNavigation.test.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminNavigation.test.ts>)
-- [src/lib/admin/adminNavigation.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminNavigation.ts>)
-- [src/lib/backup/courseBackup.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/backup/courseBackup.ts>)
-- [src/lib/pragma/contentReview.test.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/contentReview.test.ts>)
-- [src/lib/pragma/contentReviewApi.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/contentReviewApi.ts>)
-- [src/lib/pragma/promoteMission.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/promoteMission.ts>)
-- [src/lib/pragma/reviewPreparation.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/reviewPreparation.ts>)
-- [src/pages/admin/AdminAssembly.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminAssembly.tsx>)
-- [src/pages/admin/AdminBatch.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminBatch.tsx>)
-- [src/pages/admin/AdminCorpus.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminCorpus.tsx>)
-- [src/pages/admin/AdminDashboard.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminDashboard.tsx>)
-- [src/pages/admin/AdminFinalApproval.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminFinalApproval.tsx>)
-- [src/pages/admin/AdminFinalCorpusReview.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminFinalCorpusReview.tsx>)
-- [src/pages/admin/AdminGenerator.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminGenerator.tsx>)
-- [src/pages/admin/AdminGoldCalibration.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminGoldCalibration.tsx>)
-- [src/pages/admin/AdminPromptHarness.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminPromptHarness.tsx>)
-- [src/pages/admin/AdminTeachingMaterials.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminTeachingMaterials.tsx>)
-- [supabase/functions/_shared/contentReview.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/supabase/functions/_shared/contentReview.ts>)
+- [docs/dev-log/2026-09-08-admin-display-cleanup.md](</docs/dev-log/2026-09-08-admin-display-cleanup.md>)
+- [docs/product/PRAGMA_관리자구조_정본.md](</docs/product/PRAGMA_관리자구조_정본.md>)
+- [docs/research-trail/03_iteration_log.md](</docs/research-trail/03_iteration_log.md>)
+- [docs/research-trail/04_evidence_index.md](</docs/research-trail/04_evidence_index.md>)
+- [src/components/admin/ContentReviewPanel.test.tsx](</src/components/admin/ContentReviewPanel.test.tsx>)
+- [src/components/admin/ContentReviewPanel.tsx](</src/components/admin/ContentReviewPanel.tsx>)
+- [src/components/admin/InstructorReviewExperience.tsx](</src/components/admin/InstructorReviewExperience.tsx>)
+- [src/components/admin/ServiceHealthPanel.tsx](</src/components/admin/ServiceHealthPanel.tsx>)
+- [src/components/research/ResearchWorkflowGuide.tsx](</src/components/research/ResearchWorkflowGuide.tsx>)
+- [src/lib/admin/adminNavigation.test.ts](</src/lib/admin/adminNavigation.test.ts>)
+- [src/lib/admin/adminNavigation.ts](</src/lib/admin/adminNavigation.ts>)
+- [src/lib/backup/courseBackup.ts](</src/lib/backup/courseBackup.ts>)
+- [src/lib/pragma/contentReview.test.ts](</src/lib/pragma/contentReview.test.ts>)
+- [src/lib/pragma/contentReviewApi.ts](</src/lib/pragma/contentReviewApi.ts>)
+- [src/lib/pragma/promoteMission.ts](</src/lib/pragma/promoteMission.ts>)
+- [src/lib/pragma/reviewPreparation.ts](</src/lib/pragma/reviewPreparation.ts>)
+- [src/pages/admin/AdminAssembly.tsx](</src/pages/admin/AdminAssembly.tsx>)
+- [src/pages/admin/AdminBatch.tsx](</src/pages/admin/AdminBatch.tsx>)
+- [src/pages/admin/AdminCorpus.tsx](</src/pages/admin/AdminCorpus.tsx>)
+- [src/pages/admin/AdminDashboard.tsx](</src/pages/admin/AdminDashboard.tsx>)
+- [src/pages/admin/AdminFinalApproval.tsx](</src/pages/admin/AdminFinalApproval.tsx>)
+- [src/pages/admin/AdminFinalCorpusReview.tsx](</src/pages/admin/AdminFinalCorpusReview.tsx>)
+- [src/pages/admin/AdminGenerator.tsx](</src/pages/admin/AdminGenerator.tsx>)
+- [src/pages/admin/AdminGoldCalibration.tsx](</src/pages/admin/AdminGoldCalibration.tsx>)
+- [src/pages/admin/AdminPromptHarness.tsx](</src/pages/admin/AdminPromptHarness.tsx>)
+- [src/pages/admin/AdminTeachingMaterials.tsx](</src/pages/admin/AdminTeachingMaterials.tsx>)
+- [supabase/functions/_shared/contentReview.ts](</supabase/functions/_shared/contentReview.ts>)
 
 ## 문구·노출 전후 대조표
 
 같은 파일에서 반복되는 동일 문구는 한 행에 묶었다. 문자열 주변의 JSX·속성 표기는 변경 대상을 식별하기 위한 코드 조각이다. 세 테스트 파일은 새 라벨 단언·기존 데이터 보존 단언을 갱신했고 관리자 정본과 두 연구 기록은 위 범위에 맞춰 동기화했다.
 
-### [src/components/admin/ContentReviewPanel.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/ContentReviewPanel.tsx>)
+### [src/components/admin/ContentReviewPanel.tsx](</src/components/admin/ContentReviewPanel.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -202,7 +202,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | &gt;자동 품질점검 준비&lt; | &gt;기본 점검 준비&lt; |
 | 체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 확정할 수 있습니다. | 체험 감수의 장면·문항·참고 표현을 확인하고 수정 요청·보류·미저장 기록을 해결해야 최종 승인할 수 있습니다. |
 
-### [src/components/admin/InstructorReviewExperience.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/InstructorReviewExperience.tsx>)
+### [src/components/admin/InstructorReviewExperience.tsx](</src/components/admin/InstructorReviewExperience.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -210,7 +210,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 현재 저장된 지적이 없습니다. | 현재 저장된 문제 항목이 없습니다. |
 | finding.provider 그대로 표시: OpenAI / Claude / 규칙 | 화면에서만 AI 검토 / AI 독립 검토 / 규칙 검사로 표시 |
 
-### [src/pages/admin/AdminAssembly.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminAssembly.tsx>)
+### [src/pages/admin/AdminAssembly.tsx](</src/pages/admin/AdminAssembly.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -231,7 +231,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | Astra 생성 완료 · 품질 점검 시작 | Astra 생성 완료 · AI 검토 시작 |
 | Astra는 수 분 걸릴 수 있습니다. 완료 후 기존 품질 점검을 진행합니다. | Astra는 수 분 걸릴 수 있습니다. 완료 후 AI 검토를 진행합니다. |
 
-### [src/pages/admin/AdminDashboard.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminDashboard.tsx>)
+### [src/pages/admin/AdminDashboard.tsx](</src/pages/admin/AdminDashboard.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -241,7 +241,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | "선택 시에만 · Claude 의견 재검토" | "선택 시에만 · 독립 검토 의견 재검토" |
 | ("검수 이력", (from, to) | ("점검·승인 이력", (from, to) |
 
-### [src/pages/admin/AdminCorpus.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminCorpus.tsx>)
+### [src/pages/admin/AdminCorpus.tsx](</src/pages/admin/AdminCorpus.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -253,14 +253,14 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 실제 콘텐츠·검수 연동 | 실제 콘텐츠·감수 연결 |
 | 콘텐츠 검수·확정 &lt;ArrowRight | 콘텐츠 승인 &lt;ArrowRight |
 
-### [src/pages/admin/AdminBatch.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminBatch.tsx>)
+### [src/pages/admin/AdminBatch.tsx](</src/pages/admin/AdminBatch.tsx>)
 
 | 전 | 후 |
 |---|---|
 | 검수 탈락 셀을 교체할 때만 | 점검에서 탈락한 셀을 교체할 때만 |
 | &lt;b&gt;검수 대기&lt;/b&gt; | &lt;b&gt;교수자 감수 대기&lt;/b&gt; |
 
-### [src/pages/admin/AdminGenerator.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminGenerator.tsx>)
+### [src/pages/admin/AdminGenerator.tsx](</src/pages/admin/AdminGenerator.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -271,7 +271,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | &amp;nbsp;/&amp;nbsp; 검수: needs_review | &amp;nbsp;/&amp;nbsp; 승인 상태: needs_review |
 | (검수 상태: needs_review) | (승인 상태: needs_review) |
 
-### [src/pages/admin/AdminFinalApproval.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminFinalApproval.tsx>)
+### [src/pages/admin/AdminFinalApproval.tsx](</src/pages/admin/AdminFinalApproval.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -281,7 +281,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | &gt;검수 대기&lt; | &gt;감수 대기&lt; |
 | 미션 검수·승인 열기 | 학습 미션 조립 열기 |
 
-### [src/pages/admin/AdminFinalCorpusReview.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminFinalCorpusReview.tsx>)
+### [src/pages/admin/AdminFinalCorpusReview.tsx](</src/pages/admin/AdminFinalCorpusReview.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -289,7 +289,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 콘텐츠 검수·확정으로 이동 → | 콘텐츠 승인으로 이동 → |
 | 현재 콘텐츠 검수 완료율이 아닙니다. | 현재 콘텐츠 승인 완료율이 아닙니다. |
 
-### [src/pages/admin/AdminGoldCalibration.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminGoldCalibration.tsx>)
+### [src/pages/admin/AdminGoldCalibration.tsx](</src/pages/admin/AdminGoldCalibration.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -298,7 +298,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 미검수 수업 콘텐츠 수가 아닙니다. | 미승인 수업 콘텐츠 수가 아닙니다. |
 | 현재 수업 콘텐츠의 검수 완료나 학습자 공개 승인으로 사용하지 않습니다. | 현재 수업 콘텐츠의 감수 완료나 학습자 공개 승인으로 사용하지 않습니다. |
 
-### [src/pages/admin/AdminPromptHarness.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminPromptHarness.tsx>)
+### [src/pages/admin/AdminPromptHarness.tsx](</src/pages/admin/AdminPromptHarness.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -311,7 +311,7 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 자동 점검 규칙, 교수자 검수·승인의 관계를 확인합니다. | 자동 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다. |
 | &lt;b&gt;생성·검수 파이프라인은 이 테이블을 | &lt;b&gt;생성·점검 파이프라인은 이 테이블을 |
 
-### [src/pages/admin/AdminTeachingMaterials.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/pages/admin/AdminTeachingMaterials.tsx>)
+### [src/pages/admin/AdminTeachingMaterials.tsx](</src/pages/admin/AdminTeachingMaterials.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -320,26 +320,26 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 이 주차 수업자료 검수·확정 | 이 주차 수업자료 승인 |
 | 이 주차 검수·확정 후 공개되며, 내용이나 편성이 바뀌면 재검수가 필요합니다. | 이 주차 자료의 최종 승인 후 공개되며, 내용이나 편성이 바뀌면 다시 확인하고 승인해야 합니다. |
 
-### [src/components/admin/ServiceHealthPanel.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/admin/ServiceHealthPanel.tsx>)
+### [src/components/admin/ServiceHealthPanel.tsx](</src/components/admin/ServiceHealthPanel.tsx>)
 
 | 전 | 후 |
 |---|---|
 | role: "생성·검수·STT" | role: "생성·AI 검토·STT" |
 
-### [src/lib/pragma/reviewPreparation.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/reviewPreparation.ts>)
+### [src/lib/pragma/reviewPreparation.ts](</src/lib/pragma/reviewPreparation.ts>)
 
 | 전 | 후 |
 |---|---|
 | Claude 검토 모델 설정이 필요합니다. 유료 호출을 시작하지 않았습니다. | 독립 AI 검토 모델 설정이 필요합니다. 유료 호출을 시작하지 않았습니다. |
 
-### [src/lib/pragma/contentReviewApi.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/contentReviewApi.ts>)
+### [src/lib/pragma/contentReviewApi.ts](</src/lib/pragma/contentReviewApi.ts>)
 
 | 전 | 후 |
 |---|---|
 | 검수 서비스를 사용할 수 없습니다. 관리자 로그인과 content-review Edge·DB 배포 상태를 확인하세요. | 콘텐츠 승인 서비스를 사용할 수 없습니다. 관리자 로그인과 서비스 연결 상태를 확인해 주세요. |
 | 검수 응답이 올바르지 않습니다. | 콘텐츠 승인 서비스의 응답이 올바르지 않습니다. |
 
-### [src/components/research/ResearchWorkflowGuide.tsx](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/components/research/ResearchWorkflowGuide.tsx>)
+### [src/components/research/ResearchWorkflowGuide.tsx](</src/components/research/ResearchWorkflowGuide.tsx>)
 
 | 전 | 후 |
 |---|---|
@@ -347,28 +347,28 @@ contentReviewDomain 및 Edge 진입점에서 사용하는 함수는 표시 상�
 | 교수자 최종 검수와 학습자 공개 | 교수자 최종 승인과 학습자 공개 |
 | 자동 품질 점검으로 오류 후보를 찾고, 교수자가 최종 검수한 학습 콘텐츠만 수업에 사용합니다. | 자동 품질 점검으로 오류 후보를 찾고, 교수자가 감수한 뒤 최종 승인한 학습 콘텐츠만 수업에 사용합니다. |
 
-### [supabase/functions/_shared/contentReview.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/supabase/functions/_shared/contentReview.ts>)
+### [supabase/functions/_shared/contentReview.ts](</supabase/functions/_shared/contentReview.ts>)
 
 | 전 | 후 |
 |---|---|
 | OpenAI 품질 점검 / Claude 독립 검토 / OpenAI 지적별 판정 / 교수자 최종 확정 | AI 검토 / AI 독립 검토 / AI 재검토 / 교수자 최종 승인 |
 | effectiveReviewSteps의 openai 라벨 덮어쓰기: 품질 점검 | 공통 단계 키의 AI 검토 라벨 사용 |
 
-### [src/lib/admin/adminNavigation.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/admin/adminNavigation.ts>)
+### [src/lib/admin/adminNavigation.ts](</src/lib/admin/adminNavigation.ts>)
 
 | 전 | 후 |
 |---|---|
 | 콘텐츠 검수·확정 / 학습자 승인·관리 | 콘텐츠 승인 / 학습자 관리 |
 | PRIORITY_LABELS에 중복 라벨을 정의하고 label로 조회 | PRIORITY_PATHS의 기존 경로로 공통 메뉴 객체 참조 |
 
-### [src/lib/pragma/promoteMission.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/pragma/promoteMission.ts>)
+### [src/lib/pragma/promoteMission.ts](</src/lib/pragma/promoteMission.ts>)
 
 | 전 | 후 |
 |---|---|
 | 검수 대기 미션을 찾지 못했습니다. | 감수 대기 미션을 찾지 못했습니다. |
 | 현재 버전의 콘텐츠 검수에서 교수자 승인을 진행하세요. | 콘텐츠 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요. |
 
-### [src/lib/backup/courseBackup.ts](<C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/learner-e2e-2026-09-08/src/lib/backup/courseBackup.ts>)
+### [src/lib/backup/courseBackup.ts](</src/lib/backup/courseBackup.ts>)
 
 | 전 | 후 |
 |---|---|

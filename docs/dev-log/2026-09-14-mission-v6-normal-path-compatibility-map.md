@@ -2,7 +2,7 @@
 
 - 날짜: 2026-09-14
 - 분류: [단독 진행 적합] — 실행 경로의 읽기 확인과 메모리 내 순수 함수 probe. 구현·운영 DB 적용 없음.
-- 작업공간: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.tmp/request-course-pilot-20260914`
+- 작업공간: `.tmp/request-course-pilot-20260914`
 - branch / HEAD: `codex/request-course-pilot-2026-09-14` / `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`
 - 기존 v6·Reason/Contrast 미커밋 구현을 유지했다. 동결 콘텐츠·커리큘럼·60개를 재검토하지 않았다.
 - 상태: **v6 설계/계약 채택 완료, 운영 E2E 0/3 및 runtime/DB 호환성 검증 미완료**.

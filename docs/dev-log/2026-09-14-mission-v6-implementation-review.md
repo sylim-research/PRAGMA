@@ -3,7 +3,7 @@
 > 아래 검토 보고는 중단 시점의 기록을 보존한다. 이후 사용자 정식 채택 결정과 실제 E2E 준비 상태는 마지막 **「정식 채택 후속 · 정상 경로 E2E 사전 확인」** 절을 따른다.
 
 - 일자: 2026-09-14
-- 작업공간: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.tmp/request-course-pilot-20260914`
+- 작업공간: `.tmp/request-course-pilot-20260914`
 - branch / 기준 HEAD: `codex/request-course-pilot-2026-09-14` / `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`
 - 상태: 사용자 지시에 따라 구현은 보존하고 기능 수정 중단. **정식 format 채택은 미결정**이다. 코드 주석의 `adopted` 표현은 채택 완료의 증거가 아니다.
 - [독립 검토 필수] 핵심 schema가 추가된 미확정 diff다. 구현·검증 근거를 먼저 제시하는 단계이며 독립 검토나 release 확정을 수행한 것은 아니다.

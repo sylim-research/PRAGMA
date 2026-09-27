@@ -2,7 +2,7 @@
 
 - 범위: 사용자가 승인한 localhost 대표 1건. production-ready 기능·생성기 전면 수정으로 확대하지 않는다. [단독 진행 적합].
 - 기준: 원격 main으로 확인했던 `54a868d10ca9fb6cf967c875f4aa3bcddccd2961`. 기존 D checkout `4b1add30`와 미커밋 문서는 수정하지 않았다.
-- 작업공간: `C:/Users/cnkr/.codex/worktrees/a980/l2-pragmatic-translator/.tmp/learner-ux`, branch `codex/learner-free-correction-pilot-2026-09-14`.
+- 작업공간: `.tmp/learner-ux`, branch `codex/learner-free-correction-pilot-2026-09-14`.
 - 정본 탐색: 앱 `docs/CANONICAL.md`와 논문 `01_정본/00_정본목록.md`의 세 정본 경로가 일치한다. 정본의 기존 reason/공통 장면 계약을 이번 실험안으로 변경하지 않았다.
 
 ## 구현
@@ -119,7 +119,7 @@
 ## 오늘 작업 종료 · 다음 대화 인수인계
 
 - [단독 진행 적합]. 사용자 요청으로 오늘 작업을 종료한다. 마지막 콘텐츠 구현은 `ee131261`이며, 그 이후 비교·리듬 검토에서는 코드나 콘텐츠를 추가 수정하지 않았다. 이번 종료 작업은 이 인수인계 기록만 추가한다.
-- 재개 작업공간: `C:/Users/cnkr/.codex/worktrees/a980/l2-pragmatic-translator/.tmp/learner-ux`.
+- 재개 작업공간: `.tmp/learner-ux`.
 - branch: `codex/learner-free-correction-pilot-2026-09-14`. 인수인계 작성 직전 working tree는 clean이었다. 인수인계 커밋은 `git log -1`로 확인한다.
 - 부모 작업공간은 detached `4b1add30`인 별도 D 작업이다. 부모의 생성계약·D dev-log 수정 및 목업/배포본 검토·D smoke 미추적 기록은 그대로 보존한다. 부모를 pilot 최신 작업공간으로 오인하거나 그 변경을 정리·커밋하지 않는다.
 - 실행 URL: `http://127.0.0.1:8081/learner/practice?preview=v5&pilot=free-correction`. 서버가 종료됐으면 위 pilot 작업공간에서 `node scripts/serve-learner-ux-pilot.mjs`로 재시작한다. 이 기록은 내일도 서버가 실행 중임을 보장하지 않는다.

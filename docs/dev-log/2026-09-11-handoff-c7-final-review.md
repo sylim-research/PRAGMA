@@ -4,7 +4,7 @@
 
 ## 작업 환경
 
-- worktree: `C:\Users\cnkr\Documents\Projects\l2-pragmatic-translator\.worktrees\admin-takeover-2026-09-10`
+- worktree: `.worktrees/admin-takeover-2026-09-10`
 - 브랜치: `codex/scene-grounding-live-corrections-2026-09-10` (main에 병합된 뒤 문서 커밋만 앞서 있음)
 - 관리자 스크립트 실행: worktree 루트에서 `node docs/research-trail/evidence/2026-09-11-reason-item-repair/tools/run-with-env.cjs <script.ts> [args]`. `.env`는 `../../.env`(메인 레포 루트)에서 읽고 값을 출력하지 않는다.
 - Supabase CLI(`functions list`, `db query`)는 PowerShell에서, worktree 안에서 실행한다.

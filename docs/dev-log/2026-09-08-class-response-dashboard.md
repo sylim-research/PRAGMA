@@ -5,7 +5,7 @@
 - 사용자 요청: 실시간 수집을 필수로 보이지 않게 문구를 바꾸고, 기존 시연 그래프를 크게,
   한눈에 읽히는 대시보드로 개선한다. DEMO는 실제 수집 가능한 응답 데이터 범위를 따른다.
 - [단독 진행 적합]. 기준은 보존 worktree의 `838643e3`이며 이번 작업공간은
-  `C:/Users/cnkr/.codex/worktrees/a787/l2-pragmatic-translator`,
+  `(저장소 루트)`,
   branch `codex/class-response-display-2026-09-08`이다. 이전의 한 줄 푸터와 로컬 완료 원칙을 포함한다.
 - 보존 worktree와 dirty 기본 저장소는 수정하지 않는다. localhost 확인·로컬 커밋까지만 진행한다.
 

@@ -18,7 +18,7 @@
 
 ## 반드시 사용할 작업공간
 
-- worktree: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-takeover-2026-09-10`
+- worktree: `.worktrees/admin-takeover-2026-09-10`
 - branch: `codex/scene-grounding-live-corrections-2026-09-10`
 - 구현 기준 HEAD: `e6892dc63b2ab21510c78c26c84677338a5c8eeb` (PR132 merge). 인계 기록 커밋을 추가하면 그 부모가 이 SHA다.
 - 루트 저장소는 별도 논문 작업의 dirty 작업공간이다. 루트를 정리하거나 덮어쓰지 않는다.
