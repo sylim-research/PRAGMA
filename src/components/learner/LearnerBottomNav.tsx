@@ -55,7 +55,7 @@ export const LearnerTopNav = () => (
   // 선은 흐름 밖(absolute)에 그려 글자 높이를 밀지 않는다 — border-b 방식은 옆 「내 계정」과 높이가 어긋났다.
   // 글자만 있으면 「누르는 메뉴」 신호가 약해 아이콘을 붙이고, 비활성 글자도 흐리게 하지 않는다(회색=꺼진 기능으로 읽힘).
   // 「기록」→「학습 기록」: 용어대장의 「학습 수행 기록」 약칭과 맞춘다(2026-09-28).
-  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-2 md:flex">
     {TABS.map((t) => (
       <NavLink
         key={t.to}

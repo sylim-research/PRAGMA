@@ -48,7 +48,6 @@ export const LearnerJourneyShell = ({
           <div className="flex items-center gap-2">
             {headerRight}
             {nav && <LearnerTopNav />}
-            {nav && <span aria-hidden className="mx-1 hidden h-4 w-px bg-white/15 md:block" />}
             <LearnerAccountMenu />
           </div>
         </div>
