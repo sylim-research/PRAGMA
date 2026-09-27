@@ -51,17 +51,17 @@ export const LearnerBottomNav = () => (
 /** PC 헤더 안의 같은 두 탭. 현재 탭은 밝은 알약 배경으로 표시한다. */
 export const LearnerTopNav = () => (
   // 2026-09-28: 가는 밑줄 + 옅은 회청색 글자는 학생이 「누를 수 있는 메뉴」로 읽기 어려웠다.
-  // 세 항목(수업·기록·내 계정)을 같은 높이의 알약 모양으로 통일하고, 아이콘을 다시 붙여
+  // 세 항목(수업·기록·내 계정)을 같은 크기(h-10·w-[108px])·같은 테두리의 알약으로 통일하고, 아이콘을 다시 붙여
   // 무엇을 여는지 한눈에 보이게 한다. 현재 탭은 채운 배경 + 노란 아이콘으로 표시한다.
-  <nav aria-label="학습자 메뉴" className="hidden items-center gap-1 md:flex">
+  <nav aria-label="학습자 메뉴" className="hidden items-center gap-2 md:flex">
     {TABS.map((t) => (
       <NavLink
         key={t.to}
         to={t.to}
         className={({ isActive }) =>
           [
-            "inline-flex h-10 items-center gap-2 rounded-full px-4 text-[15px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
-            isActive ? "bg-white/[0.12] text-white" : "text-[#DCE3E9] hover:bg-white/[0.06] hover:text-white",
+            "inline-flex h-10 w-[108px] shrink-0 items-center justify-center gap-2 rounded-full border text-[15px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
+            isActive ? "border-white/30 bg-white/[0.12] text-white" : "border-white/15 text-[#DCE3E9] hover:border-white/30 hover:bg-white/[0.06] hover:text-white",
           ].join(" ")
         }
       >
