@@ -25,7 +25,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>PRAGMA의 설계 원리가 실제로 작동하는 코드와 그 개발 과정 전체를 공개합니다.</small>
+> <small>PRAGMA의 설계 원리를 구현한 코드와 그 개발 과정을 공개합니다.</small>
 
 <br>
 
@@ -33,7 +33,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="Fig. 1 PRAGMA 워크플로우: 콘텐츠 제작 워크플로우, 수업 운영 지원, 통번역 학습 워크플로우" width="100%"></p>
 
-> <small>AI 콘텐츠 제작에서 학습자의 최종 산출까지를 하나의 워크플로우로 설계·구현했습니다.</small>
+> <small>AI 콘텐츠 제작에서 학습자의 최종 산출까지를 하나의 흐름으로 연결해 설계·구현했습니다.</small>
 
 <br>
 
@@ -62,14 +62,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="160" align="left">조건</th><th width="530" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
-    <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R)</td></tr>
+    <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R) 기준</td></tr>
     <tr><td>언어 방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
     <tr><td>학습 수준</td><td>입문 · 중급 · 고급</td></tr>
   </tbody>
 </table>
 
-> <small>9개 화행과 P·D·R의 조합으로 관계·상황이 서로 다른 학습 미션을 체계적으로 생성합니다.</small>
+> <small>9개 목표 화행과 관계·상황 조건을 달리해 학습 미션을 구성하며, P·D·R은 관계·상황을 구체화하는 기준입니다.</small>
 
 <br>
 
@@ -85,7 +85,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>생성 조건부터 학습자의 최종 산출까지, 모든 과정을 콘텐츠 버전 단위로 추적합니다.</small>
+> <small>콘텐츠의 생성·검토·승인 이력과 학습 수행의 주요 기록을 콘텐츠 버전과 연결해 확인할 수 있습니다.</small>
 
 <br>
 
@@ -94,22 +94,25 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="70" align="left">논문</th><th width="250" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
   <tbody>
-    <tr><td>4.1</td><td>개발 환경·변경 추적</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
-    <tr><td>4.2</td><td>시스템 아키텍처</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/App.tsx"><code>App.tsx</code></a></td></tr>
-    <tr><td>4.2.3</td><td>버전 추적</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
-    <tr><td>4.3.1~2</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td>4.3.3</td><td>자동 품질 점검·AI 검토</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
-    <tr><td>4.3.4</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
-    <tr><td>4.4</td><td>통번역 학습 워크플로우</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
-    <tr><td>4.4.5</td><td>개인별 학습 수행 기록</td><td><a href="src/pages/learner/LearnerRecords.tsx"><code>LearnerRecords.tsx</code></a></td></tr>
-    <tr><td>4.5</td><td>교과목 편성·기록 관리</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/pages/admin/AdminDecisionTraces.tsx"><code>AdminDecisionTraces.tsx</code></a></td></tr>
-    <tr><td>4.6</td><td>회귀 시험·릴리스 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
+    <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
+    <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/App.tsx"><code>App.tsx</code></a></td></tr>
+    <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
+    <tr><td>4.2.1</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
+    <tr><td>4.2.4</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a></td></tr>
+    <tr><td>4.2.5</td><td>AI 검토와 교차 점검</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
+    <tr><td>4.2.6</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
+    <tr><td>4.3.2~4</td><td>MJT·통번역 과제·AI 피드백</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
+    <tr><td>4.3.5</td><td>학습 수행 기록 저장·조회</td><td><a href="src/pages/learner/LearnerRecords.tsx"><code>LearnerRecords.tsx</code></a></td></tr>
+    <tr><td>4.4.1</td><td>교과목 편성·미션 배치</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a></td></tr>
+    <tr><td>4.4.2~3</td><td>학급 응답·수행 이력 조회</td><td><a href="src/pages/admin/AdminClassResponses.tsx"><code>AdminClassResponses.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
+    <tr><td>4.5.1</td><td>기능 시험·배포 전 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
     <tr><td>부록 A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>부록 C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
   </tbody>
 </table>
 
-> <small>학위논문 제4장의 설계를 실제로 작동하는 코드와 장절 단위로 대응시켰습니다.</small>
+> <small>학위논문 제4장의 구현 내용을 실제 코드와 장·절 단위로 대응시켰습니다.</small>
 
 <br>
 
@@ -129,12 +132,13 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="190" align="left">용어</th><th width="520" align="left">정의</th></tr></thead>
   <tbody>
-    <tr><td>화용적 적절성</td><td>원문의 의미·화행 목적을 유지하며 관계·상황에 맞게 표현하는 정도</td></tr>
+    <tr><td>의미 충실성</td><td>원문의 핵심 의미와 화행 목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
+    <tr><td>화용적 적절성</td><td>관계·상황·담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>학습 미션</td><td>MJT 5문항과 DCT형 통번역 과제 1개를 연결한 상위 학습 단위</td></tr>
     <tr><td>MJT</td><td>제시된 표현의 적절성을 판단·선택·교정하는 과제</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>DCT 형식을 참고해 별도 원문을 통번역하도록 재구성한 과제</td></tr>
     <tr><td>적절성 판단 범주</td><td>과소·적정·과잉으로 나누는 교육적 분류. 단일 점수 척도가 아님</td></tr>
-    <tr><td>관계·상황 조건</td><td>P·D·R을 참여자 관계와 행위 부담으로 구체화한 장면 조건</td></tr>
+    <tr><td>관계·상황 조건</td><td>참여자 관계와 행위 부담 등을 드러내는 구체적 장면 조건</td></tr>
     <tr><td>교수자 최종 승인</td><td>감수한 콘텐츠의 수업 사용·학습자 공개 자격을 결정하는 행위</td></tr>
     <tr><td>학습 수행 기록</td><td>판단 응답, 최초·최종 산출, 제공된 AI 피드백의 저장 기록</td></tr>
   </tbody>
