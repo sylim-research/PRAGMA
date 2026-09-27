@@ -62,7 +62,7 @@ export const LearnerTopNav = () => (
         to={t.to}
         className={({ isActive }) =>
           [
-            "relative inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
+            "inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]",
             isActive ? "text-white" : "text-[#DCE3E9] hover:bg-white/[0.07] hover:text-white",
           ].join(" ")
         }
@@ -70,15 +70,17 @@ export const LearnerTopNav = () => (
         {({ isActive }) => (
           <>
             <t.icon aria-hidden strokeWidth={2} className={["h-[15px] w-[15px]", isActive ? "text-[#FAD338]" : ""].join(" ")} />
-            {t.label}
-            {/* 글자 바로 아래에 긋는다(2026-09-28). */}
-            <span
-              aria-hidden
-              className={[
-                "absolute inset-x-3 bottom-[2px] h-[2px] rounded-full bg-[#FAD338] transition-opacity",
-                isActive ? "opacity-100" : "opacity-0",
-              ].join(" ")}
-            />
+            {/* 밑줄은 아이콘을 빼고 글자 폭에만 긋는다(2026-09-28). */}
+            <span className="relative">
+              {t.label}
+              <span
+                aria-hidden
+                className={[
+                  "absolute inset-x-0 -bottom-[5px] h-[2px] rounded-full bg-[#FAD338] transition-opacity",
+                  isActive ? "opacity-100" : "opacity-0",
+                ].join(" ")}
+              />
+            </span>
           </>
         )}
       </NavLink>
