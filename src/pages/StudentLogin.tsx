@@ -23,6 +23,7 @@ const StudentLogin = () => {
   // 개발 모드의 effect 이중 실행에서 보관값을 두 번 읽지 않도록 ref로 한 번만 처리한다.
   const [callbackNext, setCallbackNext] = useState<string | null>(null);
   const callbackHandled = useRef(false);
+  const dialogTitleRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
     if (callbackHandled.current) return;
@@ -86,15 +87,25 @@ const StudentLogin = () => {
       <Landing />
       <Dialog open onOpenChange={closeToLanding}>
         <DialogPortal>
-          <DialogOverlay className="bg-[#1E2226]/45 backdrop-blur-[3px] backdrop-saturate-[.15] ![animation-duration:450ms] ![animation-timing-function:cubic-bezier(0.16,1,0.3,1)]" />
+          <DialogOverlay className="bg-[#15202B]/45 backdrop-blur-[2px] backdrop-saturate-[.35] ![animation-duration:260ms] ![animation-timing-function:cubic-bezier(0.16,1,0.3,1)]" />
           <DialogPrimitive.Content
             aria-describedby={undefined}
-            className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-32px)] max-w-[400px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white shadow-[0_24px_60px_-20px_rgba(21,32,43,0.45)] ![animation-duration:450ms] ![animation-timing-function:cubic-bezier(0.16,1,0.3,1)] focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              dialogTitleRef.current?.focus();
+            }}
+            className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-32px)] max-w-[410px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border border-[#DED9CC] bg-white shadow-[0_28px_70px_-24px_rgba(21,32,43,0.55)] ![animation-duration:260ms] ![animation-timing-function:cubic-bezier(0.16,1,0.3,1)] focus:outline-none data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
           >
-            <div className="px-7 pb-5 pt-7 sm:px-8">
-              <DialogTitle className="break-keep text-[27px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">
+            <div className="h-1 w-full bg-[#FAD338]" aria-hidden />
+            <div className="px-6 pb-6 pt-7 sm:px-8 sm:pt-8">
+              <div className="mb-4 flex items-center gap-2 text-[11px] font-bold tracking-[0.16em] text-[#6D685E]">
+                <span aria-hidden className="h-2 w-2 rounded-full bg-[#FAD338]" />
+                PRAGMA
+              </div>
+              <DialogTitle ref={dialogTitleRef} tabIndex={-1} className="break-keep text-[26px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B] outline-none">
                 학습 시작하기
               </DialogTitle>
+              <p className="mt-2 text-[14px] leading-relaxed text-[#67727D]">Google 계정으로 간편하게 시작하세요.</p>
 
               {loading ? (
                 <p className="mt-6 text-[13.5px] text-muted-foreground" role="status">
@@ -107,7 +118,7 @@ const StudentLogin = () => {
                     onClick={handleGoogle}
                     disabled={busy}
                     aria-busy={busy}
-                    className="mt-6 flex h-[54px] w-[272px] max-w-full items-center justify-center gap-3 rounded-xl bg-[#101318] px-5 text-[15px] font-semibold tracking-[-0.01em] text-white transition-[background-color,transform] duration-150 hover:-translate-y-px hover:bg-[#1B2028] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#101318] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
+                    className="mt-6 flex h-[52px] w-full items-center justify-center gap-3 rounded-xl bg-[#15202B] px-5 text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_8px_18px_-12px_rgba(21,32,43,0.8)] transition-[background-color,transform,box-shadow] duration-150 hover:-translate-y-px hover:bg-[#202F3D] hover:shadow-[0_12px_24px_-14px_rgba(21,32,43,0.9)] active:translate-y-0 active:scale-[0.995] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70 disabled:hover:translate-y-0"
                   >
                     <span aria-hidden className="grid h-5 w-5 shrink-0 place-items-center">
                       <svg viewBox="0 0 48 48" className="h-[19px] w-[19px]">
@@ -134,7 +145,7 @@ const StudentLogin = () => {
                     </span>
                   </button>
 
-                  <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#5F5A50]">
+                  <ul className="mt-4 grid gap-2 text-[13px] leading-snug text-[#6B665C]">
                     {["학교·개인 Google 계정 모두 사용할 수 있습니다."].map((note) => (
                       <li key={note} className="flex items-start gap-2 break-keep">
                         <Check aria-hidden size={15} strokeWidth={2.2} className="mt-[1px] shrink-0 text-[#2F6B4F]" />
@@ -146,20 +157,19 @@ const StudentLogin = () => {
               )}
             </div>
 
-            <div className="flex items-center justify-between gap-3 border-t border-[#EEEAE0] bg-[#FBFAF6] px-7 py-2 text-[12.5px] text-[#8A8578] sm:px-8">
-              <span>개인정보처리방침</span>
+            <div className="flex items-center justify-center border-t border-[#EEEAE0] bg-[#FBFAF6] px-7 py-3 sm:px-8">
               <Link
                 to="/privacy"
                 aria-label="개인정보처리방침 보기"
-                className="rounded-sm font-medium text-[#6B665C] underline underline-offset-2 transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
+                className="rounded-sm text-[12.5px] font-medium text-[#777267] underline decoration-[#C7C1B5] underline-offset-4 transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
               >
-                보기
+                개인정보처리방침
               </Link>
             </div>
 
             <DialogPrimitive.Close
               disabled={busy}
-              className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full text-[#8A8578] transition-colors hover:bg-[#F3F0E7] hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] disabled:opacity-40"
+              className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full border-0 bg-transparent text-[#8A8578] transition-colors hover:bg-[#F3F0E7] hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] disabled:opacity-40"
             >
               <X aria-hidden className="h-4 w-4" />
               <span className="sr-only">닫기</span>
