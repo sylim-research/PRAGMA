@@ -59,9 +59,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 4. 학습 미션의 생성 조건
 
 <table>
-  <thead><tr><th width="180" align="left">조건</th><th width="492" align="left">구성</th></tr></thead>
+  <thead><tr><th width="160" align="left">조건</th><th width="445" align="left">구성</th></tr></thead>
   <tbody>
-    <tr><td>목표 화행</td><td>요청&emsp;거절&emsp;사과&emsp;감사&emsp;불만&emsp;칭찬&emsp;초대&emsp;제안&emsp;반대</td></tr>
+    <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R)</td></tr>
     <tr><td>언어 방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
