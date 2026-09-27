@@ -38,9 +38,9 @@ export function LearnerAccountMenu() {
         <button
           type="button"
           aria-label="내 계정"
-          className="group inline-flex h-8 w-8 shrink-0 items-center justify-center gap-1.5 rounded-[3px] border border-white/20 text-[13px] font-semibold tracking-[-0.01em] text-[#DCE3E9] transition-colors hover:border-white/40 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] data-[state=open]:border-white/40 data-[state=open]:bg-white/[0.08] data-[state=open]:text-white sm:w-[84px]"
+          className="group inline-flex h-8 items-center gap-1.5 rounded-md px-3 text-[14px] font-semibold tracking-[-0.01em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B] text-[#AEB9C4] hover:text-white data-[state=open]:text-white"
         >
-          <UserRound aria-hidden className="h-[14px] w-[14px] text-[#B9C4CE] transition-colors group-hover:text-white group-data-[state=open]:text-white" strokeWidth={2} />
+          <UserRound aria-hidden className="h-4 w-4" strokeWidth={2} />
           <span className="hidden sm:inline">내 계정</span>
         </button>
       </PopoverTrigger>
