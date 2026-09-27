@@ -17,11 +17,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <br>
 
 <table>
-  <thead><tr><th width="290" align="left">항목</th><th width="327" align="left">링크</th></tr></thead>
+  <thead><tr><th width="319" align="left">작업 결과</th><th width="360" align="left">링크</th></tr></thead>
   <tbody>
-    <tr><td>🖥️ 웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
-    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt=""> PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
-    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt=""> 대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td>🖥️&nbsp;&nbsp;웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
+    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
   </tbody>
 </table>
 
@@ -59,7 +59,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 4. 학습 미션의 생성 조건
 
 <table>
-  <thead><tr><th width="160" align="left">조건</th><th width="445" align="left">구성</th></tr></thead>
+  <thead><tr><th width="160" align="left">조건</th><th width="530" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>관계·상황</td><td>상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R)</td></tr>
