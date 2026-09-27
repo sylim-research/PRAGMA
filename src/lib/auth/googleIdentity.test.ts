@@ -29,6 +29,7 @@ describe("googleIdentity", () => {
     expect(url.searchParams.get("client_id")).toBe(GOOGLE_CLIENT_ID);
     expect(url.searchParams.get("redirect_uri")).toBe("https://pragma.up.railway.app/student-login");
     expect(url.searchParams.get("response_type")).toBe("id_token");
+    expect(url.searchParams.get("prompt")).toBe("select_account");
     expect(url.searchParams.get("scope")).toBe("openid email profile");
     expect(url.searchParams.get("nonce")).toMatch(/^[0-9a-f]{64}$/);
     expect(url.searchParams.get("state")).toBeTruthy();

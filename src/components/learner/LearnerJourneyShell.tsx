@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { LearnerAccountMenu } from "@/components/learner/LearnerAccountMenu";
 import { HomeBrand } from "@/components/HomeBrand";
 import { LearnerBottomNav, LearnerTopNav } from "@/components/learner/LearnerBottomNav";
 
@@ -44,12 +45,11 @@ export const LearnerJourneyShell = ({
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
         <div className={`mx-auto flex ${widthClass} items-center justify-between gap-4 px-6 py-4 ${headerAlignmentClass}`}>
           <HomeBrand />
-          {nav ? (
-            <div className="flex items-center gap-4">
-              {headerRight}
-              <LearnerTopNav />
-            </div>
-          ) : headerRight}
+          <div className="flex items-center gap-3">
+            {headerRight}
+            {nav && <LearnerTopNav />}
+            <LearnerAccountMenu />
+          </div>
         </div>
       </header>
       <div className={`mx-auto ${widthClass} px-6 ${verticalPaddingClass}`}>{children}</div>
