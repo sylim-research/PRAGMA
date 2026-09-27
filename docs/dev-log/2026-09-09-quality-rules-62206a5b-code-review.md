@@ -17,8 +17,8 @@
 
 **수정 방향:** 저장된 코어와 실제 요청 조건을 사용해 필요한 코어 신호를 품질관리에서 재계산하거나, 버전·대상 필드를 포함한 신호를 보존하여 검수 입력으로 연결한다. 신규 context_spec 요구를 모든 과거 코어에 무조건 적용하는 방식은 피한다. 이 문제는 R30을 새 미션 장면 전체로 확장하는 후속 개선과 다르다. 이미 코어에서 발생한 신호의 전달 누락이다.
 
-- 변경 지점: [contentReviewDomain.ts:41](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/contentReviewDomain.ts:41).
-- 저장 경로: [coreBatchRun.ts:368](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/coreBatchRun.ts:368), [AdminGenerator.tsx:781](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/pages/admin/AdminGenerator.tsx:781).
+- 변경 지점: [contentReviewDomain.ts:41](/src/lib/pragma/contentReviewDomain.ts:41).
+- 저장 경로: [coreBatchRun.ts:368](/src/lib/pragma/coreBatchRun.ts:368), [AdminGenerator.tsx:781](/src/pages/admin/AdminGenerator.tsx:781).
 - 통과 조건: 코어 warning → 저장/재조회에 상당하는 입력 → 품질관리 finding에 같은 규칙·대상·경고 사유가 유지됨.
 
 ### CR-02 · P1 · needs_professor 플래그를 실제 판단·승인 조건에 연결해야 함
@@ -31,9 +31,9 @@
 
 **수정 방향:** 프런트 교수자 판단 목록과 SQL 필수 finding 집합에 규칙 신호를 일관되게 포함한다. 검사 버전·finding ID·개별 판단 저장을 함께 대조하고, 경고만 있다는 이유로 자동 승인되지 않도록 확인한다.
 
-- 변경 지점: [contentReviewDomain.ts:48](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/contentReviewDomain.ts:48).
-- 소비 경로: [contentReview.ts:106](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/_shared/contentReview.ts:106), [ContentReviewPanel.tsx:58](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/components/admin/ContentReviewPanel.tsx:58).
-- SQL: [20260906100000_focused_content_review.sql:8](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/migrations/20260906100000_focused_content_review.sql:8).
+- 변경 지점: [contentReviewDomain.ts:48](/src/lib/pragma/contentReviewDomain.ts:48).
+- 소비 경로: [contentReview.ts:106](/supabase/functions/_shared/contentReview.ts:106), [ContentReviewPanel.tsx:58](/src/components/admin/ContentReviewPanel.tsx:58).
+- SQL: [20260906100000_focused_content_review.sql:8](/supabase/migrations/20260906100000_focused_content_review.sql:8).
 - 통과 조건: 규칙 warning이 필수 판단에 나타나고, 판단 미작성/보류 시 승인 불가, 근거를 갖춘 처리 후에만 승인 가능. 프런트와 격리 SQL 모두 같은 결과.
 
 ### CR-03 · P1 · 20% 비차단 정책이 서버 최종화에 반영되지 않음
@@ -46,9 +46,9 @@
 
 **수정 방향:** Edge의 비율 차단도 결정한 정책과 일치시키고, 최종 귀속 결과의 R32 신호를 교수자에게 전달·확인하는 순서를 연결한다. 현재 저작 초안의 lineage_status=pending 동안 R31/R32는 생략되며, reviewMission은 교수자 승인 요청 뒤 귀속을 생성하고 최종화 결과에 checkMission을 재호출하지 않는다. 서버의 if 하나만 삭제하면 “교수자 판단”까지 완성되는 것은 아니다.
 
-- 변경 지점: [missionRules.ts:1015](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1015).
-- 남은 차단: [generate-scenario/index.ts:1874](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/generate-scenario/index.ts:1874).
-- 실제 최종화 연결: [generate-scenario/index.ts:4585](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/generate-scenario/index.ts:4585), [promoteMission.ts:1661](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:1661).
+- 변경 지점: [missionRules.ts:1015](/src/lib/pragma/missionRules.ts:1015).
+- 남은 차단: [generate-scenario/index.ts:1874](/supabase/functions/generate-scenario/index.ts:1874).
+- 실제 최종화 연결: [generate-scenario/index.ts:4585](/supabase/functions/generate-scenario/index.ts:4585), [promoteMission.ts:1661](/src/lib/pragma/promoteMission.ts:1661).
 - 역사 SQL에도 20% 조건이 있지만 별도 옛 prompt 게이트가 있으므로 이를 현행 모든 미션의 DB 차단이라고 확대하지 않는다.
 - 통과 조건: 20% 초과라도 구조가 올바른 귀속 결과가 생성되고 교수자 확인 대상으로 제시됨. 근거 누락·개수 모순 등 구조 오류는 계속 차단됨. 최종화 결과와 실제 승인 기록의 연결까지 확인.
 
@@ -64,7 +64,7 @@
 
 ## 추가 문서 보완
 
-생성계약 정본의 불일치는 R26만이 아니다. §8.1의 R9·R16·R30·R31·R32도 구 강도·상한을 설명한다([정본:594](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/contracts/PRAGMA_생성계약_정본.md:594)). 확정된 결정과 실제 구현을 동기화해야 하며, 단순 실행 사실 정정을 새로운 정책 선택으로 무조건 미룰 이유는 없다. 이번 요청은 코드 감수이므로 정본은 수정하지 않았다.
+생성계약 정본의 불일치는 R26만이 아니다. §8.1의 R9·R16·R30·R31·R32도 구 강도·상한을 설명한다([정본:594](/docs/contracts/PRAGMA_생성계약_정본.md:594)). 확정된 결정과 실제 구현을 동기화해야 하며, 단순 실행 사실 정정을 새로운 정책 선택으로 무조건 미룰 이유는 없다. 이번 요청은 코드 감수이므로 정본은 수정하지 않았다.
 
 카탈로그는 설명층 초안으로 유용하지만 실시간 교수자 표시의 완료 증거는 아니다. 본 커밋의 문서가 선언한 신호 전달 완료와 위 실제 경로의 누락을 구분해 기록해야 한다.
 
@@ -73,7 +73,7 @@
 - 독립 재실행: npm.cmd run typecheck 통과. 관련 9개 테스트 파일 95 tests pass / 0 fail. Fable이 보고한 전체 882개는 이번에 재실행하지 않았다.
 - Edge 번들: node scripts/build-content-review-domain.mjs --check 통과, 302,189 chars.
 - 새 반례: 코어 신호 3종의 전달 누락, 미션 신호의 교수자 판단 목록·격리 SQL helper 누락, Edge 비율 20/40/100% 경계.
-- [재현 스크립트](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.mjs) / [재현 결과 JSON](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.json).
+- [재현 스크립트](/docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.mjs) / [재현 결과 JSON](/docs/research-trail/evidence/2026-09-09-62206a5b-review-probes.json).
 - 최초 R16 합성 문장은 해당 정규식에 걸리지 않아 재현 스크립트가 실패했다. 실제 기존 R16 테스트의 명시적 구두 수행 문장으로 대조해 수정한 뒤 세 신호를 모두 확인했다. 이는 앱 테스트 실패로 집계하지 않는다.
 - esbuild의 샌드박스 상위 경로 읽기 차단은 해당 읽기·검증 명령만 좁게 승인받아 해결했다. Vite 보안 설정을 바꾸지 않았다.
 - 격리 SQL은 실제 helper 정의와 최소 composite 입력 타입으로 실행했다. 전체 migration·승인 RPC·운영 DB 통합 검증은 아니다.

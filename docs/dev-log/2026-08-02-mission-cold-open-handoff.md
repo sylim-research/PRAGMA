@@ -107,13 +107,13 @@ branch `codex/mission-experience-2026-08-02` · 전용 worktree
 ## 증거와 확인 필요
 
 - 사용자 비교 스크린샷:
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 161117.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 161122.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 165539.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 165546.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170215.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170219.png`
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170222.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 161117.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 161122.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 165539.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 165546.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170215.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170219.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-02 170222.png`
 - 다음 담당자는 현재 로컬 diff를 확정안으로 이어 붙이기보다, 위 원칙을 기준으로 유지·폐기할
   부분을 먼저 판단해야 한다.
 - reviewed 16건 전수 smoke, AI defect 9건 재검수, 8월 1일 17건/현재 16건 불일치 원인 확인,

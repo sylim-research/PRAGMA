@@ -4,7 +4,7 @@
 
 - 사용자 요청: 교수자의 소스 기반 생성 도구 시연에서 필요한 두 기능만 채택한다.
   주차 수업자료와 토론 활동을 구현하고, 7주는 중간·14주는 종합 메타화용 토론에 연결한다.
-- 기준 workspace: `C:/Users/cnkr/.codex/worktrees/a787/l2-pragmatic-translator`.
+- 기준 workspace: `(저장소 루트)`.
 - 시작 HEAD: `92f23b8f1638c277bebf388d81b1b6e875d201f6` (모바일 보완 브랜치의 clean 상태).
   작업 branch: `codex/teaching-materials-discussion-2026-09-08`. 이 기록을 포함하는 로컬 커밋이 검토 대상이다.
 - `docs/CANONICAL.md`, 세 제품·생성 정본, 관련 dev-log와 evidence index를 먼저 확인했다.

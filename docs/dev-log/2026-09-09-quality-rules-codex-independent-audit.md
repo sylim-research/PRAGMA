@@ -2,9 +2,9 @@
 
 - 작성일: 2026-09-09
 - 성격: 읽기 전용 설계·실행 감사. [단독 진행 적합]. 개선안은 미채택 제안이며 앱 코드·UI·DB·프롬프트·승인 상태를 변경하지 않았다.
-- 주 감사 대상: C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09
+- 주 감사 대상: .worktrees/admin-declutter-2026-09-09
 - branch / HEAD: admin-absorb-2026-09-09 / 72cb39bf4365da48a78fb71807edf24ade949dc0
-- 대상 validator: [missionRules.ts](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1) 1,415줄. 작업 파일 SHA-256: 73c09ae288dfe648e4485bc1b5a0bed2682435b223572ff9cc5845be8acc665d.
+- 대상 validator: [missionRules.ts](/src/lib/pragma/missionRules.ts:1) 1,415줄. 작업 파일 SHA-256: 73c09ae288dfe648e4485bc1b5a0bed2682435b223572ff9cc5845be8acc665d.
 - 다른 AI의 인벤토리·설계 감사는 독립 증거로 채택하지 않았다. 인벤토리는 대조 대상으로만 사용했다.
 - 검증: 기존 13개 테스트 파일 151개 통과, AST 127개 호출 지점 확인, 합성 입력 21건(기준선 2건 포함)과 품질관리 진입점 1건 재현, Edge 검사 번들 원본 일치 확인.
 - 한계: 운영 DB·배포 Edge·실제 수업 콘텐츠 전수·AI 판단 정확도를 이번에 재검증하지 않았다. 아래 오탐·누락은 반례의 존재를 입증하며 오류율을 뜻하지 않는다.
@@ -32,7 +32,7 @@
 
 처음 열린 기본 저장소는 codex/mission-v4-workspace-checkpoint-2026-08-22 / dffa51025b7d0b1f98d88b21268c9ab5ead72161이며, 미커밋 변경이 많고 docs/CANONICAL.md도 없었다. 그 루트의 R27은 lineage, R29는 선택지 길이 단서 등으로 주 감사 대상과 의미가 다르며 R31~R33도 없다. 이를 현행 R1~R33로 보고했다면 감사 대상부터 틀렸을 것이다.
 
-git worktree 목록에서 사용자가 지정한 인벤토리가 실제 존재하는 admin-declutter 작업트리를 찾았고, 그곳의 [정본 목록](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/CANONICAL.md:1)이 지정한 생성계약·학습자구조·관리자구조를 읽었다. 논문 [정본 목록의 앱 경로](C:/PRAGMA_THESIS_LOCAL/01_정본/00_정본목록.md:85)와도 일치한다. 기본 루트는 비교 대상으로만 남겼다.
+git worktree 목록에서 사용자가 지정한 인벤토리가 실제 존재하는 admin-declutter 작업트리를 찾았고, 그곳의 [정본 목록](/docs/CANONICAL.md:1)이 지정한 생성계약·학습자구조·관리자구조를 읽었다. 논문 [정본 목록의 앱 경로](C:/PRAGMA_THESIS_LOCAL/01_정본/00_정본목록.md:85)와도 일치한다. 기본 루트는 비교 대상으로만 남겼다.
 
 인벤토리가 기준으로 적은 b4265d17, 감사 HEAD, 당시 로컬 캐시 origin/main(6ec00b07e5a689349b3240e302d4f245a85ab4c8)의 validator Git blob을 각각 AST로 확인했다. 모두 127곳이며 LF blob SHA-256도 16ddee8c62d57ec57a056bd09073bb41ca03d0a6c16ef41990e12535e09589c0으로 같다. 작업 파일의 다른 해시는 CRLF 차이다. 원격 ref를 새로 받거나 운영 배포 일치를 확인한 결과는 아니다.
 
@@ -67,14 +67,14 @@ RuleFindingEvidence.subrule은 별도 축이다. R1c와 같은 top-level violati
 
 | 경로 | 실제 검사·조건 | 후속 처리와 저장 |
 |---|---|---|
-| [코어 배치](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/coreBatchRun.ts:299) | checkCore, require_context_spec=true | fail이면 저장 중단. R26 warning 때만 industry AI 1회. AI fail/인프라 오류면 중단하나 R26 자체는 warning으로 보존 |
-| [개별/개요 기반 코어 생성](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/pages/admin/AdminGenerator.tsx:710) | checkCore, require_context_spec=true | fail이면 중단. 이 코드 경로에는 배치의 R26 후속 AI 조정이 없음 |
-| [미션 조립 전](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:898) | checkCore, 계획 feature·direction 사용, require_context_spec 미지정 | 코어 fail이면 유료 조립 전 중단. R26 warning만으로 후속 industry 조정하지 않음 |
-| [미션 조립 후](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:1087) | checkMission(raw, ctx, core) | 허용된 구조 오류는 국소 수리 후 재검사. 미해결 fail은 저장 중단. AI 품질검사는 별도 |
-| [구조 수리](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:686) / [후보 재생성](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:793) / [교수자 수정본](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:1593) | 현재 수정본 전체에 checkMission | 수정 결과와 AI 품질점검을 연결. 교수자 수정본의 validation_result에 result·ID·level·message 저장 |
-| [현재 콘텐츠 품질관리](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/contentReviewDomain.ts:29) | checkMission만 실행; coreInput은 R23 비교용 | Edge 번들로 같은 로직 실행. content_review_runs.rules와 snapshot/hash에 연결. checkCore를 다시 실행하지 않음 |
-| [후보 잠금 감사](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/lockCandidateAudit.ts:104) | checkMission; 계획 feature와 direction을 미션 자체에서 파생 | R24·요청 방향 비교는 원 요청과의 독립 대조가 아님. 잠금 후보 구조 검사 목적 |
-| [교수자 최종 승인 준비](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/promoteMission.ts:1642) | finalize_mission → normalizeMission → finalize_reviewed_mission RPC | 이 함수는 최종화 결과에 checkMission을 다시 호출하지 않음. Edge 귀속 검증·SQL 승인 조건은 별도로 존재 |
+| [코어 배치](/src/lib/pragma/coreBatchRun.ts:299) | checkCore, require_context_spec=true | fail이면 저장 중단. R26 warning 때만 industry AI 1회. AI fail/인프라 오류면 중단하나 R26 자체는 warning으로 보존 |
+| [개별/개요 기반 코어 생성](/src/pages/admin/AdminGenerator.tsx:710) | checkCore, require_context_spec=true | fail이면 중단. 이 코드 경로에는 배치의 R26 후속 AI 조정이 없음 |
+| [미션 조립 전](/src/lib/pragma/promoteMission.ts:898) | checkCore, 계획 feature·direction 사용, require_context_spec 미지정 | 코어 fail이면 유료 조립 전 중단. R26 warning만으로 후속 industry 조정하지 않음 |
+| [미션 조립 후](/src/lib/pragma/promoteMission.ts:1087) | checkMission(raw, ctx, core) | 허용된 구조 오류는 국소 수리 후 재검사. 미해결 fail은 저장 중단. AI 품질검사는 별도 |
+| [구조 수리](/src/lib/pragma/promoteMission.ts:686) / [후보 재생성](/src/lib/pragma/promoteMission.ts:793) / [교수자 수정본](/src/lib/pragma/promoteMission.ts:1593) | 현재 수정본 전체에 checkMission | 수정 결과와 AI 품질점검을 연결. 교수자 수정본의 validation_result에 result·ID·level·message 저장 |
+| [현재 콘텐츠 품질관리](/src/lib/pragma/contentReviewDomain.ts:29) | checkMission만 실행; coreInput은 R23 비교용 | Edge 번들로 같은 로직 실행. content_review_runs.rules와 snapshot/hash에 연결. checkCore를 다시 실행하지 않음 |
+| [후보 잠금 감사](/src/lib/pragma/lockCandidateAudit.ts:104) | checkMission; 계획 feature와 direction을 미션 자체에서 파생 | R24·요청 방향 비교는 원 요청과의 독립 대조가 아님. 잠금 후보 구조 검사 목적 |
+| [교수자 최종 승인 준비](/src/lib/pragma/promoteMission.ts:1642) | finalize_mission → normalizeMission → finalize_reviewed_mission RPC | 이 함수는 최종화 결과에 checkMission을 다시 호출하지 않음. Edge 귀속 검증·SQL 승인 조건은 별도로 존재 |
 
 결정론 validator 자체는 외부 API 0회이고 fail이 없으면 ok=true, 경고가 있으면 result=warning이다. **API 0회라는 성질을 전체 생성·품질관리 파이프라인으로 확대하면 안 된다.** R26뿐 아니라 서버의 source/선행발화/평가 단서 수리와 조립 뒤 허용된 R27 수리도 AI 호출로 이어질 수 있다.
 
@@ -125,13 +125,13 @@ NATIONALIZE는 한국어 정규식 하나다. “중국인(들)은 / 중국에�
 
 ### 특별 감사 B — R30의 실제 범위·학습 지원 정보
 
-[LEARNER_SCENE_EVALUATION_CUES](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/_shared/coreSourceRepair.ts:106) 세 정규식은 부담을 주지 않음+정중/공손, 정중/공손하게+화행 동사, 완화/직접성/선택권/화용/대역/적절성/강도/명료성+조절·유지·표현 등을 찾는다. coreLearnerSceneIssue는 최초 코어 서버 수리와 checkCore에서 사용된다. R30은 checkMission에서 실행되지 않는다.
+[LEARNER_SCENE_EVALUATION_CUES](/supabase/functions/_shared/coreSourceRepair.ts:106) 세 정규식은 부담을 주지 않음+정중/공손, 정중/공손하게+화행 동사, 완화/직접성/선택권/화용/대역/적절성/강도/명료성+조절·유지·표현 등을 찾는다. coreLearnerSceneIssue는 최초 코어 서버 수리와 checkCore에서 사용된다. R30은 checkMission에서 실행되지 않는다.
 
 - “담당자는 촬영 현장에서 조명의 강도를 조절한다.” → R30 fail. 물리적 강도를 화용 평가 기준으로 오인한다.
 - “동료에게 정중히 요청해야 한다.” → core pass. ‘정중하게’와 다른 형태는 놓친다.
 - 미션 상황문 “동료에게 정중하게 요청한다.” → R30 없음. 이 미션을 품질관리 buildContentReviewDomain에 넣어도 R30이 없고, 일치하는 코어를 제공한 재현에서는 전체 fail도 없었다.
 
-이 규칙은 **학습 전 정답·평가 기준 노출 방지 전체**를 담당하지 않는다. 답안 확인 전 강조·정답·해설 숨김은 [러너의 answered 조건](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/pages/learner/CanonicalMissionRun.tsx:652) 등 별도 UI 통제다. 학습자용 P/D/R 칩과 화행 명칭·명시적 학습 지원은 [학습자 정보 노출 정본](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/product/PRAGMA_학습자구조_정본.md:38)에서 허용한다. 이를 R30 이름 때문에 전부 금지해서는 안 된다.
+이 규칙은 **학습 전 정답·평가 기준 노출 방지 전체**를 담당하지 않는다. 답안 확인 전 강조·정답·해설 숨김은 [러너의 answered 조건](/src/pages/learner/CanonicalMissionRun.tsx:652) 등 별도 UI 통제다. 학습자용 P/D/R 칩과 화행 명칭·명시적 학습 지원은 [학습자 정보 노출 정본](/docs/product/PRAGMA_학습자구조_정본.md:38)에서 허용한다. 이를 R30 이름 때문에 전부 금지해서는 안 된다.
 
 권고는 모든 학습 지원을 숨기는 것이 아니라, **어떤 필드가 언제 공개되고 어떤 평가 방향을 미리 주면 안 되는지**를 지정하는 것이다. 내부 정답 코드의 실제 공개처럼 기계적으로 확인되는 위반은 fail, 자연어의 평가 방향 추정은 warning과 검토 대상으로 나누는 것이 타당하다.
 
@@ -150,13 +150,13 @@ R20에 64자리의 임의 hash를 넣어도 통과했고, R33의 설명을 전�
 
 R31 구조 fail은 유지할 근거가 충분하다. 다만 **미귀속 20% 초과를 사용 불가로 차단하는 정책**은 구조적 모순과 다르다. 현재 구현·정책 상수는 확인했지만 20%라는 수치의 경험적·연구적 정당화는 이번 근거에서 확인하지 못했다. 억지 귀속을 유도하지 않는지 연구자가 결정해야 한다. R32를 임의로 fail로 올릴 이유는 없다.
 
-최종 승인과의 연결은 R 규칙 밖에도 있다. [승인 준비 SQL](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/migrations/20260906100000_focused_content_review.sql:67)은 관리자 권한, 현재 source/content hash, 규칙 pass/warning, 필요한 AI 증거와 교수자 결정을 확인한다. [최종화 SQL](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/migrations/20260906100000_focused_content_review.sql:166)은 학습 내용·AI 결과 불변, 교수자 근거, covered lineage 객체, version/parent/reviewer를 저장한다. 이 때문에 R20/31이 불완전하다는 사실을 곧바로 “교수자 승인 우회 가능”으로 결론내리지 않는다. 다만 최종화에서 새로 생성된 lineage에 전체 R31/R32 결과를 다시 연결하는 경로는 보강할 가치가 있다.
+최종 승인과의 연결은 R 규칙 밖에도 있다. [승인 준비 SQL](/supabase/migrations/20260906100000_focused_content_review.sql:67)은 관리자 권한, 현재 source/content hash, 규칙 pass/warning, 필요한 AI 증거와 교수자 결정을 확인한다. [최종화 SQL](/supabase/migrations/20260906100000_focused_content_review.sql:166)은 학습 내용·AI 결과 불변, 교수자 근거, covered lineage 객체, version/parent/reviewer를 저장한다. 이 때문에 R20/31이 불완전하다는 사실을 곧바로 “교수자 승인 우회 가능”으로 결론내리지 않는다. 다만 최종화에서 새로 생성된 lineage에 전체 R31/R32 결과를 다시 연결하는 경로는 보강할 가치가 있다.
 
 ### 특별 감사 D — R22 retired와 lexical audit
 
-폐기·대체의 근거는 [retired 상수](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:91), [8월 9일 HSK 운영 결정](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-09-hsk3-reference-system.md:8), [8월 25일 R 감사](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-25-mission-rule-audit.md:8), [현행 계약 §8.1](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/contracts/PRAGMA_생성계약_정본.md:672)에서 서로 확인된다. 8월 25일 기록은 R22가 실제 구현 없이 낡은 주석에 남았던 상태였다고 설명한다. 8월 9일은 어휘 감사 대체 체계의 도입일, 8월 25일은 retired 명시 정리의 증거로 구분하는 것이 정확하다.
+폐기·대체의 근거는 [retired 상수](/src/lib/pragma/missionRules.ts:91), [8월 9일 HSK 운영 결정](/docs/dev-log/2026-08-09-hsk3-reference-system.md:8), [8월 25일 R 감사](/docs/dev-log/2026-08-25-mission-rule-audit.md:8), [현행 계약 §8.1](/docs/contracts/PRAGMA_생성계약_정본.md:672)에서 서로 확인된다. 8월 25일 기록은 R22가 실제 구현 없이 낡은 주석에 남았던 상태였다고 설명한다. 8월 9일은 어휘 감사 대체 체계의 도입일, 8월 25일은 retired 명시 정리의 증거로 구분하는 것이 정확하다.
 
-[실행 함수](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/supabase/functions/_shared/hskLexicalAudit.ts:1)는 방향별 중국어 필드를 모아 고유 어휘 토큰을 최대 160개 추출하고, HSK 참고 상한 조회·일치율·범위 밖 후보 최대 40개·policy/source ID를 기록한다. 조회 실패는 unavailable이며 non_blocking=true다. 한→중 코어에는 아직 중국어 목표 산출이 없으므로 미션 단계에서 감사하고, 중→한은 중국어 원문을 감사한다.
+[실행 함수](/supabase/functions/_shared/hskLexicalAudit.ts:1)는 방향별 중국어 필드를 모아 고유 어휘 토큰을 최대 160개 추출하고, HSK 참고 상한 조회·일치율·범위 밖 후보 최대 40개·policy/source ID를 기록한다. 조회 실패는 unavailable이며 non_blocking=true다. 한→중 코어에는 아직 중국어 목표 산출이 없으므로 미션 단계에서 감사하고, 중→한은 중국어 원문을 감사한다.
 
 기존 R22 설명에 있던 문장 길이·절 수·HSK 초과 비율 전체를 일대일로 구현한 대체는 아니다. **어휘 참고 부분만 별도 비차단 감사로 대체**, 길이·담화 형태 일부는 R29가 담당한다. 숙달도·자연성·화용 적절성이나 ‘수준에 맞는 문장’을 확정하지 않는다. 별도 어휘 감사를 복원된 R22로 재번호화할 필요도 없다.
 
@@ -168,40 +168,40 @@ R31 구조 fail은 유지할 근거가 충분하다. 다만 **미귀속 20% 초�
 
 | Rule / 지점 | 기능 | 필요성 | 자동검사 적합성 | 현재 강도 | 직접 적용 범위 | 중복 | 논문 정합성 | 판정 |
 |---|---|---|---|---|---|---|---|---|
-| [R1](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:511) (7) | 미션 스키마·문항 순서·슬롯/초점/대역 참조 | 필수 | 적합. 스키마 선행 실패 시 나머지 미실행 | fail | 미션·계약별 | R11 등 스키마 방어와 겹침 | MJT5 유지. legacy 읽기와 신규 생성 분리 | 유지; 하위 검사키·선행 차단 표시 |
-| [R1c](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:367) (5) | 코어 스키마·theme/topic/domain 카탈로그 | 필수 | 적합. 자연어의 실제 주제 적합성은 미판정 | fail | 코어 | R1과 스키마 목적 공유, 대상 다름 | 코어 단계의 자료 계약 | 유지; 카탈로그 범주 단독 분류는 불완전 |
-| [R2](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:641) (3) | native Judge3 비적정 1개·앵커 PDR; legacy within 포함 | 현행 문항 설계상 필요 | 라벨/조건의 기계적 정합만 적합 | fail | 미션·native/legacy 상반 조건 | R27의 맥락 계획과 보완 | PDR로 정답을 계산하지 않음 | 유지; 버전 조건을 반드시 설명 |
-| [R3](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:656) (3) | native 수정안 3·유효 1; legacy 유효 2; 앵커 PDR | 필수 | 적합. 수정안의 실제 적절성은 AI/교수자 | fail | 미션·singleRepairContract 분기 | 스키마 수량 제한과 일부 겹침 | 현행·과거 계약 혼합 설명 금지 | 유지; 잠정 요약의 ‘유효 2개’ 보정 |
-| [R4](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:676) (7) | 이유 ID·역할·주원인·문자 중복·PDR | 필수 | ID/표식 적합. 단일 주원인의 의미 유일성은 미확인 | 혼합 | 미션; warning은 legacy reason_conf | R1 구조·R18 비적정과 보완 | 이유 판단과 산출 조건 연결 | 유지; ‘주원인이 타당하다’로 확대 금지 |
-| [R5](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:721) (13) | 후보 수·대역 분포·중복·PDR 한 축·길이 단서 | 필수, 길이는 보조 | 구조 적합; 길이는 휴리스틱 | 혼합 | 미션·저장 계약별 | R19와 후보 중복 일부 겹침 | 길이로 화용적 적절성을 확정하지 않음 | 구조 fail·길이 warning 유지 |
-| [R6](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1077) (1) | highlights가 target의 부분문자열 | 필수 | 적합. 강조 구간의 교육적 타당성은 미판정 | fail | 미션·target 문항 | 스키마와 보완 | 강조는 실제 문자열과 연결; 노출 시점은 UI | 유지 |
-| [R7](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:612) (4) | 척도 연속 구간·동일 극성 2개·참고 판정 포함 | 필수; 반례 우선은 설계 권고 | 형식 적합; 반례 내용 자체는 미판정 | 혼합 | 미션·v4/v5 추가 조건 | R1 enum과 보완 | 직접적이면 항상 나쁨이라는 소박한 규칙 방지 | 유지; 반례 warning을 보편 정답식으로 쓰지 않음 |
-| [R8](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:843) (5) | 코어 응답형 선행발화; 현행 native 미션 null; legacy 필수 | 단계별 필요 | 구조 적합. 선행 사건의 충분성은 의미 검토 | fail | 코어+미션·계약별 | 생성 서버의 선행발화 수리와 방어층 | 코어 재료와 학습자 self-contained 장면의 차이 | 유지; 한 줄 ‘선행발화 필수’ 금지 |
-| [R9](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:125) (2) | 국가 일반화로 의심되는 한국어 문자열 | 연구 원리상 필수, 현재 탐지 방식은 부족 | 의미 확정에 부적합; 위험 신호에는 적합 | fail | 코어 상황/관계; 미션 일부 해설/비고 | AI 문화·일반화 검토와 역할 분리 필요 | 부정·인용도 차단하고 우회 표현·필드 누락 | 강도·범위 조정, 의미 확인은 AI/교수자 |
-| [R10](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:194) (8) | 요청 방향 일치·한글/한자 존재·혼입 | 필수 | 방향 enum 적합; 문자 범위는 언어 추정 | 혼합 | 코어+미션·필드별 | 정규화·서버 언어 검사와 방어층 | 양방향 지원; 참고 산출안·권장안·힌트 범위 부족 | 방향 fail 유지; 필드 보완·언어 허용 정책 정리 |
-| [R11](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:798) (2) | DCT 참고안 1~2·문항 권장안 존재 | 필수 조건 | 적합하나 일부는 R1이 먼저 거부 | fail | 미션 | 현행 Zod와 높은 중복 | 참고 표현 준비 조건; 제시 시점은 별도 | 유지 또는 R1 하위 설명으로 묶기; 독립 실행 수 과장 금지 |
-| [R12](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1269) (2) | accepted의 과소/적정/과잉 쏠림 | 보조; 현행 변별력은 제한적 | 집계는 가능하나 편향/예측 가능성은 미입증 | warning | 미션 | R5 적정 2개 계약이 일부 목적 보장 | Scale4 제외·후보까지 합산하므로 문항 정답 분포와 다름 | 범위·문구 조정 권장; 폐기/흡수는 후속 |
-| [R13](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:578) (3) | feature 존재·현행 카탈로그 버전 일치 | 필수 | 적합 | fail | 미션·unit 및 item_focus | R1 대역·R14 복사값과 보완 | 과거 버전 읽기는 허용, 재검사에선 최신 카탈로그 강제 | 유지; 읽기/재승인/신규의 정책 명시 |
-| [R14](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:818) (2) | learner_label·closing_ko 정확 복사 | 현재 중앙 카탈로그 설계상 필요 | 문자 일치에는 적합; AI 생성 여부는 판정 불가 | fail | 미션 | R13 버전과 연관, 동일 검사는 아님 | 교수자 편집 자유보다 중앙 문구 일관성을 우선한 계약 | 유지; ‘AI 생성 의심’ 문구 보정 권장 |
-| [R15](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:538) (3) | 요청 화행·unit/item focus·learning_goal 정합 | 필수 | 적합. 실제 화행 구현은 미판정 | fail | 미션만 | R1c 요청 셀·R24 계획 초점과 구분 | 현재 여러 item_focus를 한 화행 목표 아래 묶음 | 유지; 코어 적용으로 표시하지 않음 |
-| [R16](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:434) (6) | 모드·양식과 명시적 수행 장면 | 필수 | 구조 적합; 자연어 정규식은 불완전 | fail | 코어+미션, 검사 필드 비대칭 | R28 채널 매핑과 일부 목적 공유 | ctx↔실제 core 양식 및 translation↔mission mode 대조 누락 | 구조 범위 보완; 서술 추정 강도 분리 |
-| [R17](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:461) (1) | industry는 work에서만 | 현재 도메인 모델상 필요 | 적합. ctx만 검사 | fail | 코어만 | R1c와 요청 셀 구성 목적 공유 | 업무 분야의 실제 구현은 R26/AI | 유지 |
-| [R18](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:665) (3) | 교정·이유의 문제 문장에 within 금지 | 현행 문제 역할상 필요 | 저장 라벨 검사는 적합; 의미 적절성 미판정 | fail | 미션·fix/reason 유형 | R2 비적정 목적과 유사하나 대상 다름 | 판단 대상이 조정 필요 표현이라는 설계 | 유지; ‘실제로 부적절함 검증’이라고 쓰지 않음 |
-| [R19](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1305) (1) | MJT source/target/교정/비교 후보 NFKC·trim 중복 | 보조 | 문자 중복에는 적합; 의도된 재사용 구분 불가 | warning | 미션 | R5 후보 내부 중복과 일부 겹침 | 공유 Anchor A의 target 재사용도 기본 샘플에서 경고 | 범위 조정 권장; 의도된 공유를 설명 |
-| [R20](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1023) (3) | 생성 provenance 객체·필수 값 | 필수 거버넌스 | 존재 검사는 적합; hash 진위·시각 유효성 미검증 | fail | 미션 | R1 provenance 스키마와 중복; R31과 대상 다름 | 추적 가능성의 최소 기록, 승인/무결성 인증 아님 | 유지; 버전·hash 대조 책임은 별도 명시 |
-| [R21](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1353) (2) | 권장안이 invalid 교정/부적정 target과 정확히 동일 | 필수 | 명시 라벨 간 모순 검사에 적합 | fail | 미션·fix_choice만 | R18·R3과 보완 | 의미 최종 판단의 침범이 아님 | fail 유지; warning 주석 수정 |
-| [R22](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:91) (0) | 옛 수준/HSK 휴리스틱 | 현재 R 체계에서 불필요 | 현행 검사 없음 | 없음 | retired | 어휘 참고는 lexical audit; 길이는 R29 | 숙달도·HSK 등치 방지 | retired 유지·번호 재사용 금지 |
-| [R23](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1371) (5) | 코어 source/PDR/양식/방향/usable_facts 계승 | 필수 | 정확 비교에 적합 | fail | 미션; 유효 coreInput 제공 시만 | 계보·서버 조립과 방어층 | DCT 상황문은 새 사건이므로 같음 강제하지 않음 | 유지; 잘못된 coreInput의 조용한 생략 보완 |
-| [R24](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1010) (1) | 계획 target_feature와 생성 unit 일치 | 필수, 계획이 있는 경로 | 적합 | fail | 미션; ctx에 계획 있을 때 | R13/15는 존재·화행, R24는 선택된 초점 | 학습목표 계획 보존 | 유지; 호출자가 준 계획의 출처 표시 |
-| [R25](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:376) (2) | 신규 context_spec·통역 A/B/C·PDR 관계 값 | 필수 provenance/역할 계약 | 상수·필드 검사는 적합; 내용 개연성 미판정 | fail | 코어; require_context_spec=true | 서버 주입 스키마와 보완 | 학생 장면에 C 소개 강제와 다른 내부 계약 | 유지; 신규/legacy 적용 조건 표시 |
-| [R26](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:465) (1) | 산업 코드별 제한된 어휘 증거 | 최소 신호로 유용 | 어휘 신호만 적합; 산업 적합성 판정 불가 | warning | 코어; batch는 후속 AI로 중단 가능 | core quality industry 축과 보완 | 정본 fail 표기와 실행 다름; 경로별 후속 불일치 | warning 유지·경로와 문서 조정 |
-| [R27](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1187) (11) | X-A-A-A-Y-C·PDR 한 축·장면 형식 | 현행 맥락 계획상 필요 | 복사/코드 정합 적합; 문장 수는 부호 개수 근사 | 혼합 | 미션 v4/v5, persisted contrast_plan별 | R2~5 PDR·서버 topology와 보완 | 새 사건의 의미 독립성·충분성은 미확인 | topology 유지; 문장 수 오탐·강도 정리 |
-| [R28](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:1247) (1) | 번역 email/messenger·통역 facetoface/phone | 현재 수행 매체 계약상 필요 | enum 매핑 적합 | fail | 미션 v4/v5 | R16 양식과 보완 | 채널이 공손성·격식을 자동 결정하는 규칙은 아님 | 유지; schema의 ‘channel 폐기’ 주석과 정렬 |
-| [R29](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:250) (9) | 원문 유효 글자·문장 권고·focal 구조·참고안 45% | 형식·부하 상한 필요; 비율은 보조 | 글자/부분문자열 적합; 충실성 추정은 경고만 | 혼합 | 코어 focal_segments 존재 시; 미션 v5 | R1 focal 스키마·서버 길이 수리와 방어층 | 범위는 파일럿 정책이지 수준 적합성/기억 용량의 검증값 아님 | 구조 유지; 원문 길이·참고안 진단 의미 분리 |
-| [R30](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:456) (1) | 학생용 상황문에 평가 방향 어휘 조합 | 노출 통제 원리상 필수 | 다의어·부정·표현 변형 때문에 의미 확정 부적합 | fail | 코어 situation_ko만; 서버 생성 수리에서도 helper 사용 | UI 답안 공개 시점 통제와 별개 | 정상 ‘조명 강도’ 차단·미션 상황문 누락 | 강도·범위 조정, 교수 지원 정보 허용 유지 |
-| [R31](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:921) (5) | 모델 귀속 구조·scope·근거 합집합·provenance·20% | 기록 무결성 필요; 20%는 정책 판단 | 구조 적합. 실제 문헌 지지·모델 사용 증명 불가 | fail | 미션 v5·현재 prompt만·authoring pending 제외 | R20은 생성 기록, R31은 문항 귀속 | pending은 확정 근거 아님; 최신 prompt 의존·최종화 후 R 검사 경로 공백 | 구조 유지; 계약 기준 적용·20% 근거 재검토 |
-| [R32](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:944) (1) | 허용 상한 이내 미귀속 claim 수 | 교수자 주의 신호 필요 | 집계 적합 | warning | R31과 같은 조건; covered·0<미귀속≤20% | R31과 상호 보완, >20%는 R31 fail | 미귀속 비율은 콘텐츠 정확도·품질 점수 아님 | 유지; 상태별 표시·필요한 교수자 판단 연결 |
-| [R33](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/missionRules.ts:972) (4) | 진단차원 2~6·코드/근거 ref·설명·2곳 이상 | 현재 생성계약상 필요; 구성개념 최소 수는 연구자 정책 | 선언 구조 적합. 차원이 실제 구현됐는지 미판정 | fail | 미션 v5·현재 prompt만 | 문항 데이터/진단 metadata; 출처 계보와 다름 | 2곳은 MJT 두 곳이어도 충족, MJT와 DCT 각각 보장 아님 | 유지하되 분류·범위 보정; 2개 최소는 근거 확인 |
+| [R1](/src/lib/pragma/missionRules.ts:511) (7) | 미션 스키마·문항 순서·슬롯/초점/대역 참조 | 필수 | 적합. 스키마 선행 실패 시 나머지 미실행 | fail | 미션·계약별 | R11 등 스키마 방어와 겹침 | MJT5 유지. legacy 읽기와 신규 생성 분리 | 유지; 하위 검사키·선행 차단 표시 |
+| [R1c](/src/lib/pragma/missionRules.ts:367) (5) | 코어 스키마·theme/topic/domain 카탈로그 | 필수 | 적합. 자연어의 실제 주제 적합성은 미판정 | fail | 코어 | R1과 스키마 목적 공유, 대상 다름 | 코어 단계의 자료 계약 | 유지; 카탈로그 범주 단독 분류는 불완전 |
+| [R2](/src/lib/pragma/missionRules.ts:641) (3) | native Judge3 비적정 1개·앵커 PDR; legacy within 포함 | 현행 문항 설계상 필요 | 라벨/조건의 기계적 정합만 적합 | fail | 미션·native/legacy 상반 조건 | R27의 맥락 계획과 보완 | PDR로 정답을 계산하지 않음 | 유지; 버전 조건을 반드시 설명 |
+| [R3](/src/lib/pragma/missionRules.ts:656) (3) | native 수정안 3·유효 1; legacy 유효 2; 앵커 PDR | 필수 | 적합. 수정안의 실제 적절성은 AI/교수자 | fail | 미션·singleRepairContract 분기 | 스키마 수량 제한과 일부 겹침 | 현행·과거 계약 혼합 설명 금지 | 유지; 잠정 요약의 ‘유효 2개’ 보정 |
+| [R4](/src/lib/pragma/missionRules.ts:676) (7) | 이유 ID·역할·주원인·문자 중복·PDR | 필수 | ID/표식 적합. 단일 주원인의 의미 유일성은 미확인 | 혼합 | 미션; warning은 legacy reason_conf | R1 구조·R18 비적정과 보완 | 이유 판단과 산출 조건 연결 | 유지; ‘주원인이 타당하다’로 확대 금지 |
+| [R5](/src/lib/pragma/missionRules.ts:721) (13) | 후보 수·대역 분포·중복·PDR 한 축·길이 단서 | 필수, 길이는 보조 | 구조 적합; 길이는 휴리스틱 | 혼합 | 미션·저장 계약별 | R19와 후보 중복 일부 겹침 | 길이로 화용적 적절성을 확정하지 않음 | 구조 fail·길이 warning 유지 |
+| [R6](/src/lib/pragma/missionRules.ts:1077) (1) | highlights가 target의 부분문자열 | 필수 | 적합. 강조 구간의 교육적 타당성은 미판정 | fail | 미션·target 문항 | 스키마와 보완 | 강조는 실제 문자열과 연결; 노출 시점은 UI | 유지 |
+| [R7](/src/lib/pragma/missionRules.ts:612) (4) | 척도 연속 구간·동일 극성 2개·참고 판정 포함 | 필수; 반례 우선은 설계 권고 | 형식 적합; 반례 내용 자체는 미판정 | 혼합 | 미션·v4/v5 추가 조건 | R1 enum과 보완 | 직접적이면 항상 나쁨이라는 소박한 규칙 방지 | 유지; 반례 warning을 보편 정답식으로 쓰지 않음 |
+| [R8](/src/lib/pragma/missionRules.ts:843) (5) | 코어 응답형 선행발화; 현행 native 미션 null; legacy 필수 | 단계별 필요 | 구조 적합. 선행 사건의 충분성은 의미 검토 | fail | 코어+미션·계약별 | 생성 서버의 선행발화 수리와 방어층 | 코어 재료와 학습자 self-contained 장면의 차이 | 유지; 한 줄 ‘선행발화 필수’ 금지 |
+| [R9](/src/lib/pragma/missionRules.ts:125) (2) | 국가 일반화로 의심되는 한국어 문자열 | 연구 원리상 필수, 현재 탐지 방식은 부족 | 의미 확정에 부적합; 위험 신호에는 적합 | fail | 코어 상황/관계; 미션 일부 해설/비고 | AI 문화·일반화 검토와 역할 분리 필요 | 부정·인용도 차단하고 우회 표현·필드 누락 | 강도·범위 조정, 의미 확인은 AI/교수자 |
+| [R10](/src/lib/pragma/missionRules.ts:194) (8) | 요청 방향 일치·한글/한자 존재·혼입 | 필수 | 방향 enum 적합; 문자 범위는 언어 추정 | 혼합 | 코어+미션·필드별 | 정규화·서버 언어 검사와 방어층 | 양방향 지원; 참고 산출안·권장안·힌트 범위 부족 | 방향 fail 유지; 필드 보완·언어 허용 정책 정리 |
+| [R11](/src/lib/pragma/missionRules.ts:798) (2) | DCT 참고안 1~2·문항 권장안 존재 | 필수 조건 | 적합하나 일부는 R1이 먼저 거부 | fail | 미션 | 현행 Zod와 높은 중복 | 참고 표현 준비 조건; 제시 시점은 별도 | 유지 또는 R1 하위 설명으로 묶기; 독립 실행 수 과장 금지 |
+| [R12](/src/lib/pragma/missionRules.ts:1269) (2) | accepted의 과소/적정/과잉 쏠림 | 보조; 현행 변별력은 제한적 | 집계는 가능하나 편향/예측 가능성은 미입증 | warning | 미션 | R5 적정 2개 계약이 일부 목적 보장 | Scale4 제외·후보까지 합산하므로 문항 정답 분포와 다름 | 범위·문구 조정 권장; 폐기/흡수는 후속 |
+| [R13](/src/lib/pragma/missionRules.ts:578) (3) | feature 존재·현행 카탈로그 버전 일치 | 필수 | 적합 | fail | 미션·unit 및 item_focus | R1 대역·R14 복사값과 보완 | 과거 버전 읽기는 허용, 재검사에선 최신 카탈로그 강제 | 유지; 읽기/재승인/신규의 정책 명시 |
+| [R14](/src/lib/pragma/missionRules.ts:818) (2) | learner_label·closing_ko 정확 복사 | 현재 중앙 카탈로그 설계상 필요 | 문자 일치에는 적합; AI 생성 여부는 판정 불가 | fail | 미션 | R13 버전과 연관, 동일 검사는 아님 | 교수자 편집 자유보다 중앙 문구 일관성을 우선한 계약 | 유지; ‘AI 생성 의심’ 문구 보정 권장 |
+| [R15](/src/lib/pragma/missionRules.ts:538) (3) | 요청 화행·unit/item focus·learning_goal 정합 | 필수 | 적합. 실제 화행 구현은 미판정 | fail | 미션만 | R1c 요청 셀·R24 계획 초점과 구분 | 현재 여러 item_focus를 한 화행 목표 아래 묶음 | 유지; 코어 적용으로 표시하지 않음 |
+| [R16](/src/lib/pragma/missionRules.ts:434) (6) | 모드·양식과 명시적 수행 장면 | 필수 | 구조 적합; 자연어 정규식은 불완전 | fail | 코어+미션, 검사 필드 비대칭 | R28 채널 매핑과 일부 목적 공유 | ctx↔실제 core 양식 및 translation↔mission mode 대조 누락 | 구조 범위 보완; 서술 추정 강도 분리 |
+| [R17](/src/lib/pragma/missionRules.ts:461) (1) | industry는 work에서만 | 현재 도메인 모델상 필요 | 적합. ctx만 검사 | fail | 코어만 | R1c와 요청 셀 구성 목적 공유 | 업무 분야의 실제 구현은 R26/AI | 유지 |
+| [R18](/src/lib/pragma/missionRules.ts:665) (3) | 교정·이유의 문제 문장에 within 금지 | 현행 문제 역할상 필요 | 저장 라벨 검사는 적합; 의미 적절성 미판정 | fail | 미션·fix/reason 유형 | R2 비적정 목적과 유사하나 대상 다름 | 판단 대상이 조정 필요 표현이라는 설계 | 유지; ‘실제로 부적절함 검증’이라고 쓰지 않음 |
+| [R19](/src/lib/pragma/missionRules.ts:1305) (1) | MJT source/target/교정/비교 후보 NFKC·trim 중복 | 보조 | 문자 중복에는 적합; 의도된 재사용 구분 불가 | warning | 미션 | R5 후보 내부 중복과 일부 겹침 | 공유 Anchor A의 target 재사용도 기본 샘플에서 경고 | 범위 조정 권장; 의도된 공유를 설명 |
+| [R20](/src/lib/pragma/missionRules.ts:1023) (3) | 생성 provenance 객체·필수 값 | 필수 거버넌스 | 존재 검사는 적합; hash 진위·시각 유효성 미검증 | fail | 미션 | R1 provenance 스키마와 중복; R31과 대상 다름 | 추적 가능성의 최소 기록, 승인/무결성 인증 아님 | 유지; 버전·hash 대조 책임은 별도 명시 |
+| [R21](/src/lib/pragma/missionRules.ts:1353) (2) | 권장안이 invalid 교정/부적정 target과 정확히 동일 | 필수 | 명시 라벨 간 모순 검사에 적합 | fail | 미션·fix_choice만 | R18·R3과 보완 | 의미 최종 판단의 침범이 아님 | fail 유지; warning 주석 수정 |
+| [R22](/src/lib/pragma/missionRules.ts:91) (0) | 옛 수준/HSK 휴리스틱 | 현재 R 체계에서 불필요 | 현행 검사 없음 | 없음 | retired | 어휘 참고는 lexical audit; 길이는 R29 | 숙달도·HSK 등치 방지 | retired 유지·번호 재사용 금지 |
+| [R23](/src/lib/pragma/missionRules.ts:1371) (5) | 코어 source/PDR/양식/방향/usable_facts 계승 | 필수 | 정확 비교에 적합 | fail | 미션; 유효 coreInput 제공 시만 | 계보·서버 조립과 방어층 | DCT 상황문은 새 사건이므로 같음 강제하지 않음 | 유지; 잘못된 coreInput의 조용한 생략 보완 |
+| [R24](/src/lib/pragma/missionRules.ts:1010) (1) | 계획 target_feature와 생성 unit 일치 | 필수, 계획이 있는 경로 | 적합 | fail | 미션; ctx에 계획 있을 때 | R13/15는 존재·화행, R24는 선택된 초점 | 학습목표 계획 보존 | 유지; 호출자가 준 계획의 출처 표시 |
+| [R25](/src/lib/pragma/missionRules.ts:376) (2) | 신규 context_spec·통역 A/B/C·PDR 관계 값 | 필수 provenance/역할 계약 | 상수·필드 검사는 적합; 내용 개연성 미판정 | fail | 코어; require_context_spec=true | 서버 주입 스키마와 보완 | 학생 장면에 C 소개 강제와 다른 내부 계약 | 유지; 신규/legacy 적용 조건 표시 |
+| [R26](/src/lib/pragma/missionRules.ts:465) (1) | 산업 코드별 제한된 어휘 증거 | 최소 신호로 유용 | 어휘 신호만 적합; 산업 적합성 판정 불가 | warning | 코어; batch는 후속 AI로 중단 가능 | core quality industry 축과 보완 | 정본 fail 표기와 실행 다름; 경로별 후속 불일치 | warning 유지·경로와 문서 조정 |
+| [R27](/src/lib/pragma/missionRules.ts:1187) (11) | X-A-A-A-Y-C·PDR 한 축·장면 형식 | 현행 맥락 계획상 필요 | 복사/코드 정합 적합; 문장 수는 부호 개수 근사 | 혼합 | 미션 v4/v5, persisted contrast_plan별 | R2~5 PDR·서버 topology와 보완 | 새 사건의 의미 독립성·충분성은 미확인 | topology 유지; 문장 수 오탐·강도 정리 |
+| [R28](/src/lib/pragma/missionRules.ts:1247) (1) | 번역 email/messenger·통역 facetoface/phone | 현재 수행 매체 계약상 필요 | enum 매핑 적합 | fail | 미션 v4/v5 | R16 양식과 보완 | 채널이 공손성·격식을 자동 결정하는 규칙은 아님 | 유지; schema의 ‘channel 폐기’ 주석과 정렬 |
+| [R29](/src/lib/pragma/missionRules.ts:250) (9) | 원문 유효 글자·문장 권고·focal 구조·참고안 45% | 형식·부하 상한 필요; 비율은 보조 | 글자/부분문자열 적합; 충실성 추정은 경고만 | 혼합 | 코어 focal_segments 존재 시; 미션 v5 | R1 focal 스키마·서버 길이 수리와 방어층 | 범위는 파일럿 정책이지 수준 적합성/기억 용량의 검증값 아님 | 구조 유지; 원문 길이·참고안 진단 의미 분리 |
+| [R30](/src/lib/pragma/missionRules.ts:456) (1) | 학생용 상황문에 평가 방향 어휘 조합 | 노출 통제 원리상 필수 | 다의어·부정·표현 변형 때문에 의미 확정 부적합 | fail | 코어 situation_ko만; 서버 생성 수리에서도 helper 사용 | UI 답안 공개 시점 통제와 별개 | 정상 ‘조명 강도’ 차단·미션 상황문 누락 | 강도·범위 조정, 교수 지원 정보 허용 유지 |
+| [R31](/src/lib/pragma/missionRules.ts:921) (5) | 모델 귀속 구조·scope·근거 합집합·provenance·20% | 기록 무결성 필요; 20%는 정책 판단 | 구조 적합. 실제 문헌 지지·모델 사용 증명 불가 | fail | 미션 v5·현재 prompt만·authoring pending 제외 | R20은 생성 기록, R31은 문항 귀속 | pending은 확정 근거 아님; 최신 prompt 의존·최종화 후 R 검사 경로 공백 | 구조 유지; 계약 기준 적용·20% 근거 재검토 |
+| [R32](/src/lib/pragma/missionRules.ts:944) (1) | 허용 상한 이내 미귀속 claim 수 | 교수자 주의 신호 필요 | 집계 적합 | warning | R31과 같은 조건; covered·0<미귀속≤20% | R31과 상호 보완, >20%는 R31 fail | 미귀속 비율은 콘텐츠 정확도·품질 점수 아님 | 유지; 상태별 표시·필요한 교수자 판단 연결 |
+| [R33](/src/lib/pragma/missionRules.ts:972) (4) | 진단차원 2~6·코드/근거 ref·설명·2곳 이상 | 현재 생성계약상 필요; 구성개념 최소 수는 연구자 정책 | 선언 구조 적합. 차원이 실제 구현됐는지 미판정 | fail | 미션 v5·현재 prompt만 | 문항 데이터/진단 metadata; 출처 계보와 다름 | 2곳은 MJT 두 곳이어도 충족, MJT와 DCT 각각 보장 아님 | 유지하되 분류·범위 보정; 2개 최소는 근거 확인 |
 
 R1·R11 중복은 실제로 재현됐다. reference_alternatives=[]를 넣으면 R11이 아니라 R1만 반환된다. 스키마에서 이미 거부한 조건이 후속 add에 남아 있는 사실을 “두 번 실행된 검사”로 세면 안 된다. 이번 127은 실행문 위치의 수일 뿐, 127개의 독립 제약·모든 도달 가능 조건·품질 보장 수가 아니다.
 
@@ -241,7 +241,7 @@ R20/23/31/32는 넓은 운영 품질 관리에는 포함할 수 있다. 다만 �
 
 ## 6) 역할 경계 감사
 
-[관리자 정본의 집중 검수](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/product/PRAGMA_관리자구조_정본.md:312)와 논문 용어대장은 자동 품질 점검→AI 검토→교수자 감수→교수자 최종 승인을 구분한다. 소스의 큰 흐름은 이 경계와 대체로 맞는다. 예외를 정리해야 한다.
+[관리자 정본의 집중 검수](/docs/product/PRAGMA_관리자구조_정본.md:312)와 논문 용어대장은 자동 품질 점검→AI 검토→교수자 감수→교수자 최종 승인을 구분한다. 소스의 큰 흐름은 이 경계와 대체로 맞는다. 예외를 정리해야 한다.
 
 | 층 | 확인된 구현과 정합성 | 필요한 보완 |
 |---|---|---|
@@ -279,8 +279,8 @@ AI fail이 자동 재시도나 저장 중단의 원인이 된다는 사실과 AI
 | 생성계약 정본:354 | core quality v5·15축 | contentRelease 현재 core_quality_v9_scene_plausibility. 현재 이름과 역사 기준선 구분 필요 |
 | 생성계약 정본:493 | 새 DCT 사건을 “근접 전이”로 표현 | 코드가 새 사건·조건을 보장하는 범위를 넘어 전이 성과로 읽히지 않도록 정리. 효과 입증은 아님 |
 | 인벤토리:3·19·138 | add 122, fail-only 22; R3 요약에 현행/legacy 중첩 | AST 127, fail-only 23, R3는 선택 분기. 현재 UI 정본으로 사용 불가 |
-| [원격 lineage smoke](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/itemLineage.remote.test.ts:90) | mission_v4_separate_item_lineage 응답 기대·R27을 lineage 성공 확인으로 사용 | 현재 R27은 장면 계약. 과거 테스트를 현행 R31/R32 검증으로 셀 수 없음; RUN_LINEAGE_SMOKE 기본 비실행, 이번 호출하지 않음 |
-| [로컬 lineage 테스트 일부](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/src/lib/pragma/itemLineage.test.ts:159) | R27 없음으로 lineage 통과를 확인하는 오래된 assertion | 같은 파일 뒤의 R31/R32 직접 테스트는 유효. ‘파일 전체가 잘못됨’으로 확대하지 않음 |
+| [원격 lineage smoke](/src/lib/pragma/itemLineage.remote.test.ts:90) | mission_v4_separate_item_lineage 응답 기대·R27을 lineage 성공 확인으로 사용 | 현재 R27은 장면 계약. 과거 테스트를 현행 R31/R32 검증으로 셀 수 없음; RUN_LINEAGE_SMOKE 기본 비실행, 이번 호출하지 않음 |
+| [로컬 lineage 테스트 일부](/src/lib/pragma/itemLineage.test.ts:159) | R27 없음으로 lineage 통과를 확인하는 오래된 assertion | 같은 파일 뒤의 R31/R32 직접 테스트는 유효. ‘파일 전체가 잘못됨’으로 확대하지 않음 |
 | R31/R33 현재 prompt 비교 | 인벤토리의 “미션” 범위보다 실제 조건이 좁음 | authoring pending/current/historical을 분리해야 정확 |
 | 코어 vs 미션 R16 | 코어는 ctx mode↔ctx source_modality, 미션은 interpreting 방향 위주 | 실제 payload 불일치 재현. 강도 설명만으로 검사 완전성을 알 수 없음 |
 | 품질관리 어댑터:40~42 | 모든 R 결과를 구조·형식/needs_professor=false·빈 위치로 변환 | 휴리스틱·거버넌스 분류와 실제 교수자 조치 필요가 소실 |
@@ -317,7 +317,7 @@ AI fail이 자동 재시도나 저장 중단의 원인이 된다는 사실과 AI
 
 현재 감사의 AST도 만능 증명은 아니다. literal add 수와 지역 호출 관계는 정확히 수집할 수 있지만 조건의 의미·모든 실행 도달 가능성·외부 호출자 정책을 자동 보증하지 않는다. 그러므로 AST는 **누락 탐지 안전망**, 타입화된 실행 정의와 경로/계약 테스트는 **운영 사실 대조**로 사용한다. 미래 동적 인자를 만나면 누락시키지 말고 미해석 항목으로 실패시켜야 한다.
 
-이미 [Edge domain 번들 대조](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/scripts/build-content-review-domain.mjs:1)가 source와 배포용 산출물의 일치를 검사한다. 이번 --check는 통과했다. 이 대조를 유지하고 카탈로그 일치 검사도 빌드/CI에서 자동화하되, 사람이 설명의 타당성을 검토하는 절차를 대체하지 않는다.
+이미 [Edge domain 번들 대조](/scripts/build-content-review-domain.mjs:1)가 source와 배포용 산출물의 일치를 검사한다. 이번 --check는 통과했다. 이 대조를 유지하고 카탈로그 일치 검사도 빌드/CI에서 자동화하되, 사람이 설명의 타당성을 검토하는 절차를 대체하지 않는다.
 
 ### 필요한 테스트 전략
 
@@ -366,7 +366,7 @@ R22는 이미 retired로 확정된 코드·정본·기록이 있어 이번에 �
 - 이 문서 자체가 이번 dev-log를 겸한다. 연구 증거 색인에만 감사 결과를 연결하며, design_traceability/decision_log/iteration_log는 설계 변경을 채택하거나 구현한 작업이 아니므로 갱신하지 않는다.
 - 연구자 확인 필요는 §10에 한정한다. 실제 콘텐츠에서의 발생률, 배포 서버 버전, 기존 승인 corpus에 대한 영향 크기는 별도 실측 전까지 확인 불가다.
 
-증거 파일: [감사 계수·기존 테스트·반례 결과](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/evidence/2026-09-09-quality-rules-codex-evidence.json), [로컬 합성 입력 재현 스크립트](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/research-trail/evidence/2026-09-09-quality-rules-codex-probes.mjs). 재현 스크립트는 감사 대상 정식 루트에서 node로 실행하며 네트워크·DB 호출을 하지 않는다. 검증 실행 환경은 Node v24.18.0이다.
+증거 파일: [감사 계수·기존 테스트·반례 결과](/docs/research-trail/evidence/2026-09-09-quality-rules-codex-evidence.json), [로컬 합성 입력 재현 스크립트](/docs/research-trail/evidence/2026-09-09-quality-rules-codex-probes.mjs). 재현 스크립트는 감사 대상 정식 루트에서 node로 실행하며 네트워크·DB 호출을 하지 않는다. 검증 실행 환경은 Node v24.18.0이다.
 
 [논문 영향 3줄]
 
@@ -376,8 +376,8 @@ R22는 이미 retired로 확정된 코드·정본·기록이 있어 이번에 �
 
 ## 후속 보강 — Fable 감사 판정
 
-독립 감사 완료 뒤 사용자가 전달한 Fable 감사에 대해 [별도 판정서](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-09-09-quality-rules-fable-adjudication.md)를 작성했다. 종합 판정은 보완이며, 이를 최초 독립 감사의 근거로 소급하지 않는다.
+독립 감사 완료 뒤 사용자가 전달한 Fable 감사에 대해 [별도 판정서](/docs/dev-log/2026-09-09-quality-rules-fable-adjudication.md)를 작성했다. 종합 판정은 보완이며, 이를 최초 독립 감사의 근거로 소급하지 않는다.
 
-- R27의 MJT fail / DCT warning 차이에는 이미 기록된 운영 이유가 있다. [8월 25일 로그](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-25-mission-rule-audit.md:68)는 모델이 바꿀 수 없는 기존 교수자 DCT 상황의 형식 때문에 조립이 막힌 문제를 기록한다. [8월 30일 감사](C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.worktrees/admin-declutter-2026-09-09/docs/dev-log/2026-08-30-rule-design-diet-audit.md:13)도 frozen C를 X/A/Y 재생성으로 고칠 수 없다는 이유로 DCT 형식 warning과 정렬했다. 따라서 권고는 근거를 새로 만들어 강도를 통일하는 일이 아니라, 기존 결정 이유를 현행 설명에 연결하고 문장부호 오탐을 별도로 해결하는 것이다.
+- R27의 MJT fail / DCT warning 차이에는 이미 기록된 운영 이유가 있다. [8월 25일 로그](/docs/dev-log/2026-08-25-mission-rule-audit.md:68)는 모델이 바꿀 수 없는 기존 교수자 DCT 상황의 형식 때문에 조립이 막힌 문제를 기록한다. [8월 30일 감사](/docs/dev-log/2026-08-30-rule-design-diet-audit.md:13)도 frozen C를 X/A/Y 재생성으로 고칠 수 없다는 이유로 DCT 형식 warning과 정렬했다. 따라서 권고는 근거를 새로 만들어 강도를 통일하는 일이 아니라, 기존 결정 이유를 현행 설명에 연결하고 문장부호 오탐을 별도로 해결하는 것이다.
 - Fable은 최초 집계에서 정수 R ID 정규식이 R1c를 놓쳤다고 명시했다. 이는 §2의 독립 재계수(122+5=127)와 부합한다. 최초 추출 스크립트를 직접 확인한 것은 아니므로 원인에 관한 작성자의 진술과 AST 계수 증거는 구별한다.
 - 이번 교차 대조에서 validator 해시는 동일했다. 선행 151 tests와 합성 입력 결과를 재사용했으며 새 테스트 실적으로 중복 집계하지 않았다. 앱·정본 설계·운영 상태는 변경하지 않았다.

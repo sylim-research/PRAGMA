@@ -1,7 +1,7 @@
 # mission_v6 정상 경로 최소 구현
 
 - 날짜: 2026-09-14
-- 작업공간: `C:/Users/cnkr/Documents/Projects/l2-pragmatic-translator/.tmp/request-course-pilot-20260914`
+- 작업공간: `.tmp/request-course-pilot-20260914`
 - branch: `codex/request-course-pilot-2026-09-14`; 시작 HEAD: `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`.
 - 사용자 승인: 기존 blocker map의 최소 diff 구현 및 정상 경로의 교과목별 3건 실검증. 탐색·설계 재개방 없음.
 - 분류: [교차검증 필수] — DB CHECK 및 승인 계약 연결. 구현·검증된 변경을 먼저 고정하고, 운영 반영 전 저장소의 독립 검토 절차를 따른다.

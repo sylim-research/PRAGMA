@@ -1,6 +1,6 @@
 # 교수자 주도 주차 도입 HOOK · 로컬 구현
 
-- 작업공간: `C:\Users\cnkr\.codex\worktrees\2eb7\l2-pragmatic-translator`
+- 작업공간: `(저장소 루트)`
 - 브랜치: `codex/weekly-class-hook-2026-09-05`, 기준 `c2afdb458c35d13db65be5fa3c91dbc8c69ac60d`.
   최초 detached `f89937f`는 오래된 작업본이었다. clean을 확인하고 전달받은 운영 완료 커밋에서
   새 브랜치를 만들었다. 다른 worktree·사용자 변경은 수정하지 않았다.

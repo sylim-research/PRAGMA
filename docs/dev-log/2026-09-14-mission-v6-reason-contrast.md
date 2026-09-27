@@ -3,7 +3,7 @@
 ## 범위와 기준
 
 - 사용자 승인: MJT2 이유 선택 1회, MJT4 피드백 contrast 최대 1회. 일반 저작 원칙은 DEC-20260914-03, 실제 콘텐츠 적용은 대표 요청 1건이다.
-- 작업 위치: `C:\Users\cnkr\Documents\Projects\l2-pragmatic-translator\.tmp\request-course-pilot-20260914`.
+- 작업 위치: `.tmp/request-course-pilot-20260914`.
 - branch/HEAD: `codex/request-course-pilot-2026-09-14` / `8dd14fbe8bd9518a11142b8a5db2936c8dadaf5f`. 선행 v6 구현을 보존한 미커밋 변경이다.
 - 동결 fixture `LEARNER_UX_PILOT`, 기존 `SAMPLE_MISSION_V6`, 공개 미션의 ID·내용을 덮어쓰지 않았다. 새 로컬 상수 `SAMPLE_MISSION_V6_REASON_CONTRAST`에만 추가했다.
 

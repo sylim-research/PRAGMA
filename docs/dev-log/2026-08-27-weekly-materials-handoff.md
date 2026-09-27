@@ -7,14 +7,14 @@
 
 ## 최초 진단 시 작업 기준(후속 구현 전)
 
-- 이 메모의 저장 위치는 `C:\Users\cnkr\.codex\worktrees\664e\l2-pragmatic-translator`다.
+- 이 메모의 저장 위치는 `(저장소 루트)`다.
   현재 HEAD는 `f89937fa82d6247c4663d45c4b4d9263d06174fc`, detached HEAD이며 오래된 작업본이다.
   메모 작성 전에는 clean이었다. 이 메모를 저장했다고 코드 기준이 최신으로 바뀐 것은 아니다.
 - 이번 세션에서 원격 main을 `git ls-remote`로 확인한 값은
   `871802f0f21369a1930f8aecdca47d09a02d4847`로, 인계받은 PR #25 병합 커밋과 일치했다.
   현재 체크아웃에는 해당 커밋 객체가 없어 조상 포함 여부 검사는 성립하지 않았다.
 - 진단에 사용한 소스는 사용자 인계 경로
-  `C:\Users\cnkr\Documents\Projects\l2-pragmatic-translator\.worktrees\mpj5-mainline-2026-08-24`다.
+  `.worktrees/mpj5-mainline-2026-08-24`다.
   브랜치 `codex/mpj5-mainline-2026-08-24`, HEAD
   `dbc092326a94d676f6086490215b35f7c2abbeb5`, clean을 확인하고 읽기만 했다.
 - 기존 worktree와 오래된 로컬 main은 건드리지 않는다. 기능 수정에 앞서 병합 커밋을 포함하는
@@ -55,7 +55,7 @@
 - 운영 `/admin/package`와 `/admin/composer`를 브라우저에서 읽기 전용으로 확인했다.
   Package의 승인 미션 선택 구조와 Composer의 교과목·주차 편성 구조를 확인했다.
 - 학습자 화면은 사용자가 제공한 다음 캡처와 소스를 대조했다. 미션 실행·학습 기록 저장은 하지 않았다.
-  - `C:\Users\cnkr\OneDrive\사진\스크린샷\스크린샷 2026-08-27 152152.png`
+  - `~\OneDrive\사진\스크린샷\스크린샷 2026-08-27 152152.png`
   - 같은 폴더의 `스크린샷 2026-08-27 152227.png`, `152235.png`, `152255.png`
 - 이전 기록 `2026-08-25-instructor-teaching-materials.md`와
   `2026-08-26-classroom-output-integration.md`에도 승인 미션 기반 자료 구성이 명시돼 있다.
