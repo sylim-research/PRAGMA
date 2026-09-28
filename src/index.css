@@ -172,14 +172,15 @@
 
 /* 중국어 예문 글꼴. components 층에 두는 이유: 같은 요소에 붙은 font-semibold 같은
    가중치 유틸리티가 항상 이겨야 하기 때문이다(utilities 층에 두면 출력 순서에 좌우된다).
-   2026-09-28 연구자 판단으로 명조(Noto Serif SC)에서 고딕(Noto Sans SC)으로 바꿨다 — 화면 가독성이
-   우선이고, 한국어 본문(Pretendard)과 섞여도 획 굵기가 튀지 않는다. 가중치 500은 도판 축소를 버틴다.
+   2026-09-28 연구자 판단(명조·고딕 500·고딕 400 나란히 비교): 웹 화면은 고딕(Noto Sans SC) 400.
+   명조가 더 유려하지만 화면에서는 고딕이 빨리 읽히고, 500은 전부 굵어 보여 한국어 본문(Pretendard)보다
+   튀었다. 굵은 최종안은 font-semibold(600)로 강약을 낸다. 논문 HWPX의 중국어 예문은 명조를 유지한다.
    Pretendard를 뒤에 두는 이유: Noto Sans SC에는 한글이 없어, 한국어가 이 상자에 들어오면
    Windows 기본 글꼴로 떨어지는 것을 막는다. */
 @layer components {
   .font-zh {
     font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Pretendard Variable", Pretendard, sans-serif;
-    font-weight: 500;
+    font-weight: 400;
   }
 }
 
