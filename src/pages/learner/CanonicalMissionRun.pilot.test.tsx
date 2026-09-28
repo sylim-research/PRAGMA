@@ -127,8 +127,9 @@ describe("local learner UX pilot", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
     click("최종안 확정하기");
     expect(screen.getByRole("heading", { name: "내 번역, 완성!" })).toBeInTheDocument();
-    expect(screen.getByText(first)).toBeInTheDocument();
-    expect(screen.getByText(final)).toBeInTheDocument();
+    const record = screen.getByRole("region", { name: /번역 완성본/ });
+    expect(record).toHaveTextContent(first);
+    expect(record).toHaveTextContent(final);
     const completed = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(completed.responses["A-DCT"]).toEqual({ first, revised: final, reflected: true });
     expect(completed.responses["A-FEEDBACK"]).not.toHaveProperty("evaluation");

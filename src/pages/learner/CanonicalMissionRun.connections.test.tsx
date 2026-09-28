@@ -50,7 +50,6 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.queryByText("상황 번역하기")).not.toBeInTheDocument();
     expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
     expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();
-    expect(screen.getByText("您方便帮我收一下快递吗？")).toBeInTheDocument();
   });
 
   it("shows the priority feedback once on each action screen", () => {

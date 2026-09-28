@@ -65,6 +65,10 @@ describe("demo route", () => {
     fireEvent.click(screen.getByRole("button", { name: "수정안 다시 확인하기" }));
     fireEvent.click(await screen.findByRole("button", { name: /최종안 확정하기/ }));
     expect(await screen.findByRole("heading", { name: "내 번역, 완성!" })).toBeInTheDocument();
+    // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
+    expect(screen.queryByRole("link", { name: "나의 학습 기록 보기" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "데모 학습 기록 보기" }));
+    expect(screen.getByRole("region", { name: "데모 학습 기록" })).toBeInTheDocument();
     expect(requestFeedback).not.toHaveBeenCalled();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
   });
