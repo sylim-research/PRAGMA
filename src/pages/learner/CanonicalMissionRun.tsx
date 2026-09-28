@@ -2847,7 +2847,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
     <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="flex items-center gap-3">
-      {demoMode && <span className="whitespace-nowrap rounded-full border border-[#F2C744]/70 px-2.5 py-0.5 text-[11px] font-bold text-[#F2C744]">시연<span className="hidden sm:inline"> · 수행 기록 저장 안 됨</span></span>}
+      {demoMode && <span className="whitespace-nowrap rounded-full border border-[#F2C744]/70 px-2.5 py-0.5 text-[11px] font-bold text-[#F2C744]">데모 시연</span>}
       <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>
     </span>}>
       {isDevPreview && (
@@ -2935,16 +2935,17 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         )}
         {demoMode && sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
-          // 시연 조수 버튼 — 문항 화면에서만 오른쪽 아래에 작게 띄운다. 주 버튼과 다투지 않게 흰 바탕에 노란 테두리.
-          <div className="fixed bottom-5 right-5 z-40">
-            <Button variant="outline" className="relative h-11 rounded-full border-2 border-[#E3C766] bg-white px-4 text-[14px] font-bold text-[#15202B] shadow-[0_4px_14px_rgba(21,32,43,0.12)] hover:bg-[#FFF8E1]" onClick={() => {
+          // 시연 조수 버튼 — 문항 화면에서만, 본문 열의 오른쪽 아래 모서리에 붙여 작게 띄운다.
+          <div className="pointer-events-none fixed inset-x-0 bottom-5 z-40 px-4">
+            <div className="mx-auto flex max-w-3xl justify-end">
+            <Button variant="outline" className="pointer-events-auto h-11 rounded-full border-2 border-[#E3C766] bg-white px-4 text-[14px] font-bold text-[#15202B] shadow-[0_4px_14px_rgba(21,32,43,0.12)] hover:bg-[#FFF8E1]" onClick={() => {
               setDevAutofillQuestId(quest.id);
               setRenderNonce(current => current + 1);
               window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 80);
             }}>
-              {questIndex === 0 && !responses[quest.id] && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#F2C744] animate-ping [animation-iteration-count:3]" />}
               <Sparkles aria-hidden className="mr-1.5 h-4 w-4 text-[#C9A62E]" />답안 자동 채우기
             </Button>
+            </div>
           </div>
         )}
       </div>

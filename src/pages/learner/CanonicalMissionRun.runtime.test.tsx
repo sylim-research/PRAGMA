@@ -47,7 +47,7 @@ describe("demo route", () => {
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
     expect(within(briefing).getByText("표현이 상황에 맞는지 판단하기")).toBeInTheDocument();
     expect(screen.getByText("직접 번역하기")).toBeInTheDocument();
-    expect(screen.getByText(/수행 기록 저장 안 됨/)).toBeInTheDocument();
+    expect(screen.getByText("데모 시연")).toBeInTheDocument();
     expect(fetchMissionByScenario).not.toHaveBeenCalled();
     expect(requestFeedback).not.toHaveBeenCalled();
     expect(appendMissionEvent).not.toHaveBeenCalled();
