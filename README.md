@@ -92,14 +92,13 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="70" align="left">논문</th><th width="250" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="110" align="left">논문</th><th width="210" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
-    <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/App.tsx"><code>App.tsx</code></a></td></tr>
     <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
-    <tr><td>4.2.1</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>4.2.1 · 부록 A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td>4.2.4</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a></td></tr>
+    <tr><td>4.2.4 · 부록 C</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
     <tr><td>4.2.5</td><td>AI 검토와 교차 점검</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
     <tr><td>4.2.6</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.3.2~4</td><td>MJT·통번역 과제·AI 피드백</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
@@ -107,8 +106,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.4.1</td><td>교과목 편성·미션 배치</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a></td></tr>
     <tr><td>4.4.2~3</td><td>학급 응답·수행 이력 조회</td><td><a href="src/pages/admin/AdminClassResponses.tsx"><code>AdminClassResponses.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
     <tr><td>4.5.1</td><td>기능 시험·배포 전 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
-    <tr><td>부록 A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
-    <tr><td>부록 C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
   </tbody>
 </table>
 
@@ -116,7 +113,26 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 7. 시스템 아키텍처
+## 7. 주요 연구·개발 단계
+
+<table>
+  <thead><tr><th width="190" align="left">단계</th><th width="540" align="left">핵심 설계·개선</th><th width="100" align="left">근거</th></tr></thead>
+  <tbody>
+    <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름 구현, 중→한 번역·통역까지 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
+    <tr><td>콘텐츠 품질관리·최종 승인</td><td>규칙·AI·교차 검토 뒤 교수자가 최종 승인하는 단계별 검수</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
+    <tr><td>교과목·주차 편성</td><td>3개 교과목·15주 계획·주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
+    <tr><td>MJT → DCT형 통번역 과제</td><td>MJT 5문항과 DCT형 통번역 과제를 한 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
+    <tr><td>9개 목표 화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
+    <tr><td>의미 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용 판정을 보류하고 의미부터 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
+    <tr><td>DCT 수정안 재확인</td><td>최초안 피드백만 보던 수정안 확정 전에 재확인 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
+  </tbody>
+</table>
+
+> <small>개발 이력 가운데 핵심 설계와 개선을 보여 주는 대표 변경입니다.</small>
+
+<br>
+
+## 8. 시스템 아키텍처
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="Fig. 4 시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
@@ -127,7 +143,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 8. 주요 용어
+## 9. 주요 용어
 
 <table>
   <thead><tr><th width="190" align="left">용어</th><th width="520" align="left">정의</th></tr></thead>
@@ -149,4 +165,4 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <br>
 <br>
 
-<p align="center"><b>박사학위논문 「AI 기반 한·중 통번역 학습 워크플로우 개발 연구(2027)」의 설계·개발 결과물입니다.</b><br><img src="docs/brand/rule.svg" width="100%" height="3" alt=""><br><sub>© 2026 Soyoung Lim · 한국외국어대학교</sub></p>
+<p align="center"><b>박사학위논문 「AI 기반 한·중 통번역 학습 워크플로우 개발 연구」의 설계·개발 결과물입니다.</b><br><img src="docs/brand/rule.svg" width="100%" height="3" alt=""><br><sub>© 2026 Soyoung Lim · 한국외국어대학교</sub></p>
