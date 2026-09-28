@@ -11,7 +11,6 @@ import { requestFeedback } from "@/lib/mission/missionFeedback";
 import { saveMissionAttempt } from "@/lib/mission/missionLog";
 import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
 import { appendMissionEvent } from "@/lib/mission/missionEvents";
-import { supabase } from "@/integrations/supabase/client";
 
 const scenarioId = "86d738b0-1891-4bfe-9b12-f8643ebbb45f";
 const { fetchMissionByScenario } = vi.hoisted(() => ({
@@ -40,10 +39,8 @@ import CanonicalMissionRun, {
 } from "@/pages/learner/CanonicalMissionRun";
 
 describe("demo route", () => {
-  it("loads the designated approved representative and keeps demo responses unsaved", async () => {
+  it("opens the approved representative snapshot without the DB and keeps demo responses unsaved", async () => {
     vi.clearAllMocks();
-    vi.spyOn(supabase.auth, "getSession").mockResolvedValue({ data: { session: {} as never }, error: null });
-    fetchMissionByScenario.mockResolvedValue({ scenario_id: REPRESENTATIVE_MISSION_ID, speech_act: "request", learner_level: "intermediate", mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh", mission: SAMPLE_MISSION_V6_REASON_CONTRAST });
     window.scrollTo = vi.fn();
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
     const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
@@ -51,19 +48,9 @@ describe("demo route", () => {
     expect(within(briefing).getByText("상황에 맞는지 판단하기")).toBeInTheDocument();
     expect(screen.getByText("다른 상황의 원문을 직접 번역하기")).toBeInTheDocument();
     expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
-    expect(fetchMissionByScenario).toHaveBeenCalledWith(REPRESENTATIVE_MISSION_ID, { includeV6: true });
-    expect(appendMissionEvent).not.toHaveBeenCalled();
-  });
-  it("opens the approved representative snapshot without sign-in and without reading the DB", async () => {
-    vi.clearAllMocks();
-    vi.spyOn(supabase.auth, "getSession").mockResolvedValue({ data: { session: null }, error: null });
-    window.scrollTo = vi.fn();
-    render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
-    const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
-    expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
-    expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
     expect(fetchMissionByScenario).not.toHaveBeenCalled();
     expect(requestFeedback).not.toHaveBeenCalled();
+    expect(appendMissionEvent).not.toHaveBeenCalled();
   });
 });
 
@@ -182,8 +169,8 @@ describe("CanonicalMissionRun live CTA route", () => {
     vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
     Element.prototype.scrollIntoView = vi.fn();
     render(<MemoryRouter><CanonicalMissionRunner mission={viewModel} runtime={runtime} isDevPreview={false} demoMode /></MemoryRouter>);
-    const fill = () => fireEvent.click(screen.getByRole("button", { name: "예시 답안 입력" }));
-    expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
+    const fill = () => fireEvent.click(screen.getByRole("button", { name: "답안 자동 채우기" }));
+    expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /학습 미션 시작하기/ }));
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     for (const [confirm, next] of [
@@ -199,7 +186,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       fireEvent.click(confirmButton);
       fireEvent.click(screen.getByRole("button", { name: next }));
     }
-    expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /^(번역|통역)하기$/ }));
     fill();
     const reference = mission.production_task.reference_alternatives[0].text;
@@ -235,7 +222,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     }
     fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
     expect(await screen.findByRole("heading", { name: /이번 미션에서 확정한 내/ })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
     expect(appendMissionEvent).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: "처음부터 다시 보기" }));
@@ -296,7 +283,7 @@ describe("CanonicalMissionRun live CTA route", () => {
 
     expect(await screen.findByRole("heading", { name: SAMPLE_MISSION_V5.production_task.situation_ko })).toBeInTheDocument();
     expect(screen.getByText("요청 화행 · 한국어 → 중국어")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "예시 답안 입력" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     expect(screen.queryByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: /학습 미션 시작하기/ }));

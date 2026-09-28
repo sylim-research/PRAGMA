@@ -59,8 +59,8 @@ import { CONSENT_VERSION, POLICY_VERSION } from "@/lib/research/versions";
 import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
-import { supabase } from "@/integrations/supabase/client";
 import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
+import { DEMO_FIRST_DRAFT, DEMO_REVISED_DRAFT, requestDemoFeedback } from "@/lib/demo/representativeDemoFeedback";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -69,6 +69,8 @@ const RuntimeMissionContext = createContext<RunnableMission | null>(null);
 const useRuntimeMission = () => useContext(RuntimeMissionContext);
 const LocalPilotContext = createContext(false);
 const DctFeedbackSessionContext = createContext<DctFeedbackSession | null>(null);
+/** 대표 미션 시연(모델 하우스) — AI·DB를 쓰지 않고 준비된 예시 답안과 피드백을 보여 준다. */
+const DemoModeContext = createContext(false);
 /** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
 const ReviewHostContext = createContext(false);
 
@@ -667,7 +669,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   // 판단을 확정하면 네 선택지와 내 선택은 그대로 두고 변경만 잠근다. 이유를 확정하기 전에는
   // 정답 배지·색상·스크린리더 안내 어디에도 판단 결과를 드러내지 않는다.
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
-  const [reasonId, setReasonId] = useState<string | null>(() => revealAnswers ? quest.reasonChoice?.acceptedId ?? null : null);
+  const [reasonId, setReasonId] = useState<string | null>(() => devAutofill || revealAnswers ? quest.reasonChoice?.acceptedId ?? null : null);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
   const judgmentLocked = answered || (Boolean(quest.reasonChoice) && judgmentCommitted);
   const judgmentShown = answered;
@@ -845,13 +847,13 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
 const freeCorrectionInstruction = (output: string) => `원문이 전달하려는 내용과 의도를 살려, ${output}을 관계와 상황에 맞게 고쳐 보세요.`;
 const FREE_CORRECTION_FIDELITY = "새로운 사실·이유·약속을 덧붙이거나, 아직 없는 합의를 있는 것처럼 바꾸지는 마세요.";
 
-function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void }) {
+function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean }) {
   const mission = useCanonicalMission();
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const output = mission.activityMode === "interpreting" ? "통역안" : "번역안";
   // 결함안을 미리 넣어 두고 고칠 곳만 바꾸게 한다. 그대로 제출은 아래 관문이 막는다.
   // 비교 기준(결함안)은 저장되는 수행 기록의 mission_content_hash가 가리키는 콘텐츠 버전의 이 문항 target이다.
-  const [draft, setDraft] = useState(quest.target);
+  const [draft, setDraft] = useState(() => devAutofill ? quest.references[0] ?? quest.target : quest.target);
   const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
@@ -891,11 +893,13 @@ function FreeCorrectionView({ quest, onDone }: { quest: FreeCorrectionQuest; onD
   </QuestScaffold>;
 }
 
-function SpectrumView({ quest, onDone }: { quest: SpectrumQuest; onDone: (response: QuestResponse) => void }) {
+function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
-  const [picks, setPicks] = useState<Record<string, string>>({});
+  const [picks, setPicks] = useState<Record<string, string>>(() => devAutofill
+    ? Object.fromEntries(quest.candidates.flatMap(candidate => candidate.acceptedAnswers[0] ? [[candidate.id, candidate.acceptedAnswers[0]]] : []))
+    : {});
   const [submitted, setSubmitted] = useState(false);
   const allPicked = quest.candidates.every(candidate => Boolean(picks[candidate.id]));
   const matched = quest.candidates.filter(candidate => candidate.acceptedAnswers.includes(picks[candidate.id] ?? "")).length;
@@ -1576,6 +1580,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const runtime = useRuntimeMission();
   const mission = useCanonicalMission();
   const localPilot = useContext(LocalPilotContext);
+  const demo = useContext(DemoModeContext);
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const first = response?.first ?? "";
@@ -1583,9 +1588,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const [localSession] = useState(() => createDctFeedbackSession());
   const feedbackSession = sharedSession ?? localSession;
   const [ready, setReady] = useState(localPilot);
-  // 비로그인 시연(실제 미션이지만 AI 호출 없음)도 로컬 파일럿처럼 작성된 안내만 보여 준다.
-  const authoredGuidanceOnly = localPilot || (!runtime && Boolean(mission.scenarioId));
-  const previewEvaluation = useMemo<DctEvaluation>(() => authoredGuidanceOnly ? {
+  const previewEvaluation = useMemo<DctEvaluation>(() => localPilot ? {
     // Authored display guidance only. Never inspect the answer or persist this as an evaluation.
     available: false,
     criteria: [{ key: "meaning", label: "의미 충실성", question: "원문의 내용과 확정성을 유지했나요?", level: "recommend", body: quest.feedback.action }],
@@ -1595,7 +1598,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     highlights: [],
     example: quest.referenceAnswer,
     takeaway: quest.feedback.action,
-  } : evaluateDct(quest, first), [authoredGuidanceOnly, first, quest]);
+  } : evaluateDct(quest, first), [first, localPilot, quest]);
   const [evaluation, setEvaluation] = useState<DctEvaluation>(previewEvaluation);
   const [runtimeFeedback, setRuntimeFeedback] = useState<RuntimeFeedback | undefined>(response?.runtimeFeedback);
   const [revised, setRevised] = useState(() => devAutofill ? quest.referenceAnswer : first);
@@ -1607,11 +1610,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!demoFillRequest) return;
-    const example = quest.feedback.alternatives.find(item => normalize(item.text) !== normalize(first))?.text
+    const example = demo ? DEMO_REVISED_DRAFT : quest.feedback.alternatives.find(item => normalize(item.text) !== normalize(first))?.text
       ?? quest.referenceAnswer;
     setRevised(example);
     setRevisionOpen(true);
-  }, [demoFillRequest, first, quest]);
+  }, [demo, demoFillRequest, first, quest]);
   useEffect(() => {
     let cancelled = false;
     if (localPilot) {
@@ -1712,9 +1715,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
           {(!revisionOpen || recheckRequested) && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
             <div className="space-y-1.5 p-3 sm:p-3.5">
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
-              {(authoredGuidanceOnly || feedbackUnavailable) && (
+              {(localPilot || feedbackUnavailable) && (
                 <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#635E52]">
-                  {authoredGuidanceOnly ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
+                  {localPilot ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
                 </p>
               )}
               {/* 세 기준은 늘 보이되, 펼쳐 읽는 것은 의미→언어→화용 순서에서 처음 걸린 하나뿐이다(한 번에 한 초점). */}
@@ -1742,7 +1745,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               })}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : authoredGuidanceOnly ? "로그인 없는 시연에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? "시연용 피드백입니다. AI를 새로 호출하지 않고, 예시 답안에 대해 미리 준비한 피드백을 보여 줍니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
           {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}
@@ -1967,8 +1970,8 @@ function QuestRenderer({ quest, responses, onDone, onRevisionStateChange, devMod
   demoFillRequest?: number;
   localPilot?: boolean;
 }) {
-  if (quest.kind === "free_correction") return <FreeCorrectionView quest={quest} onDone={onDone} />;
-  if (quest.kind === "spectrum") return <SpectrumView quest={quest} onDone={onDone} />;
+  if (quest.kind === "free_correction") return <FreeCorrectionView quest={quest} onDone={onDone} devAutofill={devAutofill} />;
+  if (quest.kind === "spectrum") return <SpectrumView quest={quest} onDone={onDone} devAutofill={devAutofill} />;
   if (quest.kind === "scale") return <ScaleView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
   if (quest.kind === "fix_choice") return <FixChoiceView quest={quest} responses={responses} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} correctionOnly={localPilot} />;
   if (quest.kind === "reason") return <ReasonView quest={quest} onDone={onDone} devAutofill={devAutofill} revealAnswers={revealAnswers} />;
@@ -2544,8 +2547,11 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const [attemptId, setAttemptId] = useState(() => runtime
     ? rotateMissionAttemptId(attemptStorageKey)
     : getOrCreateMissionAttemptId(attemptStorageKey));
+  // 모델 하우스: 대표 미션 시연에서만 준비된 예시 답안·피드백을 쓴다.
+  const modelHouse = demoMode && runtime?.scenario_id === REPRESENTATIVE_MISSION_ID;
   const feedbackSession = useMemo(() => createDctFeedbackSession(runtime
-    ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined), [attemptId, runtime?.mission.provenance?.mission_content_hash]);
+    ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined,
+    modelHouse ? requestDemoFeedback : undefined), [attemptId, modelHouse, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
 
   useEffect(() => {
@@ -2830,6 +2836,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
 
   return (
     <LocalPilotContext.Provider value={localPilot}>
+    <DemoModeContext.Provider value={modelHouse}>
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
@@ -2912,7 +2919,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               onRevisionStateChange={setFeedbackRevisionOpen}
               devMode={isDevPreview}
               devAutofill={devAutofillQuestId === quest.id}
-              devDraft={demoMode && quest.kind === "dct" ? quest.referenceAnswer : DEV_PREVIEW_COPY[devPreset].a}
+              devDraft={demoMode && quest.kind === "dct" ? (modelHouse ? DEMO_FIRST_DRAFT : quest.referenceAnswer) : DEV_PREVIEW_COPY[devPreset].a}
               demoFillRequest={demoMode && devAutofillQuestId === quest.id ? renderNonce : 0}
               localPilot={directCorrectionFlow}
             />
@@ -2929,8 +2936,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => {
                   setDevAutofillQuestId(quest.id);
                   setRenderNonce(current => current + 1);
-                }}>예시 답안 입력</Button>
-                <span>확인·제출은 직접 눌러 주세요.</span>
+                }}>답안 자동 채우기</Button>
+                <span>채운 뒤 확인 버튼을 눌러 주세요.</span>
               </div>
             )}
           </div>
@@ -2940,6 +2947,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     </CanonicalMissionContext.Provider>
     </DctFeedbackSessionContext.Provider>
     </RuntimeMissionContext.Provider>
+    </DemoModeContext.Provider>
     </LocalPilotContext.Provider>
   );
 }
@@ -2962,8 +2970,7 @@ const CanonicalMissionRun = ({
     mission_status: null, release_gate_mode: null,
     direction: SAMPLE_MISSION_V6_REASON_CONTRAST.direction, mission: SAMPLE_MISSION_V6_REASON_CONTRAST,
   }), metaLabel: "대표 요청 후보" } : null, [reasonContrastPilot]);
-  // 시연도 지정한 승인 미션의 DB 콘텐츠와 실제 피드백 엔진을 사용한다.
-  // demoMode는 시연 응답이 학습 수행 기록에 섞이지 않도록 저장·이벤트만 막는다.
+  // 시연은 승인본 스냅숏과 준비된 예시 피드백을 쓰고, 저장·이벤트도 막는다.
   const pilotStorageKey = reasonContrastPilot ? REASON_CONTRAST_PILOT_STORAGE_KEY : LEARNER_UX_PILOT_STORAGE_KEY;
   const courseLocation = parseMissionCourseLocation(window.location.search);
   const [runtimeMission, setRuntimeMission] = useState<CanonicalMissionViewModel | null>(null);
@@ -2986,18 +2993,15 @@ const CanonicalMissionRun = ({
     setLoading(true);
     setError(null);
     setFallbackToLegacy(false);
-    // 비로그인 시연은 DB 권한이 없으므로 같은 승인본 스냅숏으로 보여 주고 AI는 호출하지 않는다.
-    const publicDemo = demoMode
-      ? supabase.auth.getSession().then(({ data }) => !data.session)
-      : Promise.resolve(false);
-    void publicDemo
-      .then((usePublic) => usePublic
-        ? { runnable: publicRepresentativeMission(), live: false }
-        : fetchMissionByScenario(scenarioId, { includeV6: true }).then(runnable => ({ runnable, live: true })))
-      .then(({ runnable, live }) => {
+    // 시연은 로그인 여부와 관계없이 승인본 스냅숏을 쓴다(DB·AI 호출 없음).
+    const load = demoMode
+      ? Promise.resolve().then(() => publicRepresentativeMission())
+      : fetchMissionByScenario(scenarioId, { includeV6: true });
+    void load
+      .then((runnable) => {
         if (cancelled) return;
         setRuntimeMission(adaptRunnableMissionToCanonical(runnable));
-        setRuntimeRunnable(live ? runnable : null);
+        setRuntimeRunnable(runnable);
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
