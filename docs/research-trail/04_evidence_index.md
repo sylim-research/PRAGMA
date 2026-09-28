@@ -556,3 +556,20 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - attempt-entry-lock.json: 실제 KEEP 완료·기록 reload·재진입 후 동일 attempt ID로 저장된 두 entry 이벤트. attempt-regression-before-configured.log 및 attempt-regression-after.log: 원인 확인과 최소 수정의 red/green 검사.
 - main/deployment·동일 mission/content hash·시간순 화면 및 두 경로의 저장/이벤트 대조는 같은 폴더의 최종 README.md와 capture-manifest.json으로 연결한다. 이 항목의 작성 시점에는 배포 후 두 경로 재수행이 아직 완료되지 않았다.
 - local 테스트·UI 관찰·운영 영속화의 입증 범위를 구분한다. 콘텐츠 승인·학습효과·전 교과목 검증으로 확대하지 않는다.
+
+### EVD-20260927-01 · 대표 미션 최종 화면 감수 — 로컬 후보
+
+- `docs/dev-log/2026-09-27-parcel-final-review-local.md`: 사용자 피드백 1~16 처리표, UI/content 구분, 보류된 운영 저장/AI 원응답 RCA, focused 10파일/63개·typecheck·build 결과.
+- `evidence/2026-09-27-parcel-final-review/`: 기존 승인 v3 snapshot, 9필드만 변경한 로컬 후보, revision manifest. 기존 hash `bbf072ba…11095`, 후보 `965bd395…915df`; 운영 revision 생성/교수자 재승인/편성 교체는 미실행.
+- 학습자 판단 배너를 accepted 범위에 맞게 정정하고 저장 실패 시 복구 행동을 먼저 배치했다. A/B/C 최대 2회·fallback·저장 계약은 변경하지 않았다.
+- 운영 DB 쓰기·AI 실행·push/PR/merge/deploy 없음. 사용자 후속 지시로 실제 오류 조사는 보류. 이전 운영 성공 증거와 이번 미확정 실패 보고를 합치거나 새 후보의 운영 성공으로 주장하지 않는다.
+- 연구자 후속 보정: 표현 메모 3개를 승인 v3 원문 그대로 복원하고 MJT1 두 문구만 지정대로 보정했다. 최종 후보 hash `6254e9f9b2c5841e5d1304fb52628f1bbaadc7702adb22b1e25799e716cb34af`, 허용 필드 외 semantic diff=0, focused 12개 통과. 같은 evidence 폴더의 `final-9-field-diff.md`에 9필드 BEFORE/AFTER 전문, `final-candidate-integrity.json`에 메모 byte/hash 대조, `revision-creation-procedure.md`에 미실행 pending revision 생성 절차를 보존한다. 운영 v3/승인/편성은 그대로다.
+
+### EVD-20260927-02 · FINAL LOCK 콘텐츠 revision 승인·지정 편성 교체
+
+- 위 EVD-20260927-01 이후 사용자 승인에 따라 실제 DB revision/승인/지정 assignment 교체를 수행했다. 상세: `evidence/2026-09-27-parcel-final-review/revision-registration.md`.
+- 기존 v3는 불변 보존. 후보 v4 hash `6254e9f9…cb34af`는 최종화 전 값이며, 정상 item_lineage 재산출 뒤 최종 승인 hash는 `3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764`다.
+- 새 scenario `051532cc-c3a2-4440-9a5e-efc54e9ac481`, 최종 version `6610c6c6-1a25-4cc6-a584-5d372c8224e4`(새 scenario의 version_no=2), approval run `f8f60e0e-0b20-4648-82e1-7342bb8c20f9`. 후보 v4와 실제 최종 version 번호를 구별한다.
+- `revision-release-result.json`: 지정 course/week2/position0 assignment 교체 전후 및 관리자 세션의 learner DB 읽기 경로에서 최종 hash 확인. `finalization-diff.json`: 학습 콘텐츠 변경 0, metadata만 변경. `professor-approval-result.json`: 새 승인/lineage 근거.
+- 첫 초안의 필수 authoring 카운터 초기화 누락은 승인 gate가 차단했다. 실패 증거 보존 후 사용자 재시도 허용으로 완료했다. 총 기본 AI 검토 2회/최종화 2회, 최종 규칙·AI PASS. 기존 승인 자동 승계 없음.
+- UI 코드 push/PR/merge/deploy·운영 learner E2E·저장 RCA 추가 조사 없음. 이 기록을 새 learner 수행·저장 성공이나 학습효과 증거로 확대하지 않는다.

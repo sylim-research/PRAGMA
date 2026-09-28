@@ -39,10 +39,10 @@
 
   | 구조 | 코드 유형 (mission_v6) | 학습자 화면 명칭 |
   | --- | --- | --- |
-  | MJT1 | scale4 | 상황에 맞는지 판단하기 |
+  | MJT1 | scale4 | 표현이 상황에 맞는지 판단하기 |
   | MJT2 | scale4 + reason_choice | 판단하고 이유 고르기 |
-  | MJT3 | fix_choice | 고친 표현 고르기 |
-  | MJT4 | free_correction | 직접 고치고 비교하기 |
+  | MJT3 | fix_choice | 수정안 고르기 |
+  | MJT4 | free_correction | 직접 고쳐 보기 |
   | MJT5 | multi_judge | 여러 표현 비교하기 |
   | DCT | dct | 직접 번역하기 / 직접 통역하기 |
 

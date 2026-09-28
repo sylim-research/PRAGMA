@@ -95,14 +95,14 @@ describe("instructor experience", () => {
     const task = SAMPLE_MISSION_V6_REASON_CONTRAST.production_task;
     const { unmount } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6("intermediate"))} section="scene" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     expect(screen.getByRole("list", { name: "적절성 판단 활동" })).toBeInTheDocument();
-    expect(screen.getByText("다른 상황의 원문을 직접 번역하기")).toBeInTheDocument();
+    expect(screen.getByText("직접 번역하기")).toBeInTheDocument();
     expect(screen.queryByText(task.situation_ko)).not.toBeInTheDocument();
     expect(screen.queryByText("상대·관계")).not.toBeInTheDocument();
     unmount();
     for (const level of ["intermediate", "advanced"] as const) {
       const { unmount: close } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6(level))} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
       // 힌트는 기본이 접힘이다 — 열어야 보인다.
-      fireEvent.click(screen.getByText(/단어 힌트 \d+개/));
+      fireEvent.click(screen.getByText("단어 힌트 보기"));
       for (const hint of task.vocabulary_hints!) expect(screen.getByText(hint.target)).toBeInTheDocument();
       close();
     }
@@ -118,7 +118,7 @@ describe("instructor experience", () => {
     expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     fireEvent.click(screen.getByRole("button", { name: /최종안 확정하기/ }));

@@ -9,7 +9,7 @@ export type DctFeedbackSnapshot = {
 type Slot = { answer: string; result?: FeedbackRequestResult };
 
 /** 수행당 두 슬롯만 사용한다. 실패·재렌더·중복 클릭도 같은 슬롯을 다시 호출하지 않는다. */
-export function createDctFeedbackSession(storageKey?: string) {
+export function createDctFeedbackSession(storageKey?: string, requester: typeof requestFeedback = requestFeedback) {
   let slots: Partial<Record<DctFeedbackRound, Slot>> = {};
   const pending = new Map<DctFeedbackRound, Promise<FeedbackRequestResult>>();
   const unavailable = (error: string): FeedbackRequestResult => ({ ok: false, error });
@@ -43,7 +43,7 @@ export function createDctFeedbackSession(storageKey?: string) {
       }
       slots[round] = { answer };
       persist(); // 호출 전에 소비를 기록한다. 실패도 한 회차로 센다.
-      const result = Promise.resolve().then(() => requestFeedback(mission, answer))
+      const result = Promise.resolve().then(() => requester(mission, answer))
         .catch(() => unavailable("AI 피드백을 불러오지 못했습니다."))
         .then(value => {
           slots[round] = { answer, result: value };
