@@ -479,11 +479,10 @@ function ContextCard({ context, headerRight, title = "상황" }: {
 /** 원문·번역안 배지는 같은 한 세트 — 모양·크기는 같고 농도만 다르다. */
 const languageBadge = "inline-flex h-8 min-w-11 shrink-0 items-center justify-center rounded-lg border px-2.5 text-[12.5px] font-black";
 
-function LanguagePair({ source, target, targetHighlights = [], roomySource = false }: {
+function LanguagePair({ source, target, targetHighlights = [] }: {
   source: string;
   target?: string;
   targetHighlights?: string[];
-  roomySource?: boolean;
 }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역안" : "번역안";
@@ -491,7 +490,7 @@ function LanguagePair({ source, target, targetHighlights = [], roomySource = fal
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
     <section className="overflow-hidden rounded-2xl border border-[#E2DCCB] bg-white shadow-sm">
-      <div className={`flex items-start gap-3.5 bg-[#FBFAF4] px-4 sm:px-5 ${roomySource ? "min-h-24 py-4" : "py-2.5"}`}>
+      <div className="flex items-start gap-3.5 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
           <p className="text-[11.5px] font-bold text-[#7A7466]">{mission.activityMode === "interpreting" ? "원문 발화" : "원문"}</p>
@@ -581,6 +580,9 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
   );
 }
 
+// 문항별 해설 상자는 모두 이 모양 하나다(「💡 해설」).
+const feedbackBox = "break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[15.5px] leading-7 text-[#15202B]";
+
 function FeedbackBox({ verdict, feedback, action, highlights = [], asList = false }: {
   verdict?: string;
   feedback: string;
@@ -589,7 +591,7 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
   asList?: boolean;
 }) {
   return (
-    <div className="break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[15.5px] leading-7 text-[#15202B]">
+    <div className={feedbackBox}>
       {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict}</p>}
       {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
       {asList ? <ul className="list-disc space-y-1 pl-5">
@@ -629,6 +631,19 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 }
 
 /** 후보 문장 아래에 붙는 해설 — 문제집처럼 꼬리표·작은 글씨·구분선으로 문장과 층을 나눈다. */
+/** 문항 뒤 참고 답안 상자 — 「가능한 수정 예시」와 「참고 표현」이 같은 모양을 쓴다. */
+function ReferenceExamples({ title, items, font }: { title: string; items: string[]; font: string }) {
+  return (
+    <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
+      <h4 className="font-bold"><span aria-hidden>✅ </span>{title}</h4>
+      <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
+        <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
+        <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
+      </li>)}</ol>
+    </section>
+  );
+}
+
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
     <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
@@ -741,10 +756,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="💡 해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
-        {answered && quest.revisionExamples && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="가능한 수정 예시">
-          <h4 className="font-bold"><span aria-hidden>✅ </span>가능한 수정 예시</h4>
-          {quest.revisionExamples.map(text => <p key={text} className="font-zh rounded-lg bg-white p-3 text-base leading-7">{text}</p>)}
-        </section>}
+        {answered && quest.revisionExamples && <ReferenceExamples title="가능한 수정 예시" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
@@ -823,9 +835,9 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                   const picked = correctionId === correction.id;
                   const state = answered
                     ? correction.valid
-                      ? "border-2 border-[#3F8A5F] bg-white text-[#263444]"
+                      ? "border-[#4D8568] bg-white text-[#263444] ring-1 ring-[#4D8568]"
                       : picked
-                        ? "border-2 border-[#C9534B] bg-white text-[#263444]"
+                        ? "border-[#C86E68] bg-[#FFF3F1] text-[#263444] ring-1 ring-[#C86E68]"
                         : "border-[#E0DDD5] bg-white text-[#263444]"
                     : picked
                       ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-1 ring-[#15202B]"
@@ -894,20 +906,17 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       <div className="mt-4 pl-10">
-        <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
+        <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-[16.5px] leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
-      {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
-        <h4 className="text-[13.5px] font-black text-[#6B5518]"><span aria-hidden>💡 </span>해설</h4>
-        <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[15.5px] leading-7 text-[#15202B] marker:text-[#C9A62E]">
+      {submitted && <section className={`mt-4 ${feedbackBox}`} aria-label="화용 해설">
+        <h4 className="mb-2 font-black text-[#15202B]">💡 해설</h4>
+        <ul className="list-disc space-y-1 pl-5">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
-      {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
-        <h4 className="font-bold"><span aria-hidden>✅ </span>참고 표현</h4>
-        {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
-      </section>}
+      {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
         <div className="flex items-center gap-1.5">
           <span aria-hidden className="text-[14px]">🔄</span>
@@ -917,7 +926,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
         <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#3797F0] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#0B63CE] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
           <p className="mt-0.5 pr-1 text-right text-[11px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
@@ -951,7 +960,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span>{!submitted && <DemoFillButton />}</h3>
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
-        <p className={`${targetFont} text-[16.5px] leading-8`}>{candidate.text}</p>
+        <p className={`${targetFont} text-[16.5px] leading-7`}>{candidate.text}</p>
         <div className="relative mt-4 grid grid-cols-3 gap-1.5" role="radiogroup" aria-label={`표현 ${index + 1}의 판단`}>
           {quest.options.map(option => {
             const picked = picks[candidate.id] === option.id;
@@ -959,7 +968,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
             // MJT1·2와 같은 색 규칙: 답한 뒤 참고 답안은 초록 테두리, 내가 고른 오답은 연한 빨강.
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
-              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-2 border-[#15202B] bg-[#EEF1F6] font-bold text-[#15202B]" : "border-[#E3DDCF] bg-white"}`}>
+              className={`min-h-[42px] rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
@@ -1084,7 +1093,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                 {answered ? (
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_max-content] sm:items-start sm:gap-4">
                     <div className="min-w-0">
-                      <p className={`${targetFont} text-[17px] leading-7`}>{candidate.text}</p>
+                      <p className={`${targetFont} text-[16.5px] leading-7`}>{candidate.text}</p>
                       <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]">{candidate.note}</p>
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
@@ -1096,7 +1105,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                 ) : (
                   // 좁은 화면에서는 후보 문장이 3~4자마다 끊기지 않도록 버튼을 아래로 내린다.
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-                    <p className={`${targetFont} min-w-0 text-[17px] leading-7`}>{candidate.text}</p>
+                    <p className={`${targetFont} min-w-0 text-[16.5px] leading-7`}>{candidate.text}</p>
                     <div className="flex shrink-0 gap-2">
                     <button type="button" disabled={worstPicked} onClick={() => setBest(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${bestPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] hover:bg-[#F8F7F2]"}`}>적절한 표현</button>
                     <button type="button" disabled={bestPicked} onClick={() => setWorst(candidate.id)} className={`h-9 flex-1 rounded-lg border px-3 text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 disabled:opacity-50 sm:flex-none ${worstPicked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] hover:bg-[#F8F7F2]"}`}>조정할 표현</button>
@@ -1805,9 +1814,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       );
                     })}
                   </div>
-                  {evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    ? <p className="pt-1 text-center text-[14px] font-bold text-[#245E44]">세 기준 모두 좋아요 🎉</p>
-                    : <div className="rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
+                  {!evaluation.criteria.every(criterion => criterion.level === "very_good")
+                    && <div className="rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
                       <p className="text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
@@ -1898,7 +1906,7 @@ function QuestScaffold({ quest, target, targetHighlights, children }: {
       {pilotContext !== undefined
         ? pilotContext && <p className="px-1 text-[15.5px] font-medium leading-7 text-[#2B3647]">{pilotContext}</p>
         : <ContextCard context={quest.context} />}
-      {quest.kind !== "dct" && <LanguagePair source={quest.source} target={target} targetHighlights={targetHighlights} roomySource={quest.kind === "spectrum"} />}
+      {quest.kind !== "dct" && <LanguagePair source={quest.source} target={target} targetHighlights={targetHighlights} />}
       {children}
     </div>
   );
@@ -2292,50 +2300,6 @@ function CompletedQuestReview({ quest, response }: {
   );
 }
 
-/** 최초안 → 최종안에서 새로 들어간 부분과 빠진 부분을 글자 단위로 나눈다(짧은 문장용 LCS). */
-function draftDiff(first: string, final: string) {
-  const a = [...first]; const b = [...final];
-  const dp = Array.from({ length: a.length + 1 }, () => new Array<number>(b.length + 1).fill(0));
-  for (let i = a.length - 1; i >= 0; i--) for (let j = b.length - 1; j >= 0; j--)
-    dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
-  const before: { text: string; changed: boolean }[] = []; const after: { text: string; changed: boolean }[] = [];
-  const push = (list: typeof before, ch: string, changed: boolean) => {
-    const last = list[list.length - 1];
-    if (last && last.changed === changed) last.text += ch; else list.push({ text: ch, changed });
-  };
-  let i = 0; let j = 0;
-  while (i < a.length || j < b.length) {
-    if (i < a.length && j < b.length && a[i] === b[j]) { push(before, a[i], false); push(after, b[j], false); i++; j++; }
-    else if (j < b.length && (i >= a.length || dp[i][j + 1] >= dp[i + 1][j])) { push(after, b[j], true); j++; }
-    else { push(before, a[i], true); i++; }
-  }
-  // 바뀐 곳 사이에 낀 두 글자 이하의 같은 부분은 바뀐 덩어리에 합쳐, 형광펜이 단어 중간에서 끊기지 않게 한다.
-  const smooth = (list: typeof before) => list.reduce<typeof before>((merged, segment, index) => {
-    const bridged = !segment.changed && [...segment.text].length <= 2 && list[index - 1]?.changed && list[index + 1]?.changed;
-    const current = { text: segment.text, changed: segment.changed || Boolean(bridged) };
-    const last = merged[merged.length - 1];
-    if (last && last.changed === current.changed) last.text += current.text; else merged.push(current);
-    return merged;
-  }, []);
-  return { before: smooth(before), after: smooth(after) };
-}
-
-/** 마운트 직후 한 번 true가 된다. 동작 줄이기 설정이거나 브라우저가 지원하지 않으면 처음부터 true. */
-function useRevealAfterMount(delayMs = 250) {
-  const animate = typeof window !== "undefined" && typeof window.matchMedia === "function"
-    && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const [revealed, setRevealed] = useState(!animate);
-  useEffect(() => {
-    if (!animate) return;
-    const timer = window.setTimeout(() => setRevealed(true), delayMs);
-    return () => window.clearTimeout(timer);
-  }, [animate, delayMs]);
-  return revealed;
-}
-
-const STRIKE_LINE = "linear-gradient(transparent calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% + 0.75px), transparent calc(50% + 0.75px))";
-const HIGHLIGHT = "linear-gradient(transparent 70%, #FCE27A 70%, #FCE27A 92%, transparent 92%)";
-
 export function CompletionRecord({ source, response, alternatives = [] }: {
   source?: string;
   response?: DctResponse;
@@ -2346,44 +2310,36 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const finalText = response ? (response.reflected ? response.revised : response.first) : "";
-  const diff = useMemo(() => response?.reflected ? draftDiff(response.first, response.revised) : null, [response]);
-  const revealed = useRevealAfterMount();
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
-  const drawn = { backgroundRepeat: "no-repeat", backgroundSize: revealed ? "100% 100%" : "0% 100%", transition: "background-size 700ms ease-out" };
-  const row = "flex items-start gap-3.5 py-3 first:pt-0 last:pb-0";
+  // 고친 곳을 지우거나 칠하지 않고 굵기도 같게 둔다 — 처음 쓴 것도 고친 것도 학습자가 쓴 것이고,
+  // 어느 쪽이 맞다고 판정하지 않는다. 그래서 「최종」처럼 완성·정답을 풍기는 이름도 피한다.
+  const revised = response.reflected && response.revised !== response.first;
+  const row = "grid grid-cols-[88px_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-0 last:pb-0";
+  const rowLabel = "text-[13px] font-black text-[#6B6453]";
   const rowText = "whitespace-pre-wrap break-keep text-[17px] leading-7 text-[#15202B]";
   return (
     <article className="space-y-4">
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
         className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-4 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-6">
-        {/* 원문 → 최초안 → 최종안을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
+        {/* 원문 → 처음 쓴 번역 → 고친 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
         <div className="divide-y divide-[#ECE7DA]">
           {source && <div className={row}>
-            <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
+            <span className={rowLabel}>{mission.sourceLanguage.label} 원문</span>
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
-          {diff && <div className={row}>
-            <span className={`mt-0.5 ${languageBadge} border-[#C9CED6] bg-white text-[#4A5566]`}>{mission.targetLanguage.badge}</span>
-            <p className={`${targetFont} ${rowText}`}>
-              {diff.before.map((segment, index) => segment.changed
-                ? <del key={index} className="no-underline" style={{ ...drawn, backgroundImage: STRIKE_LINE }}>{segment.text}</del>
-                : <span key={index}>{segment.text}</span>)}
-            </p>
+          {revised && <div className={row}>
+            <span className={rowLabel}>처음 쓴 {outputName}</span>
+            <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
-            <p className={`${targetFont} ${rowText} font-semibold`}>
-              {(diff?.after ?? [{ text: finalText, changed: false }]).map((segment, index) => segment.changed
-                ? <mark key={index} className="bg-transparent text-inherit" style={{ ...drawn, backgroundImage: HIGHLIGHT, transitionDelay: "450ms" }}>{segment.text}</mark>
-                : <span key={index}>{segment.text}</span>)}
-            </p>
+            <span className={rowLabel}>{revised ? `고친 ${outputName}` : `내 ${outputName}`}</span>
+            <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
         <h2 className="text-[17px] font-black text-[#15202B]"><span aria-hidden>✅ </span>참고 표현</h2>
-        <p className="mt-0.5 text-[13.5px] font-bold text-[#8A6A00]">이렇게 옮길 수도 있어요. 정답은 하나가 아닙니다.</p>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>

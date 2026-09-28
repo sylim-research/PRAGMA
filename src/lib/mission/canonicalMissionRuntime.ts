@@ -799,7 +799,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       ]),
     } : {}),
     scenarioId: runnable.scenario_id,
-    metaLabel: "실제 미션",
+    metaLabel: "학습 미션",
     weekNo: 0,
     speechAct: SPEECH_ACT_UI[runnable.speech_act],
     level: runnable.learner_level ? LEVEL[runnable.learner_level] : "수준 정보 없음",
