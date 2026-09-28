@@ -6,6 +6,21 @@
 import { FeedbackSchema, type RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
 import type { FeedbackRequestResult } from "@/lib/mission/missionFeedback";
 
+/**
+ * 시연 학습자의 MJT 답안(2026-09-28 연구자 판정). 전부 정답이면 실제 학습 체험이 보이지 않으므로
+ * 해설이 확실한 두 자리만 의도적으로 틀린다. 두 오답은 같은 축(수락 전제·요구)이라 DCT 최초안의
+ * 「就…了」 실수와 AI 피드백으로 이어진다. 원어민(DeepSeek) 무정답 판정이 정답 키와 모두 일치했다.
+ * - A2 추천서: 「다소 적절」 + 「요청 내용과 시점이 분명」 — 就交给您写了의 수락 전제를 놓침
+ * - A3 출석 기록: 후보 1(麻烦您务必…) — 麻烦您을 붙였지만 务必의 요구가 남음
+ * - A4 리허설: 2026-09-26 운영 확인의 실제 연구자 수정문
+ * 나머지(A1·A5)는 기준 답안을 쓴다.
+ */
+export const DEMO_MJT_ANSWERS: Record<string, { pick?: string; reasonId?: string; correctionId?: string; text?: string }> = {
+  A2: { pick: "somewhat_appropriate", reasonId: "request-and-deadline" },
+  A3: { correctionId: "A3-0" },
+  A4: { text: "我下课晚，明天的彩排能从七点推迟到七点半吗？" },
+};
+
 export const DEMO_FIRST_DRAFT = "您好，这个周末我有急事要出门，送到我家的快递就麻烦您帮我收一下了。谢谢您。";
 export const DEMO_REVISED_DRAFT = "您好，这个周末我有急事要出门。如果方便的话，能不能麻烦您帮我收一下送到我家的快递？非常感谢！";
 

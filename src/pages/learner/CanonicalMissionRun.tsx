@@ -61,7 +61,7 @@ import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
 import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
-import { DEMO_FIRST_DRAFT, DEMO_REVISED_DRAFT, requestDemoFeedback } from "@/lib/demo/representativeDemoFeedback";
+import { DEMO_FIRST_DRAFT, DEMO_MJT_ANSWERS, DEMO_REVISED_DRAFT, requestDemoFeedback } from "@/lib/demo/representativeDemoFeedback";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -75,14 +75,19 @@ const DemoModeContext = createContext(false);
 /** 시연에서 지금 문항을 예시 답안으로 채우는 함수. 시연이 아니거나 문항 화면이 아니면 null. */
 const DemoFillContext = createContext<(() => void) | null>(null);
 
+/** 대표 미션 시연에서 이 문항에 미리 정한 시연 답안(의도적 오답 포함). 없으면 기준 답안을 쓴다. */
+function useDemoAnswer(questId: string) {
+  return useContext(DemoModeContext) ? DEMO_MJT_ANSWERS[questId] : undefined;
+}
+
 /** 채워질 자리 바로 옆(질문 줄 오른쪽)에 두는 시연용 자동 채우기 버튼. */
 function DemoFillButton() {
   const fill = useContext(DemoFillContext);
   if (!fill) return null;
   return (
     <button type="button" onClick={fill}
-      className="ml-auto inline-flex shrink-0 items-center gap-1 self-center whitespace-nowrap rounded-full border border-[#E3C766] bg-[#FFFBEC] px-3 py-1 text-[12.5px] font-bold text-[#6B5518] transition-colors hover:bg-[#FFF3C8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A62E]">
-      <Sparkles aria-hidden className="h-3.5 w-3.5" />답안 자동 채우기
+      className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#F2C744] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_2px_6px_rgba(201,166,46,0.35)] transition-colors hover:bg-[#E6B92F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
+      <Sparkles aria-hidden className="h-4 w-4" />답안 자동 채우기
     </button>
   );
 }
@@ -518,7 +523,7 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
 
 // 문항의 질문 표지(2026-09-25). 회색 「지금 할 일」 대신 노란 원형 「Q」로 「이게 질문」임을 먼저 보인다.
 // 네이비는 바로 위 원문·번역안 배지(KO·ZH)와 겹쳐 쓰지 않는다. 질문이 둘인 MJT2는 「Q1」「Q2」.
-const questionTitle = "flex items-start gap-2.5 break-keep text-[17px] font-bold leading-snug text-[#15202B]";
+const questionTitle = "flex flex-wrap items-start gap-2.5 [&>span:nth-child(2)]:min-w-0 [&>span:nth-child(2)]:flex-1 [&>span:nth-child(2)]:basis-0 break-keep text-[17px] font-bold leading-snug text-[#15202B]";
 function QuestionChip({ n }: { n?: number }) {
   return (
     <span aria-hidden className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[#FAD338] text-[13px] font-extrabold leading-none text-[#15202B]">
@@ -683,13 +688,14 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
   );
 }
 function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }: { quest: ScaleQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean; revealAnswers?: boolean }) {
-  const [pick, setPick] = useState<string | null>(() => devAutofill || revealAnswers ? quest.referenceAnswer : null);
+  const demoAnswer = useDemoAnswer(quest.id);
+  const [pick, setPick] = useState<string | null>(() => revealAnswers ? quest.referenceAnswer : devAutofill ? demoAnswer?.pick ?? quest.referenceAnswer : null);
   const [answered, setAnswered] = useState(revealAnswers);
   // 이유를 묻는 문항(MJT2): 판단 확정 → 이유 선택·확정 → 판단과 이유의 결과·해설 공개(2026-09-19).
   // 판단을 확정하면 네 선택지와 내 선택은 그대로 두고 변경만 잠근다. 이유를 확정하기 전에는
   // 정답 배지·색상·스크린리더 안내 어디에도 판단 결과를 드러내지 않는다.
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
-  const [reasonId, setReasonId] = useState<string | null>(() => devAutofill || revealAnswers ? quest.reasonChoice?.acceptedId ?? null : null);
+  const [reasonId, setReasonId] = useState<string | null>(() => revealAnswers ? quest.reasonChoice?.acceptedId ?? null : devAutofill ? demoAnswer?.reasonId ?? quest.reasonChoice?.acceptedId ?? null : null);
   const acceptedIds = quest.acceptedAnswers ?? [quest.referenceAnswer];
   const judgmentLocked = answered || (Boolean(quest.reasonChoice) && judgmentCommitted);
   const judgmentShown = answered;
@@ -768,8 +774,9 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
     : undefined;
   const [judgment, setJudgment] = useState<string | null>(() => revealAnswers ? quest.referenceJudgment : linkedJudgment ?? (devAutofill ? quest.referenceJudgment : null));
   const [locked, setLocked] = useState(correctionOnly || Boolean(linkedJudgment) || devAutofill || revealAnswers);
+  const demoAnswer = useDemoAnswer(quest.id);
   const [correctionId, setCorrectionId] = useState<string | null>(() => devAutofill || revealAnswers
-    ? (quest.corrections.find((option) => option.valid)?.id ?? null)
+    ? ((!revealAnswers && demoAnswer?.correctionId) || (quest.corrections.find((option) => option.valid)?.id ?? null))
     : null
   );
   const [answered, setAnswered] = useState(revealAnswers);
@@ -808,7 +815,6 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
             <div className={correctionOnly ? "" : "mt-5"}>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 {!correctionOnly && <h4 className="font-bold">가장 알맞게 고친 표현은 무엇일까요?</h4>}
-                <span className={`text-xs font-black ${correctionId ? "text-[#245E44]" : "text-[#687387]"}`} aria-live="polite">{correctionId ? "1개 선택됨 · 확인할 수 있어요" : "1개를 선택하세요"}</span>
               </div>
               <div className={optionGrid}>
                 {order.map((correction) => {
@@ -873,7 +879,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
   const output = mission.activityMode === "interpreting" ? "통역안" : "번역안";
   // 결함안을 미리 넣어 두고 고칠 곳만 바꾸게 한다. 그대로 제출은 아래 관문이 막는다.
   // 비교 기준(결함안)은 저장되는 수행 기록의 mission_content_hash가 가리키는 콘텐츠 버전의 이 문항 target이다.
-  const [draft, setDraft] = useState(() => devAutofill ? quest.references[0] ?? quest.target : quest.target);
+  const demoAnswer = useDemoAnswer(quest.id);
+  const [draft, setDraft] = useState(() => devAutofill ? demoAnswer?.text ?? quest.references[0] ?? quest.target : quest.target);
   const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
@@ -884,7 +891,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
-      <div className="mt-4">
+      <div className="mt-4 pl-10">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-base leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
@@ -1089,7 +1096,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
           })}
         </div>
       </section>
-      <ActionBar hint={!answered ? (best && worst ? "두 표현 선택 완료 · 확인할 수 있어요" : best ? "적절한 표현 선택 완료 · 조정할 표현을 골라주세요" : worst ? "조정할 표현 선택 완료 · 적절한 표현을 골라주세요" : undefined) : undefined}>
+      <ActionBar hint={!answered ? (best && worst ? undefined : best ? "적절한 표현 선택 완료 · 조정할 표현을 골라주세요" : worst ? "조정할 표현 선택 완료 · 적절한 표현을 골라주세요" : undefined) : undefined}>
         {!answered ? (
           <Button className={`h-12 ${actionButton}`} disabled={!best || !worst || best === worst} onClick={() => setAnswered(true)}>두 표현 확인하기</Button>
         ) : (
@@ -1169,11 +1176,12 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <div className="flex items-center gap-4">
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton /></div>
+            <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton /></div>
             {/* 콘텐츠와 분리된 공통 안내로 의미 보존과 맥락 조건을 알린다. */}
             <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.</p>
           </div>
         </div>
+        <div className="pl-[60px]">
         <Textarea
           id={`${quest.id}-draft`}
           value={value}
@@ -1186,6 +1194,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#8A939F]">
           제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.
         </p>
+        </div>
       </div>
     </section>
   );
@@ -1740,7 +1749,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-2.5">
-      <div className="flex items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : `${outputName} 피드백`}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton />}</div>
+      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : `${outputName} 피드백`}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton />}</div>
       <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
@@ -1815,8 +1824,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <ActionBar>
               {/* 양자택일 한 줄. 권하는 쪽만 진하게 한다 — 보완 권장이면 수정하기, 모두 좋으면 이대로 확정. */}
               <div className="grid grid-cols-2 gap-2">
-                <Button variant={needsChange ? "default" : "outline"} className="h-12 w-full" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                <Button variant={needsChange ? "outline" : "default"} className="h-12 w-full" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
+                <Button variant={needsChange ? "default" : "outline"} className={`h-12 w-full ${needsChange ? "" : "border-[#15202B] text-[#15202B]"}`} onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                <Button variant="outline" className={`h-12 w-full font-bold text-[#15202B] ${needsChange ? "border-2 border-[#E3C766] bg-[#FFF8E1] hover:bg-[#FFF1C2]" : "border-[#F2C744] bg-[#F2C744] hover:bg-[#E6B92F]"}`} aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
                   onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}>이대로 확정</Button>
               </div>
               {/* 보완 권장인데 그대로 두려면 이유 한 줄을 남긴다(이견 기록). */}
@@ -1825,7 +1834,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   <label htmlFor={`${quest.id}-keep-reason`} className="text-[13.5px] font-bold text-[#2B3647]">이대로 두는 이유를 한 줄만 적어 주세요.</label>
                   <div className="mt-2 flex gap-2">
                     <Input id={`${quest.id}-keep-reason`} value={keepReason} onChange={(event) => setKeepReason(event.target.value)} placeholder="예: 이 관계에선 이 말투가 자연스러워요" className="h-11 flex-1 bg-white text-[14.5px]" />
-                    <Button className="h-11 shrink-0 px-5 disabled:bg-[#E9D48A] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
+                    <Button className="h-11 shrink-0 bg-[#F2C744] px-5 font-bold text-[#15202B] hover:bg-[#E6B92F] disabled:bg-[#F6E3A1] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
                   </div>
                 </div>
               )}

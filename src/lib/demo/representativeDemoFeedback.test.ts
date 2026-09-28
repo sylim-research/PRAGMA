@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { publicRepresentativeMission, REPRESENTATIVE_MISSION_ID } from "./representativeMission";
-import { DEMO_FIRST_DRAFT, DEMO_REVISED_DRAFT, requestDemoFeedback } from "./representativeDemoFeedback";
+import { DEMO_FIRST_DRAFT, DEMO_MJT_ANSWERS, DEMO_REVISED_DRAFT, requestDemoFeedback } from "./representativeDemoFeedback";
 
 describe("representative mission model house", () => {
   it("runs the approved parcel snapshot", () => {
@@ -16,5 +16,14 @@ describe("representative mission model house", () => {
     const recheck = await requestDemoFeedback(null, DEMO_REVISED_DRAFT);
     expect(recheck.feedback?.verdicts.pragmatic_appropriateness.band_code).toBe("within_band");
     expect((await requestDemoFeedback(null, "你好")).ok).toBe(false);
+  });
+  it("keeps the deliberate wrong answers wrong against the approved content", () => {
+    const items = publicRepresentativeMission().mission.mpj_items as unknown as Array<Record<string, any>>;
+    const recommendation = items.find(item => item.id === 2)!;
+    expect(recommendation.accepted_scale_codes).not.toContain(DEMO_MJT_ANSWERS.A2.pick);
+    expect(recommendation.reason_choice.options.map((o: { id: string }) => o.id)).toContain(DEMO_MJT_ANSWERS.A2.reasonId);
+    expect(recommendation.reason_choice.accepted_id).not.toBe(DEMO_MJT_ANSWERS.A2.reasonId);
+    const attendance = items.find(item => item.id === 3)!;
+    expect(attendance.corrections[Number(DEMO_MJT_ANSWERS.A3.correctionId!.split("-")[1])].is_valid).toBe(false);
   });
 });
