@@ -904,9 +904,13 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
-      {submitted && <section className="mt-4 space-y-3 rounded-xl bg-[#F8F7F2] p-4" aria-label="참고 표현">
+      {submitted && <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label="참고 표현">
         <h4 className="font-bold"><span aria-hidden>✅ </span>참고 표현</h4>
-        {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
+        <p className="text-[12.5px] font-bold text-[#8A6A00]">이렇게 고칠 수도 있어요. 정답은 하나가 아닙니다.</p>
+        <ol className="mt-2 space-y-1.5">{quest.references.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
+          <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
+          <span className={`${targetFont} text-[16px] leading-7`}>{text}</span>
+        </li>)}</ol>
       </section>}
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
         <div className="flex items-center gap-1.5">
@@ -917,7 +921,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
         <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#3797F0] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#0B63CE] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
           <p className="mt-0.5 pr-1 text-right text-[11px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
@@ -2303,28 +2307,29 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   const finalText = response ? (response.reflected ? response.revised : response.first) : "";
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
-  // 고친 곳을 지우거나 칠하지 않는다 — 최초 번역도 최종 번역도 학습자가 쓴 것이고, 어느 쪽이 맞다고 판정하지 않는다.
+  // 고친 곳을 지우거나 칠하지 않고 굵기도 같게 둔다 — 처음 쓴 것도 고친 것도 학습자가 쓴 것이고,
+  // 어느 쪽이 맞다고 판정하지 않는다. 그래서 「최종」처럼 완성·정답을 풍기는 이름도 피한다.
   const revised = response.reflected && response.revised !== response.first;
-  const row = "grid grid-cols-[76px_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-0 last:pb-0";
+  const row = "grid grid-cols-[88px_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-0 last:pb-0";
   const rowLabel = "text-[13px] font-black text-[#6B6453]";
   const rowText = "whitespace-pre-wrap break-keep text-[17px] leading-7 text-[#15202B]";
   return (
     <article className="space-y-4">
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
         className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-4 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-6">
-        {/* 원문 → 최초 번역 → 최종 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다(용어대장: 최초 산출/최종 산출). */}
+        {/* 원문 → 처음 쓴 번역 → 고친 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
         <div className="divide-y divide-[#ECE7DA]">
           {source && <div className={row}>
-            <span className={rowLabel}>원문</span>
+            <span className={rowLabel}>{mission.sourceLanguage.label} 원문</span>
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
           {revised && <div className={row}>
-            <span className={rowLabel}>최초 {outputName}</span>
+            <span className={rowLabel}>처음 쓴 {outputName}</span>
             <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={`${rowLabel} text-[#15202B]`}>최종 {outputName}</span>
-            <p className={`${targetFont} ${rowText} font-semibold`}>{finalText}</p>
+            <span className={rowLabel}>{revised ? `고친 ${outputName}` : `내 ${outputName}`}</span>
+            <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
       </section>
