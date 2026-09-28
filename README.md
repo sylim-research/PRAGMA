@@ -92,14 +92,13 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="70" align="left">논문</th><th width="250" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="110" align="left">논문</th><th width="210" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
-    <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/App.tsx"><code>App.tsx</code></a></td></tr>
     <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
-    <tr><td>4.2.1</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>4.2.1 · 부록 A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td>4.2.4</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a></td></tr>
+    <tr><td>4.2.4 · 부록 C</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
     <tr><td>4.2.5</td><td>AI 검토와 교차 점검</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
     <tr><td>4.2.6</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.3.2~4</td><td>MJT·통번역 과제·AI 피드백</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
@@ -107,8 +106,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.4.1</td><td>교과목 편성·미션 배치</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a></td></tr>
     <tr><td>4.4.2~3</td><td>학급 응답·수행 이력 조회</td><td><a href="src/pages/admin/AdminClassResponses.tsx"><code>AdminClassResponses.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
     <tr><td>4.5.1</td><td>기능 시험·배포 전 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
-    <tr><td>부록 A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
-    <tr><td>부록 C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
   </tbody>
 </table>
 
