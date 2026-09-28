@@ -126,7 +126,7 @@ describe("local learner UX pilot", () => {
     const final = `${first}谢谢！`;
     fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
     click("최종안 확정하기");
-    expect(screen.getByRole("heading", { name: "이번 미션에서 확정한 내 번역" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "내 번역, 완성!" })).toBeInTheDocument();
     expect(screen.getByText(first)).toBeInTheDocument();
     expect(screen.getByText(final)).toBeInTheDocument();
     const completed = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);

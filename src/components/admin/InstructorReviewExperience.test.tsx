@@ -102,7 +102,7 @@ describe("instructor experience", () => {
     for (const level of ["intermediate", "advanced"] as const) {
       const { unmount: close } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6(level))} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
       // 힌트는 기본이 접힘이다 — 열어야 보인다.
-      fireEvent.click(screen.getByText("단어 힌트"));
+      fireEvent.click(screen.getByText("단어 힌트 보기"));
       for (const hint of task.vocabulary_hints!) expect(screen.getByText(hint.target)).toBeInTheDocument();
       close();
     }
