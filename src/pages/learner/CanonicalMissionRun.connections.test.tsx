@@ -46,8 +46,7 @@ describe("CanonicalMissionRun completion connections", () => {
     // 처음(최초안)은 흐리게, 완성(최종안)은 진하게 — 두 판이 모두 남는다.
     const record = screen.getByRole("region", { name: /번역 완성본/ });
     expect(record).toHaveTextContent("请帮我收一下快递。");
-    expect(record).toHaveTextContent("처음");
-    expect(record).toHaveTextContent("완성");
+    expect(record).toHaveTextContent("您方便帮我收一下快递吗？");
     expect(screen.queryByText("상황 번역하기")).not.toBeInTheDocument();
     expect(screen.queryByText("왜 고쳤나요?")).not.toBeInTheDocument();
     expect(screen.queryByText(/피드백을 반영한 최종/)).not.toBeInTheDocument();

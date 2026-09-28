@@ -343,7 +343,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`h-12 w-full text-[15.5px] font-extrabold ${config.previewOnly ? "" : "gap-1.5 bg-[#F7CE3E] text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : <><Rocket aria-hidden className="h-[18px] w-[18px]" />학습 미션 시작하기</>} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : <><Rocket aria-hidden className="h-[18px] w-[18px]" />학습 미션 시작하기</>} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -825,7 +825,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                       ? "border-[#4D8568] bg-white text-[#245E44]"
                       : picked
                         ? "border-[#15202B] bg-[#F3F4F5] text-[#15202B]"
-                        : "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]"
+                        : "border-[#E0DDD5] bg-white text-[#263444]"
                     : picked
                       ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-1 ring-[#15202B]"
                       : "border-[#E3DDCF] bg-white";
@@ -907,10 +907,10 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         <h4 className="font-bold">참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
       </section>}
-      {submitted && quest.contrast && <section className="mt-4 space-y-2 border-t border-[#DDD8CB] pt-4" aria-label="다른 맥락에서는?">
+      {submitted && quest.contrast && <section className="mt-4 rounded-xl bg-[#F8F7F2] p-4" aria-label="다른 맥락에서는?">
         <h4 className="font-bold">다른 맥락에서는?</h4>
-        <p className="text-[15px] leading-7">{quest.contrast.context}</p>
-        <p className={`${targetFont} text-[16.5px] leading-8`}>{quest.contrast.target}</p>
+        <p className="mt-1 text-[14.5px] leading-6 text-[#4A5566]">{quest.contrast.context}</p>
+        <p className={`${targetFont} relative mt-3 inline-block max-w-full rounded-2xl rounded-bl-sm border border-[#E3DDCF] bg-white px-4 py-2.5 text-[16.5px] leading-8 shadow-[0_1px_3px_rgba(21,32,43,0.06)]`}>{quest.contrast.target}</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
       </section>}
     </section>
@@ -939,9 +939,6 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span>{!submitted && <DemoFillButton />}</h3>
-      {submitted && <div className="mt-4">
-        <VerdictBanner tone={matched === total ? "ok" : matched === 0 ? "miss" : "partial"} title={matched === total ? `${total}개 표현 모두 가능한 판단 범위 안에서 판단했습니다.` : `${total}개 표현 중 ${matched}개를 가능한 판단 범위 안에서 판단했습니다.`} />
-      </div>}
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
         <p className={`${targetFont} text-[16.5px] leading-8`}>{candidate.text}</p>
@@ -1440,11 +1437,6 @@ function conciseFeedback(value: string): string {
   return feedbackSentences(value).slice(0, 2).join(" ");
 }
 
-function FeedbackRemainder({ text }: { text: string }) {
-  const rest = feedbackSentences(text).slice(2).join(" ");
-  return rest ? <details className="mt-3 text-sm leading-6"><summary className="cursor-pointer text-xs font-bold">설명 더 보기</summary><p className="mt-2">{rest}</p></details> : null;
-}
-
 export function feedbackNeedsRevision(
   evaluation: Pick<DctEvaluation, "available" | "criteria">,
 ): boolean {
@@ -1831,7 +1823,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
                     {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
-                    <FeedbackRemainder text={primaryCriterion.body} />
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
@@ -2161,17 +2152,18 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   return (
-    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-4 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
-      <h1 className="break-keep text-xl font-bold text-[#15202B]">핵심 정리</h1>
-      <ol className="mt-3 border-y border-[#E2DED4]">
+    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-5 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
+      <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">다섯 문항에서 챙길 한 줄</span></h1>
+      <ol className="mt-4 space-y-2.5">
         {lessonPoints.map((point, index) => (
-          <li key={point.questId} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 border-t border-[#E2DED4] py-2 first:border-t-0 sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
-            <span className="pt-0.5 text-sm font-black tabular-nums text-[#B49A23]">{String(index + 1).padStart(2, "0")}</span>
+          <li key={point.questId} style={{ animationDelay: `${index * 90}ms` }}
+            className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-xl border border-[#EAE5D8] bg-white px-4 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
+            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[14px] font-extrabold text-[#15202B]">{index + 1}</span>
             <div className="min-w-0">
-              <p className="text-[12px] font-black tracking-[0.06em] text-[#7A8493]">{mission.missionFormat === "mission_v6"
+              <p className="inline-block rounded-md bg-[#E9EFF8] px-2 py-0.5 text-[12.5px] font-black text-[#2F4F86]">{mission.missionFormat === "mission_v6"
                 ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
                 : point.label}</p>
-              <p className="mt-0.5 break-keep text-[16px] font-normal leading-6 text-[#263444] [overflow-wrap:anywhere]">
+              <p className="mt-1.5 break-keep text-[16px] font-normal leading-7 text-[#263444] [overflow-wrap:anywhere]">
                 <HighlightedText text={point.text} highlights={point.highlights} target />
               </p>
             </div>
@@ -2358,24 +2350,23 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
     <article className="space-y-4">
       {/* 아날로그 원고지 — 줄 있는 크림색 종이 위에 최종안이 타자기처럼 찍힌다. */}
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
-        className="relative overflow-hidden rounded-2xl border border-[#E6DCC3] px-5 py-6 shadow-[0_2px_10px_rgba(80,60,20,0.08)] sm:px-7"
-        style={{ backgroundColor: "#FBF7EC", backgroundImage: "repeating-linear-gradient(to bottom, transparent 0, transparent 35px, #EFE5CC 35px, #EFE5CC 36px)" }}>
-        <span aria-hidden className={`absolute right-5 top-4 rotate-[-8deg] rounded-md border-2 border-[#C0392B]/70 px-2.5 py-0.5 text-[14px] font-black tracking-[0.3em] text-[#C0392B]/80 transition-all duration-500 ${typed ? "scale-100 opacity-100" : "scale-125 opacity-0"}`}>완성</span>
-        <div className="space-y-4 pr-16">
+        className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-6 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-7">
+        <div className="space-y-4">
           {source && <div className="flex items-start gap-3.5">
             <span className={`mt-1 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
             <p className={`${sourceFont} whitespace-pre-wrap break-keep text-[16px] leading-8 text-[#3F4A59]`}>{source}</p>
           </div>}
           {diff && <div className="flex items-start gap-3.5">
-            <span className={`mt-1 ${languageBadge} flex-col gap-0 border-[#C9CED6] bg-white px-2 text-[#8A8F98]`}><span>{mission.targetLanguage.badge}</span><span className="text-[10px] font-bold">처음</span></span>
+            <span className={`mt-1 ${languageBadge} border-[#C9CED6] bg-white text-[#8A8F98]`}>{mission.targetLanguage.badge}</span>
             <p className={`${targetFont} whitespace-pre-wrap text-[16.5px] leading-8 text-[#8A8F98]`}>
               {diff.before.map((segment, index) => segment.changed
                 ? <del key={index} className="decoration-[#C0392B]/50">{segment.text}</del>
                 : <span key={index}>{segment.text}</span>)}
             </p>
           </div>}
+          {diff && <ArrowDown aria-hidden className="ml-3.5 h-4 w-4 text-[#B8AE95]" />}
           <div className="flex items-start gap-3.5">
-            <span className={`mt-1 ${languageBadge} flex-col gap-0 border-[#15202B] bg-[#15202B] px-2 text-white`}><span>{mission.targetLanguage.badge}</span><span className="text-[10px] font-bold text-[#F3D248]">완성</span></span>
+            <span className={`mt-1.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
             <p className={`${targetFont} whitespace-pre-wrap text-[19px] font-semibold leading-9 text-[#15202B]`}>
               <span className="sr-only">{finalText}</span>
               <span aria-hidden>{finalSegments}{!typed && <span className="ml-0.5 inline-block h-6 w-[2px] translate-y-1 animate-pulse bg-[#15202B]" />}</span>

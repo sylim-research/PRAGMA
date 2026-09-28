@@ -73,7 +73,6 @@ describe("representative v6 reason / contrast rhythm", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 판단` })).getByRole("radio", { name: band }));
     });
     click("판단 확인하기");
-    expect(screen.getByText(/4개 표현.*가능한 판단 범위 안에서 판단했습니다\./)).toBeInTheDocument();
     click("다음: 수정안 고르기");
     click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기");
     const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
