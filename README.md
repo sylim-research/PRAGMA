@@ -116,7 +116,26 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 7. 시스템 아키텍처
+## 7. 주요 연구·개발 단계
+
+<table>
+  <thead><tr><th width="190" align="left">단계</th><th width="540" align="left">핵심 설계·개선</th><th width="100" align="left">근거</th></tr></thead>
+  <tbody>
+    <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름 구현, 중→한 번역·통역까지 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
+    <tr><td>콘텐츠 품질관리·최종 승인</td><td>규칙·AI·교차 검토 뒤 교수자가 최종 승인하는 단계별 검수</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
+    <tr><td>교과목·주차 편성</td><td>3개 교과목·15주 계획·주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
+    <tr><td>MJT → DCT형 통번역 과제</td><td>MJT 5문항과 DCT형 통번역 과제를 한 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
+    <tr><td>9개 목표 화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
+    <tr><td>의미 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용 판정을 보류하고 의미부터 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
+    <tr><td>DCT 수정안 재확인</td><td>최초안 피드백만 보던 수정안 확정 전에 재확인 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
+  </tbody>
+</table>
+
+> <small>개발 이력 가운데 핵심 설계와 개선을 보여 주는 대표 변경입니다.</small>
+
+<br>
+
+## 8. 시스템 아키텍처
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="Fig. 4 시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
@@ -127,7 +146,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 8. 주요 용어
+## 9. 주요 용어
 
 <table>
   <thead><tr><th width="190" align="left">용어</th><th width="520" align="left">정의</th></tr></thead>
