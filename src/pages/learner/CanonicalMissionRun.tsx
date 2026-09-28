@@ -588,8 +588,8 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
   asList?: boolean;
 }) {
   return (
-    <div className="break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[14px] leading-7 text-[#3F4A59]">
-      {verdict && <p className="mb-2 font-black text-[#4A5568]">{verdict}</p>}
+    <div className="break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[15.5px] leading-7 text-[#15202B]">
+      {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict}</p>}
       {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
       {asList ? <ul className="list-disc space-y-1 pl-5">
         {withoutExpressionMemo(feedback).split(/\n|(?<=[.!?。！？])\s+/).filter(Boolean).map((line, index) =>
@@ -630,8 +630,8 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 /** 후보 문장 아래에 붙는 해설 — 문제집처럼 꼬리표·작은 글씨·구분선으로 문장과 층을 나눈다. */
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
-    <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 border-t border-dashed border-[#DDD8CB] pt-2 text-[13.5px] font-normal leading-6 text-[#6B665C]">
-      <span className="rounded bg-[#EEECE6] px-1.5 py-px text-[11px] font-black text-[#6B665C]">해설</span>
+    <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
+      <span className="mt-0.5 rounded bg-[#FFF3C4] px-1.5 py-px text-[11.5px] font-black text-[#6B5518]">해설</span>
       <span className="min-w-0">{children}</span>
     </span>
   );
@@ -898,8 +898,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className="mt-5 rounded-xl border border-[#E4E0D5] bg-[#FCFBF8] px-4 py-3.5" aria-label="화용 해설">
-        <h4 className="text-[13px] font-black text-[#6B665C]">해설</h4>
-        <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[14.5px] leading-7 text-[#3F4A59] marker:text-[#C9A62E]">
+        <h4 className="text-[13.5px] font-black text-[#6B5518]">해설</h4>
+        <ul className="mt-1.5 list-disc space-y-1 pl-5 text-[15.5px] leading-7 text-[#15202B] marker:text-[#C9A62E]">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
@@ -907,19 +907,18 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         <h4 className="font-bold">참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
       </section>}
-      {submitted && quest.contrast && <section className="mt-5 overflow-hidden rounded-2xl border-2 border-[#9DB3D6] bg-[#F3F7FD]" aria-label="다른 맥락에서는?">
-        <div className="flex items-center gap-2 border-b border-[#D6E0EF] bg-[#E6EEF9] px-4 py-2.5">
-          <span aria-hidden className="text-[17px]">🔄</span>
-          <h4 className="text-[15px] font-black text-[#2F4F86]">다른 맥락에서는?</h4>
-          <span className="ml-auto rounded-full bg-white px-2.5 py-0.5 text-[12px] font-bold text-[#2F4F86]">관계가 바뀌면</span>
+      {submitted && quest.contrast && <section className="mt-5 rounded-2xl border border-[#E1E5EA] bg-white p-4 shadow-[0_1px_4px_rgba(21,32,43,0.06)]" aria-label="다른 맥락에서는?">
+        <div className="flex items-center gap-2">
+          <span aria-hidden className="text-[16px]">🔄</span>
+          <h4 className="text-[15.5px] font-black text-[#15202B]">다른 맥락에서는?</h4>
         </div>
-        <div className="px-4 pb-4 pt-3">
-          <p className="text-[15px] font-bold leading-7 text-[#263444]">{quest.contrast.context}</p>
-          {/* 메신저 장면처럼 — 내가 보내는 말은 오른쪽 노란 말풍선. */}
-          <div className="mt-3 flex items-end justify-end gap-2">
-            <span className="mb-1 text-[11.5px] font-bold text-[#7A8493]">나</span>
-            <p className={`${targetFont} relative max-w-[85%] rounded-2xl rounded-br-[4px] bg-[#FAD338] px-4 py-2.5 text-[17px] leading-8 text-[#15202B] shadow-[0_2px_6px_rgba(201,166,46,0.3)]`}>{quest.contrast.target}</p>
+        <p className="mt-1 text-[15.5px] leading-7 text-[#15202B]">{quest.contrast.context}</p>
+        {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
+        <div className="mt-3 rounded-xl border border-[#EFEFEF] bg-[#FAFAFA] px-3 pb-2 pt-3">
+          <div className="flex justify-end">
+            <p className={`${targetFont} max-w-[85%] rounded-[22px] rounded-br-md bg-[linear-gradient(135deg,#E4EFFE_0%,#EDE7FE_100%)] px-4 py-2.5 text-[17px] leading-8 text-[#15202B]`}>{quest.contrast.target}</p>
           </div>
+          <p className="mt-1 pr-1 text-right text-[11.5px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
       </section>}
@@ -1085,7 +1084,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_max-content] sm:items-start sm:gap-4">
                     <div className="min-w-0">
                       <p className={`${targetFont} text-[17px] leading-7`}>{candidate.text}</p>
-                      <p className="mt-1 break-keep text-[13px] leading-5 text-[#536075]">{candidate.note}</p>
+                      <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]">{candidate.note}</p>
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
                       <span className={`rounded px-2 py-1 text-[11px] font-black ${isBestRole ? "bg-[#DCEFE4] text-[#245E44]" : isWorstRole ? "bg-[#F4D8D5] text-[#8B3531]" : "bg-[#EEECE6]"}`}>{role}</span>
@@ -2350,13 +2349,14 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
   const drawn = { backgroundRepeat: "no-repeat", backgroundSize: revealed ? "100% 100%" : "0% 100%", transition: "background-size 700ms ease-out" };
-  const row = "flex items-start gap-3.5";
-  const rowText = "whitespace-pre-wrap break-keep text-[17px] leading-8 text-[#15202B]";
+  const row = "flex items-start gap-3.5 py-3 first:pt-0 last:pb-0";
+  const rowText = "whitespace-pre-wrap break-keep text-[17px] leading-7 text-[#15202B]";
   return (
     <article className="space-y-4">
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
-        className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-6 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-7">
-        <div className="space-y-5">
+        className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-4 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-6">
+        {/* 원문 → 최초안 → 최종안을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
+        <div className="divide-y divide-[#ECE7DA]">
           {source && <div className={row}>
             <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
@@ -2385,7 +2385,7 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>
-          <p className="mt-1.5 break-keep text-[14.5px] leading-7 text-[#3F4A59]"><span aria-hidden>💡 </span>{alternative.note}</p>
+          <p className="mt-1.5 break-keep text-[15.5px] leading-7 text-[#15202B]"><span aria-hidden>💡 </span>{alternative.note}</p>
         </li>)}</ol>
       </section>}
     </article>
@@ -3013,7 +3013,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <CanonicalMissionContext.Provider value={mission}>
     <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="flex items-center gap-3">
       {demoMode && <span className="whitespace-nowrap rounded-full border border-[#F2C744]/70 px-2.5 py-0.5 text-[11px] font-bold text-[#F2C744]">데모 시연</span>}
-      <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>
+      <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction.replace("한국어", "한").replace("중국어", "중").replace(/\s*→\s*/, "→")}</span>
     </span>}>
       {isDevPreview && (
         <DevPreviewToolbar

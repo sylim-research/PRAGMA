@@ -302,7 +302,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     );
 
     expect(await screen.findByRole("heading", { name: SAMPLE_MISSION_V5.production_task.situation_ko })).toBeInTheDocument();
-    expect(screen.getByText("요청 화행 · 한국어 → 중국어")).toBeInTheDocument();
+    expect(screen.getByText("요청 화행 · 한→중")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     expect(screen.queryByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).not.toBeInTheDocument();
 
