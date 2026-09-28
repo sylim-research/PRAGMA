@@ -230,9 +230,9 @@ describe("v6 beyond request — the skeleton is act-neutral, the judgment axis i
     const requestView = adaptRunnableMissionToCanonical(runnable());
     const requestSpectrum = requestView.quests.find(q => q.kind === "spectrum")!;
     expect(requestSpectrum.kind === "spectrum" && requestSpectrum.options).toEqual([
-      { id: "too_direct", label: "상대의 선택권이 부족함" },
+      { id: "too_direct", label: "너무 직접적" },
       { id: "appropriate", label: "상황에 맞음" },
-      { id: "too_indirect", label: "우회해 요청이 흐려짐" },
+      { id: "too_indirect", label: "너무 우회적" },
     ]);
     const thanksView = adaptRunnableMissionToCanonical({
       ...runnable(asThanks() as MissionV6), speech_act: "thanks" as const,

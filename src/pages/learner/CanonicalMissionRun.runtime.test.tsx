@@ -135,7 +135,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     // Its identity must also be fresh, so the previous feedback slots cannot be reused.
     view.unmount();
     render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
-    expect(screen.getByRole("button", { name: /학습 미션 시작하기/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /미션 시작하기/ })).toBeInTheDocument();
     const entries = vi.mocked(appendMissionEvent).mock.calls.filter(([event]) => event.eventType === "mission_session_opened");
     expect(entries.at(-1)![0].attemptId).not.toBe(firstEntry.attemptId);
     expect(entries.at(-1)![0].contentHash).toBe(firstEntry.contentHash);

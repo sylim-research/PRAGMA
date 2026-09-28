@@ -7,7 +7,7 @@ describe("representative mission model house", () => {
   it("runs the approved parcel snapshot", () => {
     const runnable = publicRepresentativeMission();
     expect(runnable.scenario_id).toBe(REPRESENTATIVE_MISSION_ID);
-    expect(runnable.mission.provenance?.mission_content_hash).toBe("bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095");
+    expect(runnable.mission.provenance?.mission_content_hash).toBe("3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764");
   });
   it("returns prepared feedback for the example drafts only", async () => {
     const first = await requestDemoFeedback(null, DEMO_FIRST_DRAFT);

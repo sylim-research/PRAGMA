@@ -26,7 +26,7 @@ describe("representative local content candidate", () => {
       expect(m.provenance.mission_content_hash).toBe(hash);
     }
     expect(manifest.candidate_hash).not.toBe(manifest.old_hash);
-    expect(manifest.new_version_id).toBeNull();
+    expect(manifest.new_version_id).toBe("dbb99548-a93c-4d85-9659-c5e880f39c87");
     expect(candidate.quality_check).toBeUndefined();
     expect(candidate.authoring).toBeUndefined();
     expect(candidate.hsk_lexical_audit).toBeUndefined();

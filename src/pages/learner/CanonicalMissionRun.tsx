@@ -1131,6 +1131,11 @@ function sourceAlignedRows(source: string) {
   return Math.min(6, Math.max(2, estimatedLines + 1));
 }
 
+/** DCT 입력칸 — 원문과 같은 줄 수로 시작한다(한·중 길이가 비슷하고, 작은 칸이 부담을 덜어 준다). */
+function dctInputRows(source: string) {
+  return Math.min(6, Math.max(2, sourceAlignedRows(source) - 1));
+}
+
 function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: string; onChange: (value: string) => void }) {
   const mission = useCanonicalMission();
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
@@ -1158,8 +1163,8 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           id={`${quest.id}-draft`}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          rows={sourceAlignedRows(quest.source)}
-          className={`${targetFont} mt-3 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
+          rows={dctInputRows(quest.source)}
+          className={`${targetFont} mt-3 min-h-0 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
         />
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
@@ -1772,7 +1777,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <FeedbackRemainder text={primaryCriterion.body} />
                   </div>
                 )}
-                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={sourceAlignedRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
                 {recheckRequested && <p className="mt-2 text-[12.5px] leading-5 text-[#6D7788]">추가 수정에는 AI 피드백을 다시 실행하지 않습니다. 최종 표현은 직접 결정하세요.</p>}
               </section>
               <ActionBar hint={actionHint}>
@@ -2926,21 +2931,29 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             />
           </div>
         )}
+        {demoMode && <div aria-hidden className="h-24" />}
         {demoMode && (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs text-[#6B5518]">
-            <p className="flex flex-wrap items-center gap-x-2" role="status">
-              <span className="font-black">대표 미션 미리 보기</span>
-              <span>수행 기록 저장 안 됨</span>
-            </p>
-            {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <Button variant="outline" size="sm" className="h-8 px-3 text-xs" onClick={() => {
-                  setDevAutofillQuestId(quest.id);
-                  setRenderNonce(current => current + 1);
-                }}>답안 자동 채우기</Button>
-                <span>채운 뒤 확인 버튼을 눌러 주세요.</span>
-              </div>
-            )}
+          // 시연 모드 바 — 화면 아래에 항상 떠 있어 스크롤하지 않아도 자동 채우기를 누를 수 있다.
+          <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-3 sm:px-4">
+            <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl bg-[#15202B] px-4 py-3 text-white shadow-[0_8px_28px_rgba(21,32,43,0.28)]">
+              <p className="flex flex-wrap items-center gap-x-2 text-[13px]" role="status">
+                <span className="inline-block h-2 w-2 rounded-full bg-[#F2C744]" aria-hidden />
+                <span className="font-black">대표 미션 미리 보기</span>
+                <span className="text-white/70">수행 기록 저장 안 됨</span>
+              </p>
+              {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null ? (
+                <div className="flex items-center gap-3">
+                  <span className="hidden text-[12.5px] text-white/70 sm:inline">예시 답안을 채운 뒤 확인만 누르세요</span>
+                  <Button className="h-11 rounded-xl bg-[#F2C744] px-5 text-[15px] font-black text-[#15202B] hover:bg-[#E6B92F]" onClick={() => {
+                    setDevAutofillQuestId(quest.id);
+                    setRenderNonce(current => current + 1);
+                    window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 80);
+                  }}><Sparkles aria-hidden className="mr-1.5 h-4 w-4" />답안 자동 채우기</Button>
+                </div>
+              ) : (
+                <span className="text-[12.5px] text-white/70">문항 화면에서 「답안 자동 채우기」를 쓸 수 있습니다</span>
+              )}
+            </div>
           </div>
         )}
       </div>

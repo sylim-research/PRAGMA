@@ -1,8 +1,8 @@
-// 택배 대표 미션 승인본 v3 (mission_content_hash bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095).
-// 출처: 2026-09-26 승인 콘텐츠 증거 기록. 손으로 고치지 않는다.
+// 택배 대표 미션 최신 승인본 (scenario 051532cc, final version 2, mission_content_hash 3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764, 2026-09-26T16:13Z 승인).
+// 출처: docs/research-trail/evidence/2026-09-27-parcel-final-review/approved-final-content.json. 손으로 고치지 않는다.
 
 export const REPRESENTATIVE_MISSION_SNAPSHOT = {
-  "scenario_id": "3da0c62d-e91f-4f68-9b74-28cd9d42f044",
+  "scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
   "speech_act": "request",
   "learner_level": null,
   "mission_status": "reviewed",
@@ -38,8 +38,8 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         "channel": "messenger",
         "relation_ko": "친한 팀플 조원",
         "short_label": "첫인상 판단",
-        "situation_ko": "친한 팀플 조원이 최종 발표 파일을 단톡방에 올리기로 했습니다. 발표 전날, 아직 파일을 받지 못해 메신저를 보냅니다.",
-        "explanation_ko": "이미 올리기로 한 파일을 친한 조원에게 상기하는 장면입니다. 새 일을 일방적으로 맡기는 상황이 아니므로, 짧은 부탁도 자연스럽습니다.\n\n표현 메모\n· `发到群里` — 단체 대화방에 올리다. 메신저 문맥에서 `群`은 단체 대화방을 가리킬 수 있습니다.\n· `把最终版PPT发到……` — 「무엇을 어디로 보내다」를 말할 때 대상을 `把` 뒤로 옮기는 틀입니다.",
+        "situation_ko": "친한 팀플 조원이 최종 발표 파일을 단톡방에 올리기로 했습니다. 발표 전날인데 아직 파일이 올라오지 않아 메신저로 다시 부탁합니다.",
+        "explanation_ko": "이미 파일을 올리기로 한 친한 조원에게 다시 부탁하는 상황이라, `把最终版PPT发到群里吧。`처럼 把자문으로 짧게 부탁해도 자연스럽습니다.\n\n표현 메모\n· `发到群里` — 단체 대화방에 올리다. 메신저 문맥에서 `群`은 단체 대화방을 가리킬 수 있습니다.\n· `把最终版PPT发到……` — 「무엇을 어디로 보내다」를 말할 때 대상을 `把` 뒤로 옮기는 틀입니다.",
         "learner_context_ko": "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.",
         "accepted_scale_codes": [
           "very_appropriate",
@@ -81,7 +81,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           ],
           "accepted_id": "assumed-acceptance"
         },
-        "explanation_ko": "원문은 추천서의 용도와 필요한 시점을 알리면서 교수님이 작성해 주실 수 있는지 묻습니다. 번역안의 ‘就交给您写了’는 교수님이 이미 작성을 맡은 것처럼 말해, 아직 수락을 받지 않은 부탁을 업무 배정으로 바꿉니다. 아래 예시처럼 ‘您能帮我写……吗？’나 ‘请问您方便帮我写吗？’로 바꾸면 용도와 날짜를 유지하면서 작성 가능 여부를 여쭙습니다. 질문형만 가능한 것은 아니며, 수락을 전제하지 않는 다른 요청 표현도 가능합니다.\n\n표현 메모\n· `一封推荐信` — 추천서·편지는 양사 `封`으로 셉니다.\n· `下周五要用` — 다음 주 금요일에 필요하다는 시점을 밝힙니다.",
+        "explanation_ko": "원문은 추천서의 용도와 필요한 시점을 알리면서, 교수님께 작성 가능 여부를 묻는 요청입니다.\n`就交给您写了`는 교수님이 이미 맡기로 한 것처럼 말해, 부탁을 업무 배정처럼 바꿉니다.\n수락을 전제하지 않고 작성 가능 여부를 묻는 표현으로 고치면 됩니다.\n\n표현 메모\n· `一封推荐信` — 추천서·편지는 양사 `封`으로 셉니다.\n· `下周五要用` — 다음 주 금요일에 필요하다는 시점을 밝힙니다.",
         "revision_examples": [
           "老师您好，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。",
           "老师您好，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？"
@@ -102,7 +102,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         },
         "type": "fix_choice",
         "title": "출석 기록",
-        "prompt": "원문의 핵심 의미와 화행 목적을 지키면서 이 상황에 맞게 고친 표현을 골라보세요.",
+        "prompt": "원문의 뜻과 의도를 살려, 이 상황에 맞게 고친 표현을 골라보세요.",
         "source": "조교님, 지난주 출석이 결석으로 되어 있는데 확인해 주실 수 있나요?",
         "target": "助教您好，系统显示我上周缺勤，您必须帮我核实清楚。",
         "channel": "messenger",
@@ -150,7 +150,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         "relation_ko": "같은 수업의 팀플 조원들",
         "short_label": "직접 고쳐 보기",
         "situation_ko": "팀플 조원들과 내일 저녁 7시에 발표 리허설을 하기로 했습니다. 수업이 늦게 끝나 30분 늦추고 싶지만, 다른 조원들의 동의는 아직 구하지 않았습니다.",
-        "explanation_ko": "원문은 리허설 시간을 바꿔도 되는지 묻습니다. 번역안은 같은 시간과 이유를 말하지만, ‘就这么定了’로 조원들의 동의를 구하지 않고 변경을 확정합니다. 일정을 바꾸려는 내용은 유지하면서 상대의 동의를 묻도록 고쳐 보세요. 참고 표현은 가능한 예시입니다.\n\n표현 메모\n· `从A改到B` — 시간·일정을 A에서 B로 옮긴다고 말하는 틀입니다.\n· `推迟` — 예정된 시간을 뒤로 미루다(앞당기면 `提前`).\n· `彩排` — 발표·공연의 리허설.",
+        "explanation_ko": "원문은 리허설 시간을 바꿔도 되는지 묻습니다.\n번역안은 같은 시간과 이유를 말하지만, `就这么定了`로 조원들의 동의를 구하지 않고 변경을 확정합니다.\n일정을 바꾸려는 내용은 유지하면서 상대의 동의를 묻도록 고쳐 보세요.\n\n표현 메모\n· `从A改到B` — 시간·일정을 A에서 B로 옮긴다고 말하는 틀입니다.\n· `推迟` — 예정된 시간을 뒤로 미루다(앞당기면 `提前`).\n· `彩排` — 발표·공연의 리허설.",
         "learner_context_ko": "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.",
         "reference_alternatives": [
           "明天我下课晚，彩排能从七点推迟到七点半吗？",
@@ -172,28 +172,28 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         "candidates": [
           {
             "text": "学姐，能把社团宣传海报的原文件发给我吗？我只改一下日期。",
-            "note_ko": "용건과 이유를 간결하게 밝히고 전달 가능 여부를 묻습니다.",
+            "note_ko": "`能…吗？`로 파일을 보내 줄 수 있는지 묻고, 날짜만 바꾸려는 이유를 밝힙니다.",
             "accepted_band_codes": [
               "appropriate"
             ]
           },
           {
             "text": "学姐，能麻烦您把社团宣传海报的原文件发我一下吗？我只改一下日期。",
-            "note_ko": "상대에게 파일을 보내 줄 수 있는지 묻고 날짜만 바꾸려는 목적을 밝힙니다. ‘您’와 ‘麻烦’을 썼다는 이유만으로 지나치게 우회적인 표현으로 판정하지 않습니다.",
+            "note_ko": "`能麻烦您…吗？`로 파일 전달을 부탁하고, 날짜만 바꾼다고 밝혀 부탁의 범위를 한정합니다.",
             "accepted_band_codes": [
               "appropriate"
             ]
           },
           {
             "text": "学姐，我只想改一下社团宣传海报上的日期，想麻烦您把原文件发给我。",
-            "note_ko": "목적을 먼저 밝히고 ‘想麻烦您’로 파일 전달을 부탁하는 적절한 표현입니다. 의문형은 아니지만 선배가 이미 수락했다고 단정하거나 전달을 지시하지 않습니다.",
+            "note_ko": "날짜만 바꾸려는 목적을 밝히고 `想麻烦您…`로 파일을 부탁해, 이 관계에서도 자연스럽습니다.",
             "accepted_band_codes": [
               "appropriate"
             ]
           },
           {
             "text": "学姐，社团宣传海报的原文件发我，我要改一下日期。",
-            "note_ko": "전달 가능 여부를 묻는 원문을 짧은 전달 지시로 바꿨습니다. 단순히 짧아서가 아니라 수락을 전제하는 요청 방식이 문제입니다.",
+            "note_ko": "`原文件发我`는 파일을 보내 달라는 지시처럼 들려, 상대가 수락할 여지가 줄어듭니다.",
             "accepted_band_codes": [
               "too_direct"
             ]
@@ -207,17 +207,17 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
     ],
     "provenance": {
       "model": "Codex",
-      "finalized_at": "2026-09-26T06:25:13.051Z",
+      "finalized_at": "2026-09-26T16:12:53.094Z",
       "generated_at": "2026-09-26T06:24:33.817Z",
       "prompt_version": "submission_parcel_representative_20260926",
       "content_release_id": "pragma_zhko_bidirectional_candidate_20260904_02",
       "generation_attempt": 1,
-      "mission_content_hash": "bbf072ba4a7a09cf22bd99992d9ba18709d80b09fed9f2701820eb28d3d11095"
+      "mission_content_hash": "3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764"
     },
     "item_lineage": {
       "claims": [
         {
-          "note_ko": "‘吧’ 종결어미로 선택권을 남기지만 ‘把’ 구문 사용으로 명령처럼 들릴 위험이 있음.",
+          "note_ko": "‘吧’를 사용해 선택권을 남기지만, ‘把’ 구문이 명령형 느낌을 줍니다.",
           "claim_id": "ILC-001",
           "risk_ids": [
             "ba_imperative_overuse"
@@ -234,22 +234,22 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "요청 명제에 능원동사나 조건절 완화 없이 직접 요구하며, 불필요한 부연이 많음.",
+          "note_ko": "‘推荐信就交给您写了’ 표현이 한국어 한자어 직역 느낌이며, 완화 표현 없이 요청을 직진합니다.",
           "claim_id": "ILC-002",
           "risk_ids": [
-            "weak_internal_mitigation",
-            "learner_verbosity"
+            "hanja_interference",
+            "weak_internal_mitigation"
           ],
           "rule_ids": [],
           "target_path": "mpj_items[1].target",
           "evidence_ids": [
             "EV-LI-TAGUCHI-2026-REQUEST-MODIFICATION",
-            "EV-TAGUCHI-LI-2020-L2-VERBOSITY"
+            "EV-OBS-KO-ZH-HANJA-INTERFERENCE"
           ],
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘必须’ 사용으로 명령적 강도가 강해 요청이 명령처럼 들림.",
+          "note_ko": "‘必须帮我核实清楚’가 명령형으로 강하게 요구하는 표현입니다.",
           "claim_id": "ILC-003",
           "risk_ids": [
             "ba_imperative_overuse"
@@ -262,7 +262,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘麻烦您’로 부담 예고를 했으나 ‘务必’가 명령적 강도를 높임.",
+          "note_ko": "‘麻烦您’로 부담 예고를 했으나 ‘务必’가 명령적 강도를 높입니다.",
           "claim_id": "ILC-004",
           "risk_ids": [
             "ba_imperative_overuse"
@@ -279,7 +279,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘想麻烦您帮我核实一下’로 부담 예고와 완화 표현을 사용해 정중한 요청임.",
+          "note_ko": "‘想麻烦您帮我核实一下’로 부담 예고와 완화 표현을 사용해 요청합니다.",
           "claim_id": "ILC-005",
           "risk_ids": [],
           "rule_ids": [
@@ -293,20 +293,16 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘就交给您核实了’는 요청 완화 없이 조교가 확인을 맡은 것처럼 단정적으로 표현하여 내적 완화가 부족합니다.",
+          "note_ko": "‘就交给您核实了’는 조교가 확인을 맡은 것처럼 단정하여 요청 완화 표현이 없음.",
           "claim_id": "ILC-006",
-          "risk_ids": [
-            "weak_internal_mitigation"
-          ],
+          "risk_ids": [],
           "rule_ids": [],
           "target_path": "mpj_items[2].corrections[2]",
-          "evidence_ids": [
-            "EV-LI-TAGUCHI-2026-REQUEST-MODIFICATION"
-          ],
-          "attribution_status": "model_claimed"
+          "evidence_ids": [],
+          "attribution_status": "model_unattributed"
         },
         {
-          "note_ko": "요청이나 완화 표현이 없고 단순한 사실 진술 문장입니다.",
+          "note_ko": "요청이나 완화 표현이 없고 단정적 진술임.",
           "claim_id": "ILC-007",
           "risk_ids": [],
           "rule_ids": [],
@@ -315,7 +311,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_unattributed"
         },
         {
-          "note_ko": "‘能…吗’ 의문형으로 능원동사 완화가 명확히 드러납니다.",
+          "note_ko": "‘能…吗？’로 능원동사 완화 표현이 사용됨.",
           "claim_id": "ILC-008",
           "risk_ids": [],
           "rule_ids": [
@@ -328,7 +324,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘能麻烦您…吗’에서 능원동사 완화와 부담 예고가 모두 표현되었습니다.",
+          "note_ko": "‘能麻烦您…吗？’로 능원동사 완화와 부담 예고가 모두 표현됨.",
           "claim_id": "ILC-009",
           "risk_ids": [],
           "rule_ids": [
@@ -343,7 +339,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘想麻烦您’로 부담 예고가 표현되어 있습니다.",
+          "note_ko": "‘想麻烦您…’로 부담 예고 표현이 사용됨.",
           "claim_id": "ILC-010",
           "risk_ids": [],
           "rule_ids": [
@@ -357,20 +353,20 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "요청이 단순 지시형으로 되어 있어 내적 완화 표현이 없어 직진하는 요청으로 판단됩니다.",
+          "note_ko": "‘原文件发我’ 표현이 명령형으로 들려 요청이 명령처럼 과도하게 표현되었습니다.",
           "claim_id": "ILC-011",
           "risk_ids": [
-            "weak_internal_mitigation"
+            "ba_imperative_overuse"
           ],
           "rule_ids": [],
           "target_path": "mpj_items[4].candidates[3]",
           "evidence_ids": [
-            "EV-LI-TAGUCHI-2026-REQUEST-MODIFICATION"
+            "EV-OBS-ZH-BA-IMPERATIVE"
           ],
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘麻烦您帮我代收一下吗’로 부담 예고와 능원동사 완화, ‘如果方便的话’로 조건절 포석을 사용했습니다.",
+          "note_ko": "‘麻烦您帮我’로 부담을 예고하고 ‘如果方便的话’ 조건절과 ‘…吗’ 능원동사 완화가 모두 사용되었습니다.",
           "claim_id": "ILC-012",
           "risk_ids": [],
           "rule_ids": [
@@ -386,12 +382,12 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "attribution_status": "model_claimed"
         },
         {
-          "note_ko": "‘能麻烦您帮我代收一下吗’로 능원동사 완화와 부담 예고, ‘如果您方便’로 조건절 포석을 사용했습니다.",
+          "note_ko": "‘如果您方便’ 조건절 포석과 ‘能麻烦您帮我’ 능원동사 완화, ‘麻烦您’ 부담 예고가 모두 포함되어 있습니다.",
           "claim_id": "ILC-013",
           "risk_ids": [],
           "rule_ids": [
-            "RR-KOZH-REQ-BURDEN-FOREWARNING",
             "RR-KOZH-REQ-CONDITIONAL-PREFACE",
+            "RR-KOZH-REQ-BURDEN-FOREWARNING",
             "RR-KOZH-REQ-MODAL-QUESTION"
           ],
           "target_path": "production_task.reference_alternatives[1]",
@@ -406,41 +402,41 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
       "schema_version": "mission_item_lineage_v1",
       "coverage_summary": {
         "total_count": 13,
-        "claimed_count": 12,
-        "unattributed_count": 1
+        "claimed_count": 11,
+        "unattributed_count": 2
       },
       "realization_pack_id": "pragma_ko_zh_request_refusal_thanks_v1",
       "attribution_provenance": {
         "calls": [
           {
             "model": "gpt-4.1-mini",
-            "attempts": 1,
+            "attempts": 2,
             "batch_index": 1,
             "target_count": 5,
-            "prompt_instance_hash": "b329ae581b84bdc3ef103071e94efd0e65769ed71725360530e51f325f0dc06c"
+            "prompt_instance_hash": "d2b9baa5a3810ebd5f5808ab5c466265920ec54e83efda7e694fced0e693ec88"
           },
           {
             "model": "gpt-4.1-mini",
             "attempts": 1,
             "batch_index": 2,
             "target_count": 5,
-            "prompt_instance_hash": "f640bc8383fed59bc39e00817f8cdc494293e044ea2c44c7398ac19d8992f88a"
+            "prompt_instance_hash": "2ef3f68388381173390ef6150653ab5ee1adbd160208ff045e6ca3f09403ba28"
           },
           {
             "model": "gpt-4.1-mini",
             "attempts": 1,
             "batch_index": 3,
             "target_count": 3,
-            "prompt_instance_hash": "fa5d127165adee7696c9536b057e6f08f20e6f1f3415e87549d3feb035917f28"
+            "prompt_instance_hash": "cd3ea9aeed21929e295d48f54b5dc592027d49cbaae0031f3e557fbc6a016b4d"
           }
         ],
         "model": "gpt-4.1-mini",
         "provider": "openai",
         "batch_count": 3,
-        "attributed_at": "2026-09-26T06:25:12.752Z",
+        "attributed_at": "2026-09-26T16:12:52.826Z",
         "prompt_version": "item_lineage_attribution_v4_mission_v5_mpj5",
-        "attribution_attempts": 3,
-        "prompt_instance_hash": "f6208a42a69219570f363e82d68864f59b4b60ac13ef5f2d4686e2f65020fd50"
+        "attribution_attempts": 4,
+        "prompt_instance_hash": "1578e990380cb8755652303f4d5e42f6cbd56b2be7a14a295b5de0f162b56793"
       },
       "realization_pack_version": "1.2.0"
     },
@@ -475,15 +471,6 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         "item_id": 5
       }
     ],
-    "quality_check": {
-      "model": "gpt-4.1",
-      "verdict": "pass",
-      "findings": [],
-      "checked_at": "2026-09-26T06:24:44.452Z",
-      "summary_ko": "모든 문항이 실제 상황과 요청 완화·선택권 초점에 맞게 설계되어 결함이 없습니다.",
-      "prompt_version": "quality_mission_v6_act_general_v3_scene_plausibility",
-      "mission_content_hash": "2067077563512ab42a249b024c1921a45d98d1f8d82bd0196befd27b41f78387"
-    },
     "schema_version": "mission_v6",
     "production_task": {
       "pdr": {
