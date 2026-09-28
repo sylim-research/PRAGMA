@@ -959,7 +959,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
             // MJT1·2와 같은 색 규칙: 답한 뒤 참고 답안은 초록 테두리, 내가 고른 오답은 연한 빨강.
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
-              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] bg-white"}`}>
+              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-2 border-[#15202B] bg-[#EEF1F6] font-bold text-[#15202B]" : "border-[#E3DDCF] bg-white"}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
@@ -1850,7 +1850,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
           ) : (
             <ActionBar>
               {/* 양자택일 한 줄. 둘 다 타당한 학습자 결정이므로 같은 무게로 채운다 — 수정하기는 네이비, 이대로 확정은 노랑. */}
-              <div className="grid w-full grid-cols-2 gap-2 sm:w-[500px]">
+              <div className="grid w-full grid-cols-2 gap-2">
                 <Button className="h-11 w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
                 <Button className="h-11 w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
                   onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />이대로 확정</Button>
@@ -2332,8 +2332,8 @@ function useRevealAfterMount(delayMs = 250) {
   return revealed;
 }
 
-const STRIKE_LINE = "linear-gradient(transparent calc(50% - 1px), #C9534B calc(50% - 1px), #C9534B calc(50% + 1px), transparent calc(50% + 1px))";
-const HIGHLIGHT = "linear-gradient(transparent 58%, #FCE27A 58%)";
+const STRIKE_LINE = "linear-gradient(transparent calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% + 0.75px), transparent calc(50% + 0.75px))";
+const HIGHLIGHT = "linear-gradient(transparent 70%, #FCE27A 70%, #FCE27A 92%, transparent 92%)";
 
 export function CompletionRecord({ source, response, alternatives = [] }: {
   source?: string;
@@ -3060,8 +3060,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
-              <h1 className="mt-2 text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
+              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
               <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 보고 한 번 더 다듬어 최종안을 만들었어요." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했어요."}</p>
             </section>
             <div className="space-y-4">
