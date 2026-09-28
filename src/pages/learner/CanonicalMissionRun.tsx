@@ -631,8 +631,8 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 /** 후보 문장 아래에 붙는 해설 — 문제집처럼 꼬리표·작은 글씨·구분선으로 문장과 층을 나눈다. */
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
-    <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
-      <span className="mt-0.5 whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[11.5px] font-black text-[#6B5518]"><span aria-hidden>💡 </span>해설</span>
+    <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
+      <span className="whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><span aria-hidden>💡 </span>해설</span>
       <span className="min-w-0">{children}</span>
     </span>
   );
@@ -908,18 +908,18 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         <h4 className="font-bold"><span aria-hidden>✅ </span>참고 표현</h4>
         {quest.references.map(text => <p key={text} className={`${targetFont} rounded-lg bg-white p-3 text-[16.5px] leading-8`}>{text}</p>)}
       </section>}
-      {submitted && quest.contrast && <section className="mt-5 rounded-2xl border border-[#E1E5EA] bg-white p-4 shadow-[0_1px_4px_rgba(21,32,43,0.06)]" aria-label="다른 맥락에서는?">
-        <div className="flex items-center gap-2">
-          <span aria-hidden className="text-[16px]">🔄</span>
-          <h4 className="text-[15.5px] font-black text-[#15202B]">다른 맥락에서는?</h4>
+      {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
+        <div className="flex items-center gap-1.5">
+          <span aria-hidden className="text-[14px]">🔄</span>
+          <h4 className="text-[14px] font-black text-[#15202B]">다른 맥락에서는?</h4>
         </div>
-        <p className="mt-1 text-[15.5px] leading-7 text-[#15202B]">{quest.contrast.context}</p>
+        <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
         {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
-        <div className="mt-3 rounded-xl border border-[#EFEFEF] bg-[#FAFAFA] px-3 pb-2 pt-3">
+        <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[85%] rounded-[22px] rounded-br-md bg-[#3797F0] px-4 py-2.5 text-[17px] leading-8 text-white`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#3797F0] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
-          <p className="mt-1 pr-1 text-right text-[11.5px] text-[#8E8E8E]">보냄</p>
+          <p className="mt-0.5 pr-1 text-right text-[11px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
       </section>}
@@ -959,7 +959,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
             // MJT1·2와 같은 색 규칙: 답한 뒤 참고 답안은 초록 테두리, 내가 고른 오답은 연한 빨강.
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
-              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E3DDCF] bg-white"}`}>
+              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : picked ? "border-2 border-[#15202B] bg-[#EEF1F6] font-bold text-[#15202B]" : "border-[#E3DDCF] bg-white"}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
@@ -1850,7 +1850,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
           ) : (
             <ActionBar>
               {/* 양자택일 한 줄. 둘 다 타당한 학습자 결정이므로 같은 무게로 채운다 — 수정하기는 네이비, 이대로 확정은 노랑. */}
-              <div className="grid w-full grid-cols-2 gap-2 sm:w-[500px]">
+              <div className="grid w-full grid-cols-2 gap-2">
                 <Button className="h-11 w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
                 <Button className="h-11 w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
                   onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />이대로 확정</Button>
@@ -1914,10 +1914,11 @@ const PROGRESS_LABELS: Record<string, string> = {
 
 /** 산출 단계의 이름은 진행 바와 같아야 한다 — 미션 방식에 따라 「번역하기」·「통역하기」. */
 function progressLabel(quest: MissionQuest, outputName = "번역") {
-  if (quest.kind === "scale") return quest.reasonChoice ? "판단하고 이유 고르기" : "표현이 상황에 맞는지 판단하기";
+  // 진행 막대·핵심 정리·기록에 들어가는 짧은 이름. 미션 안내의 풀어 쓴 활동명과는 따로 둔다.
+  if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "표현 판단";
   if (quest.kind === "fix_choice") return "수정안 고르기";
-  if (quest.kind === "free_correction") return "직접 고쳐 보기";
-  if (quest.kind === "spectrum") return "여러 표현 비교하기";
+  if (quest.kind === "free_correction") return "직접 고치기";
+  if (quest.kind === "spectrum") return "표현 비교";
   if (quest.kind === "dct") return `${outputName}하기`;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
@@ -2332,8 +2333,8 @@ function useRevealAfterMount(delayMs = 250) {
   return revealed;
 }
 
-const STRIKE_LINE = "linear-gradient(transparent calc(50% - 1px), #C9534B calc(50% - 1px), #C9534B calc(50% + 1px), transparent calc(50% + 1px))";
-const HIGHLIGHT = "linear-gradient(transparent 58%, #FCE27A 58%)";
+const STRIKE_LINE = "linear-gradient(transparent calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% - 0.75px), rgba(201, 83, 75, 0.55) calc(50% + 0.75px), transparent calc(50% + 0.75px))";
+const HIGHLIGHT = "linear-gradient(transparent 70%, #FCE27A 70%, #FCE27A 92%, transparent 92%)";
 
 export function CompletionRecord({ source, response, alternatives = [] }: {
   source?: string;
@@ -3060,8 +3061,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <p className="text-xs font-bold text-[#F3D248]">미션 완료</p>
-              <h1 className="mt-2 text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
+              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
               <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 보고 한 번 더 다듬어 최종안을 만들었어요." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했어요."}</p>
             </section>
             <div className="space-y-4">
