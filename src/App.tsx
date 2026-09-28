@@ -96,12 +96,12 @@ const App = () => (
           <Route path="/architecture" element={<Architecture />} />
           {/* Google OAuth 동의 화면이 요구하는 공개 링크 — 비로그인 접근을 유지한다. */}
           <Route path="/privacy" element={<Privacy />} />
-          {/* 디펜스용 단일 진입점 — 실제 승인 미션 실행기를 재사용하되 수행 로그는 저장하지 않는다. */}
+          {/* 대표 미션 시연 — 로그인 없이 연다. 실제 승인 미션 실행기를 재사용하되 수행 로그는 저장하지 않는다. */}
           <Route
             path="/demo/mission"
             element={
               IS_DEMO
-                ? <RequireApproved><CanonicalMissionRun demoMode scenarioId={REPRESENTATIVE_MISSION_ID} /></RequireApproved>
+                ? <CanonicalMissionRun demoMode scenarioId={REPRESENTATIVE_MISSION_ID} />
                 : <Navigate to="/" replace />
             }
           />

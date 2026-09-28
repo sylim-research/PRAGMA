@@ -11,6 +11,7 @@ import { requestFeedback } from "@/lib/mission/missionFeedback";
 import { saveMissionAttempt } from "@/lib/mission/missionLog";
 import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
 import { appendMissionEvent } from "@/lib/mission/missionEvents";
+import { supabase } from "@/integrations/supabase/client";
 
 const scenarioId = "86d738b0-1891-4bfe-9b12-f8643ebbb45f";
 const { fetchMissionByScenario } = vi.hoisted(() => ({
@@ -41,6 +42,7 @@ import CanonicalMissionRun, {
 describe("demo route", () => {
   it("loads the designated approved representative and keeps demo responses unsaved", async () => {
     vi.clearAllMocks();
+    vi.spyOn(supabase.auth, "getSession").mockResolvedValue({ data: { session: {} as never }, error: null });
     fetchMissionByScenario.mockResolvedValue({ scenario_id: REPRESENTATIVE_MISSION_ID, speech_act: "request", learner_level: "intermediate", mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh", mission: SAMPLE_MISSION_V6_REASON_CONTRAST });
     window.scrollTo = vi.fn();
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
@@ -51,6 +53,17 @@ describe("demo route", () => {
     expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
     expect(fetchMissionByScenario).toHaveBeenCalledWith(REPRESENTATIVE_MISSION_ID, { includeV6: true });
     expect(appendMissionEvent).not.toHaveBeenCalled();
+  });
+  it("opens the approved representative snapshot without sign-in and without reading the DB", async () => {
+    vi.clearAllMocks();
+    vi.spyOn(supabase.auth, "getSession").mockResolvedValue({ data: { session: null }, error: null });
+    window.scrollTo = vi.fn();
+    render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
+    const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
+    expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
+    expect(screen.getByText("수행 기록 저장 안 됨")).toBeInTheDocument();
+    expect(fetchMissionByScenario).not.toHaveBeenCalled();
+    expect(requestFeedback).not.toHaveBeenCalled();
   });
 });
 

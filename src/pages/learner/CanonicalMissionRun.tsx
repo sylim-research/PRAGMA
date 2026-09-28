@@ -59,7 +59,8 @@ import { CONSENT_VERSION, POLICY_VERSION } from "@/lib/research/versions";
 import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
-import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
+import { supabase } from "@/integrations/supabase/client";
+import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -1582,7 +1583,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const [localSession] = useState(() => createDctFeedbackSession());
   const feedbackSession = sharedSession ?? localSession;
   const [ready, setReady] = useState(localPilot);
-  const previewEvaluation = useMemo<DctEvaluation>(() => localPilot ? {
+  // 비로그인 시연(실제 미션이지만 AI 호출 없음)도 로컬 파일럿처럼 작성된 안내만 보여 준다.
+  const authoredGuidanceOnly = localPilot || (!runtime && Boolean(mission.scenarioId));
+  const previewEvaluation = useMemo<DctEvaluation>(() => authoredGuidanceOnly ? {
     // Authored display guidance only. Never inspect the answer or persist this as an evaluation.
     available: false,
     criteria: [{ key: "meaning", label: "의미 충실성", question: "원문의 내용과 확정성을 유지했나요?", level: "recommend", body: quest.feedback.action }],
@@ -1592,7 +1595,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     highlights: [],
     example: quest.referenceAnswer,
     takeaway: quest.feedback.action,
-  } : evaluateDct(quest, first), [first, localPilot, quest]);
+  } : evaluateDct(quest, first), [authoredGuidanceOnly, first, quest]);
   const [evaluation, setEvaluation] = useState<DctEvaluation>(previewEvaluation);
   const [runtimeFeedback, setRuntimeFeedback] = useState<RuntimeFeedback | undefined>(response?.runtimeFeedback);
   const [revised, setRevised] = useState(() => devAutofill ? quest.referenceAnswer : first);
@@ -1709,9 +1712,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
           {(!revisionOpen || recheckRequested) && <section className={`${panel} overflow-hidden border ${feedbackUnavailable || needsChange ? "border-[#E0CB72]" : "border-[#B8D4C2]"}`}>
             <div className="space-y-1.5 p-3 sm:p-3.5">
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
-              {(localPilot || feedbackUnavailable) && (
+              {(authoredGuidanceOnly || feedbackUnavailable) && (
                 <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#635E52]">
-                  {localPilot ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
+                  {authoredGuidanceOnly ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
                 </p>
               )}
               {/* 세 기준은 늘 보이되, 펼쳐 읽는 것은 의미→언어→화용 순서에서 처음 걸린 하나뿐이다(한 번에 한 초점). */}
@@ -1739,7 +1742,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               })}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : authoredGuidanceOnly ? "로그인 없는 시연에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
           {/* 이견은 AI가 수정을 권고했을 때 초안을 유지하는 경로다 — 그때만 보인다. */}
@@ -2983,11 +2986,18 @@ const CanonicalMissionRun = ({
     setLoading(true);
     setError(null);
     setFallbackToLegacy(false);
-    void fetchMissionByScenario(scenarioId, { includeV6: true })
-      .then((runnable) => {
+    // 비로그인 시연은 DB 권한이 없으므로 같은 승인본 스냅숏으로 보여 주고 AI는 호출하지 않는다.
+    const publicDemo = demoMode
+      ? supabase.auth.getSession().then(({ data }) => !data.session)
+      : Promise.resolve(false);
+    void publicDemo
+      .then((usePublic) => usePublic
+        ? { runnable: publicRepresentativeMission(), live: false }
+        : fetchMissionByScenario(scenarioId, { includeV6: true }).then(runnable => ({ runnable, live: true })))
+      .then(({ runnable, live }) => {
         if (cancelled) return;
         setRuntimeMission(adaptRunnableMissionToCanonical(runnable));
-        setRuntimeRunnable(runnable);
+        setRuntimeRunnable(live ? runnable : null);
       })
       .catch((reason: unknown) => {
         if (cancelled) return;
@@ -3005,7 +3015,7 @@ const CanonicalMissionRun = ({
       });
 
     return () => { cancelled = true; };
-  }, [scenarioId]);
+  }, [demoMode, scenarioId]);
 
   if (courseLocation.ok === false) {
     return (
