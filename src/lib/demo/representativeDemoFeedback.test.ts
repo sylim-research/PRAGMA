@@ -25,5 +25,7 @@ describe("representative mission model house", () => {
     expect(recommendation.reason_choice.accepted_id).not.toBe(DEMO_MJT_ANSWERS.A2.reasonId);
     const attendance = items.find(item => item.id === 3)!;
     expect(attendance.corrections[Number(DEMO_MJT_ANSWERS.A3.correctionId!.split("-")[1])].is_valid).toBe(false);
+    const poster = items.find(item => item.id === 5)!;
+    expect(poster.candidates[0].accepted_band_codes).not.toContain(DEMO_MJT_ANSWERS.A5.candidatePicks!["A5-0"]);
   });
 });

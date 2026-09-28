@@ -8,6 +8,7 @@ import {
   ArrowDown,
   ArrowRight,
   Lightbulb,
+  Rocket,
   RotateCcw,
   Sparkles,
   X,
@@ -86,7 +87,7 @@ function DemoFillButton() {
   if (!fill) return null;
   return (
     <button type="button" onClick={fill}
-      className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#F2C744] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_2px_6px_rgba(201,166,46,0.35)] transition-colors hover:bg-[#E6B92F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
+      className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FFD43B] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_2px_8px_rgba(255,196,0,0.45)] transition-colors hover:bg-[#FFC61A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
       <Sparkles aria-hidden className="h-4 w-4" />답안 자동 채우기
     </button>
   );
@@ -341,7 +342,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className="h-12 w-full" onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`h-12 w-full text-[15.5px] font-extrabold ${config.previewOnly ? "" : "bg-[#FFD43B] text-[#15202B] shadow-[0_4px_14px_rgba(255,196,0,0.4)] hover:bg-[#FFC61A]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : <><Rocket aria-hidden className="mr-2 h-[18px] w-[18px]" />학습 미션 시작하기</>} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -924,8 +925,12 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
+  const demoAnswer = useDemoAnswer(quest.id);
   const [picks, setPicks] = useState<Record<string, string>>(() => devAutofill
-    ? Object.fromEntries(quest.candidates.flatMap(candidate => candidate.acceptedAnswers[0] ? [[candidate.id, candidate.acceptedAnswers[0]]] : []))
+    ? Object.fromEntries(quest.candidates.flatMap(candidate => {
+      const pick = demoAnswer?.candidatePicks?.[candidate.id] ?? candidate.acceptedAnswers[0];
+      return pick ? [[candidate.id, pick]] : [];
+    }))
     : {});
   const [submitted, setSubmitted] = useState(false);
   const allPicked = quest.candidates.every(candidate => Boolean(picks[candidate.id]));
@@ -1768,7 +1773,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 const expanded = localPilot || (!passed && criterion.key === primaryCriterion.key);
                 return (
                   <article key={criterion.key} className={`rounded-xl border px-4 py-2.5 ${localPilot ? "border-[#E2DED3] bg-[#FAF9F5]" : FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5">
                       <h3 className="text-[15px] font-black text-[#2B3647]">{criterion.label}</h3>
                       {!localPilot && (
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
@@ -1779,7 +1784,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     {expanded
                       ? <>
                         <p className="mt-1.5 text-[14.5px] leading-6">{conciseFeedback(criterion.body)}</p>
-                        <FeedbackRemainder text={criterion.body} />
                       </>
                       : !passed && <p className="mt-1 text-[14.5px] leading-6 text-[#5A6673]">{feedbackSentences(criterion.body)[0]}</p>}
                   </article>
@@ -1822,11 +1826,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             </>
           ) : (
             <ActionBar>
-              {/* 양자택일 한 줄. 권하는 쪽만 진하게 한다 — 보완 권장이면 수정하기, 모두 좋으면 이대로 확정. */}
+              {/* 양자택일 한 줄. 둘 다 타당한 학습자 결정이므로 같은 무게로 채운다 — 수정하기는 네이비, 이대로 확정은 노랑. */}
               <div className="grid grid-cols-2 gap-2">
-                <Button variant={needsChange ? "default" : "outline"} className={`h-12 w-full ${needsChange ? "" : "border-[#15202B] text-[#15202B]"}`} onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                <Button variant="outline" className={`h-12 w-full font-bold text-[#15202B] ${needsChange ? "border-2 border-[#E3C766] bg-[#FFF8E1] hover:bg-[#FFF1C2]" : "border-[#F2C744] bg-[#F2C744] hover:bg-[#E6B92F]"}`} aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
-                  onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}>이대로 확정</Button>
+                <Button className="h-12 w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                <Button className="h-12 w-full bg-[#FFD43B] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(255,196,0,0.35)] hover:bg-[#FFC61A]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
+                  onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />이대로 확정</Button>
               </div>
               {/* 보완 권장인데 그대로 두려면 이유 한 줄을 남긴다(이견 기록). */}
               {needsChange && !localPilot && keepOpen && (
@@ -1834,7 +1838,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   <label htmlFor={`${quest.id}-keep-reason`} className="text-[13.5px] font-bold text-[#2B3647]">이대로 두는 이유를 한 줄만 적어 주세요.</label>
                   <div className="mt-2 flex gap-2">
                     <Input id={`${quest.id}-keep-reason`} value={keepReason} onChange={(event) => setKeepReason(event.target.value)} placeholder="예: 이 관계에선 이 말투가 자연스러워요" className="h-11 flex-1 bg-white text-[14.5px]" />
-                    <Button className="h-11 shrink-0 bg-[#F2C744] px-5 font-bold text-[#15202B] hover:bg-[#E6B92F] disabled:bg-[#F6E3A1] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
+                    <Button className="h-11 shrink-0 bg-[#FFD43B] px-5 font-bold text-[#15202B] hover:bg-[#FFC61A] disabled:bg-[#FFEBA6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
                   </div>
                 </div>
               )}
