@@ -118,8 +118,8 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByText("보완 권장", { exact: true })).not.toBeInTheDocument();
     expect(screen.queryByText(/AI가 생성한 참고 피드백/)).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "이 번역으로 확정하기" })).toBeEnabled();
-    click("한 번 다듬어보기");
+    expect(screen.getByRole("button", { name: "이대로 확정" })).toBeEnabled();
+    click("수정하기");
     expect(screen.getByRole("textbox")).toHaveValue(first);
     // 다듬기 화면은 원문과 내 번역만 둔다 — 접히는 「원문·상황 다시 보기」는 없앴다.
     expectCompactContext("A-DCT");

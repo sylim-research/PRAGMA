@@ -118,7 +118,7 @@ describe("instructor experience", () => {
     expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다/)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     fireEvent.click(screen.getByRole("button", { name: /최종안 확정하기/ }));

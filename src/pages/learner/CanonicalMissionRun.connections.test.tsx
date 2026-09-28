@@ -64,7 +64,7 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.queryByText("언어 자연성")).not.toBeInTheDocument();
     const point = screen.getByRole("heading", { name: "의미 충실성" }).closest("article")!.querySelector("p")!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: "한 번 다듬어보기" }));
+    fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     expect(screen.getByRole("heading", { name: "피드백을 참고해 다시 써보세요." })).toBeInTheDocument();
     expect(screen.getAllByText(point)).toHaveLength(1);
     expect(screen.queryByRole("heading", { name: "의미 충실성" })).not.toBeInTheDocument();
@@ -127,18 +127,14 @@ describe("CanonicalMissionRun completion connections", () => {
     render(<DctFeedbackView quest={quest} response={{ first, revised: first, reflected: false }} onDone={onDone} />);
     act(() => vi.advanceTimersByTime(1300));
 
-    const retain = screen.getByRole("button", { name: "내 번역을 유지하고 확정하기" });
-    expect(retain).toBeDisabled();
-    expect(screen.getByText(/첫 번역을 유지하려면/)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: /내 판단 남기기/ }));
-    fireEvent.change(screen.getByPlaceholderText("어떤 점에서 다르게 봤는지 한 줄로 적어 주세요."), {
+    fireEvent.click(screen.getByRole("button", { name: "이대로 확정" }));
+    const confirm = screen.getByRole("button", { name: "확정" });
+    expect(confirm).toBeDisabled();
+    fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), {
       target: { value: "이미 합의된 일정이라 더 직접적으로 말해도 된다고 판단했습니다." },
     });
-    fireEvent.click(screen.getByRole("button", { name: "내 판단 남기기" }));
-
-    expect(retain).toBeEnabled();
-    fireEvent.click(retain);
+    expect(confirm).toBeEnabled();
+    fireEvent.click(confirm);
     expect(onDone).toHaveBeenCalledWith(expect.objectContaining({
       first,
       revised: first,

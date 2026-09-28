@@ -70,17 +70,17 @@ describe("one DCT revision recheck", () => {
     vi.mocked(requestFeedback).mockResolvedValueOnce({ ok: true, feedback: clear })
       .mockResolvedValueOnce({ ok: true, feedback: feedback(2) });
     const { mission } = openDraft();
-    await screen.findByText("1차 선택권 재검토");
-    expect(screen.getByRole("button", { name: "다른 표현도 시도해보기" })).toBeEnabled();
+    await screen.findByRole("heading", { name: "화용적 적절성" });
+    expect(screen.getByRole("button", { name: "수정하기" })).toBeEnabled();
     if (revise) {
-      click("다른 표현도 시도해보기");
+      click("수정하기");
       fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
       click("수정안 다시 확인하기");
       await screen.findByRole("heading", { name: "수정안 AI 피드백" });
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
       click("최종안 확정하기");
-    } else click("이 번역으로 확정하기");
+    } else click("이대로 확정");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(revise ? 2 : 1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: revise ? C : A, feedback: clear });
@@ -91,9 +91,9 @@ describe("one DCT revision recheck", () => {
     openDraft();
     await screen.findByText("1차 선택권 재검토");
     expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
-    click(/내 판단 남기기/);
-    fireEvent.change(screen.getByPlaceholderText("어떤 점에서 다르게 봤는지 한 줄로 적어 주세요."), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
-    click("내 판단 남기기"); click("내 번역을 유지하고 확정하기");
+    click("이대로 확정");
+    fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
+    click("확정");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: A,
@@ -107,7 +107,7 @@ describe("one DCT revision recheck", () => {
       .mockImplementationOnce(() => new Promise(resolve => { settle = resolve; }));
     const { mission, before } = openDraft();
     await screen.findByText("1차 선택권 재검토");
-    click("한 번 다듬어보기");
+    click("수정하기");
     fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
     const recheckButton = screen.getByRole("button", { name: "수정안 다시 확인하기" });
     fireEvent.click(recheckButton); fireEvent.click(recheckButton);

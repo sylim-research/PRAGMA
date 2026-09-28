@@ -98,7 +98,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。" } });
     click("번역 제출하기");
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
-    click("이 번역으로 확정하기");
+    click("이대로 확정");
     expect(snapshot().completed).toBe(true);
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();
   });

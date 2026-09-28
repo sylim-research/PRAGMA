@@ -113,7 +113,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(requestFeedback).toHaveBeenCalledWith(mission, first);
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
-    click("다른 표현도 시도해보기");
+    click("수정하기");
     expect(screen.getByRole("list", { name: "미션 안내, 적절성 판단, 번역하기, 피드백, 재검토" })).toBeInTheDocument();
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
@@ -252,7 +252,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     const first = "请问方便把报告的原文件再发给我吗？";
     fireEvent.change(screen.getByRole("textbox", { name: /중국어로 옮겨 보세요/ }), { target: { value: first } });
     fireEvent.click(screen.getByRole("button", { name: "번역 제출하기" }));
-    fireEvent.click(await screen.findByRole("button", { name: "이 번역으로 확정하기" }));
+    fireEvent.click(await screen.findByRole("button", { name: "이대로 확정" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("학습 기록을 저장하지 못했습니다");
     expect(save).toHaveBeenCalledTimes(1);
     const [originalInput, originalId] = save.mock.calls[0];
