@@ -549,3 +549,10 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - `CanonicalMissionRun.recheck.test.tsx`, `dctFeedbackSession.test.ts` 및 기존 관련 검사: 서로 다른 focused 10개 통과, 앱 typecheck 통과. A/B 입력 분리·중복/3차 방지·유지/수정/실패·최종 C·reference 지연 공개·1차 provenance와 두 회차 이벤트 payload 보존을 mock으로 확인했다.
 - fallback 복원 후속: 위 10개는 초기 구현 당시 기록이다. 단일 공급자 호출 강제 검사를 HTTP 400/404 fallback 동작 검사로 교체하고, 세션 4개+UI 3개 **focused 7개 및 typecheck**를 통과했다. 실제 서버 호출 구간의 mock 실행에서 내부 4호출이 학습자 A/B 2회차로 처리됨을 확인했다. 유지 1회·수정 2회·B 입력·3차 없음·2차 실패 뒤 최종 C 저장도 재확인했다. 세부 실행과 환경 제약은 위 dev-log의 후속 정정을 따른다.
 - 운영 AI·DB·E2E·배포 없음. EVD-20260926-02의 기존 운영 종단 증거와 구분한다. 콘텐츠 hash 불변은 콘텐츠 미수정과 fixture 전달 검사 범위이며 운영 재해시가 아니다. 2차 영속화는 기존 연구 이벤트 저장 조건에 의존한다.
+
+## EVD-20260928-01 · 대표 택배 Live UI 검증과 완료 후 재진입 회귀 근거
+
+- ITER-20260928-01. 증거 정본: C:/PRAGMA_THESIS_LOCAL/05_증거/앱통합검증/2026-09-28_택배대표_LiveUI.
+- attempt-entry-lock.json: 실제 KEEP 완료·기록 reload·재진입 후 동일 attempt ID로 저장된 두 entry 이벤트. attempt-regression-before-configured.log 및 attempt-regression-after.log: 원인 확인과 최소 수정의 red/green 검사.
+- main/deployment·동일 mission/content hash·시간순 화면 및 두 경로의 저장/이벤트 대조는 같은 폴더의 최종 README.md와 capture-manifest.json으로 연결한다. 이 항목의 작성 시점에는 배포 후 두 경로 재수행이 아직 완료되지 않았다.
+- local 테스트·UI 관찰·운영 영속화의 입증 범위를 구분한다. 콘텐츠 승인·학습효과·전 교과목 검증으로 확대하지 않는다.

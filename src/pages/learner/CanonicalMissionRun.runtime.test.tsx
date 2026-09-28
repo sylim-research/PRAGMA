@@ -85,7 +85,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       mission_status: "reviewed", release_gate_mode: "legacy_reviewed", direction: "ko_zh" as const, mission };
     vi.mocked(requestFeedback).mockResolvedValue({ ok: false, error: "test feedback unavailable" });
     vi.mocked(saveMissionAttempt).mockResolvedValue({ ok: true, id: "log-1" });
-    render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
+    const view = render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
     const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
     click(/학습 미션 시작하기/);
     click("다소 적절"); click("답안 확인하기"); click(/^다음:/);
@@ -129,6 +129,17 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(input.mpjResponses?.[1]).toMatchObject({ scale_code: "very_appropriate", reason_id: reason.id });
     expect(requestFeedback).toHaveBeenCalledTimes(2);
     expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, revised);
+    await screen.findByText("학습 기록에 저장되었습니다.");
+    const firstEntry = vi.mocked(appendMissionEvent).mock.calls.find(([event]) => event.eventType === "mission_session_opened")![0];
+    // Completing, viewing records and re-entering mounts a fresh runner with empty answers.
+    // Its identity must also be fresh, so the previous feedback slots cannot be reused.
+    view.unmount();
+    render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
+    expect(screen.getByRole("button", { name: /학습 미션 시작하기/ })).toBeInTheDocument();
+    const entries = vi.mocked(appendMissionEvent).mock.calls.filter(([event]) => event.eventType === "mission_session_opened");
+    expect(entries.at(-1)![0].attemptId).not.toBe(firstEntry.attemptId);
+    expect(entries.at(-1)![0].contentHash).toBe(firstEntry.contentHash);
+
   });
   beforeEach(() => {
     vi.clearAllMocks();
