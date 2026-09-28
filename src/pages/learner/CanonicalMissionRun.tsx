@@ -2846,7 +2846,10 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
-    <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>}>
+    <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="flex items-center gap-3">
+      {demoMode && <span className="whitespace-nowrap rounded-full border border-[#F2C744]/70 px-2.5 py-0.5 text-[11px] font-bold text-[#F2C744]">시연<span className="hidden sm:inline"> · 수행 기록 저장 안 됨</span></span>}
+      <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction}</span>
+    </span>}>
       {isDevPreview && (
         <DevPreviewToolbar
           sceneIntroConfig={sceneIntroConfig}
@@ -2931,29 +2934,17 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             />
           </div>
         )}
-        {demoMode && <div aria-hidden className="h-24" />}
-        {demoMode && (
-          // 시연 모드 바 — 화면 아래에 항상 떠 있어 스크롤하지 않아도 자동 채우기를 누를 수 있다.
-          <div className="fixed inset-x-0 bottom-0 z-40 px-3 pb-3 sm:px-4">
-            <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-2xl bg-[#15202B] px-4 py-3 text-white shadow-[0_8px_28px_rgba(21,32,43,0.28)]">
-              <p className="flex flex-wrap items-center gap-x-2 text-[13px]" role="status">
-                <span className="inline-block h-2 w-2 rounded-full bg-[#F2C744]" aria-hidden />
-                <span className="font-black">대표 미션 미리 보기</span>
-                <span className="text-white/70">수행 기록 저장 안 됨</span>
-              </p>
-              {sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null ? (
-                <div className="flex items-center gap-3">
-                  <span className="hidden text-[12.5px] text-white/70 sm:inline">예시 답안을 채운 뒤 확인만 누르세요</span>
-                  <Button className="h-11 rounded-xl bg-[#F2C744] px-5 text-[15px] font-black text-[#15202B] hover:bg-[#E6B92F]" onClick={() => {
-                    setDevAutofillQuestId(quest.id);
-                    setRenderNonce(current => current + 1);
-                    window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 80);
-                  }}><Sparkles aria-hidden className="mr-1.5 h-4 w-4" />답안 자동 채우기</Button>
-                </div>
-              ) : (
-                <span className="text-[12.5px] text-white/70">문항 화면에서 「답안 자동 채우기」를 쓸 수 있습니다</span>
-              )}
-            </div>
+        {demoMode && sceneIntroStep === null && !mpjRecapOpen && !completed && reviewIndex === null && (
+          // 시연 조수 버튼 — 문항 화면에서만 오른쪽 아래에 작게 띄운다. 주 버튼과 다투지 않게 흰 바탕에 노란 테두리.
+          <div className="fixed bottom-5 right-5 z-40">
+            <Button variant="outline" className="relative h-11 rounded-full border-2 border-[#E3C766] bg-white px-4 text-[14px] font-bold text-[#15202B] shadow-[0_4px_14px_rgba(21,32,43,0.12)] hover:bg-[#FFF8E1]" onClick={() => {
+              setDevAutofillQuestId(quest.id);
+              setRenderNonce(current => current + 1);
+              window.setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }), 80);
+            }}>
+              {questIndex === 0 && !responses[quest.id] && <span aria-hidden className="pointer-events-none absolute inset-0 rounded-full border-2 border-[#F2C744] animate-ping [animation-iteration-count:3]" />}
+              <Sparkles aria-hidden className="mr-1.5 h-4 w-4 text-[#C9A62E]" />답안 자동 채우기
+            </Button>
           </div>
         )}
       </div>
