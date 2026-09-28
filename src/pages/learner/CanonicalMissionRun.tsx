@@ -636,7 +636,6 @@ function ReferenceExamples({ title, items, font }: { title: string; items: strin
   return (
     <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
       <h4 className="font-bold"><span aria-hidden>✅ </span>{title}</h4>
-      <p className="text-[12.5px] font-bold text-[#8A6A00]">이렇게 고칠 수도 있어요. 정답은 하나가 아닙니다.</p>
       <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
         <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
         <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
@@ -969,7 +968,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
             // MJT1·2와 같은 색 규칙: 답한 뒤 참고 답안은 초록 테두리, 내가 고른 오답은 연한 빨강.
             return <button key={option.id} type="button" role="radio" aria-checked={picked} disabled={submitted}
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
-              className={`min-h-12 rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
+              className={`min-h-[42px] rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
             </button>;
           })}
@@ -2341,7 +2340,6 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
         <h2 className="text-[17px] font-black text-[#15202B]"><span aria-hidden>✅ </span>참고 표현</h2>
-        <p className="mt-0.5 text-[13.5px] font-bold text-[#8A6A00]">이렇게 옮길 수도 있어요. 정답은 하나가 아닙니다.</p>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>
