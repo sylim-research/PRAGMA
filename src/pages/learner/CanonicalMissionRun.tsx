@@ -2537,7 +2537,10 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const attemptStorageKey = runtime
     ? `pragma:mission-attempt:${runtime.scenario_id}:${courseContext?.assignmentId ?? "direct"}`
     : "pragma:mission-attempt:preview";
-  const [attemptId, setAttemptId] = useState(() => getOrCreateMissionAttemptId(attemptStorageKey));
+  // Live re-entry starts with empty answers, so it must also start a fresh attempt and feedback session.
+  const [attemptId, setAttemptId] = useState(() => runtime
+    ? rotateMissionAttemptId(attemptStorageKey)
+    : getOrCreateMissionAttemptId(attemptStorageKey));
   const feedbackSession = useMemo(() => createDctFeedbackSession(runtime
     ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined), [attemptId, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
