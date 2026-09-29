@@ -21,7 +21,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <tbody>
     <tr><td>🖥️&nbsp;&nbsp;웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
-    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
   </tbody>
 </table>
 
@@ -136,9 +136,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="Fig. 4 시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
-- **콘텐츠 생성·AI 검토**에는 OpenAI GPT-4.1 계열 모델을 사용합니다.
-- **교차 검토**에는 생성 모델과 다른 제공사의 Claude Opus 5를 사용합니다.
-- **AI 피드백**에는 GPT-4.1 mini, **음성**에는 GPT-4o Transcribe와 ElevenLabs를 사용합니다.
+- **학습 미션 생성**에는 GPT-5.5, **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
+- **AI 검토**에는 GPT-4.1, **교차 검토**에는 다른 제공사의 Claude Opus 5를 사용합니다.
+- **AI 피드백**에는 GPT-4.1 mini, **음성**에는 GPT-4o Transcribe(인식)와 ElevenLabs(합성)를 사용합니다.
 - **구현**은 React·TypeScript와 Supabase(Edge Functions·PostgreSQL)로 구성됩니다.
 
 <br>
