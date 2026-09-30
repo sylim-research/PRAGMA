@@ -116,7 +116,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 7. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th width="190" align="left">단계</th><th width="540" align="left">핵심 설계·개선</th><th width="100" align="left">근거</th></tr></thead>
+  <thead><tr><th width="27%" align="left">단계</th><th width="60%" align="left">핵심 설계·개선</th><th width="13%" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름 구현, 중→한 번역·통역까지 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질관리·최종 승인</td><td>규칙·AI·교차 검토 뒤 교수자가 최종 승인하는 단계별 검수</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
