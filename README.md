@@ -31,9 +31,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 ## 1. PRAGMA 워크플로우
 
-<p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="Fig. 1 PRAGMA 워크플로우: 콘텐츠 제작 워크플로우, 수업 운영 지원, 통번역 학습 워크플로우" width="100%"></p>
+<p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="Fig. 1 PRAGMA 워크플로우: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우" width="100%"></p>
 
-> <small>AI 콘텐츠 제작에서 학습자의 최종 산출까지를 하나의 흐름으로 연결해 설계·구현했습니다.</small>
+> <small>AI 생성 콘텐츠의 제작에서 학습자의 최종 산출까지를 하나의 흐름으로 연결해 설계·구현했습니다.</small>
 
 <br>
 
@@ -47,10 +47,10 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 ## 3. 통번역 학습 워크플로우
 
-<p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="Fig. 3 통번역 학습 워크플로우: MJT 5문항과 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
+<p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="Fig. 3 통번역 학습 워크플로우: 5개의 MJT 판단 문항과 1개의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
-- **학습 미션**은 MJT 5문항과 DCT형 통번역 과제 1개로 구성됩니다.
-- **MJT 문항**에서는 제시된 표현을 판단·선택하고 교정합니다.
+- **학습 미션**은 5개의 MJT 판단 문항과 1개의 DCT형 통번역 과제로 구성됩니다.
+- **MJT 판단 문항**에서는 제시된 표현을 판단하고 선택하거나 수정합니다.
 - **통번역 과제**에서는 별도의 원문을 번역 또는 통역합니다.
 - **AI 피드백**은 채점이 아니며, 최종 산출은 학습자가 결정합니다.
 
@@ -62,14 +62,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="160" align="left">조건</th><th width="530" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
-    <tr><td>관계·상황</td><td>상대적 권력(P), 사회적 거리(D), 행위 부담도(R) 기준</td></tr>
+    <tr><td>관계·상황 조건</td><td>상대적 권력(P)·사회적 거리(D)·행위 부담도(R)</td></tr>
     <tr><td>언어 방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
     <tr><td>학습 수준</td><td>입문&ensp;|&ensp;중급&ensp;|&ensp;고급</td></tr>
   </tbody>
 </table>
 
-> <small>9개 목표 화행과 관계·상황 조건을 달리해 학습 미션을 구성하며, P·D·R은 관계·상황을 구체화하는 기준입니다.</small>
+> <small>9개 목표 화행과 관계·상황 조건을 달리해 학습 미션을 구성하며, P·D·R을 해석 틀로 삼아 관계·상황 조건을 구성합니다.</small>
 
 <br>
 
@@ -81,7 +81,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 지문 (SHA-256)</td><td>최초 산출</td></tr>
     <tr><td>자동 품질 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
-    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종 산출 · 이견</td></tr>
+    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종 산출 · 학습자 의견</td></tr>
   </tbody>
 </table>
 
@@ -99,7 +99,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.2.1 · 부록 A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
     <tr><td>4.2.4 · 부록 C</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
-    <tr><td>4.2.5</td><td>AI 검토와 교차 점검</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
+    <tr><td>4.2.5</td><td>AI 검토와 모델 간 교차 검토</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
     <tr><td>4.2.6</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.3.2~4</td><td>MJT, 통번역 과제, AI 피드백</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
     <tr><td>4.3.5</td><td>학습 수행 기록 저장·조회</td><td><a href="src/pages/learner/LearnerRecords.tsx"><code>LearnerRecords.tsx</code></a></td></tr>
@@ -119,12 +119,12 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="250" align="left">단계</th><th width="560" align="left">핵심 설계·개선</th><th width="120" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름 구현, 중→한 번역·통역까지 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
-    <tr><td>콘텐츠 품질관리·최종 승인</td><td>규칙 점검, AI 검토, 교차 검토 뒤 교수자가 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
+    <tr><td>콘텐츠 품질관리·최종 승인</td><td>자동 품질 점검과 AI 검토(필요 시 교차 검토) 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
     <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
-    <tr><td>MJT → DCT형 통번역 과제</td><td>MJT 5문항과 DCT형 통번역 과제를 한 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
+    <tr><td>MJT → DCT형 통번역 과제</td><td>5개의 MJT 판단 문항과 DCT형 통번역 과제를 한 학습 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
     <tr><td>9개 목표 화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
-    <tr><td>의미 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용 판정을 보류하고 의미부터 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
-    <tr><td>DCT 수정안 재확인</td><td>최초안 피드백만 보던 수정안 확정 전에 재확인 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
+    <tr><td>의미 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용 피드백을 보류하고 의미부터 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
+    <tr><td>수정안 B의 2차 AI 피드백</td><td>최초 산출 A에만 주던 AI 피드백을 수정안 B에도 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
   </tbody>
 </table>
 
@@ -150,8 +150,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <tbody>
     <tr><td>의미 충실성</td><td>원문의 핵심 의미와 화행 목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>관계·상황과 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
-    <tr><td>학습 미션</td><td>MJT 5문항과 DCT형 통번역 과제 1개를 연결한 상위 학습 단위</td></tr>
-    <tr><td>MJT</td><td>제시된 표현의 적절성을 판단·선택하고 교정하는 과제</td></tr>
+    <tr><td>학습 미션</td><td>5개의 MJT 판단 문항과 1개의 DCT형 통번역 과제를 연결한 상위 학습 실행 단위</td></tr>
+    <tr><td>MJT</td><td>제시된 표현을 판단하고 선택하거나 수정하는 과제</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>DCT 형식을 참고해 별도 원문을 통번역하도록 재구성한 과제</td></tr>
     <tr><td>적절성 판단 범주</td><td>과소·적정·과잉으로 나누는 교육적 분류. 단일 점수 척도가 아님</td></tr>
     <tr><td>관계·상황 조건</td><td>참여자 관계와 행위 부담 등을 드러내는 구체적 장면 조건</td></tr>
