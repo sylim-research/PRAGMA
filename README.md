@@ -92,7 +92,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="110" align="left">논문</th><th width="210" align="left">내용</th><th width="430" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="120" align="left">논문</th><th width="270" align="left">내용</th><th width="560" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
@@ -146,7 +146,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 9. 주요 용어
 
 <table>
-  <thead><tr><th width="190" align="left">용어</th><th width="520" align="left">정의</th></tr></thead>
+  <thead><tr><th width="200" align="left">용어</th><th width="640" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미 충실성</td><td>원문의 핵심 의미와 화행 목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>관계·상황과 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
