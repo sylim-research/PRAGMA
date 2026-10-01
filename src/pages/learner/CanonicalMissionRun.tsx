@@ -765,7 +765,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
             else setAnswered(true);
           }}>{judgmentCommitted ? "이유 확정하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : (
           <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
@@ -853,7 +853,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                           </span>
                         )}
                       </span>
-                      {answered && <NoteLine>{correction.note}</NoteLine>}
+                      {answered && <NoteLine><RichLine text={correction.note} /></NoteLine>}
                     </button>
                   );
                 })}
@@ -869,9 +869,9 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>교정안 확인하기</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>수정안 확정하기</Button>
         ) : (
           <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ ...(!correctionOnly ? { judgment } : {}), correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
@@ -934,7 +934,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       </section>}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
+      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 확정하기</Button>
         : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -983,13 +983,13 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
               <span className="sr-only">{ok ? "O " : "X "}</span>
               가능한 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
             </p>
-            <NoteLine>{candidate.note}</NoteLine>
+            <NoteLine><RichLine text={candidate.note} /></NoteLine>
           </div>;
         })()}
       </fieldset>)}</div>
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/${total}개 표현을 판단했습니다.` : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확인하기</Button>
+      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확정하기</Button>
         : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -1094,7 +1094,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_max-content] sm:items-start sm:gap-4">
                     <div className="min-w-0">
                       <p className={`${targetFont} text-[16.5px] leading-7`}>{candidate.text}</p>
-                      <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]">{candidate.note}</p>
+                      <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]"><RichLine text={candidate.note} /></p>
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
                       <span className={`rounded px-2 py-1 text-[11px] font-black ${isBestRole ? "bg-[#DCEFE4] text-[#245E44]" : isWorstRole ? "bg-[#F4D8D5] text-[#8B3531]" : "bg-[#EEECE6]"}`}>{role}</span>
@@ -1722,7 +1722,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 「내 판단 남기기」에 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => onDone({ first, revised: revised.trim(), reflected,
     evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });

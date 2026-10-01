@@ -92,7 +92,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     fireEvent.click(screen.getByRole("button", { name: /미션 시작하기/ }));
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "매우 적절" }));
-    fireEvent.click(screen.getByRole("button", { name: "판단 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "판단 확정하기" }));
     fireEvent.click(screen.getByRole("button", { name: /^다음:/ }));
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
@@ -108,7 +108,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     const view = render(<MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)} runtime={runtime} isDevPreview={false} /></MemoryRouter>);
     const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
     click(/미션 시작하기/);
-    click("다소 적절"); click("판단 확인하기"); click(/^다음:/);
+    click("다소 적절"); click("판단 확정하기"); click(/^다음:/);
     const reason = mission.mpj_items[1].reason_choice.options[1];
     click("매우 적절"); click("판단 확정하기");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
@@ -118,10 +118,10 @@ describe("CanonicalMissionRun live CTA route", () => {
     ["상황에 맞음", "너무 직접적", "너무 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 판단` })).getByRole("radio", { name: band }));
     });
-    click("판단 확인하기"); click(/^다음:/);
-    click(mission.mpj_items[2].corrections[1].text); click("교정안 확인하기"); click(/^다음:/);
+    click("판단 확정하기"); click(/^다음:/);
+    click(mission.mpj_items[2].corrections[1].text); click("수정안 확정하기"); click(/^다음:/);
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
-    click("수정안 제출하기"); click(/^다음:/);
+    click("수정안 확정하기"); click(/^다음:/);
     click("직접 번역해 보기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
     expect(screen.getByText("원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.")).toBeInTheDocument();
@@ -194,9 +194,9 @@ describe("CanonicalMissionRun live CTA route", () => {
     fireEvent.click(screen.getByRole("button", { name: /미션 시작하기/ }));
     expect(screen.getByRole("button", { name: "답을 선택해 주세요" })).toBeDisabled();
     for (const [confirm, next] of [
-      ["판단 확인하기", "다음: 상황에 맞는지 판단하기"],
-      ["판단 확인하기", "다음: 판단하고 고쳐 보기"],
-      ["교정안 확인하기", "다음: 부적절한 이유 찾기"],
+      ["판단 확정하기", "다음: 상황에 맞는지 판단하기"],
+      ["판단 확정하기", "다음: 판단하고 고쳐 보기"],
+      ["수정안 확정하기", "다음: 부적절한 이유 찾기"],
       ["이유 확인하기", "다음: 표현 비교하기"],
       ["두 표현 확인하기", "다음: 직접 옮겨 보기"],
     ]) {

@@ -23,7 +23,7 @@ const snapshot = () => JSON.parse(sessionStorage.getItem(storageKey)!);
 const feedbackSentence = mission.mpj_items[1].explanation_ko.split(". ")[1];
 const toSecondJudgment = () => {
   render(<MemoryRouter><CanonicalMissionRun /></MemoryRouter>);
-  click("다소 적절"); click("판단 확인하기"); click("다음: 판단하고 이유 고르기");
+  click("다소 적절"); click("판단 확정하기"); click("다음: 판단하고 이유 고르기");
 };
 describe("representative v6 reason / contrast rhythm", () => {
   beforeEach(() => {
@@ -72,16 +72,16 @@ describe("representative v6 reason / contrast rhythm", () => {
     ["상황에 맞음", "너무 직접적", "너무 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 판단` })).getByRole("radio", { name: band }));
     });
-    click("판단 확인하기");
+    click("판단 확정하기");
     click("다음: 수정안 고르기");
-    click(mission.mpj_items[2].corrections[0].text); click("교정안 확인하기");
+    click(mission.mpj_items[2].corrections[0].text); click("수정안 확정하기");
     const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
     expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("가능한 선택")).toBeInTheDocument();
     click("다음: 직접 고쳐 보기");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: revisedText } });
-    click("수정안 제출하기");
+    click("수정안 확정하기");
     const contrast = screen.getByRole("region", { name: "다른 맥락에서는?" });
     expect(within(contrast).getByText(mission.mpj_items[3].contrast.target)).toBeInTheDocument();
     expect(within(contrast).queryByRole("button")).not.toBeInTheDocument();
