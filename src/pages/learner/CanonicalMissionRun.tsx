@@ -296,8 +296,8 @@ function v6IntroSteps(outputName: string) {
 
 /** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
 const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", caption: "text-[#5D6878]" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", caption: "text-[#8A6A14]" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70" },
 } as const;
 
 function IntroPhaseColumn({ tone, title, caption, steps }: {
@@ -309,8 +309,11 @@ function IntroPhaseColumn({ tone, title, caption, steps }: {
   const t = INTRO_PHASE_TONE[tone];
   return (
     <section aria-label={`${title} 단계`}>
-      <h2 className="text-[16.5px] font-black leading-6 text-[#15202B]">{title}</h2>
-      <p className={`mt-0.5 text-[12.5px] font-bold ${t.caption}`}>{caption}</p>
+      {/* 두 국면의 제목 띠 — 같은 높이, 잉크색/노랑으로 상위 구조를 먼저 보인다(2026-10-01 Codex 안). 아래 알약 목록은 그대로. */}
+      <div className={`rounded-lg px-4 py-2.5 ${t.band}`}>
+        <h2 className="text-[17px] font-black leading-6">{title}</h2>
+        <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
+      </div>
       {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
       <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
@@ -342,13 +345,14 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
 function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
-      <div className="bg-[#15202B] px-5 py-3.5 text-white sm:px-6 sm:py-4">
-        <p className="text-[11px] font-black tracking-[0.1em] text-[#F3D248]">{config.missionLabel}</p>
-        <h1 className="mt-1 break-keep text-[19px] font-bold leading-8 tracking-[-0.01em] sm:text-[21px]">
+      {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
+      <div className="border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 pb-4 pt-5 sm:px-6">
+        <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
+        <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
         </h1>
         {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「관계와 상황」 어순은 정본. */}
-        <p className="mt-1.5 break-keep text-[14px] leading-6 text-white/75">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
+        <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
       </div>
       <div className="space-y-4 p-5 sm:px-6">
         {config.briefingOnly ? (
@@ -457,7 +461,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
-      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-[#FBF7EA] px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-3.5"
+      ? "scene-in rounded-md border-l-4 border-[#15202B] bg-[#F3F3F0] px-5 py-3 sm:px-6 sm:py-3.5"
       : "rounded-xl border border-[#EDE4C8] bg-[#FBF7EA] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
@@ -465,6 +469,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
           {headerRight}
         </div>
       )}
+      {compact && <p className="mb-1 text-[11.5px] font-black tracking-[0.08em] text-[#5D6878]">{title}</p>}
       {compact ? (
         // 화행은 상단 바에 이미 있다. 이 카드는 장면만 전한다.
         // 배경 문장은 한 단 낮추고, 내가 할 말(화행)을 적은 문장을 대시와 함께 세운다.
@@ -547,8 +552,9 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
       ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-1 ring-[#15202B]"
       : "border-[#E3DDCF] bg-white hover:bg-[#FAF8F2]";
   }
-  if (correct) return "border-[#4D8568] bg-white text-[#245E44]";
-  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531]";
+  // 판정 테두리는 선택 중 테두리(border+ring-1)와 같은 굵기 — 가늘면 정답·오답이 분간되지 않는다(2026-10-01).
+  if (correct) return "border-[#4D8568] bg-white text-[#245E44] ring-1 ring-[#4D8568]";
+  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531] ring-1 ring-[#C86E68]";
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
@@ -947,13 +953,13 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         </ul>
       </section>}
       {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
-      {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
+      {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#DDD8CB] px-4 py-3" aria-label="다른 맥락에서는?">
         <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
-        {/* 메신저의 「내가 보낸 말」 모양만 빌린다 — 색은 페이지 팔레트(회청색) 안에 두어 해설·참고 표현보다 앞에 나서지 않게 한다. */}
+        {/* 메신저의 「내가 보낸 말」 — 단색 블루·흰 글자로 메시지의 생동감을 살리되, 블루는 말풍선 한 곳에만 쓴다(2026-10-01). */}
         <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md border border-[#D3DBE5] bg-[#EDF1F6] px-3.5 py-2 text-[15px] leading-7 text-[#15202B]`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#326BD6] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
@@ -1176,9 +1182,9 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
       </summary>
       <dl className="mt-1.5 flex flex-wrap gap-2.5" aria-label="단어 힌트">
         {hints.map((hint) => (
-          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-lg border border-[#EED7BF] bg-[#FFF4E8] px-3 py-1.5">
-            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[13px] font-medium leading-5 text-[#806A57]`}>{hint.source}</dt>
-            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[18px] font-medium leading-6 text-[#784A28]`}><span aria-hidden className="text-[13px] font-normal text-[#C6A789]">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
+          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-lg border border-[#DDD8CB] bg-white px-3 py-1.5">
+            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-[#15202B]`}>{hint.source}</dt>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-[#15202B]`}><span aria-hidden className="text-[13px] font-normal text-[#9AA3AE]">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
           </div>
         ))}
       </dl>
@@ -2198,14 +2204,14 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   return (
     <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-4 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
-      <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">다섯 문항에서 챙길 한 줄</span></h1>
+      <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">문항별 요점</span></h1>
       {/* 다섯 줄을 한 패널의 표처럼 — 이름 칸 폭을 고정해 한 줄 요약이 같은 선에서 시작하고, 스크롤 없이 한 화면에 들어온다. */}
       <ol className="mt-3 divide-y divide-[#EEEAE1] overflow-hidden rounded-xl border border-[#EAE5D8] bg-white">
         {lessonPoints.map((point, index) => (
           <li key={point.questId} style={{ animationDelay: `${index * 90}ms` }}
             className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-baseline gap-x-3.5 gap-y-1.5 px-4 py-2.5 sm:grid-cols-[1.75rem_6.75rem_minmax(0,1fr)] sm:gap-x-4 sm:px-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both">
             <span aria-hidden className="grid h-[26px] w-[26px] place-items-center self-start rounded-full bg-[#FAD338] text-[12.5px] font-black text-[#15202B] sm:mt-[2px]">{index + 1}</span>
-            <p className="text-[16px] font-black text-[#2F4F86]">{mission.missionFormat === "mission_v6"
+            <p className="text-[16px] font-black text-[#15202B]">{mission.missionFormat === "mission_v6"
               ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
               : point.label}</p>
             <p className="col-start-2 min-w-0 break-keep text-[16.5px] font-normal leading-[30px] text-[#263444] [overflow-wrap:anywhere] sm:col-start-3">
