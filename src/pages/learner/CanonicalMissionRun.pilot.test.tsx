@@ -104,7 +104,7 @@ describe("local learner UX pilot", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${index + 1}의 판단` })).getByRole("radio", { name: band }));
     });
     click("판단 확정하기");
-    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("가능한 판단 · 상황에 맞음")).toBeInTheDocument();
+    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("허용 판단 · 상황에 맞음")).toBeInTheDocument();
     click("다음: 번역하기"); click("직접 번역해 보기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
     const dct = screen.getByRole("textbox");

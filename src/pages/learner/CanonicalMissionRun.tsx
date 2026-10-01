@@ -26,8 +26,11 @@ function SectionIcon({ icon: Icon, tone = "amber", iconClassName = "" }: { icon:
 
 /** 해설 상자 제목 — 문항 해설 상자의 머리말. 꼬리표(NoteTag)와 같은 아이콘을 쓴다. */
 function NoteHeading() {
-  return <><BookOpenText aria-hidden className="mr-1.5 inline h-4 w-4 align-[-3px] text-[#8A6A14]" strokeWidth={2.5} />해설</>;
+  return <span className="flex items-center"><SectionIcon icon={BookOpenText} />해설</span>;
 }
+
+/** 답 확정 뒤 형제 패널(해설·참고 표현)의 제목 규격 — 24px 아이콘 칩 + 16px 굵은 제목. */
+const panelHeading = "text-[16px] font-black leading-6 text-[#15202B]";
 
 /** 해설 꼬리표 — 후보 문장·참고 표현 아래의 해설 줄이 모두 같은 표식을 쓴다. */
 function NoteTag() {
@@ -564,7 +567,7 @@ function QuestionChip({ n }: { n?: number }) {
 const REASON_PROMPT = "그렇게 판단한 이유는 무엇인가요?";
 
 // 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
-// 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「가능한 판단」, 키가 있는 선택형 = 「정답」.
+// 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「허용 판단」, 키가 있는 선택형 = 「정답」.
 function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "정답", referenceId, onSelect }: {
   option: ChoiceOption;
   value: string | null;
@@ -574,13 +577,13 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
   radio?: boolean;
   /** 키 쪽 선택지 배지. 적절성 판단은 「기준 판단」. */
   acceptedLabel?: string;
-  /** 주면 이 선택지만 acceptedLabel이고, 나머지 허용 선택지는 「가능한 판단」이다. */
+  /** 주면 이 선택지만 acceptedLabel이고, 나머지 허용 선택지는 「허용 판단」이다. */
   referenceId?: string;
   onSelect: (id: string) => void;
 }) {
   const picked = value === option.id;
   const accepted = acceptedIds.includes(option.id);
-  const badge = referenceId && option.id !== referenceId ? "가능한 판단" : acceptedLabel;
+  const badge = referenceId && option.id !== referenceId ? "허용 판단" : acceptedLabel;
   return (
     <button
       type="button"
@@ -618,7 +621,7 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
 }) {
   return (
     <div className={feedbackBox}>
-      {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict === "해설" ? <NoteHeading /> : verdict}</p>}
+      {verdict && <p className={`mb-2 ${verdict === "해설" ? panelHeading : "font-black text-[#15202B]"}`}>{verdict === "해설" ? <NoteHeading /> : verdict}</p>}
       {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
       {asList ? <ul className="list-disc space-y-1 pl-5">
         {withoutExpressionMemo(feedback).split(/\n|(?<=[.!?。！？])\s+/).filter(Boolean).map((line, index) =>
@@ -660,8 +663,8 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 /** 문항 뒤 참고 답안 상자 — 「가능한 수정 예시」와 「참고 표현」이 같은 모양을 쓴다. */
 function ReferenceExamples({ title, items, font }: { title: string; items: string[]; font: string }) {
   return (
-    <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
-      <h4 className="flex items-center font-bold"><SectionIcon icon={Quote} iconClassName="rotate-180" />{title}</h4>
+    <section className="mt-4 rounded-xl border-l-4 border-l-transparent bg-[#F8F7F2] px-4 py-3.5" aria-label={title}>
+      <h4 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />{title}</h4>
       <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
         <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
         <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
@@ -767,7 +770,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
         <p className="sr-only" aria-live="polite">
           {judgmentShown
-            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 가능한 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
+            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
@@ -931,13 +934,14 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
-      <div className="mt-4 pl-10">
+      {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
+      <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-[16.5px] leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className={`mt-4 ${feedbackBox}`} aria-label="화용 해설">
-        <h4 className="mb-2 font-black text-[#15202B]"><NoteHeading /></h4>
+        <h4 className={`mb-2 ${panelHeading}`}><NoteHeading /></h4>
         <ul className="list-disc space-y-1 pl-5">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
@@ -1003,7 +1007,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
                 {ok ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <X className="h-3.5 w-3.5" strokeWidth={3.5} />}
               </span>
               <span className="sr-only">{ok ? "O " : "X "}</span>
-              가능한 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
+              허용 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
             </p>
             <NoteLine><RichLine text={candidate.note} /></NoteLine>
           </div>;
@@ -2361,7 +2365,7 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         </div>
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className="flex items-center text-[17px] font-black text-[#15202B]"><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
+        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>

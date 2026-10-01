@@ -43,7 +43,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     // 판단 확정 직후: 네 선지와 내 선택은 남고 잠기지만, 결과는 배지·색상·스크린리더 어디에도 없다.
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: new RegExp(`^${label}`) })).toBeDisabled();
     expect(screen.getByRole("button", { name: /^매우 적절/ }).className).toContain("ring-[#15202B]");
-    for (const leak of ["내 선택", "기준 판단", "가능한 판단"]) expect(screen.queryByText(leak)).not.toBeInTheDocument();
+    for (const leak of ["내 선택", "기준 판단", "허용 판단"]) expect(screen.queryByText(leak)).not.toBeInTheDocument();
     for (const label of ["다소 적절", "다소 부적절", "매우 부적절"]) {
       const cls = screen.getByRole("button", { name: new RegExp(`^${label}`) }).className;
       expect(cls).toContain("border-[#E3DDCF]");
@@ -63,7 +63,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.getByText(/^기준 판단과 다릅니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
-    expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("가능한 판단")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("허용 판단")).toBeInTheDocument();
     expect(screen.getByText(/^핵심 이유를 골랐습니다\./)).toBeInTheDocument();
     expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("핵심 이유")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
