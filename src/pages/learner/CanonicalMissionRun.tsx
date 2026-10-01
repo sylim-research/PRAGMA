@@ -1,19 +1,38 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
+  ArrowLeftRight,
+  BookOpenText,
   Check,
   ChevronDown,
+  ClipboardList,
   ChevronRight,
   Eye,
   LoaderCircle,
   ArrowDown,
   ArrowRight,
   Lightbulb,
-  Rocket,
+  PenLine,
+  Quote,
   RotateCcw,
-  Sparkles,
   X,
 } from "lucide-react";
+
+/** 절 제목 앞의 작은 아이콘 칩 — 이모지 대신 단색 선 아이콘으로 초점을 만든다. 색은 절의 바탕색 계열을 따른다. */
+function SectionIcon({ icon: Icon, tone = "amber" }: { icon: typeof Quote; tone?: "amber" | "slate" | "navy" }) {
+  const tones = { amber: "bg-[#F6E6A4] text-[#6B5518]", slate: "bg-[#E6EBF1] text-[#2B3647]", navy: "bg-[#15202B] text-[#F7CE3E]" };
+  return <span aria-hidden className={`mr-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${tones[tone]}`}><Icon className="h-3.5 w-3.5" strokeWidth={2.25} /></span>;
+}
+
+/** 해설 상자 제목 — 문항 해설 상자의 머리말. 꼬리표(NoteTag)와 같은 아이콘을 쓴다. */
+function NoteHeading() {
+  return <><BookOpenText aria-hidden className="mr-1.5 inline h-4 w-4 align-[-3px] text-[#8A6A14]" strokeWidth={2.5} />해설</>;
+}
+
+/** 해설 꼬리표 — 후보 문장·참고 표현 아래의 해설 줄이 모두 같은 표식을 쓴다. */
+function NoteTag() {
+  return <span className="inline-flex items-center gap-1 whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><BookOpenText aria-hidden className="h-3 w-3" strokeWidth={2.5} />해설</span>;
+}
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,7 +108,7 @@ function DemoFillButton() {
   return (
     <button type="button" onClick={fill}
       className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FAD338] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_1px_4px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
-      <Sparkles aria-hidden className="h-4 w-4" />답안 자동 채우기
+      <PenLine aria-hidden className="h-4 w-4" />답안 자동 채우기
     </button>
   );
 }
@@ -344,7 +363,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : <><Rocket aria-hidden className="h-[18px] w-[18px]" />학습 미션 시작하기</>} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -580,7 +599,7 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
   );
 }
 
-// 문항별 해설 상자는 모두 이 모양 하나다(「💡 해설」).
+// 문항별 해설 상자는 모두 이 모양 하나다(「해설」 머리말 + NoteHeading 아이콘).
 const feedbackBox = "break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[15.5px] leading-7 text-[#15202B]";
 
 function FeedbackBox({ verdict, feedback, action, highlights = [], asList = false }: {
@@ -592,7 +611,7 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
 }) {
   return (
     <div className={feedbackBox}>
-      {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict}</p>}
+      {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict === "해설" ? <NoteHeading /> : verdict}</p>}
       {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
       {asList ? <ul className="list-disc space-y-1 pl-5">
         {withoutExpressionMemo(feedback).split(/\n|(?<=[.!?。！？])\s+/).filter(Boolean).map((line, index) =>
@@ -635,7 +654,7 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 function ReferenceExamples({ title, items, font }: { title: string; items: string[]; font: string }) {
   return (
     <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
-      <h4 className="font-bold"><span aria-hidden>✅ </span>{title}</h4>
+      <h4 className="flex items-center font-bold"><SectionIcon icon={Quote} />{title}</h4>
       <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
         <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
         <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
@@ -647,7 +666,7 @@ function ReferenceExamples({ title, items, font }: { title: string; items: strin
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
     <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
-      <span className="whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><span aria-hidden>💡 </span>해설</span>
+      <NoteTag />
       <span className="min-w-0">{children}</span>
     </span>
   );
@@ -755,7 +774,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           </p>
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
-        {answered && <div className="mt-4"><FeedbackBox verdict="💡 해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
+        {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
         {answered && quest.revisionExamples && <ReferenceExamples title="가능한 수정 예시" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
@@ -911,24 +930,20 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className={`mt-4 ${feedbackBox}`} aria-label="화용 해설">
-        <h4 className="mb-2 font-black text-[#15202B]">💡 해설</h4>
+        <h4 className="mb-2 font-black text-[#15202B]"><NoteHeading /></h4>
         <ul className="list-disc space-y-1 pl-5">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
       {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
-        <div className="flex items-center gap-1.5">
-          <span aria-hidden className="text-[14px]">🔄</span>
-          <h4 className="text-[14px] font-black text-[#15202B]">다른 맥락에서는?</h4>
-        </div>
+        <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
         {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
         <div className="mt-2">
           <div className="flex justify-end">
             <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#0B63CE] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
-          <p className="mt-0.5 pr-1 text-right text-[11px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
       </section>}
@@ -1788,7 +1803,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       <h3 className="text-[15px] font-black text-[#2B3647]">{criterion.label}</h3>
                       {!localPilot && (
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
-                          {passed && <Sparkles aria-hidden className="h-3 w-3" />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
+                          {passed && <Check aria-hidden className="h-3 w-3" strokeWidth={3} />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
                         </span>
                       )}
                     </div>
@@ -2339,11 +2354,11 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         </div>
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className="text-[17px] font-black text-[#15202B]"><span aria-hidden>✅ </span>참고 표현</h2>
+        <h2 className="flex items-center text-[17px] font-black text-[#15202B]"><SectionIcon icon={Quote} />참고 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>
-          <p className="mt-1.5 break-keep text-[15.5px] leading-7 text-[#15202B]"><span aria-hidden>💡 </span>{alternative.note}</p>
+          <p className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 break-keep border-t border-dashed border-[#F3E3A2] pt-2 text-[15.5px] leading-7 text-[#15202B]"><NoteTag /><span className="min-w-0">{alternative.note}</span></p>
         </li>)}</ol>
       </section>}
     </article>
@@ -2356,7 +2371,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
   const items = quests.filter(quest => quest.kind !== "dct" && quest.kind !== "dct_feedback");
   return (
     <section id="demo-record" className={`${panel} scroll-mt-24 p-5 sm:p-6`} aria-label="데모 학습 기록">
-      <h2 className="text-[17px] font-black"><span aria-hidden>📒 </span>데모 학습 기록</h2>
+      <h2 className="flex items-center text-[17px] font-black"><SectionIcon icon={ClipboardList} tone="navy" />데모 학습 기록</h2>
       <p className="mt-1 break-keep text-[13px] leading-5 text-[#6A7485]">실제 학습자는 이 기록이 「나의 학습 기록」에 저장됩니다. 데모에서는 저장하지 않고 여기에서만 보여 줍니다.</p>
       <ol className="mt-4 space-y-2.5">
         {items.map((quest, index) => {
@@ -3017,8 +3032,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
-              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 보고 한 번 더 다듬어 최종안을 만들었어요." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했어요."}</p>
+              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"} 완성</h1>
+              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 최종안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했습니다."}</p>
             </section>
             <div className="space-y-4">
               <CompletionRecord
