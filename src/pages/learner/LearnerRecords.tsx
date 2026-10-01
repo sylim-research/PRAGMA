@@ -1,42 +1,40 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { FilePenLine } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { buildLearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
 import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
+import { COURSE_PRESETS } from "@/lib/pragma/scenarioTopics";
 import { supabase } from "@/integrations/supabase/client";
 
-// 학습자 본인의 완료 기록을 전체 교과목에 걸쳐 다시 보는 화면.
-// 기록을 요약할 뿐 유형·성향·능력을 판정하지 않는다(2026-09-19 설계 판정).
+// 학습자 본인의 완료 기록을 다시 읽는 화면 — 재검토의 자료(원고 4.3.5·5.2.3).
+// 같은 미션의 수행을 한 묶음으로 모아 원문은 한 번만 보이고, 수행마다 최초→최종 표현의 차이를 표시한다.
+// 기록을 옮겨 보여 줄 뿐 점수·유형·강약점을 만들지 않는다. 고친 건수처럼 「고치는 것이 목표」로 읽히는 숫자도 두지 않는다.
 
 type ReportRecord = {
   id: string;
+  missionId: string | null;
   speechAct: SpeechActUI | null;
   taskType: "translation" | "interpreting" | "other";
-  /** 미션 원문 — 어떤 상황의 기록인지 학습자가 떠올릴 수 있게 함께 보여 준다. */
+  courseId: string | null;
+  weekNo: number | null;
   sourceText: string;
   firstResponse: string;
   revisedResponse: string;
   completedAt: string;
+  /** 저장된 AI 피드백 판정 줄 — 채점이 아니다. */
+  feedback: string[];
+  decision: "최초 산출 유지" | "수정" | null;
+  dissent: { conditions: string[]; reason: string | null } | null;
 };
 
-type MissionLogRecord = {
+type MissionLogRecord = RecordDetailRow & {
   id: string;
   mission_id: string | null;
   speech_act: string | null;
-  task_type: string | null;
-  source_text: string | null;
-  first_response: string | null;
-  revised_response: string | null;
-  completed_at: string | null;
+  course_id: string | null;
+  week_no: number | null;
   created_at: string;
 };
 
@@ -52,51 +50,49 @@ const ACTS: SpeechActUI[] = [
   "opposition",
 ];
 
-/** 모든 학습자에게 같은 회고 질문의 화행별 초점. 개인 진단이 아니다. */
-const ACT_FOCUS: Record<SpeechActUI, string> = {
-  request: "직접성·완화·선택 여지",
-  apology: "책임 인정·수리 제안",
-  thanks: "감사 이유·관계 표현",
-  compliment: "칭찬의 초점·대응 방식",
-  agreement: "초대 범위·상대 선택권",
-  refusal: "거절 명확성·관계 유지",
-  complaint: "문제 제기·해결 요청",
-  proposal: "제안 강도·협의 여지",
-  opposition: "이견 명확성·관계 조정",
-};
-
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const isSpeechAct = (value: string | null): value is SpeechActUI =>
   value !== null && ACTS.includes(value as SpeechActUI);
 
 /**
- * 모든 숫자·지도·돌아보기·수정 노트가 함께 쓰는 집계 기준(한 곳에서만 정의).
+ * 목록에 올리는 기준(한 곳에서만 정의).
  * 완료(조회 조건) + 9화행 중 하나 + 실제 미션에 연결(미션 id가 시나리오 UUID).
  * 프로토타입 시기의 `sample:` 시험 기록처럼 미션·화행 연결을 확인할 수 없는 행은 원자료로 남기되
- * 현행 요약에서는 뺀다. 과거 v5 미션의 정상 기록은 구버전이어도 포함한다.
+ * 화면에서는 뺀다. 과거 v5 미션의 정상 기록은 구버전이어도 포함한다.
  */
 function isCountableLog(row: Pick<MissionLogRecord, "mission_id" | "speech_act">) {
   return isSpeechAct(row.speech_act) && typeof row.mission_id === "string" && UUID.test(row.mission_id);
 }
+
+const COURSE_LABEL = new Map(COURSE_PRESETS.map((preset) => [preset.outline_id, preset.label]));
 
 function localRecord(session: LearningSession): ReportRecord {
   const key = session.selected_translation as keyof LearningSession["ai_translations"];
   const first = session.ai_translations[key] ?? session.selected_translation ?? "";
   return {
     id: session.session_id,
+    missionId: null,
     speechAct: isSpeechAct(session.speech_act) ? session.speech_act : null,
     taskType: session.mode === "interpretation" ? "interpreting" : "translation",
+    courseId: null,
+    weekNo: null,
     sourceText: "",
     firstResponse: first,
     revisedResponse: session.final_translation,
     completedAt: session.timestamp,
+    feedback: [],
+    decision: null,
+    dissent: null,
   };
 }
 
 function missionLogRecord(row: MissionLogRecord): ReportRecord {
+  // 관리자 기록 펼침과 같은 해석기를 쓴다 — 피드백 판정 줄·학습자 결정·이견을 같은 기준으로 읽는다.
+  const detail = buildLearningRecordDetail(row, null, "", () => "");
   return {
     id: row.id,
+    missionId: row.mission_id,
     speechAct: isSpeechAct(row.speech_act) ? row.speech_act : null,
     taskType:
       row.task_type === "interpreting"
@@ -104,14 +100,20 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
         : row.task_type === "translation"
           ? "translation"
           : "other",
+    courseId: row.course_id,
+    weekNo: row.week_no,
     sourceText: row.source_text ?? "",
     firstResponse: row.first_response ?? "",
     revisedResponse: row.revised_response ?? row.first_response ?? "",
     completedAt: row.completed_at ?? row.created_at,
+    feedback: detail.task.feedback,
+    decision: detail.task.decision,
+    dissent: detail.dissent,
   };
 }
 
 function changed(record: ReportRecord) {
+  if (record.decision) return record.decision === "수정";
   return Boolean(
     record.firstResponse.trim() &&
       record.revisedResponse.trim() &&
@@ -119,56 +121,283 @@ function changed(record: ReportRecord) {
   );
 }
 
+type Segment = { text: string; changed: boolean };
+
+/**
+ * 최초·최종 표현의 글자 단위 차이. 판정이 아니라 「어디를 바꿨는가」의 표시다.
+ * 한 글자짜리 우연한 일치(的·了 등)가 변경 사이에 끼면 읽기 어려우므로 변경으로 합친다.
+ */
+function diffSegments(before: string, after: string): { before: Segment[]; after: Segment[] } {
+  const a = [...before];
+  const b = [...after];
+  const lcs = Array.from({ length: a.length + 1 }, () => new Array<number>(b.length + 1).fill(0));
+  for (let i = a.length - 1; i >= 0; i--) {
+    for (let j = b.length - 1; j >= 0; j--) {
+      lcs[i][j] = a[i] === b[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+    }
+  }
+  const ops: { kind: "same" | "del" | "add"; ch: string }[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < a.length && j < b.length) {
+    if (a[i] === b[j]) { ops.push({ kind: "same", ch: a[i] }); i++; j++; }
+    else if (lcs[i + 1][j] >= lcs[i][j + 1]) ops.push({ kind: "del", ch: a[i++] });
+    else ops.push({ kind: "add", ch: b[j++] });
+  }
+  while (i < a.length) ops.push({ kind: "del", ch: a[i++] });
+  while (j < b.length) ops.push({ kind: "add", ch: b[j++] });
+
+  // 변경 사이에 낀 한 글자 일치는 변경으로 본다.
+  for (let k = 1; k < ops.length - 1; k++) {
+    if (ops[k].kind === "same" && ops[k - 1].kind !== "same" && ops[k + 1].kind !== "same") {
+      const ch = ops[k].ch;
+      ops.splice(k, 1, { kind: "del", ch }, { kind: "add", ch });
+      k++;
+    }
+  }
+
+  const push = (list: Segment[], text: string, isChanged: boolean) => {
+    const last = list[list.length - 1];
+    if (last && last.changed === isChanged) last.text += text;
+    else list.push({ text, changed: isChanged });
+  };
+  const result = { before: [] as Segment[], after: [] as Segment[] };
+  for (const op of ops) {
+    if (op.kind !== "add") push(result.before, op.ch, op.kind === "del");
+    if (op.kind !== "del") push(result.after, op.ch, op.kind === "add");
+  }
+  return result;
+}
+
 const TASK_LABEL: Record<ReportRecord["taskType"], string> = { translation: "번역", interpreting: "통역", other: "통번역" };
 const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
 
-/** 기록 한 건의 머리 줄 — 화행·날짜·과업. */
-function recordMeta(record: ReportRecord) {
-  return [record.speechAct ? SPEECH_ACT_UI[record.speechAct] : null, shortDate(record.completedAt), TASK_LABEL[record.taskType]]
-    .filter(Boolean).join(" · ");
+type MissionGroup = { key: string; records: ReportRecord[] };
+
+/** 같은 미션(미션 id + 원문)의 수행을 한 묶음으로. 묶음 순서는 가장 최근 수행 순. */
+function groupByMission(records: ReportRecord[]): MissionGroup[] {
+  const groups = new Map<string, ReportRecord[]>();
+  for (const record of records) {
+    const key = record.missionId ? `${record.missionId}::${record.sourceText}` : `single::${record.id}`;
+    groups.set(key, [...(groups.get(key) ?? []), record]);
+  }
+  return [...groups.entries()].map(([key, list]) => ({ key, records: list }));
 }
 
-// 글자 체계: 한국어 본문 14px · 보조 12~13px · 중국어 표현 16px(줄간격 1.75). 한 화면에서 이 값만 쓴다.
-const eyebrow = "text-[12.5px] font-semibold text-[#857653]";
-const sectionTitle = "text-[17px] font-bold text-[#15202B]";
-const rowGrid = "grid grid-cols-[4rem_minmax(0,1fr)] gap-x-3 gap-y-1";
-const rowLabel = "pt-[2px] text-[12px] font-semibold text-[#8C8471]";
-const zhText = "min-w-0 break-words font-zh text-[16px] leading-[1.65] text-[#15202B]";
+/** 묶음 머리 줄 — 수업·주차·화행·과업. */
+function groupMeta(record: ReportRecord) {
+  return [
+    record.courseId ? COURSE_LABEL.get(record.courseId) ?? null : null,
+    record.courseId && record.weekNo ? `${record.weekNo}주차` : null,
+    record.speechAct ? SPEECH_ACT_UI[record.speechAct] : null,
+    TASK_LABEL[record.taskType],
+  ].filter(Boolean).join(" · ");
+}
 
-/** 원문 — 길면 두 줄까지만 보이고 「펼치기」로 전체를 연다. */
-function SourceText({ text }: { text: string }) {
-  const [open, setOpen] = useState(false);
-  if (!text) return null;
-  const long = text.length > 70;
+// 글자 체계: 한국어 본문 14~15px · 보조 12~13px · 중국어 표현 17px. 한 화면에서 이 값만 쓴다.
+const zhLine = "font-zh text-[17px] leading-[1.8] text-[#15202B] [word-break:keep-all] break-words";
+const lineLabel = "w-9 shrink-0 pt-[5px] text-[12px] font-semibold text-[#8C8471]";
+
+function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | "after" }) {
   return (
-    <div className="break-words text-[14px] leading-6 text-[#4F6070]">
-      <p className={long && !open ? "line-clamp-2" : ""}>{text}</p>
-      {long && (
-        <button type="button" onClick={() => setOpen((v) => !v)} className="text-[12px] font-semibold text-[#344F63] hover:underline">
-          {open ? "접기" : "펼치기"}
-        </button>
+    <>
+      {segments.map((segment, index) =>
+        segment.changed ? (
+          <span
+            key={index}
+            className={
+              mode === "after"
+                ? "underline decoration-[#D6A636] decoration-2 underline-offset-[5px]"
+                : "text-[#8A949E] line-through decoration-[#8A949E]"
+            }
+          >
+            {segment.text}
+          </span>
+        ) : (
+          <span key={index}>{segment.text}</span>
+        ),
       )}
+    </>
+  );
+}
+
+/** 수행 한 번 — 날짜·결정 배지, 최초→최종(차이 표시), 「자세히」에 AI 피드백·내 결정·내 의견. */
+function Attempt({ record }: { record: ReportRecord }) {
+  const [open, setOpen] = useState(false);
+  const task = TASK_LABEL[record.taskType];
+  const revised = changed(record);
+  const diff = revised ? diffSegments(record.firstResponse, record.revisedResponse) : null;
+  const hasDetail = record.feedback.length > 0 || record.decision !== null || record.dissent !== null;
+  const detailId = `attempt-detail-${record.id}`;
+
+  return (
+    <div className="grid gap-x-6 gap-y-2 py-5 md:grid-cols-[6.5rem_minmax(0,1fr)]">
+      <div className="flex items-center gap-2 md:flex-col md:items-start md:gap-1.5 md:pt-1">
+        <span className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</span>
+        <span
+          className={[
+            "rounded-full border bg-white px-2.5 py-[1px] text-[11.5px] font-bold tracking-[0.02em]",
+            revised ? "border-[#1F3A5F] text-[#1F3A5F]" : "border-[#C99A2E] text-[#8A5A14]",
+          ].join(" ")}
+        >
+          {revised ? "수정" : "유지"}
+        </span>
+      </div>
+
+      <div className="min-w-0">
+        {diff ? (
+          <dl className="space-y-1.5">
+            <div className="flex gap-3">
+              <dt className={lineLabel}>최초</dt>
+              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.before} mode="before" /></dd>
+            </div>
+            <div className="flex gap-3">
+              <dt className={lineLabel}>최종</dt>
+              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.after} mode="after" /></dd>
+            </div>
+          </dl>
+        ) : (
+          <dl className="flex gap-3">
+            <dt className={lineLabel}>최종</dt>
+            <dd className="min-w-0">
+              <p className={zhLine}>{record.revisedResponse || record.firstResponse || "기록 없음"}</p>
+              <p className="mt-0.5 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>
+            </dd>
+          </dl>
+        )}
+
+        {hasDetail && (
+          <div className="mt-3">
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls={detailId}
+              onClick={() => setOpen((v) => !v)}
+              className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#344F63] hover:text-[#15202B]"
+            >
+              {open ? "접기" : "자세히 보기"}
+              <ChevronDown aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} strokeWidth={2.25} />
+            </button>
+            {open && (
+              <dl id={detailId} className="mt-3 space-y-2.5 border-l-2 border-[#E4DFD0] pl-4 text-[14px] leading-6 text-[#26323D]">
+                {record.feedback.length > 0 && (
+                  <div>
+                    <dt className="text-[12px] font-semibold text-[#8C8471]">AI 피드백</dt>
+                    <dd>{record.feedback.join(" · ")}</dd>
+                  </div>
+                )}
+                {record.decision && (
+                  <div>
+                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 결정</dt>
+                    <dd>{record.decision === "수정" ? `AI 피드백을 본 뒤 ${task}을 수정함` : `AI 피드백을 본 뒤 최초 ${task}을 유지함`}</dd>
+                  </div>
+                )}
+                {record.dissent && (
+                  <div>
+                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 의견</dt>
+                    <dd>
+                      {record.dissent.conditions.length > 0 && <span className="block">{record.dissent.conditions.join(" · ")}</span>}
+                      {record.dissent.reason && <span className="block text-[#4F6070]">“{record.dissent.reason}”</span>}
+                    </dd>
+                  </div>
+                )}
+              </dl>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-/** 수정 노트 한 건 — 머리 줄, 원문, 내 번역 → 고친 번역. */
-function RevisionNote({ record, plain = false }: { record: ReportRecord; plain?: boolean }) {
+/** 미션 한 묶음 — 머리 줄과 원문은 한 번, 그 아래 수행을 최신순으로. */
+function MissionCard({ group }: { group: MissionGroup }) {
+  const head = group.records[0];
+  const [sourceOpen, setSourceOpen] = useState(false);
+  const longSource = head.sourceText.length > 90;
   return (
-    <article className={plain ? "" : "rounded-xl border border-[#E4DFD0] bg-white p-4"}>
-      <p className="text-[12px] font-semibold text-[#8C8471]">{recordMeta(record)}</p>
-      <dl className={`mt-2 ${rowGrid}`}>
-        {record.sourceText && <><dt className={rowLabel}>원문</dt><dd className="min-w-0"><SourceText text={record.sourceText} /></dd></>}
-        <dt className={rowLabel}>내 {TASK_LABEL[record.taskType]}</dt>
-        <dd className={zhText}>{record.firstResponse || "기록 없음"}</dd>
-        <dt className={rowLabel}>고친 {TASK_LABEL[record.taskType]}</dt>
-        <dd className={zhText}>{record.revisedResponse || "기록 없음"}</dd>
-      </dl>
+    <article className="overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]">
+      <header className="border-b border-[#EFEBDF] px-6 pb-5 pt-5 sm:px-7">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          <p className="text-[12.5px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
+          <p className="text-[12.5px] text-[#8C8471]">수행 {group.records.length}회</p>
+        </div>
+        {head.sourceText && (
+          <div className="mt-2.5">
+            <p className={`break-keep text-[15px] leading-7 text-[#26323D] ${longSource && !sourceOpen ? "line-clamp-2" : ""}`}>
+              {head.sourceText}
+            </p>
+            {longSource && (
+              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[12px] font-semibold text-[#344F63] hover:underline">
+                {sourceOpen ? "원문 접기" : "원문 펼치기"}
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+      <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
+        {group.records.map((record) => (
+          <li key={record.id}><Attempt record={record} /></li>
+        ))}
+      </ol>
     </article>
   );
 }
 
-const panel = "rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_8px_24px_rgba(21,32,43,0.04)]";
+const selectClass =
+  "h-9 rounded-full border border-[#DDD6C4] bg-white pl-4 pr-8 text-[13px] font-semibold text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]";
+
+/**
+ * 9개 화행 지도 — 어떤 화행을 해 봤는지(수행 횟수)를 보여 주고, 누르면 아래 기록을 그 화행으로 거른다.
+ * 수행한 화행은 남색 점·테두리, 아직 안 한 화행은 호박색 빈 점(회색 금지). 능력 판정이 아니라 수행 범위다.
+ */
+function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, number>; selected: SpeechActUI | "all"; onSelect: (act: SpeechActUI | "all") => void }) {
+  const done = ACTS.filter((act) => (counts.get(act) ?? 0) > 0).length;
+  return (
+    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="9개 화행 지도">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h2 className="text-[16px] font-bold text-[#15202B]">9개 화행 지도</h2>
+        <p className="text-[12.5px] text-[#5C6A7A]">{done}/9 화행 수행 · 누르면 아래 기록을 거릅니다</p>
+      </div>
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 거르기">
+        {ACTS.map((act) => {
+          const count = counts.get(act) ?? 0;
+          const active = selected === act;
+          return (
+            <button
+              key={act}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onSelect(active ? "all" : act)}
+              className={[
+                "flex min-h-[56px] flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors",
+                active
+                  ? "border-[#15202B] bg-[#15202B] text-white"
+                  : count > 0
+                    ? "border-[#1F3A5F] bg-white text-[#15202B] hover:bg-[#F3F5F9]"
+                    : "border-[#E4D9BD] bg-white text-[#15202B] hover:bg-[#FFFBEA]",
+              ].join(" ")}
+            >
+              <span className="flex items-center gap-1.5 text-[14px] font-bold">
+                <span
+                  aria-hidden="true"
+                  className={[
+                    "inline-block h-2 w-2 rounded-full",
+                    active ? "bg-[#FAD338]" : count > 0 ? "bg-[#1F3A5F]" : "border border-[#C99A2E] bg-transparent",
+                  ].join(" ")}
+                />
+                {SPEECH_ACT_UI[act]}
+              </span>
+              <span className={`text-[11.5px] font-medium ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
+                {count > 0 ? `${count}회` : "아직"}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 const LearnerRecords = () => {
   const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
@@ -179,16 +408,8 @@ const LearnerRecords = () => {
   const [remoteRecords, setRemoteRecords] = useState<ReportRecord[] | null>(null);
   const [recordsError, setRecordsError] = useState(false);
   const [loadAttempt, setLoadAttempt] = useState(0);
-  const [selectedAct, setSelectedAct] = useState<SpeechActUI>("request");
-  const reviewRef = useRef<HTMLElement>(null);
-  const selectAct = (act: SpeechActUI) => {
-    setSelectedAct(act);
-    // 카드를 누른 결과가 화면 밖에서만 바뀌지 않도록 돌아보기 칸을 보이게 한다.
-    const panelEl = reviewRef.current;
-    if (panelEl && panelEl.getBoundingClientRect().top > window.innerHeight * 0.6) {
-      panelEl.scrollIntoView?.({ behavior: "smooth", block: "start" });
-    }
-  };
+  const [courseFilter, setCourseFilter] = useState("all");
+  const [actFilter, setActFilter] = useState<SpeechActUI | "all">("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -206,7 +427,7 @@ const LearnerRecords = () => {
         const { data, error } = await supabase
           .from("learner_mission_logs")
           .select(
-            "id,mission_id,speech_act,task_type,source_text,first_response,revised_response,completed_at,created_at",
+            "id,mission_id,speech_act,task_type,course_id,week_no,feature_id,source_lang,target_lang,source_text,first_response,revised_response,target_feature_observed,context_judgment,content_ver,started_at,completed_at,created_at",
           )
           .eq("auth_user_id", userId)
           .eq("mission_completed", true)
@@ -227,22 +448,27 @@ const LearnerRecords = () => {
 
   const usingLocalPreview = isLocalHost && !recordsError && remoteRecords !== null && remoteRecords.length === 0 && localRecords.length > 0;
   const records = usingLocalPreview ? localRecords : remoteRecords ?? [];
-  const completedCount = records.length;
-  const revisions = records.filter(changed);
-  const actsCovered = new Set(records.flatMap((record) => (record.speechAct ? [record.speechAct] : [])));
-  const translationCount = records.filter((record) => record.taskType === "translation").length;
-  const interpretingCount = records.filter((record) => record.taskType === "interpreting").length;
-  const selectedRecords = records.filter((record) => record.speechAct === selectedAct);
-  const selectedRevisions = selectedRecords.filter(changed).length;
-  const latestRevision = revisions[0] ?? null;
-  const actLabel = SPEECH_ACT_UI[selectedAct];
+  const courseIds = [...new Set(records.flatMap((record) => (record.courseId && COURSE_LABEL.has(record.courseId) ? [record.courseId] : [])))];
+  const inCourse = records.filter((record) => courseFilter === "all" || record.courseId === courseFilter);
+  const actCounts = new Map<SpeechActUI, number>();
+  for (const record of inCourse) {
+    if (record.speechAct) actCounts.set(record.speechAct, (actCounts.get(record.speechAct) ?? 0) + 1);
+  }
+  const visible = inCourse.filter((record) => actFilter === "all" || record.speechAct === actFilter);
+  const groups = groupByMission(visible);
+  const missionCount = groupByMission(records).length;
+  const filteredActLabel = actFilter === "all" ? null : SPEECH_ACT_UI[actFilter];
+
+  const title = (
+    <h1 className="border-l-4 border-[#FAD338] pl-3 text-[26px] font-bold leading-9 tracking-[-0.04em] text-[#15202B]">내 기록</h1>
+  );
 
   if (recordsError || remoteRecords === null) {
     return (
       <LearnerJourneyShell nav>
         <div className="pb-24">
-          <h1 className="text-[27px] font-bold tracking-[-0.025em] sm:text-[30px]">나의 학습 기록</h1>
-          <div className={`${panel} mt-5 p-5`} role={recordsError ? "alert" : "status"}>
+          {title}
+          <div className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white p-5" role={recordsError ? "alert" : "status"}>
             <p className="text-[13px] text-muted-foreground">
               {recordsError ? "학습 기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." : "학습 기록을 불러오는 중…"}
             </p>
@@ -260,145 +486,69 @@ const LearnerRecords = () => {
   return (
     <LearnerJourneyShell nav>
       <div className="pb-24">
-        <header className="flex flex-wrap items-end justify-between gap-5">
+        <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className={eyebrow}>전체 교과목</p>
-            <h1 className="mt-1 text-[26px] font-bold tracking-[-0.02em] text-[#15202B]">나의 학습 기록</h1>
+            {title}
+            {records.length > 0 && (
+              <p className="mt-2 pl-4 text-[13.5px] text-[#5C6A7A]">
+                미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 수업 ${courseIds.length}개` : ""}
+              </p>
+            )}
           </div>
-          {usingLocalPreview && (
-            <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[11px] font-semibold text-[#756D5E]">
-              localhost 시연 데이터
-            </span>
-          )}
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="기록 거르기">
+            {usingLocalPreview && (
+              <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[11px] font-semibold text-[#756D5E]">
+                localhost 시연 데이터
+              </span>
+            )}
+            {courseIds.length > 1 && (
+              <select aria-label="수업" value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)} className={selectClass}>
+                <option value="all">전체 수업</option>
+                {courseIds.map((id) => <option key={id} value={id}>{COURSE_LABEL.get(id)}</option>)}
+              </select>
+            )}
+          </div>
         </header>
 
-        <section className={`${panel} mt-4 grid grid-cols-2 divide-x divide-y divide-[#EEE9DC] overflow-hidden sm:grid-cols-4 sm:divide-y-0`} aria-label="수업 이수 범위">
-          {[
-            [String(completedCount), "완료 학습 기록"],
-            [String(revisions.length), "고쳐 쓴 기록"],
-            [`${actsCovered.size}/9`, "수행 화행"],
-            [`${translationCount} · ${interpretingCount}`, "번역 · 통역"],
-          ].map(([value, label]) => (
-            <div key={label} className="px-5 py-3">
-              <div className="text-[20px] font-bold leading-none tabular-nums text-[#15202B]">{value}</div>
-              <div className="mt-1.5 text-[12.5px] text-[#5C6A7A]">{label}</div>
-            </div>
-          ))}
-        </section>
-        {completedCount === 0 && (
-          <section className={`${panel} mt-4 flex flex-wrap items-center justify-between gap-4 p-5`}>
+        {records.length === 0 ? (
+          <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E4DFD0] bg-white p-6">
             <div>
               <h2 className="text-[16px] font-bold">아직 완료한 미션이 없습니다.</h2>
-              <p className="mt-1 text-[13.5px] text-[#5C6A7A]">미션을 마치면 내가 쓴 표현과 고쳐 쓴 과정이 여기에 쌓입니다.</p>
+              <p className="mt-1 text-[13.5px] text-[#5C6A7A]">미션을 마치면 내가 쓴 표현과 최종 결정이 여기에 쌓입니다.</p>
             </div>
             <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[13.5px] font-semibold text-white hover:bg-[#22303C]">
               이번 주 미션 하러 가기 →
             </Link>
           </section>
-        )}
-
-        <section className={`${panel} mt-4 p-5`}>
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 className={sectionTitle}>9개 화행 학습 지도</h2>
-              <p className="mt-1 text-[13px] text-[#5C6A7A]">화행을 누르면 아래에서 내 기록을 볼 수 있습니다.</p>
-            </div>
-            <span className="text-[12.5px] text-[#5C6A7A]">{actsCovered.size}/9 화행 수행</span>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="화행별 학습 이력">
-            {ACTS.map((act) => {
-              const count = records.filter((record) => record.speechAct === act).length;
-              const active = selectedAct === act;
-              return (
-                <button
-                  key={act}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => selectAct(act)}
-                  className={[
-                    "flex min-h-[48px] min-w-0 items-center justify-between gap-3 rounded-lg border px-4 py-2 text-left transition-colors",
-                    active
-                      ? "border-[#15202B] bg-[#15202B] text-white"
-                      : count > 0
-                        ? "border-[#D3DAE6] bg-[#F3F5F9] text-[#15202B] hover:border-[#6A7C96]"
-                        : "border-[#E4DFD0] bg-[#FBF9F3] text-[#15202B] hover:border-[#C9BFA6]",
-                  ].join(" ")}
-                >
-                  <span className="text-[15.5px] font-bold">{SPEECH_ACT_UI[act]}</span>
-                  <span className={`shrink-0 text-[12.5px] ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#344F63]" : "text-[#8C8471]"}`}>
-                    {count ? `${count}건 완료` : "기록 없음"}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </section>
-
-        <section ref={reviewRef} className={`${panel} mt-4 scroll-mt-24 p-5`} aria-live="polite" aria-label="선택한 화행 돌아보기">
-          <p className={eyebrow}>선택한 화행 돌아보기</p>
-          <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h2 className="text-[20px] font-bold text-[#15202B]">{actLabel}</h2>
-            {selectedRecords.length > 0 && (
-              <p className="text-[13px] text-[#5C6A7A]">
-                완료 {selectedRecords.length}건 · 고쳐 쓴 기록 {selectedRevisions}건 · 번역 {selectedRecords.filter((r) => r.taskType === "translation").length} · 통역 {selectedRecords.filter((r) => r.taskType === "interpreting").length}
+        ) : (
+          <>
+            <ActMap counts={actCounts} selected={actFilter} onSelect={setActFilter} />
+            {filteredActLabel && (
+              <p className="mt-6 flex items-baseline gap-3 text-[13px] text-[#5C6A7A]">
+                <span className="text-[15px] font-bold text-[#15202B]">{filteredActLabel}</span>
+                수행 {visible.length}회
+                <button type="button" onClick={() => setActFilter("all")} className="font-semibold text-[#344F63] hover:underline">전체 보기</button>
               </p>
             )}
-          </div>
-          {selectedRecords.length === 0 ? (
-            <p className="mt-3 text-[14px] text-[#5C6A7A]">{actLabel} 완료 기록이 아직 없습니다.</p>
-          ) : (
-            <ol className="mt-3 divide-y divide-[#EEE9DC] border-y border-[#EEE9DC]" aria-label={`${actLabel} 완료 기록`}>
-              {selectedRecords.map((record) => (
-                <li key={record.id} className="py-3">
-                  <p className="text-[12px] font-semibold text-[#8C8471]">{recordMeta(record)}</p>
-                  <dl className={`mt-2 ${rowGrid}`}>
-                    {record.sourceText && <><dt className={rowLabel}>원문</dt><dd className="min-w-0"><SourceText text={record.sourceText} /></dd></>}
-                    <dt className={rowLabel}>내 {TASK_LABEL[record.taskType]}</dt>
-                    <dd className={zhText}>{record.firstResponse || "기록 없음"}</dd>
-                    <dt className={rowLabel}>고친 {TASK_LABEL[record.taskType]}</dt>
-                    <dd className={changed(record) ? zhText : "text-[13.5px] leading-6 text-[#7A8590]"}>
-                      {changed(record) ? record.revisedResponse : "고치지 않음"}
-                    </dd>
-                  </dl>
-                </li>
-              ))}
-            </ol>
-          )}
-          <div className="mt-4 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-4 py-2.5">
-            <p className="text-[12.5px] font-semibold text-[#8A5A14]">회고 질문 · 모든 학습자에게 같은 질문입니다 — 위 기록을 보며 답해 보세요</p>
-            <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
-              <li>최종 표현에서도 원문의 의미와 {actLabel}의 목적이 유지되었나요?</li>
-              <li>표현을 그대로 유지하거나 바꾼 이유는 무엇인가요? <span className="text-[#7A8590]">(살펴볼 점: {ACT_FOCUS[selectedAct]})</span></li>
-            </ul>
-          </div>
-        </section>
-
-        <section className={`${panel} mt-4 p-5`}>
-          <div className="flex items-center justify-between gap-3">
-            <h2 className={`flex items-center gap-2 ${sectionTitle}`}><FilePenLine className="h-[18px] w-[18px]" />전체 화행의 최근 수정 노트</h2>
-            {revisions.length > 0 && (
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button type="button" className="text-[13px] font-semibold text-[#344F63] hover:underline">전체 수정 노트 →</button>
-                </DialogTrigger>
-                <DialogContent className="max-h-[80vh] max-w-3xl overflow-y-auto bg-[#FAF8F2]">
-                  <DialogHeader>
-                    <DialogTitle>전체 수정 노트</DialogTitle>
-                    <DialogDescription>완료한 미션에서 최초 표현과 최종 선택이 달라진 기록입니다.</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-3">
-                    {revisions.map((record) => <RevisionNote key={record.id} record={record} />)}
-                  </div>
-                </DialogContent>
-              </Dialog>
+            {groups.length === 0 ? (
+              <p className="mt-4 rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[14px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
+            ) : (
+              <ol className={`${filteredActLabel ? "mt-3" : "mt-5"} space-y-5`} aria-label="완료 기록">
+                {groups.map((group) => (
+                  <li key={group.key}><MissionCard group={group} /></li>
+                ))}
+              </ol>
             )}
-          </div>
-          {latestRevision ? (
-            <div className="mt-3"><RevisionNote record={latestRevision} plain /></div>
-          ) : (
-            <p className="mt-3 text-[13.5px] text-[#5C6A7A]">최초 표현과 최종 선택이 달라진 기록이 아직 없습니다.</p>
-          )}
-        </section>
+
+            <aside className="mt-8 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-5 py-3.5" aria-label="다시 볼 때">
+              <p className="text-[12.5px] font-semibold text-[#8A5A14]">다시 볼 때 · 모든 학습자에게 같은 질문입니다</p>
+              <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
+                <li>최종 표현에서도 원문의 의미와 화행의 목적이 유지되었나요?</li>
+                <li>표현을 유지하거나 바꾼 이유는 무엇인가요?</li>
+              </ul>
+            </aside>
+          </>
+        )}
       </div>
     </LearnerJourneyShell>
   );
