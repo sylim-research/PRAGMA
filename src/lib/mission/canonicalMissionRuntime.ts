@@ -469,7 +469,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     const presentationOrder = ["A1", "A2", "A5", "A3", "A4"];
     quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
     const nextLabels: Record<string, string> = {
-      A1: "다음: 판단과 이유", A2: "다음: 표현 비교",
+      A1: "다음: 판단과 이유", A2: "다음: 복수 표현 비교",
       A5: "다음: 수정안 선택", A3: "다음: 직접 수정", A4: "다음: 핵심 정리",
     };
     quests = quests.map(quest => ({ ...quest, nextLabel: nextLabels[quest.id] }));

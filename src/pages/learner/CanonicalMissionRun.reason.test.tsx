@@ -42,7 +42,7 @@ describe("CanonicalMissionRun reason flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
 
     expect(screen.getByText("기준 이유를 찾았어요")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /다음: 표현 비교/ }));
+    fireEvent.click(screen.getByRole("button", { name: /다음: 복수 표현 비교/ }));
 
     expect(onDone).toHaveBeenCalledWith({
       reasonId: quest.acceptedReasonId,

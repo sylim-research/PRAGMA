@@ -90,7 +90,7 @@ describe("local learner UX pilot", () => {
     expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
     expect(screen.queryByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/기준 판단과 같아요|기준 판단과 달라요/)).not.toBeInTheDocument();
-    click("다음: 표현 비교");
+    click("다음: 복수 표현 비교");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(snapshot.responses.A3).toEqual({ correctionIds: ["apology"] });
     expect(snapshot.responses.A4).toEqual({ revisedText: freeAnswer });

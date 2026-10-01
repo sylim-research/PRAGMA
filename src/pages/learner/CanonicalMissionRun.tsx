@@ -255,7 +255,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
   A1: "다음: 상황에 맞는지 판단하기",
   A2: "다음: 판단하고 고쳐 보기",
   A3: "다음: 부적절한 이유 찾기",
-  A4: "다음: 표현 비교",
+  A4: "다음: 복수 표현 비교",
 };
 
 function nextActionLabel(quest: MissionQuest) {
@@ -281,10 +281,10 @@ function v6IntroSteps(outputName: string) {
   return {
     judgment: [
       // 보조 설명은 학습자가 할 일을 「~하기」로 — 처음 보는 사람도 무엇을 하는 항목인지 바로 읽힌다. 12자 이내라 한 줄에 고정된다.
-      { title: "표현 판단", desc: "상황에 맞는지 판단하기" },
+      { title: "단일 표현 판단", desc: "상황에 맞는지 판단하기" },
       // 보조 설명은 제목의 낱말을 그대로 받는다(판단·이유·비교·선택·수정) — 학생이 두 낱말을 따로 해석하지 않게.
       { title: "판단과 이유", desc: "판단의 이유 고르기" },
-      { title: "표현 비교", desc: "여러 표현을 비교해 보기" },
+      { title: "복수 표현 비교", desc: "여러 표현을 비교해 보기" },
       { title: "수정안 선택", desc: "더 나은 수정안 선택하기" },
       { title: "직접 수정", desc: `${outputName}안을 직접 수정하기` },
     ],
@@ -1861,7 +1861,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-white px-4 py-3">
+                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9] px-4 py-3">
                       <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
@@ -1970,10 +1970,10 @@ const PROGRESS_LABELS: Record<string, string> = {
 /** 산출 단계의 이름은 진행 바와 같아야 한다 — 미션 방식에 따라 「번역하기」·「통역하기」. */
 function progressLabel(quest: MissionQuest, outputName = "번역") {
   // 진행 막대·핵심 정리·기록에 들어가는 짧은 이름. 미션 안내의 풀어 쓴 활동명과는 따로 둔다.
-  if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "표현 판단";
+  if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "단일 표현 판단";
   if (quest.kind === "fix_choice") return "수정안 선택";
   if (quest.kind === "free_correction") return "직접 수정";
-  if (quest.kind === "spectrum") return "표현 비교";
+  if (quest.kind === "spectrum") return "복수 표현 비교";
   if (quest.kind === "dct") return `${outputName}하기`;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
