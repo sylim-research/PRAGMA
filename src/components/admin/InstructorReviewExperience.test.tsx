@@ -95,7 +95,7 @@ describe("instructor experience", () => {
     const task = SAMPLE_MISSION_V6_REASON_CONTRAST.production_task;
     const { unmount } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6("intermediate"))} section="scene" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     expect(screen.getByRole("list", { name: "적절성 판단 활동" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "직접 번역", exact: true })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "직접 번역" })).toBeInTheDocument();
     expect(screen.queryByText(task.situation_ko)).not.toBeInTheDocument();
     expect(screen.queryByText("상대·관계")).not.toBeInTheDocument();
     unmount();
