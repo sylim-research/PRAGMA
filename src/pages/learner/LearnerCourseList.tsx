@@ -3,12 +3,10 @@ import { Link } from "react-router-dom";
 
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { courseModeSummary, type CourseMode } from "@/lib/curriculum/courseModePolicy";
-import { useLearnerCourse, useLearnerCourses } from "@/lib/curriculum/useLearnerCourse";
+import { useLearnerCourses } from "@/lib/curriculum/useLearnerCourse";
 import { PLANNED_MISSIONS_PER_COURSE, useLearnerHomeProgress } from "@/lib/curriculum/learnerHomeProgress";
-import { pickCurrentWeek } from "@/lib/curriculum/learnerProgress";
 import {
   LEVEL,
-  SPEECH_ACT_UI,
   type LanguageDirection,
   type LearnerLevel,
 } from "@/lib/pragma/enums";
@@ -34,40 +32,9 @@ const LEVEL_ORDER: Record<LearnerLevel, number> = {
   advanced: 2,
 };
 
-/**
- * 「이어서 하기」 — 마지막으로 활동한 교과목의 지금 할 주차로 바로 간다. 주차 판정은 pickCurrentWeek
- * (진행 중인 주차 → 아직 시작 안 한 가장 빠른 주차)를 그대로 쓴다. 할 미션이 없으면 그리지 않는다.
- */
-function ResumeCard({ courseId, courseTitle, completed }: { courseId: string; courseTitle: string; completed: ReadonlySet<string> }) {
-  const { data: course } = useLearnerCourse(courseId);
-  const current = course ? pickCurrentWeek(course.weeks, completed) : null;
-  if (!current) return null;
-  const { week, assigned, doneCount } = current;
-  const weekLabel = week.speech_act ? `${SPEECH_ACT_UI[week.speech_act]} 화행` : week.title;
-  return (
-    <Link
-      to={`/learner/course/${courseId}/week/${week.week_no}`}
-      className="group mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border-2 border-[#15202B] bg-[#FFFBEA] px-5 py-4 transition-colors hover:bg-[#FFF6D1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 sm:px-6"
-    >
-      <div className="min-w-0">
-        <p className="text-[12.5px] font-bold text-[#786022]">이어서 하기</p>
-        <p className="mt-0.5 break-keep text-[17px] font-bold leading-7 text-[#15202B]">
-          {courseTitle} · {week.week_no}주차 {weekLabel}
-        </p>
-        <p className="text-[13px] font-medium text-[#46515A]">이번 주차 미션 {doneCount}/{assigned.length} 완료</p>
-      </div>
-      <span className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#15202B] px-4 py-2 text-[13.5px] font-bold text-white">
-        이어서 하기
-        <ArrowRight aria-hidden="true" className="h-4 w-4" strokeWidth={2} />
-      </span>
-    </Link>
-  );
-}
-
 const LearnerCourseList = () => {
   const { data: courses = [], error, isPending } = useLearnerCourses();
   const { data: progress } = useLearnerHomeProgress();
-  const resumeCourse = progress?.lastCourseId ? courses.find((course) => course.id === progress.lastCourseId) : undefined;
   // 목록의 표시 순서만 변경하고, 공유 쿼리 데이터와 실제 편성 순서는 보존한다.
   const sortedCourses = [...courses].sort((left, right) =>
     (LEVEL_ORDER[left.level as LearnerLevel] ?? 99) - (LEVEL_ORDER[right.level as LearnerLevel] ?? 99),
@@ -81,14 +48,6 @@ const LearnerCourseList = () => {
             내 수업
           </h1>
         </section>
-
-        {progress && resumeCourse && (
-          <ResumeCard
-            courseId={resumeCourse.id}
-            courseTitle={courseDisplayTitle(resumeCourse)}
-            completed={progress.byCourse.get(resumeCourse.id)?.completedMissionIds ?? new Set()}
-          />
-        )}
 
         {isPending ? (
           <p className="mt-8 text-[13px] text-muted-foreground">교과목을 불러오는 중…</p>

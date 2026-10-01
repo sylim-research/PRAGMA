@@ -141,7 +141,7 @@ describe("LearnerCourseList", () => {
     expect(screen.queryByRole("list", { name: "교과목 목록" })).not.toBeInTheDocument();
   });
 
-  it("shows my progress per course and resumes at the current week of the last course", () => {
+  it("shows my progress per course without a resume card", () => {
     const [first, second] = courses;
     const progress = summarizeLearnerProgress([
       { course_id: first.id, mission_id: "m-a", mission_completed: true, updated_at: "2026-09-18T10:00:00Z" },
@@ -161,16 +161,13 @@ describe("LearnerCourseList", () => {
     } as ReturnType<typeof useLearnerCourse>);
     renderCourses();
 
-    const resume = screen.getByRole("link", { name: /이어서 하기/ });
-    expect(resume).toHaveAttribute("href", `/learner/course/${first.id}/week/3`);
-    expect(within(resume).getByText(/3주차 감사 화행/)).toBeInTheDocument();
-    expect(within(resume).getByText("이번 주차 미션 1/2 완료")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /이어서 하기/ })).not.toBeInTheDocument();
     expect(screen.getByText("미션 3/20 완료")).toBeInTheDocument();
     expect(screen.getAllByText("아직 시작 전")).toHaveLength(courses.length - 1);
     expect(second).toBeDefined();
   });
 
-  it("hides the resume card when there is no course activity", () => {
+  it("shows no progress when there is no course activity", () => {
     vi.mocked(useLearnerHomeProgress).mockReturnValue({ data: summarizeLearnerProgress([]) } as ReturnType<typeof useLearnerHomeProgress>);
     renderCourses();
     expect(screen.queryByRole("link", { name: /이어서 하기/ })).not.toBeInTheDocument();
