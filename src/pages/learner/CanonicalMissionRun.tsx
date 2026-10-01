@@ -3049,7 +3049,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <h1 className="text-2xl font-black">{mission.activityMode === "interpreting" ? "통역" : "번역"} 완료</h1>
+              <h1 className="text-2xl font-black">학습 미션 완료</h1>
               <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 최종안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했습니다."}</p>
             </section>
             <div className="space-y-4">
