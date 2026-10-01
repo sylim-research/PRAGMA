@@ -1861,7 +1861,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-white px-4 py-3">
+                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9] px-4 py-3">
                       <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
