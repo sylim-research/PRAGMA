@@ -181,6 +181,15 @@
   .font-zh {
     font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Pretendard Variable", Pretendard, sans-serif;
     font-weight: 400;
+    /* 중국어 줄바꿈 — 한자 사이에서 끊지 않고 구두점(，。？！) 뒤에서만 끊는다(keep-all).
+       한 절이 한 줄보다 길 때만 글자 단위로 끊는다(anywhere). balance는 그 절 경계 가운데서 줄 길이를 고르게 고른다. */
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+    text-wrap: balance;
+  }
+  /* 입력칸은 균형 나눔을 하지 않는다 — 한 줄에 들어가면 한 줄, 넘치면 구두점에서 끊는다. */
+  textarea.font-zh {
+    text-wrap: wrap;
   }
 }
 

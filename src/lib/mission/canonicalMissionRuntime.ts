@@ -450,7 +450,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
           } } : {}) };
         case "fix_choice": return { ...base, kind: "fix_choice", target: item.target,
           // Compatibility properties are not displayed or persisted for v6.
-          judgmentOptions: [], referenceJudgment: "", nextLabel: "다음: 직접 고쳐 보기",
+          judgmentOptions: [], referenceJudgment: "", nextLabel: "다음: 직접 수정",
           corrections: item.corrections.map((candidate, i) => ({ id: `A3-${i}`, text: candidate.text, valid: candidate.is_valid, note: candidate.note_ko })),
           feedback: item.explanation_ko };
         case "free_correction": return { ...base, kind: "free_correction", target: item.target,
@@ -469,8 +469,8 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     const presentationOrder = ["A1", "A2", "A5", "A3", "A4"];
     quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
     const nextLabels: Record<string, string> = {
-      A1: "다음: 판단하고 이유 고르기", A2: "다음: 여러 표현 비교하기",
-      A5: "다음: 수정안 고르기", A3: "다음: 직접 고쳐 보기", A4: "다음: 핵심 정리",
+      A1: "다음: 판단과 이유", A2: "다음: 표현 비교",
+      A5: "다음: 수정안 선택", A3: "다음: 직접 수정", A4: "다음: 핵심 정리",
     };
     quests = quests.map(quest => ({ ...quest, nextLabel: nextLabels[quest.id] }));
     contrastBefore = mission.mpj_items[0].situation_ko;

@@ -87,7 +87,7 @@ describe("instructor experience", () => {
     fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
     fireEvent.click(screen.getByRole("button", { name: "이유 확정하기" }));
     expect(within(screen.getByRole("button", { name: /^다소 적절/ })).getByText("내 선택")).toBeInTheDocument();
-    expect(screen.getByText(/^핵심 이유를 골랐습니다\./)).toBeInTheDocument();
+    expect(screen.getByText(/^기준 이유를 골랐습니다\./)).toBeInTheDocument();
   });
   it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
     const v6 = (learner_level: "intermediate" | "advanced"): ReviewInspection => ({ ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level },
@@ -95,7 +95,7 @@ describe("instructor experience", () => {
     const task = SAMPLE_MISSION_V6_REASON_CONTRAST.production_task;
     const { unmount } = render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6("intermediate"))} section="scene" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     expect(screen.getByRole("list", { name: "적절성 판단 활동" })).toBeInTheDocument();
-    expect(screen.getByText("직접 번역하기")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "직접 번역" })).toBeInTheDocument();
     expect(screen.queryByText(task.situation_ko)).not.toBeInTheDocument();
     expect(screen.queryByText("상대·관계")).not.toBeInTheDocument();
     unmount();

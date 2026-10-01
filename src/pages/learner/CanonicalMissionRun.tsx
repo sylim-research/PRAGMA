@@ -1,19 +1,43 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
+  ArrowLeftRight,
+  BookOpenText,
   Check,
   ChevronDown,
+  ClipboardList,
   ChevronRight,
   Eye,
   LoaderCircle,
   ArrowDown,
-  ArrowRight,
   Lightbulb,
-  Rocket,
+  ListChecks,
+  Mic,
+  MoveRight,
+  PenLine,
+  Quote,
   RotateCcw,
-  Sparkles,
   X,
 } from "lucide-react";
+
+/** 절 제목 앞의 작은 아이콘 칩 — 이모지 대신 단색 선 아이콘으로 초점을 만든다. 색은 절의 바탕색 계열을 따른다. */
+function SectionIcon({ icon: Icon, tone = "amber", iconClassName = "" }: { icon: typeof Quote; tone?: "amber" | "slate" | "navy"; iconClassName?: string }) {
+  const tones = { amber: "bg-[#F6E6A4] text-[#6B5518]", slate: "bg-[#E6EBF1] text-[#2B3647]", navy: "bg-[#15202B] text-[#F7CE3E]" };
+  return <span aria-hidden className={`mr-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${tones[tone]}`}><Icon className={`h-3.5 w-3.5 ${iconClassName}`} strokeWidth={2.25} /></span>;
+}
+
+/** 해설 상자 제목 — 문항 해설 상자의 머리말. 꼬리표(NoteTag)와 같은 아이콘을 쓴다. */
+function NoteHeading() {
+  return <span className="flex items-center"><SectionIcon icon={BookOpenText} />해설</span>;
+}
+
+/** 답 확정 뒤 형제 패널(해설·참고 표현)의 제목 규격 — 24px 아이콘 칩 + 16px 굵은 제목. */
+const panelHeading = "text-[16px] font-black leading-6 text-[#15202B]";
+
+/** 해설 꼬리표 — 후보 문장·참고 표현 아래의 해설 줄이 모두 같은 표식을 쓴다. */
+function NoteTag() {
+  return <span className="inline-flex items-center gap-1 whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><BookOpenText aria-hidden className="h-3 w-3" strokeWidth={2.5} />해설</span>;
+}
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -89,7 +113,7 @@ function DemoFillButton() {
   return (
     <button type="button" onClick={fill}
       className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FAD338] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_1px_4px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
-      <Sparkles aria-hidden className="h-4 w-4" />답안 자동 채우기
+      <PenLine aria-hidden className="h-4 w-4" />답안 자동 채우기
     </button>
   );
 }
@@ -231,7 +255,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
   A1: "다음: 상황에 맞는지 판단하기",
   A2: "다음: 판단하고 고쳐 보기",
   A3: "다음: 부적절한 이유 찾기",
-  A4: "다음: 표현 비교하기",
+  A4: "다음: 표현 비교",
 };
 
 function nextActionLabel(quest: MissionQuest) {
@@ -249,79 +273,100 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
   );
 }
 
-/** v6 미션 시작 전 안내. 다섯 판단 활동을 먼저 훑고, 마지막 직접 산출이 이 미션의 목적지다. */
+/**
+ * v6 미션 시작 전 안내 — 학습 미션의 설계도. 두 국면(적절성 판단 MJT · 직접 산출 DCT형 통번역 과제)을
+ * 같은 급의 카드로 나란히 두고, 각 단계 이름은 진행 막대·핵심 정리와 같은 한 벌을 쓴다.
+ */
 function v6IntroSteps(outputName: string) {
   return {
     judgment: [
-      "표현이 상황에 맞는지 판단하기",
-      "판단하고 이유 고르기",
-      "여러 표현 비교하기",
-      "수정안 고르기",
-      "직접 고쳐 보기",
+      // 보조 설명은 학습자가 할 일을 「~하기」로 — 처음 보는 사람도 무엇을 하는 항목인지 바로 읽힌다. 12자 이내라 한 줄에 고정된다.
+      { title: "표현 판단", desc: "상황에 맞는지 판단하기" },
+      // 보조 설명은 제목의 낱말을 그대로 받는다(판단·이유·비교·선택·수정) — 학생이 두 낱말을 따로 해석하지 않게.
+      { title: "판단과 이유", desc: "판단의 이유 고르기" },
+      { title: "표현 비교", desc: "여러 표현을 비교해 보기" },
+      { title: "수정안 선택", desc: "더 나은 수정안 선택하기" },
+      { title: "직접 수정", desc: `${outputName}안을 직접 수정하기` },
     ],
-    production: {
-      // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
-      title: outputName === "통역" ? "직접 통역하기" : "직접 번역하기",
-      // 산출 뒤에 무엇이 오는지 한 줄씩 — 오른쪽 칸의 높이를 채우면서 흐름의 끝을 보여 준다.
-      flow: ["AI 피드백 확인", `내 ${outputName} 재검토`, "최종안 결정"],
-    },
+    // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
+    production: [
+      // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
+      { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
+      { title: "AI 피드백", desc: "의미·문법·화용 기준" },
+      // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
+      { title: "최종 결정", desc: "최종안을 내가 확정하기" },
+    ],
   };
 }
-/** 활동 수를 세지 않고 순서만 보여 준다 — 다섯 판단 뒤에 직접 산출이 온다는 흐름이 배치로 드러나게. */
-const INTRO_COLUMN_LABEL = "text-[11px] font-black tracking-[0.1em] text-[#8A939F]";
+
+/** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
+const INTRO_PHASE_TONE = {
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/15 text-white ring-white/25" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white/50 text-[#15202B] ring-white/60" },
+} as const;
+
+function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
+  tone: keyof typeof INTRO_PHASE_TONE;
+  title: string;
+  caption: string;
+  /** 응답 방식 표지 — 선택형(고른다) / 산출형(직접 번역·통역한다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
+  mode: { label: string; icon: typeof ListChecks };
+  steps: { title: string; desc: string }[];
+}) {
+  const t = INTRO_PHASE_TONE[tone];
+  const ModeIcon = mode.icon;
+  return (
+    <section aria-label={`${title} 단계`}>
+      {/* 두 국면의 제목 띠 — 같은 높이, 잉크색/노랑으로 상위 구조를 먼저 보인다(2026-10-01 Codex 안). 아래 알약 목록은 그대로. */}
+      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-3.5 ${t.band}`}>
+        <div className="min-w-0">
+          <h2 className="text-[17px] font-black leading-6">{title}</h2>
+          <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
+        </div>
+        <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${t.mode}`}><ModeIcon aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />{mode.label}</span>
+      </div>
+      {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
+      <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
+        {steps.map((step, index) => (
+          <li key={step.title} className={`grid grid-cols-[22px_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg px-3 py-2.5 ${t.pill}`}>
+            <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
+            <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
+            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57]">{step.desc}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
-  // 왼쪽 다섯 판단을 중괄호로 묶어 오른쪽 산출로 넘긴다 — 수용에서 산출로 가는 흐름이 한눈에 보이게.
+  // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
-    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.9fr)] sm:items-start sm:gap-2.5">
-      <section>
-        <h2 className={INTRO_COLUMN_LABEL}>적절성 판단</h2>
-        <ol className="relative mt-2.5 space-y-1" aria-label="적절성 판단 활동">
-          <span aria-hidden className="absolute left-[1.4rem] top-5 bottom-5 w-px bg-[#E2D9BE]" />
-          {steps.judgment.map((title, index) => (
-            <li key={title} className="relative flex items-center gap-3 rounded-lg bg-[#F8F6EE] px-3 py-2.5">
-              <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-black text-[#15202B] ring-1 ring-[#DDD2AE]">{index + 1}</span>
-              <span className="break-keep text-[15px] font-semibold text-[#243441]">{title}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <div className="flex items-center justify-center gap-1 py-1 sm:self-stretch sm:py-0 sm:pt-[26px]" aria-hidden>
-        <svg viewBox="0 0 16 100" preserveAspectRatio="none" className="hidden h-full w-3 text-[#C9B67A] sm:block">
-          <path d="M3 3C11 3 5.5 46.5 14 50C5.5 53.5 11 97 3 97" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </svg>
-        <ArrowRight className="hidden h-5 w-5 shrink-0 text-[#B49A23] sm:block" />
-        <ArrowDown className="h-5 w-5 text-[#B49A23] sm:hidden" />
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "선택형", icon: ListChecks }} steps={steps.judgment} />
+      {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
+      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
+        <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
+        <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
-      <section aria-label={`직접 ${outputName} 활동`}>
-        <h2 className={INTRO_COLUMN_LABEL}>직접 {outputName}</h2>
-        <div className="mt-2.5 rounded-xl border border-[#E4CB50] bg-[#FFFBEA] px-4 py-3.5">
-          <p className="break-keep font-bold leading-7 text-[#243441]">{steps.production.title}</p>
-          <ol className="mt-3 space-y-2 border-t border-[#EFE2B4] pt-3">
-            {steps.production.flow.map((label) => (
-              <li key={label} className="flex items-center gap-2 break-keep text-[13.5px] leading-6 text-[#6B5518]">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#D9BE4A]" />
-                {label}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
     </div>
   );
 }
 function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
-      <div className="bg-[#15202B] px-5 py-4 text-white sm:px-6 sm:py-5">
-        <p className="text-[11px] font-black tracking-[0.1em] text-[#F3D248]">{config.missionLabel}</p>
-        <h1 className="mt-1.5 break-keep text-[19px] font-bold leading-8 tracking-[-0.01em] sm:text-[21px]">
+      {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
+      <div className="border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 pb-4 pt-5 sm:px-6">
+        <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
+        <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
         </h1>
+        {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「관계와 상황」 어순은 정본. */}
+        <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
       </div>
-      <div className="space-y-5 p-5 sm:p-6">
-        <p className="text-sm leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
+      <div className="space-y-4 p-5">
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
           <V6IntroOutline outputName={config.outputName} />
@@ -344,7 +389,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : <><Rocket aria-hidden className="h-[18px] w-[18px]" />학습 미션 시작하기</>} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -428,7 +473,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
-      ? "scene-in rounded-xl border-l border-[#DCCD9A] bg-[#FBF7EA] px-5 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] sm:px-6 sm:py-3.5"
+      ? "scene-in rounded-md border-l-4 border-[#15202B] bg-[#F2EEE3] px-5 py-3 sm:px-6 sm:py-3.5"
       : "rounded-xl border border-[#EDE4C8] bg-[#FBF7EA] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
@@ -436,6 +481,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
           {headerRight}
         </div>
       )}
+      {compact && <p className="mb-1 text-[12px] font-black tracking-[0.08em] text-[#15202B]">{title}</p>}
       {compact ? (
         // 화행은 상단 바에 이미 있다. 이 카드는 장면만 전한다.
         // 배경 문장은 한 단 낮추고, 내가 할 말(화행)을 적은 문장을 대시와 함께 세운다.
@@ -515,11 +561,13 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
 function optionState(answered: boolean, picked: boolean, correct: boolean) {
   if (!answered) {
     return picked
-      ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-1 ring-[#15202B]"
+      ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-[0.6px] ring-[#15202B]"
       : "border-[#E3DDCF] bg-white hover:bg-[#FAF8F2]";
   }
-  if (correct) return "border-[#4D8568] bg-white text-[#245E44]";
-  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531]";
+  // 선택·정답·오답 테두리는 모두 1.6px(border 1px + ring 0.6px)로 일원화 — 가늘면 판정이 분간되지 않고, 1.75px 이상은 무겁다(2026-10-01).
+  if (correct) return "border-[#4D8568] bg-white text-[#245E44] ring-[0.6px] ring-[#4D8568]";
+  // 색은 선과 배지에만 — 정답과 같은 구조(흰 면 + 색 테두리)로 대칭을 맞춘다(2026-10-01).
+  if (picked) return "border-[#C86E68] bg-white font-bold text-[#8B3531] ring-[0.6px] ring-[#C86E68]";
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
@@ -538,7 +586,7 @@ function QuestionChip({ n }: { n?: number }) {
 const REASON_PROMPT = "그렇게 판단한 이유는 무엇인가요?";
 
 // 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
-// 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「가능한 판단」, 키가 있는 선택형 = 「정답」.
+// 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「허용 판단」, 키가 있는 선택형 = 「정답」.
 function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "정답", referenceId, onSelect }: {
   option: ChoiceOption;
   value: string | null;
@@ -548,13 +596,13 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
   radio?: boolean;
   /** 키 쪽 선택지 배지. 적절성 판단은 「기준 판단」. */
   acceptedLabel?: string;
-  /** 주면 이 선택지만 acceptedLabel이고, 나머지 허용 선택지는 「가능한 판단」이다. */
+  /** 주면 이 선택지만 acceptedLabel이고, 나머지 허용 선택지는 「허용 판단」이다. */
   referenceId?: string;
   onSelect: (id: string) => void;
 }) {
   const picked = value === option.id;
   const accepted = acceptedIds.includes(option.id);
-  const badge = referenceId && option.id !== referenceId ? "가능한 판단" : acceptedLabel;
+  const badge = referenceId && option.id !== referenceId ? "허용 판단" : acceptedLabel;
   return (
     <button
       type="button"
@@ -580,7 +628,7 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
   );
 }
 
-// 문항별 해설 상자는 모두 이 모양 하나다(「💡 해설」).
+// 문항별 해설 상자는 모두 이 모양 하나다(「해설」 머리말 + NoteHeading 아이콘).
 const feedbackBox = "break-keep rounded-xl border border-[#DDD8CB] border-l-4 border-l-[#E0C43C] bg-[#FAF9F5] px-4 py-3.5 text-[15.5px] leading-7 text-[#15202B]";
 
 function FeedbackBox({ verdict, feedback, action, highlights = [], asList = false }: {
@@ -592,7 +640,7 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
 }) {
   return (
     <div className={feedbackBox}>
-      {verdict && <p className="mb-2 font-black text-[#15202B]">{verdict}</p>}
+      {verdict && <p className={`mb-2 ${verdict === "해설" ? panelHeading : "font-black text-[#15202B]"}`}>{verdict === "해설" ? <NoteHeading /> : verdict}</p>}
       {/* 일반 어휘·문법 설명(「표현 메모」)은 화면에 보이지 않는다 — 판단 근거인 화용 해설만 남긴다. 저장된 콘텐츠는 그대로다. */}
       {asList ? <ul className="list-disc space-y-1 pl-5">
         {withoutExpressionMemo(feedback).split(/\n|(?<=[.!?。！？])\s+/).filter(Boolean).map((line, index) =>
@@ -613,10 +661,10 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
  */
 function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "partial"; title: string; children?: React.ReactNode }) {
   const palette = tone === "ok"
-    ? { box: "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]", mark: "bg-[#245E44] text-white" }
+    ? { box: "border-[#BFD9CC] bg-white text-[#245E44]", mark: "bg-[#245E44] text-white" }
     : tone === "miss"
-      ? { box: "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]", mark: "bg-[#B5504A] text-white" }
-      : { box: "border-[#E6D49A] bg-[#FBF6E6] text-[#6B5414]", mark: "bg-[#C9A62E] text-white" };
+      ? { box: "border-[#E2AAA5] bg-white text-[#713E3A]", mark: "bg-[#B5504A] text-white" }
+      : { box: "border-[#E6D49A] bg-white text-[#6B5414]", mark: "bg-[#C9A62E] text-white" };
   return (
     <div role="status" className={`rounded-xl border px-4 py-3 text-sm leading-6 ${palette.box}`}>
       <p className="flex items-center gap-2.5 text-[16px] font-black">
@@ -634,8 +682,8 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 /** 문항 뒤 참고 답안 상자 — 「가능한 수정 예시」와 「참고 표현」이 같은 모양을 쓴다. */
 function ReferenceExamples({ title, items, font }: { title: string; items: string[]; font: string }) {
   return (
-    <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
-      <h4 className="font-bold"><span aria-hidden>✅ </span>{title}</h4>
+    <section className="mt-4 rounded-xl border-l-4 border-l-transparent bg-[#F8F7F2] px-4 py-3.5" aria-label={title}>
+      <h4 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />{title}</h4>
       <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
         <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
         <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
@@ -647,7 +695,7 @@ function ReferenceExamples({ title, items, font }: { title: string; items: strin
 function NoteLine({ children }: { children: React.ReactNode }) {
   return (
     <span className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 border-t border-dashed border-[#DDD8CB] pt-2.5 text-[15.5px] font-normal leading-7 text-[#15202B]">
-      <span className="whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><span aria-hidden>💡 </span>해설</span>
+      <NoteTag />
       <span className="min-w-0">{children}</span>
     </span>
   );
@@ -741,21 +789,21 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
         <p className="sr-only" aria-live="polite">
           {judgmentShown
-            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 가능한 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
+            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
           <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
           <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
-              answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} acceptedLabel="핵심 이유" onSelect={setReasonId} />)}
+              answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} acceptedLabel="기준 이유" onSelect={setReasonId} />)}
           </div>
           <p className="sr-only" aria-live="polite">
-            {answered && reasonAcceptedId ? `${reasonOk ? "핵심 이유를 골랐습니다" : "핵심 이유와 다릅니다"}. 핵심 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
+            {answered && reasonAcceptedId ? `${reasonOk ? "기준 이유를 골랐습니다" : "기준 이유와 다릅니다"}. 기준 이유 ${String(reasonLabel(reasonAcceptedId) ?? "").replace(/[.。]$/, "")}.` : ""}
           </p>
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
-        {answered && <div className="mt-4"><FeedbackBox verdict="💡 해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
+        {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
         {answered && quest.revisionExamples && <ReferenceExamples title="가능한 수정 예시" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
@@ -765,7 +813,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
             else setAnswered(true);
           }}>{judgmentCommitted ? "이유 확정하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : (
           <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
@@ -809,7 +857,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
         </div>}
         {locked && (
           <div className={correctionOnly ? "mt-3" : "mt-5 border-t border-[#E4E0D5] pt-4"}>
-            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]" : "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]"}`}>
+            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-white text-[#245E44]" : "border-[#E2AAA5] bg-white text-[#713E3A]"}`}>
               <p className="flex items-center gap-2 font-black">
                 <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${judgmentMatched ? "bg-[#DCEFE4] text-[#245E44]" : "bg-[#F4D8D5] text-[#8B3531]"}`}>
                   {judgmentMatched ? <Check className="h-4 w-4" strokeWidth={3} /> : <X className="h-4 w-4" strokeWidth={3} />}
@@ -835,12 +883,12 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                   const picked = correctionId === correction.id;
                   const state = answered
                     ? correction.valid
-                      ? "border-[#4D8568] bg-white text-[#263444] ring-1 ring-[#4D8568]"
+                      ? "border-[#4D8568] bg-white text-[#263444] ring-[0.6px] ring-[#4D8568]"
                       : picked
-                        ? "border-[#C86E68] bg-[#FFF3F1] text-[#263444] ring-1 ring-[#C86E68]"
+                        ? "border-[#C86E68] bg-white text-[#263444] ring-[0.6px] ring-[#C86E68]"
                         : "border-[#E0DDD5] bg-white text-[#263444]"
                     : picked
-                      ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-1 ring-[#15202B]"
+                      ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-[0.6px] ring-[#15202B]"
                       : "border-[#E3DDCF] bg-white";
                   return (
                     <button key={correction.id} type="button" disabled={answered} aria-pressed={picked} onClick={() => setCorrectionId(correction.id)} className={`${optionBase} min-w-0 [overflow-wrap:anywhere] ${state} disabled:cursor-default`}>
@@ -849,17 +897,17 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
                             {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
-                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />가능한 선택</span>}
+                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />기준 선택</span>}
                           </span>
                         )}
                       </span>
-                      {answered && <NoteLine>{correction.note}</NoteLine>}
+                      {answered && <NoteLine><RichLine text={correction.note} /></NoteLine>}
                     </button>
                   );
                 })}
               </div>
               <p className="sr-only" aria-live="polite">
-                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "가능한 선택에 해당합니다." : "가능한 선택을 다시 살펴보세요. 해당 후보에 가능한 선택 표시가 있습니다.") : ""}
+                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "기준 선택에 해당합니다." : "기준 선택을 다시 살펴보세요. 해당 후보에 기준 선택 표시가 있습니다.") : ""}
               </p>
             </div>
           </div>
@@ -869,9 +917,9 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확인하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>교정안 확인하기</Button>
+          <Button className={`h-11 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>수정안 확정하기</Button>
         ) : (
           <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ ...(!correctionOnly ? { judgment } : {}), correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
@@ -905,36 +953,33 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
-      <div className="mt-4 pl-10">
+      {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
+      <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-[16.5px] leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
         {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className={`mt-4 ${feedbackBox}`} aria-label="화용 해설">
-        <h4 className="mb-2 font-black text-[#15202B]">💡 해설</h4>
+        <h4 className={`mb-2 ${panelHeading}`}><NoteHeading /></h4>
         <ul className="list-disc space-y-1 pl-5">
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
       {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
-      {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
-        <div className="flex items-center gap-1.5">
-          <span aria-hidden className="text-[14px]">🔄</span>
-          <h4 className="text-[14px] font-black text-[#15202B]">다른 맥락에서는?</h4>
-        </div>
+      {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#DDD8CB] px-4 py-3" aria-label="다른 맥락에서는?">
+        <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
-        {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
+        {/* 메신저의 「내가 보낸 말」 — 단색 블루·흰 글자로 메시지의 생동감을 살리되, 블루는 말풍선 한 곳에만 쓴다(2026-10-01). */}
         <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#0B63CE] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#326BD6] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
           </div>
-          <p className="mt-0.5 pr-1 text-right text-[11px] text-[#8E8E8E]">보냄</p>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
       </section>}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 제출하기</Button>
+      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 확정하기</Button>
         : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -970,26 +1015,23 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
               className={`min-h-[42px] rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
+              {submitted && accepted && <span className="ml-1.5 inline-flex items-center rounded-full border border-[#80AB94] bg-white px-1.5 py-px align-[1px] text-[10.5px] font-black text-[#245E44]">허용 판단</span>}
             </button>;
           })}
         </div>
         {submitted && (() => {
           const ok = candidate.acceptedAnswers.includes(picks[candidate.id] ?? "");
-          return <div className="mt-3">
-            <p className={`flex items-center gap-1.5 text-sm font-black ${ok ? "text-[#245E44]" : "text-[#8B3531]"}`}>
-              <span aria-hidden className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-white ${ok ? "bg-[#245E44]" : "bg-[#B5504A]"}`}>
-                {ok ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <X className="h-3.5 w-3.5" strokeWidth={3.5} />}
-              </span>
-              <span className="sr-only">{ok ? "O " : "X "}</span>
-              가능한 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
-            </p>
-            <NoteLine>{candidate.note}</NoteLine>
+          // 판정은 선택지 위에서 끝낸다(DEC-20260918-03) — 내 칩의 ✓/✕와 허용 칩의 꼬리표. 아래 줄은 해설만.
+          return <div className="mt-1">
+            <p className="sr-only">{ok ? "내 선택이 허용 판단에 해당합니다." : "내 선택이 허용 판단과 다릅니다."}</p>
+            <p className="sr-only">허용 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
+            <NoteLine><RichLine text={candidate.note} /></NoteLine>
           </div>;
         })()}
       </fieldset>)}</div>
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/${total}개 표현을 판단했습니다.` : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확인하기</Button>
+      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확정하기</Button>
         : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -1004,12 +1046,12 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
   const reasonAccepted = reasonId ? acceptedReasonIds.includes(reasonId) : false;
   const reasonFeedback = reasonAccepted
     ? {
-        verdict: "핵심 이유를 찾았어요",
+        verdict: "기준 이유를 찾았어요",
         intro: "이 상황에서 표현이 어색해지는 핵심 원인을 찾았습니다.",
         action: "다음 문항에서도 상황 단서와 표현의 기능을 연결해 보세요.",
       }
     : {
-        verdict: "핵심 이유를 다시 확인해요",
+        verdict: "기준 이유를 다시 확인해요",
         intro: "선택한 이유보다 이 상황의 관계·거리·부담을 더 직접 설명하는 이유가 있습니다.",
         action: selectedReason ? `내가 고른 이유 · ${selectedReason.text}` : undefined,
       };
@@ -1036,7 +1078,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
           <div className="mt-4">
             <FeedbackBox
               verdict={reasonFeedback.verdict}
-              feedback={`${reasonFeedback.intro} 핵심 이유는 “${acceptedReason.text}”입니다. ${quest.feedback}`}
+              feedback={`${reasonFeedback.intro} 기준 이유는 “${acceptedReason.text}”입니다. ${quest.feedback}`}
               action={reasonFeedback.action}
               highlights={quest.targetHighlights}
             />
@@ -1094,7 +1136,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
                   <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_max-content] sm:items-start sm:gap-4">
                     <div className="min-w-0">
                       <p className={`${targetFont} text-[16.5px] leading-7`}>{candidate.text}</p>
-                      <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]">{candidate.note}</p>
+                      <p className="mt-1 break-keep text-[15px] leading-7 text-[#15202B]"><RichLine text={candidate.note} /></p>
                     </div>
                     <div className="flex flex-nowrap gap-1.5 whitespace-nowrap sm:justify-end">
                       <span className={`rounded px-2 py-1 text-[11px] font-black ${isBestRole ? "bg-[#DCEFE4] text-[#245E44]" : isWorstRole ? "bg-[#F4D8D5] text-[#8B3531]" : "bg-[#EEECE6]"}`}>{role}</span>
@@ -1142,21 +1184,23 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   // 코어에 저장된 힌트만 최대 3개. 기본은 접어 두고, 막혔을 때 직접 열어 본다.
   const hints = quest.vocabularyHints.slice(0, 3);
   if (hints.length === 0) return null;
-  const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh text-[16.5px]" : "";
-  const targetFont = mission.targetLanguage.code === "zh" ? "font-zh text-[16.5px]" : "";
+  const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
+  const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
-    // 펼친 힌트가 아래로 밀지 않도록 요약 오른쪽에 붙는다.
-    <details className="mt-3 flex flex-wrap items-center gap-2">
-      <summary className="group inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-[#EAD48A] bg-[#FFF9E3] px-3.5 py-1.5 text-[13px] font-bold text-[#6B5518] transition-colors hover:bg-[#FFF3C8] [&::-webkit-details-marker]:hidden">
-        <Lightbulb aria-hidden className="h-4 w-4 text-[#C9A62E]" />단어 힌트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
+    // 토글 오른쪽으로 펼친다 — 입력창 바로 아래 한 줄에 힌트가 붙어 보면서 칠 수 있다. 꺾쇠(오른쪽)와 펼침 방향을 맞춘다.
+    <details className="group/vocabulary mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-1 text-[14.5px] font-black text-[#15202B] transition-colors hover:text-[#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[#15202B]"><Lightbulb className="h-[18px] w-[18px]" strokeWidth={2.25} /></span>
+        단어 힌트 보기<ChevronRight aria-hidden className="h-4 w-4 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" strokeWidth={2.5} />
       </summary>
-      <div className="flex flex-wrap gap-2">
+      <dl className="flex flex-wrap gap-2" aria-label="단어 힌트">
         {hints.map((hint) => (
-          <span key={hint.source} className="rounded-full border border-[#E3DDCF] bg-[#FAF8F2] px-3 py-1.5 text-[15px] leading-6">
-            <b className={sourceFont}>{hint.source}</b> · <span className={targetFont}>{hint.target}</span>
-          </span>
+          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-[14px] rounded-bl-md bg-[#326BD6] px-3 py-1.5 text-white">
+            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-white`}>{hint.source}</dt>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-white`}><span aria-hidden className="text-[13px] font-normal text-white/60">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
+          </div>
         ))}
-      </div>
+      </dl>
     </details>
   );
 }
@@ -1230,15 +1274,17 @@ const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
 
 const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
   very_good: "bg-[#EAF4ED] text-[#286247]",
-  recommend: "bg-[#FFF2B8] text-[#725B12]",
+  // 수정 권장·수정 필요는 MJT 오답과 같은 빨강 계열 — 「고쳐야 한다」는 메시지를 색으로도 전한다(2026-10-01). 호박색은 허용·참고의 색.
+  recommend: "bg-[#FCE7E4] text-[#8D3B36]",
   required: "bg-[#FCE7E4] text-[#8D3B36]",
   deferred: "bg-[#EEECE6] text-[#635E52]",
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
-  very_good: "border-[#C6DDCE] bg-[#F4FAF6]",
-  recommend: "border-[#E2C84F] bg-[#FFFAE8]",
-  required: "border-[#D79A94] bg-[#FFF7F5]",
+  // 기준 카드는 흰 면 + 색 테두리, 배지만 색을 채운다 — 카드 셋이 모두 색면이면 「경고 벽지」가 된다.
+  very_good: "border-[#C6DDCE] bg-white",
+  recommend: "border-[#D79A94] bg-white",
+  required: "border-[#D79A94] bg-white",
   deferred: "border-[#E2DED3] bg-[#FAF9F5]",
 };
 
@@ -1722,7 +1768,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 「내 판단 남기기」에 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 첫 ${outputName}을 유지해 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => onDone({ first, revised: revised.trim(), reflected,
     evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
@@ -1788,7 +1834,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       <h3 className="text-[15px] font-black text-[#2B3647]">{criterion.label}</h3>
                       {!localPilot && (
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
-                          {passed && <Sparkles aria-hidden className="h-3 w-3" />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
+                          {passed && <Check aria-hidden className="h-3 w-3" strokeWidth={3} />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
                         </span>
                       )}
                     </div>
@@ -1815,8 +1861,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
-                      <p className="text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
+                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-white px-4 py-3">
+                      <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
                 </>
@@ -1838,8 +1884,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!recheckRequested && <DemoFillButton />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
-                  <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
-                    {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
+                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
+                    {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
                 )}
@@ -1848,9 +1894,10 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 다시 확인하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                  {!recheckRequested && needsChange && !reflected && canRetainWithDissent && (
-                    <Button variant="outline" className="h-11 w-full" onClick={retainFirstResponse}>수정하지 않고 첫 {outputName} 유지하기</Button>
+                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
+                  {!recheckRequested && (
+                    <Button variant="outline" className="h-11 w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 첫 {outputName} 유지하기</Button>
                   )}
                 </div>
               </ActionBar>
@@ -1924,14 +1971,14 @@ const PROGRESS_LABELS: Record<string, string> = {
 function progressLabel(quest: MissionQuest, outputName = "번역") {
   // 진행 막대·핵심 정리·기록에 들어가는 짧은 이름. 미션 안내의 풀어 쓴 활동명과는 따로 둔다.
   if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "표현 판단";
-  if (quest.kind === "fix_choice") return "수정안 고르기";
-  if (quest.kind === "free_correction") return "직접 고치기";
+  if (quest.kind === "fix_choice") return "수정안 선택";
+  if (quest.kind === "free_correction") return "직접 수정";
   if (quest.kind === "spectrum") return "표현 비교";
   if (quest.kind === "dct") return `${outputName}하기`;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
 
-const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "피드백", "재검토"] as const;
+const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "AI 피드백", "재검토"] as const;
 /** 학습자에게는 「산출」·「옮기기」 대신 미션 방식 그대로 「번역하기」·「통역하기」로 읽힌다. */
 function macroStages(outputName: string): string[] {
   return MACRO_PROGRESS.map((label) => label === "직접 옮기기" ? `${outputName}하기` : label);
@@ -1969,7 +2016,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   // 다섯 문항 동안 큰 단계가 「적절성 판단」에 머무르므로, 그 안의 진행은 점 다섯 개가 따로 나른다.
   const judging = activeIndex <= 4 && sceneIntroStep === null && !completed && reviewIndex === null && !mpjRecapOpen;
   const detail = completed
-    ? { phase: "미션 완료", activity: `내 ${outputName} 돌아보기` }
+    ? { phase: "미션 완료", activity: "미션 완료" }
       : reviewIndex !== null
       ? { phase: "기록 검토", activity: progressLabel(quests[reviewIndex], outputName) }
       : sceneIntroStep !== null
@@ -1982,7 +2029,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
           ? { phase: `${outputName}하기`, activity: progressLabel(quests[activeIndex], outputName) }
           : revisionOpen
             ? { phase: "재검토", activity: `내 ${outputName} 재검토` }
-            : { phase: "피드백", activity: progressLabel(quests[activeIndex], outputName) };
+            : { phase: "AI 피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
       <div className="flex items-center gap-3 sm:gap-4">
@@ -2171,21 +2218,20 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   return (
-    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-5 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
-      <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">다섯 문항에서 챙길 한 줄</span></h1>
-      <ol className="mt-4 space-y-2.5">
+    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-4 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
+      <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">문항별 요점</span></h1>
+      {/* 다섯 줄을 한 패널의 표처럼 — 이름 칸 폭을 고정해 한 줄 요약이 같은 선에서 시작하고, 스크롤 없이 한 화면에 들어온다. */}
+      <ol className="mt-3 divide-y divide-[#EEEAE1] overflow-hidden rounded-xl border border-[#EAE5D8] bg-white">
         {lessonPoints.map((point, index) => (
           <li key={point.questId} style={{ animationDelay: `${index * 90}ms` }}
-            className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-xl border border-[#EAE5D8] bg-white px-4 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
-            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[14px] font-extrabold text-[#15202B]">{index + 1}</span>
-            <div className="min-w-0">
-              <p className="inline-block rounded-md bg-[#E9EFF8] px-2 py-0.5 text-[12.5px] font-black text-[#2F4F86]">{mission.missionFormat === "mission_v6"
-                ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
-                : point.label}</p>
-              <p className="mt-1.5 break-keep text-[16px] font-normal leading-7 text-[#263444] [overflow-wrap:anywhere]">
-                <HighlightedText text={point.text} highlights={point.highlights} target />
-              </p>
-            </div>
+            className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-baseline gap-x-3.5 gap-y-1.5 px-4 py-2.5 sm:grid-cols-[1.75rem_6.75rem_minmax(0,1fr)] sm:gap-x-4 sm:px-5 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both">
+            <span aria-hidden className="grid h-[26px] w-[26px] place-items-center self-start rounded-full bg-[#FAD338] text-[12.5px] font-black text-[#15202B] sm:mt-[2px]">{index + 1}</span>
+            <p className="text-[16px] font-black text-[#15202B]">{mission.missionFormat === "mission_v6"
+              ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
+              : point.label}</p>
+            <p className="col-start-2 min-w-0 break-keep text-[16.5px] font-normal leading-[30px] text-[#263444] [overflow-wrap:anywhere] sm:col-start-3">
+              <HighlightedText text={point.text} highlights={point.highlights} target />
+            </p>
           </li>
         ))}
       </ol>
@@ -2313,7 +2359,8 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
   // 고친 곳을 지우거나 칠하지 않고 굵기도 같게 둔다 — 처음 쓴 것도 고친 것도 학습자가 쓴 것이고,
-  // 어느 쪽이 맞다고 판정하지 않는다. 그래서 「최종」처럼 완성·정답을 풍기는 이름도 피한다.
+  // 어느 쪽이 맞다고 판정하지 않는다. 이름은 용어대장의 「최초 산출 → 최종 산출」을 따른다(2026-10-01 연구자 결정).
+  // 「최종」은 정답이 아니라 학습자가 마지막에 결정한 표현이라는 뜻이며, 유지한 경우에도 그대로 맞는 이름이다.
   const revised = response.reflected && response.revised !== response.first;
   const row = "grid grid-cols-[88px_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-0 last:pb-0";
   const rowLabel = "text-[13px] font-black text-[#6B6453]";
@@ -2322,28 +2369,28 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
     <article className="space-y-4">
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
         className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-4 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-6">
-        {/* 원문 → 처음 쓴 번역 → 고친 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
+        {/* 원문 → 최초 번역 → 최종 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
         <div className="divide-y divide-[#ECE7DA]">
           {source && <div className={row}>
             <span className={rowLabel}>{mission.sourceLanguage.label} 원문</span>
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
           {revised && <div className={row}>
-            <span className={rowLabel}>처음 쓴 {outputName}</span>
+            <span className={rowLabel}>최초 {outputName}</span>
             <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={rowLabel}>{revised ? `고친 ${outputName}` : `내 ${outputName}`}</span>
+            <span className={rowLabel}>최종 {outputName}</span>
             <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className="text-[17px] font-black text-[#15202B]"><span aria-hidden>✅ </span>참고 표현</h2>
+        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
-          <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>
-          <p className="mt-1.5 break-keep text-[15.5px] leading-7 text-[#15202B]"><span aria-hidden>💡 </span>{alternative.note}</p>
+          <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>
+          <p className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 break-keep border-t border-dashed border-[#F3E3A2] pt-2 text-[15.5px] leading-7 text-[#15202B]"><NoteTag /><span className="min-w-0">{alternative.note}</span></p>
         </li>)}</ol>
       </section>}
     </article>
@@ -2356,7 +2403,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
   const items = quests.filter(quest => quest.kind !== "dct" && quest.kind !== "dct_feedback");
   return (
     <section id="demo-record" className={`${panel} scroll-mt-24 p-5 sm:p-6`} aria-label="데모 학습 기록">
-      <h2 className="text-[17px] font-black"><span aria-hidden>📒 </span>데모 학습 기록</h2>
+      <h2 className="flex items-center text-[17px] font-black"><SectionIcon icon={ClipboardList} tone="navy" />데모 학습 기록</h2>
       <p className="mt-1 break-keep text-[13px] leading-5 text-[#6A7485]">실제 학습자는 이 기록이 「나의 학습 기록」에 저장됩니다. 데모에서는 저장하지 않고 여기에서만 보여 줍니다.</p>
       <ol className="mt-4 space-y-2.5">
         {items.map((quest, index) => {
@@ -3017,8 +3064,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"}, 완성!</h1>
-              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 보고 한 번 더 다듬어 최종안을 만들었어요." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했어요."}</p>
+              <h1 className="text-2xl font-black">학습 미션 완료</h1>
+              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 최종안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했습니다."}</p>
             </section>
             <div className="space-y-4">
               <CompletionRecord
