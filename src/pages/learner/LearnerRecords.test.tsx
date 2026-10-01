@@ -33,8 +33,10 @@ function renderReport() {
   return render(<MemoryRouter><LearnerRecords /></MemoryRouter>);
 }
 
-const summaryText = () => screen.getByText(/완료한 미션 \d+건/).textContent;
-const recordItems = async () => within(await screen.findByRole("list", { name: "완료 기록" })).getAllByRole("listitem");
+const summaryText = () => screen.getByText(/미션 \d+개 · 수행 \d+회/).textContent;
+const missionCards = async () => within(await screen.findByRole("list", { name: "완료 기록" })).getAllByRole("article");
+const attempts = async () => (await screen.findAllByRole("list", { name: "수행 기록" })).flatMap((list) => within(list).getAllByRole("listitem"));
+const recordItems = attempts;
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -79,7 +81,7 @@ describe("learner records", () => {
     await act(async () => { await Promise.resolve(); });
     await act(async () => { complete({ data: [], error: null }); });
     expect(screen.getByText("localhost 시연 데이터")).toBeInTheDocument();
-    expect(summaryText()).toBe("완료한 미션 1건");
+    expect(summaryText()).toBe("미션 1개 · 수행 1회");
   });
 
   it("reads only the signed-in user's completed rows, even on localhost", async () => {
@@ -90,7 +92,7 @@ describe("learner records", () => {
     expect(mocks.from).toHaveBeenCalledWith("learner_mission_logs");
     expect(mocks.eq).toHaveBeenCalledWith("auth_user_id", "current-user");
     expect(mocks.eq).toHaveBeenCalledWith("mission_completed", true);
-    expect(summaryText()).toBe("완료한 미션 1건 · 수업 1개");
+    expect(summaryText()).toBe("미션 1개 · 수행 1회 · 수업 1개");
     expect(screen.queryByText("localhost 시연 데이터")).not.toBeInTheDocument();
   });
 
@@ -103,20 +105,31 @@ describe("learner records", () => {
     expect(await recordItems()).toHaveLength(2);
   });
 
-  it("lists every record with course, week, source, first and final expressions", async () => {
+  it("groups attempts by mission with the source shown once and marks kept or revised", async () => {
     const withSource = { ...ownLog, source_text: "시간 확인 부탁드립니다." };
-    const unchanged = { ...ownLog, id: "same", speech_act: "refusal", source_text: "자료 보내 주세요.", revised_response: ownLog.first_response };
-    mocks.order.mockResolvedValue({ data: [withSource, unchanged], error: null });
+    const unchanged = { ...withSource, id: "same", revised_response: ownLog.first_response, completed_at: "2026-09-04T10:00:00Z" };
+    const other = { ...ownLog, id: "other", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", speech_act: "refusal", source_text: "자료 보내 주세요." };
+    mocks.order.mockResolvedValue({ data: [withSource, unchanged, other], error: null });
     renderReport();
-    const items = await recordItems();
-    expect(items).toHaveLength(2);
-    expect(items[0]).toHaveTextContent("AI 한중 화용 통번역 · 2주차 · 요청 · 번역");
-    expect(items[0]).toHaveTextContent("원문시간 확인 부탁드립니다.");
-    expect(items[0]).toHaveTextContent(`최초 번역${ownLog.first_response}`);
-    expect(items[0]).toHaveTextContent(`최종 번역${ownLog.revised_response}`);
-    expect(within(items[0]).getByText("수정")).toBeInTheDocument();
-    expect(within(items[1]).getByText("유지")).toBeInTheDocument();
-    expect(items[1]).toHaveTextContent(`최종 번역${ownLog.first_response}`);
+    const cards = await missionCards();
+    expect(cards).toHaveLength(2);
+    expect(cards[0]).toHaveTextContent("AI 한중 화용 통번역 · 2주차 · 요청 · 번역");
+    expect(within(cards[0]).getAllByText("시간 확인 부탁드립니다.")).toHaveLength(1);
+    expect(cards[0]).toHaveTextContent("수행 2회");
+    const rows = within(within(cards[0]).getByRole("list", { name: "수행 기록" })).getAllByRole("listitem");
+    expect(within(rows[0]).getByText("수정")).toBeInTheDocument();
+    expect(rows[0]).toHaveTextContent(`최초${ownLog.first_response}`);
+    expect(rows[0]).toHaveTextContent(`최종${ownLog.revised_response}`);
+    expect(within(rows[1]).getByText("유지")).toBeInTheDocument();
+    expect(rows[1]).toHaveTextContent(`최종${ownLog.first_response}최초 번역을 그대로 결정`);
+    expect(cards[1]).toHaveTextContent("거절");
+  });
+
+  it("underlines only the changed part of the final expression", async () => {
+    mocks.order.mockResolvedValue({ data: [ownLog], error: null });
+    renderReport();
+    const [row] = await attempts();
+    expect(within(row).getByText("如果方便，").className).toContain("underline");
   });
 
   it("shows no score, type, revision count or act map — only a shared reflection question", async () => {
@@ -124,7 +137,7 @@ describe("learner records", () => {
     renderReport();
     await recordItems();
     expect(screen.getByRole("heading", { name: "내 기록" })).toBeInTheDocument();
-    expect(screen.queryByText(/고쳐 쓴 기록|\/9|시그니처|수정 노트|화행 학습 지도/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/고쳐 쓴 기록|시그니처|수정 노트|완료 학습 기록/)).not.toBeInTheDocument();
     expect(screen.getByText(/다시 볼 때 · 모든 학습자에게 같은 질문입니다/)).toBeInTheDocument();
   });
 
@@ -145,16 +158,22 @@ describe("learner records", () => {
     expect(within(item).getByText("유지")).toBeInTheDocument();
   });
 
-  it("filters by speech act and hides the course filter for a single course", async () => {
-    const refusal = { ...ownLog, id: "refusal", speech_act: "refusal" };
+  it("maps the nine acts with counts and filters records when one is pressed", async () => {
+    const refusal = { ...ownLog, id: "refusal", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", speech_act: "refusal" };
     mocks.order.mockResolvedValue({ data: [ownLog, refusal], error: null });
     renderReport();
-    await recordItems();
+    await missionCards();
+    const map = within(screen.getByRole("region", { name: "9개 화행 지도" }));
+    expect(map.getByText("2/9 화행 수행 · 누르면 아래 기록을 거릅니다")).toBeInTheDocument();
+    expect(map.getAllByRole("button")).toHaveLength(9);
+    expect(map.getByRole("button", { name: /사과\s*아직/ })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("combobox", { name: "수업" })).not.toBeInTheDocument();
-    fireEvent.change(screen.getByRole("combobox", { name: "화행" }), { target: { value: "refusal" } });
-    const items = await recordItems();
-    expect(items).toHaveLength(1);
-    expect(items[0]).toHaveTextContent("거절");
+    fireEvent.click(map.getByRole("button", { name: /거절\s*1회/ }));
+    const cards = await missionCards();
+    expect(cards).toHaveLength(1);
+    expect(cards[0]).toHaveTextContent("거절");
+    fireEvent.click(screen.getByRole("button", { name: "전체 보기" }));
+    expect(await missionCards()).toHaveLength(2);
   });
 
   it("keeps a failed query distinct from no records and allows retry", async () => {
