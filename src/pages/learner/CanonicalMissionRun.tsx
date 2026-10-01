@@ -275,53 +275,48 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
 function v6IntroSteps(outputName: string) {
   return {
     judgment: [
-      // 보조 설명은 명사형 13자 이내 — 이름 오른쪽 한 줄에 고정되어 행 높이가 같아진다.
+      // 보조 설명은 명사형 12자 이내 — 이름 오른쪽 한 줄에 고정되어 행 높이가 같아진다.
       { title: "표현 판단", desc: `${outputName}안 하나의 상황 적절성` },
       { title: "판단과 이유", desc: "판단의 근거 선택" },
-      { title: "표현 비교", desc: "같은 원문의 여러 표현 대조" },
-      { title: "수정안 선택", desc: "수정 후보 가운데 하나 선택" },
+      { title: "표현 비교", desc: "같은 원문의 표현 대조" },
+      { title: "수정안 선택", desc: "수정 후보 중 하나 선택" },
       { title: "직접 수정", desc: `${outputName}안을 직접 고쳐 쓰기` },
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
       { title: `${outputName}하기`, desc: `새 원문의 직접 ${outputName}` },
       { title: "피드백", desc: "의미·문법·화용 세 기준" },
-      { title: "재검토", desc: "유지 또는 수정의 최종 결정" },
+      { title: "재검토", desc: "유지·수정의 최종 결정" },
     ],
   };
 }
 
+/** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
+const INTRO_COLUMN_LABEL = "text-[11px] font-black tracking-[0.1em] text-[#8A939F]";
+
 const INTRO_PHASE_TONE = {
-  judgment: { card: "border-[#D6DCE4]", head: "bg-[#EEF2F6]", chip: "bg-[#15202B] text-white", num: "text-[#15202B] ring-[#C9D2DD]" },
-  production: { card: "border-[#E4CB50]", head: "bg-[#FFF6D6]", chip: "bg-[#F7CE3E] text-[#15202B]", num: "text-[#6B5518] ring-[#E4CB50]" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", caption: "text-[#5D6878]" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", caption: "text-[#8A6A14]" },
 } as const;
 
-function IntroPhaseCard({ tone, numeral, title, caption, steps }: {
+function IntroPhaseColumn({ tone, title, caption, steps }: {
   tone: keyof typeof INTRO_PHASE_TONE;
-  numeral: string;
   title: string;
   caption: string;
   steps: { title: string; desc: string }[];
 }) {
   const t = INTRO_PHASE_TONE[tone];
   return (
-    <section className={`flex flex-col overflow-hidden rounded-xl border bg-white ${t.card}`} aria-label={`${title} 단계`}>
-      <header className={`flex items-center gap-3 px-5 py-3 ${t.head}`}>
-        <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[14px] font-black ${t.chip}`}>{numeral}</span>
-        <div className="min-w-0">
-          <h2 className="text-[18px] font-black leading-7 text-[#15202B]">{title}</h2>
-          <p className="text-[13px] font-bold tracking-[0.02em] text-[#5D6878]">{caption}</p>
-        </div>
-      </header>
-      <ol className="flex flex-1 flex-col divide-y divide-[#EEEAE1]" aria-label={`${title} 활동`}>
+    <section aria-label={`${title} 단계`}>
+      <h2 className={INTRO_COLUMN_LABEL}>{title}</h2>
+      <p className={`mt-0.5 text-[12.5px] font-bold ${t.caption}`}>{caption}</p>
+      {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
+      <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className="flex flex-1 items-center gap-3.5 px-5 py-3.5">
-            <span className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-white text-[12.5px] font-black ring-1 ${t.num}`}>{index + 1}</span>
-            {/* 단계 이름과 설명을 한 줄에 — 설계도 전체가 스크롤 없이 한 화면에 들어오게. 폰에서만 두 줄로 내려간다. */}
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 break-keep sm:flex-nowrap">
-              <span className="shrink-0 text-[18px] font-bold leading-7 text-[#15202B]">{step.title}</span>
-              <span className="text-[15px] leading-6 text-[#6A7485] sm:whitespace-nowrap">{step.desc}</span>
-            </span>
+          <li key={step.title} className={`grid grid-cols-[22px_6.25rem_minmax(0,1fr)] items-center gap-x-3 rounded-lg px-3 py-2.5 ${t.pill}`}>
+            <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
+            <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
+            <span className="break-keep text-[13.5px] leading-5 text-[#6A7485] sm:truncate">{step.desc}</span>
           </li>
         ))}
       </ol>
@@ -331,17 +326,15 @@ function IntroPhaseCard({ tone, numeral, title, caption, steps }: {
 
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
-  // 두 국면을 같은 높이의 카드로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다.
+  // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
-    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-stretch sm:gap-3">
-      <IntroPhaseCard tone="judgment" numeral="Ⅰ" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
-      <div className="flex items-center justify-center" aria-hidden>
-        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DDD8CB] bg-white text-[#6B5518] shadow-[0_1px_3px_rgba(21,32,43,0.08)]">
-          <ArrowRight className="hidden h-4 w-4 sm:block" strokeWidth={2.5} />
-          <ArrowDown className="h-4 w-4 sm:hidden" strokeWidth={2.5} />
-        </span>
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-4">
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
+      <div className="flex items-center justify-center sm:self-stretch sm:pt-[42px]" aria-hidden>
+        <ArrowRight className="hidden h-5 w-5 text-[#B49A23] sm:block" />
+        <ArrowDown className="h-5 w-5 text-[#B49A23] sm:hidden" />
       </div>
-      <IntroPhaseCard tone="production" numeral="Ⅱ" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" steps={steps.production} />
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" steps={steps.production} />
     </div>
   );
 }
