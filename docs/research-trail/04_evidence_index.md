@@ -573,3 +573,10 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - `revision-release-result.json`: 지정 course/week2/position0 assignment 교체 전후 및 관리자 세션의 learner DB 읽기 경로에서 최종 hash 확인. `finalization-diff.json`: 학습 콘텐츠 변경 0, metadata만 변경. `professor-approval-result.json`: 새 승인/lineage 근거.
 - 첫 초안의 필수 authoring 카운터 초기화 누락은 승인 gate가 차단했다. 실패 증거 보존 후 사용자 재시도 허용으로 완료했다. 총 기본 AI 검토 2회/최종화 2회, 최종 규칙·AI PASS. 기존 승인 자동 승계 없음.
 - UI 코드 push/PR/merge/deploy·운영 learner E2E·저장 RCA 추가 조사 없음. 이 기록을 새 learner 수행·저장 성공이나 학습효과 증거로 확대하지 않는다.
+
+
+## EVD-20261001-01 · 대표 미션 4필드 패치 및 새 승인 계보
+
+- 연구자 채택 독립감수 → 지정 4필드 수정 → 새 scenario v1 → 정상 검토·최종화 → 위임에 따른 교수자 재승인 v2 → 지정 교과목 슬롯 교체.
+- 근거: `docs/research-trail/evidence/2026-10-01-representative-content-patch/approved-snapshot.json`, `approval-provenance.json`; 경위: `docs/dev-log/2026-10-01-representative-content-patch.md`.
+- 기존 A/B 피드백은 구 scenario/hash의 실제 수행 기록으로 보존·재사용한다. 이번 콘텐츠 버전에서 새 학습자 피드백을 생성한 증거가 아니다.

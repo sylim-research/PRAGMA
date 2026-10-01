@@ -1,8 +1,4 @@
-// 대표 미션 승인본: scenario 95209155-0067-44f3-a01d-81378939584f, version 2, 2026-10-01T12:26:48.114662+00:00.
-// mission_content_hash 241470df3049080c5a8e7fd8e776462471d705ed0e19f159ef1f4ed30d153673
-// 출처: docs/research-trail/evidence/2026-10-01-representative-content-patch/approved-snapshot.json. DB 승인본에서 생성.
-
-export const REPRESENTATIVE_MISSION_SNAPSHOT = {
+{
   "scenario_id": "95209155-0067-44f3-a01d-81378939584f",
   "speech_act": "request",
   "learner_level": null,
@@ -560,4 +556,4 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
       ]
     }
   }
-};
+}

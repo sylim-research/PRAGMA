@@ -1,0 +1,41 @@
+{
+  "scenario_id": "95209155-0067-44f3-a01d-81378939584f",
+  "version_id": "b365963a-4095-4166-960b-1e61306ae0a3",
+  "version_no": 2,
+  "parent_version_id": "5646d253-0be1-45bf-b14d-c8b7d0db148a",
+  "source_approved_parent_id": "6610c6c6-1a25-4cc6-a584-5d372c8224e4",
+  "mission_content_hash": "241470df3049080c5a8e7fd8e776462471d705ed0e19f159ef1f4ed30d153673",
+  "review_id": "dcb64c7a-59ca-4af3-a6e9-ed002e0736a9",
+  "review_hash": "473dbd2a83f95f8870464b278f06622ebbe789f5bc9f6c1be52acc69d6227eb4",
+  "approved_at": "2026-10-01T12:26:48.114662+00:00",
+  "professor_note": "2026-10-01 연구자가 독립감사 결과와 MISSION_CONTENT_DRAFT.json의 4필드 수정본을 그대로 채택하고 새 버전 등록·교수자 재승인·편성·데모 반영·제출 동결을 명시적으로 위임하여 Codex가 대행 처리. 최종화 전후 학습 콘텐츠 전체 동일 및 기존 승인본 대비 지정 4필드만 변경을 확인. 새 hash의 focused_v1 규칙·OpenAI 검토 PASS와 새 근거 귀속 자료를 연결하며 과거 승인 상태를 승계하지 않음. 기존 A/B 피드백은 2026-09-28 수행의 역사적 기록으로 재사용하며 이번 버전의 새 피드백 생성·검증으로 간주하지 않음.",
+  "rules": {
+    "verdict": "pass",
+    "findings": [],
+    "summary_ko": "현재 저장 미션에 기존 구조·형식 규칙 적용"
+  },
+  "openai_review": {
+    "model": "gpt-4.1-2025-04-14",
+    "checked_at": "2026-10-01T12:25:22.783Z",
+    "result": {
+      "verdict": "pass",
+      "findings": [],
+      "summary_ko": "전체적으로 장면의 현실성, PDR 근거, 요청의 직접성·선택권, 상황 설명, 예시 번역, 평가 기준이 모두 기준에 부합합니다. 이웃에게 택배 수령을 부탁하는 상황은 실제로 일어날 수 있고, 관계·권한·부담의 설정도 적절합니다. 미션별 문항, 예시, 설명, 기준 모두 의미 보존과 화행 목적, 맥락 일관성을 잘 지키고 있습니다. 별도의 수정이나 교수자 확인이 필요한 결함은 없습니다."
+    }
+  },
+  "instructional_changed_paths": [
+    "/mpj_items/4/candidates/3/text",
+    "/mpj_items/1/target",
+    "/mpj_items/1/revision_examples/1",
+    "/mpj_items/1/explanation_ko"
+  ],
+  "historical_feedback": {
+    "event_id": "2ca16780-44c0-4340-8371-58e6ffe658dc",
+    "attempt_id": "41fb9065-a621-41b0-8d14-7c030b5b04d1",
+    "scenario_id": "051532cc-c3a2-4440-9a5e-efc54e9ac481",
+    "content_hash": "3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764",
+    "occurred_at": "2026-09-28T14:32:06.882+00:00",
+    "reused_without_regeneration": true
+  },
+  "draft_version": "5646d253-0be1-45bf-b14d-c8b7d0db148a"
+}

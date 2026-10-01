@@ -1,7 +1,7 @@
-// 4.3 주대표와 랜딩페이지 시연은 한중 화용 2주차 첫 슬롯의 택배 미션이다(2026-09-27 재승인본).
-// 시연은 로그인 없이 여는 모델 하우스다. DB·AI를 쓰지 않고, 최신 승인본(scenario 051532cc, mission_content_hash
-// 3b213fbc…)을 옮겨 둔 스냅숏으로 실행한다. 실제 수업은 종전대로 DB 콘텐츠를 읽는다.
-// 미션을 새 버전으로 바꾸면 스냅숏과 시연용 예시 답안·피드백도 함께 갱신한다.
+// 대표 교과목 2주차 첫 슬롯의 2026-10-01 재승인본. 공개 데모는 DB·AI 호출 없이 snapshot을 읽는다.
+// DCT·A/B 산출은 불변이므로 2026-09-28 attempt 41fb9065-a621-41b0-8d14-7c030b5b04d1의 피드백을 재사용한다.
+// 그 기록의 원 scenario는 051532cc-c3a2-4440-9a5e-efc54e9ac481, 원 hash는 3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764이다.
+// 새 콘텐츠에서 피드백을 재생성·재검증한 기록이 아니다. 원문 기록 파일은 변경하지 않는다.
 
 import { normalizeLearnerMission } from "@/lib/pragma/missionV6";
 import type { CanonicalRunnableMission } from "@/lib/mission/missionDb";
@@ -9,7 +9,7 @@ import type { SpeechActUI } from "@/lib/pragma/enums";
 import { REPRESENTATIVE_MISSION_SNAPSHOT as snapshot } from "./representativeMissionSnapshot";
 
 export const REPRESENTATIVE_MISSION_PATH = "/demo/mission";
-export const REPRESENTATIVE_MISSION_ID = "051532cc-c3a2-4440-9a5e-efc54e9ac481";
+export const REPRESENTATIVE_MISSION_ID = "95209155-0067-44f3-a01d-81378939584f";
 
 export function publicRepresentativeMission(): CanonicalRunnableMission {
   const parsed = normalizeLearnerMission(snapshot.mission_content);
