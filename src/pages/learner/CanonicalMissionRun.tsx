@@ -549,12 +549,12 @@ function LanguagePair({ source, target, targetHighlights = [] }: {
 function optionState(answered: boolean, picked: boolean, correct: boolean) {
   if (!answered) {
     return picked
-      ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-[0.75px] ring-[#15202B]"
+      ? "border-[#15202B] bg-[#F8F7F2] font-bold text-[#15202B] ring-[0.6px] ring-[#15202B]"
       : "border-[#E3DDCF] bg-white hover:bg-[#FAF8F2]";
   }
-  // 선택·정답·오답 테두리는 모두 1.75px(border 1px + ring 0.75px)로 일원화 — 가늘면 판정이 분간되지 않고, 2px는 부담스럽다(2026-10-01).
-  if (correct) return "border-[#4D8568] bg-white text-[#245E44] ring-[0.75px] ring-[#4D8568]";
-  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531] ring-[0.75px] ring-[#C86E68]";
+  // 선택·정답·오답 테두리는 모두 1.6px(border 1px + ring 0.6px)로 일원화 — 가늘면 판정이 분간되지 않고, 1.75px 이상은 무겁다(2026-10-01).
+  if (correct) return "border-[#4D8568] bg-white text-[#245E44] ring-[0.6px] ring-[#4D8568]";
+  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531] ring-[0.6px] ring-[#C86E68]";
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
@@ -870,12 +870,12 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                   const picked = correctionId === correction.id;
                   const state = answered
                     ? correction.valid
-                      ? "border-[#4D8568] bg-white text-[#263444] ring-[0.75px] ring-[#4D8568]"
+                      ? "border-[#4D8568] bg-white text-[#263444] ring-[0.6px] ring-[#4D8568]"
                       : picked
-                        ? "border-[#C86E68] bg-[#FFF3F1] text-[#263444] ring-[0.75px] ring-[#C86E68]"
+                        ? "border-[#C86E68] bg-[#FFF3F1] text-[#263444] ring-[0.6px] ring-[#C86E68]"
                         : "border-[#E0DDD5] bg-white text-[#263444]"
                     : picked
-                      ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-[0.75px] ring-[#15202B]"
+                      ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-[0.6px] ring-[#15202B]"
                       : "border-[#E3DDCF] bg-white";
                   return (
                     <button key={correction.id} type="button" disabled={answered} aria-pressed={picked} onClick={() => setCorrectionId(correction.id)} className={`${optionBase} min-w-0 [overflow-wrap:anywhere] ${state} disabled:cursor-default`}>
