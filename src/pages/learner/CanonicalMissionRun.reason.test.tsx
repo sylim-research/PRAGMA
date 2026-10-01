@@ -41,7 +41,7 @@ describe("CanonicalMissionRun reason flow", () => {
     fireEvent.click(screen.getByRole("radio", { name: acceptedReason.text }));
     fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
 
-    expect(screen.getByText("핵심 이유를 찾았어요")).toBeInTheDocument();
+    expect(screen.getByText("기준 이유를 찾았어요")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /다음: 표현 비교/ }));
 
     expect(onDone).toHaveBeenCalledWith({
@@ -60,6 +60,6 @@ describe("CanonicalMissionRun reason flow", () => {
     if (!reason) throw new Error("Reason fixture is missing");
     fireEvent.click(screen.getByRole("radio", { name: reason.text }));
     fireEvent.click(screen.getByRole("button", { name: "이유 확인하기" }));
-    expect(screen.getByText("핵심 이유를 다시 확인해요")).toBeInTheDocument();
+    expect(screen.getByText("기준 이유를 다시 확인해요")).toBeInTheDocument();
   });
 });

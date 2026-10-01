@@ -64,8 +64,8 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("허용 판단")).toBeInTheDocument();
-    expect(screen.getByText(/^핵심 이유를 골랐습니다\./)).toBeInTheDocument();
-    expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("핵심 이유")).toBeInTheDocument();
+    expect(screen.getByText(/^기준 이유를 골랐습니다\./)).toBeInTheDocument();
+    expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("기준 이유")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
     click("다음: 표현 비교");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
@@ -76,7 +76,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다음: 수정안 선택");
     click(mission.mpj_items[2].corrections[0].text); click("수정안 확정하기");
     const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
-    expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("타당 수정")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("기준 선택")).toBeInTheDocument();
     click("다음: 직접 수정");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
@@ -108,7 +108,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다소 적절"); click("판단 확정하기");
     fireEvent.click(within(screen.getByRole("radiogroup", { name: "판단 이유" })).getByRole("radio", { name: picked.text }));
     click("이유 확정하기");
-    expect(screen.getByText(`핵심 이유와 다릅니다. 핵심 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
+    expect(screen.getByText(`기준 이유와 다릅니다. 기준 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
     click("다음: 표현 비교");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
