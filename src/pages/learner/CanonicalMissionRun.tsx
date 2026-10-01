@@ -280,18 +280,18 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
 function v6IntroSteps(outputName: string) {
   return {
     judgment: [
-      // 보조 설명은 명사형 12자 이내 — 이름 오른쪽 한 줄에 고정되어 행 높이가 같아진다.
-      { title: "표현 판단", desc: `${outputName}안 하나의 적절성` },
-      { title: "판단과 이유", desc: "판단의 근거 선택" },
-      { title: "표현 비교", desc: "같은 원문의 표현 대조" },
-      { title: "수정안 선택", desc: "수정 후보 중 하나 선택" },
+      // 보조 설명은 학습자가 할 일을 「~하기」로 — 처음 보는 사람도 무엇을 하는 항목인지 바로 읽힌다. 12자 이내라 한 줄에 고정된다.
+      { title: "표현 판단", desc: "상황에 맞는지 판단하기" },
+      { title: "판단과 이유", desc: "왜 그런지 근거 고르기" },
+      { title: "표현 비교", desc: "여러 표현을 견주어 보기" },
+      { title: "수정안 선택", desc: "더 나은 수정안 고르기" },
       { title: "직접 수정", desc: `${outputName}안을 직접 고쳐 쓰기` },
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
-      { title: `${outputName}하기`, desc: `새 원문의 직접 ${outputName}` },
-      { title: "피드백", desc: "의미·문법·화용 세 기준" },
-      { title: "재검토", desc: "유지·수정의 최종 결정" },
+      { title: `${outputName}하기`, desc: "새 원문을 직접 옮기기" },
+      { title: "피드백", desc: "AI 피드백 확인하기" },
+      { title: "재검토", desc: "고칠지 유지할지 정하기" },
     ],
   };
 }
@@ -315,7 +315,7 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
   return (
     <section aria-label={`${title} 단계`}>
       {/* 두 국면의 제목 띠 — 같은 높이, 잉크색/노랑으로 상위 구조를 먼저 보인다(2026-10-01 Codex 안). 아래 알약 목록은 그대로. */}
-      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-2.5 ${t.band}`}>
+      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-3.5 ${t.band}`}>
         <div className="min-w-0">
           <h2 className="text-[17px] font-black leading-6">{title}</h2>
           <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
@@ -343,7 +343,7 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
       <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "선택형", icon: ListChecks }} steps={steps.judgment} />
       {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
-      <div className="flex items-center justify-center sm:items-start sm:pt-[20px]" aria-hidden>
+      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
         <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
         <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
