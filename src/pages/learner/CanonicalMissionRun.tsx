@@ -282,26 +282,27 @@ function v6IntroSteps(outputName: string) {
     judgment: [
       // 보조 설명은 학습자가 할 일을 「~하기」로 — 처음 보는 사람도 무엇을 하는 항목인지 바로 읽힌다. 12자 이내라 한 줄에 고정된다.
       { title: "표현 판단", desc: "상황에 맞는지 판단하기" },
-      { title: "판단과 이유", desc: "왜 그런지 근거 고르기" },
-      { title: "표현 비교", desc: "여러 표현을 견주어 보기" },
-      { title: "수정안 선택", desc: "더 나은 수정안 고르기" },
-      { title: "직접 수정", desc: `${outputName}안을 직접 고쳐 쓰기` },
+      // 보조 설명은 제목의 낱말을 그대로 받는다(판단·이유·비교·선택·수정) — 학생이 두 낱말을 따로 해석하지 않게.
+      { title: "판단과 이유", desc: "판단의 이유 고르기" },
+      { title: "표현 비교", desc: "여러 표현을 비교해 보기" },
+      { title: "수정안 선택", desc: "더 나은 수정안 선택하기" },
+      { title: "직접 수정", desc: `${outputName}안을 직접 수정하기` },
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
       // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
-      { title: `${outputName}하기`, desc: "관계·상황에 맞게 옮기기" },
-      { title: "AI 피드백", desc: "의미 충실성·문법 정확성·화용적 적절성 기준" },
+      { title: `${outputName}하기`, desc: `적절하게 ${outputName}하기` },
+      { title: "AI 피드백", desc: "의미·문법·화용 기준" },
       // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
-      { title: "최종 결정", desc: "최종 표현은 내가 결정하기" },
+      { title: "최종 결정", desc: "최종 표현은 내가 결정" },
     ],
   };
 }
 
 /** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
 const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white text-[#15202B] ring-white" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white text-[#15202B] ring-white" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/15 text-white ring-white/25" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white/50 text-[#15202B] ring-white/60" },
 } as const;
 
 function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
