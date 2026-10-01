@@ -13,6 +13,7 @@ import {
   Lightbulb,
   ListChecks,
   Mic,
+  MoveRight,
   PenLine,
   Quote,
   RotateCcw,
@@ -297,8 +298,8 @@ function v6IntroSteps(outputName: string) {
 
 /** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
 const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/12 text-white ring-white/25" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-[#15202B]/10 text-[#15202B] ring-[#15202B]/20" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white text-[#15202B] ring-white" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white text-[#15202B] ring-white" },
 } as const;
 
 function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
@@ -339,14 +340,11 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
   // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
-    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-4">
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
       <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "선택형", icon: ListChecks }} steps={steps.judgment} />
       {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
-      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
-        <svg viewBox="0 0 44 16" className="hidden h-4 w-11 text-[#15202B] sm:block" fill="none">
-          <path d="M1 8H34" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          <path d="M31 2.5L39.5 8L31 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+      <div className="flex items-center justify-center sm:items-start sm:pt-[20px]" aria-hidden>
+        <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
         <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
       <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
@@ -365,7 +363,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「관계와 상황」 어순은 정본. */}
         <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
       </div>
-      <div className="space-y-4 p-5 sm:px-6">
+      <div className="space-y-4 p-5">
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
           <V6IntroOutline outputName={config.outputName} />
@@ -472,7 +470,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
   const actionIndex = actionLineIndex(situationLines);
   return (
     <section className={compact
-      ? "scene-in rounded-md border-l-4 border-[#15202B] bg-[#F3F3F0] px-5 py-3 sm:px-6 sm:py-3.5"
+      ? "scene-in rounded-md border-l-4 border-[#15202B] bg-[#F2EEE3] px-5 py-3 sm:px-6 sm:py-3.5"
       : "rounded-xl border border-[#EDE4C8] bg-[#FBF7EA] px-4 py-3.5 sm:px-5"}>
       {!compact && (
         <div className="flex min-h-6 items-center justify-between gap-3">
@@ -480,7 +478,7 @@ function ContextCard({ context, headerRight, title = "상황" }: {
           {headerRight}
         </div>
       )}
-      {compact && <p className="mb-1 text-[11.5px] font-black tracking-[0.08em] text-[#5D6878]">{title}</p>}
+      {compact && <p className="mb-1 text-[12px] font-black tracking-[0.08em] text-[#15202B]">{title}</p>}
       {compact ? (
         // 화행은 상단 바에 이미 있다. 이 카드는 장면만 전한다.
         // 배경 문장은 한 단 낮추고, 내가 할 말(화행)을 적은 문장을 대시와 함께 세운다.
@@ -565,7 +563,8 @@ function optionState(answered: boolean, picked: boolean, correct: boolean) {
   }
   // 선택·정답·오답 테두리는 모두 1.6px(border 1px + ring 0.6px)로 일원화 — 가늘면 판정이 분간되지 않고, 1.75px 이상은 무겁다(2026-10-01).
   if (correct) return "border-[#4D8568] bg-white text-[#245E44] ring-[0.6px] ring-[#4D8568]";
-  if (picked) return "border-[#C86E68] bg-[#FFF3F1] font-bold text-[#8B3531] ring-[0.6px] ring-[#C86E68]";
+  // 색은 선과 배지에만 — 정답과 같은 구조(흰 면 + 색 테두리)로 대칭을 맞춘다(2026-10-01).
+  if (picked) return "border-[#C86E68] bg-white font-bold text-[#8B3531] ring-[0.6px] ring-[#C86E68]";
   return "border-[#E0DDD5] bg-[#FAF9F6] text-[#8A92A0]";
 }
 
@@ -659,10 +658,10 @@ function FeedbackBox({ verdict, feedback, action, highlights = [], asList = fals
  */
 function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "partial"; title: string; children?: React.ReactNode }) {
   const palette = tone === "ok"
-    ? { box: "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]", mark: "bg-[#245E44] text-white" }
+    ? { box: "border-[#BFD9CC] bg-white text-[#245E44]", mark: "bg-[#245E44] text-white" }
     : tone === "miss"
-      ? { box: "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]", mark: "bg-[#B5504A] text-white" }
-      : { box: "border-[#E6D49A] bg-[#FBF6E6] text-[#6B5414]", mark: "bg-[#C9A62E] text-white" };
+      ? { box: "border-[#E2AAA5] bg-white text-[#713E3A]", mark: "bg-[#B5504A] text-white" }
+      : { box: "border-[#E6D49A] bg-white text-[#6B5414]", mark: "bg-[#C9A62E] text-white" };
   return (
     <div role="status" className={`rounded-xl border px-4 py-3 text-sm leading-6 ${palette.box}`}>
       <p className="flex items-center gap-2.5 text-[16px] font-black">
@@ -855,7 +854,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
         </div>}
         {locked && (
           <div className={correctionOnly ? "mt-3" : "mt-5 border-t border-[#E4E0D5] pt-4"}>
-            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-[#F2F8F4] text-[#245E44]" : "border-[#E2AAA5] bg-[#FFF3F1] text-[#713E3A]"}`}>
+            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-white text-[#245E44]" : "border-[#E2AAA5] bg-white text-[#713E3A]"}`}>
               <p className="flex items-center gap-2 font-black">
                 <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${judgmentMatched ? "bg-[#DCEFE4] text-[#245E44]" : "bg-[#F4D8D5] text-[#8B3531]"}`}>
                   {judgmentMatched ? <Check className="h-4 w-4" strokeWidth={3} /> : <X className="h-4 w-4" strokeWidth={3} />}
@@ -883,7 +882,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                     ? correction.valid
                       ? "border-[#4D8568] bg-white text-[#263444] ring-[0.6px] ring-[#4D8568]"
                       : picked
-                        ? "border-[#C86E68] bg-[#FFF3F1] text-[#263444] ring-[0.6px] ring-[#C86E68]"
+                        ? "border-[#C86E68] bg-white text-[#263444] ring-[0.6px] ring-[#C86E68]"
                         : "border-[#E0DDD5] bg-white text-[#263444]"
                     : picked
                       ? "border-[#15202B] bg-[#F8F7F2] text-[#15202B] ring-[0.6px] ring-[#15202B]"
@@ -1185,17 +1184,17 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
-    // 요약 줄 아래로 펼친다 — 꺾쇠(아래) 방향과 실제 펼침 방향을 맞춘다.
-    <details className="group/vocabulary mt-3">
-      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-2 text-[13px] font-bold text-[#79654F] transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-        <span aria-hidden className="grid h-7 w-7 place-items-center rounded-lg bg-[#FFF3C4] text-[#80651B]"><Lightbulb className="h-4 w-4" /></span>
-        단어 힌트 보기<ChevronDown aria-hidden className="ml-1 h-3.5 w-3.5 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" />
+    // 토글 오른쪽으로 펼친다 — 입력창 바로 아래 한 줄에 힌트가 붙어 보면서 칠 수 있다. 꺾쇠(오른쪽)와 펼침 방향을 맞춘다.
+    <details className="group/vocabulary mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-1 text-[14.5px] font-black text-[#15202B] transition-colors hover:text-[#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[#15202B]"><Lightbulb className="h-[18px] w-[18px]" strokeWidth={2.25} /></span>
+        단어 힌트 보기<ChevronRight aria-hidden className="h-4 w-4 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" strokeWidth={2.5} />
       </summary>
-      <dl className="mt-1.5 flex flex-wrap gap-2.5" aria-label="단어 힌트">
+      <dl className="flex flex-wrap gap-2" aria-label="단어 힌트">
         {hints.map((hint) => (
-          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-lg bg-[#F8F6EE] px-3 py-1.5">
-            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-[#15202B]`}>{hint.source}</dt>
-            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-[#15202B]`}><span aria-hidden className="text-[13px] font-normal text-[#9AA3AE]">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
+          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-[14px] rounded-bl-md bg-[#326BD6] px-3 py-1.5 text-white">
+            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-white`}>{hint.source}</dt>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-white`}><span aria-hidden className="text-[13px] font-normal text-white/60">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
           </div>
         ))}
       </dl>
@@ -1279,9 +1278,10 @@ const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
-  very_good: "border-[#C6DDCE] bg-[#F4FAF6]",
-  recommend: "border-[#D79A94] bg-[#FFF7F5]",
-  required: "border-[#D79A94] bg-[#FFF7F5]",
+  // 기준 카드는 흰 면 + 색 테두리, 배지만 색을 채운다 — 카드 셋이 모두 색면이면 「경고 벽지」가 된다.
+  very_good: "border-[#C6DDCE] bg-white",
+  recommend: "border-[#D79A94] bg-white",
+  required: "border-[#D79A94] bg-white",
   deferred: "border-[#E2DED3] bg-[#FAF9F5]",
 };
 
@@ -1858,7 +1858,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border-l-4 border-[#C86E68] bg-[#FFF3F1] px-4 py-3">
+                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-white px-4 py-3">
                       <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
@@ -1881,7 +1881,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!recheckRequested && <DemoFillButton />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
-                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border-[#C86E68] bg-[#FFF3F1]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
+                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-white" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
                     {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
