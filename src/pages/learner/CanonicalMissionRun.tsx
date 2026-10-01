@@ -10,8 +10,8 @@ import {
   Eye,
   LoaderCircle,
   ArrowDown,
-  ArrowRight,
   Lightbulb,
+  ListChecks,
   PenLine,
   Quote,
   RotateCcw,
@@ -279,7 +279,7 @@ function v6IntroSteps(outputName: string) {
   return {
     judgment: [
       // 보조 설명은 명사형 12자 이내 — 이름 오른쪽 한 줄에 고정되어 행 높이가 같아진다.
-      { title: "표현 판단", desc: `${outputName}안 하나의 상황 적절성` },
+      { title: "표현 판단", desc: `${outputName}안 하나의 적절성` },
       { title: "판단과 이유", desc: "판단의 근거 선택" },
       { title: "표현 비교", desc: "같은 원문의 표현 대조" },
       { title: "수정안 선택", desc: "수정 후보 중 하나 선택" },
@@ -296,31 +296,37 @@ function v6IntroSteps(outputName: string) {
 
 /** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
 const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/12 text-white ring-white/25" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-[#15202B]/10 text-[#15202B] ring-[#15202B]/20" },
 } as const;
 
-function IntroPhaseColumn({ tone, title, caption, steps }: {
+function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
   tone: keyof typeof INTRO_PHASE_TONE;
   title: string;
   caption: string;
+  /** 응답 방식 표지 — 선택형(고른다) / 작성형(직접 쓴다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
+  mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
 }) {
   const t = INTRO_PHASE_TONE[tone];
+  const ModeIcon = mode.icon;
   return (
     <section aria-label={`${title} 단계`}>
       {/* 두 국면의 제목 띠 — 같은 높이, 잉크색/노랑으로 상위 구조를 먼저 보인다(2026-10-01 Codex 안). 아래 알약 목록은 그대로. */}
-      <div className={`rounded-lg px-4 py-2.5 ${t.band}`}>
-        <h2 className="text-[17px] font-black leading-6">{title}</h2>
-        <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
+      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-2.5 ${t.band}`}>
+        <div className="min-w-0">
+          <h2 className="text-[17px] font-black leading-6">{title}</h2>
+          <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
+        </div>
+        <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${t.mode}`}><ModeIcon aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />{mode.label}</span>
       </div>
       {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
       <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className={`grid grid-cols-[22px_6.25rem_minmax(0,1fr)] items-center gap-x-3 rounded-lg px-3 py-2.5 ${t.pill}`}>
+          <li key={step.title} className={`grid grid-cols-[22px_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg px-3 py-2.5 ${t.pill}`}>
             <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
             <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
-            <span className="break-keep text-[13.5px] leading-5 text-[#6A7485] sm:truncate">{step.desc}</span>
+            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57] sm:truncate">{step.desc}</span>
           </li>
         ))}
       </ol>
@@ -333,12 +339,16 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
   // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-4">
-      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
-      <div className="flex items-center justify-center sm:self-stretch sm:pt-[60px]" aria-hidden>
-        <ArrowRight className="hidden h-5 w-5 text-[#B49A23] sm:block" />
-        <ArrowDown className="h-5 w-5 text-[#B49A23] sm:hidden" />
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "선택형", icon: ListChecks }} steps={steps.judgment} />
+      {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
+      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
+        <svg viewBox="0 0 44 16" className="hidden h-4 w-11 text-[#15202B] sm:block" fill="none">
+          <path d="M1 8H34" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path d="M31 2.5L39.5 8L31 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
-      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" steps={steps.production} />
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "작성형", icon: PenLine }} steps={steps.production} />
     </div>
   );
 }
