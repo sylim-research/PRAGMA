@@ -19,9 +19,9 @@ import {
 } from "lucide-react";
 
 /** 절 제목 앞의 작은 아이콘 칩 — 이모지 대신 단색 선 아이콘으로 초점을 만든다. 색은 절의 바탕색 계열을 따른다. */
-function SectionIcon({ icon: Icon, tone = "amber" }: { icon: typeof Quote; tone?: "amber" | "slate" | "navy" }) {
+function SectionIcon({ icon: Icon, tone = "amber", iconClassName = "" }: { icon: typeof Quote; tone?: "amber" | "slate" | "navy"; iconClassName?: string }) {
   const tones = { amber: "bg-[#F6E6A4] text-[#6B5518]", slate: "bg-[#E6EBF1] text-[#2B3647]", navy: "bg-[#15202B] text-[#F7CE3E]" };
-  return <span aria-hidden className={`mr-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${tones[tone]}`}><Icon className="h-3.5 w-3.5" strokeWidth={2.25} /></span>;
+  return <span aria-hidden className={`mr-2 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${tones[tone]}`}><Icon className={`h-3.5 w-3.5 ${iconClassName}`} strokeWidth={2.25} /></span>;
 }
 
 /** 해설 상자 제목 — 문항 해설 상자의 머리말. 꼬리표(NoteTag)와 같은 아이콘을 쓴다. */
@@ -654,7 +654,7 @@ function VerdictBanner({ tone, title, children }: { tone: "ok" | "miss" | "parti
 function ReferenceExamples({ title, items, font }: { title: string; items: string[]; font: string }) {
   return (
     <section className="mt-4 rounded-xl bg-[#F8F7F2] px-4 py-3" aria-label={title}>
-      <h4 className="flex items-center font-bold"><SectionIcon icon={Quote} />{title}</h4>
+      <h4 className="flex items-center font-bold"><SectionIcon icon={Quote} iconClassName="rotate-180" />{title}</h4>
       <ol className="mt-2 space-y-1.5">{items.map((text, index) => <li key={text} className="flex items-baseline gap-2.5 rounded-lg bg-white px-3 py-2">
         <span className="shrink-0 rounded-md bg-[#FAD338] px-1.5 py-px text-[11.5px] font-black text-[#15202B]">예시 {index + 1}</span>
         <span className={`${font} text-[16.5px] leading-7`}>{text}</span>
@@ -939,10 +939,10 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#D9DEE5] bg-[#FBFBFC] px-4 py-3" aria-label="다른 맥락에서는?">
         <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
-        {/* DM 대화 화면의 디자인 언어 — 내가 보낸 말은 오른쪽 그라데이션 말풍선. 상표는 쓰지 않는다. */}
+        {/* 메신저의 「내가 보낸 말」 모양만 빌린다 — 색은 페이지 팔레트(회청색) 안에 두어 해설·참고 표현보다 앞에 나서지 않게 한다. */}
         <div className="mt-2">
           <div className="flex justify-end">
-            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#0B63CE] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
+            <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md border border-[#D3DBE5] bg-[#EDF1F6] px-3.5 py-2 text-[15px] leading-7 text-[#15202B]`}>{quest.contrast.target}</p>
           </div>
         {/* 관계 단서와 대비 표현만 제시하며 저장된 contrast 해설은 보존한다. */}
         </div>
@@ -1160,12 +1160,12 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh text-[16.5px]" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh text-[16.5px]" : "";
   return (
-    // 펼친 힌트가 아래로 밀지 않도록 요약 오른쪽에 붙는다.
-    <details className="mt-3 flex flex-wrap items-center gap-2">
+    // 요약 줄 아래로 펼친다 — 꺾쇠(아래) 방향과 실제 펼침 방향을 맞춘다.
+    <details className="mt-3">
       <summary className="group inline-flex cursor-pointer list-none items-center gap-1.5 rounded-full border border-[#EAD48A] bg-[#FFF9E3] px-3.5 py-1.5 text-[13px] font-bold text-[#6B5518] transition-colors hover:bg-[#FFF3C8] [&::-webkit-details-marker]:hidden">
         <Lightbulb aria-hidden className="h-4 w-4 text-[#C9A62E]" />단어 힌트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5 transition-transform group-open:rotate-180" />
       </summary>
-      <div className="flex flex-wrap gap-2">
+      <div className="mt-2 flex flex-wrap gap-2">
         {hints.map((hint) => (
           <span key={hint.source} className="rounded-full border border-[#E3DDCF] bg-[#FAF8F2] px-3 py-1.5 text-[15px] leading-6">
             <b className={sourceFont}>{hint.source}</b> · <span className={targetFont}>{hint.target}</span>
@@ -1863,9 +1863,10 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 다시 확인하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                  {!recheckRequested && needsChange && !reflected && canRetainWithDissent && (
-                    <Button variant="outline" className="h-11 w-full" onClick={retainFirstResponse}>수정하지 않고 첫 {outputName} 유지하기</Button>
+                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
+                  {!recheckRequested && (
+                    <Button variant="outline" className="h-11 w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 첫 {outputName} 유지하기</Button>
                   )}
                 </div>
               </ActionBar>
@@ -2354,10 +2355,10 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         </div>
       </section>
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className="flex items-center text-[17px] font-black text-[#15202B]"><SectionIcon icon={Quote} />참고 표현</h2>
+        <h2 className="flex items-center text-[17px] font-black text-[#15202B]"><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
-          <p className={`${targetFont} mt-2 text-[17px] font-semibold leading-8 text-[#15202B]`}>{alternative.text}</p>
+          <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>
           <p className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 break-keep border-t border-dashed border-[#F3E3A2] pt-2 text-[15.5px] leading-7 text-[#15202B]"><NoteTag /><span className="min-w-0">{alternative.note}</span></p>
         </li>)}</ol>
       </section>}

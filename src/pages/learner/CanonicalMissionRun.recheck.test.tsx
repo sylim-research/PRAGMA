@@ -75,7 +75,7 @@ describe("one DCT revision recheck", () => {
     if (revise) {
       click("수정하기");
       fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
-      click("수정안 다시 확인하기");
+      click("수정안 제출하기");
       await screen.findByRole("heading", { name: "수정안 AI 피드백" });
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
@@ -109,7 +109,7 @@ describe("one DCT revision recheck", () => {
     await screen.findByText("1차 선택권 재검토");
     click("수정하기");
     fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
-    const recheckButton = screen.getByRole("button", { name: "수정안 다시 확인하기" });
+    const recheckButton = screen.getByRole("button", { name: "수정안 제출하기" });
     fireEvent.click(recheckButton); fireEvent.click(recheckButton);
     await waitFor(() => expect(requestFeedback).toHaveBeenCalledTimes(2));
     expect(requestFeedback).toHaveBeenNthCalledWith(1, mission, A);

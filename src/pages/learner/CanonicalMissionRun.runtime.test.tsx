@@ -62,7 +62,7 @@ describe("demo route", () => {
     fireEvent.click(screen.getByRole("button", { name: "번역 제출하기" }));
     fireEvent.click(await screen.findByRole("button", { name: "수정하기" }));
     fireEvent.click(screen.getByRole("button", { name: "답안 자동 채우기" }));
-    fireEvent.click(screen.getByRole("button", { name: "수정안 다시 확인하기" }));
+    fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
     fireEvent.click(await screen.findByRole("button", { name: /최종안 확정하기/ }));
     expect(await screen.findByRole("heading", { name: "내 번역 완성" })).toBeInTheDocument();
     // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
@@ -138,7 +138,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.
-    click("수정안 다시 확인하기");
+    click("수정안 제출하기");
     await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     click("최종안 확정하기");
     expect(await screen.findByRole("heading", { name: / 완성$/ })).toBeInTheDocument();
@@ -237,7 +237,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(requestFeedback).toHaveBeenCalledWith(mission, reference);
     if (alternate !== reference) {
-      fireEvent.click(screen.getByRole("button", { name: "수정안 다시 확인하기" }));
+      fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
       await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     }
     fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));

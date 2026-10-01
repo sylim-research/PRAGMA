@@ -181,6 +181,8 @@
   .font-zh {
     font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Pretendard Variable", Pretendard, sans-serif;
     font-weight: 400;
+    /* 중국어는 어디서나 줄이 꺾여 마지막 줄에 한두 글자만 남기 쉽다. 블록 요소에서는 줄 길이를 고르게 나눈다(입력칸에는 적용되지 않는다). */
+    text-wrap: balance;
   }
 }
 
