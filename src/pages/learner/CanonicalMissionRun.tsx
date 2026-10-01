@@ -250,7 +250,7 @@ const NEXT_ACTION_LABEL: Record<string, string> = {
   A1: "다음: 상황에 맞는지 판단하기",
   A2: "다음: 판단하고 고쳐 보기",
   A3: "다음: 부적절한 이유 찾기",
-  A4: "다음: 표현 비교하기",
+  A4: "다음: 표현 비교",
 };
 
 function nextActionLabel(quest: MissionQuest) {
@@ -268,78 +268,92 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
   );
 }
 
-/** v6 미션 시작 전 안내. 다섯 판단 활동을 먼저 훑고, 마지막 직접 산출이 이 미션의 목적지다. */
+/**
+ * v6 미션 시작 전 안내 — 학습 미션의 설계도. 두 국면(적절성 판단 MJT · 직접 산출 DCT형 통번역 과제)을
+ * 같은 급의 카드로 나란히 두고, 각 단계 이름은 진행 막대·핵심 정리와 같은 한 벌을 쓴다.
+ */
 function v6IntroSteps(outputName: string) {
   return {
     judgment: [
-      "표현이 상황에 맞는지 판단하기",
-      "판단하고 이유 고르기",
-      "여러 표현 비교하기",
-      "수정안 고르기",
-      "직접 고쳐 보기",
+      { title: "표현 판단", desc: `${outputName}안 하나가 상황에 맞는지` },
+      { title: "판단과 이유", desc: "그렇게 판단한 근거까지" },
+      { title: "표현 비교", desc: "같은 원문의 여러 표현을 나란히" },
+      { title: "수정안 선택", desc: "고친 후보 가운데 하나를" },
+      { title: "직접 수정", desc: `${outputName}안을 내 손으로 고쳐 쓰기` },
     ],
-    production: {
-      // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
-      title: outputName === "통역" ? "직접 통역하기" : "직접 번역하기",
-      // 산출 뒤에 무엇이 오는지 한 줄씩 — 오른쪽 칸의 높이를 채우면서 흐름의 끝을 보여 준다.
-      flow: ["AI 피드백 확인", `내 ${outputName} 재검토`, "최종안 결정"],
-    },
+    // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
+    production: [
+      { title: `${outputName}하기`, desc: "새 원문을 내 표현으로" },
+      { title: "피드백", desc: "AI가 의미·문법·화용 세 기준으로" },
+      { title: "재검토", desc: "유지할지 고칠지, 최종안은 내가" },
+    ],
   };
 }
-/** 활동 수를 세지 않고 순서만 보여 준다 — 다섯 판단 뒤에 직접 산출이 온다는 흐름이 배치로 드러나게. */
-const INTRO_COLUMN_LABEL = "text-[11px] font-black tracking-[0.1em] text-[#8A939F]";
+
+const INTRO_PHASE_TONE = {
+  judgment: { card: "border-[#D6DCE4]", head: "bg-[#EEF2F6]", chip: "bg-[#15202B] text-white", num: "text-[#15202B] ring-[#C9D2DD]" },
+  production: { card: "border-[#E4CB50]", head: "bg-[#FFF6D6]", chip: "bg-[#F7CE3E] text-[#15202B]", num: "text-[#6B5518] ring-[#E4CB50]" },
+} as const;
+
+function IntroPhaseCard({ tone, numeral, title, caption, steps }: {
+  tone: keyof typeof INTRO_PHASE_TONE;
+  numeral: string;
+  title: string;
+  caption: string;
+  steps: { title: string; desc: string }[];
+}) {
+  const t = INTRO_PHASE_TONE[tone];
+  return (
+    <section className={`flex flex-col overflow-hidden rounded-xl border bg-white ${t.card}`} aria-label={`${title} 단계`}>
+      <header className={`flex items-center gap-3 px-5 py-3 ${t.head}`}>
+        <span aria-hidden className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-[14px] font-black ${t.chip}`}>{numeral}</span>
+        <div className="min-w-0">
+          <h2 className="text-[18px] font-black leading-7 text-[#15202B]">{title}</h2>
+          <p className="text-[13px] font-bold tracking-[0.02em] text-[#5D6878]">{caption}</p>
+        </div>
+      </header>
+      <ol className="flex flex-1 flex-col divide-y divide-[#EEEAE1]" aria-label={`${title} 활동`}>
+        {steps.map((step, index) => (
+          <li key={step.title} className="flex flex-1 items-center gap-3.5 px-5 py-2.5">
+            <span className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-white text-[12.5px] font-black ring-1 ${t.num}`}>{index + 1}</span>
+            {/* 단계 이름과 설명을 한 줄에 — 설계도 전체가 스크롤 없이 한 화면에 들어오게. 좁은 폭에서는 두 줄로 내려간다. */}
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 break-keep">
+              <span className="text-[17px] font-bold leading-7 text-[#15202B]">{step.title}</span>
+              <span className="text-[14px] leading-6 text-[#6A7485]">{step.desc}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
 
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
-  // 왼쪽 다섯 판단을 중괄호로 묶어 오른쪽 산출로 넘긴다 — 수용에서 산출로 가는 흐름이 한눈에 보이게.
+  // 두 국면을 같은 높이의 카드로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다.
   return (
-    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,0.9fr)] sm:items-start sm:gap-2.5">
-      <section>
-        <h2 className={INTRO_COLUMN_LABEL}>적절성 판단</h2>
-        <ol className="relative mt-2.5 space-y-1" aria-label="적절성 판단 활동">
-          <span aria-hidden className="absolute left-[1.4rem] top-5 bottom-5 w-px bg-[#E2D9BE]" />
-          {steps.judgment.map((title, index) => (
-            <li key={title} className="relative flex items-center gap-3 rounded-lg bg-[#F8F6EE] px-3 py-2.5">
-              <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-white text-[11px] font-black text-[#15202B] ring-1 ring-[#DDD2AE]">{index + 1}</span>
-              <span className="break-keep text-[15px] font-semibold text-[#243441]">{title}</span>
-            </li>
-          ))}
-        </ol>
-      </section>
-      <div className="flex items-center justify-center gap-1 py-1 sm:self-stretch sm:py-0 sm:pt-[26px]" aria-hidden>
-        <svg viewBox="0 0 16 100" preserveAspectRatio="none" className="hidden h-full w-3 text-[#C9B67A] sm:block">
-          <path d="M3 3C11 3 5.5 46.5 14 50C5.5 53.5 11 97 3 97" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </svg>
-        <ArrowRight className="hidden h-5 w-5 shrink-0 text-[#B49A23] sm:block" />
-        <ArrowDown className="h-5 w-5 text-[#B49A23] sm:hidden" />
+    <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-stretch sm:gap-3">
+      <IntroPhaseCard tone="judgment" numeral="Ⅰ" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
+      <div className="flex items-center justify-center" aria-hidden>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[#DDD8CB] bg-white text-[#6B5518] shadow-[0_1px_3px_rgba(21,32,43,0.08)]">
+          <ArrowRight className="hidden h-4 w-4 sm:block" strokeWidth={2.5} />
+          <ArrowDown className="h-4 w-4 sm:hidden" strokeWidth={2.5} />
+        </span>
       </div>
-      <section aria-label={`직접 ${outputName} 활동`}>
-        <h2 className={INTRO_COLUMN_LABEL}>직접 {outputName}</h2>
-        <div className="mt-2.5 rounded-xl border border-[#E4CB50] bg-[#FFFBEA] px-4 py-3.5">
-          <p className="break-keep font-bold leading-7 text-[#243441]">{steps.production.title}</p>
-          <ol className="mt-3 space-y-2 border-t border-[#EFE2B4] pt-3">
-            {steps.production.flow.map((label) => (
-              <li key={label} className="flex items-center gap-2 break-keep text-[13.5px] leading-6 text-[#6B5518]">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#D9BE4A]" />
-                {label}
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
+      <IntroPhaseCard tone="production" numeral="Ⅱ" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" steps={steps.production} />
     </div>
   );
 }
 function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: () => void }) {
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
-      <div className="bg-[#15202B] px-5 py-4 text-white sm:px-6 sm:py-5">
+      <div className="bg-[#15202B] px-5 py-3.5 text-white sm:px-6 sm:py-4">
         <p className="text-[11px] font-black tracking-[0.1em] text-[#F3D248]">{config.missionLabel}</p>
-        <h1 className="mt-1.5 break-keep text-[19px] font-bold leading-8 tracking-[-0.01em] sm:text-[21px]">
+        <h1 className="mt-1 break-keep text-[19px] font-bold leading-8 tracking-[-0.01em] sm:text-[21px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
         </h1>
       </div>
-      <div className="space-y-5 p-5 sm:p-6">
+      <div className="space-y-4 p-5 sm:px-6">
         <p className="text-sm leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
@@ -1940,8 +1954,8 @@ const PROGRESS_LABELS: Record<string, string> = {
 function progressLabel(quest: MissionQuest, outputName = "번역") {
   // 진행 막대·핵심 정리·기록에 들어가는 짧은 이름. 미션 안내의 풀어 쓴 활동명과는 따로 둔다.
   if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "표현 판단";
-  if (quest.kind === "fix_choice") return "수정안 고르기";
-  if (quest.kind === "free_correction") return "직접 고치기";
+  if (quest.kind === "fix_choice") return "수정안 선택";
+  if (quest.kind === "free_correction") return "직접 수정";
   if (quest.kind === "spectrum") return "표현 비교";
   if (quest.kind === "dct") return `${outputName}하기`;
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
@@ -2189,19 +2203,18 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
   return (
     <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-5 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
       <h1 className="break-keep text-xl font-black text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">다섯 문항에서 챙길 한 줄</span></h1>
-      <ol className="mt-4 space-y-2.5">
+      {/* 다섯 줄을 한 패널의 표처럼 — 이름 칸 폭을 고정해 한 줄 요약이 같은 선에서 시작하고, 스크롤 없이 한 화면에 들어온다. */}
+      <ol className="mt-3.5 divide-y divide-[#EEEAE1] overflow-hidden rounded-xl border border-[#EAE5D8] bg-white">
         {lessonPoints.map((point, index) => (
           <li key={point.questId} style={{ animationDelay: `${index * 90}ms` }}
-            className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-xl border border-[#EAE5D8] bg-white px-4 py-3 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
-            <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[14px] font-extrabold text-[#15202B]">{index + 1}</span>
-            <div className="min-w-0">
-              <p className="inline-block rounded-md bg-[#E9EFF8] px-2 py-0.5 text-[12.5px] font-black text-[#2F4F86]">{mission.missionFormat === "mission_v6"
-                ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
-                : point.label}</p>
-              <p className="mt-1.5 break-keep text-[16px] font-normal leading-7 text-[#263444] [overflow-wrap:anywhere]">
-                <HighlightedText text={point.text} highlights={point.highlights} target />
-              </p>
-            </div>
+            className="grid grid-cols-[1.75rem_minmax(0,1fr)] items-baseline gap-3.5 px-5 py-3 sm:grid-cols-[1.75rem_7.5rem_minmax(0,1fr)] motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-2 motion-safe:duration-500 motion-safe:fill-mode-both sm:grid-cols-[2.25rem_minmax(0,1fr)] sm:gap-4">
+            <span aria-hidden className="grid h-[26px] w-[26px] place-items-center self-start rounded-full bg-[#FAD338] text-[12.5px] font-black text-[#15202B] sm:mt-[2px]">{index + 1}</span>
+            <p className="text-[16px] font-black text-[#2F4F86]">{mission.missionFormat === "mission_v6"
+              ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
+              : point.label}</p>
+            <p className="col-start-2 break-keep text-[16.5px] font-normal leading-8 text-[#263444] [overflow-wrap:anywhere] sm:col-start-auto">
+              <HighlightedText text={point.text} highlights={point.highlights} target />
+            </p>
           </li>
         ))}
       </ol>

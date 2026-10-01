@@ -75,7 +75,7 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       revisionExamples: ["老师，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。", "老师，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？"],
     },
     {
-      id: "A3", module: "A", kind: "fix_choice", shortLabel: "선택교정", title: "어디까지 고쳐 달라고 했나요?", nextLabel: "다음: 직접 고쳐 보기",
+      id: "A3", module: "A", kind: "fix_choice", shortLabel: "선택교정", title: "어디까지 고쳐 달라고 했나요?", nextLabel: "다음: 직접 수정",
       context: context("출석 앱에서 지난주 수업이 결석으로 표시된 것을 보고 조교에게 연락합니다. 표시가 잘못된 것인지는 아직 확인되지 않았습니다.", "담당 조교 · 몇 번 이야기한 사이", "상대 조금 높음", "아는 사이", "부담 보통"),
       source: "조교님, 지난주 출석이 결석으로 되어 있는데 확인해 주실 수 있나요?",
       target: "助教您好，请把我上周的缺勤记录改成出勤。",

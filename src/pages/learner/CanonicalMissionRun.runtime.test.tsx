@@ -45,8 +45,8 @@ describe("demo route", () => {
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
     const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
-    expect(within(briefing).getByText("표현이 상황에 맞는지 판단하기")).toBeInTheDocument();
-    expect(screen.getByText("직접 번역하기")).toBeInTheDocument();
+    expect(within(briefing).getByText("표현 판단")).toBeInTheDocument();
+    expect(screen.getByText("직접 번역")).toBeInTheDocument();
     expect(screen.getByText("데모 시연")).toBeInTheDocument();
     expect(fetchMissionByScenario).not.toHaveBeenCalled();
     expect(requestFeedback).not.toHaveBeenCalled();
@@ -86,7 +86,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     // Five judgment activities are listed without numbering, then the production step they lead to.
     const briefing = screen.getByRole("list", { name: "적절성 판단 활동" });
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
-    expect(screen.getByText("직접 번역하기")).toBeInTheDocument();
+    expect(screen.getByText("직접 번역")).toBeInTheDocument();
     expect(screen.queryByText(SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[0].source)).not.toBeInTheDocument();
     expect(screen.getByRole("list", { name: /미션 안내, 적절성 판단/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /미션 시작하기/ }));
@@ -197,7 +197,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       ["판단 확정하기", "다음: 상황에 맞는지 판단하기"],
       ["판단 확정하기", "다음: 판단하고 고쳐 보기"],
       ["수정안 확정하기", "다음: 부적절한 이유 찾기"],
-      ["이유 확인하기", "다음: 표현 비교하기"],
+      ["이유 확인하기", "다음: 표현 비교"],
       ["두 표현 확인하기", "다음: 직접 옮겨 보기"],
     ]) {
       fill();

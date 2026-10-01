@@ -67,7 +67,7 @@ describe("local learner UX pilot", () => {
     expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
     expect(within(inventedCause).queryByText("가능한 선택")).not.toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("가능한 선택")).toBeInTheDocument();
-    click("다음: 직접 고쳐 보기");
+    click("다음: 직접 수정");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
     expect(screen.queryByRole("heading", { name: "참고 표현" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
@@ -90,7 +90,7 @@ describe("local learner UX pilot", () => {
     expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
     expect(screen.queryByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/기준 판단과 같아요|기준 판단과 달라요/)).not.toBeInTheDocument();
-    click("다음: 표현 비교하기");
+    click("다음: 표현 비교");
     const snapshot = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(snapshot.responses.A3).toEqual({ correctionIds: ["apology"] });
     expect(snapshot.responses.A4).toEqual({ revisedText: freeAnswer });
