@@ -292,8 +292,6 @@ function v6IntroSteps(outputName: string) {
 }
 
 /** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
-const INTRO_COLUMN_LABEL = "text-[11px] font-black tracking-[0.1em] text-[#8A939F]";
-
 const INTRO_PHASE_TONE = {
   judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", caption: "text-[#5D6878]" },
   production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", caption: "text-[#8A6A14]" },
@@ -308,7 +306,7 @@ function IntroPhaseColumn({ tone, title, caption, steps }: {
   const t = INTRO_PHASE_TONE[tone];
   return (
     <section aria-label={`${title} 단계`}>
-      <h2 className={INTRO_COLUMN_LABEL}>{title}</h2>
+      <h2 className="text-[16.5px] font-black leading-6 text-[#15202B]">{title}</h2>
       <p className={`mt-0.5 text-[12.5px] font-bold ${t.caption}`}>{caption}</p>
       {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
       <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
@@ -330,7 +328,7 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
   return (
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-4">
       <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
-      <div className="flex items-center justify-center sm:self-stretch sm:pt-[42px]" aria-hidden>
+      <div className="flex items-center justify-center sm:self-stretch sm:pt-[60px]" aria-hidden>
         <ArrowRight className="hidden h-5 w-5 text-[#B49A23] sm:block" />
         <ArrowDown className="h-5 w-5 text-[#B49A23] sm:hidden" />
       </div>
@@ -346,9 +344,10 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         <h1 className="mt-1 break-keep text-[19px] font-bold leading-8 tracking-[-0.01em] sm:text-[21px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
         </h1>
+        {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「관계와 상황」 어순은 정본. */}
+        <p className="mt-1.5 break-keep text-[14px] leading-6 text-white/75">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
       </div>
       <div className="space-y-4 p-5 sm:px-6">
-        <p className="text-sm leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
           <V6IntroOutline outputName={config.outputName} />
