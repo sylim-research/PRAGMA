@@ -291,10 +291,10 @@ function v6IntroSteps(outputName: string) {
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
       // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
-      { title: `${outputName}하기`, desc: `적절하게 ${outputName}하기` },
+      { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
       { title: "AI 피드백", desc: "의미·문법·화용 기준" },
       // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
-      { title: "최종 결정", desc: "최종 표현은 내가 결정" },
+      { title: "최종 결정", desc: "최종안을 내가 확정하기" },
     ],
   };
 }
