@@ -134,7 +134,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
     click("수정하기");
-    expect(screen.getByRole("list", { name: "미션 안내, 적절성 판단, 번역하기, 피드백, 재검토" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "미션 안내, 적절성 판단, 번역하기, AI 피드백, 재검토" })).toBeInTheDocument();
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
     // Stage 4: final confirmation and save.

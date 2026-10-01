@@ -289,9 +289,11 @@ function v6IntroSteps(outputName: string) {
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
-      { title: `${outputName}하기`, desc: "새 원문을 직접 옮기기" },
-      { title: "피드백", desc: "AI 피드백 확인하기" },
-      { title: "재검토", desc: "고칠지 유지할지 정하기" },
+      // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
+      { title: `${outputName}하기`, desc: "관계·상황에 맞게 옮기기" },
+      { title: "AI 피드백", desc: "의미 충실성·문법 정확성·화용적 적절성 기준" },
+      // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
+      { title: "최종 결정", desc: "최종 표현은 내가 결정하기" },
     ],
   };
 }
@@ -328,7 +330,7 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
           <li key={step.title} className={`grid grid-cols-[22px_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg px-3 py-2.5 ${t.pill}`}>
             <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
             <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
-            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57] sm:truncate">{step.desc}</span>
+            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57]">{step.desc}</span>
           </li>
         ))}
       </ol>
@@ -1881,7 +1883,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!recheckRequested && <DemoFillButton />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
-                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-white" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
+                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
                     {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
@@ -1975,7 +1977,7 @@ function progressLabel(quest: MissionQuest, outputName = "번역") {
   return PROGRESS_LABELS[quest.id] ?? quest.shortLabel;
 }
 
-const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "피드백", "재검토"] as const;
+const MACRO_PROGRESS = ["미션 안내", "적절성 판단", "직접 옮기기", "AI 피드백", "재검토"] as const;
 /** 학습자에게는 「산출」·「옮기기」 대신 미션 방식 그대로 「번역하기」·「통역하기」로 읽힌다. */
 function macroStages(outputName: string): string[] {
   return MACRO_PROGRESS.map((label) => label === "직접 옮기기" ? `${outputName}하기` : label);
@@ -2026,7 +2028,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
           ? { phase: `${outputName}하기`, activity: progressLabel(quests[activeIndex], outputName) }
           : revisionOpen
             ? { phase: "재검토", activity: `내 ${outputName} 재검토` }
-            : { phase: "피드백", activity: progressLabel(quests[activeIndex], outputName) };
+            : { phase: "AI 피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
       <div className="flex items-center gap-3 sm:gap-4">
