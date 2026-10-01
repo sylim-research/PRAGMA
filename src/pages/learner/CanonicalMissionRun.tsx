@@ -12,6 +12,7 @@ import {
   ArrowDown,
   Lightbulb,
   ListChecks,
+  Mic,
   PenLine,
   Quote,
   RotateCcw,
@@ -304,7 +305,7 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
   tone: keyof typeof INTRO_PHASE_TONE;
   title: string;
   caption: string;
-  /** 응답 방식 표지 — 선택형(고른다) / 작성형(직접 쓴다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
+  /** 응답 방식 표지 — 선택형(고른다) / 산출형(직접 번역·통역한다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
   mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
 }) {
@@ -348,7 +349,7 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
         </svg>
         <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
-      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "작성형", icon: PenLine }} steps={steps.production} />
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
     </div>
   );
 }
@@ -1192,7 +1193,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
       </summary>
       <dl className="mt-1.5 flex flex-wrap gap-2.5" aria-label="단어 힌트">
         {hints.map((hint) => (
-          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-lg border border-[#DDD8CB] bg-white px-3 py-1.5">
+          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-lg bg-[#F8F6EE] px-3 py-1.5">
             <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-[#15202B]`}>{hint.source}</dt>
             <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-[#15202B]`}><span aria-hidden className="text-[13px] font-normal text-[#9AA3AE]">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
           </div>
@@ -1271,14 +1272,15 @@ const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
 
 const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
   very_good: "bg-[#EAF4ED] text-[#286247]",
-  recommend: "bg-[#FFF2B8] text-[#725B12]",
+  // 수정 권장·수정 필요는 MJT 오답과 같은 빨강 계열 — 「고쳐야 한다」는 메시지를 색으로도 전한다(2026-10-01). 호박색은 허용·참고의 색.
+  recommend: "bg-[#FCE7E4] text-[#8D3B36]",
   required: "bg-[#FCE7E4] text-[#8D3B36]",
   deferred: "bg-[#EEECE6] text-[#635E52]",
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
   very_good: "border-[#C6DDCE] bg-[#F4FAF6]",
-  recommend: "border-[#E2C84F] bg-[#FFFAE8]",
+  recommend: "border-[#D79A94] bg-[#FFF7F5]",
   required: "border-[#D79A94] bg-[#FFF7F5]",
   deferred: "border-[#E2DED3] bg-[#FAF9F5]",
 };
@@ -1856,8 +1858,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
-                      <p className="text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
+                    && <div className="rounded-xl border-l-4 border-[#C86E68] bg-[#FFF3F1] px-4 py-3">
+                      <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                     </div>}
                 </>
@@ -1879,8 +1881,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!recheckRequested && <DemoFillButton />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
-                  <div className="mt-4 rounded-xl border-l-4 border-[#E0C247] bg-[#FFFBEC] px-4 py-3">
-                    {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#6B5518]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
+                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border-[#C86E68] bg-[#FFF3F1]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
+                    {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
                 )}
