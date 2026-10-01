@@ -67,7 +67,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.getByText(/^기준 이유를 골랐습니다\./)).toBeInTheDocument();
     expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("기준 이유")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
-    click("다음: 표현 비교");
+    click("다음: 복수 표현 비교");
     expect(snapshot().responses.A2).toEqual({ pick: "very_appropriate", reasonId: reason.id });
     ["상황에 맞음", "너무 직접적", "너무 우회적", "상황에 맞음"].forEach((band, i) => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 판단` })).getByRole("radio", { name: band }));
@@ -110,7 +110,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("이유 확정하기");
     expect(screen.getByText(`기준 이유와 다릅니다. 기준 이유 ${accepted.text.replace(/[.。]$/, "")}.`)).toBeInTheDocument();
     expect(screen.queryByText(/참고 이유/)).not.toBeInTheDocument();
-    click("다음: 표현 비교");
+    click("다음: 복수 표현 비교");
     expect(snapshot().responses.A2).toEqual({ pick: "somewhat_appropriate", reasonId: picked.id });
   });
 });
