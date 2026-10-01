@@ -1995,7 +1995,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   // 다섯 문항 동안 큰 단계가 「적절성 판단」에 머무르므로, 그 안의 진행은 점 다섯 개가 따로 나른다.
   const judging = activeIndex <= 4 && sceneIntroStep === null && !completed && reviewIndex === null && !mpjRecapOpen;
   const detail = completed
-    ? { phase: "미션 완료", activity: `내 ${outputName} 돌아보기` }
+    ? { phase: "미션 완료", activity: "미션 완료" }
       : reviewIndex !== null
       ? { phase: "기록 검토", activity: progressLabel(quests[reviewIndex], outputName) }
       : sceneIntroStep !== null
@@ -2338,7 +2338,8 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
   if (!response || !isMeaningfulDraft(response.first, mission.targetLanguage.label, outputName)) return null;
   // 저장된 학습자 결정만 표시한다. AI 평가에서 유지·수정을 추론하지 않는다.
   // 고친 곳을 지우거나 칠하지 않고 굵기도 같게 둔다 — 처음 쓴 것도 고친 것도 학습자가 쓴 것이고,
-  // 어느 쪽이 맞다고 판정하지 않는다. 그래서 「최종」처럼 완성·정답을 풍기는 이름도 피한다.
+  // 어느 쪽이 맞다고 판정하지 않는다. 이름은 용어대장의 「최초 산출 → 최종 산출」을 따른다(2026-10-01 연구자 결정).
+  // 「최종」은 정답이 아니라 학습자가 마지막에 결정한 표현이라는 뜻이며, 유지한 경우에도 그대로 맞는 이름이다.
   const revised = response.reflected && response.revised !== response.first;
   const row = "grid grid-cols-[88px_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-0 last:pb-0";
   const rowLabel = "text-[13px] font-black text-[#6B6453]";
@@ -2347,18 +2348,18 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
     <article className="space-y-4">
       <section aria-label={`${mission.targetLanguage.label} ${outputName} 완성본`}
         className="rounded-2xl border border-[#E6E1D4] bg-[#FDFCF8] px-5 py-4 shadow-[0_2px_10px_rgba(21,32,43,0.05)] sm:px-6">
-        {/* 원문 → 처음 쓴 번역 → 고친 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
+        {/* 원문 → 최초 번역 → 최종 번역을 위아래로 훑어 대조하도록 가는 구분선으로 촘촘히 잇는다. */}
         <div className="divide-y divide-[#ECE7DA]">
           {source && <div className={row}>
             <span className={rowLabel}>{mission.sourceLanguage.label} 원문</span>
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
           {revised && <div className={row}>
-            <span className={rowLabel}>처음 쓴 {outputName}</span>
+            <span className={rowLabel}>최초 {outputName}</span>
             <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={rowLabel}>{revised ? `고친 ${outputName}` : `내 ${outputName}`}</span>
+            <span className={rowLabel}>최종 {outputName}</span>
             <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
@@ -3042,7 +3043,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           <div className="space-y-5">
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
-              <h1 className="text-2xl font-black">내 {mission.activityMode === "interpreting" ? "통역" : "번역"} 완성</h1>
+              <h1 className="text-2xl font-black">{mission.activityMode === "interpreting" ? "통역" : "번역"} 완료</h1>
               <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 최종안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했습니다."}</p>
             </section>
             <div className="space-y-4">

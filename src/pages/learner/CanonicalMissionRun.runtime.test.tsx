@@ -64,7 +64,7 @@ describe("demo route", () => {
     fireEvent.click(screen.getByRole("button", { name: "답안 자동 채우기" }));
     fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
     fireEvent.click(await screen.findByRole("button", { name: /최종안 확정하기/ }));
-    expect(await screen.findByRole("heading", { name: "내 번역 완성" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "번역 완료" })).toBeInTheDocument();
     // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
     expect(screen.queryByRole("link", { name: "나의 학습 기록 보기" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "데모 학습 기록 보기" }));
@@ -141,7 +141,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("수정안 제출하기");
     await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     click("최종안 확정하기");
-    expect(await screen.findByRole("heading", { name: / 완성$/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: / 완료$/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
     expect(input).toMatchObject({ firstResponse: first, revisedResponse: revised });
@@ -241,7 +241,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     }
     fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
-    expect(await screen.findByRole("heading", { name: / 완성$/ })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: / 완료$/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
     expect(appendMissionEvent).not.toHaveBeenCalled();
