@@ -275,17 +275,18 @@ function ActionBar({ hint, children }: { hint?: string; children: React.ReactNod
 function v6IntroSteps(outputName: string) {
   return {
     judgment: [
-      { title: "표현 판단", desc: `${outputName}안 하나가 상황에 맞는지` },
-      { title: "판단과 이유", desc: "그렇게 판단한 근거까지" },
-      { title: "표현 비교", desc: "같은 원문의 여러 표현을 나란히" },
-      { title: "수정안 선택", desc: "고친 후보 가운데 하나를" },
-      { title: "직접 수정", desc: `${outputName}안을 내 손으로 고쳐 쓰기` },
+      // 보조 설명은 명사형 13자 이내 — 이름 오른쪽 한 줄에 고정되어 행 높이가 같아진다.
+      { title: "표현 판단", desc: `${outputName}안 하나의 상황 적절성` },
+      { title: "판단과 이유", desc: "판단의 근거 선택" },
+      { title: "표현 비교", desc: "같은 원문의 여러 표현 대조" },
+      { title: "수정안 선택", desc: "수정 후보 가운데 하나 선택" },
+      { title: "직접 수정", desc: `${outputName}안을 직접 고쳐 쓰기` },
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
-      { title: `${outputName}하기`, desc: "새 원문을 내 표현으로" },
-      { title: "피드백", desc: "AI가 의미·문법·화용 세 기준으로" },
-      { title: "재검토", desc: "유지할지 고칠지, 최종안은 내가" },
+      { title: `${outputName}하기`, desc: `새 원문의 직접 ${outputName}` },
+      { title: "피드백", desc: "의미·문법·화용 세 기준" },
+      { title: "재검토", desc: "유지 또는 수정의 최종 결정" },
     ],
   };
 }
@@ -314,12 +315,12 @@ function IntroPhaseCard({ tone, numeral, title, caption, steps }: {
       </header>
       <ol className="flex flex-1 flex-col divide-y divide-[#EEEAE1]" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className="flex flex-1 items-center gap-3.5 px-5 py-2.5">
+          <li key={step.title} className="flex flex-1 items-center gap-3.5 px-5 py-3.5">
             <span className={`flex h-[26px] w-[26px] shrink-0 items-center justify-center rounded-full bg-white text-[12.5px] font-black ring-1 ${t.num}`}>{index + 1}</span>
-            {/* 단계 이름과 설명을 한 줄에 — 설계도 전체가 스크롤 없이 한 화면에 들어오게. 좁은 폭에서는 두 줄로 내려간다. */}
-            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 break-keep">
-              <span className="text-[17px] font-bold leading-7 text-[#15202B]">{step.title}</span>
-              <span className="text-[14px] leading-6 text-[#6A7485]">{step.desc}</span>
+            {/* 단계 이름과 설명을 한 줄에 — 설계도 전체가 스크롤 없이 한 화면에 들어오게. 폰에서만 두 줄로 내려간다. */}
+            <span className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 break-keep sm:flex-nowrap">
+              <span className="shrink-0 text-[18px] font-bold leading-7 text-[#15202B]">{step.title}</span>
+              <span className="text-[15px] leading-6 text-[#6A7485] sm:whitespace-nowrap">{step.desc}</span>
             </span>
           </li>
         ))}
