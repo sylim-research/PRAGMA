@@ -76,7 +76,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("다음: 수정안 선택");
     click(mission.mpj_items[2].corrections[0].text); click("수정안 확정하기");
     const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
-    expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("가능한 선택")).toBeInTheDocument();
+    expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("타당 수정")).toBeInTheDocument();
     click("다음: 직접 수정");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";

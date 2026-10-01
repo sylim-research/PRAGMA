@@ -878,7 +878,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
                             {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
-                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />가능한 선택</span>}
+                            {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />타당 수정</span>}
                           </span>
                         )}
                       </span>
@@ -888,7 +888,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                 })}
               </div>
               <p className="sr-only" aria-live="polite">
-                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "가능한 선택에 해당합니다." : "가능한 선택을 다시 살펴보세요. 해당 후보에 가능한 선택 표시가 있습니다.") : ""}
+                {answered && correctionId ? (quest.corrections.find(item => item.id === correctionId)?.valid ? "타당 수정에 해당합니다." : "타당 수정을 다시 살펴보세요. 해당 후보에 타당 수정 표시가 있습니다.") : ""}
               </p>
             </div>
           </div>
@@ -996,19 +996,16 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
               className={`min-h-[42px] rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
+              {submitted && accepted && <span className="ml-1.5 inline-flex items-center rounded-full border border-[#80AB94] bg-white px-1.5 py-px align-[1px] text-[10.5px] font-black text-[#245E44]">허용 판단</span>}
             </button>;
           })}
         </div>
         {submitted && (() => {
           const ok = candidate.acceptedAnswers.includes(picks[candidate.id] ?? "");
-          return <div className="mt-3">
-            <p className={`flex items-center gap-1.5 text-sm font-black ${ok ? "text-[#245E44]" : "text-[#8B3531]"}`}>
-              <span aria-hidden className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-white ${ok ? "bg-[#245E44]" : "bg-[#B5504A]"}`}>
-                {ok ? <Check className="h-3.5 w-3.5" strokeWidth={3.5} /> : <X className="h-3.5 w-3.5" strokeWidth={3.5} />}
-              </span>
-              <span className="sr-only">{ok ? "O " : "X "}</span>
-              허용 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}
-            </p>
+          // 판정은 선택지 위에서 끝낸다(DEC-20260918-03) — 내 칩의 ✓/✕와 허용 칩의 꼬리표. 아래 줄은 해설만.
+          return <div className="mt-1">
+            <p className="sr-only">{ok ? "내 선택이 허용 판단에 해당합니다." : "내 선택이 허용 판단과 다릅니다."}</p>
+            <p className="sr-only">허용 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
             <NoteLine><RichLine text={candidate.note} /></NoteLine>
           </div>;
         })()}
