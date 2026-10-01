@@ -62,7 +62,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="160" align="left">조건</th><th width="530" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
-    <tr><td>관계·상황 조건</td><td>참여자 관계와 행위 부담 등을 드러내는 장면 조건<br><sub>해석 틀: 상대적 권력(P) · 사회적 거리(D) · 행위 부담도(R)</sub></td></tr>
+    <tr><td>관계·상황 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
     <tr><td>언어 방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
     <tr><td>학습 수준</td><td>입문&ensp;|&ensp;중급&ensp;|&ensp;고급</td></tr>
@@ -92,14 +92,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="120" align="left">논문</th><th width="270" align="left">내용</th><th width="560" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="150" align="left">논문</th><th width="250" align="left">내용</th><th width="550" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/App.tsx"><code>App.tsx</code></a> · <a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
     <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
-    <tr><td>4.2.1 · 부록 A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>4.2.1&nbsp;·&nbsp;부록&nbsp;A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td>4.2.4 · 부록 C</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
+    <tr><td>4.2.4&nbsp;·&nbsp;부록&nbsp;C</td><td>자동 품질 점검</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
     <tr><td>4.2.5</td><td>AI 검토와 모델 간 교차 검토</td><td><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
     <tr><td>4.2.6</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.3.1</td><td>교과목 선택·주차별 학습</td><td><a href="src/pages/learner/LearnerCourseList.tsx"><code>LearnerCourseList.tsx</code></a> · <a href="src/pages/learner/LearnerCourseWeek.tsx"><code>LearnerCourseWeek.tsx</code></a></td></tr>
