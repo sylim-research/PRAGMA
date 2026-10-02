@@ -49,6 +49,10 @@ const MissionShell = lazy(() => import("./pages/MissionShell.tsx"));
 const VirtualResponseDiscussionDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/dev/VirtualResponseDiscussionDemo.tsx"))
   : null;
+// 대표 미션 가상 학급 20명의 토론 보드 — 역시 개발 모드 전용(로그인 없이 도판을 뜬다).
+const ClassDiscussionDemo = import.meta.env.DEV
+  ? lazy(() => import("./pages/dev/ClassDiscussionDemo.tsx"))
+  : null;
 const CourseOverview = lazy(() => import("./pages/learner/CourseOverview.tsx"));
 const WeekDetail = lazy(() => import("./pages/learner/WeekDetail.tsx"));
 const IntroArc = lazy(() => import("./pages/learner/IntroArc.tsx"));
@@ -128,6 +132,9 @@ const App = () => (
           />
           {VirtualResponseDiscussionDemo && (
             <Route path="/dev/virtual-response-demo" element={<VirtualResponseDiscussionDemo />} />
+          )}
+          {ClassDiscussionDemo && (
+            <Route path="/dev/class-discussion-demo" element={<ClassDiscussionDemo />} />
           )}
           {/* 홈은 폐지 — 학습자 착지 화면은 수업이다(2026-08-01). 옛 링크·북마크는 그대로 잇는다. */}
           <Route path="/learner/home" element={<Navigate to="/learner/course" replace />} />
