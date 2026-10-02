@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { MODE_LABEL, SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import type {
@@ -69,23 +69,31 @@ const percent = (count: number, total: number) => (total > 0 ? Math.round((count
 const hasHan = (text: string) => /\p{Script=Han}/u.test(text);
 const zh = (text: string) => (hasHan(text) ? "font-zh" : "break-keep");
 
-function StackedBar({ slices, total, height = "h-3" }: { slices: Slice[]; total: number; height?: string }) {
+/** 밝은 칸에는 남색 글자, 짙은 칸에는 흰 글자. */
+const ON_TONE: Record<SliceTone, string> = {
+  navy: "#FFFFFF", navyLight: "#15202B", amber: "#15202B", rust: "#FFFFFF", teal: "#FFFFFF", slate: "#15202B",
+};
+
+/** labels=true면 칸 안에 비율을 적는다(8% 미만 칸은 비운다) — 범례에서 비율 한 층을 덜어 낸다. */
+function StackedBar({ slices, total, height = "h-3", labels = false }: { slices: Slice[]; total: number; height?: string; labels?: boolean }) {
   return <div className={`flex w-full overflow-hidden rounded-sm bg-[#EEF0F2] ${height}`} aria-hidden="true">
-    {slices.filter((slice) => slice.count > 0).map((slice) => <span
-      key={slice.key}
-      className="h-full"
-      style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: TONE[slice.tone] }}
-    />)}
+    {slices.filter((slice) => slice.count > 0).map((slice) => {
+      const share = percent(slice.count, total);
+      return <span
+        key={slice.key}
+        className="flex h-full items-center justify-center overflow-hidden text-[11.5px] font-semibold tabular-nums"
+        style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: TONE[slice.tone], color: ON_TONE[slice.tone] }}
+      >{labels && share >= 8 ? `${share}%` : null}</span>;
+    })}
   </div>;
 }
 
-function Legend({ slices, total, size }: { slices: Slice[]; total: number; size: string }) {
+function Legend({ slices, size }: { slices: Slice[]; size: string }) {
   return <ul className={`flex flex-wrap gap-x-4 gap-y-1 ${size}`}>
     {slices.map((slice) => <li key={slice.key} className="flex items-center gap-1.5 text-[#44525C]">
       <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: TONE[slice.tone] }} aria-hidden="true" />
       <span className="break-keep">{slice.label}</span>
       <span className="font-semibold tabular-nums text-[#15202B]">{slice.count}</span>
-      <span className="tabular-nums text-[#7A858C]">{percent(slice.count, total)}%</span>
     </li>)}
   </ul>;
 }
@@ -121,20 +129,22 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
     aria-label={`MJT ${item.itemId} · ${item.activity}`}
     onClick={onClick}
     className={[
-      "min-w-0 rounded-xl border bg-white px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+      "flex h-[96px] min-w-0 flex-col justify-between rounded-xl border bg-white px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
       active ? "border-[#15202B] shadow-[inset_0_0_0_1px_#15202B]" : "border-[#E2DED2] hover:border-[#B9B29C]",
     ].join(" ")}
   >
-    <span className="flex items-baseline justify-between gap-2">
-      <span className="text-[11px] font-bold tracking-wide text-[#B8860B]">MJT {item.itemId}</span>
-      <span className="text-[11px] tabular-nums text-[#7A858C]">{item.total}명</span>
+    <span className="block w-full">
+      <span className="flex items-baseline justify-between gap-2">
+        <span className="text-[11px] font-bold tracking-wide text-[#B8860B]">MJT {item.itemId}</span>
+        <span className="text-[11px] tabular-nums text-[#7A858C]">{item.total}명</span>
+      </span>
+      <span className="mt-0.5 block break-keep text-[13px] font-bold text-[#15202B]">{item.activity}</span>
     </span>
-    <span className="mt-0.5 block break-keep text-[13px] font-bold text-[#15202B]">{item.activity}</span>
-    <span className="mt-2 block space-y-1">
-      {item.kind === "candidates"
-        ? item.candidates.map((candidate) => <StackedBar key={candidate.index} slices={candidate.slices} total={candidate.total} height="h-1.5" />)
-        : <StackedBar slices={summarySlices(item)} total={item.total} height="h-2.5" />}
-    </span>
+    {item.kind === "candidates"
+      ? <span className="grid w-full grid-cols-4 gap-1">
+        {item.candidates.map((candidate) => <StackedBar key={candidate.index} slices={candidate.slices} total={candidate.total} height="h-2.5" />)}
+      </span>
+      : <StackedBar slices={summarySlices(item)} total={item.total} height="h-2.5" />}
   </button>;
 }
 
@@ -159,8 +169,8 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
   return <div className="space-y-4">
     {item.target && <TargetLine text={item.target} label="판단한 표현" size={projector ? "text-[22px]" : "text-[17px]"} />}
     <div>
-      <StackedBar slices={item.slices} total={item.total} height={projector ? "h-6" : "h-4"} />
-      <div className="mt-2"><Legend slices={item.slices} total={item.total} size={size} /></div>
+      <StackedBar slices={item.slices} total={item.total} height={projector ? "h-8" : "h-6"} labels />
+      <div className="mt-2.5"><Legend slices={item.slices} size={size} /></div>
     </div>
     {reasons && <div className="rounded-lg border border-[#E2DED2]">
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#E2DED2] bg-[#FBF9F3] px-3 py-2">
@@ -175,9 +185,9 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
           <thead>
             <tr className="text-left text-[#7A858C]">
               <th scope="col" className="w-[7.5rem] px-3 py-2 font-semibold">판단</th>
-              {reasons.options.map((option) => <th key={option.id} scope="col" className="px-3 py-2 align-top font-medium">
-                <span className="block break-keep leading-snug text-[#44525C]">{option.text}</span>
-                <span className="mt-0.5 block tabular-nums text-[#15202B]">{option.count}건</span>
+              {reasons.options.map((option, index) => <th key={option.id} scope="col" title={option.text} className="px-3 py-2 font-semibold">
+                <span className="text-[#15202B]">이유 {index + 1}</span>
+                <span className="ml-1.5 font-normal tabular-nums text-[#7A858C]">{option.count}건</span>
               </th>)}
               <th scope="col" className="w-[3.5rem] px-3 py-2 text-right font-semibold">계</th>
             </tr>
@@ -201,6 +211,11 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
           </tbody>
         </table>
       </div>
+      <ol className={`space-y-1 border-t border-[#E2DED2] bg-[#FBF9F3] px-3 py-2.5 ${size} text-[#44525C]`} aria-label="선택 이유">
+        {reasons.options.map((option, index) => <li key={option.id} className="flex gap-2 break-keep leading-relaxed">
+          <span className="shrink-0 font-semibold text-[#15202B]">이유 {index + 1}</span>{option.text}
+        </li>)}
+      </ol>
     </div>}
   </div>;
 }
@@ -213,8 +228,8 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
           <span className="shrink-0 text-[12px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
           <span className={zh(candidate.text)}>{candidate.text}</span>
         </p>
-        <div className="mt-2"><StackedBar slices={candidate.slices} total={candidate.total} height={projector ? "h-4" : "h-3"} /></div>
-        <div className="mt-1.5"><Legend slices={candidate.slices.filter((slice) => slice.count > 0)} total={candidate.total} size={size} /></div>
+        <div className="mt-2.5"><StackedBar slices={candidate.slices} total={candidate.total} height={projector ? "h-7" : "h-6"} labels /></div>
+        <div className="mt-2"><Legend slices={candidate.slices.filter((slice) => slice.count > 0)} size={size} /></div>
       </li>)}
     </ol>
   </div>;
@@ -282,7 +297,7 @@ function decisionLabel(decision: DctCaseView["decision"]) {
   return decision === "revised" ? "수정" : decision === "retained" ? "최초 산출 유지" : "—";
 }
 
-function CaseColumn({ item, source, size, projector }: { item: DctCaseView; source: string | null; size: string; projector: boolean }) {
+function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string; projector: boolean }) {
   const text = projector ? "text-[18px]" : "text-[15px]";
   const feedback = item.feedback;
   return <article aria-label={item.id} className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
@@ -292,10 +307,6 @@ function CaseColumn({ item, source, size, projector }: { item: DctCaseView; sour
       {item.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-0.5 text-[11px] font-bold text-white">이견 제시</span>}
     </header>
     <ol className="divide-y divide-[#EEEBE2]">
-      {source && <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">원문</p>
-        <p className={`mt-0.5 leading-relaxed text-[#44525C] ${zh(source)} ${size}`}>{source}</p>
-      </li>}
       <li className="px-3 py-2.5">
         <p className="text-[11.5px] font-semibold text-[#7A858C]">최초 산출</p>
         <p className={`mt-0.5 leading-relaxed text-[#15202B] ${item.first ? zh(item.first) : ""} ${text}`}>{item.first ?? "—"}</p>
@@ -347,6 +358,10 @@ function DctSection({ data, state, onChange, size, projector }: { data: ClassDis
     onChange({ ...state, compare: next });
   };
   const modeLabel = dct.mode === "interpreting" ? "통역" : dct.mode === "translation" ? "번역" : null;
+  const dissentCount = dct.cases.filter((item) => item.dissent).length;
+  const [showAll, setShowAll] = useState(false);
+  const listAll = showAll || dissentCount === 0;
+  const listed = listAll ? dct.cases : dct.cases.filter((item) => item.dissent || state.compare.includes(item.id));
 
   return <section aria-label="DCT형 통번역 과제" className="rounded-xl border border-[#E2DED2] bg-white">
     <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DED2] px-4 py-2.5">
@@ -369,14 +384,14 @@ function DctSection({ data, state, onChange, size, projector }: { data: ClassDis
       : state.dctView === "class" ? <div className="grid gap-4 px-4 py-4 lg:grid-cols-3">
         <div>
           <p className={`font-semibold text-[#15202B] ${size}`}>최종 결정 <span className="font-normal text-[#7A858C]">{dct.total}명</span></p>
-          <div className="mt-2"><StackedBar slices={decisionSlices} total={dct.total} height={projector ? "h-5" : "h-3.5"} /></div>
-          <div className="mt-1.5"><Legend slices={decisionSlices} total={dct.total} size={size} /></div>
+          <div className="mt-2"><StackedBar slices={decisionSlices} total={dct.total} height={projector ? "h-7" : "h-6"} labels /></div>
+          <div className="mt-1.5"><Legend slices={decisionSlices} size={size} /></div>
         </div>
         <div>
           <p className={`font-semibold text-[#15202B] ${size}`}>이견 제시 <span className="font-normal text-[#7A858C]">수정 여부와 따로 셉니다</span></p>
-          <div className="mt-2"><StackedBar slices={dissentSlices} total={dct.total} height={projector ? "h-5" : "h-3.5"} /></div>
+          <div className="mt-2"><StackedBar slices={dissentSlices} total={dct.total} height={projector ? "h-7" : "h-6"} labels /></div>
           <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1">
-            <Legend slices={dissentSlices} total={dct.total} size={size} />
+            <Legend slices={dissentSlices} size={size} />
             {dct.dissents > 0 && <button
               type="button"
               onClick={() => onChange({ ...state, dctView: "cases", compare: dct.cases.filter((item) => item.dissent).slice(0, 2).map((item) => item.id) })}
@@ -387,18 +402,29 @@ function DctSection({ data, state, onChange, size, projector }: { data: ClassDis
         <div>
           <p className={`font-semibold text-[#15202B] ${size}`}>AI 피드백의 화용 판정 <span className="font-normal text-[#7A858C]">최초 산출 기준 {withVerdict}건</span></p>
           {withVerdict > 0 ? <>
-            <div className="mt-2"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-5" : "h-3.5"} /></div>
-            <div className="mt-1.5"><Legend slices={dct.verdicts.filter((slice) => slice.count > 0)} total={withVerdict} size={size} /></div>
+            <div className="mt-2"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-7" : "h-6"} labels /></div>
+            <div className="mt-1.5"><Legend slices={dct.verdicts.filter((slice) => slice.count > 0)} size={size} /></div>
           </> : <p className={`mt-2 text-[#7A858C] ${size}`}>피드백 기록 없음</p>}
         </div>
       </div>
       : <div className="px-4 py-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
+        {dct.source && <dl className={`mb-4 grid grid-cols-[3.5rem_1fr] gap-x-3 ${size} text-[#44525C]`}>
+          <dt className="font-semibold text-[#7A858C]">원문</dt>
+          <dd className={zh(dct.source)}>{dct.source}</dd>
+        </dl>}
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <p className={`font-semibold text-[#15202B] ${size}`}>비교할 응답을 두 개까지 고르세요.</p>
-          <p className="text-[12px] text-[#7A858C]">익명 번호이며 계정과 연결되지 않습니다.</p>
+          <div className="flex items-center gap-3">
+            <p className="text-[12px] text-[#7A858C]">익명 번호이며 계정과 연결되지 않습니다.</p>
+            {dissentCount > 0 && <button
+              type="button"
+              onClick={() => setShowAll(!showAll)}
+              className="rounded-md border border-[#15202B] px-2.5 py-1 text-[12px] font-semibold text-[#15202B] hover:bg-[#F3F1EA]"
+            >{showAll ? `이견 제시만 보기 (${dissentCount})` : `전체 응답 보기 (${dct.cases.length})`}</button>}
+          </div>
         </div>
         <ul className="mt-2 flex flex-wrap gap-1.5" aria-label="익명 응답 목록">
-          {dct.cases.map((item) => {
+          {listed.map((item) => {
             const active = state.compare.includes(item.id);
             return <li key={item.id}><button
               type="button"
@@ -416,7 +442,7 @@ function DctSection({ data, state, onChange, size, projector }: { data: ClassDis
           })}
         </ul>
         {compared.length > 0 && <div className={`mt-4 grid gap-3 ${compared.length > 1 ? "lg:grid-cols-2" : ""}`}>
-          {compared.map((item) => <CaseColumn key={item.id} item={item} source={dct.source} size={size} projector={projector} />)}
+          {compared.map((item) => <CaseColumn key={item.id} item={item} size={size} projector={projector} />)}
         </div>}
         <ol className={`mt-4 grid gap-1.5 rounded-lg bg-[#FBF9F3] px-4 py-3 ${size} text-[#44525C] sm:grid-cols-3`}>
           {DCT_QUESTIONS.map((question, index) => <li key={question} className="flex gap-2 break-keep"><span className="font-bold text-[#B8860B]">{index + 1}</span>{question}</li>)}
