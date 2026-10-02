@@ -37,3 +37,9 @@
 
 - `npm run typecheck` 통과. 표적 테스트: `classDiscussion.test.ts`(9) · `ClassResponsePanel.test.tsx`(5, 데모 전환 포함) · `AdminDecisionTraces.test.tsx`(4) 통과. admin·mission·demo 영역 307건 중 `AdminDashboard.test.tsx` 1건이 병렬 실행에서 5초 초과로 실패했으나 단독 실행 통과(무관한 타임아웃).
 - 로컬 8080(`.worktrees/class-discussion-2026-10-02`)에서 `/dev/class-discussion-demo`의 MJT1·MJT2 교차표·MJT5·DCT 사례 비교 화면을 1366px 폭으로 확인. 운영 탭(`/admin/decision-traces?tab=class`)은 관리자 로그인이 필요해 연구자 확인 몫.
+
+## 같은 날 후속 — 밀집 완화와 시각화 다양화(연구자 피드백)
+
+- 밀집 완화(P0): 막대 안에 비율, 범례는 색점·이름·건수만 · 요약 카드 높이 통일(MJT5는 후보 4개 미니 막대 가로 배열) · 교차표 머리글 「이유 n · n건」+전문은 표 아래 목록 · 사례 비교의 원문은 한 번만, 응답 칩은 이견 제시만 기본(「전체 응답 보기」로 펼침).
+- 시각화 다양화(차트 라이브러리 없이 SVG·CSS로): MJT1·MJT2 = **도넛 + 척도 스펙트럼 띠**(매우 적절→매우 부적절 축 위에 척도별 비율을 원의 크기·숫자로) · MJT2 교차표 = **히트맵**(행 척도색의 농도 = 건수) · MJT5 = **발산형 막대**(적정 범주를 축 가운데에, 과소는 왼쪽·과잉은 오른쪽, 1% = 폭 0.5%로 넘침 방지) · MJT3 = 가로 막대 · MJT4 = 수정문 카드 · DCT 학급 전체 = 작은 도넛 2개(수정 비율·이견 비율) + AI 판정 누적 막대.
+- 평균·점수는 만들지 않는다(척도 위 분포만). `Donut`·`SpectrumStrip`·`DivergingBar`는 보드 파일 안의 로컬 컴포넌트다.
