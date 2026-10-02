@@ -17,7 +17,7 @@ export const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) 
           </li>
         ))}
         <li className="flex gap-3 py-1.5">
-          <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT 문항</span>
+          <span className="w-[4.5rem] shrink-0 font-semibold text-[#66727A]">DCT형 통번역 과제</span>
           <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 다듬기</span>
         </li>
       </ol>

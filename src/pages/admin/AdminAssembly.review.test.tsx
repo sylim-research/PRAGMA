@@ -97,8 +97,8 @@ describe("professor final approval workbench", () => {
     const bench = await screen.findByRole("region", { name: "작업대" });
     expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
     expect(await within(bench).findByText("교수자 작업대")).toBeInTheDocument();
-    // 머리에는 편성 위치만 둔다(버전·수정 시각·Trace는 세부 추적 정보로).
-    expect(within(bench).getByText("비즈니스 중국어 3주차")).toBeInTheDocument();
+    // 현재 콘텐츠 식별값과 편성 위치를 함께 보여 준다.
+    expect(within(bench).getByText("콘텐츠 a84f21c9 · 비즈니스 중국어 3주차")).toBeInTheDocument();
     expect(within(bench).queryByText(/Trace a84f21c/)).toBeNull();
     expect(within(bench).queryByText(/규칙 통과|AI 검토 완료|교수자 결정 대기/)).not.toBeInTheDocument();
     // 교수자 최종 승인은 대기열을 옆에 두지 않는다. 목록은 머리의 버튼으로 연다.

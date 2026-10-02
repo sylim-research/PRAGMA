@@ -101,7 +101,7 @@ describe("admin dashboard", () => {
     const rules = within(stages).getByRole("link", { name: /자동 품질 점검 완료/ });
     // 규칙 검사를 통과한 서로 다른 미션 1건(재실행 중복·불통과 제외).
     await waitFor(() => expect(rules.textContent).toMatch(/1\s*개/));
-    expect(rules.textContent).toContain("규칙 33개 자동 검사");
+    expect(rules.textContent).toContain("미션 형식별 규칙 검사");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "지금 대기 2개");

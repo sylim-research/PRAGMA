@@ -45,6 +45,40 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+describe("quality review handoff", () => {
+  function showCompact() {
+    render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+      <MemoryRouter><ContentReviewPanel target={{ kind: "mission", targetId: "mission-1" }} handoffHref="/admin/review?scenarioId=mission-1" /></MemoryRouter>
+    </QueryClientProvider>);
+  }
+  beforeEach(() => {
+    inspection.run!.approval_policy = "focused_v1";
+    inspection.run!.claude_review = null;
+    inspection.run!.adjudication = null;
+    inspection.run!.openai_review!.model = "gpt-4.1-2025-04-14";
+  });
+  it("keeps optional reviews unexecuted and shows approval as a separate action", async () => {
+    showCompact();
+    expect(await screen.findByText("GPT-4.1")).toBeInTheDocument();
+    expect(screen.queryByText(/GPT-4.1-2025/)).not.toBeInTheDocument();
+    expect(await screen.findByText("점검·검토 완료")).toBeInTheDocument();
+    expect(screen.getByText("감수 대기")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "교수자 감수·최종 승인으로" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
+    expect(mocks.approve).not.toHaveBeenCalled();
+    expect(mocks.inspect.mock.calls.every(call => call.length === 1)).toBe(true);
+  });
+  it("shows approved content without suggesting another cross-review run", async () => {
+    inspection.run!.approved_at = "2026-10-01T12:26:48Z";
+    showCompact();
+    expect(await screen.findByText("교수자 승인 완료")).toBeInTheDocument();
+    expect(screen.getAllByText("미실행 · 선택 단계")).toHaveLength(2);
+    expect(screen.queryByRole("button", { name: "교차 검토 실행" })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "교수자 승인 기록 보기" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
+    expect(inspection.run!.openai_review!.model).toBe("gpt-4.1-2025-04-14");
+    expect(mocks.approve).not.toHaveBeenCalled();
+  });
+});
+
 const DEFAULT_RATIONALE = { no_change: "원문·장면에 맞아 이대로 사용합니다.", defer: "추가 확인이 필요해 판단을 보류합니다.", revision_required: "검토 제안대로 수정하겠습니다." } as const;
 function showPanel() {
   render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>

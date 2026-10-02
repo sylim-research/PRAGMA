@@ -43,7 +43,6 @@ import {
   type DashboardCumulativeReviewCounts,
   type DashboardCumulativeRunRow,
 } from "@/lib/admin/adminDashboardMetrics";
-import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 import { CONTENT_REVIEW_STEPS } from "../../../supabase/functions/_shared/contentReview";
 import { toast } from "sonner";
 
@@ -144,7 +143,7 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: `규칙 ${ACTIVE_RULE_IDS.length}개 자동 검사`,
+  rules: "미션 형식별 규칙 검사",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "OpenAI 의미·자연성 검토",
   claude: "교수자가 요청할 때",
@@ -244,11 +243,11 @@ const ReviewPipeline = ({
           {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
           <div
             role="group"
-            aria-label="필요 시 교차 점검"
+            aria-label="필요 시 모델 간 교차 검토"
             className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              필요 시 교차 점검
+              필요 시 모델 간 교차 검토
             </span>
             {optional.map(renderStage)}
           </div>
