@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import LearnerRecords from "./LearnerRecords";
 
@@ -11,10 +12,11 @@ const mocks = vi.hoisted(() => ({
   eq: vi.fn(),
   order: vi.fn(),
   getSessions: vi.fn(),
+  rpc: vi.fn(),
 }));
 
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: { auth: { getSession: mocks.getSession }, from: mocks.from },
+  supabase: { auth: { getSession: mocks.getSession }, from: mocks.from, rpc: mocks.rpc },
 }));
 vi.mock("@/lib/learningSessions", () => ({ getSessions: mocks.getSessions }));
 vi.mock("@/components/learner/LearnerJourneyShell", () => ({
@@ -29,17 +31,21 @@ const ownLog = {
   completed_at: "2026-09-05T10:00:00Z", created_at: "2026-09-05T10:00:00Z",
 };
 
-function renderReport() {
-  return render(<MemoryRouter><LearnerRecords /></MemoryRouter>);
+function renderReport(entry = "/learner/records") {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+  return render(<QueryClientProvider client={client}><MemoryRouter initialEntries={[entry]}><LearnerRecords /></MemoryRouter></QueryClientProvider>);
 }
 
 const summaryText = () => screen.getByText(/미션 \d+개 · 수행 \d+회/).textContent;
 const missionCards = async () => within(await screen.findByRole("list", { name: "완료 기록" })).getAllByRole("article");
-const attempts = async () => (await screen.findAllByRole("list", { name: "수행 기록" })).flatMap((list) => within(list).getAllByRole("listitem"));
+// 수행 한 번 = 「수행 기록」 목록의 바로 아래 항목(안쪽 흐름 띠의 항목은 세지 않는다).
+const attempts = async () => (await screen.findAllByRole("list", { name: "수행 기록" }))
+  .flatMap((list) => within(list).getAllByRole("listitem").filter((item) => item.parentElement === list));
 const recordItems = attempts;
 
 beforeEach(() => {
   vi.resetAllMocks();
+  mocks.rpc.mockResolvedValue({ data: null, error: null });
   vi.stubGlobal("location", new URL("https://pragma.up.railway.app/learner/records"));
   localStorage.clear();
   localStorage.setItem("dev-learner-id", "local");
@@ -116,12 +122,13 @@ describe("learner records", () => {
     expect(cards[0]).toHaveTextContent("AI 한중 화용 통번역 · 2주차 · 요청 · 번역");
     expect(within(cards[0]).getAllByText("시간 확인 부탁드립니다.")).toHaveLength(1);
     expect(cards[0]).toHaveTextContent("수행 2회");
-    const rows = within(within(cards[0]).getByRole("list", { name: "수행 기록" })).getAllByRole("listitem");
-    expect(within(rows[0]).getByText("수정")).toBeInTheDocument();
-    expect(rows[0]).toHaveTextContent(`최초${ownLog.first_response}`);
-    expect(rows[0]).toHaveTextContent(`최종${ownLog.revised_response}`);
+    const list = within(cards[0]).getByRole("list", { name: "수행 기록" });
+    const rows = within(list).getAllByRole("listitem").filter((row) => row.parentElement === list);
+    expect(within(rows[0]).getAllByText("수정").length).toBeGreaterThan(0);
+    expect(within(rows[0]).getByRole("region", { name: "최초 번역" })).toHaveTextContent(`최초 번역${ownLog.first_response}`);
+    expect(within(rows[0]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.revised_response}`);
     expect(within(rows[1]).getByText("유지")).toBeInTheDocument();
-    expect(rows[1]).toHaveTextContent(`최종${ownLog.first_response}최초 번역을 그대로 결정`);
+    expect(within(rows[1]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.first_response}최초 번역을 그대로 결정`);
     expect(cards[1]).toHaveTextContent("거절");
   });
 
@@ -141,7 +148,7 @@ describe("learner records", () => {
     expect(screen.getByText(/다시 볼 때 · 모든 학습자에게 같은 질문입니다/)).toBeInTheDocument();
   });
 
-  it("opens stored AI feedback, my decision and my opinion under 자세히 보기", async () => {
+  it("shows the change map — first, stored AI feedback with my opinion, final — without a toggle", async () => {
     const detailed = {
       ...ownLog,
       target_feature_observed: { verdicts: { semantic_fidelity: "preserved", grammatical_accuracy: "clean" }, revision_scope: "feature" },
@@ -150,11 +157,11 @@ describe("learner records", () => {
     mocks.order.mockResolvedValue({ data: [detailed], error: null });
     renderReport();
     const [item] = await recordItems();
-    expect(item).not.toHaveTextContent("AI 피드백");
-    fireEvent.click(within(item).getByRole("button", { name: "자세히 보기" }));
-    expect(item).toHaveTextContent("AI 피드백뜻이 그대로 전달됩니다 · 이해를 막는 오류 없음 · 다시 볼 곳: 상대에게 주는 인상");
-    expect(item).toHaveTextContent("내 결정AI 피드백을 본 뒤 최초 번역을 유지함");
-    expect(item).toHaveTextContent("내 의견관계·친밀도에 대한 다른 판단“같은 과 선배라서”");
+    const feedback = within(item).getByRole("region", { name: "AI 피드백" });
+    expect(feedback).toHaveTextContent("다시 볼 곳 상대에게 주는 인상");
+    expect(feedback).toHaveTextContent("내 의견관계·친밀도에 대한 다른 판단“같은 과 선배라서”");
+    expect(within(item).getByRole("region", { name: "최종 번역" })).toHaveTextContent("최초 번역을 그대로 결정");
+    expect(within(item).queryByRole("button", { name: "자세히 보기" })).not.toBeInTheDocument();
     expect(within(item).getByText("유지")).toBeInTheDocument();
   });
 
@@ -195,5 +202,62 @@ describe("learner records", () => {
     await screen.findByRole("alert");
     expect(mocks.from).not.toHaveBeenCalled();
     expect(screen.queryByText("아직 완료한 미션이 없습니다.")).not.toBeInTheDocument();
+  });
+
+  it("draws this attempt as a flow and marks my place on a class distribution only after release", async () => {
+    const withMjt = {
+      ...ownLog,
+      feature_id: "request_mitigation_optionality",
+      context_judgment: {
+        schema_version: "mpj_response_v2",
+        responses: [
+          { item_id: 1, item_type: "scale4", scale_code: "somewhat_inappropriate" },
+          { item_id: 2, item_type: "scale4", scale_code: "somewhat_appropriate", reason_id: "r1", revised_scale_code: "very_inappropriate" },
+          { item_id: 5, item_type: "multi_judge", candidate_band_codes: ["appropriate", "too_direct", "appropriate", "too_indirect"] },
+        ],
+        learner_dissent: null,
+      },
+    };
+    mocks.order.mockResolvedValue({ data: [withMjt], error: null });
+    mocks.rpc.mockResolvedValue({
+      data: {
+        state: "released", learnerCount: 6, releasedAt: null,
+        pattern: { missionId: withMjt.mission_id, learners: 6, dissents: 0, items: [
+          { itemId: 1, title: "판단 1", targetPreview: null, groups: [{ heading: "적절성 판단", total: 6, choices: [
+            { key: "somewhat_inappropriate", label: "다소 부적절", count: 4 }, { key: "very_appropriate", label: "매우 적절", count: 2 },
+          ] }] },
+        ] },
+      },
+      error: null,
+    });
+    renderReport();
+    const [item] = await recordItems();
+    const flow = within(within(item).getByRole("list", { name: "이번 수행의 흐름" }));
+    expect(flow.getAllByRole("listitem").map((step) => step.textContent)).toEqual([
+      "1단일 표현 판단다소 부적절",
+      "2판단과 이유다소 적절매우 부적절",
+      expect.stringContaining("3복수 표현 비교"),
+      expect.stringContaining("4통번역 · 최종 결정"),
+    ]);
+    const position = await screen.findByRole("region", { name: "학급 속 내 위치" });
+    expect(within(position).getByRole("img", { name: "단일 표현 판단 학급 분포와 내 판단" })).toHaveTextContent("나");
+    expect(mocks.rpc).toHaveBeenCalledWith("learner_get_peer_responses", { p_course_id: ownLog.course_id, p_mission_id: withMjt.mission_id });
+  });
+
+  it("hides the class position while the distribution is not released", async () => {
+    mocks.order.mockResolvedValue({ data: [ownLog], error: null });
+    mocks.rpc.mockResolvedValue({ data: { state: "awaiting_release" }, error: null });
+    renderReport();
+    await recordItems();
+    await act(async () => { await Promise.resolve(); });
+    expect(screen.queryByRole("region", { name: "학급 속 내 위치" })).not.toBeInTheDocument();
+  });
+
+  it("opens a labelled demo record without reading stored logs", async () => {
+    renderReport("/learner/records?demo=1");
+    expect(await screen.findByText("데모 · 가상 학급 20명 중 한 명 · 실제 학습자 자료 아님")).toBeInTheDocument();
+    expect(await screen.findByRole("region", { name: "학급 속 내 위치" })).toBeInTheDocument();
+    expect(mocks.from).not.toHaveBeenCalled();
+    expect(mocks.rpc).not.toHaveBeenCalled();
   });
 });

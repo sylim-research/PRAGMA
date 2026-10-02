@@ -1,6 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { SpectrumStrip, TONE } from "@/components/charts/responseCharts";
+import { LEARNER_DEMO_NOTICE, learnerDemoClassPositions, learnerDemoLog } from "@/lib/demo/learnerRecordsDemo";
+import {
+  buildChangeMap,
+  buildMissionFlow,
+  classPositionsFromPattern,
+  myScaleChoices,
+  type ChangeMap,
+  type ClassPosition,
+  type FlowStep,
+} from "@/lib/learner/recordFlow";
+import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { buildLearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
@@ -27,6 +40,14 @@ type ReportRecord = {
   feedback: string[];
   decision: "최초 산출 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
+  /** 이번 수행의 흐름(판단 다섯 → 통번역). 점수·정오는 없다. */
+  flow: FlowStep[];
+  /** 저장된 AI 피드백의 화용 판정·다시 볼 곳·설명. */
+  change: ChangeMap | null;
+  /** 내 척도 선택(문항 번호 → 척도 코드). 학급 속 내 위치에 쓴다. */
+  scaleChoices: Map<number, string>;
+  /** 데모 전용 — 공개된 것으로 보는 가상 학급 분포. 실제 기록은 교수자 공개 분포를 따로 읽는다. */
+  demoPositions?: ClassPosition[];
 };
 
 type MissionLogRecord = RecordDetailRow & {
@@ -84,6 +105,9 @@ function localRecord(session: LearningSession): ReportRecord {
     feedback: [],
     decision: null,
     dissent: null,
+    flow: [],
+    change: null,
+    scaleChoices: new Map(),
   };
 }
 
@@ -109,6 +133,14 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     feedback: detail.task.feedback,
     decision: detail.task.decision,
     dissent: detail.dissent,
+    flow: buildMissionFlow({
+      contextJudgment: row.context_judgment,
+      featureId: row.feature_id,
+      decision: detail.task.decision,
+      dissent: detail.dissent !== null,
+    }),
+    change: buildChangeMap(row.target_feature_observed, row.feature_id),
+    scaleChoices: myScaleChoices(row.context_judgment),
   };
 }
 
@@ -221,18 +253,133 @@ function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | 
   );
 }
 
-/** 수행 한 번 — 날짜·결정 배지, 최초→최종(차이 표시), 「자세히」에 AI 피드백·내 결정·내 의견. */
-function Attempt({ record }: { record: ReportRecord }) {
-  const [open, setOpen] = useState(false);
+const card = "rounded-xl border-[1.6px] border-[#E4DFD0] bg-white";
+const cardLabel = "text-[12px] font-semibold text-[#8C8471]";
+
+function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size?: string }) {
+  return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
+}
+
+/** 이번 수행의 흐름 — 판단 다섯 단계와 통번역을 한 줄로. 각 단계에는 내가 고른 것만 보인다. */
+function FlowStrip({ steps }: { steps: FlowStep[] }) {
+  if (steps.length === 0) return null;
+  return (
+    <ol className="grid grid-cols-2 gap-1.5 sm:grid-cols-3" aria-label="이번 수행의 흐름">
+      {steps.map((step, index) => (
+        <li key={step.key} className="flex min-w-0 items-stretch">
+          <div className={`${card} flex min-w-0 flex-1 flex-col justify-between px-3 py-2.5`}>
+            <p className="flex items-baseline gap-1.5">
+              <span className="text-[11.5px] font-bold tabular-nums text-[#B8860B]">{index + 1}</span>
+              <span className="break-keep text-[12.5px] font-bold text-[#15202B]">{step.activity}</span>
+            </p>
+            <div className="mt-2 text-[13px] font-semibold text-[#15202B]">
+              {step.dots.length > 0 ? (
+                <span className="flex items-center gap-1" aria-label={step.dots.map((dot, dotIndex) => `표현 ${dotIndex + 1} ${dot.label}`).join(", ")}>
+                  {step.dots.map((dot, dotIndex) => (
+                    <span key={dotIndex} title={`표현 ${dotIndex + 1} · ${dot.label}`} className="flex flex-col items-center gap-0.5">
+                      <ToneDot tone={dot.tone} size="h-3.5 w-3.5" />
+                      <span className="text-[10px] font-medium tabular-nums text-[#8C8471]">{dotIndex + 1}</span>
+                    </span>
+                  ))}
+                </span>
+              ) : (
+                <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                  {step.tone && <ToneDot tone={step.tone} />}
+                  <span className="break-keep">{step.value ?? "—"}</span>
+                  {step.changedTo && (
+                    <>
+                      <ArrowRight aria-label="이유를 본 뒤 바꿈" className="h-3.5 w-3.5 text-[#8C8471]" strokeWidth={2.25} />
+                      <ToneDot tone={step.changedTo.tone} />
+                      <span className="break-keep">{step.changedTo.value}</span>
+                    </>
+                  )}
+                  {step.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-[1px] text-[11px] font-bold text-white">내 의견</span>}
+                </span>
+              )}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** 표현 변화 지도 — 최초 → AI 피드백 → 최종을 세 칸으로. 바뀐 구절은 최초에서 지우고 최종에서 밑줄. */
+function ChangeFlow({ record }: { record: ReportRecord }) {
+  const [more, setMore] = useState(false);
   const task = TASK_LABEL[record.taskType];
   const revised = changed(record);
   const diff = revised ? diffSegments(record.firstResponse, record.revisedResponse) : null;
-  const hasDetail = record.feedback.length > 0 || record.decision !== null || record.dissent !== null;
-  const detailId = `attempt-detail-${record.id}`;
-
+  const change = record.change;
+  const arrow = <div aria-hidden="true" className="flex items-center justify-center"><ArrowRight className="h-4 w-4 rotate-90 text-[#C9BFA3]" strokeWidth={2.5} /></div>;
   return (
-    <div className="grid gap-x-6 gap-y-2 py-5 md:grid-cols-[6.5rem_minmax(0,1fr)]">
-      <div className="flex items-center gap-2 md:flex-col md:items-start md:gap-1.5 md:pt-1">
+    <div className="grid gap-1">
+      <section className={`${card} px-4 py-3`} aria-label={`최초 ${task}`}>
+        <p className={cardLabel}>최초 {task}</p>
+        <p className={`mt-1.5 ${zhLine}`}>
+          {diff ? <Expression segments={diff.before} mode="before" /> : record.firstResponse || "기록 없음"}
+        </p>
+      </section>
+      {arrow}
+      <section className={`${card} px-4 py-3`} aria-label="AI 피드백">
+        <p className={cardLabel}>AI 피드백</p>
+        {change || record.feedback.length > 0 ? (
+          <div className="mt-1.5 space-y-1.5 text-[13.5px] leading-6 text-[#26323D]">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {change?.band && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.6px] px-2.5 py-[1px] text-[12.5px] font-bold" style={{ borderColor: TONE[change.band.tone], color: "#15202B" }}>
+                  <ToneDot tone={change.band.tone} size="h-2 w-2" />{change.band.label}
+                </span>
+              )}
+              {change?.scope && <span className="text-[12.5px]"><span className="text-[#8C8471]">다시 볼 곳 </span><span className="font-semibold">{change.scope}</span></span>}
+            </p>
+            {change?.feature && (
+              <>
+                <p className={`break-keep ${more ? "" : "line-clamp-3"}`}>{change.feature}</p>
+                {change.feature.length > 90 && (
+                  <button type="button" onClick={() => setMore((value) => !value)} className="text-[12px] font-semibold text-[#344F63] hover:underline">
+                    {more ? "접기" : "더 보기"}
+                  </button>
+                )}
+              </>
+            )}
+            {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
+          </div>
+        ) : (
+          <p className="mt-1.5 text-[13px] text-[#8C8471]">피드백 기록 없음</p>
+        )}
+        {record.dissent && (
+          <div className="mt-3 border-t border-[#EFEBDF] pt-2.5">
+            <p className="text-[12px] font-semibold text-[#8A5A14]">내 의견</p>
+            {record.dissent.conditions.length > 0 && (
+              <p className="mt-1 flex flex-wrap gap-1.5">
+                {record.dissent.conditions.map((condition) => (
+                  <span key={condition} className="rounded-md border-[1.6px] border-[#E4C44E] px-1.5 py-[1px] text-[12px] text-[#5F4A12]">{condition}</span>
+                ))}
+              </p>
+            )}
+            {record.dissent.reason && <p className="mt-1 break-keep text-[13.5px] leading-6 text-[#26323D]">“{record.dissent.reason}”</p>}
+          </div>
+        )}
+      </section>
+      {arrow}
+      <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={`최종 ${task}`}>
+        <p className="text-[12px] font-semibold text-[#1F3A5F]">최종 {task}</p>
+        <p className={`mt-1.5 ${zhLine} font-semibold`}>
+          {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
+        </p>
+        {!diff && <p className="mt-1 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>}
+      </section>
+    </div>
+  );
+}
+
+/** 수행 한 번 — 날짜·결정 배지, 이번 수행의 흐름, 표현 변화 지도. */
+function Attempt({ record }: { record: ReportRecord }) {
+  const revised = changed(record);
+  return (
+    <div className="space-y-3 py-5">
+      <div className="flex items-center gap-2">
         <span className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</span>
         <span
           className={[
@@ -243,70 +390,44 @@ function Attempt({ record }: { record: ReportRecord }) {
           {revised ? "수정" : "유지"}
         </span>
       </div>
-
-      <div className="min-w-0">
-        {diff ? (
-          <dl className="space-y-1.5">
-            <div className="flex gap-3">
-              <dt className={lineLabel}>최초</dt>
-              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.before} mode="before" /></dd>
-            </div>
-            <div className="flex gap-3">
-              <dt className={lineLabel}>최종</dt>
-              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.after} mode="after" /></dd>
-            </div>
-          </dl>
-        ) : (
-          <dl className="flex gap-3">
-            <dt className={lineLabel}>최종</dt>
-            <dd className="min-w-0">
-              <p className={zhLine}>{record.revisedResponse || record.firstResponse || "기록 없음"}</p>
-              <p className="mt-0.5 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>
-            </dd>
-          </dl>
-        )}
-
-        {hasDetail && (
-          <div className="mt-3">
-            <button
-              type="button"
-              aria-expanded={open}
-              aria-controls={detailId}
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#344F63] hover:text-[#15202B]"
-            >
-              {open ? "접기" : "자세히 보기"}
-              <ChevronDown aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} strokeWidth={2.25} />
-            </button>
-            {open && (
-              <dl id={detailId} className="mt-3 space-y-2.5 border-l-2 border-[#E4DFD0] pl-4 text-[14px] leading-6 text-[#26323D]">
-                {record.feedback.length > 0 && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">AI 피드백</dt>
-                    <dd>{record.feedback.join(" · ")}</dd>
-                  </div>
-                )}
-                {record.decision && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 결정</dt>
-                    <dd>{record.decision === "수정" ? `AI 피드백을 본 뒤 ${task}을 수정함` : `AI 피드백을 본 뒤 최초 ${task}을 유지함`}</dd>
-                  </div>
-                )}
-                {record.dissent && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 의견</dt>
-                    <dd>
-                      {record.dissent.conditions.length > 0 && <span className="block">{record.dissent.conditions.join(" · ")}</span>}
-                      {record.dissent.reason && <span className="block text-[#4F6070]">“{record.dissent.reason}”</span>}
-                    </dd>
-                  </div>
-                )}
-              </dl>
-            )}
-          </div>
-        )}
-      </div>
+      <FlowStrip steps={record.flow} />
+      <ChangeFlow record={record} />
     </div>
+  );
+}
+
+/** 학급 속 내 위치 — 교수자가 공개한 익명 분포 위에 내 판단을 표시한다. 공개 전에는 보이지 않는다. */
+function ClassPositionPanel({ record }: { record: ReportRecord }) {
+  const enabled = !record.demoPositions && Boolean(record.courseId && record.missionId);
+  const peer = useQuery({
+    queryKey: ["learner-records-peer", record.courseId, record.missionId],
+    enabled,
+    queryFn: () => getLearnerPeerResponses(record.courseId as string, record.missionId as string),
+    staleTime: 60_000,
+  });
+  const positions = record.demoPositions
+    ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.scaleChoices) : []);
+  if (positions.length === 0) return null;
+  return (
+    <section className="border-b border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="학급 속 내 위치">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 className="flex items-center gap-2 text-[14px] font-bold text-[#15202B]">
+          <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />학급 속 내 위치
+        </h3>
+        <p className="text-[12px] text-[#8C8471]">공개된 익명 분포 · 많이 고른 판단이 정답이라는 뜻은 아닙니다</p>
+      </div>
+      <div className="mt-2 grid gap-2">
+        {positions.map((position) => (
+          <div key={position.itemId} className={`${card} px-3 pt-2.5`}>
+            <p className="flex items-baseline justify-between gap-2 text-[12.5px]">
+              <span className="font-bold text-[#15202B]">{position.activity}</span>
+              <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
+            </p>
+            <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -335,6 +456,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
           </div>
         )}
       </header>
+      <ClassPositionPanel record={head} />
       <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
         {group.records.map((record) => (
           <li key={record.id}><Attempt record={record} /></li>
@@ -399,7 +521,13 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
   );
 }
 
-const LearnerRecords = () => {
+function demoRecords(): ReportRecord[] {
+  return [{ ...missionLogRecord(learnerDemoLog() as unknown as MissionLogRecord), demoPositions: learnerDemoClassPositions() }];
+}
+
+const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
+  const [searchParams] = useSearchParams();
+  const demo = demoProp || searchParams.get("demo") === "1";
   const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
   const localRecords = useMemo(
     () => (isLocalHost ? getSessions().map(localRecord) : []),
@@ -413,6 +541,12 @@ const LearnerRecords = () => {
 
   useEffect(() => {
     let cancelled = false;
+    if (demo) {
+      // 데모는 운영 기록을 읽지 않는다.
+      setRemoteRecords(demoRecords());
+      setRecordsError(false);
+      return;
+    }
     setRemoteRecords(null);
     setRecordsError(false);
     void (async () => {
@@ -444,9 +578,9 @@ const LearnerRecords = () => {
     return () => {
       cancelled = true;
     };
-  }, [loadAttempt]);
+  }, [loadAttempt, demo]);
 
-  const usingLocalPreview = isLocalHost && !recordsError && remoteRecords !== null && remoteRecords.length === 0 && localRecords.length > 0;
+  const usingLocalPreview = !demo && isLocalHost && !recordsError && remoteRecords !== null && remoteRecords.length === 0 && localRecords.length > 0;
   const records = usingLocalPreview ? localRecords : remoteRecords ?? [];
   const courseIds = [...new Set(records.flatMap((record) => (record.courseId && COURSE_LABEL.has(record.courseId) ? [record.courseId] : [])))];
   const inCourse = records.filter((record) => courseFilter === "all" || record.courseId === courseFilter);
@@ -496,6 +630,9 @@ const LearnerRecords = () => {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="기록 거르기">
+            {demo && (
+              <span className="rounded-full bg-[#FAD338] px-3 py-1 text-[11.5px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
+            )}
             {usingLocalPreview && (
               <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[11px] font-semibold text-[#756D5E]">
                 localhost 시연 데이터

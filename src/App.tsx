@@ -50,6 +50,10 @@ const VirtualResponseDiscussionDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/dev/VirtualResponseDiscussionDemo.tsx"))
   : null;
 // 대표 미션 가상 학급 20명의 토론 보드 — 역시 개발 모드 전용(로그인 없이 도판을 뜬다).
+// 「내 기록」 데모 — 가상 학급의 한 명을 로그인 없이 연다(개발 모드 전용).
+const LearnerRecordsDemo = import.meta.env.DEV
+  ? lazy(() => import("./pages/learner/LearnerRecords.tsx").then((module) => ({ default: () => <module.default demo /> })))
+  : null;
 const ClassDiscussionDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/dev/ClassDiscussionDemo.tsx"))
   : null;
@@ -132,6 +136,9 @@ const App = () => (
           />
           {VirtualResponseDiscussionDemo && (
             <Route path="/dev/virtual-response-demo" element={<VirtualResponseDiscussionDemo />} />
+          )}
+          {LearnerRecordsDemo && (
+            <Route path="/dev/learner-records-demo" element={<LearnerRecordsDemo />} />
           )}
           {ClassDiscussionDemo && (
             <Route path="/dev/class-discussion-demo" element={<ClassDiscussionDemo />} />
