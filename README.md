@@ -58,7 +58,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 4. 학습 미션의 생성 조건
 
 <table>
-  <thead><tr><th align="left">조건</th><th align="left">구성</th></tr></thead>
+  <thead><tr><th width="160" align="left">조건</th><th width="580" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표 화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>관계·상황 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
@@ -75,7 +75,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 5. 콘텐츠·학습 기록의 추적
 
 <table>
-  <thead><tr><th align="left">콘텐츠 이력</th><th align="left">학습 수행 기록</th></tr></thead>
+  <thead><tr><th width="370" align="left">콘텐츠 이력</th><th width="370" align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 지문 (SHA-256)</td><td>초안 · 수정안</td></tr>
@@ -91,10 +91,10 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th align="left">논문</th><th align="left">내용</th><th align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="125" align="left">논문</th><th width="240" align="left">내용</th><th width="375" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
-    <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/App.tsx"><code>App.tsx</code></a> · <a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
+    <tr><td>4.1.3</td><td>웹앱 구성·역할별 권한</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
     <tr><td>4.1.4</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
     <tr><td>4.2.1&nbsp;·&nbsp;부록&nbsp;A</td><td>제작 기준·운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>4.2.2~3</td><td>시나리오·학습 미션 생성</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
@@ -120,7 +120,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 7. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th align="left">단계</th><th align="left">핵심 설계·개선</th><th align="left">근거</th></tr></thead>
+  <thead><tr><th width="215" align="left">단계</th><th width="420" align="left">핵심 설계·개선</th><th width="105" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질관리·최종 승인</td><td>자동 품질 점검·AI 검토 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
@@ -152,7 +152,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 9. 주요 용어
 
 <table>
-  <thead><tr><th align="left">용어</th><th align="left">정의</th></tr></thead>
+  <thead><tr><th width="160" align="left">용어</th><th width="580" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미 충실성</td><td>원문의 핵심 의미와 화행 목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>관계·상황과 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
