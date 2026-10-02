@@ -65,7 +65,7 @@ export function Donut({ slices, total, size = 150, thickness = 22, centerLabel, 
 export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 위 학급 분포" }: { slices: Slice[]; total: number; mine?: string | null; label?: string }) {
   const width = 560;
   const step = width / slices.length;
-  return <svg viewBox={`0 0 ${width} ${mine ? 136 : 118}`} className="h-auto w-full" role="img" aria-label={label}>
+  return <svg viewBox={`0 0 ${width} ${mine ? 146 : 128}`} className="h-auto w-full" role="img" aria-label={label}>
     <g transform={mine ? "translate(0 18)" : undefined}>
     <defs>
       <linearGradient id="spectrum-band" x1="0" x2="1" y1="0" y2="0">
@@ -82,12 +82,12 @@ export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 �
         {mine === slice.key && <>
           <circle cx={x} cy={46} r={r + 5} fill="none" stroke="#15202B" strokeWidth={2.5} />
           <rect x={x - 13} y={46 - r - 25} width={26} height={17} rx={8.5} fill="#15202B" />
-          <text x={x} y={46 - r - 16.5} textAnchor="middle" dominantBaseline="central" fill="#FAD338" className="text-[11px] font-bold">나</text>
+          <text x={x} y={46 - r - 16.5} textAnchor="middle" dominantBaseline="central" fill="#FAD338" className="text-[12px] font-bold">나</text>
         </>}
         <circle cx={x} cy={46} r={r} fill={TONE[slice.tone]} />
-        <text x={x} y={46} textAnchor="middle" dominantBaseline="central" fill={ON_TONE[slice.tone]} className="text-[12px] font-bold tabular-nums">{share}%</text>
-        <text x={x} y={100} textAnchor="middle" className="fill-[#44525C] text-[12px] font-semibold">{slice.label}</text>
-        <text x={x} y={114} textAnchor="middle" className="fill-[#7A858C] text-[11px] tabular-nums">{slice.count}명</text>
+        <text x={x} y={46} textAnchor="middle" dominantBaseline="central" fill={ON_TONE[slice.tone]} className="text-[13.5px] font-bold tabular-nums">{share}%</text>
+        <text x={x} y={104} textAnchor="middle" className="fill-[#26323D] text-[14px] font-semibold">{slice.label}</text>
+        <text x={x} y={122} textAnchor="middle" className="fill-[#5C6A7A] text-[12.5px] tabular-nums">{slice.count}명</text>
       </g>;
     })}
     </g>
