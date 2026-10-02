@@ -3,15 +3,19 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { SpectrumStrip, TONE } from "@/components/charts/responseCharts";
-import { LEARNER_DEMO_NOTICE, learnerDemoClassPositions, learnerDemoLog } from "@/lib/demo/learnerRecordsDemo";
+import { LEARNER_DEMO_NOTICE, learnerDemoClassPositions, learnerDemoLog, learnerDemoMission } from "@/lib/demo/learnerRecordsDemo";
 import {
   buildChangeMap,
   classPositionsFromPattern,
-  myScaleChoices,
+  COMPARED_ITEMS,
+  judgmentComparisons,
+  missionReference,
+  myChoices,
   type ChangeMap,
   type ClassPosition,
 } from "@/lib/learner/recordFlow";
 import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
+import { fetchMissionByScenario } from "@/lib/mission/missionDb";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { buildLearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
@@ -19,7 +23,7 @@ import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import { COURSE_PRESETS } from "@/lib/pragma/scenarioTopics";
 import { supabase } from "@/integrations/supabase/client";
 
-// 학습자 본인의 완료 기록을 다시 읽는 화면 — 재검토의 자료(원고 4.3.5·5.2.3).
+// 학습자 본인의 완료 기록을 다시 읽는 화면 — 재검토의 자료(원고 4.3.5·5.2.2).
 // 같은 미션의 수행을 한 묶음으로 모아 원문은 한 번만 보이고, 수행마다 최초→최종 표현의 차이를 표시한다.
 // 기록을 옮겨 보여 줄 뿐 점수·유형·강약점을 만들지 않는다. 고친 건수처럼 「고치는 것이 목표」로 읽히는 숫자도 두지 않는다.
 
@@ -38,12 +42,15 @@ type ReportRecord = {
   feedback: string[];
   decision: "최초 산출 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
-  /** 저장된 AI 피드백의 화용 판정·다시 볼 곳·설명. */
+  /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
   change: ChangeMap | null;
-  /** 내 척도 선택(문항 번호 → 척도 코드). 학급 속 내 위치에 쓴다. */
-  scaleChoices: Map<number, string>;
-  /** 데모 전용 — 공개된 것으로 보는 가상 학급 분포. 실제 기록은 교수자 공개 분포를 따로 읽는다. */
+  /** 내 선택(문항 번호 → 척도 코드 또는 수정안 위치). 우리 반의 판단·판단 비교에 쓴다. */
+  choices: Map<number, string>;
+  /** 수행 당시 콘텐츠 지문 — 기준 판단·핵심 정리를 같은 판본에서만 읽는다. */
+  contentHash: string | null;
+  /** 데모 전용 — 공개된 것으로 보는 가상 학급 분포와 미션 본문. 실제 기록은 따로 읽는다. */
   demoPositions?: ClassPosition[];
+  demoMission?: unknown;
 };
 
 type MissionLogRecord = RecordDetailRow & {
@@ -102,7 +109,8 @@ function localRecord(session: LearningSession): ReportRecord {
     decision: null,
     dissent: null,
     change: null,
-    scaleChoices: new Map(),
+    choices: new Map(),
+    contentHash: null,
   };
 }
 
@@ -129,7 +137,8 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     decision: detail.task.decision,
     dissent: detail.dissent,
     change: buildChangeMap(row.target_feature_observed, row.feature_id),
-    scaleChoices: myScaleChoices(row.context_judgment),
+    choices: myChoices(row.context_judgment),
+    contentHash: row.content_hash ?? null,
   };
 }
 
@@ -273,13 +282,13 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
                   <ToneDot tone={change.band.tone} size="h-2 w-2" />{change.band.label}
                 </span>
               )}
-              {change?.scope && <span className="text-[12.5px]"><span className="text-[#8C8471]">다시 볼 곳 </span><span className="font-semibold">{change.scope}</span></span>}
+              {change?.scope && <span className="text-[12.5px]"><span className="text-[#8C8471]">다시 살펴볼 점 </span><span className="font-semibold">{change.scope}</span></span>}
             </p>
             {change?.feature && <p className="break-keep">{change.feature}</p>}
             {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
           </div>
         ) : (
-          <p className="mt-1.5 text-[13px] text-[#8C8471]">피드백 기록 없음</p>
+          <p className="mt-1.5 text-[13px] text-[#8C8471]">저장된 AI 피드백이 없습니다.</p>
         )}
         {record.dissent && (
           <div className="mt-3 border-t border-[#EFEBDF] pt-2.5">
@@ -302,8 +311,8 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
         {diff
-          ? <p className="mt-1 text-[12.5px] text-[#5C6A7A]">밑줄 = 처음과 달라진 부분</p>
-          : <p className="mt-1 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>}
+          ? <p className="mt-1 text-[12.5px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
+          : <p className="mt-1 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 유지했습니다.</p>}
       </section>
     </div>
   );
@@ -319,38 +328,127 @@ function Attempt({ record }: { record: ReportRecord }) {
   );
 }
 
-/** 학급 속 내 위치 — 교수자가 공개한 익명 분포 위에 내 판단을 표시한다. 공개 전에는 보이지 않는다. */
-function ClassPositionPanel({ record }: { record: ReportRecord }) {
-  const enabled = !record.demoPositions && Boolean(record.courseId && record.missionId);
+const sectionTitle = "flex items-center gap-2 text-[14px] font-bold text-[#15202B]";
+const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />;
+
+/** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
+function ChoiceBars({ position }: { position: ClassPosition }) {
+  return (
+    <ul className="space-y-2 pb-3 pt-1" aria-label={`${position.activity} 학급 분포와 내 판단`}>
+      {position.slices.map((slice) => {
+        const share = position.total > 0 ? Math.round((slice.count / position.total) * 100) : 0;
+        const mine = position.mine === slice.key;
+        return (
+          <li key={slice.key} className="grid grid-cols-[6rem_minmax(0,1fr)_5.5rem] items-center gap-3 text-[13px]">
+            <span className="flex items-center gap-1.5 whitespace-nowrap font-semibold text-[#15202B]">
+              {slice.label}
+              {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[11px] font-bold text-[#FAD338]">나</span>}
+            </span>
+            <span className="h-3 overflow-hidden rounded-sm bg-[#EEF0F2]" aria-hidden="true">
+              <span className="block h-full rounded-r-sm" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone] }} />
+            </span>
+            <span className="text-right tabular-nums text-[#5C6A7A]"><span className="font-bold text-[#15202B]">{share}%</span> · {slice.count}명</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * 우리 반의 판단 → 판단 비교 → 핵심 정리. 학급 분포는 교수자가 공개한 미션에만 보인다.
+ * 기준 판단·핵심 정리는 수행 당시와 같은 콘텐츠 판본일 때만 미션 본문에서 그대로 옮긴다(새 해석 없음).
+ */
+function ClassReview({ record }: { record: ReportRecord }) {
+  const live = !record.demoPositions && Boolean(record.courseId && record.missionId);
   const peer = useQuery({
     queryKey: ["learner-records-peer", record.courseId, record.missionId],
-    enabled,
+    enabled: live,
     queryFn: () => getLearnerPeerResponses(record.courseId as string, record.missionId as string),
     staleTime: 60_000,
   });
+  const mission = useQuery({
+    queryKey: ["learner-records-mission", record.missionId],
+    enabled: !record.demoMission && Boolean(record.missionId && record.contentHash),
+    queryFn: async () => (await fetchMissionByScenario(record.missionId as string, { includeV6: true })).mission,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
   const positions = record.demoPositions
-    ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.scaleChoices) : []);
-  if (positions.length === 0) return null;
+    ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.choices) : []);
+  const reference = missionReference(record.demoMission ?? mission.data ?? null, record.contentHash);
+  const comparisons = judgmentComparisons(positions, reference);
+  const shownItems = comparisons.length > 0 ? comparisons.map((row) => row.itemId) : COMPARED_ITEMS;
+  const lessonPoints = (reference?.lessonPoints ?? []).filter((point) => shownItems.includes(point.itemId));
+  const showReference = comparisons.some((row) => row.reference !== null);
+  if (positions.length === 0 && lessonPoints.length === 0) return null;
+
   return (
-    <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="학급 속 내 위치">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h3 className="flex items-center gap-2 text-[14px] font-bold text-[#15202B]">
-          <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />우리 반은 어떻게 판단했을까
-        </h3>
-        <p className="text-[12px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
-      </div>
-      <div className="mt-2 grid gap-2">
-        {positions.map((position) => (
-          <div key={position.itemId} className={`${card} px-3 pt-2.5`}>
-            <p className="flex items-baseline justify-between gap-2 text-[12.5px]">
-              <span className="font-bold text-[#15202B]">{position.activity}</span>
-              <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
-            </p>
-            <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
+    <>
+      {positions.length > 0 && (
+        <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="우리 반의 판단">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h3 className={sectionTitle}>{titleBar}우리 반의 판단</h3>
+            <p className="text-[12px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
           </div>
-        ))}
-      </div>
-    </section>
+          <div className="mt-2 grid gap-2">
+            {positions.map((position) => (
+              <div key={position.itemId} className={`${card} px-3 pt-2.5`}>
+                <p className="flex items-baseline justify-between gap-2 text-[12.5px]">
+                  <span className="font-bold text-[#15202B]">{position.activity}</span>
+                  <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
+                </p>
+                {position.kind === "scale"
+                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
+                  : <ChoiceBars position={position} />}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {comparisons.length > 0 && (
+        <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="판단 비교">
+          <h3 className={sectionTitle}>{titleBar}판단 비교</h3>
+          <div className="mt-2 overflow-x-auto">
+            <table className="w-full border-collapse text-[13.5px]">
+              <thead>
+                <tr className="text-left text-[12px] text-[#8C8471]">
+                  <th scope="col" className="py-1.5 pr-3 font-semibold">활동</th>
+                  <th scope="col" className="py-1.5 pr-3 font-semibold">내 선택</th>
+                  <th scope="col" className="py-1.5 pr-3 font-semibold">반에서 가장 많이 고른 선택</th>
+                  {showReference && <th scope="col" className="py-1.5 font-semibold">기준 판단</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {comparisons.map((row) => (
+                  <tr key={row.itemId} className="border-t border-[#F0ECE2]">
+                    <th scope="row" className="py-2 pr-3 text-left font-semibold text-[#15202B]">{row.activity}</th>
+                    <td className="py-2 pr-3 font-semibold text-[#1F3A5F]">{row.mine ?? "—"}</td>
+                    <td className="py-2 pr-3 text-[#26323D]">{row.majority.length ? row.majority.join(" · ") : "—"}</td>
+                    {showReference && <td className="py-2 text-[#26323D]">{row.reference ?? "—"}</td>}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {lessonPoints.length > 0 && (
+        <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="핵심 정리">
+          <h3 className={sectionTitle}>{titleBar}핵심 정리</h3>
+          <ul className="mt-2 space-y-2">
+            {lessonPoints.map((point) => (
+              <li key={point.itemId} className="text-[14px] leading-6 text-[#26323D]">
+                <p className="text-[12.5px] font-bold text-[#786022]">{point.label}</p>
+                <p className="break-keep">{point.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </>
   );
 }
 
@@ -384,7 +482,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
-      <ClassPositionPanel record={head} />
+      <ClassReview record={head} />
     </article>
   );
 }
@@ -393,18 +491,18 @@ const selectClass =
   "h-9 rounded-full border border-[#DDD6C4] bg-white pl-4 pr-8 text-[13px] font-semibold text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]";
 
 /**
- * 9개 화행 지도 — 어떤 화행을 해 봤는지(수행 횟수)를 보여 주고, 누르면 아래 기록을 그 화행으로 거른다.
+ * 화행별 학습 기록 — 어떤 화행을 해 봤는지(수행 횟수)를 보여 주고, 누르면 아래 기록을 그 화행으로 거른다.
  * 수행한 화행은 남색 점·테두리, 아직 안 한 화행은 호박색 빈 점(회색 금지). 능력 판정이 아니라 수행 범위다.
  */
 function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, number>; selected: SpeechActUI | "all"; onSelect: (act: SpeechActUI | "all") => void }) {
   const done = ACTS.filter((act) => (counts.get(act) ?? 0) > 0).length;
   return (
-    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="9개 화행 지도">
+    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="화행별 학습 기록">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-[16px] font-bold text-[#15202B]">9개 화행 지도</h2>
-        <p className="text-[12.5px] text-[#5C6A7A]">{done}/9 화행 수행 · 누르면 아래 기록을 거릅니다</p>
+        <h2 className="text-[16px] font-bold text-[#15202B]">화행별 학습 기록</h2>
+        <p className="text-[12.5px] text-[#5C6A7A]">수행한 화행 {done}/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다</p>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 거르기">
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 선택">
         {ACTS.map((act) => {
           const count = counts.get(act) ?? 0;
           const active = selected === act;
@@ -445,7 +543,7 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
 }
 
 function demoRecords(): ReportRecord[] {
-  return [{ ...missionLogRecord(learnerDemoLog() as unknown as MissionLogRecord), demoPositions: learnerDemoClassPositions() }];
+  return [{ ...missionLogRecord(learnerDemoLog() as unknown as MissionLogRecord), demoPositions: learnerDemoClassPositions(), demoMission: learnerDemoMission() }];
 }
 
 const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
@@ -484,7 +582,7 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
         const { data, error } = await supabase
           .from("learner_mission_logs")
           .select(
-            "id,mission_id,speech_act,task_type,course_id,week_no,feature_id,source_lang,target_lang,source_text,first_response,revised_response,target_feature_observed,context_judgment,content_ver,started_at,completed_at,created_at",
+            "id,mission_id,speech_act,task_type,course_id,week_no,feature_id,source_lang,target_lang,source_text,first_response,revised_response,target_feature_observed,context_judgment,content_ver,content_hash,started_at,completed_at,created_at",
           )
           .eq("auth_user_id", userId)
           .eq("mission_completed", true)
@@ -548,11 +646,11 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
             {title}
             {records.length > 0 && (
               <p className="mt-2 pl-4 text-[13.5px] text-[#5C6A7A]">
-                미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 수업 ${courseIds.length}개` : ""}
+                학습 미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 교과목 ${courseIds.length}개` : ""}
               </p>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="기록 거르기">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="교과목 선택">
             {demo && (
               <span className="rounded-full bg-[#FAD338] px-3 py-1 text-[11.5px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
             )}
@@ -562,8 +660,8 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
               </span>
             )}
             {courseIds.length > 1 && (
-              <select aria-label="수업" value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)} className={selectClass}>
-                <option value="all">전체 수업</option>
+              <select aria-label="교과목" value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)} className={selectClass}>
+                <option value="all">전체 교과목</option>
                 {courseIds.map((id) => <option key={id} value={id}>{COURSE_LABEL.get(id)}</option>)}
               </select>
             )}
@@ -573,11 +671,11 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
         {records.length === 0 ? (
           <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E4DFD0] bg-white p-6">
             <div>
-              <h2 className="text-[16px] font-bold">아직 완료한 미션이 없습니다.</h2>
-              <p className="mt-1 text-[13.5px] text-[#5C6A7A]">미션을 마치면 내가 쓴 표현과 최종 결정이 여기에 쌓입니다.</p>
+              <h2 className="text-[16px] font-bold">아직 완료한 학습 미션이 없습니다.</h2>
+              <p className="mt-1 text-[13.5px] text-[#5C6A7A]">학습 미션을 마치면 내 번역과 최종 결정이 여기에 기록됩니다.</p>
             </div>
             <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[13.5px] font-semibold text-white hover:bg-[#22303C]">
-              이번 주 미션 하러 가기 →
+              이번 주 학습 미션으로 →
             </Link>
           </section>
         ) : (
@@ -600,10 +698,10 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
               </ol>
             )}
 
-            <aside className="mt-8 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-5 py-3.5" aria-label="다시 볼 때">
-              <p className="text-[12.5px] font-semibold text-[#8A5A14]">다시 볼 때 · 모든 학습자에게 같은 질문입니다</p>
+            <aside className="mt-8 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-5 py-3.5" aria-label="다시 생각해 볼 질문">
+              <p className="text-[12.5px] font-semibold text-[#8A5A14]">다시 생각해 볼 질문</p>
               <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
-                <li>최종 표현에서도 원문의 의미와 화행의 목적이 유지되었나요?</li>
+                <li>최종 표현에서도 원문의 의미와 화행 목적이 유지되었나요?</li>
                 <li>표현을 유지하거나 바꾼 이유는 무엇인가요?</li>
               </ul>
             </aside>
