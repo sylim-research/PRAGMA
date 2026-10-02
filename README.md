@@ -92,7 +92,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 6. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="135" align="left">논문</th><th width="240" align="left">내용</th><th width="365" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="135" align="left">논문</th><th width="225" align="left">내용</th><th width="380" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1~2&nbsp;·&nbsp;부록&nbsp;B</td><td>개발&nbsp;도구·개발&nbsp;프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.3</td><td>웹앱&nbsp;구성·역할별&nbsp;권한</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
