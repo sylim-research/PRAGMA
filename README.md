@@ -32,10 +32,10 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 </table>
 
 <table>
-  <thead><tr><th width="100" align="left">핵심 기여</th><th width="579" align="left">내용</th></tr></thead>
+  <thead><tr><th width="182" align="left">워크플로우</th><th width="608" align="left">핵심 기여</th></tr></thead>
   <tbody>
-    <tr><td>①</td><td>화용적 판단과 학습자의 직접 통번역 산출을 하나의 학습 흐름으로 연결 → <a href="#3-통번역-학습-워크플로우">통번역 학습 워크플로우</a></td></tr>
-    <tr><td>②</td><td>AI 생성 학습 콘텐츠의 품질관리와 교수자의 최종 사용 결정을 하나의 제작 절차로 체계화 → <a href="#2-콘텐츠-제작-워크플로우">콘텐츠 제작 워크플로우</a></td></tr>
+    <tr><td><a href="#3-통번역-학습-워크플로우">통번역 학습 워크플로우</a></td><td>화용적 판단과 학습자의 직접 통번역 산출을 하나의 학습 흐름으로 연결</td></tr>
+    <tr><td><a href="#2-콘텐츠-제작-워크플로우">콘텐츠 제작 워크플로우</a></td><td>AI 생성 학습 콘텐츠의 품질관리와 교수자의 최종 사용 결정을 하나의 제작 절차로 체계화</td></tr>
   </tbody>
 </table>
 
