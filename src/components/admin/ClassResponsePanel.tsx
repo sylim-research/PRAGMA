@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Maximize2, RefreshCw, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
-import { ClassResponseDashboard } from "@/components/admin/ClassResponseDashboard";
+import { ClassDiscussionBoard, INITIAL_BOARD_STATE, type ClassDiscussionBoardState } from "@/components/admin/ClassDiscussionBoard";
 import { Button } from "@/components/ui/button";
 import { getCurriculumOutline, listCurriculumOutlines } from "@/lib/curriculum/api";
 import { listCoreScenarios, listWeekAssignments } from "@/lib/curriculum/composer";
@@ -11,13 +11,15 @@ import { fetchCourseOperationLogs, summarizeCourseOperations } from "@/lib/curri
 import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourse";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
 import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
+import { buildVirtualClassRows, VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
+import { buildClassDiscussion } from "@/lib/mission/classDiscussion";
 import {
   closeClassResponses,
   getAdminClassResponseRelease,
   releaseClassResponses,
   reopenClassResponses,
 } from "@/lib/mission/classResponseRelease";
-import { classResponsePatternKey, fetchCountedResponsesByCourse, fetchMissionPattern } from "@/lib/mission/classResponseFetch";
+import { classResponsePatternKey, fetchCountedResponsesByCourse, fetchMissionClassRows } from "@/lib/mission/classResponseFetch";
 
 const MODE_LABEL: Record<string, string> = { translation: "번역", stt_interpreting: "통역" };
 
@@ -28,18 +30,29 @@ function learnerMissionPath(courseId: string, weekNo: number, scenarioId: string
 }
 
 /**
- * 「학습 수행 기록」의 학급 응답 분포 탭. 개별 수행 기록과 같은 학습 기록에서 익명 집계만 보여 준다.
- * 들어오자마자 공개 교과목의 첫 미션 주차를 열고, 미션이 있는 주차를 카드로 늘어놓는다.
- * 운영 화면에는 예시(mock) 분포를 두지 않는다 — 응답이 없으면 안내 한 줄로 끝낸다.
+ * 「학습 수행 기록」의 학급 응답 분포 탭 — 학급 응답을 보고 토론할 지점을 고르는 화면.
+ * 개별 수행 기록과 같은 학습 기록에서 익명 집계와 익명 사례만 보여 준다.
+ * 들어오자마자 공개 교과목의 첫 미션 주차를 열고, 미션이 있는 주차를 칩으로 늘어놓는다.
+ * 실제 응답과 데모 응답(가상 학급 20명)은 명시적으로 전환하며, 데모는 운영 DB에 저장하지 않는다.
  */
 export function ClassResponsePanel() {
   const queryClient = useQueryClient();
   const [params, setSearchParams] = useSearchParams();
-  // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션만 바꾼다.
+  const demo = params.get("demo") === "1";
+  // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션·데모만 바꾼다.
   const setParams = (next: Record<string, string>, options?: { replace?: boolean }) =>
-    setSearchParams({ tab: "class", ...next }, options);
+    setSearchParams({ tab: "class", ...(demo ? { demo: "1" } : {}), ...next }, options);
+  const setDemo = (on: boolean) => {
+    const next: Record<string, string> = { tab: "class" };
+    for (const key of ["courseId", "weekNo", "missionId"]) {
+      const value = params.get(key);
+      if (value) next[key] = value;
+    }
+    if (on) next.demo = "1";
+    setSearchParams(next);
+  };
   const [projector, setProjector] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
+  const [board, setBoard] = useState<ClassDiscussionBoardState>(INITIAL_BOARD_STATE);
   const projectorRef = useRef<HTMLDivElement>(null);
   const courseId = params.get("courseId") ?? "";
 
@@ -106,19 +119,19 @@ export function ClassResponsePanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps -- setParams는 매 렌더 새로 만들지만 setSearchParams만 감싼다.
   }, [courseId, outlines.data, responseCounts.isPending, responseCounts.data]);
 
-  const patternQuery = useQuery({
+  const rowsQuery = useQuery({
     queryKey: classResponsePatternKey(courseId, week?.week_no, missionId),
     enabled: Boolean(missionId),
-    refetchInterval: releaseState && releaseState.status !== "collecting" ? false : 5000,
-    queryFn: () => fetchMissionPattern(missionId),
+    refetchInterval: demo || (releaseState && releaseState.status !== "collecting") ? false : 5000,
+    queryFn: () => fetchMissionClassRows(missionId),
   });
 
   const transition = useMutation({
     mutationFn: async (action: "close" | "reopen" | "release") => {
       if (!courseId || !missionId) return;
       if (action === "close") {
-        if (!patternQuery.data) throw new Error("마감할 응답이 없습니다.");
-        await closeClassResponses(courseId, missionId, patternQuery.data);
+        if (!rowsQuery.data) throw new Error("마감할 응답이 없습니다.");
+        await closeClassResponses(courseId, missionId, rowsQuery.data.pattern);
       } else if (action === "reopen") {
         await reopenClassResponses(courseId, missionId);
       } else {
@@ -131,11 +144,22 @@ export function ClassResponsePanel() {
     },
   });
 
-  const realPattern = releaseStatus !== "collecting" && releaseState?.pattern
-    ? releaseState.pattern
-    : patternQuery.data ?? null;
-  const empty = patternQuery.isSuccess && !(realPattern && realPattern.learners > 0 && realPattern.items.length > 0);
-  const hasResponses = Boolean(realPattern && !empty);
+  const missionContent = rowsQuery.data?.missionContent ?? null;
+  const realRows = useMemo(() => rowsQuery.data?.rows ?? [], [rowsQuery.data]);
+  const virtualRows = useMemo(
+    () => (missionId && missionContent ? buildVirtualClassRows(missionId, missionContent) : null),
+    [missionId, missionContent],
+  );
+  const demoAvailable = virtualRows !== null;
+  const showingDemo = demo && demoAvailable;
+  const discussion = useMemo(() => {
+    if (!missionId || !rowsQuery.data) return null;
+    return buildClassDiscussion(missionId, showingDemo ? virtualRows ?? [] : realRows, missionContent);
+  }, [missionId, rowsQuery.data, showingDemo, virtualRows, realRows, missionContent]);
+  const realLearners = rowsQuery.data?.pattern.learners ?? 0;
+  const realEmpty = rowsQuery.isSuccess && realLearners === 0;
+  const hasRealResponses = rowsQuery.isSuccess && realLearners > 0;
+  const boardVisible = Boolean(discussion) && (showingDemo || hasRealResponses);
 
   useEffect(() => {
     if (!projector) return;
@@ -153,89 +177,100 @@ export function ClassResponsePanel() {
   }, [projector]);
 
   const selectWeek = (weekNo: number) => {
-    setSelectedItemId(null);
+    setBoard(INITIAL_BOARD_STATE);
     setParams({ courseId, weekNo: String(weekNo) });
   };
   const selectMission = (nextMissionId: string) => {
-    setSelectedItemId(null);
+    setBoard(INITIAL_BOARD_STATE);
     setParams({ courseId, weekNo: String(week?.week_no ?? ""), missionId: nextMissionId });
   };
+
+  const statusPill = hasRealResponses && !showingDemo
+    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[11px] font-bold text-[#15202B]">
+      {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
+    </span>
+    : null;
 
   return <>
     <div className="max-w-[1120px] space-y-3">
       <section aria-label="교과목과 주차" className="rounded-xl border border-[#E2DED2] bg-white px-4 py-3">
-        <div className="flex flex-wrap items-end gap-3">
-          <label className="min-w-[260px] flex-1 text-[12px] font-semibold text-[#6B7780]">교과목
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <label className="flex items-center gap-2 text-[12.5px] font-semibold text-[#6B7780]">교과목
             <select
               aria-label="응답 교과목"
               value={courseId}
               onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})}
-              className="mt-1 h-9 w-full rounded-md border border-[#D9DED9] bg-white px-2.5 text-[14px] font-normal text-[#15202B]"
+              className="h-8 min-w-[220px] rounded-md border border-[#D9DED9] bg-white px-2 text-[13.5px] font-normal text-[#15202B]"
             >
               {!courseId && <option value="">교과목 선택</option>}
               {outlines.data?.map((outline) => <option key={outline.id} value={outline.id}>{outline.title}</option>)}
             </select>
           </label>
+          {missionWeeks.length > 0 && <div role="group" aria-label="주차 선택" className="flex min-w-0 flex-1 flex-wrap gap-1.5">
+            {missionWeeks.map((item) => {
+              const active = item.week_no === week?.week_no;
+              const summary = operations.get(item.week_no);
+              return <button
+                key={item.week_no}
+                type="button"
+                aria-pressed={active}
+                aria-label={`${item.week_no}주차 · ${item.title}`}
+                onClick={() => selectWeek(item.week_no)}
+                className={[
+                  "min-w-0 rounded-md border px-2.5 py-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+                  active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-[#FCFBF8] text-[#24323D] hover:border-[#B9B29C]",
+                ].join(" ")}
+              >
+                <span className="block text-[12.5px] font-semibold">{item.week_no}주차 · {item.title}</span>
+                {summary && summary.participants > 0 && <span className={`block text-[11px] tabular-nums ${active ? "text-[#D8DEE2]" : "text-[#7A858C]"}`}>
+                  {`참여 ${summary.participants}명 · 완료 ${summary.completedLearners}명${summary.dissents > 0 ? ` · 이견 ${summary.dissents}` : ""}`}
+                </span>}
+              </button>;
+            })}
+          </div>}
         </div>
-        {courseQuery.isPending && courseId && <p role="status" className="mt-3 text-sm">주차를 불러오는 중…</p>}
-        {courseQuery.isError && <p role="alert" className="mt-3 text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
-        {outlines.isError && <p role="alert" className="mt-3 text-sm text-destructive">교과목 목록을 불러오지 못했습니다.</p>}
-        {course && missionWeeks.length === 0 && <p className="mt-3 text-sm text-muted-foreground">이 교과목에는 아직 편성된 미션이 없습니다. 수업 편성에서 먼저 미션을 배정해 주세요.</p>}
-        {missionWeeks.length > 0 && <p className="mt-3 text-[12px] text-[#6B7780]">
-          학습 미션이 편성된 주차만 표시합니다. 집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.
-        </p>}
-        {missionWeeks.length > 0 && <div role="group" aria-label="주차 선택" className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4 lg:grid-cols-6">
-          {missionWeeks.map((item) => {
-            const active = item.week_no === week?.week_no;
-            const summary = operations.get(item.week_no);
-            return <button
-              key={item.week_no}
-              type="button"
-              aria-pressed={active}
-              aria-label={`${item.week_no}주차 · ${item.title}`}
-              onClick={() => selectWeek(item.week_no)}
-              className={[
-                "min-w-0 rounded-lg border px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-                active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-[#FCFBF8] text-[#24323D] hover:border-[#B9B29C]",
-              ].join(" ")}
-            >
-              <span className="block truncate text-[13px] font-semibold">{item.week_no}주차 · {item.title}</span>
-              {summary && summary.participants > 0 && <span className={`mt-0.5 block text-[11px] tabular-nums ${active ? "text-[#D8DEE2]" : "text-[#7A858C]"}`}>
-                {`참여 ${summary.participants}명 · 완료 ${summary.completedLearners}명${summary.dissents > 0 ? ` · 이견 ${summary.dissents}` : ""}`}
-              </span>}
-            </button>;
-          })}
-        </div>}
+        {courseQuery.isPending && courseId && <p role="status" className="mt-2 text-sm">주차를 불러오는 중…</p>}
+        {courseQuery.isError && <p role="alert" className="mt-2 text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
+        {outlines.isError && <p role="alert" className="mt-2 text-sm text-destructive">교과목 목록을 불러오지 못했습니다.</p>}
+        {course && missionWeeks.length === 0 && <p className="mt-2 text-sm text-muted-foreground">이 교과목에는 아직 편성된 미션이 없습니다. 수업 편성에서 먼저 미션을 배정해 주세요.</p>}
+        {missionWeeks.length > 0 && <p className="mt-2 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
       </section>
 
       {week && selectedMission && <section className="rounded-2xl border border-[#E5E3DB] bg-[#FAFAF7] p-3 sm:p-4">
-        <div className="flex flex-wrap items-start justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2">
-              {/* 탭 이름이 이미 「학급 응답 분포」라 섹션 제목은 지금 보고 있는 미션으로 둔다. */}
-              <h2 className="break-keep text-lg font-bold text-[#15202B]">
-                {week.week_no}주차 · 미션 {missionIndex + 1} · {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
-              </h2>
-              {hasResponses && <span className="rounded-full bg-[#EEF1F4] px-2 py-0.5 text-[11px] font-bold text-[#344150]">
-                {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
-              </span>}
-            </div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {/* 탭 이름이 이미 「학급 응답 분포」라 섹션 제목은 지금 보고 있는 미션으로 둔다. */}
+            <h2 className="break-keep text-lg font-bold text-[#15202B]">
+              {week.week_no}주차 · 미션 {missionIndex + 1} · {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
+            </h2>
+            {statusPill}
+            {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[11.5px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {demoAvailable && <div role="radiogroup" aria-label="응답 자료" className="flex overflow-hidden rounded-md border border-[#15202B]">
+              {([[false, "실제 응답"], [true, "데모 응답"]] as const).map(([on, label]) => <button
+                key={label}
+                type="button"
+                role="radio"
+                aria-checked={showingDemo === on}
+                onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
+                className={`px-3 py-1 text-[12.5px] font-semibold ${showingDemo === on ? "bg-[#15202B] text-white" : "bg-white text-[#15202B] hover:bg-[#F3F1EA]"}`}
+              >{label}</button>)}
+            </div>}
             <Button
               variant="outline"
               size="icon"
               aria-label="응답 새로고침"
-              disabled={patternQuery.isFetching}
-              onClick={() => void patternQuery.refetch()}
+              disabled={rowsQuery.isFetching}
+              onClick={() => void rowsQuery.refetch()}
             ><RefreshCw className="h-4 w-4" /></Button>
-            {hasResponses && <Button variant="outline" onClick={() => setProjector(true)}>
+            {boardVisible && <Button variant="outline" onClick={() => setProjector(true)}>
               <Maximize2 className="mr-2 h-4 w-4" />크게 보기
             </Button>}
           </div>
         </div>
 
-        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
           {week.scenarios.length > 1 && <div role="tablist" aria-label="응답을 볼 미션" className="flex flex-wrap gap-1.5">
             {week.scenarios.map((scenario, index) => {
               const title = missionMenuTitle(scenario.brief_note_ko);
@@ -246,7 +281,7 @@ export function ClassResponsePanel() {
                 aria-selected={scenario.scenario_id === missionId}
                 onClick={() => selectMission(scenario.scenario_id)}
                 className={[
-                  "rounded-md border px-3 py-1.5 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+                  "rounded-md border px-3 py-1 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
                   scenario.scenario_id === missionId ? "border-[#15202B] bg-[#15202B] font-semibold text-white" : "border-[#DCD8CC] bg-white text-[#44525C] hover:border-[#B9B29C]",
                 ].join(" ")}
               >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}{title ? ` · ${title}` : ""}</button>;
@@ -260,35 +295,35 @@ export function ClassResponsePanel() {
           >학습 미션 열기 ↗</Link>
         </div>
 
-        {hasResponses && <div aria-label="응답 공개 단계" className="mt-4 grid gap-2 rounded-lg border bg-[#FAFAF7] p-3 sm:grid-cols-3">
+        {hasRealResponses && !showingDemo && <div aria-label="응답 공개 단계" className="mt-3 grid gap-2 sm:grid-cols-3">
           {[
             { key: "collecting", label: "1 · 응답 수집", reached: true },
             { key: "closed", label: "2 · 분포 고정", reached: releaseStatus === "closed" || releaseStatus === "released" },
             { key: "released", label: "3 · 학습자 공개", reached: releaseStatus === "released" },
           ].map((step) => <div key={step.key} className={[
-            "rounded-md border px-3 py-2 text-center text-xs font-bold",
-            step.reached
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-slate-200 bg-white text-slate-400",
+            "rounded-md border px-3 py-1.5 text-center text-[12px] font-bold",
+            step.reached ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D9D5C8] bg-white text-[#15202B]",
           ].join(" ")}>{step.label}</div>)}
         </div>}
 
-        {patternQuery.isPending && <p role="status" className="mt-5 text-sm">응답 분포를 불러오는 중…</p>}
-        {patternQuery.isError && <p role="alert" className="mt-5 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
-        {realPattern && !empty && <div className="mt-3"><ClassResponseDashboard
-          pattern={realPattern}
-          selectedItemId={selectedItemId}
-          onSelectItem={setSelectedItemId}
+        {rowsQuery.isPending && <p role="status" className="mt-4 text-sm">응답 분포를 불러오는 중…</p>}
+        {rowsQuery.isError && <p role="alert" className="mt-4 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
+        {boardVisible && discussion && <div className="mt-3"><ClassDiscussionBoard
+          data={discussion}
+          demo={showingDemo}
+          state={board}
+          onChange={setBoard}
         /></div>}
-        {empty && <p className="mt-4 rounded-xl border border-dashed border-[#DAD6CA] bg-white p-5 text-sm text-[#5D6970]">
-          아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.
-        </p>}
+        {realEmpty && !showingDemo && <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-[#DAD6CA] bg-white px-5 py-4">
+          <p className="text-sm text-[#5D6970]">아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.</p>
+          {demoAvailable && <Button variant="outline" size="sm" onClick={() => setDemo(true)}>데모로 살펴보기</Button>}
+        </div>}
 
-        {realPattern && !empty && realPattern.learners < 5 && <p className="mt-5 rounded-xl border border-[#E5DFC9] bg-[#FFFDF4] p-4 text-sm leading-relaxed text-[#5F573D]">
+        {hasRealResponses && !showingDemo && realLearners < 5 && <p className="mt-3 rounded-xl border border-[#E5DFC9] bg-[#FFFDF4] px-4 py-3 text-sm text-[#5F573D]">
           학습자에게 분포를 공개하려면 5명 이상의 응답이 필요합니다.
         </p>}
 
-        {hasResponses && <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+        {hasRealResponses && !showingDemo && <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
           <div>
             <p className="text-sm font-black">
               {!releaseState || releaseState.status === "collecting"
@@ -311,7 +346,7 @@ export function ClassResponsePanel() {
             {(!releaseState || releaseState.status === "collecting") && (
               <Button
                 size="sm"
-                disabled={transition.isPending || !patternQuery.data?.learners}
+                disabled={transition.isPending || !realLearners}
                 onClick={() => transition.mutate("close")}
               >응답 마감</Button>
             )}
@@ -327,7 +362,7 @@ export function ClassResponsePanel() {
       </section>}
     </div>
 
-    {projector && realPattern && hasResponses && <div
+    {projector && discussion && boardVisible && <div
       ref={projectorRef}
       role="dialog"
       aria-modal="true"
@@ -338,14 +373,14 @@ export function ClassResponsePanel() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-[#B8860B]">익명 학급 집계</p>
+            <p className="text-sm font-bold text-[#B8860B]">{showingDemo ? VIRTUAL_CLASS_NOTICE : "익명 학급 집계"}</p>
             <h1 className="mt-1 break-keep text-3xl font-black text-[#15202B]">우리 반은 어떻게 판단했을까?</h1>
           </div>
           <Button variant="outline" onClick={() => setProjector(false)}>
             <X className="mr-2 h-4 w-4" />닫기
           </Button>
         </div>
-        <ClassResponseDashboard pattern={realPattern} selectedItemId={selectedItemId} onSelectItem={setSelectedItemId} projector />
+        <ClassDiscussionBoard data={discussion} demo={showingDemo} state={board} onChange={setBoard} projector />
       </div>
     </div>}
   </>;

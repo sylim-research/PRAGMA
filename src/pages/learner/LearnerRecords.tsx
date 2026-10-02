@@ -1,6 +1,20 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { SpectrumStrip, TONE } from "@/components/charts/responseCharts";
+import { LEARNER_DEMO_NOTICE, learnerDemoClassPositions, learnerDemoLog, learnerDemoMission } from "@/lib/demo/learnerRecordsDemo";
+import {
+  buildChangeMap,
+  classPositionsFromPattern,
+  COMPARED_ITEMS,
+  missionReference,
+  myChoices,
+  type ChangeMap,
+  type ClassPosition,
+} from "@/lib/learner/recordFlow";
+import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
+import { fetchMissionByScenario } from "@/lib/mission/missionDb";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { buildLearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
@@ -8,7 +22,7 @@ import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import { COURSE_PRESETS } from "@/lib/pragma/scenarioTopics";
 import { supabase } from "@/integrations/supabase/client";
 
-// 학습자 본인의 완료 기록을 다시 읽는 화면 — 재검토의 자료(원고 4.3.5·5.2.3).
+// 학습자 본인의 완료 기록을 다시 읽는 화면 — 재검토의 자료(원고 4.3.5·5.2.2).
 // 같은 미션의 수행을 한 묶음으로 모아 원문은 한 번만 보이고, 수행마다 최초→최종 표현의 차이를 표시한다.
 // 기록을 옮겨 보여 줄 뿐 점수·유형·강약점을 만들지 않는다. 고친 건수처럼 「고치는 것이 목표」로 읽히는 숫자도 두지 않는다.
 
@@ -27,6 +41,15 @@ type ReportRecord = {
   feedback: string[];
   decision: "최초 산출 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
+  /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
+  change: ChangeMap | null;
+  /** 내 선택(문항 번호 → 척도 코드 또는 수정안 위치). 우리 반의 판단·판단 비교에 쓴다. */
+  choices: Map<number, string>;
+  /** 수행 당시 콘텐츠 지문 — 기준 판단·핵심 정리를 같은 판본에서만 읽는다. */
+  contentHash: string | null;
+  /** 데모 전용 — 공개된 것으로 보는 가상 학급 분포와 미션 본문. 실제 기록은 따로 읽는다. */
+  demoPositions?: ClassPosition[];
+  demoMission?: unknown;
 };
 
 type MissionLogRecord = RecordDetailRow & {
@@ -84,6 +107,9 @@ function localRecord(session: LearningSession): ReportRecord {
     feedback: [],
     decision: null,
     dissent: null,
+    change: null,
+    choices: new Map(),
+    contentHash: null,
   };
 }
 
@@ -109,6 +135,9 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     feedback: detail.task.feedback,
     decision: detail.task.decision,
     dissent: detail.dissent,
+    change: buildChangeMap(row.target_feature_observed, row.feature_id),
+    choices: myChoices(row.context_judgment),
+    contentHash: row.content_hash ?? null,
   };
 }
 
@@ -170,7 +199,7 @@ function diffSegments(before: string, after: string): { before: Segment[]; after
 }
 
 const TASK_LABEL: Record<ReportRecord["taskType"], string> = { translation: "번역", interpreting: "통역", other: "통번역" };
-const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 
 type MissionGroup = { key: string; records: ReportRecord[] };
 
@@ -196,7 +225,7 @@ function groupMeta(record: ReportRecord) {
 
 // 글자 체계: 한국어 본문 14~15px · 보조 12~13px · 중국어 표현 17px. 한 화면에서 이 값만 쓴다.
 const zhLine = "font-zh text-[17px] leading-[1.8] text-[#15202B] [word-break:keep-all] break-words";
-const lineLabel = "w-9 shrink-0 pt-[5px] text-[12px] font-semibold text-[#8C8471]";
+const lineLabel = "w-9 shrink-0 pt-[5px] text-[13.5px] font-semibold text-[#8C8471]";
 
 function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | "after" }) {
   return (
@@ -221,92 +250,183 @@ function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | 
   );
 }
 
-/** 수행 한 번 — 날짜·결정 배지, 최초→최종(차이 표시), 「자세히」에 AI 피드백·내 결정·내 의견. */
-function Attempt({ record }: { record: ReportRecord }) {
-  const [open, setOpen] = useState(false);
+const card = "rounded-xl border-[1.6px] border-[#E4DFD0] bg-white";
+const cardLabel = "text-[13.5px] font-semibold text-[#8C8471]";
+
+function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size?: string }) {
+  return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
+}
+
+/** 표현 변화 지도 — 최초 → AI 피드백 → 최종을 세 칸으로. 바뀐 구절은 최초에서 지우고 최종에서 밑줄. */
+function ChangeFlow({ record }: { record: ReportRecord }) {
   const task = TASK_LABEL[record.taskType];
   const revised = changed(record);
   const diff = revised ? diffSegments(record.firstResponse, record.revisedResponse) : null;
-  const hasDetail = record.feedback.length > 0 || record.decision !== null || record.dissent !== null;
-  const detailId = `attempt-detail-${record.id}`;
-
+  const change = record.change;
+  const arrow = <div aria-hidden="true" className="flex items-center justify-center"><ArrowRight className="h-4 w-4 rotate-90 text-[#C9BFA3]" strokeWidth={2.5} /></div>;
   return (
-    <div className="grid gap-x-6 gap-y-2 py-5 md:grid-cols-[6.5rem_minmax(0,1fr)]">
-      <div className="flex items-center gap-2 md:flex-col md:items-start md:gap-1.5 md:pt-1">
-        <span className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</span>
-        <span
-          className={[
-            "rounded-full border bg-white px-2.5 py-[1px] text-[11.5px] font-bold tracking-[0.02em]",
-            revised ? "border-[#1F3A5F] text-[#1F3A5F]" : "border-[#C99A2E] text-[#8A5A14]",
-          ].join(" ")}
-        >
-          {revised ? "수정" : "유지"}
-        </span>
-      </div>
-
-      <div className="min-w-0">
-        {diff ? (
-          <dl className="space-y-1.5">
-            <div className="flex gap-3">
-              <dt className={lineLabel}>최초</dt>
-              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.before} mode="before" /></dd>
-            </div>
-            <div className="flex gap-3">
-              <dt className={lineLabel}>최종</dt>
-              <dd className={`${zhLine} min-w-0`}><Expression segments={diff.after} mode="after" /></dd>
-            </div>
-          </dl>
+    <div className="grid gap-1">
+      <section className={`${card} px-4 py-3`} aria-label={`최초 ${task}`}>
+        <p className={cardLabel}>최초 {task}</p>
+        <p className={`mt-1.5 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
+      </section>
+      {arrow}
+      <section className={`${card} px-4 py-3`} aria-label="AI 피드백">
+        <p className={cardLabel}>AI 피드백</p>
+        {change || record.feedback.length > 0 ? (
+          <div className="mt-1.5 space-y-1.5 text-[14.5px] leading-6 text-[#26323D]">
+            <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              {change?.band && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.6px] px-2.5 py-[1px] text-[13.5px] font-bold" style={{ borderColor: TONE[change.band.tone], color: "#15202B" }}>
+                  <ToneDot tone={change.band.tone} size="h-2 w-2" />{change.band.label}
+                </span>
+              )}
+              {change?.scope && <span className="text-[13.5px]"><span className="text-[#8C8471]">다시 살펴볼 점 </span><span className="font-semibold">{change.scope}</span></span>}
+            </p>
+            {change?.feature && <p className="break-keep">{change.feature}</p>}
+            {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
+          </div>
         ) : (
-          <dl className="flex gap-3">
-            <dt className={lineLabel}>최종</dt>
-            <dd className="min-w-0">
-              <p className={zhLine}>{record.revisedResponse || record.firstResponse || "기록 없음"}</p>
-              <p className="mt-0.5 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>
-            </dd>
-          </dl>
+          <p className="mt-1.5 text-[14px] text-[#8C8471]">저장된 AI 피드백이 없습니다.</p>
         )}
-
-        {hasDetail && (
-          <div className="mt-3">
-            <button
-              type="button"
-              aria-expanded={open}
-              aria-controls={detailId}
-              onClick={() => setOpen((v) => !v)}
-              className="inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#344F63] hover:text-[#15202B]"
-            >
-              {open ? "접기" : "자세히 보기"}
-              <ChevronDown aria-hidden="true" className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} strokeWidth={2.25} />
-            </button>
-            {open && (
-              <dl id={detailId} className="mt-3 space-y-2.5 border-l-2 border-[#E4DFD0] pl-4 text-[14px] leading-6 text-[#26323D]">
-                {record.feedback.length > 0 && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">AI 피드백</dt>
-                    <dd>{record.feedback.join(" · ")}</dd>
-                  </div>
-                )}
-                {record.decision && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 결정</dt>
-                    <dd>{record.decision === "수정" ? `AI 피드백을 본 뒤 ${task}을 수정함` : `AI 피드백을 본 뒤 최초 ${task}을 유지함`}</dd>
-                  </div>
-                )}
-                {record.dissent && (
-                  <div>
-                    <dt className="text-[12px] font-semibold text-[#8C8471]">내 의견</dt>
-                    <dd>
-                      {record.dissent.conditions.length > 0 && <span className="block">{record.dissent.conditions.join(" · ")}</span>}
-                      {record.dissent.reason && <span className="block text-[#4F6070]">“{record.dissent.reason}”</span>}
-                    </dd>
-                  </div>
-                )}
-              </dl>
+        {record.dissent && (
+          <div className="mt-3 border-t border-[#EFEBDF] pt-2.5">
+            <p className="text-[13.5px] font-semibold text-[#8A5A14]">내 의견</p>
+            {record.dissent.conditions.length > 0 && (
+              <p className="mt-1 flex flex-wrap gap-1.5">
+                {record.dissent.conditions.map((condition) => (
+                  <span key={condition} className="rounded-md border-[1.6px] border-[#E4C44E] px-1.5 py-[1px] text-[13.5px] text-[#5F4A12]">{condition}</span>
+                ))}
+              </p>
             )}
+            {record.dissent.reason && <p className="mt-1 break-keep text-[14.5px] leading-6 text-[#26323D]">“{record.dissent.reason}”</p>}
           </div>
         )}
-      </div>
+      </section>
+      {arrow}
+      <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={`최종 ${task}`}>
+        <p className="text-[13.5px] font-semibold text-[#1F3A5F]">최종 {task}</p>
+        <p className={`mt-1.5 ${zhLine} font-semibold`}>
+          {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
+        </p>
+        {diff
+          ? <p className="mt-1 text-[13.5px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
+          : <p className="mt-1 text-[13.5px] text-[#8A5A14]">최초 {task}을 그대로 유지했습니다.</p>}
+      </section>
     </div>
+  );
+}
+
+/** 수행 한 번 — 날짜와 표현 변화 지도(최초 → AI 피드백 → 최종). */
+function Attempt({ record }: { record: ReportRecord }) {
+  return (
+    <div className="space-y-2.5 pb-5 pt-2">
+      <p className="text-[14px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</p>
+      <ChangeFlow record={record} />
+    </div>
+  );
+}
+
+const sectionTitle = "flex items-center gap-2 text-[15px] font-bold text-[#15202B]";
+const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />;
+
+/** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
+function ChoiceBars({ position }: { position: ClassPosition }) {
+  return (
+    <ul className="space-y-3.5 pb-2 pt-3" aria-label={`${position.activity} 학급 분포와 내 판단`}>
+      {position.slices.map((slice) => {
+        const share = position.total > 0 ? Math.round((slice.count / position.total) * 100) : 0;
+        const mine = position.mine === slice.key;
+        return (
+          <li key={slice.key} className="grid grid-cols-[6.5rem_minmax(0,1fr)_6.5rem] items-center gap-3 text-[14px]">
+            <span className="flex items-center gap-1.5 whitespace-nowrap font-semibold text-[#15202B]">
+              {slice.label}
+              {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[12.5px] font-bold text-[#FAD338]">나</span>}
+            </span>
+            <span className="h-4 overflow-hidden rounded-sm bg-[#EEF0F2]" aria-hidden="true">
+              <span className="block h-full rounded-r-sm" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone] }} />
+            </span>
+            <span className="text-right tabular-nums text-[#5C6A7A]"><span className="font-bold text-[#15202B]">{share}%</span> · {slice.count}명</span>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/**
+ * 우리 반의 판단 → 판단 비교 → 핵심 정리. 학급 분포는 교수자가 공개한 미션에만 보인다.
+ * 기준 판단·핵심 정리는 수행 당시와 같은 콘텐츠 판본일 때만 미션 본문에서 그대로 옮긴다(새 해석 없음).
+ */
+function ClassReview({ record }: { record: ReportRecord }) {
+  const live = !record.demoPositions && Boolean(record.courseId && record.missionId);
+  const peer = useQuery({
+    queryKey: ["learner-records-peer", record.courseId, record.missionId],
+    enabled: live,
+    queryFn: () => getLearnerPeerResponses(record.courseId as string, record.missionId as string),
+    staleTime: 60_000,
+  });
+  const mission = useQuery({
+    queryKey: ["learner-records-mission", record.missionId],
+    enabled: !record.demoMission && Boolean(record.missionId && record.contentHash),
+    queryFn: async () => (await fetchMissionByScenario(record.missionId as string, { includeV6: true })).mission,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+  const positions = record.demoPositions
+    ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.choices) : []);
+  const reference = missionReference(record.demoMission ?? mission.data ?? null, record.contentHash);
+  const shownItems = positions.length > 0 ? positions.map((position) => position.itemId) : COMPARED_ITEMS;
+  const lessonPoints = (reference?.lessonPoints ?? []).filter((point) => shownItems.includes(point.itemId));
+  const referenceLabel = (position: ClassPosition) => {
+    const key = reference?.answers.get(position.itemId);
+    return key === undefined ? null : position.slices.find((slice) => slice.key === key)?.label ?? null;
+  };
+  if (positions.length === 0 && lessonPoints.length === 0) return null;
+
+  return (
+    <>
+      {positions.length > 0 && (
+        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="우리 반의 판단">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h3 className={sectionTitle}>{titleBar}우리 반의 판단</h3>
+            <p className="text-[13.5px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
+          </div>
+          <div className="mt-3 grid gap-4">
+            {positions.map((position) => (
+              <div key={position.itemId} className={`${card} px-5 pb-3 pt-4`}>
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[13.5px]">
+                  <span className="font-bold text-[#15202B]">{position.activity}</span>
+                  <span className="flex items-baseline gap-3">
+                    {referenceLabel(position) && (
+                      <span className="rounded-full border-[1.6px] border-[#2F6B5E] px-2 py-[1px] text-[13.5px] font-semibold text-[#245449]">기준 판단: {referenceLabel(position)}</span>
+                    )}
+                    <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
+                  </span>
+                </p>
+                {position.kind === "scale"
+                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
+                  : <ChoiceBars position={position} />}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {lessonPoints.length > 0 && (
+        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="핵심 정리">
+          <h3 className={sectionTitle}>{titleBar}핵심 정리</h3>
+          <ul className="mt-3 space-y-3">
+            {lessonPoints.map((point) => (
+              <li key={point.itemId} className="flex gap-2 break-keep text-[14.5px] leading-6 text-[#26323D]">
+                <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#B8860B]" />
+                <p><span className="mr-1.5 font-bold text-[#15202B]">{point.label}</span>{point.text}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </>
   );
 }
 
@@ -319,8 +439,8 @@ function MissionCard({ group }: { group: MissionGroup }) {
     <article className="overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]">
       <header className="border-b border-[#EFEBDF] px-6 pb-5 pt-5 sm:px-7">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <p className="text-[12.5px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
-          <p className="text-[12.5px] text-[#8C8471]">수행 {group.records.length}회</p>
+          <p className="text-[13.5px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
+          <p className="text-[13.5px] text-[#8C8471]">수행 {group.records.length}회</p>
         </div>
         {head.sourceText && (
           <div className="mt-2.5">
@@ -328,38 +448,44 @@ function MissionCard({ group }: { group: MissionGroup }) {
               {head.sourceText}
             </p>
             {longSource && (
-              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[12px] font-semibold text-[#344F63] hover:underline">
+              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[13.5px] font-semibold text-[#344F63] hover:underline">
                 {sourceOpen ? "원문 접기" : "원문 펼치기"}
               </button>
             )}
           </div>
         )}
       </header>
+      <h3 className={`${sectionTitle} px-6 pt-4 sm:px-7`}>{titleBar}내 수행</h3>
       <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
         {group.records.map((record) => (
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
+      <ClassReview record={head} />
+      <p className="border-t border-[#EFEBDF] px-6 py-3 text-[14px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
+        <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
+        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행 목적이 유지되었나요?
+      </p>
     </article>
   );
 }
 
 const selectClass =
-  "h-9 rounded-full border border-[#DDD6C4] bg-white pl-4 pr-8 text-[13px] font-semibold text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]";
+  "h-9 rounded-full border border-[#DDD6C4] bg-white pl-4 pr-8 text-[14px] font-semibold text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]";
 
 /**
- * 9개 화행 지도 — 어떤 화행을 해 봤는지(수행 횟수)를 보여 주고, 누르면 아래 기록을 그 화행으로 거른다.
+ * 화행별 학습 기록 — 어떤 화행을 해 봤는지(수행 횟수)를 보여 주고, 누르면 아래 기록을 그 화행으로 거른다.
  * 수행한 화행은 남색 점·테두리, 아직 안 한 화행은 호박색 빈 점(회색 금지). 능력 판정이 아니라 수행 범위다.
  */
 function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, number>; selected: SpeechActUI | "all"; onSelect: (act: SpeechActUI | "all") => void }) {
   const done = ACTS.filter((act) => (counts.get(act) ?? 0) > 0).length;
   return (
-    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="9개 화행 지도">
+    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="화행별 학습 기록">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-[16px] font-bold text-[#15202B]">9개 화행 지도</h2>
-        <p className="text-[12.5px] text-[#5C6A7A]">{done}/9 화행 수행 · 누르면 아래 기록을 거릅니다</p>
+        <h2 className="text-[16px] font-bold text-[#15202B]">화행별 학습 기록</h2>
+        <p className="text-[13.5px] text-[#5C6A7A]">수행한 화행 {done}/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다</p>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 거르기">
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 선택">
         {ACTS.map((act) => {
           const count = counts.get(act) ?? 0;
           const active = selected === act;
@@ -378,7 +504,7 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
                     : "border-[#E4D9BD] bg-white text-[#15202B] hover:bg-[#FFFBEA]",
               ].join(" ")}
             >
-              <span className="flex items-center gap-1.5 text-[14px] font-bold">
+              <span className="flex items-center gap-1.5 text-[15px] font-bold">
                 <span
                   aria-hidden="true"
                   className={[
@@ -388,7 +514,7 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
                 />
                 {SPEECH_ACT_UI[act]}
               </span>
-              <span className={`text-[11.5px] font-medium ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
+              <span className={`text-[12.5px] font-medium ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
                 {count > 0 ? `${count}회` : "아직"}
               </span>
             </button>
@@ -399,7 +525,13 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
   );
 }
 
-const LearnerRecords = () => {
+function demoRecords(): ReportRecord[] {
+  return [{ ...missionLogRecord(learnerDemoLog() as unknown as MissionLogRecord), demoPositions: learnerDemoClassPositions(), demoMission: learnerDemoMission() }];
+}
+
+const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
+  const [searchParams] = useSearchParams();
+  const demo = demoProp || searchParams.get("demo") === "1";
   const isLocalHost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
   const localRecords = useMemo(
     () => (isLocalHost ? getSessions().map(localRecord) : []),
@@ -413,6 +545,12 @@ const LearnerRecords = () => {
 
   useEffect(() => {
     let cancelled = false;
+    if (demo) {
+      // 데모는 운영 기록을 읽지 않는다.
+      setRemoteRecords(demoRecords());
+      setRecordsError(false);
+      return;
+    }
     setRemoteRecords(null);
     setRecordsError(false);
     void (async () => {
@@ -427,7 +565,7 @@ const LearnerRecords = () => {
         const { data, error } = await supabase
           .from("learner_mission_logs")
           .select(
-            "id,mission_id,speech_act,task_type,course_id,week_no,feature_id,source_lang,target_lang,source_text,first_response,revised_response,target_feature_observed,context_judgment,content_ver,started_at,completed_at,created_at",
+            "id,mission_id,speech_act,task_type,course_id,week_no,feature_id,source_lang,target_lang,source_text,first_response,revised_response,target_feature_observed,context_judgment,content_ver,content_hash,started_at,completed_at,created_at",
           )
           .eq("auth_user_id", userId)
           .eq("mission_completed", true)
@@ -444,9 +582,9 @@ const LearnerRecords = () => {
     return () => {
       cancelled = true;
     };
-  }, [loadAttempt]);
+  }, [loadAttempt, demo]);
 
-  const usingLocalPreview = isLocalHost && !recordsError && remoteRecords !== null && remoteRecords.length === 0 && localRecords.length > 0;
+  const usingLocalPreview = !demo && isLocalHost && !recordsError && remoteRecords !== null && remoteRecords.length === 0 && localRecords.length > 0;
   const records = usingLocalPreview ? localRecords : remoteRecords ?? [];
   const courseIds = [...new Set(records.flatMap((record) => (record.courseId && COURSE_LABEL.has(record.courseId) ? [record.courseId] : [])))];
   const inCourse = records.filter((record) => courseFilter === "all" || record.courseId === courseFilter);
@@ -469,11 +607,11 @@ const LearnerRecords = () => {
         <div className="pb-24">
           {title}
           <div className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white p-5" role={recordsError ? "alert" : "status"}>
-            <p className="text-[13px] text-muted-foreground">
+            <p className="text-[14px] text-muted-foreground">
               {recordsError ? "학습 기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." : "학습 기록을 불러오는 중…"}
             </p>
             {recordsError && (
-              <button type="button" className="mt-3 text-[13px] font-semibold underline underline-offset-4" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+              <button type="button" className="mt-3 text-[14px] font-semibold underline underline-offset-4" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
                 다시 불러오기
               </button>
             )}
@@ -490,20 +628,23 @@ const LearnerRecords = () => {
           <div>
             {title}
             {records.length > 0 && (
-              <p className="mt-2 pl-4 text-[13.5px] text-[#5C6A7A]">
-                미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 수업 ${courseIds.length}개` : ""}
+              <p className="mt-2 pl-4 text-[14.5px] text-[#5C6A7A]">
+                학습 미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 교과목 ${courseIds.length}개` : ""}
               </p>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="기록 거르기">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="교과목 선택">
+            {demo && (
+              <span className="rounded-full bg-[#FAD338] px-3 py-1 text-[12.5px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
+            )}
             {usingLocalPreview && (
-              <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[11px] font-semibold text-[#756D5E]">
+              <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[12.5px] font-semibold text-[#756D5E]">
                 localhost 시연 데이터
               </span>
             )}
             {courseIds.length > 1 && (
-              <select aria-label="수업" value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)} className={selectClass}>
-                <option value="all">전체 수업</option>
+              <select aria-label="교과목" value={courseFilter} onChange={(event) => setCourseFilter(event.target.value)} className={selectClass}>
+                <option value="all">전체 교과목</option>
                 {courseIds.map((id) => <option key={id} value={id}>{COURSE_LABEL.get(id)}</option>)}
               </select>
             )}
@@ -513,25 +654,25 @@ const LearnerRecords = () => {
         {records.length === 0 ? (
           <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E4DFD0] bg-white p-6">
             <div>
-              <h2 className="text-[16px] font-bold">아직 완료한 미션이 없습니다.</h2>
-              <p className="mt-1 text-[13.5px] text-[#5C6A7A]">미션을 마치면 내가 쓴 표현과 최종 결정이 여기에 쌓입니다.</p>
+              <h2 className="text-[16px] font-bold">아직 완료한 학습 미션이 없습니다.</h2>
+              <p className="mt-1 text-[14.5px] text-[#5C6A7A]">학습 미션을 마치면 내 번역과 최종 결정이 여기에 기록됩니다.</p>
             </div>
-            <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[13.5px] font-semibold text-white hover:bg-[#22303C]">
-              이번 주 미션 하러 가기 →
+            <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[14.5px] font-semibold text-white hover:bg-[#22303C]">
+              이번 주 학습 미션으로 →
             </Link>
           </section>
         ) : (
           <>
             <ActMap counts={actCounts} selected={actFilter} onSelect={setActFilter} />
             {filteredActLabel && (
-              <p className="mt-6 flex items-baseline gap-3 text-[13px] text-[#5C6A7A]">
+              <p className="mt-6 flex items-baseline gap-3 text-[14px] text-[#5C6A7A]">
                 <span className="text-[15px] font-bold text-[#15202B]">{filteredActLabel}</span>
                 수행 {visible.length}회
                 <button type="button" onClick={() => setActFilter("all")} className="font-semibold text-[#344F63] hover:underline">전체 보기</button>
               </p>
             )}
             {groups.length === 0 ? (
-              <p className="mt-4 rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[14px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
+              <p className="mt-4 rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[15px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
             ) : (
               <ol className={`${filteredActLabel ? "mt-3" : "mt-5"} space-y-5`} aria-label="완료 기록">
                 {groups.map((group) => (
@@ -540,13 +681,6 @@ const LearnerRecords = () => {
               </ol>
             )}
 
-            <aside className="mt-8 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-5 py-3.5" aria-label="다시 볼 때">
-              <p className="text-[12.5px] font-semibold text-[#8A5A14]">다시 볼 때 · 모든 학습자에게 같은 질문입니다</p>
-              <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
-                <li>최종 표현에서도 원문의 의미와 화행의 목적이 유지되었나요?</li>
-                <li>표현을 유지하거나 바꾼 이유는 무엇인가요?</li>
-              </ul>
-            </aside>
           </>
         )}
       </div>

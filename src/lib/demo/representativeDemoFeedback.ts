@@ -25,7 +25,8 @@ export const DEMO_MJT_ANSWERS: Record<string, { pick?: string; reasonId?: string
 export const DEMO_FIRST_DRAFT = "您好，这个周末我有急事要出门，送到我家的快递就麻烦您帮我收一下了。谢谢您。";
 export const DEMO_REVISED_DRAFT = "您好，这个周末我有急事要出门。如果方便的话，能不能麻烦您帮我收一下送到我家的快递？非常感谢！";
 
-const RECORDED_FIRST_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
+/** 최초안 A에 돌아온 실제 피드백(too_direct). 가상 학급 데모도 이 기록만 쓴다. */
+export const RECORDED_FIRST_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
   "blocks": {
     "alternatives": [
       {
@@ -58,7 +59,8 @@ const RECORDED_FIRST_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
   }
 });
 
-const RECORDED_RECHECK_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
+/** 수정안 B에 돌아온 실제 피드백(within_band). */
+export const RECORDED_RECHECK_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
   "blocks": {
     "alternatives": [
       {

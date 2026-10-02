@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { REPRESENTATIVE_MISSION_SNAPSHOT } from "@/lib/demo/representativeMissionSnapshot";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { ClassResponsePanel } from "./ClassResponsePanel";
 import { CURRENT_CONTENT_RELEASE_ID } from "../../../supabase/functions/_shared/contentRelease";
@@ -149,7 +150,7 @@ function mount(entry = "/admin/decision-traces?tab=class&courseId=course-a&weekN
 async function expectCounts(learners: number, dissents: number) {
   await waitFor(() => {
     expect(screen.getByText("집계 학습자").parentElement).toHaveTextContent(`${learners}명`);
-    expect(screen.getByText("이견 제기").parentElement).toHaveTextContent(`${dissents}건`);
+    expect(screen.getByText("이견 제시").parentElement).toHaveTextContent(`${dissents}건`);
   });
 }
 
@@ -161,12 +162,12 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
     expect(screen.getByRole("button", { name: "2주차 · 요청" })).toHaveAttribute("aria-pressed", "true");
     expect(await screen.findByText("참여 2명 · 완료 2명 · 이견 1")).toBeVisible();
-    expect(screen.getByRole("button", { name: "판단 1 · 첫인상 판단" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "MJT 1 · 단일 표현 판단" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/private-learner/)).not.toBeInTheDocument();
     expect(screen.queryByText(/private dissent/)).not.toBeInTheDocument();
     expect(screen.getByLabelText("응답 공개 단계")).toHaveTextContent("1 · 응답 수집");
     expect(screen.getByText(/학습자에게 분포를 공개하려면 5명 이상의 응답이 필요합니다/)).toBeVisible();
-    expect(screen.queryByText(/수업자료|DEMO|예시/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/수업자료|데모|가상 학급/)).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "학습 미션 열기 ↗" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
     expect(mocks.logRows).toHaveBeenCalledWith("mission_id", "mission-1");
   });
@@ -193,11 +194,48 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     mocks.logRows.mockResolvedValue({ data: [], error: null });
     mount();
     expect(await screen.findByText("아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.")).toBeVisible();
-    expect(screen.queryByLabelText("학급 응답 대시보드")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("학급 응답 토론 보드")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("응답 공개 단계")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "응답 마감" })).not.toBeInTheDocument();
-    expect(screen.queryByText(/DEMO|예시|12명/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/데모|가상 학급|12명/)).not.toBeInTheDocument();
+    // v6 이전 미션은 가상 학급을 만들 수 없어 데모 입구도 없다.
+    expect(screen.queryByRole("button", { name: "데모로 살펴보기" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "크게 보기" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "응답 새로고침" })).toBeVisible();
+  });
+
+  it("v6 미션에 응답이 없으면 「데모로 살펴보기」로 가상 학급 20명을 열고, 실제 응답으로 되돌릴 수 있다", async () => {
+    mocks.logRows.mockResolvedValue({ data: [], error: null });
+    mocks.missionRow.mockResolvedValue({ data: { mission_content: REPRESENTATIVE_MISSION_SNAPSHOT.mission_content }, error: null });
+    mount();
+    fireEvent.click(await screen.findByRole("button", { name: "데모로 살펴보기" }));
+    expect(await screen.findByText("데모 · 가상 학급 20명 · 실제 학습자 자료 아님")).toBeVisible();
+    expect(screen.getByRole("radio", { name: "데모 응답" })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByText("집계 학습자").parentElement).toHaveTextContent("20명");
+    // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
+    const cards = within(screen.getByLabelText("MJT 판단 문항")).getAllByRole("button");
+    expect(cards.map((card) => card.getAttribute("aria-label"))).toEqual([
+      "MJT 1 · 단일 표현 판단", "MJT 2 · 판단과 이유", "MJT 5 · 복수 표현 비교", "MJT 3 · 수정안 선택", "MJT 4 · 직접 수정",
+    ]);
+    // 데모에서는 마감·공개 운영 단계가 없다.
+    expect(screen.queryByLabelText("응답 공개 단계")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "응답 마감" })).not.toBeInTheDocument();
+    // MJT2 교차표
+    fireEvent.click(cards[1]);
+    expect(screen.getByText("판단 × 선택 이유")).toBeVisible();
+    // DCT형 통번역 과제 — 수정 여부와 이견 여부를 따로 세고, 사례 비교에서만 이견 사유가 보인다.
+    const dct = within(screen.getByLabelText("DCT형 통번역 과제"));
+    const decisionLegend = dct.getByText("최초 산출 유지").closest("ul")!;
+    expect(decisionLegend).toHaveTextContent("최초 산출 유지10");
+    expect(decisionLegend).toHaveTextContent("수정10");
+    expect(screen.queryByText(/이웃이라/)).not.toBeInTheDocument();
+    fireEvent.click(dct.getByRole("button", { name: "이견 사례 열기" }));
+    expect(dct.getByRole("tab", { name: "사례 비교" })).toHaveAttribute("aria-selected", "true");
+    expect(dct.getAllByRole("article")).toHaveLength(2);
+    expect(dct.getByText(/이웃이라/)).toBeVisible();
+    expect(screen.queryByText(/virtual-/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("radio", { name: "실제 응답" }));
+    expect(await screen.findByText("아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.")).toBeVisible();
+    expect(screen.queryByText("데모 · 가상 학급 20명 · 실제 학습자 자료 아님")).not.toBeInTheDocument();
   });
 });

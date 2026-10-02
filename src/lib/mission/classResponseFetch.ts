@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { normalizeMission } from "@/lib/pragma/missionSchema";
+import type { ClassDiscussionRow } from "@/lib/mission/classDiscussion";
 import {
   aggregateMissionResponses,
   type ClassResponseLogRow,
@@ -40,6 +41,39 @@ export async function fetchMissionPattern(missionId: string): Promise<MissionPat
   const rows = ((logsResult.data ?? []) as unknown as Array<ClassResponseLogRow & { profiles?: ProfileGate }>)
     .filter((row) => isCountedClassLearner(row.profiles));
   return aggregateMissionResponses(missionId, rows, mission.ok ? mission.data ?? null : null);
+}
+
+/** 토론 보드가 읽는 행과 미션 본문. 분포(pattern)와 토론 뷰 모델을 같은 행에서 계산한다. */
+export interface MissionClassRows {
+  rows: ClassDiscussionRow[];
+  /** scenarios.mission_content 원본 JSON(버전 무관). */
+  missionContent: unknown;
+  pattern: MissionPattern;
+}
+
+/** 한 미션의 완료 응답 행(익명 집계용 열 + DCT형 통번역 과제 열)과 미션 본문을 함께 읽는다. */
+export async function fetchMissionClassRows(missionId: string): Promise<MissionClassRows> {
+  const [logsResult, missionResult] = await Promise.all([
+    supabase.from("learner_mission_logs")
+      .select(`mission_id,profile_id,completed_at,context_judgment,first_response,revised_response,target_feature_observed,${CLASS_LEARNER_PROFILE_SELECT}`)
+      .eq("mission_id", missionId),
+    supabase.from("scenarios")
+      .select("mission_content")
+      .eq("scenario_id", missionId)
+      .maybeSingle(),
+  ]);
+  if (logsResult.error) throw new Error(logsResult.error.message);
+  if (missionResult.error) throw new Error(missionResult.error.message);
+  const missionContent = missionResult.data?.mission_content ?? null;
+  const mission = normalizeMission(missionContent);
+  const rows = ((logsResult.data ?? []) as unknown as Array<ClassDiscussionRow & { profiles?: ProfileGate }>)
+    .filter((row) => isCountedClassLearner(row.profiles))
+    .map(({ profiles: _profiles, ...row }) => row);
+  return {
+    rows,
+    missionContent,
+    pattern: aggregateMissionResponses(missionId, rows, mission.ok ? mission.data ?? null : null),
+  };
 }
 
 type CourseLogDb = {
