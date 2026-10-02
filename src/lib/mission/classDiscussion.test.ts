@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "@/lib/demo/representativeMissionSnapshot";
-import { buildVirtualClassRows } from "@/lib/demo/virtualClassRows";
+import { buildVirtualClassRows, DEMO_LEARNER_ROW } from "@/lib/demo/virtualClassRows";
+import { DEMO_FIRST_DRAFT, DEMO_MJT_ANSWERS, DEMO_REVISED_DRAFT } from "@/lib/demo/representativeDemoFeedback";
 import { buildClassDiscussion, type CandidatesItemView, type FreeItemView, type ScaleItemView } from "./classDiscussion";
 
 const MISSION_ID = REPRESENTATIVE_MISSION_SNAPSHOT.scenario_id;
@@ -118,5 +119,19 @@ describe("buildVirtualClassRows", () => {
     expect(buildVirtualClassRows(MISSION_ID, content)).toEqual(rows);
     expect(buildVirtualClassRows("x", { schema_version: "mission_v5", mpj_items: [] })).toBeNull();
     expect(rows.every((row) => row.profile_id.startsWith("virtual-"))).toBe(true);
+  });
+  it("응답 1은 공개 시연 미션의 시연 답안과 글자까지 같다(분포는 그대로)", () => {
+    const me = rows[DEMO_LEARNER_ROW];
+    const responses = (me.context_judgment as { responses: Array<Record<string, unknown>> }).responses;
+    const trace = (id: number) => responses.find((item) => item.item_id === id)!;
+    expect(trace(1).scale_code).toBe("very_appropriate");
+    expect(trace(2)).toMatchObject({ scale_code: DEMO_MJT_ANSWERS.A2.pick, reason_id: DEMO_MJT_ANSWERS.A2.reasonId });
+    expect(trace(2).revised_scale_code).toBeUndefined();
+    expect(trace(3).correction_indexes).toEqual([1]);
+    expect(trace(4).revised_text).toBe(DEMO_MJT_ANSWERS.A4.text);
+    expect(trace(5).candidate_band_codes).toEqual(["too_direct", "appropriate", "appropriate", "too_direct"]);
+    expect(me.first_response).toBe(DEMO_FIRST_DRAFT);
+    expect(me.revised_response).toBe(DEMO_REVISED_DRAFT);
+    expect((me.context_judgment as { learner_dissent: unknown }).learner_dissent).toBeNull();
   });
 });

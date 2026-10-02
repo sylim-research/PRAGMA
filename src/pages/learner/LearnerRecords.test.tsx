@@ -237,7 +237,7 @@ describe("learner records", () => {
       "1단일 표현 판단다소 부적절",
       "2판단과 이유다소 적절매우 부적절",
       expect.stringContaining("3복수 표현 비교"),
-      expect.stringContaining("4통번역 · 최종 결정"),
+      expect.stringContaining("4번역 · 최종 결정"),
     ]);
     const position = await screen.findByRole("region", { name: "학급 속 내 위치" });
     expect(within(position).getByRole("img", { name: "단일 표현 판단 학급 분포와 내 판단" })).toHaveTextContent("나");

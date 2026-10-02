@@ -261,25 +261,37 @@ function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size
 }
 
 /** 이번 수행의 흐름 — 판단 다섯 단계와 통번역을 한 줄로. 각 단계에는 내가 고른 것만 보인다. */
-function FlowStrip({ steps }: { steps: FlowStep[] }) {
+function FlowStrip({ steps, task }: { steps: FlowStep[]; task: string }) {
   if (steps.length === 0) return null;
+  const bandTones = [...new Map(steps.flatMap((step) => step.dots).map((dot) => [dot.label, dot.tone])).entries()];
   return (
+    <div>
+    <p className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-[12.5px]">
+      <span className="font-bold text-[#15202B]">이번 미션에서 내가 고른 것</span>
+      {bandTones.length > 0 && (
+        <span className="flex flex-wrap gap-x-3 text-[#5C6A7A]">
+          {bandTones.map(([label, tone]) => <span key={label} className="flex items-center gap-1"><ToneDot tone={tone} size="h-2 w-2" />{label}</span>)}
+        </span>
+      )}
+    </p>
     <ol className="grid grid-cols-2 gap-1.5 sm:grid-cols-3" aria-label="이번 수행의 흐름">
       {steps.map((step, index) => (
         <li key={step.key} className="flex min-w-0 items-stretch">
           <div className={`${card} flex min-w-0 flex-1 flex-col justify-between px-3 py-2.5`}>
             <p className="flex items-baseline gap-1.5">
               <span className="text-[11.5px] font-bold tabular-nums text-[#B8860B]">{index + 1}</span>
-              <span className="break-keep text-[12.5px] font-bold text-[#15202B]">{step.activity}</span>
+              <span className="break-keep text-[12.5px] font-bold text-[#15202B]">{step.key === "dct" ? `${task} · 최종 결정` : step.activity}</span>
             </p>
             <div className="mt-2 text-[13px] font-semibold text-[#15202B]">
               {step.dots.length > 0 ? (
                 <span className="flex items-center gap-1" aria-label={step.dots.map((dot, dotIndex) => `표현 ${dotIndex + 1} ${dot.label}`).join(", ")}>
                   {step.dots.map((dot, dotIndex) => (
-                    <span key={dotIndex} title={`표현 ${dotIndex + 1} · ${dot.label}`} className="flex flex-col items-center gap-0.5">
-                      <ToneDot tone={dot.tone} size="h-3.5 w-3.5" />
-                      <span className="text-[10px] font-medium tabular-nums text-[#8C8471]">{dotIndex + 1}</span>
-                    </span>
+                    <span
+                      key={dotIndex}
+                      title={`표현 ${dotIndex + 1} · ${dot.label}`}
+                      className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold tabular-nums text-white"
+                      style={{ backgroundColor: TONE[dot.tone] }}
+                    >{dotIndex + 1}</span>
                   ))}
                 </span>
               ) : (
@@ -301,12 +313,12 @@ function FlowStrip({ steps }: { steps: FlowStep[] }) {
         </li>
       ))}
     </ol>
+    </div>
   );
 }
 
 /** 표현 변화 지도 — 최초 → AI 피드백 → 최종을 세 칸으로. 바뀐 구절은 최초에서 지우고 최종에서 밑줄. */
 function ChangeFlow({ record }: { record: ReportRecord }) {
-  const [more, setMore] = useState(false);
   const task = TASK_LABEL[record.taskType];
   const revised = changed(record);
   const diff = revised ? diffSegments(record.firstResponse, record.revisedResponse) : null;
@@ -316,9 +328,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
     <div className="grid gap-1">
       <section className={`${card} px-4 py-3`} aria-label={`최초 ${task}`}>
         <p className={cardLabel}>최초 {task}</p>
-        <p className={`mt-1.5 ${zhLine}`}>
-          {diff ? <Expression segments={diff.before} mode="before" /> : record.firstResponse || "기록 없음"}
-        </p>
+        <p className={`mt-1.5 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
       </section>
       {arrow}
       <section className={`${card} px-4 py-3`} aria-label="AI 피드백">
@@ -333,16 +343,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
               )}
               {change?.scope && <span className="text-[12.5px]"><span className="text-[#8C8471]">다시 볼 곳 </span><span className="font-semibold">{change.scope}</span></span>}
             </p>
-            {change?.feature && (
-              <>
-                <p className={`break-keep ${more ? "" : "line-clamp-3"}`}>{change.feature}</p>
-                {change.feature.length > 90 && (
-                  <button type="button" onClick={() => setMore((value) => !value)} className="text-[12px] font-semibold text-[#344F63] hover:underline">
-                    {more ? "접기" : "더 보기"}
-                  </button>
-                )}
-              </>
-            )}
+            {change?.feature && <p className="break-keep">{change.feature}</p>}
             {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
           </div>
         ) : (
@@ -368,7 +369,9 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         <p className={`mt-1.5 ${zhLine} font-semibold`}>
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
-        {!diff && <p className="mt-1 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>}
+        {diff
+          ? <p className="mt-1 text-[12.5px] text-[#5C6A7A]">밑줄 = 처음과 달라진 부분</p>
+          : <p className="mt-1 text-[12.5px] text-[#8A5A14]">최초 {task}을 그대로 결정</p>}
       </section>
     </div>
   );
@@ -390,7 +393,7 @@ function Attempt({ record }: { record: ReportRecord }) {
           {revised ? "수정" : "유지"}
         </span>
       </div>
-      <FlowStrip steps={record.flow} />
+      <FlowStrip steps={record.flow} task={TASK_LABEL[record.taskType]} />
       <ChangeFlow record={record} />
     </div>
   );
@@ -409,12 +412,12 @@ function ClassPositionPanel({ record }: { record: ReportRecord }) {
     ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.scaleChoices) : []);
   if (positions.length === 0) return null;
   return (
-    <section className="border-b border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="학급 속 내 위치">
+    <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="학급 속 내 위치">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <h3 className="flex items-center gap-2 text-[14px] font-bold text-[#15202B]">
-          <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />학급 속 내 위치
+          <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />우리 반은 어떻게 판단했을까
         </h3>
-        <p className="text-[12px] text-[#8C8471]">공개된 익명 분포 · 많이 고른 판단이 정답이라는 뜻은 아닙니다</p>
+        <p className="text-[12px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
       </div>
       <div className="mt-2 grid gap-2">
         {positions.map((position) => (
@@ -456,12 +459,12 @@ function MissionCard({ group }: { group: MissionGroup }) {
           </div>
         )}
       </header>
-      <ClassPositionPanel record={head} />
       <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
         {group.records.map((record) => (
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
+      <ClassPositionPanel record={head} />
     </article>
   );
 }

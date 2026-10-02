@@ -21,6 +21,11 @@ import {
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "./representativeMissionSnapshot";
 
 export const VIRTUAL_CLASS_SIZE = 20;
+/**
+ * 대표 미션일 때 이 자리(응답 1)는 공개 시연 미션(/demo/mission)의 시연 답안과 글자까지 같은 학습자다 —
+ * 논문 4.3의 미션 캡처와 「내 기록」·학급 보드 캡처가 한 사람의 같은 수행을 가리키게 한다.
+ */
+export const DEMO_LEARNER_ROW = 0;
 export const VIRTUAL_CLASS_NOTICE = `데모 · 가상 학급 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료 아님`;
 
 type Obj = Record<string, unknown>;
@@ -140,6 +145,27 @@ export function buildVirtualClassRows(missionId: string, mission: unknown): Clas
     : taskReferences.length
       ? interleave(spread<Dct>(taskReferences.map((text, index) => [{ first: text, final: text, feedback: null, dissent: null }, index === 0 ? 11 : 9])))
       : [];
+
+  // 대표 미션이면 응답 1을 시연 답안으로 고정한다. 값을 바꾸지 않고 다른 자리와 맞바꿔 20명 분포는 그대로 둔다.
+  if (recorded && researcherText) {
+    const pin = <T>(list: T[], wanted: (value: T) => boolean) => {
+      if (wanted(list[DEMO_LEARNER_ROW])) return;
+      const j = list.findIndex((value, index) => index !== DEMO_LEARNER_ROW && wanted(value));
+      if (j < 0) throw new Error("가상 학급에 시연 답안과 같은 응답이 없습니다.");
+      [list[DEMO_LEARNER_ROW], list[j]] = [list[j], list[DEMO_LEARNER_ROW]];
+    };
+    const referenceScale = str(item(1)?.reference_scale_code) ?? SCALE.va; // A1: 기준 판단
+    pin(mjt1, (value) => value === referenceScale);
+    pin(mjt2, (value) => value.scale === DEMO_MJT_ANSWERS.A2?.pick && value.reason === DEMO_MJT_ANSWERS.A2?.reasonId && !value.revised);
+    pin(mjt3, (value) => value === validIndex); // A3: 기준 수정안
+    if (mjt4) pin(mjt4, (value) => value === researcherText);
+    const candidates = arr(item(5)?.candidates).map(obj);
+    mjt5.forEach((column, index) => {
+      const picked = DEMO_MJT_ANSWERS.A5?.candidatePicks?.[`A5-${index}`] ?? str(arr(candidates[index]?.accepted_band_codes)[0]);
+      pin(column, (value) => value === picked);
+    });
+    pin(dct, (value) => value.first === DEMO_FIRST_DRAFT && value.final === DEMO_REVISED_DRAFT && value.dissent === null);
+  }
 
   const completedAt = (index: number) => new Date(Date.UTC(2026, 8, 30, 9, 0 + index)).toISOString();
   return Array.from({ length: VIRTUAL_CLASS_SIZE }, (_, index) => {
