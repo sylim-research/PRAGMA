@@ -6,12 +6,10 @@ import { SpectrumStrip, TONE } from "@/components/charts/responseCharts";
 import { LEARNER_DEMO_NOTICE, learnerDemoClassPositions, learnerDemoLog } from "@/lib/demo/learnerRecordsDemo";
 import {
   buildChangeMap,
-  buildMissionFlow,
   classPositionsFromPattern,
   myScaleChoices,
   type ChangeMap,
   type ClassPosition,
-  type FlowStep,
 } from "@/lib/learner/recordFlow";
 import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
@@ -40,8 +38,6 @@ type ReportRecord = {
   feedback: string[];
   decision: "최초 산출 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
-  /** 이번 수행의 흐름(판단 다섯 → 통번역). 점수·정오는 없다. */
-  flow: FlowStep[];
   /** 저장된 AI 피드백의 화용 판정·다시 볼 곳·설명. */
   change: ChangeMap | null;
   /** 내 척도 선택(문항 번호 → 척도 코드). 학급 속 내 위치에 쓴다. */
@@ -105,7 +101,6 @@ function localRecord(session: LearningSession): ReportRecord {
     feedback: [],
     decision: null,
     dissent: null,
-    flow: [],
     change: null,
     scaleChoices: new Map(),
   };
@@ -133,12 +128,6 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     feedback: detail.task.feedback,
     decision: detail.task.decision,
     dissent: detail.dissent,
-    flow: buildMissionFlow({
-      contextJudgment: row.context_judgment,
-      featureId: row.feature_id,
-      decision: detail.task.decision,
-      dissent: detail.dissent !== null,
-    }),
     change: buildChangeMap(row.target_feature_observed, row.feature_id),
     scaleChoices: myScaleChoices(row.context_judgment),
   };
@@ -202,7 +191,7 @@ function diffSegments(before: string, after: string): { before: Segment[]; after
 }
 
 const TASK_LABEL: Record<ReportRecord["taskType"], string> = { translation: "번역", interpreting: "통역", other: "통번역" };
-const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
+const shortDate = (iso: string) => new Date(iso).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric" });
 
 type MissionGroup = { key: string; records: ReportRecord[] };
 
@@ -258,63 +247,6 @@ const cardLabel = "text-[12px] font-semibold text-[#8C8471]";
 
 function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size?: string }) {
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
-}
-
-/** 이번 수행의 흐름 — 판단 다섯 단계와 통번역을 한 줄로. 각 단계에는 내가 고른 것만 보인다. */
-function FlowStrip({ steps, task }: { steps: FlowStep[]; task: string }) {
-  if (steps.length === 0) return null;
-  const bandTones = [...new Map(steps.flatMap((step) => step.dots).map((dot) => [dot.label, dot.tone])).entries()];
-  return (
-    <div>
-    <p className="mb-1.5 flex flex-wrap items-baseline justify-between gap-x-3 text-[12.5px]">
-      <span className="font-bold text-[#15202B]">이번 미션에서 내가 고른 것</span>
-      {bandTones.length > 0 && (
-        <span className="flex flex-wrap gap-x-3 text-[#5C6A7A]">
-          {bandTones.map(([label, tone]) => <span key={label} className="flex items-center gap-1"><ToneDot tone={tone} size="h-2 w-2" />{label}</span>)}
-        </span>
-      )}
-    </p>
-    <ol className="grid grid-cols-2 gap-1.5 sm:grid-cols-3" aria-label="이번 수행의 흐름">
-      {steps.map((step, index) => (
-        <li key={step.key} className="flex min-w-0 items-stretch">
-          <div className={`${card} flex min-w-0 flex-1 flex-col justify-between px-3 py-2.5`}>
-            <p className="flex items-baseline gap-1.5">
-              <span className="text-[11.5px] font-bold tabular-nums text-[#B8860B]">{index + 1}</span>
-              <span className="break-keep text-[12.5px] font-bold text-[#15202B]">{step.key === "dct" ? `${task} · 최종 결정` : step.activity}</span>
-            </p>
-            <div className="mt-2 text-[13px] font-semibold text-[#15202B]">
-              {step.dots.length > 0 ? (
-                <span className="flex items-center gap-1" aria-label={step.dots.map((dot, dotIndex) => `표현 ${dotIndex + 1} ${dot.label}`).join(", ")}>
-                  {step.dots.map((dot, dotIndex) => (
-                    <span
-                      key={dotIndex}
-                      title={`표현 ${dotIndex + 1} · ${dot.label}`}
-                      className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold tabular-nums text-white"
-                      style={{ backgroundColor: TONE[dot.tone] }}
-                    >{dotIndex + 1}</span>
-                  ))}
-                </span>
-              ) : (
-                <span className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                  {step.tone && <ToneDot tone={step.tone} />}
-                  <span className="break-keep">{step.value ?? "—"}</span>
-                  {step.changedTo && (
-                    <>
-                      <ArrowRight aria-label="이유를 본 뒤 바꿈" className="h-3.5 w-3.5 text-[#8C8471]" strokeWidth={2.25} />
-                      <ToneDot tone={step.changedTo.tone} />
-                      <span className="break-keep">{step.changedTo.value}</span>
-                    </>
-                  )}
-                  {step.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-[1px] text-[11px] font-bold text-white">내 의견</span>}
-                </span>
-              )}
-            </div>
-          </div>
-        </li>
-      ))}
-    </ol>
-    </div>
-  );
 }
 
 /** 표현 변화 지도 — 최초 → AI 피드백 → 최종을 세 칸으로. 바뀐 구절은 최초에서 지우고 최종에서 밑줄. */
@@ -377,23 +309,11 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
   );
 }
 
-/** 수행 한 번 — 날짜·결정 배지, 이번 수행의 흐름, 표현 변화 지도. */
+/** 수행 한 번 — 날짜와 표현 변화 지도(최초 → AI 피드백 → 최종). */
 function Attempt({ record }: { record: ReportRecord }) {
-  const revised = changed(record);
   return (
     <div className="space-y-3 py-5">
-      <div className="flex items-center gap-2">
-        <span className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</span>
-        <span
-          className={[
-            "rounded-full border bg-white px-2.5 py-[1px] text-[11.5px] font-bold tracking-[0.02em]",
-            revised ? "border-[#1F3A5F] text-[#1F3A5F]" : "border-[#C99A2E] text-[#8A5A14]",
-          ].join(" ")}
-        >
-          {revised ? "수정" : "유지"}
-        </span>
-      </div>
-      <FlowStrip steps={record.flow} task={TASK_LABEL[record.taskType]} />
+      <p className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</p>
       <ChangeFlow record={record} />
     </div>
   );

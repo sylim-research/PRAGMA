@@ -124,10 +124,8 @@ describe("learner records", () => {
     expect(cards[0]).toHaveTextContent("수행 2회");
     const list = within(cards[0]).getByRole("list", { name: "수행 기록" });
     const rows = within(list).getAllByRole("listitem").filter((row) => row.parentElement === list);
-    expect(within(rows[0]).getAllByText("수정").length).toBeGreaterThan(0);
     expect(within(rows[0]).getByRole("region", { name: "최초 번역" })).toHaveTextContent(`최초 번역${ownLog.first_response}`);
     expect(within(rows[0]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.revised_response}`);
-    expect(within(rows[1]).getByText("유지")).toBeInTheDocument();
     expect(within(rows[1]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.first_response}최초 번역을 그대로 결정`);
     expect(cards[1]).toHaveTextContent("거절");
   });
@@ -162,7 +160,8 @@ describe("learner records", () => {
     expect(feedback).toHaveTextContent("내 의견관계·친밀도에 대한 다른 판단“같은 과 선배라서”");
     expect(within(item).getByRole("region", { name: "최종 번역" })).toHaveTextContent("최초 번역을 그대로 결정");
     expect(within(item).queryByRole("button", { name: "자세히 보기" })).not.toBeInTheDocument();
-    expect(within(item).getByText("유지")).toBeInTheDocument();
+    expect(within(item).queryByText("유지")).not.toBeInTheDocument();
+    expect(item).toHaveTextContent("2026년 9월 5일");
   });
 
   it("maps the nine acts with counts and filters records when one is pressed", async () => {
@@ -204,7 +203,7 @@ describe("learner records", () => {
     expect(screen.queryByText("아직 완료한 미션이 없습니다.")).not.toBeInTheDocument();
   });
 
-  it("draws this attempt as a flow and marks my place on a class distribution only after release", async () => {
+  it("marks my place on a class distribution only after release, without a per-step strip", async () => {
     const withMjt = {
       ...ownLog,
       feature_id: "request_mitigation_optionality",
@@ -232,13 +231,7 @@ describe("learner records", () => {
     });
     renderReport();
     const [item] = await recordItems();
-    const flow = within(within(item).getByRole("list", { name: "이번 수행의 흐름" }));
-    expect(flow.getAllByRole("listitem").map((step) => step.textContent)).toEqual([
-      "1단일 표현 판단다소 부적절",
-      "2판단과 이유다소 적절매우 부적절",
-      expect.stringContaining("3복수 표현 비교"),
-      expect.stringContaining("4번역 · 최종 결정"),
-    ]);
+    expect(within(item).queryByRole("list", { name: "이번 수행의 흐름" })).not.toBeInTheDocument();
     const position = await screen.findByRole("region", { name: "학급 속 내 위치" });
     expect(within(position).getByRole("img", { name: "단일 표현 판단 학급 분포와 내 판단" })).toHaveTextContent("나");
     expect(mocks.rpc).toHaveBeenCalledWith("learner_get_peer_responses", { p_course_id: ownLog.course_id, p_mission_id: withMjt.mission_id });
