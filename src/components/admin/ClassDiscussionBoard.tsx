@@ -338,7 +338,19 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
   </article>;
 }
 
-function DctSection({ data, state, onChange, size, projector }: { data: ClassDiscussion; state: ClassDiscussionBoardState; onChange: Props["onChange"]; size: string; projector: boolean }) {
+/**
+ * 데모에서 사례 비교를 처음 열면 「응답 1」(공개 시연 미션과 같은 학습자)과 첫 이견 사례를 나란히 올린다.
+ * 실제 응답에서는 교수자가 직접 고른다.
+ */
+// eslint-disable-next-line react-refresh/only-export-components -- 데모 도판 경로와 같은 기본 선택을 쓴다.
+export function defaultDemoCompare(data: ClassDiscussion): string[] {
+  const cases = data.dct.cases;
+  const first = cases.find((item) => item.id === "응답 1");
+  const dissent = cases.find((item) => item.dissent && item.id !== first?.id);
+  return [first?.id, dissent?.id].filter((id): id is string => Boolean(id));
+}
+
+function DctSection({ data, demo, state, onChange, size, projector }: { data: ClassDiscussion; demo: boolean; state: ClassDiscussionBoardState; onChange: Props["onChange"]; size: string; projector: boolean }) {
   const dct = data.dct;
   const decisionSlices: Slice[] = [
     { key: "retained", label: "최초 산출 유지", count: dct.retained, tone: "navy" },
@@ -373,7 +385,7 @@ function DctSection({ data, state, onChange, size, projector }: { data: ClassDis
           type="button"
           role="tab"
           aria-selected={state.dctView === key}
-          onClick={() => onChange({ ...state, dctView: key })}
+          onClick={() => onChange({ ...state, dctView: key, compare: key === "cases" && demo && state.compare.length === 0 ? defaultDemoCompare(data) : state.compare })}
           className={`px-3 py-1 text-[12.5px] font-semibold ${state.dctView === key ? "bg-[#15202B] text-white" : "bg-white text-[#15202B] hover:bg-[#F3F1EA]"}`}
         >{label}</button>)}
       </div>
@@ -512,7 +524,7 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
       </section>}
     </>}
 
-    <DctSection data={data} state={state} onChange={onChange} size={size} projector={projector} />
+    <DctSection data={data} demo={demo} state={state} onChange={onChange} size={size} projector={projector} />
 
     <section aria-label="토론에서 검토할 관점" className="rounded-xl border border-[#E2DED2] bg-white">
       <div className="border-b border-[#E2DED2] px-4 py-2.5">

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { ClassDiscussionBoard, INITIAL_BOARD_STATE, type ClassDiscussionBoardState } from "@/components/admin/ClassDiscussionBoard";
+import { ClassDiscussionBoard, defaultDemoCompare, INITIAL_BOARD_STATE, type ClassDiscussionBoardState } from "@/components/admin/ClassDiscussionBoard";
 import { REPRESENTATIVE_MISSION_ID } from "@/lib/demo/representativeMission";
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "@/lib/demo/representativeMissionSnapshot";
 import { buildVirtualClassRows, VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
@@ -20,7 +20,7 @@ const ClassDiscussionDemo = () => {
   const [state, setState] = useState<ClassDiscussionBoardState>(() => {
     const item = Number(params.get("item"));
     const dctView = params.get("dct") === "cases" ? "cases" : "class";
-    const compare = dctView === "cases" ? discussion.dct.cases.filter((entry) => entry.dissent).slice(0, 2).map((entry) => entry.id) : [];
+    const compare = dctView === "cases" ? defaultDemoCompare(discussion) : [];
     return { ...INITIAL_BOARD_STATE, itemId: Number.isFinite(item) && item > 0 ? item : null, dctView, compare };
   });
   return <main className="min-h-screen bg-[#F3F1EA] px-6 py-8 text-[#15202B]">
