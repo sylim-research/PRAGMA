@@ -8,5 +8,5 @@
     <circle cx="720" cy="78" r="17"/>
   </g>
   <text x="607" y="162" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="52" font-weight="700" letter-spacing="14" fill="#FFFFFF">PRAGMA</text>
-  <text x="600" y="200" text-anchor="middle" font-family="Pretendard, Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif" font-size="17" letter-spacing="1" fill="#D5DCE8">AI 기반 한·중 통번역 화용 학습 워크플로우</text>
+  <text x="600" y="200" text-anchor="middle" font-family="Pretendard, Apple SD Gothic Neo, Malgun Gothic, Noto Sans KR, sans-serif" font-size="17" letter-spacing="1" fill="#D5DCE8">AI 기반 한·중 통번역 학습 워크플로우</text>
 </svg>
