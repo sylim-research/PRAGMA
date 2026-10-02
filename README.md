@@ -14,12 +14,10 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 학습자는 원문의 의미와 화행 목적을 유지하며 관계·상황에 맞게 통번역합니다.
 </p>
 
-<p align="center"><b>AI는 생성·검토·피드백에 활용하되, 판단과 최종 결정은 인간이 수행합니다.</b></p>
-
 <br>
 
 <table>
-  <thead><tr><th width="273" align="left">작업 결과</th><th width="413" align="left">링크</th></tr></thead>
+  <thead><tr><th width="319" align="left">작업 결과</th><th width="360" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td>🖥️&nbsp;&nbsp;웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;PRAGMA 워크플로우 전체 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
@@ -27,7 +25,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>PRAGMA의 설계 원리를 구현한 코드와 그 개발 과정을 공개합니다. 이 저장소가 제시하는 결과는 PRAGMA의 설계·개발 및 내부 점검 결과이며, 학습 효과나 전이를 검증한 결과가 아닙니다.</small>
+> <small>PRAGMA의 설계 원리를 구현한 코드와 그 개발 과정을 공개합니다.</small>
 
 <br>
 
