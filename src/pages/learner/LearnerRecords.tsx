@@ -8,7 +8,6 @@ import {
   buildChangeMap,
   classPositionsFromPattern,
   COMPARED_ITEMS,
-  judgmentComparisons,
   missionReference,
   myChoices,
   type ChangeMap,
@@ -321,7 +320,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
 /** 수행 한 번 — 날짜와 표현 변화 지도(최초 → AI 피드백 → 최종). */
 function Attempt({ record }: { record: ReportRecord }) {
   return (
-    <div className="space-y-3 py-5">
+    <div className="space-y-2.5 pb-5 pt-2">
       <p className="text-[13px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</p>
       <ChangeFlow record={record} />
     </div>
@@ -377,10 +376,12 @@ function ClassReview({ record }: { record: ReportRecord }) {
   const positions = record.demoPositions
     ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.choices) : []);
   const reference = missionReference(record.demoMission ?? mission.data ?? null, record.contentHash);
-  const comparisons = judgmentComparisons(positions, reference);
-  const shownItems = comparisons.length > 0 ? comparisons.map((row) => row.itemId) : COMPARED_ITEMS;
+  const shownItems = positions.length > 0 ? positions.map((position) => position.itemId) : COMPARED_ITEMS;
   const lessonPoints = (reference?.lessonPoints ?? []).filter((point) => shownItems.includes(point.itemId));
-  const showReference = comparisons.some((row) => row.reference !== null);
+  const referenceLabel = (position: ClassPosition) => {
+    const key = reference?.answers.get(position.itemId);
+    return key === undefined ? null : position.slices.find((slice) => slice.key === key)?.label ?? null;
+  };
   if (positions.length === 0 && lessonPoints.length === 0) return null;
 
   return (
@@ -394,9 +395,14 @@ function ClassReview({ record }: { record: ReportRecord }) {
           <div className="mt-2 grid gap-2">
             {positions.map((position) => (
               <div key={position.itemId} className={`${card} px-3 pt-2.5`}>
-                <p className="flex items-baseline justify-between gap-2 text-[12.5px]">
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[12.5px]">
                   <span className="font-bold text-[#15202B]">{position.activity}</span>
-                  <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
+                  <span className="flex items-baseline gap-3">
+                    {referenceLabel(position) && (
+                      <span className="rounded-full border-[1.6px] border-[#2F6B5E] px-2 py-[1px] text-[12px] font-semibold text-[#245449]">기준 판단: {referenceLabel(position)}</span>
+                    )}
+                    <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
+                  </span>
                 </p>
                 {position.kind === "scale"
                   ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
@@ -407,42 +413,14 @@ function ClassReview({ record }: { record: ReportRecord }) {
         </section>
       )}
 
-      {comparisons.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="판단 비교">
-          <h3 className={sectionTitle}>{titleBar}판단 비교</h3>
-          <div className="mt-2 overflow-x-auto">
-            <table className="w-full border-collapse text-[13.5px]">
-              <thead>
-                <tr className="text-left text-[12px] text-[#8C8471]">
-                  <th scope="col" className="py-1.5 pr-3 font-semibold">활동</th>
-                  <th scope="col" className="py-1.5 pr-3 font-semibold">내 선택</th>
-                  <th scope="col" className="py-1.5 pr-3 font-semibold">반에서 가장 많이 고른 선택</th>
-                  {showReference && <th scope="col" className="py-1.5 font-semibold">기준 판단</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {comparisons.map((row) => (
-                  <tr key={row.itemId} className="border-t border-[#F0ECE2]">
-                    <th scope="row" className="py-2 pr-3 text-left font-semibold text-[#15202B]">{row.activity}</th>
-                    <td className="py-2 pr-3 font-semibold text-[#1F3A5F]">{row.mine ?? "—"}</td>
-                    <td className="py-2 pr-3 text-[#26323D]">{row.majority.length ? row.majority.join(" · ") : "—"}</td>
-                    {showReference && <td className="py-2 text-[#26323D]">{row.reference ?? "—"}</td>}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
       {lessonPoints.length > 0 && (
         <section className="border-t border-[#EFEBDF] px-6 py-4 sm:px-7" aria-label="핵심 정리">
           <h3 className={sectionTitle}>{titleBar}핵심 정리</h3>
-          <ul className="mt-2 space-y-2">
+          <ul className="mt-2 space-y-1.5">
             {lessonPoints.map((point) => (
-              <li key={point.itemId} className="text-[14px] leading-6 text-[#26323D]">
-                <p className="text-[12.5px] font-bold text-[#786022]">{point.label}</p>
-                <p className="break-keep">{point.text}</p>
+              <li key={point.itemId} className="flex gap-2 break-keep text-[13.5px] leading-6 text-[#26323D]">
+                <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#B8860B]" />
+                <p><span className="mr-1.5 font-bold text-[#15202B]">{point.label}</span>{point.text}</p>
               </li>
             ))}
           </ul>
@@ -477,12 +455,17 @@ function MissionCard({ group }: { group: MissionGroup }) {
           </div>
         )}
       </header>
+      <h3 className={`${sectionTitle} px-6 pt-4 sm:px-7`}>{titleBar}내 수행</h3>
       <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
         {group.records.map((record) => (
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
       <ClassReview record={head} />
+      <p className="border-t border-[#EFEBDF] px-6 py-3 text-[13px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
+        <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
+        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행 목적이 유지되었나요?
+      </p>
     </article>
   );
 }
@@ -698,13 +681,6 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
               </ol>
             )}
 
-            <aside className="mt-8 rounded-r-lg border-l-[3px] border-[#D6A636] bg-[#FFF9EA] px-5 py-3.5" aria-label="다시 생각해 볼 질문">
-              <p className="text-[12.5px] font-semibold text-[#8A5A14]">다시 생각해 볼 질문</p>
-              <ul className="mt-1 space-y-0.5 text-[14px] leading-relaxed text-[#26323D]">
-                <li>최종 표현에서도 원문의 의미와 화행 목적이 유지되었나요?</li>
-                <li>표현을 유지하거나 바꾼 이유는 무엇인가요?</li>
-              </ul>
-            </aside>
           </>
         )}
       </div>

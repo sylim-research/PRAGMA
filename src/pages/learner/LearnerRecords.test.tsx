@@ -140,13 +140,16 @@ describe("learner records", () => {
     expect(within(row).getByText("如果方便，").className).toContain("underline");
   });
 
-  it("shows no score, type, revision count or act map — only a shared reflection question", async () => {
+  it("shows no score, type or revision count — one low-key question per mission", async () => {
     mocks.order.mockResolvedValue({ data: [ownLog], error: null });
     renderReport();
     await recordItems();
     expect(screen.getByRole("heading", { name: "내 기록" })).toBeInTheDocument();
     expect(screen.queryByText(/고쳐 쓴 기록|시그니처|수정 노트|완료 학습 기록/)).not.toBeInTheDocument();
-    expect(screen.getByText("다시 생각해 볼 질문")).toBeInTheDocument();
+    expect(screen.getAllByLabelText("생각해 보기")).toHaveLength(1);
+    expect(screen.getByLabelText("생각해 보기")).toHaveTextContent("최종 번역에서도 원문의 의미와 화행 목적이 유지되었나요?");
+    expect(screen.queryByText("표현을 유지하거나 바꾼 이유는 무엇인가요?")).not.toBeInTheDocument();
+    expect(screen.queryByText("다시 생각해 볼 질문")).not.toBeInTheDocument();
   });
 
   it("shows the change map — first, stored AI feedback with my opinion, final — without a toggle", async () => {
@@ -238,9 +241,9 @@ describe("learner records", () => {
     const position = await screen.findByRole("region", { name: "우리 반의 판단" });
     expect(within(position).getByRole("img", { name: "단일 표현 판단 학급 분포와 내 판단" })).toHaveTextContent("나");
     expect(mocks.rpc).toHaveBeenCalledWith("learner_get_peer_responses", { p_course_id: ownLog.course_id, p_mission_id: withMjt.mission_id });
-    const comparison = within(screen.getByRole("region", { name: "판단 비교" }));
-    expect(comparison.queryByRole("columnheader", { name: "기준 판단" })).not.toBeInTheDocument();
-    expect(comparison.getAllByRole("row")[1]).toHaveTextContent("단일 표현 판단다소 부적절다소 부적절");
+    // 판단 비교 표는 없다. 판본을 확인할 수 없으면 기준 판단 라벨도 없다.
+    expect(screen.queryByRole("region", { name: "판단 비교" })).not.toBeInTheDocument();
+    expect(within(position).queryByText(/기준 판단:/)).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "핵심 정리" })).not.toBeInTheDocument();
     // 콘텐츠 지문이 없는 기록은 미션 본문을 읽지 않는다.
     expect(mocks.fetchMission).not.toHaveBeenCalled();
@@ -260,11 +263,12 @@ describe("learner records", () => {
     expect(await screen.findByText("데모 · 가상 학급 20명 · 실제 학습자 자료가 아닙니다")).toBeInTheDocument();
     const classView = await screen.findByRole("region", { name: "우리 반의 판단" });
     expect(within(classView).getByRole("list", { name: "수정안 선택 학급 분포와 내 판단" })).toHaveTextContent("수정안 2나60% · 12명");
-    const comparison = within(screen.getByRole("region", { name: "판단 비교" }));
-    expect(comparison.getAllByRole("row").slice(1).map((row) => row.textContent)).toEqual([
-      "단일 표현 판단매우 적절다소 부적절매우 적절",
-      "판단과 이유다소 적절다소 부적절다소 부적절",
-      "수정안 선택수정안 2수정안 2수정안 2",
+    // 판단 비교 표 대신, 각 활동 그래프 옆에 기준 판단 라벨 하나.
+    expect(screen.queryByRole("region", { name: "판단 비교" })).not.toBeInTheDocument();
+    expect(within(classView).getAllByText(/^기준 판단:/).map((label) => label.textContent)).toEqual([
+      "기준 판단: 매우 적절",
+      "기준 판단: 다소 부적절",
+      "기준 판단: 수정안 2",
     ]);
     const lessons = screen.getByRole("region", { name: "핵심 정리" });
     expect(lessons).toHaveTextContent("짧아도 자연스러운 부탁");

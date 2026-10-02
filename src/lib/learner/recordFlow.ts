@@ -1,7 +1,6 @@
-// 「내 기록」의 시각화 모델 — 표현 변화, 우리 반의 판단, 판단 비교, 핵심 정리.
+// 「내 기록」의 시각화 모델 — 표현 변화, 우리 반의 판단(기준 판단 라벨), 핵심 정리.
 //
 // 원칙(원고 4.3.5·5.2.2): 학습자 본인의 선택을 옮겨 보일 뿐 점수·정오·유형·경향을 만들지 않는다.
-// 판단 비교는 문항 하나씩 「내 선택 / 반에서 가장 많이 고른 선택 / 기준 판단」의 사실만 놓는다.
 // 기준 판단과 핵심 정리는 수행 당시와 같은 콘텐츠 판본(지문 일치)일 때만 미션 본문에서 그대로 읽는다.
 // 학급 분포는 교수자가 「학습자 공개」한 것만 쓴다. AI 호출·새 진단 로직은 없다.
 
@@ -30,16 +29,6 @@ export interface MissionReference {
   /** 문항 번호 → 기준 선택 키(척도 코드 또는 수정안 위치). */
   answers: Map<number, string>;
   lessonPoints: Array<{ itemId: number; label: string; text: string }>;
-}
-
-/** 판단 비교 한 줄 — 문항 하나의 사실 비교. */
-export interface JudgmentComparison {
-  itemId: number;
-  activity: string;
-  mine: string | null;
-  /** 반에서 가장 많이 고른 선택. 같은 수로 갈리면 모두. */
-  majority: string[];
-  reference: string | null;
 }
 
 type Obj = Record<string, unknown>;
@@ -144,21 +133,4 @@ export function missionReference(mission: unknown, recordContentHash: string | n
     return itemId !== null && label && text ? [{ itemId, label, text }] : [];
   });
   return { answers, lessonPoints };
-}
-
-const labelOf = (position: ClassPosition, key: string | null) =>
-  key === null ? null : position.slices.find((slice) => slice.key === key)?.label ?? (position.kind === "choice" ? choiceLabel(key) : key);
-
-/** 판단 비교 — 공개된 학급 분포가 있는 문항만, 문항 하나씩 사실만 놓는다. */
-export function judgmentComparisons(positions: ClassPosition[], reference: MissionReference | null): JudgmentComparison[] {
-  return positions.map((position) => {
-    const max = Math.max(0, ...position.slices.map((slice) => slice.count));
-    return {
-      itemId: position.itemId,
-      activity: position.activity,
-      mine: labelOf(position, position.mine),
-      majority: max > 0 ? position.slices.filter((slice) => slice.count === max).map((slice) => slice.label) : [],
-      reference: labelOf(position, reference?.answers.get(position.itemId) ?? null),
-    };
-  });
 }
