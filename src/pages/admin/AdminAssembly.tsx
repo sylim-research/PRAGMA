@@ -904,9 +904,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         <header className={(fitScreen ? "sticky top-0" : "sticky top-16") + " z-10 flex flex-wrap items-start justify-between gap-x-5 gap-y-5 rounded-t-xl border-b border-[#ECE8DE] bg-white/95 px-5 py-4 backdrop-blur supports-[backdrop-filter]:bg-white/85"}>
           {professorScreen && queueButton}
           <div className={["min-w-0 flex-1", professorScreen ? "self-center" : "space-y-5"].join(" ")}>
-            <div className="flex min-w-0 items-center gap-2">
-              {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
-              <span className="shrink-0">{headerBadges(r)}</span>
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              {/* 좁은 작업대에서는 배지도 영역 안에서 줄바꿈한다. */}
+              <span className="min-w-0 max-w-full">{headerBadges(r)}</span>
               {metaLine.some(Boolean) && (
                 <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
                   {metaLine.filter(Boolean).join(" · ")}
@@ -1035,7 +1035,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div ref={fitScreen ? splitRef : undefined} className={professorScreen ? "grid items-start"
-          : aiReview ? "grid items-start gap-4 xl:grid-cols-[9fr_11fr]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
+          : aiReview ? "grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(16rem,2fr)_minmax(0,3fr)]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
@@ -1058,9 +1058,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
-              {/* 상태 칩은 한 줄로 두고(넘치면 가로 스크롤), 검색 줄은 목록 폭을 모두 쓴다. */}
+              {/* 상태 칩은 영역 안에서 줄바꿈하고, 검색 줄은 목록 폭을 모두 쓴다. */}
               <div className="flex flex-col gap-1.5">
-              <div className="flex flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none]" role="group" aria-label="상태">
+              <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
                 {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
                   <button
                     key={s}

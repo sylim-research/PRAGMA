@@ -245,7 +245,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
   }
   const heading = "text-[10.5px] font-semibold tracking-[0.04em] text-[#8A7621]";
   return (
-    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_1fr_auto]">
+    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_minmax(0,1fr)]">
       <div className="min-w-0">
         <div className={heading}>화행</div>
         <div className="mt-1 text-[14px] font-bold text-[#15202B]">{act}</div>
@@ -260,7 +260,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
           ))}
         </div>
       </div>
-      <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
+      <div className="min-w-0 border-t border-[#E6E1D5] pt-2 sm:col-span-2">
         <div className={heading}>방향 · 수준 · 수행 방식</div>
         {/* 교수자 최종 승인 화면의 머리 칩과 같은 「이름 값」 짝으로 보여 준다. */}
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">

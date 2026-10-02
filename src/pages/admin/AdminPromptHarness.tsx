@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { PROMPT_SNAPSHOT, type PromptSnapshotEntry } from "@/lib/pragma/promptSnapshot.generated";
-import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 
 // ── 저장소 정본(읽기 전용) ─────────────────────────────────────────────
 // 이 섹션의 원문은 promptSnapshot.generated.ts에서 온다. 그 파일은 build마다
@@ -13,7 +12,7 @@ import { ACTIVE_RULE_IDS } from "@/lib/pragma/missionRules";
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "시나리오 생성",
   mission: "학습 미션 생성",
-  review: "AI 검토와 교차 점검",
+  review: "AI 검토와 모델 간 교차 검토",
   runtime: "학습자 AI 피드백",
   authoring: "실제 자료 활용",
 };
@@ -51,7 +50,7 @@ function HarnessOverview() {
           <h3 className="mt-2 text-[14px] font-bold">규칙 기반 검사</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
-            같은 입력에는 같은 결과를 냅니다. 현행 규칙 {ACTIVE_RULE_IDS.length}개가 여기에 속합니다.
+            미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
         </div>
         <div className="rounded-lg border border-[#D8E0E5] bg-[#F7FAFB] p-3">
@@ -61,8 +60,7 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[14px] font-bold">프롬프트 통제 기반 검토</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
-            생성과 분리된 AI가 버전이 관리되는 지시문에 따라 의미·자연성·후보 자격을 검토합니다. 필요하면 다른
-            AI가 교차 점검합니다.
+            운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
         </div>
         <div className="rounded-lg border border-[#E1DDD4] bg-[#FAF9F7] p-3">
@@ -96,7 +94,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="truncate text-[15px]">{entry.label}</CardTitle>
+            <CardTitle className="text-[15px] leading-snug">{entry.label}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
             {entry.sha256.slice(0, 10)}
@@ -105,7 +103,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1 truncate pl-5 text-xs text-muted-foreground" title={entry.note}>
+        <p className="mt-1 pl-5 text-[13px] leading-relaxed text-muted-foreground">
           {entry.note}
         </p>
       </CardHeader>
