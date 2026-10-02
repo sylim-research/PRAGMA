@@ -72,7 +72,7 @@ function whereLabel(where: string): string {
 const DEFAULT_APPROVAL_NOTE = "이 학습 미션을 수업에 사용합니다.";
 const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
-/** 화면에 보이는 단계 이름에서 서비스 이름을 뺀다. 저장·추적 정보의 모델명은 세부 추적 정보에 그대로 둔다. */
+/** 단계 역할과 표시 모델명을 구분한다. 원본 모델 ID는 저장 기록에 유지한다. */
 const STEP_LABEL: Record<string, string> = {
   "규칙 검사": "자동 품질 점검", "OpenAI 검토": "AI 검토", "Claude 독립 검토": "모델 간 교차 검토", "OpenAI 재검토": "AI 의견 대조", "최종 검수 자료": "감수 자료 준비",
 };

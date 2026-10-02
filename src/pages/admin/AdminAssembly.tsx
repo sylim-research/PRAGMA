@@ -885,9 +885,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const loaded = preview[r.scenario_id];
     // 머리 한 줄에 식별 정보를 모은다. 본문에서 같은 상태를 다시 말하지 않는다.
     // The final-approval screen already implies the review stage, so the header omits pipeline status.
-    const metaLine = [r.mission_content_hash ? `콘텐츠 ${r.mission_content_hash.slice(0,8)}` : null, ...(aiReview ? [] : reviewMode
+    const metaLine = aiReview ? [] : reviewMode
       ? [info?.placement === "편성 전" ? null : info?.placement]
-      : [])];
+      : [];
     const scenarioText = (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
@@ -905,8 +905,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {professorScreen && queueButton}
           <div className={["min-w-0 flex-1", professorScreen ? "self-center" : "space-y-5"].join(" ")}>
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              {/* 배지는 줄바꿈하지 않고, 좁아지면 옆의 식별 정보가 먼저 말줄임된다. */}
-              <span className="shrink-0">{headerBadges(r)}</span>
+              {/* 좁은 작업대에서는 배지도 영역 안에서 줄바꿈한다. */}
+              <span className="min-w-0 max-w-full">{headerBadges(r)}</span>
               {metaLine.some(Boolean) && (
                 <p className="min-w-0 truncate text-[12px] text-[#7A868D]" title={metaLine.filter(Boolean).join(" · ")}>
                   {metaLine.filter(Boolean).join(" · ")}
@@ -946,7 +946,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
                 <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
-                  <dd className="text-[#4E5A63]">표현 판단 · 판단과 이유 · 표현 비교 · 수정안 선택 · 직접 수정</dd>
+                  <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
@@ -1058,7 +1058,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   ⚠️ 조회 상한 {ROW_CAP}건 — 최신 {ROW_CAP}건만 보고 있습니다.
                 </p>
               )}
-              {/* 상태 칩은 한 줄로 두고(넘치면 가로 스크롤), 검색 줄은 목록 폭을 모두 쓴다. */}
+              {/* 상태 칩은 영역 안에서 줄바꿈하고, 검색 줄은 목록 폭을 모두 쓴다. */}
               <div className="flex flex-col gap-1.5">
               <div className="flex flex-wrap gap-1" role="group" aria-label="상태">
                 {chips.filter((s) => professorScreen || s === "all" || s === fState || dash[s] > 0).map((s) => (
