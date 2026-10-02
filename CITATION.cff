@@ -8,10 +8,11 @@ authors:
     alias: "sylim-research"
     affiliation: "Hankuk University of Foreign Studies"
 abstract: >-
-  한국어·중국어 통번역 학습에서 화용적 적절성 판단과 산출을 다루는 교육 우선형
-  연구 플랫폼. 화행과 상황 조건(상대적 권력·사회적 거리·행위 부담도)을 통제해
-  학습 콘텐츠를 생성하고, 교수자가 검수·승인한 미션만 수업에 배치하며, 학습자의
-  판단·산출·수정 과정을 생성 조건 및 버전과 함께 기록한다.
+  화용적 적절성을 중심으로 설계한 한·중 통번역 학습 플랫폼. 목표 화행과
+  관계·상황 조건(상대적 권력, 사회적 거리, 행위 부담도)을 달리해 학습 콘텐츠를
+  생성하고, 교수자가 감수한 뒤 최종 승인한 학습 미션만 교과목·주차에 편성하며,
+  학습자의 판단, 통번역 산출과 수정 과정을 콘텐츠 버전과 함께 기록한다.
+  학습자는 원문의 의미와 화행 목적을 유지하며 관계·상황에 맞게 통번역한다.
 repository-code: "https://github.com/sylim-research/PRAGMA"
 url: "https://pragma.up.railway.app"
 keywords:
@@ -24,9 +25,7 @@ keywords:
   - translation studies
 references:
   - type: thesis
-    title: >-
-      AI 기반 한·중 통번역 학습 워크플로우 개발 연구:
-      화용적 적절성 판단과 통번역 산출의 연계
+    title: "AI 기반 한·중 통번역 학습 워크플로우 개발 연구"
     authors:
       - family-names: "Lim"
         given-names: "Soyoung"
