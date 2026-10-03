@@ -64,7 +64,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^매우 부적절/ })).getByText("허용 판단")).toBeInTheDocument();
-    expect(screen.getByText(/^기준 이유를 골랐습니다\./)).toBeInTheDocument();
+    expect(screen.getByText(/^기준 이유와 같습니다./)).toBeInTheDocument();
     expect(within(screen.getByRole("radio", { name: new RegExp(reason.text) })).getByText("기준 이유")).toBeInTheDocument();
     expect(screen.getByText(feedbackSentence)).toBeInTheDocument();
     click("다음: 복수 표현 비교");

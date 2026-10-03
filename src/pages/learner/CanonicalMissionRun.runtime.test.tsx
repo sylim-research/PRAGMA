@@ -66,7 +66,7 @@ describe("demo route", () => {
     fireEvent.click(await screen.findByRole("button", { name: /이 번역으로 확정하기/ }));
     expect(await screen.findByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
-    expect(screen.queryByRole("link", { name: "나의 학습 기록 보기" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "내 기록 보기" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "데모 학습 기록 보기" }));
     expect(screen.getByRole("region", { name: "데모 학습 기록" })).toBeInTheDocument();
     expect(requestFeedback).not.toHaveBeenCalled();
@@ -129,7 +129,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
     click("번역 제출하기");
     // Stage 2: feedback for the submitted draft (live request, not a preview).
-    expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
     expect(requestFeedback).toHaveBeenCalledWith(mission, first);
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
@@ -289,7 +289,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     await waitFor(() => expect(screen.getByText("학습 기록에 저장되었습니다.")).toBeInTheDocument());
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(vi.mocked(appendMissionEvent).mock.calls.filter(([event]) => event.eventType === "mission_completed")).toHaveLength(1);
-    expect(screen.getByRole("link", { name: "나의 학습 기록 보기" })).toHaveAttribute("href", "/learner/records#correction-notes");
+    expect(screen.getByRole("link", { name: "내 기록 보기" })).toHaveAttribute("href", "/learner/records#correction-notes");
   });
 
   it("shows the live scenario intro before entering the five-judgment screen", async () => {
