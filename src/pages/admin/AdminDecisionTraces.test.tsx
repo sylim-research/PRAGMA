@@ -62,8 +62,7 @@ describe("학습 수행 기록", () => {
   it("표에는 코드값 대신 사람이 읽는 화행·과업·미션 이름을 보여 준다", async () => {
     mountAt("/admin/decision-traces?tab=records");
     expect(await screen.findAllByText("논문 면담 요청")).not.toHaveLength(0);
-    expect(screen.getAllByText("요청").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("번역").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("요청 · 번역").length).toBeGreaterThan(0);
     expect(screen.queryByText("request")).not.toBeInTheDocument();
     expect(screen.queryByText(/translation/)).not.toBeInTheDocument();
   });
