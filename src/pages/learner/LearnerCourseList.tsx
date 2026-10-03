@@ -103,7 +103,7 @@ const LearnerCourseList = () => {
                           <dd className="font-medium text-[#15202B]">{COURSE_DIRECTION[course.language_direction as LanguageDirection] ?? course.language_direction}</dd>
                         </div>
                         <div className="flex items-baseline gap-3">
-                          <dt className="sr-only">수행모드</dt>
+                          <dt className="sr-only">수행 방식</dt>
                           <dd className="font-medium text-[#15202B]">
                             <span aria-hidden="true" className="mr-3 font-normal text-[#C7C2B4]">|</span>
                             {modeSummary}

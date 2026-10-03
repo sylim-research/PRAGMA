@@ -32,7 +32,7 @@ const WeeklyLearningNote = (_props: { allowSample?: boolean }) => {
         : !course || !week ? <p>이 주차의 수업자료를 찾을 수 없습니다.</p>
         : materialQuery.isPending ? <p role="status">승인된 수업자료를 확인하는 중…</p>
         : materialQuery.isError ? <p role="alert">승인된 수업자료를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.</p>
-        : !materialQuery.data ? <p role="status">이번 주 수업자료는 교수자 검수 후 공개됩니다. 학습 미션과 수행 기록은 주차 화면에서 이용할 수 있습니다.</p>
+        : !materialQuery.data ? <p role="status">이번 주 수업자료는 교수자 최종 승인 후 공개됩니다. 학습 미션과 수행 기록은 주차 화면에서 이용할 수 있습니다.</p>
         : <>
           <WeeklyMaterialDocument material={materialQuery.data.material} />
           <p className="mt-5 text-xs leading-5 text-muted-foreground">

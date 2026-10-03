@@ -36,7 +36,7 @@ describe("CanonicalMissionRun completion connections", () => {
         example: "您方便帮我收一下快递吗？", takeaway: "상대의 선택 여지 확인",
         criteria: [
           { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "핵심 내용 유지" },
-          { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "문법 안정" },
+          { key: "language", label: "문법적 정확성", question: "", level: "very_good", body: "문법 안정" },
           { key: "pragmatics", label: "화용적 적절성", question: "", level: "recommend", body: "선택 여지 확인" },
         ],
       },
@@ -60,15 +60,15 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(screen.getByText("번역안을 세 기준으로 살펴보고 있습니다")).toBeInTheDocument();
     act(() => vi.advanceTimersByTime(1300));
     // 세 기준이 모두 보이고, 우선 기준의 본문은 화면마다 한 번만 나온다.
-    ["의미 충실성", "문법 정확성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
+    ["의미적 충실성", "문법적 정확성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
     expect(screen.queryByText("언어 자연성")).not.toBeInTheDocument();
     // 판정은 가로 한 줄, 걸린 기준의 설명은 아래 상자 하나에만 있다.
-    const point = screen.getByText(/^의미 충실성 · /).nextElementSibling!.textContent!;
+    const point = screen.getByText(/^의미적 충실성 · /).nextElementSibling!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     expect(screen.getByRole("heading", { name: "피드백을 참고해 다시 써보세요." })).toBeInTheDocument();
     expect(screen.getAllByText(point)).toHaveLength(1);
-    expect(screen.queryByRole("heading", { name: "의미 충실성" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "의미적 충실성" })).not.toBeInTheDocument();
   });
 
   it("offers save-only retry after failure and prevents navigation while saving", () => {

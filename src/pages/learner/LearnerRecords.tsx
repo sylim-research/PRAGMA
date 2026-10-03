@@ -464,7 +464,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
       <ClassReview record={head} />
       <p className="border-t border-[#EFEBDF] px-6 py-3 text-[14px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
         <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
-        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행 목적이 유지되었나요?
+        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행목적이 유지되었나요?
       </p>
     </article>
   );

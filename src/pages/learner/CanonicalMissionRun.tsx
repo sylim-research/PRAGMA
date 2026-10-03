@@ -294,7 +294,7 @@ function v6IntroSteps(outputName: string) {
       { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
       { title: "AI 피드백", desc: "의미·문법·화용 기준" },
       // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
-      { title: "최종 결정", desc: "최종안을 내가 확정하기" },
+      { title: "최종 결정", desc: "확정안을 내가 결정하기" },
     ],
   };
 }
@@ -378,7 +378,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             </li>
             <li className="rounded-xl bg-[#F8F6EE] p-4">
               <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
-              <p className="mt-1 text-sm leading-6 text-[#635E52]">아래 상황의 원문을 직접 옮긴 뒤, 피드백을 검토하고 내 최종안을 결정합니다.</p>
+              <p className="mt-1 text-sm leading-6 text-[#635E52]">아래 상황의 원문을 직접 옮긴 뒤, AI 피드백을 검토하고 내 확정안을 결정합니다.</p>
             </li>
           </ol>
         )}
@@ -509,9 +509,9 @@ function ContextCard({ context, headerRight, title = "상황" }: {
       {!compact && (
         <div className="mt-2 flex flex-wrap gap-1.5">
           {[
-            ["상대적 지위", context.pdr.p],
-            ["친숙도", context.pdr.d],
-            ["부담", context.pdr.r.replace(/^부담\s*/, "")],
+            ["상대적 권력", context.pdr.p],
+            ["사회적 거리", context.pdr.d],
+            ["행위 부담도", context.pdr.r.replace(/^부담\s*/, "")],
           ].map(([label, value]) => (
             <span key={label} className="rounded-full border border-[#E2DCCB] bg-white px-2.5 py-1 text-xs font-bold text-[#5C574C]">
               {label} · {value}
@@ -789,7 +789,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
         <p className="sr-only" aria-live="polite">
           {judgmentShown
-            ? `${judgmentOk ? "맞았습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
+            ? `${judgmentOk ? "기준 판단과 같습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
@@ -804,7 +804,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
-        {answered && quest.revisionExamples && <ReferenceExamples title="가능한 수정 예시" items={quest.revisionExamples} font="font-zh" />}
+        {answered && quest.revisionExamples && <ReferenceExamples title="참고 표현" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
@@ -1205,7 +1205,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   );
 }
 /** 학습자에게 보이는 피드백 기준 세 가지. 쓰기 전에도 같은 이름으로 미리 알린다. */
-const FEEDBACK_CRITERIA_LABELS = ["의미 충실성", "문법 정확성", "화용적 적절성"] as const;
+const FEEDBACK_CRITERIA_LABELS = ["의미적 충실성", "문법적 정확성", "화용적 적절성"] as const;
 
 /**
  * 빈칸은 기준 문장보다 딱 한 줄만 크다. 크게 벌어진 칸은 「이만큼 써야 한다」로 읽힌다.
@@ -1336,7 +1336,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
   const criteria: FeedbackCriterion[] = [
     {
       key: "meaning",
-      label: "의미 충실성",
+      label: "의미적 충실성",
       question: "뜻이 제대로 전달됐나요?",
       level: meaningOk ? "very_good" : "required",
       body: meaningOk
@@ -1345,7 +1345,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
     },
     {
       key: "language",
-      label: "문법 정확성",
+      label: "문법적 정확성",
       question: "중국어 표현에 문법적인 문제가 없나요?",
       level: languageLevel,
       body: languageLevel === "very_good"
@@ -1390,7 +1390,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
   };
 }
 
-const FIDELITY_FIRST_NOTE = "의미 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.";
+const FIDELITY_FIRST_NOTE = "의미적 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.";
 
 function feedbackLevel(ok: boolean, warning = false): FeedbackLevel {
   return ok ? "very_good" : warning ? "recommend" : "required";
@@ -1420,7 +1420,7 @@ export function evaluationFromRuntimeFeedback(
   const criteria: FeedbackCriterion[] = [
     {
       key: "meaning",
-      label: "의미 충실성",
+      label: "의미적 충실성",
       question: "뜻이 제대로 전달됐나요?",
       level: meaningLevel,
       body: feedback.blocks.meaning_ko || (meaningLevel === "very_good"
@@ -1429,7 +1429,7 @@ export function evaluationFromRuntimeFeedback(
     },
     {
       key: "language",
-      label: "문법 정확성",
+      label: "문법적 정확성",
       question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`,
       level: grammarLevel,
       // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
@@ -1479,8 +1479,8 @@ function unavailableRuntimeEvaluation(
   return {
     available: false,
     criteria: [
-      { key: "meaning", label: "의미 충실성", question: "뜻이 제대로 전달됐나요?", level: "recommend", body },
-      { key: "language", label: "문법 정확성", question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`, level: "recommend", body },
+      { key: "meaning", label: "의미적 충실성", question: "뜻이 제대로 전달됐나요?", level: "recommend", body },
+      { key: "language", label: "문법적 정확성", question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`, level: "recommend", body },
       { key: "pragmatics", label: "화용적 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
     ],
     headline: "자동 피드백을 불러오지 못했습니다.",
@@ -1688,7 +1688,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const previewEvaluation = useMemo<DctEvaluation>(() => localPilot ? {
     // Authored display guidance only. Never inspect the answer or persist this as an evaluation.
     available: false,
-    criteria: [{ key: "meaning", label: "의미 충실성", question: "원문의 내용과 확정성을 유지했나요?", level: "recommend", body: quest.feedback.action }],
+    criteria: [{ key: "meaning", label: "의미적 충실성", question: "원문의 내용과 확정성을 유지했나요?", level: "recommend", body: quest.feedback.action }],
     headline: "원문과 비교해 내 번역을 확인해 보세요.",
     body: quest.feedback.action,
     feedback: quest.feedback.action,
@@ -1879,7 +1879,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "다시 다듬기"}</p>
-                    <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? "최종안을 확정하세요." : "피드백을 참고해 다시 써보세요."}</h2>
+                    <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? "확정안을 결정하세요." : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
                   {!recheckRequested && <DemoFillButton />}
                 </div>
@@ -1889,12 +1889,12 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
                 )}
-                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "확정안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
                 {recheckRequested && <p className="mt-2 text-[12.5px] leading-5 text-[#6D7788]">추가 수정에는 AI 피드백을 다시 실행하지 않습니다. 최종 표현은 직접 결정하세요.</p>}
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 확정하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 확정하기" : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? `이 ${outputName}으로 확정하기` : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? `이 ${outputName}으로 확정하기` : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
                     <Button variant="outline" className="h-11 w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 첫 {outputName} 유지하기</Button>
@@ -2419,7 +2419,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
           );
         })}
       </ol>
-      <p className="mt-3 text-[13px] text-[#6A7485]">{outputName} 최초안·최종안은 위 완성 카드에 있습니다.</p>
+      <p className="mt-3 text-[13px] text-[#6A7485]">최초 {outputName}·최종 {outputName}은 위 완성 카드에 있습니다.</p>
     </section>
   );
 }
@@ -3065,7 +3065,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <h1 className="text-2xl font-black">학습 미션 완료</h1>
-              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 최종안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 최초안을 확정했습니다."}</p>
+              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? "AI 피드백을 참고해 한 번 더 다듬어 확정안을 결정했습니다." : "AI 피드백을 확인하고, 내 판단으로 초안을 그대로 확정했습니다."}</p>
             </section>
             <div className="space-y-4">
               <CompletionRecord

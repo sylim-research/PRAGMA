@@ -63,7 +63,7 @@ describe("demo route", () => {
     fireEvent.click(await screen.findByRole("button", { name: "수정하기" }));
     fireEvent.click(screen.getByRole("button", { name: "답안 자동 채우기" }));
     fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
-    fireEvent.click(await screen.findByRole("button", { name: /최종안 확정하기/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /이 번역으로 확정하기/ }));
     expect(await screen.findByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
     expect(screen.queryByRole("link", { name: "나의 학습 기록 보기" })).not.toBeInTheDocument();
@@ -140,7 +140,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     // Stage 4: final confirmation and save.
     click("수정안 제출하기");
     await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
-    click("최종안 확정하기");
+    click("이 번역으로 확정하기");
     expect(await screen.findByRole("heading", { name: /학습 미션 완료/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     const [input] = vi.mocked(saveMissionAttempt).mock.calls[0];
@@ -240,7 +240,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
       await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
     }
-    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : "최종안 확정하기" }));
+    fireEvent.click(screen.getByRole("button", { name: alternate === reference ? `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` : `이 ${mode === "translation" ? "번역" : "통역"}으로 확정하기` }));
     expect(await screen.findByRole("heading", { name: /학습 미션 완료/ })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "답안 자동 채우기" })).not.toBeInTheDocument();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
@@ -311,9 +311,9 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(await screen.findByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "적절성 판단하기" })).not.toBeInTheDocument();
     expect(screen.getByText(SAMPLE_MISSION_V5.mpj_items[0].situation_ko)).toBeInTheDocument();
-    expect(screen.getByText(/^상대적 지위 · /)).toBeInTheDocument();
-    expect(screen.getByText(/^친숙도 · /)).toBeInTheDocument();
-    expect(screen.getByText(/^부담 · /)).toBeInTheDocument();
+    expect(screen.getByText(/^상대적 권력 · /)).toBeInTheDocument();
+    expect(screen.getByText(/^사회적 거리 · /)).toBeInTheDocument();
+    expect(screen.getByText(/^행위 부담도 · /)).toBeInTheDocument();
     expect(fetchMissionByScenario).toHaveBeenCalledWith(scenarioId, { includeV6: true });
   });
 
@@ -398,13 +398,13 @@ describe("CanonicalMissionRun live CTA route", () => {
   it("학습자 원포인트는 심각도와 무관하게 의미→언어→화용 순서의 첫 보완 항목이다", () => {
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "recommend", body: "의미 먼저" },
-      { key: "language", label: "문법 정확성", question: "", level: "very_good", body: "언어" },
+      { key: "language", label: "문법적 정확성", question: "", level: "very_good", body: "언어" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "meaning", body: "의미 먼저" });
 
     expect(primaryFeedbackCriterion([
       { key: "meaning", label: "의미 전달", question: "", level: "very_good", body: "의미" },
-      { key: "language", label: "문법 정확성", question: "", level: "required", body: "언어 먼저" },
+      { key: "language", label: "문법적 정확성", question: "", level: "required", body: "언어 먼저" },
       { key: "pragmatics", label: "화용 적절성", question: "", level: "required", body: "화용" },
     ])).toMatchObject({ key: "language", body: "언어 먼저" });
   });

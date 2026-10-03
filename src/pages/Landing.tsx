@@ -69,7 +69,7 @@ const Landing = () => {
                 「원문의 의미와 화행 목적을 유지하면서」로 늘리는 안은 기각 — 1행이 568.5px가
                 되어 폭(489px)을 80px 넘고, 3행에 짧은 꼬리가 남는다(2026-09-17 실측). */}
             <span className="block">
-              PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
+              PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하면서,
             </span>
             <span className="block">
               관계·상황에 맞는 표현을 판단하고 직접 통번역하는 학습 플랫폼입니다.
@@ -100,7 +100,7 @@ const Landing = () => {
             </span>
             <span className="mt-2.5 break-keep text-[13.5px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
               관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
-              AI 피드백을 참고해 표현을 검토한 뒤, 최종안을 결정합니다.
+              AI 피드백을 참고해 표현을 검토한 뒤, 확정안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}

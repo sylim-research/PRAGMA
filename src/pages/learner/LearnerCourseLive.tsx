@@ -98,7 +98,7 @@ const LearnerCourseLive = () => {
                 const title = weekHeading(week);
                 const savedGoal = week.can_do[0];
                 const goal = week.speech_act === "request" && (!savedGoal || savedGoal === "부탁을 부드럽고 분명하게 말하기")
-                  ? `원문의 요청 의도를 유지하면서 상황과 상대에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
+                  ? `원문의 요청 의도를 유지하면서 관계와 상황에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
                   : savedGoal;
                 const weekPath = `/learner/course/${courseId}/week/${week.week_no}`;
                 const modes = week.expected_mission_modes ?? expectedMissionModesForWeek({
@@ -128,7 +128,7 @@ const LearnerCourseLive = () => {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className={`block break-keep leading-5 ${expanded ? "text-[17px] font-semibold" : "text-[14px] font-medium"}`}>{title}</span>
-                          {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습목표 · {goal}</span>}
+                          {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습 목표 · {goal}</span>}
                         </span>
                         <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#969E9E]"}`} />
                       </button>

@@ -83,7 +83,7 @@ const Privacy = () => {
             </p>
             <p>
               <strong className="font-semibold text-[#15202B]">학습 수행 기록</strong> — 미션
-              수행 이력, 판단 과제 응답, 산출물과 피드백, 이의와 수정 기록.
+              수행 이력, MJT 응답, 통번역 산출과 AI 피드백, 학습자 의견과 수정 기록.
             </p>
             <p className="text-[#8A8578]">주민등록번호·연락처 등 개인 정보는 수집하지 않습니다.</p>
           </Row>
@@ -107,7 +107,7 @@ const Privacy = () => {
               <strong className="font-semibold text-[#15202B]">Supabase</strong>(데이터베이스·인증)
               · <strong className="font-semibold text-[#15202B]">Railway</strong>(배포) ·{" "}
               <strong className="font-semibold text-[#15202B]">OpenAI·Anthropic</strong>(콘텐츠
-              생성·검수) · <strong className="font-semibold text-[#15202B]">ElevenLabs</strong>(음성
+              생성·AI 검토) · <strong className="font-semibold text-[#15202B]">ElevenLabs</strong>(음성
               합성)를 이용합니다.
             </p>
           </Row>
@@ -119,9 +119,9 @@ const Privacy = () => {
             </p>
           </Row>
 
-          <Row no="06" title="연구윤리">
+          <Row no="06" title="연구 윤리">
             <p>
-              연구윤리 심의 여부와 승인 정보는 확정 후 이 항에 명시합니다.
+              연구 윤리 심의 여부와 승인 정보는 확정 후 이 항에 명시합니다.
               <Pending />
             </p>
           </Row>
