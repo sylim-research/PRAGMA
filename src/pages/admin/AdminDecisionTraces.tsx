@@ -205,88 +205,73 @@ const IndividualRecords = () => {
   return (
     <>
       {!loading && !error && rows.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-end gap-2 xl:flex-nowrap">
-          <label className="text-xs font-medium text-muted-foreground">
-            학습자
-            <select
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <select
               aria-label="학습자 필터"
               value={filters.query}
               onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
-              className={`mt-1 block w-36 font-normal text-foreground ${selectClass}`}
+              className={`block w-36 font-normal text-foreground ${selectClass}`}
             >
-              <option value="">전체</option>
+              <option value="">학습자 전체</option>
               {learnerNames.map((name) => (
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            교과목
-            <select
+                      <select
               aria-label="교과목 필터"
               value={filters.courseId}
               disabled={courses.length === 0}
               onChange={(event) => setFilters((current) => ({ ...current, courseId: event.target.value }))}
-              className={`mt-1 block w-52 font-normal text-foreground ${selectClass}`}
+              className={`block w-52 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">교과목 전체</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>{course.title}</option>
               ))}
               <option value="unknown">교과목 미상</option>
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            주차
-            <select
+                      <select
               aria-label="주차 필터"
               value={filters.weekNo}
               onChange={(event) => setFilters((current) => ({ ...current, weekNo: event.target.value }))}
-              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
+              className={`block w-24 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">주차 전체</option>
               {Array.from({ length: 15 }, (_, index) => index + 1).map((week) => (
                 <option key={week} value={week}>{week}주차</option>
               ))}
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            화행
-            <select
+                      <select
               aria-label="화행 필터"
               value={filters.speechAct}
               onChange={(event) => setFilters((current) => ({ ...current, speechAct: event.target.value }))}
-              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
+              className={`block w-24 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">화행 전체</option>
               {speechActs.map((act) => (
                 <option key={act} value={act}>{SPEECH_ACT_UI[act as SpeechActUI] ?? act}</option>
               ))}
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            완료 여부
-            <select
+                      <select
               aria-label="완료 여부 필터"
               value={filters.completion}
               onChange={(event) =>
                 setFilters((current) => ({ ...current, completion: event.target.value as MissionLogFilters["completion"] }))
               }
-              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
+              className={`block w-32 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">완료·진행 전체</option>
               <option value="completed">완료</option>
               <option value="in_progress">진행 중</option>
             </select>
-          </label>
-          <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
+          <label className="ml-auto flex h-9 items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
             <input
               type="checkbox"
               checked={includeTestRecords}
               onChange={(event) => setIncludeTestRecords(event.target.checked)}
               className="accent-[#1F3A5F]"
             />
-            관리자 테스트 기록 포함 ({testRecordCount})
+            테스트 기록 포함 ({testRecordCount})
           </label>
           {filtered && (
             <button
@@ -347,7 +332,7 @@ const IndividualRecords = () => {
                 <th className="px-3 py-2 font-medium">교과목·주차</th>
                 <th className="px-3 py-2 font-medium">수행 방식</th>
                 <th className="px-3 py-2 font-medium">상태</th>
-                <th className="px-3 py-2 text-right font-medium">내용</th>
+                <th className="px-3 py-2 text-right font-medium"><span className="sr-only">내용</span></th>
               </tr>
             </thead>
             <tbody>
@@ -360,7 +345,7 @@ const IndividualRecords = () => {
                   <Fragment key={row.id}>
                     <tr className="border-t border-border">
                       <td className="whitespace-nowrap px-3 py-2 text-[13px] tabular-nums text-[#46515A]">{fmtKst(row.updated_at)}</td>
-                      <td className="px-3 py-2" title={row.profiles?.email ?? undefined}>
+                      <td className="whitespace-nowrap px-3 py-2" title={row.profiles?.email ?? undefined}>
                         {learnerLabel(row)}
                       </td>
                       <td className="whitespace-nowrap px-3 py-2">{speechActLabel(row.speech_act)}</td>
@@ -394,7 +379,7 @@ const IndividualRecords = () => {
                     </tr>
                     {open && (
                       <tr className="border-t border-border bg-background">
-                        <td colSpan={8} className="px-3 py-3">
+                        <td colSpan={8} className="px-5 pb-5 pt-1">
                           <DetailPanel row={row} mission={missionContents.get(row.mission_id)} placement={placement} />
                         </td>
                       </tr>

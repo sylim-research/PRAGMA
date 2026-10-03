@@ -1,4 +1,4 @@
-// 학습 수행 기록 「보기」 — 한 번의 수행을 ①상황 → ②MJT → ③통번역 과제 → ④이견 순서의 흐름으로 그린다.
+// 학습 수행 기록 「보기」 — 한 번의 수행을 원문·상황 → MJT → 통번역 과제 → 이견 순서의 구획으로 읽게 한다.
 // 학습자가 실제로 고른·쓴 값은 남색 테두리로 표시해, 제시된 내용과 학습자의 응답이 한눈에 갈리게 한다.
 import type { ReactNode } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
@@ -6,21 +6,15 @@ import type { LearningRecordDetail, RecordChoice } from "@/lib/admin/learningRec
 
 const NAVY = "#1F2A44";
 
-function Step({ no, title, last = false, children }: { no: number; title: string; last?: boolean; children: ReactNode }) {
+function Section({ title, aside, children }: { title: string; aside?: ReactNode; children: ReactNode }) {
   return (
-    <li className="relative flex gap-4">
-      {!last && <span aria-hidden className="absolute left-[13px] top-8 bottom-0 w-px bg-[#E2DED2]" />}
-      <span
-        className="relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white"
-        style={{ background: NAVY }}
-      >
-        {no}
-      </span>
-      <div className="min-w-0 flex-1 pb-6">
-        <h3 className="mb-2 text-[15px] font-bold leading-7 text-[#15202B]">{title}</h3>
-        {children}
-      </div>
-    </li>
+    <section className="border-t border-[#ECE8DD] py-4 first:border-t-0 first:pt-2">
+      <h3 className="mb-2.5 flex flex-wrap items-baseline gap-x-2 text-[14px] font-bold text-[#15202B]">
+        {title}
+        {aside && <span className="text-xs font-semibold text-[#6B645A]">{aside}</span>}
+      </h3>
+      {children}
+    </section>
   );
 }
 
@@ -69,21 +63,21 @@ function Flow({ children }: { children: ReactNode[] }) {
 
 export function LearningRecordDetailView({ detail }: { detail: LearningRecordDetail }) {
   const { context, mjt, task, dissent, meta } = detail;
-  const steps: Array<{ title: string; body: ReactNode }> = [];
+  const steps: Array<{ title: string; aside?: ReactNode; body: ReactNode }> = [];
 
   steps.push({
-    title: "관계·상황과 원문",
+    title: "원문과 관계·상황",
+    aside: context.mode,
     body: (
-      <div className="grid gap-2 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-        <Box className="bg-[#FBF5E6]">
-          {context.relation && (<><Caption>관계</Caption><p className="text-sm">{context.relation}</p></>)}
-          {context.situation && (<div className="mt-2"><Caption>상황</Caption><p className="text-sm leading-relaxed">{context.situation}</p></div>)}
-          {context.mode && <p className="mt-2 text-xs font-semibold" style={{ color: NAVY }}>{context.mode}</p>}
-        </Box>
+      <div className="space-y-2.5">
         <Box>
           <Caption>{context.sourceLabel}</Caption>
           <p className="text-sm leading-relaxed">{context.source ?? "—"}</p>
         </Box>
+        <dl className="grid gap-x-4 gap-y-1 px-1 text-[13px] leading-relaxed text-[#46515A] sm:grid-cols-[3rem_minmax(0,1fr)]">
+          {context.relation && (<><dt className="font-semibold text-[#6B645A]">관계</dt><dd>{context.relation}</dd></>)}
+          {context.situation && (<><dt className="font-semibold text-[#6B645A]">상황</dt><dd>{context.situation}</dd></>)}
+        </dl>
       </div>
     ),
   });
@@ -126,7 +120,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
             <Caption>초안</Caption>
             <p className="text-sm leading-relaxed">{task.first ?? "—"}</p>
           </Box>,
-          <Box key="feedback" className="h-full bg-[#FBF5E6]">
+          <Box key="feedback" className="h-full bg-[#FAF8F3]">
             <Caption>AI 피드백</Caption>
             {task.feedback.length > 0
               ? task.feedback.map((line) => <p key={line} className="text-[13px] leading-relaxed">{line}</p>)
@@ -162,16 +156,14 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
   }
 
   return (
-    <div className="rounded-lg border border-[#E2DED2] bg-[#FFFDF8] p-4">
-      <ol>
-        {steps.map((step, index) => (
-          <Step key={step.title} no={index + 1} title={step.title} last={index === steps.length - 1}>
-            {step.body}
-          </Step>
-        ))}
-      </ol>
+    <div>
+      {steps.map((step) => (
+        <Section key={step.title} title={step.title} aside={step.aside}>
+          {step.body}
+        </Section>
+      ))}
       {meta.length > 0 && (
-        <p className="border-t border-[#E2DED2] pt-2 text-xs tabular-nums text-[#6B645A]">{meta.join("  ·  ")}</p>
+        <p className="border-t border-[#ECE8DD] pt-2 text-xs tabular-nums text-[#8A8478]">{meta.join("  ·  ")}</p>
       )}
     </div>
   );
