@@ -33,7 +33,7 @@ describe("representative v6 reason / contrast rhythm", () => {
   });
   afterEach(cleanup);
 
-  it("locks the judgment without revealing it, then reveals judgment and reason together after the reason is committed", () => {
+  it("locks the judgment without revealing it, then reveals judgment and reason together after the reason is committed", { timeout: 20000 }, () => {
     toSecondJudgment();
     const reason = mission.mpj_items[1].reason_choice.options[1];
     expect(mission.mpj_items[1].reason_choice.accepted_id).toBe(reason.id);

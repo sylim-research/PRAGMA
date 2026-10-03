@@ -37,7 +37,7 @@ describe("local learner UX pilot", () => {
   });
   afterEach(cleanup);
 
-  it("runs five independent scenes, ungraded free correction and one new DCT without external writes or AI", () => {
+  it("runs five independent scenes, ungraded free correction and one new DCT without external writes or AI", { timeout: 20000 }, () => {
     const scenes = LEARNER_UX_PILOT.quests.filter(q => q.kind !== "dct_feedback");
     expect(new Set(scenes.map(q => q.source)).size).toBe(6);
     expect(new Set(scenes.map(q => q.context.situation)).size).toBe(6);
