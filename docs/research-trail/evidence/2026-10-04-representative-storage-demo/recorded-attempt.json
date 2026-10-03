@@ -1,0 +1,101 @@
+{
+  "note": "2026-10-04 01:24–01:27 KST 연구자가 학습자 계정으로 운영 수업 경로(「AI 한중 화용 통번역」 2주차 첫 슬롯)에서 수행한 한 번의 시험 수행. learner_mission_events·learner_mission_logs에서 추출했으며 개인 식별자(profile_id·auth_user_id)는 뺐다. 결과를 고르기 위해 다시 돌리지 않았다. 독립 학습자 자료가 아니다.",
+  "extracted_at": "2026-10-04",
+  "attempt_id": "fe5051ac-7819-4d36-88d5-b3b7b629264d",
+  "mission_log_id": "6fc92f6e-4efd-42f0-a1fd-91fc5da617f6",
+  "scenario_id": "24fb6841-6868-4e14-8e54-4e946466dc8e",
+  "lineage_version_id": "93559b05-3c36-452e-b38a-bbf4964a8006",
+  "content_hash": "0024c9117662c674380b461cd7825e44704166577de73d752f58fa65e86a063b",
+  "course_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+  "week_no": 2,
+  "assignment_id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+  "events": {
+    "first_response_submitted": "ce43adc8-0a36-4fa2-a6a1-fe49097e8fdc",
+    "feedback_received": "64a009c6-9e55-4504-b945-35d298c1601d",
+    "revision_submitted": "69d7e058-5bf2-465c-94e6-99f28659947b",
+    "mission_completed": "cbb7a7ae-13a8-41e4-825f-13aa61921c75"
+  },
+  "mjt_responses_of_this_attempt": {
+    "A1": { "pick": "very_appropriate" },
+    "A2": { "pick": "very_appropriate", "reasonId": "request-and-deadline" },
+    "A5": { "candidateJudgments": { "A5-0": "too_direct", "A5-1": "appropriate", "A5-2": "appropriate", "A5-3": "too_direct" } },
+    "A3": { "correctionIds": ["A3-1"] },
+    "A4": { "revisedText": "明天我下课晚，彩排能从七点推迟到七点半吗？" }
+  },
+  "first_response": "您好，这个周末我不在家，送到门口的快递就麻烦您帮我保管一下了，我周日晚上回来拿。谢谢您。",
+  "revised_response": "您好，这个周末我不在家，快递已经送到门口了。我周日晚上回来，在那之前能麻烦您帮我暂时保管一下吗？给您添麻烦了，非常感谢！",
+  "feedback_rounds": [
+    {
+      "round": 1,
+      "answer": "您好，这个周末我不在家，送到门口的快递就麻烦您帮我保管一下了，我周日晚上回来拿。谢谢您。",
+      "feedback": {
+        "blocks": {
+          "grammar": [],
+          "feature_ko": "요청이 '麻烦您帮我保管一下了'로 직접적이고 단정적으로 표현되어, 상대에게 선택권이나 완화된 여지를 충분히 주지 못하는 점이 있습니다. 이 상황에서는 좀 더 완화적이고 선택권을 남기는 표현을 검토할 필요가 있습니다.",
+          "meaning_ko": "원문의 핵심 내용인 주말 부재, 택배 도착, 일요일 저녁에 돌아와서 찾겠다는 사실이 모두 전달되었습니다. 추가적인 사실이나 조건이 들어가지 않아 의미가 잘 보존되었습니다.",
+          "alternatives": [
+            {
+              "text": "您好，这个周末我不在家，送到门口的快递能不能麻烦您帮我保管一下？我周日晚上回来拿。谢谢您。",
+              "note_ko": "요청을 의문형으로 바꿔 상대의 선택권을 더 명확히 남긴 최소대조안입니다."
+            }
+          ],
+          "discourse_ko": "전체 문장이 자연스럽게 연결되어 있으며, 상황 설명과 요청, 감사 인사가 잘 어우러져 있습니다.",
+          "offfocus_warnings": []
+        },
+        "verdicts": {
+          "semantic_fidelity": "preserved",
+          "grammatical_accuracy": "clean",
+          "pragmatic_appropriateness": {
+            "band_code": "too_direct",
+            "feature_code": "request_mitigation_optionality"
+          }
+        },
+        "provenance": {
+          "model": "gpt-4.1-mini",
+          "generated_at": "2026-10-03T16:26:32.053Z",
+          "prompt_version": "feedback_v1_minidiscourse_v6_concise"
+        },
+        "revision_scope": "feature",
+        "rubric_version": "request_mitigation_optionality@1.1",
+        "schema_version": "feedback_v1",
+        "uncertainty_flags": []
+      }
+    },
+    {
+      "round": 2,
+      "answer": "您好，这个周末我不在家，快递已经送到门口了。我周日晚上回来，在那之前能麻烦您帮我暂时保管一下吗？给您添麻烦了，非常感谢！",
+      "feedback": {
+        "blocks": {
+          "grammar": [],
+          "feature_ko": "요청이 직접적이면서도 '能麻烦您帮我…吗' 표현으로 상대에게 선택권과 완화된 부탁의 뉘앙스를 적절히 남겨 상황에 알맞게 실현되었을 수 있습니다.",
+          "meaning_ko": "원문의 핵심 내용인 주말 부재, 택배 도착, 일요일 저녁 귀가 예정, 그때까지 잠시 보관 요청, 감사 표현이 모두 잘 전달되었습니다.",
+          "alternatives": [
+            {
+              "text": "您好，这个周末我不在家，快递已经送到门口了。我周日晚上回来，在那之前您能帮我暂时保管一下吗？给您添麻烦了，非常感谢！",
+              "note_ko": "'能麻烦您帮我…吗' 대신 '您能帮我…吗'로 요청을 약간 더 직접적으로 표현한 예입니다."
+            }
+          ],
+          "discourse_ko": "전체 문장이 자연스럽게 연결되어 상황 설명과 요청, 감사가 매끄럽게 표현되었습니다.",
+          "offfocus_warnings": []
+        },
+        "verdicts": {
+          "semantic_fidelity": "preserved",
+          "grammatical_accuracy": "clean",
+          "pragmatic_appropriateness": {
+            "band_code": "within_band",
+            "feature_code": "request_mitigation_optionality"
+          }
+        },
+        "provenance": {
+          "model": "gpt-4.1-mini",
+          "generated_at": "2026-10-03T16:26:52.698Z",
+          "prompt_version": "feedback_v1_minidiscourse_v6_concise"
+        },
+        "revision_scope": "clear",
+        "rubric_version": "request_mitigation_optionality@1.1",
+        "schema_version": "feedback_v1",
+        "uncertainty_flags": []
+      }
+    }
+  ]
+}

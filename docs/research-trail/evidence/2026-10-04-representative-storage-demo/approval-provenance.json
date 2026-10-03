@@ -1,0 +1,40 @@
+{
+  "scenario_id": "24fb6841-6868-4e14-8e54-4e946466dc8e",
+  "title": "옆집 이웃에게 택배 보관을 부탁하는 글 메시지",
+  "version_id": "93559b05-3c36-452e-b38a-bbf4964a8006",
+  "version_no": 2,
+  "parent_version_id": "52e89518-b36c-43d9-bab2-f09778b90542",
+  "mission_content_hash": "0024c9117662c674380b461cd7825e44704166577de73d752f58fa65e86a063b",
+  "supersedes_scenario_id": "95209155-0067-44f3-a01d-81378939584f",
+  "review_id": "c0ae6bad-e5fd-43d2-b7af-bbce1e3b2342",
+  "review_hash": "b1d194e5d481dd8add66ea499252fdd702eb0973e998991e8456f81a988a6b4f",
+  "rules": {
+    "verdict": "pass",
+    "findings": [],
+    "summary_ko": "현재 저장 미션에 기존 구조·형식 규칙 적용"
+  },
+  "openai_review": {
+    "model": "gpt-4.1-2025-04-14",
+    "checked_at": "2026-10-02T07:00:29.061Z",
+    "result": {
+      "verdict": "pass",
+      "findings": [],
+      "summary_ko": "옆집 이웃에게 택배 보관을 부탁하는 상황은 현실적이고, 관계·사건·부담·표현 모두 기준에 부합합니다. PDR, 상황 설명, 요청 내용, 선택권 남김 등도 적절하게 구현되어 있습니다. 미션 전체와 각 문항, 예시, 설명, 기준이 일관되게 설계되어 있습니다."
+    }
+  },
+  "approved_at": "2026-10-02T07:07:12.23115+00:00",
+  "professor_note": "2026-10-02 연구자가 MJT2 문항과 DCT 택배 보관 장면 수정본을 채택하고 직접 승인함. 직전 승인본(scenario 95209155, version b365963a) 대비 변경은 MJT2·핵심 정리 2번·DCT에 한정되며 최종화 전후 학습 콘텐츠 변화 0건. focused_v1 규칙·OpenAI(gpt-4.1) 검토 PASS, 지적 0. item_lineage는 모델(gpt-4.1-mini)이 다시 산출한 귀속 후보(model_attribution_pending_review)이며, ILC-001(把…吧 명령형 위험)과 ILC-002(learner_verbosity)는 콘텐츠 판단으로 채택하지 않음. 과거 승인·검토·A/B 피드백은 승계하지 않음. 새 DCT의 수행·피드백 증거는 아직 없음.",
+  "week2_primary_assignment": {
+    "assignment_id": "9a44e362-8bed-4a40-9d65-f50961e3a026",
+    "outline_id": "915fec24-cc38-4b00-a2a0-c3628abcd3f7",
+    "week_no": 2,
+    "swapped_at": "2026-10-02T07:41:10.621027+00:00"
+  },
+  "live_db_check": {
+    "checked_at": "2026-10-04",
+    "canonical_sha256_of_mission_content": "681f34abae983d49fe569dd922e5c084261de31c9f29652009009aafe4e11392",
+    "note": "운영 scenarios 행과 이 파일의 mission_content가 정규화 JSON 기준으로 동일함을 확인."
+  },
+  "source_package": "Documents/Codex/2026-10-02/representative-dct-storage-revision (work/registration·review·approval·assignment 결과, outputs/PROFESSOR_NOTE.txt)",
+  "revision_rationale": "Documents/Codex/2026-10-03/new-chat-3/outputs/CLAUDE_대표미션_수정경위_핵심기록.txt"
+}

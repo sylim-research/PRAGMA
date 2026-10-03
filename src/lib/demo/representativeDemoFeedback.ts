@@ -1,96 +1,99 @@
 // 대표 미션 시연(모델 하우스)의 DCT 예시 답안과 피드백. 시연은 AI를 호출하지 않는다.
-// 1차·2차 모두 2026-09-28 운영 수업 경로의 한 번의 연구자 시험 수행(attempt 41fb9065-a621-41b0-8d14-7c030b5b04d1)에서
-// 실제 AI(gpt-4.1-mini)가 최초안 A와 수정안 B에 돌려준 피드백 원문이다(learner_mission_events feedback_received).
-// 같은 수행의 MJT 응답·A·B는 아래 시연 답안과 같다. 결과를 고르기 위해 다시 돌리지 않았다.
+// 1차·2차 모두 2026-10-04 운영 수업 경로의 한 번의 연구자 시험 수행(attempt fe5051ac-7819-4d36-88d5-b3b7b629264d,
+// 승인본 24fb6841 v2 · hash 0024c911…)에서 실제 AI(gpt-4.1-mini)가 초안과 수정안에 돌려준 피드백 원문이다
+// (learner_mission_events feedback_received 64a009c6-9e55-4504-b945-35d298c1601d). 결과를 고르기 위해 다시 돌리지 않았다.
+// 원자료: docs/research-trail/evidence/2026-10-04-representative-storage-demo/recorded-attempt.json
 
 import { FeedbackSchema, type RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
 import type { FeedbackRequestResult } from "@/lib/mission/missionFeedback";
 
 /**
- * 시연 학습자의 MJT 답안(2026-09-28 연구자 판정). 전부 정답이면 실제 학습 체험이 보이지 않으므로
- * 해설이 확실한 두 자리만 의도적으로 틀린다(2026-09-28 연구자 재판정: 화면 4번 수정안 고르기는 정답).
- * 원어민(DeepSeek) 무정답 판정이 정답 키와 모두 일치했다.
- * - A2 추천서: 「다소 적절」 + 「요청 내용과 시점이 분명」 — 就交给您写了의 수락 전제를 놓침
- * - A5 포스터 원본(화면상 세 번째): 표현 1(能…发给我吗？)을 「너무 직접적」으로 봄 — 麻烦가 없으면 무례하다는 과잉 공손 오판.
- *   원어민 판정은 「매우 적절」이다.
- * - A4 리허설: 2026-09-26 운영 확인의 실제 연구자 수정문
- * 나머지(A1·A5)는 기준 답안을 쓴다.
+ * 시연 학습자의 MJT 답안 — 연구자가 구성한 시연 응답이다(2026-10-04, GPT 프로젝트 설계안 채택). 실제 학습자 자료가 아니며,
+ * 아래 DCT 기록을 남긴 수행의 MJT 응답과도 다르다(그 수행의 응답은 증거 파일 mjt_responses_of_this_attempt에 보존).
+ * 채점되는 8자리 = 기준과 같음 6 · 허용 판단 1 · 기준과 다름 1.
+ * - A1 단일 표현 판단: 「다소 적절」 — 기준 판단(매우 적절)과 다르지만 허용 판단. 허용 판단 꼬리표의 의미를 실제 선택으로 보여 준다.
+ * - A2 판단과 이유: 「다소 부적절」 + 「일을 맡기는 방식」 — 판단·이유 모두 기준과 같음.
+ * - A5 복수 표현 비교(화면상 세 번째): 표현 1(能…吗？)만 「너무 직접적」 — 유일한 오판. 麻烦您 같은 추가 완화 표지가 없다고
+ *   과잉 판단한 경우를 해설이 바로잡는다. 표현 2·3·4는 기준 판단.
+ * - A3 수정안 선택: 기준 선택(想麻烦您帮我核实一下) — 항목을 두지 않으면 기준 답을 쓴다.
+ * - A4 직접 수정(채점 없음): 참고 표현을 그대로 베끼지 않은 자연스러운 다른 수정.
  */
 export const DEMO_MJT_ANSWERS: Record<string, { pick?: string; reasonId?: string; text?: string; candidatePicks?: Record<string, string> }> = {
-  A2: { pick: "somewhat_appropriate", reasonId: "request-and-deadline" },
+  A1: { pick: "somewhat_appropriate" },
+  A2: { pick: "somewhat_inappropriate", reasonId: "assumed-acceptance" },
   A5: { candidatePicks: { "A5-0": "too_direct" } },
-  A4: { text: "我下课晚，明天的彩排能从七点推迟到七点半吗？" },
+  A4: { text: "明天我下课比较晚，彩排从七点改到七点半，可以吗？" },
 };
 
-export const DEMO_FIRST_DRAFT = "您好，这个周末我有急事要出门，送到我家的快递就麻烦您帮我收一下了。谢谢您。";
-export const DEMO_REVISED_DRAFT = "您好，这个周末我有急事要出门。如果方便的话，能不能麻烦您帮我收一下送到我家的快递？非常感谢！";
+export const DEMO_FIRST_DRAFT = "您好，这个周末我不在家，送到门口的快递就麻烦您帮我保管一下了，我周日晚上回来拿。谢谢您。";
+export const DEMO_REVISED_DRAFT = "您好，这个周末我不在家，快递已经送到门口了。我周日晚上回来，在那之前能麻烦您帮我暂时保管一下吗？给您添麻烦了，非常感谢！";
 
-/** 최초안 A에 돌아온 실제 피드백(too_direct). 가상 학급 데모도 이 기록만 쓴다. */
+/** 초안에 돌아온 실제 1차 AI 피드백(too_direct). 가상 학급 데모도 이 기록만 쓴다. */
 export const RECORDED_FIRST_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
   "blocks": {
+    "grammar": [],
+    "feature_ko": "요청이 '麻烦您帮我保管一下了'로 직접적이고 단정적으로 표현되어, 상대에게 선택권이나 완화된 여지를 충분히 주지 못하는 점이 있습니다. 이 상황에서는 좀 더 완화적이고 선택권을 남기는 표현을 검토할 필요가 있습니다.",
+    "meaning_ko": "원문의 핵심 내용인 주말 부재, 택배 도착, 일요일 저녁에 돌아와서 찾겠다는 사실이 모두 전달되었습니다. 추가적인 사실이나 조건이 들어가지 않아 의미가 잘 보존되었습니다.",
     "alternatives": [
       {
-        "note_ko": "‘能不能’과 ‘如果方便的话’를 넣어 요청을 완화하고 상대의 선택권을 명확히 표현했습니다.",
-        "text": "您好，这个周末我有急事要出门，能不能麻烦您帮我收一下送到我家的快递？如果方便的话，真的非常感谢您。"
+        "text": "您好，这个周末我不在家，送到门口的快递能不能麻烦您帮我保管一下？我周日晚上回来拿。谢谢您。",
+        "note_ko": "요청을 의문형으로 바꿔 상대의 선택권을 더 명확히 남긴 최소대조안입니다."
       }
     ],
-    "discourse_ko": "전체 문장이 자연스럽게 연결되어 있으며, 상황에 맞는 간결한 메시지입니다.",
-    "feature_ko": "‘麻烦您帮我收一下了’는 요청을 직접적으로 단정하는 어조로, 원문의 완화와 선택권을 주는 표현보다 부담이 다소 커 보일 수 있습니다. 이 상황에서는 상대에게 선택권을 더 명확히 남기는 표현을 다시 점검해 보길 권합니다.",
-    "grammar": [],
-    "meaning_ko": "원문의 핵심 요청인 ‘이번 주말에 외출하니 집으로 올 택배를 대신 받아달라’는 내용과 감사 인사가 모두 포함되어 의미가 잘 전달되었습니다.",
+    "discourse_ko": "전체 문장이 자연스럽게 연결되어 있으며, 상황 설명과 요청, 감사 인사가 잘 어우러져 있습니다.",
     "offfocus_warnings": []
   },
+  "verdicts": {
+    "semantic_fidelity": "preserved",
+    "grammatical_accuracy": "clean",
+    "pragmatic_appropriateness": {
+      "band_code": "too_direct",
+      "feature_code": "request_mitigation_optionality"
+    }
+  },
   "provenance": {
-    "generated_at": "2026-09-28T14:31:34.888Z",
     "model": "gpt-4.1-mini",
+    "generated_at": "2026-10-03T16:26:32.053Z",
     "prompt_version": "feedback_v1_minidiscourse_v6_concise"
   },
   "revision_scope": "feature",
   "rubric_version": "request_mitigation_optionality@1.1",
   "schema_version": "feedback_v1",
-  "uncertainty_flags": [],
-  "verdicts": {
-    "grammatical_accuracy": "clean",
-    "pragmatic_appropriateness": {
-      "band_code": "too_direct",
-      "feature_code": "request_mitigation_optionality"
-    },
-    "semantic_fidelity": "preserved"
-  }
+  "uncertainty_flags": []
 });
 
-/** 수정안 B에 돌아온 실제 피드백(within_band). */
+/** 수정안에 돌아온 실제 2차 AI 피드백(within_band). */
 export const RECORDED_RECHECK_FEEDBACK: RuntimeFeedback = FeedbackSchema.parse({
   "blocks": {
+    "grammar": [],
+    "feature_ko": "요청이 직접적이면서도 '能麻烦您帮我…吗' 표현으로 상대에게 선택권과 완화된 부탁의 뉘앙스를 적절히 남겨 상황에 알맞게 실현되었을 수 있습니다.",
+    "meaning_ko": "원문의 핵심 내용인 주말 부재, 택배 도착, 일요일 저녁 귀가 예정, 그때까지 잠시 보관 요청, 감사 표현이 모두 잘 전달되었습니다.",
     "alternatives": [
       {
-        "note_ko": "‘如果方便的话’를 빼고 ‘您能帮我收一下…吗’로 직접적인 의문형 요청만 사용해 선택권 완화 정도를 줄인 예입니다.",
-        "text": "您好，这个周末我有急事要出门，您能帮我收一下送到我家的快递吗？非常感谢！"
+        "text": "您好，这个周末我不在家，快递已经送到门口了。我周日晚上回来，在那之前您能帮我暂时保管一下吗？给您添麻烦了，非常感谢！",
+        "note_ko": "'能麻烦您帮我…吗' 대신 '您能帮我…吗'로 요청을 약간 더 직접적으로 표현한 예입니다."
       }
     ],
-    "discourse_ko": "전체 문장이 자연스럽게 연결되어 있으며, 상황에 맞는 요청과 감사 표현이 잘 어우러져 있습니다.",
-    "feature_ko": "‘如果方便的话’와 ‘能不能麻烦您帮我收一下’ 표현으로 요청의 완화와 상대의 선택권이 적절히 드러납니다. 이 상황과 관계에 비추어 요청이 너무 직접적이지 않고, 상대에게 부담을 덜어주는 표현으로 알맞게 실현된 것으로 보입니다.",
-    "grammar": [],
-    "meaning_ko": "원문의 핵심 요청인 ‘이번 주말에 급한 일이 있어 외출해야 하므로 집으로 올 택배를 대신 받아줄 수 있느냐’는 내용이 모두 포함되어 있습니다. 추가적인 사실이나 조건 없이 원문의 명제가 잘 보존되었습니다.",
+    "discourse_ko": "전체 문장이 자연스럽게 연결되어 상황 설명과 요청, 감사가 매끄럽게 표현되었습니다.",
     "offfocus_warnings": []
   },
+  "verdicts": {
+    "semantic_fidelity": "preserved",
+    "grammatical_accuracy": "clean",
+    "pragmatic_appropriateness": {
+      "band_code": "within_band",
+      "feature_code": "request_mitigation_optionality"
+    }
+  },
   "provenance": {
-    "generated_at": "2026-09-28T14:31:56.228Z",
     "model": "gpt-4.1-mini",
+    "generated_at": "2026-10-03T16:26:52.698Z",
     "prompt_version": "feedback_v1_minidiscourse_v6_concise"
   },
   "revision_scope": "clear",
   "rubric_version": "request_mitigation_optionality@1.1",
   "schema_version": "feedback_v1",
-  "uncertainty_flags": [],
-  "verdicts": {
-    "grammatical_accuracy": "clean",
-    "pragmatic_appropriateness": {
-      "band_code": "within_band",
-      "feature_code": "request_mitigation_optionality"
-    },
-    "semantic_fidelity": "preserved"
-  }
+  "uncertainty_flags": []
 });
 
 const normalize = (text: string) => text.replace(/\s+/g, "");
