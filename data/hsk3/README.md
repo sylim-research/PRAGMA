@@ -1,5 +1,7 @@
 # HSK 3.0 reference data
 
+HSK 3.0 vocabulary and topic references with their provenance; used only as a non-blocking reference ceiling, not as a proficiency equivalence.
+
 이 디렉터리는 PRAGMA가 사용하는 HSK 3.0 참고 데이터의 provenance 경계를 보존한다.
 HSK 급수와 PRAGMA 학습자 수준을 숙달도 등가로 해석하지 않는다. HSK 값은 생성된 중국어의
 누적 어휘 참고 상한과 비차단 사후감사에만 사용한다.
