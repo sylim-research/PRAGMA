@@ -87,7 +87,7 @@ describe("instructor experience", () => {
     fireEvent.click(screen.getByRole("radio", { name: SAMPLE_MISSION_V6_REASON_CONTRAST.mpj_items[1].reason_choice.options[1].text }));
     fireEvent.click(screen.getByRole("button", { name: "이유 확정하기" }));
     expect(within(screen.getByRole("button", { name: /^다소 적절/ })).getByText("내 선택")).toBeInTheDocument();
-    expect(screen.getByText(/^기준 이유를 골랐습니다\./)).toBeInTheDocument();
+    expect(screen.getByText(/^기준 이유와 같습니다./)).toBeInTheDocument();
   });
   it("opens v6 with a briefing instead of the translation scenario, and shows core hints at every level", () => {
     const v6 = (learner_level: "intermediate" | "advanced"): ReviewInspection => ({ ...inspection(), snapshot: { content: { context: { scenario_id: "fixture", speech_act: "request", learner_level },
@@ -115,7 +115,7 @@ describe("instructor experience", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
     fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
     // Same stage order as the learner runner: feedback → revision → final confirm.
-    expect(await screen.findByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));

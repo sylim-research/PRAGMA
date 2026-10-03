@@ -78,7 +78,7 @@ describe("one DCT revision recheck", () => {
       click("수정안 제출하기");
       await screen.findByRole("heading", { name: "수정안 AI 피드백" });
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
-      fireEvent.change(screen.getByRole("textbox", { name: "확정안" }), { target: { value: C } });
+      fireEvent.change(screen.getByRole("textbox", { name: "최종 번역" }), { target: { value: C } });
       click("이 번역으로 확정하기");
     } else click("이대로 확정");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
@@ -118,10 +118,10 @@ describe("one DCT revision recheck", () => {
     expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
     await act(async () => settle(status === "success" ? { ok: true, feedback: feedback(2) } : { ok: false, error: "offline" }));
     expect(screen.getByRole("heading", { name: "수정안 AI 피드백" })).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: "확정안" })).toHaveValue(B);
+    expect(screen.getByRole("textbox", { name: "최종 번역" })).toHaveValue(B);
     if (status === "failure") expect(screen.getByText(/현재 번역안을 직접 검토한 뒤 최종 결정/)).toBeInTheDocument();
     // 2차가 수정 권고여도 AI 승인을 기다리지 않는다. 최종 텍스트는 세 번째 호출을 만들지 않는다.
-    fireEvent.change(screen.getByRole("textbox", { name: "확정안" }), { target: { value: C } });
+    fireEvent.change(screen.getByRole("textbox", { name: "최종 번역" }), { target: { value: C } });
     expect(screen.getByText(/추가 수정에는 AI 피드백을 다시 실행하지 않습니다/)).toBeInTheDocument();
     click("이 번역으로 확정하기");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));

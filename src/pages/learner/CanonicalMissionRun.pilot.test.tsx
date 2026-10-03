@@ -111,7 +111,7 @@ describe("local learner UX pilot", () => {
     expect(dct).toHaveValue("");
     const first = "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。";
     fireEvent.change(dct, { target: { value: first } }); click("번역 제출하기");
-    expect(screen.getByRole("heading", { name: "번역 피드백" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
     expect(screen.getByText(first)).toBeInTheDocument();
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     expect(screen.getByText(/미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다/)).toBeInTheDocument();

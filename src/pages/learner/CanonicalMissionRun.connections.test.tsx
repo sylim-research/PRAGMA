@@ -83,13 +83,13 @@ describe("CanonicalMissionRun completion connections", () => {
     view.rerender(<MemoryRouter><CompletionActions runtime saveState="saving" onRestart={onRestart} onRetrySave={onRetrySave} /></MemoryRouter>);
     expect(screen.queryByRole("button", { name: "학습 기록 저장 다시 시도" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "처음부터 다시 보기" })).toBeDisabled();
-    const recordsLink = screen.getByRole("link", { name: "나의 학습 기록 보기" });
+    const recordsLink = screen.getByRole("link", { name: "내 기록 보기" });
     expect(recordsLink).toHaveAttribute("aria-disabled", "true");
     expect(fireEvent.click(recordsLink)).toBe(false);
 
     view.rerender(<MemoryRouter><CompletionActions runtime saveState="saved" onRestart={onRestart} onRetrySave={onRetrySave} /></MemoryRouter>);
     expect(screen.getByRole("status")).toHaveTextContent("학습 기록에 저장되었습니다.");
-    expect(screen.getByRole("link", { name: "나의 학습 기록 보기" })).not.toHaveAttribute("aria-disabled");
+    expect(screen.getByRole("link", { name: "내 기록 보기" })).not.toHaveAttribute("aria-disabled");
   });
 
   it("collects a learner challenge while preserving the AI reference judgment", () => {
@@ -155,11 +155,11 @@ describe("CanonicalMissionRun completion connections", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "나의 학습 기록 보기" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "내 기록 보기" })).toHaveAttribute(
       "href",
       "/learner/records#correction-notes",
     );
-    expect(screen.getByText(/답안과 의견은 DB에 저장되지 않습니다/)).toBeInTheDocument();
+    expect(screen.getByText(/데모에서는 답안과 의견을 저장하지 않습니다/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "처음부터 다시 보기" }));
     expect(onRestart).toHaveBeenCalledTimes(1);
