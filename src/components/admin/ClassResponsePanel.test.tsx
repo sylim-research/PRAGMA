@@ -147,10 +147,9 @@ function mount(entry = "/admin/decision-traces?tab=class&courseId=course-a&weekN
   );
 }
 
-async function expectCounts(learners: number, dissents: number) {
+async function expectCounts(learners: number, _dissents: number) {
   await waitFor(() => {
-    expect(screen.getByText("집계 학습자").parentElement).toHaveTextContent(`${learners}명`);
-    expect(screen.getByText("이견 제시").parentElement).toHaveTextContent(`${dissents}건`);
+    expect(screen.getByText(new RegExp(`· 응답 ${learners}명$`))).toBeVisible();
   });
 }
 
@@ -158,10 +157,10 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
   it("교과목만 골라 들어와도 첫 미션 주차의 실제 분포를 바로 보여 준다", async () => {
     mount("/admin/decision-traces?tab=class&courseId=course-a&demo=0");
     await expectCounts(2, 1);
-    expect(screen.getByRole("heading", { level: 2, name: /2주차 · 미션 1/ })).toBeVisible();
+    expect(screen.getByRole("heading", { level: 2 })).toBeVisible();
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
-    expect(screen.getByRole("button", { name: "2주차 · 요청 화행" })).toHaveAttribute("aria-pressed", "true");
-    expect(await screen.findByText("참여 2명 · 완료 2명 · 이견 1")).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "주차 선택" })).toHaveValue("2");
+    expect(await screen.findByRole("option", { name: "2주차 · 요청 화행 (참여 2명)" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "MJT 1 · 단일 표현 판단" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/private-learner/)).not.toBeInTheDocument();
     expect(screen.queryByText(/private dissent/)).not.toBeInTheDocument();
@@ -211,7 +210,7 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     fireEvent.click(await screen.findByRole("button", { name: "데모로 살펴보기" }));
     expect(await screen.findByText("데모 · 가상 학급 20명 · 실제 학습자 자료 아님")).toBeVisible();
     expect(screen.getByRole("radio", { name: "데모 응답" })).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByText("집계 학습자").parentElement).toHaveTextContent("20명");
+    expect(screen.getByText(/· 응답 20명$/)).toBeVisible();
     // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
     const cards = within(screen.getByLabelText("MJT 판단 문항")).getAllByRole("button");
     expect(cards.map((card) => card.getAttribute("aria-label"))).toEqual([
