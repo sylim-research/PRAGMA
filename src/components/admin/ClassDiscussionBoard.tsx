@@ -79,23 +79,6 @@ function PlainBar({ count, total, tone = "navy", height = "h-2.5" }: { count: nu
   </div>;
 }
 
-function summarySlices(item: DiscussionItemView): Slice[] {
-  if (item.kind === "scale") return item.slices;
-  if (item.kind === "corrections") {
-    const tones: SliceTone[] = ["navy", "navyLight", "slate"];
-    return item.corrections.map((correction, index) => ({ key: String(correction.index), label: `수정안 ${correction.index + 1}`, count: correction.count, tone: tones[index % tones.length] }));
-  }
-  if (item.kind === "free") {
-    const tones: SliceTone[] = ["navy", "navyLight", "teal", "slate", "amber"];
-    return item.texts.map((text, index) => ({ key: String(index), label: `수정문 ${index + 1}`, count: text.count, tone: tones[index % tones.length] }));
-  }
-  if (item.kind === "generic") {
-    const tones: SliceTone[] = ["navy", "navyLight", "amber", "rust", "slate"];
-    return (item.groups[0]?.choices ?? []).map((choice, index) => ({ key: choice.key, label: choice.label, count: choice.count, tone: tones[index % tones.length] }));
-  }
-  return [];
-}
-
 function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; active: boolean; onClick: () => void }) {
   return <button
     type="button"
@@ -103,22 +86,11 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
     aria-label={`MJT ${item.itemId} · ${item.activity}`}
     onClick={onClick}
     className={[
-      "flex h-[96px] min-w-0 flex-col justify-between rounded-xl border bg-white px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-      active ? "border-[#15202B] shadow-[inset_0_0_0_1px_#15202B]" : "border-[#E2DED2] hover:border-[#B9B29C]",
+      "-mb-px min-w-0 border-b-2 px-3 py-2 text-left text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+      active ? "border-[#15202B] font-bold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
     ].join(" ")}
   >
-    <span className="block w-full">
-      <span className="flex items-baseline justify-between gap-2">
-        <span className="text-[11px] font-bold tracking-wide text-[#B8860B]">MJT {item.itemId}</span>
-        <span className="text-[11px] tabular-nums text-[#7A858C]">{item.total}명</span>
-      </span>
-      <span className="mt-0.5 block break-keep text-[13px] font-bold text-[#15202B]">{item.activity}</span>
-    </span>
-    {item.kind === "candidates"
-      ? <span className="grid w-full grid-cols-4 gap-1">
-        {item.candidates.map((candidate) => <StackedBar key={candidate.index} slices={candidate.slices} total={candidate.total} height="h-2.5" />)}
-      </span>
-      : <StackedBar slices={summarySlices(item)} total={item.total} height="h-2.5" />}
+    <span className="mr-1.5 text-[11px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
   </button>;
 }
 
@@ -468,35 +440,19 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
 export function ClassDiscussionBoard({ data, demo, state, onChange, projector = false }: Props) {
   const size = projector ? "text-[15.5px]" : "text-[13.5px]";
   const selected = data.items.find((item) => item.itemId === state.itemId) ?? data.items[0] ?? null;
-  const respondedItems = data.items.filter((item) => item.total > 0).length;
   const speechAct = data.speechAct ? SPEECH_ACT_UI[data.speechAct as SpeechActUI] ?? data.speechAct : null;
   const modeLabel = data.dct.mode === "interpreting" ? MODE_LABEL.stt_interpreting : data.dct.mode === "translation" ? MODE_LABEL.translation : null;
   const summary = useMemo(() => [speechAct, modeLabel, data.direction ? DIRECTION_LABEL[data.direction] ?? data.direction : null, data.focus].filter(Boolean), [speechAct, modeLabel, data.direction, data.focus]);
 
   return <div className="space-y-3" aria-label="학급 응답 토론 보드">
-    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-2.5">
-      <dl className={`flex flex-wrap items-center gap-x-3 gap-y-1 ${size}`}>
-        <dt className="font-semibold text-[#7A858C]">선택한 미션</dt>
-        <dd className="flex flex-wrap gap-1.5">
-          {summary.map((label) => <span key={label} className="rounded-md border border-[#D9D5C8] bg-[#FFFDF8] px-2 py-0.5 text-[12.5px] font-semibold text-[#15202B]">{label}</span>)}
-        </dd>
-      </dl>
-      <dl className={`flex flex-wrap gap-x-4 gap-y-1 ${size} text-[#44525C]`}>
-        {[
-          { label: "집계 학습자", value: `${data.learners}명` },
-          { label: "응답 있는 문항", value: `${respondedItems}개` },
-          { label: "이견 제시", value: `${data.dissents}건` },
-        ].map(({ label, value }) => <div key={label} className="flex items-baseline gap-1">
-          <dt>{label}</dt><dd className="font-semibold tabular-nums text-[#15202B]">{value}</dd>
-        </div>)}
-      </dl>
-      {demo && <p className="basis-full text-[12px] font-semibold text-[#9A6F14]">데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.</p>}
-    </div>
+    <p className={`text-[#5D6970] ${size}`}>
+      {[...summary, `응답 ${data.learners}명`].join(" · ")}
+    </p>
 
     {data.items.length === 0 ? <p className={`rounded-xl border border-dashed border-[#DAD6CA] bg-white p-5 text-[#5D6970] ${size}`}>
       집계된 기록에 MJT 판단 응답이 없습니다.
     </p> : <>
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5" aria-label="MJT 판단 문항">
+      <div className="flex flex-wrap border-b border-[#E2DED2]" aria-label="MJT 판단 문항">
         {data.items.map((item) => <ItemSummaryCard
           key={item.itemId}
           item={item}

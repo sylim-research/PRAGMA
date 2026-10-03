@@ -39,17 +39,18 @@ function learnerMissionPath(courseId: string, weekNo: number, scenarioId: string
 export function ClassResponsePanel() {
   const queryClient = useQueryClient();
   const [params, setSearchParams] = useSearchParams();
-  const demo = params.get("demo") === "1";
+  // 기본은 데모 응답(가상 학급 20명). 실제 응답으로 바꾸면 ?demo=0을 남긴다.
+  const demo = params.get("demo") !== "0";
   // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션·데모만 바꾼다.
   const setParams = (next: Record<string, string>, options?: { replace?: boolean }) =>
-    setSearchParams({ tab: "class", ...(demo ? { demo: "1" } : {}), ...next }, options);
+    setSearchParams({ tab: "class", ...(demo ? {} : { demo: "0" }), ...next }, options);
   const setDemo = (on: boolean) => {
     const next: Record<string, string> = { tab: "class" };
     for (const key of ["courseId", "weekNo", "missionId"]) {
       const value = params.get(key);
       if (value) next[key] = value;
     }
-    if (on) next.demo = "1";
+    if (!on) next.demo = "0";
     setSearchParams(next);
   };
   const [projector, setProjector] = useState(false);
@@ -192,109 +193,82 @@ export function ClassResponsePanel() {
     </span>
     : null;
 
+  const ghost = "inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[12.5px] font-medium text-[#44525C] hover:bg-[#F1EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] disabled:opacity-50";
+  const plainSelect = "h-8 rounded-md border border-[#D9DED9] bg-white px-2 text-[13px] text-[#15202B]";
+  const segment = (selected: boolean) => selected
+    ? "bg-[#EEF0F3] font-semibold text-[#15202B]"
+    : "bg-white text-[#5D6970] hover:bg-[#F6F5F0]";
+
   return <>
-    <div className="max-w-[1120px] space-y-3">
-      <section aria-label="교과목과 주차" className="rounded-xl border border-[#E2DED2] bg-white px-4 py-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <label className="flex items-center gap-2 text-[12.5px] font-semibold text-[#6B7780]">교과목
-            <select
-              aria-label="응답 교과목"
-              value={courseId}
-              onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})}
-              className="h-8 min-w-[220px] rounded-md border border-[#D9DED9] bg-white px-2 text-[13.5px] font-normal text-[#15202B]"
-            >
-              {!courseId && <option value="">교과목 선택</option>}
-              {outlines.data?.map((outline) => <option key={outline.id} value={outline.id}>{outline.title}</option>)}
-            </select>
-          </label>
-          {missionWeeks.length > 0 && <div role="group" aria-label="주차 선택" className="flex min-w-0 flex-1 flex-wrap gap-1.5">
-            {missionWeeks.map((item) => {
-              const active = item.week_no === week?.week_no;
-              const summary = operations.get(item.week_no);
-              return <button
-                key={item.week_no}
-                type="button"
-                aria-pressed={active}
-                aria-label={`${item.week_no}주차 · ${weekDisplayTitle(item)}`}
-                onClick={() => selectWeek(item.week_no)}
-                className={[
-                  "min-w-0 rounded-md border px-2.5 py-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-                  active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-[#FCFBF8] text-[#24323D] hover:border-[#B9B29C]",
-                ].join(" ")}
-              >
-                <span className="block text-[12.5px] font-semibold">{item.week_no}주차 · {weekDisplayTitle(item)}</span>
-                {summary && summary.participants > 0 && <span className={`block text-[11px] tabular-nums ${active ? "text-[#D8DEE2]" : "text-[#7A858C]"}`}>
-                  {`참여 ${summary.participants}명 · 완료 ${summary.completedLearners}명${summary.dissents > 0 ? ` · 이견 ${summary.dissents}` : ""}`}
-                </span>}
-              </button>;
-            })}
+    <div className="max-w-[1120px] space-y-4">
+      {/* 고르는 것은 한 줄(교과목 · 주차 · 미션), 보조 동작은 오른쪽의 작은 글자 버튼. 검은 강조는 아래 MJT 탭 하나만 쓴다. */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#E2DED2] pb-3">
+        <select
+          aria-label="응답 교과목"
+          value={courseId}
+          onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})}
+          className={`${plainSelect} min-w-[200px]`}
+        >
+          {!courseId && <option value="">교과목 선택</option>}
+          {outlines.data?.map((outline) => <option key={outline.id} value={outline.id}>{outline.title}</option>)}
+        </select>
+        {missionWeeks.length > 0 && <select
+          aria-label="주차 선택"
+          value={week?.week_no ?? ""}
+          onChange={(event) => selectWeek(Number(event.target.value))}
+          className={plainSelect}
+        >
+          {missionWeeks.map((item) => {
+            const summary = operations.get(item.week_no);
+            const joined = summary && summary.participants > 0 ? ` (참여 ${summary.participants}명)` : "";
+            return <option key={item.week_no} value={item.week_no}>{`${item.week_no}주차 · ${weekDisplayTitle(item)}${joined}`}</option>;
+          })}
+        </select>}
+        {week && week.scenarios.length > 1 && <div role="tablist" aria-label="응답을 볼 미션" className="flex overflow-hidden rounded-md border border-[#D9DED9]">
+          {week.scenarios.map((scenario, index) => <button
+            key={scenario.scenario_id}
+            type="button"
+            role="tab"
+            aria-selected={scenario.scenario_id === missionId}
+            onClick={() => selectMission(scenario.scenario_id)}
+            className={`px-3 py-1 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
+          >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}</button>)}
+        </div>}
+        <div className="ml-auto flex flex-wrap items-center gap-0.5">
+          {demoAvailable && <div role="radiogroup" aria-label="응답 자료" className="mr-1 flex overflow-hidden rounded-md border border-[#D9DED9]">
+            {([[false, "실제 응답"], [true, "데모 응답"]] as const).map(([on, label]) => <button
+              key={label}
+              type="button"
+              role="radio"
+              aria-checked={showingDemo === on}
+              onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
+              className={`px-2.5 py-1 text-[12px] ${segment(showingDemo === on)}`}
+            >{label}</button>)}
           </div>}
-        </div>
-        {courseQuery.isPending && courseId && <p role="status" className="mt-2 text-sm">주차를 불러오는 중…</p>}
-        {courseQuery.isError && <p role="alert" className="mt-2 text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
-        {outlines.isError && <p role="alert" className="mt-2 text-sm text-destructive">교과목 목록을 불러오지 못했습니다.</p>}
-        {course && missionWeeks.length === 0 && <p className="mt-2 text-sm text-muted-foreground">이 교과목에는 아직 편성된 미션이 없습니다. 수업 편성에서 먼저 미션을 배정해 주세요.</p>}
-        {missionWeeks.length > 0 && <p className="mt-2 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
-      </section>
-
-      {week && selectedMission && <section className="rounded-2xl border border-[#E5E3DB] bg-[#FAFAF7] p-3 sm:p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            {/* 탭 이름이 이미 「학급 응답 분포」라 섹션 제목은 지금 보고 있는 미션으로 둔다. */}
-            <h2 className="break-keep text-lg font-bold text-[#15202B]">
-              {week.week_no}주차 · 미션 {missionIndex + 1} · {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
-            </h2>
-            {statusPill}
-            {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[11.5px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>}
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            {demoAvailable && <div role="radiogroup" aria-label="응답 자료" className="flex overflow-hidden rounded-md border border-[#15202B]">
-              {([[false, "실제 응답"], [true, "데모 응답"]] as const).map(([on, label]) => <button
-                key={label}
-                type="button"
-                role="radio"
-                aria-checked={showingDemo === on}
-                onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
-                className={`px-3 py-1 text-[12.5px] font-semibold ${showingDemo === on ? "bg-[#15202B] text-white" : "bg-white text-[#15202B] hover:bg-[#F3F1EA]"}`}
-              >{label}</button>)}
-            </div>}
-            <Button
-              variant="outline"
-              size="icon"
-              aria-label="응답 새로고침"
-              disabled={rowsQuery.isFetching}
-              onClick={() => void rowsQuery.refetch()}
-            ><RefreshCw className="h-4 w-4" /></Button>
-            {boardVisible && <Button variant="outline" onClick={() => setProjector(true)}>
-              <Maximize2 className="mr-2 h-4 w-4" />크게 보기
-            </Button>}
-          </div>
-        </div>
-
-        <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-          {week.scenarios.length > 1 && <div role="tablist" aria-label="응답을 볼 미션" className="flex flex-wrap gap-1.5">
-            {week.scenarios.map((scenario, index) => {
-              const title = missionMenuTitle(scenario.brief_note_ko);
-              return <button
-                key={scenario.scenario_id}
-                type="button"
-                role="tab"
-                aria-selected={scenario.scenario_id === missionId}
-                onClick={() => selectMission(scenario.scenario_id)}
-                className={[
-                  "rounded-md border px-3 py-1 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-                  scenario.scenario_id === missionId ? "border-[#15202B] bg-[#15202B] font-semibold text-white" : "border-[#DCD8CC] bg-white text-[#44525C] hover:border-[#B9B29C]",
-                ].join(" ")}
-              >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}{title ? ` · ${title}` : ""}</button>;
-            })}
-          </div>}
-          <Link
+          <button type="button" aria-label="응답 새로고침" title="응답 새로고침" disabled={rowsQuery.isFetching} onClick={() => void rowsQuery.refetch()} className={ghost}><RefreshCw className="h-3.5 w-3.5" /></button>
+          {boardVisible && <button type="button" onClick={() => setProjector(true)} className={ghost}><Maximize2 className="h-3.5 w-3.5" />크게 보기</button>}
+          {week && selectedMission && <Link
             target="_blank"
             rel="noreferrer"
             to={learnerMissionPath(courseId, week.week_no, missionId, selectedMission.assignment_id)}
-            className="ml-auto text-[12.5px] font-medium text-[#44525C] underline-offset-4 hover:underline"
-          >학습 미션 열기 ↗</Link>
+            className={ghost}
+          >학습 미션 열기 ↗</Link>}
         </div>
+        {courseQuery.isPending && courseId && <p role="status" className="basis-full text-sm">주차를 불러오는 중…</p>}
+        {courseQuery.isError && <p role="alert" className="basis-full text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
+        {outlines.isError && <p role="alert" className="basis-full text-sm text-destructive">교과목 목록을 불러오지 못했습니다.</p>}
+        {course && missionWeeks.length === 0 && <p className="basis-full text-sm text-muted-foreground">이 교과목에는 아직 편성된 미션이 없습니다. 수업 편성에서 먼저 미션을 배정해 주세요.</p>}
+      </div>
+
+      {week && selectedMission && <section>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="break-keep text-[19px] font-bold text-[#15202B]">
+            {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
+          </h2>
+          {statusPill}
+          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[11.5px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
+        </div>
+        {!showingDemo && <p className="mt-1 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 
         {hasRealResponses && !showingDemo && <div aria-label="응답 공개 단계" className="mt-3 grid gap-2 sm:grid-cols-3">
           {[
@@ -309,7 +283,7 @@ export function ClassResponsePanel() {
 
         {rowsQuery.isPending && <p role="status" className="mt-4 text-sm">응답 분포를 불러오는 중…</p>}
         {rowsQuery.isError && <p role="alert" className="mt-4 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
-        {boardVisible && discussion && <div className="mt-3"><ClassDiscussionBoard
+        {boardVisible && discussion && <div className="mt-4"><ClassDiscussionBoard
           data={discussion}
           demo={showingDemo}
           state={board}

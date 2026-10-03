@@ -67,7 +67,7 @@ const DetailPanel = ({ row, mission, placement }: { row: MissionLogRow; mission:
 const IndividualRecords = () => {
   const [rows, setRows] = useState<MissionLogRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // 직접 펼치거나 접은 행만 기록한다. 나머지는 아래 defaultOpenId 규칙을 따른다.
+  // 목록은 모두 접힌 채로 연다. 펼친 행만 기록한다.
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   // 학습자 승인·관리에서 「수행 기록」으로 넘어오면 ?q=… 로 검색어를 받는다.
   const [params] = useSearchParams();
@@ -172,12 +172,6 @@ const IndividualRecords = () => {
     () => filterMissionLogs(baseRows, filters, courseIndex),
     [baseRows, filters, courseIndex],
   );
-  // 화면에 들어오면 한 건은 펼쳐 둔다 — 현행(mission_v6) 수행 중 가장 최근 것, 없으면 맨 위 행.
-  const defaultOpenId = useMemo(() => {
-    const isCurrent = (row: MissionLogRow) =>
-      (row.context_judgment as { mission_schema_version?: unknown } | null)?.mission_schema_version === "mission_v6";
-    return (visibleRows.find(isCurrent) ?? visibleRows[0])?.id ?? null;
-  }, [visibleRows]);
   const completedCount = useMemo(
     () => visibleRows.filter((row) => row.mission_completed).length,
     [visibleRows],
@@ -205,88 +199,50 @@ const IndividualRecords = () => {
   return (
     <>
       {!loading && !error && rows.length > 0 && (
-        <div className="mb-3 flex flex-wrap items-end gap-2 xl:flex-nowrap">
-          <label className="text-xs font-medium text-muted-foreground">
-            학습자
-            <select
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+                      <select
               aria-label="학습자 필터"
               value={filters.query}
               onChange={(event) => setFilters((current) => ({ ...current, query: event.target.value }))}
-              className={`mt-1 block w-36 font-normal text-foreground ${selectClass}`}
+              className={`block w-36 font-normal text-foreground ${selectClass}`}
             >
-              <option value="">전체</option>
+              <option value="">학습자 전체</option>
               {learnerNames.map((name) => (
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            교과목
-            <select
+                      <select
               aria-label="교과목 필터"
               value={filters.courseId}
               disabled={courses.length === 0}
               onChange={(event) => setFilters((current) => ({ ...current, courseId: event.target.value }))}
-              className={`mt-1 block w-52 font-normal text-foreground ${selectClass}`}
+              className={`block w-52 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">교과목 전체</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>{course.title}</option>
               ))}
               <option value="unknown">교과목 미상</option>
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            주차
-            <select
-              aria-label="주차 필터"
-              value={filters.weekNo}
-              onChange={(event) => setFilters((current) => ({ ...current, weekNo: event.target.value }))}
-              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
-            >
-              <option value="all">전체</option>
-              {Array.from({ length: 15 }, (_, index) => index + 1).map((week) => (
-                <option key={week} value={week}>{week}주차</option>
-              ))}
-            </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            화행
-            <select
+                      <select
               aria-label="화행 필터"
               value={filters.speechAct}
               onChange={(event) => setFilters((current) => ({ ...current, speechAct: event.target.value }))}
-              className={`mt-1 block w-24 font-normal text-foreground ${selectClass}`}
+              className={`block w-24 font-normal text-foreground ${selectClass}`}
             >
-              <option value="all">전체</option>
+              <option value="all">화행 전체</option>
               {speechActs.map((act) => (
                 <option key={act} value={act}>{SPEECH_ACT_UI[act as SpeechActUI] ?? act}</option>
               ))}
             </select>
-          </label>
-          <label className="text-xs font-medium text-muted-foreground">
-            완료 여부
-            <select
-              aria-label="완료 여부 필터"
-              value={filters.completion}
-              onChange={(event) =>
-                setFilters((current) => ({ ...current, completion: event.target.value as MissionLogFilters["completion"] }))
-              }
-              className={`mt-1 block w-28 font-normal text-foreground ${selectClass}`}
-            >
-              <option value="all">전체</option>
-              <option value="completed">완료</option>
-              <option value="in_progress">진행 중</option>
-            </select>
-          </label>
-          <label className="flex h-9 items-center gap-2 whitespace-nowrap rounded-md border border-[#D8D4C8] bg-white px-3 text-sm font-medium text-[#1F3A5F]">
+          <label className="ml-auto flex h-9 items-center gap-2 whitespace-nowrap text-[13px] text-muted-foreground">
             <input
               type="checkbox"
               checked={includeTestRecords}
               onChange={(event) => setIncludeTestRecords(event.target.checked)}
               className="accent-[#1F3A5F]"
             />
-            관리자 테스트 기록 포함 ({testRecordCount})
+            테스트 기록 포함 ({testRecordCount})
           </label>
           {filtered && (
             <button
@@ -340,35 +296,32 @@ const IndividualRecords = () => {
           <table className="w-full min-w-[880px] text-sm">
             <thead className="bg-muted/60 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="px-3 py-2 font-medium">최근 저장</th>
+                <th className="px-3 py-2 font-medium">날짜</th>
                 <th className="px-3 py-2 font-medium">학습자</th>
-                <th className="px-3 py-2 font-medium">화행</th>
                 <th className="px-3 py-2 font-medium">학습 미션</th>
                 <th className="px-3 py-2 font-medium">교과목·주차</th>
-                <th className="px-3 py-2 font-medium">수행 방식</th>
                 <th className="px-3 py-2 font-medium">상태</th>
-                <th className="px-3 py-2 text-right font-medium">내용</th>
+                <th className="px-3 py-2 text-right font-medium"><span className="sr-only">내용</span></th>
               </tr>
             </thead>
             <tbody>
               {visibleRows.map((row) => {
-                const open = expanded[row.id] ?? row.id === defaultOpenId;
+                const open = expanded[row.id] ?? false;
                 const placement = row.course_id
                   ? `${courseTitle.get(row.course_id) ?? row.course_id.slice(0, 8)} · ${row.week_no ?? "—"}주차`
                   : "편성 외 수행";
                 return (
                   <Fragment key={row.id}>
                     <tr className="border-t border-border">
-                      <td className="whitespace-nowrap px-3 py-2 text-[13px] tabular-nums text-[#46515A]">{fmtKst(row.updated_at)}</td>
-                      <td className="px-3 py-2" title={row.profiles?.email ?? undefined}>
+                      <td className="whitespace-nowrap px-3 py-2 text-[13px] tabular-nums text-[#46515A]">{fmtKst(row.updated_at).slice(0, 13)}</td>
+                      <td className="whitespace-nowrap px-3 py-2" title={row.profiles?.email ?? undefined}>
                         {learnerLabel(row)}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2">{speechActLabel(row.speech_act)}</td>
-                      <td className="max-w-56 truncate px-3 py-2 font-semibold text-[#15202B]" title={row.mission_id}>
-                        {missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}
+                      <td className="max-w-72 px-3 py-2" title={row.mission_id}>
+                        <span className="block truncate font-semibold text-[#15202B]">{missionLabel(missionBriefs.get(row.mission_id), row.mission_id)}</span>
+                        <span className="text-xs text-[#6B7780]">{speechActLabel(row.speech_act)} · {taskLabel(row.task_type)}</span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-2 text-xs">{placement}</td>
-                      <td className="whitespace-nowrap px-3 py-2">{taskLabel(row.task_type)}</td>
                       <td className="px-3 py-2">
                         <span
                           className={[
@@ -394,7 +347,7 @@ const IndividualRecords = () => {
                     </tr>
                     {open && (
                       <tr className="border-t border-border bg-background">
-                        <td colSpan={8} className="px-3 py-3">
+                        <td colSpan={6} className="px-5 pb-5 pt-1">
                           <DetailPanel row={row} mission={missionContents.get(row.mission_id)} placement={placement} />
                         </td>
                       </tr>
@@ -411,18 +364,19 @@ const IndividualRecords = () => {
 };
 
 const TABS = [
-  { key: "records", label: "개별 수행 기록" },
   { key: "class", label: "학급 응답 분포" },
+  { key: "records", label: "학습자별 기록" },
 ] as const;
 
-/** 같은 학습 기록을 개인 단위(개별 수행 기록)와 익명 집계 단위(학급 응답 분포)로 나눠 본다. */
+/** 같은 학습 기록을 익명 집계 단위(학급 응답 분포)와 학습자 단위(학습자별 기록)로 나눠 본다. 기본은 학급 응답 분포. */
 const Page = () => {
   const [params, setParams] = useSearchParams();
-  const tab = params.get("tab") === "class" ? "class" : "records";
+  // 학습자 관리의 「수행 기록 →」(?q=)는 학습자별 기록으로 연다.
+  const tab = params.get("tab") === "records" || params.has("q") ? "records" : "class";
   return (
     <AdminShell
       title="학습 수행 기록"
-      description="학습자가 수행한 학습 미션을 개별 수행 기록과 익명 학급 응답 분포로 확인합니다."
+      description="학습자가 수행한 학습 미션을 익명 학급 응답 분포와 학습자별 기록으로 확인합니다."
     >
       <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
         {TABS.map((item) => (
@@ -431,7 +385,7 @@ const Page = () => {
             type="button"
             role="tab"
             aria-selected={tab === item.key}
-            onClick={() => setParams(item.key === "class" ? { tab: "class" } : {})}
+            onClick={() => setParams(item.key === "records" ? { tab: "records" } : {})}
             className={[
               "-mb-px border-b-2 px-4 py-2 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
               tab === item.key ? "border-[#15202B] font-semibold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
