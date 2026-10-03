@@ -89,6 +89,7 @@ export default {
           from: { opacity: "0", transform: "translateY(10px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        // 첫 화면 핵심 문장 강조선: 왼쪽에서 오른쪽으로 그어진다.
         "marker-sweep": {
           from: { transform: "scaleX(0)" },
           to: { transform: "scaleX(1)" },
