@@ -580,3 +580,16 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
 - 연구자 채택 독립감수 → 지정 4필드 수정 → 새 scenario v1 → 정상 검토·최종화 → 위임에 따른 교수자 재승인 v2 → 지정 교과목 슬롯 교체.
 - 근거: `docs/research-trail/evidence/2026-10-01-representative-content-patch/approved-snapshot.json`, `approval-provenance.json`; 경위: `docs/dev-log/2026-10-01-representative-content-patch.md`.
 - 기존 A/B 피드백은 구 scenario/hash의 실제 수행 기록으로 보존·재사용한다. 이번 콘텐츠 버전에서 새 학습자 피드백을 생성한 증거가 아니다.
+
+## EVD-20261002-01 · 대표 미션 택배 보관 장면 개정과 승인 (소급 등재 2026-10-04)
+
+- 연구자 검토에서 DCT 장면(주말에 올 택배의 대리 수령)이 관계에 비해 작위적이고 요청 범위·종료 시점이 불분명하다고 판정 → 「이미 도착한 택배를 일요일 저녁까지 임시 보관」으로 장면 최소 수정, MJT2 번역안을 경계 문항(`想把这封推荐信交给您写，可以吗？`)으로 교체하고 허용 판단을 `somewhat_inappropriate + somewhat_appropriate`로 조정, 핵심 정리 2번 동기화. 중국어 표현은 DeepSeek을 보조 언어감사로 반복 점검(타당화로 기록하지 않음).
+- 새 scenario `24fb6841` generated v1 `52e89518` → reviewed v2 `93559b05`(hash `0024c911…`). 규칙 PASS, OpenAI(gpt-4.1) 검토 PASS(지적 0). 2026-10-02 07:07Z 연구자 직접 승인, 07:41Z 「AI 한중 화용 통번역」 2주차 첫 슬롯(assignment `9a44e362`) 교체. 이전 승인본(`95209155`)·검토·A/B 피드백은 승계하지 않고 보존.
+- 근거: `docs/research-trail/evidence/2026-10-04-representative-storage-demo/approved-snapshot.json`, `approval-provenance.json`(운영 행과 정규화 JSON 동일 확인). 원작업 패키지와 변경 경위 기록의 위치는 provenance 파일에 적었다.
+
+## EVD-20261004-01 · 택배 보관 승인본의 연구자 시험 수행과 공개 시연 갱신
+
+- 2026-10-04 연구자가 학습자 계정으로 운영 수업 경로에서 수정 경로를 한 번 수행했다(attempt `fe5051ac`): 초안 → 1차 AI 피드백(화용 `too_direct`) → 수정안 → 2차 AI 피드백(`within_band`) → 확정. 결과를 고르기 위해 다시 돌리지 않았다.
+- 공개 시연 `/demo/mission`, 학급 응답 토론 보드 데모, 「내 기록」 데모를 이 승인본과 이 수행의 피드백 원문으로 갱신했다. 시연의 MJT 응답은 연구자가 구성한 시연 응답이며(설계 근거는 dev-log), 위 수행의 MJT 응답과 다르다.
+- 근거: `docs/research-trail/evidence/2026-10-04-representative-storage-demo/recorded-attempt.json`(운영 이벤트와 피드백 정규화 지문 일치 확인); 경위: `docs/dev-log/2026-10-04-representative-storage-demo.md`.
+- 연구자 본인의 시험 수행이며 학습 효과의 증거가 아니다.

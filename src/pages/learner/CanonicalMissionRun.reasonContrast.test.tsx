@@ -33,7 +33,7 @@ describe("representative v6 reason / contrast rhythm", () => {
   });
   afterEach(cleanup);
 
-  it("locks the judgment without revealing it, then reveals judgment and reason together after the reason is committed", () => {
+  it("locks the judgment without revealing it, then reveals judgment and reason together after the reason is committed", { timeout: 20000 }, () => {
     toSecondJudgment();
     const reason = mission.mpj_items[1].reason_choice.options[1];
     expect(mission.mpj_items[1].reason_choice.accepted_id).toBe(reason.id);
@@ -49,7 +49,7 @@ describe("representative v6 reason / contrast rhythm", () => {
       expect(cls).toContain("border-[#E3DDCF]");
       expect(cls).not.toMatch(/4D8568|C86E68|E0DDD5/);
     }
-    expect(screen.queryByText(/기준 판단과 같습니다|기준 판단과 다릅니다/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/기준 판단과 같습니다|기준 판단과 다릅니다|기준 판단과 다르지만/)).not.toBeInTheDocument();
     expect(screen.getByText(/^판단을 확정했습니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();

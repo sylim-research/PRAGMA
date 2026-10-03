@@ -272,7 +272,7 @@ describe("learner records", () => {
     ]);
     const lessons = screen.getByRole("region", { name: "핵심 정리" });
     expect(lessons).toHaveTextContent("짧아도 자연스러운 부탁");
-    expect(lessons).toHaveTextContent("공손 표지와 수락은 별개");
+    expect(lessons).toHaveTextContent("맡기는 틀과 묻는 틀");
     expect(lessons).toHaveTextContent("확인 부탁의 강도와 확정성");
     expect(lessons).not.toHaveTextContent("적절한 표현은 여러 가지");
     expect(screen.queryByText(/경향|편이다|강점|약점|민감/)).not.toBeInTheDocument();

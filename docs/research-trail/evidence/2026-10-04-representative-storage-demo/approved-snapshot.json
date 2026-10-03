@@ -1,8 +1,4 @@
-// 대표 미션 승인본: scenario 24fb6841-6868-4e14-8e54-4e946466dc8e, version 93559b05-3c36-452e-b38a-bbf4964a8006(v2), 2026-10-02T07:07:12Z 연구자 직접 승인.
-// mission_content_hash 0024c9117662c674380b461cd7825e44704166577de73d752f58fa65e86a063b
-// 출처: docs/research-trail/evidence/2026-10-04-representative-storage-demo/approved-snapshot.json. DB 승인본에서 생성(운영 행과 정규화 JSON 동일 확인).
-
-export const REPRESENTATIVE_MISSION_SNAPSHOT = {
+{
   "scenario_id": "24fb6841-6868-4e14-8e54-4e946466dc8e",
   "speech_act": "request",
   "learner_level": null,
@@ -567,4 +563,4 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
       ]
     }
   }
-};
+}

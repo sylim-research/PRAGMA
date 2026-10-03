@@ -789,7 +789,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {/* 눈으로는 배지가 판정을 전한다. 키보드·스크린리더에는 같은 내용을 문장으로 알린다. */}
         <p className="sr-only" aria-live="polite">
           {judgmentShown
-            ? `${judgmentOk ? "기준 판단과 같습니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
+            ? `${pick === quest.referenceAnswer ? "기준 판단과 같습니다" : judgmentOk ? "기준 판단과 다르지만 허용 판단에 해당합니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">

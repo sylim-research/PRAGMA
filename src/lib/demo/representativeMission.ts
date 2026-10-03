@@ -1,7 +1,6 @@
-// 대표 교과목 2주차 첫 슬롯의 2026-10-01 재승인본. 공개 데모는 DB·AI 호출 없이 snapshot을 읽는다.
-// DCT·A/B 산출은 불변이므로 2026-09-28 attempt 41fb9065-a621-41b0-8d14-7c030b5b04d1의 피드백을 재사용한다.
-// 그 기록의 원 scenario는 051532cc-c3a2-4440-9a5e-efc54e9ac481, 원 hash는 3b213fbc547ad2e53834f5557ce53ebe7359a39de3e1781d297e2b37abd3e764이다.
-// 새 콘텐츠에서 피드백을 재생성·재검증한 기록이 아니다. 원문 기록 파일은 변경하지 않는다.
+// 대표 교과목 2주차 첫 슬롯의 승인본(2026-10-02 연구자 직접 승인, 택배 보관 장면). 공개 데모는 DB·AI 호출 없이 snapshot을 읽는다.
+// DCT 피드백은 같은 승인본으로 남긴 2026-10-04 attempt fe5051ac-7819-4d36-88d5-b3b7b629264d의 실제 기록이다.
+// 이전 승인본(95209155, 택배 대리 수령 장면)과 그 2026-09-28 기록은 역사 기록으로 보존하며 이 데모에 쓰지 않는다.
 
 import { normalizeLearnerMission } from "@/lib/pragma/missionV6";
 import type { CanonicalRunnableMission } from "@/lib/mission/missionDb";
@@ -9,7 +8,7 @@ import type { SpeechActUI } from "@/lib/pragma/enums";
 import { REPRESENTATIVE_MISSION_SNAPSHOT as snapshot } from "./representativeMissionSnapshot";
 
 export const REPRESENTATIVE_MISSION_PATH = "/demo/mission";
-export const REPRESENTATIVE_MISSION_ID = "95209155-0067-44f3-a01d-81378939584f";
+export const REPRESENTATIVE_MISSION_ID = "24fb6841-6868-4e14-8e54-4e946466dc8e";
 
 export function publicRepresentativeMission(): CanonicalRunnableMission {
   const parsed = normalizeLearnerMission(snapshot.mission_content);

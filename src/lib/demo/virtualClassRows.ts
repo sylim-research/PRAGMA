@@ -129,7 +129,7 @@ export function buildVirtualClassRows(missionId: string, mission: unknown): Clas
         } }, 1],
         [{ first: DEMO_FIRST_DRAFT, final: DEMO_FIRST_DRAFT, feedback: RECORDED_FIRST_FEEDBACK, dissent: {
           conditions: ["burden"], decision: "retained_first_response",
-          reason: "주말에 급한 일이라는 사정을 밝히고 ‘谢谢您’으로 감사도 표했으니 상대의 부담은 이미 덜었다고 생각합니다.",
+          reason: "주말에 집을 비운 사정을 밝히고 ‘谢谢您’으로 감사도 표했으니 상대의 부담은 이미 덜었다고 생각합니다.",
         } }, 1],
         [{ first: DEMO_FIRST_DRAFT, final: DEMO_FIRST_DRAFT, feedback: RECORDED_FIRST_FEEDBACK, dissent: {
           conditions: ["experience"], decision: "retained_first_response",
@@ -137,7 +137,7 @@ export function buildVirtualClassRows(missionId: string, mission: unknown): Clas
         } }, 1],
         [{ first: DEMO_FIRST_DRAFT, final: DEMO_REVISED_DRAFT, feedback: RECORDED_FIRST_FEEDBACK, dissent: {
           conditions: ["preceding"], decision: "revised_response",
-          reason: "선택권을 묻는 쪽으로 고치긴 했지만, 이미 몇 번 인사한 사이라 ‘如果方便的话’까지 넣을 필요는 없다고 봅니다.",
+          reason: "선택권을 묻는 쪽으로 고치긴 했지만, 이미 몇 번 인사한 사이라 ‘给您添麻烦了’까지 붙일 필요는 없다고 봅니다.",
         } }, 1],
         [{ first: DEMO_FIRST_DRAFT, final: DEMO_FIRST_DRAFT, feedback: RECORDED_FIRST_FEEDBACK, dissent: null }, 1],
         [{ first: DEMO_REVISED_DRAFT, final: DEMO_REVISED_DRAFT, feedback: RECORDED_RECHECK_FEEDBACK, dissent: null }, 6],
@@ -154,8 +154,8 @@ export function buildVirtualClassRows(missionId: string, mission: unknown): Clas
       if (j < 0) throw new Error("가상 학급에 시연 답안과 같은 응답이 없습니다.");
       [list[DEMO_LEARNER_ROW], list[j]] = [list[j], list[DEMO_LEARNER_ROW]];
     };
-    const referenceScale = str(item(1)?.reference_scale_code) ?? SCALE.va; // A1: 기준 판단
-    pin(mjt1, (value) => value === referenceScale);
+    const referenceScale = str(item(1)?.reference_scale_code) ?? SCALE.va;
+    pin(mjt1, (value) => value === (DEMO_MJT_ANSWERS.A1?.pick ?? referenceScale)); // A1: 시연 답안(허용 판단), 없으면 기준 판단
     pin(mjt2, (value) => value.scale === DEMO_MJT_ANSWERS.A2?.pick && value.reason === DEMO_MJT_ANSWERS.A2?.reasonId && !value.revised);
     pin(mjt3, (value) => value === validIndex); // A3: 기준 수정안
     if (mjt4) pin(mjt4, (value) => value === researcherText);

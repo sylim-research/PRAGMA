@@ -65,7 +65,7 @@ describe("buildClassDiscussion — 가상 학급 20명(대표 미션)", () => {
 
     const free = data.items[4] as FreeItemView;
     const item4 = content.mpj_items[3] as { reference_alternatives: string[]; contrast: { target: string } };
-    const allowed = new Set([...item4.reference_alternatives, item4.contrast.target, "我下课晚，明天的彩排能从七点推迟到七点半吗？"]);
+    const allowed = new Set([...item4.reference_alternatives, item4.contrast.target, DEMO_MJT_ANSWERS.A4.text!]);
     expect(free.texts.reduce((sum, entry) => sum + entry.count, 0)).toBe(20);
     expect(free.texts.every((entry) => allowed.has(entry.text))).toBe(true);
   });
@@ -124,7 +124,7 @@ describe("buildVirtualClassRows", () => {
     const me = rows[DEMO_LEARNER_ROW];
     const responses = (me.context_judgment as { responses: Array<Record<string, unknown>> }).responses;
     const trace = (id: number) => responses.find((item) => item.item_id === id)!;
-    expect(trace(1).scale_code).toBe("very_appropriate");
+    expect(trace(1).scale_code).toBe(DEMO_MJT_ANSWERS.A1.pick);
     expect(trace(2)).toMatchObject({ scale_code: DEMO_MJT_ANSWERS.A2.pick, reason_id: DEMO_MJT_ANSWERS.A2.reasonId });
     expect(trace(2).revised_scale_code).toBeUndefined();
     expect(trace(3).correction_indexes).toEqual([1]);
