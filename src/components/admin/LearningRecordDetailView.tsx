@@ -72,7 +72,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
   const steps: Array<{ title: string; body: ReactNode }> = [];
 
   steps.push({
-    title: "상황과 출발텍스트",
+    title: "관계·상황과 원문",
     body: (
       <div className="grid gap-2 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Box className="bg-[#FBF5E6]">
@@ -123,7 +123,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
       <Flow>
         {[
           <Box key="first" className="h-full">
-            <Caption>최초 산출</Caption>
+            <Caption>초안</Caption>
             <p className="text-sm leading-relaxed">{task.first ?? "—"}</p>
           </Box>,
           <Box key="feedback" className="h-full bg-[#FBF5E6]">
@@ -134,7 +134,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           </Box>,
           <Box key="final" className="h-full">
             <div className="mb-1 flex flex-wrap items-center gap-2">
-              <Caption>최종 산출</Caption>
+              <Caption>확정안</Caption>
               {task.decision && <Answer>{task.decision}</Answer>}
             </div>
             <p className="text-sm leading-relaxed">{task.final ?? "—"}</p>

@@ -607,7 +607,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         {/* 만들 콘텐츠의 언어 방향 — 자료(영상·이미지)의 언어가 아니라 학습 과제의 방향 */}
         <div className="border-t border-[#EFEAE0] pt-4">
           <div className="flex items-baseline justify-between gap-2">
-            <label className="text-[13px] font-semibold text-[#15202B]">만들 콘텐츠의 언어 방향</label>
+            <label className="text-[13px] font-semibold text-[#15202B]">만들 콘텐츠의 언어방향</label>
           </div>
           <div className="mt-2 flex gap-2">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (

@@ -52,7 +52,7 @@ const EntryLanguageDirection = () => {
 
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-6 py-12">
         <h1 className="text-[26px] font-bold tracking-tight sm:text-[30px]">
-          언어 방향을 선택해 주세요
+          언어방향을 선택해 주세요
         </h1>
         <p className="mt-3 text-[14px] text-muted-foreground">
           어느 방향으로 학습할지 골라 주세요.

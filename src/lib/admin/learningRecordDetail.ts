@@ -35,7 +35,7 @@ export interface LearningRecordDetail {
   task: {
     first: string | null;
     feedback: string[];
-    decision: "최초 산출 유지" | "수정" | null;
+    decision: "초안 유지" | "수정" | null;
     final: string | null;
     hintOpened: boolean | null;
   };
@@ -106,7 +106,11 @@ function bandLabeler(featureId: string | null) {
   };
 }
 
+// v6 문항은 저장된 short_label 대신 화면 표시명(활동명)으로 보여 준다. 키는 내부 문항 ID다.
+const V6_ACTIVITY: Record<number, string> = { 1: "단일 표현 판단", 2: "판단과 이유", 3: "수정안 선택", 4: "직접 수정", 5: "복수 표현 비교" };
+
 function mjtCards(row: RecordDetailRow, mission: Obj | null): MjtCard[] {
+  const isV6 = mission?.schema_version === "mission_v6";
   const envelope = obj(row.context_judgment);
   const responses = arr(envelope?.responses).map(obj).filter((item): item is Obj => item !== null);
   const items = arr(mission?.mpj_items).map(obj);
@@ -149,7 +153,7 @@ function mjtCards(row: RecordDetailRow, mission: Obj | null): MjtCard[] {
 
     return {
       id,
-      activity: str(item?.short_label) ?? ITEM_TITLES[type] ?? type,
+      activity: (isV6 && id !== null ? V6_ACTIVITY[id] : undefined) ?? str(item?.short_label) ?? ITEM_TITLES[type] ?? type,
       target: str(item?.target),
       choices,
       rows,
@@ -189,11 +193,11 @@ export function buildLearningRecordDetail(
   const first = str(row.first_response);
   const final = str(row.revised_response);
   const decision = dissent?.final_decision === "retained_first_response"
-    ? "최초 산출 유지"
+    ? "초안 유지"
     : dissent?.final_decision === "revised_response"
       ? "수정"
       : first && final
-        ? (first.trim() === final.trim() ? "최초 산출 유지" : "수정")
+        ? (first.trim() === final.trim() ? "초안 유지" : "수정")
         : null;
   const support = obj(envelope?.production_support);
 
@@ -202,7 +206,7 @@ export function buildLearningRecordDetail(
       relation: str(task?.relation_ko),
       situation: str(task?.situation_ko),
       mode: [interpreting ? "통역" : row.task_type ? "번역" : null, direction].filter(Boolean).join(" · ") || null,
-      sourceLabel: interpreting ? "출발텍스트(통역 음성 전사)" : "출발텍스트",
+      sourceLabel: interpreting ? "원문(통역 음성 전사)" : "원문",
       source: str(row.source_text),
     },
     mjt: mjtCards(row, content),

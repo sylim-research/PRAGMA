@@ -34,7 +34,7 @@ describe("instructor experience", () => {
     render(<MemoryRouter><InstructorReviewExperience inspection={v6} onSave={vi.fn()} onReady={vi.fn()} /></MemoryRouter>);
     const nav = screen.getByRole("navigation", { name: "감수할 장면과 문항" });
     // 꼬리표(단계) + 학생 화면과 같은 이름.
-    const v6Labels = ["도입미션 안내", "MJT 1상황에 맞는지 판단하기", "MJT 2판단하고 이유 고르기", "MJT 3고친 표현 고르기", "MJT 4직접 고치고 비교하기", "MJT 5여러 표현 비교하기", "중간 정리핵심 정리", "DCT직접 번역하기"];
+    const v6Labels = ["도입미션 안내", "MJT 1단일 표현 판단", "MJT 2판단과 이유", "MJT 3수정안 선택", "MJT 4직접 수정", "MJT 5복수 표현 비교", "중간 정리핵심 정리", "DCT직접 번역하기"];
     expect(within(nav).getAllByRole("button").map((button) => button.firstElementChild?.textContent)).toEqual(v6Labels);
     for (const old of ["4. 이유 찾기", "5. 여러 초안 비교", "문항별 핵심"]) expect(within(nav).queryByText(old)).not.toBeInTheDocument();
     expect(screen.queryByLabelText("감수 진행")).toBeNull();
@@ -121,7 +121,7 @@ describe("instructor experience", () => {
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
-    fireEvent.click(screen.getByRole("button", { name: /최종안 확정하기/ }));
+    fireEvent.click(screen.getByRole("button", { name: /으로 확정하기/ }));
     const final = screen.getByRole("region", { name: "최종 확정 미리보기" });
     expect(within(final).getByText(first)).toBeInTheDocument();
     expect(within(final).getByText(revised)).toBeInTheDocument();

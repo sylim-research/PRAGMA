@@ -15,8 +15,8 @@ import {
 // 내려받은 파일은 아직 「학습 데이터(연구 자료)」가 아니다 — 선별·구성은 연구자의 몫이다.
 const RULES: Array<[string, string]> = [
   ["동의한 기록만", "데이터 이용·가명 분석에 동의했고 동의 버전이 유효한 학습자의 기록만 자동으로 담습니다."],
-  ["가명 처리", "이름·이메일·사용자 ID를 연구용 번호로 바꿉니다. 원자료와 연결될 수 있으므로 연구자료 보안 기준에 따라 보관합니다."],
-  ["연구자의 선별·구성", "필수 활동 완료·응답 누락 같은 포함 기준으로 선별·구성한 뒤에 학습 데이터(연구 자료)가 됩니다."],
+  ["가명 처리", "이름·이메일·사용자 ID를 연구용 번호로 바꿉니다. 원자료와 연결될 수 있으므로 연구 자료 보안 기준에 따라 보관합니다."],
+  ["연구자의 선별·구성", "필수 활동 완료·응답 누락 같은 포함 기준으로 선별·구성한 뒤에 연구 자료가 됩니다."],
 ];
 
 const Page = () => {
@@ -53,7 +53,7 @@ const Page = () => {
         <h2 className="text-[16px] font-bold text-[#15202B]">기간을 정해 내려받기</h2>
         <div className="flex items-center gap-1.5">
           <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[11.5px] text-emerald-800">동의 기반</Badge>
-          <Badge variant="outline" className="border-[#9FB0C6] bg-[#F7F9FC] text-[11.5px] text-[#1F3A5F]">내보내기 형식 1판</Badge>
+          <Badge variant="outline" className="border-[#9FB0C6] bg-[#F7F9FC] text-[11.5px] text-[#1F3A5F]">내보내기 형식 버전 1</Badge>
         </div>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">

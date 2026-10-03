@@ -43,7 +43,7 @@ const EntryTaskMode = () => {
           학습 유형을 선택해 주세요
         </h1>
         <p className="mt-3 text-[14px] text-muted-foreground">
-          어떤 방식으로 학습할지 먼저 골라 주세요. 다음 화면에서 언어 방향을 선택합니다.
+          어떤 방식으로 학습할지 먼저 골라 주세요. 다음 화면에서 언어방향을 선택합니다.
         </p>
 
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">

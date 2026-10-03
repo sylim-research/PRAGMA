@@ -12,11 +12,11 @@ const empty = (): InstructorExperience => ({ version: "instructor_experience_v1"
 // 꼬리표(단계) + 학생 화면과 같은 이름. DCT 이름은 번역·통역에 따라 정한다.
 const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], { tag: string; name: string }> = {
   scene: { tag: "도입", name: "미션 안내" },
-  "mjt-0": { tag: "MJT 1", name: "상황에 맞는지 판단하기" },
-  "mjt-1": { tag: "MJT 2", name: "판단하고 이유 고르기" },
-  "mjt-2": { tag: "MJT 3", name: "고친 표현 고르기" },
-  "mjt-3": { tag: "MJT 4", name: "직접 고치고 비교하기" },
-  "mjt-4": { tag: "MJT 5", name: "여러 표현 비교하기" },
+  "mjt-0": { tag: "MJT 1", name: "단일 표현 판단" },
+  "mjt-1": { tag: "MJT 2", name: "판단과 이유" },
+  "mjt-2": { tag: "MJT 3", name: "수정안 선택" },
+  "mjt-3": { tag: "MJT 4", name: "직접 수정" },
+  "mjt-4": { tag: "MJT 5", name: "복수 표현 비교" },
   recap: { tag: "중간 정리", name: "핵심 정리" },
   dct: { tag: "DCT", name: "직접 번역하기" },
 };

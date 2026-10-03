@@ -39,7 +39,7 @@ type ReportRecord = {
   completedAt: string;
   /** 저장된 AI 피드백 판정 줄 — 채점이 아니다. */
   feedback: string[];
-  decision: "최초 산출 유지" | "수정" | null;
+  decision: "초안 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
   /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
   change: ChangeMap | null;
