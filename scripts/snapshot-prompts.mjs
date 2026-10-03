@@ -228,7 +228,7 @@ const prompts = [
     "통역에서도 원발화의 화용 기능이 유지되게 합니다.",
     S.buildMissionSystemPrompt(PROBE_FEATURE, false, true, "zh_ko")),
   entry("mission.system.proposal", "제안 화행 판단 기준", "mission",
-    "선택의 여지와 구체성으로 적정·부족·과함을 가릅니다.",
+    "제안의 구체성과 상대의 선택권을 검토합니다.",
     S.buildMissionSystemPrompt({ ...PROBE_FEATURE, code: "proposal_optionality_clarity" }, false, false, "ko_zh")),
   entry("mission.system.spoken", "프롬프트 (통역)", "mission",
     "말로 산출하는 통역 미션의 문항을 구성합니다.", S.buildMissionSystemPrompt(PROBE_FEATURE, false, true, "ko_zh")),

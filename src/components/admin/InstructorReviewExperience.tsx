@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { EXPERIENCE_SECTIONS, experienceComplete, viewModelFromReview } from "@/lib/pragma/instructorExperience";
+import { V6_MJT_PRESENTATION_ORDER } from "@/lib/mission/canonicalMissionRuntime";
 import type { InstructorExperience, ReviewInspection } from "../../../supabase/functions/_shared/contentReview";
 
 const ReviewStage = lazy(() => import("@/pages/learner/CanonicalMissionRun").then((module) => ({ default: module.CanonicalReviewStage })));
@@ -14,12 +15,14 @@ const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], { ta
   scene: { tag: "도입", name: "미션 안내" },
   "mjt-0": { tag: "MJT 1", name: "단일 표현 판단" },
   "mjt-1": { tag: "MJT 2", name: "판단과 이유" },
-  "mjt-2": { tag: "MJT 3", name: "수정안 선택" },
-  "mjt-3": { tag: "MJT 4", name: "직접 수정" },
-  "mjt-4": { tag: "MJT 5", name: "복수 표현 비교" },
+  "mjt-2": { tag: "MJT 4", name: "수정안 선택" },
+  "mjt-3": { tag: "MJT 5", name: "직접 수정" },
+  "mjt-4": { tag: "MJT 3", name: "복수 표현 비교" },
   recap: { tag: "중간 정리", name: "핵심 정리" },
   dct: { tag: "DCT", name: "직접 번역하기" },
 };
+// v6는 학습자 제시 순서로 보여 주고 넘긴다. 섹션 id(mjt-n = mpj_items[n])와 저장된 감수 기록은 그대로다.
+const V6_SECTION_ORDER: string[] = ["scene", ...V6_MJT_PRESENTATION_ORDER.map((index) => `mjt-${index}`), "recap", "dct"];
 
 export function InstructorReviewExperience({ inspection, onSave, onReady, disabled = false }: {
   inspection: ReviewInspection;
@@ -73,7 +76,12 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
   const current = draft.decisions.find((entry) => entry.section === section.id);
   const editable = current && current.status !== "defer";
   const noteValue = editable ? current.note : pendingNotes[section.id] ?? current?.note ?? "";
-  const next = () => { setSectionIndex((index) => Math.min(index + 1, EXPERIENCE_SECTIONS.length - 1)); };
+  const sectionOrder = EXPERIENCE_SECTIONS.map((item, index) => ({ item, index }));
+  const displayOrder = model.value?.missionFormat === "mission_v6"
+    ? [...sectionOrder].sort((a, b) => V6_SECTION_ORDER.indexOf(a.item.id) - V6_SECTION_ORDER.indexOf(b.item.id))
+    : sectionOrder;
+  const displayPosition = displayOrder.findIndex(({ index }) => index === sectionIndex);
+  const next = () => { setSectionIndex(displayOrder[Math.min(displayPosition + 1, displayOrder.length - 1)].index); };
   const persist = async (value: InstructorExperience) => {
     setDraft(value); setSaving(true); setError(null);
     try { await onSave({ ...value, active_seconds: Math.floor(elapsed.current / 1000) }); }
@@ -90,8 +98,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     const decisions = [...draft.decisions.filter((entry) => entry.section !== section.id), { section: section.id, status, note: noteValue }];
     void persist({ ...draft, decisions });
     if (status !== "checked") return;
-    const order = EXPERIENCE_SECTIONS.map((item, index) => ({ item, index }));
-    const nextOpen = [...order.slice(sectionIndex + 1), ...order.slice(0, sectionIndex)].find(({ item }) => !decided(decisions, item.id));
+    const nextOpen = [...displayOrder.slice(displayPosition + 1), ...displayOrder.slice(0, displayPosition)].find(({ item }) => !decided(decisions, item.id));
     if (nextOpen) setSectionIndex(nextOpen.index);
     else if (decisions.filter((entry) => entry.status === "checked").length === EXPERIENCE_SECTIONS.length) goToApproval();
   };
@@ -128,7 +135,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
       <aside className="space-y-3 xl:sticky xl:top-24">
         {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
-        <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{EXPERIENCE_SECTIONS.map((item, index) => {
+        <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{displayOrder.map(({ item, index }) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.5px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
