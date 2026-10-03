@@ -161,7 +161,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-<sub>* MJT: 메타화용적 판단 과제 (Metapragmatic Judgment Task)<br>* DCT: 담화완성과제 (Discourse Completion Task)</sub>
+<sub>* MJT: 메타화용적 판단 과제 (Metapragmatic Judgment Task)<br>* DCT: 담화완성과제 (Discourse Completion Task)<br>* STT·TTS: 음성 인식·음성 합성 (Speech-to-Text · Text-to-Speech)</sub>
 
 <br>
 <br>
