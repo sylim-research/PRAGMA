@@ -11,6 +11,7 @@ import { fetchCourseOperationLogs, summarizeCourseOperations } from "@/lib/curri
 import { assembleLearnerCourse } from "@/lib/curriculum/learnerCourse";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
 import { missionSituationSummary } from "@/lib/curriculum/weeklyMaterials";
+import { weekDisplayTitle } from "@/lib/curriculum/weekGuidance";
 import { buildVirtualClassRows, VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
 import { buildClassDiscussion } from "@/lib/mission/classDiscussion";
 import {
@@ -214,14 +215,14 @@ export function ClassResponsePanel() {
                 key={item.week_no}
                 type="button"
                 aria-pressed={active}
-                aria-label={`${item.week_no}주차 · ${item.title}`}
+                aria-label={`${item.week_no}주차 · ${weekDisplayTitle(item)}`}
                 onClick={() => selectWeek(item.week_no)}
                 className={[
                   "min-w-0 rounded-md border px-2.5 py-1 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
                   active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-[#FCFBF8] text-[#24323D] hover:border-[#B9B29C]",
                 ].join(" ")}
               >
-                <span className="block text-[12.5px] font-semibold">{item.week_no}주차 · {item.title}</span>
+                <span className="block text-[12.5px] font-semibold">{item.week_no}주차 · {weekDisplayTitle(item)}</span>
                 {summary && summary.participants > 0 && <span className={`block text-[11px] tabular-nums ${active ? "text-[#D8DEE2]" : "text-[#7A858C]"}`}>
                   {`참여 ${summary.participants}명 · 완료 ${summary.completedLearners}명${summary.dissents > 0 ? ` · 이견 ${summary.dissents}` : ""}`}
                 </span>}

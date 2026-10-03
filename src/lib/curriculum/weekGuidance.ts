@@ -5,7 +5,7 @@ type GuidanceWeek = { week_no: number; type: string; speech_act: string | null; 
 export const REINFORCEMENT_WEEK = 13;
 export const REINFORCEMENT_TITLE = "선택 화행 집중 보완";
 export const REINFORCEMENT_DESCRIPTION = "교강사가 기학습 화행 하나를 선택해 새 상황의 미션 두 개로 집중 보완합니다. 수행 결과는 14주 종합 토론으로 이어집니다.";
-export const CENTRAL_QUESTION_GUIDANCE = "중심 질문은 수업의 방향을 안내하는 대표 질문입니다. 관계(P)·거리(D)·부담(R), 상황과 원문의 의도에 따라 구체화하거나 바꿔 사용할 수 있습니다. 특정 표현 전략이나 정답을 요구하지 않습니다.";
+export const CENTRAL_QUESTION_GUIDANCE = "중심 질문은 수업의 방향을 안내하는 대표 질문입니다. 권력(P)·거리(D)·부담도(R), 관계·상황과 원문의 의도에 따라 구체화하거나 바꿔 사용할 수 있습니다. 특정 표현 전략이나 정답을 요구하지 않습니다.";
 
 // 수업 안내 전용. 생성·검수 통과 조건, 평가 준거, 내부 진단 태그로 사용하지 않는다.
 const ACT_QUESTIONS: Record<SpeechActUI, string> = {
@@ -45,6 +45,12 @@ export function weekActivityLabel(week: GuidanceWeek): string {
     return SPEECH_ACT_UI[week.speech_act as SpeechActUI];
   }
   return week.title?.trim() || `${week.week_no}주차`;
+}
+
+/** 주차 목록·칩에 쓰는 제목. 화행 주차는 「칭찬 화행」처럼, 나머지는 활동명으로. 학습자·교수자 화면이 같이 쓴다. */
+export function weekDisplayTitle(week: GuidanceWeek): string {
+  if (!week.speech_act || !Object.prototype.hasOwnProperty.call(SPEECH_ACT_UI, week.speech_act)) return weekActivityLabel(week);
+  return `${SPEECH_ACT_UI[week.speech_act as SpeechActUI]} 화행${isReinforcementWeek(week) ? " · 새 상황에 적용하기" : ""}`;
 }
 
 export function weekCentralQuestion(week: GuidanceWeek): string | null {

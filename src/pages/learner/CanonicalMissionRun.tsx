@@ -1015,7 +1015,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
               onClick={() => setPicks(current => ({ ...current, [candidate.id]: option.id }))}
               className={`min-h-[42px] rounded-lg border px-1.5 py-2 text-xs font-semibold transition-colors sm:text-sm ${submitted ? optionState(true, picked, accepted) : optionState(false, picked, false)}`}>
               {submitted && picked && (accepted ? <Check className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden /> : <X className="mr-1 inline h-3.5 w-3.5" strokeWidth={3} aria-hidden />)}{option.label}
-              {submitted && accepted && <span className="ml-1.5 inline-flex items-center rounded-full border border-[#80AB94] bg-white px-1.5 py-px align-[1px] text-[10.5px] font-black text-[#245E44]">허용 판단</span>}
+              {submitted && accepted && <span className="ml-1.5 inline-flex items-center rounded-full border border-[#80AB94] bg-white px-1.5 py-px align-[1px] text-[10.5px] font-black text-[#245E44]">기준 판단</span>}
             </button>;
           })}
         </div>
@@ -1023,8 +1023,8 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
           const ok = candidate.acceptedAnswers.includes(picks[candidate.id] ?? "");
           // 판정은 선택지 위에서 끝낸다(DEC-20260918-03) — 내 칩의 ✓/✕와 허용 칩의 꼬리표. 아래 줄은 해설만.
           return <div className="mt-1">
-            <p className="sr-only">{ok ? "내 선택이 허용 판단에 해당합니다." : "내 선택이 허용 판단과 다릅니다."}</p>
-            <p className="sr-only">허용 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
+            <p className="sr-only">{ok ? "내 선택이 기준 판단에 해당합니다." : "내 선택이 기준 판단과 다릅니다."}</p>
+            <p className="sr-only">기준 판단 · {quest.options.filter(option => candidate.acceptedAnswers.includes(option.id)).map(option => option.label).join(" / ")}</p>
             <NoteLine><RichLine text={candidate.note} /></NoteLine>
           </div>;
         })()}

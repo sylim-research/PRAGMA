@@ -160,7 +160,7 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     await expectCounts(2, 1);
     expect(screen.getByRole("heading", { level: 2, name: /2주차 · 미션 1/ })).toBeVisible();
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
-    expect(screen.getByRole("button", { name: "2주차 · 요청" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "2주차 · 요청 화행" })).toHaveAttribute("aria-pressed", "true");
     expect(await screen.findByText("참여 2명 · 완료 2명 · 이견 1")).toBeVisible();
     expect(screen.getByRole("button", { name: "MJT 1 · 단일 표현 판단" })).toHaveAttribute("aria-pressed", "true");
     expect(screen.queryByText(/private-learner/)).not.toBeInTheDocument();
