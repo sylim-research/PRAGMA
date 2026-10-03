@@ -53,14 +53,14 @@ const mountAt = (entry: string) =>
 
 describe("학습 수행 기록", () => {
   it("파라미터가 없으면 전체 기록을 보여 준다", async () => {
-    mountAt("/admin/decision-traces");
+    mountAt("/admin/decision-traces?tab=records");
     expect(await screen.findByText("총 2건")).toBeVisible();
     expect(within(screen.getByRole("table")).getByText("김학생")).toBeVisible();
     expect(within(screen.getByRole("table")).getByText("이학생")).toBeVisible();
   });
 
   it("표에는 코드값 대신 사람이 읽는 화행·과업·미션 이름을 보여 준다", async () => {
-    mountAt("/admin/decision-traces");
+    mountAt("/admin/decision-traces?tab=records");
     expect(await screen.findAllByText("논문 면담 요청")).not.toHaveLength(0);
     expect(screen.getAllByText("요청").length).toBeGreaterThan(0);
     expect(screen.getAllByText("번역").length).toBeGreaterThan(0);

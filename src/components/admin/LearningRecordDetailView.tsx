@@ -1,4 +1,4 @@
-// 학습 수행 기록 「보기」 — 한 번의 수행을 원문·상황 → MJT → 통번역 과제 → 이견 순서의 구획으로 읽게 한다.
+// 학습자별 기록 「보기」 — 학습자가 실제로 고르고 쓴 것만 MJT → 통번역 과제 → 이견 순서로 보여 준다. 미션 내용(관계·상황)은 싣지 않는다.
 // 학습자가 실제로 고른·쓴 값은 남색 테두리로 표시해, 제시된 내용과 학습자의 응답이 한눈에 갈리게 한다.
 import type { ReactNode } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
@@ -62,25 +62,8 @@ function Flow({ children }: { children: ReactNode[] }) {
 }
 
 export function LearningRecordDetailView({ detail }: { detail: LearningRecordDetail }) {
-  const { context, mjt, task, dissent, meta } = detail;
+  const { context, mjt, task, dissent } = detail;
   const steps: Array<{ title: string; aside?: ReactNode; body: ReactNode }> = [];
-
-  steps.push({
-    title: "원문과 관계·상황",
-    aside: context.mode,
-    body: (
-      <div className="space-y-2.5">
-        <Box>
-          <Caption>{context.sourceLabel}</Caption>
-          <p className="text-sm leading-relaxed">{context.source ?? "—"}</p>
-        </Box>
-        <dl className="grid gap-x-4 gap-y-1 px-1 text-[13px] leading-relaxed text-[#46515A] sm:grid-cols-[3rem_minmax(0,1fr)]">
-          {context.relation && (<><dt className="font-semibold text-[#6B645A]">관계</dt><dd>{context.relation}</dd></>)}
-          {context.situation && (<><dt className="font-semibold text-[#6B645A]">상황</dt><dd>{context.situation}</dd></>)}
-        </dl>
-      </div>
-    ),
-  });
 
   if (mjt.length > 0) {
     steps.push({
@@ -113,7 +96,10 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
 
   steps.push({
     title: "DCT형 통번역 과제",
+    aside: context.mode,
     body: (
+      <div className="space-y-2.5">
+      {context.source && <p className="px-1 text-[13px] leading-relaxed text-[#46515A]"><span className="mr-2 font-semibold text-[#6B645A]">{context.sourceLabel}</span>{context.source}</p>}
       <Flow>
         {[
           <Box key="first" className="h-full">
@@ -138,6 +124,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           </Box>,
         ]}
       </Flow>
+      </div>
     ),
   });
 
@@ -162,9 +149,6 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           {step.body}
         </Section>
       ))}
-      {meta.length > 0 && (
-        <p className="border-t border-[#ECE8DD] pt-2 text-xs tabular-nums text-[#8A8478]">{meta.join("  ·  ")}</p>
-      )}
     </div>
   );
 }

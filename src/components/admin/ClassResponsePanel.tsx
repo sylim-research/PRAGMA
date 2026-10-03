@@ -39,17 +39,18 @@ function learnerMissionPath(courseId: string, weekNo: number, scenarioId: string
 export function ClassResponsePanel() {
   const queryClient = useQueryClient();
   const [params, setSearchParams] = useSearchParams();
-  const demo = params.get("demo") === "1";
+  // 기본은 데모 응답(가상 학급 20명). 실제 응답으로 바꾸면 ?demo=0을 남긴다.
+  const demo = params.get("demo") !== "0";
   // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션·데모만 바꾼다.
   const setParams = (next: Record<string, string>, options?: { replace?: boolean }) =>
-    setSearchParams({ tab: "class", ...(demo ? { demo: "1" } : {}), ...next }, options);
+    setSearchParams({ tab: "class", ...(demo ? {} : { demo: "0" }), ...next }, options);
   const setDemo = (on: boolean) => {
     const next: Record<string, string> = { tab: "class" };
     for (const key of ["courseId", "weekNo", "missionId"]) {
       const value = params.get(key);
       if (value) next[key] = value;
     }
-    if (on) next.demo = "1";
+    if (!on) next.demo = "0";
     setSearchParams(next);
   };
   const [projector, setProjector] = useState(false);

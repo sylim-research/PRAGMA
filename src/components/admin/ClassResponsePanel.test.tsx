@@ -136,7 +136,7 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-function mount(entry = "/admin/decision-traces?tab=class&courseId=course-a&weekNo=2&missionId=mission-1") {
+function mount(entry = "/admin/decision-traces?tab=class&courseId=course-a&weekNo=2&missionId=mission-1&demo=0") {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   return render(
     <QueryClientProvider client={client}>
@@ -156,7 +156,7 @@ async function expectCounts(learners: number, dissents: number) {
 
 describe("학습 수행 기록 › 학급 응답 분포", () => {
   it("교과목만 골라 들어와도 첫 미션 주차의 실제 분포를 바로 보여 준다", async () => {
-    mount("/admin/decision-traces?tab=class&courseId=course-a");
+    mount("/admin/decision-traces?tab=class&courseId=course-a&demo=0");
     await expectCounts(2, 1);
     expect(screen.getByRole("heading", { level: 2, name: /2주차 · 미션 1/ })).toBeVisible();
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
@@ -175,7 +175,7 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
   it("교과목을 지정하지 않으면 집계 대상 응답이 있는 교과목을 먼저 연다", async () => {
     mocks.outlines.mockResolvedValue([{ ...outline, id: "course-empty", title: "응답 없는 강좌" }, outline]);
     mocks.courseCounts.mockResolvedValue(new Map([["course-a", 2]]));
-    mount("/admin/decision-traces?tab=class");
+    mount("/admin/decision-traces?tab=class&demo=0");
     await expectCounts(2, 1);
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
   });
