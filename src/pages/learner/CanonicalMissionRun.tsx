@@ -2390,7 +2390,7 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>
-          <p className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 break-keep border-t border-dashed border-[#F3E3A2] pt-2 text-[15.5px] leading-7 text-[#15202B]"><NoteTag /><span className="min-w-0">{alternative.note}</span></p>
+          <p className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-2 break-keep border-t border-dashed border-[#F3E3A2] pt-2 text-[15.5px] leading-7 text-[#15202B]"><NoteTag /><span className="min-w-0"><RichLine text={alternative.note} /></span></p>
         </li>)}</ol>
       </section>}
     </article>

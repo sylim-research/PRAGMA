@@ -178,6 +178,12 @@ function clipped(value: string, max: number): string {
   return `${prefix.slice(0, boundary >= Math.floor(max * 0.65) ? boundary : max).trim()}…`;
 }
 
+/**
+ * mission_v6 MJT의 학습자 제시 순서(mpj_items 배열 index). 단일 표현 판단 → 판단과 이유 → 복수 표현 비교 →
+ * 수정안 선택 → 직접 수정. 저장 ID·배열·응답 tuple은 그대로 두고 화면 번호만 이 순서를 따른다.
+ */
+export const V6_MJT_PRESENTATION_ORDER = [0, 1, 4, 2, 3] as const;
+
 /** 역사 장면도 학습자에게는 핵심 두 문장만 보여 주는 표시 전용 projection. */
 export function compactLearnerScenario(value: string): string {
   const normalized = naturalLearnerScene(value);
@@ -466,7 +472,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       }
     });
     // Presentation order is separate from the stored item IDs and response tuple.
-    const presentationOrder = ["A1", "A2", "A5", "A3", "A4"];
+    const presentationOrder = V6_MJT_PRESENTATION_ORDER.map((index) => `A${index + 1}`);
     quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
     const nextLabels: Record<string, string> = {
       A1: "다음: 판단과 이유", A2: "다음: 복수 표현 비교",

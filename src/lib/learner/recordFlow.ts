@@ -56,8 +56,12 @@ export function buildChangeMap(feedbackRaw: unknown, featureId: string | null): 
     ? feature.find((candidate) => candidate.code === code) ?? (code === "within_band" ? feature.find((candidate) => candidate.tone === "teal") : undefined)
     : undefined;
   const scope = str(feedback?.revision_scope);
+  // 요청 화행은 미션 피드백 화면과 같은 공통 상태(좋음/수정 권장)로 보여 준다. 설명과 다시 살펴볼 점은 그대로 둔다.
+  const label = band && featureId === "request_mitigation_optionality"
+    ? (band.tone === "teal" ? "좋음" : "수정 권장")
+    : band?.label;
   return {
-    band: band ? { label: band.label, tone: band.tone } : null,
+    band: band && label ? { label, tone: band.tone } : null,
     scope: scope ? SCOPE_LABEL[scope as keyof typeof SCOPE_LABEL] ?? scope : null,
     feature: str(obj(feedback?.blocks)?.feature_ko),
   };
