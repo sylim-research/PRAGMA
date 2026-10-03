@@ -945,8 +945,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
                 <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
                 <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
-                  <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 5문항</dt>
-                  <dd className="text-[#4E5A63]">표현 판단 · 판단 근거 · 복수 표현 비교 · 수정안 선택 · 직접 교정</dd>
+                  <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항 5개</dt>
+                  <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 이유 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
@@ -1125,7 +1125,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                     opts={[["all", "전체"], ...LEVELS.map((l) => [l, LEVEL[l]] as [string, string])]} />
                   <AxisSel index="3" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                     opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-                  <AxisSel index="4" label="언어 방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+                  <AxisSel index="4" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                     opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
                 </div>
               )}

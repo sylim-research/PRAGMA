@@ -53,7 +53,7 @@ describe("단일 주차 강의 유인물", () => {
     if (state === "unapproved") mocks.material.mockResolvedValue(null);
     else mocks.material.mockRejectedValue(new Error("DB unavailable"));
     showNote();
-    await screen.findByText(state === "unapproved" ? /교수자 검수 후 공개됩니다/ : /승인된 수업자료를 확인하지 못했습니다/);
+    await screen.findByText(state === "unapproved" ? /교수자 최종 승인 후 공개됩니다/ : /승인된 수업자료를 확인하지 못했습니다/);
     expect(screen.queryByText("저장된 주차 목표")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "인쇄·PDF" })).not.toBeInTheDocument();
   });

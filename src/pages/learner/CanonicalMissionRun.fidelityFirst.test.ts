@@ -25,14 +25,14 @@ describe("fidelity first", () => {
   it("defers grammar and pragmatics when the meaning was not carried over", () => {
     const evaluation = evaluationFromRuntimeFeedback(runtime, quest, feedback("distorted"));
     expect(evaluation.criteria.map(c => c.level)).toEqual(["required", "deferred", "deferred"]);
-    expect(evaluation.criteria[1].body).toBe("의미 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.");
+    expect(evaluation.criteria[1].body).toBe("의미적 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.");
     expect(evaluation.headline).toBe("먼저 원문의 뜻을 옮겨 주세요.");
   });
 
   it("keeps all three judgments when the meaning is mostly carried over", () => {
     const evaluation = evaluationFromRuntimeFeedback(runtime, quest, feedback("minor_loss"));
     expect(evaluation.criteria.map(c => c.level)).toEqual(["recommend", "very_good", "recommend"]);
-    expect(evaluation.criteria[1]).toMatchObject({ key: "language", label: "문법 정확성", question: "중국어 표현에 문법적인 문제가 없나요?" });
+    expect(evaluation.criteria[1]).toMatchObject({ key: "language", label: "문법적 정확성", question: "중국어 표현에 문법적인 문제가 없나요?" });
     expect(evaluation.criteria[2].body).toBe("감사가 약하게 들릴 수 있습니다.");
   });
 });

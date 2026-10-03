@@ -14,10 +14,10 @@ function bandLabel(featureCode: string, code: string): string {
 
 // v6 유형은 학습자 화면과 같은 이름으로, v5에만 있던 유형은 이전 형식임을 밝힌다.
 const TYPE_LABEL: Record<string, string> = {
-  scale4: "상황에 맞는지 판단하기",
-  fix_choice: "고친 표현 고르기",
-  free_correction: "직접 고치고 비교하기",
-  multi_judge: "여러 표현 비교하기",
+  scale4: "단일 표현 판단",
+  fix_choice: "수정안 선택",
+  free_correction: "직접 수정",
+  multi_judge: "복수 표현 비교",
   judge3: "맥락 대비 판단(이전 형식)",
   reason_conf: "판정+이유+확신(이전 형식)",
   reason: "왜 문제일까(이전 형식)",

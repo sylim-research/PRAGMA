@@ -974,7 +974,7 @@ const AdminGenerator = () => {
 
           {/* 3. 목표 화행 — 3x3 카드 */}
           <div>
-            <SectionTitle n={2} label="목표 화행" accent="핵심 조건" />
+            <SectionTitle n={2} label="목표화행" accent="핵심 조건" />
             <div className="mt-2 grid grid-cols-3 gap-1.5">
               {(Object.keys(SPEECH_ACT_UI) as SpeechActUI[]).map((sa) => {
                 const on = form.speech_act_ui === sa;
@@ -1019,7 +1019,7 @@ const AdminGenerator = () => {
           {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
           <div>
             <SectionTitle n={3} label="관계·상황 조건 (P·D·R)" accent="핵심 조건" />
-            <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Imposition</p>
+            <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Ranking of imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="권력(P)">
                 <Select
@@ -1070,7 +1070,7 @@ const AdminGenerator = () => {
                 과제 모드에서 정한다: 번역 = 이메일, 통역 = 대면(setTaskModeSafe). 2026-09-26 */}
             <SectionTitle n={4} label="방향 · 수준" />
             <div className="mt-2 grid grid-cols-2 gap-3">
-              <Field label="언어 방향">
+              <Field label="언어방향">
                 <Select
                   value={form.language_direction}
                   onValueChange={(v) => update("language_direction", v as LanguageDirection)}
@@ -1219,7 +1219,7 @@ const AdminGenerator = () => {
             {outlines && outlines.length > 0 && (
               <div className="mt-2.5 space-y-1.5">
                 <div className="text-[12px] text-[#4E5A63]">
-                  목표 화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
+                  목표화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
                 </div>
                 {outlines.map((o, i) => {
                   const on = selectedOutlines.has(i);

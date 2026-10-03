@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { weekDisplayTitle } from "@/lib/curriculum/weekGuidance";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { BookOpen, MessagesSquare, ArrowRight, Sparkles } from "lucide-react";
@@ -79,7 +80,7 @@ export default function AdminTeachingStudio() {
           <fieldset disabled={locked || Boolean(editing)} className="mt-4 min-w-0 space-y-4"><legend className="sr-only">교과목과 산출물 선택</legend>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="min-w-0 text-sm font-semibold">교과목<select className={field} value={courseId} onChange={e => changeTarget("courseId", e.target.value)}><option value="">교과목 선택</option>{outlines.data?.map(o => <option key={o.id} value={o.id}>{o.title}</option>)}</select></label>
-              <label className="min-w-0 text-sm font-semibold">사용할 주차<select className={field} value={weekNo} onChange={e => changeTarget("weekNo", e.target.value)}>{course?.weeks.filter(w => teachingKind(w.week_no,w.type)).map(w => <option key={w.week_no} value={w.week_no}>{w.week_no}주 · {w.title}</option>)}</select></label>
+              <label className="min-w-0 text-sm font-semibold">사용할 주차<select className={field} value={weekNo} onChange={e => changeTarget("weekNo", e.target.value)}>{course?.weeks.filter(w => teachingKind(w.week_no,w.type)).map(w => <option key={w.week_no} value={w.week_no}>{w.week_no}주 · {weekDisplayTitle(w)}</option>)}</select></label>
             </div>
             {(outlines.isError || courseQuery.isError) && <p role="alert" className="text-sm text-destructive">교과목 계획을 불러오지 못했습니다.<button type="button" className="ml-2 underline" onClick={() => { void outlines.refetch(); void courseQuery.refetch(); }}>다시 불러오기</button></p>}
             <div className="rounded-xl border-l-4 border-[#E0C64F] bg-[#FFFCF0] px-4 py-3 text-sm leading-6">

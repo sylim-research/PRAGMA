@@ -23,7 +23,7 @@ const expectCompactContext = (questId: string, brief?: string) => {
   expect(screen.getByText(quest.source)).toBeInTheDocument();
   expect(screen.queryByText(quest.context.situation)).not.toBeInTheDocument();
   expect(screen.queryByText("상황", { exact: true })).not.toBeInTheDocument();
-  expect(screen.queryByText(/^(상대적 지위|친숙도|부담) · /)).not.toBeInTheDocument();
+  expect(screen.queryByText(/^(상대적 권력|사회적 거리|행위 부담도) · /)).not.toBeInTheDocument();
   if (brief) expect(screen.getByText(brief)).toBeInTheDocument();
 };
 
@@ -48,11 +48,11 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A1", "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.");
     click("다소 적절"); click("판단 확정하기"); click("다음: 상황에 맞는지 판단하기");
     expectCompactContext("A2", "수업에서만 뵌 교수님께 이메일로 처음 부탁하며, 아직 수락을 받지 않았습니다.");
-    expect(screen.queryByRole("region", { name: "가능한 수정 예시" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
     // Examples also appear when the learner judged the problematic draft appropriate.
     click("매우 적절"); click("판단 확정하기");
-    const examples = screen.getByRole("region", { name: "가능한 수정 예시" });
+    const examples = screen.getByRole("region", { name: "참고 표현" });
     expect(within(examples).getByText("老师，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。")).toBeInTheDocument();
     expect(within(examples).getByText("老师，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？")).toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
@@ -104,7 +104,7 @@ describe("local learner UX pilot", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${index + 1}의 판단` })).getByRole("radio", { name: band }));
     });
     click("판단 확정하기");
-    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("허용 판단 · 상황에 맞음")).toBeInTheDocument();
+    expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("기준 판단 · 상황에 맞음")).toBeInTheDocument();
     click("다음: 번역하기"); click("직접 번역해 보기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
     const dct = screen.getByRole("textbox");
@@ -125,7 +125,7 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A-DCT");
     const final = `${first}谢谢！`;
     fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
-    click("최종안 확정하기");
+    click("이 번역으로 확정하기");
     expect(screen.getByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     const record = screen.getByRole("region", { name: /번역 완성본/ });
     expect(record).toHaveTextContent(first);

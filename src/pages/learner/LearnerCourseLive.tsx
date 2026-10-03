@@ -5,18 +5,13 @@ import { ArrowRight, ChevronDown } from "lucide-react";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { useLearnerCourse } from "@/lib/curriculum/useLearnerCourse";
 import { MODE_LABEL, SPEECH_ACT_UI } from "@/lib/pragma/enums";
-import { isReinforcementWeek, weekActivityLabel } from "@/lib/curriculum/weekGuidance";
+import { weekDisplayTitle } from "@/lib/curriculum/weekGuidance";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { expectedMissionModesForWeek, remainingMissionModes, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
 import type { LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 import { LEGACY_TEACHING_MATERIALS as materialsOn } from "@/lib/admin/legacyFeatures";
 
-function weekHeading(week: LearnerCourseWeek): string {
-  if (!week.speech_act) return weekActivityLabel(week);
-  const act = SPEECH_ACT_UI[week.speech_act];
-  return `${act} 화행${isReinforcementWeek(week) ? " · 새 상황에 적용하기" : ""}`;
-}
 
 function savedWeek(key: string): number | null {
   try {
@@ -95,10 +90,10 @@ const LearnerCourseLive = () => {
             <ol aria-label="주차별 학습계획" className="overflow-hidden rounded-xl border border-[#E8E3D8] bg-white">
               {weeks.map((week) => {
                 const expanded = openWeek === week.week_no;
-                const title = weekHeading(week);
+                const title = weekDisplayTitle(week);
                 const savedGoal = week.can_do[0];
                 const goal = week.speech_act === "request" && (!savedGoal || savedGoal === "부탁을 부드럽고 분명하게 말하기")
-                  ? `원문의 요청 의도를 유지하면서 상황과 상대에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
+                  ? `원문의 요청 의도를 유지하면서 관계와 상황에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
                   : savedGoal;
                 const weekPath = `/learner/course/${courseId}/week/${week.week_no}`;
                 const modes = week.expected_mission_modes ?? expectedMissionModesForWeek({
@@ -128,7 +123,7 @@ const LearnerCourseLive = () => {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className={`block break-keep leading-5 ${expanded ? "text-[17px] font-semibold" : "text-[14px] font-medium"}`}>{title}</span>
-                          {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습목표 · {goal}</span>}
+                          {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습 목표 · {goal}</span>}
                         </span>
                         <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#969E9E]"}`} />
                       </button>

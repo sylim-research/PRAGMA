@@ -301,8 +301,8 @@ const AdminBatch = () => {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-lg font-bold"><StepNum n={1} />생성 조건</h2>
                 <div className="order-last flex w-full items-center gap-2 sm:order-none sm:ml-4 sm:w-auto">
-                  <span className="text-[13px] font-semibold text-[#3F4E59]">언어 방향</span>
-                  <div role="group" aria-label="언어 방향" className="inline-flex gap-1.5">
+                  <span className="text-[13px] font-semibold text-[#3F4E59]">언어방향</span>
+                  <div role="group" aria-label="언어방향" className="inline-flex gap-1.5">
                     {(["ko_zh", "zh_ko"] as const).map(d =>
                       <button key={d} type="button" aria-pressed={direction === d} disabled={busy} onClick={() => switchDirection(d)}
                         className={"h-9 rounded-md px-5 text-[13.5px] transition-colors disabled:opacity-60 " + (direction === d ? "border-2 border-[#BA7517] bg-[#FBEFD9] font-semibold text-[#7A4A0A]" : "border border-[#EAE4D2] bg-white font-medium text-[#3F4E59] hover:bg-[#FAF8F2]")}>

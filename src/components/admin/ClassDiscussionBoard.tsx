@@ -55,7 +55,7 @@ const PERSPECTIVES = [
 const DCT_QUESTIONS = [
   "AI는 어떤 부분의 수정을 권고했는가?",
   "학습자는 어떤 관계·상황을 근거로 이견을 제시했는가?",
-  "유지하거나 수정한 표현은 원문의 의미와 화행 목적을 어떻게 보존하는가?",
+  "유지하거나 수정한 표현은 원문의 의미와 화행목적을 어떻게 보존하는가?",
 ] as const;
 
 const percent = (count: number, total: number) => (total > 0 ? Math.round((count / total) * 100) : 0);
@@ -293,7 +293,7 @@ function GenericDetail({ item, size, projector }: { item: GenericItemView; size:
 }
 
 function decisionLabel(decision: DctCaseView["decision"]) {
-  return decision === "revised" ? "수정" : decision === "retained" ? "최초 산출 유지" : "—";
+  return decision === "revised" ? "수정" : decision === "retained" ? "초안 유지" : "—";
 }
 
 function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string; projector: boolean }) {
@@ -307,7 +307,7 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
     </header>
     <ol className="divide-y divide-[#EEEBE2]">
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">최초 산출</p>
+        <p className="text-[11.5px] font-semibold text-[#7A858C]">초안</p>
         <p className={`mt-0.5 leading-relaxed text-[#15202B] ${item.first ? zh(item.first) : ""} ${text}`}>{item.first ?? "—"}</p>
       </li>
       <li className="px-3 py-2.5">
@@ -331,7 +331,7 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>이견 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">최종 산출</p>
+        <p className="text-[11.5px] font-semibold text-[#7A858C]">확정안</p>
         <p className={`mt-0.5 leading-relaxed font-semibold text-[#15202B] ${item.final ? zh(item.final) : ""} ${text}`}>{item.final ?? "—"}</p>
       </li>
     </ol>
@@ -353,7 +353,7 @@ export function defaultDemoCompare(data: ClassDiscussion): string[] {
 function DctSection({ data, demo, state, onChange, size, projector }: { data: ClassDiscussion; demo: boolean; state: ClassDiscussionBoardState; onChange: Props["onChange"]; size: string; projector: boolean }) {
   const dct = data.dct;
   const decisionSlices: Slice[] = [
-    { key: "retained", label: "최초 산출 유지", count: dct.retained, tone: "navy" },
+    { key: "retained", label: "초안 유지", count: dct.retained, tone: "navy" },
     { key: "revised", label: "수정", count: dct.revised, tone: "amber" },
   ];
   const dissentSlices: Slice[] = [
@@ -413,7 +413,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
           </div>
         </div>
         <div>
-          <p className={`font-semibold text-[#15202B] ${size}`}>AI 피드백의 화용 판정 <span className="font-normal text-[#7A858C]">최초 산출 기준 {withVerdict}건</span></p>
+          <p className={`font-semibold text-[#15202B] ${size}`}>AI 피드백의 화용 판정 <span className="font-normal text-[#7A858C]">초안 기준 {withVerdict}건</span></p>
           {withVerdict > 0 ? <>
             <div className="mt-2"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-7" : "h-6"} labels /></div>
             <div className="mt-1.5"><Legend slices={dct.verdicts.filter((slice) => slice.count > 0)} size={size} /></div>

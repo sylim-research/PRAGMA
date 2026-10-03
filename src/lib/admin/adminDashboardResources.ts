@@ -15,7 +15,7 @@ export type ResourceScope = "all" | "ready";
 export const RESOURCE_DIMENSIONS: { key: ResourceDimension; title: string; labels: Record<string, string>; query: string }[] = [
   { key: "speech_act", title: "화행별", labels: SPEECH_ACT_UI, query: "act" },
   { key: "learner_level", title: "수준별", labels: LEVEL, query: "level" },
-  { key: "direction", title: "언어 방향별", labels: DIRECTION_LABEL, query: "direction" },
+  { key: "direction", title: "언어방향별", labels: DIRECTION_LABEL, query: "direction" },
   { key: "mode", title: "수행 방식별", labels: MODE_LABEL, query: "mode" },
 ];
 

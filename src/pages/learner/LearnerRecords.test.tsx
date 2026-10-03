@@ -147,7 +147,7 @@ describe("learner records", () => {
     expect(screen.getByRole("heading", { name: "내 기록" })).toBeInTheDocument();
     expect(screen.queryByText(/고쳐 쓴 기록|시그니처|수정 노트|완료 학습 기록/)).not.toBeInTheDocument();
     expect(screen.getAllByLabelText("생각해 보기")).toHaveLength(1);
-    expect(screen.getByLabelText("생각해 보기")).toHaveTextContent("최종 번역에서도 원문의 의미와 화행 목적이 유지되었나요?");
+    expect(screen.getByLabelText("생각해 보기")).toHaveTextContent("최종 번역에서도 원문의 의미와 화행목적이 유지되었나요?");
     expect(screen.queryByText("표현을 유지하거나 바꾼 이유는 무엇인가요?")).not.toBeInTheDocument();
     expect(screen.queryByText("다시 생각해 볼 질문")).not.toBeInTheDocument();
   });

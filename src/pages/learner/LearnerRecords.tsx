@@ -39,7 +39,7 @@ type ReportRecord = {
   completedAt: string;
   /** 저장된 AI 피드백 판정 줄 — 채점이 아니다. */
   feedback: string[];
-  decision: "최초 산출 유지" | "수정" | null;
+  decision: "초안 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
   /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
   change: ChangeMap | null;
@@ -464,7 +464,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
       <ClassReview record={head} />
       <p className="border-t border-[#EFEBDF] px-6 py-3 text-[14px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
         <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
-        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행 목적이 유지되었나요?
+        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행목적이 유지되었나요?
       </p>
     </article>
   );

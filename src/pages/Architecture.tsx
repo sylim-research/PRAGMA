@@ -171,7 +171,7 @@ const Handoff = ({ label }: { label: string }) => (
 // 이 환류가 자동 최적화가 아님을 말하는 지점이다(3.7절).
 // 🔴 2026-09-20 연구자 지시로 「문제 확인」을 빼고 검토 주체를 「교수자」로 통일했다.
 // 3.7절은 「교수자·연구자」로 적혀 있으므로 원고 쪽 표현을 이 화면에 맞춰야 한다.
-const CYCLE_LABEL = "교수자 검토 → 수정 → 재승인";
+const CYCLE_LABEL = "교수자 감수 → 수정 → 재승인";
 
 const CycleReturn = () => (
   <div
@@ -219,7 +219,7 @@ const Architecture = () => (
           <span aria-hidden className="h-[34px] w-[5px] rounded-sm bg-[#FAD338]" />
           <div>
             <h1 className="text-[16.5px] font-bold leading-tight tracking-tight text-white">
-              PRAGMA · 통합 워크플로우
+              PRAGMA 워크플로우
             </h1>
             {/* 관리자·심사 화면에서는 제품 설명어 대신 논문 가제를 그대로 쓴다. */}
             <p className="mt-0.5 text-[13px] text-[#95A2B0]">
@@ -271,7 +271,7 @@ const Architecture = () => (
             lane="supply"
             num="1"
             title="콘텐츠 제작"
-            desc="기준 고정 → 조건 생성 → 관문 통과분만 인계"
+            desc="기준 고정 → 조건 생성 → 승인된 미션만 인계"
           />
 
           <Node
@@ -289,12 +289,12 @@ const Architecture = () => (
           <Node
             lane="supply"
             title="학습 미션 조립"
-            desc={`MJT ${MPJ_ITEM_COUNT} + DCT형 통번역 산출 1 · 라이브러리`}
+            desc={`MJT 판단 문항 ${MPJ_ITEM_COUNT} + DCT형 통번역 과제 1 · 라이브러리`}
           />
           <Down />
           <Chain
             tone="gate"
-            label="품질 관문 · 승인분만 통과"
+            label="승인 단계 · 승인분만 통과"
             steps={[
               { title: "자동 품질 점검", detail: "규칙 기반 · 같은 입력에 같은 결과" },
               { title: "AI 검토", detail: "1차 검토 · 필요할 때 교차 검토 · 판정 권한 없음" },
@@ -303,7 +303,7 @@ const Architecture = () => (
           />
         </section>
 
-        <Handoff label="승인 미션" />
+        <Handoff label="승인된 미션" />
 
         {/* ② 학습자 수행 — 3.5.1 ~ 3.5.5 */}
         <section className="rounded-[13px] border border-[#D3D1C7] bg-card px-3.5 pb-3.5 pt-3.5 shadow-[0_8px_20px_-18px_rgba(21,32,43,.55)] lg:flex lg:flex-col lg:justify-between">
@@ -322,16 +322,16 @@ const Architecture = () => (
             tone="core"
             label="한 미션의 흐름 · 매 미션 반복"
             steps={[
-              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "상황 판단 · 이유 고르기 · 고친 표현 고르기 · 직접 고치기 · 여러 표현 비교" },
-              { title: "DCT형 통번역 산출", detail: "번역 · 통역(음성 STT/TTS) · 한→중 / 중→한" },
-              { title: "AI 피드백 검토", detail: "의미 · 언어 · 화용 3층 피드백 · 유지/수정은 학습자 결정" },
+              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "단일 표현 판단 · 판단과 이유 · 복수 표현 비교 · 수정안 선택 · 직접 수정" },
+              { title: "DCT형 통번역 과제", detail: "번역 · 통역(음성 STT/TTS) · 한→중 / 중→한" },
+              { title: "AI 피드백 검토", detail: "의미·문법·화용 기준 피드백 · 유지/수정은 학습자 결정" },
             ]}
           />
           <Down />
           <Node
             lane="learn"
-            title="수행 기록 · 이견 제기"
-            desc="판단 · 근거 · 최초안 · 최종 산출을 버전과 저장 · 이견 제기"
+            title="수행 기록 · 학습자 의견"
+            desc="판단 · 근거 · 초안 · 확정안을 버전과 저장 · 학습자 의견"
             status="수업 운영"
           />
           <Down />
@@ -352,7 +352,7 @@ const Architecture = () => (
           <Node
             lane="class"
             title="15주 편성 · 강의계획서"
-            desc="교과목 · 주차 주제 · 승인 미션 배치 · 자동 채우기"
+            desc="교과목 · 주차 주제 · 승인된 미션 배치 · 자동 채우기"
           />
           <Down />
           {/* 「조건 대비」(미션 1 vs 미션 2)는 폐기한 개념이다(연구자 결정 2026-09-17) —
@@ -361,7 +361,7 @@ const Architecture = () => (
           <Node
             lane="class"
             title="학습 수행 기록"
-            desc="개별 수행 기록 · 학급 응답 분포(익명 집계 · 이견 건수)"
+            desc="개별 수행 기록 · 학급 응답 분포(익명 집계 · 학습자 의견 건수)"
             status="분포 준비 중"
           />
           <Down />
@@ -373,7 +373,7 @@ const Architecture = () => (
           <Down />
           <Node
             lane="class"
-            title="연구 데이터 내보내기"
+            title="연구 자료 내보내기"
             desc="동의한 학습자만 · 비식별 · 분석용 내보내기"
           />
           <Down />

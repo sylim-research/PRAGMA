@@ -1083,12 +1083,10 @@ function WeekRow({
     ? getTargetFeature(plannedFeatureCode)?.learner_label ?? plannedFeatureCode
     : null;
   // 화행 주차는 「요청 화행」처럼 네 글자로 보인다.
-  // 7·14주는 미션 없이 누적 수행 기록으로 성찰·정리하는 주차다(2026-09-19 GPT 교차검증 A안 수정).
+  // 7·14주는 미션 없이 누적 수행 기록으로 학급 토론을 하는 주차다. 이름은 학습자 화면과 같은 weekActivityLabel을 쓴다.
   const displayTitle = week.type === "orientation"
     ? "오리엔테이션"
     : act && !reinforcement ? `${SPEECH_ACT_UI[act]} 화행`
-    : week.type === "regular" && week.week_no === 7 ? "전반부 성찰·정리"
-    : week.type === "regular" && week.week_no === 14 ? "종합 성찰·정리"
     : weekActivityLabel(week);
 
   const cands = filterManualCandidates(candidates.filter((candidate) => !replaced?.has(candidate.scenario_id)), {

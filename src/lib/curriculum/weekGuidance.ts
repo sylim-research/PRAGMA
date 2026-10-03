@@ -47,6 +47,12 @@ export function weekActivityLabel(week: GuidanceWeek): string {
   return week.title?.trim() || `${week.week_no}주차`;
 }
 
+/** 주차 목록·칩에 쓰는 제목. 화행 주차는 「칭찬 화행」처럼, 나머지는 활동명으로. 학습자·교수자 화면이 같이 쓴다. */
+export function weekDisplayTitle(week: GuidanceWeek): string {
+  if (!week.speech_act || !Object.prototype.hasOwnProperty.call(SPEECH_ACT_UI, week.speech_act)) return weekActivityLabel(week);
+  return `${SPEECH_ACT_UI[week.speech_act as SpeechActUI]} 화행${isReinforcementWeek(week) ? " · 새 상황에 적용하기" : ""}`;
+}
+
 export function weekCentralQuestion(week: GuidanceWeek): string | null {
   if (isReinforcementWeek(week)) {
     return "선택한 화행에서 다시 살펴볼 판단은 무엇이며, 새 상황에서는 어떻게 적용할까?";
