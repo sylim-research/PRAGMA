@@ -3225,7 +3225,7 @@ const CanonicalMissionRun = ({
         <section className="mx-auto max-w-3xl rounded-2xl border border-[#E5C8C2] bg-white px-6 py-8">
           <p className="text-xs font-black text-[#A44736]">대표 미션을 열지 못했습니다</p>
           <p className="mt-2 text-sm leading-6 text-[#5B6678]">현행 MJT5+DCT1 실행 계약을 지원하는 대표 미션을 다시 지정해 주세요.</p>
-          <Button asChild className="mt-5"><Link to="/architecture">통합 구조로 돌아가기</Link></Button>
+          <Button asChild className="mt-5"><Link to="/architecture">전체 구조로 돌아가기</Link></Button>
         </section>
       </LearnerJourneyShell>
     );

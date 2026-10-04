@@ -6,7 +6,7 @@ import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 
 // 심사 설명용 read-only 화면. 온라인 시연에서 한 화면으로 보여 주는 그림이다.
 //
-// 세 레인은 3.7절이 확정한 세 워크플로우 그대로다 — 콘텐츠 제작 / 학습자 수행 / 수업 운영.
+// 세 레인은 3.7절이 확정한 세 워크플로우 그대로다 — 콘텐츠 제작 / 통번역 학습 / 수업 운영.
 // 카드는 관리자 앱의 실제 메뉴(생성 기준 → 미션 재료 → 제작·품질 관리 → 수업 운영)와
 // 학습자 화면의 실제 단계를 그대로 옮긴 것이며, 3.5·3.6의 항과 1:1로 대응한다.
 //
@@ -53,10 +53,10 @@ const Node = ({
     }`}
   >
     <div className="flex items-start justify-between gap-2">
-      <div className="break-keep text-[13px] font-bold leading-[1.3] text-[#15202B]">{title}</div>
+      <div className="break-keep text-[14px] font-bold leading-[1.3] text-[#15202B]">{title}</div>
       {status && (
         <span
-          className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[9.5px] font-semibold leading-none ${
+          className={`shrink-0 rounded-full border px-1.5 py-0.5 text-[10px] font-semibold leading-none ${
             STATUS_TONE[status] ?? "border-[#D5C6B8] bg-white/70 text-[#765D4C]"
           }`}
         >
@@ -64,7 +64,7 @@ const Node = ({
         </span>
       )}
     </div>
-    <div className="mt-0.5 break-keep text-[11px] leading-[1.35] text-muted-foreground">{desc}</div>
+    <div className="mt-0.5 break-keep text-[12px] leading-[1.35] text-muted-foreground">{desc}</div>
   </div>
 );
 
@@ -72,21 +72,18 @@ const LaneHeader = ({
   lane,
   num,
   title,
-  desc,
 }: {
   lane: Lane;
   num: string;
   title: string;
-  desc: React.ReactNode;
 }) => (
-  <div className="mb-2.5">
+  <div className="mb-3">
     <div className="flex items-center gap-2">
-      <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold text-white ${LANE[lane].num}`}>
+      <span className={`grid h-[22px] w-[22px] place-items-center rounded-full text-[12px] font-bold text-white ${LANE[lane].num}`}>
         {num}
       </span>
-      <h2 className="text-[15.5px] font-extrabold leading-tight tracking-[-0.025em] text-[#15202B]">{title}</h2>
+      <h2 className="text-[16.5px] font-extrabold leading-tight tracking-[-0.025em] text-[#15202B]">{title}</h2>
     </div>
-    <p className="mt-1 break-keep pl-7 text-[11px] leading-[1.35] text-muted-foreground">{desc}</p>
   </div>
 );
 
@@ -122,7 +119,7 @@ const Chain = ({
       : { box: "border-[#FAD338] bg-[#FFFDF4]", chip: "bg-[#FDF1C4] text-[#8A6D00]", num: "bg-[#FDF1C4] text-[#8A6D00]", link: "text-[#D6B84A]" };
   return (
     <div className={`rounded-[11px] border-[1.5px] px-[10px] pb-[10px] pt-2 ${t.box}`}>
-      <span className={`inline-block rounded-[5px] px-[7px] py-0.5 text-[10px] font-bold tracking-[0.07em] ${t.chip}`}>
+      <span className={`inline-block rounded-[5px] px-[7px] py-0.5 text-[10.5px] font-bold tracking-[0.07em] ${t.chip}`}>
         {label}
       </span>
       <div className="mt-1.5 grid gap-[2px]">
@@ -132,14 +129,14 @@ const Chain = ({
             <span className="flex items-start gap-1.5 rounded-md border border-[#E5E1D4] bg-white px-2 py-[5px]">
               <span
                 aria-hidden
-                className={`mt-[1px] grid h-[15px] w-[15px] shrink-0 place-items-center rounded-[4px] text-[9px] font-bold ${t.num}`}
+                className={`mt-[1px] grid h-[16px] w-[16px] shrink-0 place-items-center rounded-[4px] text-[10px] font-bold ${t.num}`}
               >
                 {i + 1}
               </span>
               <span className="min-w-0">
-                <span className="block break-keep text-[11.5px] font-semibold leading-[1.3] text-[#15202B]">{step.title}</span>
+                <span className="block break-keep text-[12.5px] font-semibold leading-[1.3] text-[#15202B]">{step.title}</span>
                 {step.detail && (
-                  <span className="block break-keep text-[10.5px] leading-[1.35] text-muted-foreground">{step.detail}</span>
+                  <span className="block break-keep text-[11.5px] leading-[1.35] text-muted-foreground">{step.detail}</span>
                 )}
               </span>
             </span>
@@ -160,7 +157,7 @@ const Handoff = ({ label }: { label: string }) => (
     <span className="relative flex items-center gap-1 rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-2.5 py-1 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:flex-col lg:gap-0.5 lg:px-[5px] lg:py-2">
       <ChevronDown size={14} strokeWidth={2.5} className="shrink-0 text-[#A9761A] lg:hidden" />
       <ArrowRight size={15} strokeWidth={2.5} className="hidden shrink-0 text-[#A9761A] lg:block" />
-      <span className="whitespace-nowrap text-[10.5px] font-bold text-[#6B5518] lg:text-[9.5px]">{label}</span>
+      <span className="whitespace-nowrap text-[11px] font-bold text-[#6B5518] lg:text-[10.5px]">{label}</span>
     </span>
   </div>
 );
@@ -200,7 +197,7 @@ const CycleReturn = () => (
     </svg>
     <div className="absolute left-1/2 top-[9px] hidden -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-3 py-1 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:flex">
       <RotateCcw size={13} strokeWidth={2.5} className="text-[#A9761A]" aria-hidden />
-      <span className="text-[10.5px] font-bold text-[#6B5518]">{CYCLE_LABEL}</span>
+      <span className="text-[11.5px] font-bold text-[#6B5518]">{CYCLE_LABEL}</span>
     </div>
     <div className="flex items-center justify-center gap-1.5 rounded-full border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 shadow-[0_2px_6px_-3px_rgba(21,32,43,.35)] lg:hidden">
       <RotateCcw size={14} strokeWidth={2.5} className="shrink-0 text-[#A9761A]" aria-hidden />
@@ -214,24 +211,21 @@ const Architecture = () => (
     <header className="sticky top-0 z-40 bg-[#15202B]">
       {/* 아래 도식과 같은 1024 격자를 쓴다 — 헤더만 1120이면 CTA가 3열 우측
           테두리보다 49px 바깥에 떠서 액자가 그림보다 커 보인다(실측). */}
-      <div className="mx-auto flex max-w-[1024px] flex-wrap items-center justify-between gap-4 px-6 py-[11px]">
+      <div className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-4 px-6 py-[11px]">
         <div className="flex items-center gap-2.5">
-          <span aria-hidden className="h-[34px] w-[5px] rounded-sm bg-[#FAD338]" />
+          <span aria-hidden className="h-[24px] w-[5px] rounded-sm bg-[#FAD338]" />
           <div>
-            <h1 className="text-[16.5px] font-bold leading-tight tracking-tight text-white">
-              PRAGMA 워크플로우
+            {/* 랜딩의 「전체 구조 보기」와 같은 이름으로 연결한다. */}
+            <h1 className="text-[17.5px] font-bold leading-tight tracking-tight text-white">
+              PRAGMA 전체 구조
             </h1>
-            {/* 관리자·심사 화면에서는 제품 설명어 대신 논문 가제를 그대로 쓴다. */}
-            <p className="mt-0.5 text-[13px] text-[#95A2B0]">
-              「AI 기반 한·중 통번역 학습 워크플로우 개발 연구」
-            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           {IS_DEMO && (
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#FAD338] bg-[#FAD338] px-3 py-1.5 text-[12px] font-semibold text-[#15202B] transition-colors hover:bg-[#F5C400]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-white/35 px-3 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-white/10"
             >
               <PlayCircle aria-hidden size={14} strokeWidth={2} />
               대표 미션 시연
@@ -239,7 +233,7 @@ const Architecture = () => (
           )}
           <Link
             to="/"
-            className="rounded-lg border border-white/35 px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-white/10"
+            className="rounded-lg border border-[#FAD338] bg-[#FAD338] px-3 py-1.5 text-[12.5px] font-semibold text-[#15202B] transition-colors hover:bg-[#F5C400]"
           >
             ← 처음으로
           </Link>
@@ -252,10 +246,10 @@ const Architecture = () => (
         실측: 헤더 포함 743px. 1600×830에는 들어가고, 1366×640 노트북 공유에서는
         103px 넘친다. 그 경우에만 도식 전체를 84%로 줄여 한 화면을 지킨다 — 카드를
         더 깎아 맞추면 정상 화면에서 필요 없이 작아진다. */}
-    <div className="mx-auto max-w-[1024px] px-6 pb-4 pt-3 lg:[@media(max-height:720px)]:[zoom:.84]">
+    <div className="mx-auto max-w-[1120px] px-6 pb-4 pt-3 lg:[@media(max-height:720px)]:[zoom:.84]">
       {/* 세 레인을 한 문장으로 — 강조한 세 마디가 그대로 ①②③ 제목이다(3.7절 첫 문단). */}
-      <p className="mb-2 text-[14px] font-medium leading-relaxed text-[#4A5A66]">
-        <Mark>콘텐츠 제작</Mark> · <Mark>학습자 수행</Mark> · <Mark>수업 운영</Mark>을 같은 콘텐츠 버전과
+      <p className="mb-2 text-[15px] font-medium leading-relaxed text-[#4A5A66]">
+        <Mark>콘텐츠 제작</Mark> · <Mark>통번역 학습</Mark> · <Mark>수업 운영</Mark>을 같은 콘텐츠 버전과
         수행 기록으로 연결합니다.
       </p>
 
@@ -264,14 +258,13 @@ const Architecture = () => (
           레인 사이 여백 56px는 인계 라벨을 가로로 쓰기 위한 것이다.
           카드 설명은 한 줄이 원칙이다 — 두 줄이 되면 두 줄을 꽉 채우고, 애매하게
           넘치는 두 줄은 만들지 않는다. */}
-      <div className="grid grid-cols-1 items-start lg:grid-cols-[272px_56px_320px_56px_272px] lg:items-stretch">
+      <div className="grid grid-cols-1 items-start lg:grid-cols-[304px_56px_360px_56px_304px] lg:items-stretch">
         {/* ① 콘텐츠 제작 — 관리자 메뉴 1·2·3(생성 기준 → 미션 재료 → 제작·품질 관리) */}
         <section className="rounded-[13px] border border-border bg-card px-3.5 pb-3.5 pt-3.5 lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="supply"
             num="1"
             title="콘텐츠 제작"
-            desc="기준 고정 → 조건 생성 → 승인된 미션만 인계"
           />
 
           <Node
@@ -289,53 +282,52 @@ const Architecture = () => (
           <Node
             lane="supply"
             title="학습 미션 조립"
-            desc={`MJT 판단 문항 ${MPJ_ITEM_COUNT} + DCT형 통번역 과제 1 · 라이브러리`}
+            desc={`MJT ${MPJ_ITEM_COUNT}문항 + DCT형 통번역 과제 1`}
           />
           <Down />
           <Chain
             tone="gate"
-            label="승인 단계 · 승인분만 통과"
+            label="승인 단계"
             steps={[
               { title: "자동 품질 점검", detail: "규칙 기반 · 같은 입력에 같은 결과" },
-              { title: "AI 검토", detail: "1차 검토 · 필요할 때 교차 검토 · 판정 권한 없음" },
-              { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 자격 결정" },
+              { title: "AI 검토", detail: "1차·교차 검토 · 판정 권한 없음" },
+              { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 결정" },
             ]}
           />
         </section>
 
         <Handoff label="승인된 미션" />
 
-        {/* ② 학습자 수행 — 3.5.1 ~ 3.5.5 */}
+        {/* ② 통번역 학습 — 3.5.1 ~ 3.5.5 */}
         <section className="rounded-[13px] border border-[#D3D1C7] bg-card px-3.5 pb-3.5 pt-3.5 shadow-[0_8px_20px_-18px_rgba(21,32,43,.55)] lg:flex lg:flex-col lg:justify-between">
           <LaneHeader
             lane="learn"
             num="2"
-            title="학습자 수행"
-            desc="판단 → 산출 → 피드백 · 최종 결정은 학습자"
+            title="통번역 학습"
           />
 
           <Node lane="learn" title="교과목 선택 · 주차 학습 진입" desc="이번 주차 미션 · 학습 자료 · 진행 상태" />
           <Down />
-          <Node lane="learn" title="미션 도입 안내" desc="장면 · 관계 · 오늘 볼 것 확인" />
+          <Node lane="learn" title="미션 도입 안내" desc="장면 · 관계 · 오늘 볼 것" />
           <Down />
           <Chain
             tone="core"
-            label="한 미션의 흐름 · 매 미션 반복"
+            label="한 미션의 흐름"
             steps={[
-              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "단일 표현 판단 · 판단과 이유 · 복수 표현 비교 · 수정안 선택 · 직접 수정" },
-              { title: "DCT형 통번역 과제", detail: "번역 · 통역(음성 STT/TTS) · 한→중 / 중→한" },
-              { title: "AI 피드백 검토", detail: "의미·문법·화용 기준 피드백 · 유지/수정은 학습자 결정" },
+              { title: `화용적 적절성 판단 (MJT ${MPJ_ITEM_COUNT})`, detail: "판단 → 이유 → 비교 → 수정안 선택 → 직접 수정" },
+              { title: "DCT형 통번역 과제", detail: "번역 · 통역(STT/TTS) · 한→중 / 중→한" },
+              { title: "AI 피드백 검토", detail: "의미·문법·화용 기준 · 유지/수정은 학습자 결정" },
             ]}
           />
           <Down />
           <Node
             lane="learn"
             title="수행 기록 · 학습자 의견"
-            desc="판단 · 근거 · 초안 · 확정안을 버전과 함께 저장 · 학습자 의견"
+            desc="판단 · 근거 · 초안 · 확정안을 버전과 함께 저장"
             status="수업 운영"
           />
           <Down />
-          <Node lane="learn" title="개인별 학습 기록" desc="주차·화행별 자기 기록 · 저장된 피드백과 다시 살펴볼 점" />
+          <Node lane="learn" title="개인별 학습 기록" desc="주차·화행별 기록 · 피드백 다시 보기" />
         </section>
 
         <Handoff label="수행 기록" />
@@ -346,13 +338,12 @@ const Architecture = () => (
             lane="class"
             num="3"
             title="수업 운영"
-            desc="편성 · 자료 · 기록 관리 → 후속 검토 결정"
           />
 
           <Node
             lane="class"
             title="15주 편성 · 강의계획서"
-            desc="교과목 · 주차 주제 · 승인된 미션 배치 · 자동 채우기"
+            desc="주차 주제 · 미션 배치 · 자동 채우기"
           />
           <Down />
           {/* 「조건 대비」(미션 1 vs 미션 2)는 폐기한 개념이다(연구자 결정 2026-09-17) —
@@ -361,25 +352,25 @@ const Architecture = () => (
           <Node
             lane="class"
             title="학습 수행 기록"
-            desc="개별 수행 기록 · 학급 응답 분포(익명 집계 · 학습자 의견 건수)"
+            desc="개별 기록 · 학급 응답 분포(익명 집계)"
           />
           <Down />
           <Node
             lane="class"
             title="학습자 관리 · 수업 데이터"
-            desc="계정 · 학습한 교과목 · 최근 활동 · 백업·복원"
+            desc="계정 · 교과목 · 최근 활동 · 백업·복원"
           />
           <Down />
           <Node
             lane="class"
             title="연구 자료 내보내기"
-            desc="동의한 학습자만 · 가명 처리 · 분석용 내보내기"
+            desc="동의한 학습자만 · 가명 처리"
           />
           <Down />
           <Node
             lane="class"
             title="후속 콘텐츠 검토"
-            desc="확인한 문제 → 콘텐츠 · 편성 · 절차 재검토"
+            desc="콘텐츠 · 편성 · 절차 재검토"
             decision
           />
         </section>
