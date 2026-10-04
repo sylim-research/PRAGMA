@@ -14,13 +14,13 @@ export const MissionOutline = ({ mission }: { mission: LearnerMissionRuntime }) 
         {/* 학습자 제시 순서로 번호를 붙인다(저장 배열 순서와 다름). */}
         {V6_MJT_PRESENTATION_ORDER.filter((index) => v6.mpj_items[index]).map((index, position) => (
           <li key={index} className="flex gap-3 py-1.5">
-            <span className="w-[4.5rem] shrink-0 font-semibold tabular-nums text-[#66727A]">MJT 문항 {position + 1}</span>
+            <span className="w-[7.5rem] shrink-0 whitespace-nowrap font-semibold tabular-nums text-[#66727A]">MJT 판단 문항 {position + 1}</span>
             <span className="min-w-0 text-[#202B33]">{v6.mpj_items[index].title}</span>
           </li>
         ))}
         <li className="flex gap-3 py-1.5">
           <span className="w-[8.5rem] shrink-0 font-semibold text-[#66727A]">DCT형 통번역 과제</span>
-          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 다듬기</span>
+          <span className="min-w-0 text-[#202B33]">{task.mode === "interpreting" ? "통역" : "번역"} → AI 피드백 → 재검토</span>
         </li>
       </ol>
     </section>

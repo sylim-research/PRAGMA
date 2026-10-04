@@ -1878,7 +1878,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               <section ref={revisionRef} className={`${panel} scroll-mt-24 p-5 sm:p-6`}>
                 <div className="flex items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "다시 다듬기"}</p>
+                    <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "재검토"}</p>
                     <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? `최종 ${outputName}을 결정하세요.` : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
                   {!recheckRequested && <DemoFillButton />}
@@ -3066,7 +3066,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <h1 className="text-2xl font-black">학습 미션 완료</h1>
-              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? `AI 피드백을 참고해 한 번 더 다듬어 최종 ${completionOutput}을 결정했습니다.` : `AI 피드백을 확인하고, 내 판단으로 최초 ${completionOutput}을 그대로 확정했습니다.`}</p>
+              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? `${completionOutput}을 수정한 뒤 최종 ${completionOutput}을 결정했습니다.` : `AI 피드백을 확인하고, 내 판단으로 최초 ${completionOutput}을 그대로 확정했습니다.`}</p>
             </section>
             <div className="space-y-4">
               <CompletionRecord
