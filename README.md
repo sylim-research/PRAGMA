@@ -7,11 +7,11 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
-<h3 align="center">같은 뜻도, 관계와 상황에 따라 다르게 표현합니다.</h3>
+<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
 
 <p align="center">
 PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학습 플랫폼입니다.<br>
-학습자는 원문의 의미·화행목적을 유지하며 관계·상황에 맞게 통번역합니다.
+학습자는 원문의 의미·화행목적을 유지하며 상황·관계에 맞게 통번역합니다.
 </p>
 
 <br>
@@ -61,14 +61,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="165" align="left">조건</th><th width="595" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
-    <tr><td>관계·상황 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
+    <tr><td>상황·관계 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
     <tr><td>언어방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
     <tr><td>학습자 수준</td><td>입문&ensp;|&ensp;중급&ensp;|&ensp;고급</td></tr>
   </tbody>
 </table>
 
-> <small>9개 목표화행과 관계·상황 조건(Brown &amp; Levinson(1987)의 P·D·R을 해석 틀로 삼음)을 달리해 학습 미션을 구성합니다.</small>
+> <small>9개 목표화행과 상황·관계 조건(Brown &amp; Levinson(1987)의 P·D·R을 해석 틀로 삼음)을 달리해 학습 미션을 구성합니다.</small>
 
 <br>
 
@@ -153,7 +153,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
-    <tr><td>화용적 적절성</td><td>관계·상황과 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
+    <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
     <tr><td>직접 수정</td><td>설계된 결함 표현을 판단해 고치는 MJT 활동</td></tr>
     <tr><td>AI 피드백</td><td>통번역 산출 뒤 AI가 주는 재검토 정보. 채점이나 정답 확정이 아님</td></tr>
