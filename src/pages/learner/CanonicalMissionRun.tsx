@@ -1493,9 +1493,28 @@ function unavailableRuntimeEvaluation(
   };
 }
 
-/** Display only: preserve complete diagnostic text in the response and disclosure. */
-function feedbackSentences(value: string): string[] {
-  return [...new Set((value.match(/[^.!?。！？]+[.!?。！？]?/gu) ?? [value]).map((part) => part.trim()).filter(Boolean))];
+const QUOTE_PAIRS: Record<string, string> = { "'": "'", "\"": "\"", "‘": "’", "“": "”", "「": "」", "『": "』" };
+
+/**
+ * Display only: preserve complete diagnostic text in the response and disclosure.
+ * 따옴표 안의 ?·.·!는 문장 끝으로 보지 않는다 — 피드백이 원문 「…주실 수 있을까요?」를 인용하면
+ * 그 자리에서 잘려 해설 뒷부분이 사라졌다(2026-10-04).
+ */
+export function feedbackSentences(value: string): string[] {
+  const parts: string[] = [];
+  const closers: string[] = [];
+  let current = "";
+  for (const char of value) {
+    current += char;
+    if (closers.length && char === closers[closers.length - 1]) closers.pop();
+    else if (QUOTE_PAIRS[char]) closers.push(QUOTE_PAIRS[char]);
+    else if (!closers.length && /[.!?。！？]/u.test(char)) {
+      parts.push(current);
+      current = "";
+    }
+  }
+  parts.push(current);
+  return [...new Set(parts.map((part) => part.trim()).filter(Boolean))];
 }
 
 function conciseFeedback(value: string): string {
