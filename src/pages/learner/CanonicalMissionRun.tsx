@@ -309,7 +309,7 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
   tone: keyof typeof INTRO_PHASE_TONE;
   title: string;
   caption: string;
-  /** 응답 방식 표지 — 선택형(고른다) / 산출형(직접 번역·통역한다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
+  /** 응답 방식 표지 — 판단형(주어진 표현을 판단·수정한다) / 산출형(직접 번역·통역한다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
   mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
 }) {
@@ -344,7 +344,7 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
   // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
-      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "선택형", icon: ListChecks }} steps={steps.judgment} />
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "판단형", icon: ListChecks }} steps={steps.judgment} />
       {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
       <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
         <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
