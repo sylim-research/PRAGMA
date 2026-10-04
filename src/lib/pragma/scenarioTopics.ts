@@ -134,7 +134,7 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "campus_study",
     allowedDomains: ["school"],
     allowedSpeechActs: ["request", "thanks", "proposal", "complaint"],
-    situationSeedKo: "조별 과제를 함께 수행하는 학생들 사이에서 생기는 상호작용 상황",
+    situationSeedKo: "조별 과제를 수행하며 조원 또는 과제를 지도·평가하는 교수·조교와 생기는 상호작용 상황",
   },
   {
     code: "school_request_refusal",
@@ -189,6 +189,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "daily_living",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["request", "complaint"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
     situationSeedKo: "상대 이웃이 낸 생활 소음으로 불편이 이어져 그 이웃에게 말을 꺼내야 하는 상황",
   },
   {
@@ -197,6 +199,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "daily_living",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["apology"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
     situationSeedKo: "화자 본인의 집에서 난 생활 소음으로 상대 이웃에게 불편을 준 책임을 인정하고 사과하는 상황",
   },
   {
@@ -205,6 +209,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "daily_living",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["request", "thanks"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
     situationSeedKo: "친구·이웃과 물건을 빌리거나 작은 도움을 주고받는 일로 연락하는 상황",
   },
   {
@@ -213,6 +219,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "daily_living",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["agreement", "refusal"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
     situationSeedKo: "동호회 모임 일정이 잡혀 모임 참석을 두고 회원끼리 연락하는 상황",
   },
 
@@ -239,6 +247,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "relationship_social",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["apology"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedDistances: ["close", "acquaintance"],
     situationSeedKo: "일상 관계의 상대와 한 약속에 늦거나 약속을 지키지 못해 사과하는 상황",
   },
   {
@@ -317,6 +327,9 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "commerce_customer",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["request", "complaint"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
+    allowedDistances: ["formal", "acquaintance"],
     situationSeedKo: "구매한 상품에 문제가 있어 판매자에게 연락하는 상황(고객 입장)",
   },
   {
@@ -369,6 +382,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "digital_content",
     allowedDomains: ["daily", "work"],
     allowedSpeechActs: ["request", "refusal"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
     situationSeedKo: "콘텐츠 2차 사용 문제를 두고 크리에이터끼리 연락하는 상황",
   },
   // 구 group_chat_coordination(단체방 일정 조율)은 매체 기준 분류라 삭제 —
@@ -387,6 +402,9 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "relationship_social",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["proposal", "refusal", "agreement"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
+    allowedDistances: ["close", "acquaintance"],
     situationSeedKo: "일상 모임의 날짜·장소를 정하는 과정에서 의견이 오가는 상황",
   },
 
@@ -407,6 +425,8 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "international_exchange",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["thanks"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedDistances: ["acquaintance", "close"],
     situationSeedKo: "유학·교류 생활에서 함께 지낸 호스트 가족이나 생활 적응을 도운 현지 버디가 제공한 숙소·생활 도움에 감사를 전하는 상황",
   },
   {
@@ -456,6 +476,9 @@ export const SCENARIO_TOPICS: ScenarioTopic[] = [
     themeCode: "daily_living",
     allowedDomains: ["daily"],
     allowedSpeechActs: ["request", "thanks"],
+    // 관계가 주제에 내장된 시드(ITER-20261004-01): 장면 사전 검토와 같은 P·D 기준으로 미리 거른다.
+    allowedPowers: ["equal"],
+    allowedDistances: ["formal", "acquaintance"],
     situationSeedKo: "병원·약국에서 증상을 설명하고 예약이나 복용 방법을 두고 직원과 이야기하는 상황",
   },
 ];

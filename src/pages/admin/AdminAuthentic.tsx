@@ -38,7 +38,7 @@ const STATUS_LABEL: Record<StoredCandidate["status"], { text: string; tone: stri
 };
 
 const Chip = ({ children }: { children: React.ReactNode }) => (
-  <span className="whitespace-nowrap rounded-md bg-[#F5F2EA] px-1.5 py-[1px] text-[11.5px] text-[#3F4E59]">{children}</span>
+  <span className="whitespace-nowrap rounded-md bg-[#F5F2EA] px-1.5 py-[1px] text-[13.5px] text-[#3F4E59]">{children}</span>
 );
 
 const excerpt = (s: string, n = 90) => (s.length > n ? `${s.slice(0, n)}…` : s);
@@ -124,17 +124,17 @@ const AdminAuthentic = () => {
   const archive = (
     <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[16px] font-bold text-[#15202B]">분석 기록</h2>
-        <span className="whitespace-nowrap text-[12px] text-muted-foreground">최근 30건</span>
+        <h2 className="text-[18px] font-bold text-[#15202B]">분석 기록</h2>
+        <span className="whitespace-nowrap text-[14px] text-muted-foreground">최근 30건</span>
       </div>
 
       {pending && (
-        <p className="mt-3 rounded-md border border-[#FDE68A] bg-[#FFFBEB] px-3 py-2 text-[12.5px] text-[#92400E]">
+        <p className="mt-3 rounded-md border border-[#FDE68A] bg-[#FFFBEB] px-3 py-2 text-[14.5px] text-[#92400E]">
           {AUTHENTIC_STORE_PENDING} 지금은 분석과 생성기 전달만 됩니다.
         </p>
       )}
       {listError && (
-        <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[12.5px] text-[#991B1B]">
+        <p className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEF2F2] px-3 py-2 text-[14.5px] text-[#991B1B]">
           분석 기록을 읽지 못했습니다 · {listError}
         </p>
       )}
@@ -146,7 +146,7 @@ const AdminAuthentic = () => {
           ))}
         </div>
       ) : rows.length === 0 && !pending && !listError ? (
-        <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[14.5px] text-muted-foreground">
+        <p className="mt-4 rounded-md border border-dashed border-border px-3 py-6 text-center text-[16.5px] text-muted-foreground">
           분석한 자료가 아직 없습니다. 위에서 자료를 분석해 보세요.
         </p>
       ) : (
@@ -160,13 +160,13 @@ const AdminAuthentic = () => {
                   onClick={() => setOpenId(open ? null : row.id)}
                   className="flex w-full items-center gap-3 px-3 py-2.5 text-left hover:bg-muted/60"
                 >
-                  <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FBF5E6] px-2 py-[1px] text-[11.5px] font-semibold text-[#8A6A0E]">
+                  <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FBF5E6] px-2 py-[1px] text-[13.5px] font-semibold text-[#8A6A0E]">
                     {row.source_type === "image" ? "이미지" : "문구"}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-[14.5px] text-foreground">
+                  <span className="min-w-0 flex-1 truncate text-[16.5px] text-foreground">
                     {open ? "원자료" : excerpt(row.source_original)}
                   </span>
-                  <span className="shrink-0 whitespace-nowrap text-[12.5px] tabular-nums text-muted-foreground">
+                  <span className="shrink-0 whitespace-nowrap text-[14.5px] tabular-nums text-muted-foreground">
                     후보 {row.candidates.length}건 ·{" "}
                     {new Date(row.created_at).toLocaleDateString("ko-KR")}
                   </span>
@@ -175,13 +175,13 @@ const AdminAuthentic = () => {
                 {open && (
                   <div className="px-3 pb-3">
                     {/* 원자료 = 출발점. 금색 띠·미색 바탕으로 파생 후보(흰 카드)와 구분한다. */}
-                    <blockquote className="whitespace-pre-wrap rounded-md border-l-[3px] border-[#FAD338] bg-[#FBF5E6] px-3.5 py-2.5 text-[14.5px] leading-relaxed text-[#15202B]">
+                    <blockquote className="whitespace-pre-wrap rounded-md border-l-[3px] border-[#FAD338] bg-[#FBF5E6] px-3.5 py-2.5 text-[16.5px] leading-relaxed text-[#15202B]">
                       {row.source_original}
                     </blockquote>
 
                     {/* 파생 후보 — 원자료 아래로 들여 쓰고 세로선으로 이어, 「이 문구에서 나온 것」임을 모양으로 보인다. */}
                     <div className="ml-3 mt-2 border-l-2 border-[#E2DED2] pl-4 pt-1">
-                    <p className="mb-2 whitespace-nowrap text-[12px] font-semibold text-[#6B645A]">
+                    <p className="mb-2 whitespace-nowrap text-[14px] font-semibold text-[#6B645A]">
                       이 자료에서 나온 후보 {row.candidates.length}건
                     </p>
                     <div className="grid grid-cols-1 gap-2">
@@ -194,26 +194,26 @@ const AdminAuthentic = () => {
                             className="flex flex-col gap-1.5 rounded-md border border-[#E2DED2] bg-white p-3"
                           >
                             <div className="flex flex-wrap items-center gap-1.5">
-                              <span className="whitespace-nowrap rounded-full border border-[#E2DED2] bg-white px-2 py-[1px] text-[11.5px] font-semibold text-[#15202B]">
+                              <span className="whitespace-nowrap rounded-full border border-[#E2DED2] bg-white px-2 py-[1px] text-[13.5px] font-semibold text-[#15202B]">
                                 {authenticUsageLabel(c.usage_type)}
                               </span>
                               {cond?.speech_act_ui && <Chip>{SPEECH_ACT_UI[cond.speech_act_ui]}</Chip>}
                               {cond?.level && <Chip>{LEVEL[cond.level]}</Chip>}
                               {cond?.language_direction && <Chip>{DIRECTION_LABEL[cond.language_direction]}</Chip>}
                               <span
-                                className={`ml-auto whitespace-nowrap text-[12px] font-semibold ${status.tone}`}
+                                className={`ml-auto whitespace-nowrap text-[14px] font-semibold ${status.tone}`}
                               >
                                 {status.text}
                               </span>
                             </div>
 
                             {c.label_ko && (
-                              <p className="text-[14px] font-semibold text-[#15202B]">
+                              <p className="text-[16px] font-semibold text-[#15202B]">
                                 {c.label_ko}
                               </p>
                             )}
                             {c.source_text && (
-                              <p className="rounded-md bg-[#FBF8F0] px-2.5 py-1.5 text-[13.5px] leading-relaxed text-[#15202B]">
+                              <p className="rounded-md bg-[#FBF8F0] px-2.5 py-1.5 text-[15.5px] leading-relaxed text-[#15202B]">
                                 {c.source_text}
                               </p>
                             )}
@@ -222,7 +222,7 @@ const AdminAuthentic = () => {
                               {canMakeScenarioFromAuthentic(c.usage_type, c.source_text) && (
                                 <Button
                                   onClick={() => void sendStoredToGenerator(c, row)}
-                                  className="h-8 bg-[#15202B] px-2.5 text-[12.5px] text-white hover:bg-[#15202B]/90"
+                                  className="h-8 bg-[#15202B] px-2.5 text-[14.5px] text-white hover:bg-[#15202B]/90"
                                 >
                                   시나리오 만들기
                                 </Button>
@@ -230,14 +230,14 @@ const AdminAuthentic = () => {
                               <button
                                 type="button"
                                 onClick={() => void mark(c, c.status === "held" ? "stored" : "held")}
-                                className="rounded-md border border-border px-2.5 py-1 text-[12.5px] text-muted-foreground hover:bg-muted"
+                                className="rounded-md border border-border px-2.5 py-1 text-[14.5px] text-muted-foreground hover:bg-muted"
                               >
                                 {c.status === "held" ? "보류 해제" : "보류"}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => void mark(c, "discarded")}
-                                className="rounded-md border border-border px-2.5 py-1 text-[12.5px] text-muted-foreground hover:bg-muted"
+                                className="rounded-md border border-border px-2.5 py-1 text-[14.5px] text-muted-foreground hover:bg-muted"
                               >
                                 버리기
                               </button>
@@ -265,7 +265,7 @@ const AdminAuthentic = () => {
       {saveNote && (
         <p
           className={[
-            "mb-4 rounded-md border px-3 py-2 text-[12.5px]",
+            "mb-4 rounded-md border px-3 py-2 text-[14.5px]",
             saveNote === AUTHENTIC_STORE_PENDING
               ? "border-[#FDE68A] bg-[#FFFBEB] text-[#92400E]"
               : "border-[#6EE7B7] bg-[#ECFDF5] text-[#065F46]",

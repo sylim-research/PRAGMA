@@ -73,16 +73,14 @@ export interface BatchCell {
  * 도메인 topic 다수가 campus_study라 학교 셀이 campus로 쏠리고(관측: campus 23 vs 유학 1),
  * daily의 다른 테마가 소외된다. 동률·같은 테마 내 topic 변주는 seq로 회전(결정론).
  */
-function selectTopic(
+function compatibleTopics(
   act: SpeechActUI,
   domain: Domain,
-  pdr: { p: PdrPower; d: PdrDistance; r: PdrBurden },
+  pdr: { p: PdrPower; d: PdrDistance },
   mode: GenMode,
-  seq: number,
-  themeCount: Record<string, number>,
-  topicCount: Record<string, number>,
-): ScenarioTopic {
-  const inDomain = SCENARIO_TOPICS.filter((topic) => topic.allowedDomains.includes(domain));
+  topics: ScenarioTopic[] = SCENARIO_TOPICS,
+): ScenarioTopic[] {
+  const inDomain = topics.filter((topic) => topic.allowedDomains.includes(domain));
   const explicitMatch = inDomain.filter((topic) => topic.allowedSpeechActs?.includes(act));
   const wildcardMatch = inDomain.filter((topic) => !topic.allowedSpeechActs);
   const context = {
@@ -94,10 +92,39 @@ function selectTopic(
   };
   const explicitCompatible = explicitMatch.filter((topic) => topicSupportsContext(topic, context));
   const wildcardCompatible = wildcardMatch.filter((topic) => topicSupportsContext(topic, context));
-  const finalPool = explicitCompatible.length > 0 ? explicitCompatible : wildcardCompatible;
+  return explicitCompatible.length > 0 ? explicitCompatible : wildcardCompatible;
+}
+
+/**
+ * 배정 domain에 관계가 맞는 topic이 없으면 다른 domain으로 넘어간다(ITER-20261004-01).
+ * domain은 편성층이지 화용 구인축이 아니므로, 구인 셀(화행·P·D·R)을 지키려고 domain을 옮긴다.
+ * 예: 일상 topic은 관계가 대등하게 정해져 있어 「초대·내가 낮음」은 학업·직장 topic으로 간다.
+ */
+function domainFallbackOrder(domain: Domain, seq = 0): Domain[] {
+  // 넘겨받는 domain을 seq로 번갈아 한쪽으로만 쏠리지 않게 한다.
+  const others = DOMAINS.filter((candidate) => candidate !== domain);
+  return [domain, ...(seq % 2 === 0 ? others : [...others].reverse())];
+}
+
+function selectTopic(
+  act: SpeechActUI,
+  domain: Domain,
+  pdr: { p: PdrPower; d: PdrDistance; r: PdrBurden },
+  mode: GenMode,
+  seq: number,
+  themeCount: Record<string, number>,
+  topicCount: Record<string, number>,
+): { topic: ScenarioTopic; domain: Domain } {
+  let finalPool: ScenarioTopic[] = [];
+  let chosenDomain = domain;
+  for (const candidate of domainFallbackOrder(domain, seq)) {
+    finalPool = compatibleTopics(act, candidate, pdr, mode);
+    chosenDomain = candidate;
+    if (finalPool.length) break;
+  }
   if (!finalPool.length) {
     throw new Error(
-      `화행·P·D·mode·domain 호환 topic 없음: ${act}×${pdr.p}×${pdr.d}×${mode}×${domain}`,
+      `화행·P·D·mode 호환 topic 없음(전 domain): ${act}×${pdr.p}×${pdr.d}×${mode}`,
     );
   }
 
@@ -116,7 +143,7 @@ function selectTopic(
       best = t;
     }
   }
-  return best;
+  return { topic: best, domain: chosenDomain };
 }
 
 export interface BatchQuota {
@@ -231,16 +258,12 @@ export function auditTopicCompatibility(
       for (const power of powers) {
         for (const distance of distances) {
           for (const mode of modes) {
-            const context = { speechAct, domain, power, distance, mode };
-            const explicit = topics.some(
-              (topic) =>
-                topic.allowedSpeechActs?.includes(speechAct) &&
-                topicSupportsContext(topic, context),
+            // 배치 계획은 domain을 옮겨서라도 구인 셀을 채운다(domainFallbackOrder).
+            const servable = domainFallbackOrder(domain).some(
+              (candidate) =>
+                compatibleTopics(speechAct, candidate, { p: power, d: distance }, mode, topics).length > 0,
             );
-            const wildcard = topics.some(
-              (topic) => !topic.allowedSpeechActs && topicSupportsContext(topic, context),
-            );
-            if (!explicit && !wildcard) {
+            if (!servable) {
               gaps.push({ speechAct, domain, power, distance, mode });
             }
           }
@@ -406,10 +429,10 @@ export function buildBatchPlan(
           const domainIndex =
             (Math.floor(ordinal / 3) + Math.floor(ordinal / 27) + Math.max(actIndex, 0)) %
             DOMAINS.length;
-          const domain = DOMAINS[domainIndex];
-          const topic = selectTopic(
+          const plannedDomain = DOMAINS[domainIndex];
+          const { topic, domain } = selectTopic(
             speech_act_ui,
-            domain,
+            plannedDomain,
             pdr,
             slot.mode,
             seq,

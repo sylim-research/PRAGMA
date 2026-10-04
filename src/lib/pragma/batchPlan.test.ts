@@ -3,6 +3,7 @@ import {
   auditTopicCompatibility,
   auditTopicCoverage,
   buildBatchPlan,
+  FINAL_CORPUS_QUOTA_504,
   buildZhKoValidationPlan,
   productionModeCounts,
   FULL_BATCH_QUOTA_495,
@@ -176,15 +177,25 @@ describe("construct matrix coverage", () => {
     }
   });
 
-  it("keeps daily·school·work at 1:1:1 inside every level of the 495 plan", () => {
+  // 1:1:1이던 기준을 완화했다(ITER-20261004-01): 일상 topic은 관계가 대등하게 정해져 있어
+  // P가 기울어진 구인 셀은 학업·직장으로 넘어간다. 구인 셀 243을 지키고 domain은 하한만 둔다.
+  it("keeps every domain at 25% or more inside every level of the 495 plan", () => {
     const plan = buildBatchPlan(FULL_BATCH_QUOTA_495);
 
     for (const level of ["beginner_intermediate", "intermediate", "advanced"] as const) {
       const inLevel = plan.filter((cell) => cell.level === level);
-      const counts = ["daily", "school", "work"].map(
-        (domain) => inLevel.filter((cell) => cell.domain === domain).length,
-      );
-      expect(new Set(counts).size).toBe(1);
+      for (const domain of ["daily", "school", "work"]) {
+        const count = inLevel.filter((cell) => cell.domain === domain).length;
+        expect(count / inLevel.length).toBeGreaterThanOrEqual(0.25);
+      }
+    }
+  });
+
+  it("assigns role-bound peer topics only to equal-power cells", () => {
+    const plan = buildBatchPlan(FINAL_CORPUS_QUOTA_504);
+    const peerOnly = ["refund_request", "neighbor_noise", "club_meetup_invite", "content_reuse_permission"];
+    for (const cell of plan.filter((c) => peerOnly.includes(c.topic_code))) {
+      expect(cell.pdr_power).toBe("equal");
     }
   });
 
