@@ -15,7 +15,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
   // 순서 = 제작 흐름: 시나리오 → 미션에 든 MJT·DCT → 편성 가능 미션.
   const cards = [
     { label: "시나리오", value: resources?.scenarioCount, unit: "개", note: "생성된 학습 상황 설정", icon: Layers },
-    { label: "MJT 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 문항", icon: BookOpen },
+    { label: "MJT 판단 문항", value: resources?.all.judgmentCount, unit: "문항", note: "미션에 포함된 MJT 판단 문항", icon: BookOpen },
     { label: "DCT형 통번역 과제", value: resources?.all.productionCount, unit: "과제", note: "미션에 포함된 통번역 과제", icon: MessagesSquare },
     { label: "편성 가능 학습 미션", value: resources?.ready.missionCount, unit: "개 미션", note: "수업에 편성할 수 있는 학습 미션", icon: CheckCircle2 },
   ];
