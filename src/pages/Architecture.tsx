@@ -282,7 +282,7 @@ const Architecture = () => (
           <Node
             lane="supply"
             title="학습 미션 조립"
-            desc={`MJT ${MPJ_ITEM_COUNT}문항 + DCT형 통번역 과제 1`}
+            desc="MJT 판단 문항 + DCT형 통번역 과제"
           />
           <Down />
           <Chain
@@ -290,7 +290,7 @@ const Architecture = () => (
             label="승인 단계"
             steps={[
               { title: "자동 품질 점검", detail: "규칙 기반 · 같은 입력에 같은 결과" },
-              { title: "AI 검토", detail: "1차·교차 검토 · 판정 권한 없음" },
+              { title: "AI 검토", detail: "1차·교차 검토" },
               { title: "교수자 최종 승인", detail: "감수 → 수업 사용·공개 결정" },
             ]}
           />
@@ -323,7 +323,7 @@ const Architecture = () => (
           <Node
             lane="learn"
             title="수행 기록 · 학습자 의견"
-            desc="판단 · 근거 · 초안 · 확정안을 버전과 함께 저장"
+            desc="판단 · 근거 · 초안 · 확정안 저장"
             status="수업 운영"
           />
           <Down />
@@ -352,7 +352,7 @@ const Architecture = () => (
           <Node
             lane="class"
             title="학습 수행 기록"
-            desc="개별 기록 · 학급 응답 분포(익명 집계)"
+            desc="개별 기록 · 학급 응답 분포"
           />
           <Down />
           <Node
