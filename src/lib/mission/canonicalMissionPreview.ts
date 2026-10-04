@@ -232,7 +232,7 @@ export const CANONICAL_MISSION_PREVIEW: CanonicalMissionViewModel = {
     changedDimensions: ["R: 중·상 → 낮음"],
     note: "요청이라는 화행과 상대는 같지만, 이번 부탁은 아까보다 훨씬 가볍습니다.",
   },
-  summaryPrinciple: "요청의 핵심 의미는 지키고, 이유·사과·선택권 같은 덧붙임은 관계와 상황에 맞게 선택합니다.",
+  summaryPrinciple: "요청의 핵심 의미는 지키고, 이유·사과·선택권 같은 덧붙임은 상황과 관계에 맞게 선택합니다.",
   lessonPoints: [
     {
       questId: "A1",

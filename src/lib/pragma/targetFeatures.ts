@@ -676,7 +676,7 @@ const POLITENESS: TargetFeature = {
   closing_principle_ko: "공손함은 상황에 맞을 때 자연스럽습니다.",
   handoff_summary: {
     first_impression: "상대와 상황에 이 정도 공손성이 자연스러운지 살폈습니다.",
-    correction: "관계와 상황에 맞게 공손 표현의 정도를 조절했습니다.",
+    correction: "상황과 관계에 맞게 공손 표현의 정도를 조절했습니다.",
     reason: "무례하거나 지나치게 공손하면 상황에 어긋날 수 있음을 찾았습니다.",
     compare_low: "상황에 맞는 공손 표현과 무례하게 들리는 안을 구분했습니다.",
     compare_high: "상황에 맞는 공손 표현과 지나치게 격식을 높인 안을 구분했습니다.",

@@ -42,7 +42,7 @@ export function buildMpjSummaryRows(
           label: "첫인상 판단",
           comment: sameDirection
             ? summary?.first_impression ??
-              `관계와 상황에 비춰 「${mission.unit.learner_label}」의 정도를 살폈습니다.`
+              `상황과 관계에 비춰 「${mission.unit.learner_label}」의 정도를 살폈습니다.`
             : MPJ_SUMMARY_DIVERGENCE_COPY,
         };
       }

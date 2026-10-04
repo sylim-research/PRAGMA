@@ -363,8 +363,8 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
         </h1>
-        {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「관계와 상황」 어순은 정본. */}
-        <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 관계와 상황에 맞게 표현해 보세요.</p>
+        {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「상황과 관계」 어순은 정본. */}
+        <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 상황과 관계에 맞게 표현해 보세요.</p>
       </div>
       <div className="space-y-4 p-5">
         {config.briefingOnly ? (
@@ -932,7 +932,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
  * v6 자유교정은 결함안에서 출발하는 편집 과제다(DEC-20260918-05). 지시문은 할 일 하나만 말하고,
  * 의미 보존(Gate B)은 바로 아래 한 줄로 따로 둔다. 연구 용어(핵심 의미·화행 목적)는 화면에 쓰지 않는다.
  */
-const freeCorrectionInstruction = (output: string) => `원문이 전달하려는 내용과 의도를 살려, ${output}을 관계와 상황에 맞게 고쳐 보세요.`;
+const freeCorrectionInstruction = (output: string) => `원문이 전달하려는 내용과 의도를 살려, ${output}을 상황과 관계에 맞게 고쳐 보세요.`;
 const FREE_CORRECTION_FIDELITY = "원문에 없는 사실·이유·약속·합의는 새로 만들지 마세요.";
 
 function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: FreeCorrectionQuest; onDone: (response: QuestResponse) => void; devAutofill?: boolean }) {
@@ -1243,7 +1243,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton /></div>
             {/* 콘텐츠와 분리된 공통 안내로 의미 보존과 맥락 조건을 알린다. */}
-            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 관계와 상황에 맞게 작성해 보세요.</p>
+            <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 상황과 관계에 맞게 작성해 보세요.</p>
           </div>
         </div>
         <div className="pl-[60px]">
@@ -1355,7 +1355,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
     {
       key: "pragmatics",
       label: "화용적 적절성",
-      question: "이 관계와 상황에 잘 맞나요?",
+      question: "이 상황과 관계에 잘 맞나요?",
       level: pragmaticLevel,
       body: pragmaticLevel === "very_good"
         ? "상대와 요청 부담에 맞는 말투를 사용했습니다."
@@ -1441,11 +1441,11 @@ export function evaluationFromRuntimeFeedback(
     {
       key: "pragmatics",
       label: "화용적 적절성",
-      question: "이 관계와 상황에 잘 맞나요?",
+      question: "이 상황과 관계에 잘 맞나요?",
       level: pragmaticLevel,
       body: fidelityFirst ? FIDELITY_FIRST_NOTE : feedback.blocks.feature_ko || (pragmaticOk
         ? "이번 목표 화용요소의 적정 범위에 들어갑니다."
-        : "관계와 상황에 맞게 표현의 정도를 다시 조절해 보세요."),
+        : "상황과 관계에 맞게 표현의 정도를 다시 조절해 보세요."),
     },
   ];
   const primary = primaryFeedbackCriterion(criteria);
@@ -1481,7 +1481,7 @@ function unavailableRuntimeEvaluation(
     criteria: [
       { key: "meaning", label: "의미적 충실성", question: "뜻이 제대로 전달됐나요?", level: "recommend", body },
       { key: "language", label: "문법적 정확성", question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`, level: "recommend", body },
-      { key: "pragmatics", label: "화용적 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
+      { key: "pragmatics", label: "화용적 적절성", question: "이 상황과 관계에 잘 맞나요?", level: "recommend", body },
     ],
     headline: "AI 피드백을 불러오지 못했습니다.",
     body,

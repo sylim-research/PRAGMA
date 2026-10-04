@@ -93,7 +93,7 @@ const LearnerCourseLive = () => {
                 const title = weekDisplayTitle(week);
                 const savedGoal = week.can_do[0];
                 const goal = week.speech_act === "request" && (!savedGoal || savedGoal === "부탁을 부드럽고 분명하게 말하기")
-                  ? `원문의 요청 의도를 유지하면서 관계와 상황에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
+                  ? `원문의 요청 의도를 유지하면서 상황과 관계에 맞게 ${course.outline.language_direction === "zh_ko" ? "한국어" : "중국어"}로 전달한다.`
                   : savedGoal;
                 const weekPath = `/learner/course/${courseId}/week/${week.week_no}`;
                 const modes = week.expected_mission_modes ?? expectedMissionModesForWeek({

@@ -48,7 +48,7 @@ const Landing = () => {
                 />
                 {/* 형광펜 위에 얹히도록 텍스트도 위치를 잡아 준다(-z-10은 페이지
                     배경 뒤로 숨어 버린다). */}
-                <span className="relative">관계와 상황</span>
+                <span className="relative">상황과 관계</span>
               </span>
               에 따라
             </span>
@@ -72,7 +72,7 @@ const Landing = () => {
               PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하면서,
             </span>
             <span className="block">
-              관계·상황에 맞는 표현을 판단하고 직접 통번역하는 학습 플랫폼입니다.
+              상황·관계에 맞는 표현을 판단하고 직접 통번역하는 학습 플랫폼입니다.
             </span>
           </p>
         </section>
@@ -99,7 +99,7 @@ const Landing = () => {
               학습자 영역
             </span>
             <span className="mt-2.5 break-keep text-[13.5px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
-              관계와 상황에 맞는 표현을 판단하고 직접 통번역합니다.<br />
+              상황과 관계에 맞는 표현을 판단하고 직접 통번역합니다.<br />
               AI 피드백을 참고해 표현을 검토한 뒤, 확정안을 결정합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계

@@ -436,12 +436,12 @@ function specificPraiseLine(fb: RuntimeFeedback, learnerLabel: string): string {
   const expressions = [...new Set(quoted)].slice(0, 2);
 
   if (expressions.length === 2) {
-    return `‘${expressions[0]}’와 ‘${expressions[1]}’처럼 핵심 표현을 관계와 상황에 맞게 조절한 점이 좋았습니다.`;
+    return `‘${expressions[0]}’와 ‘${expressions[1]}’처럼 핵심 표현을 상황과 관계에 맞게 조절한 점이 좋았습니다.`;
   }
   if (expressions.length === 1) {
-    return `‘${expressions[0]}’처럼 핵심 표현을 관계와 상황에 맞게 조절한 점이 좋았습니다.`;
+    return `‘${expressions[0]}’처럼 핵심 표현을 상황과 관계에 맞게 조절한 점이 좋았습니다.`;
   }
-  return `이번 초점인 「${learnerLabel}」를 관계와 상황에 맞게 실현했습니다.`;
+  return `이번 초점인 「${learnerLabel}」를 상황과 관계에 맞게 실현했습니다.`;
 }
 
 /**
@@ -501,7 +501,7 @@ function FeedbackPanel({
       passed: v.pragmatic_appropriateness.band_code === withinBandCode,
       short:
         v.pragmatic_appropriateness.band_code === withinBandCode
-          ? "이 관계와 상황에 잘 맞췄습니다"
+          ? "이 상황과 관계에 잘 맞췄습니다"
           : learnerBandLabel(
               featureCode,
               v.pragmatic_appropriateness.band_code,
@@ -1667,7 +1667,7 @@ function MissionColdOpen({
   const actVerb = (speechAct && (SPEECH_ACT_VERB_KO as Record<string, string>)[speechAct]) || "말하면";
   const targetLangKo = direction === "zh_ko" ? "한국어" : "중국어";
   const clue =
-    sceneContext || "말뜻뿐 아니라 이 장면의 관계와 상황도 함께 살펴보세요.";
+    sceneContext || "말뜻뿐 아니라 이 장면의 상황과 관계도 함께 살펴보세요.";
   const closingQuestion =
     productionTask.mode === "interpreting"
       ? `${targetLangKo}로 어떻게 통역하면 좋을까?`

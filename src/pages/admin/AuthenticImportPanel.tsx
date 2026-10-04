@@ -863,7 +863,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                       ) : (
                         <p className="mt-auto whitespace-nowrap rounded-md border border-dashed border-[#E2DED2] px-2.5 py-1.5 text-[12px] text-[#6B645A]">
                           {contextReference
-                            ? "참고 자료 · 관계·상황 이해용, 과제로 만들지 않음"
+                            ? "참고 자료 · 상황·관계 이해용, 과제로 만들지 않음"
                             : generatableType
                               ? "출발 텍스트 없음 · 원문을 고쳐 다시 분석"
                               : "참고만 · 독립 미션으로 만들지 않음"}
