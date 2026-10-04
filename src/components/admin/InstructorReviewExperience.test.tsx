@@ -139,7 +139,7 @@ describe("instructor experience", () => {
     render(<MemoryRouter><CanonicalReviewStage mission={model} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，请问您方便的时候可以帮我确认一下这份资料吗？非常感谢您的帮助。" } });
     fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
-    expect(screen.getByText("DCT 참고 표현·해설")).toBeInTheDocument();
+    expect(screen.getByText("DCT형 통번역 과제 참고 표현·해설")).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled(); expect(effects.feedback).not.toHaveBeenCalled();
   });
   it("keeps the memo editable while an autosave is in flight, and the next save carries what was typed meanwhile", async () => {

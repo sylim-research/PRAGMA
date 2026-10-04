@@ -83,7 +83,7 @@ const ITEM_TITLES: Record<string, string> = {
 
 // 학습자 화면(CanonicalMissionRun)의 이견 조건과 같은 코드·문구.
 const DISSENT_LABELS: Record<string, string> = {
-  relationship: "관계·친밀도에 대한 다른 판단",
+  relationship: "관계에 대한 다른 판단",
   burden: "행위의 부담 크기에 대한 다른 판단",
   preceding: "앞선 대화 흐름을 더 고려함",
   experience: "실제 사용 경험과 차이가 있음",

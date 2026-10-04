@@ -87,7 +87,7 @@ function missionSlides(mission: ExportMission) {
       ])}</div>`, true),
     slide("MJT·DCT 수행자료 토론", missionHeading, `
       <div class="items">${mpjItems}</div>
-      <article class="item dct"><h3>DCT 직접 산출</h3><p><strong>산출 원문:</strong> ${escapeHtml(guide.dct.sourceText)}</p><div class="answer"><h3>수정 후 참고안 비교</h3><ol>${alternatives}</ol></div></article>`, true),
+      <article class="item dct"><h3>DCT형 통번역 과제</h3><p><strong>원문:</strong> ${escapeHtml(guide.dct.sourceText)}</p><div class="answer"><h3>수정 후 참고안 비교</h3><ol>${alternatives}</ol></div></article>`, true),
     slide("다른 맥락으로 재맥락화", missionHeading, `
       <p class="lead">${escapeHtml(guide.recontextualization.situationKo)}</p>
       <p class="muted">관계: ${escapeHtml(guide.recontextualization.relationKo)}</p>

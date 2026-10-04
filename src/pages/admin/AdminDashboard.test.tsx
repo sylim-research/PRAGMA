@@ -77,7 +77,7 @@ describe("admin dashboard", () => {
 
   it("drops the duplicated production flow row and keeps no helper sentence", async () => {
     show();
-    await screen.findByRole("group", { name: "품질 검수 단계" });
+    await screen.findByRole("group", { name: "품질 점검 단계" });
     expect(screen.queryByText("제작·승인 현황")).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: /검수·승인 중/ })).not.toBeInTheDocument();
     expect(screen.queryByText("승인 전 미션")).not.toBeInTheDocument();
@@ -95,7 +95,7 @@ describe("admin dashboard", () => {
       run("rule-fail", { rules_verdict: "fail" }),
     ];
     show();
-    const stages = await screen.findByRole("group", { name: "품질 검수 단계" });
+    const stages = await screen.findByRole("group", { name: "품질 점검 단계" });
     // 카드 제목(규칙 검사 · OpenAI/Claude · 교수자)이 이미 세 층을 말하므로 묶음 머리표는 두지 않는다.
     expect(stages.textContent).not.toContain("AI 문맥 검토");
     const rules = within(stages).getByRole("link", { name: /자동 품질 점검 완료/ });
@@ -125,7 +125,7 @@ describe("admin dashboard", () => {
     ];
     mocks.tables.content_review_runs = [...(mocks.tables.content_review_runs as unknown[]), run("v5-ready")];
     show();
-    const stages = screen.getByRole("group", { name: "품질 검수 단계" });
+    const stages = screen.getByRole("group", { name: "품질 점검 단계" });
     const rules = within(stages).getByRole("link", { name: /자동 품질 점검 완료/ });
     await waitFor(() => expect(rules).toHaveAttribute("title", "지금 대기 2개"));
     expect(rules.textContent).not.toContain("v5");
@@ -158,7 +158,7 @@ describe("admin dashboard", () => {
     for (const label of ["AI 검토 완료", "Claude 교차 검토 완료", "OpenAI 재검토 완료"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
-    const stages = screen.getByRole("group", { name: "품질 검수 단계" });
+    const stages = screen.getByRole("group", { name: "품질 점검 단계" });
     const professorCards = within(stages).getAllByRole("link", { name: /교수자 최종 승인 완료/ });
     expect(professorCards).toHaveLength(1);
     expect(professorCards[0]).toHaveAttribute("href", "/admin/review");

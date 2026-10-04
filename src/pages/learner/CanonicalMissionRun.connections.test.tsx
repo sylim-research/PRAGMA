@@ -103,7 +103,7 @@ describe("CanonicalMissionRun completion connections", () => {
     expect(submit).toBeDisabled();
 
     // 조건 선택지는 없다 — 한 줄 서술만 받는다.
-    expect(screen.queryByRole("button", { name: "관계·친밀도에 대한 다른 판단" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "관계에 대한 다른 판단" })).not.toBeInTheDocument();
     fireEvent.change(screen.getByPlaceholderText("어떤 점에서 다르게 봤는지 한 줄로 적어 주세요."), {
       target: { value: "초면보다 이미 아는 사이에 가깝다고 보았습니다." },
     });

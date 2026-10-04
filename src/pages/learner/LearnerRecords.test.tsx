@@ -163,7 +163,7 @@ describe("learner records", () => {
     const [item] = await recordItems();
     const feedback = within(item).getByRole("region", { name: "AI 피드백" });
     expect(feedback).toHaveTextContent("다시 살펴볼 점 상대에게 주는 인상");
-    expect(feedback).toHaveTextContent("내 의견관계·친밀도에 대한 다른 판단“같은 과 선배라서”");
+    expect(feedback).toHaveTextContent("내 의견관계에 대한 다른 판단“같은 과 선배라서”");
     expect(within(item).getByRole("region", { name: "최종 번역" })).toHaveTextContent("최초 번역을 그대로 유지했습니다.");
     expect(within(item).queryByRole("button", { name: "자세히 보기" })).not.toBeInTheDocument();
     expect(within(item).queryByText("유지")).not.toBeInTheDocument();

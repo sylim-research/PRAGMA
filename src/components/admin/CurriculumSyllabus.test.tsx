@@ -87,7 +87,7 @@ describe("CurriculumSyllabus", () => {
     expect(screen.getByText("번역 2개 · 각 미션의 판단 → 산출 → 피드백·수정")).toBeInTheDocument();
     expect(screen.getByText("배정 미션 완료 · 주차 학습노트 정리")).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "학습목표–평가 근거 대응" })).toBeInTheDocument();
-    expect(screen.getByText("최초 산출, 최소 피드백 반영, 수정본")).toBeInTheDocument();
+    expect(screen.getByText("초안, AI 피드백 반영, 수정안·확정안")).toBeInTheDocument();
     expect(screen.getByText("배정 미션은 해당 주차 안에 완료한다.")).toBeInTheDocument();
     expect(screen.getByText("40%")).toBeInTheDocument();
   });
