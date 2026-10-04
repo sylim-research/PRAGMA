@@ -139,7 +139,7 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
         },
         "type": "free_correction",
         "title": "리허설 일정",
-        "prompt": "원문이 전달하려는 내용과 의도를 살려, 번역안을 관계와 상황에 맞게 고쳐 보세요.",
+        "prompt": "원문이 전달하려는 내용과 의도를 살려, 번역안을 상황과 관계에 맞게 고쳐 보세요.",
         "source": "내일 발표 리허설을 7시에서 7시 반으로 늦춰도 될까? 수업이 늦게 끝나서.",
         "target": "我下课晚，明天的彩排从七点改到七点半，就这么定了。",
         "channel": "messenger",

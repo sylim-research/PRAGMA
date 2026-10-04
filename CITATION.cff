@@ -9,10 +9,10 @@ authors:
     affiliation: "Hankuk University of Foreign Studies"
 abstract: >-
   화용적 적절성을 중심으로 설계한 한·중 통번역 학습 플랫폼. 목표 화행과
-  관계·상황 조건(상대적 권력, 사회적 거리, 행위 부담도)을 달리해 학습 콘텐츠를
+  상황·관계 조건(상대적 권력, 사회적 거리, 행위 부담도)을 달리해 학습 콘텐츠를
   생성하고, 교수자가 감수한 뒤 최종 승인한 학습 미션만 교과목·주차에 편성하며,
   학습자의 판단, 통번역 산출과 수정 과정을 콘텐츠 버전과 함께 기록한다.
-  학습자는 원문의 의미와 화행 목적을 유지하며 관계·상황에 맞게 통번역한다.
+  학습자는 원문의 의미와 화행 목적을 유지하며 상황·관계에 맞게 통번역한다.
 repository-code: "https://github.com/sylim-research/PRAGMA"
 url: "https://pragma.up.railway.app"
 keywords:

@@ -251,7 +251,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
         <div className="mt-1 text-[14px] font-bold text-[#15202B]">{act}</div>
       </div>
       <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
-        <div className={heading}>관계·상황 조건 (P·D·R)</div>
+        <div className={heading}>상황·관계 조건 (P·D·R)</div>
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
           {pdr.map(({ name, value }) => (
             <span key={name} className="whitespace-nowrap text-[12.5px] text-[#5B6770]">
@@ -897,7 +897,7 @@ const AdminGenerator = () => {
   return (
     <AdminShell
       title="시나리오 개별 생성"
-      description="관계·상황 조건을 정해 시나리오를 한 건씩 만들고, 교수자 감수 대기 상태로 저장합니다."
+      description="상황·관계 조건을 정해 시나리오를 한 건씩 만들고, 교수자 감수 대기 상태로 저장합니다."
     >
       {gridPrefill && (
         <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-[12px] text-amber-950">
@@ -1018,7 +1018,7 @@ const AdminGenerator = () => {
           {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
           {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
           <div>
-            <SectionTitle n={3} label="관계·상황 조건 (P·D·R)" accent="핵심 조건" />
+            <SectionTitle n={3} label="상황·관계 조건 (P·D·R)" accent="핵심 조건" />
             <p className="mt-1 pl-[30px] text-[11.5px] text-muted-foreground">Power · Distance · Ranking of imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="권력(P)">

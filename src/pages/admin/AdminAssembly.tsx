@@ -948,7 +948,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항 5개</dt>
                   <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 이유 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
-                  <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 관계·상황에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
+                  <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 상황·관계에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
                 <div className="mt-2.5 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
