@@ -122,7 +122,7 @@ describe("one DCT revision recheck", () => {
     if (status === "failure") expect(screen.getByText(/현재 번역안을 직접 검토한 뒤 최종 결정/)).toBeInTheDocument();
     // 2차가 수정 권고여도 AI 승인을 기다리지 않는다. 최종 텍스트는 세 번째 호출을 만들지 않는다.
     fireEvent.change(screen.getByRole("textbox", { name: "최종 번역" }), { target: { value: C } });
-    expect(screen.getByText(/추가 수정에는 AI 피드백을 다시 실행하지 않습니다/)).toBeInTheDocument();
+    expect(screen.queryByText(/추가 수정에는 AI 피드백을 다시 실행하지 않습니다/)).not.toBeInTheDocument();
     click("이 번역으로 확정하기");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(2);

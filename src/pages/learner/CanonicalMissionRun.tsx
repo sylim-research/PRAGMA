@@ -1890,7 +1890,6 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? `최종 ${outputName}` : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
-                {recheckRequested && <p className="mt-2 text-[12.5px] leading-5 text-[#6D7788]">추가 수정에는 AI 피드백을 다시 실행하지 않습니다. 최종 표현은 직접 결정하세요.</p>}
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
