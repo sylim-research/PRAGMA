@@ -702,7 +702,7 @@ function NoteLine({ children }: { children: React.ReactNode }) {
 }
 
 const DISSENT_CONDITIONS = [
-  { code: "relationship", label: "관계·친밀도에 대한 다른 판단" },
+  { code: "relationship", label: "관계에 대한 다른 판단" },
   { code: "burden", label: "행위의 부담 크기에 대한 다른 판단" },
   { code: "preceding", label: "앞선 대화 흐름을 더 고려함" },
   { code: "experience", label: "실제 사용 경험과 차이가 있음" },
@@ -1390,7 +1390,7 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
   };
 }
 
-const FIDELITY_FIRST_NOTE = "의미적 충실성을 먼저 보완하면, 다듬기 단계에서 문법과 화용을 이어서 검토합니다.";
+const FIDELITY_FIRST_NOTE = "의미적 충실성을 먼저 보완하면, 재검토 단계에서 문법과 화용을 이어서 검토합니다.";
 
 function feedbackLevel(ok: boolean, warning = false): FeedbackLevel {
   return ok ? "very_good" : warning ? "recommend" : "required";
@@ -1444,7 +1444,7 @@ export function evaluationFromRuntimeFeedback(
       question: "이 관계와 상황에 잘 맞나요?",
       level: pragmaticLevel,
       body: fidelityFirst ? FIDELITY_FIRST_NOTE : feedback.blocks.feature_ko || (pragmaticOk
-        ? "이번 목표 화용 요소의 적정 범위에 들어갑니다."
+        ? "이번 목표 화용요소의 적정 범위에 들어갑니다."
         : "관계와 상황에 맞게 표현의 정도를 다시 조절해 보세요."),
     },
   ];
@@ -1475,7 +1475,7 @@ function unavailableRuntimeEvaluation(
   targetLanguage = "중국어",
   outputName = "번역",
 ): DctEvaluation {
-  const body = `자동 피드백을 불러오지 못했습니다. 참고 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
+  const body = `AI 피드백을 불러오지 못했습니다. 참고 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
   return {
     available: false,
     criteria: [
@@ -1483,7 +1483,7 @@ function unavailableRuntimeEvaluation(
       { key: "language", label: "문법적 정확성", question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`, level: "recommend", body },
       { key: "pragmatics", label: "화용적 적절성", question: "이 관계와 상황에 잘 맞나요?", level: "recommend", body },
     ],
-    headline: "자동 피드백을 불러오지 못했습니다.",
+    headline: "AI 피드백을 불러오지 못했습니다.",
     body,
     highlights: [],
     feedback: body,
@@ -2141,7 +2141,7 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
               if (quest.kind !== "dct") onNext();
             }} />}
           {quest.kind === "dct" && (revealAnswers || responses[quest.id]) && <section className={`${panel} space-y-3 p-5`}>
-            <h3 className="font-bold">DCT 참고 표현·해설</h3>
+            <h3 className="font-bold">DCT형 통번역 과제 참고 표현·해설</h3>
             <p className="text-sm text-muted-foreground">정적 콘텐츠 감수입니다. 이 화면의 제출은 학습 기록이나 AI 피드백 요청을 만들지 않습니다.</p>
             {!quest.feedback.alternatives.length && <p className="whitespace-pre-wrap text-lg">{quest.referenceAnswer}</p>}
             {quest.feedback.alternatives.map((alternative, index) => <div key={index} className="border-t pt-3">

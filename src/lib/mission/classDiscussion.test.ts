@@ -77,7 +77,7 @@ describe("buildClassDiscussion — 가상 학급 20명(대표 미션)", () => {
     const revisedWithDissent = data.dct.cases.filter((item) => item.decision === "revised" && item.dissent);
     expect(revisedWithDissent).toHaveLength(1);
     expect(data.dct.cases.every((item) => /^응답 \d+$/.test(item.id))).toBe(true);
-    const dissent = data.dct.cases.find((item) => item.dissent?.conditions.includes("관계·친밀도에 대한 다른 판단"))!;
+    const dissent = data.dct.cases.find((item) => item.dissent?.conditions.includes("관계에 대한 다른 판단"))!;
     expect(dissent.feedback?.band).toBe("너무 직접적");
     expect(dissent.feedback?.scope).toBe("상대에게 주는 인상");
     expect(dissent.final).toBe(dissent.first);

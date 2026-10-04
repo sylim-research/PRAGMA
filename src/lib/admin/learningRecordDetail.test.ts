@@ -41,7 +41,7 @@ describe("buildLearningRecordDetail", () => {
     expect(detail.mjt[1].choices[0].value).toBe("고친 문장");
     expect(detail.mjt[2].rows.map((r) => r.label)).toEqual(["후보1", "후보2"]);
     expect(detail.task).toMatchObject({ first: "A", final: "C", decision: "수정" });
-    expect(detail.dissent?.conditions).toEqual(["관계·친밀도에 대한 다른 판단"]);
+    expect(detail.dissent?.conditions).toEqual(["관계에 대한 다른 판단"]);
   });
 
   it("labels the frozen request middle band like the learner screen", () => {

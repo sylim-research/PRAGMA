@@ -182,7 +182,7 @@ const ReviewPipeline = ({
   error: string | null;
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
-  <div role="group" aria-label="품질 검수 단계">
+  <div role="group" aria-label="품질 점검 단계">
   <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
     {(() => {
       const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {

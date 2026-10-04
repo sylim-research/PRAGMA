@@ -159,7 +159,7 @@ const prompts = [
       func: "PROBE_FUNCTION",
     })),
   entry("core.user.written.zh_ko", "요청 프롬프트 (중→한 번역)", "core",
-    "화자 본인의 중국어 원문과 목표 화행을 고정합니다.",
+    "화자 본인의 중국어 원문과 목표화행을 고정합니다.",
     S.buildCoreUserPrompt({
       ...S.CORE_PROBE_BASE,
       direction: "zh_ko",
@@ -248,7 +248,7 @@ const prompts = [
     "확정된 후보에 맞춰 해설과 참고 표현만 고칩니다.",
     S.CANDIDATE_FEEDBACK_SYSTEM_PROMPT),
   entry("mission.repair.system", "문항 국소 수리", "mission",
-    "지적된 문항·후보만 고치고 나머지는 동결합니다.",
+    "문제가 확인된 문항·후보만 고치고 나머지는 동결합니다.",
     S.buildMissionRepairPrompt({
       direction: "ko_zh", feature: PROBE_FEATURE, findings: [],
       mission_content: { schema_version: "mission_v5", mpj_items: [], production_task: {} },
@@ -300,7 +300,7 @@ const prompts = [
     "화행·관계·분야·역할이 요청대로인지 확인합니다.",
     S.buildCoreQualitySystemPrompt("ko_zh")),
   entry("core_quality.system.zh_ko", "시나리오 조건 검토 (중→한)", "review",
-    "원문이 화자 본인의 말이고 목표 화행과 맞는지 확인합니다.",
+    "원문이 화자 본인의 말이고 목표화행과 맞는지 확인합니다.",
     S.buildCoreQualitySystemPrompt("zh_ko")),
   entry("feedback.system", "프롬프트 (번역)", "runtime",
     "답안을 의미·문법·화용 세 층위로 진단합니다(점수 없음).",
