@@ -94,11 +94,9 @@ export function InterpretingConsole({
         const url = URL.createObjectURL(result.blob);
         sourceAudioUrlRef.current = url;
         audio = new Audio(url);
-        {
-          audio.volume = SOURCE_PLAYBACK[sourceLanguage.code].volume;
-          audio.preservesPitch = true;
-          audio.playbackRate = SOURCE_PLAYBACK[sourceLanguage.code].rate;
-        }
+        audio.volume = SOURCE_PLAYBACK[sourceLanguage.code].volume;
+        audio.preservesPitch = true;
+        audio.playbackRate = SOURCE_PLAYBACK[sourceLanguage.code].rate;
         sourceAudioRef.current = audio;
         audio.onended = () => setPlaying(false);
         audio.onerror = () => {
