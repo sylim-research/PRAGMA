@@ -38,38 +38,39 @@ export const KO_ZH_INTERPRETING_FEEDBACK = FeedbackSchema.parse({
   }
 });
 
-// 중→한 반대 승인본(원래 통역 미션, 데모에서는 번역 과제로 제시) · translation · recorded 2026-10-06T14:16:39.102Z
-export const ZH_KO_TRANSLATION_DRAFT = "프로젝트 기간 단축은 중요하지만, 품질 관리를 하지 않으면 오히려 전체 진행에 영향을 줍니다. 각 단계의 품질을 보장해야 최종 결과물에 문제가 없습니다.";
+// 중→한 반대 승인본(원래 통역 미션, 데모에서는 번역 과제로 제시) · translation · recorded 2026-10-06T15:58:16.508Z
+// The prepared draft keeps the workplace register but gives a different reason than the source (meaning distortion example).
+export const ZH_KO_TRANSLATION_DRAFT = "한 달 앞당기자는 말씀은 충분히 이해가 됩니다. 다만 테스트가 아직 끝나지 않아 제 생각에는 원래 계획대로 가는 게 좋을 것 같습니다.";
 export const ZH_KO_TRANSLATION_FEEDBACK = FeedbackSchema.parse({
   "schema_version": "feedback_v1",
   "rubric_version": "opposition_stance_mitigation@1.0",
   "verdicts": {
-    "semantic_fidelity": "preserved",
+    "semantic_fidelity": "distorted",
     "grammatical_accuracy": "clean",
     "pragmatic_appropriateness": {
       "feature_code": "opposition_stance_mitigation",
-      "band_code": "within_band"
+      "band_code": "too_obscured"
     }
   },
-  "revision_scope": "clear",
+  "revision_scope": "meaning",
   "blocks": {
-    "meaning_ko": "원문의 핵심 명제인 프로젝트 기간 단축의 중요성과 품질 관리 미비 시 전체 진행에 부정적 영향이 있다는 점, 각 단계 품질 보장의 필요성이 모두 잘 전달되었습니다.",
+    "meaning_ko": "원문은 프로젝트 기간을 2주 줄이자는 제안에 대해 품질 관리를 소홀히 하면 전체 일정에 악영향이 생긴다는 반대 입장을 명확히 밝히고 있다. 학습자 번역은 기간 단축에 대한 반대 이유가 품질 관리가 아니라 테스트 미완료라는 다른 근거로 바뀌어 원문의 핵심 명제가 누락되었다.",
     "grammar": [],
-    "feature_ko": "이견을 명확히 하면서도 상대 제안의 중요성을 인정하고, 품질 관리의 필요성을 근거로 들어 관계를 해치지 않는 적절한 반대 입장을 표현하고 있습니다.",
+    "feature_ko": "이견의 대상과 근거가 원문과 달라서 반대 입장이 흐려지고, 관계 조정도 원문의 근거 중심 설명 대신 개인 의견으로 바뀌어 이견 명료성이 떨어질 수 있다.",
     "alternatives": [
       {
-        "text": "프로젝트 기간 단축이 중요하긴 하지만, 품질 관리를 소홀히 하면 오히려 전체 진행에 악영향을 미칠 수 있습니다. 각 단계의 품질을 반드시 보장해야 최종 결과물이 문제없을 것입니다.",
-        "note_ko": "표현을 조금 더 명확하고 자연스럽게 다듬어 이견의 근거와 범위를 분명히 했습니다."
+        "text": "프로젝트 기간을 2주 줄이자는 말씀은 이해합니다. 다만 품질 관리를 소홀히 하면 오히려 전체 일정에 영향을 줄 수 있다고 생각합니다.",
+        "note_ko": "반대 이유를 원문과 같이 품질 관리 문제로 명확히 하여 이견의 대상과 근거를 일치시켰다."
       }
     ],
-    "discourse_ko": "전체적으로 자연스럽고 논리적이며, 한국어 담화로서 무리 없이 연결됩니다.",
+    "discourse_ko": "한국어 문장 연결은 자연스럽지만 원문 의미와 근거가 달라져 전체 담화 의미가 변질되었다.",
     "offfocus_warnings": []
   },
   "uncertainty_flags": [],
   "provenance": {
     "model": "gpt-4.1-mini",
     "prompt_version": "feedback_v1_minidiscourse_v6_concise",
-    "generated_at": "2026-10-06T14:16:39.124Z"
+    "generated_at": "2026-10-06T15:58:16.545Z"
   }
 });
 
