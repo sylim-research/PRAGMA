@@ -24,12 +24,15 @@ const REVERSE: RepresentativeDemoContent = {
   requestFeedback: requestReverseDemoFeedback,
 };
 const KO_ZH_INTERPRETING: RepresentativeDemoContent = {
-  firstDraft: KO_ZH_INTERPRETING_DRAFT, revisedDraft: KO_ZH_INTERPRETING_DRAFT, mjtAnswers: {},
+  firstDraft: KO_ZH_INTERPRETING_DRAFT, revisedDraft: KO_ZH_INTERPRETING_DRAFT,
+  // MJT3 demo answer is deliberately wrong: the under-calibrated candidate is marked as fitting.
+  mjtAnswers: { A5: { candidatePicks: { "A5-1": "within_band" } } },
   feedbackNote: "이 예시 전사문으로 수행한 통역 과제의 실제 AI 피드백 기록입니다. 시연에서는 AI를 새로 호출하지 않습니다.",
   requestFeedback: recordedDemoFeedback(KO_ZH_INTERPRETING_DRAFT, KO_ZH_INTERPRETING_FEEDBACK),
 };
 const ZH_KO_TRANSLATION: RepresentativeDemoContent = {
-  firstDraft: ZH_KO_TRANSLATION_DRAFT, revisedDraft: ZH_KO_TRANSLATION_DRAFT, mjtAnswers: {},
+  firstDraft: ZH_KO_TRANSLATION_DRAFT, revisedDraft: ZH_KO_TRANSLATION_DRAFT,
+  mjtAnswers: { A2: { pick: "very_inappropriate" } },
   feedbackNote: "이 예시 답안으로 수행한 번역 과제의 실제 AI 피드백 기록입니다. 시연에서는 AI를 새로 호출하지 않습니다.",
   requestFeedback: recordedDemoFeedback(ZH_KO_TRANSLATION_DRAFT, ZH_KO_TRANSLATION_FEEDBACK),
 };

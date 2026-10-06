@@ -212,12 +212,17 @@ const MISSION_B_SCENE_INTRO: SceneIntroConfig = {
 
 const SCENE_INTRO_STEP_IDS = ["scene-1", "scene-2", "scene-3"] as const;
 
+// One order per option list for the loaded mission: remounts (e.g. demo autofill) must not reshuffle.
+const shuffledOrders = new WeakMap<readonly unknown[], unknown[]>();
 function shuffle<T>(values: readonly T[]): T[] {
+  const cached = shuffledOrders.get(values);
+  if (cached) return cached as T[];
   const copy = [...values];
   for (let index = copy.length - 1; index > 0; index -= 1) {
     const target = Math.floor(Math.random() * (index + 1));
     [copy[index], copy[target]] = [copy[target], copy[index]];
   }
+  shuffledOrders.set(values, copy);
   return copy;
 }
 
