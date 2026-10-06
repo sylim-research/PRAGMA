@@ -1,9 +1,9 @@
-# 대표 미션 음성 연결 · 2026-10-06
+# Representative mission audio · 2026-10-06
 
-- 대표 통역 미션의 한국어·중국어 원발화에 지정 ElevenLabs 음성 파일을 연결했다. 각 파일은 승인된 원문과 언어가 일치할 때만 선택한다.
-- 언어별 Voice ID·제공자·모델·생성 시각·원문 및 파일의 SHA-256을 `public/demo-audio/manifest.json`에 보존했다. 생성 응답이 지정 음성과 다르거나 대체 제공자를 사용하면 파일을 채택하지 않는다.
-- 데모 재생 음량은 0.85이며 재생 속도는 1이다. 합성된 MP3를 재인코딩하지 않는다. 데모 재생 시 실시간 TTS 요청이나 브라우저 기본 음성으로의 대체는 하지 않는다.
-- 타입 검사·전체 테스트 1,114개 통과(9개 제외)·production build를 확인했다. 로컬 브라우저에서 양방향 음성 재생, 파일 경로, 음량 0.85, 속도 1과 오류 없음·백엔드 요청 없음을 확인했다.
-- [단독 진행 적합]: 대표 미션 음성 자산과 재생 연결 변경이다. 학습설계·평가·DB 계약 변경이 없어 research-trail은 갱신하지 않았다. 음색의 주관적 자연스러움은 사용자 청취 확인 대상이다.
+- Connected the Korean and Chinese source utterances to recorded ElevenLabs audio. Assets are selected only when both source text and language match.
+- `public/demo-audio/manifest.json` retains voice IDs, provider, model, generation timestamps, and source/audio SHA-256 hashes. The preparation script rejects unexpected voices or fallback providers.
+- Demo playback volume is 0.85 and playback rate is 1. Generated MP3 files are not re-encoded. Demo playback makes no live TTS requests and does not substitute browser speech synthesis.
+- Validation: type checking, 1,114 passing tests (9 skipped), and production build. Local browser checks confirmed playback in both directions, asset paths, volume 0.85, rate 1, and no page errors or backend requests.
+- Review scope: suitable for a single implementation review. Learning design, assessment, and database contracts are unchanged, so the research trail was not revised. Perceived voice naturalness remains subject to listening review.
 
-논문 영향: 테스트 6개 추가. 화면 구성 변경 없음(브라우저 음성 안내 문장 삭제). 프롬프트·생성계약 변경 없음.
+Thesis impact: six additional tests; unchanged page layout with the obsolete browser-speech notice removed; no prompt or generation-contract changes.
