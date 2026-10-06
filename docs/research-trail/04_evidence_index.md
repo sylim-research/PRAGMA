@@ -445,7 +445,7 @@ success와 운영 리포트 번들 HTTP 200·수정 코드 제공을 확인했�
   입증한 결과가 아니다. 운영 DB·유료 모델·배포·전체 학습자 E2E는 실행하지 않았다.
 - 판정은 보완 수용이며 변경 권고는 미채택 상태다. 앱 코드·UI·DB·프롬프트·정본 설계·승인 상태를
   변경하지 않았으므로 DEC/ITER/TRC를 새 설계 결정으로 추가하지 않았다.
-- 후속 Fable 감사 판정: `docs/dev-log/2026-09-09-quality-rules-fable-adjudication.md`. 종합 보완.
+- 후속 Fable 검토 결과: `docs/dev-log/2026-09-09-quality-rules-fable-adjudication.md`. 종합 보완.
   R31 바깥 적용 조건, R20의 Edge/SQL 책임 구분, R4/R10 강도와 R23 계승의 한계를 재대조했다.
   R27 강도 차이의 기존 근거는 8월 25일 mission-rule-audit 및 8월 30일 rule-design-diet 기록에서
   확인했다. validator 해시가 같아 위 테스트·반례를 재사용했으며 새 실행 수로 중복 집계하지 않았다.

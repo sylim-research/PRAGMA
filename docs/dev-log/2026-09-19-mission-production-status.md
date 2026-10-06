@@ -6,7 +6,7 @@
   - 오른쪽: 제작 경로 5단계(검수 이력·편성 조회는 대시보드·점검·승인 화면과 같은 기준) + 「학습 미션 설계」(MJT 문항 1~5 제목, DCT 문항).
   - 목록·상세 5:5, v6만 표시(칩 = 검토 중·승인 완료·전체), 버전 번호·서비스 이름·Trace·고급 필터 제거, 카드에는 현재 단계 한 구절.
 - 대체된 옛 판 제외: 다른 행의 `supersedes_scenario_id`가 가리키는 행을 목록·숫자에서 뺀다(`excludeSupersededRows`). 제작 현황·품질 점검·최종 승인·대시보드가 같은 기준을 쓴다. DB는 그대로.
-- DB 보관(박사님 실행): 대체 기록 없이 남아 있던 v6 요청 파일럿 초안 중 편성되지 않은 26건(generated 23·reviewed 3)에 `archived_at`, `archive_note = stale_v6_request_pilot_draft_unplaced_20260919`. 되돌리기 SQL과 보관 전 목록은 저장소 밖 `l2-pragmatic-translator-archive/2026-09-19-v6-stale-drafts/`.
+- DB 보관(연구자 실행): 대체 기록 없이 남아 있던 v6 요청 파일럿 초안 중 편성되지 않은 26건(generated 23·reviewed 3)에 `archived_at`, `archive_note = stale_v6_request_pilot_draft_unplaced_20260919`. 되돌리기 SQL과 보관 전 목록은 저장소 밖 `l2-pragmatic-translator-archive/2026-09-19-v6-stale-drafts/`.
 
 ## 확인
 - 제작 현황: 검토 중 30 → 7, 승인 완료 14 → 11(DB 실측과 일치).

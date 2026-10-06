@@ -93,7 +93,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="117" align="left">논문</th><th width="236" align="left">내용</th><th width="407" align="left">구현 위치</th></tr></thead>
   <tbody>
-    <tr><td>4.1.1&nbsp;·&nbsp;부록&nbsp;B</td><td>개발 도구·개발 프롬프트</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
+    <tr><td>4.1.1&nbsp;·&nbsp;부록&nbsp;B</td><td>개발 과정과 설계 결정 기록</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.2</td><td>역할별 권한</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
     <tr><td>4.1.2</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
     <tr><td>4.2.1&nbsp;·&nbsp;부록&nbsp;A</td><td>콘텐츠 생성과 운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a> · <a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
