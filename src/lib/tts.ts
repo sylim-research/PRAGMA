@@ -45,11 +45,14 @@ export const requestTtsAudio = async ({
   lang,
   level = "intermediate",
   logPrefix = "[TTS]",
+  profile,
 }: {
   text: string;
   lang: TtsLang;
   level?: TtsLevel;
   logPrefix?: string;
+  /** Demo only: the voice's saved ElevenLabs settings, no fallback provider. */
+  profile?: "voice_default";
 }): Promise<TtsResult> => {
   const requestedVoiceId = DEFAULT_TTS_VOICE_BY_LANG[lang];
 
@@ -63,7 +66,7 @@ export const requestTtsAudio = async ({
         Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
         apikey: SUPABASE_ANON_KEY,
       },
-      body: JSON.stringify({ text, lang, level, voiceId: requestedVoiceId }),
+      body: JSON.stringify({ text, lang, level, voiceId: requestedVoiceId, ...(profile ? { profile } : {}) }),
     });
 
     const contentType = response.headers.get("content-type") || "";

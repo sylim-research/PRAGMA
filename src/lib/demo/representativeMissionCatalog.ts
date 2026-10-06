@@ -1,3 +1,5 @@
+import type { DemoStep } from "./demoStepNavigation";
+
 export type DemoDirection = "ko_zh" | "zh_ko";
 export type DemoTaskMode = "translation" | "interpreting";
 
@@ -9,8 +11,8 @@ export const REPRESENTATIVE_DEMOS = [
   { direction: "zh_ko", label: "중 → 한", title: "회의 일정 변경 요청하기", scenarioId: REVERSE_REPRESENTATIVE_MISSION_ID, originalMode: "interpreting" },
 ] as const;
 
-export function representativeDemoPath(direction: DemoDirection, mode: DemoTaskMode) {
-  return `${REPRESENTATIVE_MISSION_PATH}?direction=${direction}&mode=${mode}`;
+export function representativeDemoPath(direction: DemoDirection, mode: DemoTaskMode, step?: DemoStep) {
+  return `${REPRESENTATIVE_MISSION_PATH}?direction=${direction}&mode=${mode}${step ? `&step=${step}` : ""}`;
 }
 
 export function parseRepresentativeDemo(search: string) {

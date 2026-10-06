@@ -25,6 +25,16 @@ describe('language-specific designed TTS voices', () => {
     expect(body(request).voice_settings).toMatchObject({ speed, style: 0.1 });
     expect(result).toMatchObject({ ok: true, provider: 'elevenlabs', voice: TTS_VOICE_BY_LANG[lang], fallbackUsed: false });
   });
+  it.each(['ko', 'zh'] as const)('uses the %s voice defaults without fallback for the voice_default profile', async lang => {
+    const request = vi.fn().mockResolvedValue(audio());
+    const result = await synthesizeTts('sample', lang, { elevenlabs: 'test', openai: 'test' }, request, 'intermediate', 'voice_default');
+    expect(request.mock.calls[0][0]).toContain(TTS_VOICE_BY_LANG[lang]);
+    expect(body(request)).toEqual({ text: 'sample', model_id: 'eleven_multilingual_v2' });
+    expect(result).toMatchObject({ ok: true, provider: 'elevenlabs', fallbackUsed: false });
+    const failing = vi.fn().mockResolvedValue(failure(429));
+    expect(await synthesizeTts('sample', lang, { elevenlabs: 'test', openai: 'test' }, failing, 'intermediate', 'voice_default')).toMatchObject({ ok: false });
+    expect(failing).toHaveBeenCalledTimes(1);
+  });
   it('uses instructed OpenAI audio when ElevenLabs has no key', async () => {
     const request = vi.fn().mockResolvedValue(audio());
     expect(await synthesizeTts('中文', 'zh', { openai: 'test' }, request)).toMatchObject({

@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeftRight,
   BookOpenText,
@@ -90,6 +90,7 @@ import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/de
 import { representativeDemoContent, unavailableDemoFeedback, type RepresentativeDemoContent } from "@/lib/demo/representativeDemoContent";
 import type { DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
 import { RepresentativeDemoHeader, RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
+import { DEMO_MJT_QUEST_IDS, demoQuestIndex, demoStepForQuest, parseDemoStep } from "@/lib/demo/demoStepNavigation";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -2015,7 +2016,7 @@ function macroProgressIndex(activeIndex: number, completed: boolean | undefined,
   return revisionOpen ? 4 : 3;
 }
 
-function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest, freeJump = false, onJumpStage }: {
+function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = false, sceneIntroStep = null, sceneIntroConfig = MISSION_A_SCENE_INTRO, mpjRecapOpen = false, skipIntro = false, onJumpQuest, freeJump = false, onJumpStage, answeredQuestIds = [] }: {
   activeIndex: number;
   completed?: boolean;
   reviewIndex?: number | null;
@@ -2028,6 +2029,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   onJumpQuest?: (index: number) => void;
   /** 대표 미션 시연 전용(2026-09-25): 아직 풀지 않은 문항 점도 눌러 바로 연다. 학습자 화면에는 켜지 않는다. */
   freeJump?: boolean;
+  answeredQuestIds?: string[];
   /** 시연 전용: 「적절성 판단」·「번역하기」 단계 막대를 눌러 MJT1·DCT로 바로 간다. */
   onJumpStage?: (stage: "judge" | "produce") => void;
 }) {
@@ -2055,11 +2057,17 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             : { phase: "AI 피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
     <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className={`flex items-center gap-3 sm:gap-4 ${freeJump ? "flex-wrap sm:flex-nowrap" : ""}`}>
         {/* 단계를 점과 선으로 따로 그리지 않고 이어진 막대 하나로 — 지난 구간 금색, 현재 구간 남색. */}
         <ol className="flex min-w-0 flex-1 gap-1.5" aria-label={stages.join(", ")}>
           {stages.map((label, index) => {
-            const done = Boolean(completed) || index < macroIndex;
+            const done = freeJump
+              ? (label === "적절성 판단"
+                ? DEMO_MJT_QUEST_IDS.every(id => answeredQuestIds.includes(id))
+                : label === `${outputName}하기`
+                  ? quests.some(quest => quest.kind === "dct" && answeredQuestIds.includes(quest.id))
+                  : false)
+              : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
             const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
             const body = (
@@ -2071,16 +2079,33 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               </>
             );
             return (
-              <li key={label} className="min-w-0 flex-1">
+              <li key={label} className={`${freeJump && jumpStage === "produce" ? "min-w-[84px]" : "min-w-0"} flex-1`}>
                 {onJumpStage && jumpStage
                   ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
-                      className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">{body}</button>
+                      className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">
+                      {freeJump && jumpStage === "produce"
+                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#3276A8]/50 bg-white text-[#24608D]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
+                        : body}
+                    </button>
                   : body}
               </li>
             );
           })}
         </ol>
-        <div className="flex shrink-0 items-center gap-2.5 border-l border-[#DDD8CC] pl-3">
+        {freeJump && onJumpQuest ? <nav className="flex shrink-0 items-center gap-1 border-l border-[#DDD8CC] pl-3" aria-label="MJT 문항 바로가기">
+          <span className="mr-1 text-[11.5px] font-bold text-[#536572]">MJT</span>
+          {DEMO_MJT_QUEST_IDS.map((id, number) => {
+            const index = quests.findIndex(quest => quest.id === id);
+            if (index < 0) return null;
+            const selected = judging && activeIndex === index;
+            const label = `MJT ${number + 1} · ${progressLabel(quests[index], outputName)}`;
+            return <button key={id} type="button" title={label} aria-label={label} aria-current={selected ? "step" : undefined}
+              onClick={() => { if (!selected) onJumpQuest(index); }}
+              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3276A8] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#3276A8] hover:bg-[#F3F7FA]"}`}>
+              {number + 1}
+            </button>;
+          })}
+        </nav> : <div className="flex shrink-0 items-center gap-2.5 border-l border-[#DDD8CC] pl-3">
           <div className="min-w-0 text-right">
             <p className="truncate text-[13px] font-black text-[#15202B]">{detail.activity}</p>
             {judging && <p className="text-[11px] leading-4 text-[#8A939F]">{activeIndex + 1}/5</p>}
@@ -2098,7 +2123,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               })}
             </span>
           )}
-        </div>
+        </div>}
       </div>
       <span className="sr-only">현재 단계: {detail.phase}, {detail.activity}</span>
     </section>
@@ -2710,13 +2735,16 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   pilotStorageKey?: string;
 }) {
   const directCorrectionFlow = localPilot || mission.missionFormat === "mission_v6";
+  const demoLocation = useLocation();
+  const navigate = useNavigate();
+  const [initialDemoQuest] = useState(() => demoMode ? demoQuestIndex(mission.quests, parseDemoStep(demoLocation.search)) : -1);
   const requestedMission = new URLSearchParams(window.location.search).get("mission")?.toUpperCase();
   const sceneIntroConfig = isDevPreview && requestedMission === "B"
     ? MISSION_B_SCENE_INTRO
     : buildSceneIntroConfig(mission);
   const [pilotProgress] = useState(() => readLocalPilotProgress(localPilot, pilotStorageKey));
-  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(localPilot ? null : 0);
-  const [questIndex, setQuestIndex] = useState(pilotProgress?.questIndex ?? 0);
+  const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(localPilot || initialDemoQuest >= 0 ? null : 0);
+  const [questIndex, setQuestIndex] = useState(initialDemoQuest >= 0 ? initialDemoQuest : pilotProgress?.questIndex ?? 0);
   const [completed, setCompleted] = useState(pilotProgress?.completed ?? false);
   const [reviewIndex, setReviewIndex] = useState<number | null>(null);
   const [responses, setResponses] = useState<Record<string, QuestResponse | DctResponse>>(pilotProgress?.responses ?? {});
@@ -2744,6 +2772,16 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined,
     demoMode ? demoContent?.requestFeedback ?? unavailableDemoFeedback : undefined), [attemptId, demoMode, demoContent, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
+
+  useEffect(() => {
+    if (!demoMode) return;
+    const params = new URLSearchParams(demoLocation.search);
+    // Feedback and completion links reopen DCT with an empty attempt.
+    const step = sceneIntroStep !== null ? undefined : demoStepForQuest(quest);
+    if ((params.get("step") ?? undefined) === step) return;
+    if (step) params.set("step", step); else params.delete("step");
+    navigate({ pathname: demoLocation.pathname, search: params.toString() }, { replace: true });
+  }, [demoMode, demoLocation.pathname, demoLocation.search, navigate, quest.id, quest.kind, sceneIntroStep]);
 
   useEffect(() => {
     if (!localPilot) return;
@@ -3032,6 +3070,10 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     }
     setReviewIndex(index);
   };
+  const demoProgressProps = demoMode ? {
+    onJumpQuest: navigateProgress, freeJump: true, onJumpStage: jumpDemoStage,
+    answeredQuestIds: Object.keys(responses),
+  } : {};
 
   return (
     <LocalPilotContext.Provider value={localPilot}>
@@ -3068,7 +3110,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         </p>}
         {sceneIntroStep !== null ? (
           <div className={demoMode ? "space-y-2" : "space-y-5"}>
-            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} onJumpStage={demoMode ? jumpDemoStage : undefined} />
+            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />
             <SceneIntroFlow
               config={sceneIntroConfig}
               onNext={advanceSceneIntro}
@@ -3076,7 +3118,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : mpjRecapOpen ? (
           <div className="space-y-5">
-            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
+            <Progress activeIndex={5} mpjRecapOpen skipIntro={localPilot} {...demoProgressProps} />
             <MpjLessonBridge lessonPoints={mission.lessonPoints} onContinue={continueFromMpjRecap} />
           </div>
         ) : reviewedQuest && reviewedResponse ? (
@@ -3087,7 +3129,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : completed ? (
           <div className="space-y-5">
-            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpStage={demoMode ? jumpDemoStage : undefined} />
+            <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} {...demoProgressProps} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <h1 className="text-2xl font-black">학습 미션 완료</h1>
               <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? `${completionOutput}을 수정한 뒤 최종 ${completionOutput}을 결정했습니다.` : `AI 피드백을 확인하고, 내 판단으로 최초 ${completionOutput}을 그대로 확정했습니다.`}</p>
@@ -3116,7 +3158,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           </div>
         ) : (
           <div className="space-y-4">
-            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} freeJump={demoMode} onJumpStage={demoMode ? jumpDemoStage : undefined} />
+            <Progress activeIndex={currentProgressIndex} revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} onJumpQuest={navigateProgress} {...demoProgressProps} />
             <QuestRenderer
               key={`${quest.id}-${demoMode && quest.kind === "dct_feedback" ? 0 : renderNonce}`}
               quest={quest}

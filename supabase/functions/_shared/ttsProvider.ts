@@ -10,6 +10,9 @@ export async function synthesizeTts(
   keys: { elevenlabs?: string; openai?: string },
   request: typeof fetch = fetch,
   level: TtsLevel = 'intermediate',
+  // 'voice_default' sends no voice_settings, so ElevenLabs applies the voice's saved settings
+  // (the same defaults as its web preview), and never falls back to another provider.
+  profile: 'learner' | 'voice_default' = 'learner',
 ): Promise<AudioResult> {
   const post = async (url: string, headers: Record<string, string>, body: unknown) => {
     try {
@@ -36,10 +39,12 @@ export async function synthesizeTts(
     const attempt = await post(
       `https://api.elevenlabs.io/v1/text-to-speech/${TTS_VOICE_BY_LANG[lang]}?output_format=mp3_44100_128`,
       { 'xi-api-key': keys.elevenlabs },
-      { text, model_id: 'eleven_multilingual_v2', voice_settings: {
-        stability: 0.5, similarity_boost: 0.75, style: 0.1,
-        use_speaker_boost: true, speed: ttsSpeed(lang, level),
-      } },
+      profile === 'voice_default'
+        ? { text, model_id: 'eleven_multilingual_v2' }
+        : { text, model_id: 'eleven_multilingual_v2', voice_settings: {
+          stability: 0.5, similarity_boost: 0.75, style: 0.1,
+          use_speaker_boost: true, speed: ttsSpeed(lang, level),
+        } },
     );
     if (attempt.ok === true) return { ...attempt, provider: 'elevenlabs', model: 'eleven_multilingual_v2',
       voice: TTS_VOICE_BY_LANG[lang], fallbackUsed: false };
@@ -47,7 +52,7 @@ export async function synthesizeTts(
     console.warn('ElevenLabs TTS unavailable; trying same-language OpenAI audio', { code: attempt.code });
   }
 
-  if (!keys.openai) return failure;
+  if (!keys.openai || profile === 'voice_default') return failure;
   const voice = lang === 'zh' ? 'shimmer' : 'nova';
   for (const model of ['gpt-4o-mini-tts', 'tts-1-hd']) {
     const attempt = await post('https://api.openai.com/v1/audio/speech',
