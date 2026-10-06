@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap, Network, Play, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, GraduationCap, Network, SlidersHorizontal } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
 import { ensureSession } from "@/lib/tracking";
 import { IS_DEMO } from "@/lib/auth/useProfile";
-import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
+import { REPRESENTATIVE_DEMOS, representativeDemoPath } from "@/lib/demo/representativeMissionCatalog";
 
 // 화살표는 hover에서 진행 방향으로 살짝 미끄러진다. 카드가 통째로 떠오르는 동작은
 // "이 카드가 반응한다"까지만 말하고, 화살표의 이동이 "누르면 저쪽으로 간다"를 말한다.
@@ -142,23 +142,33 @@ const Landing = () => {
         {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
             학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
         {IS_DEMO && (
-          <section className="mt-8 flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
-            <Link
-              to="/architecture"
-              className={secondaryLink}
-            >
-              <Network aria-hidden size={17} strokeWidth={1.9} className="text-[#5C6A7A]" />
-              전체 구조 보기
-              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
-            </Link>
-            <Link
-              to={REPRESENTATIVE_MISSION_PATH}
-              className={secondaryLink}
-            >
-              <Play aria-hidden size={16} strokeWidth={1.6} className="fill-[#3E4C57] text-[#3E4C57]" />
-              대표 미션 살펴보기
-              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
-            </Link>
+          <section className="mt-7 w-full" aria-label="대표 미션 체험">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-sm font-bold text-[#15202B]">대표 미션 체험</h2>
+              <p className="text-xs text-[#5C6A7A]">로그인 없이 · 시연용 답안 채우기 제공</p>
+            </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {REPRESENTATIVE_DEMOS.map(demo => (
+                <article key={demo.direction} className="rounded-xl border border-[#DED9CD] bg-white/70 p-4">
+                  <h3 className="text-sm font-bold text-[#15202B]">{demo.label} <span className="ml-1 font-medium">{demo.title}</span></h3>
+                  <div className="mt-3 flex gap-2">
+                    {(["translation", "interpreting"] as const).map(mode => (
+                      <Link key={mode} to={representativeDemoPath(demo.direction, mode)} aria-label={`${demo.label} ${mode === "translation" ? "번역" : "통역"} 체험`}
+                        className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-[#D6CFBD] bg-white px-3 py-2 text-[13px] font-semibold text-[#2F3D48] hover:bg-[#FDF3C4] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground">
+                        {mode === "translation" ? "번역" : "통역"} 체험 <ArrowRight aria-hidden size={13} />
+                      </Link>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="mt-4 flex flex-wrap justify-center gap-4">
+              <Link to="/demo/profile" className={secondaryLink}>학습자 등록·프로필 화면 보기</Link>
+              <Link to="/architecture" className={secondaryLink}>
+                <Network aria-hidden size={17} strokeWidth={1.9} className="text-[#5C6A7A]" />
+                전체 구조 보기 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
+              </Link>
+            </div>
           </section>
         )}
       </main>

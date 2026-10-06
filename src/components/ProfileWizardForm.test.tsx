@@ -1,15 +1,16 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { ProfileWizardForm } from "./ProfileWizardForm";
+import { ProfileWizardForm, ProfileWizardPreview } from "./ProfileWizardForm";
 
 const mocks = vi.hoisted(() => ({
   complete: vi.fn(),
   refresh: vi.fn().mockResolvedValue(undefined),
+  readProfile: vi.fn(),
 }));
 
 vi.mock("@/lib/auth/useProfile", () => ({
-  useProfile: () => ({ profile: null, isDevStub: true, refresh: mocks.refresh }),
+  useProfile: () => { mocks.readProfile(); return { profile: null, isDevStub: true, refresh: mocks.refresh }; },
   devStubCompleteProfile: mocks.complete,
 }));
 
@@ -21,6 +22,20 @@ afterEach(() => {
 });
 
 describe("학습자 프로필 입력", () => {
+  it("프로필 체험은 인증 조회나 저장 없이 모든 단계를 확인한다", () => {
+    const completed = vi.fn();
+    render(<ProfileWizardPreview onCompleted={completed} />);
+    expect(screen.getByDisplayValue("시연용 학습자")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "다음" }));
+    expect(screen.getByRole("radio", { name: "한국어" })).toBeChecked();
+    fireEvent.click(screen.getByRole("button", { name: "다음" }));
+    expect(screen.getByText("학습 기록 공유")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "체험 마치기" }));
+    expect(completed).toHaveBeenCalledOnce();
+    expect(mocks.readProfile).not.toHaveBeenCalled();
+    expect(mocks.complete).not.toHaveBeenCalled();
+    expect(mocks.refresh).not.toHaveBeenCalled();
+  });
   it("모든 학습 배경에 응답한 뒤 기록 공유와 연구 활용 여부를 선택하게 한다", async () => {
     render(<ProfileWizardForm />);
 

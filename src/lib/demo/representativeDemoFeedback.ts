@@ -102,5 +102,5 @@ const normalize = (text: string) => text.replace(/\s+/g, "");
 export async function requestDemoFeedback(_mission: unknown, answer: string): Promise<FeedbackRequestResult> {
   if (normalize(answer) === normalize(DEMO_FIRST_DRAFT)) return { ok: true, feedback: RECORDED_FIRST_FEEDBACK };
   if (normalize(answer) === normalize(DEMO_REVISED_DRAFT)) return { ok: true, feedback: RECORDED_RECHECK_FEEDBACK };
-  return { ok: false, error: "시연에서는 AI를 호출하지 않습니다. 「답안 자동 채우기」로 예시 답안의 피드백을 확인해 주세요." };
+  return { ok: false, error: "시연에서는 AI를 호출하지 않습니다. 「시연용 답안 채우기」로 예시 답안의 피드백을 확인해 주세요." };
 }

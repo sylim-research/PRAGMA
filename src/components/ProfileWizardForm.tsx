@@ -195,7 +195,19 @@ type Props = {
 };
 
 export const ProfileWizardForm = ({ onCompleted }: Props) => {
-  const { profile, isDevStub, refresh } = useProfile();
+  const auth = useProfile();
+  return <ProfileWizardFields onCompleted={onCompleted} auth={auth} />;
+};
+
+export const ProfileWizardPreview = ({ onCompleted }: Props) => (
+  <ProfileWizardFields preview onCompleted={onCompleted} />
+);
+
+const ProfileWizardFields = ({ onCompleted, preview = false, auth }: Props & {
+  preview?: boolean;
+  auth?: Pick<ReturnType<typeof useProfile>, "profile" | "isDevStub" | "refresh">;
+}) => {
+  const { profile, isDevStub, refresh } = auth ?? { profile: null, isDevStub: false, refresh: async () => {} };
 
   const [step, setStep] = useState<Step>(1);
   const stepTopRef = useRef<HTMLDivElement>(null);
@@ -205,14 +217,14 @@ export const ProfileWizardForm = ({ onCompleted }: Props) => {
   }, [step]);
 
   // Screen 1
-  const [fullName, setFullName] = useState("");
-  const [affiliation, setAffiliation] = useState("");
+  const [fullName, setFullName] = useState(preview ? "시연용 학습자" : "");
+  const [affiliation, setAffiliation] = useState(preview ? "대학원생(석사)" : "");
 
   // Screen 2 — coded values
-  const [primaryLanguage, setPrimaryLanguage] = useState("");
-  const [languageTestLevel, setLanguageTestLevel] = useState("");
-  const [exposureContexts, setExposureContexts] = useState<string[]>([]);
-  const [tiExperience, setTiExperience] = useState("");
+  const [primaryLanguage, setPrimaryLanguage] = useState(preview ? "ko" : "");
+  const [languageTestLevel, setLanguageTestLevel] = useState(preview ? "hsk6" : "");
+  const [exposureContexts, setExposureContexts] = useState<string[]>(preview ? ["class"] : []);
+  const [tiExperience, setTiExperience] = useState(preview ? "coursework" : "");
 
   // Screen 3 — 수업 운영 동의와 자발적 연구 동의를 분리한다.
   const [classRecordConsent, setClassRecordConsent] = useState(false);
@@ -234,10 +246,14 @@ export const ProfileWizardForm = ({ onCompleted }: Props) => {
     exposureContexts.length > 0 &&
     tiExperience !== "";
   const step3Valid = classRecordConsent && researchConsent !== "";
-  const canSubmit = step1Valid && step2Valid && step3Valid && !busy;
+  const canSubmit = (preview || (step1Valid && step2Valid && step3Valid)) && !busy;
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
+    if (preview) {
+      onCompleted?.();
+      return;
+    }
     setBusy(true);
     try {
       if (isDevStub) {
@@ -440,7 +456,7 @@ export const ProfileWizardForm = ({ onCompleted }: Props) => {
             disabled={!canSubmit}
             className="rounded-xl bg-[#15202B] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#22303E] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {busy ? "저장 중…" : "학습 시작하기"}
+            {busy ? "저장 중…" : preview ? "체험 마치기" : "학습 시작하기"}
           </button>
         )}
       </div>

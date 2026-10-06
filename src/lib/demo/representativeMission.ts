@@ -7,17 +7,24 @@ import type { CanonicalRunnableMission } from "@/lib/mission/missionDb";
 import type { SpeechActUI } from "@/lib/pragma/enums";
 import { REPRESENTATIVE_MISSION_SNAPSHOT as snapshot } from "./representativeMissionSnapshot";
 
-export const REPRESENTATIVE_MISSION_PATH = "/demo/mission";
-export const REPRESENTATIVE_MISSION_ID = "24fb6841-6868-4e14-8e54-4e946466dc8e";
+import { REVERSE_REPRESENTATIVE_SNAPSHOT } from "./reverseRepresentativeSnapshot";
+import { REPRESENTATIVE_MISSION_ID, REVERSE_REPRESENTATIVE_MISSION_ID, type DemoTaskMode } from "./representativeMissionCatalog";
+export { REPRESENTATIVE_MISSION_PATH, REPRESENTATIVE_MISSION_ID } from "./representativeMissionCatalog";
 
-export function publicRepresentativeMission(): CanonicalRunnableMission {
-  const parsed = normalizeLearnerMission(snapshot.mission_content);
+export function publicRepresentativeMission(scenarioId = REPRESENTATIVE_MISSION_ID, mode?: DemoTaskMode): CanonicalRunnableMission {
+  const selected = scenarioId === REPRESENTATIVE_MISSION_ID ? snapshot
+    : scenarioId === REVERSE_REPRESENTATIVE_MISSION_ID ? REVERSE_REPRESENTATIVE_SNAPSHOT : null;
+  if (!selected) throw new Error("알 수 없는 대표 미션입니다.");
+  const parsed = normalizeLearnerMission(structuredClone(selected.mission_content));
   if (!parsed.ok || !parsed.data) throw new Error("대표 미션 스냅숏 형식이 유효하지 않습니다.");
+  // Public presentation override only. Never change the approved snapshot or persist this copy.
+  // Navigation identifies alternate-mode views and the original feedback's modality.
+  if (mode) parsed.data.production_task.mode = mode;
   return {
-    scenario_id: snapshot.scenario_id,
-    speech_act: snapshot.speech_act as SpeechActUI,
+    scenario_id: selected.scenario_id,
+    speech_act: selected.speech_act as SpeechActUI,
     learner_level: null,
-    mission_status: snapshot.mission_status,
+    mission_status: selected.mission_status,
     release_gate_mode: null,
     direction: parsed.data.direction,
     mission: parsed.data,
