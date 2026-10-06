@@ -47,7 +47,12 @@ describe("demo route", () => {
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
     expect(within(briefing).getByText("단일 표현 판단")).toBeInTheDocument();
     expect(screen.getByText("직접 번역")).toBeInTheDocument();
-    expect(screen.getByText("데모 시연")).toBeInTheDocument();
+    expect(screen.getByText("DEMO")).toBeInTheDocument();
+    const demoChoices = screen.getByRole("navigation", { name: "데모 미션 선택" });
+    expect(within(demoChoices).getAllByRole("link")).toHaveLength(4);
+    expect(within(demoChoices).getByRole("link", { name: "한 → 중 번역" })).toHaveAttribute("aria-current", "page");
+    expect(within(within(demoChoices).getByRole("group", { name: "중 → 한" })).getByRole("link", { name: "중 → 한 통역" })).toHaveAttribute("href", "/demo/mission?direction=zh_ko&mode=interpreting");
+    expect(screen.queryByRole("link", { name: "학습자 등록·프로필 화면 보기" })).not.toBeInTheDocument();
     expect(fetchMissionByScenario).not.toHaveBeenCalled();
     expect(requestFeedback).not.toHaveBeenCalled();
     expect(appendMissionEvent).not.toHaveBeenCalled();

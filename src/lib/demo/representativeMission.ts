@@ -18,7 +18,7 @@ export function publicRepresentativeMission(scenarioId = REPRESENTATIVE_MISSION_
   const parsed = normalizeLearnerMission(structuredClone(selected.mission_content));
   if (!parsed.ok || !parsed.data) throw new Error("대표 미션 스냅숏 형식이 유효하지 않습니다.");
   // Public presentation override only. Never change the approved snapshot or persist this copy.
-  // Navigation identifies alternate-mode views and the original feedback's modality.
+  // The feedback note identifies the original recorded modality.
   if (mode) parsed.data.production_task.mode = mode;
   return {
     scenario_id: selected.scenario_id,
