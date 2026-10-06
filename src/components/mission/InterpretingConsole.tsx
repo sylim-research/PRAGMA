@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
 import { DEFAULT_TTS_VOICE_BY_LANG, requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
 
-// Demo playback per designed voice. The Chinese voice is louder at the same gain, and Chinese is the
-// learners' foreign language, so it gets a lower level, a slower rate, and longer sentence pauses.
-const DEMO_PLAYBACK = {
-  ko: { volume: 0.6, rate: 1, pauseSeconds: 1 },
-  zh: { volume: 0.5, rate: 0.9, pauseSeconds: 1.5 },
+// Demo and learner playback share full volume and sentence pauses.
+// Synthesis applies the language-specific speed; playback must not slow it again.
+const SOURCE_PLAYBACK = {
+  ko: { volume: 1, rate: 1, pauseSeconds: 0.5 },
+  zh: { volume: 1, rate: 1, pauseSeconds: 1.5 },
 } as const;
 // Multilingual v2 leaves little gap between sentences; break tags add a pause between them.
 export const withSentencePauses = (text: string, pauseSeconds = 1) => text.trim()
@@ -74,11 +74,10 @@ export function InterpretingConsole({
         setTtsLoading(true);
         const lang = sourceLanguage.code as TtsLang;
         const result = await requestTtsAudio({
-          text: demoMode ? withSentencePauses(sourceText, DEMO_PLAYBACK[lang].pauseSeconds) : sourceText,
+          text: withSentencePauses(sourceText, SOURCE_PLAYBACK[lang].pauseSeconds),
           lang,
           level: learnerLevel,
           logPrefix: demoMode ? "[demo-mission-tts]" : "[canonical-mission-tts]",
-          ...(demoMode ? { profile: "voice_default" as const } : {}),
         });
         setTtsLoading(false);
         if (result.ok === false) {
@@ -95,10 +94,10 @@ export function InterpretingConsole({
         const url = URL.createObjectURL(result.blob);
         sourceAudioUrlRef.current = url;
         audio = new Audio(url);
-        if (demoMode) {
-          audio.volume = DEMO_PLAYBACK[sourceLanguage.code].volume;
+        {
+          audio.volume = SOURCE_PLAYBACK[sourceLanguage.code].volume;
           audio.preservesPitch = true;
-          audio.playbackRate = DEMO_PLAYBACK[sourceLanguage.code].rate;
+          audio.playbackRate = SOURCE_PLAYBACK[sourceLanguage.code].rate;
         }
         sourceAudioRef.current = audio;
         audio.onended = () => setPlaying(false);
