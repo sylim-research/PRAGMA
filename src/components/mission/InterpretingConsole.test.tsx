@@ -50,15 +50,15 @@ describe("InterpretingConsole", () => {
   });
 
   const DEMO_SOURCES = [
-    { language: "ko" as const, voiceId: "tjTX4kAaf3HNGHJnq6iy", volume: 0.6, rate: 1, sourceText: "안녕하세요. 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?",
-      requestText: '안녕하세요. <break time="1.0s" /> 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?' },
-    { language: "zh" as const, voiceId: "nUrEpZ0St3GU2UgOHW3h", volume: 0.5, rate: 0.9, sourceText: "您好。方便的话，请把修改意见发给我。",
+    { language: "ko" as const, voiceId: "tjTX4kAaf3HNGHJnq6iy", volume: 1, rate: 1, sourceText: "안녕하세요. 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?",
+      requestText: '안녕하세요. <break time="0.5s" /> 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?' },
+    { language: "zh" as const, voiceId: "nUrEpZ0St3GU2UgOHW3h", volume: 1, rate: 1, sourceText: "您好。方便的话，请把修改意见发给我。",
       requestText: '您好。 <break time="1.5s" /> 方便的话，请把修改意见发给我。' },
   ];
   const elevenLabsAudio = (voiceId: string) => ({ ok: true as const, blob: new Blob(["source"], { type: "audio/mpeg" }),
     requestedVoiceId: voiceId, usedVoiceId: voiceId, fallbackUsed: false, provider: "elevenlabs", model: "eleven_multilingual_v2" });
 
-  it.each(DEMO_SOURCES)("synthesizes the $language demo source with ElevenLabs and reuses it for the replay", async (entry) => {
+  it.each(DEMO_SOURCES.flatMap(entry => [true, false].map(demoMode => ({ ...entry, demoMode }))))("synthesizes the $language source (demo=$demoMode) with shared settings and reuses it for the replay", async (entry) => {
     vi.mocked(requestTtsAudio).mockResolvedValue(elevenLabsAudio(entry.voiceId));
     const audio = { currentTime: 0, volume: 1, playbackRate: 1, onended: null as null | (() => void),
       onerror: null, pause: vi.fn(), play: vi.fn().mockResolvedValue(undefined) };
@@ -67,10 +67,11 @@ describe("InterpretingConsole", () => {
     const { unmount } = render(<InterpretingConsole
       sourceText={entry.sourceText} sourceLanguage={{ code: entry.language, label: entry.language }}
       targetLanguage={{ code: entry.language === "ko" ? "zh" : "ko", label: "target" }}
-      demoMode onSubmit={() => {}} />);
+      demoMode={entry.demoMode} onSubmit={() => {}} />);
     fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
     await waitFor(() => expect(screen.getByText("남은 재생 1회")).toBeInTheDocument());
-    expect(requestTtsAudio).toHaveBeenCalledWith(expect.objectContaining({ text: entry.requestText, lang: entry.language, profile: "voice_default" }));
+    expect(requestTtsAudio).toHaveBeenCalledWith(expect.objectContaining({ text: entry.requestText, lang: entry.language }));
+    expect(vi.mocked(requestTtsAudio).mock.calls[0][0].profile).toBeUndefined();
     expect(AudioMock).toHaveBeenCalledWith("blob:audio");
     expect(audio.volume).toBe(entry.volume);
     expect(audio.playbackRate).toBe(entry.rate);
