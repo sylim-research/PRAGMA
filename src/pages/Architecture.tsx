@@ -13,12 +13,12 @@ type Step = readonly [title: string, desc?: string];
 const Steps = ({ steps, dot }: { steps: readonly Step[]; dot: string }) => (
   <ol>
     {steps.map(([title, desc], index) => (
-      <li key={title} className="relative flex gap-4 pb-[26px] last:pb-0">
+      <li key={title} className="relative flex gap-4 pb-5 last:pb-0">
         {index < steps.length - 1 && <span aria-hidden className="absolute left-[13px] top-7 bottom-0 w-[2px] bg-[#C9D0DA]" />}
         <span aria-hidden className={`relative grid h-7 w-7 shrink-0 place-items-center rounded-full text-[13px] font-black ${dot}`}>{index + 1}</span>
         <div className="pt-[3px]">
           <p className="break-keep text-[15.5px] font-bold leading-snug text-[#15202B]">{title}</p>
-          {desc && <p className="mt-0.5 break-keep text-[13.5px] leading-snug text-[#4E5F6C]">{desc}</p>}
+          {desc && <p className="mt-0.5 whitespace-nowrap text-[13.5px] leading-snug text-[#4E5F6C]">{desc}</p>}
         </div>
       </li>
     ))}
@@ -26,10 +26,11 @@ const Steps = ({ steps, dot }: { steps: readonly Step[]; dot: string }) => (
 );
 
 // 칸 머리는 README Fig. 1처럼 연한 바탕 + 위쪽 진한 띠로 그 워크플로우의 색을 보인다.
-const Lane = ({ title, head, children }: { title: string; head: string; children: React.ReactNode }) => (
-  <section className="flex flex-col overflow-hidden rounded-2xl border border-[#E1E5EB] bg-white">
-    <h2 className={`border-b border-t-[5px] border-b-[#E1E5EB] py-4 text-center text-[17.5px] font-black text-[#15202B] ${head}`}>{title}</h2>
-    <div className="flex-1 px-7 pb-8 pt-7">{children}</div>
+// 두 워크플로우(제작·학습)가 주인공이라 머리를 한 단계 진하고 크게, 수업 운영은 연결 기능이라 그대로 둔다.
+const Lane = ({ title, head, hero = false, children }: { title: string; head: string; hero?: boolean; children: React.ReactNode }) => (
+  <section className={`flex flex-col overflow-hidden rounded-2xl border bg-white ${hero ? "border-[#D3D9E2] shadow-[0_8px_24px_-18px_rgba(21,32,43,0.45)]" : "border-[#E1E5EB]"}`}>
+    <h2 className={`border-b border-b-[#E1E5EB] text-center font-black text-[#15202B] ${hero ? "border-t-[7px] py-[18px] text-[19px]" : "border-t-[5px] py-4 text-[17.5px]"} ${head}`}>{title}</h2>
+    <div className="flex-1 px-6 pb-7 pt-6">{children}</div>
   </section>
 );
 
@@ -40,14 +41,27 @@ const Connector = ({ label }: { label: string }) => (
   </div>
 );
 
-const CONTENT_STEPS: readonly Step[] = [["시나리오·학습 미션 생성"], ["자동 품질 점검"], ["AI 검토"], ["교수자 감수"], ["교수자 최종 승인"]];
+const CONTENT_STEPS: readonly Step[] = [
+  ["시나리오·학습 미션 생성", "화행 × P·D·R × 도메인"],
+  ["자동 품질 점검", "규칙 기반 · 형식·정합성 확인"],
+  ["AI 교차 검토", "1차 · 독립 교차 · 재검토"],
+  ["교수자 감수", "단계별 확인 · 수정 필요 표시"],
+  ["교수자 최종 승인", "수업 사용·공개 결정"],
+];
 const CLASS_STEPS: readonly Step[] = [
   ["15주 교과목 편성", "주차별 학습 미션 배치"],
+  ["학습자 관리", "계정 · 교과목 · 최근 활동"],
   ["주차별 운영", "교과목 공개와 접근 조건"],
   ["학급 응답 집계·조회", "익명 분포와 서로 다른 판단"],
   ["후속 콘텐츠 검토", "필요 시 수정 · 재승인"],
 ];
-const LEARNING_STEPS: readonly Step[] = [["MJT 판단 문항"], ["DCT형 통번역 과제"], ["AI 피드백"], ["학습자의 재검토"], ["확정안 · 학습자 최종 결정"]];
+const LEARNING_STEPS: readonly Step[] = [
+  ["MJT 판단 문항", "판단·이유·비교·수정 5문항"],
+  ["DCT형 통번역 과제", "번역·통역 · 한→중 / 중→한"],
+  ["AI 피드백", "의미·문법·화용 기준"],
+  ["학습자의 재검토", "유지 또는 수정은 학습자가 결정"],
+  ["학습자 최종 결정", "학습 기록 저장"],
+];
 
 const TRACE = ["학습 수행 기록", "AI 검토 의견", "운영 프롬프트 지문", "교수자 승인 이력"];
 
@@ -78,8 +92,8 @@ const Architecture = () => (
         <span aria-hidden className="h-px flex-1 bg-[#D9DEE6]" />
       </h1>
 
-      <div className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_96px_1fr_96px_1fr] lg:gap-0">
-        <Lane title="콘텐츠 제작 워크플로우" head="border-t-[#1F2A44] bg-[#E8ECF3]">
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_80px_1fr_80px_1fr] lg:gap-0">
+        <Lane hero title="콘텐츠 제작 워크플로우" head="border-t-[#1F2A44] bg-[#DCE3EE]">
           <Steps steps={CONTENT_STEPS} dot="bg-[#1F2A44] text-white" />
         </Lane>
 
@@ -91,7 +105,7 @@ const Architecture = () => (
 
         <Connector label={"학습자에게\n공개"} />
 
-        <Lane title="통번역 학습 워크플로우" head="border-t-[#F2C94C] bg-[#FBF0C9]">
+        <Lane hero title="통번역 학습 워크플로우" head="border-t-[#F2C94C] bg-[#F9E7A8]">
           <Steps steps={LEARNING_STEPS} dot="bg-[#F2C94C] text-[#15202B]" />
         </Lane>
       </div>
