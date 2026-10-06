@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, RotateCcw } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
+import { MPJ_ITEM_COUNT } from "@/lib/curriculum/learnerWorkflow";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 
@@ -56,7 +57,7 @@ const CLASS_STEPS: readonly Step[] = [
   ["후속 콘텐츠 검토", "필요 시 수정 · 재승인"],
 ];
 const LEARNING_STEPS: readonly Step[] = [
-  ["MJT 판단 문항", "판단·이유·비교·수정 5문항"],
+  ["MJT 판단 문항", `판단·이유·비교·수정 ${MPJ_ITEM_COUNT}문항`],
   ["DCT형 통번역 과제", "번역·통역 · 한→중 / 중→한"],
   ["AI 피드백", "의미·문법·화용 기준"],
   ["학습자의 재검토", "유지 또는 수정은 학습자가 결정"],
