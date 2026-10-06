@@ -16,6 +16,7 @@ export function InterpretingConsole({
   learnerLevel = "intermediate",
   replayLimit = 2,
   demoTranscript,
+  demoMode = false,
   onSubmit,
 }: {
   sourceText: string;
@@ -25,6 +26,7 @@ export function InterpretingConsole({
   replayLimit?: number;
   /** 데모에서만 명시적으로 채운 예시. 녹음·전사 API는 호출하지 않는다. */
   demoTranscript?: string;
+  demoMode?: boolean;
   onSubmit: (transcript: string) => void;
 }) {
   const maxPlays = Math.max(1, replayLimit);
@@ -48,13 +50,33 @@ export function InterpretingConsole({
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     sourceAudioRef.current?.pause();
+    if (demoMode) window.speechSynthesis?.cancel();
     if (sourceAudioUrlRef.current) URL.revokeObjectURL(sourceAudioUrlRef.current);
     if (recordingUrlRef.current) URL.revokeObjectURL(recordingUrlRef.current);
-  }, []);
+  }, [demoMode]);
 
   const playSource = async () => {
     if (plays >= maxPlays || playing || ttsLoading) return;
     setNotice(null);
+    if (demoMode) {
+      if (!("speechSynthesis" in window)) {
+        setNotice("이 브라우저에서는 원발화를 재생할 수 없습니다. 예시 전사문으로 다음 단계를 체험할 수 있습니다.");
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(sourceText);
+      utterance.lang = sourceLanguage.code === "zh" ? "zh-CN" : "ko-KR";
+      utterance.rate = 0.9;
+      utterance.onend = () => setPlaying(false);
+      utterance.onerror = () => {
+        setPlaying(false);
+        setNotice("원발화를 재생하지 못했습니다. 예시 전사문으로 계속 체험할 수 있습니다.");
+      };
+      window.speechSynthesis.cancel();
+      setPlaying(true);
+      setPlays(count => count + 1);
+      window.speechSynthesis.speak(utterance);
+      return;
+    }
     try {
       let audio = sourceAudioRef.current;
       if (!audio) {
@@ -92,6 +114,7 @@ export function InterpretingConsole({
   };
 
   const startRecording = async () => {
+    if (demoMode) return;
     setNotice(null);
     setRecorded(false);
     setConfirmed(false);
@@ -151,8 +174,8 @@ export function InterpretingConsole({
     <div className="space-y-3" data-scene-skin="oral-console">
       <section className="overflow-hidden rounded-2xl border border-[#CBD4DC] bg-white shadow-[0_8px_22px_rgba(21,32,43,0.07)]">
         <div className="flex items-center justify-between gap-3 border-b border-[#E1E6EA] bg-[#F7F9FA] px-4 py-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#40515F]"><Mic className="h-4 w-4" />직접 통역하기</div>
-          <span className="text-[10.5px] text-[#7B8994]">듣기 → 녹음 → 전사 확인</span>
+          <div className="flex items-center gap-2 text-xs font-bold text-[#40515F]"><Mic className="h-4 w-4" />{demoMode ? "통역 과정 체험" : "직접 통역하기"}</div>
+          <span className="text-[10.5px] text-[#7B8994]">{demoMode ? "듣기 → 예시 전사문 → 피드백" : "듣기 → 녹음 → 전사 확인"}</span>
         </div>
         <div className="space-y-4 p-4">
           <section aria-label="원발화 듣기">
@@ -167,7 +190,11 @@ export function InterpretingConsole({
               <div><p className="text-sm font-semibold">{ttsLoading ? "음성 준비 중…" : playing ? "재생 중…" : "원발화 재생"}</p><p className="text-[11px] text-[#A5B5C1]">남은 재생 {Math.max(0, maxPlays - plays)}회</p></div>
             </div>
           </section>
-          <section aria-label="통역 녹음">
+          {demoMode ? <section aria-label="통역 시연 안내" className="rounded-xl bg-[#F7F6F2] p-3">
+            <h3 className="text-xs font-bold text-[#273642]">② 예시 전사문으로 체험 ({targetLanguage.label})</h3>
+            <p className="mt-1 text-xs leading-5 text-[#536572]">위의 ‘시연용 답안 채우기’를 누르면 준비된 전사문이 입력됩니다. 실제 녹음한 내용이 아닙니다.</p>
+            <p className="mt-1 text-[11px] leading-5 text-[#7B8994]">원발화는 브라우저 음성으로 재생됩니다.</p>
+          </section> : <section aria-label="통역 녹음">
             <h3 className="text-xs font-bold text-[#273642]">② 통역 녹음 ({targetLanguage.label})</h3>
             <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3">
               <button type="button" onClick={recording ? stopRecording : startRecording} disabled={transcribing} className={`rounded-lg border px-4 py-2 text-xs font-bold ${recording ? "border-[#B44647] bg-[#B44647] text-white" : "border-[#C4494A] text-[#F0A3A4]"}`}>
@@ -176,18 +203,18 @@ export function InterpretingConsole({
               <span className="text-[11px] text-[#A5B5C1]">{recording ? "녹음 중…" : transcribing ? "자동 전사 중…" : recorded ? "아래에서 전사를 확인하세요" : "버튼을 누른 뒤 통역 시작"}</span>
             </div>
             <p className="mt-2 text-[10.5px] leading-5 text-[#7B8994]">음성은 자동 전사를 위해 OpenAI 음성 인식 API로 전송됩니다. 음성 파일은 저장하지 않고 확인한 전사만 제출합니다.</p>
-          </section>
+          </section>}
         </div>
       </section>
 
-      {(recorded || notice || transcribing) && (
+      {(demoMode || recorded || notice || transcribing) && (
         <section className="rounded-2xl border border-[#E1DED5] bg-[#F7F6F2] p-4">
-          <h3 className="text-sm font-bold text-[#15202B]">③ 내가 말한 내용 확인</h3>
+          <h3 className="text-sm font-bold text-[#15202B]">{demoMode ? "③ 예시 전사문 확인" : "③ 내가 말한 내용 확인"}</h3>
           {notice && <p className="mt-2 rounded-lg bg-white px-3 py-2 text-xs leading-5 text-[#536572]">{notice}</p>}
           {recordingUrl && <audio src={recordingUrl} controls preload="metadata" className="mt-3 h-9 w-full" aria-label="내 통역 녹음" />}
           <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={3} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className="mt-3 w-full rounded-xl border-2 border-[#15202B] bg-white p-3 text-[15.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55" />
           <button type="button" onClick={() => transcript.trim() && setConfirmed(true)} disabled={transcribing || !transcript.trim()} className={`mt-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${confirmed ? "border-[#2E7D5B] bg-[#E7F5EC] text-[#256548]" : "border-[#B8B3A2] bg-white text-[#3D4B55]"}`}>
-            {confirmed ? "✓ 전사 확인 완료" : "말한 내용과 같아요"}
+            {confirmed ? "✓ 전사 확인 완료" : demoMode ? "예시 전사문 확인" : "말한 내용과 같아요"}
           </button>
         </section>
       )}

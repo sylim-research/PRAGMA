@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
+import { IS_DEMO } from "@/lib/auth/useProfile";
 import {
   ADMIN_DASHBOARD_ITEM,
   ADMIN_NAV_GROUPS,
@@ -66,6 +67,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
           <div className="md:pl-9">
             <HomeBrand />
           </div>
+          <div className="flex flex-wrap justify-end gap-x-5 gap-y-2">
+          {IS_DEMO && <Link to="/demo/mission" target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#F1EFE8] hover:text-[#FAD338]">대표 미션 체험 ↗</Link>}
           <Link
             to="/learner/course"
             target="_blank"
@@ -74,6 +77,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
           >
             학습자 수업 열기 ↗
           </Link>
+          </div>
         </div>
       </header>
 

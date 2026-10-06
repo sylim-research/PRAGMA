@@ -87,7 +87,9 @@ import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
 import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
-import { DEMO_FIRST_DRAFT, DEMO_MJT_ANSWERS, DEMO_REVISED_DRAFT, requestDemoFeedback } from "@/lib/demo/representativeDemoFeedback";
+import { representativeDemoContent, unavailableDemoFeedback, type RepresentativeDemoContent } from "@/lib/demo/representativeDemoContent";
+import type { DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
+import { RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -98,12 +100,13 @@ const LocalPilotContext = createContext(false);
 const DctFeedbackSessionContext = createContext<DctFeedbackSession | null>(null);
 /** 대표 미션 시연(모델 하우스) — AI·DB를 쓰지 않고 준비된 예시 답안과 피드백을 보여 준다. */
 const DemoModeContext = createContext(false);
+const DemoContentContext = createContext<RepresentativeDemoContent | null>(null);
 /** 시연에서 지금 문항을 예시 답안으로 채우는 함수. 시연이 아니거나 문항 화면이 아니면 null. */
 const DemoFillContext = createContext<(() => void) | null>(null);
 
 /** 대표 미션 시연에서 이 문항에 미리 정한 시연 답안(의도적 오답 포함). 없으면 기준 답안을 쓴다. */
 function useDemoAnswer(questId: string) {
-  return useContext(DemoModeContext) ? DEMO_MJT_ANSWERS[questId] : undefined;
+  return useContext(DemoContentContext)?.mjtAnswers[questId];
 }
 
 /** 채워질 자리 바로 옆(질문 줄 오른쪽)에 두는 시연용 자동 채우기 버튼. */
@@ -113,7 +116,7 @@ function DemoFillButton() {
   return (
     <button type="button" onClick={fill}
       className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FAD338] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_1px_4px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
-      <PenLine aria-hidden className="h-4 w-4" />답안 자동 채우기
+      <PenLine aria-hidden className="h-4 w-4" />시연용 답안 채우기
     </button>
   );
 }
@@ -1597,6 +1600,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   devDraft?: string;
 }) {
   const mission = useCanonicalMission();
+  const demo = useContext(DemoModeContext);
   const [draft, setDraft] = useState(() => devAutofill ? devDraft : "");
   const validation = validateDraft(draft, mission.targetLanguage.label);
   const canSubmit = devMode || validation.valid;
@@ -1610,6 +1614,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
           targetLanguage={mission.targetLanguage}
           learnerLevel={mission.supportLevel}
           replayLimit={quest.replayLimit}
+          demoMode={demo}
           demoTranscript={devAutofill ? devDraft : undefined}
           onSubmit={(transcript) => onDone({ first: transcript, revised: transcript, reflected: false })}
         />
@@ -1697,6 +1702,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const mission = useCanonicalMission();
   const localPilot = useContext(LocalPilotContext);
   const demo = useContext(DemoModeContext);
+  const demoContent = useContext(DemoContentContext);
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   const first = response?.first ?? "";
@@ -1726,11 +1732,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!demoFillRequest) return;
-    const example = demo ? DEMO_REVISED_DRAFT : quest.feedback.alternatives.find(item => normalize(item.text) !== normalize(first))?.text
+    const example = demoContent ? demoContent.revisedDraft : quest.feedback.alternatives.find(item => normalize(item.text) !== normalize(first))?.text
       ?? quest.referenceAnswer;
     setRevised(example);
     setRevisionOpen(true);
-  }, [demo, demoFillRequest, first, quest]);
+  }, [demoContent, demoFillRequest, first, quest]);
   useEffect(() => {
     let cancelled = false;
     if (localPilot) {
@@ -1888,7 +1894,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               )}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? "실제 AI가 같은 예시 답안에 준 피드백 기록입니다. 시연에서는 AI를 새로 호출하지 않습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? demoContent?.feedbackNote ?? "이 시연의 피드백 기록을 찾을 수 없습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
           </section>}
 
 
@@ -2734,10 +2740,10 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     ? rotateMissionAttemptId(attemptStorageKey)
     : getOrCreateMissionAttemptId(attemptStorageKey));
   // 모델 하우스: 대표 미션 시연에서만 준비된 예시 답안·피드백을 쓴다.
-  const modelHouse = demoMode && runtime?.scenario_id === REPRESENTATIVE_MISSION_ID;
+  const demoContent = demoMode ? representativeDemoContent(runtime?.scenario_id) : null;
   const feedbackSession = useMemo(() => createDctFeedbackSession(runtime
     ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined,
-    modelHouse ? requestDemoFeedback : undefined), [attemptId, modelHouse, runtime?.mission.provenance?.mission_content_hash]);
+    demoMode ? demoContent?.requestFeedback ?? unavailableDemoFeedback : undefined), [attemptId, demoMode, demoContent, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
 
   useEffect(() => {
@@ -3030,7 +3036,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
 
   return (
     <LocalPilotContext.Provider value={localPilot}>
-    <DemoModeContext.Provider value={modelHouse}>
+    <DemoModeContext.Provider value={demoMode}>
+    <DemoContentContext.Provider value={demoContent}>
     <DemoFillContext.Provider value={demoFill}>
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
@@ -3057,6 +3064,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         />
       )}
       <div className="mx-auto max-w-3xl">
+        {demoMode && <RepresentativeDemoNavigation scenarioId={runtime?.scenario_id} mode={mission.activityMode} />}
         {localPilot && <p className="mb-3 text-xs leading-5 text-[#7A7466]">
           로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
         </p>}
@@ -3119,7 +3127,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
               onRevisionStateChange={setFeedbackRevisionOpen}
               devMode={isDevPreview}
               devAutofill={devAutofillQuestId === quest.id}
-              devDraft={demoMode && quest.kind === "dct" ? (modelHouse ? DEMO_FIRST_DRAFT : quest.referenceAnswer) : DEV_PREVIEW_COPY[devPreset].a}
+              devDraft={demoMode && quest.kind === "dct" ? (demoContent?.firstDraft ?? quest.referenceAnswer) : DEV_PREVIEW_COPY[devPreset].a}
               demoFillRequest={demoMode && devAutofillQuestId === quest.id ? renderNonce : 0}
               localPilot={directCorrectionFlow}
             />
@@ -3131,6 +3139,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     </DctFeedbackSessionContext.Provider>
     </RuntimeMissionContext.Provider>
     </DemoFillContext.Provider>
+    </DemoContentContext.Provider>
     </DemoModeContext.Provider>
     </LocalPilotContext.Provider>
   );
@@ -3139,9 +3148,11 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
 const CanonicalMissionRun = ({
   scenarioId: scenarioIdOverride,
   demoMode = false,
+  demoTaskMode,
 }: {
   scenarioId?: string;
   demoMode?: boolean;
+  demoTaskMode?: DemoTaskMode;
 } = {}) => {
   const { scenarioId: routeScenarioId } = useParams<{ scenarioId: string }>();
   const scenarioId = scenarioIdOverride ?? routeScenarioId ?? (demoMode ? REPRESENTATIVE_MISSION_ID : undefined);
@@ -3179,7 +3190,7 @@ const CanonicalMissionRun = ({
     setFallbackToLegacy(false);
     // 시연은 로그인 여부와 관계없이 승인본 스냅숏을 쓴다(DB·AI 호출 없음).
     const load = demoMode
-      ? Promise.resolve().then(() => publicRepresentativeMission())
+      ? Promise.resolve().then(() => publicRepresentativeMission(scenarioId, demoTaskMode))
       : fetchMissionByScenario(scenarioId, { includeV6: true });
     void load
       .then((runnable) => {
@@ -3203,7 +3214,7 @@ const CanonicalMissionRun = ({
       });
 
     return () => { cancelled = true; };
-  }, [demoMode, scenarioId]);
+  }, [demoMode, scenarioId, demoTaskMode]);
 
   if (courseLocation.ok === false) {
     return (

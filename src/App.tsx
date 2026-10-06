@@ -9,7 +9,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { seedIfEmpty } from "./lib/learningSessions";
 import { IS_DEMO } from "./lib/auth/useProfile";
-import { REPRESENTATIVE_MISSION_ID } from "./lib/demo/representativeMission";
+const RepresentativeMissionDemo = lazy(() => import("./pages/RepresentativeMissionDemo"));
+const LearnerProfileDemo = lazy(() => import("./pages/LearnerProfileDemo"));
 
 const RequireApproved = lazy(() => import("./components/RequireApproved"));
 const RequireAdmin = lazy(() => import("./components/RequireAdmin"));
@@ -109,10 +110,11 @@ const App = () => (
             path="/demo/mission"
             element={
               IS_DEMO
-                ? <CanonicalMissionRun demoMode scenarioId={REPRESENTATIVE_MISSION_ID} />
+                ? <RepresentativeMissionDemo />
                 : <Navigate to="/" replace />
             }
           />
+          <Route path="/demo/profile" element={IS_DEMO ? <LearnerProfileDemo /> : <Navigate to="/" replace />} />
           <Route path="/student-login" element={<StudentLogin />} />
           {/* 폐기된 콘텐츠 전문가 검수 주소는 현행 품질관리 흐름으로 연결한다. */}
           <Route path="/expert-login" element={<Navigate to="/admin/research-qa/final-review" replace />} />
