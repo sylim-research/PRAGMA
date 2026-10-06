@@ -11,7 +11,7 @@ export function RepresentativeDemoHeader() {
 
 export function RepresentativeDemoNavigation({ scenarioId, mode }: DemoNavigationProps) {
   const step = parseDemoStep(useLocation().search);
-  const current = REPRESENTATIVE_DEMOS.find(item => item.scenarioId === scenarioId) ?? REPRESENTATIVE_DEMOS[0];
+  const current = REPRESENTATIVE_DEMOS.find(item => Object.values(item.missions).some(id => id === scenarioId)) ?? REPRESENTATIVE_DEMOS[0];
   return <nav className="-mt-4 mb-1 flex flex-wrap items-center justify-end gap-2" aria-label="데모 미션 선택">
     {REPRESENTATIVE_DEMOS.map(demo => {
       return <div key={demo.direction} role="group" aria-label={demo.label}

@@ -8,17 +8,18 @@ import type { SpeechActUI } from "@/lib/pragma/enums";
 import { REPRESENTATIVE_MISSION_SNAPSHOT as snapshot } from "./representativeMissionSnapshot";
 
 import { REVERSE_REPRESENTATIVE_SNAPSHOT } from "./reverseRepresentativeSnapshot";
-import { REPRESENTATIVE_MISSION_ID, REVERSE_REPRESENTATIVE_MISSION_ID, type DemoTaskMode } from "./representativeMissionCatalog";
+import { KO_ZH_INTERPRETING_SNAPSHOT, ZH_KO_TRANSLATION_SNAPSHOT } from "./additionalDemoSnapshots";
+import { REPRESENTATIVE_MISSION_ID, type DemoTaskMode } from "./representativeMissionCatalog";
 export { REPRESENTATIVE_MISSION_PATH, REPRESENTATIVE_MISSION_ID } from "./representativeMissionCatalog";
 
 export function publicRepresentativeMission(scenarioId = REPRESENTATIVE_MISSION_ID, mode?: DemoTaskMode): CanonicalRunnableMission {
-  const selected = scenarioId === REPRESENTATIVE_MISSION_ID ? snapshot
-    : scenarioId === REVERSE_REPRESENTATIVE_MISSION_ID ? REVERSE_REPRESENTATIVE_SNAPSHOT : null;
+  const selected = [snapshot, REVERSE_REPRESENTATIVE_SNAPSHOT, KO_ZH_INTERPRETING_SNAPSHOT, ZH_KO_TRANSLATION_SNAPSHOT]
+    .find(item => item.scenario_id === scenarioId);
   if (!selected) throw new Error("알 수 없는 대표 미션입니다.");
   const parsed = normalizeLearnerMission(structuredClone(selected.mission_content));
   if (!parsed.ok || !parsed.data) throw new Error("대표 미션 스냅숏 형식이 유효하지 않습니다.");
   // Public presentation override only. Never change the approved snapshot or persist this copy.
-  // The feedback note identifies the original recorded modality.
+  // Only the zh_ko translation slot differs from its approved mode; its feedback was recorded in translation mode.
   if (mode) parsed.data.production_task.mode = mode;
   return {
     scenario_id: selected.scenario_id,
