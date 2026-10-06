@@ -89,7 +89,7 @@ import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } 
 import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
 import { representativeDemoContent, unavailableDemoFeedback, type RepresentativeDemoContent } from "@/lib/demo/representativeDemoContent";
 import type { DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
-import { RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
+import { RepresentativeDemoHeader, RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -296,8 +296,7 @@ function v6IntroSteps(outputName: string) {
       // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
       { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
       { title: "AI 피드백", desc: "의미·문법·화용 기준" },
-      // 수락/거부의 이분법이 아니라 결정 주체를 말한다 — 고치더라도 어떻게 고칠지는 학습자가 정한다(학습자의 최종 결정).
-      { title: "최종 결정", desc: `최종 ${outputName}을 내가 결정하기` },
+      { title: "최종 결정", desc: "최종안 제출하기" },
     ],
   };
 }
@@ -392,7 +391,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-11 w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -811,14 +810,14 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
+          <Button className={`h-[48px] ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
             if (!judgmentCommitted) setJudgmentCommitted(true);
             else setAnswered(true);
           }}>{judgmentCommitted ? "이유 확정하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : (
-          <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -920,11 +919,11 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>수정안 확정하기</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>수정안 확정하기</Button>
         ) : (
-          <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ ...(!correctionOnly ? { judgment } : {}), correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ ...(!correctionOnly ? { judgment } : {}), correctionIds: correctionId ? [correctionId] : [] })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -982,8 +981,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       </section>}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 확정하기</Button>
-        : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 확정하기</Button>
+        : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
 }
@@ -1034,8 +1033,8 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
       </fieldset>)}</div>
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/${total}개 표현을 판단했습니다.` : undefined}>
-      {!submitted ? <Button className={`h-11 ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확정하기</Button>
-        : <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
+      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확정하기</Button>
+        : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
 }
@@ -1090,10 +1089,10 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
       </section>
       <ActionBar hint={!answered && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
         {!answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!reasonId} onClick={() => setAnswered(true)}>이유 확인하기</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!reasonId} onClick={() => setAnswered(true)}>이유 확인하기</Button>
         ) : (
           <Button
-            className={`h-11 ${actionButton}`}
+            className={`h-[48px] ${actionButton}`}
             onClick={() => {
               if (reasonId) onDone({ reasonId });
             }}
@@ -1164,9 +1163,9 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
       </section>
       <ActionBar hint={!answered ? (best && worst ? undefined : best ? "적절한 표현 선택 완료 · 조정할 표현을 골라주세요" : worst ? "조정할 표현 선택 완료 · 적절한 표현을 골라주세요" : undefined) : undefined}>
         {!answered ? (
-          <Button className={`h-11 ${actionButton}`} disabled={!best || !worst || best === worst} onClick={() => setAnswered(true)}>두 표현 확인하기</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!best || !worst || best === worst} onClick={() => setAnswered(true)}>두 표현 확인하기</Button>
         ) : (
-          <Button className={`h-11 ${actionButton}`} onClick={() => onDone({ best, worst })}>다음: 직접 옮겨 보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+          <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ best, worst })}>다음: 직접 옮겨 보기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
       </ActionBar>
     </QuestScaffold>
@@ -1625,7 +1624,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
     <QuestScaffold quest={quest}>
       <DctDraftCard quest={quest} value={draft} onChange={setDraft} />
       <ActionBar hint={devMode || !draft.trim() ? undefined : validation.hint}>
-        <Button className={`h-11 ${actionButton}`} disabled={!canSubmit} onClick={() => onDone({ first: draft.trim(), revised: draft.trim(), reflected: false })}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`h-[48px] ${actionButton}`} disabled={!canSubmit} onClick={() => onDone({ first: draft.trim(), revised: draft.trim(), reflected: false })}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </ActionBar>
     </QuestScaffold>
   );
@@ -1918,10 +1917,10 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-11 ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? `이 ${outputName}으로 확정하기` : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? `이 ${outputName}으로 확정하기` : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? `이 ${outputName}으로 확정하기` : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? `이 ${outputName}으로 확정하기` : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
-                    <Button variant="outline" className="h-11 w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 최초 {outputName} 유지하기</Button>
+                    <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 최초 {outputName} 유지하기</Button>
                   )}
                 </div>
               </ActionBar>
@@ -1930,8 +1929,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             <ActionBar>
               {/* 양자택일 한 줄. 둘 다 타당한 학습자 결정이므로 같은 무게로 채운다 — 수정하기는 네이비, 이대로 확정은 노랑. */}
               <div className="grid w-full grid-cols-2 gap-2">
-                <Button className="h-11 w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                <Button className="h-11 w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
+                <Button className="h-[48px] w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                <Button className="h-[48px] w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
                   onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />이대로 확정</Button>
               </div>
               {/* 수정 권장인데 그대로 두려면 이유 한 줄을 남긴다(이견 기록). */}
@@ -1940,7 +1939,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   <label htmlFor={`${quest.id}-keep-reason`} className="text-[13.5px] font-bold text-[#2B3647]">이대로 두는 이유를 한 줄만 적어 주세요.</label>
                   <div className="mt-2 flex gap-2">
                     <Input id={`${quest.id}-keep-reason`} value={keepReason} onChange={(event) => setKeepReason(event.target.value)} placeholder="예: 이 관계에선 이 말투가 자연스러워요" className="h-11 flex-1 bg-white text-[14.5px]" />
-                    <Button className="h-11 shrink-0 bg-[#F7CE3E] px-5 font-bold text-[#15202B] hover:bg-[#F9D960] disabled:bg-[#FBE8A6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
+                    <Button className="h-[48px] shrink-0 bg-[#F7CE3E] px-5 font-bold text-[#15202B] hover:bg-[#F9D960] disabled:bg-[#FBE8A6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>확정</Button>
                   </div>
                 </div>
               )}
@@ -2261,7 +2260,7 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
       </ol>
 
       <div className="mt-3 flex justify-end">
-        <Button type="button" className={`h-11 font-black ${actionButton}`} onClick={onContinue}>
+        <Button type="button" className={`h-[48px] font-black ${actionButton}`} onClick={onContinue}>
           직접 {outputName}해 보기 <ChevronRight className="ml-1 h-4 w-4" />
         </Button>
       </div>
@@ -2486,7 +2485,7 @@ export function CompletionActions({ onRestart, onRetrySave, runtime = false, sav
       {failed && <div role="alert" className="mb-4 rounded-xl border border-[#E2AAA5] bg-[#FFF3F1] p-4">
         <p className="text-sm font-bold text-[#713E3A]">학습 기록을 저장하지 못했습니다.</p>
         <p className="mt-1 text-sm leading-6 text-[#713E3A]">답안은 이 화면에 남아 있으니, 화면을 떠나기 전에 저장을 다시 시도해 주세요.</p>
-        {onRetrySave && <Button className="mt-3 min-h-11 w-full sm:w-auto" onClick={onRetrySave}>학습 기록 저장 다시 시도</Button>}
+        {onRetrySave && <Button className="mt-3 min-h-[48px] w-full sm:w-auto" onClick={onRetrySave}>학습 기록 저장 다시 시도</Button>}
       </div>}
       <div className={`grid gap-2 ${returnPath ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
         {returnPath && (
@@ -2494,20 +2493,20 @@ export function CompletionActions({ onRestart, onRetrySave, runtime = false, sav
             to={returnPath}
             aria-disabled={saving || undefined}
             onClick={(event) => { if (saving) event.preventDefault(); }}
-            className={`flex h-11 items-center justify-center rounded-md px-4 text-center text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 ${secondaryNavigation ?? "bg-[#F3D248] text-[#15202B] hover:bg-[#F7DF73]"}`}
+            className={`flex h-[48px] items-center justify-center rounded-md px-4 text-center text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 ${secondaryNavigation ?? "bg-[#F3D248] text-[#15202B] hover:bg-[#F7DF73]"}`}
           >
             이번 주 학습으로 돌아가기
           </Link>
         )}
-        {onShowDemoRecord ? <Button className="h-11 w-full" onClick={onShowDemoRecord}>데모 학습 기록 보기</Button> : <Link
+        {onShowDemoRecord ? <Button className="h-[48px] w-full" onClick={onShowDemoRecord}>데모 학습 기록 보기</Button> : <Link
           to="/learner/records#correction-notes"
           aria-disabled={saving || undefined}
           onClick={(event) => { if (saving) event.preventDefault(); }}
-          className={`flex h-11 items-center justify-center rounded-md px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 ${secondaryNavigation ?? "bg-[#15202B] text-white hover:bg-[#263547]"}`}
+          className={`flex h-[48px] items-center justify-center rounded-md px-4 text-sm font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 ${secondaryNavigation ?? "bg-[#15202B] text-white hover:bg-[#263547]"}`}
         >
           내 기록 보기
         </Link>}
-        <Button variant="outline" className="h-11 w-full" onClick={onRestart} disabled={saving}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
+        <Button variant="outline" className="h-[48px] w-full" onClick={onRestart} disabled={saving}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
       </div>
       {!failed && <p role="status" className="mt-3 break-keep text-[12px] leading-5 text-[#6A7485]">
         {runtime
@@ -3042,10 +3041,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
-    <LearnerJourneyShell canvas="max-w-3xl" headerRight={<span className="flex items-center gap-3">
-      {demoMode && <span className="whitespace-nowrap rounded-full border border-[#F2C744]/70 px-2.5 py-0.5 text-[11px] font-bold text-[#F2C744]">데모 시연</span>}
-      <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction.replace("한국어", "한").replace("중국어", "중").replace(/\s*→\s*/, "→")}</span>
-    </span>}>
+    <LearnerJourneyShell canvas="max-w-3xl" headerRight={demoMode
+      ? <RepresentativeDemoHeader />
+      : <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction.replace("한국어", "한").replace("중국어", "중").replace(/\s*→\s*/, "→")}</span>}>
       {isDevPreview && (
         <DevPreviewToolbar
           sceneIntroConfig={sceneIntroConfig}
@@ -3069,7 +3067,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
         </p>}
         {sceneIntroStep !== null ? (
-          <div className="space-y-5">
+          <div className={demoMode ? "space-y-2" : "space-y-5"}>
             <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} onJumpStage={demoMode ? jumpDemoStage : undefined} />
             <SceneIntroFlow
               config={sceneIntroConfig}
@@ -3111,7 +3109,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 learnerChoices={peerChoices}
               /></div></details>
             )}
-            {localPilot ? <Button variant="outline" className="h-11 w-full" onClick={restart}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
+            {localPilot ? <Button variant="outline" className="h-[48px] w-full" onClick={restart}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
               : <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState}
                 onShowDemoRecord={demoMode ? () => { setDemoRecordOpen(true); window.setTimeout(() => document.getElementById("demo-record")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); } : undefined} />}
             {demoMode && demoRecordOpen && <DemoRecord quests={mission.quests} responses={responses} />}

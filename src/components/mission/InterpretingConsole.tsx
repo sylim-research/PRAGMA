@@ -219,7 +219,7 @@ export function InterpretingConsole({
         </section>
       )}
 
-      <Button className="h-12 w-full" disabled={!canSubmit} onClick={() => onSubmit(transcript.trim())}>확인한 전사로 제출</Button>
+      <Button className="h-[50px] w-full" disabled={!canSubmit} onClick={() => onSubmit(transcript.trim())}>확인한 전사로 제출</Button>
     </div>
   );
 }
