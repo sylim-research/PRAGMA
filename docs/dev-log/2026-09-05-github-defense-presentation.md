@@ -3,7 +3,7 @@
 ## 범위와 결정
 
 - 단독 진행 적합: 공개 번들 예시 연결·소개 정비. 실제 학습 경로의 Auth/RLS, 생성계약, DB·Edge는 변경하지 않는다.
-- 사용자는 심사위원의 첫 5분에 제품·기술 구조·검증 근거가 보이도록 요청했고, README 축약과 심사용 Release 준비를 수용했다. Zenodo는 공개 판본 확정 뒤 진행한다.
+- 공개 소개에서 제품·기술 구조·검증 근거를 쉽게 확인할 수 있도록 README 축약과 검토용 Release 준비를 계획했다. Zenodo는 공개 판본 확정 뒤 진행한다.
 - /demo/mission이 RequireApproved를 거쳐 Google 로그인으로 이동하는 것을 운영 브라우저에서 확인했다.
 - PublicMissionDemo는 기존 CanonicalMissionRunner와 CANONICAL_MISSION_PREVIEW만 사용한다. runtime·scenarioId를 전달하지 않아 DB 미션 조회·외부 AI 피드백·서버 수행 저장 경로가 열리지 않는다. 예시 피드백과 서버 비저장을 화면에 표시한다.
 - 기존 로그인·교수자 승인 경로와 실제 수업 데이터는 유지한다. 홈페이지·아키텍처의 공개 체험 링크는 배포 환경 플래그와 분리한다.

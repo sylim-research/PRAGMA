@@ -21,7 +21,7 @@
 | 교수자 판단 경로 | `contentReviewDomain.ts:55-60` `isSignal = level==="warning"` → `needs_professor: true` (62206a5b, 2026-09-09) → SQL `content_review_required_findings`의 `v_rules`(`needs_professor='true'`)에 포함 (20260909230000, 9997f23f) → `save_content_review_decisions`가 전 항목 결정 요구, 승인 시 `no_change`만 허용. |
 | 생성·승인 영향 | 저장 차단 없음(warning). 승인은 결정 입력 전까지 잠김. |
 | 테스트 | `missionRules.audit.test.ts:90-111` — items[0].source = items[1].source(X=A) → 「source 완전 중복」 발생, MJT5 후보 = fix 교정안 → 「판정 후보 완전 중복」 발생. **A-A-A 공유가 finding을 내지 않는다는 테스트는 없다.** 반대로 R27 테스트 제목이 「without rejecting Anchor A sharing」(:113)이라 R27만 앵커 공유를 알고 있다. |
-| 변경 이력 | 07-23 도입 → 08-25 범위 확장 → 09-09 needs_professor=true(어댑터). 카탈로그(`qualityRuleCatalog.ts:142`) 설명문이 이미 「**의도된 Anchor 공유도 함께 잡힌다**」고 적어 둠. 08-30 다이어트 감사 「KEEP-WARNING · exact만」. 09-09 Codex 감사 「의도된 공유 target도 경고 → 정상 콘텐츠 경고 상시화 · 범위·문구 조정 권장; 통합/폐기는 후속」, Fable 판정 「보완 — 단순한 결함 탐지 건수로 해석하지 않는다」. **후속 조치 없음.** |
+| 변경 이력 | 07-23 도입 → 08-25 범위 확장 → 09-09 needs_professor=true(어댑터). 카탈로그(`qualityRuleCatalog.ts:142`) 설명문이 이미 「**의도된 Anchor 공유도 함께 잡힌다**」고 적어 둠. 08-30 다이어트 감사 「KEEP-WARNING · exact만」. 09-09 Codex 감사 「의도된 공유 target도 경고 → 정상 콘텐츠 경고 상시화 · 범위·문구 조정 권장; 통합/폐기는 후속」, Fable 검토 의견 「보완 — 단순한 결함 탐지 건수로 해석하지 않는다」. **후속 조치 없음.** |
 
 ### R5 — `checkMultiJudgeLength` (`missionRules.ts:1181-1252`) + 구조 분기 (`:784-856`)
 
@@ -161,7 +161,7 @@ R19 80 + R5 C 10 + R5 B 11 = **101/107**은 규칙이 아니라 「warning = 항
 3. 2026-09-06 focused_v1: 필수 목록 = fail 또는 needs_professor. 규칙 finding은 어댑터가 전부 `needs_professor:false`로 넘겨 목록에 없었다.
 4. 2026-09-09 `62206a5b`: R9·R30·R16 장면을 fail→warning으로 내리면서 「어댑터를 먼저 고치지 않으면 **warning 강등 = 침묵**」(decision-plan:19)이 첫 MUST가 됐고, 해결은 **개별 규칙이 아니라 `level==="warning"` 전체**에 `needs_professor:true`를 붙이는 한 줄이었다.
 5. 같은 날 `9997f23f` / DEC-20260909-02: 「경고를 TS/SQL 필수 판단 목록에 포함」 — TS 표시와 SQL 승인 조건의 불일치를 맞추려는 결정. 회귀 테스트(`qualitySignalFlow.test.ts:60-80`)의 fixture는 **R9·R30·R16·R32뿐**이다. R19·R5는 어느 결정문·테스트에도 등장하지 않는다.
-6. 같은 날 Codex 감사(`:108`)와 Fable 판정(`:54`)이 R19의 「정상 콘텐츠 경고 상시화」를 확인하고 「범위·문구 조정 권장; 통합/폐기는 후속」·「단순한 결함 탐지 건수로 해석하지 않는다」로 **미뤘다.**
+6. 같은 날 Codex 감사(`:108`)와 Fable 검토 의견(`:54`)이 R19의 「정상 콘텐츠 경고 상시화」를 확인하고 「범위·문구 조정 권장; 통합/폐기는 후속」·「단순한 결함 탐지 건수로 해석하지 않는다」로 **미뤘다.**
 
 결론: 「의미 추정 신호(R9·R30·R16·R32)는 교수자 결정을 받아야 한다」는 **의도된 결정**이다. 그것을 **모든 warning에 일괄 적용**한 것은 구현 편의였고, 그 결과 R19·R5가 결정 목록에 들어간 것은 **당일 감사에서 인지됐으나 후속으로 미뤄진 부작용**이다.
 

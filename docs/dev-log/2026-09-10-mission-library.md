@@ -31,7 +31,7 @@
 - 증거: 이 작업공간 `.tmp/mission-library-smoke/`의 `result.json`, `desktop.png`, `composer.png`, `mobile.png`.
   전체 검사·빌드 로그는 `.tmp/mission-library-tests.log`, `.tmp/mission-library-build.log`다.
 - Node v24.18.0에서 실행했다. CI의 Node 22·실제 운영 DB·운영 배포·실제 학습효과를 검증한 결과는 아니다.
-  사용자의 검증 최소화 지시에 따라 진행 중이던 검사 결과를 수집한 뒤 반복 검사를 추가하지 않았다.
+  진행 중이던 검사 결과를 수집했으며, 같은 범위의 반복 검사는 추가하지 않았다.
 
 ## 기록과 남은 범위
 

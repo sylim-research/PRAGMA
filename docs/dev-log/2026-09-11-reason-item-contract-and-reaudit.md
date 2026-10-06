@@ -595,9 +595,9 @@ production gate fail 4건은 모두 Reason 오답 critic note의 자기모순 �
 
 교수자 승인·편성은 실행하지 않았다.
 
-## 19. 마지막 3건(C8) — 연구자 판정 반영 · 재검수 · 2026-09-11 심야
+## 19. 마지막 3건(C8) — 검토 의견 반영 · 재검수 · 2026-09-11 심야
 
-연구자(fable) 판정: ①w12-0 「问题都在你这边」 유형 제거(의미 보존 > 자연성 > 화용 — 원문에 없는 책임 귀속은 화용 조작 범위를 넘는 의미 추가) ②w5-1 R=mid→**high**(부담은 강평만이 아니라 토요일 오전 교외 이동·참석·강평 전체 행위) ③w13-1 해설 stale reference 정정. 3건 외 17건 수정 금지, 계약·critic·policy 불변, revision 경로, 3건만 production gate + focused_v1 공식 검수, 승인·편성 금지. 도구 = `c8-fix/content-fix.ts`(mission w12-0·w13-1 / core w5-1)·`c8-fix/w12-0-diag-fix.ts`, 결과 `c8-fix/<key>-fix.json`, manifest `v3-manifest-after-c8.json`, DB 실측 `v3-content-review-runs-after-c8.json`.
+AI 검토 의견(Fable): ①w12-0 「问题都在你这边」 유형 제거(의미 보존 > 자연성 > 화용 — 원문에 없는 책임 귀속은 화용 조작 범위를 넘는 의미 추가) ②w5-1 R=mid→**high**(부담은 강평만이 아니라 토요일 오전 교외 이동·참석·강평 전체 행위) ③w13-1 해설 stale reference 정정. 3건 외 17건 수정 금지, 계약·critic·policy 불변, revision 경로, 3건만 production gate + focused_v1 공식 검수, 승인·편성 금지. 도구 = `c8-fix/content-fix.ts`(mission w12-0·w13-1 / core w5-1)·`c8-fix/w12-0-diag-fix.ts`, 결과 `c8-fix/<key>-fix.json`, manifest `v3-manifest-after-c8.json`, DB 실측 `v3-content-review-runs-after-c8.json`.
 
 ### 3건 before → after
 
@@ -694,7 +694,7 @@ production gate fail 4건은 모두 Reason 오답 critic note의 자기모순 �
 
 ## 21. 교수자 판단 패킷 → 연구자 판정 → 보완 2건 반영 · 2026-09-12
 
-- 패킷 = `evidence/2026-09-11-reason-item-repair/professor-decision-packet-c9.md`. 사실층(Opus) → Fable 판정(17: 보완 4·기각 13) → 연구자 판정(보완 2·기각/현행 유지 15, 6-0-3·10-0-3은 P1 backlog). 「기각」은 현행 콘텐츠를 수정할 근거가 부족해 현재 버전을 유지한다는 연구자 결정이지 AI 지적이 틀렸다는 절대 판정이 아니다.
+- 패킷 = `evidence/2026-09-11-reason-item-repair/professor-decision-packet-c9.md`. 사실층(Opus) → Fable 검토 의견(17: 보완 4·기각 13) → 연구자 판정(보완 2·기각/현행 유지 15, 6-0-3·10-0-3은 P1 backlog). 「기각」은 현행 콘텐츠를 수정할 근거가 부족해 현재 버전을 유지한다는 연구자 결정이지 AI 지적이 틀렸다는 절대 판정이 아니다.
 - 반영(`c10-fix/content-fix.ts`, reviseMissionDraft, v24 gate):
   - w5-0 rev 10 · hash ecb8ba83 · 검수 9020cb99: 「我也展出了照片的公司内部展览」→「有我照片参展的公司内部展览」 12곳(MJT2~4 target·권장안·교정안). Fable 제안문(我参展的…)은 「사진」이 빠져 채택하지 않음. gate warning(r1 possible) · Claude pass(0) · professor.
   - w12-0 rev 7 · hash a781f0a8 · 검수 e74a6f7b: MJT4 해설을 Reason 전용으로 교체(r2 주원인 · r3 정보 배열 · r1 원문 요청). gate warning(r3·r1 possible) · Claude fail 5(진단 차원 비노출 2 fail·r1·MJT5 주석 오귀속·highlights) · adjudication accept 3·refine 2 · professor.
