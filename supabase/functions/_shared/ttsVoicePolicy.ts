@@ -3,8 +3,8 @@ export type TtsLevel = 'beginner' | 'intermediate' | 'advanced';
 
 // Instructor-designed voices. Older browser defaults cannot override the language mapping.
 export const TTS_VOICE_BY_LANG: Record<TtsLang, string> = {
-  ko: 'HO5dktW48cbvRzT0It88',
-  zh: 'NM6TmNGKSoReFxHSsuGZ',
+  ko: 'tjTX4kAaf3HNGHJnq6iy',
+  zh: 'nUrEpZ0St3GU2UgOHW3h',
 };
 // Keep each language's instructor-selected pace consistent across learner levels.
 export const ttsSpeed = (lang: TtsLang, _level: TtsLevel = 'intermediate') => lang === 'zh' ? 0.8 : 0.9;
