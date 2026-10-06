@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap, Network, Play, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, GraduationCap, SlidersHorizontal } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
 import { ensureSession } from "@/lib/tracking";
 import { IS_DEMO } from "@/lib/auth/useProfile";
@@ -12,7 +12,23 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[163px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[9px] text-[13.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[163px] sm:w-[240px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[12px] text-[14.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+
+// 데모 공개 중에는 로그인 없이 들어가는 대표 미션이 첫 행동이다 — 노란 채움은 이 버튼 하나만
+// 쓰고, 두 카드 버튼은 대등하게 테두리형으로 낮춘다. 데모를 감추면 카드 버튼은 원래 채움으로 돌아간다.
+const demoLink = secondaryLink
+  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#FAD338]")
+  .replace("font-semibold", "font-bold")
+  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#FAD338]");
+const archLink = secondaryLink
+  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#15202B]")
+  .replace("text-[#15202B]", "text-white")
+  .replace("font-semibold", "font-bold")
+  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#2A3B48]");
+const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[13.833px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+
+// Preserve the button fill on hover; emphasize its outline without layout shift.
+const demoCardHover = "bg-white text-[#15202B]";
 
 const Landing = () => {
   useEffect(() => {
@@ -32,7 +48,7 @@ const Landing = () => {
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-[804px] flex-1 flex-col items-center justify-center px-6 py-6 sm:pb-6 sm:pt-[clamp(8px,calc(100vh_-_643px),72px)]">
+      <main className="mx-auto flex w-full max-w-[804px] flex-1 flex-col items-center justify-center px-6 py-6">
         <section className="text-center">
           {/* 후크 — 문구는 즉시 표시하고 핵심어에만 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -96,8 +112,8 @@ const Landing = () => {
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/student-login" className="group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#FAD338] px-5 py-2.5 text-[13.833px] font-bold text-[#15202B] transition-colors hover:bg-[#FCE07A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2">
-                학습 시작하기
+              <Link to="/student-login" className={`${cardButton} text-[#15202B] ${IS_DEMO ? demoCardHover : "bg-[#FAD338] hover:bg-[#FAD338]"}`}>
+                학습자 로그인
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
             </span>
@@ -121,7 +137,7 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/admin-login" className="group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] bg-[#15202B] px-5 py-2.5 text-[13.833px] font-bold text-white transition-colors hover:bg-[#2A3B48] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2">
+              <Link to="/admin-login" className={`${cardButton} ${IS_DEMO ? demoCardHover : "bg-[#15202B] text-white"}`}>
                 제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
@@ -129,25 +145,20 @@ const Landing = () => {
           </article>
         </section>
 
-        {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
-            학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
+        {/* Paired demo and architecture entry points while the demo is public. */}
         {IS_DEMO && (
           <section className="mt-[28px] flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
-              className={secondaryLink}
+              className={demoLink}
             >
-              <Play aria-hidden size={16} strokeWidth={1.6} className="fill-[#3E4C57] text-[#3E4C57]" />
-              학습 데모 보기
-              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
+              학습 미션 체험
+              <span className="ml-0.5 text-[12.5px] font-semibold text-[#15202B]">로그인 없이</span>
+              <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
-            <Link
-              to="/architecture"
-              className={secondaryLink}
-            >
-              <Network aria-hidden size={17} strokeWidth={1.9} className="text-[#5C6A7A]" />
+            <Link to="/architecture" className={archLink}>
               전체 구조 보기
-              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-[#5C6A7A] ${arrow}`} />
+              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-white ${arrow}`} />
             </Link>
           </section>
         )}
@@ -155,7 +166,7 @@ const Landing = () => {
 
       <footer className="mx-auto w-full max-w-[804px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.833px] leading-relaxed text-[#5C6A7A]">
-          한국외국어대학교 중어중문학과 · © 2026 임소영. All rights reserved.
+          © 2026 임소영. All rights reserved.
         </p>
       </footer>
     </div>
