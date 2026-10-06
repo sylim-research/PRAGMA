@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap, Network, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, GraduationCap, Network, PlayCircle, SlidersHorizontal } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
 import { ensureSession } from "@/lib/tracking";
 import { IS_DEMO } from "@/lib/auth/useProfile";
@@ -12,7 +12,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[163px] sm:w-[240px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[12px] text-[14px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[163px] sm:w-[240px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[12px] text-[14.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 // 데모 공개 중에는 로그인 없이 들어가는 대표 미션이 첫 행동이다 — 노란 채움은 이 버튼 하나만
 // 쓰고, 두 카드 버튼은 대등하게 테두리형으로 낮춘다. 데모를 감추면 카드 버튼은 원래 채움으로 돌아간다.
@@ -20,16 +20,15 @@ const demoLink = secondaryLink
   .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#FAD338]")
   .replace("font-semibold", "font-bold")
   .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#FAD338]");
-// 구조 보기는 남색 채움으로 데모 버튼과 짝을 이룬다(카드의 노랑·남색 띠와 같은 구성).
 const archLink = secondaryLink
   .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#15202B]")
   .replace("text-[#15202B]", "text-white")
   .replace("font-semibold", "font-bold")
   .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#2A3B48]");
-const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[13.833px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[13.833px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
-// 테두리형 카드 버튼은 hover에서 잉크색으로 반전한다 — 옅은 파스텔 채움보다 또렷하고, 두 카드가 같은 반응을 한다.
-const demoCardHover = "bg-white text-[#15202B] hover:bg-[#15202B] hover:text-white";
+// Preserve the button fill on hover; emphasize its outline without layout shift.
+const demoCardHover = "bg-white text-[#15202B]";
 
 const Landing = () => {
   useEffect(() => {
@@ -138,7 +137,7 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/admin-login" className={`${cardButton} ${IS_DEMO ? demoCardHover : "bg-[#15202B] text-white hover:bg-[#2A3B48]"}`}>
+              <Link to="/admin-login" className={`${cardButton} ${IS_DEMO ? demoCardHover : "bg-[#15202B] text-white"}`}>
                 제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
@@ -146,22 +145,19 @@ const Landing = () => {
           </article>
         </section>
 
-        {/* 보조 이동. 설명(/architecture)과 실제 실행(/demo/mission)을 나란히 두되
-            학습자·교수자 두 주 경로보다 작게 유지한다. 실증 시작 전에는 감춘다. */}
+        {/* Paired demo and architecture entry points while the demo is public. */}
         {IS_DEMO && (
           <section className="mt-[28px] flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
             >
+              <PlayCircle aria-hidden size={14} strokeWidth={2} className="shrink-0" />
               학습 미션 체험
-              <span className="ml-0.5 rounded-full bg-white px-2 py-[1px] text-[11.5px] font-bold text-[#15202B]">로그인 없이</span>
+              <span className="ml-0.5 text-[12.5px] font-semibold text-[#15202B]">로그인 없이</span>
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
-            <Link
-              to="/architecture"
-              className={archLink}
-            >
+            <Link to="/architecture" className={archLink}>
               <Network aria-hidden size={17} strokeWidth={1.9} className="text-white" />
               전체 구조 보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-white ${arrow}`} />

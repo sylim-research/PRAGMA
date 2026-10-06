@@ -68,7 +68,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
             <HomeBrand />
           </div>
           <div className="flex flex-wrap justify-end gap-x-5 gap-y-2">
-          {IS_DEMO && <Link to="/demo/mission" target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#F1EFE8] hover:text-[#FAD338]">대표 미션 체험 ↗</Link>}
+          {IS_DEMO && <Link to="/demo/mission" target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#F1EFE8] hover:text-[#FAD338]">학습 미션 체험 ↗</Link>}
           <Link
             to="/learner/course"
             target="_blank"

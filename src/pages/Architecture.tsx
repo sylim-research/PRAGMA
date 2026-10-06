@@ -228,7 +228,7 @@ const Architecture = () => (
               className="inline-flex items-center gap-1.5 rounded-lg border border-white/35 px-3 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-white/10"
             >
               <PlayCircle aria-hidden size={14} strokeWidth={2} />
-              대표 미션 시연
+              학습 미션 체험
             </Link>
           )}
           <Link
