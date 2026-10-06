@@ -3,6 +3,7 @@ import { Mic, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
 import { requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
+import { representativeDemoAudio } from "@/lib/demo/representativeDemoAudio";
 
 type LanguageSpec = {
   code: "ko" | "zh";
@@ -50,7 +51,6 @@ export function InterpretingConsole({
   useEffect(() => () => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     sourceAudioRef.current?.pause();
-    if (demoMode) window.speechSynthesis?.cancel();
     if (sourceAudioUrlRef.current) URL.revokeObjectURL(sourceAudioUrlRef.current);
     if (recordingUrlRef.current) URL.revokeObjectURL(recordingUrlRef.current);
   }, [demoMode]);
@@ -58,43 +58,35 @@ export function InterpretingConsole({
   const playSource = async () => {
     if (plays >= maxPlays || playing || ttsLoading) return;
     setNotice(null);
-    if (demoMode) {
-      if (!("speechSynthesis" in window)) {
-        setNotice("이 브라우저에서는 원발화를 재생할 수 없습니다. 예시 전사문으로 다음 단계를 체험할 수 있습니다.");
-        return;
-      }
-      const utterance = new SpeechSynthesisUtterance(sourceText);
-      utterance.lang = sourceLanguage.code === "zh" ? "zh-CN" : "ko-KR";
-      utterance.rate = 0.9;
-      utterance.onend = () => setPlaying(false);
-      utterance.onerror = () => {
-        setPlaying(false);
-        setNotice("원발화를 재생하지 못했습니다. 예시 전사문으로 계속 체험할 수 있습니다.");
-      };
-      window.speechSynthesis.cancel();
-      setPlaying(true);
-      setPlays(count => count + 1);
-      window.speechSynthesis.speak(utterance);
-      return;
-    }
     try {
       let audio = sourceAudioRef.current;
       if (!audio) {
-        setTtsLoading(true);
-        const result = await requestTtsAudio({
-          text: sourceText,
-          lang: sourceLanguage.code as TtsLang,
-          level: learnerLevel,
-          logPrefix: "[canonical-mission-tts]",
-        });
-        setTtsLoading(false);
-        if (result.ok === false) {
-          setNotice(`원발화 음성을 준비하지 못했습니다 — ${result.message}`);
-          return;
+        let url: string;
+        if (demoMode) {
+          const recorded = representativeDemoAudio(sourceText, sourceLanguage.code);
+          if (!recorded) {
+            setNotice("이 원발화의 음성 파일을 찾지 못했습니다. 예시 전사문으로 계속할 수 있습니다.");
+            return;
+          }
+          url = recorded.src;
+        } else {
+          setTtsLoading(true);
+          const result = await requestTtsAudio({
+            text: sourceText,
+            lang: sourceLanguage.code as TtsLang,
+            level: learnerLevel,
+            logPrefix: "[canonical-mission-tts]",
+          });
+          setTtsLoading(false);
+          if (result.ok === false) {
+            setNotice(`원발화 음성을 준비하지 못했습니다 — ${result.message}`);
+            return;
+          }
+          url = URL.createObjectURL(result.blob);
+          sourceAudioUrlRef.current = url;
         }
-        const url = URL.createObjectURL(result.blob);
-        sourceAudioUrlRef.current = url;
         audio = new Audio(url);
+        if (demoMode) audio.volume = 0.85;
         sourceAudioRef.current = audio;
         audio.onended = () => setPlaying(false);
         audio.onerror = () => {
@@ -193,7 +185,6 @@ export function InterpretingConsole({
           {demoMode ? <section aria-label="통역 시연 안내" className="rounded-xl bg-[#F7F6F2] p-3">
             <h3 className="text-xs font-bold text-[#273642]">② 예시 전사문으로 체험 ({targetLanguage.label})</h3>
             <p className="mt-1 text-xs leading-5 text-[#536572]">위의 ‘시연용 답안 채우기’를 누르면 준비된 전사문이 입력됩니다. 실제 녹음한 내용이 아닙니다.</p>
-            <p className="mt-1 text-[11px] leading-5 text-[#7B8994]">원발화는 브라우저 음성으로 재생됩니다.</p>
           </section> : <section aria-label="통역 녹음">
             <h3 className="text-xs font-bold text-[#273642]">② 통역 녹음 ({targetLanguage.label})</h3>
             <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3">
