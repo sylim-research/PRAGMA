@@ -15,3 +15,4 @@
 - Final qualifier refinement: removed the underline and increased `로그인 없이` from 11.5px/500 to 12.5px/600, retaining plain navy text without a badge background.
 - Increased both landing secondary CTA labels from 14px to 14.5px; the qualifier remains 12.5px.
 - Final validation before release: TypeScript check passed; local DOM checks confirmed the two CTA links, original navy, PlayCircle icon, 14.5px CTA labels, and a transparent 12.5px/600 qualifier without an underline. Release CI validates the committed changes separately.
+- Final pre-release choice: removed both leading icons from the paired landing CTAs while retaining their trailing arrows. The architecture page's existing navigation icon remains unchanged.

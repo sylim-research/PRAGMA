@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, GraduationCap, Network, PlayCircle, SlidersHorizontal } from "lucide-react";
+import { ArrowRight, GraduationCap, SlidersHorizontal } from "lucide-react";
 import { HomeBrand } from "@/components/HomeBrand";
 import { ensureSession } from "@/lib/tracking";
 import { IS_DEMO } from "@/lib/auth/useProfile";
@@ -152,13 +152,11 @@ const Landing = () => {
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
             >
-              <PlayCircle aria-hidden size={14} strokeWidth={2} className="shrink-0" />
               학습 미션 체험
               <span className="ml-0.5 text-[12.5px] font-semibold text-[#15202B]">로그인 없이</span>
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
             <Link to="/architecture" className={archLink}>
-              <Network aria-hidden size={17} strokeWidth={1.9} className="text-white" />
               전체 구조 보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-white ${arrow}`} />
             </Link>
