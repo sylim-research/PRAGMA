@@ -6,12 +6,12 @@ vi.mock("@/lib/mission/missionStt", () => ({
 }));
 vi.mock("@/lib/tts", () => ({
   requestTtsAudio: vi.fn(),
+  DEFAULT_TTS_VOICE_BY_LANG: { ko: "tjTX4kAaf3HNGHJnq6iy", zh: "nUrEpZ0St3GU2UgOHW3h" },
 }));
 
 import { requestSttTranscript } from "@/lib/mission/missionStt";
 import { requestTtsAudio } from "@/lib/tts";
-import { InterpretingConsole } from "@/components/mission/InterpretingConsole";
-import audioManifest from "../../../public/demo-audio/manifest.json";
+import { InterpretingConsole, withSentencePauses } from "@/components/mission/InterpretingConsole";
 
 class FakeMediaRecorder {
   mimeType = "audio/webm";
@@ -49,43 +49,70 @@ describe("InterpretingConsole", () => {
     });
   });
 
-  it.each(audioManifest.recordings)("plays the recorded $language demo at reduced volume without requesting synthesis", async (entry) => {
+  const DEMO_SOURCES = [
+    { language: "ko" as const, voiceId: "tjTX4kAaf3HNGHJnq6iy", volume: 0.6, rate: 1, sourceText: "안녕하세요. 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?",
+      requestText: '안녕하세요. <break time="1.0s" /> 혹시 괜찮으시면 택배 좀 맡아 주실 수 있을까요?' },
+    { language: "zh" as const, voiceId: "nUrEpZ0St3GU2UgOHW3h", volume: 0.5, rate: 0.9, sourceText: "您好。方便的话，请把修改意见发给我。",
+      requestText: '您好。 <break time="1.5s" /> 方便的话，请把修改意见发给我。' },
+  ];
+  const elevenLabsAudio = (voiceId: string) => ({ ok: true as const, blob: new Blob(["source"], { type: "audio/mpeg" }),
+    requestedVoiceId: voiceId, usedVoiceId: voiceId, fallbackUsed: false, provider: "elevenlabs", model: "eleven_multilingual_v2" });
+
+  it.each(DEMO_SOURCES)("synthesizes the $language demo source with ElevenLabs and reuses it for the replay", async (entry) => {
+    vi.mocked(requestTtsAudio).mockResolvedValue(elevenLabsAudio(entry.voiceId));
     const audio = { currentTime: 0, volume: 1, playbackRate: 1, onended: null as null | (() => void),
       onerror: null, pause: vi.fn(), play: vi.fn().mockResolvedValue(undefined) };
     const AudioMock = vi.fn(function () { return audio; });
     vi.stubGlobal("Audio", AudioMock);
-    const language = entry.language as "ko" | "zh";
     const { unmount } = render(<InterpretingConsole
-      sourceText={entry.sourceText} sourceLanguage={{ code: language, label: language }}
-      targetLanguage={{ code: language === "ko" ? "zh" : "ko", label: "target" }}
+      sourceText={entry.sourceText} sourceLanguage={{ code: entry.language, label: entry.language }}
+      targetLanguage={{ code: entry.language === "ko" ? "zh" : "ko", label: "target" }}
       demoMode onSubmit={() => {}} />);
     fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
     await waitFor(() => expect(screen.getByText("남은 재생 1회")).toBeInTheDocument());
-    expect(AudioMock).toHaveBeenCalledWith(entry.src);
-    expect(audio.volume).toBe(0.85);
-    expect(audio.playbackRate).toBe(1);
-    expect(requestTtsAudio).not.toHaveBeenCalled();
+    expect(requestTtsAudio).toHaveBeenCalledWith(expect.objectContaining({ text: entry.requestText, lang: entry.language, profile: "voice_default" }));
+    expect(AudioMock).toHaveBeenCalledWith("blob:audio");
+    expect(audio.volume).toBe(entry.volume);
+    expect(audio.playbackRate).toBe(entry.rate);
     expect(requestSttTranscript).not.toHaveBeenCalled();
     act(() => audio.onended?.());
     fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
     await waitFor(() => expect(screen.getByText("남은 재생 0회")).toBeInTheDocument());
     act(() => audio.onended?.());
     expect(screen.getByRole("button", { name: "원발화 재생" })).toBeDisabled();
+    expect(requestTtsAudio).toHaveBeenCalledTimes(1);
     expect(AudioMock).toHaveBeenCalledTimes(1);
     unmount();
     expect(audio.pause).toHaveBeenCalled();
   });
 
-  it("does not substitute a different recording or request TTS for an unknown demo source", () => {
-    const AudioMock = vi.fn();
+  it("adds pauses only between sentences", () => {
+    expect(withSentencePauses("안녕하세요. 가능할까요? 감사합니다."))
+      .toBe('안녕하세요. <break time="1.0s" /> 가능할까요? <break time="1.0s" /> 감사합니다.');
+    expect(withSentencePauses("您好！可以吗？谢谢。", 2)).toBe('您好！ <break time="2.0s" /> 可以吗？ <break time="2.0s" /> 谢谢。');
+    expect(withSentencePauses("3.5일")).toBe("3.5일");
+  });
+
+  it.each([
+    ["a fallback provider", { ...elevenLabsAudio("tjTX4kAaf3HNGHJnq6iy"), provider: "openai", usedVoiceId: "nova", fallbackUsed: true }],
+    ["a failed request", { ok: false as const, message: "음성을 생성할 수 없습니다.", requestedVoiceId: "tjTX4kAaf3HNGHJnq6iy" }],
+  ])("does not play %s in the demo and allows a retry", async (_label, failure) => {
+    vi.mocked(requestTtsAudio).mockResolvedValueOnce(failure).mockResolvedValueOnce(elevenLabsAudio("tjTX4kAaf3HNGHJnq6iy"));
+    const audio = { currentTime: 0, volume: 1, playbackRate: 1, onended: null, onerror: null,
+      pause: vi.fn(), play: vi.fn().mockResolvedValue(undefined) };
+    const AudioMock = vi.fn(function () { return audio; });
     vi.stubGlobal("Audio", AudioMock);
-    render(<InterpretingConsole sourceText="unmatched source"
+    render(<InterpretingConsole sourceText={DEMO_SOURCES[0].sourceText}
       sourceLanguage={{ code: "ko", label: "한국어" }} targetLanguage={{ code: "zh", label: "중국어" }}
       demoMode onSubmit={() => {}} />);
     fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
-    expect(screen.getByText(/음성 파일을 찾지 못했습니다/)).toBeInTheDocument();
+    expect(await screen.findByText(/ElevenLabs 음성을 생성하지 못했습니다/)).toBeInTheDocument();
     expect(AudioMock).not.toHaveBeenCalled();
-    expect(requestTtsAudio).not.toHaveBeenCalled();
+    expect(screen.getByText("남은 재생 2회")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
+    await waitFor(() => expect(screen.getByText("남은 재생 1회")).toBeInTheDocument());
+    expect(requestTtsAudio).toHaveBeenCalledTimes(2);
+    expect(AudioMock).toHaveBeenCalledTimes(1);
   });
 
   it("maps zh_ko to Chinese listening and Korean recording without exposing source text", () => {

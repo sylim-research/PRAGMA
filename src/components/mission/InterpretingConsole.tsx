@@ -2,8 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { Mic, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
-import { requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
-import { representativeDemoAudio } from "@/lib/demo/representativeDemoAudio";
+import { DEFAULT_TTS_VOICE_BY_LANG, requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
+
+// Demo playback per designed voice. The Chinese voice is louder at the same gain, and Chinese is the
+// learners' foreign language, so it gets a lower level, a slower rate, and longer sentence pauses.
+const DEMO_PLAYBACK = {
+  ko: { volume: 0.6, rate: 1, pauseSeconds: 1 },
+  zh: { volume: 0.5, rate: 0.9, pauseSeconds: 1.5 },
+} as const;
+// Multilingual v2 leaves little gap between sentences; break tags add a pause between them.
+export const withSentencePauses = (text: string, pauseSeconds = 1) => text.trim()
+  .replace(/([.?!])\s+|([。？！])\s*(?=\S)/g, (_match, latin?: string, cjk?: string) =>
+    `${latin ?? cjk} <break time="${pauseSeconds.toFixed(1)}s" /> `);
 
 type LanguageSpec = {
   code: "ko" | "zh";
@@ -61,32 +71,35 @@ export function InterpretingConsole({
     try {
       let audio = sourceAudioRef.current;
       if (!audio) {
-        let url: string;
-        if (demoMode) {
-          const recorded = representativeDemoAudio(sourceText, sourceLanguage.code);
-          if (!recorded) {
-            setNotice("이 원발화의 음성 파일을 찾지 못했습니다. 예시 전사문으로 계속할 수 있습니다.");
-            return;
-          }
-          url = recorded.src;
-        } else {
-          setTtsLoading(true);
-          const result = await requestTtsAudio({
-            text: sourceText,
-            lang: sourceLanguage.code as TtsLang,
-            level: learnerLevel,
-            logPrefix: "[canonical-mission-tts]",
-          });
-          setTtsLoading(false);
-          if (result.ok === false) {
-            setNotice(`원발화 음성을 준비하지 못했습니다 — ${result.message}`);
-            return;
-          }
-          url = URL.createObjectURL(result.blob);
-          sourceAudioUrlRef.current = url;
+        setTtsLoading(true);
+        const lang = sourceLanguage.code as TtsLang;
+        const result = await requestTtsAudio({
+          text: demoMode ? withSentencePauses(sourceText, DEMO_PLAYBACK[lang].pauseSeconds) : sourceText,
+          lang,
+          level: learnerLevel,
+          logPrefix: demoMode ? "[demo-mission-tts]" : "[canonical-mission-tts]",
+          ...(demoMode ? { profile: "voice_default" as const } : {}),
+        });
+        setTtsLoading(false);
+        if (result.ok === false) {
+          setNotice(demoMode
+            ? "ElevenLabs 음성을 생성하지 못했습니다. 다시 재생을 눌러 시도해 주세요."
+            : `원발화 음성을 준비하지 못했습니다 — ${result.message}`);
+          return;
         }
+        // The demo plays only the designated ElevenLabs voice; a server-side fallback voice is discarded.
+        if (demoMode && (result.provider !== "elevenlabs" || result.fallbackUsed || result.usedVoiceId !== DEFAULT_TTS_VOICE_BY_LANG[lang])) {
+          setNotice("ElevenLabs 음성을 생성하지 못했습니다. 다른 목소리로 대신 재생하지 않습니다. 다시 재생을 눌러 시도해 주세요.");
+          return;
+        }
+        const url = URL.createObjectURL(result.blob);
+        sourceAudioUrlRef.current = url;
         audio = new Audio(url);
-        if (demoMode) audio.volume = 0.85;
+        if (demoMode) {
+          audio.volume = DEMO_PLAYBACK[sourceLanguage.code].volume;
+          audio.preservesPitch = true;
+          audio.playbackRate = DEMO_PLAYBACK[sourceLanguage.code].rate;
+        }
         sourceAudioRef.current = audio;
         audio.onended = () => setPlaying(false);
         audio.onerror = () => {
