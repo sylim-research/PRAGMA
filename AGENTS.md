@@ -1,5 +1,12 @@
 # PRAGMA Codex 작업 가이드
 
+## Engineering record language
+
+- Write new or revised PR titles, PR descriptions, commit messages, release notes, and development logs in English.
+- Use concise, neutral technical descriptions of the change, rationale, validation, and remaining limitations. Preserve factual accuracy and provenance.
+- Summarize requirements without copying conversational instructions. Preserve quoted product text, language-learning examples, and source citations in their original language when needed.
+- Apply this convention to ongoing work. Historical record normalization is a separate maintenance task; do not rewrite Git history as part of routine edits.
+
 ## PRAGMA 상위 작업 원칙 — 완성 우선 모드
 
 이 절은 이 저장소의 모든 개발·검증·문서화 판단에 우선하는 상위 원칙이다.

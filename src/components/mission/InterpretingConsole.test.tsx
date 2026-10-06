@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/mission/missionStt", () => ({
@@ -11,6 +11,7 @@ vi.mock("@/lib/tts", () => ({
 import { requestSttTranscript } from "@/lib/mission/missionStt";
 import { requestTtsAudio } from "@/lib/tts";
 import { InterpretingConsole } from "@/components/mission/InterpretingConsole";
+import audioManifest from "../../../public/demo-audio/manifest.json";
 
 class FakeMediaRecorder {
   mimeType = "audio/webm";
@@ -46,6 +47,45 @@ describe("InterpretingConsole", () => {
       pause = vi.fn();
       play = vi.fn().mockResolvedValue(undefined);
     });
+  });
+
+  it.each(audioManifest.recordings)("plays the recorded $language demo at reduced volume without requesting synthesis", async (entry) => {
+    const audio = { currentTime: 0, volume: 1, playbackRate: 1, onended: null as null | (() => void),
+      onerror: null, pause: vi.fn(), play: vi.fn().mockResolvedValue(undefined) };
+    const AudioMock = vi.fn(function () { return audio; });
+    vi.stubGlobal("Audio", AudioMock);
+    const language = entry.language as "ko" | "zh";
+    const { unmount } = render(<InterpretingConsole
+      sourceText={entry.sourceText} sourceLanguage={{ code: language, label: language }}
+      targetLanguage={{ code: language === "ko" ? "zh" : "ko", label: "target" }}
+      demoMode onSubmit={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
+    await waitFor(() => expect(screen.getByText("남은 재생 1회")).toBeInTheDocument());
+    expect(AudioMock).toHaveBeenCalledWith(entry.src);
+    expect(audio.volume).toBe(0.85);
+    expect(audio.playbackRate).toBe(1);
+    expect(requestTtsAudio).not.toHaveBeenCalled();
+    expect(requestSttTranscript).not.toHaveBeenCalled();
+    act(() => audio.onended?.());
+    fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
+    await waitFor(() => expect(screen.getByText("남은 재생 0회")).toBeInTheDocument());
+    act(() => audio.onended?.());
+    expect(screen.getByRole("button", { name: "원발화 재생" })).toBeDisabled();
+    expect(AudioMock).toHaveBeenCalledTimes(1);
+    unmount();
+    expect(audio.pause).toHaveBeenCalled();
+  });
+
+  it("does not substitute a different recording or request TTS for an unknown demo source", () => {
+    const AudioMock = vi.fn();
+    vi.stubGlobal("Audio", AudioMock);
+    render(<InterpretingConsole sourceText="unmatched source"
+      sourceLanguage={{ code: "ko", label: "한국어" }} targetLanguage={{ code: "zh", label: "중국어" }}
+      demoMode onSubmit={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: "원발화 재생" }));
+    expect(screen.getByText(/음성 파일을 찾지 못했습니다/)).toBeInTheDocument();
+    expect(AudioMock).not.toHaveBeenCalled();
+    expect(requestTtsAudio).not.toHaveBeenCalled();
   });
 
   it("maps zh_ko to Chinese listening and Korean recording without exposing source text", () => {
