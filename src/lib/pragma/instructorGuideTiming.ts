@@ -33,8 +33,8 @@ const TIMING_PLANS: Record<InstructorGuideTimingPreset, InstructorGuideTimingPla
         id: "mission-a",
         labelKo: "MJT5+DCT1 미션 1세트 수행",
         minutes: 20,
-        howKo: "학습자가 MJT5를 판단하고 DCT 최초안→최소 피드백→수정안을 완성합니다.",
-        outputKo: "MJT5 판단·근거와 DCT 최초안·수정안",
+        howKo: "학습자가 MJT5를 판단하고 DCT 초안→최소 피드백→수정안을 완성합니다.",
+        outputKo: "MJT5 판단·근거와 DCT 초안·수정안",
       },
       {
         id: "discussion-a",
@@ -61,8 +61,8 @@ const TIMING_PLANS: Record<InstructorGuideTimingPreset, InstructorGuideTimingPla
         id: "mission-a",
         labelKo: "MJT5+DCT1 미션 1세트 수행",
         minutes: 20,
-        howKo: "MJT5 판단과 DCT 최초안→최소 피드백→수정안을 수행합니다.",
-        outputKo: "MJT5 판단·근거와 DCT 최초안·수정안",
+        howKo: "MJT5 판단과 DCT 초안→최소 피드백→수정안을 수행합니다.",
+        outputKo: "MJT5 판단·근거와 DCT 초안·수정안",
       },
       {
         id: "discussion-a",

@@ -15,7 +15,7 @@ describe("buildClassDiscussion — 가상 학급 20명(대표 미션)", () => {
   it("문항을 학습자 제시 순서(1→2→5→3→4)로 늘어놓고 모든 그래프를 같은 20명에서 센다", () => {
     expect(data.learners).toBe(20);
     expect(data.items.map((item) => item.itemId)).toEqual([1, 2, 5, 3, 4]);
-    expect(data.items.map((item) => item.activity)).toEqual(["단일 표현 판단", "판단과 이유", "복수 표현 비교", "수정안 선택", "직접 수정"]);
+    expect(data.items.map((item) => item.activity)).toEqual(["단일 표현 판단", "판단과 근거", "복수 표현 비교", "수정안 선택", "직접 수정"]);
     expect(data.items.every((item) => item.total === 20)).toBe(true);
     expect(data.focus).toBe("완화와 선택권");
     expect(data.speechAct).toBe("request");

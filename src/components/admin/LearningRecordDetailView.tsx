@@ -114,7 +114,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           </Box>,
           <Box key="final" className="h-full">
             <div className="mb-1 flex flex-wrap items-center gap-2">
-              <Caption>확정안</Caption>
+              <Caption>최종안</Caption>
               {task.decision && <Answer>{task.decision}</Answer>}
             </div>
             <p className="text-sm leading-relaxed">{task.final ?? "—"}</p>

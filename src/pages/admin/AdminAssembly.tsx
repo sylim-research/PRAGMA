@@ -946,7 +946,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
                 <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항 5개</dt>
-                  <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 이유 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
+                  <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 근거 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
                   <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 상황·관계에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>

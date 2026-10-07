@@ -12,7 +12,7 @@ import {
 const REQUIRED_ENTRY_PATHS = [
   "/admin/review",
   "/admin/composer",
-  "/admin/learners",
+  "/admin/library",
   "/admin/decision-traces",
   "/admin/export",
 ] as const;
@@ -43,14 +43,13 @@ describe("admin navigation reachability", () => {
       "/admin/assembly", "/admin/corpus", "/admin/ai-review", "/admin/review",
     ]);
     // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
-    expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(false);
+    expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(true);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/composer/new", "/admin/composer", "/admin/decision-traces",
+      "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/decision-traces",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
     expect(research?.items.map((item) => item.to)).toEqual([
-      "/admin/learners",
       "/admin/data-backup",
       "/admin/export",
     ]);

@@ -214,7 +214,7 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
     const cards = within(screen.getByLabelText("MJT 판단 문항")).getAllByRole("button");
     expect(cards.map((card) => card.getAttribute("aria-label"))).toEqual([
-      "MJT 1 · 단일 표현 판단", "MJT 2 · 판단과 이유", "MJT 5 · 복수 표현 비교", "MJT 3 · 수정안 선택", "MJT 4 · 직접 수정",
+      "MJT 1 · 단일 표현 판단", "MJT 2 · 판단과 근거", "MJT 5 · 복수 표현 비교", "MJT 3 · 수정안 선택", "MJT 4 · 직접 수정",
     ]);
     // 데모에서는 마감·공개 운영 단계가 없다.
     expect(screen.queryByLabelText("응답 공개 단계")).not.toBeInTheDocument();

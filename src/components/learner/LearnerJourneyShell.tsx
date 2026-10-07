@@ -7,6 +7,7 @@ interface LearnerJourneyShellProps {
   children: ReactNode;
   /** 헤더 우측 슬롯 (모드 전환 등). 학습자 UI에 노출되는 요소만 넣을 것. */
   headerRight?: ReactNode;
+  demo?: boolean;
   /** 세 열 리포트처럼 넓은 읽기 폭이 필요한 화면에만 사용한다. */
   wide?: boolean;
   /** 데스크톱 미션 화면에서 세로 단계표와 본문을 아우르는 축에 헤더를 맞춘다. */
@@ -28,6 +29,7 @@ interface LearnerJourneyShellProps {
 export const LearnerJourneyShell = ({
   children,
   headerRight,
+  demo = false,
   wide = false,
   missionLayout = false,
   nav = false,
@@ -35,7 +37,7 @@ export const LearnerJourneyShell = ({
 }: LearnerJourneyShellProps) => {
   // 학습자 화면 폭 기준 하나: 본문 720px(max-w-3xl) — 미션 수행 화면과 같은 폭. 예외는 wide(세 열 리포트).
   const widthClass = canvas ?? (wide ? "max-w-6xl" : "max-w-3xl");
-  const verticalPaddingClass = wide ? "py-3" : missionLayout ? "py-4" : "py-6";
+  const verticalPaddingClass = demo ? "py-4" : wide ? "py-3" : missionLayout ? "py-4" : "py-6";
   const headerAlignmentClass = missionLayout
     ? "xl:w-[61rem] xl:max-w-none xl:-translate-x-[6.5rem] xl:px-0"
     : "";
@@ -43,13 +45,13 @@ export const LearnerJourneyShell = ({
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
-        <div className={`mx-auto flex ${widthClass} items-center justify-between gap-4 px-6 py-4 ${headerAlignmentClass}`}>
-          <HomeBrand />
-          <div className="flex items-center gap-1">
+        <div className={`mx-auto flex ${demo ? "flex-wrap" : ""} ${widthClass} items-center justify-between gap-4 px-6 ${demo ? "py-3" : "py-4"} ${headerAlignmentClass}`}>
+          <HomeBrand demo={demo} />
+          {(headerRight || nav || !demo) && <div className="flex items-center gap-1">
             {headerRight}
             {nav && <LearnerTopNav />}
-            <LearnerAccountMenu />
-          </div>
+            {!demo && <LearnerAccountMenu />}
+          </div>}
         </div>
       </header>
       <div className={`mx-auto ${widthClass} px-6 ${verticalPaddingClass}`}>{children}</div>

@@ -38,7 +38,7 @@ export interface Slice {
 
 interface ItemBase {
   itemId: number;
-  /** 학습자 화면과 같은 활동명(단일 표현 판단·판단과 이유·…). */
+  /** 학습자 화면과 같은 활동명(단일 표현 판단·판단과 근거·…). */
   activity: string;
   title: string | null;
   source: string | null;
@@ -144,7 +144,7 @@ export const SCALE_ORDER: Array<{ key: string; label: string; tone: SliceTone }>
 /** 학습자 화면(v6 안내·진행 막대)과 같은 활동명. */
 export const ACTIVITY_LABEL: Record<string, string> = {
   scale4: "단일 표현 판단",
-  scale4_reason: "판단과 이유",
+  scale4_reason: "판단과 근거",
   multi_judge: "복수 표현 비교",
   fix_choice: "수정안 선택",
   free_correction: "직접 수정",

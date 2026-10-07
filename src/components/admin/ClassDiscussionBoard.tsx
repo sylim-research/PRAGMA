@@ -303,7 +303,7 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>이견 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">확정안</p>
+        <p className="text-[11.5px] font-semibold text-[#7A858C]">최종안</p>
         <p className={`mt-0.5 leading-relaxed font-semibold text-[#15202B] ${item.final ? zh(item.final) : ""} ${text}`}>{item.final ?? "—"}</p>
       </li>
     </ol>

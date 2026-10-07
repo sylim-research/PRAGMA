@@ -125,7 +125,7 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A-DCT");
     const final = `${first}谢谢！`;
     fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
-    click("이 번역으로 확정하기");
+    click("최종안 제출하기");
     expect(screen.getByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     const record = screen.getByRole("region", { name: /번역 완성본/ });
     expect(record).toHaveTextContent(first);
@@ -133,7 +133,7 @@ describe("local learner UX pilot", () => {
     const completed = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     expect(completed.responses["A-DCT"]).toEqual({ first, revised: final, reflected: true });
     expect(completed.responses["A-FEEDBACK"]).not.toHaveProperty("evaluation");
-    expect(screen.queryByText("최초안에 대한 AI 피드백 보기")).not.toBeInTheDocument();
+    expect(screen.queryByText("초안에 대한 AI 피드백 보기")).not.toBeInTheDocument();
     expect(completed.responses.A4.revisedText).toBe(freeAnswer);
     expect(completed.responses.A5.candidateJudgments).toEqual({ a: "appropriate", b: "appropriate", c: "appropriate", d: "too_direct" });
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();

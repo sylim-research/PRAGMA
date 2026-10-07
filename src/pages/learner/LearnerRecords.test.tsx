@@ -127,9 +127,9 @@ describe("learner records", () => {
     expect(cards[0]).toHaveTextContent("수행 2회");
     const list = within(cards[0]).getByRole("list", { name: "수행 기록" });
     const rows = within(list).getAllByRole("listitem").filter((row) => row.parentElement === list);
-    expect(within(rows[0]).getByRole("region", { name: "최초 번역" })).toHaveTextContent(`최초 번역${ownLog.first_response}`);
-    expect(within(rows[0]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.revised_response}`);
-    expect(within(rows[1]).getByRole("region", { name: "최종 번역" })).toHaveTextContent(`최종 번역${ownLog.first_response}최초 번역을 그대로 유지했습니다.`);
+    expect(within(rows[0]).getByRole("region", { name: "초안" })).toHaveTextContent(`초안${ownLog.first_response}`);
+    expect(within(rows[0]).getByRole("region", { name: "최종안" })).toHaveTextContent(`최종안${ownLog.revised_response}`);
+    expect(within(rows[1]).getByRole("region", { name: "최종안" })).toHaveTextContent(`최종안${ownLog.first_response}초안을 그대로 유지했습니다.`);
     expect(cards[1]).toHaveTextContent("거절");
   });
 
@@ -147,7 +147,7 @@ describe("learner records", () => {
     expect(screen.getByRole("heading", { name: "내 기록" })).toBeInTheDocument();
     expect(screen.queryByText(/고쳐 쓴 기록|시그니처|수정 노트|완료 학습 기록/)).not.toBeInTheDocument();
     expect(screen.getAllByLabelText("생각해 보기")).toHaveLength(1);
-    expect(screen.getByLabelText("생각해 보기")).toHaveTextContent("최종 번역에서도 원문의 의미와 화행목적이 유지되었나요?");
+    expect(screen.getByLabelText("생각해 보기")).toHaveTextContent("최종안에서도 원문의 의미와 화행목적이 유지되었나요?");
     expect(screen.queryByText("표현을 유지하거나 바꾼 이유는 무엇인가요?")).not.toBeInTheDocument();
     expect(screen.queryByText("다시 생각해 볼 질문")).not.toBeInTheDocument();
   });
@@ -164,7 +164,7 @@ describe("learner records", () => {
     const feedback = within(item).getByRole("region", { name: "AI 피드백" });
     expect(feedback).toHaveTextContent("다시 살펴볼 점 상대에게 주는 인상");
     expect(feedback).toHaveTextContent("내 의견관계에 대한 다른 판단“같은 과 선배라서”");
-    expect(within(item).getByRole("region", { name: "최종 번역" })).toHaveTextContent("최초 번역을 그대로 유지했습니다.");
+    expect(within(item).getByRole("region", { name: "최종안" })).toHaveTextContent("초안을 그대로 유지했습니다.");
     expect(within(item).queryByRole("button", { name: "자세히 보기" })).not.toBeInTheDocument();
     expect(within(item).queryByText("유지")).not.toBeInTheDocument();
     expect(item).toHaveTextContent("2026년 9월 5일");

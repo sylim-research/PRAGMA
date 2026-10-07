@@ -14,7 +14,7 @@ const empty = (): InstructorExperience => ({ version: "instructor_experience_v1"
 const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], { tag: string; name: string }> = {
   scene: { tag: "도입", name: "미션 안내" },
   "mjt-0": { tag: "MJT 1", name: "단일 표현 판단" },
-  "mjt-1": { tag: "MJT 2", name: "판단과 이유" },
+  "mjt-1": { tag: "MJT 2", name: "판단과 근거" },
   "mjt-2": { tag: "MJT 4", name: "수정안 선택" },
   "mjt-3": { tag: "MJT 5", name: "직접 수정" },
   "mjt-4": { tag: "MJT 3", name: "복수 표현 비교" },

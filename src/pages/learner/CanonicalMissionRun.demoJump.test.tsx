@@ -24,7 +24,7 @@ vi.mock("@/components/learner/PeerResponsesPanel", () => ({ PeerResponsesPanel: 
 import { CanonicalMissionRunner } from "@/pages/learner/CanonicalMissionRun";
 import RepresentativeMissionDemo from "@/pages/RepresentativeMissionDemo";
 
-const MJT_LABELS = ["단일 표현 판단", "판단과 이유", "복수 표현 비교", "수정안 선택", "직접 수정"];
+const MJT_LABELS = ["단일 표현 판단", "판단과 근거", "복수 표현 비교", "수정안 선택", "직접 수정"];
 
 function LocationProbe() {
   const location = useLocation();
@@ -71,15 +71,17 @@ describe("representative mission demo: free navigation", () => {
     expect(currentStep()).toBe("dct");
   });
 
-  it("jumps from the briefing without answering and keeps the step in the URL and mode links", async () => {
+  it("starts from the briefing then jumps without answering and preserves the step in mode links", async () => {
     const view = renderDemo("?direction=ko_zh&mode=translation");
+    expect(screen.queryByRole("button", { name: "번역하기 단계로 이동" })).not.toBeInTheDocument();
+    fireEvent.click(await screen.findByRole("button", { name: "한 → 중 번역 시작하기" }));
     fireEvent.click(await screen.findByRole("button", { name: "번역하기 단계로 이동" }));
     expect(screen.getByText(/현재 단계: 번역하기/)).toBeInTheDocument();
     expect(currentStep()).toBe("dct");
     // Moving alone must not mark skipped stages as done.
     expect(view.container.querySelector('[class*="F3D248"]')).toBeNull();
-    expect(screen.getByRole("link", { name: "한 → 중 통역" })).toHaveAttribute("href", "/demo/mission?direction=ko_zh&mode=interpreting&step=dct");
-    expect(screen.getByRole("link", { name: "중 → 한 번역" })).toHaveAttribute("href", "/demo/mission?direction=zh_ko&mode=translation&step=dct");
+    expect(screen.getByRole("link", { name: "한 → 중 통역 미션" })).toHaveAttribute("href", "/demo/mission?direction=ko_zh&mode=interpreting&step=dct");
+    expect(screen.getByRole("link", { name: "중 → 한 번역 미션" })).toHaveAttribute("href", "/demo/mission?direction=zh_ko&mode=translation&step=dct");
 
     fireEvent.click(screen.getByRole("button", { name: "MJT 3 · 복수 표현 비교" }));
     expect(currentStep()).toBe("mjt3");

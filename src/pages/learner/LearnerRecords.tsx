@@ -266,8 +266,8 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
   const arrow = <div aria-hidden="true" className="flex items-center justify-center"><ArrowRight className="h-4 w-4 rotate-90 text-[#C9BFA3]" strokeWidth={2.5} /></div>;
   return (
     <div className="grid gap-1">
-      <section className={`${card} px-4 py-3`} aria-label={`최초 ${task}`}>
-        <p className={cardLabel}>최초 {task}</p>
+      <section className={`${card} px-4 py-3`} aria-label={"초안"}>
+        <p className={cardLabel}>초안</p>
         <p className={`mt-1.5 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
       </section>
       {arrow}
@@ -304,14 +304,14 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         )}
       </section>
       {arrow}
-      <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={`최종 ${task}`}>
-        <p className="text-[13.5px] font-semibold text-[#1F3A5F]">최종 {task}</p>
+      <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={"최종안"}>
+        <p className="text-[13.5px] font-semibold text-[#1F3A5F]">최종안</p>
         <p className={`mt-1.5 ${zhLine} font-semibold`}>
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
         {diff
           ? <p className="mt-1 text-[13.5px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
-          : <p className="mt-1 text-[13.5px] text-[#8A5A14]">최초 {task}을 그대로 유지했습니다.</p>}
+          : <p className="mt-1 text-[13.5px] text-[#8A5A14]">초안을 그대로 유지했습니다.</p>}
       </section>
     </div>
   );
@@ -464,7 +464,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
       <ClassReview record={head} />
       <p className="border-t border-[#EFEBDF] px-6 py-3 text-[14px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
         <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
-        최종 {TASK_LABEL[head.taskType]}에서도 원문의 의미와 화행목적이 유지되었나요?
+        최종안에서도 원문의 의미와 화행목적이 유지되었나요?
       </p>
     </article>
   );

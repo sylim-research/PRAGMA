@@ -20,7 +20,7 @@ const runnable = (mission = SAMPLE_MISSION_V6) => ({ scenario_id: "11111111-1111
   direction: mission.direction, mission });
 const attempt = (responses = buildMissionV6Responses(SAMPLE_MISSION_V6, rawResponses(), at)) => ({
   mission: SAMPLE_MISSION_V6, scenarioId: runnable().scenario_id, speechAct: "request", level: "intermediate",
-  firstResponse: "DCT 최초안", revisedResponse: "DCT 최종안", startedAtIso: at, mpjResponses: responses,
+  firstResponse: "DCT 초안", revisedResponse: "DCT 최종안", startedAtIso: at, mpjResponses: responses,
 });
 
 describe("v6 inline reason and feedback-only contrast", () => {
@@ -145,7 +145,7 @@ describe("v6 unscored response contract", () => {
     expect(traces[2]).not.toHaveProperty("band_code");
     const row = buildMissionAttemptRow(attempt(traces), "profile", "user", at);
     expect(row.context_judgment).toMatchObject({ schema_version: "mpj_response_v2", mission_schema_version: "mission_v6", responses: traces });
-    expect(row.first_response).toBe("DCT 최초안"); expect(row.revised_response).toBe("DCT 최종안");
+    expect(row.first_response).toBe("DCT 초안"); expect(row.revised_response).toBe("DCT 최종안");
     expect(JSON.stringify(traces)).not.toMatch(/reason_id|reason_kind|confidence|best_candidate_index|worst_candidate_index/);
   });
   it("accepts an unchanged starting translation; no scoring or edit-count gate", () => {

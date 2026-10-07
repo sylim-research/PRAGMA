@@ -112,7 +112,7 @@ export function convertMissionV5ToV6(
   const withinBand = String(mission.unit.target_feature ? "within_band" : "within_band");
   const contrastIsWithin = (contrast.accepted_band_codes as string[] | undefined)?.includes(withinBand) ?? false;
   const secondScale = contrastIsWithin ? SCALE_FOR_WITHIN : SCALE_FOR_NON_WITHIN;
-  // judge3의 해설 뒤에 reason의 해설을 붙인다 — v6 2번은 판단과 이유를 한 화면에서 확인한다.
+  // judge3의 해설 뒤에 reason의 해설을 붙인다 — v6 2번은 판단과 근거를 한 화면에서 확인한다.
   const secondExplanation = [contrast.explanation_ko, reason.explanation_ko]
     .filter((text): text is string => typeof text === "string" && text.trim().length > 0)
     .join("\n\n");

@@ -179,7 +179,7 @@ function clipped(value: string, max: number): string {
 }
 
 /**
- * mission_v6 MJT의 학습자 제시 순서(mpj_items 배열 index). 단일 표현 판단 → 판단과 이유 → 복수 표현 비교 →
+ * mission_v6 MJT의 학습자 제시 순서(mpj_items 배열 index). 단일 표현 판단 → 판단과 근거 → 복수 표현 비교 →
  * 수정안 선택 → 직접 수정. 저장 ID·배열·응답 tuple은 그대로 두고 화면 번호만 이 순서를 따른다.
  */
 export const V6_MJT_PRESENTATION_ORDER = [0, 1, 4, 2, 3] as const;
@@ -475,7 +475,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
     const presentationOrder = V6_MJT_PRESENTATION_ORDER.map((index) => `A${index + 1}`);
     quests.sort((a, b) => presentationOrder.indexOf(a.id) - presentationOrder.indexOf(b.id));
     const nextLabels: Record<string, string> = {
-      A1: "다음: 판단과 이유", A2: "다음: 복수 표현 비교",
+      A1: "다음: 판단과 근거", A2: "다음: 복수 표현 비교",
       A5: "다음: 수정안 선택", A3: "다음: 직접 수정", A4: "다음: 핵심 정리",
     };
     quests = quests.map(quest => ({ ...quest, nextLabel: nextLabels[quest.id] }));
