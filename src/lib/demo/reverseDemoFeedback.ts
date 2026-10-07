@@ -38,5 +38,5 @@ export const REVERSE_RECORDED_FEEDBACK = FeedbackSchema.parse({
 
 export async function requestReverseDemoFeedback(_mission: unknown, answer: string): Promise<FeedbackRequestResult> {
   if (answer.replace(/\s+/g, "") === REVERSE_DEMO_DRAFT.replace(/\s+/g, "")) return { ok: true, feedback: REVERSE_RECORDED_FEEDBACK };
-  return { ok: false, error: "이 시연에는 예시 초안의 피드백 기록만 있습니다. 시연용 답안을 채우거나 현재 표현을 직접 검토해 최종 결정해 주세요." };
+  return { ok: false, error: "이 시연에는 예시 초안의 피드백 기록만 있습니다. 준비된 예시를 넣거나 현재 표현을 직접 검토해 최종 결정해 주세요." };
 }

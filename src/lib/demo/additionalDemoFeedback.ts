@@ -74,7 +74,7 @@ export const ZH_KO_TRANSLATION_FEEDBACK = FeedbackSchema.parse({
   }
 });
 
-const MISMATCH = "이 시연에는 예시 초안의 피드백 기록만 있습니다. 시연용 답안을 채우거나 현재 표현을 직접 검토해 최종 결정해 주세요.";
+const MISMATCH = "이 시연에는 예시 초안의 피드백 기록만 있습니다. 준비된 예시를 넣거나 현재 표현을 직접 검토해 최종 결정해 주세요.";
 const same = (a: string, b: string) => a.replace(/s+/g, "") === b.replace(/s+/g, "");
 export const recordedDemoFeedback = (draft: string, feedback: ReturnType<typeof FeedbackSchema.parse>) =>
   async (_mission: unknown, answer: string): Promise<FeedbackRequestResult> =>
