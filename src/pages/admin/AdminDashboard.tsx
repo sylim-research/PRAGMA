@@ -538,7 +538,7 @@ const AdminDashboard = () => {
 
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
       <PanelHeader
-        title="콘텐츠 제작 현황"
+        title="콘텐츠 품질 관리"
         action={liveStatus()}
       />
       <ReviewPipeline

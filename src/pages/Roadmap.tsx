@@ -60,7 +60,7 @@ const TODAY = {
     "새 상황의 상대와 부담 확인",
     "직접 번역·통역하기",
     "AI 피드백으로 의미·문법·화용 확인",
-    "최초안을 다시 다듬기",
+    "초안을 다시 다듬기",
     "오늘의 원리와 최초·최종안 확인",
   ],
 };
@@ -241,7 +241,7 @@ const Roadmap = () => {
           <div className="flex items-start gap-3 rounded-xl border border-border border-l-4 border-l-emerald-600 bg-card p-3">
             <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
             <p className="text-[14px] leading-relaxed text-foreground">
-              오늘 학습을 마치면 <b>최초안 · 최종안 · 수행 맥락</b>이 수행 기록으로 남습니다.
+              오늘 학습을 마치면 <b>초안 · 최종안 · 수행 맥락</b>이 수행 기록으로 남습니다.
             </p>
           </div>
         </section>

@@ -88,8 +88,8 @@ import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/le
 import { SAMPLE_MISSION_V6_REASON_CONTRAST, REASON_CONTRAST_PILOT_STORAGE_KEY } from "@/lib/mission/missionV6Sample";
 import { REPRESENTATIVE_MISSION_ID, publicRepresentativeMission } from "@/lib/demo/representativeMission";
 import { representativeDemoContent, unavailableDemoFeedback, type RepresentativeDemoContent } from "@/lib/demo/representativeDemoContent";
-import type { DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
-import { RepresentativeDemoHeader, RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
+import { parseRepresentativeDemo, type DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
+import { RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
 import { DEMO_MJT_QUEST_IDS, demoQuestIndex, demoStepForQuest, parseDemoStep } from "@/lib/demo/demoStepNavigation";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
@@ -182,6 +182,7 @@ const optionBase = "w-full rounded-xl border px-4 py-2 text-left text-[15px] bre
 
 type SceneIntroConfig = {
   missionLabel: string;
+  startLabel?: string;
   previewOnly?: boolean;
   context: MissionContext;
   outputName: string;
@@ -298,10 +299,10 @@ function v6IntroSteps(outputName: string) {
       // 보조 설명은 학습자가 할 일을 「~하기」로 — 처음 보는 사람도 무엇을 하는 항목인지 바로 읽힌다. 12자 이내라 한 줄에 고정된다.
       { title: "단일 표현 판단", desc: "상황에 맞는지 판단하기" },
       // 보조 설명은 제목의 낱말을 그대로 받는다(판단·이유·비교·선택·수정) — 학생이 두 낱말을 따로 해석하지 않게.
-      { title: "판단과 이유", desc: "판단의 이유 고르기" },
+      { title: "판단과 근거", desc: "판단의 근거를 고르기" },
       { title: "복수 표현 비교", desc: "여러 표현을 비교해 보기" },
-      { title: "수정안 선택", desc: "더 나은 수정안 선택하기" },
-      { title: "직접 수정", desc: `${outputName}안을 직접 수정하기` },
+      { title: "수정안 선택", desc: "제시된 후보 중에서 고르기" },
+      { title: "직접 수정", desc: `${outputName}안 직접 수정하기` },
     ],
     // 핵심 정리는 독립 과제가 아니라 직접 산출로 넘어가는 전환이라 따로 세지 않는다.
     production: [
@@ -372,7 +373,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
       {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
-      <div className="border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 pb-4 pt-5 sm:px-6">
+      <div className={`border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 sm:px-6 ${config.startLabel ? "py-3" : "pb-4 pt-5"}`}>
         <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
         <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
@@ -380,7 +381,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
         {/* 설계 원리 한 줄은 제목의 부제로 — 본문에 두면 채움말처럼 읽힌다. 「상황과 관계」 어순은 정본. */}
         <p className="mt-1.5 break-keep text-[14.5px] leading-6 text-[#635E52]">단어를 그대로 옮기기보다, 원문의 뜻과 의도를 살려 상황과 관계에 맞게 표현해 보세요.</p>
       </div>
-      <div className="space-y-4 p-5">
+      <div className={`space-y-4 ${config.startLabel ? "p-4" : "p-5"}`}>
         {config.briefingOnly ? (
           // v6: 각 활동이 무엇을 하는지만 알린다. 문항 내용·정답·DCT 장면은 보여 주지 않는다.
           <V6IntroOutline outputName={config.outputName} />
@@ -392,7 +393,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             </li>
             <li className="rounded-xl bg-[#F8F6EE] p-4">
               <h2 className="font-bold">2. 새로운 상황에서 직접 {config.outputName}</h2>
-              <p className="mt-1 text-sm leading-6 text-[#635E52]">아래 상황의 원문을 직접 옮긴 뒤, AI 피드백을 검토하고 최종 {config.outputName}을 결정합니다.</p>
+              <p className="mt-1 text-sm leading-6 text-[#635E52]">아래 상황의 원문을 직접 옮긴 뒤, AI 피드백을 검토하고 최종안을 결정합니다.</p>
             </li>
           </ol>
         )}
@@ -403,7 +404,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : "학습 미션 시작하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -771,7 +772,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   const demoAnswer = useDemoAnswer(quest.id);
   const [pick, setPick] = useState<string | null>(() => revealAnswers ? quest.referenceAnswer : devAutofill ? demoAnswer?.pick ?? quest.referenceAnswer : null);
   const [answered, setAnswered] = useState(revealAnswers);
-  // 이유를 묻는 문항(MJT2): 판단 확정 → 이유 선택·확정 → 판단과 이유의 결과·해설 공개(2026-09-19).
+  // 이유를 묻는 문항(MJT2): 판단 확정 → 이유 선택·확정 → 판단과 근거의 결과·해설 공개(2026-09-19).
   // 판단을 확정하면 네 선택지와 내 선택은 그대로 두고 변경만 잠근다. 이유를 확정하기 전에는
   // 정답 배지·색상·스크린리더 안내 어디에도 판단 결과를 드러내지 않는다.
   const [judgmentCommitted, setJudgmentCommitted] = useState(revealAnswers);
@@ -804,7 +805,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         <p className="sr-only" aria-live="polite">
           {judgmentShown
             ? `${pick === quest.referenceAnswer ? "기준 판단과 같습니다" : judgmentOk ? "기준 판단과 다르지만 허용 판단에 해당합니다" : "기준 판단과 다릅니다"}. 내 선택 ${pickLabel}. 기준 판단 ${referenceLabel}.${alsoAcceptedLabels.length ? ` 허용 판단 ${alsoAcceptedLabels.join(", ")}.` : ""}`
-            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 이유의 결과가 함께 공개됩니다.` : ""}
+            : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 근거의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
           <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
@@ -1807,7 +1808,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 최초 ${outputName}을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 초안을 유지해 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => onDone({ first, revised: revised.trim(), reflected,
     evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
@@ -1918,7 +1919,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "재검토"}</p>
-                    <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? `최종 ${outputName}을 결정하세요.` : "피드백을 참고해 다시 써보세요."}</h2>
+                    <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? "최종안을 결정하세요." : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
                   {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" hasInput={revisionOpen && revised !== first} />}
                 </div>
@@ -1928,14 +1929,14 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
                 )}
-                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? `최종 ${outputName}` : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? `이 ${outputName}으로 확정하기` : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? `이 ${outputName}으로 확정하기` : needsChange ? "피드백을 참고해 수정해 주세요" : `이 ${outputName}으로 확정하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "피드백을 참고해 수정해 주세요" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
-                    <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 최초 {outputName} 유지하기</Button>
+                    <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 초안 유지하기</Button>
                   )}
                 </div>
               </ActionBar>
@@ -2008,7 +2009,7 @@ const PROGRESS_LABELS: Record<string, string> = {
 /** 산출 단계의 이름은 진행 바와 같아야 한다 — 미션 방식에 따라 「번역하기」·「통역하기」. */
 function progressLabel(quest: MissionQuest, outputName = "번역") {
   // 진행 막대·핵심 정리·기록에 들어가는 짧은 이름. 미션 안내의 풀어 쓴 활동명과는 따로 둔다.
-  if (quest.kind === "scale") return quest.reasonChoice ? "판단과 이유" : "단일 표현 판단";
+  if (quest.kind === "scale") return quest.reasonChoice ? "판단과 근거" : "단일 표현 판단";
   if (quest.kind === "fix_choice") return "수정안 선택";
   if (quest.kind === "free_correction") return "직접 수정";
   if (quest.kind === "spectrum") return "복수 표현 비교";
@@ -2186,10 +2187,10 @@ export function CanonicalReviewStage({ mission, section, revealAnswers, onNext }
         : quest && quest.kind !== "dct_feedback" ? <>
           {draft && feedbackQuest ? finalDct ? <section className={`${panel} space-y-3 p-5`} aria-label="최종 확정 미리보기">
             <p className="text-xs font-black text-[#776727]">최종 확정</p>
-            <h3 className="font-bold">학습자는 여기서 최종 {outputName}을 확정하고, 학습 기록이 저장됩니다.</h3>
+            <h3 className="font-bold">학습자는 여기서 최종안을 확정하고, 학습 기록이 저장됩니다.</h3>
             <p className="text-sm text-muted-foreground">감수 화면에서는 저장하지 않습니다.</p>
-            <div><p className="text-xs font-bold text-[#7A7466]">최초 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
-            <div><p className="text-xs font-bold text-[#7A7466]">확정한 {outputName}</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
+            <div><p className="text-xs font-bold text-[#7A7466]">초안</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.first}</p></div>
+            <div><p className="text-xs font-bold text-[#7A7466]">최종안</p><p className="mt-1 whitespace-pre-wrap text-lg">{finalDct.revised}</p></div>
           </section> : <>
             <p className="rounded-lg border border-[#E3D08F] bg-[#FFF8E1] px-3 py-2 text-xs leading-5 text-[#6B5518]">실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다. 감수 화면은 AI를 호출하지 않고, 미리 작성한 확인 기준으로 같은 피드백·다듬기·확정 순서를 보여 줍니다.</p>
             <LocalPilotContext.Provider value={true}>
@@ -2392,10 +2393,10 @@ function CompletedQuestReview({ quest, response }: {
                 </div>
               );
             })()}
-            <div><p className="text-xs font-bold text-[#677287]">최종 {outputName}</p><p className={`${targetFont} mt-1 text-[17px] leading-8`}>{feedbackResponse.revised}</p></div>
+            <div><p className="text-xs font-bold text-[#677287]">최종안</p><p className={`${targetFont} mt-1 text-[17px] leading-8`}>{feedbackResponse.revised}</p></div>
           </div>
         ) : dct ? (
-          <div><p className="text-xs font-bold text-[#677287]">최초 {outputName}</p><p className={`${targetFont} mt-1 text-[17px] leading-8`}>{dct.first}</p></div>
+          <div><p className="text-xs font-bold text-[#677287]">초안</p><p className={`${targetFont} mt-1 text-[17px] leading-8`}>{dct.first}</p></div>
         ) : (
           <>
             <p className="text-xs font-bold text-[#677287]">내가 고른 답</p>
@@ -2438,11 +2439,11 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
           {revised && <div className={row}>
-            <span className={rowLabel}>최초 {outputName}</span>
+            <span className={rowLabel}>초안</span>
             <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={rowLabel}>최종 {outputName}</span>
+            <span className={rowLabel}>최종안</span>
             <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
@@ -2481,7 +2482,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
           );
         })}
       </ol>
-      <p className="mt-3 text-[13px] text-[#6A7485]">최초 {outputName}·최종 {outputName}은 위 완성 카드에 있습니다.</p>
+      <p className="mt-3 text-[13px] text-[#6A7485]">초안·최종안은 위 완성 카드에 있습니다.</p>
     </section>
   );
 }
@@ -2755,7 +2756,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   const requestedMission = new URLSearchParams(window.location.search).get("mission")?.toUpperCase();
   const sceneIntroConfig = isDevPreview && requestedMission === "B"
     ? MISSION_B_SCENE_INTRO
-    : buildSceneIntroConfig(mission);
+    : { ...buildSceneIntroConfig(mission), ...(demoMode ? { startLabel: `${parseRepresentativeDemo(demoLocation.search).label} ${mission.activityMode === "interpreting" ? "통역" : "번역"} 시작하기` } : {}) };
   const [pilotProgress] = useState(() => readLocalPilotProgress(localPilot, pilotStorageKey));
   const [sceneIntroStep, setSceneIntroStep] = useState<number | null>(localPilot || initialDemoQuest >= 0 ? null : 0);
   const [questIndex, setQuestIndex] = useState(initialDemoQuest >= 0 ? initialDemoQuest : pilotProgress?.questIndex ?? 0);
@@ -3097,8 +3098,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
-    <LearnerJourneyShell canvas="max-w-3xl" headerRight={demoMode
-      ? <RepresentativeDemoHeader />
+    <LearnerJourneyShell canvas="max-w-3xl" demo={demoMode} headerRight={demoMode
+      ? null
       : <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction.replace("한국어", "한").replace("중국어", "중").replace(/\s*→\s*/, "→")}</span>}>
       {isDevPreview && (
         <DevPreviewToolbar
@@ -3124,7 +3125,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         </p>}
         {sceneIntroStep !== null ? (
           <div className={demoMode ? "space-y-2" : "space-y-5"}>
-            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />
+            {!demoMode && <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />}
             <SceneIntroFlow
               config={sceneIntroConfig}
               onNext={advanceSceneIntro}
@@ -3146,7 +3147,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             <Progress activeIndex={currentProgressIndex} completed revisionOpen={feedbackRevisionOpen} skipIntro={localPilot} {...demoProgressProps} />
             <section className="rounded-2xl bg-[#15202B] px-6 py-7 text-white sm:px-8">
               <h1 className="text-2xl font-black">학습 미션 완료</h1>
-              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? `${completionOutput}을 수정한 뒤 최종 ${completionOutput}을 결정했습니다.` : `AI 피드백을 확인하고, 내 판단으로 최초 ${completionOutput}을 그대로 확정했습니다.`}</p>
+              <p className="mt-1.5 text-[14.5px] text-white/75">{aDct?.reflected ? `${completionOutput}을 수정한 뒤 최종안을 결정했습니다.` : `AI 피드백을 확인하고, 내 판단으로 초안을 그대로 확정했습니다.`}</p>
             </section>
             <div className="space-y-4">
               <CompletionRecord

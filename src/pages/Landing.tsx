@@ -12,14 +12,14 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
 // 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
 const secondaryLink =
-  "group inline-flex min-w-[163px] sm:w-[240px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[12px] text-[14.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex min-w-[155px] sm:w-[228px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[10px] text-[14.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
-// 데모 공개 중에는 로그인 없이 들어가는 대표 미션이 첫 행동이다 — 노란 채움은 이 버튼 하나만
-// 쓰고, 두 카드 버튼은 대등하게 테두리형으로 낮춘다. 데모를 감추면 카드 버튼은 원래 채움으로 돌아간다.
+// Match the demo selector blue; keep the role-card entry points outlined.
 const demoLink = secondaryLink
-  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#FAD338]")
+  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#315F9C] bg-[#315F9C]")
   .replace("font-semibold", "font-bold")
-  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#FAD338]");
+  .replace("text-[#15202B]", "text-white")
+  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:border-[#284F83] hover:bg-[#284F83]");
 const archLink = secondaryLink
   .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#15202B]")
   .replace("text-[#15202B]", "text-white")
@@ -48,7 +48,7 @@ const Landing = () => {
 
       {/* 랜딩은 '읽는 페이지'가 아니라 '갈라지는 문'이다 — 스크롤 없이 한 화면에
           후크 → 설명 → 흐름 → 두 갈래가 모두 들어와야 한다. */}
-      <main className="mx-auto flex w-full max-w-[804px] flex-1 flex-col items-center justify-center px-6 py-6">
+      <main className="mx-auto flex w-full max-w-[804px] flex-1 flex-col items-center justify-center px-6 pt-[29px] pb-[19px]">
         <section className="text-center">
           {/* 후크 — 문구는 즉시 표시하고 핵심어에만 형광펜이 그어진다. 메시지
               ("같은 뜻인데 다르게 표현한다")를 활자로 시연하는 장치라 장식이 아니다.
@@ -76,13 +76,13 @@ const Landing = () => {
               글자색은 muted-foreground(#5C6A7A, 배경 #FAF7F0 대비 5.1:1)에서 같은 남색
               계열 한 단계 위(#4E5F6C, 6.3:1)로 올린다 — 논문 도판으로 축소·인쇄될 때
               본문이 흐려지지 않게 하려는 것이다. 글자 크기에 맞춰 문단 폭도 확보한다. */}
-          <p className="mx-auto mt-4 max-w-[620px] break-keep text-[15.333px] leading-relaxed text-[#4E5F6C] sm:text-[16.333px]">
+          <p className="mx-auto mt-4 max-w-[680px] break-keep text-[15.333px] leading-relaxed text-[#4E5F6C] sm:text-[16.333px]">
             {/* 데스크톱에서는 의미 단위 두 행을 유지하고, 좁은 화면에서는 자연스럽게 줄바꿈한다. */}
             <span className="block">
-              PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하면서,
+              PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              상황·관계에 맞는 표현을 판단하고 직접 통번역하는 학습 플랫폼입니다.
+              상황과 관계에 맞는 표현을 탐구하는 통번역 학습·연구 플랫폼입니다.
             </span>
           </p>
         </section>
@@ -93,9 +93,9 @@ const Landing = () => {
             똑같이 두고, 왼쪽 띠와 버튼의 색으로만 갈라진다 — 학습자는 노랑, 교수자는
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
         {/* 헤더·본문·푸터는 같은 804px 칼럼을 사용한다. */}
-        <section className="mx-auto mt-[30px] grid w-full max-w-[744px] grid-cols-1 gap-5 sm:grid-cols-2">
+        <section className="mx-auto mt-[22px] grid w-full max-w-[650px] grid-cols-1 gap-5 sm:grid-cols-2">
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -105,9 +105,9 @@ const Landing = () => {
               </span>
               학습자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
-              상황과 관계에 맞는 표현을 판단하고 직접 통번역합니다.<br />
-              AI 피드백을 참고해 표현을 검토한 뒤, 확정안을 결정합니다.
+            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+              상황과 관계에 맞게 통번역합니다.<br />
+              AI 피드백을 검토해 최종안을 제출합니다.
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
@@ -120,7 +120,7 @@ const Landing = () => {
           </article>
 
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-5 text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -128,9 +128,9 @@ const Landing = () => {
               </span>
               교수자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D] lg:whitespace-nowrap">
-              AI 콘텐츠를 생성하고, 자동 품질 점검과 AI 검토를 거칩니다.<br />
-              교수자가 감수하고 최종 승인한 콘텐츠를 수업에 활용합니다.
+            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+              자동 검사와 AI 검토로 콘텐츠를 점검합니다.<br />
+              교수자가 감수·승인해 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
                 버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·승인하기.
@@ -147,13 +147,13 @@ const Landing = () => {
 
         {/* Paired demo and architecture entry points while the demo is public. */}
         {IS_DEMO && (
-          <section className="mt-[28px] flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
+          <section className="mt-[18px] flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
             >
               학습 미션 체험
-              <span className="ml-0.5 text-[12.5px] font-semibold text-[#15202B]">로그인 없이</span>
+              <span className="ml-0.5 text-[12.5px] font-semibold text-white">로그인 없이</span>
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
             <Link to="/architecture" className={archLink}>
@@ -166,7 +166,7 @@ const Landing = () => {
 
       <footer className="mx-auto w-full max-w-[804px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.833px] leading-relaxed text-[#5C6A7A]">
-          © 2026 임소영. All rights reserved.
+          © 2026 PRAGMA. All rights reserved.
         </p>
       </footer>
     </div>

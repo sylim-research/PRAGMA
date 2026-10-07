@@ -23,7 +23,7 @@ const snapshot = () => JSON.parse(sessionStorage.getItem(storageKey)!);
 const feedbackSentence = mission.mpj_items[1].explanation_ko.split(". ")[1];
 const toSecondJudgment = () => {
   render(<MemoryRouter><CanonicalMissionRun /></MemoryRouter>);
-  click("다소 적절"); click("판단 제출하기"); click("다음: 판단과 이유");
+  click("다소 적절"); click("판단 제출하기"); click("다음: 판단과 근거");
 };
 describe("representative v6 reason / contrast rhythm", () => {
   beforeEach(() => {
@@ -59,7 +59,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     fireEvent.click(within(reasons).getByRole("radio", { name: reason.text }));
     expect(screen.queryByText("기준 판단")).not.toBeInTheDocument();
     click("이유 제출하기");
-    // 이유 확정 후: 판단과 이유의 결과·해설을 함께 공개한다.
+    // 이유 확정 후: 판단과 근거의 결과·해설을 함께 공개한다.
     expect(screen.getByText(/^기준 판단과 다릅니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^매우 적절/ })).getByText("내 선택")).toBeInTheDocument();
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("기준 판단")).toBeInTheDocument();

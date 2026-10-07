@@ -13,7 +13,7 @@ import type {
 // 학습자·검수 화면과 같은 v6 문항 이름을 쓴다(InstructorReviewExperience의 이름이 정본).
 const ITEM_LABELS = [
   "단일 표현 판단",
-  "판단과 이유",
+  "판단과 근거",
   "수정안 선택",
   "직접 수정",
   "복수 표현 비교",

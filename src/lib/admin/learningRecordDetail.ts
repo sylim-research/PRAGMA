@@ -107,7 +107,7 @@ function bandLabeler(featureId: string | null) {
 }
 
 // v6 문항은 저장된 short_label 대신 화면 표시명(활동명)으로 보여 준다. 키는 내부 문항 ID다.
-const V6_ACTIVITY: Record<number, string> = { 1: "단일 표현 판단", 2: "판단과 이유", 3: "수정안 선택", 4: "직접 수정", 5: "복수 표현 비교" };
+const V6_ACTIVITY: Record<number, string> = { 1: "단일 표현 판단", 2: "판단과 근거", 3: "수정안 선택", 4: "직접 수정", 5: "복수 표현 비교" };
 
 function mjtCards(row: RecordDetailRow, mission: Obj | null): MjtCard[] {
   const isV6 = mission?.schema_version === "mission_v6";

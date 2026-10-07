@@ -87,7 +87,7 @@ export interface MyMissionLogEntry {
   sourceText: string | null;
   firstResponse: string | null;
   revisedResponse: string | null;
-  /** 최초안과 최종안이 다르면 true. 별도 플래그가 없어 두 값을 비교한다. */
+  /** 초안과 최종안이 다르면 true. 별도 플래그가 없어 두 값을 비교한다. */
   revised: boolean;
   /** 이번 수행의 목표 화용 초점 코드(카탈로그 조회용). */
   featureId: string | null;

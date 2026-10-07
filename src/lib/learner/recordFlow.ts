@@ -14,7 +14,7 @@ export interface ChangeMap {
   feature: string | null;
 }
 
-/** 우리 반의 판단 — 문항별 공개 분포와 내 선택. scale = 4점 척도(단일 표현 판단·판단과 이유), choice = 수정안 선택. */
+/** 우리 반의 판단 — 문항별 공개 분포와 내 선택. scale = 4점 척도(단일 표현 판단·판단과 근거), choice = 수정안 선택. */
 export interface ClassPosition {
   itemId: number;
   kind: "scale" | "choice";

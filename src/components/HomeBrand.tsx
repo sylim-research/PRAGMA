@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { DemoBadge } from "@/components/mission/DemoBadge";
 
-export const HomeBrand = ({ largerText = false }: { largerText?: boolean }) => {
+export const HomeBrand = ({ largerText = false, demo = false }: { largerText?: boolean; demo?: boolean }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [pulse, setPulse] = useState(false);
@@ -31,10 +32,12 @@ export const HomeBrand = ({ largerText = false }: { largerText?: boolean }) => {
       {/* 제품명은 로고타입처럼 — 자간을 넓혀 문장이 아니라 '마크'로 읽히게 한다. */}
       <span className={`${largerText ? "text-[16.333px] sm:text-[17.333px]" : "text-[16px] sm:text-[17px]"} font-bold tracking-[0.18em]`}>PRAGMA</span>
       {/* 공식 설명어(= 논문 제목의 앞부분). 좁은 화면에서는 제품명만 남긴다. */}
+      {demo ? <DemoBadge /> : <>
       <span aria-hidden className="hidden h-[11px] w-px self-center bg-[#3E4C5A] sm:inline-block" />
       <span className={`hidden ${largerText ? "text-[14.333px]" : "text-[14px]"} font-normal text-[#A9B6C4] transition-colors group-hover:text-[#D3DBE3] sm:inline`}>
         AI 기반 한·중 통번역 학습
       </span>
+      </>}
     </button>
   );
 };

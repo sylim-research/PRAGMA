@@ -13,7 +13,7 @@ export const SYLLABUS_EVALUATION_ROWS: ReadonlyArray<{
   evidence: string;
 }> = [
   { key: "mpj", label: "MJT5 상황·표현 판단", evidence: "맥락 판단 5문항의 선택과 판단 근거" },
-  { key: "dct", label: "DCT형 통번역 과제 산출·수정", evidence: "초안, AI 피드백 반영, 수정안·확정안" },
+  { key: "dct", label: "DCT형 통번역 과제 산출·수정", evidence: "초안, AI 피드백 반영, 수정안·최종안" },
   { key: "completion", label: "주차 미션 이수", evidence: "배정된 두 학습 미션의 완료 기록" },
   { key: "participation", label: "학습노트·수업 참여", evidence: "주차 학습노트와 수업 활동 산출물" },
 ] as const;
