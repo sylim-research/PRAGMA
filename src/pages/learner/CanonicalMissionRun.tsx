@@ -367,13 +367,13 @@ function IntroPhaseColumn({ title, caption, steps }: {
 }) {
   return (
     <section aria-label={`${title} 단계`}>
-      <div className="border-b border-[#DDD8CB] pb-3">
+      <div className="border-b border-[#ECE7DA] pb-3">
         <h2 className="text-[18px] font-bold leading-6 text-[#15202B]">{title}</h2>
         <p className="mt-1 text-[12px] leading-5 text-[#687481]">{caption}</p>
       </div>
-      <ol className="mt-1 divide-y divide-[#ECEAE3]" aria-label={`${title} 활동`}>
+      <ol className="mt-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className="grid grid-cols-[18px_5.75rem_minmax(0,1fr)] items-baseline gap-x-2 py-3">
+          <li key={step.title} className="grid grid-cols-[18px_5.75rem_minmax(0,1fr)] items-baseline gap-x-2 py-2">
             <span className="text-[12px] font-medium tabular-nums text-[#7A8590]">{index + 1}</span>
             <span className="break-keep text-[14.5px] font-semibold leading-6 text-[#243B53]">{step.title}</span>
             <span className="break-keep text-[13.5px] font-normal leading-5 text-[#56636D]">{step.desc}</span>
@@ -387,10 +387,11 @@ function IntroPhaseColumn({ title, caption, steps }: {
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
   return (
-    <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-4">
+    <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-stretch sm:gap-x-9">
       <IntroPhaseColumn title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
-      <div className="flex items-center justify-center sm:pt-1" aria-hidden>
-        <MoveRight className="hidden h-5 w-5 text-[#83909C] sm:block" strokeWidth={1.5} />
+      {/* 두 국면은 표가 아니라 두 목록이다 — 데스크톱은 가는 세로선 하나로만 가른다. */}
+      <div className="flex items-center justify-center sm:items-stretch" aria-hidden>
+        <span className="hidden w-px bg-[#E6E1D4] sm:block" />
         <ArrowDown className="h-5 w-5 text-[#83909C] sm:hidden" strokeWidth={1.5} />
       </div>
       <IntroPhaseColumn title={`직접 ${outputName}`} caption="DCT · 통번역 과제" steps={steps.production} />
@@ -401,7 +402,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
       {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
-      <div className={`border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 sm:px-6 ${config.startLabel ? "py-3" : "pb-4 pt-5"}`}>
+      <div className={`border-b border-[#ECE7DA] bg-white px-5 sm:px-6 ${config.startLabel ? "pb-3 pt-5" : "pb-4 pt-5"}`}>
         <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
         <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
@@ -432,7 +433,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 bg-[#274D7C] px-8 text-white shadow-[0_3px_7px_#203e641c] hover:bg-[#203F65] hover:shadow-[0_5px_12px_#203e6429] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 rounded-xl bg-[#15202B] px-8 text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] hover:bg-[#24313F] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -2144,7 +2145,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
                   ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
                       className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">
                       {freeJump && jumpStage === "produce"
-                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#3276A8]/50 bg-white text-[#24608D]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
+                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#15202B]/35 bg-white text-[#15202B]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
                         : body}
                     </button>
                   : body}
@@ -2161,7 +2162,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             const label = `MJT ${number + 1} · ${progressLabel(quests[index], outputName)}`;
             return <button key={id} type="button" title={label} aria-label={label} aria-current={selected ? "step" : undefined}
               onClick={() => { if (!selected) onJumpQuest(index); }}
-              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3276A8] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#3276A8] hover:bg-[#F3F7FA]"}`}>
+              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#15202B] hover:bg-[#F4F1E9]"}`}>
               {number + 1}
             </button>;
           })}
@@ -2520,7 +2521,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
             <li key={quest.id} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-xl border border-[#EAE5D8] bg-white px-4 py-3">
               <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-[#FAD338] text-[13px] font-extrabold">{index + 1}</span>
               <div className="min-w-0">
-                <p className="flex flex-wrap items-center gap-2"><span className="inline-block rounded-md bg-[#E9EFF8] px-2 py-0.5 text-[12.5px] font-black text-[#2F4F86]">{progressLabel(quest, outputName)}</span>{quest.kind === "free_correction" && typeof response?.revisedText === "string" && <DemoExampleTag text={response.revisedText} />}</p>
+                <p className="flex flex-wrap items-center gap-2"><span className="inline-block rounded-md bg-[#F1EEE6] px-2 py-0.5 text-[12.5px] font-black text-[#3E4C57]">{progressLabel(quest, outputName)}</span>{quest.kind === "free_correction" && typeof response?.revisedText === "string" && <DemoExampleTag text={response.revisedText} />}</p>
                 <p className="mt-1.5 whitespace-pre-line break-keep text-[15px] leading-7 text-[#263444]">{response ? <RichLine text={responseLabel(quest, response)} /> : "건너뜀"}</p>
               </div>
             </li>
