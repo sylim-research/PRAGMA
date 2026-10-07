@@ -14,7 +14,7 @@ export function RepresentativeDemoNavigation({ scenarioId, mode }: DemoNavigatio
         const label = taskMode === "translation" ? "번역" : "통역";
         const selected = mode === taskMode && current.direction === demo.direction;
         return <Link key={`${demo.direction}-${taskMode}`} to={representativeDemoPath(demo.direction, taskMode, step)} aria-label={`${demo.label} ${label} 미션`} aria-current={selected ? "page" : undefined}
-          className={`flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-[14px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3276A8] focus-visible:ring-offset-2 ${selected ? "border-[#3276A8] bg-[#3276A8] text-white" : "border-[#CBD5DF] bg-white text-[#243B53] hover:border-[#3276A8] hover:bg-[#EDF4FA]"}`}>
+          className={`flex min-h-11 items-center justify-center gap-2 rounded-lg border px-3 py-2 text-[14px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#315F9C] focus-visible:ring-offset-2 ${selected ? "border-[#315F9C] bg-white text-[#244A7D] shadow-[inset_0_0_0_1px_#315F9C]" : "border-[#CBD5DF] bg-white text-[#243B53] hover:border-[#315F9C]"}`}>
           <span>{demo.label}</span><span>{label} 미션</span>
           {selected && <span aria-hidden="true" className="text-[13px]">✓</span>}
         </Link>;
