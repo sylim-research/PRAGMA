@@ -77,9 +77,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="165" align="left">기능</th><th width="595" align="left">내용</th></tr></thead>
   <tbody>
-    <tr><td>교과목 편성</td><td>3개 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
-    <tr><td>학습자 관리</td><td>교수자가 승인한 학습자만 교과목에 참여</td></tr>
-    <tr><td>학급 응답</td><td>학습자의 MJT 응답과 선택 이유를 모아 수업 토론에 활용</td></tr>
+    <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
+    <tr><td>학습자 관리</td><td>프로필 작성과 교수자의 가입 승인을 마친 학습자가 교과목에 참여</td></tr>
+    <tr><td>학급 응답</td><td>학습자의 MJT 응답 분포와 선택 이유를 비교하고 수업 토론에 활용</td></tr>
     <tr><td>수행 현황</td><td>학습자별 미션 수행 상태와 기록을 확인</td></tr>
   </tbody>
 </table>
@@ -120,7 +120,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.3.2</td><td>통번역 과제와 AI 피드백</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
     <tr><td>4.3.3</td><td>수행 기록의 저장과 조회</td><td><a href="src/pages/learner/LearnerRecords.tsx"><code>LearnerRecords.tsx</code></a></td></tr>
     <tr><td>4.4.1</td><td>교과목 편성과 미션 배치</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a></td></tr>
-    <tr><td>4.4.2</td><td>학급 응답과 학습자 수행 현황</td><td><a href="src/pages/admin/AdminClassResponses.tsx"><code>AdminClassResponses.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
+    <tr><td>4.4.2</td><td>학급 응답과 학습자 수행 현황</td><td><a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
     <tr><td>4.5.1</td><td>기능 시험과 배포 전 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
     <tr><td>4.5.2</td><td>문제 판정과 개선·재점검</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
     <tr><td>4.5.3</td><td>배포·운영 상태와 확인 범위</td><td><a href="docs/DEPLOY.md"><code>DEPLOY.md</code></a> · <a href="railway.json"><code>railway.json</code></a></td></tr>
@@ -138,7 +138,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 품질 점검·AI 검토 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
-    <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
+    <tr><td>교과목·주차 편성</td><td>번역·통역·통번역 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
     <tr><td>MJT → 통번역 과제</td><td>MJT와 통번역 과제를 한 학습 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
     <tr><td>9개 목표화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
     <tr><td>의미적 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용보다 의미를 먼저 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
@@ -162,6 +162,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
 - **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase(Edge Functions·PostgreSQL)로 구성됩니다.
+- **코드 관리와 배포**는 GitHub와 Railway를 사용합니다. GitHub Actions에서 타입 검사·테스트·빌드를 수행하며, 운영 웹앱은 GitHub main을 기준으로 Railway에 배포합니다.
 
 <br>
 
