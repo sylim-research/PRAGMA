@@ -11,6 +11,7 @@ import {
   LoaderCircle,
   ArrowDown,
   Lightbulb,
+  ListChecks,
   Mic,
   MoveRight,
   PenLine,
@@ -359,24 +360,37 @@ function v6IntroSteps(outputName: string) {
   };
 }
 
-/** Static activity lists use typography, not interactive button surfaces. */
-function IntroPhaseColumn({ title, caption, steps }: {
+/** 국면별 색 — 판단은 네이비 띠, 산출은 노랑 띠. 아래 목록은 같은 색을 연하게 깐 칸으로 이어 두 국면을 가른다. */
+const INTRO_PHASE_TONE = {
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/15 text-white ring-white/25" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white/50 text-[#15202B] ring-white/60" },
+} as const;
+
+function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
+  tone: keyof typeof INTRO_PHASE_TONE;
   title: string;
   caption: string;
+  /** 응답 방식 표지 — 판단형(주어진 표현을 판단·수정한다) / 산출형(직접 번역·통역한다). */
+  mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
 }) {
+  const t = INTRO_PHASE_TONE[tone];
+  const ModeIcon = mode.icon;
   return (
     <section aria-label={`${title} 단계`}>
-      <div className="border-b border-[#ECE7DA] pb-3">
-        <h2 className="text-[18px] font-bold leading-6 text-[#15202B]">{title}</h2>
-        <p className="mt-1 text-[12px] leading-5 text-[#687481]">{caption}</p>
+      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-3.5 ${t.band}`}>
+        <div className="min-w-0">
+          <h2 className="text-[17px] font-black leading-6">{title}</h2>
+          <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
+        </div>
+        <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${t.mode}`}><ModeIcon aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />{mode.label}</span>
       </div>
-      <ol className="mt-1.5" aria-label={`${title} 활동`}>
+      <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className="grid grid-cols-[18px_5.75rem_minmax(0,1fr)] items-baseline gap-x-2 py-2">
-            <span className="text-[12px] font-medium tabular-nums text-[#7A8590]">{index + 1}</span>
-            <span className="break-keep text-[14.5px] font-semibold leading-6 text-[#243B53]">{step.title}</span>
-            <span className="break-keep text-[13.5px] font-normal leading-5 text-[#56636D]">{step.desc}</span>
+          <li key={step.title} className={`grid grid-cols-[22px_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg px-3 py-2.5 ${t.pill}`}>
+            <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
+            <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
+            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57]">{step.desc}</span>
           </li>
         ))}
       </ol>
@@ -387,14 +401,13 @@ function IntroPhaseColumn({ title, caption, steps }: {
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
   return (
-    <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-stretch sm:gap-x-9">
-      <IntroPhaseColumn title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
-      {/* 두 국면은 표가 아니라 두 목록이다 — 데스크톱은 가는 세로선 하나로만 가른다. */}
-      <div className="flex items-center justify-center sm:items-stretch" aria-hidden>
-        <span className="hidden w-px bg-[#E6E1D4] sm:block" />
-        <ArrowDown className="h-5 w-5 text-[#83909C] sm:hidden" strokeWidth={1.5} />
+    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "판단형", icon: ListChecks }} steps={steps.judgment} />
+      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
+        <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
+        <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
-      <IntroPhaseColumn title={`직접 ${outputName}`} caption="DCT · 통번역 과제" steps={steps.production} />
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT · 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
     </div>
   );
 }
@@ -402,7 +415,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
       {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
-      <div className={`border-b border-[#ECE7DA] bg-white px-5 sm:px-6 ${config.startLabel ? "pb-3 pt-5" : "pb-4 pt-5"}`}>
+      <div className={`border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 sm:px-6 ${config.startLabel ? "py-3" : "pb-4 pt-5"}`}>
         <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
         <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
@@ -433,7 +446,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 rounded-xl bg-[#15202B] px-8 text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] hover:bg-[#24313F] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 rounded-xl bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -2131,11 +2144,13 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
             const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
+            // 시연에서는 산출 단계 이름을 「DCT 번역」으로 보이되, 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
+            const shownLabel = freeJump && jumpStage === "produce" ? `DCT ${outputName}` : label;
             const body = (
               <>
                 <span aria-hidden className={`block h-1.5 rounded-full ${done ? "bg-[#F3D248]" : active ? "bg-[#15202B]" : "bg-[#E4E0D5]"}`} />
                 <span className={`mt-1.5 hidden truncate text-center text-[11.5px] leading-4 sm:block ${active ? "font-black text-[#15202B]" : done ? "font-bold text-[#96812A]" : "font-bold text-[#A8ADB5]"}`}>
-                  {label}
+                  {shownLabel}
                 </span>
               </>
             );
@@ -2144,9 +2159,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
                 {onJumpStage && jumpStage
                   ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
                       className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">
-                      {freeJump && jumpStage === "produce"
-                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#15202B]/35 bg-white text-[#15202B]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
-                        : body}
+                      {body}
                     </button>
                   : body}
               </li>
@@ -3162,7 +3175,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
     <LearnerJourneyShell canvas="max-w-3xl" demo={demoMode} headerRight={demoMode
-      ? null
+      ? <RepresentativeDemoNavigation scenarioId={runtime?.scenario_id} mode={mission.activityMode} />
       : <span className="hidden text-xs font-semibold text-white/75 sm:block">{mission.speechAct} 화행 · {mission.direction.replace("한국어", "한").replace("중국어", "중").replace(/\s*→\s*/, "→")}</span>}>
       {isDevPreview && (
         <DevPreviewToolbar
@@ -3182,13 +3195,12 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
         />
       )}
       <div className="mx-auto max-w-3xl">
-        {demoMode && <RepresentativeDemoNavigation scenarioId={runtime?.scenario_id} mode={mission.activityMode} />}
         {localPilot && <p className="mb-3 text-xs leading-5 text-[#7A7466]">
           로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
         </p>}
         {sceneIntroStep !== null ? (
           <div className={demoMode ? "space-y-2" : "space-y-5"}>
-            {!demoMode && <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />}
+            <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />
             <SceneIntroFlow
               config={sceneIntroConfig}
               onNext={advanceSceneIntro}

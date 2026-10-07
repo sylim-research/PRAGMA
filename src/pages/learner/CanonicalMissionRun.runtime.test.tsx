@@ -50,9 +50,9 @@ describe("demo route", () => {
     expect(screen.getByText("직접 번역")).toBeInTheDocument();
     expect(screen.getByText("DEMO")).toBeInTheDocument();
     const demoChoices = screen.getByRole("navigation", { name: "데모 미션 선택" });
-    expect(within(screen.getByRole("banner")).queryByRole("navigation", { name: "데모 미션 선택" })).not.toBeInTheDocument();
+    expect(within(screen.getByRole("banner")).getByRole("navigation", { name: "데모 미션 선택" })).toBe(demoChoices);
     expect(screen.getByRole("button", { name: "한 → 중 번역 시작하기" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "번역하기 단계로 이동" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "번역하기 단계로 이동" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "내 계정" })).not.toBeInTheDocument();
     expect(screen.queryByText("AI 기반 한·중 통번역 학습")).not.toBeInTheDocument();
     expect(within(demoChoices).getAllByRole("link")).toHaveLength(4);
