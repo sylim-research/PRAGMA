@@ -11,7 +11,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 브랜드 색은 네이비·옐로우·크림 셋뿐이다(2026-10-07). 방문자의 주 행동은 네이비 채움 하나,
 // 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
 const demoLink =
-  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-3 text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
+  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-[13.5px] text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
   "group inline-flex items-center gap-1.5 rounded-sm text-[13.833px] font-bold text-[#15202B] underline decoration-[#15202B]/35 decoration-[1.5px] underline-offset-[5px] transition-colors hover:decoration-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
