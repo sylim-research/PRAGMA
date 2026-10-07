@@ -29,7 +29,7 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-[804px] items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-[698px] items-center justify-between gap-4 px-6 py-4">
           <HomeBrand largerText />
           {IS_DEMO && (
             <Link to="/architecture" className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[14px] font-semibold text-[#F1EFE8] decoration-[#FAD338] decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]">
@@ -155,7 +155,7 @@ const Landing = () => {
         )}
       </main>
 
-      <footer className="mx-auto w-full max-w-[804px] px-6 pb-6">
+      <footer className="mx-auto w-full max-w-[698px] px-6 pb-6">
         <p className="break-keep border-t border-[#E6E1D2] pt-3 text-center text-[12.833px] leading-relaxed text-[#5C6A7A]">
           © 2026 PRAGMA. All rights reserved.
         </p>
