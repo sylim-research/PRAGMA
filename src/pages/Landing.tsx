@@ -11,7 +11,7 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 브랜드 색은 네이비·옐로우·크림 셋뿐이다(2026-10-07). 방문자의 주 행동은 네이비 채움 하나,
 // 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
 const demoLink =
-  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-[13.5px] text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
+  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-[13px] text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
   "group inline-flex items-center gap-1.5 rounded-sm text-[13.833px] font-bold text-[#15202B] underline decoration-[#15202B]/35 decoration-[1.5px] underline-offset-[5px] transition-colors hover:decoration-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
@@ -89,7 +89,7 @@ const Landing = () => {
         {/* 헤더·본문·푸터는 같은 804px 칼럼을 사용한다. */}
         <section className="mx-auto mt-[22px] grid w-full max-w-[650px] grid-cols-1 gap-5 sm:grid-cols-2">
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -114,7 +114,7 @@ const Landing = () => {
           </article>
 
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -142,7 +142,7 @@ const Landing = () => {
         {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 전체 구조는 헤더 오른쪽 링크로 옮겼다. */}
         {IS_DEMO && (
           // 카드 그림자가 아래로 번져 같은 22px도 좁아 보인다 — 부제→카드와 눈으로 같은 간격이 되게 더 띄운다.
-          <section className="mt-[34px] flex justify-center" aria-label="대표 미션 체험">
+          <section className="mt-[30px] flex justify-center" aria-label="대표 미션 체험">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
