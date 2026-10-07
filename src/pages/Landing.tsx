@@ -141,7 +141,7 @@ const Landing = () => {
 
         {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 전체 구조는 헤더 오른쪽 링크로 옮겼다. */}
         {IS_DEMO && (
-          <section className="mt-[22px] flex justify-center" aria-label="대표 미션 체험">
+          <section className="mt-[26px] flex justify-center" aria-label="대표 미션 체험">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
