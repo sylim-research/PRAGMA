@@ -194,7 +194,7 @@ export function InterpretingConsole({
           </section>
           {demoMode ? <section aria-label="통역 시연 안내" className="rounded-xl bg-[#F7F6F2] p-3">
             <h3 className="text-xs font-bold text-[#273642]">② 예시 전사문으로 체험 ({targetLanguage.label})</h3>
-            <p className="mt-1 text-xs leading-5 text-[#536572]">위의 ‘시연용 답안 채우기’를 누르면 준비된 전사문이 입력됩니다. 실제 녹음한 내용이 아닙니다.</p>
+            <p className="mt-1 text-xs leading-5 text-[#536572]">위의 ‘예시 전사문 넣기’를 누르면 준비된 전사문이 입력됩니다. 실제 녹음한 내용이 아닙니다.</p>
           </section> : <section aria-label="통역 녹음">
             <h3 className="text-xs font-bold text-[#273642]">② 통역 녹음 ({targetLanguage.label})</h3>
             <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3">

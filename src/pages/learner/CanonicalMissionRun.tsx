@@ -111,15 +111,21 @@ function useDemoAnswer(questId: string) {
 }
 
 /** 채워질 자리 바로 옆(질문 줄 오른쪽)에 두는 시연용 자동 채우기 버튼. */
-function DemoFillButton() {
+function DemoFillButton({ label, hasInput = false }: { label: string; hasInput?: boolean }) {
   const fill = useContext(DemoFillContext);
   if (!fill) return null;
   return (
-    <button type="button" onClick={fill}
+    <button type="button" onClick={() => {
+      if (hasInput && !window.confirm("작성한 내용을 준비된 예시로 바꿀까요? 취소하면 작성한 내용이 유지됩니다.")) return;
+      fill();
+    }}
       className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FAD338] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_1px_4px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
-      <PenLine aria-hidden className="h-4 w-4" />시연용 답안 채우기
+      <PenLine aria-hidden className="h-4 w-4" />{label}
     </button>
   );
+}
+function DemoFeedbackNotice() {
+  return <p className="my-2 text-[13px] leading-5 text-[#536572]">이 데모에서는 예시 답안의 AI 피드백만 확인할 수 있습니다. 직접 쓴 답안에는 AI 피드백이 제공되지 않습니다.</p>;
 }
 /** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
 const ReviewHostContext = createContext(false);
@@ -787,7 +793,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} /><span className="pt-[3px]">{quest.prompt}</span>{!answered && !judgmentCommitted && <DemoFillButton />}</h3>
+        <h3 className={questionTitle}><QuestionChip n={quest.reasonChoice ? 1 : undefined} /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className={optionGrid}>
           {quest.options.map((option) => (
             <OptionButton key={option.id} option={option} value={pick} disabled={judgmentLocked} answered={judgmentShown} acceptedIds={acceptedIds}
@@ -819,9 +825,9 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           <Button className={`h-[48px] ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
             if (!judgmentCommitted) setJudgmentCommitted(true);
             else setAnswered(true);
-          }}>{judgmentCommitted ? "이유 확정하기" : pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          }}>{judgmentCommitted ? "이유 제출하기" : pick ? "판단 제출하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
-          <Button className={`h-[48px] ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!pick} onClick={() => setAnswered(true)}>{pick ? "판단 제출하기" : "답을 선택해 주세요"}</Button>
         ) : (
           <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ pick, ...(reasonId ? { reasonId } : {}) })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>
         )}
@@ -857,7 +863,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span>{!answered && <DemoFillButton />}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         {!correctionOnly && <div className={optionGrid}>
           {quest.judgmentOptions.map((option) => (
             <OptionButton key={option.id} option={option} value={judgment} disabled={locked} answered={locked} acceptedIds={[quest.referenceJudgment]} acceptedLabel="기준 판단" onSelect={setJudgment} />
@@ -925,7 +931,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
       </section>
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 교정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
-          <Button className={`h-[48px] ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 확정하기" : "답을 선택해 주세요"}</Button>
+          <Button className={`h-[48px] ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 제출하기" : "답을 선택해 주세요"}</Button>
         ) : !answered ? (
           <Button className={`h-[48px] ${actionButton}`} disabled={!correctionId} onClick={() => setAnswered(true)}>수정안 확정하기</Button>
         ) : (
@@ -959,7 +965,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
-      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton />}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton label="예시 수정안 넣기" hasInput={touched} />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
       <div className="mt-4">
@@ -1010,7 +1016,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
   const total = quest.candidates.length;
   return <QuestScaffold quest={quest}>
     <section className={taskPanelBody}>
-      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span>{!submitted && <DemoFillButton />}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
       <div className="mt-4 space-y-4">{quest.candidates.map((candidate, index) => <fieldset key={candidate.id} className="min-w-0 rounded-xl border border-[#DDD8CB] p-3 sm:p-4">
         <legend className="px-1 text-sm font-bold">표현 {index + 1}</legend>
         <p className={`${targetFont} text-[16.5px] leading-7`}>{candidate.text}</p>
@@ -1039,7 +1045,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
       </fieldset>)}</div>
     </section>
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/${total}개 표현을 판단했습니다.` : undefined}>
-      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 확정하기</Button>
+      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 제출하기</Button>
         : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -1066,7 +1072,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
   return (
     <QuestScaffold quest={quest} target={quest.target} targetHighlights={answered ? quest.targetHighlights : undefined}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</span>{!answered && <DemoFillButton />}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">이 표현이 상황에 맞지 않는 가장 큰 이유는 무엇일까요?</span></h3>
             <div role="radiogroup" aria-label="가장 큰 이유 하나" className={optionGrid}>
               {reasonOrder.map((reason) => (
                 <OptionButton
@@ -1121,7 +1127,7 @@ function BestWorstView({ quest, onDone, devAutofill = false, revealAnswers = fal
   return (
     <QuestScaffold quest={quest}>
       <section className={taskPanelBody}>
-        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span>{!answered && <DemoFillButton />}</h3>
+        <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{quest.prompt}</span></h3>
         <div className="mt-3 flex items-center gap-3">
           <span className="inline-flex h-8 min-w-11 items-center justify-center rounded-lg bg-[#15202B] px-2.5 text-xs font-black text-white">{mission.targetLanguage.badge}</span>
           <span className="text-sm font-bold text-[#6B665C]">비교할 표현</span>
@@ -1233,6 +1239,7 @@ function dctInputRows(source: string) {
 
 function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: string; onChange: (value: string) => void }) {
   const mission = useCanonicalMission();
+  const demo = useContext(DemoModeContext);
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   // 원문을 읽고 옮기는 한 벌 — 카드 전체에 금색 띠를 둘러 두 칸이 한 과제임을 보인다.
@@ -1249,12 +1256,13 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <div className="flex items-center gap-4">
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton /></div>
+            <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton label="예시 번역문 넣기" hasInput={Boolean(value.trim())} /></div>
             {/* 콘텐츠와 분리된 공통 안내로 의미 보존과 맥락 조건을 알린다. */}
             <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 상황과 관계에 맞게 작성해 보세요.</p>
           </div>
         </div>
         <div className="pl-[60px]">
+        {demo && <DemoFeedbackNotice />}
         <Textarea
           id={`${quest.id}-draft`}
           value={value}
@@ -1265,7 +1273,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
         <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#8A939F]">
-          제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.
+          {demo ? "수정 과정을 보여 주기 위한 예시입니다." : "제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다."}
         </p>
         </div>
       </div>
@@ -1612,7 +1620,8 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   if (mission.activityMode === "interpreting") {
     return (
       <QuestScaffold quest={quest}>
-        <div className="flex justify-end"><DemoFillButton /></div>
+        <div className="flex justify-end"><DemoFillButton label="예시 전사문 넣기" hasInput /></div>
+        {demo && <DemoFeedbackNotice />}
         <InterpretingConsole
           sourceText={quest.source}
           sourceLanguage={mission.sourceLanguage}
@@ -1841,7 +1850,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-2.5">
-      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : "AI 피드백"}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton />}</div>
+      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : "AI 피드백"}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton label="예시 수정안 넣기" hasInput={revisionOpen && revised !== first} />}</div>
       <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
@@ -1911,7 +1920,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "재검토"}</p>
                     <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? `최종 ${outputName}을 결정하세요.` : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
-                  {!recheckRequested && <DemoFillButton />}
+                  {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" hasInput={revisionOpen && revised !== first} />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
                   <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>

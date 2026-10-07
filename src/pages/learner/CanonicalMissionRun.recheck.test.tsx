@@ -49,12 +49,12 @@ function openDraft() {
   render(<StrictMode><MemoryRouter><CanonicalMissionRunner mission={adaptRunnableMissionToCanonical(runtime)}
     runtime={runtime} isDevPreview={false} /></MemoryRouter></StrictMode>);
   click(/미션 시작하기/);
-  click("다소 적절"); click("판단 확정하기"); click(/^다음:/);
-  click("매우 적절"); click("판단 확정하기");
+  click("다소 적절"); click("판단 제출하기"); click(/^다음:/);
+  click("매우 적절"); click("판단 제출하기");
   fireEvent.click(screen.getByRole("radio", { name: mission.mpj_items[1].reason_choice.options[1].text }));
-  click("이유 확정하기"); click(/^다음:/);
+  click("이유 제출하기"); click(/^다음:/);
   screen.getAllByRole("radio", { name: "상황에 맞음" }).forEach(button => fireEvent.click(button));
-  click("판단 확정하기"); click(/^다음:/);
+  click("판단 제출하기"); click(/^다음:/);
   click(mission.mpj_items[2].corrections[1].text); click("수정안 확정하기"); click(/^다음:/);
   fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
   click("수정안 확정하기"); click(/^다음:/); click("직접 번역해 보기");

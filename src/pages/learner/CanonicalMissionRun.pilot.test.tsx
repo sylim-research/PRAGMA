@@ -46,18 +46,18 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByText("미션 안내")).not.toBeInTheDocument();
     expect(screen.queryByText(/세미나실 예약 가능 여부/)).not.toBeInTheDocument();
     expectCompactContext("A1", "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.");
-    click("다소 적절"); click("판단 확정하기"); click("다음: 상황에 맞는지 판단하기");
+    click("다소 적절"); click("판단 제출하기"); click("다음: 상황에 맞는지 판단하기");
     expectCompactContext("A2", "수업에서만 뵌 교수님께 이메일로 처음 부탁하며, 아직 수락을 받지 않았습니다.");
     expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
     // Examples also appear when the learner judged the problematic draft appropriate.
-    click("매우 적절"); click("판단 확정하기");
+    click("매우 적절"); click("판단 제출하기");
     const examples = screen.getByRole("region", { name: "참고 표현" });
     expect(within(examples).getByText("老师，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。")).toBeInTheDocument();
     expect(within(examples).getByText("老师，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？")).toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
     expectCompactContext("A3");
-    expect(screen.queryByRole("button", { name: "판단 확정하기" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "판단 제출하기" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "원문의 뜻을 유지하면서 이 상황에 맞게 고친 표현을 골라보세요." })).toBeInTheDocument();
     expect(screen.queryByText(/가장 알맞게 고친 표현/)).not.toBeInTheDocument();
     click("助教您好，不好意思，我上周忘了签到，能帮我查一下记录吗？");
@@ -100,10 +100,10 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A5", "활동 중 몇 번 이야기한 한 학년 위 여자 선배와의 메신저 대화입니다.");
     const bands = ["상황에 맞음", "상황에 맞음", "상황에 맞음", "너무 직접적"];
     bands.forEach((band, index) => {
-      expect(screen.getByRole("button", { name: "판단 확정하기" })).toBeDisabled();
+      expect(screen.getByRole("button", { name: "판단 제출하기" })).toBeDisabled();
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${index + 1}의 판단` })).getByRole("radio", { name: band }));
     });
-    click("판단 확정하기");
+    click("판단 제출하기");
     expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("기준 판단 · 상황에 맞음")).toBeInTheDocument();
     click("다음: 번역하기"); click("직접 번역해 보기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
