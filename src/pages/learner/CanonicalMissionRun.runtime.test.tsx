@@ -244,10 +244,10 @@ describe("CanonicalMissionRun live CTA route", () => {
       expect(screen.getByPlaceholderText("통역한 중국어 문장")).toHaveValue(reference);
       expect(screen.queryByLabelText("내 통역 녹음")).not.toBeInTheDocument();
       expect(screen.getByRole("button", { name: "확인한 전사로 제출" })).toBeDisabled();
-      fireEvent.click(screen.getByRole("button", { name: "예시 전사문 확인" }));
+      fireEvent.click(screen.getByRole("button", { name: "전사문 확정" }));
       fireEvent.click(screen.getByRole("button", { name: "확인한 전사로 제출" }));
     }
-    await screen.findByText("자동 피드백을 확인하지 못했습니다.");
+    await screen.findByText("이 답안에는 AI 피드백 기록이 없습니다.");
     fill();
     const revision = screen.getByRole("textbox");
     const alternate = mission.production_task.reference_alternatives.find(item => item.text !== reference)?.text ?? reference;

@@ -8,27 +8,15 @@ import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 
 // 진입 링크에 마우스를 올리면 화살표가 진행 방향으로 살짝 이동한다.
 const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
-// 보조 이동은 두 역할 카드보다 한 단계 아래로 읽혀야 한다 — 테두리를 카드와 같은
-// 선을 한 단계 낮추고 글자색을 눌러 두되, 옅은 그림자와 반각 큰 글자는 남긴다 —
-// 카드 CTA보다 아래로 읽히면서도 버튼으로서의 존재감은 잃지 않는 중간 강도다.
-const secondaryLink =
-  "group inline-flex min-w-[155px] sm:w-[228px] items-center justify-center gap-1.5 rounded-full border border-[#D6CFBD] bg-white/70 px-4 py-[10px] text-[14.5px] font-semibold text-[#15202B] transition-colors hover:border-[#A9A08A] hover:bg-[#FBF9F2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
-
-// Match the demo selector blue; keep the role-card entry points outlined.
-const demoLink = secondaryLink
-  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#315F9C] bg-[#315F9C]")
-  .replace("font-semibold", "font-bold")
-  .replace("text-[#15202B]", "text-white")
-  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:border-[#284F83] hover:bg-[#284F83]");
-const archLink = secondaryLink
-  .replace("border-[#D6CFBD] bg-white/70", "border-[1.5px] border-[#15202B] bg-[#15202B]")
-  .replace("text-[#15202B]", "text-white")
-  .replace("font-semibold", "font-bold")
-  .replace("hover:border-[#A9A08A] hover:bg-[#FBF9F2]", "hover:bg-[#2A3B48]");
+// 브랜드 색은 네이비·옐로우·크림 셋뿐이다(2026-10-07). 방문자의 주 행동은 네이비 채움 하나,
+// 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
+const demoLink =
+  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-3 text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
+// 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
+const cardTextLink =
+  "group inline-flex items-center gap-1.5 rounded-sm text-[13.833px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[13.833px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
-// Preserve the button fill on hover; emphasize its outline without layout shift.
-const demoCardHover = "bg-white text-[#15202B]";
 
 const Landing = () => {
   useEffect(() => {
@@ -41,8 +29,14 @@ const Landing = () => {
           문구가 두 번 나오고, 랜딩만 헤더가 없어 다른 화면과 골격이 어긋난다. */}
       {/* 헤더는 본문과 같은 칼럼을 쓴다 — 워드마크 왼쪽 끝이 카드·푸터의 왼쪽 선과 맞는다(2026-09-19 전 화면 기준). */}
       <header className="sticky top-0 z-40 bg-[#15202B]">
-        <div className="mx-auto flex max-w-[804px] items-center px-6 py-4">
+        <div className="mx-auto flex max-w-[804px] items-center justify-between gap-4 px-6 py-4">
           <HomeBrand largerText />
+          {IS_DEMO && (
+            <Link to="/architecture" className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[14px] font-semibold text-[#F1EFE8] decoration-[#FAD338] decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]">
+              전체 구조 보기
+              <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
+            </Link>
+          )}
         </div>
       </header>
 
@@ -112,7 +106,7 @@ const Landing = () => {
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/student-login" className={`${cardButton} text-[#15202B] ${IS_DEMO ? demoCardHover : "bg-[#FAD338] hover:bg-[#FAD338]"}`}>
+              <Link to="/student-login" className={IS_DEMO ? cardTextLink : `${cardButton} text-[#15202B] bg-[#FAD338] hover:bg-[#FAD338]`}>
                 학습자 로그인
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
@@ -137,7 +131,7 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/admin-login" className={`${cardButton} ${IS_DEMO ? demoCardHover : "bg-[#15202B] text-white"}`}>
+              <Link to="/admin-login" className={IS_DEMO ? cardTextLink : `${cardButton} bg-[#15202B] text-white`}>
                 제작·승인하기
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
@@ -145,20 +139,16 @@ const Landing = () => {
           </article>
         </section>
 
-        {/* Paired demo and architecture entry points while the demo is public. */}
+        {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 전체 구조는 헤더 오른쪽 링크로 옮겼다. */}
         {IS_DEMO && (
-          <section className="mt-[18px] flex flex-wrap items-center justify-center gap-3" aria-label="구조·대표 미션 살펴보기">
+          <section className="mt-[22px] flex justify-center" aria-label="대표 미션 체험">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
               className={demoLink}
             >
               학습 미션 체험
-              <span className="ml-0.5 text-[12.5px] font-semibold text-white">로그인 없이</span>
+              <span className="ml-0.5 text-[12.5px] font-semibold text-white/80">로그인 없이</span>
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
-            </Link>
-            <Link to="/architecture" className={archLink}>
-              전체 구조 보기
-              <ArrowRight aria-hidden size={14} strokeWidth={2} className={`text-white ${arrow}`} />
             </Link>
           </section>
         )}

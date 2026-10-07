@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ArrowLeftRight,
@@ -11,7 +11,6 @@ import {
   LoaderCircle,
   ArrowDown,
   Lightbulb,
-  ListChecks,
   Mic,
   MoveRight,
   PenLine,
@@ -104,6 +103,52 @@ const DemoModeContext = createContext(false);
 const DemoContentContext = createContext<RepresentativeDemoContent | null>(null);
 /** 시연에서 지금 문항을 예시 답안으로 채우는 함수. 시연이 아니거나 문항 화면이 아니면 null. */
 const DemoFillContext = createContext<(() => void) | null>(null);
+/**
+ * 시연의 예시 출처. examples = 「예시 … 넣기」가 넣는 준비된 문장(정규화),
+ * edited = 예시로 시작한 칸을 고쳐 제출한 문장(정규화). 시연이 아니면 둘 다 비어 있고 markEdited는 아무것도 하지 않는다.
+ */
+type DemoExampleState = { examples: ReadonlySet<string>; edited: ReadonlySet<string>; markEdited: (text: string) => void };
+const DemoExampleTextsContext = createContext<DemoExampleState>({ examples: new Set(), edited: new Set(), markEdited: () => {} });
+function useDemoExampleKind(text: string | undefined): "used" | "edited" | null {
+  const { examples, edited } = useContext(DemoExampleTextsContext);
+  if (!text?.trim()) return null;
+  const key = normalize(text);
+  return examples.has(key) ? "used" : edited.has(key) ? "edited" : null;
+}
+function useIsDemoExample(text: string | undefined) {
+  return useDemoExampleKind(text) === "used";
+}
+/** 이 칸이 「예시 … 넣기」로 시작했는지. 고쳐도 출처가 이어지고, 칸을 완전히 비우면 끊긴다. 시연이 아니면 늘 false. */
+function useDemoLineage(text: string, startedFromExample: boolean) {
+  const demo = useContext(DemoModeContext);
+  const isExample = useIsDemoExample(text);
+  const [lineage, setLineage] = useState(startedFromExample);
+  useEffect(() => {
+    if (isExample) setLineage(true);
+    else if (!text.trim()) setLineage(false);
+  }, [isExample, text]);
+  return demo && (lineage || isExample);
+}
+/** 제출 순간, 예시로 시작해 고친 문장을 「예시 수정」으로 등록한다. */
+function useMarkDemoEdited() {
+  const { examples, markEdited } = useContext(DemoExampleTextsContext);
+  return (text: string, fromExample: boolean) => {
+    if (fromExample && text.trim() && !examples.has(normalize(text))) markEdited(text);
+  };
+}
+/** 예시 출처 꼬리표 — 그대로 쓰면 「예시 사용」, 고쳐 쓰면 「예시 수정」. derived는 아직 제출 전인 칸의 출처 고리. */
+function DemoExampleTag({ text, derived = false, className = "" }: { text?: string; derived?: boolean; className?: string }) {
+  const kind = useDemoExampleKind(text);
+  const label = kind === "used" ? "예시 사용" : kind === "edited" || (derived && text?.trim()) ? "예시 수정" : null;
+  if (!label) return null;
+  return <span className={`inline-flex w-fit shrink-0 items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518] ${className}`}>{label}</span>;
+}
+/** 입력칸 바로 아래 한 줄 — 지금 칸에 든 글이 준비된 예시(또는 예시를 고친 글)임을 알린다. */
+function DemoExampleNote({ text, derived = false }: { text?: string; derived?: boolean }) {
+  const kind = useDemoExampleKind(text);
+  if (kind !== "used" && !(derived && text?.trim())) return null;
+  return <p className="mt-2 flex items-center gap-2 text-xs leading-5 text-[#6B5518]"><DemoExampleTag text={text} derived={derived} />{kind === "used" ? "준비된 예시 문장입니다." : "준비된 예시를 고친 문장입니다."}</p>;
+}
 
 /** 대표 미션 시연에서 이 문항에 미리 정한 시연 답안(의도적 오답 포함). 없으면 기준 답안을 쓴다. */
 function useDemoAnswer(questId: string) {
@@ -309,44 +354,29 @@ function v6IntroSteps(outputName: string) {
       // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
       { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
       { title: "AI 피드백", desc: "의미·문법·화용 기준" },
-      { title: "최종 결정", desc: "최종안 제출하기" },
+      { title: "최종안 제출", desc: "검토한 답안 제출하기" },
     ],
   };
 }
 
-/** 국면별 색 — 판단은 회청색, 산출은 호박색. 선 대신 알약의 바탕색으로 두 국면을 가른다. */
-const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/15 text-white ring-white/25" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white/50 text-[#15202B] ring-white/60" },
-} as const;
-
-function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
-  tone: keyof typeof INTRO_PHASE_TONE;
+/** Static activity lists use typography, not interactive button surfaces. */
+function IntroPhaseColumn({ title, caption, steps }: {
   title: string;
   caption: string;
-  /** 응답 방식 표지 — 판단형(주어진 표현을 판단·수정한다) / 산출형(직접 번역·통역한다). 처음 보는 사람에게 두 국면의 모드 차이를 먼저 알린다. */
-  mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
 }) {
-  const t = INTRO_PHASE_TONE[tone];
-  const ModeIcon = mode.icon;
   return (
     <section aria-label={`${title} 단계`}>
-      {/* 두 국면의 제목 띠 — 같은 높이, 잉크색/노랑으로 상위 구조를 먼저 보인다(2026-10-01 Codex 안). 아래 알약 목록은 그대로. */}
-      <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-3.5 ${t.band}`}>
-        <div className="min-w-0">
-          <h2 className="text-[17px] font-black leading-6">{title}</h2>
-          <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
-        </div>
-        <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${t.mode}`}><ModeIcon aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />{mode.label}</span>
+      <div className="border-b border-[#ECE7DA] pb-3">
+        <h2 className="text-[18px] font-bold leading-6 text-[#15202B]">{title}</h2>
+        <p className="mt-1 text-[12px] leading-5 text-[#687481]">{caption}</p>
       </div>
-      {/* 배포본의 알약 언어 그대로 — 테두리·구분선 없이 바탕색 하나. 이름 열 폭을 고정해 설명이 한 선에서 시작한다. */}
-      <ol className="mt-2.5 space-y-1.5" aria-label={`${title} 활동`}>
+      <ol className="mt-1.5" aria-label={`${title} 활동`}>
         {steps.map((step, index) => (
-          <li key={step.title} className={`grid grid-cols-[22px_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 rounded-lg px-3 py-2.5 ${t.pill}`}>
-            <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full bg-white text-[11px] font-black ring-1 ${t.ring}`}>{index + 1}</span>
-            <span className="break-keep text-[15.5px] font-semibold leading-6 text-[#15202B]">{step.title}</span>
-            <span className="break-keep text-[14px] font-medium leading-5 text-[#3F4A57]">{step.desc}</span>
+          <li key={step.title} className="grid grid-cols-[18px_5.75rem_minmax(0,1fr)] items-baseline gap-x-2 py-2">
+            <span className="text-[12px] font-medium tabular-nums text-[#7A8590]">{index + 1}</span>
+            <span className="break-keep text-[14.5px] font-semibold leading-6 text-[#243B53]">{step.title}</span>
+            <span className="break-keep text-[13.5px] font-normal leading-5 text-[#56636D]">{step.desc}</span>
           </li>
         ))}
       </ol>
@@ -356,16 +386,15 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
 
 function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
-  // 두 국면을 같은 폭으로 나란히 — 가운데 화살표 하나가 판단에서 산출로의 전환을 표시한다. 오른쪽이 짧게 끝나도 늘리지 않는다.
   return (
-    <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
-      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "판단형", icon: ListChecks }} steps={steps.judgment} />
-      {/* 두 띠를 잇는 연결선 — 띠 높이 중앙에서 Ⅰ→Ⅱ로 흐른다. 글자 크기 화살표 하나로는 장식으로 읽힌다. */}
-      <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
-        <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
-        <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
+    <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-stretch sm:gap-x-9">
+      <IntroPhaseColumn title="적절성 판단" caption="MJT · 메타화용적 판단 과제" steps={steps.judgment} />
+      {/* 두 국면은 표가 아니라 두 목록이다 — 데스크톱은 가는 세로선 하나로만 가른다. */}
+      <div className="flex items-center justify-center sm:items-stretch" aria-hidden>
+        <span className="hidden w-px bg-[#E6E1D4] sm:block" />
+        <ArrowDown className="h-5 w-5 text-[#83909C] sm:hidden" strokeWidth={1.5} />
       </div>
-      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT형 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
+      <IntroPhaseColumn title={`직접 ${outputName}`} caption="DCT · 통번역 과제" steps={steps.production} />
     </div>
   );
 }
@@ -373,7 +402,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
   return (
     <section className={`${panel} overflow-hidden`} aria-label={`${config.missionLabel} 미션 안내`}>
       {/* 히어로는 채우지 않는다 — 남색 블록은 상단바와 「적절성 판단」 띠에만 두어 두 국면 띠가 페이지의 유일한 색 블록 쌍이 되게 한다. */}
-      <div className={`border-b-2 border-[#DDD8CB] bg-[#FBFAF6] px-5 sm:px-6 ${config.startLabel ? "py-3" : "pb-4 pt-5"}`}>
+      <div className={`border-b border-[#ECE7DA] bg-white px-5 sm:px-6 ${config.startLabel ? "pb-3 pt-5" : "pb-4 pt-5"}`}>
         <p className="text-[11px] font-black tracking-[0.1em] text-[#8A6A14]">{config.missionLabel}</p>
         <h1 className="mt-1 break-keep text-[21px] font-black leading-8 tracking-[-0.01em] text-[#15202B] sm:text-[23px]">
           표현을 판단하고, 직접 {config.outputName}해 봅니다
@@ -404,7 +433,7 @@ function SceneIntroFlow({ config, onNext }: { config: SceneIntroConfig; onNext: 
             <div><dt className="text-xs font-bold text-[#7A7466]">전달 방식</dt><dd className="mt-1 leading-6">{config.context.channel}</dd></div>
           </dl>
         </>}
-        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 bg-[#FADB6A] px-8 text-[#15202B] hover:bg-[#FCE38A] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`text-[15px] font-extrabold ${config.previewOnly ? "h-12 w-full" : "mx-auto flex h-[48px] w-full gap-1.5 rounded-xl bg-[#15202B] px-8 text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] hover:bg-[#24313F] sm:w-auto sm:min-w-[240px]"}`} onClick={onNext}>{config.previewOnly ? "도입 다시 보기" : (config.startLabel ?? "학습 미션 시작하기")} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </div>
     </section>
   );
@@ -960,6 +989,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
   const [draft, setDraft] = useState(() => devAutofill ? demoAnswer?.text ?? quest.references[0] ?? quest.target : quest.target);
   const [touched, setTouched] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const fromExample = useDemoLineage(draft, devAutofill);
+  const markDemoEdited = useMarkDemoEdited();
   const unchanged = draft.trim().length > 0 && normalize(draft) === normalize(quest.target);
   // 해설과 표현 메모는 한 문자열로 저장된다(콘텐츠 계약). 화면에서만 갈라 읽기 순서를 만든다:
   // 내가 고친 표현 → 화용 해설 → 참고 표현 → 다른 맥락. 표현 메모는 보이지 않는다.
@@ -971,7 +1002,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-[16.5px] leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
-        {!submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
+        {fromExample ? <DemoExampleNote text={draft} derived /> : !submitted && <p className="mt-2 text-xs leading-5 text-[#7A7466]">위 {output}을 미리 넣어 두었습니다. 필요한 부분만 고쳐 주세요.</p>}
       </div>
       {/* 해설은 문제집처럼 핵심만 한 줄씩 — 저장된 문단을 문장 단위로 끊어 불릿으로 보인다. */}
       {submitted && <section className={`mt-4 ${feedbackBox}`} aria-label="화용 해설">
@@ -994,7 +1025,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       </section>}
     </section>
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
-      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => setSubmitted(true)}>수정안 확정하기</Button>
+      {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => { markDemoEdited(draft, fromExample); setSubmitted(true); }}>수정안 확정하기</Button>
         : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
     </ActionBar>
   </QuestScaffold>;
@@ -1238,7 +1269,7 @@ function dctInputRows(source: string) {
   return Math.min(6, Math.max(2, sourceAlignedRows(source) - 1));
 }
 
-function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: string; onChange: (value: string) => void }) {
+function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: DctQuest; value: string; onChange: (value: string) => void; fromExample?: boolean }) {
   const mission = useCanonicalMission();
   const demo = useContext(DemoModeContext);
   const sourceFont = mission.sourceLanguage.code === "zh" ? "font-zh" : "";
@@ -1271,6 +1302,7 @@ function DctDraftCard({ quest, value, onChange }: { quest: DctQuest; value: stri
           rows={dctInputRows(quest.source)}
           className={`${targetFont} mt-3 min-h-0 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
         />
+        <DemoExampleNote text={value} derived={fromExample} />
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
         <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#8A939F]">
@@ -1616,6 +1648,8 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   const mission = useCanonicalMission();
   const demo = useContext(DemoModeContext);
   const [draft, setDraft] = useState(() => devAutofill ? devDraft : "");
+  const fromExample = useDemoLineage(draft, devAutofill && Boolean(devDraft));
+  const markDemoEdited = useMarkDemoEdited();
   const validation = validateDraft(draft, mission.targetLanguage.label);
   const canSubmit = devMode || validation.valid;
   if (mission.activityMode === "interpreting") {
@@ -1631,16 +1665,16 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
           replayLimit={quest.replayLimit}
           demoMode={demo}
           demoTranscript={devAutofill ? devDraft : undefined}
-          onSubmit={(transcript) => onDone({ first: transcript, revised: transcript, reflected: false })}
+          onSubmit={(transcript) => { markDemoEdited(transcript, demo && devAutofill && Boolean(devDraft)); onDone({ first: transcript, revised: transcript, reflected: false }); }}
         />
       </QuestScaffold>
     );
   }
   return (
     <QuestScaffold quest={quest}>
-      <DctDraftCard quest={quest} value={draft} onChange={setDraft} />
+      <DctDraftCard quest={quest} value={draft} onChange={setDraft} fromExample={fromExample} />
       <ActionBar hint={devMode || !draft.trim() ? undefined : validation.hint}>
-        <Button className={`h-[48px] ${actionButton}`} disabled={!canSubmit} onClick={() => onDone({ first: draft.trim(), revised: draft.trim(), reflected: false })}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`h-[48px] ${actionButton}`} disabled={!canSubmit} onClick={() => { markDemoEdited(draft, fromExample); onDone({ first: draft.trim(), revised: draft.trim(), reflected: false }); }}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </ActionBar>
     </QuestScaffold>
   );
@@ -1694,7 +1728,7 @@ function SourceAnswerCompare({ source, answer, highlights = [] }: {
       <div className="flex items-start gap-3.5 border-t border-dashed border-[#E3DDCF] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] font-bold text-[#7A7466]">내 {outputName}</p>
+          <p className="flex items-center gap-2 text-[11.5px] font-bold text-[#7A7466]">내 {outputName}<DemoExampleTag text={answer} /></p>
           <p className={`${targetFont} break-keep text-[16px] leading-7 text-[#101B2B]`}>
             <HighlightedText text={answer} highlights={highlights} target />
           </p>
@@ -1739,6 +1773,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const [evaluation, setEvaluation] = useState<DctEvaluation>(previewEvaluation);
   const [runtimeFeedback, setRuntimeFeedback] = useState<RuntimeFeedback | undefined>(response?.runtimeFeedback);
   const [revised, setRevised] = useState(() => devAutofill ? quest.referenceAnswer : first);
+  const revisedFromExample = useDemoLineage(revised, useDemoExampleKind(first) !== null);
+  const markDemoEdited = useMarkDemoEdited();
   const [revisionOpen, setRevisionOpen] = useState(devAutofill);
   const [dissent, setDissent] = useState<DissentResponse | undefined>(response?.dissent);
   const [recheckRequested, setRecheckRequested] = useState(false);
@@ -1810,12 +1846,16 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const canRetainWithDissent = Boolean(dissent);
   const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 초안을 유지해 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
-  const confirmRevision = () => onDone({ first, revised: revised.trim(), reflected,
-    evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
+  const confirmRevision = () => {
+    markDemoEdited(revised, revisedFromExample);
+    onDone({ first, revised: revised.trim(), reflected,
+      evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
+  };
   const checkRevision = async () => {
     if (!runtime || !ready || !canConfirmRevision || !reflected || recheckStarted.current) return;
     recheckStarted.current = true;
     const answer = revised.trim();
+    markDemoEdited(answer, revisedFromExample);
     setRecheckRequested(true);
     setReady(false);
     const result = await feedbackSession.request(2, runtime.mission, answer);
@@ -1861,11 +1901,16 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               {/* 정상일 때는 세 기준만 남기고, 예외 상태(AI 미실행·판정 실패)만 한 줄로 알린다. */}
               {(localPilot || feedbackUnavailable) && (
                 <p className="rounded-lg bg-[#EEECE6] px-3 py-2 text-[12.5px] font-bold text-[#635E52]">
-                  {localPilot ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : "자동 피드백을 확인하지 못했습니다."}
+                  {localPilot ? "AI 미실행" : recheckRequested ? "AI 피드백을 불러오지 못했습니다. 현재 번역안을 직접 검토한 뒤 최종 결정할 수 있습니다." : demo ? "이 답안에는 AI 피드백 기록이 없습니다." : "자동 피드백을 확인하지 못했습니다."}
                 </p>
               )}
               {/* 판정이 주인공이다 — 세 기준의 판정을 한 줄에 나란히 두고, 걸린 기준 하나만 아래에서 설명한다. */}
-              {localPilot ? evaluation.criteria.map((criterion) => {
+              {/* 판정이 없으면 판정처럼 보이는 기준 칸·배지를 그리지 않는다 — 「없음」이 「수정 권장」으로 읽히지 않게(2026-10-07). */}
+              {!localPilot && feedbackUnavailable ? (
+                <p className="px-1 py-1 text-[14.5px] leading-6 text-[#2B3647]">{demo
+                  ? "데모에서는 준비된 예시 답안에만 AI 피드백 기록이 있습니다. 원문과 비교해 직접 검토한 뒤, 수정하거나 그대로 확정할 수 있습니다."
+                  : conciseFeedback(evaluation.body)}</p>
+              ) : localPilot ? evaluation.criteria.map((criterion) => {
                 const passed = !localPilot && criterion.level === "very_good";
                 const expanded = localPilot || (!passed && criterion.key === primaryCriterion.key);
                 return (
@@ -1909,7 +1954,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               )}
             </div>
 
-            <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? demoContent?.feedbackNote ?? "이 시연의 피드백 기록을 찾을 수 없습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>
+            {(localPilot || !feedbackUnavailable) && <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? demoContent?.feedbackNote ?? "이 시연의 피드백 기록을 찾을 수 없습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>}
           </section>}
 
 
@@ -1930,6 +1975,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-8`} />
+                <DemoExampleNote text={revised} derived={revisedFromExample} />
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
@@ -2099,7 +2145,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
                   ? <button type="button" aria-label={`${label} 단계로 이동`} onClick={() => onJumpStage(jumpStage)}
                       className="block w-full rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 hover:opacity-80">
                       {freeJump && jumpStage === "produce"
-                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#3276A8]/50 bg-white text-[#24608D]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
+                        ? <span className={`flex h-[30px] items-center justify-center gap-1 whitespace-nowrap rounded-md border px-1 text-[11.5px] font-bold ${active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#15202B]/35 bg-white text-[#15202B]"}`}>DCT {outputName}<MoveRight className="h-3.5 w-3.5" aria-hidden /></span>
                         : body}
                     </button>
                   : body}
@@ -2116,7 +2162,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             const label = `MJT ${number + 1} · ${progressLabel(quests[index], outputName)}`;
             return <button key={id} type="button" title={label} aria-label={label} aria-current={selected ? "step" : undefined}
               onClick={() => { if (!selected) onJumpQuest(index); }}
-              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3276A8] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#3276A8] hover:bg-[#F3F7FA]"}`}>
+              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#15202B] hover:bg-[#F4F1E9]"}`}>
               {number + 1}
             </button>;
           })}
@@ -2439,11 +2485,11 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
             <p className={`${sourceFont} ${rowText}`}>{source}</p>
           </div>}
           {revised && <div className={row}>
-            <span className={rowLabel}>초안</span>
+            <span className={`${rowLabel} flex flex-col items-start gap-1`}>초안<DemoExampleTag text={response.first} /></span>
             <p className={`${targetFont} ${rowText}`}>{response.first}</p>
           </div>}
           <div className={row}>
-            <span className={rowLabel}>최종안</span>
+            <span className={`${rowLabel} flex flex-col items-start gap-1`}>최종안<DemoExampleTag text={finalText} /></span>
             <p className={`${targetFont} ${rowText}`}>{finalText}</p>
           </div>
         </div>
@@ -2475,7 +2521,7 @@ function DemoRecord({ quests, responses }: { quests: MissionQuest[]; responses: 
             <li key={quest.id} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-3 rounded-xl border border-[#EAE5D8] bg-white px-4 py-3">
               <span aria-hidden className="grid h-7 w-7 place-items-center rounded-full bg-[#FAD338] text-[13px] font-extrabold">{index + 1}</span>
               <div className="min-w-0">
-                <p className="inline-block rounded-md bg-[#E9EFF8] px-2 py-0.5 text-[12.5px] font-black text-[#2F4F86]">{progressLabel(quest, outputName)}</p>
+                <p className="flex flex-wrap items-center gap-2"><span className="inline-block rounded-md bg-[#F1EEE6] px-2 py-0.5 text-[12.5px] font-black text-[#3E4C57]">{progressLabel(quest, outputName)}</span>{quest.kind === "free_correction" && typeof response?.revisedText === "string" && <DemoExampleTag text={response.revisedText} />}</p>
                 <p className="mt-1.5 whitespace-pre-line break-keep text-[15px] leading-7 text-[#263444]">{response ? <RichLine text={responseLabel(quest, response)} /> : "건너뜀"}</p>
               </div>
             </li>
@@ -3070,6 +3116,22 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       setRenderNonce(current => current + 1);
     }
     : null;
+  // 「예시 … 넣기」가 실제로 넣는 문장과 같은 규칙으로 모은다(DCT 초안·전사 = firstDraft, 재검토 = revisedDraft, MJT 직접 수정 = 시연 답안 또는 첫 참고 표현).
+  const demoExampleTexts = useMemo<ReadonlySet<string>>(() => {
+    if (!demoMode || !demoContent) return new Set();
+    const texts = [demoContent.firstDraft, demoContent.revisedDraft, ...mission.quests.flatMap(item =>
+      item.kind === "free_correction" ? [demoContent.mjtAnswers[item.id]?.text ?? item.references[0]] : [])];
+    return new Set(texts.filter((text): text is string => Boolean(text?.trim())).map(normalize));
+  }, [demoContent, demoMode, mission.quests]);
+  const [demoEditedTexts, setDemoEditedTexts] = useState<ReadonlySet<string>>(() => new Set());
+  const markDemoEdited = useCallback((text: string) => {
+    if (!demoMode) return;
+    const key = normalize(text);
+    setDemoEditedTexts(previous => previous.has(key) ? previous : new Set([...previous, key]));
+  }, [demoMode]);
+  const demoExampleState = useMemo<DemoExampleState>(
+    () => ({ examples: demoExampleTexts, edited: demoEditedTexts, markEdited: markDemoEdited }),
+    [demoEditedTexts, demoExampleTexts, markDemoEdited]);
   const navigateProgress = (index: number) => {
     if (demoMode) {
       openDemoQuest(index);
@@ -3095,6 +3157,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     <DemoModeContext.Provider value={demoMode}>
     <DemoContentContext.Provider value={demoContent}>
     <DemoFillContext.Provider value={demoFill}>
+    <DemoExampleTextsContext.Provider value={demoExampleState}>
     <RuntimeMissionContext.Provider value={runtime ?? null}>
     <DctFeedbackSessionContext.Provider value={feedbackSession}>
     <CanonicalMissionContext.Provider value={mission}>
@@ -3193,6 +3256,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     </CanonicalMissionContext.Provider>
     </DctFeedbackSessionContext.Provider>
     </RuntimeMissionContext.Provider>
+    </DemoExampleTextsContext.Provider>
     </DemoFillContext.Provider>
     </DemoContentContext.Provider>
     </DemoModeContext.Provider>
