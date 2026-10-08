@@ -56,7 +56,7 @@ function PartHeading({ no, id, title, description }: { no: number; id: string; t
       <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{no}</span>
       <div>
         <h2 id={id} className="text-[19px] font-bold leading-8 text-[#15202B]">{title}</h2>
-        <p className="text-[13px] leading-relaxed text-[#52616B]">{description}</p>
+        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#2F3D46]">{description}</p>
       </div>
     </div>
   );
@@ -255,7 +255,7 @@ const AdminPromptHarness = () => {
       <HarnessOverview />
 
       <section aria-labelledby="prompts-title">
-        <PartHeading no={3} id="prompts-title" title="운영 프롬프트" description="실제 생성·검토·피드백에 쓰는 프롬프트 원문입니다. 코드에서 자동으로 옮겨 와 판본 지문과 함께 보여 줍니다." />
+        <PartHeading no={3} id="prompts-title" title="운영 프롬프트" description="실제 생성·검토·피드백에 쓰는 프롬프트 원문입니다. 손으로 옮겨 적지 않고 코드에서 그대로 가져와 보여 줍니다." />
         <div className="space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
