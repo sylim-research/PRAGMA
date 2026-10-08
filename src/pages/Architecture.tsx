@@ -35,9 +35,9 @@ const Lane = ({ title, head, children }: { title: string; head: string; children
   </section>
 );
 
-// 칸과 칸을 머리 높이에서 잇는다 — 화살표가 머리띠 가운데(머리 높이 45px의 절반)에 오고, 문구는 그 아래에 둔다.
+// 칸(상자)과 칸을 세로 가운데에서 잇는다 — 선과 화살표가 상자 사이를 건너고, 문구는 그 아래에 둔다.
 const Connector = ({ label }: { label: string }) => (
-  <div className="flex items-center justify-center gap-2 py-1 lg:flex-col lg:justify-start lg:gap-1 lg:py-0 lg:pt-[11px]" aria-hidden>
+  <div className="flex items-center justify-center gap-2 py-1 lg:flex-col lg:gap-1 lg:py-0" aria-hidden>
     <span className="flex w-full items-center lg:px-2">
       <span className="hidden h-[2px] flex-1 bg-[#15202B] lg:block" />
       <ArrowRight size={22} strokeWidth={2} className="-ml-1.5 shrink-0 rotate-90 text-[#15202B] lg:rotate-0" />
@@ -86,12 +86,13 @@ const LEARNING_STEPS: readonly Step[] = [
   ["학습자 최종 결정", "학습 기록 저장"],
 ];
 
-// 추적 기록은 실제 관리자 화면으로 연결한다(관리자 로그인 필요).
+// 단계별 기록은 그 기록이 남는 관리자 화면으로 연결한다(관리자 로그인 필요).
+// 이름은 연결되는 화면의 메뉴명과 같게 둔다 — 누른 뒤 도착한 화면 제목이 태그와 같아야 한다(2026-10-08).
 const TRACE = [
+  { label: "자동 품질 검토", to: "/admin/ai-review" },
+  { label: "교수자 감수·최종 승인", to: "/admin/review" },
   { label: "학습 수행 기록", to: "/admin/decision-traces" },
-  { label: "AI 검토 의견", to: "/admin/ai-review" },
-  { label: "운영 프롬프트 지문", to: "/admin/prompt-harness" },
-  { label: "교수자 승인 이력", to: "/admin/review" },
+  { label: "운영 프롬프트", to: "/admin/prompt-harness" },
 ] as const;
 
 const Architecture = () => (
@@ -142,7 +143,7 @@ const Architecture = () => (
       <FeedbackLoop />
 
       <div className="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-[#E2DED2] px-1 pt-3">
-        <span className="mr-1 text-[14px] font-bold text-[#15202B]">추적 기록</span>
+        <span className="mr-1 text-[14px] font-bold text-[#15202B]">단계별 기록</span>
         {TRACE.map(({ label, to }) => (
           <Link key={label} to={to}
             className="inline-flex items-center gap-1 rounded-md border border-[#E2DED2] bg-white px-2.5 py-1 text-[13px] font-medium text-[#3F4E59] transition-colors hover:border-[#15202B] hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]">
