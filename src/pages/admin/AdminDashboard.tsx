@@ -103,17 +103,19 @@ function dashboardMetricValues(snapshot: DashboardSnapshot): Record<DashboardMet
 }
 
 const PanelHeader = ({
+  no,
   title,
   description,
   action,
 }: {
+  no: number;
   title: string;
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-3 mt-6">
+  <div className="mb-3 mt-8">
     <div className="flex flex-wrap items-center gap-2">
-      <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">{title}</h2>
+      <h2 className="flex items-center gap-2.5 text-[17px] font-bold text-[#15202B]"><span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>{title}</h2>
       {action}
     </div>
     {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
@@ -212,7 +214,7 @@ const ReviewPipeline = ({
                 <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#56646E]">
                   {stage.step}
                 </span>
-                <span className="text-xs font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
+                <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
               </div>
               <div className="mt-1.5 flex items-end gap-1.5">
                 {value === null && !error && !unavailable ? (
@@ -222,9 +224,9 @@ const ReviewPipeline = ({
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[11.5px] text-[#4F5D68]">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11px] text-[#4F5D68]">
+              <span className="mt-auto pt-1.5 text-[11.5px] text-[#4F5D68]">
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -288,7 +290,7 @@ const OperationMetric = ({
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E6E1D5]",
     ].join(" ")}
   >
-    <span className="text-xs font-medium text-[#4F5D68] group-hover:text-[#273B4A]">{label}</span>
+    <span className="text-[13px] font-semibold text-[#3F4E59] group-hover:text-[#273B4A]">{label}</span>
     {value === null && !error ? (
       <span aria-label="불러오는 중" className="mt-1.5 h-7 w-16 rounded bg-muted motion-safe:animate-pulse" />
     ) : (
@@ -296,10 +298,10 @@ const OperationMetric = ({
         <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
-        {!error && value !== null && <span className="pb-0.5 text-[11px] text-[#4F5D68]">{unit}</span>}
+        {!error && value !== null && <span className="pb-0.5 text-[11.5px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[11px] leading-4 text-[#4F5D68]">{description}</span>
+    <span className="mt-auto pt-1.5 text-[11.5px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -526,7 +528,7 @@ const AdminDashboard = () => {
   return (
     <AdminShell
       title="PRAGMA 대시보드"
-      hideTitle
+      description="학습 콘텐츠를 만들고 검토해 수업에 쓰기까지, 지금 상태를 한눈에 봅니다."
     >
       {displayError && (
         <p role="alert" className="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
@@ -537,10 +539,7 @@ const AdminDashboard = () => {
       <DashboardResourceOverview resources={snapshot?.resources ?? null} error={displayError} status={liveStatus(true)} />
 
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
-      <PanelHeader
-        title="콘텐츠 품질 관리"
-        action={liveStatus()}
-      />
+      <PanelHeader no={2} title="콘텐츠 품질 관리" />
       <ReviewPipeline
         review={snapshot?.review ?? null}
         cumulative={snapshot?.cumulative ?? null}
@@ -551,7 +550,7 @@ const AdminDashboard = () => {
         changedKeys={changedKeys}
       />
 
-      <PanelHeader title="수업 운영·학습 수행 현황" action={liveStatus()} />
+      <PanelHeader no={3} title="수업 운영·학습 수행 현황" />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 교과목이 최상위 단위다 — 주차·미션 배정도, 백업도, 학습자 진입도 여기서 갈린다.
             운영에서 중요한 축은 만든 수보다 「학습자에게 공개했는가」다. */}
