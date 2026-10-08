@@ -77,7 +77,7 @@ const Landing = () => {
               PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              상황과 관계에 맞는 표현을 탐구하는 통번역 학습 시스템입니다.
+              상황과 관계에 알맞은 표현을 탐구하는 통번역 학습 시스템입니다.
             </span>
           </p>
         </section>
