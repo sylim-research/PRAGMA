@@ -31,7 +31,7 @@ export function CompositionConditionFields({
   leading?: React.ReactNode;
   /** true면 편성 주제 줄을 그리지 않는다(ThemePicker를 따로 크게 둘 때). */
   hideThemes?: boolean;
-  /** true면 좁은 칸(새 교과목 개설 왼쪽 열)용 — 2열로 둔다. */
+  /** true면 좁은 칸(교과목 개설 왼쪽 열)용 — 2열로 둔다. */
   compact?: boolean;
 }) {
   const toggleTheme = (theme: ThemeCode) =>
