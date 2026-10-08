@@ -85,7 +85,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
       {/* 관리자 화면 폭 기준 2개: 사이드바 285 + 간격 24 + 본문 최대 1,200px(2·3번 묶음) 또는 1,040px, 가운데 정렬.
           좌우 여백 대칭 — 사이드바 상자가 안쪽으로 36px(pl-6+ml-3) 들어가 있으므로 바깥 왼쪽 0, 오른쪽 36px(pr-9). */}
-      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:px-9 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:pl-9 md:pr-[34px] print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
         <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden">
           <nav className="flex flex-col pb-1 pl-6 pr-1 pt-1">
             <Link
@@ -161,8 +161,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
           </nav>
         </aside>
 
-        {/* 오른쪽에 6px만 더 비워 양쪽 여백을 가깝게 맞춘다 — 36px는 본문이 좁아져 줄바꿈이 생겼다(2026-10-08). */}
-        <main className="min-w-0 flex-1 md:pr-1.5 print:w-full print:pr-0">
+        <main className="min-w-0 flex-1 print:w-full">
           <div className="mb-5 print:hidden md:hidden">
             <label
               htmlFor="admin-mobile-navigation"
