@@ -757,22 +757,25 @@ const AdminComposer = () => {
                   data-course-id={item.id}
                   disabled={loading}
                   onClick={() => setOutlineId(item.id)}
-                  className={`flex flex-col gap-2 rounded-xl border bg-white px-4 py-4 text-left transition ${
+                  // 방향·수업 방식은 교과목 이름과 아래 편성 조건에 이미 있어 카드에는 수준만 꼬리표로 둔다(2026-10-08).
+                  // 이름에 방향이 드러나지 않는 교과목을 위해 전체 조건은 마우스를 올리면 보인다.
+                  title={`${LEVEL[item.level as LearnerLevel] ?? item.level} · ${DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · ${COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}`}
+                  className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-3.5 text-left transition ${
                     selected
                       ? "border-[#7D90A8] shadow-[0_0_0_1px_#7D90A8] bg-[#F7F9FC]"
                       : "border-[#E2DED2] hover:border-[#9FB0C6]"
                   }`}
                 >
-                  <span className="flex items-start justify-between gap-2">
-                    <span className="text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  <span className="min-w-0 text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[11.5px] font-semibold text-[#1F3A5F]">
+                      {LEVEL[item.level as LearnerLevel] ?? item.level}
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                       published ? "bg-[#E8F4EC] text-[#245E44]" : "bg-[#FFF3D6] text-[#8A5A14]"
                     }`}>
                       {published ? "공개" : "비공개"}
                     </span>
-                  </span>
-                  <span className="text-[13px] font-medium text-[#1F3A5F]">
-                    {LEVEL[item.level as LearnerLevel] ?? item.level} · {DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · {COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}
                   </span>
                 </button>
               );
