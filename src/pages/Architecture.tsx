@@ -19,7 +19,7 @@ const Steps = ({ steps, dot }: { steps: readonly Step[]; dot: string }) => (
         <span aria-hidden className={`relative grid h-7 w-7 shrink-0 place-items-center rounded-full text-[13px] font-bold ${dot}`}>{index + 1}</span>
         <div className="pt-[3px]">
           <p className="break-keep text-[15.5px] font-bold leading-snug text-[#15202B]">{title}</p>
-          {desc && <p className="mt-0.5 whitespace-nowrap text-[13.5px] leading-snug text-[#4E5F6C]">{desc}</p>}
+          {desc && <p className="mt-0.5 break-keep text-[13.5px] leading-snug text-[#4E5F6C]">{desc}</p>}
         </div>
       </li>
     ))}
@@ -28,9 +28,13 @@ const Steps = ({ steps, dot }: { steps: readonly Step[]; dot: string }) => (
 
 // 세 칸은 같은 크기·같은 왼쪽 정렬 제목을 쓰고, 칸마다 머리띠를 둔다(2026-10-08).
 // 주인공인 두 워크플로우는 브랜드 색으로 채운 머리(제작 = 남색, 학습 = 옐로우), 둘을 잇는 수업 운영은 한 단계 옅은 남회색 머리로 둔다.
-const Lane = ({ title, head, children }: { title: string; head: string; children: React.ReactNode }) => (
+// 머리 아래 한 줄은 칸의 성격이다 — 핵심 워크플로우 두 개와 둘을 잇는 연계·관리 기능을 구분한다(2026-10-08 Astra 검토 수용).
+const Lane = ({ title, role, head, children }: { title: string; role: string; head: string; children: React.ReactNode }) => (
   <section className="flex flex-col overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
-    <h2 className={`px-6 py-3 text-left text-[17px] font-bold ${head}`}>{title}</h2>
+    <h2 className={`px-6 pb-2.5 pt-3 text-left text-[17px] font-bold leading-tight ${head}`}>
+      {title}
+      <span className="mt-0.5 block text-[12px] font-semibold opacity-75">{role}</span>
+    </h2>
     <div className="flex-1 px-6 pb-6 pt-5">{children}</div>
   </section>
 );
@@ -46,10 +50,10 @@ const Connector = ({ label }: { label: string }) => (
   </div>
 );
 
-// 되먹임 고리 — 학습 기록이 수업 운영(메타화용 토론)을 거쳐 콘텐츠 제작(후속 검토·재승인)으로 돌아간다.
+// 되먹임 고리 — 학습 수행 기록이 수업 운영(메타화용 토론)을 거쳐, 교수자의 후속 콘텐츠 검토·재승인으로 반영된다.
 // 세 칸 아래 가운데에서 내려온 선이 한 줄로 이어져, 세 칸이 하나의 순환으로 묶인다. 칸 폭은 (전체 − 연결 칸 200px) ÷ 3.
 const FeedbackLoop = () => (
-  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 기록 → 메타화용 토론 → 후속 콘텐츠 검토·재승인">
+  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 수행 기록 → 메타화용 토론 → 학습 기록·토론 결과 반영(후속 콘텐츠 검토·재승인)">
     {/* 가로선: 제작 칸 가운데 ~ 학습 칸 가운데 */}
     <span aria-hidden className="absolute bottom-[14px] left-[calc((100%-200px)/6)] right-[calc((100%-200px)/6)] border-b-2 border-dashed border-[#4A5764]" />
     {/* 세 칸 가운데에서 내려오는 선 */}
@@ -59,8 +63,8 @@ const FeedbackLoop = () => (
     {/* 제작 칸으로 돌아가는 화살촉 */}
     <ArrowUp aria-hidden size={18} strokeWidth={2.25} className="absolute -top-[3px] left-[calc((100%-200px)/6)] -translate-x-1/2 bg-background text-[#4A5764]" />
     {/* 구간 문구 — 오른쪽(학습 → 운영), 왼쪽(운영 → 제작) */}
-    <span className="absolute bottom-[5px] left-[calc(75%-(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 학습 기록 · 토론</span>
-    <span className="absolute bottom-[5px] left-[calc(25%+(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 후속 콘텐츠 검토 · 재승인</span>
+    <span className="absolute bottom-[5px] left-[calc(75%-(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 학습 수행 기록</span>
+    <span className="absolute bottom-[5px] left-[calc(25%+(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 학습 기록·토론 결과 반영</span>
   </div>
 );
 
@@ -75,7 +79,7 @@ const CLASS_STEPS: readonly Step[] = [
   ["15주 교과목 편성", "주차별 학습 미션 배치"],
   ["학습자 관리", "계정 · 교과목 · 최근 활동"],
   ["주차별 운영", "교과목 공개와 접근 조건"],
-  ["메타화용 토론", "익명 응답 분포로 서로 다른 판단 논의"],
+  ["메타화용 토론", "익명 응답 분포를 바탕으로 판단의 차이와 근거 논의"],
   ["후속 콘텐츠 검토", "필요 시 수정 · 재승인"],
 ];
 const LEARNING_STEPS: readonly Step[] = [
@@ -86,11 +90,11 @@ const LEARNING_STEPS: readonly Step[] = [
   ["학습자 최종 결정", "학습 기록 저장"],
 ];
 
-// 단계별 기록은 그 기록이 남는 관리자 화면으로 연결한다(관리자 로그인 필요).
-// 이름은 연결되는 화면의 메뉴명과 같게 둔다 — 누른 뒤 도착한 화면 제목이 태그와 같아야 한다(2026-10-08).
+// 기록·자료는 그것이 남는 관리자 화면으로 연결한다(관리자 로그인 필요).
+// 활동(검토·승인)과 자료(기록·프롬프트)가 한 이름 아래 섞이지 않게 「결과·기록」으로 맞춘다(2026-10-08 Astra 검토 수용).
 const TRACE = [
-  { label: "자동 품질 검토", to: "/admin/ai-review" },
-  { label: "교수자 감수·최종 승인", to: "/admin/review" },
+  { label: "자동 품질 검토 결과", to: "/admin/ai-review" },
+  { label: "교수자 감수·승인 기록", to: "/admin/review" },
   { label: "학습 수행 기록", to: "/admin/decision-traces" },
   { label: "운영 프롬프트", to: "/admin/prompt-harness" },
 ] as const;
@@ -123,19 +127,19 @@ const Architecture = () => (
       </h1>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_100px_1fr_100px_1fr] lg:gap-0">
-        <Lane title="콘텐츠 제작 워크플로우" head="bg-[#15202B] text-white">
+        <Lane title="콘텐츠 제작 워크플로우" role="핵심 워크플로우" head="bg-[#15202B] text-white">
           <Steps steps={CONTENT_STEPS} dot="bg-[#15202B] text-white" />
         </Lane>
 
         <Connector label="승인 후 편성" />
 
-        <Lane title="수업 운영" head="bg-[#4A5764] text-white">
+        <Lane title="수업 운영" role="두 워크플로우의 연계·관리 기능" head="bg-[#4A5764] text-white">
           <Steps steps={CLASS_STEPS} dot="bg-[#4A5764] text-white" />
         </Lane>
 
         <Connector label="학습자에게 공개" />
 
-        <Lane title="통번역 학습 워크플로우" head="bg-[#FAD338] text-[#15202B]">
+        <Lane title="통번역 학습 워크플로우" role="핵심 워크플로우" head="bg-[#FAD338] text-[#15202B]">
           <Steps steps={LEARNING_STEPS} dot="bg-[#FAD338] text-[#15202B]" />
         </Lane>
       </div>
@@ -143,7 +147,7 @@ const Architecture = () => (
       <FeedbackLoop />
 
       <div className="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-[#E2DED2] px-1 pt-3">
-        <span className="mr-1 text-[14px] font-bold text-[#15202B]">단계별 기록</span>
+        <span className="mr-1 text-[14px] font-bold text-[#15202B]">기록·자료</span>
         {TRACE.map(({ label, to }) => (
           <Link key={label} to={to}
             className="inline-flex items-center gap-1 rounded-md border border-[#E2DED2] bg-white px-2.5 py-1 text-[13px] font-medium text-[#3F4E59] transition-colors hover:border-[#15202B] hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B]">
