@@ -353,7 +353,7 @@ export const CurriculumEditor = ({
             ].map(([title, copy]) => (
               <div key={title} className="rounded-lg bg-[#FAF7EE] px-3 py-3">
                 <p className="text-[12px] font-semibold text-[#6B5518]">{title}</p>
-                <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">{copy}</p>
+                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{copy}</p>
               </div>
             ))}
           </div>
@@ -443,7 +443,7 @@ export const CurriculumEditor = ({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-[11.5px] text-muted-foreground">
+            <p className="text-[12px] text-muted-foreground">
               「게시」로 바꿔야 학습자 쪽에서 이 교과목을 사용합니다.
             </p>
           </div>
@@ -510,16 +510,16 @@ export const CurriculumEditor = ({
                 <span className="inline-flex h-7 min-w-[3rem] items-center justify-center rounded-md bg-muted px-2 text-[13px] font-medium">
                   {w.week_no}주차
                 </span>
-                <span className="rounded bg-[#EEF2F6] px-2 py-0.5 text-[11.5px] font-medium text-[#5B6B76]">
+                <span className="rounded bg-[#EEF2F6] px-2 py-0.5 text-[12px] font-medium text-[#5B6B76]">
                   {ROLE_LABEL[role]} · {STAGE_LABEL[role]}
                 </span>
                 {w.speech_act && (
-                  <span className="rounded bg-[#FFF3C4] px-2 py-0.5 text-[11.5px] font-medium text-[#6B5518]">
+                  <span className="rounded bg-[#FFF3C4] px-2 py-0.5 text-[12px] font-medium text-[#6B5518]">
                     {SPEECH_ACT_UI[w.speech_act]}
                   </span>
                 )}
                 {w.review_released && (
-                  <span className="rounded bg-emerald-50 px-2 py-0.5 text-[11.5px] font-medium text-emerald-800">
+                  <span className="rounded bg-emerald-50 px-2 py-0.5 text-[12px] font-medium text-emerald-800">
                     복습 공개
                   </span>
                 )}
@@ -613,7 +613,7 @@ export const CurriculumEditor = ({
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                className="h-7 px-2 text-[11.5px]"
+                                className="h-7 px-2 text-[12px]"
                               >
                                 <CircleHelp className="mr-1 h-3.5 w-3.5" />
                                 작성 가이드
@@ -622,7 +622,7 @@ export const CurriculumEditor = ({
                             <PopoverContent align="end" className="w-[380px] space-y-3">
                               <div>
                                 <p className="text-[13px] font-semibold">상황 중심 Can-do 작성 틀</p>
-                                <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
+                                <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
                                   [상황·관계]에서 [소통 행동]을 [맥락 조건]에 맞게 수행할 수 있다.
                                 </p>
                               </div>
@@ -632,7 +632,7 @@ export const CurriculumEditor = ({
                                     key={suggestion}
                                     type="button"
                                     onClick={() => addCanDoSuggestion(i, suggestion)}
-                                    className="w-full rounded-md border border-[#E2DED2] bg-[#FAF8F2] px-3 py-2 text-left text-[11.5px] leading-relaxed transition hover:bg-[#FFF7CC]"
+                                    className="w-full rounded-md border border-[#E2DED2] bg-[#FAF8F2] px-3 py-2 text-left text-[12px] leading-relaxed transition hover:bg-[#FFF7CC]"
                                   >
                                     {suggestion}
                                     <span className="mt-1 block font-semibold text-[#7A4A0A]">

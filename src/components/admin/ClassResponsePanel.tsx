@@ -188,7 +188,7 @@ export function ClassResponsePanel() {
   };
 
   const statusPill = hasRealResponses && !showingDemo
-    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[11px] font-bold text-[#15202B]">
+    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[12px] font-bold text-[#15202B]">
       {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
     </span>
     : null;
@@ -266,7 +266,7 @@ export function ClassResponsePanel() {
             {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
           </h2>
           {statusPill}
-          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[11.5px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
+          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[12px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
         </div>
         {!showingDemo && <p className="mt-1 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 

@@ -85,7 +85,7 @@ import {
 
 // 이 브라우저에서 마지막으로 연 교과목(편의 기능). 서버 상태가 아니다.
 const LAST_OUTLINE_KEY = "pragma.admin.composer.lastOutline";
-const CONDITION_LABEL = "text-[11.5px] font-semibold text-[#46515A]";
+const CONDITION_LABEL = "text-[12px] font-semibold text-[#46515A]";
 const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]";
 const SETTINGS_MENU_ITEM =
   "flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[13px] text-[#26333B] hover:bg-[#F6F5F1] disabled:pointer-events-none disabled:opacity-50";
@@ -685,7 +685,7 @@ const AdminComposer = () => {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E2DED2] bg-white p-3 print:hidden">
           <div>
             <p className="text-[13px] font-semibold text-[#15202B]">현재 화면 편성 기준</p>
-            <p className="mt-0.5 text-[11.5px] text-muted-foreground">최신 편성을 반영하려면 먼저 돌아가서 편성 저장을 눌러주세요.</p>
+            <p className="mt-0.5 text-[12px] text-muted-foreground">최신 편성을 반영하려면 먼저 돌아가서 편성 저장을 눌러주세요.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setSyllabusOpen(false)}>편성으로 돌아가기</Button>
@@ -768,10 +768,10 @@ const AdminComposer = () => {
                 >
                   <span className="min-w-0 text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
                   <span className="flex shrink-0 items-center gap-1.5">
-                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[11.5px] font-semibold text-[#1F3A5F]">
+                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[12px] font-semibold text-[#1F3A5F]">
                       {LEVEL[item.level as LearnerLevel] ?? item.level}
                     </span>
-                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                    <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${
                       published ? "bg-[#E8F4EC] text-[#245E44]" : "bg-[#FFF3D6] text-[#8A5A14]"
                     }`}>
                       {published ? "공개" : "비공개"}
@@ -844,7 +844,7 @@ const AdminComposer = () => {
                 className="flex items-center gap-1.5 text-[15px] font-bold text-[#15202B]"
               >
                 편성 조건
-                <span aria-hidden className="text-[11.5px] font-semibold text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+                <span aria-hidden className="text-[12px] font-semibold text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
               </button>
               {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
               {!conditionsOpen && (
@@ -905,12 +905,12 @@ const AdminComposer = () => {
                     </button>
                   )}
                   <div className="my-1.5 border-t border-[#EFEBE1]" />
-                  <p className="px-2.5 pb-0.5 pt-1 text-[11px] font-semibold text-[#8B3531]">위험 작업</p>
+                  <p className="px-2.5 pb-0.5 pt-1 text-[12px] font-semibold text-[#8B3531]">위험 작업</p>
                   <button type="button" role="menuitem" disabled={deleting || selectedIsPublished}
                     className={`${SETTINGS_MENU_ITEM} flex-col items-start text-[#8B3531] hover:bg-[#FFF3F1]`}
                     onClick={() => { setSettingsOpen(false); setConfirmAction("delete"); }}>
                     <span>{deleting ? "삭제 중…" : "교과목 삭제"}</span>
-                    <span className="text-[11px] text-[#9AA3A9]">
+                    <span className="text-[12px] text-[#9AA3A9]">
                       {selectedIsPublished ? "학습자에게 공개 중인 교과목은 삭제할 수 없습니다." : "주차 계획과 배정이 함께 삭제됩니다."}
                     </span>
                   </button>
@@ -1116,7 +1116,7 @@ function WeekRow({
                 <span className="shrink-0 text-[14px] font-bold text-[#15202B]">집중 보완</span>
                 <button type="button" onClick={onEditWeek} aria-label={act ? `집중 보완 화행 바꾸기 · 현재 ${SPEECH_ACT_UI[act]}` : "집중 보완 화행 고르기"}
                   className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#C9C3B4] bg-white px-2.5 py-0.5 text-[12.5px] font-semibold text-[#233542] hover:border-[#1F3A5F]">
-                  {act ? SPEECH_ACT_UI[act] : "화행 고르기"}<span aria-hidden className="text-[10px] text-[#66727A]">▾</span>
+                  {act ? SPEECH_ACT_UI[act] : "화행 고르기"}<span aria-hidden className="text-[12px] text-[#66727A]">▾</span>
                 </button>
               </span>
             ) : (
@@ -1143,12 +1143,12 @@ function WeekRow({
                     className={`group flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1 ${needsReplace ? "border-[#F0C9A8] bg-[#FFF7F0]" : "border-[#E6E1D4] bg-[#FCFBF8]"}`}
                     title={[title, `초점 · ${featureLabel}`, needsReplace ? (replaced?.has(item.scenario_id) ? "새 판 있음 · 교체 필요" : "교체 필요") : ""].filter(Boolean).join("\n")}
                   >
-                    <span className={`shrink-0 rounded px-1.5 py-px text-[11px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
+                    <span className={`shrink-0 rounded px-1.5 py-px text-[12px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
                       {core ? (core.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation) : "?"}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#202B33]">{title}</span>
                     {needsReplace && <button type="button" onClick={() => onReplace(item.scenario_id)} aria-label={`${title} 교체하기`}
-                      className="shrink-0 rounded-full border border-[#D98A5C] bg-white px-2 py-0.5 text-[11px] font-bold text-[#9A3F1C] hover:bg-[#9A3F1C] hover:text-white">교체하기 →</button>}
+                      className="shrink-0 rounded-full border border-[#D98A5C] bg-white px-2 py-0.5 text-[12px] font-bold text-[#9A3F1C] hover:bg-[#9A3F1C] hover:text-white">교체하기 →</button>}
                     {/* 제거 ×는 평소 숨기고 칩에 마우스를 올리거나 키보드로 닿을 때만 보인다 — 배치표가 삭제 목록처럼 보이지 않게. */}
                     <button
                       type="button"
@@ -1182,7 +1182,7 @@ function WeekRow({
       {/* 후보 추가 패널 */}
       {adding && isAssignable && (
         <div className="mt-3 rounded-lg border border-dashed border-[#D8D0BC] bg-[#FAF8F2] p-3">
-          <p className="mb-2 text-[11.5px] text-muted-foreground">
+          <p className="mb-2 text-[12px] text-muted-foreground">
             현재 방향·수준·주제와 {missionModesSummary(expectedModes)} 구성에서 아직 채우지 않은 모드에 맞는 검토 완료 미션만 표시됩니다. 같은 상황의 복제본은 제외됩니다.
           </p>
           {cands.length === 0 ? (
@@ -1199,7 +1199,7 @@ function WeekRow({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[13px]" title={c.situation_ko}>{c.brief_note_ko?.trim() || c.situation_ko || "(상황 없음)"}</p>
-                    <p className="text-[11.5px] text-muted-foreground">
+                    <p className="text-[12px] text-muted-foreground">
                       {c.theme_code ? THEME_LABEL[c.theme_code] : "—"} ·{" "}
                       {c.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
                     </p>
@@ -1210,7 +1210,7 @@ function WeekRow({
                 </li>
               ))}
               {cands.length > 40 && (
-                <li className="px-3 py-1 text-[11.5px] text-muted-foreground">
+                <li className="px-3 py-1 text-[12px] text-muted-foreground">
                   … 외 {cands.length - 40}개(상위 40개만 표시)
                 </li>
               )}

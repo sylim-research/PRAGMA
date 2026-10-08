@@ -50,7 +50,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
                 : "border-[#E5E3DB] bg-white text-[#626B73] hover:border-[#C1B681] hover:bg-[#FFFCF1]",
             ].join(" ")}
           >
-            <span className="block text-[11px] font-bold tracking-wider">판단 {String(item.itemId).padStart(2, "0")}</span>
+            <span className="block text-[12px] font-bold tracking-wider">판단 {String(item.itemId).padStart(2, "0")}</span>
             <span className="mt-1 block break-keep text-sm font-bold leading-5">{item.title.replace(/^판단 \d+\s*·\s*/, "")}</span>
           </button>)}
         </div>
@@ -101,7 +101,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
                 </li>;
               })}
             </ol>
-            <div className="mt-2 flex justify-between text-[11px] tabular-nums text-[#78848D]" aria-hidden="true">
+            <div className="mt-2 flex justify-between text-[12px] tabular-nums text-[#78848D]" aria-hidden="true">
               <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
             </div>
           </figure>)}

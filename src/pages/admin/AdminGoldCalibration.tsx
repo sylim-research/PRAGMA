@@ -358,7 +358,7 @@ const AdminGoldCalibration = () => {
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-xs font-semibold">{item.case_id.replace("GOLD-KOZH-", "")}</span>
-                    <Badge variant="outline" className={`text-[10px] ${statusTone(resolution?.resolution_status)}`}>
+                    <Badge variant="outline" className={`text-[12px] ${statusTone(resolution?.resolution_status)}`}>
                       {resolution ? STATUS_LABEL[resolution.resolution_status] : "미판정"}
                     </Badge>
                   </div>

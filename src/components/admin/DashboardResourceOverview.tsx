@@ -40,9 +40,9 @@ export function DashboardResourceOverview({ resources, error, status }: {
             </div>
             <div className="mt-1.5 flex flex-wrap items-end gap-1.5">
               <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] tabular-nums">{error ? "—" : number(value)}</span>
-              <span className="pb-0.5 text-[11.5px] text-[#4F5D68]">{unit}</span>
+              <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>
             </div>
-            <div className="mt-auto flex items-center justify-between gap-1 pt-1.5 text-[11.5px] text-[#4F5D68]">
+            <div className="mt-auto flex items-center justify-between gap-1 pt-1.5 text-[12px] text-[#4F5D68]">
               <span>{note}</span>
             </div>
           </div>

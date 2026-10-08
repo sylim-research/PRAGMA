@@ -445,7 +445,7 @@ const AdminBatch = () => {
                 <p className="text-[12.5px] font-semibold">
                   통과 {auditPass} · 경고 {auditWarning} · 실패 {auditFail} · 호출 실패 {auditErrors}
                 </p>
-                <ul className="mt-2 max-h-80 space-y-2 overflow-auto text-[11.5px]">
+                <ul className="mt-2 max-h-80 space-y-2 overflow-auto text-[12px]">
                   {auditResults.map((result) => {
                     const cell = result.source.cell;
                     const core = result.source.coreContent as {
@@ -479,7 +479,7 @@ const AdminBatch = () => {
                           </div>
                         ))}
                         {result.check && result.check.verdict !== "pass" && (
-                          <div className="mt-2 space-y-0.5 rounded bg-[#FAF8F2] px-2.5 py-2 text-[11px] leading-relaxed">
+                          <div className="mt-2 space-y-0.5 rounded bg-[#FAF8F2] px-2.5 py-2 text-[12px] leading-relaxed">
                             <div>상황 · {core.situation_ko ?? "—"}</div>
                             <div>관계 · {core.relation_ko ?? "—"}</div>
                             {core.preceding_turn && <div>상황 맥락 참고 · {core.preceding_turn}</div>}

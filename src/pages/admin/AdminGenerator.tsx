@@ -1003,7 +1003,7 @@ const AdminGenerator = () => {
                     </div>
                     <div
                       className={[
-                        "text-[11.75px] mt-0.5",
+                        "text-[12px] mt-0.5",
                         on ? "text-[#4E5A63]" : "text-muted-foreground",
                       ].join(" ")}
                     >

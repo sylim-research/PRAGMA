@@ -142,7 +142,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.75px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className={["w-[6rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[11.75px] font-bold tracking-[0.06em]",
+              {partsOf(item).tag && <span className={["w-[6rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[12px] font-bold tracking-[0.06em]",
                 // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
                 sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>

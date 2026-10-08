@@ -53,7 +53,7 @@ const StatusChip = ({ children, tone = "neutral", className = "" }: {
   tone?: "good" | "attention" | "neutral";
   className?: string;
 }) => <span className={[
-  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[12px] font-semibold",
   className,
   tone === "good"
     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -401,7 +401,7 @@ const AdminTeachingMaterials = () => {
                   onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
                   className={["text-left text-[13.5px] hover:underline", selected ? "font-bold text-[#15202B]" : "font-semibold text-[#34444D]"].join(" ")}
                 >{operationWeekLabel(item)}</button>
-                {issue && <p className="mt-0.5 text-[11.5px] font-medium text-amber-800">확인 · {issue}</p>}
+                {issue && <p className="mt-0.5 text-[12px] font-medium text-amber-800">확인 · {issue}</p>}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <StatusChip tone={missionsReady ? "good" : "attention"}>

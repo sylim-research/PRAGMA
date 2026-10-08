@@ -76,7 +76,7 @@ const AdminLogin = () => {
           className="w-full max-w-[380px] rounded-2xl border border-l-[5px] border-[#E8E4D8] border-l-[#FAD338] bg-white px-7 pb-6 pt-6 shadow-[0_24px_60px_-28px_rgba(21,32,43,0.35)] sm:px-8"
           onSubmit={handleSubmit}
         >
-          <p className="text-[11px] font-semibold tracking-[0.16em] text-[#8B7324]">INSTRUCTOR</p>
+          <p className="text-[12px] font-semibold tracking-[0.16em] text-[#8B7324]">INSTRUCTOR</p>
           <h1 className="mt-1 text-[24px] font-bold leading-[1.25] tracking-[-0.025em] text-[#15202B]">교수자 로그인</h1>
           <div className="mt-5 flex flex-col gap-1.5">
             <label htmlFor="admin-account" className="text-[13px] font-medium text-[#4E5A63]">아이디</label>

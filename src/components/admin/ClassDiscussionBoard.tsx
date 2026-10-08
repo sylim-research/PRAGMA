@@ -90,7 +90,7 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
       active ? "border-[#15202B] font-bold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
     ].join(" ")}
   >
-    <span className="mr-1.5 text-[11px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
+    <span className="mr-1.5 text-[12px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
   </button>;
 }
 
@@ -104,7 +104,7 @@ function Scene({ item, size }: { item: DiscussionItemView; size: string }) {
 
 function TargetLine({ text, label, size }: { text: string; label: string; size: string }) {
   return <p className={`break-keep border-l-[3px] border-[#E4C44E] pl-3 leading-relaxed text-[#15202B] ${size}`}>
-    <span className="mr-3 inline-block text-[11.5px] font-semibold text-[#7A858C]">{label}</span>
+    <span className="mr-3 inline-block text-[12px] font-semibold text-[#7A858C]">{label}</span>
     <span className={zh(text)}>{text}</span>
   </p>;
 }
@@ -274,27 +274,27 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
   return <article aria-label={item.id} className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
     <header className="flex flex-wrap items-center gap-2 border-b border-[#E2DED2] bg-[#FBF9F3] px-3 py-2">
       <span className={`font-bold text-[#15202B] ${size}`}>{item.id}</span>
-      <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[11px] font-bold text-[#15202B]">{decisionLabel(item.decision)}</span>
-      {item.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-0.5 text-[11px] font-bold text-white">이견 제시</span>}
+      <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[12px] font-bold text-[#15202B]">{decisionLabel(item.decision)}</span>
+      {item.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-0.5 text-[12px] font-bold text-white">이견 제시</span>}
     </header>
     <ol className="divide-y divide-[#EEEBE2]">
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">초안</p>
+        <p className="text-[12px] font-semibold text-[#7A858C]">초안</p>
         <p className={`mt-0.5 leading-relaxed text-[#15202B] ${item.first ? zh(item.first) : ""} ${text}`}>{item.first ?? "—"}</p>
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">AI 피드백</p>
+        <p className="text-[12px] font-semibold text-[#7A858C]">AI 피드백</p>
         {feedback ? <div className={`mt-0.5 space-y-1 ${size}`}>
           <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-[#15202B]">
             {feedback.band && <span><span className="text-[#7A858C]">화용 </span><span className="font-semibold">{feedback.band}</span></span>}
             {feedback.scope && <span><span className="text-[#7A858C]">다시 볼 곳 </span><span className="font-semibold">{feedback.scope}</span></span>}
           </p>
           {feedback.feature && <p className="break-keep leading-relaxed text-[#44525C]">{feedback.feature}</p>}
-          {feedback.alternative && <p className={`leading-relaxed text-[#44525C] ${zh(feedback.alternative)}`}><span className="mr-2 text-[11.5px] font-semibold text-[#7A858C]">대안</span>{feedback.alternative}</p>}
+          {feedback.alternative && <p className={`leading-relaxed text-[#44525C] ${zh(feedback.alternative)}`}><span className="mr-2 text-[12px] font-semibold text-[#7A858C]">대안</span>{feedback.alternative}</p>}
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>피드백 기록 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">학습자의 이견·근거</p>
+        <p className="text-[12px] font-semibold text-[#7A858C]">학습자의 이견·근거</p>
         {item.dissent ? <div className={`mt-0.5 space-y-1 ${size}`}>
           {item.dissent.conditions.length > 0 && <p className="flex flex-wrap gap-1.5">
             {item.dissent.conditions.map((condition) => <span key={condition} className="rounded-md border border-[#D9CFA8] bg-[#FFFBEC] px-1.5 py-0.5 text-[12px] text-[#5F573D]">{condition}</span>)}
@@ -303,7 +303,7 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>이견 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[11.5px] font-semibold text-[#7A858C]">최종안</p>
+        <p className="text-[12px] font-semibold text-[#7A858C]">최종안</p>
         <p className={`mt-0.5 leading-relaxed font-semibold text-[#15202B] ${item.final ? zh(item.final) : ""} ${text}`}>{item.final ?? "—"}</p>
       </li>
     </ol>
