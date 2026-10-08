@@ -161,11 +161,10 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 - **학습 미션 생성**에는 GPT-5.5를 기본으로 사용하며, 교수자가 GPT-6 Astra를 선택할 수 있습니다.
 - **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5를 사용합니다.
-- **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
+- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
 - **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase(Edge Functions·PostgreSQL)로 구성됩니다.
-- **코드 관리와 배포**는 GitHub와 Railway를 사용합니다. GitHub Actions에서 타입 검사·테스트·빌드를 수행하며, 운영 웹앱은 GitHub main을 기준으로 Railway에 배포합니다.
+- **코드 관리와 배포**는 GitHub에서 자동 검사를 거쳐 Railway로 배포합니다.
 
 <br>
 
