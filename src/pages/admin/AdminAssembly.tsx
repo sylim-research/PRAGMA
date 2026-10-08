@@ -913,7 +913,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
+            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -928,7 +928,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
           {/* 교수자 화면은 왼쪽에 승인 대기 목록 단추가 있어 제목이 가운데로 밀린다 — 제목만 한 줄 아래 왼쪽 끝에서 시작한다. */}
-          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
+          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
         </header>
         <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 

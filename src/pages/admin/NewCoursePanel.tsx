@@ -114,7 +114,7 @@ export function NewCoursePanel({
     <div className="space-y-3">
       {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
       <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
-        <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>시작 방법</h2>
+        <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>시작 방법</h2>
         <div role="radiogroup" aria-label="시작 방법" className="flex flex-wrap items-center gap-3">
           <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "copy" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
             <input type="radio" name="new-course-method" checked={method === "copy"} onChange={() => chooseMethod("copy")} className="accent-[#1F3A5F]" />
@@ -143,7 +143,7 @@ export function NewCoursePanel({
 
       <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 조건</h2>
+            <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 조건</h2>
 
         </div>
         <div className="mt-3">
@@ -173,7 +173,7 @@ export function NewCoursePanel({
 
       <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>편성 주제</h2>
+          <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>편성 주제</h2>
           <span
               className={`inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
                 available > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"

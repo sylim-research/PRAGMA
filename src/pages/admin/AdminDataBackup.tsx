@@ -321,7 +321,7 @@ const Page = () => {
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="brand">수업 백업</RoleBadge>
-              <h2 className="text-[17px] font-bold">데이터 백업</h2>
+              <h2 className="text-[16.5px] font-bold">데이터 백업</h2>
             </div>
             {/* 제외 항목은 「백업 범위 자세히 보기」에만 둔다 — 첫 화면에서 굳이 앞세우지 않는다. */}
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -401,7 +401,7 @@ const Page = () => {
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="ink">수업 복원</RoleBadge>
-              <h2 className="text-[17px] font-bold">데이터 복원</h2>
+              <h2 className="text-[16.5px] font-bold">데이터 복원</h2>
             </div>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               이전에 저장한 백업 파일을 불러와 해당 시점의 수업 구성으로 복원합니다.

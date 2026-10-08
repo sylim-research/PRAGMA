@@ -299,7 +299,7 @@ const AdminBatch = () => {
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border border-[#E2DED2] bg-white p-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-[17px] font-bold"><StepNum n={1} />생성 조건</h2>
+                <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-[16.5px] font-bold"><StepNum n={1} />생성 조건</h2>
                 <div className="order-last flex w-full items-center gap-2 sm:order-none sm:ml-4 sm:w-auto">
                   <span className="text-[13px] font-semibold text-[#3F4E59]">언어방향</span>
                   <div role="group" aria-label="언어방향" className="inline-flex gap-1.5">
@@ -340,7 +340,7 @@ const AdminBatch = () => {
 
             <section aria-labelledby="batch-plan-heading" className="rounded-xl border border-[#E2DED2] bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 id="batch-plan-heading" className="flex items-center gap-2 text-[17px] font-bold"><StepNum n={2} />생성 계획·분포</h2>
+                <h2 id="batch-plan-heading" className="flex items-center gap-2 text-[16.5px] font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>
               {/* 상자는 흰색으로 통일하고, 번역·통역은 이름 앞 색 점(호박·세이지)으로, 핵심 변수인 화행별은 금색 띠로만 구분한다. 2026-09-26 */}
               {/* 넓은 화면에서는 건수 3개와 분포 충족도 2개를 한 줄에 둔다. 위·아래 줄이 같은 4칸 틀(9:9:11:11)을 써서 경계가 맞는다 —

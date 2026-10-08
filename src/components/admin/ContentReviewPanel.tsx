@@ -474,7 +474,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && <section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
+              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
@@ -520,7 +520,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">4</span>교수자 최종 승인</h4>
+          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">4</span>교수자 최종 승인</h4>
           <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
           <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
