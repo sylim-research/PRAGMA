@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-import { MODE_LABEL, SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import type {
   CandidatesItemView,
   ClassDiscussion,
@@ -43,7 +42,6 @@ const TEXT_TONE: Record<SliceTone, string> = {
   slate: "#64727F",
 };
 
-const DIRECTION_LABEL: Record<string, string> = { ko_zh: "한→중", zh_ko: "중→한" };
 
 /** 교수자가 응답을 고른 뒤 검토할 관점(논문 5.2.2). 시스템이 원인을 확정하지 않는다. */
 const PERSPECTIVES = [
@@ -122,7 +120,7 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
       </div>
       <div className="min-w-0 rounded-lg border border-[#EEEBE2] bg-[#FDFCF9] px-4 pt-3">
         <p className="text-[12px] font-semibold text-[#7A858C]">척도 위 응답 분포</p>
-        <SpectrumStrip slices={item.slices} total={item.total} />
+        <SpectrumStrip slices={item.slices} total={item.total} className="mx-auto h-auto w-full max-w-[600px]" />
       </div>
     </div>
     {reasons && <div className="rounded-lg border border-[#E2DED2]">
@@ -440,15 +438,8 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
 export function ClassDiscussionBoard({ data, demo, state, onChange, projector = false }: Props) {
   const size = projector ? "text-[15.5px]" : "text-[13.5px]";
   const selected = data.items.find((item) => item.itemId === state.itemId) ?? data.items[0] ?? null;
-  const speechAct = data.speechAct ? SPEECH_ACT_UI[data.speechAct as SpeechActUI] ?? data.speechAct : null;
-  const modeLabel = data.dct.mode === "interpreting" ? MODE_LABEL.stt_interpreting : data.dct.mode === "translation" ? MODE_LABEL.translation : null;
-  const summary = useMemo(() => [speechAct, modeLabel, data.direction ? DIRECTION_LABEL[data.direction] ?? data.direction : null, data.focus].filter(Boolean), [speechAct, modeLabel, data.direction, data.focus]);
 
   return <div className="space-y-3" aria-label="학습자 응답 토론 보드">
-    <p className={`text-[#5D6970] ${size}`}>
-      {[...summary, `응답 ${data.learners}명`].join(" · ")}
-    </p>
-
     {data.items.length === 0 ? <p className={`rounded-xl border border-dashed border-[#DAD6CA] bg-white p-5 text-[#5D6970] ${size}`}>
       집계된 기록에 MJT 판단 응답이 없습니다.
     </p> : <>

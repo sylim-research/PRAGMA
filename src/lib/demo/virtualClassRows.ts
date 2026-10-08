@@ -26,7 +26,7 @@ export const VIRTUAL_CLASS_SIZE = 20;
  * 논문 4.3의 미션 캡처와 「내 기록」·학급 보드 캡처가 한 사람의 같은 수행을 가리키게 한다.
  */
 export const DEMO_LEARNER_ROW = 0;
-export const VIRTUAL_CLASS_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료 아님`;
+export const VIRTUAL_CLASS_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명`;
 
 type Obj = Record<string, unknown>;
 const obj = (value: unknown): Obj | null => (value && typeof value === "object" && !Array.isArray(value) ? (value as Obj) : null);
