@@ -297,7 +297,7 @@ const AdminBatch = () => {
       <div className="space-y-5">
         <div className="space-y-5">
           <div className="min-w-0 space-y-5">
-            <section aria-labelledby="batch-config-heading" className="rounded-xl border bg-white p-4">
+            <section aria-labelledby="batch-config-heading" className="rounded-xl border border-[#E2DED2] bg-white p-4">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <h2 id="batch-config-heading" className="flex shrink-0 items-center gap-2 text-[17px] font-bold"><StepNum n={1} />생성 조건</h2>
                 <div className="order-last flex w-full items-center gap-2 sm:order-none sm:ml-4 sm:w-auto">
@@ -338,7 +338,7 @@ const AdminBatch = () => {
               </div>
             </section>
 
-            <section aria-labelledby="batch-plan-heading" className="rounded-xl border bg-white p-4">
+            <section aria-labelledby="batch-plan-heading" className="rounded-xl border border-[#E2DED2] bg-white p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-3">
                 <h2 id="batch-plan-heading" className="flex items-center gap-2 text-[17px] font-bold"><StepNum n={2} />생성 계획·분포</h2>
               </div>

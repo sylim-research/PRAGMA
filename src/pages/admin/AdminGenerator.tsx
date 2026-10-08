@@ -1609,7 +1609,7 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-2 text-[15.75px] font-semibold text-[#15202B]",
+      "flex items-center gap-2 text-[15px] font-bold text-[#15202B]",
     ].join(" ")}
   >
     <span

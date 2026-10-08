@@ -971,7 +971,7 @@ const AdminComposer = () => {
           <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#CFC8B6] px-5 pb-2 pt-5">
             {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
-            <h3 className="text-[14px] font-semibold text-[#46515A]">주차별 미션 배치</h3>
+            <h3 className="text-[15px] font-bold text-[#15202B]">주차별 미션 배치</h3>
             <span className="text-[12.5px] text-[#66727A]">
               배치 {assignedMissionCount}개
             </span>
