@@ -936,7 +936,7 @@ const AdminGenerator = () => {
 
       {/* 2-col layout */}
       {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
-      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,43fr)_minmax(0,57fr)]">
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,415fr)_minmax(0,585fr)]">
         {/* LEFT — settings */}
         <section className="space-y-5 rounded-lg border border-[#E2DED2] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
