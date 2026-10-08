@@ -13,8 +13,8 @@ const REQUIRED_ENTRY_PATHS = [
   "/admin/review",
   "/admin/composer",
   "/admin/library",
-  "/admin/decision-traces",
-  "/admin/export",
+  "/admin/discussion",
+  "/admin/data-backup",
 ] as const;
 
 describe("admin navigation reachability", () => {
@@ -46,12 +46,11 @@ describe("admin navigation reachability", () => {
     expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(true);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/decision-traces",
+      "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/discussion", "/admin/decision-traces",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
     expect(research?.items.map((item) => item.to)).toEqual([
       "/admin/data-backup",
-      "/admin/export",
     ]);
   });
 
@@ -140,12 +139,12 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
     // 원자료 분석은 보관함을 갖춘 별도 화면이다(2026-09-09 오후).
     expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
-    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/package")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/decision-traces");
+    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/discussion");
+    expect(adminMobileNavValue("/admin/package")).toBe("/admin/discussion");
+    expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/discussion");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
     expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
     expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/export")).toBe("/admin/export");
+    expect(adminMobileNavValue("/admin/export")).toBe("/admin/data-backup");
   });
 });

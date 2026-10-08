@@ -98,7 +98,7 @@ describe("교과목·주차 수업자료 연결", () => {
     mountAt("/admin/package?courseId=course-a&weekNo=2#weekly-material-detail");
     const summary = await screen.findByText("이 주차 수업자료 승인");
     expect(screen.getByRole("link", { name: "수업자료·토론 만들기" })).toHaveAttribute("href", "/admin/teaching-generator?courseId=course-a&weekNo=2");
-    expect(screen.getByRole("link", { name: "학습자 응답 확인" })).toHaveAttribute("href", "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1");
+    expect(screen.getByRole("link", { name: "학습자 응답 확인" })).toHaveAttribute("href", "/admin/discussion?courseId=course-a&weekNo=2&missionId=mission-1");
     await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
   });
@@ -220,7 +220,7 @@ describe("교과목·주차 수업자료 연결", () => {
     expect(screen.getByText("이견 1건")).toBeVisible();
     expect(screen.getByRole("link", { name: "응답 분포" })).toHaveAttribute(
       "href",
-      "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1",
+      "/admin/discussion?courseId=course-a&weekNo=2&missionId=mission-1",
     );
     expect(screen.getByText("확인 · 미션 2개 미배정")).toBeVisible();
   });

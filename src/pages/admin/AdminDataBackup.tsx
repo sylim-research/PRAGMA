@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Check, ShieldCheck, Upload } from "lucide-react";
-import { AdminShell } from "@/components/AdminShell";
+import { RecordToolsShell } from "@/components/admin/RecordToolsShell";
 import { Button } from "@/components/ui/button";
 import { DIRECTION_LABEL, DOMAIN, INDUSTRY, LEVEL } from "@/lib/pragma/enums";
 import type { Domain, IndustrySector, LanguageDirection, LearnerLevel } from "@/lib/pragma/enums";
@@ -312,11 +312,7 @@ const Page = () => {
   };
 
   return (
-    <AdminShell
-      title="수업 편성 백업·복원"
-      description="교과목의 15주 편성과 미션 배치를 파일로 저장하고 복원합니다. 학습 수행 기록은 포함하지 않습니다."
-      compact
-    >
+    <RecordToolsShell active="backup">
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
         {/* 기본 흐름 = 교과목 선택 → 백업. 그래서 이쪽이 주(主)다. */}
@@ -511,7 +507,7 @@ const Page = () => {
           </div>
         </section>
       </div>
-    </AdminShell>
+    </RecordToolsShell>
   );
 };
 

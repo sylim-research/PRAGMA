@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { ArrowDown, ArrowRight } from "lucide-react";
-import { AdminShell } from "@/components/AdminShell";
+import { RecordToolsShell } from "@/components/admin/RecordToolsShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,11 +43,7 @@ const Page = () => {
   };
 
   return (
-  <AdminShell
-    title="연구용 기록 내보내기"
-    description="동의한 학습자의 학습 수행 기록을 가명 처리해 연구용 파일로 내려받습니다."
-    compact
-  >
+  <RecordToolsShell active="export">
     <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-[17px] font-bold text-[#15202B]">내려받기 기간 설정</h2>
@@ -99,7 +95,7 @@ const Page = () => {
         </Fragment>
       ))}
     </section>
-  </AdminShell>
+  </RecordToolsShell>
   );
 };
 

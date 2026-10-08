@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
+import { classResponsesTabPath } from "@/lib/admin/classResponsesPath";
 import { AdminShell } from "@/components/AdminShell";
-import { ClassResponsePanel } from "@/components/admin/ClassResponsePanel";
 import { LearningRecordDetailView } from "@/components/admin/LearningRecordDetailView";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
@@ -363,37 +363,16 @@ const IndividualRecords = () => {
   );
 };
 
-const TABS = [
-  { key: "class", label: "학습자 응답 분포" },
-  { key: "records", label: "학습자별 기록" },
-] as const;
-
-/** 같은 학습 기록을 익명 집계 단위(학습자 응답 분포)와 학습자 단위(학습자별 기록)로 나눠 본다. 기본은 학습자 응답 분포. */
+/** 학습자별 기록. 익명 응답 분포(옛 「학습자 응답 분포」 탭)는 「메타화용 토론」 메뉴로 옮겼다(2026-10-08) — 옛 주소는 그리로 넘긴다. */
 const Page = () => {
-  const [params, setParams] = useSearchParams();
-  // 학습자 관리의 「수행 기록 →」(?q=)는 학습자별 기록으로 연다.
-  const tab = params.get("tab") === "records" || params.has("q") ? "records" : "class";
+  const [params] = useSearchParams();
+  if (params.get("tab") === "class") return <Navigate to={classResponsesTabPath(params)} replace />;
   return (
     <AdminShell
       title="학습 수행 기록"
-      description="학습자가 수행한 학습 미션을 익명 학습자 응답 분포와 학습자별 기록으로 확인합니다."
+      description="학습자별로 학습 미션의 판단, 통번역 초안과 최종안, AI 피드백 이후의 결정을 확인합니다."
     >
-      <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
-        {TABS.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            role="tab"
-            aria-selected={tab === item.key}
-            onClick={() => setParams(item.key === "records" ? { tab: "records" } : {})}
-            className={[
-              "-mb-px border-b-2 px-4 py-2 text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-              tab === item.key ? "border-[#15202B] font-semibold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
-            ].join(" ")}
-          >{item.label}</button>
-        ))}
-      </div>
-      {tab === "class" ? <ClassResponsePanel /> : <IndividualRecords />}
+      <IndividualRecords />
     </AdminShell>
   );
 };

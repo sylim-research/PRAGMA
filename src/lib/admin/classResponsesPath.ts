@@ -1,9 +1,10 @@
-/** 옛 주소(/admin/class-responses·/admin/package)를 「학습 수행 기록 › 학습자 응답 분포」 탭으로 넘긴다. */
+/** 옛 주소(/admin/class-responses·/admin/package·/admin/decision-traces?tab=class)를 「메타화용 토론」으로 넘긴다. */
 export function classResponsesTabPath(params: URLSearchParams) {
-  const next = new URLSearchParams({ tab: "class" });
-  for (const key of ["courseId", "weekNo", "missionId"]) {
+  const next = new URLSearchParams();
+  for (const key of ["courseId", "weekNo", "missionId", "demo"]) {
     const value = params.get(key);
     if (value) next.set(key, value);
   }
-  return `/admin/decision-traces?${next}`;
+  const query = next.toString();
+  return query ? `/admin/discussion?${query}` : "/admin/discussion";
 }

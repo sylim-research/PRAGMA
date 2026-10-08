@@ -40,11 +40,11 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/library", label: "학습 미션 관리" },
     { to: "/admin/composer/new", label: "신규 교과목 개설" },
     { to: "/admin/composer", label: "주차별 미션 배치" },
-    { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
+    { to: "/admin/discussion", label: "메타화용 토론", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
+    { to: "/admin/decision-traces", label: "학습 수행 기록" },
   ]},
   { header: "5. 관리 도구", items: [
-    { to: "/admin/data-backup", label: "수업 편성 백업·복원" },
-    { to: "/admin/export", label: "연구용 기록 내보내기" },
+    { to: "/admin/data-backup", label: "기록 백업·내보내기", activePaths: ["/admin/export"] },
   ]},
 ] as const;
 
@@ -52,8 +52,8 @@ const PRIORITY_PATHS = [
   "/admin/review",
   "/admin/composer",
   "/admin/library",
-  "/admin/decision-traces",
-  "/admin/export",
+  "/admin/discussion",
+  "/admin/data-backup",
 ] as const;
 
 const ALL_ADMIN_NAV_ITEMS = ADMIN_NAV_GROUPS.flatMap((group) => group.items);

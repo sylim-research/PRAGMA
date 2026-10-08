@@ -293,7 +293,7 @@ const AdminTeachingMaterials = () => {
                 <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
               </Button>}
               {week.scenarios[0] && <Button variant="outline" asChild>
-                <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학습자 응답 확인</Link>
+                <Link to={`/admin/discussion?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학습자 응답 확인</Link>
               </Button>}
             </div>
           </div>
@@ -305,7 +305,7 @@ const AdminTeachingMaterials = () => {
                 <span className="text-[13.5px] font-medium text-[#15202B]">{mission.label}</span>
                 <span className="flex gap-1">
                   <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" asChild><Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, week.week_no, mission.id, week.scenarios.find((scenario) => scenario.scenario_id === mission.id)?.assignment_id)}>{mission.label} 열기 ↗</Link></Button>
-                  <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" asChild><Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(mission.id)}`}>{mission.label} 응답</Link></Button>
+                  <Button size="sm" variant="ghost" className="h-8 text-[12.5px]" asChild><Link to={`/admin/discussion?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(mission.id)}`}>{mission.label} 응답</Link></Button>
                 </span>
               </li>)}
             </ul> : <p className="mt-1 text-[13px] text-muted-foreground">연결된 공개 미션이 없습니다. 미션을 사용하는 주차는 수업 편성에서 먼저 편성해 주세요.</p>}
@@ -424,7 +424,7 @@ const AdminTeachingMaterials = () => {
                     <Link target="_blank" rel="noreferrer" to={assignedMissionPath(courseId, item.week_no, firstMission.scenario_id, firstMission.assignment_id)}>미션</Link>
                   </Button>
                   <Button size="sm" variant="ghost" className="h-7 px-2 text-[12px]" asChild>
-                    <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}&missionId=${encodeURIComponent(firstMission.scenario_id)}`}>응답 분포</Link>
+                    <Link to={`/admin/discussion?courseId=${encodeURIComponent(courseId)}&weekNo=${item.week_no}&missionId=${encodeURIComponent(firstMission.scenario_id)}`}>응답 분포</Link>
                   </Button>
                 </>}
               </div>
