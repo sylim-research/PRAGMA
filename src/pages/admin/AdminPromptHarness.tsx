@@ -70,7 +70,7 @@ function ContractSummary() {
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[11px] font-bold text-[#6D5C1F]">{index + 1}</span>
-            <p className="text-[13px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
+            <p className="text-[13.5px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
       </ol>
@@ -153,42 +153,42 @@ function HarnessOverview() {
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
           className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
+            <span className="text-[11.5px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
           </div>
-          <h3 className="mt-2 text-[14px] font-bold">규칙 기반 검사</h3>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[15px] font-bold">규칙 기반 검사</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B]">
+          <span className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B]">
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
             {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
           </span>
         </button>
         <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-semibold text-[#3F6172]">AI 검토</span>
+            <span className="text-[11.5px] font-semibold text-[#3F6172]">AI 검토</span>
             <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
           </div>
-          <h3 className="mt-2 text-[14px] font-bold">프롬프트 통제 기반 검토</h3>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[15px] font-bold">프롬프트 통제 기반 검토</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
-          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
             검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
           </a>
         </div>
         <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-semibold text-[#6D675D]">최종 사용 결정</span>
+            <span className="text-[11.5px] font-semibold text-[#6D675D]">최종 사용 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[14px] font-bold">교수자 최종 승인</h3>
-          <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[15px] font-bold">교수자 최종 승인</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
-          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
             승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -226,7 +226,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1 pl-5 text-[13px] leading-relaxed text-muted-foreground">
+        <p className="mt-1 pl-5 text-[13.5px] leading-relaxed text-muted-foreground">
           {entry.note}
         </p>
       </CardHeader>
