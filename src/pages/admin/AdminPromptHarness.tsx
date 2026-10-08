@@ -186,7 +186,7 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-2 text-[15px] font-bold">교수자 최종 승인</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            자동 규칙 검사·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
+            자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
           <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
             승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />

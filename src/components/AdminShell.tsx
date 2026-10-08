@@ -24,7 +24,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mobileNavValue = adminMobileNavValue(pathname);
-  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1525px]" : "max-w-[1425px]";
+  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1465px]" : "max-w-[1365px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );

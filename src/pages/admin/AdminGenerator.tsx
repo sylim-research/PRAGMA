@@ -200,7 +200,7 @@ interface BatchItem {
   auto_check: "pass" | "warning";
 }
 
-const formField = "h-9 text-[15px] bg-[#FFFDF8] border-[#E6DECB]";
+const formField = "h-9 text-[14.75px] bg-[#FFFDF8] border-[#E6DECB]";
 
 // 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
 const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
@@ -243,19 +243,19 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
     if (m) pdr.push({ name: PDR_AXIS_NAME[m[1]], value: m[2] });
     else others.push(c);
   }
-  const heading = "text-[12.5px] font-semibold tracking-[0.04em] text-[#8A7621]";
+  const heading = "text-[12.25px] font-semibold tracking-[0.04em] text-[#8A7621]";
   return (
     <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_minmax(0,1fr)]">
       <div className="min-w-0">
         <div className={heading}>화행</div>
-        <div className="mt-1 text-[16px] font-bold text-[#15202B]">{act}</div>
+        <div className="mt-1 text-[15.75px] font-bold text-[#15202B]">{act}</div>
       </div>
       <div className="min-w-0 sm:border-l sm:border-[#E6E1D5] sm:pl-5">
         <div className={heading}>상황·관계 조건 (P·D·R)</div>
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
           {pdr.map(({ name, value }) => (
-            <span key={name} className="whitespace-nowrap text-[14.5px] text-[#5B6770]">
-              {name} <b className="text-[15.5px] font-bold text-[#15202B]">{value}</b>
+            <span key={name} className="whitespace-nowrap text-[14.25px] text-[#5B6770]">
+              {name} <b className="text-[15.25px] font-bold text-[#15202B]">{value}</b>
             </span>
           ))}
         </div>
@@ -265,8 +265,8 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
         {/* 교수자 최종 승인 화면의 머리 칩과 같은 「이름 값」 짝으로 보여 준다. */}
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
           {others.map((value, index) => (
-            <span key={index} className="whitespace-nowrap text-[14.5px] text-[#5B6770]">
-              {OTHER_AXIS_NAME[index] ?? ""} <b className="text-[15.5px] font-bold text-[#15202B]">{value}</b>
+            <span key={index} className="whitespace-nowrap text-[14.25px] text-[#5B6770]">
+              {OTHER_AXIS_NAME[index] ?? ""} <b className="text-[15.25px] font-bold text-[#15202B]">{value}</b>
             </span>
           ))}
         </div>
@@ -900,7 +900,7 @@ const AdminGenerator = () => {
       description="상황·관계 조건을 정해 시나리오를 한 건씩 만들고, 교수자 감수 대기 상태로 저장합니다."
     >
       {gridPrefill && (
-        <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-[14px] text-amber-950">
+        <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-[13.75px] text-amber-950">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <b>현황표에서 고른 조건을 불러왔습니다.</b>
@@ -927,7 +927,7 @@ const AdminGenerator = () => {
       {/* 적용된 원문이 보이지 않으면 무엇이 반영됐는지 알 수 없다 —
           manualSourceText는 입력 UI가 없는 내부 상태라 여기서 확인시킨다. */}
       {authenticProv && manualSourceText.trim() && (
-        <p className="mt-2 rounded-md border border-[#6EE7B7] bg-[#ECFDF5] px-3 py-2 text-[14px] leading-relaxed text-[#065F46]">
+        <p className="mt-2 rounded-md border border-[#6EE7B7] bg-[#ECFDF5] px-3 py-2 text-[13.75px] leading-relaxed text-[#065F46]">
           ✓ 실제 자료 후보가 적용되었습니다 · 원문 「{manualSourceText.slice(0, 60)}
           {manualSourceText.length > 60 ? "…" : ""}」 — 생성 시 이 원문과 출처(
           {authenticProv.source_ref ?? "출처 미입력"})가 함께 저장됩니다.
@@ -951,7 +951,7 @@ const AdminGenerator = () => {
                     type="button"
                     onClick={() => setTaskModeSafe(m)}
                     className={[
-                      "h-10 rounded-md text-[15px] font-medium transition-colors",
+                      "h-10 rounded-md text-[14.75px] font-medium transition-colors",
                       on
                         ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
                         : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
@@ -963,7 +963,7 @@ const AdminGenerator = () => {
               })}
             </div>
             {taskMode === "stt_interpreting" && (
-              <p className="mt-1.5 text-[13.5px] text-muted-foreground">
+              <p className="mt-1.5 text-[13.25px] text-muted-foreground">
                 순차통역 · 2인 상호작용 과제로 생성됩니다.
               </p>
             )}
@@ -995,7 +995,7 @@ const AdminGenerator = () => {
                   >
                     <div
                       className={[
-                        "text-[15.5px]",
+                        "text-[15.25px]",
                         on ? "font-bold text-[#15202B]" : "font-medium text-foreground",
                       ].join(" ")}
                     >
@@ -1003,7 +1003,7 @@ const AdminGenerator = () => {
                     </div>
                     <div
                       className={[
-                        "text-[12px] mt-0.5",
+                        "text-[11.75px] mt-0.5",
                         on ? "text-[#4E5A63]" : "text-muted-foreground",
                       ].join(" ")}
                     >
@@ -1019,7 +1019,7 @@ const AdminGenerator = () => {
           {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
           <div>
             <SectionTitle n={3} label="상황·관계 조건 (P·D·R)" accent="핵심 조건" />
-            <p className="mt-1 pl-[30px] text-[13.5px] text-muted-foreground">Power · Distance · Ranking of imposition</p>
+            <p className="mt-1 pl-[30px] text-[13.25px] text-muted-foreground">Power · Distance · Ranking of imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="권력(P)">
                 <Select
@@ -1102,10 +1102,10 @@ const AdminGenerator = () => {
             <SectionTitle n={5} label="도메인 · 업종 · 편성 주제" />
             <div className="mt-2 grid items-start gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-[14.5px] font-semibold text-[#3F4E59]">도메인</label>
+                <label className="text-[14.25px] font-semibold text-[#3F4E59]">도메인</label>
                 <div className="mt-1.5 flex h-9 items-center gap-3">
                   {(Object.keys(DOMAIN) as Domain[]).map((d) => (
-                    <label key={d} className="flex items-center gap-1.5 text-[15px] cursor-pointer">
+                    <label key={d} className="flex items-center gap-1.5 text-[14.75px] cursor-pointer">
                       <input
                         type="radio"
                         name="domain"
@@ -1135,7 +1135,7 @@ const AdminGenerator = () => {
                   15주 수업 편성·검색에 쓰는 소재 영역이다(scenarioTopics.ts). 2026-09-26 */}
               {form.domain === "work" && (
                 <div>
-                  <label className="text-[14.5px] font-semibold text-[#3F4E59]">
+                  <label className="text-[14.25px] font-semibold text-[#3F4E59]">
                     업종 배경 <span className="font-normal text-[#7A858C]">· 직장 장면에만</span>
                   </label>
                   <Select
@@ -1152,7 +1152,7 @@ const AdminGenerator = () => {
                 </div>
               )}
               <div>
-                <label className="text-[14.5px] font-semibold text-[#3F4E59]">
+                <label className="text-[14.25px] font-semibold text-[#3F4E59]">
                   편성 주제 <span className="font-normal text-[#7A858C]">· 수업 편성에서 쓰는 소재 영역</span>
                 </label>
                 {/* 도메인이 허용하지 않는 주제는 아예 목록에서 뺀다 — 고른 뒤 생성이 실패하는
@@ -1182,7 +1182,7 @@ const AdminGenerator = () => {
                     type="button"
                     onClick={() => setOutlineCountSafe(n)}
                     className={[
-                      "flex-1 h-9 rounded-md text-[15px] font-medium transition-colors",
+                      "flex-1 h-9 rounded-md text-[14.75px] font-medium transition-colors",
                       on
                         ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
                         : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
@@ -1199,26 +1199,26 @@ const AdminGenerator = () => {
               type="button"
               onClick={generateOutlines}
               disabled={outlineLoading || finalizing}
-              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-[#FFFDF8] text-[15px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2.5 w-full h-10 rounded-md border border-[#15202B]/25 bg-[#FFFDF8] text-[14.75px] font-medium text-[#15202B] hover:border-[#15202B]/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="inline-flex items-center justify-center gap-1.5">
                 <Search className="h-4 w-4" aria-hidden />
                 {outlineLoading ? "개요 생성 중..." : `상황 개요 ${outlineCount}개 생성`}
               </span>
             </button>
-            <p className="mt-1.5 text-center text-[13.5px] text-[#5B6770]">
+            <p className="mt-1.5 text-center text-[13.25px] text-[#5B6770]">
               개요를 먼저 확인하고, 선택한 것만 전체 시나리오로 생성됩니다
             </p>
 
             {outlineError && (
-              <div className="mt-2 rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[13.5px] text-[#991B1B]">
+              <div className="mt-2 rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[13.25px] text-[#991B1B]">
                 개요 생성 실패: {outlineError}
               </div>
             )}
 
             {outlines && outlines.length > 0 && (
               <div className="mt-2.5 space-y-1.5">
-                <div className="text-[14px] text-[#4E5A63]">
+                <div className="text-[13.75px] text-[#4E5A63]">
                   목표화행 <b className="text-[#15202B]">{SPEECH_ACT_UI[form.speech_act_ui]}</b> · 개요 {outlines.length}개 · 체크한 것만 생성
                 </div>
                 {outlines.map((o, i) => {
@@ -1227,7 +1227,7 @@ const AdminGenerator = () => {
                     <label
                       key={i}
                       className={[
-                        "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[15px] cursor-pointer transition-colors",
+                        "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[14.75px] cursor-pointer transition-colors",
                         on ? "border-[#CDBB8A] bg-[#FBF5E6]" : "border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                       ].join(" ")}
                     >
@@ -1240,7 +1240,7 @@ const AdminGenerator = () => {
                       <span>
                         <span className="font-semibold text-[#15202B]">{o.title || "(제목 없음)"}</span>
                         {o.situation && (
-                          <span className="mt-1 block text-[14.5px] leading-[1.65] text-[#3F4E59]">
+                          <span className="mt-1 block text-[14.25px] leading-[1.65] text-[#3F4E59]">
                             {o.situation}
                           </span>
                         )}
@@ -1265,7 +1265,7 @@ const AdminGenerator = () => {
               return (
                 <p
                   className={[
-                    "mt-2.5 rounded-md border px-3 py-2 text-[14px] font-medium",
+                    "mt-2.5 rounded-md border px-3 py-2 text-[13.75px] font-medium",
                     saved > 0 ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]" : "border-[#FCD34D] bg-[#FFFBEB] text-[#92400E]",
                   ].join(" ")}
                 >
@@ -1280,24 +1280,24 @@ const AdminGenerator = () => {
 
         {/* RIGHT — preview */}
         <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
-          <h2 className="text-[17px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
+          <h2 className="text-[16.75px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
-              <p className="text-[14.5px] font-medium text-[#065F46]">
+              <p className="text-[14.25px] font-medium text-[#065F46]">
                 ✓ 시나리오가 교수자 감수 대기 상태로 저장되었습니다.
               </p>
-              <p className="mt-1 text-[13.5px] text-[#065F46]/85">
-                다음 단계: 자동 규칙 검사·AI 검토 → 교수자 최종 승인
+              <p className="mt-1 text-[13.25px] text-[#065F46]/85">
+                다음 단계: 자동 품질 검토 → 교수자 감수·최종 승인
               </p>
             </div>
           )}
           {saveError && (
-            <div className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEE2E2] p-3 text-[14.5px] text-[#991B1B]">
+            <div className="mt-3 rounded-md border border-[#FCA5A5] bg-[#FEE2E2] p-3 text-[14.25px] text-[#991B1B]">
               저장 실패: {saveError}
             </div>
           )}
           {metaWarning && (
-            <div className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] p-2.5 text-[13.5px] text-[#92400E]">
+            <div className="mt-2 rounded-md border border-[#FCD34D] bg-[#FEF3C7] p-2.5 text-[13.25px] text-[#92400E]">
               ⚠ {metaWarning}
             </div>
           )}
@@ -1305,14 +1305,14 @@ const AdminGenerator = () => {
             {loading && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
-                <p className="mt-3 text-[14px] text-muted-foreground">생성 중...</p>
+                <p className="mt-3 text-[13.75px] text-muted-foreground">생성 중...</p>
               </div>
             )}
 
             {finalizing && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
-                <p className="mt-3 text-[14px] text-muted-foreground">시나리오 생성 중...</p>
+                <p className="mt-3 text-[13.75px] text-muted-foreground">시나리오 생성 중...</p>
               </div>
             )}
 
@@ -1321,16 +1321,16 @@ const AdminGenerator = () => {
                 <ConditionSummary conditions={example.conditions} />
                 <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="inline-flex items-center rounded border border-[#E3D3A0] bg-[#FDF8EA] px-1.5 py-0.5 text-[13px] font-medium text-[#6D5C1F]">생성 예시</span>
-                    <span className="text-[15.5px] font-semibold text-foreground">{example.title}</span>
+                    <span className="inline-flex items-center rounded border border-[#E3D3A0] bg-[#FDF8EA] px-1.5 py-0.5 text-[12.75px] font-medium text-[#6D5C1F]">생성 예시</span>
+                    <span className="text-[15.25px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>
-                    <div className="mb-1 text-[13px] font-semibold text-[#8a857c]">상황</div>
-                    <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[15px] leading-relaxed text-[#3F4E59]">{example.situation}</div>
+                    <div className="mb-1 text-[12.75px] font-semibold text-[#8a857c]">상황</div>
+                    <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{example.situation}</div>
                   </div>
                   <div>
-                    <div className="mb-1 text-[13px] font-semibold text-[#6D5C1F]">원문</div>
-                    <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[16px] leading-relaxed text-[#15202B]">{example.source}</div>
+                    <div className="mb-1 text-[12.75px] font-semibold text-[#6D5C1F]">원문</div>
+                    <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.75px] leading-relaxed text-[#15202B]">{example.source}</div>
                   </div>
                 </div>
               </div>
@@ -1351,7 +1351,7 @@ const AdminGenerator = () => {
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
                         className={[
-                          "inline-flex items-center rounded border px-1.5 py-0.5 text-[13px] font-medium",
+                          "inline-flex items-center rounded border px-1.5 py-0.5 text-[12.75px] font-medium",
                           r.ok
                             ? "border-[#6EE7B7] bg-[#D1FAE5] text-[#065F46]"
                             : r.stage === "system"
@@ -1363,7 +1363,7 @@ const AdminGenerator = () => {
                       </span>
                       {r.ok && r.rule && (
                         <span className={[
-                          "inline-flex items-center rounded border bg-white px-1.5 py-0.5 text-[13px] font-medium",
+                          "inline-flex items-center rounded border bg-white px-1.5 py-0.5 text-[12.75px] font-medium",
                           r.rule === "pass" ? "border-[#9FD3B5] text-[#1F6B45]"
                             : r.rule === "warning" ? "border-[#EBCB8B] text-[#7A4A0A]"
                               : "border-[#FCA5A5] text-[#991B1B]",
@@ -1371,38 +1371,38 @@ const AdminGenerator = () => {
                           자동 품질 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
-                      <span className="text-[15.5px] font-semibold text-foreground">{r.title}</span>
+                      <span className="text-[15.25px] font-semibold text-foreground">{r.title}</span>
                     </div>
                     {r.error && heldStage && (
                       <div>
-                        <p className="text-[15px] font-medium text-[#15202B]">{HOLD_STAGE_SUMMARY[heldStage]}</p>
+                        <p className="text-[14.75px] font-medium text-[#15202B]">{HOLD_STAGE_SUMMARY[heldStage]}</p>
                         <div className="mt-2.5 border-t border-[#EEEAE0] pt-2.5">
-                          <div className="text-[12.5px] font-semibold tracking-[0.04em] text-[#8A7621]">{HOLD_REASON_SOURCE[heldStage]}</div>
-                          <p className="mt-1 max-w-[64ch] text-[15px] leading-[1.75] text-[#3F4E59]">{humanizeHoldReason(r.error)}</p>
+                          <div className="text-[12.25px] font-semibold tracking-[0.04em] text-[#8A7621]">{HOLD_REASON_SOURCE[heldStage]}</div>
+                          <p className="mt-1 max-w-[64ch] text-[14.75px] leading-[1.75] text-[#3F4E59]">{humanizeHoldReason(r.error)}</p>
                         </div>
                       </div>
                     )}
                     {r.error && !heldStage && (
-                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[14.5px] leading-relaxed text-[#991B1B]">
+                      <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] px-3 py-2 text-[14.25px] leading-relaxed text-[#991B1B]">
                         {humanizeHoldReason(r.error)}
                       </div>
                     )}
                     {r.core && typeof r.core.situation_ko === "string" && (
                       <div>
-                        <div className="mb-1 text-[13px] font-semibold text-[#8a857c]">상황</div>
-                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[15px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
+                        <div className="mb-1 text-[12.75px] font-semibold text-[#8a857c]">상황</div>
+                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.source_text === "string" && (
                       <div>
-                        <div className="mb-1 text-[13px] font-semibold text-[#6D5C1F]">원문</div>
-                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[16px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
+                        <div className="mb-1 text-[12.75px] font-semibold text-[#6D5C1F]">원문</div>
+                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.75px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
-                        <div className="mb-1 text-[13px] font-semibold text-[#8a857c]">상황 맥락 참고</div>
-                        <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[14px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
+                        <div className="mb-1 text-[12.75px] font-semibold text-[#8a857c]">상황 맥락 참고</div>
+                        <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[13.75px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
                       </div>
                     )}
                   </div>
@@ -1412,7 +1412,7 @@ const AdminGenerator = () => {
             )}
 
             {!loading && aiError && (
-              <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] p-3 text-[14.5px] text-[#991B1B]">
+              <div className="rounded-md border border-[#FCA5A5] bg-[#FEE2E2] p-3 text-[14.25px] text-[#991B1B]">
                 생성 실패: {aiError}
               </div>
             )}
@@ -1421,13 +1421,13 @@ const AdminGenerator = () => {
               <div className="space-y-5">
                 {outlineCount > 1 && batchItems && (
                   <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2">
-                    <p className="text-[14.5px] font-medium text-[#5B5446]">
+                    <p className="text-[14.25px] font-medium text-[#5B5446]">
                       총 {batchItems.length}개의 시나리오가 생성 예정입니다.
                     </p>
                   </div>
                 )}
 
-                <h3 className="text-[17px] font-medium text-foreground leading-snug">
+                <h3 className="text-[16.75px] font-medium text-foreground leading-snug">
                   {aiResult.title}
                 </h3>
 
@@ -1435,7 +1435,7 @@ const AdminGenerator = () => {
                   {tags.map((t) => (
                     <span
                       key={t}
-                      className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[13px] text-muted-foreground"
+                      className="inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[12.75px] text-muted-foreground"
                     >
                       {t}
                     </span>
@@ -1443,29 +1443,29 @@ const AdminGenerator = () => {
                 </div>
 
                 <div>
-                  <div className="mb-1.5 text-[13px] font-medium text-[#8a857c] uppercase tracking-wide">
+                  <div className="mb-1.5 text-[12.75px] font-medium text-[#8a857c] uppercase tracking-wide">
                     상황 카드
                   </div>
-                  <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15px] leading-relaxed text-foreground">
+                  <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[14.75px] leading-relaxed text-foreground">
                     {aiResult.situation}
                   </div>
                 </div>
 
                 <div>
-                  <div className="mb-1.5 text-[13px] font-medium text-[#8a857c] uppercase tracking-wide">
+                  <div className="mb-1.5 text-[12.75px] font-medium text-[#8a857c] uppercase tracking-wide">
                     한국어 원문 (source_text)
                   </div>
-                  <div className="max-h-44 overflow-y-auto rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-3 text-[15px] leading-relaxed text-foreground">
+                  <div className="max-h-44 overflow-y-auto rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-3 text-[14.75px] leading-relaxed text-foreground">
                     {aiResult.source_text}
                   </div>
                 </div>
 
                 <div>
                   <div className="mb-1.5 flex items-baseline justify-between">
-                    <div className="text-[13px] font-medium text-[#8a857c] uppercase tracking-wide">
+                    <div className="text-[12.75px] font-medium text-[#8a857c] uppercase tracking-wide">
                       중국어 후보 번역안 · 총 {aiResult.candidates.length}개
                     </div>
-                    <div className="text-[12.5px] text-muted-foreground">
+                    <div className="text-[12.25px] text-muted-foreground">
                       directness 1(완곡) ~ 5(직접)
                     </div>
                   </div>
@@ -1476,30 +1476,30 @@ const AdminGenerator = () => {
                         className="rounded-md border border-border bg-background p-3 space-y-1.5"
                       >
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-[13px] font-medium text-foreground">
+                          <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 text-[12.75px] font-medium text-foreground">
                             #{i + 1}
                           </span>
                           <span
-                            className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[13px] ${APPROPRIATENESS_TONE[c.appropriateness_label]}`}
+                            className={`inline-flex items-center rounded border px-1.5 py-0.5 text-[12.75px] ${APPROPRIATENESS_TONE[c.appropriateness_label]}`}
                           >
                             {APPROPRIATENESS_KO[c.appropriateness_label]}
                           </span>
-                          <span className="inline-flex items-center rounded border border-border bg-background px-1.5 py-0.5 text-[13px] text-muted-foreground">
+                          <span className="inline-flex items-center rounded border border-border bg-background px-1.5 py-0.5 text-[12.75px] text-muted-foreground">
                             directness {c.directness_level}
                           </span>
                           {c.failed_challenge.map((f) => (
                             <span
                               key={f}
-                              className="inline-flex items-center rounded bg-[#FEE2E2] px-1.5 py-0.5 text-[12.5px] text-[#991B1B]"
+                              className="inline-flex items-center rounded bg-[#FEE2E2] px-1.5 py-0.5 text-[12.25px] text-[#991B1B]"
                             >
                               실패: {CHALLENGE_KO[f] ?? f}
                             </span>
                           ))}
                         </div>
-                        <div className="text-[15px] leading-relaxed text-foreground">
+                        <div className="text-[14.75px] leading-relaxed text-foreground">
                           {c.candidate_text}
                         </div>
-                        <div className="text-[13.5px] leading-relaxed text-muted-foreground">
+                        <div className="text-[13.25px] leading-relaxed text-muted-foreground">
                           <span className="text-[#8a857c]">근거 · </span>
                           {c.rationale}
                         </div>
@@ -1509,7 +1509,7 @@ const AdminGenerator = () => {
                 </div>
 
                 <div>
-                  <div className="mb-1.5 text-[13px] font-medium text-[#8a857c] uppercase tracking-wide">
+                  <div className="mb-1.5 text-[12.75px] font-medium text-[#8a857c] uppercase tracking-wide">
                     3관점 피드백
                   </div>
                   <div className="space-y-2">
@@ -1522,8 +1522,8 @@ const AdminGenerator = () => {
                         key={k}
                         className="rounded-md border border-border bg-background p-3"
                       >
-                        <div className="text-[14px] font-medium text-[#1d2336]">{label}</div>
-                        <p className="mt-1 text-[14.5px] leading-relaxed text-muted-foreground">
+                        <div className="text-[13.75px] font-medium text-[#1d2336]">{label}</div>
+                        <p className="mt-1 text-[14.25px] leading-relaxed text-muted-foreground">
                           {text}
                         </p>
                       </div>
@@ -1532,7 +1532,7 @@ const AdminGenerator = () => {
                 </div>
 
                 {aiMeta && (
-                  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3 text-[13px] text-muted-foreground">
+                  <div className="flex flex-wrap items-center gap-2 border-t border-border pt-3 text-[12.75px] text-muted-foreground">
                     <span className="inline-flex items-center rounded border border-border bg-background px-1.5 py-0.5">
                       provider: {aiMeta.provider}
                     </span>
@@ -1553,14 +1553,14 @@ const AdminGenerator = () => {
                     variant="outline"
                     onClick={generate}
                     disabled={saving}
-                    className="border-border bg-transparent text-[15px]"
+                    className="border-border bg-transparent text-[14.75px]"
                   >
                     ↻ 다시 생성
                   </Button>
                   <Button
                     onClick={saveToArchive}
                     disabled={saving || saved}
-                    className="bg-[#1d2336] text-[15px] text-white hover:bg-[#1d2336]/90 disabled:opacity-60"
+                    className="bg-[#1d2336] text-[14.75px] text-white hover:bg-[#1d2336]/90 disabled:opacity-60"
                   >
                     {saved ? "✓ 저장됨" : saving ? "저장 중..." : "💾 아카이브에 저장"}
                   </Button>
@@ -1586,7 +1586,7 @@ const Field = ({
   <div>
     <label
       className={[
-        "text-[14.5px] font-semibold",
+        "text-[14.25px] font-semibold",
         tone === "accent" ? "text-[#7A4A0A]" : "text-[#3F4E59]",
       ].join(" ")}
     >
@@ -1609,18 +1609,18 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-2 text-[16px] font-semibold text-[#15202B]",
+      "flex items-center gap-2 text-[15.75px] font-semibold text-[#15202B]",
     ].join(" ")}
   >
     <span
       className={[
-        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[14px] font-semibold text-[#15202B]",
+        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[13.75px] font-semibold text-[#15202B]",
       ].join(" ")}
     >
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[13px] font-semibold text-[#6D5C1F]">{accent}</span>}
+    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[12.75px] font-semibold text-[#6D5C1F]">{accent}</span>}
   </h3>
 );
 
