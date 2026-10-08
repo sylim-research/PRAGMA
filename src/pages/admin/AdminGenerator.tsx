@@ -936,7 +936,7 @@ const AdminGenerator = () => {
 
       {/* 2-col layout */}
       {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
-      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,43fr)_minmax(0,57fr)]">
         {/* LEFT — settings */}
         <section className="space-y-5 rounded-lg border border-[#E2DED2] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
@@ -1330,7 +1330,7 @@ const AdminGenerator = () => {
                   </div>
                   <div>
                     <div className="mb-1 text-[12.25px] font-semibold text-[#6D5C1F]">원문</div>
-                    <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.25px] leading-relaxed text-[#15202B]">{example.source}</div>
+                    <div className="font-zh rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.25px] leading-relaxed text-[#15202B]">{example.source}</div>
                   </div>
                 </div>
               </div>
@@ -1396,13 +1396,13 @@ const AdminGenerator = () => {
                     {r.core && typeof r.core.source_text === "string" && (
                       <div>
                         <div className="mb-1 text-[12.25px] font-semibold text-[#6D5C1F]">원문</div>
-                        <div className="rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.25px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
+                        <div className="font-zh rounded-md border border-[#FAD338] bg-[#FAD338]/15 p-3 text-[15.25px] leading-relaxed text-[#15202B]">{r.core.source_text as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
                         <div className="mb-1 text-[12.25px] font-semibold text-[#8a857c]">상황 맥락 참고</div>
-                        <div className="rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[13.25px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
+                        <div className="font-zh rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[13.25px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
                       </div>
                     )}
                   </div>
