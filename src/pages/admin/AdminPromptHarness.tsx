@@ -4,6 +4,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { PROMPT_SNAPSHOT, type PromptSnapshotEntry } from "@/lib/pragma/promptSnapshot.generated";
+import {
+  CURRENT_MISSION_V6_RULE_IDS,
+  CURRENT_PIPELINE_RULE_IDS,
+  CURRENT_SCENARIO_RULE_IDS,
+  QUALITY_RULE_CATALOG,
+  QUALITY_RULE_CATALOG_REVIEW_STATUS,
+  QUALITY_RULE_CATEGORIES,
+  QUALITY_RULE_IDS_IN_CATALOG,
+  type QualityRuleNature,
+} from "@/lib/pragma/qualityRuleCatalog";
+import type { RuleId } from "@/lib/pragma/missionRules";
 
 // ── 저장소 정본(읽기 전용) ─────────────────────────────────────────────
 // 이 섹션의 원문은 promptSnapshot.generated.ts에서 온다. 그 파일은 build마다
@@ -26,7 +37,104 @@ const HIDDEN_PROMPT_KEYS = new Set([
   "feedback.system.spoken",
 ]);
 
+// 생성계약 정본(docs/contracts/PRAGMA_생성계약_정본.md)이 고정하는 것을 화면용 한 줄로 옮긴다.
+// 정본은 변경 이력·결정 ID가 섞인 긴 문서라 원문을 싣지 않는다. 계약이 바뀌면 이 목록도 고친다.
+const CONTRACT_CLAUSES: { title: string; body: string }[] = [
+  { title: "생성 조건", body: "화행·상황과 관계·학습 수준·언어 방향·수행 방식이 정해진 조합 안에서만 만듭니다." },
+  { title: "두 단계 생성", body: "시나리오를 먼저 만들고, 고른 시나리오만 학습 미션(MJT 5문항과 통번역 과제 1개)으로 만듭니다." },
+  { title: "언어 방향", body: "한→중·중→한마다 원문 언어와 산출 언어를 고정하고, 섞이지 않았는지 검사합니다." },
+  { title: "평가 경계", body: "의미 전달·문법 정확성·상황 적절성을 따로 판정하고 하나의 점수로 합치지 않습니다. 더 길거나 더 완곡한 표현을 자동으로 더 낫다고 보지 않습니다." },
+  { title: "생성 기록", body: "모델·프롬프트 판본과 지문·생성 시각·형식 판본을 남겨, 어떤 조건에서 만들었는지 되짚을 수 있게 합니다." },
+  { title: "공개 조건", body: "생성 성공은 승인이 아닙니다. 자동 품질 점검과 AI 검토를 거쳐 교수자가 승인한 미션만 학습자에게 공개합니다." },
+];
+
+function ContractSummary() {
+  return (
+    <section aria-labelledby="contract-title" className="mb-4 rounded-xl border border-[#D9D2BF] bg-white p-4 sm:p-5">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">생성계약</p>
+      <h2 id="contract-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
+        모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다.
+      </h2>
+      <ol className="mt-4 grid gap-x-6 gap-y-3 md:grid-cols-2">
+        {CONTRACT_CLAUSES.map((clause, index) => (
+          <li key={clause.title} className="flex gap-3">
+            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[11px] font-bold text-[#15202B]">{index + 1}</span>
+            <p className="text-[13px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+const NATURE_LABEL: Record<QualityRuleNature, string> = {
+  structural: "형식 확인",
+  signal: "위험 신호",
+  governance: "기록 확인",
+};
+const SCENARIO_RULES = new Set<RuleId>(CURRENT_SCENARIO_RULE_IDS);
+const MISSION_RULES = new Set<RuleId>(CURRENT_MISSION_V6_RULE_IDS);
+const ruleOrder = (id: RuleId) => Number(id.replace(/\D/g, "")) + (id.endsWith("c") ? 0.5 : 0);
+
+function RuleCatalogPanel() {
+  const [scope, setScope] = useState<"current" | "legacy">("current");
+  const ids = QUALITY_RULE_IDS_IN_CATALOG.filter((id) => (scope === "current") === CURRENT_PIPELINE_RULE_IDS.has(id));
+  const currentCount = QUALITY_RULE_IDS_IN_CATALOG.filter((id) => CURRENT_PIPELINE_RULE_IDS.has(id)).length;
+  const legacyCount = QUALITY_RULE_IDS_IN_CATALOG.length - currentCount;
+  return (
+    <div id="quality-rules" className="mt-3 rounded-lg border border-[#E5DEC9] bg-[#FFFDF7] p-3 sm:p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        {([["current", `현행 미션에 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
+          <button key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
+            className={`rounded-lg border px-3 py-1.5 text-[13px] font-medium ${scope === value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#3B4A54] hover:bg-[#F5F4EF]"}`}>
+            {label}
+          </button>
+        ))}
+        {QUALITY_RULE_CATALOG_REVIEW_STATUS === "draft_pending_researcher_review" && (
+          <span className="ml-auto text-[11.5px] text-[#8A7621]">설명 문안은 연구자 확인 전입니다.</span>
+        )}
+      </div>
+      <p className="mt-2 text-[12px] leading-relaxed text-[#52616B]">
+        {scope === "current"
+          ? "지금 만드는 시나리오와 학습 미션에 실제로 실행되는 규칙입니다."
+          : "이전 미션 형식에만 실행되는 규칙입니다. 현행 미션의 문항 품질은 AI 검토와 교수자 승인으로 확인합니다."}
+      </p>
+      <div className="mt-3 space-y-4">
+        {QUALITY_RULE_CATEGORIES.map((category) => {
+          const rules = ids.filter((id) => QUALITY_RULE_CATALOG[id].category === category).sort((a, b) => ruleOrder(a) - ruleOrder(b));
+          if (rules.length === 0) return null;
+          return (
+            <div key={category}>
+              <h4 className="text-[13px] font-bold text-[#15202B]">{category} <span className="font-normal text-[#6D675D]">{rules.length}</span></h4>
+              <ul className="mt-1.5 divide-y divide-[#EEE9DB] rounded-md border border-[#EEE9DB] bg-white">
+                {rules.map((id) => {
+                  const rule = QUALITY_RULE_CATALOG[id];
+                  return (
+                    <li key={id} className="grid gap-1 px-3 py-2 sm:grid-cols-[3.25rem_minmax(0,1fr)]">
+                      <span className="font-mono text-[12.5px] font-bold text-[#15202B]">{id}</span>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          {scope === "current" && SCENARIO_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">시나리오</Badge>}
+                          {scope === "current" && MISSION_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">학습 미션</Badge>}
+                          <Badge variant="outline" className="border-[#E5DEC9] bg-[#FBFAF6] px-1.5 py-0 text-[11px] font-normal text-[#6D5C1F]">{NATURE_LABEL[rule.nature]}</Badge>
+                        </div>
+                        <p className="mt-1 text-[12.5px] leading-relaxed text-[#26333B]">{rule.summary_ko}</p>
+                        {rule.applicability_ko && <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#6D675D]">적용 조건 · {rule.applicability_ko}</p>}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function HarnessOverview() {
+  const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section
       aria-labelledby="harness-overview-title"
@@ -42,7 +150,8 @@ function HarnessOverview() {
       </div>
 
       <div className="mt-4 grid gap-2 md:grid-cols-3">
-        <div className="rounded-lg border border-[#E5DEC9] bg-[#FBFAF6] p-3">
+        <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
+          className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E5DEC9] bg-[#FBFAF6]"}`}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
@@ -52,7 +161,11 @@ function HarnessOverview() {
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
-        </div>
+          <span className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B]">
+            {rulesOpen ? "규칙 접기" : "규칙 보기"}
+            {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
+          </span>
+        </button>
         <div className="rounded-lg border border-[#D8E0E5] bg-[#F7FAFB] p-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#3F6172]">AI 검토</span>
@@ -74,6 +187,7 @@ function HarnessOverview() {
           </p>
         </div>
       </div>
+      {rulesOpen && <RuleCatalogPanel />}
     </section>
   );
 }
@@ -127,6 +241,7 @@ const AdminPromptHarness = () => {
       title="생성계약·운영 프롬프트"
       description="생성계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
+      <ContractSummary />
       <HarnessOverview />
 
       <div className="mt-6 space-y-6">
