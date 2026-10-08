@@ -174,8 +174,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="165" align="left">용어</th><th width="672" align="left">정의</th></tr></thead>
   <tbody>
-    <tr><td>MJT</td><td>메타화용적 판단 과제(Metapragmatic Judgment Task). 표현의 화용적 적절성을 판단하는 문항</td></tr>
-    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT, Discourse Completion Task) 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
+    <tr><td>MJT</td><td>메타화용적 판단 과제<sup>*</sup>. 표현의 화용적 적절성을 판단하는 문항</td></tr>
+    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT)<sup>*</sup> 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
     <tr><td>STT·TTS</td><td>음성 인식·음성 합성(Speech-to-Text · Text-to-Speech). 통역 미션에 사용</td></tr>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
@@ -185,6 +185,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>교수자 최종 승인</td><td>감수한 콘텐츠 버전의 수업 사용 여부 결정</td></tr>
   </tbody>
 </table>
+
+> <small>* MJT: Metapragmatic Judgment Task · DCT: Discourse Completion Task</small>
 
 <br>
 <br>
