@@ -15,8 +15,8 @@ const demoLink =
   "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
-  "group inline-flex items-center gap-1.5 rounded-sm text-[14.333px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
-const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[14.333px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex items-center gap-1.5 rounded-sm text-[14.833px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[14.833px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 
 const Landing = () => {
