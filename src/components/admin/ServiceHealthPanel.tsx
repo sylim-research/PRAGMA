@@ -169,7 +169,7 @@ export const ServiceHealthPanel = () => {
           data-testid="summary-dot"
           aria-hidden="true"
         />
-        <h2 id="service-health-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#1B2A36]">
+        <h2 id="service-health-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#1B2A36]">
           외부 서비스 연동
         </h2>
         <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>

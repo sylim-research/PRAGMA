@@ -45,7 +45,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
       // 평소 = 「학습 미션 시작하기」의 연한 노랑, 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
@@ -54,7 +54,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2.5px] text-[14px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2.5px] text-[14.25px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-[#F3ECD9] text-foreground font-normal"
         : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
@@ -85,8 +85,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
       {/* 관리자 화면 폭 기준 2개: 사이드바 285 + 간격 24 + 본문 최대 1,200px(2·3번 묶음) 또는 1,040px, 가운데 정렬.
           좌우 여백 대칭 — 사이드바 상자가 안쪽으로 36px(pl-6+ml-3) 들어가 있으므로 바깥 왼쪽 0, 오른쪽 36px(pr-9). */}
-      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:px-9 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
-        <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden">
+      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:pl-9 md:pr-[64px] print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+        <aside className="hidden w-[265px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden">
           <nav className="flex flex-col pb-1 pl-6 pr-1 pt-1">
             <Link
               to={ADMIN_DASHBOARD_ITEM.to}
@@ -106,14 +106,14 @@ export const AdminShell = ({ title, description, children, compact = false, hide
               // ml-3은 대시보드 링크와 같은 값이다 — 하위 항목의 세로선이 「운영 대시보드」 상자
               // 왼쪽 테두리와 맞아 1~4번 묶음이 그 아래에 종속돼 보인다.
               return (
-                <div key={group.header} className="ml-3 mt-2 flex flex-col">
+                <div key={group.header} className="ml-3 mt-[11px] flex flex-col">
                   <button
                     type="button"
                     aria-expanded={expanded}
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14.5px] font-semibold transition-colors",
+                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[15px] font-semibold transition-colors",
                       groupActive
                         ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",

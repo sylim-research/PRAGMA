@@ -239,7 +239,7 @@ const titleOf = (r: CoreRow) => r.core_content?.brief_note_ko?.trim() || r.core_
  * 한 컴포넌트가 세 화면을 그린다. 대기열·필터 기계장치가 같기 때문이며, 화면마다 다른 것은
  * 대기열의 상태 칩·정렬과 작업대에서 할 수 있는 일이다.
  *   reviewMode=false      → 학습 미션 조립 (코어를 미션으로 만든다)
- *   reviewMode + aiReview → 자동 품질 검토 (판단 자료를 준비한다. 승인 기능 없음)
+ *   reviewMode + aiReview → 자동 품질 점검·AI 검토 (판단 자료를 준비한다. 승인 기능 없음)
  *   reviewMode            → 교수자 최종 승인 (감수하고 승인한다)
  * 목록 데이터를 나누지 않는다 — 같은 미션과 검토 이력을 공유하고 상태별 보기만 다르다.
  */
@@ -888,7 +888,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const metaLine = aiReview ? [] : reviewMode
       ? [info?.placement === "편성 전" ? null : info?.placement]
       : [];
-    const scenarioText = (
+    // 제작 화면은 상황을 한 줄로 줄여 오른쪽 칸에 스크롤이 생기지 않게 한다 — 전문은 마우스를 올리면 보인다(2026-10-08).
+    // 품질 점검·감수 화면은 상황 전문을 읽고 판단해야 하므로 그대로 둔다.
+    const scenarioLine = !aiReview && !reviewMode;
+    const scenarioText = scenarioLine ? (
+      <p className="max-w-[54rem] truncate text-[13.5px] leading-relaxed text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
+        {r.core_content?.situation_ko ?? "—"}
+      </p>
+    ) : (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
         {professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
@@ -913,7 +920,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
+            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -928,7 +935,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
           {/* 교수자 화면은 왼쪽에 승인 대기 목록 단추가 있어 제목이 가운데로 밀린다 — 제목만 한 줄 아래 왼쪽 끝에서 시작한다. */}
-          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[17px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
+          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
         </header>
         <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
@@ -971,7 +978,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           </>
         )}
 
-        {/* ── 자동 품질 검토: 검사하고 넘기는 화면 ── */}
+        {/* ── 자동 품질 점검·AI 검토: 검사하고 넘기는 화면 ── */}
         {aiReview && (
           <>
             {scenarioText}
@@ -1019,12 +1026,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   return (
     <AdminShell
-      title={aiReview ? "자동 품질 검토" : reviewMode ? "교수자 감수·최종 승인" : "학습 미션 제작"}
+      title={aiReview ? "자동 품질 점검·AI 검토" : reviewMode ? "교수자 감수·최종 승인" : "학습 미션 제작"}
       description={aiReview
         ? "자동 품질 점검과 AI 검토로 교수자 감수에 쓸 판단 자료를 준비합니다."
         : reviewMode
           ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
-          : "시나리오로 학습 미션 초안을 만들고, 자동 품질 검토, 교수자 감수·최종 승인, 편성 중 어디에 있는지 봅니다."}
+          : "시나리오를 골라 학습 미션 초안을 만듭니다."}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>
@@ -1354,8 +1361,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E2DED2] bg-[#FBFAF6]">
-      <h3 className="flex items-center gap-2 text-[15px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
+    <section aria-label="콘텐츠 제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E2DED2] bg-[#FBFAF6]">
+      <h3 className="flex items-center gap-2 text-[15px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />콘텐츠 제작 워크플로우</h3>
       <ol className="grid grid-cols-5 gap-2 px-4 pb-3 pt-[18px]">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">

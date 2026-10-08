@@ -304,7 +304,7 @@ function OperationsSection({
         <div className="space-y-3.5 px-5 py-4">
           <div>
             <p className="text-[13px] font-medium text-[#8A7423]">대조 상세 · {kind}</p>
-            <h2 id="lexical-audit-title" className="mt-0.5 text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">
+            <h2 id="lexical-audit-title" className="mt-0.5 text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">
               {cleanTitle(audit.title) ?? axes.join(" · ")}
             </h2>
             <p className="mt-1 text-[13.5px] text-[#655F55]">
@@ -382,7 +382,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
     <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-3 pt-4">
         <div className="flex items-baseline gap-3">
-          <h2 id="audit-history-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
+          <h2 id="audit-history-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
             학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · 평균 HSK 목록 포함률 <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
@@ -437,7 +437,7 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   return (
     <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
-        <h2 id="top-outside-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
+        <h2 id="top-outside-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
         <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -461,7 +461,7 @@ function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 기록"];
   return (
     <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3.5">
-      <h2 id="audit-method-title" className="text-[17px] font-bold text-[#15202B]">대조 방식</h2>
+      <h2 id="audit-method-title" className="text-[16.5px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
@@ -521,7 +521,7 @@ function DatasetOverview({
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
               </span>
             </div>
-            <h2 id="dataset-title" className="mt-0.5 text-[17px] font-bold tracking-[-0.015em] text-[#15202B]">
+            <h2 id="dataset-title" className="mt-0.5 text-[16.5px] font-bold tracking-[-0.015em] text-[#15202B]">
               HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
             </h2>
           </div>

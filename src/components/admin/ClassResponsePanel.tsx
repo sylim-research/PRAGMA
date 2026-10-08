@@ -41,11 +41,11 @@ export function ClassResponsePanel() {
   const [params, setSearchParams] = useSearchParams();
   // 기본은 데모 응답(가상 학습자 20명). 실제 응답으로 바꾸면 ?demo=0을 남긴다.
   const demo = params.get("demo") !== "0";
-  // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션·데모만 바꾼다.
+  // 교과목·주차·미션·데모만 주소에 남긴다.
   const setParams = (next: Record<string, string>, options?: { replace?: boolean }) =>
-    setSearchParams({ tab: "class", ...(demo ? {} : { demo: "0" }), ...next }, options);
+    setSearchParams({ ...(demo ? {} : { demo: "0" }), ...next }, options);
   const setDemo = (on: boolean) => {
-    const next: Record<string, string> = { tab: "class" };
+    const next: Record<string, string> = {};
     for (const key of ["courseId", "weekNo", "missionId"]) {
       const value = params.get(key);
       if (value) next[key] = value;

@@ -240,8 +240,9 @@ describe("CanonicalMissionRun live CTA route", () => {
       expect(screen.getByText("시연용 전사 예시입니다. 실제 녹음한 내용이 아닙니다.")).toBeInTheDocument();
       expect(screen.getByPlaceholderText("통역한 중국어 문장")).toHaveValue(reference);
       expect(screen.queryByLabelText("내 통역 녹음")).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "확인한 전사로 제출" })).toBeDisabled();
-      fireEvent.click(screen.getByRole("button", { name: "전사문 확정" }));
+      // The demo example arrives already confirmed so the presenter can move on at once.
+      expect(screen.getByRole("button", { name: "✓ 전사 확인 완료" })).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "확인한 전사로 제출" })).toBeEnabled();
       fireEvent.click(screen.getByRole("button", { name: "확인한 전사로 제출" }));
     }
     await screen.findByText("이 답안에는 AI 피드백 기록이 없습니다.");

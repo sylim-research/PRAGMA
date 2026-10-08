@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Check, ShieldCheck, Upload } from "lucide-react";
-import { AdminShell } from "@/components/AdminShell";
+import { RecordToolsShell } from "@/components/admin/RecordToolsShell";
 import { Button } from "@/components/ui/button";
 import { DIRECTION_LABEL, DOMAIN, INDUSTRY, LEVEL } from "@/lib/pragma/enums";
 import type { Domain, IndustrySector, LanguageDirection, LearnerLevel } from "@/lib/pragma/enums";
@@ -312,11 +312,7 @@ const Page = () => {
   };
 
   return (
-    <AdminShell
-      title="수업 편성 백업·복원"
-      description="교과목의 15주 편성과 미션 배치를 파일로 저장하고 복원합니다. 학습 수행 기록은 포함하지 않습니다."
-      compact
-    >
+    <RecordToolsShell active="backup">
       {/* 두 카드는 같은 크기·같은 형태로 둔다. 위계는 테두리 색과 배지로만 준다. */}
       <div className="grid grid-cols-1 items-stretch gap-4 lg:grid-cols-2">
         {/* 기본 흐름 = 교과목 선택 → 백업. 그래서 이쪽이 주(主)다. */}
@@ -325,7 +321,7 @@ const Page = () => {
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="brand">수업 백업</RoleBadge>
-              <h2 className="text-[17px] font-bold">데이터 백업</h2>
+              <h2 className="text-[16.5px] font-bold">데이터 백업</h2>
             </div>
             {/* 제외 항목은 「백업 범위 자세히 보기」에만 둔다 — 첫 화면에서 굳이 앞세우지 않는다. */}
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -405,7 +401,7 @@ const Page = () => {
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="ink">수업 복원</RoleBadge>
-              <h2 className="text-[17px] font-bold">데이터 복원</h2>
+              <h2 className="text-[16.5px] font-bold">데이터 복원</h2>
             </div>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               이전에 저장한 백업 파일을 불러와 해당 시점의 수업 구성으로 복원합니다.
@@ -511,7 +507,7 @@ const Page = () => {
           </div>
         </section>
       </div>
-    </AdminShell>
+    </RecordToolsShell>
   );
 };
 

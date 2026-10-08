@@ -273,12 +273,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     ];
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
-    return <section aria-label="품질 점검 워크플로우" className="space-y-3 text-sm">
+    return <section aria-label="품질 점검 파이프라인" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
+          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 파이프라인</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
@@ -474,7 +474,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && <section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
+              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
@@ -520,7 +520,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">4</span>교수자 최종 승인</h4>
+          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">4</span>교수자 최종 승인</h4>
           <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
           <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}

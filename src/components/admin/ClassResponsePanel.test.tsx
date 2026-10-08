@@ -149,7 +149,7 @@ function mount(entry = "/admin/decision-traces?tab=class&courseId=course-a&weekN
 
 async function expectCounts(learners: number, _dissents: number) {
   await waitFor(() => {
-    expect(screen.getByText(new RegExp(`· 응답 ${learners}명$`))).toBeVisible();
+    expect(screen.getAllByRole("img", { name: `${learners} 명 응답` })[0]).toBeVisible();
   });
 }
 
@@ -208,9 +208,9 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     mocks.missionRow.mockResolvedValue({ data: { mission_content: REPRESENTATIVE_MISSION_SNAPSHOT.mission_content }, error: null });
     mount();
     fireEvent.click(await screen.findByRole("button", { name: "데모로 살펴보기" }));
-    expect(await screen.findByText("데모 · 가상 학습자 20명 · 실제 학습자 자료 아님")).toBeVisible();
+    expect(await screen.findByText("데모 · 가상 학습자 20명")).toBeVisible();
     expect(screen.getByRole("radio", { name: "데모 응답" })).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByText(/· 응답 20명$/)).toBeVisible();
+    expect(screen.getAllByRole("img", { name: "20 명 응답" })[0]).toBeVisible();
     // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
     const cards = within(screen.getByLabelText("MJT 판단 문항")).getAllByRole("button");
     expect(cards.map((card) => card.getAttribute("aria-label"))).toEqual([
@@ -235,6 +235,6 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     expect(screen.queryByText(/virtual-/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: "실제 응답" }));
     expect(await screen.findByText("아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.")).toBeVisible();
-    expect(screen.queryByText("데모 · 가상 학습자 20명 · 실제 학습자 자료 아님")).not.toBeInTheDocument();
+    expect(screen.queryByText("데모 · 가상 학습자 20명")).not.toBeInTheDocument();
   });
 });

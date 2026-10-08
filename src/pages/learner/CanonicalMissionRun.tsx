@@ -1984,7 +1984,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "피드백을 참고해 수정해 주세요" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "수정안 제출하기" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
                     <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 초안 유지하기</Button>
@@ -2096,8 +2096,8 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   /** 대표 미션 시연 전용(2026-09-25): 아직 풀지 않은 문항 점도 눌러 바로 연다. 학습자 화면에는 켜지 않는다. */
   freeJump?: boolean;
   answeredQuestIds?: string[];
-  /** 시연 전용: 「적절성 판단」·「번역하기」 단계 막대를 눌러 MJT1·DCT로 바로 간다. */
-  onJumpStage?: (stage: "judge" | "produce") => void;
+  /** 시연 전용: 「미션 안내」·「적절성 판단」·「번역하기」 단계 막대를 눌러 안내 첫 화면·MJT1·DCT로 바로 간다. */
+  onJumpStage?: (stage: "intro" | "judge" | "produce") => void;
 }) {
   const mission = useCanonicalMission();
   const quests = mission.quests;
@@ -2135,7 +2135,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
                   : false)
               : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
-            const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
+            const jumpStage = label === "미션 안내" ? "intro" : label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
             // 시연에서는 산출 단계 이름을 「DCT 번역」으로 보이되, 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
             const shownLabel = freeJump && jumpStage === "produce" ? `DCT ${outputName}` : label;
             const body = (
@@ -3111,7 +3111,13 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     setRenderNonce((current) => current + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const jumpDemoStage = (stage: "judge" | "produce") => {
+  const jumpDemoStage = (stage: "intro" | "judge" | "produce") => {
+    // 시연에서 「미션 안내」로 돌아간다 — 고른 답은 그대로 두고 안내 첫 화면만 다시 연다(2026-10-08).
+    if (stage === "intro") {
+      openDemoQuest(0);
+      setSceneIntroStep(0);
+      return;
+    }
     const index = stage === "judge" ? 0 : mission.quests.findIndex((item) => item.kind === "dct");
     if (index >= 0) openDemoQuest(index);
   };

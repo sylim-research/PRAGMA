@@ -62,10 +62,10 @@ export function Donut({ slices, total, size = 150, thickness = 22, centerLabel, 
 }
 
 /** 4점 척도를 한 축(매우 적절 → 매우 부적절)에 놓고, 척도별 학급 비율을 원의 크기와 숫자로 보인다. */
-export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 위 응답 분포" }: { slices: Slice[]; total: number; mine?: string | null; label?: string }) {
+export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 위 응답 분포", className = "h-auto w-full" }: { slices: Slice[]; total: number; mine?: string | null; label?: string; className?: string }) {
   const width = 560;
   const step = width / slices.length;
-  return <svg viewBox={`0 0 ${width} ${mine ? 146 : 128}`} className="h-auto w-full" role="img" aria-label={label}>
+  return <svg viewBox={`0 0 ${width} ${mine ? 146 : 128}`} className={className} role="img" aria-label={label}>
     <g transform={mine ? "translate(0 18)" : undefined}>
     <defs>
       <linearGradient id="spectrum-band" x1="0" x2="1" y1="0" y2="0">

@@ -833,7 +833,7 @@ const AdminComposer = () => {
             {/* 상자 머리 = 교과목 이름만. 페이지 제목보다 한 단계 낮게(2026-10-08 — 네이비 띠가 페이지 제목보다 무거웠다).
                 수준·방향·수행 방식은 바로 아래 편성 조건과 위 카드에 이미 있다. */}
             <span aria-hidden className="h-[18px] w-[4px] rounded-sm bg-[#FAD338]" />
-            <span className="text-[17px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
+            <span className="text-[16.5px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
           </h2>}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">

@@ -13,7 +13,7 @@ const REQUIRED_ENTRY_PATHS = [
   "/admin/review",
   "/admin/composer",
   "/admin/library",
-  "/admin/decision-traces",
+  "/admin/discussion",
   "/admin/export",
 ] as const;
 
@@ -40,17 +40,16 @@ describe("admin navigation reachability", () => {
     ]);
     const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·승인");
     expect(production?.items.map((item) => item.to)).toEqual([
-      "/admin/assembly", "/admin/corpus", "/admin/ai-review", "/admin/review",
+      "/admin/assembly", "/admin/ai-review", "/admin/corpus", "/admin/review",
     ]);
     // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
     expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(true);
     const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
-      "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/decision-traces",
+      "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/discussion",
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
     expect(research?.items.map((item) => item.to)).toEqual([
-      "/admin/data-backup",
       "/admin/export",
     ]);
   });
@@ -131,8 +130,8 @@ describe("admin navigation reachability", () => {
     );
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly",
-      "/admin/corpus",
       "/admin/ai-review",
+      "/admin/corpus",
       "/admin/review",
     ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");
@@ -140,12 +139,12 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/generator")).toBe("/admin/generator");
     // 원자료 분석은 보관함을 갖춘 별도 화면이다(2026-09-09 오후).
     expect(adminMobileNavValue("/admin/authentic")).toBe("/admin/authentic");
-    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/package")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/decision-traces");
+    expect(adminMobileNavValue("/admin/teaching-generator")).toBe("/admin/discussion");
+    expect(adminMobileNavValue("/admin/package")).toBe("/admin/discussion");
+    expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/discussion");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
-    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
-    expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");
+    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/export");
+    expect(adminMobileNavValue("/admin/decision-traces")).toBe("");
     expect(adminMobileNavValue("/admin/export")).toBe("/admin/export");
   });
 });
