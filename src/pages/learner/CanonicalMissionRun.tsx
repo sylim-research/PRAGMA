@@ -157,21 +157,15 @@ function useDemoAnswer(questId: string) {
 }
 
 /** 채워질 자리 바로 옆(질문 줄 오른쪽)에 두는 시연용 자동 채우기 버튼. */
-function DemoFillButton({ label, hasInput = false }: { label: string; hasInput?: boolean }) {
+function DemoFillButton({ label }: { label: string }) {
   const fill = useContext(DemoFillContext);
   if (!fill) return null;
   return (
-    <button type="button" onClick={() => {
-      if (hasInput && !window.confirm("작성한 내용을 준비된 예시로 바꿀까요? 취소하면 작성한 내용이 유지됩니다.")) return;
-      fill();
-    }}
+    <button type="button" onClick={fill}
       className="order-last inline-flex h-9 w-full shrink-0 items-center justify-center gap-1.5 self-center sm:order-none sm:ml-auto sm:w-auto whitespace-nowrap rounded-full bg-[#FAD338] px-4 text-[13.5px] font-extrabold text-[#15202B] shadow-[0_1px_4px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2">
       <PenLine aria-hidden className="h-4 w-4" />{label}
     </button>
   );
-}
-function DemoFeedbackNotice() {
-  return <p className="my-2 text-[13px] leading-5 text-[#536572]">이 데모에서는 예시 답안의 AI 피드백만 확인할 수 있습니다. 직접 쓴 답안에는 AI 피드백이 제공되지 않습니다.</p>;
 }
 /** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
 const ReviewHostContext = createContext(false);
@@ -1010,7 +1004,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
   const { paragraphs } = useMemo(() => splitExpressionMemo(quest.feedback), [quest.feedback]);
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
-      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton label="예시 수정안 넣기" hasInput={touched} />}</h3>
+      <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton label="예시 수정안 넣기" />}</h3>
       <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
       {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
       <div className="mt-4">
@@ -1301,13 +1295,12 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
         <div className="flex items-center gap-4">
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton label="예시 번역문 넣기" hasInput={Boolean(value.trim())} /></div>
+            <div className="flex flex-wrap items-center gap-2"><label htmlFor={`${quest.id}-draft`} className="text-base font-bold leading-7">{mission.targetLanguage.label}로 옮겨 보세요.</label><DemoFillButton label="예시 번역문 넣기" /></div>
             {/* 콘텐츠와 분리된 공통 안내로 의미 보존과 맥락 조건을 알린다. */}
             <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#7A7466]">원문의 내용과 의도를 유지하면서, 상황과 관계에 맞게 작성해 보세요.</p>
           </div>
         </div>
         <div className="pl-[60px]">
-        {demo && <DemoFeedbackNotice />}
         <Textarea
           id={`${quest.id}-draft`}
           value={value}
@@ -1668,8 +1661,7 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   if (mission.activityMode === "interpreting") {
     return (
       <QuestScaffold quest={quest}>
-        <div className="flex justify-end"><DemoFillButton label="예시 전사문 넣기" hasInput /></div>
-        {demo && <DemoFeedbackNotice />}
+        <div className="flex justify-end"><DemoFillButton label="예시 전사문 넣기" /></div>
         <InterpretingConsole
           sourceText={quest.source}
           sourceLanguage={mission.sourceLanguage}
@@ -1904,7 +1896,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-2.5">
-      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : "AI 피드백"}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton label="예시 수정안 넣기" hasInput={revisionOpen && revised !== first} />}</div>
+      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-lg font-bold">{recheckRequested ? "수정안 AI 피드백" : "AI 피드백"}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton label="예시 수정안 넣기" />}</div>
       <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading /> : (
         <>
@@ -1979,7 +1971,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     <p className="text-xs font-black text-[#776727]">{recheckRequested ? "최종 결정" : "재검토"}</p>
                     <h2 className="mt-1 text-lg font-black">{localPilot ? "원문과 비교하며 다시 써보세요." : recheckRequested ? "최종안을 결정하세요." : "피드백을 참고해 다시 써보세요."}</h2>
                   </div>
-                  {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" hasInput={revisionOpen && revised !== first} />}
+                  {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
                   <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>

@@ -63,9 +63,9 @@ describe("demo route", () => {
     expect(requestFeedback).not.toHaveBeenCalled();
     expect(appendMissionEvent).not.toHaveBeenCalled();
   });
-  it("preserves a visitor judgment and protects an edited draft from example replacement", async () => {
+  it("preserves a visitor judgment and replaces a draft with the example without a browser dialog", async () => {
     window.scrollTo = vi.fn();
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const confirm = vi.spyOn(window, "confirm");
     render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
     fireEvent.click(await screen.findByRole("button", { name: "한 → 중 번역 시작하기" }));
 
@@ -74,14 +74,11 @@ describe("demo route", () => {
     fireEvent.click(screen.getByRole("button", { name: "판단 제출하기" }));
     expect(within(screen.getByRole("button", { name: /^다소 부적절/ })).getByText("내 선택")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "번역하기 단계로 이동" }));
-    expect(screen.getByText(/직접 쓴 답안에는 AI 피드백이 제공되지 않습니다/)).toBeInTheDocument();
+    expect(screen.queryByText(/직접 쓴 답안에는 AI 피드백이 제공되지 않습니다/)).not.toBeInTheDocument();
     const draft = screen.getByRole("textbox");
     fireEvent.change(draft, { target: { value: "내가 작성한 답안" } });
     fireEvent.click(screen.getByRole("button", { name: "예시 번역문 넣기" }));
-    expect(confirm).toHaveBeenCalled();
-    expect(draft).toHaveValue("내가 작성한 답안");
-    confirm.mockReturnValue(true);
-    fireEvent.click(screen.getByRole("button", { name: "예시 번역문 넣기" }));
+    expect(confirm).not.toHaveBeenCalled();
     expect(screen.getByRole("textbox")).not.toHaveValue("내가 작성한 답안");
   });
   it("finishes the demo when a visitor jumps straight to translation and skips the judgment items", async () => {
