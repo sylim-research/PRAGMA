@@ -474,7 +474,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && <section className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>교수자 감수 · AI 검토 의견 {substantiveFindings.length}건</h4>
+              <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
