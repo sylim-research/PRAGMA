@@ -113,7 +113,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2.5 mt-6">
+  <div className="mb-2.5 mt-7">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="flex items-center gap-2.5 text-[17px] font-bold text-[#15202B]"><span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>{title}</h2>
       {action}
