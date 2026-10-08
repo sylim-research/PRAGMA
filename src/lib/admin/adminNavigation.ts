@@ -4,12 +4,10 @@ export type AdminNavItem = {
   pending?: boolean;
   activePaths?: readonly string[];
   /** 그룹이 좁은 폭이어도 이 화면만 넓은 폭을 쓴다. */
-  wideCanvas?: boolean;
 };
 
 export type AdminNavGroup = {
   header: string;
-  wideCanvas?: boolean;
   items: readonly AdminNavItem[];
 };
 
@@ -24,16 +22,16 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   { header: "1. 콘텐츠 제작 기준", items: [
     { to: "/admin/prompt-harness", label: "생성계약·운영 프롬프트" },
   ]},
-  { header: "2. 시나리오 생성", wideCanvas: true, items: [
+  { header: "2. 시나리오 생성", items: [
     { to: "/admin/authentic", label: "실제 자료 활용 분석" },
     { to: "/admin/generator", label: "시나리오 개별 생성" },
     { to: "/admin/batch", label: "시나리오 배치 생성" },
   ]},
-  { header: "3. 학습 미션 제작·승인", wideCanvas: true, items: [
+  { header: "3. 학습 미션 제작·승인", items: [
     { to: "/admin/assembly", label: "학습 미션 제작" },
     // HSK 대조는 미션 생성 직후 자동으로 남는 참고 기록이다 — 제작 기준·생성계약과 같은 층위가 아니다(2026-09-27 정본).
     // 화면 폭은 옮기기 전과 같게 둔다.
-    { to: "/admin/corpus", label: "HSK 3.0 어휘 대조", wideCanvas: false },
+    { to: "/admin/corpus", label: "HSK 3.0 어휘 대조" },
     { to: "/admin/ai-review", label: "자동 품질 검토" },
     // 제작·승인 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
     { to: "/admin/review", label: "교수자 감수·최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
@@ -70,14 +68,6 @@ export function adminNavItemIsActive(item: AdminNavItem, pathname: string) {
 }
 
 // 메뉴 순서가 바뀌어도 기존 시나리오·검토 화면의 폭을 유지한다.
-const WIDE_CANVAS_PATHS = ADMIN_NAV_GROUPS
-  .flatMap((group) => group.items.filter((item) => ("wideCanvas" in item ? item.wideCanvas : group.wideCanvas)))
-  .flatMap((item) => [item.to, ...(item.activePaths ?? [])]);
-
-export function adminUsesWideCanvas(pathname: string) {
-  return WIDE_CANVAS_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
-}
-
 export function adminMobileNavValue(pathname: string) {
   const active = ADMIN_NAV_GROUPS.flatMap((group) => group.items)
     .find((item) => adminNavItemIsActive(item, pathname));
