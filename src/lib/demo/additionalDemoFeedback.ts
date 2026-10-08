@@ -41,6 +41,8 @@ export const KO_ZH_INTERPRETING_FEEDBACK = FeedbackSchema.parse({
 // 중→한 반대 승인본(원래 통역 미션, 데모에서는 번역 과제로 제시) · translation · recorded 2026-10-06T15:58:16.508Z
 // The prepared draft keeps the workplace register but gives a different reason than the source (meaning distortion example).
 export const ZH_KO_TRANSLATION_DRAFT = "한 달 앞당기자는 말씀은 충분히 이해가 됩니다. 다만 테스트가 아직 끝나지 않아 제 생각에는 원래 계획대로 가는 게 좋을 것 같습니다.";
+// Example revision for the demo: restores the source's reason (quality control) that the draft replaced.
+export const ZH_KO_TRANSLATION_REVISED = "프로젝트 기간을 줄이는 것도 중요하지만, 품질 관리를 소홀히 하면 오히려 전체 진행에 영향을 줄 수 있습니다. 단계마다 품질을 챙겨야 마지막 결과물에도 문제가 없을 것 같습니다.";
 export const ZH_KO_TRANSLATION_FEEDBACK = FeedbackSchema.parse({
   "schema_version": "feedback_v1",
   "rubric_version": "opposition_stance_mitigation@1.0",

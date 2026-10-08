@@ -1984,7 +1984,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
-                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "피드백을 참고해 수정해 주세요" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+                  <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "수정안 제출하기" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「이대로 확정」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
                     <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>수정하지 않고 초안 유지하기</Button>
