@@ -46,10 +46,10 @@ const Connector = ({ label }: { label: string }) => (
   </div>
 );
 
-// 되먹임 고리 — 학습 기록이 수업 운영(학급 응답 집계)을 거쳐 콘텐츠 제작(후속 검토·재승인)으로 돌아간다.
+// 되먹임 고리 — 학습 기록이 수업 운영(메타화용 토론)을 거쳐 콘텐츠 제작(후속 검토·재승인)으로 돌아간다.
 // 세 칸 아래 가운데에서 내려온 선이 한 줄로 이어져, 세 칸이 하나의 순환으로 묶인다. 칸 폭은 (전체 − 연결 칸 200px) ÷ 3.
 const FeedbackLoop = () => (
-  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 기록 → 학급 응답 집계 → 후속 콘텐츠 검토·재승인">
+  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 기록 → 메타화용 토론 → 후속 콘텐츠 검토·재승인">
     {/* 가로선: 제작 칸 가운데 ~ 학습 칸 가운데 */}
     <span aria-hidden className="absolute bottom-[14px] left-[calc((100%-200px)/6)] right-[calc((100%-200px)/6)] border-b-2 border-dashed border-[#4A5764]" />
     {/* 세 칸 가운데에서 내려오는 선 */}
@@ -59,7 +59,7 @@ const FeedbackLoop = () => (
     {/* 제작 칸으로 돌아가는 화살촉 */}
     <ArrowUp aria-hidden size={18} strokeWidth={2.25} className="absolute -top-[3px] left-[calc((100%-200px)/6)] -translate-x-1/2 bg-background text-[#4A5764]" />
     {/* 구간 문구 — 오른쪽(학습 → 운영), 왼쪽(운영 → 제작) */}
-    <span className="absolute bottom-[5px] left-[calc(75%-(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 학습 기록 · 학급 응답</span>
+    <span className="absolute bottom-[5px] left-[calc(75%-(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 학습 기록 · 토론</span>
     <span className="absolute bottom-[5px] left-[calc(25%+(100%-200px)/12)] -translate-x-1/2 whitespace-nowrap bg-background px-2 text-[12.5px] font-semibold text-[#4A5764]">← 후속 콘텐츠 검토 · 재승인</span>
   </div>
 );
@@ -75,7 +75,7 @@ const CLASS_STEPS: readonly Step[] = [
   ["15주 교과목 편성", "주차별 학습 미션 배치"],
   ["학습자 관리", "계정 · 교과목 · 최근 활동"],
   ["주차별 운영", "교과목 공개와 접근 조건"],
-  ["학급 응답 집계·조회", "익명 분포와 서로 다른 판단"],
+  ["메타화용 토론", "익명 응답 분포로 서로 다른 판단 논의"],
   ["후속 콘텐츠 검토", "필요 시 수정 · 재승인"],
 ];
 const LEARNING_STEPS: readonly Step[] = [
