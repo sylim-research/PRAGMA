@@ -888,7 +888,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const metaLine = aiReview ? [] : reviewMode
       ? [info?.placement === "편성 전" ? null : info?.placement]
       : [];
-    const scenarioText = (
+    // 제작 화면은 상황을 한 줄로 줄여 오른쪽 칸에 스크롤이 생기지 않게 한다 — 전문은 마우스를 올리면 보인다(2026-10-08).
+    // 품질 점검·감수 화면은 상황 전문을 읽고 판단해야 하므로 그대로 둔다.
+    const scenarioLine = !aiReview && !reviewMode;
+    const scenarioText = scenarioLine ? (
+      <p className="max-w-[54rem] truncate text-[13.5px] leading-relaxed text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
+        {r.core_content?.situation_ko ?? "—"}
+      </p>
+    ) : (
       <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
         {r.core_content?.situation_ko ?? "—"}
         {professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
