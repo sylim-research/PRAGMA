@@ -176,7 +176,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <tbody>
     <tr><td>MJT</td><td>메타화용적 판단 과제<sup>*</sup>. 표현의 화용적 적절성을 판단하는 문항</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT)<sup>*</sup> 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
-    <tr><td>STT·TTS</td><td>음성 인식·음성 합성(Speech-to-Text · Text-to-Speech). 통역 미션에 사용</td></tr>
+    <tr><td>STT·TTS</td><td>음성 인식·음성 합성<sup>*</sup>. 통역 미션에 사용</td></tr>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
@@ -186,7 +186,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>* 메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)<br>* 담화완성과제(DCT: Discourse Completion Task)</small>
+> <small>* 메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)<br>* 담화완성과제(DCT: Discourse Completion Task)<br>* 음성 인식(STT: Speech-to-Text) · 음성 합성(TTS: Text-to-Speech)</small>
 
 <br>
 <br>
