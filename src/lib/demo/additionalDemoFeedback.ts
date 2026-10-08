@@ -76,8 +76,46 @@ export const ZH_KO_TRANSLATION_FEEDBACK = FeedbackSchema.parse({
   }
 });
 
+// Re-check of the example revision above · translation · recorded 2026-10-08T10:39:41Z (same feedback action learners use).
+export const ZH_KO_TRANSLATION_RECHECK_FEEDBACK = FeedbackSchema.parse({
+  "schema_version": "feedback_v1",
+  "rubric_version": "opposition_stance_mitigation@1.0",
+  "verdicts": {
+    "semantic_fidelity": "preserved",
+    "grammatical_accuracy": "clean",
+    "pragmatic_appropriateness": {
+      "feature_code": "opposition_stance_mitigation",
+      "band_code": "within_band"
+    }
+  },
+  "revision_scope": "clear",
+  "blocks": {
+    "meaning_ko": "원문의 핵심 명제인 '프로젝트 기간 단축의 중요성 인정'과 '품질 관리를 소홀히 하면 전체 진행에 부정적 영향이 있음', 그리고 '각 단계 품질 보장이 최종 결과물 문제 방지에 필수적임'이 모두 잘 전달되었습니다.",
+    "grammar": [],
+    "feature_ko": "이견을 명확히 하면서도 상대 제안을 인정하는 태도가 적절하게 조절되어 있어, 관계 부담이 높은 상황에서 대립을 키우지 않고 의견을 분명히 전달하는 표현으로 보입니다.",
+    "alternatives": [
+      {
+        "text": "프로젝트 기간을 줄이는 것도 중요하지만, 품질 관리를 소홀히 하면 오히려 전체 진행에 영향을 미칠 수 있습니다. 단계마다 품질을 보장해야 마지막 결과물에 문제가 없을 것입니다.",
+        "note_ko": "‘영향을 줄 수 있습니다’를 ‘영향을 미칠 수 있습니다’로 바꿔 조금 더 자연스러운 표현으로 다듬었습니다."
+      }
+    ],
+    "discourse_ko": "전체적으로 자연스러운 한국어 구어체로 연결되어 있습니다.",
+    "offfocus_warnings": []
+  },
+  "uncertainty_flags": [],
+  "provenance": {
+    "model": "gpt-4.1-mini",
+    "prompt_version": "feedback_v1_minidiscourse_v6_concise",
+    "generated_at": "2026-10-08T10:39:41.244Z"
+  }
+});
+
 const MISMATCH = "이 시연에는 예시 초안의 피드백 기록만 있습니다. 준비된 예시를 넣거나 현재 표현을 직접 검토해 최종 결정해 주세요.";
-const same = (a: string, b: string) => a.replace(/s+/g, "") === b.replace(/s+/g, "");
-export const recordedDemoFeedback = (draft: string, feedback: ReturnType<typeof FeedbackSchema.parse>) =>
+const same = (a: string, b: string) => a.replace(/\s+/g, "") === b.replace(/\s+/g, "");
+type RecordedFeedback = ReturnType<typeof FeedbackSchema.parse>;
+/** 준비된 답안(초안, 필요하면 예시 수정안)에 남긴 실제 피드백만 재생한다. 그 밖의 답안은 AI를 부르지 않고 안내만 한다. */
+export const recordedDemoFeedback = (draft: string, feedback: RecordedFeedback, revision?: { text: string; feedback: RecordedFeedback }) =>
   async (_mission: unknown, answer: string): Promise<FeedbackRequestResult> =>
-    same(answer, draft) ? { ok: true, feedback } : { ok: false, error: MISMATCH };
+    same(answer, draft) ? { ok: true, feedback }
+      : revision && same(answer, revision.text) ? { ok: true, feedback: revision.feedback }
+      : { ok: false, error: MISMATCH };
