@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -40,12 +41,12 @@ const HIDDEN_PROMPT_KEYS = new Set([
 // 생성계약 정본(docs/contracts/PRAGMA_생성계약_정본.md)이 고정하는 것을 화면용 한 줄로 옮긴다.
 // 정본은 변경 이력·결정 ID가 섞인 긴 문서라 원문을 싣지 않는다. 계약이 바뀌면 이 목록도 고친다.
 const CONTRACT_CLAUSES: { title: string; body: string }[] = [
-  { title: "생성 조건", body: "화행·상황과 관계·학습 수준·언어 방향·수행 방식이 정해진 조합 안에서만 만듭니다." },
-  { title: "두 단계 생성", body: "시나리오를 먼저 만들고, 고른 시나리오만 학습 미션(MJT 5문항과 통번역 과제 1개)으로 만듭니다." },
-  { title: "언어 방향", body: "한→중·중→한마다 원문 언어와 산출 언어를 고정하고, 섞이지 않았는지 검사합니다." },
-  { title: "평가 경계", body: "의미 전달·문법 정확성·상황 적절성을 따로 판정하고 하나의 점수로 합치지 않습니다. 더 길거나 더 완곡한 표현을 자동으로 더 낫다고 보지 않습니다." },
-  { title: "생성 기록", body: "모델·프롬프트 판본과 지문·생성 시각·형식 판본을 남겨, 어떤 조건에서 만들었는지 되짚을 수 있게 합니다." },
-  { title: "공개 조건", body: "생성 성공은 승인이 아닙니다. 자동 품질 점검과 AI 검토를 거쳐 교수자가 승인한 미션만 학습자에게 공개합니다." },
+  { title: "생성 조건", body: "화행·상황과 관계·수준·언어 방향·수행 방식 조합 안에서 만듭니다." },
+  { title: "두 단계 생성", body: "시나리오를 먼저 만들고, 고른 것만 학습 미션으로 만듭니다." },
+  { title: "언어 방향", body: "원문 언어와 산출 언어를 방향마다 고정하고 검사합니다." },
+  { title: "평가 경계", body: "의미·문법·상황 적절성을 따로 판정하고 점수로 합치지 않습니다." },
+  { title: "생성 기록", body: "모델·프롬프트 판본과 생성 시각을 남겨 되짚을 수 있게 합니다." },
+  { title: "공개 조건", body: "교수자가 승인한 미션만 학습자에게 공개합니다." },
 ];
 
 function ContractSummary() {
@@ -55,10 +56,10 @@ function ContractSummary() {
       <h2 id="contract-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
         모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다.
       </h2>
-      <ol className="mt-4 grid gap-x-6 gap-y-3 md:grid-cols-2">
+      <ol className="mt-3 grid gap-x-6 gap-y-2 md:grid-cols-2">
         {CONTRACT_CLAUSES.map((clause, index) => (
-          <li key={clause.title} className="flex gap-3">
-            <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[11px] font-bold text-[#15202B]">{index + 1}</span>
+          <li key={clause.title} className="flex items-center gap-2.5">
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[11px] font-bold text-[#15202B]">{index + 1}</span>
             <p className="text-[13px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
@@ -175,6 +176,9 @@ function HarnessOverview() {
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
+          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+            검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
+          </a>
         </div>
         <div className="rounded-lg border border-[#E1DDD4] bg-[#FAF9F7] p-3">
           <div className="flex items-center justify-between gap-2">
@@ -185,6 +189,9 @@ function HarnessOverview() {
           <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
+          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+            승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />
+          </Link>
         </div>
       </div>
       {rulesOpen && <RuleCatalogPanel />}
@@ -192,10 +199,13 @@ function HarnessOverview() {
   );
 }
 
+// 장면 사전 검토는 원문을 쓰기 전 관계 조건을 거르는 첫 관문이라 시나리오 생성 묶음의 맨 위 한 줄을 차지한다.
+const FULL_WIDTH_PROMPT_KEYS = new Set(["core.scene_preflight.system"]);
+
 function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card className={open ? "md:col-span-2" : undefined}>
+    <Card className={open || FULL_WIDTH_PROMPT_KEYS.has(entry.key) ? "md:col-span-2" : undefined}>
       <CardHeader className="p-4">
         <div className="flex items-center gap-2">
           <button
@@ -249,7 +259,7 @@ const AdminPromptHarness = () => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
-            <div key={g}>
+            <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
               <h3 className="mb-2 text-[15px] font-bold">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid grid-flow-row-dense gap-2 md:grid-cols-2">
                 {items.map((p) => (
