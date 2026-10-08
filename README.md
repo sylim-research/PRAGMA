@@ -33,7 +33,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
-> <small>두 핵심 워크플로우(콘텐츠 제작·통번역 학습)를 수업 운영으로 잇고, 학습 수행 기록과 메타화용 토론의 결과를 다시 콘텐츠 검토로 되돌립니다.</small>
+> <small>콘텐츠 제작과 통번역 학습을 수업 운영으로 잇고, 학습 기록은 다시 콘텐츠 검토로 이어집니다.</small>
 
 <br>
 
@@ -108,7 +108,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 7. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="117" align="left">논문</th><th width="236" align="left">내용</th><th width="407" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="117" align="left">논문</th><th width="236" align="left">내용</th><th width="484" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1</td><td>개발 과정과 설계 결정 기록</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.2</td><td>역할별 권한</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
@@ -172,9 +172,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 10. 주요 용어
 
 <table>
-  <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
+  <thead><tr><th width="165" align="left">용어</th><th width="672" align="left">정의</th></tr></thead>
   <tbody>
-    <tr><td>MJT</td><td>메타화용적 판단 과제(Metapragmatic Judgment Task). 제시된 표현의 화용적 적절성을 판단하는 문항</td></tr>
+    <tr><td>MJT</td><td>메타화용적 판단 과제(Metapragmatic Judgment Task). 표현의 화용적 적절성을 판단하는 문항</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT, Discourse Completion Task) 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
     <tr><td>STT·TTS</td><td>음성 인식·음성 합성(Speech-to-Text · Text-to-Speech). 통역 미션에 사용</td></tr>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
