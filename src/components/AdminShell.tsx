@@ -69,8 +69,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
             <HomeBrand />
           </div>
           <div className="flex flex-wrap justify-end gap-x-5 gap-y-2">
-          {IS_DEMO && <Link to="/demo/mission" target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#F1EFE8] hover:text-[#FAD338]">학습 미션 체험 ↗</Link>}
-          {/* 공개 시연에서는 학습자 로그인 벽으로 이어지므로 체험 링크 하나만 둔다(2026-10-08). */}
+          {/* 공개 시연에서는 오른쪽 링크를 두지 않는다 — 왼쪽 PRAGMA 로고가 랜딩으로 가고, 체험은 랜딩에서 시작한다.
+              학습자 화면 링크는 학습자 로그인 벽으로 이어져 운영에서만 둔다(2026-10-08). */}
           {!IS_DEMO && <Link
             to="/learner/course"
             target="_blank"
