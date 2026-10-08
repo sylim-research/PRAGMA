@@ -193,10 +193,8 @@ export function InterpretingConsole({
               <div><p className="text-sm font-semibold">{ttsLoading ? "음성 준비 중…" : playing ? "재생 중…" : "원발화 재생"}</p><p className="text-[11px] text-[#A5B5C1]">남은 재생 {Math.max(0, maxPlays - plays)}회</p></div>
             </div>
           </section>
-          {demoMode ? <section aria-label="통역 시연 안내" className="rounded-xl bg-[#F7F6F2] p-3">
-            <h3 className="text-xs font-bold text-[#273642]">② 예시 전사문으로 체험 ({targetLanguage.label})</h3>
-            <p className="mt-1 text-xs leading-5 text-[#536572]">위의 ‘예시 전사문 넣기’를 누르면 준비된 전사문이 입력됩니다. 실제 녹음한 내용이 아닙니다.</p>
-          </section> : <section aria-label="통역 녹음">
+          {/* 데모는 녹음 단계 없이 「예시 전사문 넣기」로 바로 채운다 — 안내 상자는 군더더기라 두지 않는다(2026-10-08). */}
+          {!demoMode && <section aria-label="통역 녹음">
             <h3 className="text-xs font-bold text-[#273642]">② 통역 녹음 ({targetLanguage.label})</h3>
             <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3">
               <button type="button" onClick={recording ? stopRecording : startRecording} disabled={transcribing} className={`rounded-lg border px-4 py-2 text-xs font-bold ${recording ? "border-[#B44647] bg-[#B44647] text-white" : "border-[#C4494A] text-[#F0A3A4]"}`}>
@@ -211,7 +209,7 @@ export function InterpretingConsole({
 
       {(demoMode || recorded || notice || transcribing) && (
         <section className="rounded-2xl border border-[#E1DED5] bg-[#F7F6F2] p-4">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-[#15202B]">{demoMode ? "③ 전사문 확인" : "③ 내가 말한 내용 확인"}{demoMode && demoTranscript && transcript.trim() && <span className="inline-flex items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518]">{transcript.trim() === demoTranscript.trim() ? "예시 사용" : "예시 수정"}</span>}</h3>
+          <h3 className="flex items-center gap-2 text-sm font-bold text-[#15202B]">{demoMode ? "② 전사문 확인" : "③ 내가 말한 내용 확인"}{demoMode && demoTranscript && transcript.trim() && <span className="inline-flex items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518]">{transcript.trim() === demoTranscript.trim() ? "예시 사용" : "예시 수정"}</span>}</h3>
           {notice && <p className="mt-2 rounded-lg bg-white px-3 py-2 text-xs leading-5 text-[#536572]">{notice}</p>}
           {recordingUrl && <audio src={recordingUrl} controls preload="metadata" className="mt-3 h-9 w-full" aria-label="내 통역 녹음" />}
           <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={3} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className={`${targetLanguage.code === "zh" ? "font-zh " : ""}mt-3 w-full rounded-xl border-2 border-[#15202B] bg-white p-3 text-[15.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55`} />
