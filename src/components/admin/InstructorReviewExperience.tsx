@@ -12,14 +12,14 @@ const empty = (): InstructorExperience => ({ version: "instructor_experience_v1"
 // mission_v6 roles for the same section ids; v5 keeps the fixed labels in EXPERIENCE_SECTIONS.
 // 꼬리표(단계) + 학생 화면과 같은 이름. DCT 이름은 번역·통역에 따라 정한다.
 const V6_SECTION_LABELS: Record<(typeof EXPERIENCE_SECTIONS)[number]["id"], { tag: string; name: string }> = {
-  scene: { tag: "도입", name: "미션 안내" },
+  scene: { tag: "미션 안내", name: "미션 안내" },
   "mjt-0": { tag: "MJT 1", name: "단일 표현 판단" },
   "mjt-1": { tag: "MJT 2", name: "판단과 근거" },
   "mjt-2": { tag: "MJT 4", name: "수정안 선택" },
   "mjt-3": { tag: "MJT 5", name: "직접 수정" },
   "mjt-4": { tag: "MJT 3", name: "복수 표현 비교" },
-  recap: { tag: "중간 정리", name: "핵심 정리" },
-  dct: { tag: "DCT형 통번역 과제", name: "직접 번역하기" },
+  recap: { tag: "MJT 핵심 정리", name: "핵심 정리" },
+  dct: { tag: "DCT형 통번역", name: "직접 번역하기" },
 };
 // v6는 학습자 제시 순서로 보여 주고 넘긴다. 섹션 id(mjt-n = mpj_items[n])와 저장된 감수 기록은 그대로다.
 const V6_SECTION_ORDER: string[] = ["scene", ...V6_MJT_PRESENTATION_ORDER.map((index) => `mjt-${index}`), "recap", "dct"];
@@ -140,7 +140,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
             className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.75px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className={["w-[8.5rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[11.75px] font-bold tracking-[0.06em]",
+              {partsOf(item).tag && <span className={["w-[6rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[11.75px] font-bold tracking-[0.06em]",
                 // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
                 sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
