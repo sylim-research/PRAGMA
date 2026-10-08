@@ -108,13 +108,13 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 7. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="117" align="left">논문</th><th width="236" align="left">내용</th><th width="484" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1.1</td><td>개발 과정과 설계 결정 기록</td><td><a href="docs/research-trail/"><code>research-trail/</code></a> · <a href="docs/dev-log/"><code>dev-log/</code></a></td></tr>
     <tr><td>4.1.2</td><td>역할별 권한</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="src/components/RequireApproved.tsx"><code>RequireApproved.tsx</code></a></td></tr>
     <tr><td>4.1.2</td><td>콘텐츠·기록 저장 구조</td><td><a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/lib/pragma/missionLineage.ts"><code>missionLineage.ts</code></a></td></tr>
-    <tr><td>4.2.1&nbsp;·&nbsp;부록&nbsp;A</td><td>콘텐츠 생성과 운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a> · <a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td>4.2.2&nbsp;·&nbsp;부록&nbsp;C</td><td>자동 품질 점검과 AI 검토</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a> · <a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
+    <tr><td>4.2.1</td><td>콘텐츠 생성과 운영 프롬프트</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
+    <tr><td>4.2.2</td><td>자동 품질 점검과 AI 검토</td><td><a href="src/lib/pragma/missionRules.ts"><code>missionRules.ts</code></a> · <a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
     <tr><td>4.2.3</td><td>교수자 감수와 최종 승인</td><td><a href="src/pages/admin/AdminAssembly.tsx"><code>AdminAssembly.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.3</td><td>교과목 선택·주차별 학습</td><td><a href="src/pages/learner/LearnerCourseList.tsx"><code>LearnerCourseList.tsx</code></a> · <a href="src/pages/learner/LearnerCourseWeek.tsx"><code>LearnerCourseWeek.tsx</code></a></td></tr>
     <tr><td>4.3.1</td><td>메타화용적 판단 과제</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a></td></tr>
@@ -124,8 +124,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.4.1</td><td>교과목 편성과 미션 배치</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a></td></tr>
     <tr><td>4.4.2</td><td>학습자 응답과 수행 현황</td><td><a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a> · <a href="src/pages/admin/AdminLearners.tsx"><code>AdminLearners.tsx</code></a></td></tr>
     <tr><td>4.5.1</td><td>기능 시험과 배포 전 점검</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="tests/"><code>tests/</code></a></td></tr>
-    <tr><td>4.5.2&nbsp;·&nbsp;부록&nbsp;B</td><td>반복적 개선의 세 사례 · 연구자 판정과 후속 점검</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
+    <tr><td>4.5.2</td><td>반복적 개선의 세 사례</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
     <tr><td>4.5.3</td><td>배포·운영 상태와 확인 범위</td><td><a href="docs/DEPLOY.md"><code>DEPLOY.md</code></a> · <a href="railway.json"><code>railway.json</code></a></td></tr>
+    <tr><td>부록&nbsp;A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>부록&nbsp;B</td><td>연구자 판정과 후속 점검</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
+    <tr><td>부록&nbsp;C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
     <tr><td>부록&nbsp;F</td><td>주요 연구·개발 단계</td><td>아래 8절</td></tr>
   </tbody>
 </table>
@@ -171,7 +174,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ## 10. 주요 용어
 
 <table>
-  <thead><tr><th width="165" align="left">용어</th><th width="672" align="left">정의</th></tr></thead>
+  <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>MJT</td><td>메타화용적 판단 과제<sup>*</sup>. 표현의 화용적 적절성을 판단하는 문항</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT)<sup>*</sup> 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
