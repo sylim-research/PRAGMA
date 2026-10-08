@@ -111,9 +111,9 @@ export function NewCoursePanel({
   return (
     // 왼쪽 = 입력(1·2·3), 오른쪽 = 조건을 바꿀 때마다 바뀌는 15주 미리보기.
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.16fr)_minmax(21rem,0.84fr)]">
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
-      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
+      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
         <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>시작 방법</h2>
         <div role="radiogroup" aria-label="시작 방법" className="flex flex-wrap items-center gap-3">
           <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "copy" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
@@ -141,12 +141,12 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 조건</h2>
 
         </div>
-        <div className="mt-3">
+        <div className="mt-2.5">
           <CompositionConditionFields
             value={conditions}
             onLevel={(level) => patch({ level })}
@@ -171,7 +171,7 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>편성 주제</h2>
           <span
@@ -183,10 +183,10 @@ export function NewCoursePanel({
             </span>
         </div>
         <p className="mt-0.5 text-[13.5px] text-[#46515A]">주제만 고르면 그 주제의 승인된 학습 미션으로 15주가 자동으로 채워집니다.</p>
-        <div className="mt-3"><ThemePicker themes={conditions.themes} onThemes={(themes) => patch({ themes })} /></div>
+        <div className="mt-2.5"><ThemePicker themes={conditions.themes} onThemes={(themes) => patch({ themes })} /></div>
         {/* 주 실행 버튼 = 상자 아래 오른쪽, 브랜드 노랑(다른 관리자 화면과 같은 자리·색). */}
-        <div className="mt-3 flex justify-end">
-          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" onClick={create} disabled={creating}>
+        <div className="mt-2 flex justify-end">
+          <Button className="h-9 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" onClick={create} disabled={creating}>
             {creating ? "만드는 중" : "교과목 만들고 미션 자동 채우기"}
           </Button>
         </div>
