@@ -129,7 +129,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>부록&nbsp;A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>부록&nbsp;B</td><td>연구자 판정과 후속 점검</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
     <tr><td>부록&nbsp;C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;F</td><td>주요 연구·개발 단계</td><td>아래 8절</td></tr>
+    <tr><td>부록&nbsp;F</td><td>주요 연구·개발 단계</td><td><a href="docs/research-trail/01_design_traceability.md"><code>01_design_traceability.md</code></a> · <a href="docs/research-trail/02_decision_log.md"><code>02_decision_log.md</code></a></td></tr>
   </tbody>
 </table>
 
@@ -137,7 +137,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 8. 주요 연구·개발 단계 (부록 F)
+## 8. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="220" align="left">단계</th><th width="430" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
