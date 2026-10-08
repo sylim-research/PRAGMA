@@ -90,7 +90,7 @@ const Landing = () => {
         {/* 헤더·본문·푸터는 같은 804px 칼럼을 사용한다. */}
         <section className="mx-auto mt-[22px] grid w-full max-w-[650px] grid-cols-1 gap-5 sm:grid-cols-2">
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[19px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -106,7 +106,7 @@ const Landing = () => {
             </span>
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
-            <span className="mt-auto pt-4">
+            <span className="mt-auto pt-3.5">
               <Link to="/student-login" className={IS_DEMO ? cardTextLink : `${cardButton} text-[#15202B] bg-[#FAD338] hover:bg-[#FAD338]`}>
                 학습자 로그인
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
@@ -115,7 +115,7 @@ const Landing = () => {
           </article>
 
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[19px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -131,7 +131,7 @@ const Landing = () => {
                 두 입구는 같은 꼴로 읽히게 「학습자 로그인 / 교수자 로그인」으로 맞춘다(2026-10-08).
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
-            <span className="mt-auto pt-4">
+            <span className="mt-auto pt-3.5">
               <Link to="/admin-login" className={IS_DEMO ? cardTextLink : `${cardButton} bg-[#15202B] text-white`}>
                 교수자 로그인
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
