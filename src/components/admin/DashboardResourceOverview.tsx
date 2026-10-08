@@ -32,7 +32,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
         {cards.map(({ label, value, unit, note, icon: Icon }) => (
           <div key={label} className={[
             "flex min-h-[78px] flex-col rounded-xl border px-4 py-2.5",
-            "border-[#E6E1D5] bg-white text-[#15202B]",
+            "border-[#E2DED2] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
               <span className="text-[13px] font-semibold text-[#3F4E59]">{label}</span>
@@ -51,10 +51,10 @@ export function DashboardResourceOverview({ resources, error, status }: {
       {!!resources?.all.incompleteCount && <p className="mt-1 text-xs text-amber-800">문항·산출 정보 확인이 필요한 미션 {resources.all.incompleteCount}개 · 확인된 구성요소만 집계</p>}
     </section>
 
-    <section aria-labelledby="resource-distribution-title" className="mt-3 rounded-xl border border-[#E6E1D5] bg-white px-5 py-3.5">
+    <section aria-labelledby="resource-distribution-title" className="mt-3 rounded-xl border border-[#E2DED2] bg-white px-5 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 id="resource-distribution-title" className="text-base font-bold text-[#253441]">학습 콘텐츠 구성</h2>
+          <h2 id="resource-distribution-title" className="text-[15px] font-bold text-[#253441]">학습 콘텐츠 구성</h2>
         </div>
         <div aria-label="콘텐츠 구성 집계 범위" className="inline-flex rounded-lg bg-[#F4F2EA] p-1">
           {([['all', '전체 보유'], ['ready', '편성 가능']] as const).map(([value, label]) => <button
@@ -74,7 +74,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceAssemblyHref(scope, key, code)} title={`${label} 학습 미션 보기`}
-                  className="flex items-baseline justify-between gap-2 rounded-lg border border-[#E6E1D5] bg-white px-3.5 py-2 transition-colors hover:border-[#C9B76A] hover:bg-[#FFFCF0] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  className="flex items-baseline justify-between gap-2 rounded-lg border border-[#E2DED2] bg-white px-3.5 py-2 transition-colors hover:border-[#C9B76A] hover:bg-[#FFFCF0] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <span className="text-sm text-[#3F4C55]">{label}</span>
                   <span className="text-xl font-semibold tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceAssemblyHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">

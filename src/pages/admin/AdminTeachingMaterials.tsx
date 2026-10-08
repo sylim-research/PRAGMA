@@ -252,7 +252,7 @@ const AdminTeachingMaterials = () => {
   return <AdminShell title="주차별 수업 운영" description={materialsOn ? "선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다." : "선택한 주차의 편성 미션을 열어 수업에 쓰고, 학급 응답과 운영 현황을 확인합니다."}>
     <div className="w-full space-y-5">
       {/* 이 화면의 주인공은 지금 고른 주차다. 15주 전체 현황은 맨 아래 개요로 둔다. */}
-      <section aria-label="선택 주차 작업대" className="rounded-2xl border border-[#E2DED2] bg-white">
+      <section aria-label="선택 주차 작업대" className="rounded-xl border border-[#E2DED2] bg-white">
         <div className="flex flex-wrap items-end gap-3 border-b border-[#EFEBE1] px-5 py-3">
           <label className="min-w-[240px] flex-1 text-[12px] font-semibold text-[#6B7780]">교과목
             <select aria-label="수업자료 교과목" value={courseId} onChange={(event) => setParams(event.target.value ? { courseId: event.target.value } : {})} className="mt-1 h-9 w-full rounded-md border border-[#D9DED9] bg-white px-2.5 text-[14px] font-normal text-[#15202B]">
@@ -363,7 +363,7 @@ const AdminTeachingMaterials = () => {
       </>}
       {/* 15주 전체 현황 — 개요라서 선택 주차 작업대보다 조용하게, 맨 아래에 둔다.
           행마다 같은 문구를 반복하지 않도록 강좌 공개 여부는 머리에 한 번만 보이고, 행에는 주차별로 다른 것만 남긴다. */}
-      {course && !projectorOpen && <section aria-labelledby="course-operation-heading" className="rounded-xl border border-[#E6E1D5] bg-[#FBFAF7]">
+      {course && !projectorOpen && <section aria-labelledby="course-operation-heading" className="rounded-xl border border-[#E2DED2] bg-[#FBFAF7]">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
           <div className="min-w-0">
             <h2 id="course-operation-heading" className="text-[15px] font-semibold text-[#15202B]">15주 운영 현황</h2>

@@ -50,7 +50,7 @@ const Page = () => {
   >
     <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-[16px] font-bold text-[#15202B]">내려받기 기간 설정</h2>
+        <h2 className="text-[17px] font-bold text-[#15202B]">내려받기 기간 설정</h2>
         <div className="flex items-center gap-1.5">
           <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[11.5px] text-emerald-800">동의 기반</Badge>
           <Badge variant="outline" className="border-[#9FB0C6] bg-[#F7F9FC] text-[11.5px] text-[#1F3A5F]">내보내기 형식 버전 1</Badge>

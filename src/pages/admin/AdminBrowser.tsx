@@ -409,13 +409,13 @@ const AdminBrowser = () => {
           {(
             <section className="mt-4 max-w-[1030px] rounded-xl border border-[#E2DED2] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
               <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-[15.5px] font-bold text-[#15202B]">
+              <h3 className="text-[15px] font-bold text-[#15202B]">
                 {sel ? `${SPEECH_ACT_UI[sel.act]} · ${LEVEL[sel.level]}` : LIBRARY_VIEWS.find((item) => item.value === view)?.label} {cellRows.length}개
               </h3>
               {sel && <Button size="sm" variant="ghost" onClick={() => setSel(null)}>화행·수준 선택 해제</Button>}
               </div>
               {cellRows.length === 0 && <p className="py-6 text-[13.5px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
-              <ul className="mt-2.5 divide-y divide-[#EAE4D2] overflow-hidden rounded-lg border border-[#EAE4D2]">
+              <ul className="mt-2.5 divide-y divide-[#EAE4D2] overflow-hidden rounded-lg border border-[#E2DED2]">
                 {cellRows.slice(0, visibleCount).map((r) => (
                   <li key={r.scenario_id} className="bg-white">
                     {/* 한 줄 표: 화행·수준 / 제목 / 방향 / 과제 / 상태. 누르면 미션을 펼친다. */}
@@ -443,7 +443,7 @@ const AdminBrowser = () => {
                       </span>
                     </button>
                     {openId === r.scenario_id && preview[r.scenario_id] && (
-                      <div className="border-t border-[#EAE4D2] px-4 py-3">
+                      <div className="border-t border-[#E2DED2] px-4 py-3">
                         {preview[r.scenario_id].mission.schema_version === "mission_v6"
                           ? <MissionOutline mission={preview[r.scenario_id].mission} />
                           : <MissionPreview mission={preview[r.scenario_id].mission as MissionRuntime} warnings={preview[r.scenario_id].warnings} />}
@@ -484,7 +484,7 @@ const Filter = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 w-full rounded-md border border-[#D8D4C8] bg-[#FCFBF8] px-2 text-[13px] text-[#15202B]"
+      className="h-8 w-full rounded-md border border-[#E2DED2] bg-[#FCFBF8] px-2 text-[13px] text-[#15202B]"
     >
       {opts.map(([v, l]) => (
         <option key={v} value={v}>{l}</option>

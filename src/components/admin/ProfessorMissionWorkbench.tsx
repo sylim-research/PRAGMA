@@ -170,7 +170,7 @@ export function ProfessorMissionWorkbench({
         </div>
         {failFindingsBlock}
         {editor}
-        <div className="mt-4 rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
+        <div className="mt-4 rounded-xl border border-[#E2DED2] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
           <p className="text-[#3F4E57]">
             이 화면은 미션을 만들고 고치는 자리입니다. 다음 단계는 자동 품질 검토이고,
             그 뒤 교수자가 콘텐츠를 감수해 최종 승인합니다.

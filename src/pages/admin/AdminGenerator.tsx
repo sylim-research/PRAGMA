@@ -200,7 +200,7 @@ interface BatchItem {
   auto_check: "pass" | "warning";
 }
 
-const formField = "h-9 text-[14.75px] bg-[#FFFDF8] border-[#E6DECB]";
+const formField = "h-9 text-[14.75px] bg-[#FFFDF8] border-[#E2DED2]";
 
 // 저장된 코어의 P·D·R 코드(화자 기준)를 화면 말로 옮긴다.
 const EXAMPLE_P: Record<string, string> = { speaker_lower: "P: 내가 낮음", equal: "P: 동등", speaker_higher: "P: 내가 높음" };
@@ -245,7 +245,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
   }
   const heading = "text-[12.25px] font-semibold tracking-[0.04em] text-[#8A7621]";
   return (
-    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E6E1D5] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_minmax(0,1fr)]">
+    <div className="grid gap-x-5 gap-y-2.5 rounded-lg border border-[#E2DED2] bg-[#FAF8F2] px-4 py-3 sm:grid-cols-[auto_minmax(0,1fr)]">
       <div className="min-w-0">
         <div className={heading}>화행</div>
         <div className="mt-1 text-[15.75px] font-bold text-[#15202B]">{act}</div>
@@ -260,7 +260,7 @@ function ConditionSummary({ conditions }: { conditions: string[] }) {
           ))}
         </div>
       </div>
-      <div className="min-w-0 border-t border-[#E6E1D5] pt-2 sm:col-span-2">
+      <div className="min-w-0 border-t border-[#E2DED2] pt-2 sm:col-span-2">
         <div className={heading}>방향 · 수준 · 수행 방식</div>
         {/* 교수자 최종 승인 화면의 머리 칩과 같은 「이름 값」 짝으로 보여 준다. */}
         <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -938,7 +938,7 @@ const AdminGenerator = () => {
       {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
       <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* LEFT — settings */}
-        <section className="space-y-5 rounded-lg border border-[#E6DECB] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
+        <section className="space-y-5 rounded-lg border border-[#E2DED2] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
             <SectionTitle n={1} label="수행 방식" />
@@ -954,7 +954,7 @@ const AdminGenerator = () => {
                       "h-10 rounded-md text-[14.75px] font-medium transition-colors",
                       on
                         ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
-                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
+                        : "border border-[#E2DED2] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {m === "translation" ? "번역" : "통역"}
@@ -990,7 +990,7 @@ const AdminGenerator = () => {
                       "rounded-md py-2 px-1.5 text-center transition-colors leading-tight",
                       on
                         ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6]"
-                        : "border border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
+                        : "border border-[#E2DED2] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     <div
@@ -1185,7 +1185,7 @@ const AdminGenerator = () => {
                       "flex-1 h-9 rounded-md text-[14.75px] font-medium transition-colors",
                       on
                         ? "border-[1.5px] border-[#2F3D48] bg-[#FBF5E6] font-semibold text-[#15202B]"
-                        : "border border-[#E6DECB] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
+                        : "border border-[#E2DED2] bg-[#FFFDF8] text-[#4E5A63] hover:border-[#CDBB8A]",
                     ].join(" ")}
                   >
                     {n}개
@@ -1228,7 +1228,7 @@ const AdminGenerator = () => {
                       key={i}
                       className={[
                         "flex items-start gap-2.5 rounded-md border px-3 py-2.5 text-[14.75px] cursor-pointer transition-colors",
-                        on ? "border-[#CDBB8A] bg-[#FBF5E6]" : "border-[#E6DECB] bg-[#FFFDF8] hover:border-[#CDBB8A]",
+                        on ? "border-[#CDBB8A] bg-[#FBF5E6]" : "border-[#E2DED2] bg-[#FFFDF8] hover:border-[#CDBB8A]",
                       ].join(" ")}
                     >
                       <input
@@ -1280,7 +1280,7 @@ const AdminGenerator = () => {
 
         {/* RIGHT — preview */}
         <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
-          <h2 className="text-[16.75px] font-semibold text-[#1d2336]">생성 결과 미리보기</h2>
+          <h2 className="text-[17px] font-bold text-[#1d2336]">생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[14.25px] font-medium text-[#065F46]">
@@ -1304,14 +1304,14 @@ const AdminGenerator = () => {
           <div className="mt-2.5">
             {loading && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#E2DED2] border-t-[#1d2336]" />
                 <p className="mt-3 text-[13.75px] text-muted-foreground">생성 중...</p>
               </div>
             )}
 
             {finalizing && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#EAE4D2] border-t-[#1d2336]" />
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#E2DED2] border-t-[#1d2336]" />
                 <p className="mt-3 text-[13.75px] text-muted-foreground">시나리오 생성 중...</p>
               </div>
             )}
@@ -1319,14 +1319,14 @@ const AdminGenerator = () => {
             {!loading && !finalizing && !coreResults && !aiResult && example && (
               <div className="space-y-3">
                 <ConditionSummary conditions={example.conditions} />
-                <div className="space-y-2.5 rounded-lg border border-[#D9D2BF] bg-white p-4 shadow-sm">
+                <div className="space-y-2.5 rounded-lg border border-[#E2DED2] bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span className="inline-flex items-center rounded border border-[#E3D3A0] bg-[#FDF8EA] px-1.5 py-0.5 text-[12.75px] font-medium text-[#6D5C1F]">생성 예시</span>
                     <span className="text-[15.25px] font-semibold text-foreground">{example.title}</span>
                   </div>
                   <div>
                     <div className="mb-1 text-[12.75px] font-semibold text-[#8a857c]">상황</div>
-                    <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{example.situation}</div>
+                    <div className="rounded-md border border-[#E2DED2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{example.situation}</div>
                   </div>
                   <div>
                     <div className="mb-1 text-[12.75px] font-semibold text-[#6D5C1F]">원문</div>
@@ -1346,7 +1346,7 @@ const AdminGenerator = () => {
                   return (
                   <div key={i} className={[
                     "space-y-2.5 rounded-lg border bg-white p-4 shadow-sm",
-                    heldStage ? "border-[#E6E1D5] border-l-4 border-l-[#D9A441]" : "border-[#D9D2BF]",
+                    heldStage ? "border-[#E2DED2] border-l-4 border-l-[#D9A441]" : "border-[#E2DED2]",
                   ].join(" ")}>
                     <div className="flex flex-wrap items-center gap-1.5">
                       <span
@@ -1390,7 +1390,7 @@ const AdminGenerator = () => {
                     {r.core && typeof r.core.situation_ko === "string" && (
                       <div>
                         <div className="mb-1 text-[12.75px] font-semibold text-[#8a857c]">상황</div>
-                        <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
+                        <div className="rounded-md border border-[#E2DED2] bg-[#FAF7EE] p-2.5 text-[14.75px] leading-relaxed text-[#3F4E59]">{r.core.situation_ko as string}</div>
                       </div>
                     )}
                     {r.core && typeof r.core.source_text === "string" && (
@@ -1420,7 +1420,7 @@ const AdminGenerator = () => {
             {!loading && aiResult && (
               <div className="space-y-5">
                 {outlineCount > 1 && batchItems && (
-                  <div className="rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2">
+                  <div className="rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2">
                     <p className="text-[14.25px] font-medium text-[#5B5446]">
                       총 {batchItems.length}개의 시나리오가 생성 예정입니다.
                     </p>
@@ -1455,7 +1455,7 @@ const AdminGenerator = () => {
                   <div className="mb-1.5 text-[12.75px] font-medium text-[#8a857c] uppercase tracking-wide">
                     한국어 원문 (source_text)
                   </div>
-                  <div className="max-h-44 overflow-y-auto rounded-md border border-[#EAE4D2] bg-[#FAF7EE] p-3 text-[14.75px] leading-relaxed text-foreground">
+                  <div className="max-h-44 overflow-y-auto rounded-md border border-[#E2DED2] bg-[#FAF7EE] p-3 text-[14.75px] leading-relaxed text-foreground">
                     {aiResult.source_text}
                   </div>
                 </div>

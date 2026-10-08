@@ -53,9 +53,9 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
   return (
     <div className="mb-3 flex items-start gap-2.5">
-      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{no}</span>
+      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
       <div>
-        <h2 id={id} className="text-[19px] font-bold leading-8 text-[#15202B]">{title}</h2>
+        <h2 id={id} className="text-[17px] font-bold leading-8 text-[#15202B]">{title}</h2>
         <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
       </div>
     </div>
@@ -93,7 +93,7 @@ function RuleCatalogPanel() {
   const currentCount = QUALITY_RULE_IDS_IN_CATALOG.filter((id) => CURRENT_PIPELINE_RULE_IDS.has(id)).length;
   const legacyCount = QUALITY_RULE_IDS_IN_CATALOG.length - currentCount;
   return (
-    <div id="quality-rules" className="mt-3 rounded-lg border border-[#E5DEC9] bg-[#FFFDF7] p-3 sm:p-4">
+    <div id="quality-rules" className="mt-3 rounded-lg border border-[#E2DED2] bg-[#FFFDF7] p-3 sm:p-4">
       <div className="flex flex-wrap items-center gap-2">
         {([["current", `현행 미션에 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
           <button key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
@@ -127,7 +127,7 @@ function RuleCatalogPanel() {
                         <div className="flex flex-wrap items-center gap-1.5">
                           {scope === "current" && SCENARIO_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">시나리오</Badge>}
                           {scope === "current" && MISSION_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">학습 미션</Badge>}
-                          <Badge variant="outline" className="border-[#E5DEC9] bg-[#FBFAF6] px-1.5 py-0 text-[11px] font-normal text-[#6D5C1F]">{NATURE_LABEL[rule.nature]}</Badge>
+                          <Badge variant="outline" className="border-[#E2DED2] bg-[#FBFAF6] px-1.5 py-0 text-[11px] font-normal text-[#6D5C1F]">{NATURE_LABEL[rule.nature]}</Badge>
                         </div>
                         <p className="mt-1 text-[12.5px] leading-relaxed text-[#26333B]">{rule.summary_ko}</p>
                         {rule.applicability_ko && <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#6D675D]">적용 조건 · {rule.applicability_ko}</p>}
@@ -204,7 +204,7 @@ const FULL_WIDTH_PROMPT_KEYS = new Set(["core.scene_preflight.system"]);
 function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card className={open || FULL_WIDTH_PROMPT_KEYS.has(entry.key) ? "md:col-span-2" : undefined}>
+    <Card className={`border-[#E2DED2] ${open || FULL_WIDTH_PROMPT_KEYS.has(entry.key) ? "md:col-span-2" : ""}`}>
       <CardHeader className="p-4">
         <div className="flex items-center gap-2">
           <button

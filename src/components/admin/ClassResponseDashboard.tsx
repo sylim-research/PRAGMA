@@ -56,7 +56,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
         </div>
       </div>}
 
-      <section aria-label={selected.title} className="overflow-hidden rounded-2xl border border-[#E0E3E5] bg-white shadow-sm">
+      <section aria-label={selected.title} className="overflow-hidden rounded-xl border border-[#E0E3E5] bg-white shadow-sm">
         {!compactJudgment && <div className="border-b border-[#E9EBEC] bg-[#F6F8F8] px-4 py-3 sm:px-6">
           <p className="text-xs font-bold tracking-wider text-[#65737D]">판단 {String(selected.itemId).padStart(2, "0")} · 선택 분포</p>
           <h3 className={`mt-1 font-black text-[#15202B] ${projector ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"}`}>{selected.title.replace(/^판단 \d+\s*·\s*/, "")}</h3>

@@ -86,7 +86,7 @@ import {
 // 이 브라우저에서 마지막으로 연 교과목(편의 기능). 서버 상태가 아니다.
 const LAST_OUTLINE_KEY = "pragma.admin.composer.lastOutline";
 const CONDITION_LABEL = "text-[11.5px] font-semibold text-[#46515A]";
-const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#D8D4C8] bg-white px-2 text-[13.5px] text-[#15202B]";
+const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]";
 const SETTINGS_MENU_ITEM =
   "flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[13px] text-[#26333B] hover:bg-[#F6F5F1] disabled:pointer-events-none disabled:opacity-50";
 
@@ -826,10 +826,10 @@ const AdminComposer = () => {
 
         {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
-        <div className={["mt-6 overflow-hidden border border-[#D8D3C4] bg-white", outline ? "rounded-t-2xl border-b-0" : "rounded-2xl"].join(" ")}>
+        <div className={["mt-6 overflow-hidden border border-[#E2DED2] bg-white", outline ? "rounded-t-xl border-b-0" : "rounded-xl"].join(" ")}>
           {/* 교과목 상자 = 네이비 이름 머리 + 편성 조건 + 주차별 배치. 배치표는 이 교과목에 딸린 아랫부분이다(outline이 있을 때 아래로 이어진다). */}
           {/* 작업 머리 = 지금 고친 교과목 이름. 카드 줄(고르기) 아래에서 「이 교과목을 편성한다」가 먼저 읽히게. */}
-          {outline && <h2 className="flex items-center gap-2.5 border-b border-[#E5E0D2] bg-[#FBFAF6] px-5 py-3 text-[#15202B]">
+          {outline && <h2 className="flex items-center gap-2.5 border-b border-[#E2DED2] bg-[#FBFAF6] px-5 py-3 text-[#15202B]">
             {/* 상자 머리 = 교과목 이름만. 페이지 제목보다 한 단계 낮게(2026-10-08 — 네이비 띠가 페이지 제목보다 무거웠다).
                 수준·방향·수행 방식은 바로 아래 편성 조건과 위 카드에 이미 있다. */}
             <span aria-hidden className="h-[18px] w-[4px] rounded-sm bg-[#FAD338]" />
@@ -926,7 +926,7 @@ const AdminComposer = () => {
             </div>
           </div>
           {conditionsOpen && (
-            <div className="border-t border-[#EAE4D2] px-4 pb-5 pt-3">
+            <div className="border-t border-[#E2DED2] px-4 pb-5 pt-3">
               <CompositionConditionFields
                 value={{ level, direction, courseMode, themes }}
                 onLevel={setLevel}
@@ -968,7 +968,7 @@ const AdminComposer = () => {
         <p className="mt-4 text-[13px] text-muted-foreground">주차 골격을 불러오는 중…</p>
       ) : (
         <>
-          <div className="overflow-hidden rounded-b-2xl border border-t-0 border-[#D8D3C4] bg-white">
+          <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#CFC8B6] px-5 pb-2 pt-5">
             {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
             <h3 className="text-[14px] font-semibold text-[#46515A]">주차별 미션 배치</h3>

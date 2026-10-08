@@ -599,7 +599,7 @@ export const CurriculumEditor = ({
                     </div>
                   )}
 
-                  <details className="rounded-lg border border-[#EAE4D2] bg-[#FAF8F2] px-4 py-3">
+                  <details className="rounded-lg border border-[#E2DED2] bg-[#FAF8F2] px-4 py-3">
                     <summary className="cursor-pointer text-[12.5px] font-medium text-muted-foreground">
                       학습자 화면 세부 설정 (선택)
                     </summary>
@@ -632,7 +632,7 @@ export const CurriculumEditor = ({
                                     key={suggestion}
                                     type="button"
                                     onClick={() => addCanDoSuggestion(i, suggestion)}
-                                    className="w-full rounded-md border border-[#EAE4D2] bg-[#FAF8F2] px-3 py-2 text-left text-[11.5px] leading-relaxed transition hover:bg-[#FFF7CC]"
+                                    className="w-full rounded-md border border-[#E2DED2] bg-[#FAF8F2] px-3 py-2 text-left text-[11.5px] leading-relaxed transition hover:bg-[#FFF7CC]"
                                   >
                                     {suggestion}
                                     <span className="mt-1 block font-semibold text-[#7A4A0A]">

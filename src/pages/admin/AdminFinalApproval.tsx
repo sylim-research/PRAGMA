@@ -62,7 +62,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
     >
       <ResearchWorkflowGuide current="release" />
 
-      <section className="rounded-xl border border-[#D9D4C8] bg-white p-5">
+      <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold tracking-wide text-[#756F64]">교수자 감수 대기열</p>
@@ -95,7 +95,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
           <Link to="/admin/assembly" className="inline-flex items-center gap-2 rounded-md bg-[#15202B] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#263747]">
             학습 미션 제작 열기 <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
-          <Link to="/admin/composer" className="inline-flex items-center gap-2 rounded-md border border-[#D9D4C8] bg-white px-4 py-2 text-sm font-semibold transition hover:bg-[#F7F4EC]">
+          <Link to="/admin/composer" className="inline-flex items-center gap-2 rounded-md border border-[#E2DED2] bg-white px-4 py-2 text-sm font-semibold transition hover:bg-[#F7F4EC]">
             주차별 수업 편성 <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>

@@ -473,11 +473,11 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
     // 스크롤해도 따라오게 sticky — 후보를 훑다가 원문을 고치는 왕복이 잦다.
     <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[9fr_11fr]">
       {/* ── LEFT: 자료 → 문구 확정 ── */}
-      <section className="space-y-5 rounded-xl border border-[#D9D2BF] bg-white p-5 lg:sticky lg:top-4">
+      <section className="space-y-5 rounded-xl border border-[#E2DED2] bg-white p-5 lg:sticky lg:top-4">
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="whitespace-nowrap text-[16px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
+            <h3 className="whitespace-nowrap text-[17px] font-bold text-[#15202B]">① 원자료 가져오기</h3>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {([
@@ -526,13 +526,13 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                     <img
                       src={imageDataUrl}
                       alt={imageName ?? "미리보기"}
-                      className="max-h-96 w-full rounded-md border border-[#EAE4D2] bg-[#F1EDE2] object-contain"
+                      className="max-h-96 w-full rounded-md border border-[#E2DED2] bg-[#F1EDE2] object-contain"
                     />
                   </button>
                   <div className="flex items-center justify-between">
                     <p className="truncate text-[14px] text-muted-foreground">{imageName}</p>
                     <button type="button" onClick={clearImage}
-                      className="rounded-md border border-[#EAE4D2] bg-white px-2.5 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted">
+                      className="rounded-md border border-[#E2DED2] bg-white px-2.5 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted">
                       제거
                     </button>
                   </div>
@@ -543,7 +543,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                     type="button"
                     onClick={() => setImgLarge(true)}
                     title="클릭하면 크게 보기"
-                    className="h-28 w-20 shrink-0 overflow-hidden rounded-md border border-[#EAE4D2] bg-[#F1EDE2]"
+                    className="h-28 w-20 shrink-0 overflow-hidden rounded-md border border-[#E2DED2] bg-[#F1EDE2]"
                   >
                     <img src={imageDataUrl} alt={imageName ?? "미리보기"} className="h-full w-full object-contain" />
                   </button>
@@ -551,7 +551,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                     <p className="truncate text-[14px] text-muted-foreground">{imageName}</p>
                     <p className="text-[12.5px] text-[#5A6670]">썸네일을 누르면 크게 봅니다</p>
                     <button type="button" onClick={clearImage}
-                      className="rounded-md border border-[#EAE4D2] bg-white px-2.5 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted">
+                      className="rounded-md border border-[#E2DED2] bg-white px-2.5 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted">
                       제거
                     </button>
                   </div>
@@ -576,7 +576,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   onKeyDown={(e) => { if (e.key === "Enter" && !ytLoading && youtubeUrl.trim()) fetchCaption(); }}
                   placeholder="https://www.youtube.com/watch?v=…"
                   aria-label="YouTube 영상 주소"
-                  className="h-10 min-w-0 flex-1 rounded-md border border-[#D9D2BF] bg-white px-3 text-[15px] text-[#15202B] placeholder:text-[#8A949C] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+                  className="h-10 min-w-0 flex-1 rounded-md border border-[#E2DED2] bg-white px-3 text-[15px] text-[#15202B] placeholder:text-[#8A949C] focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
                 />
                 <button
                   type="button"
@@ -598,7 +598,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
-              className="mt-2.5 h-40 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[15px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="mt-2.5 h-40 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[15px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
@@ -620,7 +620,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   "flex h-10 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-md text-[15px] transition-colors",
                   direction === d
                     ? "border-2 border-[#15202B] bg-white font-semibold text-[#15202B]"
-                    : "border border-[#D9D2BF] bg-white font-medium text-[#3F4E59] hover:bg-[#F3F0E7]",
+                    : "border border-[#E2DED2] bg-white font-medium text-[#3F4E59] hover:bg-[#F3F0E7]",
                 ].join(" ")}
               >
                 {d === "zh_ko" ? "중→한" : "한→중"}
@@ -656,7 +656,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
 
         {/* ② 추출 문구 확인 — 입력의 최종 산출물은 오른쪽이 아니라 여기서 확정된다 */}
         {analysis && (
-          <div className="rounded-md border border-[#EAE4D2] bg-white p-3">
+          <div className="rounded-md border border-[#E2DED2] bg-white p-3">
             <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
               <span className="text-[14.5px] font-bold text-[#15202B]">② 추출 문구 확인</span>
               {analysis.extraction_confidence && (
@@ -673,13 +673,13 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
             <textarea
               value={editedOriginal}
               onChange={(e) => setEditedOriginal(e.target.value)}
-              className="h-20 w-full resize-none rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[15px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="h-20 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[15px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
             <button
               type="button"
               onClick={() => runAnalyze(editedOriginal)}
               disabled={loading || !editedOriginal.trim()}
-              className="mt-2 rounded-md border border-[#EAE4D2] bg-[#FAF7EE] px-3 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted disabled:opacity-60"
+              className="mt-2 rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-1 text-[13.5px] text-[#1d2336] hover:bg-muted disabled:opacity-60"
             >
               ↻ 수정한 문구로 다시 분석
             </button>
@@ -692,7 +692,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
       {/* ── RIGHT: 확정된 문구 → 활용 ── */}
       <section className="min-w-0 space-y-4">
         {!analysis && !history && (
-          <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#EAE4D2] bg-[#FAF8F2] px-6 py-10 text-center text-[15px] leading-relaxed text-muted-foreground">
+          <div className="flex min-h-[240px] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#E2DED2] bg-[#FAF8F2] px-6 py-10 text-center text-[15px] leading-relaxed text-muted-foreground">
             <p className="font-medium text-[#5B5446]">
               원자료 가져오기 → 추출 문구 확인 → 활용 방향 분석 → 콘텐츠 후보
             </p>
@@ -714,7 +714,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                 </p>
               </div>
               {/* ③ 활용 방향 분석 — 확정된 문구가 어떤 콘텐츠가 될 수 있는가 */}
-              <div className="space-y-2 rounded-xl border border-[#EAE4D2] bg-white p-4">
+              <div className="space-y-2 rounded-xl border border-[#E2DED2] bg-white p-4">
                 <div className="flex flex-wrap items-center gap-2 border-l-[3px] border-[#FAD338] pl-2.5">
                   <span className="text-[15.5px] font-bold text-[#1d2336]">③ 활용 방향 분석</span>
                   <span className="rounded-full bg-[#EAE4D2] px-2 py-0.5 text-[12px] font-medium text-[#5B5446]">AI 제안</span>
@@ -790,7 +790,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                         <Fact label="AI 상황">{c.situation_seed_ko}</Fact>
                       )}
                       {c.source_text && (
-                        <div className="rounded-md border border-[#EAE4D2] bg-[#FBF8F0] px-3 py-2">
+                        <div className="rounded-md border border-[#E2DED2] bg-[#FBF8F0] px-3 py-2">
                           <div className="text-[13.5px] font-semibold text-[#6B645A]">출발 텍스트</div>
                           <p className="mt-0.5 text-[16px] leading-relaxed text-[#15202B]">{c.source_text}</p>
                         </div>
@@ -801,7 +801,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
 
                       {/* 표현 자원(비생성 후보) — 후속 「오늘의 살아 있는 표현」 카드 후보 */}
                       {c.expression?.text && (
-                        <div className="rounded border border-[#EAE4D2] bg-[#FAF7EE] px-2.5 py-1.5 text-[14px] space-y-0.5">
+                        <div className="rounded border border-[#E2DED2] bg-[#FAF7EE] px-2.5 py-1.5 text-[14px] space-y-0.5">
                           <div>
                             <span className="font-medium text-foreground">{c.expression.text}</span>
                             {c.expression.meaning_ko && <span className="text-muted-foreground"> — {c.expression.meaning_ko}</span>}
@@ -877,7 +877,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
                   );
                 })}
                 {(analysis.candidates ?? []).length === 0 && (
-                  <p className="rounded-md border border-dashed border-[#EAE4D2] bg-[#FAF7EE] px-3 py-2 text-[14px] text-muted-foreground">
+                  <p className="rounded-md border border-dashed border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[14px] text-muted-foreground">
                     제안된 활용 후보가 없습니다. 원문을 수정해 재분석하거나 다른 자료를 시도하세요.
                   </p>
                 )}

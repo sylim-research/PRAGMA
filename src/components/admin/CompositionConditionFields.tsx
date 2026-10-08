@@ -9,7 +9,7 @@ import { DIRECTION_LABEL, LEVEL, type LanguageDirection, type LearnerLevel } fro
 import { THEME_CODES, THEME_LABEL, type ThemeCode } from "@/lib/pragma/scenarioTopics";
 
 const LABEL = "text-[11.5px] font-semibold text-[#46515A]";
-const SELECT = "h-9 w-full rounded-md border border-[#D8D4C8] bg-white px-2 text-[13.5px] text-[#15202B]";
+const SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]";
 
 /** 편성 조건 입력 — 수준·언어방향·번역·통역 비율을 한 줄, 주제를 한 줄에 둔다. */
 export function CompositionConditionFields({
@@ -79,7 +79,7 @@ export function CompositionConditionFields({
           type="button"
           onClick={() => onThemes([])}
           className={`rounded-md border px-2.5 py-0.5 transition ${
-            value.themes.length === 0 ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
+            value.themes.length === 0 ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white hover:bg-[#FAF8F2]"
           }`}
         >
           전체
@@ -90,7 +90,7 @@ export function CompositionConditionFields({
             type="button"
             onClick={() => toggleTheme(theme)}
             className={`rounded-md border px-2.5 py-0.5 transition ${
-              value.themes.includes(theme) ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
+              value.themes.includes(theme) ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#E2DED2] bg-white hover:bg-[#FAF8F2]"
             }`}
           >
             {THEME_LABEL[theme]}
@@ -109,7 +109,7 @@ export function ThemePicker({ themes, onThemes }: { themes: ThemeCode[]; onTheme
   const toggle = (theme: ThemeCode) => onThemes(themes.includes(theme) ? themes.filter((item) => item !== theme) : [...themes, theme]);
   // 고른 주제 = 옅은 남색 바탕 + 남색 테두리 + ✓. 노랑은 실행 버튼(CTA) 색이라 선택 상태에 쓰지 않고(2026-10-08), 남색 채움은 과해서 쓰지 않는다.
   const tile = (on: boolean) => `inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[14px] font-semibold transition ${
-    on ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#E4DDCB] bg-white text-[#3F4E57] hover:border-[#7D90A8]"}`;
+    on ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#E2DED2] bg-white text-[#3F4E57] hover:border-[#7D90A8]"}`;
   return (
     <div className="flex flex-wrap gap-2">
       <button type="button" aria-pressed={themes.length === 0} onClick={() => onThemes([])} className={tile(themes.length === 0)}>

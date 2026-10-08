@@ -8,7 +8,6 @@ import {
   ADMIN_NAV_GROUPS,
   adminMobileNavValue,
   adminNavItemIsActive,
-  adminUsesWideCanvas,
 } from "@/lib/admin/adminNavigation";
 
 interface AdminShellProps {
@@ -24,7 +23,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mobileNavValue = adminMobileNavValue(pathname);
-  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1465px]" : "max-w-[1365px]";
+  // 모든 관리자 화면은 같은 캔버스 폭을 쓴다(2026-10-08 — 메뉴를 옮길 때 본문 폭이 흔들리지 않게).
+  const canvasClass = "max-w-[1465px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );
@@ -191,7 +191,9 @@ export const AdminShell = ({ title, description, children, compact = false, hide
             </select>
           </div>
 
-          <div className={hideTitle ? "sr-only" : "flex items-stretch gap-3 print:hidden"}>
+          {/* 페이지 머리와 본문 사이에 가는 선을 둔다 — 머리 아래가 비어 있으면 본문이 머리에 붙어 좁아 보인다(2026-10-08). */}
+          <div className={hideTitle ? "sr-only" : "border-b border-[#E2DED2] pb-5 print:hidden"}>
+          <div className="flex items-stretch gap-3">
             <span
               aria-hidden
               className="mt-1 w-[5px] shrink-0 self-stretch rounded-sm bg-[#FAD338]"
@@ -205,7 +207,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
               )}
             </div>
           </div>
-          <div className={`${description ? "mt-5" : "mt-3"} print:mt-0`}>{children}</div>
+          </div>
+          <div className={`${hideTitle ? "mt-3" : "mt-6"} print:mt-0`}>{children}</div>
         </main>
       </div>
     </div>

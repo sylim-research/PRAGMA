@@ -113,7 +113,7 @@ export function NewCoursePanel({
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.16fr)_minmax(21rem,0.84fr)]">
     <div className="space-y-3">
       {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
-      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3">
+      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
         <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>시작 방법</h2>
         <div role="radiogroup" aria-label="시작 방법" className="flex flex-wrap items-center gap-3">
           <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "copy" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
@@ -125,7 +125,7 @@ export function NewCoursePanel({
               disabled={courses.length === 0}
               onFocus={() => method !== "copy" && chooseMethod("copy")}
               onChange={(event) => { setMethod("copy"); chooseSource(event.target.value); }}
-              className="ml-1 h-8 rounded-md border border-[#D8D4C8] bg-white px-2 text-[13.5px] text-[#15202B]"
+              className="ml-1 h-8 rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]"
             >
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
@@ -141,7 +141,7 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">2</span>교과목 이름과 조건</h2>
 
@@ -163,7 +163,7 @@ export function NewCoursePanel({
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
                   placeholder={source ? `예: 2026-2 ${courseDisplayTitle(source)}` : "예: 2026-2 중급 한중 통번역"}
-                  className="h-9 w-full rounded-md border border-[#D8D4C8] bg-white px-2 text-[13.5px] text-[#15202B]"
+                  className="h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]"
                 />
               </label>
             }
@@ -171,7 +171,7 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-[#E8E2D3] bg-[#FFFDF8] px-5 py-3">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h2 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>편성 주제</h2>
           <span

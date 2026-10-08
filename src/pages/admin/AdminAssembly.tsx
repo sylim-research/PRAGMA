@@ -801,7 +801,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     const facet = (label: string, value: string) => (
-      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#E6DECB] bg-[#FFFDF8] px-2.5 text-[13px] font-bold text-[#233542]">
+      <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#E2DED2] bg-[#FFFDF8] px-2.5 text-[13px] font-bold text-[#233542]">
         <span className="text-[11.5px] font-medium text-[#6B757B]">{label}</span>{value}
       </span>
     );
@@ -943,7 +943,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             {productionOf(r) === "core_only" && (
               <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-3.5 text-[13.5px]">
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
-                <p className="flex items-center gap-2 text-[15.5px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
+                <p className="flex items-center gap-2 text-[15px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
                 <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
                   <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항 5개</dt>
                   <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 근거 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
@@ -988,7 +988,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {professorScreen && (
           <>
             {st === "generated" && info?.queue !== "decision" && (
-              <div className="rounded-xl border border-[#D8D3C4] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
+              <div className="rounded-xl border border-[#E2DED2] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "진행 상태 확인 중"}</p>
                 <Link to={`/admin/ai-review?scenarioId=${r.scenario_id}`} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
                   품질 점검 화면에서 이 미션 열기 →
@@ -1354,8 +1354,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (
-    <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E7E2D4] bg-[#FBFAF6]">
-      <h3 className="flex items-center gap-2 text-[15.5px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
+    <section aria-label="제작 워크플로우" className="!mt-5 overflow-hidden rounded-lg border border-[#E2DED2] bg-[#FBFAF6]">
+      <h3 className="flex items-center gap-2 text-[15px] font-bold text-white bg-[#233542] px-4 py-2.5 leading-6"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />제작 워크플로우</h3>
       <ol className="grid grid-cols-5 gap-2 px-4 pb-3 pt-[18px]">
         {steps.map((step, index) => (
           <li key={step.label} className="relative min-w-0">

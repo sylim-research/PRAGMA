@@ -122,9 +122,9 @@ const AdminAuthentic = () => {
   };
 
   const archive = (
-    <section className="rounded-xl border border-[#D9D2BF] bg-white p-5">
+    <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-[17.75px] font-bold text-[#15202B]">분석 기록</h2>
+        <h2 className="text-[17px] font-bold text-[#15202B]">분석 기록</h2>
         <span className="whitespace-nowrap text-[13.75px] text-muted-foreground">최근 30건</span>
       </div>
 

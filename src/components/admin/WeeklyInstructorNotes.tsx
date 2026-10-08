@@ -16,7 +16,7 @@ export function WeeklyInstructorNotes({ week, direction, missions, generatedNote
   generatedNotes?: Array<{ title: string; body: string }>;
 }) {
   const { features, procedure, missionCases = [] } = weeklyInstructorContent(week, direction);
-  return <section aria-label="교수자 전용 메모" className="space-y-4 rounded-xl border border-[#DBD3BD] bg-[#FFFCF2] p-5">
+  return <section aria-label="교수자 전용 메모" className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#FFFCF2] p-5">
     <div>
       <h2 className="text-lg font-bold">교수자 전용 메모</h2>
       <p className="mt-1 text-xs text-muted-foreground">공용 화면·유인물·HTML에 포함되지 않습니다. 기존 검토 기준과 배정 미션의 해설을 참고합니다.</p>
@@ -42,7 +42,7 @@ export function WeeklyInstructorNotes({ week, direction, missions, generatedNote
         guide.situationKo !== item.situationKo || guide.dct.sourceText !== item.sourceText
           || !guide.dct.alternatives.some((alternative) => alternative.text === item.referenceText)
           ? <p key={item.scenarioId} className="mt-3 text-sm">연결 지도안의 상황·원문·참고 산출이 현재 DCT와 다릅니다. 교수자 재확인 전 사례 설명을 표시하지 않습니다.</p>
-          : <details key={item.scenarioId} className="mt-3 rounded border border-[#DBD3BD] bg-[#FFFCF2] p-3 text-sm">
+          : <details key={item.scenarioId} className="mt-3 rounded border border-[#E2DED2] bg-[#FFFCF2] p-3 text-sm">
             <summary className="cursor-pointer font-semibold">{item.title}</summary>
             <p className="mt-2 font-semibold">{item.status}</p>
             <p className="mt-2"><strong>상황:</strong> {item.contextNote}</p>
