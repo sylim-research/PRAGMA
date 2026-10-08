@@ -2096,8 +2096,8 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   /** 대표 미션 시연 전용(2026-09-25): 아직 풀지 않은 문항 점도 눌러 바로 연다. 학습자 화면에는 켜지 않는다. */
   freeJump?: boolean;
   answeredQuestIds?: string[];
-  /** 시연 전용: 「적절성 판단」·「번역하기」 단계 막대를 눌러 MJT1·DCT로 바로 간다. */
-  onJumpStage?: (stage: "judge" | "produce") => void;
+  /** 시연 전용: 「미션 안내」·「적절성 판단」·「번역하기」 단계 막대를 눌러 안내 첫 화면·MJT1·DCT로 바로 간다. */
+  onJumpStage?: (stage: "intro" | "judge" | "produce") => void;
 }) {
   const mission = useCanonicalMission();
   const quests = mission.quests;
@@ -2135,7 +2135,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
                   : false)
               : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
-            const jumpStage = label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
+            const jumpStage = label === "미션 안내" ? "intro" : label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
             // 시연에서는 산출 단계 이름을 「DCT 번역」으로 보이되, 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
             const shownLabel = freeJump && jumpStage === "produce" ? `DCT ${outputName}` : label;
             const body = (
@@ -3111,7 +3111,13 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     setRenderNonce((current) => current + 1);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const jumpDemoStage = (stage: "judge" | "produce") => {
+  const jumpDemoStage = (stage: "intro" | "judge" | "produce") => {
+    // 시연에서 「미션 안내」로 돌아간다 — 고른 답은 그대로 두고 안내 첫 화면만 다시 연다(2026-10-08).
+    if (stage === "intro") {
+      openDemoQuest(0);
+      setSceneIntroStep(0);
+      return;
+    }
     const index = stage === "judge" ? 0 : mission.quests.findIndex((item) => item.kind === "dct");
     if (index >= 0) openDemoQuest(index);
   };
