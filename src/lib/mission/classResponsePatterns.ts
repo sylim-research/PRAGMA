@@ -1,4 +1,4 @@
-// 학급 응답 분포 집계 — 수업자료·교실 화면의 「이 주차 응답 분포」 데이터.
+// 학습자 응답 분포 집계 — 수업자료·교실 화면의 「이 주차 응답 분포」 데이터.
 //
 // 입력 = learner_mission_logs의 context_judgment(mpj_response_v1/v2 봉투)와
 // 해당 미션의 mission_content. 개인 식별 없이 문항×선택지 단위로만 세어,

@@ -153,7 +153,7 @@ async function expectCounts(learners: number, _dissents: number) {
   });
 }
 
-describe("학습 수행 기록 › 학급 응답 분포", () => {
+describe("학습 수행 기록 › 학습자 응답 분포", () => {
   it("교과목만 골라 들어와도 첫 미션 주차의 실제 분포를 바로 보여 준다", async () => {
     mount("/admin/decision-traces?tab=class&courseId=course-a&demo=0");
     await expectCounts(2, 1);
@@ -179,12 +179,12 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
   });
 
-  it("크게 보기는 익명 학급 집계로 열고 닫을 수 있다", async () => {
+  it("크게 보기는 익명 응답 집계로 열고 닫을 수 있다", async () => {
     mount();
     await expectCounts(2, 1);
     fireEvent.click(screen.getByRole("button", { name: "크게 보기" }));
-    const dialog = within(screen.getByRole("dialog", { name: "학급 응답 크게 보기" }));
-    expect(dialog.getByText("익명 학급 집계")).toBeVisible();
+    const dialog = within(screen.getByRole("dialog", { name: "학습자 응답 크게 보기" }));
+    expect(dialog.getByText("익명 응답 집계")).toBeVisible();
     fireEvent.click(dialog.getByRole("button", { name: "닫기" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -193,22 +193,22 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     mocks.logRows.mockResolvedValue({ data: [], error: null });
     mount();
     expect(await screen.findByText("아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.")).toBeVisible();
-    expect(screen.queryByLabelText("학급 응답 토론 보드")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("학습자 응답 토론 보드")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("응답 공개 단계")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "응답 마감" })).not.toBeInTheDocument();
-    expect(screen.queryByText(/데모|가상 학급|12명/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/데모|가상 학습자|12명/)).not.toBeInTheDocument();
     // v6 이전 미션은 가상 학급을 만들 수 없어 데모 입구도 없다.
     expect(screen.queryByRole("button", { name: "데모로 살펴보기" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "크게 보기" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "응답 새로고침" })).toBeVisible();
   });
 
-  it("v6 미션에 응답이 없으면 「데모로 살펴보기」로 가상 학급 20명을 열고, 실제 응답으로 되돌릴 수 있다", async () => {
+  it("v6 미션에 응답이 없으면 「데모로 살펴보기」로 가상 학습자 20명을 열고, 실제 응답으로 되돌릴 수 있다", async () => {
     mocks.logRows.mockResolvedValue({ data: [], error: null });
     mocks.missionRow.mockResolvedValue({ data: { mission_content: REPRESENTATIVE_MISSION_SNAPSHOT.mission_content }, error: null });
     mount();
     fireEvent.click(await screen.findByRole("button", { name: "데모로 살펴보기" }));
-    expect(await screen.findByText("데모 · 가상 학급 20명 · 실제 학습자 자료 아님")).toBeVisible();
+    expect(await screen.findByText("데모 · 가상 학습자 20명 · 실제 학습자 자료 아님")).toBeVisible();
     expect(screen.getByRole("radio", { name: "데모 응답" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByText(/· 응답 20명$/)).toBeVisible();
     // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
@@ -235,6 +235,6 @@ describe("학습 수행 기록 › 학급 응답 분포", () => {
     expect(screen.queryByText(/virtual-/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: "실제 응답" }));
     expect(await screen.findByText("아직 집계된 응답이 없습니다. 응답이 쌓이면 문항별 판단 분포를 확인할 수 있습니다.")).toBeVisible();
-    expect(screen.queryByText("데모 · 가상 학급 20명 · 실제 학습자 자료 아님")).not.toBeInTheDocument();
+    expect(screen.queryByText("데모 · 가상 학습자 20명 · 실제 학습자 자료 아님")).not.toBeInTheDocument();
   });
 });

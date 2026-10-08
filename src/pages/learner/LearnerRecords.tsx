@@ -43,7 +43,7 @@ type ReportRecord = {
   dissent: { conditions: string[]; reason: string | null } | null;
   /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
   change: ChangeMap | null;
-  /** 내 선택(문항 번호 → 척도 코드 또는 수정안 위치). 우리 반의 판단·판단 비교에 쓴다. */
+  /** 내 선택(문항 번호 → 척도 코드 또는 수정안 위치). 동료들의 판단·판단 비교에 쓴다. */
   choices: Map<number, string>;
   /** 수행 당시 콘텐츠 지문 — 기준 판단·핵심 정리를 같은 판본에서만 읽는다. */
   contentHash: string | null;
@@ -333,7 +333,7 @@ const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounde
 /** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
 function ChoiceBars({ position }: { position: ClassPosition }) {
   return (
-    <ul className="space-y-3.5 pb-2 pt-3" aria-label={`${position.activity} 학급 분포와 내 판단`}>
+    <ul className="space-y-3.5 pb-2 pt-3" aria-label={`${position.activity} 동료 응답 분포와 내 판단`}>
       {position.slices.map((slice) => {
         const share = position.total > 0 ? Math.round((slice.count / position.total) * 100) : 0;
         const mine = position.mine === slice.key;
@@ -355,7 +355,7 @@ function ChoiceBars({ position }: { position: ClassPosition }) {
 }
 
 /**
- * 우리 반의 판단 → 판단 비교 → 핵심 정리. 학급 분포는 교수자가 공개한 미션에만 보인다.
+ * 동료들의 판단 → 판단 비교 → 핵심 정리. 학급 분포는 교수자가 공개한 미션에만 보인다.
  * 기준 판단·핵심 정리는 수행 당시와 같은 콘텐츠 판본일 때만 미션 본문에서 그대로 옮긴다(새 해석 없음).
  */
 function ClassReview({ record }: { record: ReportRecord }) {
@@ -387,9 +387,9 @@ function ClassReview({ record }: { record: ReportRecord }) {
   return (
     <>
       {positions.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="우리 반의 판단">
+        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="동료들의 판단">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className={sectionTitle}>{titleBar}우리 반의 판단</h3>
+            <h3 className={sectionTitle}>{titleBar}동료들의 판단</h3>
             <p className="text-[13.5px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
           </div>
           <div className="mt-3 grid gap-4">
@@ -405,7 +405,7 @@ function ClassReview({ record }: { record: ReportRecord }) {
                   </span>
                 </p>
                 {position.kind === "scale"
-                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 학급 분포와 내 판단`} />
+                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} />
                   : <ChoiceBars position={position} />}
               </div>
             ))}

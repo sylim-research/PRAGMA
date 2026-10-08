@@ -20,7 +20,7 @@ describe("가상 응답 토론 시연", () => {
     render(<VirtualResponseDiscussionDemo />);
     const figure = screen.getByTestId("virtual-response-figure");
     const inFigure = within(figure);
-    expect(inFigure.getByText("가상 응답을 이용한 학급 토론 예시")).toBeInTheDocument();
+    expect(inFigure.getByText("가상 응답을 이용한 수업 토론 예시")).toBeInTheDocument();
     expect(inFigure.getByText("연구자가 구성한 가상 응답 20건 · 실제 학습자 자료 아님")).toBeInTheDocument();
     expect(inFigure.getByText("把最终版PPT发到群里吧。")).toBeInTheDocument();
     expect(inFigure.getByText("최종 PPT 단톡방에 올려줘.")).toBeInTheDocument();

@@ -20,7 +20,7 @@ const VirtualResponseDiscussionDemo = () => (
       className="mx-auto w-full max-w-[1000px] space-y-6 rounded-2xl border border-[#D9D5C8] bg-white p-8"
     >
       <header className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-[28px] font-black tracking-tight">가상 응답을 이용한 학급 토론 예시</h1>
+        <h1 className="text-[28px] font-black tracking-tight">가상 응답을 이용한 수업 토론 예시</h1>
         <p className="rounded-full border-2 border-[#15202B] px-4 py-1.5 text-[15px] font-bold">{VIRTUAL_RESPONSE_NOTICE}</p>
       </header>
 

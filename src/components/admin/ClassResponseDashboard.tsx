@@ -17,7 +17,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
   const compactJudgment = selected?.groups.length === 1 && Boolean(selected.targetPreview)
     && (selected.itemId === 1 || selected.itemId === 2);
 
-  return <div className="space-y-3" aria-label="학급 응답 대시보드">
+  return <div className="space-y-3" aria-label="학습자 응답 대시보드">
     {!figureOnly && <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <p className="flex items-center gap-2 text-sm font-bold text-[#15202B]"><BarChart3 className="h-4 w-4" aria-hidden="true" />문항별 응답 살펴보기</p>
       <dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#65737D]">

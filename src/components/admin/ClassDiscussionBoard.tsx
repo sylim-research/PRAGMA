@@ -121,7 +121,7 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
         <div className="lg:hidden"><Legend slices={item.slices} size={size} /></div>
       </div>
       <div className="min-w-0 rounded-lg border border-[#EEEBE2] bg-[#FDFCF9] px-4 pt-3">
-        <p className="text-[12px] font-semibold text-[#7A858C]">척도 위 학급 분포</p>
+        <p className="text-[12px] font-semibold text-[#7A858C]">척도 위 응답 분포</p>
         <SpectrumStrip slices={item.slices} total={item.total} />
       </div>
     </div>
@@ -352,7 +352,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
         <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />DCT형 통번역 과제{modeLabel && <span className="font-normal text-[#7A858C]">· {modeLabel}</span>}
       </h3>
       <div role="tablist" aria-label="DCT형 통번역 과제 보기" className="flex overflow-hidden rounded-md border border-[#15202B]">
-        {([["class", "학급 전체"], ["cases", "사례 비교"]] as const).map(([key, label]) => <button
+        {([["class", "전체 응답"], ["cases", "사례 비교"]] as const).map(([key, label]) => <button
           key={key}
           type="button"
           role="tab"
@@ -444,7 +444,7 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
   const modeLabel = data.dct.mode === "interpreting" ? MODE_LABEL.stt_interpreting : data.dct.mode === "translation" ? MODE_LABEL.translation : null;
   const summary = useMemo(() => [speechAct, modeLabel, data.direction ? DIRECTION_LABEL[data.direction] ?? data.direction : null, data.focus].filter(Boolean), [speechAct, modeLabel, data.direction, data.focus]);
 
-  return <div className="space-y-3" aria-label="학급 응답 토론 보드">
+  return <div className="space-y-3" aria-label="학습자 응답 토론 보드">
     <p className={`text-[#5D6970] ${size}`}>
       {[...summary, `응답 ${data.learners}명`].join(" · ")}
     </p>

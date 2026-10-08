@@ -238,8 +238,8 @@ describe("learner records", () => {
     renderReport();
     const [item] = await recordItems();
     expect(within(item).queryByRole("list", { name: "이번 수행의 흐름" })).not.toBeInTheDocument();
-    const position = await screen.findByRole("region", { name: "우리 반의 판단" });
-    expect(within(position).getByRole("img", { name: "단일 표현 판단 학급 분포와 내 판단" })).toHaveTextContent("나");
+    const position = await screen.findByRole("region", { name: "동료들의 판단" });
+    expect(within(position).getByRole("img", { name: "단일 표현 판단 동료 응답 분포와 내 판단" })).toHaveTextContent("나");
     expect(mocks.rpc).toHaveBeenCalledWith("learner_get_peer_responses", { p_course_id: ownLog.course_id, p_mission_id: withMjt.mission_id });
     // 판단 비교 표는 없다. 판본을 확인할 수 없으면 기준 판단 라벨도 없다.
     expect(screen.queryByRole("region", { name: "판단 비교" })).not.toBeInTheDocument();
@@ -255,14 +255,14 @@ describe("learner records", () => {
     renderReport();
     await recordItems();
     await act(async () => { await Promise.resolve(); });
-    expect(screen.queryByRole("region", { name: "우리 반의 판단" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "동료들의 판단" })).not.toBeInTheDocument();
   });
 
   it("opens a labelled demo record without reading stored logs", async () => {
     renderReport("/learner/records?demo=1");
-    expect(await screen.findByText("데모 · 가상 학급 20명 · 실제 학습자 자료가 아닙니다")).toBeInTheDocument();
-    const classView = await screen.findByRole("region", { name: "우리 반의 판단" });
-    expect(within(classView).getByRole("list", { name: "수정안 선택 학급 분포와 내 판단" })).toHaveTextContent("수정안 2나60% · 12명");
+    expect(await screen.findByText("데모 · 가상 학습자 20명 · 실제 학습자 자료가 아닙니다")).toBeInTheDocument();
+    const classView = await screen.findByRole("region", { name: "동료들의 판단" });
+    expect(within(classView).getByRole("list", { name: "수정안 선택 동료 응답 분포와 내 판단" })).toHaveTextContent("수정안 2나60% · 12명");
     // 판단 비교 표 대신, 각 활동 그래프 옆에 기준 판단 라벨 하나.
     expect(screen.queryByRole("region", { name: "판단 비교" })).not.toBeInTheDocument();
     expect(within(classView).getAllByText(/^기준 판단:/).map((label) => label.textContent)).toEqual([

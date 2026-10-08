@@ -3225,7 +3225,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             </div>
             <DissentSummary dissent={aDct?.dissent} />
             {SHOW_PEER_RESPONSES && runtime && !demoMode && (
-              <details className={`${panel} p-5`}><summary className="cursor-pointer text-sm font-bold">익명 학급 응답 보기</summary><div className="mt-4">
+              <details className={`${panel} p-5`}><summary className="cursor-pointer text-sm font-bold">익명 동료 응답 보기</summary><div className="mt-4">
               <PeerResponsesPanel
                 courseId={peerCourseId}
                 missionId={runtime.scenario_id}

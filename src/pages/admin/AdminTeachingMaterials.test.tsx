@@ -98,7 +98,7 @@ describe("교과목·주차 수업자료 연결", () => {
     mountAt("/admin/package?courseId=course-a&weekNo=2#weekly-material-detail");
     const summary = await screen.findByText("이 주차 수업자료 승인");
     expect(screen.getByRole("link", { name: "수업자료·토론 만들기" })).toHaveAttribute("href", "/admin/teaching-generator?courseId=course-a&weekNo=2");
-    expect(screen.getByRole("link", { name: "학급 응답 확인" })).toHaveAttribute("href", "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1");
+    expect(screen.getByRole("link", { name: "학습자 응답 확인" })).toHaveAttribute("href", "/admin/class-responses?courseId=course-a&weekNo=2&missionId=mission-1");
     await waitFor(() => expect(summary.closest("details")).toHaveAttribute("open"));
     await waitFor(() => expect(mocks.scrollIntoView).toHaveBeenCalled());
   });
@@ -205,10 +205,10 @@ describe("교과목·주차 수업자료 연결", () => {
     expect(screen.getByRole("combobox", { name: "수업자료 교과목" })).toHaveValue("");
   });
 
-  it("선택 주차 상세 하단에 학급 응답 현황 카드를 중복 표시하지 않는다", async () => {
+  it("선택 주차 상세 하단에 학습자 응답 현황 카드를 중복 표시하지 않는다", async () => {
     mount();
     await screen.findByText("2주차 목표");
-    expect(screen.queryByRole("heading", { name: "학급 응답 현황" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "학습자 응답 현황" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "응답 보드 열기 →" })).not.toBeInTheDocument();
   });
 
@@ -231,7 +231,7 @@ describe("수업자료 de-scope(DEC-20260918-06)", () => {
     legacy.on = false;
     mount();
     expect(await screen.findByRole("link", { name: "미션 1 · 번역 열기 ↗" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "학급 응답 확인" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "학습자 응답 확인" })).toBeInTheDocument();
     expect(screen.getByText(/참여 2명 · 완료 2명/)).toBeInTheDocument();
     for (const name of ["프로젝터 화면", "HTML", "교수자 전용 메모"]) expect(screen.queryByRole("button", { name })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "수업자료·토론 만들기" })).not.toBeInTheDocument();
