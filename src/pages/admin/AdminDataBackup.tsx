@@ -94,13 +94,13 @@ const BADGE_TONE = {
 } as const;
 
 const RoleBadge = ({ children, tone }: { children: string; tone: keyof typeof BADGE_TONE }) => (
-  <span className={`rounded border px-2 py-0.5 text-[11px] font-medium ${BADGE_TONE[tone]}`}>{children}</span>
+  <span className={`rounded border px-2 py-0.5 text-[12px] font-medium ${BADGE_TONE[tone]}`}>{children}</span>
 );
 
 /** 백업 전 「무엇이 담기는지」를 보여 주는 작은 수치 칸 — 오른쪽 미리보기와 같은 리듬. */
 const StatTile = ({ label, value }: { label: string; value: string }) => (
   <div className="rounded-lg bg-muted/50 px-3 py-2 text-center">
-    <p className="text-[11px] text-muted-foreground">{label}</p>
+    <p className="text-[12px] text-muted-foreground">{label}</p>
     <p className="mt-0.5 text-base font-semibold">{value}</p>
   </div>
 );

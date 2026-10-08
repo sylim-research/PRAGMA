@@ -1,4 +1,4 @@
-// 학급 응답 분포 뷰 — 문항별 선택지 분포 막대와 이견 건수.
+// 학습자 응답 분포 뷰 — 문항별 선택지 분포 막대와 이견 건수.
 // 익명 집계만 표시한다. 학생 이름·개별 응답·이견 원문은 여기서 다루지 않는다.
 
 import {
@@ -54,7 +54,7 @@ export const ClassResponsePatterns = ({
                 )}
                 {item.groups.map((group) => (
                   <div key={group.heading} className={projector ? "mt-4" : "mt-3"}>
-                    <p className={projector ? "text-base font-medium text-muted-foreground" : "text-[11px] font-medium text-muted-foreground"}>
+                    <p className={projector ? "text-base font-medium text-muted-foreground" : "text-[12px] font-medium text-muted-foreground"}>
                       {group.heading}
                     </p>
                     <ul className="mt-1.5 space-y-1.5">
@@ -74,7 +74,7 @@ export const ClassResponsePatterns = ({
                             <span className={projector ? "min-w-0 truncate text-lg" : "min-w-0 truncate text-xs"} title={choice.label}>
                               {choice.label}
                               <span className="ml-1 text-muted-foreground">({choice.count}명)</span>
-                              {isLearnerChoice && <span className="ml-2 rounded-full bg-[#F3D248] px-2 py-0.5 text-[10px] font-black text-[#15202B]">내 선택</span>}
+                              {isLearnerChoice && <span className="ml-2 rounded-full bg-[#F3D248] px-2 py-0.5 text-[12px] font-black text-[#15202B]">내 선택</span>}
                             </span>
                           </li>
                         );

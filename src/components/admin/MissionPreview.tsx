@@ -60,7 +60,7 @@ export function MissionPreview({
       {/* unit + provenance */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span className="font-semibold">내부 문항 초점 · {mission.unit.learner_label}</span>
-        <span className="rounded bg-[#E7EFF5] px-1.5 py-0.5 text-[11px] font-semibold text-[#2B5B7A]">{DIRECTION_LABEL[mission.direction]}</span>
+        <span className="rounded bg-[#E7EFF5] px-1.5 py-0.5 text-[12px] font-semibold text-[#2B5B7A]">{DIRECTION_LABEL[mission.direction]}</span>
         <span className="text-muted-foreground">({feat} v{mission.unit.target_feature_version})</span>
         {p && (
           <span className="text-[12px] text-muted-foreground">
@@ -153,7 +153,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
       <div className="flex items-center justify-between">
         <span className="text-[12px] font-semibold text-muted-foreground">{TYPE_LABEL[item.type] ?? item.type}</span>
         {accepted.length > 0 && (
-          <span className="rounded bg-[#E7F5EE] px-1.5 py-0.5 text-[11px] font-semibold text-[#2E7D5B]">
+          <span className="rounded bg-[#E7F5EE] px-1.5 py-0.5 text-[12px] font-semibold text-[#2E7D5B]">
             정답 대역: {accepted.join(" / ")}
           </span>
         )}

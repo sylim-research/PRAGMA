@@ -27,7 +27,7 @@ export function PeerResponsesPanel({
 
   return (
     <section className={`${panel} p-5 sm:p-6`} aria-labelledby="peer-responses-title">
-      <p className="text-xs font-black text-[#6B5518]">익명 학급 비교</p>
+      <p className="text-xs font-black text-[#6B5518]">익명 동료 응답 비교</p>
       <h2 id="peer-responses-title" className="mt-1 text-lg font-black">동료 학습자 응답</h2>
 
       {!courseId ? (
@@ -45,7 +45,7 @@ export function PeerResponsesPanel({
         </div>
       ) : state?.state === "released" ? (
         <div className="mt-4">
-          <p className="mb-4 break-keep text-sm leading-6 text-[#596579]">내 선택이 학급의 다양한 판단 속에서 어디에 있었는지 비교해 보세요.</p>
+          <p className="mb-4 break-keep text-sm leading-6 text-[#596579]">내 선택이 동료들의 다양한 판단 속에서 어디에 있었는지 비교해 보세요.</p>
           <ClassResponsePatterns patterns={[state.pattern]} learnerChoices={learnerChoices} />
           <p className="mt-4 border-t border-[#E8E5DC] pt-3 break-keep text-xs font-semibold leading-5 text-[#6B5518]">
             가장 많이 선택된 응답이 정답을 의미하지는 않습니다. 판단이 달라진 맥락과 이유를 돌아보세요.
@@ -54,7 +54,7 @@ export function PeerResponsesPanel({
       ) : (
         <div className="mt-3 rounded-xl bg-[#F7F6F1] p-4">
           <p className="text-sm font-black">교수자 공개를 기다리고 있습니다.</p>
-          <p className="mt-1 break-keep text-xs leading-5 text-[#667085]">응답이 마감되고 교수자가 공개하면 익명 학급 분포를 확인할 수 있습니다.</p>
+          <p className="mt-1 break-keep text-xs leading-5 text-[#667085]">응답이 마감되고 교수자가 공개하면 익명 동료 응답 분포를 확인할 수 있습니다.</p>
         </div>
       )}
     </section>

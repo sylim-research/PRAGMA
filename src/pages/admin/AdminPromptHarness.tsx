@@ -69,7 +69,7 @@ function ContractSummary() {
       <ol className="grid gap-x-6 gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-cols-2">
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[11px] font-bold text-[#6D5C1F]">{index + 1}</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
             <p className="text-[13.5px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
@@ -102,7 +102,7 @@ function RuleCatalogPanel() {
           </button>
         ))}
         {QUALITY_RULE_CATALOG_REVIEW_STATUS === "draft_pending_researcher_review" && (
-          <span className="ml-auto text-[11.5px] text-[#8A7621]">설명 문안은 연구자 확인 전입니다.</span>
+          <span className="ml-auto text-[12px] text-[#8A7621]">설명 문안은 연구자 확인 전입니다.</span>
         )}
       </div>
       <p className="mt-2 text-[12px] leading-relaxed text-[#52616B]">
@@ -125,12 +125,12 @@ function RuleCatalogPanel() {
                       <span className="font-mono text-[12.5px] font-bold text-[#15202B]">{id}</span>
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          {scope === "current" && SCENARIO_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">시나리오</Badge>}
-                          {scope === "current" && MISSION_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[11px] font-normal">학습 미션</Badge>}
-                          <Badge variant="outline" className="border-[#E2DED2] bg-[#FBFAF6] px-1.5 py-0 text-[11px] font-normal text-[#6D5C1F]">{NATURE_LABEL[rule.nature]}</Badge>
+                          {scope === "current" && SCENARIO_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[12px] font-normal">시나리오</Badge>}
+                          {scope === "current" && MISSION_RULES.has(id) && <Badge variant="outline" className="bg-white px-1.5 py-0 text-[12px] font-normal">학습 미션</Badge>}
+                          <Badge variant="outline" className="border-[#E2DED2] bg-[#FBFAF6] px-1.5 py-0 text-[12px] font-normal text-[#6D5C1F]">{NATURE_LABEL[rule.nature]}</Badge>
                         </div>
                         <p className="mt-1 text-[12.5px] leading-relaxed text-[#26333B]">{rule.summary_ko}</p>
-                        {rule.applicability_ko && <p className="mt-0.5 text-[11.5px] leading-relaxed text-[#6D675D]">적용 조건 · {rule.applicability_ko}</p>}
+                        {rule.applicability_ko && <p className="mt-0.5 text-[12px] leading-relaxed text-[#6D675D]">적용 조건 · {rule.applicability_ko}</p>}
                       </div>
                     </li>
                   );
@@ -153,7 +153,7 @@ function HarnessOverview() {
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
           className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11.5px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
+            <span className="text-[12px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
           </div>
           <h3 className="mt-2 text-[15px] font-bold">규칙 기반 검사</h3>
@@ -168,7 +168,7 @@ function HarnessOverview() {
         </button>
         <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11.5px] font-semibold text-[#3F6172]">AI 검토</span>
+            <span className="text-[12px] font-semibold text-[#3F6172]">AI 검토</span>
             <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
           </div>
           <h3 className="mt-2 text-[15px] font-bold">프롬프트 통제 기반 검토</h3>
@@ -181,7 +181,7 @@ function HarnessOverview() {
         </div>
         <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11.5px] font-semibold text-[#6D675D]">최종 사용 결정</span>
+            <span className="text-[12px] font-semibold text-[#6D675D]">최종 사용 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
           <h3 className="mt-2 text-[15px] font-bold">교수자 최종 승인</h3>
@@ -219,7 +219,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             )}
             <CardTitle className="text-[15px] leading-snug">{entry.label}</CardTitle>
           </button>
-          <Badge variant="outline" className="shrink-0 font-mono text-[11px]">
+          <Badge variant="outline" className="shrink-0 font-mono text-[12px]">
             {entry.sha256.slice(0, 10)}
           </Badge>
           <Badge variant="secondary" className="shrink-0 font-normal">
@@ -235,7 +235,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
           <pre className="max-h-[520px] overflow-auto whitespace-pre-wrap rounded-md border bg-muted/40 p-3 text-xs leading-relaxed">
             {entry.text}
           </pre>
-          <p className="mt-2 break-all font-mono text-[10.5px] text-muted-foreground">
+          <p className="mt-2 break-all font-mono text-[12px] text-muted-foreground">
             {entry.key} · sha256 {entry.sha256}
           </p>
         </CardContent>

@@ -46,7 +46,7 @@ export const VIRTUAL_DISCUSSION_QUESTIONS = [
   "원문의 의미와 화행 목적을 유지하면서 어떻게 조정할 수 있는가?",
 ] as const;
 
-/** 운영 학급 응답 대시보드가 읽는 모양으로 옮긴다. 정답 키·해설은 싣지 않는다. */
+/** 운영 학습자 응답 대시보드가 읽는 모양으로 옮긴다. 정답 키·해설은 싣지 않는다. */
 export const virtualResponsePattern: MissionPattern = {
   missionId: VIRTUAL_RESPONSE_SOURCE.scenarioId,
   learners: VIRTUAL_RESPONSE_TOTAL,

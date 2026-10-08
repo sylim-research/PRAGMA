@@ -775,7 +775,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const nextLabel = professorScreen && fState === "decision" ? "다음 결정 대기 미션 ▶" : "다음 미션 ▶";
 
   const badges = (r: CoreRow, size: "sm" | "md") => {
-    const cls = size === "sm" ? "px-1.5 py-0 text-[11px]" : "px-2 py-0.5 text-[12.5px]";
+    const cls = size === "sm" ? "px-1.5 py-0 text-[12px]" : "px-2 py-0.5 text-[12.5px]";
     const direction = coreDirection(r.core_content);
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     {
@@ -802,14 +802,14 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const mode = r.mode === "stt_interpreting" ? "stt_interpreting" : "translation";
     const facet = (label: string, value: string) => (
       <span className="inline-flex h-8 min-w-[6rem] items-center justify-center gap-1.5 rounded-md border border-[#E2DED2] bg-[#FFFDF8] px-2.5 text-[13px] font-bold text-[#233542]">
-        <span className="text-[11.5px] font-medium text-[#6B757B]">{label}</span>{value}
+        <span className="text-[12px] font-medium text-[#6B757B]">{label}</span>{value}
       </span>
     );
     return (
       <span className="flex flex-wrap items-center gap-2">
         {/* 화행은 목록 꼬리표와 같은 화행 색으로 채워 핵심 변수임을 보인다(연구자 선호, 2026-09-26). */}
         <span className={["inline-flex h-8 min-w-[6rem] items-center justify-center rounded-md border border-transparent gap-1.5 px-2.5 text-[13px] font-bold", ACT_TONE[r.speech_act]].join(" ")}>
-          <span className="text-[11px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
+          <span className="text-[12px] font-medium opacity-70">화행</span>{SPEECH_ACT_UI[r.speech_act]}
         </span>
         {facet("방향", DIRECTION_LABEL[direction])}
         {facet("수준", LEVEL[r.learner_level])}
@@ -1110,7 +1110,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                       openFilter === key ? "border-[#233542] bg-white text-[#233542]" : "border-[#DDE2E4] bg-white text-[#46515A] hover:bg-[#F3F5F6]",
                     ].join(" ")}>
                     <span className="truncate">{label}</span>
-                    {active && <span className="shrink-0 rounded bg-[#F6EDD0] px-1 text-[11px] text-[#8A6B24]">적용</span>}
+                    {active && <span className="shrink-0 rounded bg-[#F6EDD0] px-1 text-[12px] text-[#8A6B24]">적용</span>}
                     <span aria-hidden className="shrink-0 text-[#8C969B]">{openFilter === key ? "▴" : "▾"}</span>
                   </button>
                 ))}
@@ -1264,7 +1264,7 @@ const AxisSel = ({
 }) => (
   <label className="rounded-md border border-[#E1E5E6] bg-white p-2">
     <span className="mb-1.5 flex items-center gap-1.5 text-[12.5px] font-semibold text-[#34444D]">
-      <span className="flex size-4.5 items-center justify-center rounded-full bg-[#E7ECEE] text-[11px] text-[#53656F]">{index}</span>
+      <span className="flex size-4.5 items-center justify-center rounded-full bg-[#E7ECEE] text-[12px] text-[#53656F]">{index}</span>
       {label}
     </span>
     <SelectField value={value} onChange={onChange} opts={opts} />
@@ -1312,7 +1312,7 @@ const AssemblyProgressView = ({
                 ].join(" ")}
               />
               <span className={[
-                "mt-1 block truncate text-[11px]",
+                "mt-1 block truncate text-[12px]",
                 isActive ? "font-semibold text-[#233542]" : isDone ? "text-[#53656F]" : "text-[#98A1A6]",
               ].join(" ")}>{label}</span>
             </li>
@@ -1364,7 +1364,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
                 step.status === "todo" ? "bg-[#DDD8CB]" : "bg-[#233542]"].join(" ")} />
             )}
             <span className="flex flex-col items-center text-center">
-              <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[11.5px] font-bold tabular-nums",
+              <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[12px] font-bold tabular-nums",
                 "bg-[#233542] text-white", step.status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
@@ -1372,7 +1372,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
               <span className={["mt-1.5 whitespace-nowrap text-[12.5px] leading-tight",
                 step.status === "todo" ? "text-[#5B6770]" : "font-semibold text-[#233542]"].join(" ")}>{step.label}</span>
               {step.detail && (
-                <span className={["mt-0.5 max-w-full truncate text-[11.5px] leading-snug",
+                <span className={["mt-0.5 max-w-full truncate text-[12px] leading-snug",
                   step.status === "current" ? "font-semibold text-[#233542]" : "text-[#66727A]"].join(" ")}>{step.detail}</span>
               )}
             </span>

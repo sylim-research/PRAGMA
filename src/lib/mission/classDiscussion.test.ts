@@ -9,7 +9,7 @@ const MISSION_ID = REPRESENTATIVE_MISSION_SNAPSHOT.scenario_id;
 const content = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content;
 const rows = buildVirtualClassRows(MISSION_ID, content)!;
 
-describe("buildClassDiscussion — 가상 학급 20명(대표 미션)", () => {
+describe("buildClassDiscussion — 가상 학습자 20명(대표 미션)", () => {
   const data = buildClassDiscussion(MISSION_ID, rows, content);
 
   it("문항을 학습자 제시 순서(1→2→5→3→4)로 늘어놓고 모든 그래프를 같은 20명에서 센다", () => {

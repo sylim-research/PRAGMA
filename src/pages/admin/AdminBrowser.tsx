@@ -388,7 +388,7 @@ const AdminBrowser = () => {
                             <span className="text-[14.5px] font-semibold">{n === 0 ? "—" : n}</span>
                             {n === 0 ? null : (
                               <span
-                                className={`text-[11px] ${active ? "text-white/70" : ""}`}
+                                className={`text-[12px] ${active ? "text-white/70" : ""}`}
                                 style={!active ? { color: tone.text } : undefined}
                               >
                                 번역 {c.t} · 통역 {c.i}

@@ -161,7 +161,7 @@ const IndividualRecords = () => {
     };
   }, [missionIds]);
 
-  // 관리자 계정의 시험 수행은 기본으로 빼고 본다(학급 응답 분포와 같은 기준: 학습자 계정만).
+  // 관리자 계정의 시험 수행은 기본으로 빼고 본다(학습자 응답 분포와 같은 기준: 학습자 계정만).
   const [includeTestRecords, setIncludeTestRecords] = useState(false);
   const testRecordCount = useMemo(() => (rows ?? []).filter((row) => row.profiles?.role === "admin").length, [rows]);
   const baseRows = useMemo(
@@ -364,11 +364,11 @@ const IndividualRecords = () => {
 };
 
 const TABS = [
-  { key: "class", label: "학급 응답 분포" },
+  { key: "class", label: "학습자 응답 분포" },
   { key: "records", label: "학습자별 기록" },
 ] as const;
 
-/** 같은 학습 기록을 익명 집계 단위(학급 응답 분포)와 학습자 단위(학습자별 기록)로 나눠 본다. 기본은 학급 응답 분포. */
+/** 같은 학습 기록을 익명 집계 단위(학습자 응답 분포)와 학습자 단위(학습자별 기록)로 나눠 본다. 기본은 학습자 응답 분포. */
 const Page = () => {
   const [params, setParams] = useSearchParams();
   // 학습자 관리의 「수행 기록 →」(?q=)는 학습자별 기록으로 연다.
@@ -376,7 +376,7 @@ const Page = () => {
   return (
     <AdminShell
       title="학습 수행 기록"
-      description="학습자가 수행한 학습 미션을 익명 학급 응답 분포와 학습자별 기록으로 확인합니다."
+      description="학습자가 수행한 학습 미션을 익명 학습자 응답 분포와 학습자별 기록으로 확인합니다."
     >
       <div role="tablist" aria-label="기록 보기 방식" className="mb-4 flex gap-1 border-b border-[#E2DED2]">
         {TABS.map((item) => (

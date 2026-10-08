@@ -8,7 +8,7 @@ import { COURSE_MODE_LABEL, COURSE_MODES, type CourseMode } from "@/lib/curricul
 import { DIRECTION_LABEL, LEVEL, type LanguageDirection, type LearnerLevel } from "@/lib/pragma/enums";
 import { THEME_CODES, THEME_LABEL, type ThemeCode } from "@/lib/pragma/scenarioTopics";
 
-const LABEL = "text-[11.5px] font-semibold text-[#46515A]";
+const LABEL = "text-[12px] font-semibold text-[#46515A]";
 const SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]";
 
 /** 편성 조건 입력 — 수준·언어방향·번역·통역 비율을 한 줄, 주제를 한 줄에 둔다. */

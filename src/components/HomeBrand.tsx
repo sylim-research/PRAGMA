@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { DemoBadge } from "@/components/mission/DemoBadge";
 
-export const HomeBrand = ({ largerText = false, demo = false }: { largerText?: boolean; demo?: boolean }) => {
+export const HomeBrand = ({ largerText = false, demo = false, subtitle = "AI 기반 한·중 통번역 학습" }: { largerText?: boolean; demo?: boolean; subtitle?: string }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [pulse, setPulse] = useState(false);
@@ -35,7 +35,7 @@ export const HomeBrand = ({ largerText = false, demo = false }: { largerText?: b
       {demo ? <DemoBadge /> : <>
       <span aria-hidden className="hidden h-[11px] w-px self-center bg-[#3E4C5A] sm:inline-block" />
       <span className={`hidden ${largerText ? "text-[14.333px]" : "text-[14px]"} font-normal text-[#A9B6C4] transition-colors group-hover:text-[#D3DBE3] sm:inline`}>
-        AI 기반 한·중 통번역 학습
+        {subtitle}
       </span>
       </>}
     </button>

@@ -133,7 +133,7 @@ export function ProfessorMissionWorkbench({
                 MJT {itemIndex + 1} · {ITEM_LABELS[itemIndex] ?? "문항"}
               </span>
               <Textarea
-                className="min-h-52 font-mono text-[11px] leading-4"
+                className="min-h-52 font-mono text-[12px] leading-4"
                 value={text}
                 onChange={(event) => setItemTexts((current) =>
                   current.map((value, index) => index === itemIndex ? event.target.value : value))}
@@ -143,7 +143,7 @@ export function ProfessorMissionWorkbench({
           <label className="block">
             <span className="mb-1 block font-medium">DCT 참고안</span>
             <Textarea
-              className="min-h-28 font-mono text-[11px] leading-4"
+              className="min-h-28 font-mono text-[12px] leading-4"
               value={referenceText}
               onChange={(event) => setReferenceText(event.target.value)}
             />

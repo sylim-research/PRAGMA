@@ -295,13 +295,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#EEF1F4]" : ""].join(" ")}>
               {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
+                <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold",
                   status === "failed" ? "bg-red-700 text-white" : "bg-[#233542] text-white",
                   status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
                 </span>
                 <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">
-                  <span className="inline-flex flex-wrap items-center gap-2">{row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[11px] font-semibold text-[#233542]">선택</span>}</span>
+                  <span className="inline-flex flex-wrap items-center gap-2">{row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
                   {row.metadata && <span className="block text-[12px] font-normal leading-5 text-[#5D6970]">{row.metadata}</span>}
                 </span>
                 {row.action ? <span className="ml-auto flex min-w-0 justify-end">{row.action}</span> : <span className={["ml-auto min-w-0 max-w-full text-right", status === "running" ? "font-semibold text-[#233542]"
@@ -324,7 +324,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </li>;
           })}
           <li className={["flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3", professorCurrent ? "bg-[#EEF1F4]" : ""].join(" ")}>
-            <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[11.5px] font-bold",
+            <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold",
               "bg-[#233542] text-white", professorCurrent ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
@@ -425,7 +425,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
                 <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
-                {badge && <span className={`rounded-full px-2 py-0.5 text-[11.5px] font-semibold ${badge.cls}`}>{badge.text}</span>}
+                {badge && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${badge.cls}`}>{badge.text}</span>}
               </div>
               {/* 결정에 필요한 것은 「어디를 · 어떻게」 둘뿐이다. 지적 전문·이유는 근거 안에 둔다. */}
               <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
@@ -541,11 +541,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
       {!experiential && <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
-        {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[11px] text-[#5D6970]">
+        {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[12px] text-[#5D6970]">
           <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 검토 의견 {isolatedGrounding(primary).length}건 — 승인 판단에 쓰이지 않습니다.</p>
           <ul className="mt-1 list-disc pl-4">{isolatedGrounding(primary).map((finding) => <li key={finding.id}>{finding.issue_ko}</li>)}</ul>
         </div>}
-        {experiential && <dl className="my-2 grid gap-x-3 gap-y-1 break-all text-[11px] sm:grid-cols-[10rem_1fr]">
+        {experiential && <dl className="my-2 grid gap-x-3 gap-y-1 break-all text-[12px] sm:grid-cols-[10rem_1fr]">
           {([
             ["미션 콘텐츠 해시", missionContentHash],
             ["점검 버전 해시", state.contentHash],
@@ -560,7 +560,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>
           </div>)}
         </dl>}
-        <pre className="max-h-72 overflow-auto rounded bg-[#F7F7F5] p-3 text-[11px]">{JSON.stringify(state.snapshot, null, 2)}</pre>
+        <pre className="max-h-72 overflow-auto rounded bg-[#F7F7F5] p-3 text-[12px]">{JSON.stringify(state.snapshot, null, 2)}</pre>
         <ul className="mt-2 space-y-1 text-xs">{state.history.map((item) => <li key={item.id}>{item.created_at} · {experiential ? item.content_hash : item.content_hash.slice(0, 12)} · {item.approved_at ? "당시 승인" : "점검·승인 이력"}</li>)}</ul>
       </details>}
     </>}

@@ -157,7 +157,7 @@ export function NewCoursePanel({
             compact
             leading={
               <label className="flex flex-col gap-1">
-                <span className="text-[11.5px] font-semibold text-[#46515A]">교과목 이름</span>
+                <span className="text-[12px] font-semibold text-[#46515A]">교과목 이름</span>
                 <input
                   id="new-course-title"
                   value={title}

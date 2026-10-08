@@ -39,7 +39,7 @@ const Answer = ({ children }: { children: ReactNode }) => (
 function Choice({ choice }: { choice: RecordChoice }) {
   return (
     <div className="mt-2">
-      {choice.label && <div className="text-[11px] text-[#6B645A]">{choice.label}</div>}
+      {choice.label && <div className="text-[12px] text-[#6B645A]">{choice.label}</div>}
       <Answer>{choice.value}</Answer>
     </div>
   );
@@ -119,7 +119,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
             </div>
             <p className="text-sm leading-relaxed">{task.final ?? "—"}</p>
             {task.hintOpened !== null && (
-              <p className="mt-2 text-[11px] text-[#6B645A]">어휘 힌트 {task.hintOpened ? "열어 봄" : "열지 않음"}</p>
+              <p className="mt-2 text-[12px] text-[#6B645A]">어휘 힌트 {task.hintOpened ? "열어 봄" : "열지 않음"}</p>
             )}
           </Box>,
         ]}

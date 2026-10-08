@@ -31,15 +31,15 @@ function learnerMissionPath(courseId: string, weekNo: number, scenarioId: string
 }
 
 /**
- * 「학습 수행 기록」의 학급 응답 분포 탭 — 학급 응답을 보고 토론할 지점을 고르는 화면.
+ * 「학습 수행 기록」의 학습자 응답 분포 탭 — 학급 응답을 보고 토론할 지점을 고르는 화면.
  * 개별 수행 기록과 같은 학습 기록에서 익명 집계와 익명 사례만 보여 준다.
  * 들어오자마자 공개 교과목의 첫 미션 주차를 열고, 미션이 있는 주차를 칩으로 늘어놓는다.
- * 실제 응답과 데모 응답(가상 학급 20명)은 명시적으로 전환하며, 데모는 운영 DB에 저장하지 않는다.
+ * 실제 응답과 데모 응답(가상 학습자 20명)은 명시적으로 전환하며, 데모는 운영 DB에 저장하지 않는다.
  */
 export function ClassResponsePanel() {
   const queryClient = useQueryClient();
   const [params, setSearchParams] = useSearchParams();
-  // 기본은 데모 응답(가상 학급 20명). 실제 응답으로 바꾸면 ?demo=0을 남긴다.
+  // 기본은 데모 응답(가상 학습자 20명). 실제 응답으로 바꾸면 ?demo=0을 남긴다.
   const demo = params.get("demo") !== "0";
   // 탭 주소(?tab=class)를 지키면서 교과목·주차·미션·데모만 바꾼다.
   const setParams = (next: Record<string, string>, options?: { replace?: boolean }) =>
@@ -188,7 +188,7 @@ export function ClassResponsePanel() {
   };
 
   const statusPill = hasRealResponses && !showingDemo
-    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[11px] font-bold text-[#15202B]">
+    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[12px] font-bold text-[#15202B]">
       {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
     </span>
     : null;
@@ -266,7 +266,7 @@ export function ClassResponsePanel() {
             {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
           </h2>
           {statusPill}
-          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[11.5px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
+          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[12px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
         </div>
         {!showingDemo && <p className="mt-1 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 
@@ -341,15 +341,15 @@ export function ClassResponsePanel() {
       ref={projectorRef}
       role="dialog"
       aria-modal="true"
-      aria-label="학급 응답 크게 보기"
+      aria-label="학습자 응답 크게 보기"
       tabIndex={-1}
       className="fixed inset-0 z-[110] overflow-y-auto bg-[#F8F6EE] p-4 sm:p-6"
     >
       <div className="mx-auto max-w-6xl">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-[#B8860B]">{showingDemo ? VIRTUAL_CLASS_NOTICE : "익명 학급 집계"}</p>
-            <h1 className="mt-1 break-keep text-3xl font-black text-[#15202B]">우리 반은 어떻게 판단했을까?</h1>
+            <p className="text-sm font-bold text-[#B8860B]">{showingDemo ? VIRTUAL_CLASS_NOTICE : "익명 응답 집계"}</p>
+            <h1 className="mt-1 break-keep text-3xl font-black text-[#15202B]">이 수업은 어떻게 판단했을까?</h1>
           </div>
           <Button variant="outline" onClick={() => setProjector(false)}>
             <X className="mr-2 h-4 w-4" />닫기

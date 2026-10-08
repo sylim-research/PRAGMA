@@ -113,7 +113,7 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-3 mt-8">
+  <div className="mb-3 mt-7">
     <div className="flex flex-wrap items-center gap-2">
       <h2 className="flex items-center gap-2.5 text-[17px] font-bold text-[#15202B]"><span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>{title}</h2>
       {action}
@@ -201,7 +201,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[78px] flex-col rounded-xl border bg-white px-4 py-2.5",
+                "group flex min-h-[74px] flex-col rounded-xl border bg-white px-4 py-2.5",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -211,7 +211,7 @@ const ReviewPipeline = ({
               title={waiting === null || error ? undefined : `지금 대기 ${waiting}개`}
             >
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[10px] font-semibold tabular-nums text-[#56646E]">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EEF1F2] text-[12px] font-semibold tabular-nums text-[#56646E]">
                   {stage.step}
                 </span>
                 <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">{stage.displayLabel}</span>
@@ -224,9 +224,9 @@ const ReviewPipeline = ({
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[11.5px] text-[#4F5D68]">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[11.5px] text-[#4F5D68]">
+              <span className="mt-auto pt-1.5 text-[12px] text-[#4F5D68]">
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -248,7 +248,7 @@ const ReviewPipeline = ({
             aria-label="필요 시 모델 간 교차 검토"
             className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
           >
-            <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[10.5px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
+            <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[12px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
               필요 시 모델 간 교차 검토
             </span>
             {optional.map(renderStage)}
@@ -285,7 +285,7 @@ const OperationMetric = ({
     to={to}
     title={title}
     className={[
-      "group flex min-h-[78px] flex-col rounded-xl border bg-white px-4 py-2.5",
+      "group flex min-h-[74px] flex-col rounded-xl border bg-white px-4 py-2.5",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E2DED2]",
     ].join(" ")}
@@ -298,10 +298,10 @@ const OperationMetric = ({
         <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
           {error ? <span className="text-sm font-normal text-destructive">확인 필요</span> : value}
         </span>
-        {!error && value !== null && <span className="pb-0.5 text-[11.5px] text-[#4F5D68]">{unit}</span>}
+        {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[11.5px] leading-4 text-[#4F5D68]">{description}</span>
+    <span className="mt-auto pt-1.5 text-[12px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -309,7 +309,7 @@ const LiveDatabaseStatus = ({ delayed, announce = false }: { delayed: boolean; a
   <span
     aria-live={announce ? "polite" : undefined}
     className={[
-      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium",
+      "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[12px] font-medium",
       delayed
         ? "border-amber-200 bg-amber-50 text-amber-800"
         : "border-emerald-200 bg-emerald-50 text-emerald-700",

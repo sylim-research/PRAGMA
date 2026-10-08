@@ -15,8 +15,8 @@ const demoLink =
   "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
-  "group inline-flex items-center gap-1.5 rounded-sm text-[13.833px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
-const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[13.833px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group inline-flex items-center gap-1.5 rounded-sm text-[14.333px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[14.333px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
 
 
 const Landing = () => {
@@ -34,7 +34,7 @@ const Landing = () => {
           <HomeBrand largerText />
           {IS_DEMO && (
             <Link to="/architecture" className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[14px] font-semibold text-[#F1EFE8] decoration-[#FAD338] decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]">
-              전체 구조 보기
+              시스템 구조 보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
           )}
@@ -77,7 +77,7 @@ const Landing = () => {
               PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              상황과 관계에 맞는 표현을 탐구하는 통번역 학습·연구 플랫폼입니다.
+              상황과 관계에 알맞은 표현을 탐구하는 통번역 학습 시스템입니다.
             </span>
           </p>
         </section>
@@ -90,7 +90,7 @@ const Landing = () => {
         {/* 헤더·본문·푸터는 같은 804px 칼럼을 사용한다. */}
         <section className="mx-auto mt-[22px] grid w-full max-w-[650px] grid-cols-1 gap-5 sm:grid-cols-2">
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
@@ -100,7 +100,7 @@ const Landing = () => {
               </span>
               학습자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+            <span className="mt-3 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
               상황과 관계에 맞게 통번역합니다.<br />
               AI 피드백을 검토해 최종안을 제출합니다.
             </span>
@@ -115,7 +115,7 @@ const Landing = () => {
           </article>
 
           <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[15px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
+            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
           >
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
@@ -123,24 +123,24 @@ const Landing = () => {
               </span>
               교수자 영역
             </span>
-            <span className="mt-2.5 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+            <span className="mt-3 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
               자동 검사와 AI 검토로 콘텐츠를 점검합니다.<br />
               교수자가 감수·승인해 수업에 활용합니다.
             </span>
             {/* 카드 제목이 이미 '교수자 영역'이라 버튼까지 같은 말이면 한 번 더 읽게 된다.
-                버튼은 무엇을 하러 가는지만 말한다 — 학습 시작하기 / 제작·승인하기.
+                두 입구는 같은 꼴로 읽히게 「학습자 로그인 / 교수자 로그인」으로 맞춘다(2026-10-08).
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-3.5">
               <Link to="/admin-login" className={IS_DEMO ? cardTextLink : `${cardButton} bg-[#15202B] text-white`}>
-                제작·승인하기
+                교수자 로그인
                 <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
               </Link>
             </span>
           </article>
         </section>
 
-        {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 전체 구조는 헤더 오른쪽 링크로 옮겼다. */}
+        {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 시스템 구조는 헤더 오른쪽 링크로 옮겼다. */}
         {IS_DEMO && (
           <section className="mt-[26px] flex justify-center" aria-label="대표 미션 체험">
             <Link

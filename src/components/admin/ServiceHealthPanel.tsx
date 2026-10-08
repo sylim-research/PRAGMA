@@ -202,7 +202,7 @@ export const ServiceHealthPanel = () => {
               <StatusRow key={status.id} status={status} pending={pending} />
             ))}
           </ul>
-          <p className="border-t border-[#EEEAE0] px-5 py-2.5 text-[11px] text-muted-foreground">
+          <p className="border-t border-[#EEEAE0] px-5 py-2.5 text-[12px] text-muted-foreground">
             OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
             {CONSOLES.map((item, index) => (
               <span key={item.href}>

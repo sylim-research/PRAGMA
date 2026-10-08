@@ -50,7 +50,7 @@ const MissionShell = lazy(() => import("./pages/MissionShell.tsx"));
 const VirtualResponseDiscussionDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/dev/VirtualResponseDiscussionDemo.tsx"))
   : null;
-// 대표 미션 가상 학급 20명의 토론 보드 — 역시 개발 모드 전용(로그인 없이 도판을 뜬다).
+// 대표 미션 가상 학습자 20명의 토론 보드 — 역시 개발 모드 전용(로그인 없이 도판을 뜬다).
 // 「내 기록」 데모 — 가상 학급의 한 명을 로그인 없이 연다(개발 모드 전용).
 const LearnerRecordsDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/learner/LearnerRecords.tsx").then((module) => ({ default: () => <module.default demo /> })))
@@ -78,7 +78,7 @@ seedIfEmpty();
 
 const queryClient = new QueryClient();
 
-// 「주차별 수업 운영」은 메뉴에서 내리고 「학습 수행 기록 › 학급 응답 분포」 탭으로 합쳤다. 옛 링크는 교과목·주차를 이어서 넘긴다.
+// 「주차별 수업 운영」은 메뉴에서 내리고 「학습 수행 기록 › 학습자 응답 분포」 탭으로 합쳤다. 옛 링크는 교과목·주차를 이어서 넘긴다.
 const PackageRoute = () => {
   const [params] = useSearchParams();
   if (LEGACY_TEACHING_MATERIALS) return <AdminTeachingMaterials />;

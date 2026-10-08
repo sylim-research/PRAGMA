@@ -17,7 +17,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
   const compactJudgment = selected?.groups.length === 1 && Boolean(selected.targetPreview)
     && (selected.itemId === 1 || selected.itemId === 2);
 
-  return <div className="space-y-3" aria-label="학급 응답 대시보드">
+  return <div className="space-y-3" aria-label="학습자 응답 대시보드">
     {!figureOnly && <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <p className="flex items-center gap-2 text-sm font-bold text-[#15202B]"><BarChart3 className="h-4 w-4" aria-hidden="true" />문항별 응답 살펴보기</p>
       <dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#65737D]">
@@ -50,7 +50,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
                 : "border-[#E5E3DB] bg-white text-[#626B73] hover:border-[#C1B681] hover:bg-[#FFFCF1]",
             ].join(" ")}
           >
-            <span className="block text-[11px] font-bold tracking-wider">판단 {String(item.itemId).padStart(2, "0")}</span>
+            <span className="block text-[12px] font-bold tracking-wider">판단 {String(item.itemId).padStart(2, "0")}</span>
             <span className="mt-1 block break-keep text-sm font-bold leading-5">{item.title.replace(/^판단 \d+\s*·\s*/, "")}</span>
           </button>)}
         </div>
@@ -101,7 +101,7 @@ export function ClassResponseDashboard({ pattern, selectedItemId, onSelectItem, 
                 </li>;
               })}
             </ol>
-            <div className="mt-2 flex justify-between text-[11px] tabular-nums text-[#78848D]" aria-hidden="true">
+            <div className="mt-2 flex justify-between text-[12px] tabular-nums text-[#78848D]" aria-hidden="true">
               <span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span>
             </div>
           </figure>)}

@@ -1,4 +1,4 @@
-// 가상 학급 20명의 응답 행 — 학급 응답 토론 보드의 「데모 응답」.
+// 가상 학습자 20명의 응답 행 — 학습자 응답 토론 보드의 「데모 응답」.
 //
 // - 실제 학습자 자료가 아니다. 계정·수행 기록·DB 행을 만들지 않고 화면에서만 계산한다.
 // - 선택한 미션의 실제 문항·선택지·참고 표현에서만 응답을 조립한다. 중국어 문장을 지어내지 않는다:
@@ -26,7 +26,7 @@ export const VIRTUAL_CLASS_SIZE = 20;
  * 논문 4.3의 미션 캡처와 「내 기록」·학급 보드 캡처가 한 사람의 같은 수행을 가리키게 한다.
  */
 export const DEMO_LEARNER_ROW = 0;
-export const VIRTUAL_CLASS_NOTICE = `데모 · 가상 학급 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료 아님`;
+export const VIRTUAL_CLASS_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료 아님`;
 
 type Obj = Record<string, unknown>;
 const obj = (value: unknown): Obj | null => (value && typeof value === "object" && !Array.isArray(value) ? (value as Obj) : null);
@@ -56,7 +56,7 @@ const SCALE = {
   vi: "very_inappropriate",
 };
 
-/** 가상 학급 20명이 이 미션에 남긴 응답 행. v6 미션이 아니면 null. */
+/** 가상 학습자 20명이 이 미션에 남긴 응답 행. v6 미션이 아니면 null. */
 export function buildVirtualClassRows(missionId: string, mission: unknown): ClassDiscussionRow[] | null {
   const content = obj(mission);
   if (!content || content.schema_version !== "mission_v6") return null;
@@ -151,7 +151,7 @@ export function buildVirtualClassRows(missionId: string, mission: unknown): Clas
     const pin = <T>(list: T[], wanted: (value: T) => boolean) => {
       if (wanted(list[DEMO_LEARNER_ROW])) return;
       const j = list.findIndex((value, index) => index !== DEMO_LEARNER_ROW && wanted(value));
-      if (j < 0) throw new Error("가상 학급에 시연 답안과 같은 응답이 없습니다.");
+      if (j < 0) throw new Error("가상 학습자 응답에 시연 답안과 같은 응답이 없습니다.");
       [list[DEMO_LEARNER_ROW], list[j]] = [list[j], list[DEMO_LEARNER_ROW]];
     };
     const referenceScale = str(item(1)?.reference_scale_code) ?? SCALE.va;

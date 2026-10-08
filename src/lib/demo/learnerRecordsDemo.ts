@@ -1,4 +1,4 @@
-// 「내 기록」 데모 — 학급 응답 데모(가상 학급 20명)의 「응답 1」을 데모 학습자 「나」로 삼는다.
+// 「내 기록」 데모 — 학급 응답 데모(가상 학습자 20명)의 「응답 1」을 데모 학습자 「나」로 삼는다.
 // 그 사람은 공개 시연 미션(/demo/mission)의 시연 답안과 글자까지 같은 수행이다(virtualClassRows.DEMO_LEARNER_ROW).
 // 학급 화면과 개인 화면이 같은 20행에서 나오므로, 두 화면을 묶음 도판으로 쓸 수 있다.
 // 실제 학습자 자료가 아니며 DB에 저장하지 않는다.
@@ -9,7 +9,7 @@ import { REPRESENTATIVE_MISSION_ID } from "./representativeMission";
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "./representativeMissionSnapshot";
 import { buildVirtualClassRows, DEMO_LEARNER_ROW, VIRTUAL_CLASS_SIZE } from "./virtualClassRows";
 
-export const LEARNER_DEMO_NOTICE = `데모 · 가상 학급 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료가 아닙니다`;
+export const LEARNER_DEMO_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료가 아닙니다`;
 /** 학급 보드의 「응답 1」과 같은 사람. */
 export const LEARNER_DEMO_INDEX = DEMO_LEARNER_ROW;
 /** 대표 교과목(AI 한중 화용 통번역) — 대표 미션이 2주차 첫 슬롯이다. */

@@ -53,7 +53,7 @@ const StatusChip = ({ children, tone = "neutral", className = "" }: {
   tone?: "good" | "attention" | "neutral";
   className?: string;
 }) => <span className={[
-  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-semibold",
+  "inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border px-2.5 py-1 text-[12px] font-semibold",
   className,
   tone === "good"
     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
@@ -249,7 +249,7 @@ const AdminTeachingMaterials = () => {
   const selectedExpected = week && (week.speech_act || weekRole(week.week_no) === "contextualization") ? 2 : 0;
   const selectedMaterialState = week ? weeklyReviewStates.data?.get(week.week_no) : undefined;
 
-  return <AdminShell title="주차별 수업 운영" description={materialsOn ? "선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학급 응답을 확인합니다." : "선택한 주차의 편성 미션을 열어 수업에 쓰고, 학급 응답과 운영 현황을 확인합니다."}>
+  return <AdminShell title="주차별 수업 운영" description={materialsOn ? "선택한 주차의 수업자료를 준비·승인하고, 교실 화면과 학습자 응답을 확인합니다." : "선택한 주차의 편성 미션을 열어 수업에 쓰고, 학습자 응답과 운영 현황을 확인합니다."}>
     <div className="w-full space-y-5">
       {/* 이 화면의 주인공은 지금 고른 주차다. 15주 전체 현황은 맨 아래 개요로 둔다. */}
       <section aria-label="선택 주차 작업대" className="rounded-xl border border-[#E2DED2] bg-white">
@@ -293,7 +293,7 @@ const AdminTeachingMaterials = () => {
                 <Link to={`/admin/teaching-generator?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}`}>수업자료·토론 만들기</Link>
               </Button>}
               {week.scenarios[0] && <Button variant="outline" asChild>
-                <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학급 응답 확인</Link>
+                <Link to={`/admin/class-responses?courseId=${encodeURIComponent(courseId)}&weekNo=${week.week_no}&missionId=${encodeURIComponent(week.scenarios[0].scenario_id)}`}>학습자 응답 확인</Link>
               </Button>}
             </div>
           </div>
@@ -401,7 +401,7 @@ const AdminTeachingMaterials = () => {
                   onClick={() => setParams({ courseId, weekNo: String(item.week_no) })}
                   className={["text-left text-[13.5px] hover:underline", selected ? "font-bold text-[#15202B]" : "font-semibold text-[#34444D]"].join(" ")}
                 >{operationWeekLabel(item)}</button>
-                {issue && <p className="mt-0.5 text-[11.5px] font-medium text-amber-800">확인 · {issue}</p>}
+                {issue && <p className="mt-0.5 text-[12px] font-medium text-amber-800">확인 · {issue}</p>}
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <StatusChip tone={missionsReady ? "good" : "attention"}>
