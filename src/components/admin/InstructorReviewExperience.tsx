@@ -127,42 +127,42 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     {/* 교수자가 학습자 경험을 그대로 거치며 감수한다는 것이 이 화면의 뜻이다. */}
     <h3 className="mb-4 flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>교수자 감수 · 학습자 화면</h3>
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(20.5rem,22.5rem)]">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,20.5rem)]">
       <div className="min-w-0">
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
       {/* 확인 목록은 촘촘하게 둔다 — 상자 높이가 이 목록이 아니라 왼쪽 문항 길이를 따르도록. */}
       <aside className="space-y-3 xl:sticky xl:top-24">
-        {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13px] font-semibold" disabled={disabled || saving || approved || !model.value}
+        {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13.25px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{displayOrder.map(({ item, index }) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
-            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.5px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
+            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.75px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className={["w-[8.5rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[11.5px] font-bold tracking-[0.06em]",
+              {partsOf(item).tag && <span className={["w-[8.5rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[11.75px] font-bold tracking-[0.06em]",
                 // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
                 sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
-            <span className={`shrink-0 text-[13px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
+            <span className={`shrink-0 text-[13.25px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
           </button>;
         })}</nav>
         <div className="space-y-2.5 rounded-xl bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="outline" className="h-9 border-[#233542] text-[13.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
-            <Button size="sm" className="h-9 text-[13.5px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
+            <Button size="sm" variant="outline" className="h-9 border-[#233542] text-[13.75px] font-semibold text-[#233542] hover:bg-[#EEF1F4]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
+            <Button size="sm" className="h-9 text-[13.75px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
-          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14px] leading-6" value={noteValue} disabled={disabled || approved}
+          <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14.25px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
             onChange={(event) => editable
               ? setDraft({ ...draft, decisions: [...draft.decisions.filter((entry) => entry.section !== section.id), { ...current, note: event.target.value }] })
               : setPendingNotes((notes) => ({ ...notes, [section.id]: event.target.value }))} />
-          {error && dirty && <Button variant="outline" className="h-10 w-full text-sm" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
-          <p className="text-sm text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 필요를 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
-          {error && <p role="alert" className="text-sm text-red-800">{error}</p>}
-          {current?.status === "revision_required" && <p className="text-sm text-amber-800">수정 필요가 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
-          {current?.status === "defer" && <p className="text-sm text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 필요로 다시 판정하세요.</p>}
+          {error && dirty && <Button variant="outline" className="h-10 w-full text-[14.25px]" disabled={disabled || saving || approved} onClick={() => { setError(null); void persist(draft); }}>다시 저장</Button>}
+          <p className="text-[14.25px] text-muted-foreground" role="status">{saving ? "감수 기록 저장 중…" : dirty && error ? "저장하지 않은 감수 기록이 있습니다." : dirty ? "메모를 곧 저장합니다…" : !editable && pendingNotes[section.id] ? "확인 또는 수정 필요를 누르면 메모가 자동 저장됩니다." : saved ? "현재 버전에 감수 기록이 저장되었습니다." : ""}</p>
+          {error && <p role="alert" className="text-[14.25px] text-red-800">{error}</p>}
+          {current?.status === "revision_required" && <p className="text-[14.25px] text-amber-800">수정 필요가 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
+          {current?.status === "defer" && <p className="text-[14.25px] text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 필요로 다시 판정하세요.</p>}
         </div>
       </aside>
     </div>
