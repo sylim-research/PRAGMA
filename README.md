@@ -186,7 +186,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>* MJT: Metapragmatic Judgment Task · DCT: Discourse Completion Task</small>
+> <small>* 메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)<br>* 담화완성과제(DCT: Discourse Completion Task)</small>
 
 <br>
 <br>
