@@ -44,7 +44,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/decision-traces", label: "학습 수행 기록" },
   ]},
   { header: "5. 관리 도구", items: [
-    { to: "/admin/data-backup", label: "기록 백업·내보내기", activePaths: ["/admin/export"] },
+    { to: "/admin/export", label: "기록 내보내기·백업", activePaths: ["/admin/data-backup"] },
   ]},
 ] as const;
 
@@ -53,7 +53,7 @@ const PRIORITY_PATHS = [
   "/admin/composer",
   "/admin/library",
   "/admin/discussion",
-  "/admin/data-backup",
+  "/admin/export",
 ] as const;
 
 const ALL_ADMIN_NAV_ITEMS = ADMIN_NAV_GROUPS.flatMap((group) => group.items);

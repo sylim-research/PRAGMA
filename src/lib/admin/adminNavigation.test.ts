@@ -14,7 +14,7 @@ const REQUIRED_ENTRY_PATHS = [
   "/admin/composer",
   "/admin/library",
   "/admin/discussion",
-  "/admin/data-backup",
+  "/admin/export",
 ] as const;
 
 describe("admin navigation reachability", () => {
@@ -50,7 +50,7 @@ describe("admin navigation reachability", () => {
     ]);
     const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
     expect(research?.items.map((item) => item.to)).toEqual([
-      "/admin/data-backup",
+      "/admin/export",
     ]);
   });
 
@@ -143,8 +143,8 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/package")).toBe("/admin/discussion");
     expect(adminMobileNavValue("/admin/class-responses")).toBe("/admin/discussion");
     expect(adminMobileNavValue("/admin/batch")).toBe("/admin/batch");
-    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/data-backup");
+    expect(adminMobileNavValue("/admin/data-backup")).toBe("/admin/export");
     expect(adminMobileNavValue("/admin/decision-traces")).toBe("/admin/decision-traces");
-    expect(adminMobileNavValue("/admin/export")).toBe("/admin/data-backup");
+    expect(adminMobileNavValue("/admin/export")).toBe("/admin/export");
   });
 });
