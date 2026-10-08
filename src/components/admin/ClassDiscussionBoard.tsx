@@ -457,7 +457,7 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
           <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[15px]"}`}>
             <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />MJT {selected.itemId} · {selected.activity}{selected.title && <span className="font-normal text-[#7A858C]">· {selected.title}</span>}
           </h3>
-          <p className="text-[12px] tabular-nums text-[#7A858C]">응답 {selected.total}명</p>
+          <p className="text-[12px] tabular-nums text-[#7A858C]">응답자 수 {selected.total}명</p>
         </div>
         <div className="space-y-4 px-4 py-4">
           <Scene item={selected} size={size} />

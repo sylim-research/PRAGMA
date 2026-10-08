@@ -161,7 +161,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 print:w-full">
+        {/* 사이드바 안쪽 여백(36px)만큼 오른쪽도 비워 화면 양쪽 여백을 맞춘다(2026-10-08). */}
+        <main className="min-w-0 flex-1 md:pr-9 print:w-full print:pr-0">
           <div className="mb-5 print:hidden md:hidden">
             <label
               htmlFor="admin-mobile-navigation"
