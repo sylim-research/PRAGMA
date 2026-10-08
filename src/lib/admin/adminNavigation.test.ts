@@ -40,7 +40,7 @@ describe("admin navigation reachability", () => {
     ]);
     const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·승인");
     expect(production?.items.map((item) => item.to)).toEqual([
-      "/admin/assembly", "/admin/corpus", "/admin/ai-review", "/admin/review",
+      "/admin/assembly", "/admin/ai-review", "/admin/corpus", "/admin/review",
     ]);
     // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
     expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(true);
@@ -130,8 +130,8 @@ describe("admin navigation reachability", () => {
     );
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly",
-      "/admin/corpus",
       "/admin/ai-review",
+      "/admin/corpus",
       "/admin/review",
     ]);
     expect(adminMobileNavValue("/admin/ai-review")).toBe("/admin/ai-review");

@@ -93,7 +93,7 @@ const LEARNING_STEPS: readonly Step[] = [
 // 기록·자료는 그것이 남는 관리자 화면으로 연결한다(관리자 로그인 필요).
 // 활동(검토·승인)과 자료(기록·프롬프트)가 한 이름 아래 섞이지 않게 「결과·기록」으로 맞춘다(2026-10-08 Astra 검토 수용).
 const TRACE = [
-  { label: "자동 품질 검토 결과", to: "/admin/ai-review" },
+  { label: "자동 품질 점검 결과", to: "/admin/ai-review" },
   { label: "교수자 감수·승인 기록", to: "/admin/review" },
   { label: "학습 수행 기록", to: "/admin/decision-traces" },
   { label: "운영 프롬프트", to: "/admin/prompt-harness" },
