@@ -54,7 +54,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2.5px] text-[14.25px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2.5px] text-[14px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-[#F3ECD9] text-foreground font-normal"
         : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
