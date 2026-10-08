@@ -46,9 +46,11 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const standaloneClasses = (active: boolean) =>
     [
       "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14.75px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      // 평소에도 랜딩 「학습 미션 체험」과 같은 PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
+      // 지금 대시보드에 있을 때만 남색 테두리로 「여기」를 표시한다.
       active
-        ? "bg-[#FAD338] text-[#15202B]"
-        : "bg-[#F7F2DF] text-[#15202B] hover:bg-[#FFF1B8]",
+        ? "bg-[#FAD338] text-[#15202B] ring-[1.5px] ring-inset ring-[#15202B]"
+        : "bg-[#FAD338] text-[#15202B] hover:bg-[#FCE27A]",
     ].join(" ");
 
   const itemClasses = (active: boolean) =>
