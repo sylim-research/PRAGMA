@@ -40,8 +40,8 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/library", label: "학습 미션 관리" },
     { to: "/admin/composer/new", label: "신규 교과목 개설" },
     { to: "/admin/composer", label: "주차별 미션 배치" },
+    // 학습 수행 기록(/admin/decision-traces)은 학습자 관리처럼 메뉴에 두지 않는다 — 대시보드 카드·시스템 구조도 링크로 연다(2026-10-08).
     { to: "/admin/discussion", label: "메타화용 토론", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
-    { to: "/admin/decision-traces", label: "학습 수행 기록" },
   ]},
   { header: "5. 관리 도구", items: [
     { to: "/admin/export", label: "기록 내보내기·백업", activePaths: ["/admin/data-backup"] },
