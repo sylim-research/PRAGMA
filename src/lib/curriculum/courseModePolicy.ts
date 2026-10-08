@@ -66,9 +66,9 @@ export function missionModesSummary(modes: readonly GenMode[]): string {
 }
 
 export const COURSE_MODE_LABEL: Record<CourseMode, string> = {
-  translation: "번역 100%",
-  interpreting: "통역 100%",
-  mixed: "번역 50% · 통역 50%",
+  translation: "번역 수업",
+  interpreting: "통역 수업",
+  mixed: "통번역 수업",
 };
 
 /** 학습자 화면용 — 비율(%) 없이 수행 유형만 보인다. */

@@ -108,7 +108,7 @@ const libraryDb = supabase as unknown as { from: (table: string) => any };
 
 const AdminBrowser = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const view = LIBRARY_VIEWS.find((item) => item.value === searchParams.get("view"))?.value ?? "ready";
+  const view = LIBRARY_VIEWS.find((item) => item.value === searchParams.get("view"))?.value ?? "missions";
   const currentOnly = searchParams.get("current") === "1";
   const setView = (next: LibraryView) => {
     const params = new URLSearchParams(searchParams);

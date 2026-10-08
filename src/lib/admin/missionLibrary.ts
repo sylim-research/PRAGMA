@@ -2,9 +2,9 @@ import { isReviewedMission } from "@/lib/curriculum/composerEligibility";
 
 export type LibraryView = "ready" | "pending" | "missions" | "materials";
 export const LIBRARY_VIEWS: { value: LibraryView; label: string }[] = [
-  { value: "ready", label: "편성 가능 미션" },
-  { value: "pending", label: "승인 전 미션" },
   { value: "missions", label: "전체 미션" },
+  { value: "pending", label: "승인 대기" },
+  { value: "ready", label: "수업 편성 가능" },
 ];
 
 export interface LibraryMissionState {
@@ -36,7 +36,7 @@ export function libraryMatchesView(row: LibraryMissionState, view: LibraryView):
 
 export function libraryMissionLabel(row: LibraryMissionState): string {
   if (!libraryHasMission(row)) return "시나리오 재료";
-  if (libraryMissionIsReady(row)) return "편성 가능";
-  if (["reviewed", "released"].includes(row.mission_status ?? "")) return "현재 편성 대상 아님";
-  return "승인 전";
+  if (libraryMissionIsReady(row)) return "수업 편성 가능";
+  if (["reviewed", "released"].includes(row.mission_status ?? "")) return "편성 제외";
+  return "승인 대기";
 }

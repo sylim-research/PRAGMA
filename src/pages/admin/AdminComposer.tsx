@@ -123,7 +123,7 @@ const AdminComposer = () => {
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [conditionsOpen, setConditionsOpen] = useState(true);
-  // 「새 교과목 개설」(/admin/composer/new)과 「15주 수업 편성」(/admin/composer)은 메뉴가 따로다(2026-09-26 연구자 결정).
+  // 「신규 교과목 개설」(/admin/composer/new)과 「주차별 미션 배치」(/admin/composer)는 메뉴가 따로다(2026-09-26 연구자 결정, 2026-10-08 이름 변경).
   const location = useLocation();
   const navigate = useNavigate();
   const tab: "existing" | "new" = location.pathname === "/admin/composer/new" ? "new" : "existing";
@@ -643,7 +643,7 @@ const AdminComposer = () => {
   if (structureEditor) {
     return (
       <AdminShell
-        title="15주 수업 편성"
+        title={structureEditor === "new" ? "신규 교과목 개설" : "교과목 설정"}
         compact
         description={
           structureEditor === "new"
@@ -705,7 +705,7 @@ const AdminComposer = () => {
 
   return (
     <AdminShell
-      title={tab === "new" ? "새 교과목 개설" : "15주 수업 편성"}
+      title={tab === "new" ? "신규 교과목 개설" : "주차별 미션 배치"}
       description={tab === "new"
         ? "수준·방향·수행 방식과 편성 주제를 정하면 승인된 학습 미션으로 15주를 자동 편성합니다."
         : "교수자가 최종 승인한 학습 미션을 교과목의 15주에 배치합니다."}
@@ -757,22 +757,25 @@ const AdminComposer = () => {
                   data-course-id={item.id}
                   disabled={loading}
                   onClick={() => setOutlineId(item.id)}
-                  className={`flex flex-col gap-2 rounded-xl border bg-white px-4 py-4 text-left transition ${
+                  // 방향·수업 방식은 교과목 이름과 아래 편성 조건에 이미 있어 카드에는 수준만 꼬리표로 둔다(2026-10-08).
+                  // 이름에 방향이 드러나지 않는 교과목을 위해 전체 조건은 마우스를 올리면 보인다.
+                  title={`${LEVEL[item.level as LearnerLevel] ?? item.level} · ${DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · ${COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}`}
+                  className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-3.5 text-left transition ${
                     selected
                       ? "border-[#7D90A8] shadow-[0_0_0_1px_#7D90A8] bg-[#F7F9FC]"
                       : "border-[#E2DED2] hover:border-[#9FB0C6]"
                   }`}
                 >
-                  <span className="flex items-start justify-between gap-2">
-                    <span className="text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
-                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                  <span className="min-w-0 text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
+                  <span className="flex shrink-0 items-center gap-1.5">
+                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[11.5px] font-semibold text-[#1F3A5F]">
+                      {LEVEL[item.level as LearnerLevel] ?? item.level}
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
                       published ? "bg-[#E8F4EC] text-[#245E44]" : "bg-[#FFF3D6] text-[#8A5A14]"
                     }`}>
                       {published ? "공개" : "비공개"}
                     </span>
-                  </span>
-                  <span className="text-[13px] font-medium text-[#1F3A5F]">
-                    {LEVEL[item.level as LearnerLevel] ?? item.level} · {DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · {COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}
                   </span>
                 </button>
               );
@@ -826,13 +829,11 @@ const AdminComposer = () => {
         <div className={["mt-6 overflow-hidden border border-[#D8D3C4] bg-white", outline ? "rounded-t-2xl border-b-0" : "rounded-2xl"].join(" ")}>
           {/* 교과목 상자 = 네이비 이름 머리 + 편성 조건 + 주차별 배치. 배치표는 이 교과목에 딸린 아랫부분이다(outline이 있을 때 아래로 이어진다). */}
           {/* 작업 머리 = 지금 고친 교과목 이름. 카드 줄(고르기) 아래에서 「이 교과목을 편성한다」가 먼저 읽히게. */}
-          {outline && <h2 className="flex flex-wrap items-center gap-x-3 gap-y-1 bg-[#233542] px-5 py-3.5 text-white">
-            {/* 지금 편성하는 교과목이 한눈에 튀도록 네이비 머리띠(제작·품질 점검 워크플로우 머리와 같은 모양). */}
-            <span aria-hidden className="h-5 w-[4px] rounded-sm bg-[#FAD338]" />
-            <span className="text-[19px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
-            <span className="text-[13px] font-medium text-[#C5CFD4]">
-              {LEVEL[outline.level as LearnerLevel] ?? outline.level} · {DIRECTION_LABEL[outline.language_direction as LanguageDirection] ?? outline.language_direction} · {COURSE_MODE_LABEL[outline.course_mode as CourseMode] ?? outline.course_mode}
-            </span>
+          {outline && <h2 className="flex items-center gap-2.5 border-b border-[#E5E0D2] bg-[#FBFAF6] px-5 py-3 text-[#15202B]">
+            {/* 상자 머리 = 교과목 이름만. 페이지 제목보다 한 단계 낮게(2026-10-08 — 네이비 띠가 페이지 제목보다 무거웠다).
+                수준·방향·수행 방식은 바로 아래 편성 조건과 위 카드에 이미 있다. */}
+            <span aria-hidden className="h-[18px] w-[4px] rounded-sm bg-[#FAD338]" />
+            <span className="text-[17px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
           </h2>}
           <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">

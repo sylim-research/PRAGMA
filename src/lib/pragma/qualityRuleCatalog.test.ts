@@ -1,9 +1,13 @@
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { checkCore, checkMission, type CheckContext } from "@/lib/pragma/missionRules";
 import {
   ACTIVE_RULE_IDS,
+  CURRENT_MISSION_V6_RULE_IDS,
+  CURRENT_SCENARIO_RULE_IDS,
   QUALITY_RULE_CATALOG,
   QUALITY_RULE_CATEGORIES,
   QUALITY_RULE_IDS_IN_CATALOG,
@@ -77,5 +81,33 @@ describe("품질 점검 규칙 카탈로그 — 설명층과 실행 ID의 대응
 
     expect(emitted.size).toBeGreaterThan(5);
     for (const id of emitted) expect(active.has(id), id).toBe(true);
+  });
+});
+
+describe("현행 생성 경로 규칙 표 — missionRules.ts 실행 경로와 대조", () => {
+  // 함수 본문에서 add(v, "Rn")과 그 함수가 부르는 check*/validate* 보조 함수를 따라가 ID를 모은다.
+  const source = readFileSync(resolve(__dirname, "missionRules.ts"), "utf8");
+  const body = (name: string) => {
+    const start = source.search(new RegExp(`^(export )?function ${name}[(<]`, "m"));
+    if (start < 0) return "";
+    const rest = source.slice(start);
+    const end = rest.search(/\r?\n\}\r?\n/);
+    return end < 0 ? rest : rest.slice(0, end);
+  };
+  const collect = (name: string, seen = new Set<string>()): Set<string> => {
+    const ids = new Set<string>();
+    if (seen.has(name)) return ids;
+    seen.add(name);
+    const text = body(name);
+    for (const m of text.matchAll(/add\(\s*\w+,\s*"(R\d+c?)"/g)) ids.add(m[1]);
+    for (const m of text.matchAll(/\b(check[A-Z]\w*)\(/g)) if (m[1] !== name) collect(m[1], seen).forEach((id) => ids.add(id));
+    return ids;
+  };
+
+  it("시나리오 검사(checkCore)가 실행하는 ID와 표가 같다", () => {
+    expect([...collect("checkCore")].sort()).toEqual([...CURRENT_SCENARIO_RULE_IDS].sort());
+  });
+  it("현행 미션 검사(checkV6Mission)가 실행하는 ID와 표가 같다", () => {
+    expect([...collect("checkV6Mission")].sort()).toEqual([...CURRENT_MISSION_V6_RULE_IDS].sort());
   });
 });

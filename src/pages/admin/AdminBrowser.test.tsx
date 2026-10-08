@@ -42,9 +42,11 @@ afterEach(cleanup);
 const show = () => render(<MemoryRouter><AdminBrowser /></MemoryRouter>);
 
 describe("학습 미션 라이브러리", () => {
-  it("현재 편성 범위의 reviewed와 released MJT5만 기본 표시하고 미션 ID를 인계한다", async () => {
+  it("수업 편성 가능 보기는 현재 편성 범위의 reviewed와 released MJT5만 보이고 미션 ID를 인계한다", async () => {
     show();
     await screen.findByText("상황 released");
+    expect(screen.getByRole("button", { name: /전체 미션/ })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: /수업 편성 가능/ }));
     expect(screen.getByText("상황 reviewed")).toBeInTheDocument();
     for (const id of ["draft", "old", "legacy-four", "core"]) expect(screen.queryByText(`상황 ${id}`)).not.toBeInTheDocument();
     const item = screen.getByText("상황 released").closest("li")!;
@@ -61,7 +63,7 @@ describe("학습 미션 라이브러리", () => {
 
   it("승인 전·과거 미션·재료를 분리하고 빈 셀은 생성기로 보내지 않는다", async () => {
     show(); await screen.findByText("상황 released");
-    fireEvent.click(screen.getByRole("button", { name: /승인 전 미션/ }));
+    fireEvent.click(screen.getByRole("button", { name: /승인 대기/ }));
     expect(screen.getByText("상황 draft")).toBeInTheDocument();
     expect(screen.queryByText("상황 old")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /전체 미션/ }));
@@ -76,17 +78,18 @@ describe("학습 미션 라이브러리", () => {
     mocks.rows = [...Array.from({ length: 1001 }, (_, i) => row(`material-${i}`, null)), row("oldest", "reviewed")];
     show(); await screen.findByText("상황 oldest");
     expect(mocks.ranges).toEqual([0, 500, 1000]);
-    expect(screen.getByRole("button", { name: "편성 가능 미션 1" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "전체 미션 1" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "수업 편성 가능 1" })).toBeInTheDocument();
   });
 
   it("뒷페이지 조회가 실패하면 부분 건수를 전체인 것처럼 표시하지 않는다", async () => {
     mocks.rows = Array.from({ length: 501 }, (_, i) => row(`mission-${i}`, "reviewed"));
     mocks.failPage = true;
     show(); await screen.findByText(/후속 페이지 실패/);
-    expect(screen.getByRole("button", { name: "편성 가능 미션 —" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "수업 편성 가능 —" })).toBeInTheDocument();
     expect(screen.queryByText("상황 mission-0")).not.toBeInTheDocument();
     mocks.failPage = false;
     fireEvent.click(screen.getByRole("button", { name: "다시 불러오기" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "편성 가능 미션 501" })).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole("button", { name: "수업 편성 가능 501" })).toBeInTheDocument());
   });
 });

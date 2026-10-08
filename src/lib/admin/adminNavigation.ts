@@ -34,14 +34,14 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     // HSK 대조는 미션 생성 직후 자동으로 남는 참고 기록이다 — 제작 기준·생성계약과 같은 층위가 아니다(2026-09-27 정본).
     // 화면 폭은 옮기기 전과 같게 둔다.
     { to: "/admin/corpus", label: "HSK 3.0 어휘 대조", wideCanvas: false },
-    { to: "/admin/ai-review", label: "자동 품질 점검·AI 검토" },
+    { to: "/admin/ai-review", label: "자동 규칙 검사·AI 검토" },
     // 제작·승인 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
     { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
   ]},
   { header: "4. 수업 운영", items: [
     { to: "/admin/library", label: "학습 미션 관리" },
-    { to: "/admin/composer/new", label: "새 교과목 개설" },
-    { to: "/admin/composer", label: "15주 수업 편성" },
+    { to: "/admin/composer/new", label: "신규 교과목 개설" },
+    { to: "/admin/composer", label: "주차별 미션 배치" },
     { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},
   { header: "5. 관리 도구", items: [

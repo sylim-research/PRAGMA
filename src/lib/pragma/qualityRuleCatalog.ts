@@ -205,7 +205,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
     category: "생성 기록·계승·근거 귀속",
     nature: "governance",
     summary_ko: "문항별 모델 귀속(item_lineage)의 구조·scope·근거 id·귀속 호출 metadata를 확인한다. 문헌이 실제로 표현을 지지하는지는 판정하지 않는다.",
-    applicability_ko: "mission_v5이고 provenance.prompt_version이 현행 콘텐츠 릴리스와 같으며 authoring pending이 아닌 미션만 검사한다. 구버전 미션은 건너뛴다.",
+    applicability_ko: "mission_v5는 provenance.prompt_version이 현행 콘텐츠 릴리스와 같고 authoring pending이 아닌 미션만, mission_v6는 lineage가 pending이 아닌 미션을 검사한다. 구버전 미션은 건너뛴다.",
   },
   R32: {
     category: "생성 기록·계승·근거 귀속",
@@ -227,6 +227,16 @@ export const RETIRED_QUALITY_RULES: Record<RetiredRuleId, { retired_on: string; 
     replacement_ko: "어휘 참고 부분만 비차단 HSK lexical audit가 대신하고, 길이·담화 형태 일부는 R29가 담당한다. 옛 R22의 모든 목적을 일대일로 대체한 것은 아니다.",
   },
 };
+
+/**
+ * 현행 생성 경로에서 실제로 실행되는 단계. missionRules.ts의 checkCore(시나리오)와
+ * checkV6Mission(현행 mission_v6)이 add()하는 ID를 손으로 옮긴 표다 — 그 함수가 바뀌면
+ * qualityRuleCatalog.test.ts의 실행 대조 테스트가 이 표의 갱신을 요구한다.
+ * 여기에 없는 ID는 mission_v5(native·legacy) 전용이다(계약 정본 서두 — v5 규칙을 v6에 자동 적용하지 않는다).
+ */
+export const CURRENT_SCENARIO_RULE_IDS = ["R1c", "R8", "R9", "R10", "R16", "R17", "R25", "R26", "R29", "R30"] as const satisfies readonly RuleId[];
+export const CURRENT_MISSION_V6_RULE_IDS = ["R1", "R9", "R10", "R13", "R15", "R16", "R20", "R23", "R24", "R30", "R31", "R32"] as const satisfies readonly RuleId[];
+export const CURRENT_PIPELINE_RULE_IDS = new Set<RuleId>([...CURRENT_SCENARIO_RULE_IDS, ...CURRENT_MISSION_V6_RULE_IDS]);
 
 export const QUALITY_RULE_IDS_IN_CATALOG = Object.keys(QUALITY_RULE_CATALOG) as RuleId[];
 export { ACTIVE_RULE_IDS, RETIRED_MISSION_RULE_IDS };

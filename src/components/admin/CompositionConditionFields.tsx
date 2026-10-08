@@ -31,7 +31,7 @@ export function CompositionConditionFields({
   leading?: React.ReactNode;
   /** true면 편성 주제 줄을 그리지 않는다(ThemePicker를 따로 크게 둘 때). */
   hideThemes?: boolean;
-  /** true면 좁은 칸(새 교과목 개설 왼쪽 열)용 — 2열로 둔다. */
+  /** true면 좁은 칸(교과목 개설 왼쪽 열)용 — 2열로 둔다. */
   compact?: boolean;
 }) {
   const toggleTheme = (theme: ThemeCode) =>
@@ -90,7 +90,7 @@ export function CompositionConditionFields({
             type="button"
             onClick={() => toggleTheme(theme)}
             className={`rounded-md border px-2.5 py-0.5 transition ${
-              value.themes.includes(theme) ? "border-[#FAD338] bg-[#FFF3C4] text-[#15202B]" : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
+              value.themes.includes(theme) ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#EAE4D2] bg-white hover:bg-[#FAF8F2]"
             }`}
           >
             {THEME_LABEL[theme]}
@@ -107,9 +107,9 @@ export function CompositionConditionFields({
  */
 export function ThemePicker({ themes, onThemes }: { themes: ThemeCode[]; onThemes: (themes: ThemeCode[]) => void }) {
   const toggle = (theme: ThemeCode) => onThemes(themes.includes(theme) ? themes.filter((item) => item !== theme) : [...themes, theme]);
-  // 고른 주제 = 옅은 브랜드 노랑 바탕 + 진한 테두리 + ✓. 남색 채움은 과해서 쓰지 않는다.
+  // 고른 주제 = 옅은 남색 바탕 + 남색 테두리 + ✓. 노랑은 실행 버튼(CTA) 색이라 선택 상태에 쓰지 않고(2026-10-08), 남색 채움은 과해서 쓰지 않는다.
   const tile = (on: boolean) => `inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-[14px] font-semibold transition ${
-    on ? "border-[#C9A227] bg-[#FFF3C4] text-[#15202B]" : "border-[#E4DDCB] bg-white text-[#3F4E57] hover:border-[#C9A227]"}`;
+    on ? "border-[#15202B] bg-[#EEF1F4] text-[#15202B]" : "border-[#E4DDCB] bg-white text-[#3F4E57] hover:border-[#7D90A8]"}`;
   return (
     <div className="flex flex-wrap gap-2">
       <button type="button" aria-pressed={themes.length === 0} onClick={() => onThemes([])} className={tile(themes.length === 0)}>

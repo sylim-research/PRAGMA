@@ -24,7 +24,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mobileNavValue = adminMobileNavValue(pathname);
-  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1545px]" : "max-w-[1385px]";
+  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1525px]" : "max-w-[1425px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );
@@ -45,15 +45,16 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      // 평소 = 「학습 미션 시작하기」의 연한 노랑, 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
-        : "bg-[#F7F2DF] text-[#15202B] hover:bg-[#FFF1B8]",
+        : "bg-[#FADB6A] text-[#15202B] hover:bg-[#FCE38A]",
     ].join(" ");
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2.5px] text-[13.5px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2.5px] text-[14px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-[#F3ECD9] text-foreground font-normal"
         : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
@@ -63,27 +64,28 @@ export const AdminShell = ({ title, description, children, compact = false, hide
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-40 bg-[#15202B] print:hidden">
         {/* 본문과 같은 좌우 여백을 쓴다 — 로고가 사이드바 「운영 워크플로우」 상자 왼쪽 선과, 오른쪽 링크가 본문 오른쪽 끝과 맞는다. */}
-        <div className={`mx-auto flex ${canvasClass} items-center justify-between px-5 py-4 md:pl-0 md:pr-9`}>
+        <div className={`mx-auto flex ${canvasClass} items-center justify-between px-5 py-4 md:px-9`}>
           <div className="md:pl-9">
             <HomeBrand />
           </div>
           <div className="flex flex-wrap justify-end gap-x-5 gap-y-2">
-          {IS_DEMO && <Link to="/demo/mission" target="_blank" rel="noreferrer" className="text-sm font-semibold text-[#F1EFE8] hover:text-[#FAD338]">학습 미션 체험 ↗</Link>}
-          <Link
+          {/* 공개 시연에서는 오른쪽 링크를 두지 않는다 — 왼쪽 PRAGMA 로고가 랜딩으로 가고, 체험은 랜딩에서 시작한다.
+              학습자 화면 링크는 학습자 로그인 벽으로 이어져 운영에서만 둔다(2026-10-08). */}
+          {!IS_DEMO && <Link
             to="/learner/course"
             target="_blank"
             rel="noreferrer"
             className="text-sm text-[#8899A6] transition-colors hover:text-[#F1EFE8]"
           >
-            학습자 수업 열기 ↗
-          </Link>
+            학습자 화면 열기 ↗
+          </Link>}
           </div>
         </div>
       </header>
 
       {/* 관리자 화면 폭 기준 2개: 사이드바 285 + 간격 24 + 본문 최대 1,200px(2·3번 묶음) 또는 1,040px, 가운데 정렬.
           좌우 여백 대칭 — 사이드바 상자가 안쪽으로 36px(pl-6+ml-3) 들어가 있으므로 바깥 왼쪽 0, 오른쪽 36px(pr-9). */}
-      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:pl-0 md:pr-9 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:px-9 print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
         <aside className="hidden w-[285px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden">
           <nav className="flex flex-col pb-1 pl-6 pr-1 pt-1">
             <Link
@@ -111,7 +113,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14px] font-semibold transition-colors",
+                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14.5px] font-semibold transition-colors",
                       groupActive
                         ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",

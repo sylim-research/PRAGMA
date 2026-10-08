@@ -8,10 +8,11 @@ import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
 
 // 진입 링크에 마우스를 올리면 화살표가 진행 방향으로 살짝 이동한다.
 const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
-// 브랜드 색은 네이비·옐로우·크림 셋뿐이다(2026-10-07). 방문자의 주 행동은 네이비 채움 하나,
+// 브랜드 색은 네이비·옐로우·크림 셋뿐이다(2026-10-07). 방문자의 주 행동은 옐로우 채움 하나(2026-10-08 —
+// 네이비 헤더 아래에서 네이비 버튼은 가라앉는다. 헤드라인 형광펜과 같은 노랑으로 잇는다),
 // 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
 const demoLink =
-  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#15202B] px-8 py-3 text-[15px] font-bold text-white shadow-[0_6px_18px_rgba(21,32,43,0.18)] transition-colors hover:bg-[#24313F] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2";
+  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
   "group inline-flex items-center gap-1.5 rounded-sm text-[13.833px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
@@ -147,7 +148,7 @@ const Landing = () => {
               className={demoLink}
             >
               학습 미션 체험
-              <span className="ml-0.5 text-[12.5px] font-semibold text-white/80">로그인 없이</span>
+              <span className="ml-0.5 text-[12.5px] font-semibold text-[#15202B]/70">로그인 없이</span>
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
           </section>
