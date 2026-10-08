@@ -8,7 +8,6 @@ import {
   ADMIN_NAV_GROUPS,
   adminMobileNavValue,
   adminNavItemIsActive,
-  adminUsesWideCanvas,
 } from "@/lib/admin/adminNavigation";
 
 interface AdminShellProps {
@@ -24,7 +23,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const mobileNavValue = adminMobileNavValue(pathname);
-  const canvasClass = adminUsesWideCanvas(pathname) ? "max-w-[1545px]" : "max-w-[1385px]";
+  // 모든 관리자 화면은 같은 캔버스 폭을 쓴다(2026-10-08). 화면마다 폭이 달라 메뉴를 옮길 때 본문이 흔들렸다.
+  const canvasClass = "max-w-[1545px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );

@@ -56,7 +56,7 @@ function PartHeading({ no, id, title, description }: { no: number; id: string; t
       <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{no}</span>
       <div>
         <h2 id={id} className="text-[19px] font-bold leading-8 text-[#15202B]">{title}</h2>
-        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#2F3D46]">{description}</p>
+        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
       </div>
     </div>
   );
