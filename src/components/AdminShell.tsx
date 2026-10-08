@@ -45,7 +45,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[14.75px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15px] font-semibold whitespace-nowrap shadow-sm transition-colors",
       // 평소 = 「학습 미션 시작하기」의 연한 노랑, 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
@@ -54,7 +54,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2.5px] text-[13.75px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2.5px] text-[14px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-[#F3ECD9] text-foreground font-normal"
         : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
@@ -112,7 +112,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14.25px] font-semibold transition-colors",
+                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[14.5px] font-semibold transition-colors",
                       groupActive
                         ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",

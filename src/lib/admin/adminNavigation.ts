@@ -40,7 +40,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
   ]},
   { header: "4. 수업 운영", items: [
     { to: "/admin/library", label: "학습 미션 관리" },
-    { to: "/admin/composer/new", label: "교과목 개설" },
+    { to: "/admin/composer/new", label: "신규 교과목 개설" },
     { to: "/admin/composer", label: "주차별 미션 배치" },
     { to: "/admin/decision-traces", label: "학습 수행 기록", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},
