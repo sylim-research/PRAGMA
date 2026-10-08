@@ -99,8 +99,8 @@ const Architecture = () => (
   <div className="flex min-h-screen flex-col bg-background text-foreground">
     <header className="sticky top-0 z-40 bg-[#15202B]">
       <div className="mx-auto flex max-w-[1000px] flex-wrap items-center justify-between gap-4 px-6 py-[11px]">
-        {/* 브랜드 옆 설명어 자리에 화면 이름을 둔다 — 「PRAGMA | 전체 구조」(2026-10-08). */}
-        <HomeBrand largerText subtitle="전체 구조" />
+        {/* 브랜드 옆 설명어 자리에 화면 이름을 둔다 — 「PRAGMA | 시스템 구조」. 전체 = 시스템, 그 안의 두 절차 = 워크플로우(2026-10-08 연구자 확정). */}
+        <HomeBrand largerText subtitle="시스템 구조" />
         <div className="flex items-center gap-2">
           {IS_DEMO && (
             <Link to={REPRESENTATIVE_MISSION_PATH}
@@ -118,7 +118,7 @@ const Architecture = () => (
     <main className="mx-auto flex w-full max-w-[1000px] flex-1 flex-col justify-center px-6 py-4">
       <h1 className="mb-4 flex items-center gap-3 text-[15.5px] font-bold text-[#15202B]">
         <span className="tracking-[0.06em] text-[#8A949E]">Fig. 1</span>
-        PRAGMA 워크플로우
+        PRAGMA 시스템 구조
         <span aria-hidden className="h-px flex-1 bg-[#E2DED2]" />
       </h1>
 

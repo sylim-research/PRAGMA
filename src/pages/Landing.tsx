@@ -34,7 +34,7 @@ const Landing = () => {
           <HomeBrand largerText />
           {IS_DEMO && (
             <Link to="/architecture" className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[14px] font-semibold text-[#F1EFE8] decoration-[#FAD338] decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]">
-              전체 구조 보기
+              시스템 구조 보기
               <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
             </Link>
           )}
@@ -77,7 +77,7 @@ const Landing = () => {
               PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,
             </span>
             <span className="block">
-              상황과 관계에 맞는 표현을 탐구하는 통번역 학습·연구 플랫폼입니다.
+              상황과 관계에 맞는 표현을 탐구하는 통번역 학습 시스템입니다.
             </span>
           </p>
         </section>
@@ -140,7 +140,7 @@ const Landing = () => {
           </article>
         </section>
 
-        {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 전체 구조는 헤더 오른쪽 링크로 옮겼다. */}
+        {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 시스템 구조는 헤더 오른쪽 링크로 옮겼다. */}
         {IS_DEMO && (
           <section className="mt-[26px] flex justify-center" aria-label="대표 미션 체험">
             <Link
