@@ -297,14 +297,14 @@ function OperationsSection({
       : "아직 대조 기록이 없습니다.";
 
   return (
-    <section className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white" aria-labelledby="lexical-audit-title">
+    <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="lexical-audit-title">
       {loading ? (
         <div className="p-5"><Skeleton className="h-32" /></div>
       ) : complete && audit ? (
         <div className="space-y-3.5 px-5 py-4">
           <div>
             <p className="text-[13px] font-medium text-[#8A7423]">대조 상세 · {kind}</p>
-            <h2 id="lexical-audit-title" className="mt-0.5 text-[17px] font-semibold tracking-[-0.01em] text-[#15202B]">
+            <h2 id="lexical-audit-title" className="mt-0.5 text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">
               {cleanTitle(audit.title) ?? axes.join(" · ")}
             </h2>
             <p className="mt-1 text-[13.5px] text-[#655F55]">
@@ -379,10 +379,10 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
   if (recent.length === 0) return null;
   const grid = "grid grid-cols-[6.5rem_minmax(0,1fr)_9.5rem_5.5rem_6.5rem] items-center gap-x-4";
   return (
-    <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white">
+    <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-3 pt-4">
         <div className="flex items-baseline gap-3">
-          <h2 id="audit-history-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
+          <h2 id="audit-history-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
             학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · 평균 HSK 목록 포함률 <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
@@ -435,9 +435,9 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   if (top.words.length === 0) return null;
   const max = top.words[0].missionCount;
   return (
-    <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white">
+    <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
-        <h2 id="top-outside-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
+        <h2 id="top-outside-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
         <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -460,8 +460,8 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#D9D3C4] bg-[#FFFDF7] px-5 py-3.5">
-      <h2 id="audit-method-title" className="text-[16px] font-semibold text-[#15202B]">대조 방식</h2>
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3.5">
+      <h2 id="audit-method-title" className="text-[17px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
@@ -509,7 +509,7 @@ function DatasetOverview({
   }
 
   return (
-    <section className="overflow-hidden rounded-xl border border-[#D9D3C4] bg-white" aria-labelledby="dataset-title">
+    <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="dataset-title">
       <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF1F2] text-[#3F4E59]" aria-hidden>
@@ -521,7 +521,7 @@ function DatasetOverview({
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
               </span>
             </div>
-            <h2 id="dataset-title" className="mt-0.5 text-[17px] font-semibold tracking-[-0.015em] text-[#15202B]">
+            <h2 id="dataset-title" className="mt-0.5 text-[17px] font-bold tracking-[-0.015em] text-[#15202B]">
               HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
             </h2>
           </div>
@@ -568,7 +568,7 @@ function OfficialSource({ status }: { status: ReferenceStatus | null }) {
     : fallback;
 
   return (
-    <section className="rounded-xl border border-[#D9D3C4] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
+    <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
       {/* 공식 출처는 한 줄: 「공식 출처 · 제목 · 발행처 · 발표·시행」 + 오른쪽 PDF 링크. */}
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 text-[13.5px]">

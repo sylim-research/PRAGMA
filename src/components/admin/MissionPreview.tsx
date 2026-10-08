@@ -6,7 +6,7 @@ import { DIRECTION_LABEL } from "@/lib/pragma/enums";
 // 학습자 러너와 달리 정답 대역·해설·교정 valid를 모두 펼쳐 보여준다(검토가 목적).
 // 게이트1 눈검사(H1: 모든 후보가 불변항 통과 / H2: 부적절 근거가 초점 과소·적정·과잉)에 쓴다.
 
-const box = "rounded-lg border border-[#EAE4D2] bg-white p-3";
+const box = "rounded-lg border border-[#E2DED2] bg-white p-3";
 
 function bandLabel(featureCode: string, code: string): string {
   return getTargetFeature(featureCode)?.band_schema.find((b) => b.code === code)?.label_ko ?? code;

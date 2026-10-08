@@ -59,7 +59,7 @@ export function TeachingGeneratorPanel({ course, week, state, loading, loadError
       ? { ...section, [field]: field === "title" ? value : value.split("\n").filter((line) => line.trim()) } : section) });
   };
   const fieldClass = "mt-1 w-full min-w-0 rounded-md border bg-white p-2 text-sm font-normal leading-6 [overflow-wrap:anywhere]";
-  return <section aria-label="수업자료 생성" className="min-w-0 space-y-4 rounded-xl border border-[#DBD3BD] bg-[#FFFCF2] p-4 sm:p-5">
+  return <section aria-label="수업자료 생성" className="min-w-0 space-y-4 rounded-xl border border-[#E2DED2] bg-[#FFFCF2] p-4 sm:p-5">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div>
         <Link className="mb-2 inline-block text-sm font-semibold underline" to={`/admin/teaching-generator?courseId=${encodeURIComponent(course.outline.id)}&weekNo=${week.week_no}`}>PDF·영상·이미지 등 소스로 자료 만들기 →</Link>

@@ -123,7 +123,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     const timer = window.setTimeout(() => { void persist(draft); }, 2500);
     return () => window.clearTimeout(timer);
   }, [dirty, saving, approved, disabled, error, draft]);
-  return <section aria-label="학습자 화면 체험 감수" className="rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6">
+  return <section aria-label="학습자 화면 체험 감수" className="rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6">
     {/* 교수자가 학습자 경험을 그대로 거치며 감수한다는 것이 이 화면의 뜻이다. */}
     {model.error && <p role="alert" className="mb-4 text-red-800">{model.error}</p>}
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,20.5rem)]">

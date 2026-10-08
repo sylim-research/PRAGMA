@@ -192,7 +192,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
           </div>
 
           {/* 페이지 머리와 본문 사이에 가는 선을 둔다 — 머리 아래가 비어 있으면 본문이 머리에 붙어 좁아 보인다(2026-10-08). */}
-          <div className={hideTitle ? "sr-only" : "border-b border-[#E3DED1] pb-5 print:hidden"}>
+          <div className={hideTitle ? "sr-only" : "border-b border-[#E2DED2] pb-5 print:hidden"}>
           <div className="flex items-stretch gap-3">
             <span
               aria-hidden

@@ -35,7 +35,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, fo
   }, [pageSelectedCount, pageAllSelected]);
 
   return <section aria-labelledby="batch-items-heading" className="rounded-xl border bg-white p-5">
-    <h2 id="batch-items-heading" className="flex items-center gap-2 text-lg font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FBEFD9] text-xs font-bold text-[#7A4A0A]">3</span>생성 항목 확인·실행</h2>
+    <h2 id="batch-items-heading" className="flex items-center gap-2 text-[17px] font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-xs font-bold text-[#7A4A0A]">3</span>생성 항목 확인·실행</h2>
     {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
       <table className="w-full min-w-[820px] table-fixed text-[14px]">
@@ -51,7 +51,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, fo
                 : [...new Set([...selected, ...indexes])].sort((a, b) => a - b))} />
           </th>{["번호", "화행", "수준", "수행 방식", "도메인"].map(label =>
             <th key={label} rowSpan={2} className="px-2 py-2 text-center align-middle font-semibold">{label}</th>)}
-            <th colSpan={3} className="border-b border-[#E6DECB] bg-[#F6EFDB] px-2 pb-1 pt-2 text-center text-[12.5px] font-semibold tracking-[0.02em] text-[#6D5C1F]">관계 조건 (P·D·R)</th>
+            <th colSpan={3} className="border-b border-[#E2DED2] bg-[#F6EFDB] px-2 pb-1 pt-2 text-center text-[12.5px] font-semibold tracking-[0.02em] text-[#6D5C1F]">관계 조건 (P·D·R)</th>
             <th rowSpan={2} className="px-3 py-2 text-left align-middle font-semibold">장면 소재</th></tr>
           <tr>{["권력", "거리", "부담도"].map(label =>
             <th key={label} className="bg-[#F6EFDB] px-2 pb-2 pt-1 text-center font-semibold text-[#4E5A63]">{label}</th>)}</tr>

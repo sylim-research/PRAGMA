@@ -278,7 +278,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15.5px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
+          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 워크플로우</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
@@ -311,11 +311,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               </div>
               {row.detail && <details className="ml-9 mt-1.5">
                 <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
-                <p className="mt-1.5 border-l-2 border-[#E7E2D4] pl-3 text-[#3F4E57]">{row.detail}</p>
+                <p className="mt-1.5 border-l-2 border-[#E2DED2] pl-3 text-[#3F4E57]">{row.detail}</p>
               </details>}
               {row.items && row.items.length > 0 && <details className="ml-9 mt-1.5">
                 <summary className="cursor-pointer text-[12.5px] text-[#5D6970]">내용 보기</summary>
-                <ul className="mt-1.5 space-y-2">{row.items.map((finding) => <li key={finding.id} className="border-l-2 border-[#E7E2D4] pl-3">
+                <ul className="mt-1.5 space-y-2">{row.items.map((finding) => <li key={finding.id} className="border-l-2 border-[#E2DED2] pl-3">
                   <p className="font-semibold text-[#202B33]">{plainIssue(finding.issue_ko)}</p>
                   {plainIssue(finding.reason_ko) !== plainIssue(finding.issue_ko) && <p className="text-[#3F4E57]">{plainIssue(finding.reason_ko)}</p>}
                   {finding.quote && <blockquote className="mt-1 border-l-2 pl-2 text-[#5D6970]">{finding.quote}</blockquote>}
@@ -353,7 +353,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {error && <p role="alert" className="text-red-800">{error}</p>}
     </section>;
   }
-  return <section aria-label="콘텐츠 승인" className={framed ? "my-4 space-y-4 rounded-xl border border-[#D8D3C4] bg-white p-4 text-sm" : "space-y-3 text-sm"}>
+  return <section aria-label="콘텐츠 승인" className={framed ? "my-4 space-y-4 rounded-xl border border-[#E2DED2] bg-white p-4 text-sm" : "space-y-3 text-sm"}>
     {/* 단계는 얇은 진행줄로. 끝난 단계는 조용히, 현재 단계만 강조한다. 최종 승인 화면은 이 줄 없이 감수부터 시작한다. */}
     {!experiential && <div className="flex flex-wrap items-center justify-between gap-2">
       {/* The final-approval screen already shows its own ①②③ flow; the stage line stays on the quality-check screen. */}
@@ -473,7 +473,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
-            {substantiveFindings.length > 0 && <section className="space-y-4 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
+            {substantiveFindings.length > 0 && <section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
               <h4 className="flex items-center gap-2.5 text-[17px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
@@ -506,7 +506,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
       })()}
-      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-2xl border border-[#D8D3C4] bg-[#F8F7F2] px-4 py-3 sm:px-6">
+      {next === "professor" && !handoffHref && <div id="professor-final-approval" className="space-y-3 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] px-4 py-3 sm:px-6">
         {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
         {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}

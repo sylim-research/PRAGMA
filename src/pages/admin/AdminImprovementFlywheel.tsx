@@ -201,7 +201,7 @@ const AdminImprovementFlywheel = ({ preview = false }: { preview?: boolean }) =>
       description="학습 수행에서 반복된 학습자 이견을 모아 교수자가 콘텐츠 개선 여부를 결정합니다."
     >
       <div className="space-y-5">
-        <section className="rounded-xl border border-[#D9D4C8] bg-white p-5">
+        <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
           <p className="text-xs font-semibold text-[#756F64]">학습 수행 근거</p>
           <h2 className="mt-1 text-lg font-semibold">반복되는 학습자 이견을 개선 검토로 연결</h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">

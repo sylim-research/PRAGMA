@@ -162,14 +162,14 @@ export const ServiceHealthPanel = () => {
 
   return (
     // 요약 줄·항목 목록·잔액 안내를 한 장의 카드로 묶는다 — 따로 떨어진 상자 둘로 읽히지 않게.
-    <section aria-labelledby="service-health-title" className="overflow-hidden rounded-2xl border border-[#E6E1D5] bg-white">
+    <section aria-labelledby="service-health-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className={`flex flex-wrap items-center gap-x-3 gap-y-1 px-5 py-3.5 ${open ? "border-b border-[#EEEAE0] bg-[#FAF8F2]" : ""}`}>
         <span
           className={`h-2.5 w-2.5 shrink-0 rounded-full ${pending ? "animate-pulse" : ""} ${tone.dot}`}
           data-testid="summary-dot"
           aria-hidden="true"
         />
-        <h2 id="service-health-title" className="text-[17px] font-semibold tracking-[-0.01em] text-[#1B2A36]">
+        <h2 id="service-health-title" className="text-[17px] font-bold tracking-[-0.01em] text-[#1B2A36]">
           외부 서비스 연동
         </h2>
         <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>

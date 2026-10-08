@@ -32,7 +32,7 @@ export function TeachingSourceCollection({ sources, selected, onChange, onSelect
     setError(failures.join("\n")); setBusy(false); onBusy(false);
   };
   const locked = disabled || busy;
-  return <section aria-label="근거 소스" className="min-w-0 rounded-2xl border bg-white p-4 sm:p-5">
+  return <section aria-label="근거 소스" className="min-w-0 rounded-xl border bg-white p-4 sm:p-5">
     <h2 className="text-lg font-bold">1. 근거 소스</h2>
     <p className="mt-1 text-sm leading-6 text-muted-foreground">수업에 사용할 원문을 넣고, 추출 내용과 출처를 확인하세요.</p>
     <fieldset disabled={locked} className="mt-4 min-w-0">
