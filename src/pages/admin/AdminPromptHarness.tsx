@@ -49,17 +49,27 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
   { title: "공개 조건", body: "교수자가 승인한 미션만 학습자에게 공개합니다." },
 ];
 
+// 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
+function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
+  return (
+    <div className="mb-3 flex items-start gap-2.5">
+      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{no}</span>
+      <div>
+        <h2 id={id} className="text-[19px] font-bold leading-8 text-[#15202B]">{title}</h2>
+        <p className="text-[13px] leading-relaxed text-[#52616B]">{description}</p>
+      </div>
+    </div>
+  );
+}
+
 function ContractSummary() {
   return (
-    <section aria-labelledby="contract-title" className="mb-4 rounded-xl border border-[#D9D2BF] bg-white p-4 sm:p-5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">생성계약</p>
-      <h2 id="contract-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
-        모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다.
-      </h2>
-      <ol className="mt-3 grid gap-x-6 gap-y-2 md:grid-cols-2">
+    <section aria-labelledby="contract-title">
+      <PartHeading no={1} id="contract-title" title="생성계약" description="모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다." />
+      <ol className="grid gap-x-6 gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-cols-2">
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[11px] font-bold text-[#15202B]">{index + 1}</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[11px] font-bold text-[#6D5C1F]">{index + 1}</span>
             <p className="text-[13px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
@@ -137,22 +147,11 @@ function RuleCatalogPanel() {
 function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
-    <section
-      aria-labelledby="harness-overview-title"
-      className="rounded-xl border border-[#D9D2BF] bg-white p-4 sm:p-5"
-    >
-      <div className="max-w-[48rem]">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8A7621]">
-          품질관리 구조
-        </p>
-        <h2 id="harness-overview-title" className="mt-1 text-[18px] font-bold text-[#26333B]">
-          자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다.
-        </h2>
-      </div>
-
-      <div className="mt-4 grid gap-2 md:grid-cols-3">
+    <section aria-labelledby="harness-overview-title">
+      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다." />
+      <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
-          className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E5DEC9] bg-[#FBFAF6]"}`}>
+          className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
@@ -167,7 +166,7 @@ function HarnessOverview() {
             {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
           </span>
         </button>
-        <div className="rounded-lg border border-[#D8E0E5] bg-[#F7FAFB] p-3">
+        <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#3F6172]">AI 검토</span>
             <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
@@ -180,7 +179,7 @@ function HarnessOverview() {
             검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
           </a>
         </div>
-        <div className="rounded-lg border border-[#E1DDD4] bg-[#FAF9F7] p-3">
+        <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11px] font-semibold text-[#6D675D]">최종 사용 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
@@ -251,16 +250,19 @@ const AdminPromptHarness = () => {
       title="생성계약·운영 프롬프트"
       description="생성계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
+      <div className="space-y-10">
       <ContractSummary />
       <HarnessOverview />
 
-      <div className="mt-6 space-y-6">
+      <section aria-labelledby="prompts-title">
+        <PartHeading no={3} id="prompts-title" title="운영 프롬프트" description="실제 생성·검토·피드백에 쓰는 프롬프트 원문입니다. 코드에서 자동으로 옮겨 와 판본 지문과 함께 보여 줍니다." />
+        <div className="space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-2 text-[15px] font-bold">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-2 border-l-[3px] border-[#C9A62E] pl-2 text-[15px] font-bold leading-5 text-[#26333B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid grid-flow-row-dense gap-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
@@ -269,6 +271,8 @@ const AdminPromptHarness = () => {
             </div>
           );
         })}
+        </div>
+      </section>
       </div>
     </AdminShell>
   );
