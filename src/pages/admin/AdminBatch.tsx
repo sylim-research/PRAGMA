@@ -372,7 +372,7 @@ const AdminBatch = () => {
                 <Dist title="수준별" rows={LEVEL_ORDER.map(level => [LEVEL[level], summary.byLevel[level] ?? 0])} />
                 <Dist title="도메인별" rows={Object.entries(DOMAIN).map(([key, label]) => [label, summary.byDomain[key] ?? 0])} />
                 <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="편성 주제별" rows={Object.entries(THEME_LABEL).map(([key, label]) => [label, summary.byTheme[key] ?? 0])} />
-                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="업종 배경별 (직장)" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
+                <Dist className="border border-[#E6DECB] bg-white lg:row-span-2" title="직장 업종별" rows={Object.entries(INDUSTRY).map(([key, label]) => [label, summary.byIndustry[key] ?? 0])} />
                 {/* 수준별·도메인별 아래 빈자리를 화행별이 채운다(넓은 화면 기준 1~2열, 두 번째 줄). */}
                 <div className="rounded-lg border border-[#E6DECB] border-l-4 border-l-[#D8C07A] bg-white px-3 py-2 sm:col-span-2">
                   <h3 className="text-[14.5px] font-semibold">화행별</h3>
