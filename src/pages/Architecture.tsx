@@ -116,8 +116,11 @@ const Architecture = () => (
     </header>
 
     <main className="mx-auto flex w-full max-w-[1000px] flex-1 flex-col justify-center px-6 py-4">
-      {/* 화면 이름은 헤더가 보인다. 그림 제목줄(Fig. 1)은 두지 않는다 — 논문 캡처에서도 잘라 내는 줄이다. */}
-      <h1 className="sr-only">PRAGMA 전체 구조</h1>
+      <h1 className="mb-4 flex items-center gap-3 text-[15.5px] font-bold text-[#15202B]">
+        <span className="tracking-[0.06em] text-[#8A949E]">Fig. 1</span>
+        PRAGMA 워크플로우
+        <span aria-hidden className="h-px flex-1 bg-[#E2DED2]" />
+      </h1>
 
       <div className="grid grid-cols-1 gap-2 lg:grid-cols-[1fr_100px_1fr_100px_1fr] lg:gap-0">
         <Lane title="콘텐츠 제작 워크플로우" head="bg-[#15202B] text-white">
