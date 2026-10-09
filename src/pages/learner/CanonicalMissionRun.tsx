@@ -3195,7 +3195,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           로컬 체험 · {pilotStorageAvailable ? "다음 문항으로 넘긴 답안은 이 탭에 임시 보관됩니다. 작성 중 내용은 새로고침하면 사라집니다." : "임시 보관을 사용할 수 없습니다. 새로고침하지 않고 진행해 주세요."}
         </p>}
         {sceneIntroStep !== null ? (
-          <div className={demoMode ? "space-y-2" : "space-y-5"}>
+          <div className={demoMode ? "space-y-4" : "space-y-5"}>
             <Progress activeIndex={0} sceneIntroStep={sceneIntroStep} sceneIntroConfig={sceneIntroConfig} {...demoProgressProps} />
             <SceneIntroFlow
               config={sceneIntroConfig}
