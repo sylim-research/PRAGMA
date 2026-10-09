@@ -149,13 +149,13 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
                 sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
-            <span className={`shrink-0 text-[14.25px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
+            <span className={`shrink-0 text-[14.25px] font-semibold ${decision?.status === "checked" ? "text-[#245E44]" : decision?.status === "revision_required" ? "text-[#8B3531]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : decision.status === "revision_required" ? "✗ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
           </button>;
         })}</nav>
         <div className="space-y-2.5 rounded-xl bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="outline" className="h-9 border-[#233542] text-[13.75px] font-semibold text-[#233542] hover:bg-[#EEF1F4]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
-            <Button size="sm" className="h-9 text-[13.75px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
+            <Button size="sm" variant="outline" className="h-9 border-[#4D8568] text-[13.75px] font-semibold text-[#245E44] hover:bg-[#EEF5F0]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
+            <Button size="sm" className="h-9 border-[#C86E68] text-[13.75px] font-semibold text-[#8B3531] hover:bg-[#FBF0EF]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
           <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14.25px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."

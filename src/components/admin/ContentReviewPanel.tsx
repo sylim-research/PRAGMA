@@ -370,6 +370,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
         <div className={pairRow ? "flex flex-col items-start gap-4" : "flex flex-wrap items-center justify-between gap-x-6 gap-y-3"}>
           <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">4</span>교수자 최종 승인</h4>
+          {/* 최종 의견은 기본 문구로 채워 두어, 그대로 확인·승인만 눌러도 된다(2026-10-09). */}
+          {pairRow && <label className="flex w-full flex-col gap-1.5">
+            <span className="text-[14px] font-semibold text-[#5D6970]">최종 의견</span>
+            <Textarea aria-label="교수자 최종 의견" rows={3} maxLength={2000} className="resize-y bg-white text-[14.5px] leading-6" value={note}
+              onChange={(event) => setNote(event.target.value)} disabled={busy || Boolean(locked)} />
+          </label>}
           <div className={pairRow ? "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2" : "flex flex-wrap items-center justify-end gap-x-4 gap-y-2"}>
           <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
