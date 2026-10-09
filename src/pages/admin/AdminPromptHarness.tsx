@@ -154,7 +154,7 @@ function HarnessOverview() {
       <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" />
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
-          className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
+          className={`group rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[12px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
@@ -164,7 +164,7 @@ function HarnessOverview() {
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B]">
+          <span className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
             {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
           </span>
