@@ -92,7 +92,22 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 6. 콘텐츠·학습 기록의 추적
+## 6. 시스템 아키텍처
+
+<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+
+<sub>2026년 10월 기준</sub>
+
+- **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
+- **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
+- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
+- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
+- **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
+- **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
+
+<br>
+
+## 7. 콘텐츠·학습 기록의 추적
 
 <table>
   <thead><tr><th width="380" align="left">콘텐츠 이력</th><th width="380" align="left">학습 수행 기록</th></tr></thead>
@@ -105,21 +120,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 </table>
 
 > <small>생성·검토·승인 이력과 학습 기록을 콘텐츠 버전에 연결해 추적합니다.</small>
-
-<br>
-
-## 7. 시스템 아키텍처
-
-<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
-
-<sub>2026년 10월 기준</sub>
-
-- **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
-- **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
-- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
-- **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
-- **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
 
 <br>
 
