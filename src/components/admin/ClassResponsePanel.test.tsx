@@ -157,7 +157,7 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
   it("교과목만 골라 들어와도 첫 미션 주차의 실제 분포를 바로 보여 준다", async () => {
     mount("/admin/decision-traces?tab=class&courseId=course-a&demo=0");
     await expectCounts(2, 1);
-    expect(screen.getByRole("heading", { level: 2 })).toBeVisible();
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument(); // 미션 제목 줄은 두지 않는다(2026-10-09)
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
     expect(screen.getByRole("combobox", { name: "주차 선택" })).toHaveValue("2");
     expect(await screen.findByRole("option", { name: "2주차 · 요청 화행 (참여 2명)" })).toBeInTheDocument();

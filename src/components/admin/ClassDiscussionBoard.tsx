@@ -84,11 +84,11 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
     aria-label={`MJT ${item.itemId} · ${item.activity}`}
     onClick={onClick}
     className={[
-      "-mb-px min-w-0 border-b-2 px-3 py-2 text-left text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+      "-mb-px min-w-0 border-b-2 px-3 py-2 text-left text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
       active ? "border-[#15202B] font-bold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
     ].join(" ")}
   >
-    <span className="mr-1.5 text-[13px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
+    <span className="mr-1.5 text-[14px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
   </button>;
 }
 

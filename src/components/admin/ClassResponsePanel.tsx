@@ -188,12 +188,12 @@ export function ClassResponsePanel() {
   };
 
   const statusPill = hasRealResponses && !showingDemo
-    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[12px] font-bold text-[#15202B]">
+    ? <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[13px] font-bold text-[#15202B]">
       {releaseStatus === "collecting" ? "응답 수집 중" : releaseStatus === "closed" ? "분포 고정" : "학습자 공개"}
     </span>
     : null;
 
-  const ghost = "inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[12.5px] font-medium text-[#44525C] hover:bg-[#F1EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] disabled:opacity-50";
+  const ghost = "inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[13px] font-medium text-[#44525C] hover:bg-[#F1EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] disabled:opacity-50";
   const plainSelect = "h-8 rounded-md border border-[#D9DED9] bg-white px-2 text-[13px] text-[#15202B]";
   const segment = (selected: boolean) => selected
     ? "bg-[#EEF0F3] font-semibold text-[#15202B]"
@@ -231,7 +231,7 @@ export function ClassResponsePanel() {
             role="tab"
             aria-selected={scenario.scenario_id === missionId}
             onClick={() => selectMission(scenario.scenario_id)}
-            className={`px-3 py-1 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
+            className={`px-3 py-1 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
           >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}</button>)}
         </div>}
         <div className="ml-auto flex flex-wrap items-center gap-0.5">
@@ -242,7 +242,7 @@ export function ClassResponsePanel() {
               role="radio"
               aria-checked={showingDemo === on}
               onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
-              className={`px-2.5 py-1 text-[12px] ${segment(showingDemo === on)}`}
+              className={`px-2.5 py-1 text-[13px] ${segment(showingDemo === on)}`}
             >{label}</button>)}
           </div>}
           <button type="button" aria-label="응답 새로고침" title="응답 새로고침" disabled={rowsQuery.isFetching} onClick={() => void rowsQuery.refetch()} className={ghost}><RefreshCw className="h-3.5 w-3.5" /></button>
@@ -261,14 +261,14 @@ export function ClassResponsePanel() {
       </div>
 
       {week && selectedMission && <section>
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="break-keep text-[19px] font-bold text-[#15202B]">
-            {missionMenuTitle(selectedMission.brief_note_ko) ?? missionSituationSummary(selectedMission.situation_ko)}
-          </h2>
-          {statusPill}
-          {showingDemo && <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[12px] font-bold text-[#15202B]" title="데모 응답은 운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
-        </div>
-        {!showingDemo && <p className="mt-1 text-[12px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
+        {/* 미션 제목 줄은 두지 않는다 — 위 선택 줄이 이미 주차·미션을 보인다(2026-10-09). 실제 응답일 때만 공개 단계 꼬리표를 둔다. */}
+        {statusPill && <div className="flex flex-wrap items-center gap-2">{statusPill}</div>}
+        {/* 데모 표시는 그것이 가리키는 응답 분포 바로 위, 보드 폭 전체의 띠로 둔다 — 아래 모든 수치가 가상 응답임이 먼저 읽힌다. */}
+        {showingDemo && <div role="note" className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-[#EAD58A] bg-[#FFF8DC] px-4 py-2.5">
+          <span className="text-[13px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>
+          <span className="text-[13px] text-[#5F573D]">운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.</span>
+        </div>}
+        {!showingDemo && <p className="mt-1 text-[13px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 
         {hasRealResponses && !showingDemo && <div aria-label="응답 공개 단계" className="mt-3 grid gap-2 sm:grid-cols-3">
           {[
@@ -276,7 +276,7 @@ export function ClassResponsePanel() {
             { key: "closed", label: "2 · 분포 고정", reached: releaseStatus === "closed" || releaseStatus === "released" },
             { key: "released", label: "3 · 학습자 공개", reached: releaseStatus === "released" },
           ].map((step) => <div key={step.key} className={[
-            "rounded-md border px-3 py-1.5 text-center text-[12px] font-bold",
+            "rounded-md border px-3 py-1.5 text-center text-[13px] font-bold",
             step.reached ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D9D5C8] bg-white text-[#15202B]",
           ].join(" ")}>{step.label}</div>)}
         </div>}
