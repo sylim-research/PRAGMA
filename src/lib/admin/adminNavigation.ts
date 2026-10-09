@@ -44,7 +44,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/discussion", label: "메타화용 토론", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},
   { header: "5. 관리 도구", items: [
-    { to: "/admin/export", label: "연구 기록·편성 백업", activePaths: ["/admin/data-backup"] },
+    { to: "/admin/export", label: "연구 기록·수업 백업", activePaths: ["/admin/data-backup"] },
   ]},
 ] as const;
 

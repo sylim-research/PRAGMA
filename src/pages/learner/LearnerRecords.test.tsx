@@ -39,7 +39,9 @@ function renderReport(entry = "/learner/records") {
 }
 
 const summaryText = () => screen.getByText(/학습 미션 \d+개 · 수행 \d+회/).textContent;
-const missionCards = async () => within(await screen.findByRole("list", { name: "완료 기록" })).getAllByRole("article");
+// 미션은 한 번에 하나만 보이고, 여러 개면 위의 「학습 미션 선택」에서 고른다.
+const shownMission = async () => screen.findByRole("article");
+const missionPicks = () => within(screen.getByRole("navigation", { name: "학습 미션 선택" })).getAllByRole("button");
 // 수행 한 번 = 「수행 기록」 목록의 바로 아래 항목(안쪽 흐름 띠의 항목은 세지 않는다).
 const attempts = async () => (await screen.findAllByRole("list", { name: "수행 기록" }))
   .flatMap((list) => within(list).getAllByRole("listitem").filter((item) => item.parentElement === list));
@@ -111,7 +113,8 @@ describe("learner records", () => {
     const v5 = { ...ownLog, id: "v5", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", revised_response: ownLog.first_response };
     mocks.order.mockResolvedValue({ data: [ownLog, prototype, noAct, v5], error: null });
     renderReport();
-    expect(await recordItems()).toHaveLength(2);
+    expect(await recordItems()).toHaveLength(1);
+    expect(missionPicks()).toHaveLength(2);
   });
 
   it("groups attempts by mission with the source shown once and marks kept or revised", async () => {
@@ -120,17 +123,21 @@ describe("learner records", () => {
     const other = { ...ownLog, id: "other", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", speech_act: "refusal", source_text: "자료 보내 주세요." };
     mocks.order.mockResolvedValue({ data: [withSource, unchanged, other], error: null });
     renderReport();
-    const cards = await missionCards();
-    expect(cards).toHaveLength(2);
-    expect(cards[0]).toHaveTextContent("AI 한중 화용 통번역 · 2주차 · 요청 · 번역");
-    expect(within(cards[0]).getAllByText("시간 확인 부탁드립니다.")).toHaveLength(1);
-    expect(cards[0]).toHaveTextContent("수행 2회");
-    const list = within(cards[0]).getByRole("list", { name: "수행 기록" });
+    const card = await shownMission();
+    expect(missionPicks()).toHaveLength(2);
+    expect(card).toHaveTextContent("AI 한중 화용 통번역 · 2주차 · 요청 · 번역");
+    // 원문은 접혀 있다가 「원문 보기」로 한 번만 펼친다.
+    expect(within(card).queryByText("시간 확인 부탁드립니다.")).not.toBeInTheDocument();
+    fireEvent.click(within(card).getByRole("button", { name: "원문 보기" }));
+    expect(within(card).getAllByText("시간 확인 부탁드립니다.")).toHaveLength(1);
+    expect(card).toHaveTextContent("수행 2회");
+    const list = within(card).getByRole("list", { name: "수행 기록" });
     const rows = within(list).getAllByRole("listitem").filter((row) => row.parentElement === list);
     expect(within(rows[0]).getByRole("region", { name: "초안" })).toHaveTextContent(`초안${ownLog.first_response}`);
     expect(within(rows[0]).getByRole("region", { name: "최종안" })).toHaveTextContent(`최종안${ownLog.revised_response}`);
     expect(within(rows[1]).getByRole("region", { name: "최종안" })).toHaveTextContent(`최종안${ownLog.first_response}초안을 그대로 유지했습니다.`);
-    expect(cards[1]).toHaveTextContent("거절");
+    fireEvent.click(missionPicks()[1]);
+    expect(await shownMission()).toHaveTextContent("거절");
   });
 
   it("underlines only the changed part of the final expression", async () => {
@@ -174,18 +181,18 @@ describe("learner records", () => {
     const refusal = { ...ownLog, id: "refusal", mission_id: "f62f9ce7-04bd-40e6-8f06-2fd2947d79a0", speech_act: "refusal" };
     mocks.order.mockResolvedValue({ data: [ownLog, refusal], error: null });
     renderReport();
-    await missionCards();
+    await shownMission();
     const map = within(screen.getByRole("region", { name: "화행별 학습 기록" }));
     expect(map.getByText("수행한 화행 2/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다")).toBeInTheDocument();
     expect(map.getAllByRole("button")).toHaveLength(9);
     expect(map.getByRole("button", { name: /사과\s*아직/ })).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("combobox", { name: "교과목" })).not.toBeInTheDocument();
     fireEvent.click(map.getByRole("button", { name: /거절\s*1회/ }));
-    const cards = await missionCards();
-    expect(cards).toHaveLength(1);
-    expect(cards[0]).toHaveTextContent("거절");
+    expect(await shownMission()).toHaveTextContent("거절");
+    expect(screen.queryByRole("navigation", { name: "학습 미션 선택" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "전체 보기" }));
-    expect(await missionCards()).toHaveLength(2);
+    await shownMission();
+    expect(missionPicks()).toHaveLength(2);
   });
 
   it("keeps a failed query distinct from no records and allows retry", async () => {
@@ -260,7 +267,7 @@ describe("learner records", () => {
 
   it("opens a labelled demo record without reading stored logs", async () => {
     renderReport("/learner/records?demo=1");
-    expect(await screen.findByText("데모 · 가상 학습자 20명 · 실제 학습자 자료가 아닙니다")).toBeInTheDocument();
+    expect(await screen.findByText("데모 · 가상 학습자 20명")).toBeInTheDocument();
     const classView = await screen.findByRole("region", { name: "동료들의 판단" });
     expect(within(classView).getByRole("list", { name: "수정안 선택 동료 응답 분포와 내 판단" })).toHaveTextContent("수정안 2나60% · 12명");
     // 판단 비교 표 대신, 각 활동 그래프 옆에 기준 판단 라벨 하나.
@@ -275,6 +282,12 @@ describe("learner records", () => {
     expect(lessons).toHaveTextContent("맡기는 틀과 묻는 틀");
     expect(lessons).toHaveTextContent("확인 부탁의 강도와 확정성");
     expect(lessons).not.toHaveTextContent("적절한 표현은 여러 가지");
+    // 추천 표현과 해설이 있으면 추상적인 「생각해 보기」 질문은 두지 않는다.
+    const alternatives = screen.getByRole("region", { name: "추천 표현" });
+    expect(within(alternatives).getAllByText(/^예시 \d$/)).toHaveLength(2);
+    expect(within(alternatives).getAllByText("해설").length).toBeGreaterThan(0);
+    expect(alternatives).not.toHaveTextContent("`");
+    expect(screen.queryByLabelText("생각해 보기")).not.toBeInTheDocument();
     expect(screen.queryByText(/경향|편이다|강점|약점|민감/)).not.toBeInTheDocument();
     expect(mocks.from).not.toHaveBeenCalled();
     expect(mocks.fetchMission).not.toHaveBeenCalled();

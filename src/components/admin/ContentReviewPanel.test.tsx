@@ -97,13 +97,13 @@ describe("professor finding decisions", () => {
       rationale_ko: "상황문·원문과 대조한 결과 같은 결론에 이르렀습니다.", proposed_change_ko: "해설의 책임 주체를 화자로 맞추십시오.",
       needs_professor: false, evidence_path: finding.where, evidence_quote: finding.quote }] });
     showPanel();
-    expect(await screen.findByText("AI 검토 일치")).toBeInTheDocument();
+    expect(await screen.findByText("✓ AI 검토 일치")).toBeInTheDocument();
     // 재서술은 지우지 않고 근거 안으로 접는다.
-    const details = screen.getByText("검토 의견 전문·근거").closest("details");
+    const details = screen.getByText("수정 제안·근거 보기").closest("details");
     expect(details).not.toHaveAttribute("open");
     expect(details).toHaveTextContent("같은 결론에 이르렀습니다.");
-    // 판단에 필요한 제안은 펼치지 않아도 보인다.
-    expect(screen.getByText("해설의 책임 주체를 화자로 맞추십시오.")).toBeInTheDocument();
+    // 수정 제안도 근거와 함께 접혀 있다(실제 감수에서 거의 읽히지 않음).
+    expect(details).toHaveTextContent("해설의 책임 주체를 화자로 맞추십시오.");
   });
   it("결정 버튼만 누르면 입력 칸 없이 기본 근거로 저장된다", async () => {
     showPanel();

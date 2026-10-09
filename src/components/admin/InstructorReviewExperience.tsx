@@ -129,31 +129,33 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,20.5rem)]">
       <div className="min-w-0">
         {/* 왼쪽 = 학습자가 보는 화면 그대로, 오른쪽 = 교수자의 감수 기록(2026-10-08 — 한 제목 아래 섞여 있던 두 역할을 나눴다). */}
-        <h3 className="mb-4 flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>학습자 화면</h3>
+        <h3 className="mb-4 flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>학습자 화면</h3>
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
       {/* 확인 목록은 촘촘하게 둔다 — 상자 높이가 이 목록이 아니라 왼쪽 문항 길이를 따르도록. */}
-      <aside className="space-y-3 xl:sticky xl:top-24">
-        <h3 className="!mb-1 flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>교수자 감수</h3>
+      {/* 오른쪽 목록의 첫 줄이 왼쪽 학습자 화면 상자의 윗선과 같은 높이에서 시작하도록, 제목 아래 간격을 왼쪽과 같게 둔다(2026-10-09). */}
+      <aside className="xl:sticky xl:top-24">
+        <h3 className="mb-4 flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>교수자 감수</h3>
+        <div className="space-y-3">
         {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13.25px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}
         <nav aria-label="감수할 장면과 문항" className="grid grid-cols-2 gap-1 xl:grid-cols-1">{displayOrder.map(({ item, index }) => {
           const decision = draft.decisions.find((entry) => entry.section === item.id);
           return <button key={item.id} type="button" aria-current={sectionIndex === index ? "step" : undefined} onClick={() => setSectionIndex(index)}
-            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-1.5 text-left text-[13.75px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
+            className={`flex items-center justify-between gap-2 rounded-lg border px-3 py-2 text-left text-[14.75px] ${sectionIndex === index ? "border-[#CAB23D] bg-[#FFF5C2] font-bold" : "border-transparent bg-white"}`}>
             <span className="flex min-w-0 items-center gap-2">
-              {partsOf(item).tag && <span className={["w-[6rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[12px] font-bold tracking-[0.06em]",
+              {partsOf(item).tag && <span className={["w-[6.5rem] shrink-0 whitespace-nowrap border-r border-[#E2DED2] pr-2 text-[13px] font-bold tracking-[0.06em]",
                 // 글자만 + 세로 구분선. 지금 보는 단계만 남색으로 또렷하게.
                 sectionIndex === index ? "text-[#15202B]" : "text-[#8A6B24]"].join(" ")}>{partsOf(item).tag}</span>}
               <span className="min-w-0 truncate">{partsOf(item).name}</span>
             </span>
-            <span className={`shrink-0 text-[13.25px] font-semibold ${decision?.status === "checked" ? "text-[#233542]" : decision?.status === "revision_required" ? "text-[#A0521C]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
+            <span className={`shrink-0 text-[14.25px] font-semibold ${decision?.status === "checked" ? "text-[#245E44]" : decision?.status === "revision_required" ? "text-[#8B3531]" : "text-[#8A5A14]"}`}>{decision ? `${decision.status === "checked" ? "✓ " : decision.status === "revision_required" ? "✗ " : ""}${statusLabel[decision.status]}` : "미확인"}</span>
           </button>;
         })}</nav>
         <div className="space-y-2.5 rounded-xl bg-white p-3">
           <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" variant="outline" className="h-9 border-[#233542] text-[13.75px] font-semibold text-[#233542] hover:bg-[#EEF1F4]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
-            <Button size="sm" className="h-9 text-[13.75px]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
+            <Button size="sm" variant="outline" className="h-9 border-[#4D8568] text-[13.75px] font-semibold text-[#245E44] hover:bg-[#EEF5F0]" disabled={disabled || saving || approved || !model.value} onClick={() => mark("checked")}>✓ 확인</Button>
+            <Button size="sm" className="h-9 border-[#C86E68] text-[13.75px] font-semibold text-[#8B3531] hover:bg-[#FBF0EF]" variant="outline" disabled={disabled || saving || approved} onClick={() => mark("revision_required")}>✗ 수정 필요</Button>
           </div>
           <Textarea aria-label="현재 문항 감수 메모" maxLength={2000} rows={2} className="resize-y bg-white text-[14.25px] leading-6" value={noteValue} disabled={disabled || approved}
             placeholder="문제 지점이나 수정 방향을 남기세요."
@@ -165,6 +167,7 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
           {error && <p role="alert" className="text-[14.25px] text-red-800">{error}</p>}
           {current?.status === "revision_required" && <p className="text-[14.25px] text-amber-800">수정 필요가 남아 있어 최종 승인을 보류합니다. 다시 보고 문제가 없으면 확인으로 바꾸세요.</p>}
           {current?.status === "defer" && <p className="text-[14.25px] text-[#697386]">기존에 보류로 남긴 기록입니다. 확인 또는 수정 필요로 다시 판정하세요.</p>}
+        </div>
         </div>
       </aside>
     </div>

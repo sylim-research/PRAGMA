@@ -266,12 +266,7 @@ export function ClassResponsePanel() {
       {week && selectedMission && <section>
         {/* 미션 제목 줄은 두지 않는다 — 위 선택 줄이 이미 주차·미션을 보인다(2026-10-09). 실제 응답일 때만 공개 단계 꼬리표를 둔다. */}
         {statusPill && <div className="flex flex-wrap items-center gap-2">{statusPill}</div>}
-        {/* 데모 표시는 그것이 가리키는 응답 분포 바로 위, 보드 폭 전체의 띠로 둔다 — 아래 모든 수치가 가상 응답임이 먼저 읽힌다. */}
-        {showingDemo && <div role="note" className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-[#EAD58A] bg-[#FFF8DC] px-4 py-2.5">
-          <span className="text-[14px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>
-          <span className="text-[14px] text-[#5F573D]">운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.</span>
-        </div>}
-        {!showingDemo && <p className="mt-1 text-[13px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
+                {!showingDemo && <p className="mt-1 text-[13px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 
         {hasRealResponses && !showingDemo && <div aria-label="응답 공개 단계" className="mt-3 grid gap-2 sm:grid-cols-3">
           {[

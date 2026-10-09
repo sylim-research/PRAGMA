@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { CAPTURE_CANVAS, useCaptureMode } from "@/lib/captureMode";
 import { HomeBrand } from "@/components/HomeBrand";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import {
@@ -22,9 +23,11 @@ interface AdminShellProps {
 export const AdminShell = ({ title, description, children, compact = false, hideTitle = false }: AdminShellProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
+  // 원고 캡처 모드(?capture=1) — 사이드바를 감추고 본문을 800px로 묶는다(lib/captureMode).
+  const capture = useCaptureMode();
   const mobileNavValue = adminMobileNavValue(pathname);
   // 모든 관리자 화면은 같은 캔버스 폭을 쓴다(2026-10-08 — 메뉴를 옮길 때 본문 폭이 흔들리지 않게).
-  const canvasClass = "max-w-[1465px]";
+  const canvasClass = capture ? CAPTURE_CANVAS : "max-w-[1465px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );
@@ -46,10 +49,10 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const standaloneClasses = (active: boolean) =>
     [
       "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
-      // 평소 = 「학습 미션 시작하기」의 연한 노랑, 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
+      // 평소 = 한 단계 더 연한 노랑(2026-10-09), 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
-        : "bg-[#FADB6A] text-[#15202B] hover:bg-[#FCE38A]",
+        : "bg-[#FDECA8] text-[#15202B] hover:bg-[#FCE38A]",
     ].join(" ");
 
   const itemClasses = (active: boolean) =>
@@ -85,8 +88,8 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
       {/* 관리자 화면 폭 기준 2개: 사이드바 285 + 간격 24 + 본문 최대 1,200px(2·3번 묶음) 또는 1,040px, 가운데 정렬.
           좌우 여백 대칭 — 사이드바 상자가 안쪽으로 36px(pl-6+ml-3) 들어가 있으므로 바깥 왼쪽 0, 오른쪽 36px(pr-9). */}
-      <div className={`mx-auto flex ${canvasClass} gap-6 px-5 md:pl-9 md:pr-[64px] print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
-        <aside className="hidden w-[265px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden">
+      <div className={`mx-auto flex ${canvasClass} gap-6 ${capture ? "px-0" : "px-5 md:pl-9 md:pr-[64px]"} print:block print:p-0 ${compact ? "py-5" : "py-6"}`}>
+        <aside className={`${capture ? "!hidden" : ""} hidden w-[265px] shrink-0 md:sticky md:top-20 md:block md:max-h-[calc(100dvh-5rem)] md:-mt-2 md:self-start md:overflow-y-auto print:hidden`}>
           <nav className="flex flex-col pb-1 pl-6 pr-1 pt-1">
             <Link
               to={ADMIN_DASHBOARD_ITEM.to}

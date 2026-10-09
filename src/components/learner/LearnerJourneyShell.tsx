@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { LearnerAccountMenu } from "@/components/learner/LearnerAccountMenu";
 import { HomeBrand } from "@/components/HomeBrand";
 import { LearnerBottomNav, LearnerTopNav } from "@/components/learner/LearnerBottomNav";
+import { CAPTURE_CANVAS, useCaptureMode } from "@/lib/captureMode";
 
 interface LearnerJourneyShellProps {
   children: ReactNode;
@@ -36,9 +37,11 @@ export const LearnerJourneyShell = ({
   canvas,
 }: LearnerJourneyShellProps) => {
   // 학습자 화면 폭 기준 하나: 본문 720px(max-w-3xl) — 미션 수행 화면과 같은 폭. 예외는 wide(세 열 리포트).
-  const widthClass = canvas ?? (wide ? "max-w-6xl" : "max-w-3xl");
+  // 원고 캡처 모드(?capture=1)에서는 모든 학습자 화면을 800px 캔버스로 묶는다(lib/captureMode).
+  const capture = useCaptureMode();
+  const widthClass = capture ? CAPTURE_CANVAS : canvas ?? (wide ? "max-w-6xl" : "max-w-3xl");
   const verticalPaddingClass = demo ? "py-4" : wide ? "py-3" : missionLayout ? "py-4" : "py-6";
-  const headerAlignmentClass = missionLayout
+  const headerAlignmentClass = missionLayout && !capture
     ? "xl:w-[61rem] xl:max-w-none xl:-translate-x-[6.5rem] xl:px-0"
     : "";
 
