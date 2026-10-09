@@ -69,7 +69,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
 - **DCT형 통번역 과제**에서는 초안에 1차, 수정안에 2차 AI 피드백을 받고, 최종안은 학습자가 결정합니다.
-- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에는 음성 인식과 음성 합성을 씁니다.
+- **AI 피드백**은 의미적 충실성·문법적 정확성·화용적 적절성의 세 기준으로 통번역을 검토합니다.
+- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에서는 속도와 휴지를 조정한 합성 음성을 듣고 통역합니다.
 
 <br>
 
@@ -105,7 +106,22 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 7. 시스템 아키텍처
+## 7. 연구 활용
+
+<table>
+  <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
+  <tbody>
+    <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
+    <tr><td>수행 기록 연결</td><td>가명 학습자 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 초안·수정안·최종안, AI 피드백을 연결</td></tr>
+    <tr><td>해석의 분담</td><td>프로그램은 연결·집계를 맡고, 표현의 적절성과 수정 이유는 연구자가 원자료와 대조해 해석</td></tr>
+  </tbody>
+</table>
+
+> <small>현재 도구는 사용할 콘텐츠의 범위를 확인하는 단계이며, 학습 효과를 분석한 결과는 아닙니다.</small>
+
+<br>
+
+## 8. 시스템 아키텍처
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
@@ -116,11 +132,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
 - **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
-- **코드 관리와 배포**는 GitHub에서 자동 검사를 거쳐 Railway로 배포합니다.
+- **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
 
 <br>
 
-## 8. 학위논문과 구현의 대응
+## 9. 학위논문과 구현의 대응
 
 <table>
   <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
@@ -130,6 +146,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>4.3</td><td>통번역 학습 워크플로우 구현</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
     <tr><td>4.4</td><td>수업 운영 기능</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
     <tr><td>4.5</td><td>개발 과정의 반복적 개선</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a></td></tr>
+    <tr><td>5.3</td><td>PRAGMA 기반 연구 활용</td><td><a href="analysis/content_coverage.py"><code>content_coverage.py</code></a></td></tr>
     <tr><td>부록&nbsp;A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
     <tr><td>부록&nbsp;B</td><td>연구자 판정과 후속 점검</td><td><a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
     <tr><td>부록&nbsp;C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
@@ -139,11 +156,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>학위논문 제4장과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다.</small>
+> <small>학위논문 제4장·5.3절과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다.</small>
 
 <br>
 
-## 9. 주요 연구·개발 단계
+## 10. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
@@ -162,16 +179,17 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 10. 주요 용어
+## 11. 주요 용어
 
 <table>
   <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
+    <tr><td>문법적 정확성</td><td>목표어 표현이 어순·형태·통사 규칙에 맞게 구성된 것</td></tr>
     <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
     <tr><td>MJT 판단 문항</td><td>메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)의 개별 문항</td></tr>
-    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task) 형식의 통번역 과제</td></tr>
+    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task)의 상황 제시를 응용한 통번역 과제</td></tr>
     <tr><td>직접 수정</td><td>설계된 결함 표현을 판단해 고치는 MJT 활동</td></tr>
     <tr><td>AI 피드백</td><td>통번역 산출 뒤 AI가 주는 재검토 정보. 채점이나 정답 확정이 아님</td></tr>
     <tr><td>교수자 최종 승인</td><td>감수한 콘텐츠 버전의 수업 사용 여부 결정</td></tr>
