@@ -333,7 +333,7 @@ const AdminBrowser = () => {
         <>
           {/* ── 27칸 그리드 ── */}
           <section className="overflow-x-auto rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
-            <div className="max-w-[980px]">
+            <div className="mx-auto max-w-[980px]">
             {/* 화행 × 수준이 이 화면의 본론이다. 전폭이면 칸 하나가 330px가 되어 숫자 사이가
                   벌어지고 화행 라벨은 저 멀리 왼쪽에 남는다 — 표를 내용 폭까지만 넓히고
                   라벨을 칸 쪽으로 붙인다. */}
