@@ -282,7 +282,7 @@ const AdminBrowser = () => {
   return (
     <AdminShell
       title="학습 미션 관리"
-      description="수업에 쓸 수 있는 학습 미션을 화행·수준별로 봅니다."
+      description="편성할 수 있는 학습 미션을 화행·수준별로 봅니다."
     >
       {/* 관리자 화면 공통 정렬(2026-10-09): 카드 사이 16px · 카드 안쪽 px-5 py-4 · 같은 폭 · 그림자 없음 · 본문 14 / 보조 13 / 카드 제목 18. */}
       <div className="flex w-full flex-col gap-4">
