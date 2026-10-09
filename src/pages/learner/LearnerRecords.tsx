@@ -329,12 +329,17 @@ function Attempt({ record }: { record: ReportRecord }) {
 }
 
 const sectionTitle = "flex items-center gap-2 text-[17px] font-bold text-[#15202B]";
+/** 카드 하나 = 제목 하나. 미션 머리·동료들의 판단·핵심 정리·화행별 기록이 같은 제목 양식을 쓴다. */
+const cardShell = "overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]";
+const cardTitle = "flex min-w-0 items-center gap-2 text-[18px] font-bold leading-7 text-[#15202B]";
+const cardHead = "flex flex-wrap items-center justify-between gap-x-4 gap-y-1";
+const subTitle = "text-[16px] font-bold text-[#15202B]";
 const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />;
 
 /** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
 function ChoiceBars({ position }: { position: ClassPosition }) {
   return (
-    <ul className="space-y-2.5 pb-1 pt-2" aria-label={`${position.activity} 동료 응답 분포와 내 판단`}>
+    <ul className="mx-auto max-w-[640px] space-y-4 pb-2 pt-4" aria-label={`${position.activity} 동료 응답 분포와 내 판단`}>
       {position.slices.map((slice) => {
         const share = position.total > 0 ? Math.round((slice.count / position.total) * 100) : 0;
         const mine = position.mine === slice.key;
@@ -344,8 +349,8 @@ function ChoiceBars({ position }: { position: ClassPosition }) {
               {slice.label}
               {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[13px] font-bold text-[#FAD338]">나</span>}
             </span>
-            <span className="h-4 overflow-hidden rounded-sm bg-[#EEF0F2]" aria-hidden="true">
-              <span className="block h-full rounded-r-sm" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone] }} />
+            <span className="h-3 overflow-hidden rounded-full bg-[#F1F2F3]" aria-hidden="true">
+              <span className="block h-full rounded-full" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone], opacity: 0.82 }} />
             </span>
             <span className="text-right tabular-nums text-[#5C6A7A]"><span className="font-bold text-[#15202B]">{share}%</span> · {slice.count}명</span>
           </li>
@@ -385,7 +390,7 @@ function NoteText({ text }: { text: string }) {
 function Alternatives({ items }: { items: MissionReference["alternatives"] }) {
   return (
     <section className="border-t border-[#EFEBDF] px-6 py-5" aria-label="추천 표현">
-      <h3 className={sectionTitle}>{titleBar}추천 표현</h3>
+      <h3 className={subTitle}>추천 표현</h3>
       <ol className="mt-[12px] flex flex-col gap-3">
         {items.map((item, index) => (
           <li key={item.text} className="rounded-xl border-[1.6px] border-[#EBDDA2] bg-[#FFFCF0] px-4 py-2.5">
@@ -425,16 +430,16 @@ function ClassReview({ record }: { record: ReportRecord }) {
   return (
     <>
       {positions.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-5" aria-label="동료들의 판단">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h3 className={sectionTitle}>{titleBar}동료들의 판단</h3>
+        <section className={`${cardShell} px-6 py-5`} aria-label="동료들의 판단">
+          <div className={cardHead}>
+            <h2 className={cardTitle}>{titleBar}동료들의 판단</h2>
             {record.demoPositions
               ? <span className="rounded-full bg-[#FAD338] px-2.5 py-0.5 text-[13px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
               : <p className="text-[14px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>}
           </div>
-          <div className="mt-[10px] grid gap-3">
+          <div className="mt-[6px] divide-y divide-[#EFEBDF]">
             {positions.map((position) => (
-              <div key={position.itemId} className={`${card} px-5 py-3`}>
+              <div key={position.itemId} className="py-5 last:pb-1">
                 <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[14px]">
                   <span className="font-bold text-[#15202B]">{position.activity}</span>
                   <span className="flex items-baseline gap-3">
@@ -445,7 +450,7 @@ function ClassReview({ record }: { record: ReportRecord }) {
                   </span>
                 </p>
                 {position.kind === "scale"
-                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} />
+                  ? <SpectrumStrip soft slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} className="mx-auto mt-3 h-auto w-full max-w-[520px]" />
                   : <ChoiceBars position={position} />}
               </div>
             ))}
@@ -454,8 +459,8 @@ function ClassReview({ record }: { record: ReportRecord }) {
       )}
 
       {lessonPoints.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-5" aria-label="핵심 정리">
-          <h3 className={sectionTitle}>{titleBar}핵심 정리</h3>
+        <section className={`${cardShell} px-6 py-5`} aria-label="핵심 정리">
+          <h2 className={cardTitle}>{titleBar}핵심 정리</h2>
           <ul className="mt-[12px] flex flex-col gap-3">
             {lessonPoints.map((point) => (
               <li key={point.itemId} className="flex gap-2 break-keep text-[15px] leading-6 text-[#26323D]">
@@ -470,48 +475,82 @@ function ClassReview({ record }: { record: ReportRecord }) {
   );
 }
 
-/** 미션 한 묶음 — 머리 줄과 원문은 한 번, 그 아래 수행을 최신순으로. */
+/**
+ * 미션 하나 = 카드 여러 장. ① 미션 카드(내 수행·추천 표현) ② 동료들의 판단 ③ 핵심 정리.
+ * 원문은 접어 두고 제목 줄의 「원문 보기」로만 펼친다.
+ */
 function MissionCard({ group }: { group: MissionGroup }) {
   const head = group.records[0];
   const [sourceOpen, setSourceOpen] = useState(false);
-  const longSource = head.sourceText.length > 90;
   const alternatives = useRecordReference(head)?.alternatives ?? [];
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]">
-      <header className="border-b border-[#EFEBDF] px-6 py-4">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <p className="text-[14px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
-          <p className="text-[14px] text-[#8C8471]">수행 {group.records.length}회</p>
-        </div>
-        {head.sourceText && (
-          <div className="mt-2.5">
-            <p className={`break-keep text-[15px] leading-[1.65] text-[#26323D] ${longSource && !sourceOpen ? "line-clamp-2" : ""}`}>
-              {head.sourceText}
+    <div className="flex flex-col gap-4">
+      <article className={cardShell} aria-label={groupMeta(head)}>
+        <header className="px-6 pb-1 pt-5">
+          <div className={cardHead}>
+            <h2 className={cardTitle}>{titleBar}<span className="truncate">{groupMeta(head)}</span></h2>
+            <p className="flex items-center gap-3 text-[14px] text-[#8C8471]">
+              수행 {group.records.length}회
+              {head.sourceText && (
+                <button type="button" aria-expanded={sourceOpen} onClick={() => setSourceOpen((v) => !v)} className="font-semibold text-[#344F63] hover:underline">
+                  {sourceOpen ? "원문 접기" : "원문 보기"}
+                </button>
+              )}
             </p>
-            {longSource && (
-              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[14px] font-semibold text-[#344F63] hover:underline">
-                {sourceOpen ? "원문 접기" : "원문 펼치기"}
-              </button>
-            )}
           </div>
+          {sourceOpen && (
+            <p className="mt-[10px] rounded-lg bg-[#F8F6F0] px-4 py-2.5 break-keep text-[15px] leading-[1.65] text-[#26323D]">{head.sourceText}</p>
+          )}
+        </header>
+        <h3 className={`${subTitle} px-6 pt-4`}>내 수행</h3>
+        <ol className="divide-y divide-[#F0ECE2] px-6" aria-label="수행 기록">
+          {group.records.map((record) => (
+            <li key={record.id}><Attempt record={record} /></li>
+          ))}
+        </ol>
+        {alternatives.length > 0 && <Alternatives items={alternatives} />}
+        {/* 추천 표현을 볼 수 없는 기록(판본이 바뀐 미션 등)에만 스스로 점검할 질문을 남긴다. */}
+        {alternatives.length === 0 && (
+          <p className="border-t border-[#EFEBDF] px-6 py-4 text-[15px] text-[#5C6A7A]" aria-label="생각해 보기">
+            <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
+            최종안에서도 원문의 의미와 화행목적이 유지되었나요?
+          </p>
         )}
-      </header>
-      <h3 className={`${sectionTitle} px-6 pt-5`}>{titleBar}내 수행</h3>
-      <ol className="divide-y divide-[#F0ECE2] px-6" aria-label="수행 기록">
-        {group.records.map((record) => (
-          <li key={record.id}><Attempt record={record} /></li>
-        ))}
-      </ol>
-      {alternatives.length > 0 && <Alternatives items={alternatives} />}
+      </article>
       <ClassReview record={head} />
-      {/* 추천 표현을 볼 수 없는 기록(판본이 바뀐 미션 등)에만 스스로 점검할 질문을 남긴다. */}
-      {alternatives.length === 0 && (
-        <p className="border-t border-[#EFEBDF] px-6 py-4 text-[15px] text-[#5C6A7A]" aria-label="생각해 보기">
-          <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
-          최종안에서도 원문의 의미와 화행목적이 유지되었나요?
-        </p>
-      )}
-    </article>
+    </div>
+  );
+}
+
+/** 학습 미션 고르기 — 미션이 늘어도 아래로 쌓지 않고, 위에서 하나를 골라 본다(최근 수행 순). */
+function MissionPicker({ groups, selected, onSelect }: { groups: MissionGroup[]; selected: string; onSelect: (key: string) => void }) {
+  return (
+    <nav className="mt-6 flex flex-wrap gap-2" aria-label="학습 미션 선택">
+      {groups.map((group) => {
+        const head = group.records[0];
+        const active = group.key === selected;
+        const label = [
+          head.courseId && head.weekNo ? `${head.weekNo}주차` : null,
+          head.speechAct ? SPEECH_ACT_UI[head.speechAct] : null,
+          TASK_LABEL[head.taskType],
+        ].filter(Boolean).join(" · ");
+        return (
+          <button
+            key={group.key}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onSelect(group.key)}
+            className={[
+              "rounded-full border px-3.5 py-1.5 text-[14px] font-semibold transition-colors",
+              active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#1F3A5F] bg-white text-[#15202B] hover:bg-[#F3F5F9]",
+            ].join(" ")}
+          >
+            {label}
+            <span className={`ml-1.5 font-normal tabular-nums ${active ? "text-[#D8DEE4]" : "text-[#5C6A7A]"}`}>{shortDate(head.completedAt)}</span>
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -525,9 +564,9 @@ const selectClass =
 function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, number>; selected: SpeechActUI | "all"; onSelect: (act: SpeechActUI | "all") => void }) {
   const done = ACTS.filter((act) => (counts.get(act) ?? 0) > 0).length;
   return (
-    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]" aria-label="화행별 학습 기록">
+    <section className={`mt-6 ${cardShell} px-6 py-5`} aria-label="화행별 학습 기록">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-[18px] font-bold text-[#15202B]">화행별 학습 기록</h2>
+        <h2 className={cardTitle}>{titleBar}화행별 학습 기록</h2>
         <p className="text-[14px] text-[#5C6A7A]">수행한 화행 {done}/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다</p>
       </div>
       <div className="mt-[12px] grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 선택">
@@ -587,6 +626,7 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [courseFilter, setCourseFilter] = useState("all");
   const [actFilter, setActFilter] = useState<SpeechActUI | "all">("all");
+  const [missionKey, setMissionKey] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -639,6 +679,7 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
   }
   const visible = inCourse.filter((record) => actFilter === "all" || record.speechAct === actFilter);
   const groups = groupByMission(visible);
+  const shown = groups.find((group) => group.key === missionKey) ?? groups[0];
   const missionCount = groupByMission(records).length;
   const filteredActLabel = actFilter === "all" ? null : SPEECH_ACT_UI[actFilter];
 
@@ -716,11 +757,12 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
             {groups.length === 0 ? (
               <p className="mt-[12px] rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[15px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
             ) : (
-              <ol className={`${filteredActLabel ? "mt-[12px]" : "mt-6"} flex flex-col gap-4`} aria-label="완료 기록">
-                {groups.map((group) => (
-                  <li key={group.key}><MissionCard group={group} /></li>
-                ))}
-              </ol>
+              <>
+                {groups.length > 1 && <MissionPicker groups={groups} selected={shown.key} onSelect={setMissionKey} />}
+                <div className={groups.length > 1 || filteredActLabel ? "mt-[12px]" : "mt-6"} aria-label="완료 기록">
+                  <MissionCard key={shown.key} group={shown} />
+                </div>
+              </>
             )}
 
           </>
