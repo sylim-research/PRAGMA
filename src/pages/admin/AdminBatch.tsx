@@ -294,7 +294,7 @@ const AdminBatch = () => {
   return (
     <AdminShell title="시나리오 배치 생성"
       description="상황·관계 조건별 생성 계획을 세우고 시나리오를 한꺼번에 만듭니다. 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
-      <div className="space-y-5">
+      <div className="flex flex-col gap-4">
         <div className="space-y-5">
           <div className="min-w-0 space-y-5">
             <section aria-labelledby="batch-config-heading" className="rounded-xl border border-[#E2DED2] bg-white p-4">

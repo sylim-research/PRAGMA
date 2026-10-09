@@ -201,7 +201,7 @@ const AdminCorpus = () => {
       title="HSK 3.0 어휘 대조"
       description="생성된 중국어 어휘를 수준별 HSK 누적 목록과 대조해 참고 기록으로 남깁니다."
     >
-      <div className="w-full space-y-4">
+      <div className="flex w-full flex-col gap-4">
         <DatasetOverview
           loading={loading}
           ready={referenceReady}
