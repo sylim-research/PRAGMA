@@ -221,7 +221,8 @@ export function ClassResponsePanel() {
           {missionWeeks.map((item) => {
             const summary = operations.get(item.week_no);
             const joined = summary && summary.participants > 0 ? ` (참여 ${summary.participants}명)` : "";
-            return <option key={item.week_no} value={item.week_no}>{`${item.week_no}주차 · ${weekDisplayTitle(item)}${joined}`}</option>;
+            // 선택 상자를 짧게 — 집중 보완 주차의 「· 새 상황에 적용하기」는 이 목록에서만 뺀다(2026-10-09).
+            return <option key={item.week_no} value={item.week_no}>{`${item.week_no}주차 · ${weekDisplayTitle(item).replace(" · 새 상황에 적용하기", "")}${joined}`}</option>;
           })}
         </select>}
         {week && week.scenarios.length > 1 && <div role="tablist" aria-label="응답을 볼 미션" className="flex overflow-hidden rounded-md border border-[#D9DED9]">
