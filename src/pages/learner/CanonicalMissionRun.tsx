@@ -2134,8 +2134,8 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
             const jumpStage = label === "미션 안내" ? "intro" : label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
-            // 시연에서는 산출 단계 이름을 「DCT 번역」으로 보이되, 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
-            const shownLabel = freeJump && jumpStage === "produce" ? `DCT ${outputName}` : label;
+            // 시연에서는 산출 단계 이름을 「직접 번역」으로 보이되(약어 없음, 2026-10-09), 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
+            const shownLabel = freeJump && jumpStage === "produce" ? `직접 ${outputName}` : label;
             const body = (
               <>
                 <span aria-hidden className={`block h-1.5 rounded-full ${done ? "bg-[#F3D248]" : active ? "bg-[#15202B]" : "bg-[#E4E0D5]"}`} />
@@ -2156,13 +2156,13 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             );
           })}
         </ol>
-        {freeJump && onJumpQuest ? <nav className="flex shrink-0 items-center gap-1 border-l border-[#DDD8CC] pl-3" aria-label="MJT 문항 바로가기">
-          <span className="mr-1 text-[11.5px] font-bold text-[#536572]">MJT</span>
+        {freeJump && onJumpQuest ? <nav className="flex shrink-0 items-center gap-1 border-l border-[#DDD8CC] pl-3" aria-label="판단 문항 바로가기">
+          <span className="mr-1 text-[11.5px] font-bold text-[#536572]">판단</span>
           {DEMO_MJT_QUEST_IDS.map((id, number) => {
             const index = quests.findIndex(quest => quest.id === id);
             if (index < 0) return null;
             const selected = judging && activeIndex === index;
-            const label = `MJT ${number + 1} · ${progressLabel(quests[index], outputName)}`;
+            const label = `판단 ${number + 1} · ${progressLabel(quests[index], outputName)}`;
             return <button key={id} type="button" title={label} aria-label={label} aria-current={selected ? "step" : undefined}
               onClick={() => { if (!selected) onJumpQuest(index); }}
               className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#15202B] hover:bg-[#F4F1E9]"}`}>

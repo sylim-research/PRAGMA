@@ -61,7 +61,7 @@ describe("representative mission demo: free navigation", () => {
   ] as const)("opens every step directly for %s %s", async (direction, mode, outputName) => {
     for (const [number, label] of MJT_LABELS.entries()) {
       const view = renderDemo(`?direction=${direction}&mode=${mode}&step=mjt${number + 1}`);
-      const selected = await screen.findByRole("button", { name: `MJT ${number + 1} · ${label}` });
+      const selected = await screen.findByRole("button", { name: `판단 ${number + 1} · ${label}` });
       expect(selected).toHaveAttribute("aria-current", "step");
       expect(currentStep()).toBe(`mjt${number + 1}`);
       view.unmount();
@@ -83,9 +83,9 @@ describe("representative mission demo: free navigation", () => {
     expect(screen.getByRole("link", { name: "한 → 중 통역 미션" })).toHaveAttribute("href", "/demo/mission?direction=ko_zh&mode=interpreting&step=dct");
     expect(screen.getByRole("link", { name: "중 → 한 번역 미션" })).toHaveAttribute("href", "/demo/mission?direction=zh_ko&mode=translation&step=dct");
 
-    fireEvent.click(screen.getByRole("button", { name: "MJT 3 · 복수 표현 비교" }));
+    fireEvent.click(screen.getByRole("button", { name: "판단 3 · 복수 표현 비교" }));
     expect(currentStep()).toBe("mjt3");
-    fireEvent.click(screen.getByRole("button", { name: "MJT 1 · 단일 표현 판단" }));
+    fireEvent.click(screen.getByRole("button", { name: "판단 1 · 단일 표현 판단" }));
     expect(currentStep()).toBe("mjt1");
     expect(view.container.querySelector('[class*="F3D248"]')).toBeNull();
     expect(screen.queryByText("학습 미션 완료")).not.toBeInTheDocument();
@@ -100,7 +100,7 @@ describe("representative mission demo: free navigation", () => {
       isDevPreview={false} /><LocationProbe /></MemoryRouter>);
     expect(screen.queryByRole("button", { name: /번째 문항으로 이동/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /단계로 이동/ })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /^MJT \d/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /^판단 \d/ })).not.toBeInTheDocument();
     // step= is ignored outside the demo: the learner still starts at the briefing.
     expect(screen.getByText(/현재 단계: 미션 안내/)).toBeInTheDocument();
   });

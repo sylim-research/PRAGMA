@@ -47,7 +47,7 @@ describe("demo route", () => {
     const briefing = await screen.findByRole("list", { name: "적절성 판단 활동" });
     expect(within(briefing).getAllByRole("listitem")).toHaveLength(5);
     expect(within(briefing).getByText("단일 표현 판단")).toBeInTheDocument();
-    expect(screen.getByText("직접 번역")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "직접 번역" })).toBeInTheDocument();
     expect(screen.getByText("DEMO")).toBeInTheDocument();
     const demoChoices = screen.getByRole("navigation", { name: "데모 미션 선택" });
     expect(within(screen.getByRole("banner")).getByRole("navigation", { name: "데모 미션 선택" })).toBe(demoChoices);
