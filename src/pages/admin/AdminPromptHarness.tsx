@@ -71,9 +71,11 @@ function ContractSummary() {
       {/* 넓은 화면에서는 위→아래로 읽는 2열(1~3 | 4~6)이고, 가는 세로선으로 두 열을 나눈다(2026-10-09). */}
       <ol className="grid gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-flow-col md:grid-cols-2 md:grid-rows-3">
         {CONTRACT_CLAUSES.map((clause, index) => (
-          <li key={clause.title} className={`flex items-center gap-2.5 ${index < 3 ? "md:pr-6" : "md:border-l md:border-[#E2DED2] md:pl-6"}`}>
+          // 조항 제목을 고정 너비 열로 세워 위에서 아래로 제목만 훑어도 읽히게 한다(2026-10-09).
+          <li key={clause.title} className={`grid grid-cols-[1.25rem_5.75rem_minmax(0,1fr)] items-center gap-x-2.5 ${index < 3 ? "md:pr-6" : "md:border-l md:border-[#E2DED2] md:pl-6"}`}>
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
-            <p className="text-[13.5px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
+            <b className="text-[13.5px] font-bold text-[#15202B]">{clause.title}</b>
+            <p className="text-[13.5px] leading-relaxed text-[#3B4A54]">{clause.body}</p>
           </li>
         ))}
       </ol>
@@ -147,67 +149,76 @@ function RuleCatalogPanel() {
   );
 }
 
+function StageHead({ step, title, badge }: { step: number; title: string; badge: string }) {
+  return (
+    <div>
+      <p className="text-[12px] font-semibold text-[#8A7423]">{step}단계</p>
+      <div className="mt-0.5 flex items-center justify-between gap-2">
+        <h3 className="text-[15.5px] font-bold text-[#15202B]">{title}</h3>
+        <Badge variant="outline" className="shrink-0 bg-white font-normal">{badge}</Badge>
+      </div>
+    </div>
+  );
+}
+
+function StageArrow() {
+  return <li aria-hidden className="hidden items-center text-[18px] text-[#B5AC98] md:flex">→</li>;
+}
+
 function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title">
       <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" />
-      <div className="grid gap-2 md:grid-cols-3">
-        <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
-          className={`group rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[12px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
-            <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
-          </div>
-          <h3 className="mt-2 text-[15px] font-bold">규칙 기반 검사</h3>
-          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
-            미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
+      {/* 점검 → 검토 → 승인의 순서를 화살표로 보이고, 최종 권한인 교수자 승인만 네이비 윗선으로 구분한다(2026-10-09).
+          카드 하나에 이름은 하나 — 단계 이름이 제목, 성격은 배지, 방식 이름은 설명 첫머리. */}
+      <ol className="grid items-stretch gap-2 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <li className="flex">
+          <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
+            className={`group flex w-full flex-col rounded-lg border p-4 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
+            <StageHead step={1} title="자동 품질 점검" badge="재현 가능" />
+            <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+              {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
+              <b className="font-semibold text-[#3B4A54]">규칙 기반 검사.</b> 미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
+            </p>
+            <span className="mt-auto inline-flex items-center gap-0.5 pt-3 text-[13.5px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
+              {rulesOpen ? "규칙 접기" : "규칙 보기"}
+              {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
+            </span>
+          </button>
+        </li>
+        <StageArrow />
+        <li className="flex flex-col rounded-lg border border-[#E2DED2] bg-white p-4">
+          <StageHead step={2} title="AI 검토" badge="문맥 검토" />
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
+            <b className="font-semibold text-[#3B4A54]">프롬프트 통제 기반 검토.</b> 운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
-            {rulesOpen ? "규칙 접기" : "규칙 보기"}
-            {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
-          </span>
-        </button>
-        <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[12px] font-semibold text-[#3F6172]">AI 검토</span>
-            <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
-          </div>
-          <h3 className="mt-2 text-[15px] font-bold">프롬프트 통제 기반 검토</h3>
-          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
-          </p>
-          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+          <a href="#prompts-review" className="mt-auto inline-flex items-center gap-0.5 pt-3 text-[13.5px] font-bold text-[#15202B] underline-offset-4 hover:underline">
             검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
           </a>
-        </div>
-        <div className="rounded-lg border border-[#E2DED2] bg-white p-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[12px] font-semibold text-[#6D675D]">최종 사용 결정</span>
-            <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
-          </div>
-          <h3 className="mt-2 text-[15px] font-bold">교수자 최종 승인</h3>
-          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
+        </li>
+        <StageArrow />
+        <li className="flex flex-col rounded-lg border border-[#E2DED2] border-t-[3px] border-t-[#233542] bg-white p-4">
+          <StageHead step={3} title="교수자 최종 승인" badge="최종 권한" />
+          <p className="mt-1.5 text-[13.5px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
-          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[13.5px] font-bold text-[#15202B] hover:underline underline-offset-4">
+          <Link to="/admin/review" className="mt-auto inline-flex items-center gap-0.5 pt-3 text-[13.5px] font-bold text-[#15202B] underline-offset-4 hover:underline">
             승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />
           </Link>
-        </div>
-      </div>
+        </li>
+      </ol>
       {rulesOpen && <RuleCatalogPanel />}
     </section>
   );
 }
 
 // 장면 사전 검토는 원문을 쓰기 전 관계 조건을 거르는 첫 관문이라 시나리오 생성 묶음의 맨 위 한 줄을 차지한다.
-const FULL_WIDTH_PROMPT_KEYS = new Set(["core.scene_preflight.system"]);
 
 function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
-    <Card className={`border-[#E2DED2] ${open || FULL_WIDTH_PROMPT_KEYS.has(entry.key) ? "md:col-span-2" : ""}`}>
+    <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
       <CardHeader className="p-4">
         <div className="flex items-center gap-2">
           <button
@@ -266,7 +277,8 @@ const AdminPromptHarness = () => {
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
               <h3 className="mb-2 border-l-[3px] border-[#C9A62E] pl-2 text-[15px] font-bold leading-5 text-[#26333B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="grid grid-flow-row-dense gap-2 md:grid-cols-2">
+              {/* 카드는 순서대로 2열 — 한 칸만 넓게 쓰거나 빈칸을 뒤 카드로 메우지 않는다(2026-10-09). */}
+              <div className="grid gap-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
                 ))}
