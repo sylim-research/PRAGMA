@@ -53,14 +53,12 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 ];
 
 // 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
-function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
+// 번호 동그라미는 두지 않는다 — 제목과 한 줄 설명만(2026-10-09).
+function PartHeading({ id, title, description }: { no?: number; id: string; title: string; description: string }) {
   return (
-    <div className="mb-3 flex items-start gap-2.5">
-      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-      <div>
-        <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
-        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
-      </div>
+    <div className="mb-3">
+      <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
+      <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
     </div>
   );
 }
