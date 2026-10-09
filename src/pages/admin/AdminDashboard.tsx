@@ -115,7 +115,8 @@ const PanelHeader = ({
 }) => (
   <div className="mb-2.5 mt-7">
     <div className="flex flex-wrap items-center gap-2">
-      <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{no}</span>{title}</h2>
+      {/* 대시보드 구역은 작업 순서가 아니라 번호를 두지 않는다 — 번호는 실제 작업 흐름에만(2026-10-09). */}
+      <h2 className="text-[16.5px] font-bold text-[#15202B]">{title}</h2>
       {action}
     </div>
     {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
