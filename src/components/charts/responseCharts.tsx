@@ -27,7 +27,7 @@ export function StackedBar({ slices, total, height = "h-3", labels = false }: { 
       const share = percent(slice.count, total);
       return <span
         key={slice.key}
-        className="flex h-full items-center justify-center overflow-hidden text-[11.5px] font-semibold tabular-nums"
+        className="flex h-full items-center justify-center overflow-hidden text-[12.5px] font-semibold tabular-nums"
         style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: TONE[slice.tone], color: ON_TONE[slice.tone] }}
       >{labels && share >= 8 ? `${share}%` : null}</span>;
     })}
@@ -56,8 +56,8 @@ export function Donut({ slices, total, size = 150, thickness = 22, centerLabel, 
       offset += len;
       return el;
     })}
-    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" dy={centerSub ? -8 : 0} className="fill-[#15202B] text-[22px] font-black tabular-nums">{centerLabel}</text>
-    {centerSub && <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" dy={14} className="fill-[#7A858C] text-[11.5px] font-semibold">{centerSub}</text>}
+    <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" dy={centerSub ? -8 : 0} className="fill-[#15202B] text-[23px] font-black tabular-nums">{centerLabel}</text>
+    {centerSub && <text x="50%" y="50%" textAnchor="middle" dominantBaseline="central" dy={14} className="fill-[#7A858C] text-[12.5px] font-semibold">{centerSub}</text>}
   </svg>;
 }
 
@@ -82,12 +82,12 @@ export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 �
         {mine === slice.key && <>
           <circle cx={x} cy={46} r={r + 5} fill="none" stroke="#15202B" strokeWidth={2.5} />
           <rect x={x - 13} y={46 - r - 25} width={26} height={17} rx={8.5} fill="#15202B" />
-          <text x={x} y={46 - r - 16.5} textAnchor="middle" dominantBaseline="central" fill="#FAD338" className="text-[12px] font-bold">나</text>
+          <text x={x} y={46 - r - 16.5} textAnchor="middle" dominantBaseline="central" fill="#FAD338" className="text-[13px] font-bold">나</text>
         </>}
         <circle cx={x} cy={46} r={r} fill={TONE[slice.tone]} />
-        <text x={x} y={46} textAnchor="middle" dominantBaseline="central" fill={ON_TONE[slice.tone]} className="text-[13.5px] font-bold tabular-nums">{share}%</text>
-        <text x={x} y={104} textAnchor="middle" className="fill-[#26323D] text-[14px] font-semibold">{slice.label}</text>
-        <text x={x} y={122} textAnchor="middle" className="fill-[#5C6A7A] text-[12.5px] tabular-nums">{slice.count}명</text>
+        <text x={x} y={46} textAnchor="middle" dominantBaseline="central" fill={ON_TONE[slice.tone]} className="text-[14.5px] font-bold tabular-nums">{share}%</text>
+        <text x={x} y={104} textAnchor="middle" className="fill-[#26323D] text-[15px] font-semibold">{slice.label}</text>
+        <text x={x} y={122} textAnchor="middle" className="fill-[#5C6A7A] text-[13.5px] tabular-nums">{slice.count}명</text>
       </g>;
     })}
     </g>
@@ -111,7 +111,7 @@ export function DivergingBar({ slices, total, height = "h-6" }: { slices: Slice[
         const value = percent(slice.count, total);
         return <span
           key={slice.key}
-          className="flex h-full items-center justify-center overflow-hidden text-[11.5px] font-semibold tabular-nums"
+          className="flex h-full items-center justify-center overflow-hidden text-[12.5px] font-semibold tabular-nums"
           style={{ width: `${(share(slice) / ordered.reduce((sum, item) => sum + share(item), 0)) * 100}%`, backgroundColor: TONE[slice.tone], color: ON_TONE[slice.tone] }}
         >{value >= 8 ? `${value}%` : null}</span>;
       })}
