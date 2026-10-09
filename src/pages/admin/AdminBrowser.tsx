@@ -374,7 +374,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-[54px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-[50px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
