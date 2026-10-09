@@ -193,8 +193,8 @@ export function ClassResponsePanel() {
     </span>
     : null;
 
-  const ghost = "inline-flex h-8 items-center gap-1.5 rounded-md px-2 text-[13px] font-medium text-[#44525C] hover:bg-[#F1EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] disabled:opacity-50";
-  const plainSelect = "h-8 rounded-md border border-[#D9DED9] bg-white px-2 text-[13px] text-[#15202B]";
+  const ghost = "inline-flex h-9 items-center gap-1.5 rounded-md px-2.5 text-[14.5px] font-medium text-[#44525C] hover:bg-[#F1EFE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] disabled:opacity-50";
+  const plainSelect = "h-9 rounded-md border border-[#D9DED9] bg-white px-2.5 text-[14.5px] text-[#15202B]";
   const segment = (selected: boolean) => selected
     ? "bg-[#EEF0F3] font-semibold text-[#15202B]"
     : "bg-white text-[#5D6970] hover:bg-[#F6F5F0]";
@@ -231,7 +231,7 @@ export function ClassResponsePanel() {
             role="tab"
             aria-selected={scenario.scenario_id === missionId}
             onClick={() => selectMission(scenario.scenario_id)}
-            className={`px-3 py-1 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
+            className={`px-3 py-1.5 text-[14.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
           >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}</button>)}
         </div>}
         <div className="ml-auto flex flex-wrap items-center gap-0.5">
@@ -242,7 +242,7 @@ export function ClassResponsePanel() {
               role="radio"
               aria-checked={showingDemo === on}
               onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
-              className={`px-2.5 py-1 text-[13px] ${segment(showingDemo === on)}`}
+              className={`px-3 py-1.5 text-[14.5px] ${segment(showingDemo === on)}`}
             >{label}</button>)}
           </div>}
           <button type="button" aria-label="응답 새로고침" title="응답 새로고침" disabled={rowsQuery.isFetching} onClick={() => void rowsQuery.refetch()} className={ghost}><RefreshCw className="h-3.5 w-3.5" /></button>
@@ -251,8 +251,9 @@ export function ClassResponsePanel() {
             target="_blank"
             rel="noreferrer"
             to={learnerMissionPath(courseId, week.week_no, missionId, selectedMission.assignment_id)}
-            className={ghost}
-          >학습 미션 열기 ↗</Link>}
+            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-[#15202B] bg-white px-3 text-[14.5px] font-semibold text-[#15202B] hover:bg-[#F3F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+            title="이 응답이 나온 학습 미션을 새 창에서 학습자 화면으로 엽니다."
+          >해당 학습 미션 열기 ↗</Link>}
         </div>
         {courseQuery.isPending && courseId && <p role="status" className="basis-full text-sm">주차를 불러오는 중…</p>}
         {courseQuery.isError && <p role="alert" className="basis-full text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
@@ -265,8 +266,8 @@ export function ClassResponsePanel() {
         {statusPill && <div className="flex flex-wrap items-center gap-2">{statusPill}</div>}
         {/* 데모 표시는 그것이 가리키는 응답 분포 바로 위, 보드 폭 전체의 띠로 둔다 — 아래 모든 수치가 가상 응답임이 먼저 읽힌다. */}
         {showingDemo && <div role="note" className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-lg border border-[#EAD58A] bg-[#FFF8DC] px-4 py-2.5">
-          <span className="text-[13px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>
-          <span className="text-[13px] text-[#5F573D]">운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.</span>
+          <span className="text-[14px] font-bold text-[#15202B]">{VIRTUAL_CLASS_NOTICE}</span>
+          <span className="text-[14px] text-[#5F573D]">운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.</span>
         </div>}
         {!showingDemo && <p className="mt-1 text-[13px] text-[#7A858C]">집계에는 수업 기록 공유에 동의한 학습자만 포함됩니다.</p>}
 

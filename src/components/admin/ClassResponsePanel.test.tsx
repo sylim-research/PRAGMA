@@ -167,7 +167,7 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     expect(screen.getByLabelText("응답 공개 단계")).toHaveTextContent("1 · 응답 수집");
     expect(screen.getByText(/학습자에게 분포를 공개하려면 5명 이상의 응답이 필요합니다/)).toBeVisible();
     expect(screen.queryByText(/수업자료|데모|가상 학급/)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "학습 미션 열기 ↗" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
+    expect(screen.getByRole("link", { name: "해당 학습 미션 열기 ↗" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
     expect(mocks.logRows).toHaveBeenCalledWith("mission_id", "mission-1");
   });
 
