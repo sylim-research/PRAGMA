@@ -251,7 +251,7 @@ function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | 
 }
 
 const card = "rounded-xl border-[1.6px] border-[#E4DFD0] bg-white";
-const cardLabel = "text-[14px] font-semibold text-[#8C8471]";
+const cardLabel = "text-[14px] font-bold text-[#8A7423]";
 
 function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size?: string }) {
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
@@ -291,7 +291,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         )}
         {record.dissent && (
           <div className="mt-[12px] border-t border-[#EFEBDF] pt-2.5">
-            <p className="text-[14px] font-semibold text-[#8A5A14]">내 의견</p>
+            <p className={cardLabel}>내 의견</p>
             {record.dissent.conditions.length > 0 && (
               <p className="mt-1 flex flex-wrap gap-1.5">
                 {record.dissent.conditions.map((condition) => (
@@ -305,7 +305,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       </section>
       {arrow}
       <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={"최종안"}>
-        <p className="text-[14px] font-semibold text-[#1F3A5F]">최종안</p>
+        <p className={cardLabel}>최종안</p>
         <p className={`mt-1.5 ${zhLine} font-medium`}>
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
