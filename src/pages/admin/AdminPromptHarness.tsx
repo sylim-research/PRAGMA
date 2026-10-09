@@ -214,7 +214,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="space-y-0 p-0 px-4 py-2">
+      <CardHeader className="space-y-0 p-0 px-4 py-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -235,7 +235,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-0.5 pl-5 text-[13.5px] leading-tight text-muted-foreground">
+        <p className="mt-1 truncate pl-5 text-[13.5px] leading-tight text-muted-foreground" title={entry.note}>
           {entry.note}
         </p>
       </CardHeader>
