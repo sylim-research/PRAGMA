@@ -33,8 +33,9 @@ function signalSummary(findings: ReviewFinding[]): string {
  */
 /** 판단 버튼의 무게: 사용 가능 = 남색(진행), 수정 필요 = 호박색(주의), 판단 보류 = 옅은 테두리(미결). */
 const DECISION_TONE: Record<keyof typeof PROFESSOR_DECISION_LABELS, { on: string; off: string }> = {
-  no_change: { on: "bg-[#233542] text-white", off: "border border-[#233542] text-[#233542] hover:bg-[#EEF1F4]" },
-  revision_required: { on: "bg-[#B45309] text-white", off: "border border-[#C08A2E] text-[#8A5A14] hover:bg-[#FBF3E3]" },
+  // 통과 = 초록, 수정 필요 = 빨강 — 학습자 화면의 정답·오답 색과 같은 약속(2026-10-09).
+  no_change: { on: "bg-[#2F6B4F] text-white", off: "border border-[#4D8568] text-[#245E44] hover:bg-[#EEF5F0]" },
+  revision_required: { on: "bg-[#A8433D] text-white", off: "border border-[#C86E68] text-[#8B3531] hover:bg-[#FBF0EF]" },
   defer: { on: "bg-[#5D6970] text-white", off: "border border-[#B8B2A3] text-[#46515A] hover:bg-[#F5F3EC]" },
 };
 const DEFAULT_FINDING_RATIONALE: Record<keyof typeof PROFESSOR_DECISION_LABELS, string> = {
@@ -451,8 +452,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
             const change = decision?.proposed_change_ko?.trim() || finding.suggestion_ko;
             const badge = finding.needs_professor || decision?.needs_professor ? { text: "교수자 확인 필요", cls: "bg-[#233542] text-white" }
-              : agreed ? { text: "AI 검토 일치", cls: "bg-[#F3ECD9] text-[#7A5A12]" }
-              : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: "border border-[#C08A2E] text-[#8A5A14]" }
+              : agreed ? { text: "✓ AI 검토 일치", cls: "border border-[#4D8568] bg-white text-[#245E44]" }
+              : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: decision.decision === "reject" ? "border border-[#C86E68] text-[#8B3531]" : "border border-[#C08A2E] text-[#8A5A14]" }
               : focused ? { text: "교수자 단독 판단", cls: "border border-[#C08A2E] text-[#8A5A14]" } : null;
             const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
