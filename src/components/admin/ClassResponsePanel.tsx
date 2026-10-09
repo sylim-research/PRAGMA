@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Maximize2, RefreshCw, X } from "lucide-react";
+import { ExternalLink, Maximize2, RefreshCw, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { ClassDiscussionBoard, INITIAL_BOARD_STATE, type ClassDiscussionBoardState } from "@/components/admin/ClassDiscussionBoard";
@@ -232,7 +232,7 @@ export function ClassResponsePanel() {
             role="tab"
             aria-selected={scenario.scenario_id === missionId}
             onClick={() => selectMission(scenario.scenario_id)}
-            className={`px-3 py-1.5 text-[14.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
+            className={`inline-flex h-9 items-center px-3 text-[14.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B] ${segment(scenario.scenario_id === missionId)}`}
           >미션 {index + 1}{scenario.mode ? ` · ${MODE_LABEL[scenario.mode] ?? ""}` : ""}</button>)}
         </div>}
         <div className="ml-auto flex flex-wrap items-center gap-0.5">
@@ -243,18 +243,19 @@ export function ClassResponsePanel() {
               role="radio"
               aria-checked={showingDemo === on}
               onClick={() => { setBoard(INITIAL_BOARD_STATE); setDemo(on); }}
-              className={`px-3 py-1.5 text-[14.5px] ${segment(showingDemo === on)}`}
+              className={`inline-flex h-9 items-center px-3 text-[14.5px] ${segment(showingDemo === on)}`}
             >{label}</button>)}
           </div>}
           <button type="button" aria-label="응답 새로고침" title="응답 새로고침" disabled={rowsQuery.isFetching} onClick={() => void rowsQuery.refetch()} className={ghost}><RefreshCw className="h-3.5 w-3.5" /></button>
-          {boardVisible && <button type="button" onClick={() => setProjector(true)} className={ghost}><Maximize2 className="h-3.5 w-3.5" />크게 보기</button>}
+          {/* 보드가 없을 때도 자리를 지켜 실제/데모 전환 때 단추들이 밀리지 않게 한다(2026-10-09). */}
+          <button type="button" onClick={() => setProjector(true)} disabled={!boardVisible} aria-hidden={!boardVisible} tabIndex={boardVisible ? 0 : -1} className={`${ghost} ${boardVisible ? "" : "invisible"}`}><Maximize2 className="h-3.5 w-3.5" />크게 보기</button>
           {week && selectedMission && <Link
             target="_blank"
             rel="noreferrer"
             to={learnerMissionPath(courseId, week.week_no, missionId, selectedMission.assignment_id)}
-            className="inline-flex h-9 items-center gap-1.5 rounded-md border border-[#15202B] bg-white px-3 text-[14.5px] font-semibold text-[#15202B] hover:bg-[#F3F1EA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
+            className={ghost}
             title="이 응답이 나온 학습 미션을 새 창에서 학습자 화면으로 엽니다."
-          >해당 학습 미션 열기 ↗</Link>}
+          ><ExternalLink className="h-3.5 w-3.5" />해당 학습 미션 열기</Link>}
         </div>
         {courseQuery.isPending && courseId && <p role="status" className="basis-full text-sm">주차를 불러오는 중…</p>}
         {courseQuery.isError && <p role="alert" className="basis-full text-sm text-destructive">주차를 불러오지 못했습니다.</p>}
