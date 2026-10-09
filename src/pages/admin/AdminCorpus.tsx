@@ -316,7 +316,7 @@ function OperationsSection({
             </p>
           </div>
           {/* 흐름 = 뽑은 단어 → 이 미션의 기준 → 대조 결과(비율 막대). 목록 밖 단어는 아래에 예시로. */}
-          <ol className="grid overflow-hidden rounded-lg border border-[#DED8CB] sm:grid-cols-[1fr_1fr_1.7fr] sm:divide-x sm:divide-[#DED8CB]">
+          <ol className="grid overflow-hidden rounded-lg border border-[#DED8CB] sm:grid-cols-[1fr_1fr_1.85fr] sm:divide-x sm:divide-[#DED8CB]">
             {/* 핵심 대응: 미션 수준(PRAGMA) → 그 수준의 HSK 대조 범위 → 결과. */}
             <li className="bg-white px-4 py-3">
               <p className="text-[13px] font-medium text-[#8A7423]">1 · 미션 수준</p>
