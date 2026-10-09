@@ -106,22 +106,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 7. 연구 활용
-
-<table>
-  <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
-  <tbody>
-    <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
-    <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
-    <tr><td>해석의 분담</td><td>프로그램은 연결·집계를, 적절성과 수정 이유의 해석은 연구자가 맡음</td></tr>
-  </tbody>
-</table>
-
-> <small>현재 도구는 사용할 콘텐츠의 범위를 확인하는 단계이며, 학습 효과를 분석한 결과는 아닙니다.</small>
-
-<br>
-
-## 8. 시스템 아키텍처
+## 7. 시스템 아키텍처
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
@@ -133,6 +118,21 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
+
+<br>
+
+## 8. 연구 활용
+
+<table>
+  <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
+  <tbody>
+    <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
+    <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
+    <tr><td>해석의 분담</td><td>프로그램은 연결·집계를, 적절성과 수정 이유의 해석은 연구자가 맡음</td></tr>
+  </tbody>
+</table>
+
+> <small>현재 도구는 사용할 콘텐츠의 범위를 확인하는 단계이며, 학습 효과를 분석한 결과는 아닙니다.</small>
 
 <br>
 
