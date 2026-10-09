@@ -291,7 +291,7 @@ const AdminBrowser = () => {
           <div className="mb-4 flex flex-wrap gap-2" aria-label="라이브러리 보기">
             {LIBRARY_VIEWS.map((item) => (
               <button key={item.value} type="button" aria-pressed={view === item.value} onClick={() => setView(item.value)}
-                className={`rounded-lg border px-3 py-2 text-[14px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
+                className={`rounded-lg border px-3 py-2 text-[15px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
                 {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
               </button>
             ))}
@@ -300,21 +300,21 @@ const AdminBrowser = () => {
             {/* ── 필터 ── */}
             <div className="flex flex-wrap items-end gap-2 text-[13px]" aria-label="라이브러리 필터">
               {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인) → 관리 정보(생성 출처·미션 형식·상태). */}
-              <Filter className="w-full sm:w-[96px]" label="화행" value={fAct} onChange={setFAct}
+              <Filter className="w-full sm:w-[112px]" label="화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
-              <Filter className="w-full sm:w-[96px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+              <Filter className="w-full sm:w-[112px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="수준" value={fLevel} onChange={setFLevel}
+              <Filter className="w-full sm:w-[112px]" label="수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+              <Filter className="w-full sm:w-[112px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-              <Filter className="w-full sm:w-[92px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
+              <Filter className="w-full sm:w-[112px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
-              <Filter className="w-full sm:w-[126px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
+              <Filter className="w-full sm:w-[112px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
               <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
                 opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
-              <Filter className="w-full sm:w-[96px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
+              <Filter className="w-full sm:w-[112px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
                 opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
@@ -368,7 +368,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-10 w-full cursor-pointer flex-col items-center justify-center rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-12 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
