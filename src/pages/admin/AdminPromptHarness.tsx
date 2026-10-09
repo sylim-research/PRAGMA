@@ -62,7 +62,7 @@ const PART_BODY = "border-t border-[#EFEAE0] px-5 py-4";
 function PartHeading({ id, title, description }: { id: string; title: string; description: string }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
-      <h2 id={id} className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
+      <h2 id={id} className="text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
       <span className="text-[14.5px] text-[#514C44]">{description}</span>
     </div>
   );
