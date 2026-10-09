@@ -533,7 +533,7 @@ function DatasetOverview({
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {/* 카드 제목은 수준별 참조 범위, 데이터셋 규모는 옆의 보조 정보로 둔다(2026-10-09). */}
             <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">PRAGMA 수준별 HSK 참조 범위</h2>
-            <span className="text-[14px] text-[#514C44]">HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span></span>
+            <span className="text-[14px] text-[#514C44]">HSK 3.0 전체 <span className="tabular-nums">{vocabularyEntries}</span>개 중 1–6급 <span className="tabular-nums">5,400</span>개까지 사용</span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
             </span>
