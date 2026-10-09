@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, ChevronRight, Code2, FileText, ShieldCheck, type LucideIcon } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { PROMPT_SNAPSHOT, type PromptSnapshotEntry } from "@/lib/pragma/promptSnapshot.generated";
 import {
   CURRENT_MISSION_V6_RULE_IDS,
@@ -57,18 +57,13 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 const PART_CARD = "overflow-hidden rounded-xl border border-[#E2DED2] bg-white";
 const PART_BODY = "border-t border-[#EFEAE0] px-5 py-4";
 
-// 1층 = 카드 머리(회색 원 속 선 아이콘 + 제목 + 요약), 2층 = 크림 바탕·노란 윗선 안쪽 카드, 3층 = 흰 항목.
-// HSK 화면의 데이터셋 카드(아이콘 원)·수준 범위 카드(노란 윗선)와 같은 양식이다(2026-10-09).
-function PartHeading({ id, title, description, icon: Icon }: { id: string; title: string; description: string; icon: LucideIcon }) {
+// 1층 = 카드 머리(제목 + 요약), 2층 = 크림 바탕·노란 윗선 안쪽 카드, 3층 = 흰 항목.
+// 아이콘은 두지 않는다 — 정렬이 깨져 오히려 읽기 어렵다(2026-10-09).
+function PartHeading({ id, title, description }: { id: string; title: string; description: string }) {
   return (
-    <div className="flex items-center gap-3 px-5 py-3.5">
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF1F2] text-[#3F4E59]" aria-hidden>
-        <Icon className="h-4 w-4" />
-      </span>
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h2 id={id} className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
-        <span className="text-[14px] text-[#514C44]">{description}</span>
-      </div>
+    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
+      <h2 id={id} className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
+      <span className="text-[14px] text-[#514C44]">{description}</span>
     </div>
   );
 }
@@ -78,7 +73,7 @@ const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[
 function ContractSummary() {
   return (
     <section aria-labelledby="contract-title" className={PART_CARD}>
-      <PartHeading icon={FileText} id="contract-title" title="생성계약" description="모든 생성·검토·저장이 지키는 여섯 조건" />
+      <PartHeading id="contract-title" title="생성계약" description="모든 생성·검토·저장이 지키는 여섯 조건" />
       <ol className={`grid gap-x-6 gap-y-2 md:grid-cols-2 ${PART_BODY}`}>
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
@@ -161,7 +156,7 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title" className={PART_CARD}>
-      <PartHeading icon={ShieldCheck} id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검 → AI 검토 → 교수자 최종 승인" />
+      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검 → AI 검토 → 교수자 최종 승인" />
       <div className={PART_BODY}>
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
@@ -269,7 +264,7 @@ const AdminPromptHarness = () => {
       <HarnessOverview />
 
       <section aria-labelledby="prompts-title" className={PART_CARD}>
-        <PartHeading icon={Code2} id="prompts-title" title="운영 프롬프트" description="코드에서 그대로 가져온 생성·검토·피드백 원문" />
+        <PartHeading id="prompts-title" title="운영 프롬프트" description="코드에서 그대로 가져온 생성·검토·피드백 원문" />
         <div className={`space-y-9 ${PART_BODY}`}>
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));
