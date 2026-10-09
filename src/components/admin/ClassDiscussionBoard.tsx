@@ -13,6 +13,7 @@ import type {
   SliceTone,
 } from "@/lib/mission/classDiscussion";
 import { DivergingBar, Donut, ON_TONE, SpectrumStrip, StackedBar, TONE } from "@/components/charts/responseCharts";
+import { VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
 
 /** 보드 상태 — 패널이 들고 있어 「크게 보기」로 열어도 같은 문항·사례가 보인다. */
 export interface ClassDiscussionBoardState {
@@ -450,6 +451,9 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
           active={selected?.itemId === item.itemId}
           onClick={() => onChange({ ...state, itemId: item.itemId })}
         />)}
+        {/* 데모 표시는 문항 탭 줄 오른쪽 끝의 배지로 둔다 — 따로 띠 카드를 두지 않는다(2026-10-09). */}
+        {demo && !projector && <span role="note" className="mb-1.5 ml-auto self-center rounded-full bg-[#FAD338] px-3 py-1 text-[13.5px] font-bold text-[#15202B]"
+          title="운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
       </div>
 
       {selected && <section aria-label={`MJT ${selected.itemId} · ${selected.activity}`} className="rounded-xl border border-[#E2DED2] bg-white">
