@@ -225,8 +225,7 @@ const AdminCorpus = () => {
           <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
         )}
 
-        {!loading && !auditLookupFailed && <TopOutOfListWords audits={allAudits} />}
-
+        {/* 목록에서 고른 기록의 상세는 목록 바로 아래에 둔다(2026-10-09). */}
         <OperationsSection
           loading={loading}
           audit={selectedAudit ?? recentAudit}
@@ -234,7 +233,10 @@ const AdminCorpus = () => {
           referenceReady={referenceReady}
         />
 
-        <OfficialSource status={status} />
+        {!loading && !auditLookupFailed && <TopOutOfListWords audits={allAudits} />}
+
+        {/* 데이터셋이 준비되면 공식 출처는 맨 위 기준 카드에 함께 보인다. */}
+        {!referenceReady && <OfficialSource status={status} />}
       </div>
     </AdminShell>
   );
@@ -290,6 +292,8 @@ function OperationsSection({
   const kind = audit?.contentKind === "core" ? "시나리오" : "학습 미션";
   const axes = [speechAct, level, mode, direction].filter((item): item is string => Boolean(item));
   const referenceEntries = referenceEntriesForCeiling(audit?.referenceCeiling ?? null);
+  // 목록 밖 수 = 분석 유형 − 일치 유형. 저장된 후보 목록은 미션당 40개까지라 개수로 쓰지 않는다.
+  const outsideCount = Math.max(0, (audit?.distinctTokenCount ?? 0) - (audit?.matchedTokenCount ?? 0));
   const emptyTitle = lookupFailed || audit?.status === "unavailable"
     ? "대조 기록을 불러오지 못했습니다."
     : audit?.status === "not_applicable"
@@ -326,7 +330,7 @@ function OperationsSection({
             </li>
             <li className="relative bg-[#FBFAF6] px-4 py-3">
               <span aria-hidden className="absolute -left-2.5 top-1/2 hidden -translate-y-1/2 rounded-full bg-[#FBFAF6] px-0.5 text-[16px] text-[#B5AC98] sm:block">→</span>
-              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과 <span className="font-normal text-[#655F55]">· 중국어 단어 {fmt(audit.distinctTokenCount ?? 0)}개 중</span></p>
+              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과 <span className="font-normal text-[#655F55]">· 서로 다른 중국어 단어 {fmt(audit.distinctTokenCount ?? 0)}개 중</span></p>
               <div className="mt-1.5 grid grid-cols-2 gap-2">
                 <div className="rounded-md bg-[#EEF1F2] px-3 py-2">
                   <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
@@ -336,22 +340,22 @@ function OperationsSection({
                 </div>
                 <div className="rounded-md bg-[#FFF4BE] px-3 py-2">
                   <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
-                    {fmt(audit.candidates.length)}<span className="ml-1 text-[14px] font-semibold text-[#8A6A0E]">{pct(audit.distinctTokenCount ? audit.candidates.length / audit.distinctTokenCount : null)}</span>
+                    {fmt(outsideCount)}<span className="ml-1 text-[14px] font-semibold text-[#8A6A0E]">{pct(audit.distinctTokenCount ? outsideCount / audit.distinctTokenCount : null)}</span>
                   </p>
-                  <p className="mt-1 text-[13px] font-medium text-[#8A6A0E]">목록 밖</p>
+                  <p className="mt-1 text-[13px] font-medium text-[#8A6A0E]">목록 밖 후보</p>
                 </div>
               </div>
-              <RatioBar matched={audit.matchedTokenCount ?? 0} outside={audit.candidates.length} className="mt-2.5" />
+              <RatioBar matched={audit.matchedTokenCount ?? 0} outside={outsideCount} className="mt-2.5" />
             </li>
           </ol>
           {audit.candidates.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-[13.5px] font-medium text-[#514C44]">목록 밖 단어 예</span>
+              <span className="mr-1 text-[13.5px] font-medium text-[#514C44]">목록 밖 후보 예</span>
               {audit.candidates.slice(0, 12).map((word) => (
                 <span key={word} className="rounded-md border border-[#EBDDA2] bg-[#FFF9E3] px-2 py-0.5 text-[14px] text-[#3F3A32]" lang="zh">{word}</span>
               ))}
-              {audit.candidates.length > 12 && <span className="text-[13.5px] text-[#655F55]">외 {fmt(audit.candidates.length - 12)}개</span>}
-              <span className="text-[13px] text-[#7A746A]">· 고유명사·업무 용어·어절 분리 등</span>
+              {outsideCount > Math.min(12, audit.candidates.length) && <span className="text-[13.5px] text-[#655F55]">외 {fmt(outsideCount - Math.min(12, audit.candidates.length))}개</span>}
+              <span className="text-[13px] text-[#7A746A]">· 분절 단위·고유명사·전문용어가 섞여 있어 자동으로 가르지 않습니다</span>
             </div>
           )}
         </div>
@@ -384,7 +388,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
         <div className="flex items-baseline gap-3">
           <h2 id="audit-history-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
-            학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · 평균 HSK 목록 포함률 <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
+            학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · HSK 목록 포함률(유형 기준·합산) <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -395,16 +399,16 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
           ))}
         </div>
         {/* 76% 같은 평균 바로 곁에서 해석의 경계를 한 번 보인다(목록 밖 = 수준 부적합이 아님). */}
-        <p className="basis-full text-[13px] text-[#7A746A]">목록 밖 단어는 곧바로 수준 부적합을 뜻하지 않습니다. 필요 어휘·전문용어·단어 분절 등이 섞여 있습니다.</p>
+        <p className="basis-full text-[13px] text-[#7A746A]">포함률은 서로 다른 단어(유형)를 미션 전체에서 합산한 비율로, 텍스트 커버리지(토큰 기준)와 다릅니다. 목록 밖 후보는 곧바로 수준 부적합을 뜻하지 않습니다.</p>
       </div>
       <div className={`${grid} border-y border-[#EFEAE0] bg-[#FBFAF6] px-5 py-1.5 text-[12.5px] text-[#7A746A]`}>
-        <span>일시</span><span>콘텐츠</span><span>조건</span><span className="text-right">일치 / 밖</span><span className="text-right">목록 포함률</span>
+        <span>일시</span><span>콘텐츠</span><span>조건</span><span className="text-right">일치 / 밖</span><span className="text-right">포함률(유형)</span>
       </div>
       <ol className="divide-y divide-[#F2EEE6]">
         {recent.map((audit, index) => {
           const active = selected === audit || (!selected && index === 0);
           const matched = audit.matchedTokenCount ?? 0;
-          const outside = audit.candidates.length;
+          const outside = Math.max(0, (audit.distinctTokenCount ?? 0) - matched);
           const ratio = audit.distinctTokenCount ? matched / audit.distinctTokenCount : null;
           return (
             <li key={`${audit.createdAt}-${index}`}>
@@ -437,8 +441,8 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   return (
     <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
-        <h2 id="top-outside-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 어휘</h2>
-        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
+        <h2 id="top-outside-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 후보</h2>
+        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준 · 미션당 저장된 후보 최대 40개에서 셈</span>
       </div>
       <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
         {top.words.map(({ word, missionCount }, index) => (
@@ -456,9 +460,17 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   );
 }
 
-/** 대조 방식 — 설명 대신 세 단계와 「판정하지 않는 것」을 한 띠로 보여 준다. */
+/** 대조 방식 — 세 단계와, 어휘교육 연구자가 먼저 묻는 방법 세부를 한 줄씩 보인다(2026-10-09). */
+const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
+  { label: "분절", body: "ICU 단어 분절기(Intl.Segmenter, 중국어 단어 단위) · 한자가 들어간 단어만" },
+  { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개, 넘으면 등장 순서로 자름" },
+  { label: "대상", body: "한→중은 중국어 산출문(번역안·후보·추천 표현), 중→한은 중국어 원문" },
+  { label: "산식", body: "목록 안 유형 수 ÷ 분석한 유형 수 — 텍스트 커버리지(토큰 기준)가 아님" },
+  { label: "쓰임", body: "참고 기록 · 생성을 막거나 수준·적절성을 판정하지 않음" },
+];
+
 function AuditMethodSection() {
-  const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 기록"];
+  const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
     <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3.5">
       <h2 id="audit-method-title" className="text-[16.5px] font-bold text-[#15202B]">대조 방식</h2>
@@ -472,6 +484,14 @@ function AuditMethodSection() {
           </li>
         ))}
       </ol>
+      <dl className="grid basis-full gap-x-6 gap-y-1 border-t border-[#EFE8D2] pt-2.5 text-[13.5px] md:grid-cols-2">
+        {AUDIT_METHOD_DETAILS.map((item) => (
+          <div key={item.label} className="flex gap-2">
+            <dt className="w-8 shrink-0 font-semibold text-[#8A7423]">{item.label}</dt>
+            <dd className="text-[#3B4A54]">{item.body}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }
@@ -531,10 +551,34 @@ function DatasetOverview({
         </div>
       </div>
 
+      {/* 무엇과 대조했나 — 공식 기준과 실제 대조 목록을 나눠 보인다(2026-10-09). */}
+      <dl className="space-y-1 border-b border-[#E8E2D6] bg-[#FBFAF6] px-4 py-2.5 text-[13.5px] sm:px-5">
+        <div className="flex flex-wrap items-baseline gap-x-2.5">
+          <dt className="w-[5.5rem] shrink-0 font-semibold text-[#8A7423]">공식 기준</dt>
+          <dd className="flex min-w-0 flex-1 flex-wrap items-baseline justify-between gap-x-4">
+            <span><b className="font-semibold text-[#15202B]">{status?.title ?? "확인 필요"}</b> <span className="text-[#5B564D]">· {status?.publisher ?? "확인 필요"} · {releaseLine(status)}</span></span>
+            {status?.official_url && (
+              <a href={status.official_url} target="_blank" rel="noreferrer"
+                className="inline-flex shrink-0 items-center gap-1 font-semibold text-[#15202B] underline decoration-[#D6C65E] decoration-2 underline-offset-3">
+                공식 PDF <ExternalLink className="h-2.5 w-2.5" />
+              </a>
+            )}
+          </dd>
+        </div>
+        <div className="flex flex-wrap items-baseline gap-x-2.5">
+          <dt className="w-[5.5rem] shrink-0 font-semibold text-[#8A7423]">실제 대조 목록</dt>
+          <dd className="text-[#5B564D]">
+            공식 PDF 추출본 · 표제어 <b className="font-semibold tabular-nums text-[#15202B]">{vocabularyEntries}개</b>
+            {status?.extraction_version && <> · 추출 {status.extraction_version}</>}
+            {status?.manifest_version && <> · 목록 {status.manifest_version}</>}
+          </dd>
+        </div>
+      </dl>
+
       <div className="px-4 py-4 sm:px-5">
         <div>
           <div>
-            <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
+            <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위 <span className="font-normal text-[#655F55]">· 연구자가 정한 잠정 참고 범위이며, 7–9급은 쓰지 않습니다</span></p>
           </div>
         </div>
 
@@ -561,11 +605,15 @@ function DatasetOverview({
   );
 }
 
+function releaseLine(status: ReferenceStatus | null) {
+  return status?.released_at || status?.effective_at
+    ? `${status?.released_at ?? "—"} 발표 · ${status?.effective_at ?? "—"} 시행`
+    : "확인 필요";
+}
+
 function OfficialSource({ status }: { status: ReferenceStatus | null }) {
   const fallback = "확인 필요";
-  const release = status?.released_at || status?.effective_at
-    ? `${status?.released_at ?? "—"} 발표 · ${status?.effective_at ?? "—"} 시행`
-    : fallback;
+  const release = releaseLine(status);
 
   return (
     <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
