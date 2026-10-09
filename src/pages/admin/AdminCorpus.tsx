@@ -468,7 +468,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-4">
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
       <h2 id="audit-method-title" className="text-[20px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
