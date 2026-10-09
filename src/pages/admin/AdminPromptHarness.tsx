@@ -50,22 +50,20 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 ];
 
 // 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
-function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
+// 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
+function PartHeading({ no, id, title }: { no: number; id: string; title: string }) {
   return (
-    <div className="mb-3 flex items-start gap-2.5">
-      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-      <div>
-        <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
-        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
-      </div>
-    </div>
+    <h2 id={id} className="mb-3 flex items-center gap-2.5 text-[16.5px] font-bold leading-8 text-[#15202B]">
+      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+      {title}
+    </h2>
   );
 }
 
 function ContractSummary() {
   return (
     <section aria-labelledby="contract-title">
-      <PartHeading no={1} id="contract-title" title="생성계약" description="모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다." />
+      <PartHeading no={1} id="contract-title" title="생성계약" />
       {/* 넓은 화면에서는 위→아래로 읽는 2열(1~3 | 4~6)이고, 가는 세로선으로 두 열을 나눈다(2026-10-09). */}
       <ol className="grid gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-flow-col md:grid-cols-2 md:grid-rows-3">
         {CONTRACT_CLAUSES.map((clause, index) => (
@@ -149,7 +147,7 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title">
-      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다." />
+      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" />
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
           className={`rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
@@ -256,7 +254,7 @@ const AdminPromptHarness = () => {
       <HarnessOverview />
 
       <section aria-labelledby="prompts-title">
-        <PartHeading no={3} id="prompts-title" title="운영 프롬프트" description="실제 생성·검토·피드백에 쓰는 프롬프트 원문입니다. 손으로 옮겨 적지 않고 코드에서 그대로 가져와 보여 줍니다." />
+        <PartHeading no={3} id="prompts-title" title="운영 프롬프트 원문" />
         <div className="space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));

@@ -211,7 +211,7 @@ const AdminCorpus = () => {
       {/* 네 부분을 「묻는 것 → 답」 순서로 번호를 붙여 둔다 — 생성계약 화면의 번호 제목과 같은 양식(2026-10-09). */}
       <div className="w-full space-y-8">
         <section aria-labelledby="part-reference">
-          <PartHeading no={1} id="part-reference" title="대조 기준" description="HSK 3.0 공식 목록과 PRAGMA 수준별 대조 범위입니다." />
+          <PartHeading no={1} id="part-reference" title="HSK 3.0 대조 기준" />
           <div className="space-y-3">
             <DatasetOverview
               loading={loading}
@@ -233,12 +233,12 @@ const AdminCorpus = () => {
         </section>
 
         <section aria-labelledby="part-method">
-          <PartHeading no={2} id="part-method" title="대조 방식" description="중국어 단어를 나눠 수준별 HSK 누적 목록과 대조합니다." />
+          <PartHeading no={2} id="part-method" title="어휘 대조 방식" />
           <AuditMethodSection />
         </section>
 
         <section aria-labelledby="part-result">
-          <PartHeading no={3} id="part-result" title="대조 결과" description="기록을 고르면 아래에 그 미션의 대조 상세가 보입니다." />
+          <PartHeading no={3} id="part-result" title="미션별 대조 결과" />
           <div className="space-y-3">
             {!loading && !auditLookupFailed && (
               <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
@@ -254,7 +254,7 @@ const AdminCorpus = () => {
 
         {!loading && !auditLookupFailed && (
           <section aria-labelledby="part-trend">
-            <PartHeading no={4} id="part-trend" title="누적 경향" description="여러 미션에서 자주 나온 HSK 목록 밖 후보입니다." />
+            <PartHeading no={4} id="part-trend" title="목록 밖 후보 누적 경향" />
             <TopOutOfListWords audits={allAudits} />
           </section>
         )}
@@ -263,15 +263,13 @@ const AdminCorpus = () => {
   );
 };
 
-function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
+// 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
+function PartHeading({ no, id, title }: { no: number; id: string; title: string }) {
   return (
-    <div className="mb-3 flex items-start gap-2.5">
-      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-      <div>
-        <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
-        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
-      </div>
-    </div>
+    <h2 id={id} className="mb-3 flex items-center gap-2.5 text-[16.5px] font-bold leading-8 text-[#15202B]">
+      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+      {title}
+    </h2>
   );
 }
 
