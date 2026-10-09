@@ -84,8 +84,9 @@ const AUTHENTIC_SOURCE_KO: Record<string, string> = {
 
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
-// 칸 색은 수준이 아니라 개수의 많고 적음만 나타낸다 — 네이비 한 색의 농도(2026-10-09).
-const CELL_TONE = { rgb: "35, 53, 66", text: "#4A5A66" };
+// 칸 색은 수준이 아니라 개수의 많고 적음만 나타낸다 — 브랜드 노랑 한 색의 농도(2026-10-09).
+// 회색 계열은 「죽은 기능」처럼 보여 쓰지 않는다.
+const CELL_TONE = { rgb: "250, 211, 56", text: "#6D5C1F" };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
 /**
@@ -376,7 +377,7 @@ const AdminBrowser = () => {
                             }`}
                             style={
                               !active && n > 0
-                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.05 + density * 0.2})` }
+                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.18 + density * 0.62})` }
                                 : undefined
                             }
                             title={
