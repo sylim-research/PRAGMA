@@ -86,10 +86,11 @@ const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 // 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
 // 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
-const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "246, 225, 212", text: "#8A5A3C" },
-  intermediate: { rgb: "220, 233, 223", text: "#496557" },
-  advanced: { rgb: "220, 232, 240", text: "#4B6575" },
+// 고급스럽게: 채도를 낮춘 더스티 파스텔 + 같은 색의 가는 안쪽 테두리 + 숫자도 같은 계열의 짙은 색.
+const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; edge: string; ink: string; text: string }> = {
+  beginner_intermediate: { rgb: "244, 228, 218", edge: "196, 150, 122", ink: "#6E4630", text: "#8F6A55" },
+  intermediate: { rgb: "222, 232, 224", edge: "128, 158, 136", ink: "#3D5848", text: "#617A6B" },
+  advanced: { rgb: "222, 230, 239", edge: "120, 146, 170", ink: "#3C5468", text: "#647C90" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
@@ -381,7 +382,11 @@ const AdminBrowser = () => {
                             }`}
                             style={
                               !active && n > 0
-                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.6 + density * 0.4})` }
+                                ? {
+                                    backgroundColor: `rgba(${tone.rgb}, ${0.55 + density * 0.45})`,
+                                    boxShadow: `inset 0 0 0 1px rgba(${tone.edge}, ${0.18 + density * 0.17})`,
+                                    color: tone.ink,
+                                  }
                                 : undefined
                             }
                             title={
