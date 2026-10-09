@@ -577,7 +577,7 @@ function OfficialSource({ status }: { status: ReferenceStatus | null }) {
     : fallback;
 
   return (
-    <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
+    <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-[13px] sm:px-5" aria-labelledby="official-source-title">
       {/* 공식 출처는 한 줄: 「공식 출처 · 제목 · 발행처 · 발표·시행」 + 오른쪽 PDF 링크. */}
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 text-[13.5px]">
