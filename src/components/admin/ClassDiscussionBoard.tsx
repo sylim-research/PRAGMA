@@ -12,7 +12,7 @@ import type {
   Slice,
   SliceTone,
 } from "@/lib/mission/classDiscussion";
-import { DivergingBar, Donut, ON_TONE, SpectrumStrip, StackedBar, TONE } from "@/components/charts/responseCharts";
+import { Donut, ON_TONE, SpectrumStrip, StackedBar, TONE } from "@/components/charts/responseCharts";
 import { VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
 
 /** 보드 상태 — 패널이 들고 있어 「크게 보기」로 열어도 같은 문항·사례가 보인다. */
@@ -191,7 +191,6 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
   return <div className="space-y-3">
     <div className={`flex items-center justify-between px-1 ${size} text-[#7A858C]`}>
       <span className="flex items-center gap-1.5">{leftBand && <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: TONE[leftBand.tone] }} />}← {leftBand?.label ?? "과소"}</span>
-      <span className="font-semibold text-[#245449]">적정 범주는 축 가운데</span>
       <span className="flex items-center gap-1.5">{rightBand?.label ?? "과잉"} →{rightBand && <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: TONE[rightBand.tone] }} />}</span>
     </div>
     <ol className="space-y-3">
@@ -200,7 +199,8 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
           <span className="shrink-0 text-[13px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
           <span className={zh(candidate.text)}>{candidate.text}</span>
         </p>
-        <div className="mt-2.5"><DivergingBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-7" : "h-6"} /></div>
+        {/* 막대는 모두 같은 시작선·끝선의 100% 막대 — 우회적(왼쪽) · 알맞음 · 직접적(오른쪽) 순서로 칸 크기만 다르다(2026-10-09). */}
+        <div className="mt-2.5"><StackedBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-7" : "h-6"} labels /></div>
         <div className="mt-2"><Legend slices={axis(candidate.slices).filter((slice) => slice.count > 0)} size={size} /></div>
       </li>)}
     </ol>
