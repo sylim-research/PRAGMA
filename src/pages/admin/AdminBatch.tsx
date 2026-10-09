@@ -511,10 +511,11 @@ const AdminBatch = () => {
 const StepNum = ({ n }: { n: number }) =>
   <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{n}</span>;
 
+// 네이비 채움은 화면의 행동 하나(생성 시작)에만 쓴다 — 총 생성 예정은 네이비 테두리로만 구분한다(2026-10-09).
 // 상자 바탕은 모두 흰색 + 같은 가는 테두리로 통일하고, 차이는 이름 앞 작은 색 점과 화행별의 금색 띠로만 준다.
 // 옅은 바탕색을 여러 개 섞으면 명도가 비슷해 탁해 보인다(2026-09-26 디자인 판단).
 const PlanMetric = ({ label, value, unit = "건", primary = false, dot, className = "border border-[#E2DED2] bg-white" }: { label: string; value: number; unit?: string; primary?: boolean; dot?: string; className?: string }) =>
-  <div className={"rounded-lg px-3 py-2 " + (primary ? "bg-[#15202B] text-white" : className)}>
+  <div className={"rounded-lg px-3 py-2 " + (primary ? "border-[1.6px] border-[#15202B] bg-white text-[#15202B]" : className)}>
     <p className="flex items-center gap-1.5 text-[14.5px] font-semibold">{dot && <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: dot }} />}{label}</p><p className="mt-1 text-2xl font-bold leading-7 tabular-nums">{value}<span className="ml-1 text-[13px] font-medium">{unit}</span></p>
   </div>;
 
