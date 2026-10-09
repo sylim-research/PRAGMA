@@ -93,19 +93,22 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
   </button>;
 }
 
-function Scene({ item, size }: { item: DiscussionItemView; size: string }) {
-  return <dl className={`grid grid-cols-[3.5rem_1fr] gap-x-3 gap-y-1 ${size} text-[#44525C]`}>
-    {item.relation && <><dt className="font-semibold text-[#7A858C]">관계</dt><dd className="break-keep">{item.relation}</dd></>}
-    {item.situation && <><dt className="font-semibold text-[#7A858C]">상황</dt><dd className="break-keep">{item.situation}</dd></>}
-    {item.source && <><dt className="font-semibold text-[#7A858C]">원문</dt><dd className={zh(item.source)}>{item.source}</dd></>}
-  </dl>;
-}
-
-function TargetLine({ text, label, size }: { text: string; label: string; size: string }) {
-  return <p className={`break-keep border-l-[3px] border-[#E4C44E] pl-3 leading-relaxed text-[#15202B] ${size}`}>
-    <span className="mr-3 inline-block text-[13px] font-semibold text-[#7A858C]">{label}</span>
-    <span className={zh(text)}>{text}</span>
-  </p>;
+// 두 묶음으로 나눈다(2026-10-09): ① 관계·상황 = 장면, ② 원문·초안 = 판단 대상 한 쌍.
+// 「판단한 표현」「고치기 전 표현」은 원고 명칭(초안–수정안–최종안)에 맞춰 「초안」으로 부른다.
+function Scene({ item, size, projector }: { item: DiscussionItemView; size: string; projector: boolean }) {
+  const label = "w-[3.5rem] shrink-0 font-semibold text-[#7A858C]";
+  return <div className="space-y-3">
+    {(item.relation || item.situation) && <dl className={`grid grid-cols-[3.5rem_1fr] gap-x-3 gap-y-1 ${size} text-[#44525C]`}>
+      {item.relation && <><dt className="font-semibold text-[#7A858C]">관계</dt><dd className="break-keep">{item.relation}</dd></>}
+      {item.situation && <><dt className="font-semibold text-[#7A858C]">상황</dt><dd className="break-keep">{item.situation}</dd></>}
+    </dl>}
+    {(item.source || item.target) && <dl className="space-y-1.5 rounded-lg border border-[#EEEBE2] border-l-[3px] border-l-[#E4C44E] bg-[#FDFCF8] px-3 py-2.5">
+      {item.source && <div className={`flex gap-3 ${size} text-[#44525C]`}><dt className={label}>원문</dt><dd className={`break-keep ${zh(item.source)}`}>{item.source}</dd></div>}
+      {item.target && <div className={`flex items-baseline gap-3 leading-relaxed text-[#15202B] ${projector ? "text-[22px]" : "text-[17px]"}`}>
+        <dt className={`${label} text-[14.5px]`}>초안</dt><dd className={`break-keep ${zh(item.target)}`}>{item.target}</dd>
+      </div>}
+    </dl>}
+  </div>;
 }
 
 function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: string; projector: boolean }) {
@@ -113,7 +116,6 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
   const activeRows = reasons?.cross.filter((row) => row.total > 0) ?? [];
   const cellMax = Math.max(1, ...activeRows.flatMap((row) => Object.values(row.byReason)));
   return <div className="space-y-4">
-    {item.target && <TargetLine text={item.target} label="판단한 표현" size={projector ? "text-[22px]" : "text-[17px]"} />}
     <div className="grid items-center gap-4 lg:grid-cols-[170px_1fr]">
       <div className="flex items-center gap-4 lg:justify-center">
         <Donut slices={item.slices} total={item.total} size={projector ? 176 : 150} centerLabel={String(item.total)} centerSub="명 응답" />
@@ -207,7 +209,6 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
 
 function CorrectionsDetail({ item, size, projector }: { item: CorrectionsItemView; size: string; projector: boolean }) {
   return <div className="space-y-4">
-    {item.target && <TargetLine text={item.target} label="고치기 전 표현" size={projector ? "text-[20px]" : "text-[16px]"} />}
     <ol className="space-y-3">
       {item.corrections.map((correction) => <li key={correction.index}>
         <div className="flex items-start justify-between gap-3">
@@ -228,7 +229,6 @@ function CorrectionsDetail({ item, size, projector }: { item: CorrectionsItemVie
 
 function FreeDetail({ item, size, projector }: { item: FreeItemView; size: string; projector: boolean }) {
   return <div className="space-y-4">
-    {item.target && <TargetLine text={item.target} label="고치기 전 표현" size={projector ? "text-[20px]" : "text-[16px]"} />}
     <div className="flex items-baseline justify-between gap-2">
       <p className={`font-bold text-[#15202B] ${size}`}>익명 수정문 {item.texts.length}종</p>
       <p className="text-[13px] text-[#7A858C]">수정문은 분류하지 않고 그대로 보여 줍니다.</p>
@@ -247,7 +247,6 @@ function FreeDetail({ item, size, projector }: { item: FreeItemView; size: strin
 
 function GenericDetail({ item, size, projector }: { item: GenericItemView; size: string; projector: boolean }) {
   return <div className="space-y-4">
-    {item.target && <TargetLine text={item.target} label="판단한 표현" size={projector ? "text-[20px]" : "text-[16px]"} />}
     {item.groups.map((group) => <div key={group.heading}>
       <p className={`mb-2 font-bold text-[#15202B] ${size}`}>{group.heading}<span className="ml-2 font-normal text-[#7A858C]">선택 {group.total}건</span></p>
       <ol className="space-y-2">
@@ -464,7 +463,7 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
           <p className="text-[13px] tabular-nums text-[#7A858C]">응답자 수 {selected.total}명</p>
         </div>
         <div className="space-y-4 px-5 py-4">
-          <Scene item={selected} size={size} />
+          <Scene item={selected} size={size} projector={projector} />
           {selected.kind === "scale" && <ScaleDetail item={selected} size={size} projector={projector} />}
           {selected.kind === "candidates" && <CandidatesDetail item={selected} size={size} projector={projector} />}
           {selected.kind === "corrections" && <CorrectionsDetail item={selected} size={size} projector={projector} />}
