@@ -226,7 +226,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[16.5px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
+            <CardTitle className="text-[16px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[13px] leading-5">
             {entry.sha256.slice(0, 10)}
@@ -271,7 +271,7 @@ const AdminPromptHarness = () => {
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[18px] font-bold leading-6 text-[#15202B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[18px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid gap-1.5 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />

@@ -1042,7 +1042,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div ref={fitScreen ? splitRef : undefined} className={professorScreen ? "grid items-start"
-          : aiReview ? "grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(16rem,2fr)_minmax(0,3fr)]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
+          : aiReview ? "grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}
