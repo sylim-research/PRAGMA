@@ -938,6 +938,8 @@ const AdminGenerator = () => {
       {/* 조건 폼 : 미리보기 = 2 : 3. 조건 단계 사이에는 가는 구분선을 둔다. 2026-09-26 */}
       <div className="mt-5 grid grid-cols-1 items-start gap-5 lg:grid-cols-[minmax(0,415fr)_minmax(0,585fr)]">
         {/* LEFT — settings */}
+        {/* 논문 도판으로 나눠 실을 수 있게 조건 1~3과 4~6을 두 카드로 나눈다. 2026-10-09 */}
+        <div className="space-y-5">
         <section className="space-y-5 rounded-lg border border-[#E2DED2] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 1. 과제 모드 */}
           <div>
@@ -1064,6 +1066,8 @@ const AdminGenerator = () => {
 
           </div>
 
+        </section>
+        <section className="space-y-5 rounded-lg border border-[#E2DED2] bg-[#FFFEFB] p-5 [&>div+div]:border-t [&>div+div]:border-[#EEEAE0] [&>div+div]:pt-5">
           {/* 6. 언어 · 학습 · 상황 조건 */}
           <div>
             {/* 채널(매체)은 연구 변수가 아니다(시나리오 매트릭스 LOCK, 2026-07-25 매체 축 폐기). 화면에서 고르지 않고
@@ -1276,6 +1280,7 @@ const AdminGenerator = () => {
           </div>
 
         </section>
+        </div>
 
 
         {/* RIGHT — preview */}
