@@ -443,9 +443,9 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
       {/* 순위는 위에서 아래로 센다(1–5 | 6–10 …) — 다단 배열(2026-10-09). */}
       <ol className="gap-x-10 border-t border-[#EFEAE0] px-5 py-3 [column-rule:1px_solid_#EAE4D6] sm:columns-2 lg:columns-4">
         {top.words.map(({ word, missionCount }, index) => (
-          <li key={word} className="flex break-inside-avoid items-center gap-2.5 py-1 text-[14px]">
+          <li key={word} className="flex break-inside-avoid items-center gap-2.5 py-1.5 text-[14px]">
             <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
-            <span className="w-16 shrink-0 font-zh text-[14.5px] text-[#15202B]" lang="zh">{word}</span>
+            <span className="w-16 shrink-0 font-zh text-[15px] text-[#15202B]" lang="zh">{word}</span>
             <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F4F1E8]">
               <span className="block h-full rounded-full bg-[#E3C44E]" style={{ width: `${(missionCount / max) * 100}%` }} />
             </span>
