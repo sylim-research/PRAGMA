@@ -266,13 +266,13 @@ const AdminCorpus = () => {
 // 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
 function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
   return (
-    // 번호·제목 옆에 짧은 보조 설명을 같은 줄로 둔다(2026-10-09).
-    <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
-      <h2 id={id} className="flex items-center gap-2.5 self-center text-[18px] font-bold leading-8 text-[#15202B]">
+    // 짧은 보조 설명은 제목 아랫줄, 제목 글자와 같은 선에서 시작한다 — 제목과 상자 사이 빈자리를 채운다(2026-10-09).
+    <div className="mb-2.5">
+      <h2 id={id} className="flex items-center gap-2.5 text-[18px] font-bold leading-8 text-[#15202B]">
         <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
         {title}
       </h2>
-      <p className="text-[14px] text-[#5B6670]">{description}</p>
+      <p className="pl-[34px] text-[14px] text-[#5B6670]">{description}</p>
     </div>
   );
 }
