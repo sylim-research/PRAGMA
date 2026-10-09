@@ -219,7 +219,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="space-y-0 px-4 py-2">
+      <CardHeader className="space-y-0 p-0 px-4 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -231,7 +231,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[15px] leading-tight">{entry.label}</CardTitle>
+            <CardTitle className="text-[15px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[12px] leading-5">
             {entry.sha256.slice(0, 10)}
@@ -270,13 +270,13 @@ const AdminPromptHarness = () => {
 
       <section aria-labelledby="prompts-title" className={PART_CARD}>
         <PartHeading icon={Code2} id="prompts-title" title="운영 프롬프트" description="코드에서 그대로 가져온 생성·검토·피드백 원문" />
-        <div className={`space-y-6 ${PART_BODY}`}>
+        <div className={`space-y-9 ${PART_BODY}`}>
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-2 border-l-[3px] border-[#C9A62E] pl-2 text-[16px] font-bold leading-5 text-[#26333B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[18px] font-bold leading-6 text-[#15202B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid gap-1.5 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
