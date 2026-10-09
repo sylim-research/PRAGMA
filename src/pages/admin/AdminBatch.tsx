@@ -509,7 +509,7 @@ const AdminBatch = () => {
 };
 
 const StepNum = ({ n }: { n: number }) =>
-  <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-xs font-bold text-white">{n}</span>;
+  <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{n}</span>;
 
 // 상자 바탕은 모두 흰색 + 같은 가는 테두리로 통일하고, 차이는 이름 앞 작은 색 점과 화행별의 금색 띠로만 준다.
 // 옅은 바탕색을 여러 개 섞으면 명도가 비슷해 탁해 보인다(2026-09-26 디자인 판단).

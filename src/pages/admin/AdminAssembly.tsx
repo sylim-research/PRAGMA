@@ -1371,8 +1371,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
                 step.status === "todo" ? "bg-[#DDD8CB]" : "bg-[#233542]"].join(" ")} />
             )}
             <span className="flex flex-col items-center text-center">
-              <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[12px] font-bold tabular-nums",
-                "bg-[#233542] text-white", step.status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
+              <span className={["relative z-[1] flex h-[22px] w-[22px] items-center justify-center rounded-full text-[12.5px] font-bold tabular-nums",
+                "bg-[#FAD338] text-[#15202B]", step.status === "current" ? "ring-2 ring-[#233542] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
               {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}

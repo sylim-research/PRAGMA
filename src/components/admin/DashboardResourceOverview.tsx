@@ -24,7 +24,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
     <section aria-labelledby="resource-overview-title">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         {/* 대시보드의 세 부분(보유 콘텐츠 → 품질 관리 → 수업 운영)은 같은 급 제목을 쓴다(2026-10-08). */}
-        <h2 id="resource-overview-title" className="flex items-center gap-2.5 text-[16.5px] font-bold text-[#15202B]"><span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">1</span>보유 학습 콘텐츠</h2>
+        <h2 id="resource-overview-title" className="flex items-center gap-2.5 text-[16.5px] font-bold text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>보유 학습 콘텐츠</h2>
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
