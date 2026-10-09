@@ -531,9 +531,8 @@ function DatasetOverview({
         <div className="flex min-w-0 items-center gap-3">
           {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            {/* 카드 제목은 수준별 참조 범위, 데이터셋 규모는 옆의 보조 정보로 둔다(2026-10-09). */}
+            {/* 카드 제목은 수준별 참조 범위, 데이터셋 규모는 범위 카드 아래 보조 문구로 둔다(2026-10-09). */}
             <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">PRAGMA 수준별 HSK 참조 범위</h2>
-            <span className="text-[14px] text-[#514C44]">HSK 3.0 전체 <span className="tabular-nums">{vocabularyEntries}</span>개 중 1–6급 <span className="tabular-nums">5,400</span>개까지 사용</span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
             </span>
@@ -563,6 +562,7 @@ function DatasetOverview({
             </div>
           ))}
         </div>
+        <p className="mt-2.5 text-[13.5px] text-[#655F55]">HSK 3.0 전체 <span className="tabular-nums">{vocabularyEntries}</span>개 중 1–6급 <span className="tabular-nums">5,400</span>개까지 사용합니다.</p>
       </div>
     </section>
   );
