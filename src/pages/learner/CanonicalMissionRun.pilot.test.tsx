@@ -48,11 +48,11 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A1", "친한 팀플 조원이 하기로 한 일을 메신저로 다시 부탁합니다.");
     click("다소 적절"); click("판단 제출하기"); click("다음: 상황에 맞는지 판단하기");
     expectCompactContext("A2", "수업에서만 뵌 교수님께 이메일로 처음 부탁하며, 아직 수락을 받지 않았습니다.");
-    expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     for (const label of ["매우 적절", "다소 적절", "다소 부적절", "매우 부적절"]) expect(screen.getByRole("button", { name: label })).toBeInTheDocument();
     // Examples also appear when the learner judged the problematic draft appropriate.
     click("매우 적절"); click("판단 제출하기");
-    const examples = screen.getByRole("region", { name: "참고 표현" });
+    const examples = screen.getByRole("region", { name: "추천 표현" });
     expect(within(examples).getByText("老师，您能帮我写一封交换生申请的推荐信吗？下周五就需要用到。")).toBeInTheDocument();
     expect(within(examples).getByText("老师，我申请交换生需要一封推荐信，下周五要用。请问您方便帮我写吗？")).toBeInTheDocument();
     click("다음: 판단하고 고쳐 보기");
@@ -69,7 +69,7 @@ describe("local learner UX pilot", () => {
     expect(within(screen.getByRole("button", { name: /助教您好，系统显示我上周缺勤，能帮我核实一下吗/ })).getByText("기준 선택")).toBeInTheDocument();
     click("다음: 직접 수정");
     expectCompactContext("A4", "같은 수업의 팀플 조원들과 나누는 메신저 대화입니다.");
-    expect(screen.queryByRole("heading", { name: "참고 표현" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "추천 표현" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "판단 남기고 직접 고치기" })).not.toBeInTheDocument();
     // The correction field opens prefilled with the flawed draft; the unchanged original cannot be submitted.
     const input = screen.getByRole("textbox", { name: "내가 고친 표현" }) as HTMLTextAreaElement;
@@ -87,7 +87,7 @@ describe("local learner UX pilot", () => {
     fireEvent.change(input, { target: { value: freeAnswer } });
     click("수정안 확정하기");
     expect(screen.getByRole("textbox", { name: "내가 고친 표현" })).toHaveValue(freeAnswer);
-    expect(screen.getByRole("heading", { name: "참고 표현" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "추천 표현" })).toBeInTheDocument();
     expect(screen.queryByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).not.toBeInTheDocument();
     expect(screen.queryByText(/기준 판단과 같아요|기준 판단과 달라요/)).not.toBeInTheDocument();
     click("다음: 복수 표현 비교");

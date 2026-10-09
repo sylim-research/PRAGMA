@@ -356,14 +356,13 @@ function v6IntroSteps(outputName: string) {
 
 /** 국면별 색 — 판단은 네이비 띠, 산출은 노랑 띠. 아래 목록은 같은 색을 연하게 깐 칸으로 이어 두 국면을 가른다. */
 const INTRO_PHASE_TONE = {
-  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", caption: "text-white/70", mode: "bg-white/15 text-white ring-white/25" },
-  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", caption: "text-[#15202B]/70", mode: "bg-white/50 text-[#15202B] ring-white/60" },
+  judgment: { pill: "bg-[#EEF2F6]", ring: "ring-[#C9D2DD] text-[#15202B]", band: "bg-[#15202B] text-white", mode: "bg-white/15 text-white ring-white/25" },
+  production: { pill: "bg-[#FFFBEA] ring-1 ring-inset ring-[#F0DE8C]", ring: "ring-[#E4CB50] text-[#6B5518]", band: "bg-[#F7CE3E] text-[#15202B]", mode: "bg-white/50 text-[#15202B] ring-white/60" },
 } as const;
 
-function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
+function IntroPhaseColumn({ tone, title, mode, steps }: {
   tone: keyof typeof INTRO_PHASE_TONE;
   title: string;
-  caption: string;
   /** 응답 방식 표지 — 판단형(주어진 표현을 판단·수정한다) / 산출형(직접 번역·통역한다). */
   mode: { label: string; icon: typeof ListChecks };
   steps: { title: string; desc: string }[];
@@ -375,7 +374,6 @@ function IntroPhaseColumn({ tone, title, caption, mode, steps }: {
       <div className={`flex items-center justify-between gap-3 rounded-lg px-4 py-3.5 ${t.band}`}>
         <div className="min-w-0">
           <h2 className="text-[17px] font-black leading-6">{title}</h2>
-          <p className={`mt-0.5 text-[12px] font-bold ${t.caption}`}>{caption}</p>
         </div>
         <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-black ring-1 ${t.mode}`}><ModeIcon aria-hidden className="h-3.5 w-3.5" strokeWidth={2.5} />{mode.label}</span>
       </div>
@@ -396,12 +394,12 @@ function V6IntroOutline({ outputName }: { outputName: string }) {
   const steps = v6IntroSteps(outputName);
   return (
     <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-start sm:gap-2.5">
-      <IntroPhaseColumn tone="judgment" title="적절성 판단" caption="MJT · 메타화용적 판단 과제" mode={{ label: "판단형", icon: ListChecks }} steps={steps.judgment} />
+      <IntroPhaseColumn tone="judgment" title="적절성 판단" mode={{ label: "판단형", icon: ListChecks }} steps={steps.judgment} />
       <div className="flex items-center justify-center sm:items-start sm:pt-[25px]" aria-hidden>
         <MoveRight className="hidden h-6 w-7 text-[#15202B] sm:block" strokeWidth={1.75} />
         <ArrowDown className="h-5 w-5 text-[#15202B] sm:hidden" strokeWidth={2.25} />
       </div>
-      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} caption="DCT · 통번역 과제" mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
+      <IntroPhaseColumn tone="production" title={`직접 ${outputName}`} mode={{ label: "산출형", icon: outputName === "통역" ? Mic : PenLine }} steps={steps.production} />
     </div>
   );
 }
@@ -855,7 +853,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
-        {answered && quest.revisionExamples && <ReferenceExamples title="참고 표현" items={quest.revisionExamples} font="font-zh" />}
+        {answered && quest.revisionExamples && <ReferenceExamples title="추천 표현" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
@@ -1018,7 +1016,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
-      {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
+      {submitted && <ReferenceExamples title="추천 표현" items={quest.references} font={targetFont} />}
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#DDD8CB] px-4 py-3" aria-label="다른 맥락에서는?">
         <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
@@ -1530,7 +1528,7 @@ function unavailableRuntimeEvaluation(
   targetLanguage = "중국어",
   outputName = "번역",
 ): DctEvaluation {
-  const body = `AI 피드백을 불러오지 못했습니다. 참고 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
+  const body = `AI 피드백을 불러오지 못했습니다. 추천 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
   return {
     available: false,
     criteria: [
@@ -1542,7 +1540,7 @@ function unavailableRuntimeEvaluation(
     body,
     highlights: [],
     feedback: body,
-    action: `참고 표현을 복사하지 말고, 내 ${outputName}에서 한 곳을 직접 점검해 보세요.`,
+    action: `추천 표현을 복사하지 말고, 내 ${outputName}에서 한 곳을 직접 점검해 보세요.`,
     example: quest.referenceAnswer,
     takeaway: "판정이 불가능했던 수행은 점수로 해석하지 않습니다.",
   };
@@ -2122,7 +2120,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             ? { phase: "재검토", activity: `내 ${outputName} 재검토` }
             : { phase: "AI 피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
-    <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
+    <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-3 sm:px-4" aria-label="미션 학습 흐름">
       <div className={`flex items-center gap-3 sm:gap-4 ${freeJump ? "flex-wrap sm:flex-nowrap" : ""}`}>
         {/* 단계를 점과 선으로 따로 그리지 않고 이어진 막대 하나로 — 지난 구간 금색, 현재 구간 남색. */}
         <ol className="flex min-w-0 flex-1 gap-1.5" aria-label={stages.join(", ")}>
@@ -2136,8 +2134,8 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
               : Boolean(completed) || index < macroIndex;
             const active = !completed && index === macroIndex;
             const jumpStage = label === "미션 안내" ? "intro" : label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
-            // 시연에서는 산출 단계 이름을 「DCT 번역」으로 보이되, 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
-            const shownLabel = freeJump && jumpStage === "produce" ? `DCT ${outputName}` : label;
+            // 시연에서는 산출 단계 이름을 「직접 번역」으로 보이되(약어 없음, 2026-10-09), 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
+            const shownLabel = freeJump && jumpStage === "produce" ? `직접 ${outputName}` : label;
             const body = (
               <>
                 <span aria-hidden className={`block h-1.5 rounded-full ${done ? "bg-[#F3D248]" : active ? "bg-[#15202B]" : "bg-[#E4E0D5]"}`} />
@@ -2158,13 +2156,13 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             );
           })}
         </ol>
-        {freeJump && onJumpQuest ? <nav className="flex shrink-0 items-center gap-1 border-l border-[#DDD8CC] pl-3" aria-label="MJT 문항 바로가기">
-          <span className="mr-1 text-[11.5px] font-bold text-[#536572]">MJT</span>
+        {freeJump && onJumpQuest ? <nav className="flex shrink-0 items-center gap-1 border-l border-[#DDD8CC] pl-3" aria-label="판단 문항 바로가기">
+          <span className="mr-1 text-[11.5px] font-bold text-[#536572]">판단</span>
           {DEMO_MJT_QUEST_IDS.map((id, number) => {
             const index = quests.findIndex(quest => quest.id === id);
             if (index < 0) return null;
             const selected = judging && activeIndex === index;
-            const label = `MJT ${number + 1} · ${progressLabel(quests[index], outputName)}`;
+            const label = `판단 ${number + 1} · ${progressLabel(quests[index], outputName)}`;
             return <button key={id} type="button" title={label} aria-label={label} aria-current={selected ? "step" : undefined}
               onClick={() => { if (!selected) onJumpQuest(index); }}
               className={`inline-flex h-7 min-w-7 items-center justify-center rounded-md border text-[12px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1 ${selected ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#D6CFBD] bg-white text-[#15202B] hover:border-[#15202B] hover:bg-[#F4F1E9]"}`}>
@@ -2499,8 +2497,8 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
           </div>
         </div>
       </section>
-      {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
+      {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="추천 표현">
+        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />추천 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>
