@@ -458,10 +458,10 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
 
 /** 대조 방식 세부 — 분절·단위·대상·산식을 한 줄씩 늘 보인다(2026-10-09). */
 const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
-  { label: "분절", body: "ICU 단어 분절기(Intl.Segmenter, 중국어 단어 단위) · 한자가 들어간 단어만" },
-  { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개, 넘으면 등장 순서로 자름" },
-  { label: "대상", body: "한→중은 중국어 산출문(번역안·후보·추천 표현), 중→한은 중국어 원문" },
-  { label: "산식", body: "목록 안 유형 수 ÷ 분석한 유형 수 — 텍스트 커버리지(토큰 기준)가 아님" },
+  { label: "분절", body: "ICU 단어 분절기(Intl.Segmenter) · 한자 포함 단어만" },
+  { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개(등장 순)" },
+  { label: "대상", body: "한→중은 중국어 산출문, 중→한은 중국어 원문" },
+  { label: "산식", body: "목록 안 유형 ÷ 분석한 유형 · 토큰 커버리지 아님" },
 ];
 
 /** 대조 방식 — 설명 대신 세 단계와 「판정하지 않는 것」을 한 띠로 보여 준다. */
