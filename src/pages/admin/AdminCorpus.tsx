@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  Database,
   ExternalLink,
 } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
@@ -530,9 +529,6 @@ function DatasetOverview({
     <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="dataset-title">
       <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEF1F2] text-[#3F4E59]" aria-hidden>
-            <Database className="h-4 w-4" />
-          </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
