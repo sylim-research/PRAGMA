@@ -544,14 +544,15 @@ function DatasetOverview({
         </div>
       </div>
 
-      <div className="px-4 py-3.5 sm:px-5">
+      <div className="px-4 pb-3.5 pt-[22px] sm:px-5">
         <div>
           <div>
-            <p className="text-[14.5px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
+            <p className="text-[15px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
           </div>
         </div>
 
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+        {/* 소제목은 아래 카드에 붙인다 — 위 22px, 아래 6px(전역 mt-3 덮어쓰기를 피해 mt-[6px]). */}
+        <div className="mt-[6px] grid gap-2 sm:grid-cols-3">
           {PRAGMA_RANGES.map((range) => (
             <div
               key={range.id}
