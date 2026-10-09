@@ -112,8 +112,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
-    <tr><td>수행 기록 연결</td><td>가명 학습자 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 초안·수정안·최종안, AI 피드백을 연결</td></tr>
-    <tr><td>해석의 분담</td><td>프로그램은 연결·집계를 맡고, 표현의 적절성과 수정 이유는 연구자가 원자료와 대조해 해석</td></tr>
+    <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
+    <tr><td>해석의 분담</td><td>프로그램은 연결·집계를, 적절성과 수정 이유의 해석은 연구자가 맡음</td></tr>
   </tbody>
 </table>
 
