@@ -199,9 +199,9 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
           <span className="shrink-0 text-[13px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
           <span className={zh(candidate.text)}>{candidate.text}</span>
         </p>
-        {/* 막대는 모두 같은 폭(최대 560px)·같은 시작선의 100% 막대 — 우회적 · 알맞음 · 직접적 순서로 칸 크기만 다르다.
+        {/* 막대는 모두 같은 폭·같은 시작선의 100% 막대 — 우회적 · 알맞음 · 직접적 순서로 칸 크기만 다르다.
             표현·막대·범례 사이에 숨 쉴 틈을 두고 막대 높이를 낮춰 화면이 덜 무겁게 한다(2026-10-09). */}
-        <div className="mt-4 max-w-[560px]"><StackedBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-6" : "h-5"} labels /></div>
+        <div className="mt-4"><StackedBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-6" : "h-5"} labels /></div>
         <div className="mt-3"><Legend slices={axis(candidate.slices).filter((slice) => slice.count > 0)} size={size} /></div>
       </li>)}
     </ol>
@@ -440,7 +440,8 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
   const size = projector ? "text-[15.5px]" : "text-[14.5px]";
   const selected = data.items.find((item) => item.itemId === state.itemId) ?? data.items[0] ?? null;
 
-  return <div className="space-y-3" aria-label="학습자 응답 토론 보드">
+  // 보드는 학습 미션 화면과 같은 폭(48rem)으로 묶는다 — 원고 그림으로 한 장에 잘라 넣기 좋고, 막대·문장이 지나치게 길어지지 않는다(2026-10-09). 크게 보기는 넓게.
+  return <div className={`space-y-3 ${projector ? "" : "max-w-3xl"}`} aria-label="학습자 응답 토론 보드">
     {data.items.length === 0 ? <p className={`rounded-xl border border-dashed border-[#DAD6CA] bg-white p-5 text-[#5D6970] ${size}`}>
       집계된 기록에 MJT 판단 응답이 없습니다.
     </p> : <>
