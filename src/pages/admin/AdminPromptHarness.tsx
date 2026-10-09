@@ -78,7 +78,7 @@ function ContractSummary() {
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
-            <p className="text-[14px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
+            <p className="text-[15px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
       </ol>
@@ -226,7 +226,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[15px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
+            <CardTitle className="text-[16.5px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[13px] leading-5">
             {entry.sha256.slice(0, 10)}
@@ -235,7 +235,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1.5 truncate pl-5 text-[14px] leading-tight text-muted-foreground" title={entry.note}>
+        <p className="mt-[15px] truncate pl-5 text-[14px] leading-tight text-muted-foreground" title={entry.note}>
           {entry.note}
         </p>
       </CardHeader>
