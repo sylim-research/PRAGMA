@@ -84,11 +84,8 @@ const AUTHENTIC_SOURCE_KO: Record<string, string> = {
 
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
-const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "255, 241, 184", text: "#7A6418" },
-  intermediate: { rgb: "220, 233, 223", text: "#496557" },
-  advanced: { rgb: "220, 232, 240", text: "#4B6575" },
-};
+// 칸 색은 수준이 아니라 개수의 많고 적음만 나타낸다 — 네이비 한 색의 농도(2026-10-09).
+const CELL_TONE = { rgb: "35, 53, 66", text: "#4A5A66" };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
 /**
@@ -296,25 +293,26 @@ const AdminBrowser = () => {
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap items-end gap-3">
+          <div>
             {/* ── 필터 ── */}
-            <div className="flex flex-wrap items-end gap-2 text-[13px]" aria-label="라이브러리 필터">
+            {/* 필터 8개를 카드 폭에 같은 너비로 채운다(2026-10-09). */}
+            <div className="grid grid-cols-2 items-end gap-2 text-[13px] sm:grid-cols-4 lg:grid-cols-8" aria-label="라이브러리 필터">
               {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인) → 관리 정보(생성 출처·미션 형식·상태). */}
-              <Filter className="w-full sm:w-[112px]" label="화행" value={fAct} onChange={setFAct}
+              <Filter className="w-full" label="화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
-              <Filter className="w-full sm:w-[112px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+              <Filter className="w-full" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-              <Filter className="w-full sm:w-[112px]" label="수준" value={fLevel} onChange={setFLevel}
+              <Filter className="w-full" label="수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
-              <Filter className="w-full sm:w-[112px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+              <Filter className="w-full" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-              <Filter className="w-full sm:w-[112px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
+              <Filter className="w-full" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
-              <Filter className="w-full sm:w-[112px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
+              <Filter className="w-full" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
-              <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
+              <Filter className="w-full" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
                 opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
-              <Filter className="w-full sm:w-[112px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
+              <Filter className="w-full" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
                 opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
@@ -334,7 +332,7 @@ const AdminBrowser = () => {
           {/* ── 27칸 그리드 ── */}
           <section className="overflow-x-auto rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
             {/* 색 칸 덩어리를 가운데 두려고, 왼쪽 화행 라벨 열(82px)만큼 오른쪽에도 빈자리를 둔다(2026-10-09). */}
-            <div className="mx-auto max-w-[1068px] sm:pr-[88px]">
+            <div className="mx-auto max-w-[908px] sm:pr-[88px]">
             {/* 화행 × 수준이 이 화면의 본론이다. 전폭이면 칸 하나가 330px가 되어 숫자 사이가
                   벌어지고 화행 라벨은 저 멀리 왼쪽에 남는다 — 표를 내용 폭까지만 넓히고
                   라벨을 칸 쪽으로 붙인다. */}
@@ -361,7 +359,7 @@ const AdminBrowser = () => {
                       const n = c.total;
                       const active = sel?.act === act && sel?.level === lv;
                       const density = maxCellCount > 0 ? n / maxCellCount : 0;
-                      const tone = LEVEL_CELL_TONE[lv];
+                      const tone = CELL_TONE;
                       return (
                         <td key={lv} className="text-center">
                           <button
@@ -378,7 +376,7 @@ const AdminBrowser = () => {
                             }`}
                             style={
                               !active && n > 0
-                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.6 + density * 0.4})` }
+                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.05 + density * 0.2})` }
                                 : undefined
                             }
                             title={
@@ -387,7 +385,7 @@ const AdminBrowser = () => {
                                 : `번역 ${c.t} / 통역 ${c.i}`
                             }
                           >
-                            <span className="text-[14.5px] font-semibold">{n === 0 ? "—" : n}</span>
+                            <span className="text-[17px] font-bold tabular-nums">{n === 0 ? "—" : n}</span>
                             {n === 0 ? null : (
                               <span
                                 className={`text-[13px] ${active ? "text-white/70" : ""}`}
