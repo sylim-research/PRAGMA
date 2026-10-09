@@ -437,8 +437,8 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   return (
     <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
-        <h2 id="top-outside-title" className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 후보</h2>
-        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
+        <h2 id="top-outside-title" className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">HSK 목록 밖 후보 Top {top.words.length}</h2>
+        <span className="text-[14px] text-[#514C44]">학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       {/* 순위는 위에서 아래로 센다(1–5 | 6–10 …) — 다단 배열(2026-10-09). */}
       <ol className="gap-x-6 border-t border-[#EFEAE0] px-5 py-3 sm:columns-2 lg:columns-4">
