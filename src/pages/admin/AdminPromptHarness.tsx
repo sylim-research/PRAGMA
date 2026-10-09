@@ -37,6 +37,9 @@ const HIDDEN_PROMPT_KEYS = new Set([
   "feedback.system.zh_ko.spoken",
   "feedback.system.spoken",
 ]);
+// 호출은 되지만 화면에서는 생략하는 지시문(2026-10-09). 선행발화의 언어 표기만 1회 고치는 기술 보정이라
+// 연구 서술과 관련이 가장 적다. 스냅숏(감사 기록)에는 그대로 남는다.
+const OMITTED_PROMPT_KEYS = new Set(["core.user.preceding_turn_repair"]);
 
 // 생성계약 정본(docs/contracts/PRAGMA_생성계약_정본.md)이 고정하는 것을 화면용 한 줄로 옮긴다.
 // 정본은 변경 이력·결정 ID가 섞인 긴 문서라 원문을 싣지 않는다. 계약이 바뀌면 이 목록도 고친다.
@@ -257,7 +260,7 @@ const AdminPromptHarness = () => {
         <PartHeading no={3} id="prompts-title" title="운영 프롬프트 원문" />
         <div className="space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
-          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key));
+          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
