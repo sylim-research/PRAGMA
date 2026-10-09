@@ -170,7 +170,7 @@ function HarnessOverview() {
   return (
     <section aria-labelledby="harness-overview-title">
       <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" />
-      {/* 점검 → 검토 → 승인의 순서를 화살표로 보이고, 최종 권한인 교수자 승인만 네이비 윗선으로 구분한다(2026-10-09).
+      {/* 점검 → 검토 → 승인의 순서를 화살표로 보이고, 세 카드는 같은 모양이다(2026-10-09).
           카드 하나에 이름은 하나 — 단계 이름이 제목, 성격은 배지, 방식 이름은 설명 첫머리. */}
       <ol className="grid items-stretch gap-2 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
         <li className="flex">
@@ -179,7 +179,7 @@ function HarnessOverview() {
             <StageHead step={1} title="자동 품질 점검" badge="재현 가능" />
             <p className="mt-1.5 text-[13.75px] leading-relaxed text-muted-foreground">
               {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
-              <b className="font-semibold text-[#3B4A54]">규칙 기반 검사.</b> 미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
+              <b className="font-semibold text-[#3B4A54]">규칙 기반 검사.</b> 구성·언어·요청 조건을 규칙으로 확인하며, 같은 입력에는 같은 결과를 냅니다.
             </p>
             <span className="mt-auto inline-flex items-center gap-0.5 pt-3 text-[13.75px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
               {rulesOpen ? "규칙 접기" : "규칙 보기"}
@@ -191,14 +191,14 @@ function HarnessOverview() {
         <li className="flex flex-col rounded-lg border border-[#E2DED2] bg-white p-4">
           <StageHead step={2} title="AI 검토" badge="문맥 검토" />
           <p className="mt-1.5 text-[13.75px] leading-relaxed text-muted-foreground">
-            <b className="font-semibold text-[#3B4A54]">프롬프트 통제 기반 검토.</b> 운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
+            <b className="font-semibold text-[#3B4A54]">프롬프트 통제 기반 검토.</b> 의미·자연성·후보 자격을 보고, 필요 시 모델 간 교차 검토합니다.
           </p>
           <a href="#prompts-review" className="mt-auto inline-flex items-center gap-0.5 pt-3 text-[13.75px] font-bold text-[#15202B] underline-offset-4 hover:underline">
             검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
           </a>
         </li>
         <StageArrow />
-        <li className="flex flex-col rounded-lg border border-[#E2DED2] border-t-[3px] border-t-[#233542] bg-white p-4">
+        <li className="flex flex-col rounded-lg border border-[#E2DED2] bg-white p-4">
           <StageHead step={3} title="교수자 최종 승인" badge="최종 권한" />
           <p className="mt-1.5 text-[13.75px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
@@ -219,7 +219,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="px-4 py-5">
+      <CardHeader className="px-4 py-3">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -231,7 +231,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[16.5px] leading-snug">{entry.label}</CardTitle>
+            <CardTitle className="text-[15.5px] leading-snug">{entry.label}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 font-mono text-[12.25px]">
             {entry.sha256.slice(0, 10)}
@@ -240,7 +240,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-1.5 pl-5 text-[13.75px] leading-relaxed text-muted-foreground">
+        <p className="mt-0.5 pl-5 text-[13.75px] leading-snug text-muted-foreground">
           {entry.note}
         </p>
       </CardHeader>
@@ -264,7 +264,7 @@ const AdminPromptHarness = () => {
       title="생성계약·운영 프롬프트"
       description="생성계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
-      <div className="space-y-10">
+      <div className="space-y-6">
       <ContractSummary />
       <HarnessOverview />
 
