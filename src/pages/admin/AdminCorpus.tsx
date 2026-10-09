@@ -208,45 +208,72 @@ const AdminCorpus = () => {
       title="HSK 3.0 어휘 대조"
       description="생성된 중국어 어휘를 수준별 HSK 누적 목록과 대조해 참고 기록으로 남깁니다."
     >
-      <div className="w-full space-y-4">
-        <DatasetOverview
-          loading={loading}
-          ready={referenceReady}
-          status={status}
-          checkedAt={referenceCheckedAt}
-        />
-
-        {error && (
-          <div
-            className="border-l-2 border-amber-500 bg-amber-50 px-4 py-3 text-[14px] text-amber-900"
-            title={error}
-          >
-            운영 DB 상태를 확인하지 못했습니다. 공식 데이터의 출처와 구성 정보는 계속 볼 수 있습니다.
+      {/* 네 부분을 「묻는 것 → 답」 순서로 번호를 붙여 둔다 — 생성계약 화면의 번호 제목과 같은 양식(2026-10-09). */}
+      <div className="w-full space-y-8">
+        <section aria-labelledby="part-reference">
+          <PartHeading no={1} id="part-reference" title="대조 기준" description="HSK 3.0 공식 목록과 PRAGMA 수준별 대조 범위입니다." />
+          <div className="space-y-3">
+            <DatasetOverview
+              loading={loading}
+              ready={referenceReady}
+              status={status}
+              checkedAt={referenceCheckedAt}
+            />
+            {error && (
+              <div
+                className="border-l-2 border-amber-500 bg-amber-50 px-4 py-3 text-[14px] text-amber-900"
+                title={error}
+              >
+                운영 DB 상태를 확인하지 못했습니다. 공식 데이터의 출처와 구성 정보는 계속 볼 수 있습니다.
+              </div>
+            )}
+            {/* 데이터셋이 준비되면 공식 출처는 기준 카드 안에 함께 보인다. */}
+            {!referenceReady && <OfficialSource status={status} />}
           </div>
-        )}
+        </section>
 
-        <AuditMethodSection />
+        <section aria-labelledby="part-method">
+          <PartHeading no={2} id="part-method" title="대조 방식" description="중국어 단어를 나눠 수준별 HSK 누적 목록과 대조합니다." />
+          <AuditMethodSection />
+        </section>
+
+        <section aria-labelledby="part-result">
+          <PartHeading no={3} id="part-result" title="대조 결과" description="기록을 고르면 아래에 그 미션의 대조 상세가 보입니다." />
+          <div className="space-y-3">
+            {!loading && !auditLookupFailed && (
+              <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
+            )}
+            <OperationsSection
+              loading={loading}
+              audit={selectedAudit ?? recentAudit}
+              lookupFailed={auditLookupFailed}
+              referenceReady={referenceReady}
+            />
+          </div>
+        </section>
 
         {!loading && !auditLookupFailed && (
-          <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
+          <section aria-labelledby="part-trend">
+            <PartHeading no={4} id="part-trend" title="누적 경향" description="여러 미션에서 자주 나온 HSK 목록 밖 후보입니다." />
+            <TopOutOfListWords audits={allAudits} />
+          </section>
         )}
-
-        {/* 목록에서 고른 기록의 상세는 목록 바로 아래에 둔다(2026-10-09). */}
-        <OperationsSection
-          loading={loading}
-          audit={selectedAudit ?? recentAudit}
-          lookupFailed={auditLookupFailed}
-          referenceReady={referenceReady}
-        />
-
-        {!loading && !auditLookupFailed && <TopOutOfListWords audits={allAudits} />}
-
-        {/* 데이터셋이 준비되면 공식 출처는 맨 위 기준 카드에 함께 보인다. */}
-        {!referenceReady && <OfficialSource status={status} />}
       </div>
     </AdminShell>
   );
 };
+
+function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
+  return (
+    <div className="mb-3 flex items-start gap-2.5">
+      <span className="mt-[3px] flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+      <div>
+        <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
+        <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
+      </div>
+    </div>
+  );
+}
 
 const cleanTitle = (title: string | null) => title?.replace(/^\s*\[[^\]]*\]\s*/, "") || null;
 const pct = (value: number | null) => (value === null ? "—" : `${Math.round(value * 100)}%`);
@@ -307,18 +334,14 @@ function OperationsSection({
       : "아직 대조 기록이 없습니다.";
 
   return (
-    <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="lexical-audit-title">
+    <div className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-label="선택한 기록의 대조 상세">
       {loading ? (
         <div className="p-5"><Skeleton className="h-32" /></div>
       ) : complete && audit ? (
-        <>
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b border-[#EFEAE0] px-5 pb-3 pt-4">
-          <h2 id="lexical-audit-title" className={H2}>대조 상세</h2>
-          <span className={META}>{kind}</span>
-        </div>
         <div className="space-y-4 px-5 py-4">
           <div>
-            <h3 className={H3}>{cleanTitle(audit.title) ?? axes.join(" · ")}</h3>
+            <p className="text-[13px] font-semibold text-[#8A7423]">선택한 기록 · {kind}</p>
+            <h3 className={`mt-0.5 ${H3}`}>{cleanTitle(audit.title) ?? axes.join(" · ")}</h3>
             <p className={`mt-1 ${NOTE}`}>{[speechAct, mode, direction].filter(Boolean).join(" · ")}</p>
           </div>
           {/* 흐름 = 뽑은 단어 → 이 미션의 기준 → 대조 결과(비율 막대). 목록 밖 단어는 아래에 예시로. */}
@@ -363,7 +386,6 @@ function OperationsSection({
             </div>
           )}
         </div>
-        </>
       ) : (
         <div className="px-5 py-4">
           <p className="text-[15px] font-medium text-[#15202B]">{emptyTitle}</p>
@@ -374,7 +396,7 @@ function OperationsSection({
           )}
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -388,10 +410,9 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
   if (recent.length === 0) return null;
   const grid = "grid grid-cols-[6.5rem_minmax(0,1fr)_9.5rem_5.5rem_6.5rem] items-center gap-x-4";
   return (
-    <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
+    <section aria-label="대조 기록" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-3 pt-4">
         <div className="flex items-baseline gap-3">
-          <h2 id="audit-history-title" className={H2}>대조 기록</h2>
           <span className={META}>
             학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · HSK 목록 포함률(유형 기준·합산) <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
@@ -444,9 +465,8 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   if (top.words.length === 0) return null;
   const max = top.words[0].missionCount;
   return (
-    <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
+    <section aria-label="자주 나온 HSK 목록 밖 후보" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
-        <h2 id="top-outside-title" className={H2}>자주 나온 HSK 목록 밖 후보</h2>
         <span className={META}>상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -476,8 +496,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-4">
-      <h2 id="audit-method-title" className={H2}>대조 방식</h2>
+    <section aria-label="대조 방식" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-4">
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
@@ -545,9 +564,9 @@ function DatasetOverview({
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
               </span>
             </div>
-            <h2 id="dataset-title" className={`mt-0.5 ${H2}`}>
+            <h3 id="dataset-title" className={`mt-0.5 ${H2}`}>
               HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
-            </h2>
+            </h3>
           </div>
         </div>
         <div className="text-left sm:text-right">
