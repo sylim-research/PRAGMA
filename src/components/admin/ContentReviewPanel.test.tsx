@@ -72,7 +72,7 @@ describe("quality review handoff", () => {
     showCompact();
     expect(await screen.findByText("교수자 승인 완료")).toBeInTheDocument();
     expect(screen.getAllByText("미실행 · 선택 단계")).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: "교차 검토 실행" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "독립 검토 실행" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "교수자 승인 기록 보기" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
     expect(inspection.run!.openai_review!.model).toBe("gpt-4.1-2025-04-14");
     expect(mocks.approve).not.toHaveBeenCalled();
@@ -97,7 +97,7 @@ describe("professor finding decisions", () => {
       rationale_ko: "상황문·원문과 대조한 결과 같은 결론에 이르렀습니다.", proposed_change_ko: "해설의 책임 주체를 화자로 맞추십시오.",
       needs_professor: false, evidence_path: finding.where, evidence_quote: finding.quote }] });
     showPanel();
-    expect(await screen.findByText("✓ AI 검토 일치")).toBeInTheDocument();
+    expect(await screen.findByText("✓ 재판정 수용")).toBeInTheDocument();
     // 재서술은 지우지 않고 근거 안으로 접는다.
     const details = screen.getByText("수정 제안·근거 보기").closest("details");
     expect(details).not.toHaveAttribute("open");
@@ -131,7 +131,7 @@ describe("professor finding decisions", () => {
     showPanel();
     await enterDecision(decision);
     expect(screen.getByText("원문 · 화용적 적절성")).toBeInTheDocument();
-    expect(screen.getByText(/의견 대조 · 기각/)).toBeInTheDocument();
+    expect(screen.getByText(/재판정 · 기각/)).toBeInTheDocument();
     expect(screen.getAllByText(/불확실성: 수업에서/).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
@@ -175,7 +175,7 @@ describe("professor finding decisions", () => {
       history: [{ id: "review-1", content_hash: "hash-current", approved_at: null, created_at: "2026-08-27" }] };
     fireEvent.click(screen.getByRole("button", { name: "결과 새로고침" }));
     await screen.findByText(/내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다/);
-    expect(screen.getByRole("button", { name: "자동 품질 점검 시작" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "자동 규칙 점검 시작" })).toBeEnabled();
     expect(screen.queryByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "교수자 최종 승인" })).not.toBeInTheDocument();
     expect(mocks.save).not.toHaveBeenCalled();
@@ -194,18 +194,18 @@ describe("professor finding decisions", () => {
     expect(screen.getAllByText(/보고된 문제 항목 없음/).length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
-    fireEvent.change(screen.getByRole("textbox", { name: "AI 검토의 중대 문제 항목 사용 근거" }), { target: { value: rationale } });
+    fireEvent.change(screen.getByRole("textbox", { name: "AI 품질 심사의 중대 문제 항목 사용 근거" }), { target: { value: rationale } });
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
-    fireEvent.click(screen.getByRole("checkbox", { name: /AI 검토의 중대 문제 항목을 확인했으며/ }));
+    fireEvent.click(screen.getByRole("checkbox", { name: /AI 품질 심사의 중대 문제 항목을 확인했으며/ }));
     fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
-    expect(await screen.findByText(`AI 검토의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
+    expect(await screen.findByText(`AI 품질 심사의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
   });
 });
 
 describe("automated quality signals", () => {
-  const bundleButton = (count: number) => screen.findByRole("button", { name: `미결 자동 품질 점검 신호 ${count}건 확인 · 현재 버전 그대로 사용` });
+  const bundleButton = (count: number) => screen.findByRole("button", { name: `미결 자동 규칙 점검 신호 ${count}건 확인 · 현재 버전 그대로 사용` });
   const setDecision = (id: string, decision: ProfessorFindingDecision["decision"]) => {
     fireEvent.click(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS[decision]} · ${id}` }));
   };
@@ -260,7 +260,7 @@ describe("automated quality signals", () => {
   it("keeps a blocking rule finding out of the bundle", async () => {
     withSignals(signal("rule-1", "R30"), signal("rule-2", "R31", "fail"));
     showPanel();
-    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
+    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 규칙 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
     // 계약 위반은 묶이지 않고 개별 판정 자리에 남는다.
     expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · rule-2` })).toHaveAttribute("aria-pressed", "false");
@@ -272,7 +272,7 @@ describe("automated quality signals", () => {
     inspection.run!.professor_decisions = [{ finding_id: "rule-1", decision: "defer", rationale_ko: "현장 확인 뒤 판단합니다." }];
     showPanel();
     // 이미 결정된 1건은 대상에서 빠진다.
-    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 품질 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
+    fireEvent.click(await screen.findByRole("button", { name: "미결 자동 규칙 점검 신호 1건 확인 · 현재 버전 그대로 사용" }));
     await screen.findByText("모든 신호에 교수자 결정이 있습니다.");
     expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.defer} · rule-1` })).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · rule-2` })).toHaveAttribute("aria-pressed", "true");
@@ -307,7 +307,7 @@ describe("professor approval screen (experiential)", () => {
     expect(await screen.findByRole("button", { name: "교수자 최종 승인" })).toBeInTheDocument();
     // 최종 승인 화면은 점검 요약 줄을 두지 않는다.
     expect(screen.queryByText("자동 점검 결과")).toBeNull();
-    expect(screen.queryByText(/^AI 검토 · /)).toBeNull();
+    expect(screen.queryByText(/^AI 품질 심사 · /)).toBeNull();
     // 판정에 쓰이지 않는 격리 지적과 세부 추적 정보는 최종 승인 화면에 두지 않는다.
     expect(screen.queryAllByText(isolated.issue_ko)).toHaveLength(0);
     expect(screen.queryByText(/추가 모델 검토 선택/)).toBeNull();

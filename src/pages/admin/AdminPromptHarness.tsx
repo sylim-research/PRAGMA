@@ -24,7 +24,7 @@ import type { RuleId } from "@/lib/pragma/missionRules";
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "시나리오 생성",
   mission: "학습 미션 생성",
-  review: "AI 검토와 모델 간 교차 검토",
+  review: "AI 품질 심사와 독립 검토",
   runtime: "학습자 AI 피드백",
   authoring: "실제 자료 활용",
 };
@@ -159,19 +159,19 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title" className={PART_CARD}>
-      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검 → AI 검토 → 교수자 최종 승인" />
+      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 규칙 점검 → AI 품질 심사 → 교수자 감수·최종 승인" />
       <div className={PART_BODY}>
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
           className={`group ${STAGE_CARD} text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : ""}`}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
-            <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
+            <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 규칙 점검</span>
+            <Badge variant="outline" className="bg-white font-normal">서버 코드</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">규칙 기반 검사</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
-            미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
+            구성·수량·언어 방향·생성 기록을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
           <span className={STAGE_LINK}>
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
@@ -180,12 +180,12 @@ function HarnessOverview() {
         </button>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#3F6172]">AI 검토</span>
-            <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
+            <span className="text-[13px] font-semibold text-[#3F6172]">AI 품질 심사</span>
+            <Badge variant="outline" className="bg-white font-normal">GPT-4.1</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">프롬프트 통제 기반 검토</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
+            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 Claude가 따로 검토하고 GPT-4.1이 그 의견을 재판정합니다.
           </p>
           <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
             검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
@@ -193,12 +193,12 @@ function HarnessOverview() {
         </div>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#6D675D]">최종 사용 결정</span>
+            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 감수·최종 승인</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">교수자 최종 승인</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
+            각 단계의 의견과 실제 콘텐츠를 직접 대조해 수업 사용 여부를 결정합니다.
           </p>
           <Link to="/admin/review" className={`group ${STAGE_LINK}`}>
             승인 화면으로<ChevronRight aria-hidden className={STAGE_ARROW} />

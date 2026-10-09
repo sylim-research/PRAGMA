@@ -1245,11 +1245,13 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
         <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[#15202B]"><Lightbulb className="h-[18px] w-[18px]" strokeWidth={2.25} /></span>
         단어 힌트 보기<ChevronRight aria-hidden className="h-4 w-4 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" strokeWidth={2.5} />
       </summary>
-      <dl className="flex flex-wrap gap-2" aria-label="단어 힌트">
-        {hints.map((hint) => (
-          <div key={hint.source} className="inline-flex w-fit max-w-full items-baseline gap-2 rounded-[14px] rounded-bl-md bg-[#326BD6] px-3 py-1.5 text-white">
-            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] font-semibold leading-6 text-white`}>{hint.source}</dt>
-            <dd lang={mission.targetLanguage.code} className={`${targetFont} flex min-w-0 items-baseline gap-2 break-words text-[17px] font-medium leading-6 text-white`}><span aria-hidden className="text-[13px] font-normal text-white/60">·</span><span className="min-w-0 break-words">{hint.target}</span></dd>
+      {/* 칩 없이 사전식 한 줄(2026-10-10 연구자 선택 D안). 파란 채움 칩은 화면의 CTA보다 먼저 눈에 들어와 뺐다. */}
+      <dl className="flex flex-wrap items-baseline gap-x-3 gap-y-1" aria-label="단어 힌트">
+        {hints.map((hint, index) => (
+          <div key={hint.source} className="inline-flex max-w-full items-baseline gap-2">
+            {index > 0 && <span aria-hidden className="text-[15px] font-bold text-[#C9A62E]">·</span>}
+            <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] leading-6 text-[#5D6970]`}>{hint.source}</dt>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} min-w-0 break-words border-b-[1.5px] border-dotted border-[#C9A62E] text-[17px] font-semibold leading-6 text-[#15202B]`}>{hint.target}</dd>
           </div>
         ))}
       </dl>
