@@ -2120,7 +2120,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
             ? { phase: "재검토", activity: `내 ${outputName} 재검토` }
             : { phase: "AI 피드백", activity: progressLabel(quests[activeIndex], outputName) };
   return (
-    <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-2.5 sm:px-4" aria-label="미션 학습 흐름">
+    <section className="sticky top-16 z-30 border-b border-[#DDD8CC] bg-[#FBFAF6] px-3 py-3 sm:px-4" aria-label="미션 학습 흐름">
       <div className={`flex items-center gap-3 sm:gap-4 ${freeJump ? "flex-wrap sm:flex-nowrap" : ""}`}>
         {/* 단계를 점과 선으로 따로 그리지 않고 이어진 막대 하나로 — 지난 구간 금색, 현재 구간 남색. */}
         <ol className="flex min-w-0 flex-1 gap-1.5" aria-label={stages.join(", ")}>
