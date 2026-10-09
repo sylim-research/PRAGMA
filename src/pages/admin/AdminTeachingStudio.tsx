@@ -74,7 +74,7 @@ export default function AdminTeachingStudio() {
     <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(320px,0.85fr)_minmax(0,1.35fr)]">
       <TeachingSourceCollection sources={sources} selected={selected} disabled={busy || Boolean(editing)} onBusy={setExtracting}
         onChange={value => { restored.current = true; setSources(value); invalid(); }} onSelected={value => { setSelected(value); invalid(); }} />
-      <div className="min-w-0 space-y-5">
+      <div className="flex min-w-0 flex-col gap-4">
         <section className="rounded-2xl border bg-white p-4 sm:p-5" aria-label="생성 조건">
           <h2 className="text-lg font-bold">2. 이번 수업의 조건</h2>
           <fieldset disabled={locked || Boolean(editing)} className="mt-4 min-w-0 space-y-4"><legend className="sr-only">교과목과 산출물 선택</legend>

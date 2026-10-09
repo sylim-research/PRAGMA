@@ -888,11 +888,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     const metaLine = aiReview ? [] : reviewMode
       ? [info?.placement === "편성 전" ? null : info?.placement]
       : [];
-    // 제작 화면은 상황을 한 줄로 줄여 오른쪽 칸에 스크롤이 생기지 않게 한다 — 전문은 마우스를 올리면 보인다(2026-10-08).
+    // 제작 화면은 상황을 두 줄까지만 보여 오른쪽 칸에 스크롤이 생기지 않게 한다 — 전문은 마우스를 올리면 보인다(2026-10-08, 한 줄→두 줄 2026-10-09).
     // 품질 점검·감수 화면은 상황 전문을 읽고 판단해야 하므로 그대로 둔다.
     const scenarioLine = !aiReview && !reviewMode;
     const scenarioText = scenarioLine ? (
-      <p className="max-w-[54rem] truncate text-[13.5px] leading-relaxed text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
+      <p className="max-w-[54rem] line-clamp-2 text-[13.5px] leading-relaxed text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
         {r.core_content?.situation_ko ?? "—"}
       </p>
     ) : (
@@ -1371,8 +1371,8 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
                 step.status === "todo" ? "bg-[#DDD8CB]" : "bg-[#233542]"].join(" ")} />
             )}
             <span className="flex flex-col items-center text-center">
-              <span className={["relative z-[1] flex size-6 items-center justify-center rounded-full text-[12px] font-bold tabular-nums",
-                "bg-[#233542] text-white", step.status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
+              <span className={["relative z-[1] flex h-[22px] w-[22px] items-center justify-center rounded-full text-[12.5px] font-bold tabular-nums",
+                "bg-[#FAD338] text-[#15202B]", step.status === "current" ? "ring-2 ring-[#233542] ring-offset-2 ring-offset-[#FBFAF6]" : ""].join(" ")}>
                 {step.status === "done" ? "✓" : index + 1}
               </span>
               {/* 아직 안 한 단계도 흐름이 읽히도록 한 단계 진하게 둔다(굵기로 현재·완료와 구분). */}

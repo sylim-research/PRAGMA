@@ -1280,7 +1280,7 @@ const AdminGenerator = () => {
 
         {/* RIGHT — preview */}
         <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
-          <h2 className="text-[16.5px] font-bold text-[#1d2336]">생성 결과 미리보기</h2>
+          <h2 className="flex items-center gap-2 text-[16.5px] font-bold text-[#1d2336]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">7</span>생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[13.75px] font-medium text-[#065F46]">
@@ -1614,7 +1614,7 @@ const SectionTitle = ({
   >
     <span
       className={[
-        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[13.75px] font-semibold text-[#15202B]",
+        "inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]",
       ].join(" ")}
     >
       {n}

@@ -477,7 +477,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         {/* ① 원자료 가져오기 — 세 경로는 결국 전부 '문구'가 된다 */}
         <div>
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="flex items-center gap-2 whitespace-nowrap text-[16.5px] font-bold text-[#15202B]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[13.75px] font-semibold text-[#15202B]">1</span>원자료 가져오기</h3>
+            <h3 className="flex items-center gap-2 whitespace-nowrap text-[16.5px] font-bold text-[#15202B]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>원자료 가져오기</h3>
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2">
             {([
@@ -607,7 +607,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
         {/* 만들 콘텐츠의 언어 방향 — 자료(영상·이미지)의 언어가 아니라 학습 과제의 방향 */}
         <div className="border-t border-[#EFEAE0] pt-4">
           <div className="flex items-baseline justify-between gap-2">
-            <h3 className="flex items-center gap-2 text-[16.5px] font-bold text-[#15202B]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[13.75px] font-semibold text-[#15202B]">2</span>만들 콘텐츠의 언어방향</h3>
+            <h3 className="flex items-center gap-2 text-[16.5px] font-bold text-[#15202B]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>만들 콘텐츠의 언어방향</h3>
           </div>
           <div className="mt-2 flex gap-2">
             {(["zh_ko", "ko_zh"] as LanguageDirection[]).map((d) => (

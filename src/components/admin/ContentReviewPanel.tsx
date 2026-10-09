@@ -295,10 +295,10 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             return <li key={row.key} className={["relative px-4 py-2.5", status === "running" ? "bg-[#EEF1F4]" : ""].join(" ")}>
               {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-                <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold",
-                  status === "failed" ? "bg-red-700 text-white" : "bg-[#233542] text-white",
-                  status === "current" ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
-                  {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-white/40 border-t-white" /> : status === "done" ? "✓" : index + 1}
+                <span className={["flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12.5px] font-bold",
+                  status === "failed" ? "bg-red-700 text-white" : "bg-[#FAD338] text-[#15202B]",
+                  status === "current" ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
+                  {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" /> : status === "done" ? "✓" : index + 1}
                 </span>
                 <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">
                   <span className="inline-flex flex-wrap items-center gap-2">{row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
@@ -324,8 +324,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             </li>;
           })}
           <li className={["flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3", professorCurrent ? "bg-[#EEF1F4]" : ""].join(" ")}>
-            <span className={["flex size-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold",
-              "bg-[#233542] text-white", professorCurrent ? "ring-2 ring-[#FAD338] ring-offset-2" : ""].join(" ")}>
+            <span className={["flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12.5px] font-bold",
+              "bg-[#FAD338] text-[#15202B]", professorCurrent ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
             <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">교수자 최종 승인</span>
@@ -474,7 +474,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && <section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
+              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>}
             {next === "professor" && <>
@@ -520,7 +520,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">4</span>교수자 최종 승인</h4>
+          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">4</span>교수자 최종 승인</h4>
           <div className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
           <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
