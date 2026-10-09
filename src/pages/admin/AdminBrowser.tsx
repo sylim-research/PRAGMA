@@ -84,9 +84,13 @@ const AUTHENTIC_SOURCE_KO: Record<string, string> = {
 
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
-// 칸 색은 수준이 아니라 개수의 많고 적음만 나타낸다 — 브랜드 노랑 한 색의 농도(2026-10-09).
-// 회색 계열은 「죽은 기능」처럼 보여 쓰지 않는다.
-const CELL_TONE = { rgb: "250, 211, 56", text: "#6D5C1F" };
+// 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
+// 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
+const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
+  beginner_intermediate: { rgb: "246, 225, 212", text: "#8A5A3C" },
+  intermediate: { rgb: "220, 233, 223", text: "#496557" },
+  advanced: { rgb: "220, 232, 240", text: "#4B6575" },
+};
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
 /**
@@ -360,7 +364,7 @@ const AdminBrowser = () => {
                       const n = c.total;
                       const active = sel?.act === act && sel?.level === lv;
                       const density = maxCellCount > 0 ? n / maxCellCount : 0;
-                      const tone = CELL_TONE;
+                      const tone = LEVEL_CELL_TONE[lv];
                       return (
                         <td key={lv} className="text-center">
                           <button
@@ -377,7 +381,7 @@ const AdminBrowser = () => {
                             }`}
                             style={
                               !active && n > 0
-                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.18 + density * 0.62})` }
+                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.6 + density * 0.4})` }
                                 : undefined
                             }
                             title={
