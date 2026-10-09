@@ -46,10 +46,10 @@ const Page = () => {
   <RecordToolsShell active="export">
     <section className="rounded-xl border border-[#E2DED2] bg-white p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="text-[16.5px] font-bold text-[#15202B]">내려받기 기간 설정</h2>
+        <h2 className="text-[17.5px] font-bold text-[#15202B]">내려받기 기간 설정</h2>
         <div className="flex items-center gap-1.5">
-          <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[12px] text-emerald-800">동의 기반</Badge>
-          <Badge variant="outline" className="border-[#9FB0C6] bg-[#F7F9FC] text-[12px] text-[#1F3A5F]">내보내기 형식 버전 1</Badge>
+          <Badge variant="outline" className="border-emerald-200 bg-emerald-50 text-[13px] text-emerald-800">동의 기반</Badge>
+          <Badge variant="outline" className="border-[#9FB0C6] bg-[#F7F9FC] text-[13px] text-[#1F3A5F]">내보내기 형식 버전 1</Badge>
         </div>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_auto] md:items-end">
@@ -70,7 +70,7 @@ const Page = () => {
           </Button>
         </div>
       </div>
-      <p className="mt-3 text-[12.5px] text-[#46515A]">
+      <p className="mt-3 text-[14px] text-[#46515A]">
         기간을 비우면 전체 기간을 내려받습니다. 누가 언제 어떤 기준으로 내려받았는지도 기록됩니다.
       </p>
       {message && <p role="status" className="mt-2 text-sm font-semibold text-[#1F3A5F]">{message}</p>}
@@ -86,11 +86,11 @@ const Page = () => {
             </span>
           )}
           <div className="min-w-0 flex-1 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5">
-            <h3 className="flex items-center gap-2 text-[13.5px] font-bold text-[#15202B]">
+            <h3 className="flex items-center gap-2 text-[16px] font-bold text-[#15202B]">
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1F2A44] text-[12px] text-white">{index + 1}</span>
               {title}
             </h3>
-            <p className="mt-1.5 text-[12.5px] leading-[1.6] text-[#46515A]">{body}</p>
+            <p className="mt-1.5 text-[14px] leading-[1.65] text-[#46515A]">{body}</p>
           </div>
         </Fragment>
       ))}

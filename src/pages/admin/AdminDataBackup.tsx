@@ -90,17 +90,18 @@ const ScopeDetails = () => (
  */
 const BADGE_TONE = {
   brand: "border-accent bg-accent/25 text-foreground",
-  ink: "border-primary/20 bg-primary/5 text-primary/80",
+  // 복원 = 남색(브랜드색). 초록은 「통과」 판정색이라 쓰지 않고, 회색은 죽은 기능처럼 보여 쓰지 않는다(2026-10-09).
+  ink: "border-[#233542] bg-[#233542] text-white",
 } as const;
 
 const RoleBadge = ({ children, tone }: { children: string; tone: keyof typeof BADGE_TONE }) => (
-  <span className={`rounded border px-2 py-0.5 text-[12px] font-medium ${BADGE_TONE[tone]}`}>{children}</span>
+  <span className={`rounded border px-2 py-0.5 text-[13px] font-medium ${BADGE_TONE[tone]}`}>{children}</span>
 );
 
 /** 백업 전 「무엇이 담기는지」를 보여 주는 작은 수치 칸 — 오른쪽 미리보기와 같은 리듬. */
 const StatTile = ({ label, value }: { label: string; value: string }) => (
   <div className="rounded-lg bg-muted/50 px-3 py-2 text-center">
-    <p className="text-[12px] text-muted-foreground">{label}</p>
+    <p className="text-[13px] text-muted-foreground">{label}</p>
     <p className="mt-0.5 text-base font-semibold">{value}</p>
   </div>
 );
@@ -321,7 +322,7 @@ const Page = () => {
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="brand">수업 백업</RoleBadge>
-              <h2 className="text-[16.5px] font-bold">데이터 백업</h2>
+              <h2 className="text-[17.5px] font-bold">데이터 백업</h2>
             </div>
             {/* 제외 항목은 「백업 범위 자세히 보기」에만 둔다 — 첫 화면에서 굳이 앞세우지 않는다. */}
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
@@ -348,7 +349,7 @@ const Page = () => {
             </select>
 
             {selectedCourse && (
-              <p className="mt-1.5 text-[12.5px] font-medium text-[#1F3A5F]">{courseTraits(selectedCourse).join(" · ")}</p>
+              <p className="mt-1.5 text-[13px] font-medium text-[#1F3A5F]">{courseTraits(selectedCourse).join(" · ")}</p>
             )}
 
             <Button className="mt-3.5 w-full" onClick={runBackup} disabled={!selectedId || backingUp}>
@@ -370,7 +371,7 @@ const Page = () => {
                   <p className="text-sm text-emerald-900/80">
                     {lastBackup.weeks}주 · 미션 배치 {lastBackup.assignments}건 · 학습 미션 {lastBackup.scenarios}건
                   </p>
-                  <p className="mt-1 break-all text-xs text-emerald-900/70">{lastBackup.filename}</p>
+                  <p className="mt-1 break-all text-[13px] text-emerald-900/70">{lastBackup.filename}</p>
                 </div>
               </div>
             )}
@@ -383,7 +384,7 @@ const Page = () => {
                   <StatTile label="미션 배치" value={`${counts.assignments}건`} />
                   <StatTile label="학습 미션" value={`${counts.scenarios}건`} />
                 </div>
-                <p className="mt-2 break-all text-xs text-muted-foreground">
+                <p className="mt-2 break-all text-[13px] text-muted-foreground">
                   저장될 파일 이름 · {courseBackupFilenamePreview(selectedCourse?.title ?? "교과목")}
                 </p>
               </div>
@@ -396,12 +397,12 @@ const Page = () => {
         </section>
 
         {/* 복원은 보조 동작이지만 배경을 죽이지 않는다 — 위계는 배지와 테두리로만 준다. */}
-        <section className="flex h-full flex-col overflow-hidden rounded-xl border border-border bg-card">
-          <div className="h-1 bg-primary/15" />
+        <section className="flex h-full flex-col overflow-hidden rounded-xl border border-[#233542]/30 bg-card">
+          <div className="h-1 bg-[#233542]" />
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="ink">수업 복원</RoleBadge>
-              <h2 className="text-[16.5px] font-bold">데이터 복원</h2>
+              <h2 className="text-[17.5px] font-bold">데이터 복원</h2>
             </div>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               이전에 저장한 백업 파일을 불러와 해당 시점의 수업 구성으로 복원합니다.
@@ -421,7 +422,7 @@ const Page = () => {
             >
               <Upload className="mb-2 h-5 w-5 text-muted-foreground" aria-hidden="true" />
               <span className="text-sm font-medium">{pendingFileName ?? "백업 파일 올리기"}</span>
-              <span className="mt-1 text-xs text-muted-foreground">
+              <span className="mt-1 text-[13px] text-muted-foreground">
                 {pendingFileName ? "다른 파일을 올리려면 다시 선택하세요" : ".json 파일을 끌어다 놓아도 됩니다 · 복원 전에 내용을 먼저 보여 줍니다"}
               </span>
             </label>
@@ -499,7 +500,7 @@ const Page = () => {
             )}
 
             <div className="mt-auto pt-3.5">
-              <p className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-[12.5px] leading-5 text-emerald-900">
+              <p className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50/60 px-3 py-2 text-[13px] leading-5 text-emerald-900">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" aria-hidden="true" />
                 <span><b>복원 전 자동 백업</b> · 현재 구성을 먼저 저장해 되돌릴 수 있습니다.</span>
               </p>
