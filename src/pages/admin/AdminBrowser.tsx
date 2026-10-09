@@ -86,12 +86,12 @@ const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 // 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
 // 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
-// 핑크 → 옐로 → 그린을 채도를 뺀 뉴트럴 톤으로(2026-10-09): 더스티 로즈 · 샴페인 · 세이지.
+// 핑크 → 옐로 → 그린(2026-10-09): 사탕색과 칙칙한 뉴트럴 사이 — 로즈 · 샴페인 · 세이지에 생기를 조금.
 // 사탕색이 아니라 회색이 한 방울 섞인 색이라 차분하다. 테두리 없음, 숫자는 기본 짙은 색.
 const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "240, 225, 225", text: "#7C5660" },
-  intermediate: { rgb: "243, 237, 222", text: "#72653F" },
-  advanced: { rgb: "225, 234, 226", text: "#526A57" },
+  beginner_intermediate: { rgb: "245, 226, 230", text: "#83505D" },
+  intermediate: { rgb: "247, 240, 217", text: "#756636" },
+  advanced: { rgb: "223, 237, 226", text: "#4E6C55" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
