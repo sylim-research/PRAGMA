@@ -86,12 +86,12 @@ const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
 // 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
 // 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
-// 은은한 핑크 → 버터 옐로 → 그린(2026-10-09). 테두리 없음, 숫자는 기본 짙은 색.
-// 미션이 몰리는 중급(옐로)은 핑크·그린보다 살짝 옅게 해 혼자 튀지 않게 한다.
+// 핑크 → 옐로 → 그린을 채도를 뺀 뉴트럴 톤으로(2026-10-09): 더스티 로즈 · 샴페인 · 세이지.
+// 사탕색이 아니라 회색이 한 방울 섞인 색이라 차분하다. 테두리 없음, 숫자는 기본 짙은 색.
 const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "249, 228, 232", text: "#8A4D5C" },
-  intermediate: { rgb: "250, 243, 218", text: "#77692F" },
-  advanced: { rgb: "224, 238, 226", text: "#4B6B51" },
+  beginner_intermediate: { rgb: "240, 225, 225", text: "#7C5660" },
+  intermediate: { rgb: "243, 237, 222", text: "#72653F" },
+  advanced: { rgb: "225, 234, 226", text: "#526A57" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
@@ -374,7 +374,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-[50px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-[54px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
