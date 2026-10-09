@@ -78,6 +78,8 @@ function PlainBar({ count, total, tone = "navy", height = "h-2.5" }: { count: nu
   </div>;
 }
 
+// 문항 고르기 = 다섯 개의 타일(2026-10-09). 밑줄 탭은 눌러 볼 수 있다는 게 잘 안 보여 MJT 2~5를 지나치기 쉬웠다.
+// 타일마다 번호·활동 이름·응답 수를 보이고, 마우스를 올리면 떠오르며 금빛 테두리가 생긴다. 고른 타일은 네이비.
 function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; active: boolean; onClick: () => void }) {
   return <button
     type="button"
@@ -85,11 +87,17 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
     aria-label={`MJT ${item.itemId} · ${item.activity}`}
     onClick={onClick}
     className={[
-      "-mb-px min-w-0 border-b-2 px-3 py-2 text-left text-[14px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
-      active ? "border-[#15202B] font-bold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
+      "group flex min-w-0 flex-col items-start gap-0.5 rounded-lg border px-3 py-2.5 text-left transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+      active
+        ? "border-[#15202B] bg-[#15202B] text-white shadow-[0_4px_12px_rgba(21,32,43,0.18)]"
+        : "border-[#E2DED2] bg-white text-[#15202B] hover:-translate-y-0.5 hover:border-[#C9A62E] hover:bg-[#FFFBEB] hover:shadow-[0_4px_12px_rgba(21,32,43,0.08)]",
     ].join(" ")}
   >
-    <span className="mr-1.5 text-[14px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
+    <span className="flex w-full items-center justify-between gap-2">
+      <span className={`text-[13px] font-bold ${active ? "text-[#FAD338]" : "text-[#B8860B]"}`}>MJT {item.itemId}</span>
+      <span className={`text-[12.5px] tabular-nums ${active ? "text-white/70" : "text-[#7A858C]"}`}>{item.total}명</span>
+    </span>
+    <span className="truncate text-[14.5px] font-semibold">{item.activity}</span>
   </button>;
 }
 
@@ -440,21 +448,21 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
   const size = projector ? "text-[15.5px]" : "text-[14.5px]";
   const selected = data.items.find((item) => item.itemId === state.itemId) ?? data.items[0] ?? null;
 
-  // 보드는 학습 미션 화면과 같은 폭(48rem)으로 묶는다 — 원고 그림으로 한 장에 잘라 넣기 좋고, 막대·문장이 지나치게 길어지지 않는다(2026-10-09). 크게 보기는 넓게.
-  return <div className={`space-y-3 ${projector ? "" : "max-w-3xl"}`} aria-label="학습자 응답 토론 보드">
+  // 보드는 학습 미션 화면보다 조금 넓은 780px로 묶는다 — 원고 그림으로 한 장에 잘라 넣기 좋고, 막대·문장이 지나치게 길어지지 않는다(2026-10-09). 크게 보기는 넓게.
+  return <div className={`space-y-3 ${projector ? "" : "max-w-[780px]"}`} aria-label="학습자 응답 토론 보드">
     {data.items.length === 0 ? <p className={`rounded-xl border border-dashed border-[#DAD6CA] bg-white p-5 text-[#5D6970] ${size}`}>
       집계된 기록에 MJT 판단 응답이 없습니다.
     </p> : <>
-      <div className="flex flex-wrap border-b border-[#E2DED2]" aria-label="MJT 판단 문항">
+      {/* 데모 표시는 문항 타일 위 오른쪽 끝의 배지로 둔다 — 따로 띠 카드를 두지 않는다(2026-10-09). */}
+      {demo && !projector && <div className="flex justify-end"><span role="note" className="rounded-full bg-[#FAD338] px-3 py-1 text-[13.5px] font-bold text-[#15202B]"
+        title="운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span></div>}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5" aria-label="MJT 판단 문항">
         {data.items.map((item) => <ItemSummaryCard
           key={item.itemId}
           item={item}
           active={selected?.itemId === item.itemId}
           onClick={() => onChange({ ...state, itemId: item.itemId })}
         />)}
-        {/* 데모 표시는 문항 탭 줄 오른쪽 끝의 배지로 둔다 — 따로 띠 카드를 두지 않는다(2026-10-09). */}
-        {demo && !projector && <span role="note" className="mb-1.5 ml-auto self-center rounded-full bg-[#FAD338] px-3 py-1 text-[13.5px] font-bold text-[#15202B]"
-          title="운영 기록에 저장되지 않으며, 실제 응답과 같은 집계·표시 코드로 그립니다.">{VIRTUAL_CLASS_NOTICE}</span>}
       </div>
 
       {selected && <section aria-label={`MJT ${selected.itemId} · ${selected.activity}`} className="rounded-xl border border-[#E2DED2] bg-white">
