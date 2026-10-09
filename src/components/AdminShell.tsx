@@ -49,10 +49,10 @@ export const AdminShell = ({ title, description, children, compact = false, hide
   const standaloneClasses = (active: boolean) =>
     [
       "ml-3 mr-2 rounded-lg py-2 pl-4 pr-3 text-[15.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
-      // 평소 = 「학습 미션 시작하기」의 연한 노랑, 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
+      // 평소 = 한 단계 더 연한 노랑(2026-10-09), 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
-        : "bg-[#FADB6A] text-[#15202B] hover:bg-[#FCE38A]",
+        : "bg-[#FDECA8] text-[#15202B] hover:bg-[#FCE38A]",
     ].join(" ");
 
   const itemClasses = (active: boolean) =>
