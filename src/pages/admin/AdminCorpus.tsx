@@ -531,9 +531,9 @@ function DatasetOverview({
         <div className="flex min-w-0 items-center gap-3">
           {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">
-              HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
-            </h2>
+            {/* 카드 제목은 수준별 참조 범위, 데이터셋 규모는 옆의 보조 정보로 둔다(2026-10-09). */}
+            <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">PRAGMA 수준별 HSK 참조 범위</h2>
+            <span className="text-[14px] text-[#514C44]">HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span></span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
             </span>
@@ -544,15 +544,8 @@ function DatasetOverview({
         </div>
       </div>
 
-      <div className="px-4 pb-3.5 pt-[22px] sm:px-5">
-        <div>
-          <div>
-            <p className="text-[15px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
-          </div>
-        </div>
-
-        {/* 소제목은 아래 카드에 붙인다 — 위 22px, 아래 6px(전역 mt-3 덮어쓰기를 피해 mt-[6px]). */}
-        <div className="mt-[6px] grid gap-2 sm:grid-cols-3">
+      <div className="px-4 py-3.5 sm:px-5">
+        <div className="grid gap-2 sm:grid-cols-3">
           {PRAGMA_RANGES.map((range) => (
             <div
               key={range.id}
