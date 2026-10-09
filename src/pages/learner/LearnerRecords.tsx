@@ -225,7 +225,7 @@ function groupMeta(record: ReportRecord) {
 }
 
 // 글자 체계: 한국어 본문 14~15px · 보조 12~13px · 중국어 표현 17px. 한 화면에서 이 값만 쓴다.
-const zhLine = "font-zh text-[17px] leading-[1.7] text-[#15202B] [word-break:keep-all] break-words";
+const zhLine = "font-zh text-[17px] leading-[1.85] text-[#15202B] [word-break:keep-all] break-words";
 const lineLabel = "w-9 shrink-0 pt-[5px] text-[14px] font-semibold text-[#8C8471]";
 
 function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | "after" }) {
@@ -275,7 +275,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       <section className={`${card} px-4 py-2.5`} aria-label="AI 피드백">
         <p className={cardLabel}>AI 피드백</p>
         {change || record.feedback.length > 0 ? (
-          <div className="mt-1 space-y-1 text-[15px] leading-6 text-[#26323D]">
+          <div className="mt-1.5 space-y-1.5 text-[15px] leading-[1.8] text-[#26323D]">
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {change?.band && (
                 <span className="inline-flex items-center gap-1.5 rounded-full border-[1.6px] px-2.5 py-[1px] text-[14px] font-bold" style={{ borderColor: TONE[change.band.tone], color: "#15202B" }}>
@@ -397,7 +397,7 @@ function Alternatives({ items }: { items: MissionReference["alternatives"] }) {
             <p className={cardLabel}>예시 {index + 1}</p>
             <p className={`mt-1 ${zhLine}`}>{item.text}</p>
             {item.note && (
-              <p className="mt-[8px] border-t border-dashed border-[#EBDDA2] pt-1.5 break-keep text-[15px] leading-[1.65] text-[#26323D]">
+              <p className="mt-[8px] border-t border-dashed border-[#EBDDA2] pt-2 break-keep text-[15px] leading-[1.8] text-[#26323D]">
                 <span className="mr-1.5 font-bold text-[#8A7423]">해설</span><NoteText text={item.note} />
               </p>
             )}
