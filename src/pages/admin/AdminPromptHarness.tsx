@@ -219,7 +219,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="px-4 py-2.5">
+      <CardHeader className="space-y-0 px-4 py-2">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -231,16 +231,16 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[15px] leading-snug">{entry.label}</CardTitle>
+            <CardTitle className="text-[15px] leading-tight">{entry.label}</CardTitle>
           </button>
-          <Badge variant="outline" className="shrink-0 font-mono text-[12px]">
+          <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[12px] leading-5">
             {entry.sha256.slice(0, 10)}
           </Badge>
-          <Badge variant="secondary" className="shrink-0 font-normal">
+          <Badge variant="secondary" className="shrink-0 px-2 py-0 font-normal leading-5">
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="mt-0.5 pl-5 text-[13.5px] leading-snug text-muted-foreground">
+        <p className="mt-0.5 pl-5 text-[13.5px] leading-tight text-muted-foreground">
           {entry.note}
         </p>
       </CardHeader>
@@ -277,7 +277,7 @@ const AdminPromptHarness = () => {
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
               <h3 className="mb-2 border-l-[3px] border-[#C9A62E] pl-2 text-[16px] font-bold leading-5 text-[#26333B]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="grid gap-2 md:grid-cols-2">
+              <div className="grid gap-1.5 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
                 ))}
