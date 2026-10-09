@@ -441,7 +441,7 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
         <span className="text-[14px] text-[#514C44]">학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       {/* 순위는 위에서 아래로 센다(1–5 | 6–10 …) — 다단 배열(2026-10-09). */}
-      <ol className="gap-x-6 border-t border-[#EFEAE0] px-5 py-3 sm:columns-2 lg:columns-4">
+      <ol className="gap-x-10 border-t border-[#EFEAE0] px-5 py-3 [column-rule:1px_solid_#EAE4D6] sm:columns-2 lg:columns-4">
         {top.words.map(({ word, missionCount }, index) => (
           <li key={word} className="flex break-inside-avoid items-center gap-2.5 py-1 text-[14px]">
             <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
