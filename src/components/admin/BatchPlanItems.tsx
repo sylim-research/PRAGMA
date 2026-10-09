@@ -35,7 +35,7 @@ export function BatchPlanItems({ plan, selected, disabled, onSelect, actions, fo
   }, [pageSelectedCount, pageAllSelected]);
 
   return <section aria-labelledby="batch-items-heading" className="rounded-xl border bg-white p-5">
-    <h2 id="batch-items-heading" className="flex items-center gap-2 text-[16.5px] font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-xs font-bold text-[#7A4A0A]">3</span>생성 항목 확인·실행</h2>
+    <h2 id="batch-items-heading" className="flex items-center gap-2 text-[16.5px] font-bold"><span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-xs font-bold text-white">3</span>생성 항목 확인·실행</h2>
     {actions && <div className="mt-3 rounded-lg bg-[#FAF8F2] px-3 py-2">{actions}</div>}
     <div className="mt-4 max-w-full overflow-x-auto">
       <table className="w-full min-w-[820px] table-fixed text-[14px]">
