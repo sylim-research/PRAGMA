@@ -4,7 +4,7 @@ import { ArchiveRestore, FileDown } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 
 /**
- * 「연구 기록·편성 백업」 — 연구용 기록 내보내기(기본)와 수업 편성 백업·복원을 한 메뉴의 두 탭으로 묶는다(2026-10-08).
+ * 「연구 기록·수업 백업」 — 연구용 기록 내보내기(기본)와 수업 편성 백업·복원을 한 메뉴의 두 탭으로 묶는다(2026-10-08).
  * 두 화면은 주소(/admin/data-backup, /admin/export)와 내용을 그대로 두고, 머리와 탭만 공유한다.
  */
 const TABS = [
@@ -16,7 +16,7 @@ export function RecordToolsShell({ active, children }: { active: (typeof TABS)[n
   const current = TABS.find((tab) => tab.key === active)!;
   return (
     <AdminShell
-      title="연구 기록·편성 백업"
+      title="연구 기록·수업 백업"
       description="연구에 쓸 학습 수행 기록을 내려받고, 수업 편성을 파일로 보관·복원합니다."
       compact
     >
