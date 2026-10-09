@@ -88,9 +88,10 @@ export const REPRESENTATIVE_MISSION_SNAPSHOT = {
           "老师您好，我申请交换生需要一封推荐信，请问您方便帮我写一封吗？下周五之前需要。"
         ],
         "learner_context_ko": "수업에서만 뵌 교수님께 이메일로 처음 부탁하며, 아직 수락을 받지 않았습니다.",
+        // 2026-10-09 연구자 지시: 허용 범위는 적절/부적절 경계 한쪽에만 둔다(이전 승인본은 경계를 넘어 「다소 적절」까지 허용). 운영 DB 행은 아직 옛 값.
         "accepted_scale_codes": [
           "somewhat_inappropriate",
-          "somewhat_appropriate"
+          "very_inappropriate"
         ],
         "reference_scale_code": "somewhat_inappropriate"
       },

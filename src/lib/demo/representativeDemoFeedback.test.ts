@@ -10,6 +10,8 @@ import {
   requestDemoFeedback,
 } from "./representativeDemoFeedback";
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "./representativeMissionSnapshot";
+import { REVERSE_REPRESENTATIVE_SNAPSHOT } from "./reverseRepresentativeSnapshot";
+import { KO_ZH_INTERPRETING_SNAPSHOT, ZH_KO_TRANSLATION_SNAPSHOT } from "./additionalDemoSnapshots";
 import { FeedbackSchema } from "@/lib/pragma/feedbackSchema";
 import approved from "../../../docs/research-trail/evidence/2026-10-04-representative-storage-demo/approved-snapshot.json";
 import recorded from "../../../docs/research-trail/evidence/2026-10-04-representative-storage-demo/recorded-attempt.json";
@@ -22,8 +24,10 @@ describe("representative mission model house", () => {
     expect(runnable.mission.provenance?.mission_content_hash).toBe("0024c9117662c674380b461cd7825e44704166577de73d752f58fa65e86a063b");
   });
 
-  it("is the approved DB content verbatim", () => {
-    expect(REPRESENTATIVE_MISSION_SNAPSHOT).toEqual(approved);
+  it("is the approved DB content verbatim except the documented one-sided band correction", () => {
+    const corrected = structuredClone(approved);
+    corrected.mission_content.mpj_items[1].accepted_scale_codes = ["somewhat_inappropriate", "very_inappropriate"];
+    expect(REPRESENTATIVE_MISSION_SNAPSHOT).toEqual(corrected);
     const task = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content.production_task;
     expect(task.vocabulary_hints.map((hint) => hint.target)).toEqual(["快递", "保管"]);
     expect(JSON.stringify(task)).not.toContain("代收");
@@ -56,5 +60,15 @@ describe("representative mission model house", () => {
     expect(DEMO_MJT_ANSWERS.A3).toBeUndefined(); // 기준 선택
     const rehearsal = items.find((item) => item.id === 4)!;
     expect(rehearsal.reference_alternatives).not.toContain(DEMO_MJT_ANSWERS.A4.text);
+  });
+
+  it("keeps every demo scale key on one side of the appropriate/inappropriate line", () => {
+    const sides = { very_appropriate: "a", somewhat_appropriate: "a", somewhat_inappropriate: "i", very_inappropriate: "i" } as Record<string, string>;
+    for (const snap of [REPRESENTATIVE_MISSION_SNAPSHOT, REVERSE_REPRESENTATIVE_SNAPSHOT, KO_ZH_INTERPRETING_SNAPSHOT, ZH_KO_TRANSLATION_SNAPSHOT]) {
+      for (const item of snap.mission_content.mpj_items as Array<Record<string, any>>) {
+        if (item.type !== "scale4") continue;
+        expect(new Set(item.accepted_scale_codes.map((code: string) => sides[code])).size).toBe(1);
+      }
+    }
   });
 });
