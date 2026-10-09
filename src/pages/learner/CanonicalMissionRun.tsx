@@ -853,7 +853,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
           {answered && !reasonAcceptedId && reasonId && <p className="mt-3 text-sm leading-6 text-[#635E52]">내 판단 이유 · {reasonLabel(reasonId)}</p>}
         </fieldset>}
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
-        {answered && quest.revisionExamples && <ReferenceExamples title="참고 표현" items={quest.revisionExamples} font="font-zh" />}
+        {answered && quest.revisionExamples && <ReferenceExamples title="추천 표현" items={quest.revisionExamples} font="font-zh" />}
       </section>
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
@@ -1016,7 +1016,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
           {paragraphs.flatMap(line => line.split(/(?<=[.!?。！？])\s+/)).filter(Boolean).map((line, index) => <li key={`${line}-${index}`} className="break-keep"><RichLine text={line} /></li>)}
         </ul>
       </section>}
-      {submitted && <ReferenceExamples title="참고 표현" items={quest.references} font={targetFont} />}
+      {submitted && <ReferenceExamples title="추천 표현" items={quest.references} font={targetFont} />}
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#DDD8CB] px-4 py-3" aria-label="다른 맥락에서는?">
         <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
@@ -1528,7 +1528,7 @@ function unavailableRuntimeEvaluation(
   targetLanguage = "중국어",
   outputName = "번역",
 ): DctEvaluation {
-  const body = `AI 피드백을 불러오지 못했습니다. 참고 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
+  const body = `AI 피드백을 불러오지 못했습니다. 추천 표현과 원문을 비교해 직접 다듬어 주세요. (${message})`;
   return {
     available: false,
     criteria: [
@@ -1540,7 +1540,7 @@ function unavailableRuntimeEvaluation(
     body,
     highlights: [],
     feedback: body,
-    action: `참고 표현을 복사하지 말고, 내 ${outputName}에서 한 곳을 직접 점검해 보세요.`,
+    action: `추천 표현을 복사하지 말고, 내 ${outputName}에서 한 곳을 직접 점검해 보세요.`,
     example: quest.referenceAnswer,
     takeaway: "판정이 불가능했던 수행은 점수로 해석하지 않습니다.",
   };
@@ -2497,8 +2497,8 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
           </div>
         </div>
       </section>
-      {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="참고 표현">
-        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />참고 표현</h2>
+      {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="추천 표현">
+        <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />추천 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
           <span className="inline-block rounded-md bg-[#FAD338] px-2 py-0.5 text-[12px] font-black text-[#15202B]">예시 {index + 1}</span>
           <p className={`${targetFont} mt-2 text-[17px] font-medium leading-8 text-[#15202B]`}>{alternative.text}</p>

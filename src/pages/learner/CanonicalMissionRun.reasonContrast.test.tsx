@@ -52,7 +52,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(screen.queryByText(/기준 판단과 같습니다|기준 판단과 다릅니다|기준 판단과 다르지만/)).not.toBeInTheDocument();
     expect(screen.getByText(/^판단을 확정했습니다\. 내 선택 매우 적절\./)).toBeInTheDocument();
     expect(screen.queryByText(feedbackSentence)).not.toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     const reasons = screen.getByRole("radiogroup", { name: "판단 이유" });
     expect(within(reasons).getAllByRole("radio")).toHaveLength(3);
     expect(screen.getByRole("button", { name: "이유 제출하기" })).toBeDisabled();

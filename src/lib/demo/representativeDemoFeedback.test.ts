@@ -24,9 +24,12 @@ describe("representative mission model house", () => {
     expect(runnable.mission.provenance?.mission_content_hash).toBe("0024c9117662c674380b461cd7825e44704166577de73d752f58fa65e86a063b");
   });
 
-  it("is the approved DB content verbatim except the documented one-sided band correction", () => {
+  it("is the approved DB content verbatim except the documented learner-facing corrections", () => {
     const corrected = structuredClone(approved);
     corrected.mission_content.mpj_items[1].accepted_scale_codes = ["somewhat_inappropriate", "very_inappropriate"];
+    // 2026-10-09: MJT5 explanation reads as commentary on the fix, not a second instruction.
+    corrected.mission_content.mpj_items[3].explanation_ko = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content.mpj_items[3].explanation_ko;
+    expect(corrected.mission_content.mpj_items[3].explanation_ko).not.toContain("고쳐 보세요");
     expect(REPRESENTATIVE_MISSION_SNAPSHOT).toEqual(corrected);
     const task = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content.production_task;
     expect(task.vocabulary_hints.map((hint) => hint.target)).toEqual(["快递", "保管"]);

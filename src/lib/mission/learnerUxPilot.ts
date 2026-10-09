@@ -109,6 +109,6 @@ export const LEARNER_UX_PILOT: CanonicalMissionViewModel = {
       ],
     },
     dct,
-    { ...dct, id: "A-FEEDBACK", kind: "dct_feedback", dctId: dct.id, shortLabel: "참고 표현 확인", title: "참고 표현과 내 번역을 비교해 보세요" },
+    { ...dct, id: "A-FEEDBACK", kind: "dct_feedback", dctId: dct.id, shortLabel: "추천 표현 확인", title: "추천 표현과 내 번역을 비교해 보세요" },
   ],
 };

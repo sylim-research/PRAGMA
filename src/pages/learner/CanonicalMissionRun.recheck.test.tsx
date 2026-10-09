@@ -90,7 +90,7 @@ describe("one DCT revision recheck", () => {
     vi.mocked(requestFeedback).mockResolvedValue({ ok: true, feedback: feedback(1) });
     openDraft();
     await screen.findByText("1차 선택권 재검토");
-    expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     click("이대로 확정");
     fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
     click("확정");
@@ -98,7 +98,7 @@ describe("one DCT revision recheck", () => {
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: A,
       feedback: feedback(1), contextJudgment: { reason_ko: "이 상황에서는 첫 표현을 유지하겠습니다.", final_decision: "retained_first_response" } });
-    expect(screen.getByRole("region", { name: "참고 표현" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "추천 표현" })).toBeInTheDocument();
   });
 
   it.each(["success", "failure"])("evaluates B once, allows final C and preserves A/B provenance after second %s", async status => {
@@ -115,7 +115,7 @@ describe("one DCT revision recheck", () => {
     expect(requestFeedback).toHaveBeenNthCalledWith(1, mission, A);
     expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
     expect(screen.queryByRole("button", { name: "최종안 제출하기" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("region", { name: "참고 표현" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     await act(async () => settle(status === "success" ? { ok: true, feedback: feedback(2) } : { ok: false, error: "offline" }));
     expect(screen.getByRole("heading", { name: "수정안 AI 피드백" })).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: "최종안" })).toHaveValue(B);
@@ -135,7 +135,7 @@ describe("one DCT revision recheck", () => {
       { round: 1, answer: A, result: { ok: true, feedback: feedback(1) } },
       { round: 2, answer: B, result: status === "success" ? { ok: true, feedback: feedback(2) } : { ok: false, error: "offline" } },
     ]);
-    expect(screen.getByRole("region", { name: "참고 표현" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "추천 표현" })).toBeInTheDocument();
     expect(JSON.stringify(mission)).toBe(before);
   });
 });
