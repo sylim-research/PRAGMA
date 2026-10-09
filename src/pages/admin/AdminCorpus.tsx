@@ -306,7 +306,7 @@ function OperationsSection({
         <div className="space-y-3.5 px-5 py-4">
           <div>
             <p className="text-[13px] font-medium text-[#8A7423]">대조 상세 · {kind}</p>
-            <h2 id="lexical-audit-title" className="mt-0.5 text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">
+            <h2 id="lexical-audit-title" className="mt-0.5 text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">
               {cleanTitle(audit.title) ?? axes.join(" · ")}
             </h2>
             <p className="mt-1 text-[13.5px] text-[#655F55]">
@@ -382,7 +382,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
     <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-3 pt-4">
         <div className="flex items-baseline gap-3">
-          <h2 id="audit-history-title" className="text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
+          <h2 id="audit-history-title" className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
             학습 미션 <b className="font-semibold text-[#15202B]">{fmt(summary.all.count)}</b> · HSK 목록 포함률(유형 기준) <b className="font-semibold text-[#15202B]">{pct(summary.all.matchRatio)}</b>
           </span>
@@ -437,14 +437,15 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   return (
     <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
-        <h2 id="top-outside-title" className="text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 후보</h2>
-        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
+        <h2 id="top-outside-title" className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">HSK 목록 밖 후보 Top {top.words.length}</h2>
+        <span className="text-[14px] text-[#514C44]">학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
-      <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 순위는 위에서 아래로 센다(1–5 | 6–10 …) — 다단 배열(2026-10-09). */}
+      <ol className="gap-x-10 border-t border-[#EFEAE0] px-5 py-3 [column-rule:1px_solid_#EAE4D6] sm:columns-2 lg:columns-4">
         {top.words.map(({ word, missionCount }, index) => (
-          <li key={word} className="flex items-center gap-2.5 py-1 text-[14px]">
+          <li key={word} className="flex break-inside-avoid items-center gap-2.5 py-1.5 text-[14px]">
             <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
-            <span className="w-16 shrink-0 font-zh text-[#15202B]" lang="zh">{word}</span>
+            <span className="w-16 shrink-0 font-zh text-[15px] text-[#15202B]" lang="zh">{word}</span>
             <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F4F1E8]">
               <span className="block h-full rounded-full bg-[#E3C44E]" style={{ width: `${(missionCount / max) * 100}%` }} />
             </span>
@@ -468,14 +469,15 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
-      <h2 id="audit-method-title" className="text-[20px] font-bold text-[#15202B]">대조 방식</h2>
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-4">
+      <h2 id="audit-method-title" className="text-[18px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
             {index > 0 && <span aria-hidden className="text-[#B5AC98]">→</span>}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-[#E5DEC9]">
-              <span className="text-[12px] font-semibold text-[#8A7423]">{index + 1}</span>{step}
+            {/* 실제 작업 순서라 관리자 화면 단계 번호(노란 원)와 같은 표지를 쓴다(2026-10-09). */}
+            <span className="inline-flex items-center gap-2 rounded-full bg-white py-1 pl-1 pr-3.5 font-medium text-[#15202B] shadow-[0_1px_2px_rgba(21,32,43,0.06)] ring-1 ring-[#E2D6AE]">
+              <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{index + 1}</span>{step}
             </span>
           </li>
         ))}
@@ -532,7 +534,7 @@ function DatasetOverview({
           {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {/* 카드 제목은 수준별 참조 범위, 데이터셋 규모는 범위 카드 아래 보조 문구로 둔다(2026-10-09). */}
-            <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">PRAGMA 수준별 HSK 참조 범위</h2>
+            <h2 id="dataset-title" className="text-[18px] font-bold tracking-[-0.015em] text-[#15202B]">PRAGMA 수준별 HSK 참조 범위</h2>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
             </span>
@@ -575,7 +577,7 @@ function OfficialSource({ status }: { status: ReferenceStatus | null }) {
     : fallback;
 
   return (
-    <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-2.5 sm:px-5" aria-labelledby="official-source-title">
+    <section className="rounded-xl border border-[#E2DED2] bg-[#F8F6EF] px-4 py-[13px] sm:px-5" aria-labelledby="official-source-title">
       {/* 공식 출처는 한 줄: 「공식 출처 · 제목 · 발행처 · 발표·시행」 + 오른쪽 PDF 링크. */}
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2.5 text-[13.5px]">

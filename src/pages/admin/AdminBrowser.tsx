@@ -84,10 +84,14 @@ const AUTHENTIC_SOURCE_KO: Record<string, string> = {
 
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
+// 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
+// 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
+// 피치 코럴 → 옐로 → 그린(2026-10-09): 핑크와 주황 사이의 피치 · 샴페인 · 세이지, 차분하되 생기 있게.
+// 사탕색이 아니라 회색이 한 방울 섞인 색이라 차분하다. 테두리 없음, 숫자는 기본 짙은 색.
 const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "255, 241, 184", text: "#7A6418" },
-  intermediate: { rgb: "220, 233, 223", text: "#496557" },
-  advanced: { rgb: "220, 232, 240", text: "#4B6575" },
+  beginner_intermediate: { rgb: "248, 228, 219", text: "#8A5442" },
+  intermediate: { rgb: "247, 240, 217", text: "#756636" },
+  advanced: { rgb: "223, 237, 226", text: "#4E6C55" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
@@ -282,47 +286,49 @@ const AdminBrowser = () => {
   return (
     <AdminShell
       title="학습 미션 관리"
-      description="수업에 쓸 수 있는 학습 미션을 화행·수준별로 봅니다."
+      description="편성할 수 있는 학습 미션을 화행·수준별로 봅니다."
     >
-      <div className="w-full">
+      {/* 관리자 화면 공통 정렬(2026-10-09): 카드 사이 16px · 카드 안쪽 px-5 py-4 · 같은 폭 · 그림자 없음 · 본문 14 / 보조 13 / 카드 제목 18. */}
+      <div className="flex w-full flex-col gap-4">
         {/* ── 요약 ── */}
-        <section className="rounded-xl border border-[#E2DED2] bg-white px-4 py-3 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
+        <section className="rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
           <div className="mb-4 flex flex-wrap gap-2" aria-label="라이브러리 보기">
             {LIBRARY_VIEWS.map((item) => (
               <button key={item.value} type="button" aria-pressed={view === item.value} onClick={() => setView(item.value)}
-                className={`rounded-lg border px-3 py-2 text-[13.5px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
+                className={`rounded-lg border px-3 py-2 text-[15px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
                 {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
               </button>
             ))}
           </div>
-          <div className="flex flex-wrap items-end gap-3">
+          <div>
             {/* ── 필터 ── */}
-            <div className="flex flex-wrap items-end gap-2 text-[12.5px]" aria-label="라이브러리 필터">
+            {/* 필터 8개를 카드 폭에 같은 너비로 채운다(2026-10-09). */}
+            <div className="grid grid-cols-2 items-end gap-2 text-[13px] sm:grid-cols-4 lg:grid-cols-8" aria-label="라이브러리 필터">
               {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인) → 관리 정보(생성 출처·미션 형식·상태). */}
-              <Filter className="w-full sm:w-[96px]" label="화행" value={fAct} onChange={setFAct}
+              <Filter className="w-full" label="화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
-              <Filter className="w-full sm:w-[96px]" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+              <Filter className="w-full" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="수준" value={fLevel} onChange={setFLevel}
+              <Filter className="w-full" label="수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
-              <Filter className="w-full sm:w-[96px]" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
+              <Filter className="w-full" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
-              <Filter className="w-full sm:w-[92px]" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
+              <Filter className="w-full" label="도메인" value={fDomain} onChange={(v) => setFDomain(v as typeof fDomain)}
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
-              <Filter className="w-full sm:w-[126px]" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
+              <Filter className="w-full" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
-              <Filter className="w-full sm:w-[112px]" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
+              <Filter className="w-full" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
                 opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
-              <Filter className="w-full sm:w-[96px]" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
+              <Filter className="w-full" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
                 opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
         </section>
 
       {loading ? (
-        <p className="mt-4 text-[13.5px] text-muted-foreground">불러오는 중…</p>
+        <p className="text-[14px] text-muted-foreground">불러오는 중…</p>
       ) : error ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-[13.5px] text-red-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-red-50 px-4 py-3 text-[14px] text-red-900">
           <p>조회 실패: {error} 교수자 로그인 상태를 확인해 주세요.</p>
           <Button type="button" variant="outline" size="sm" onClick={() => void loadRows()}>
             다시 불러오기
@@ -331,16 +337,18 @@ const AdminBrowser = () => {
       ) : (
         <>
           {/* ── 27칸 그리드 ── */}
-          <section className="mt-4 overflow-x-auto rounded-xl border border-[#E2DED2] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
-            <div className="max-w-[980px]">
+          <section className="overflow-x-auto rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
+            {/* 색 칸 덩어리를 가운데 두려고, 왼쪽 화행 라벨 열(82px)만큼 오른쪽에도 빈자리를 둔다(2026-10-09). */}
+            <div className="mx-auto w-fit sm:pr-[88px]">
             {/* 화행 × 수준이 이 화면의 본론이다. 전폭이면 칸 하나가 330px가 되어 숫자 사이가
                   벌어지고 화행 라벨은 저 멀리 왼쪽에 남는다 — 표를 내용 폭까지만 넓히고
                   라벨을 칸 쪽으로 붙인다. */}
-            <table className="w-full min-w-[620px] table-fixed border-separate border-spacing-x-1.5 border-spacing-y-1 text-[13.5px]">
-              <colgroup><col className="w-[82px]" /><col /><col /><col /></colgroup>
+            <table className="table-fixed border-separate border-spacing-x-1.5 border-spacing-y-1 text-[14px]">
+              {/* 색 칸 너비는 256px로 고정한다(2026-10-09). */}
+              <colgroup><col className="w-[82px]" /><col className="w-[256px]" /><col className="w-[256px]" /><col className="w-[256px]" /></colgroup>
               <thead>
                 <tr>
-                  <th className="w-[82px] pr-2 text-right text-[12px] font-semibold text-muted-foreground">
+                  <th className="w-[82px] pr-2 text-right text-[13px] font-semibold text-muted-foreground">
                     화행
                   </th>
                   {LEVELS.map((lv) => (
@@ -367,7 +375,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-10 w-full cursor-pointer flex-col items-center justify-center rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-12 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
@@ -385,10 +393,10 @@ const AdminBrowser = () => {
                                 : `번역 ${c.t} / 통역 ${c.i}`
                             }
                           >
-                            <span className="text-[14.5px] font-semibold">{n === 0 ? "—" : n}</span>
+                            <span className="text-[15px] font-bold tabular-nums">{n === 0 ? "—" : n}</span>
                             {n === 0 ? null : (
                               <span
-                                className={`text-[12px] ${active ? "text-white/70" : ""}`}
+                                className={`text-[13px] ${active ? "text-white/70" : ""}`}
                                 style={!active ? { color: tone.text } : undefined}
                               >
                                 번역 {c.t} · 통역 {c.i}
@@ -407,27 +415,27 @@ const AdminBrowser = () => {
 
           {/* ── 셀 상세 ── */}
           {(
-            <section className="mt-4 max-w-[1030px] rounded-xl border border-[#E2DED2] bg-white px-5 py-4 shadow-[0_6px_18px_rgba(21,32,43,0.04)]">
+            <section className="rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-[15px] font-bold text-[#15202B]">
+              <h3 className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">
                 {sel ? `${SPEECH_ACT_UI[sel.act]} · ${LEVEL[sel.level]}` : LIBRARY_VIEWS.find((item) => item.value === view)?.label} {cellRows.length}개
               </h3>
               {sel && <Button size="sm" variant="ghost" onClick={() => setSel(null)}>화행·수준 선택 해제</Button>}
               </div>
-              {cellRows.length === 0 && <p className="py-6 text-[13.5px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
+              {cellRows.length === 0 && <p className="py-6 text-[14px] text-muted-foreground" role="status">이 조건의 {view === "materials" ? "시나리오가" : "미션이"} 없습니다. 다른 보기나 필터를 선택해 주세요.</p>}
               <ul className="mt-2.5 divide-y divide-[#EAE4D2] overflow-hidden rounded-lg border border-[#E2DED2]">
                 {cellRows.slice(0, visibleCount).map((r) => (
                   <li key={r.scenario_id} className="bg-white">
                     {/* 한 줄 표: 화행·수준 / 제목 / 방향 / 과제 / 상태. 누르면 미션을 펼친다. */}
                     <button type="button" disabled={!libraryHasMission(r)} onClick={() => togglePreview(r)} aria-expanded={openId === r.scenario_id}
-                      className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)_3.5rem_3rem_minmax(0,11rem)] items-center gap-3 px-4 py-2.5 text-left text-[13.5px] hover:bg-[#FBFAF6] disabled:cursor-default">
+                      className="grid w-full grid-cols-[5.5rem_minmax(0,1fr)_3.5rem_3rem_minmax(0,11rem)] items-center gap-3 px-4 py-2.5 text-left text-[14px] hover:bg-[#FBFAF6] disabled:cursor-default">
                       <span className="font-bold text-[#233542]">{SPEECH_ACT_UI[r.speech_act]} · {LEVEL[r.learner_level]}</span>
                       <span className="min-w-0 truncate text-[#202B33]" title={r.core_content?.situation_ko ?? undefined}>
                         {r.core_content?.brief_note_ko?.trim() || r.core_content?.situation_ko || "—"}
                       </span>
                       <span className="text-[#3F4E57]">{DIRECTION_LABEL[coreDirection(r.core_content)]}</span>
                       <span className="text-[#3F4E57]">{r.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}</span>
-                      <span className="flex min-w-0 flex-wrap items-center justify-end gap-1 text-[12px]">
+                      <span className="flex min-w-0 flex-wrap items-center justify-end gap-1 text-[13px]">
                         {libraryHasMission(r) && r.mission_schema_version !== "mission_v6" && (
                           <span className="rounded bg-[#F3E9D2] px-1.5 py-0.5 font-semibold text-[#8A5A14]">이전 형식</span>
                         )}
@@ -452,7 +460,7 @@ const AdminBrowser = () => {
                   </li>
                 ))}
               </ul>
-              {cellRows.length > LIST_PAGE_SIZE && <div className="mt-3 flex items-center gap-3 text-[12.5px] text-muted-foreground">
+              {cellRows.length > LIST_PAGE_SIZE && <div className="mt-3 flex items-center gap-3 text-[13px] text-muted-foreground">
                 <span>{Math.min(visibleCount, cellRows.length)} / {cellRows.length}개 표시</span>
                 {visibleCount < cellRows.length && <Button size="sm" variant="outline" onClick={() => setVisibleCount((n) => n + LIST_PAGE_SIZE)}>더 보기</Button>}
                 {visibleCount > LIST_PAGE_SIZE && <Button size="sm" variant="ghost" onClick={() => setVisibleCount(LIST_PAGE_SIZE)}>접기</Button>}
@@ -480,11 +488,11 @@ const Filter = ({
   opts: [string, string][];
 }) => (
   <label className={`grid gap-1 ${className ?? ""}`}>
-    <span className="text-[12px] font-medium text-muted-foreground">{label}</span>
+    <span className="text-[13px] font-medium text-muted-foreground">{label}</span>
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 w-full rounded-md border border-[#E2DED2] bg-[#FCFBF8] px-2 text-[13px] text-[#15202B]"
+      className="h-8 w-full rounded-md border border-[#E2DED2] bg-[#FCFBF8] px-2 text-[13.5px] text-[#15202B]"
     >
       {opts.map(([v, l]) => (
         <option key={v} value={v}>{l}</option>

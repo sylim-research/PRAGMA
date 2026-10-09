@@ -163,7 +163,7 @@ const AdminAuthentic = () => {
                   <span className="shrink-0 whitespace-nowrap rounded-full bg-[#FBF5E6] px-2 py-[1px] text-[12.75px] font-semibold text-[#8A6A0E]">
                     {row.source_type === "image" ? "이미지" : "문구"}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-[15.75px] text-foreground">
+                  <span className={`min-w-0 flex-1 truncate text-[15.75px] text-foreground ${open ? "" : "font-zh"}`}>
                     {open ? "원자료" : excerpt(row.source_original)}
                   </span>
                   <span className="shrink-0 whitespace-nowrap text-[13.75px] tabular-nums text-muted-foreground">
@@ -175,7 +175,7 @@ const AdminAuthentic = () => {
                 {open && (
                   <div className="px-3 pb-3">
                     {/* 원자료 = 출발점. 금색 띠·미색 바탕으로 파생 후보(흰 카드)와 구분한다. */}
-                    <blockquote className="whitespace-pre-wrap rounded-md border-l-[3px] border-[#FAD338] bg-[#FBF5E6] px-3.5 py-2.5 text-[15.75px] leading-relaxed text-[#15202B]">
+                    <blockquote className="font-zh whitespace-pre-wrap rounded-md border-l-[3px] border-[#FAD338] bg-[#FBF5E6] px-3.5 py-2.5 text-[15.75px] leading-relaxed text-[#15202B]">
                       {row.source_original}
                     </blockquote>
 
@@ -213,7 +213,7 @@ const AdminAuthentic = () => {
                               </p>
                             )}
                             {c.source_text && (
-                              <p className="rounded-md bg-[#FBF8F0] px-2.5 py-1.5 text-[14.75px] leading-relaxed text-[#15202B]">
+                              <p className="font-zh rounded-md bg-[#FBF8F0] px-2.5 py-1.5 text-[14.75px] leading-relaxed text-[#15202B]">
                                 {c.source_text}
                               </p>
                             )}

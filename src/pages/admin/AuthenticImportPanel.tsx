@@ -598,7 +598,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
               value={text}
               onChange={(e) => setText(e.target.value)}
               placeholder="중국어 또는 한국어 텍스트 (예: 每天都有忙不完的事) — 소설 구절·메신저 문구·자막 대사"
-              className="mt-2.5 h-40 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[14.5px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="font-zh mt-2.5 h-40 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[14.5px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
           )}
 
@@ -673,7 +673,7 @@ const AuthenticImportPanel = ({ onApply, onAnalyzed, history }: Props) => {
             <textarea
               value={editedOriginal}
               onChange={(e) => setEditedOriginal(e.target.value)}
-              className="h-20 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[14.5px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
+              className="font-zh h-20 w-full resize-none rounded-md border border-[#E2DED2] bg-[#FAF7EE] px-3 py-2 text-[14.5px] leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#C8AA2F]/40"
             />
             <button
               type="button"

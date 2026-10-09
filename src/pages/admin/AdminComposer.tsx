@@ -85,8 +85,8 @@ import {
 
 // 이 브라우저에서 마지막으로 연 교과목(편의 기능). 서버 상태가 아니다.
 const LAST_OUTLINE_KEY = "pragma.admin.composer.lastOutline";
-const CONDITION_LABEL = "text-[12px] font-semibold text-[#46515A]";
-const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[13.5px] text-[#15202B]";
+const CONDITION_LABEL = "text-[13px] font-semibold text-[#46515A]";
+const CONDITION_SELECT = "h-9 w-full rounded-md border border-[#E2DED2] bg-white px-2 text-[14px] text-[#15202B]";
 const SETTINGS_MENU_ITEM =
   "flex w-full items-center rounded-lg px-2.5 py-2 text-left text-[13px] text-[#26333B] hover:bg-[#F6F5F1] disabled:pointer-events-none disabled:opacity-50";
 
@@ -685,7 +685,7 @@ const AdminComposer = () => {
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#E2DED2] bg-white p-3 print:hidden">
           <div>
             <p className="text-[13px] font-semibold text-[#15202B]">현재 화면 편성 기준</p>
-            <p className="mt-0.5 text-[12px] text-muted-foreground">최신 편성을 반영하려면 먼저 돌아가서 편성 저장을 눌러주세요.</p>
+            <p className="mt-0.5 text-[13px] text-muted-foreground">최신 편성을 반영하려면 먼저 돌아가서 편성 저장을 눌러주세요.</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => setSyllabusOpen(false)}>편성으로 돌아가기</Button>
@@ -715,13 +715,13 @@ const AdminComposer = () => {
       {libraryScenarioId && <section aria-label="라이브러리에서 선택한 미션" className="mb-4 rounded-xl border border-[#D6BC40] bg-[#FFFBEA] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-[15px] font-semibold">라이브러리에서 선택한 미션</h2>
-          <Link to="/admin/library" className="text-[12px] underline">라이브러리로 돌아가기</Link>
+          <Link to="/admin/library" className="text-[13px] underline">라이브러리로 돌아가기</Link>
         </div>
-        {loading ? <p className="mt-2 text-sm">미션 확인 중…</p> : !libraryMission ? (
-          <p role="alert" className="mt-2 text-sm">선택한 미션을 불러오지 못했습니다. 라이브러리에서 다시 확인해 주세요.</p>
+        {loading ? <p className="mt-2 text-[14px]">미션 확인 중…</p> : !libraryMission ? (
+          <p role="alert" className="mt-2 text-[14px]">선택한 미션을 불러오지 못했습니다. 라이브러리에서 다시 확인해 주세요.</p>
         ) : <>
           <p className="mt-2 text-[13px] leading-6">{libraryMission.situation_ko}</p>
-          <p className="mt-1 text-[12px] text-muted-foreground">{SPEECH_ACT_UI[libraryMission.speech_act]} · {LEVEL[libraryMission.learner_level]} · {DIRECTION_LABEL[libraryMission.direction]} · {MODE_LABEL[libraryMission.mode]}</p>
+          <p className="mt-1 text-[13px] text-muted-foreground">{SPEECH_ACT_UI[libraryMission.speech_act]} · {LEVEL[libraryMission.learner_level]} · {DIRECTION_LABEL[libraryMission.direction]} · {MODE_LABEL[libraryMission.mode]}</p>
           {!outlineId ? <p className="mt-3 text-[13px]">아래에서 교과목을 선택하면 이 미션을 추가할 수 있는 주차가 나타납니다.</p>
             : loadingOutline || loadedAssignments === null ? <p className="mt-3 text-[13px]">교과목 편성 확인 중…</p>
             : libraryMissionAssigned ? <p role="status" className="mt-3 text-[13px]">현재 교과목 편성에 포함되어 있습니다. 변경한 편성은 ‘편성 저장’으로 확정해 주세요.</p>
@@ -729,7 +729,7 @@ const AdminComposer = () => {
             : <div className="mt-3 flex flex-wrap items-center gap-2">
               {libraryTargetWeeks.map((week) => <Button key={week.id} size="sm" variant="outline" disabled={saving}
                 onClick={() => addItem(week.week_no, libraryMission)}>{week.week_no}주차에 추가</Button>)}
-              <span className="text-[12px] text-muted-foreground">추가한 뒤 ‘편성 저장’을 눌러 확정합니다.</span>
+              <span className="text-[13px] text-muted-foreground">추가한 뒤 ‘편성 저장’을 눌러 확정합니다.</span>
             </div>}
         </>}
       </section>}
@@ -766,12 +766,12 @@ const AdminComposer = () => {
                       : "border-[#E2DED2] hover:border-[#9FB0C6]"
                   }`}
                 >
-                  <span className="min-w-0 text-[15px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
+                  <span className="min-w-0 text-[16px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
                   <span className="flex shrink-0 items-center gap-1.5">
-                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[12px] font-semibold text-[#1F3A5F]">
+                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[13px] font-semibold text-[#1F3A5F]">
                       {LEVEL[item.level as LearnerLevel] ?? item.level}
                     </span>
-                    <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${
+                    <span className={`rounded-full px-2 py-0.5 text-[13px] font-semibold ${
                       published ? "bg-[#E8F4EC] text-[#245E44]" : "bg-[#FFF3D6] text-[#8A5A14]"
                     }`}>
                       {published ? "공개" : "비공개"}
@@ -826,39 +826,39 @@ const AdminComposer = () => {
 
         {/* 편성 조건(기본 펼침)과 일상 업무. 조건 네 축은 한 줄, 주제는 한 줄에 둔다. 저장만 채운 버튼으로 둔다. */}
         {tab === "existing" && (
-        <div className={["mt-6 overflow-hidden border border-[#E2DED2] bg-white", outline ? "rounded-t-xl border-b-0" : "rounded-xl"].join(" ")}>
+        <div className={["mt-4 overflow-hidden border border-[#E2DED2] bg-white", outline ? "rounded-t-xl border-b-0" : "rounded-xl"].join(" ")}>
           {/* 교과목 상자 = 네이비 이름 머리 + 편성 조건 + 주차별 배치. 배치표는 이 교과목에 딸린 아랫부분이다(outline이 있을 때 아래로 이어진다). */}
           {/* 작업 머리 = 지금 고친 교과목 이름. 카드 줄(고르기) 아래에서 「이 교과목을 편성한다」가 먼저 읽히게. */}
           {outline && <h2 className="flex items-center gap-2.5 border-b border-[#E2DED2] bg-[#FBFAF6] px-5 py-3 text-[#15202B]">
             {/* 상자 머리 = 교과목 이름만. 페이지 제목보다 한 단계 낮게(2026-10-08 — 네이비 띠가 페이지 제목보다 무거웠다).
                 수준·방향·수행 방식은 바로 아래 편성 조건과 위 카드에 이미 있다. */}
             <span aria-hidden className="h-[18px] w-[4px] rounded-sm bg-[#FAD338]" />
-            <span className="text-[16.5px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
+            <span className="text-[18px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
           </h2>}
-          <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
               <button
                 type="button"
                 aria-expanded={conditionsOpen}
                 onClick={() => setConditionsOpen((open) => !open)}
-                className="flex items-center gap-1.5 text-[15px] font-bold text-[#15202B]"
+                className="flex items-center gap-1.5 text-[16.5px] font-bold text-[#15202B]"
               >
                 편성 조건
-                <span aria-hidden className="text-[12px] font-semibold text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
+                <span aria-hidden className="text-[13px] font-semibold text-[#1F3A5F]">{conditionsOpen ? "▲ 접기" : "▼ 펼치기"}</span>
               </button>
               {axesDirty && <Badge variant="outline">저장 전 변경</Badge>}
               {!conditionsOpen && (
-                <span className="text-[12.5px] text-muted-foreground">
+                <span className="text-[13px] text-muted-foreground">
                   {LEVEL[level]} · {DIRECTION_LABEL[direction]} · {COURSE_MODE_LABEL[courseMode]} · {themes.length ? "편성 주제 " + themes.length + "개" : "편성 주제 전체"}
                 </span>
               )}
-              <span className="text-[12px] text-[#46515A]">
+              <span className="text-[13px] text-[#46515A]">
                 {outline
                   ? `배치됨 · 번역 ${assignedModeWeekCounts.translation} · 통역 ${assignedModeWeekCounts.interpreting}`
                   : "현재 설정은 새 교과목에 그대로 적용됩니다."}
               </span>
               <span
-                className={`inline-flex rounded-full px-2.5 py-0.5 text-[12px] font-medium ${
+                className={`inline-flex rounded-full px-2.5 py-0.5 text-[13px] font-medium ${
                   availableMissionCount > 0 ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"
                 }`}
               >
@@ -905,12 +905,12 @@ const AdminComposer = () => {
                     </button>
                   )}
                   <div className="my-1.5 border-t border-[#EFEBE1]" />
-                  <p className="px-2.5 pb-0.5 pt-1 text-[12px] font-semibold text-[#8B3531]">위험 작업</p>
+                  <p className="px-2.5 pb-0.5 pt-1 text-[13px] font-semibold text-[#8B3531]">위험 작업</p>
                   <button type="button" role="menuitem" disabled={deleting || selectedIsPublished}
                     className={`${SETTINGS_MENU_ITEM} flex-col items-start text-[#8B3531] hover:bg-[#FFF3F1]`}
                     onClick={() => { setSettingsOpen(false); setConfirmAction("delete"); }}>
                     <span>{deleting ? "삭제 중…" : "교과목 삭제"}</span>
-                    <span className="text-[12px] text-[#9AA3A9]">
+                    <span className="text-[13px] text-[#9AA3A9]">
                       {selectedIsPublished ? "학습자에게 공개 중인 교과목은 삭제할 수 없습니다." : "주차 계획과 배정이 함께 삭제됩니다."}
                     </span>
                   </button>
@@ -937,7 +937,7 @@ const AdminComposer = () => {
             </div>
           )}
             {autoFillShortages.length > 0 && (
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[12px] text-amber-900">
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-[13px] text-amber-900">
                 <span>
                   선택 주제를 지키면서 채우지 못한 주차가 {autoFillShortages.length}개 있습니다: {" "}
                   {autoFillShortages.map((item) => `${item.weekNo}주차 ${item.missingSlots}개`).join(", ")}
@@ -971,8 +971,8 @@ const AdminComposer = () => {
           <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#CFC8B6] px-5 pb-2 pt-5">
             {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
-            <h3 className="text-[15px] font-bold text-[#15202B]">주차별 미션 배치</h3>
-            <span className="text-[12.5px] text-[#66727A]">
+            <h3 className="text-[16.5px] font-bold text-[#15202B]">주차별 미션 배치</h3>
+            <span className="text-[13px] text-[#66727A]">
               배치 {assignedMissionCount}개
             </span>
           </div>
@@ -1105,7 +1105,7 @@ function WeekRow({
     <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. 주차마다 같은 「번역 1개 · 통역 1개」 열은 두지 않는다 — 그 폭을 미션 제목에 준다. */}
       <div className="grid min-h-9 grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
-        <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[12px] font-semibold text-[#46515A]">
+        <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[13px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
         {isAssignable || reinforcement ? (
@@ -1115,8 +1115,8 @@ function WeekRow({
               <span className="flex min-w-0 items-center gap-2" title={REINFORCEMENT_DESCRIPTION}>
                 <span className="shrink-0 text-[14px] font-bold text-[#15202B]">집중 보완</span>
                 <button type="button" onClick={onEditWeek} aria-label={act ? `집중 보완 화행 바꾸기 · 현재 ${SPEECH_ACT_UI[act]}` : "집중 보완 화행 고르기"}
-                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#C9C3B4] bg-white px-2.5 py-0.5 text-[12.5px] font-semibold text-[#233542] hover:border-[#1F3A5F]">
-                  {act ? SPEECH_ACT_UI[act] : "화행 고르기"}<span aria-hidden className="text-[12px] text-[#66727A]">▾</span>
+                  className="inline-flex shrink-0 items-center gap-1 rounded-full border border-[#C9C3B4] bg-white px-2.5 py-0.5 text-[13px] font-semibold text-[#233542] hover:border-[#1F3A5F]">
+                  {act ? SPEECH_ACT_UI[act] : "화행 고르기"}<span aria-hidden className="text-[13px] text-[#66727A]">▾</span>
                 </button>
               </span>
             ) : (
@@ -1128,7 +1128,7 @@ function WeekRow({
                 const core = item ? coreById[item.scenario_id] : undefined;
                 if (!item) {
                   return (
-                    <span key={`empty-${index}`} className="truncate rounded-md border border-dashed border-[#E3C77A] bg-[#FFFBEF] px-2 py-1 text-[12px] font-medium text-[#8A5A14]">
+                    <span key={`empty-${index}`} className="truncate rounded-md border border-dashed border-[#E3C77A] bg-[#FFFBEF] px-2 py-1 text-[13px] font-medium text-[#8A5A14]">
                       빈 자리
                     </span>
                   );
@@ -1140,15 +1140,15 @@ function WeekRow({
                 return (
                   <span
                     key={item.scenario_id}
-                    className={`group flex min-w-0 items-center gap-1.5 rounded-md border px-2 py-1 ${needsReplace ? "border-[#F0C9A8] bg-[#FFF7F0]" : "border-[#E6E1D4] bg-[#FCFBF8]"}`}
+                    className="group flex min-w-0 items-center gap-1.5 rounded-md border border-[#E6E1D4] bg-[#FCFBF8] px-2 py-1"
                     title={[title, `초점 · ${featureLabel}`, needsReplace ? (replaced?.has(item.scenario_id) ? "새 판 있음 · 교체 필요" : "교체 필요") : ""].filter(Boolean).join("\n")}
                   >
-                    <span className={`shrink-0 rounded px-1.5 py-px text-[12px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
+                    <span className={`shrink-0 rounded px-1.5 py-px text-[13px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
                       {core ? (core.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation) : "?"}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-[12.5px] text-[#202B33]">{title}</span>
+                    <span className="min-w-0 flex-1 truncate text-[14px] text-[#202B33]">{title}</span>
                     {needsReplace && <button type="button" onClick={() => onReplace(item.scenario_id)} aria-label={`${title} 교체하기`}
-                      className="shrink-0 rounded-full border border-[#D98A5C] bg-white px-2 py-0.5 text-[12px] font-bold text-[#9A3F1C] hover:bg-[#9A3F1C] hover:text-white">교체하기 →</button>}
+                      className="shrink-0 text-[13px] font-semibold text-[#9A3F1C] underline-offset-4 hover:underline">교체</button>}
                     {/* 제거 ×는 평소 숨기고 칩에 마우스를 올리거나 키보드로 닿을 때만 보인다 — 배치표가 삭제 목록처럼 보이지 않게. */}
                     <button
                       type="button"
@@ -1165,7 +1165,7 @@ function WeekRow({
             {/* 자리가 다 찼으면 추가 버튼을 숨긴다(흐린 비활성 버튼 금지). 교체는 × 후 추가. */}
             {isAssignable && (items.length < expectedModes.length || adding) ? (
               <Button
-                className="h-7 px-2 text-[12px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
+                className="h-7 px-2 text-[13px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
                 variant="ghost"
                 size="sm"
                 onClick={onToggleAdd}
@@ -1175,18 +1175,18 @@ function WeekRow({
             ) : <span />}
           </>
         ) : (
-          <span className="col-span-3 text-[13.5px] font-semibold text-[#46515A]">{displayTitle}</span>
+          <span className="col-span-3 text-[14px] font-semibold text-[#46515A]">{displayTitle}</span>
         )}
       </div>
 
       {/* 후보 추가 패널 */}
       {adding && isAssignable && (
         <div className="mt-3 rounded-lg border border-dashed border-[#D8D0BC] bg-[#FAF8F2] p-3">
-          <p className="mb-2 text-[12px] text-muted-foreground">
+          <p className="mb-2 text-[13px] text-muted-foreground">
             현재 방향·수준·주제와 {missionModesSummary(expectedModes)} 구성에서 아직 채우지 않은 모드에 맞는 검토 완료 미션만 표시됩니다. 같은 상황의 복제본은 제외됩니다.
           </p>
           {cands.length === 0 ? (
-            <p className="text-[12.5px] text-muted-foreground">
+            <p className="text-[13px] text-muted-foreground">
               조건에 맞는 후보 시나리오가 없습니다
               {act ? ` (${SPEECH_ACT_UI[act]} · ${LEVEL[level]}${themes.length ? " · 선택 주제" : ""})` : ""}.
             </p>
@@ -1199,7 +1199,7 @@ function WeekRow({
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[13px]" title={c.situation_ko}>{c.brief_note_ko?.trim() || c.situation_ko || "(상황 없음)"}</p>
-                    <p className="text-[12px] text-muted-foreground">
+                    <p className="text-[13px] text-muted-foreground">
                       {c.theme_code ? THEME_LABEL[c.theme_code] : "—"} ·{" "}
                       {c.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation}
                     </p>
@@ -1210,7 +1210,7 @@ function WeekRow({
                 </li>
               ))}
               {cands.length > 40 && (
-                <li className="px-3 py-1 text-[12px] text-muted-foreground">
+                <li className="px-3 py-1 text-[13px] text-muted-foreground">
                   … 외 {cands.length - 40}개(상위 40개만 표시)
                 </li>
               )}

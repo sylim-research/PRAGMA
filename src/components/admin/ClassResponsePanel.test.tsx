@@ -157,7 +157,7 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
   it("교과목만 골라 들어와도 첫 미션 주차의 실제 분포를 바로 보여 준다", async () => {
     mount("/admin/decision-traces?tab=class&courseId=course-a&demo=0");
     await expectCounts(2, 1);
-    expect(screen.getByRole("heading", { level: 2 })).toBeVisible();
+    expect(screen.queryByRole("heading", { level: 2 })).not.toBeInTheDocument(); // 미션 제목 줄은 두지 않는다(2026-10-09)
     expect(screen.getByRole("combobox", { name: "응답 교과목" })).toHaveValue("course-a");
     expect(screen.getByRole("combobox", { name: "주차 선택" })).toHaveValue("2");
     expect(await screen.findByRole("option", { name: "2주차 · 요청 화행 (참여 2명)" })).toBeInTheDocument();
@@ -167,7 +167,7 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     expect(screen.getByLabelText("응답 공개 단계")).toHaveTextContent("1 · 응답 수집");
     expect(screen.getByText(/학습자에게 분포를 공개하려면 5명 이상의 응답이 필요합니다/)).toBeVisible();
     expect(screen.queryByText(/수업자료|데모|가상 학급/)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "학습 미션 열기 ↗" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
+    expect(screen.getByRole("link", { name: "해당 학습 미션 열기" })).toHaveAttribute("href", "/learner/course/course-a/week/2");
     expect(mocks.logRows).toHaveBeenCalledWith("mission_id", "mission-1");
   });
 
@@ -222,8 +222,8 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     // MJT2 교차표
     fireEvent.click(cards[1]);
     expect(screen.getByText("판단 × 선택 이유")).toBeVisible();
-    // DCT형 통번역 과제 — 수정 여부와 이견 여부를 따로 세고, 사례 비교에서만 이견 사유가 보인다.
-    const dct = within(screen.getByLabelText("DCT형 통번역 과제"));
+    // 통번역 과제 — 수정 여부와 이견 여부를 따로 세고, 사례 비교에서만 이견 사유가 보인다.
+    const dct = within(screen.getByLabelText("통번역 과제"));
     const decisionLegend = dct.getByText("초안 유지").closest("ul")!;
     expect(decisionLegend).toHaveTextContent("초안 유지10");
     expect(decisionLegend).toHaveTextContent("수정10");

@@ -111,9 +111,9 @@ export function NewCoursePanel({
   return (
     // 왼쪽 = 입력(1·2·3), 오른쪽 = 조건을 바꿀 때마다 바뀌는 15주 미리보기.
     <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.16fr)_minmax(21rem,0.84fr)]">
-    <div className="space-y-2.5">
+    <div className="flex flex-col gap-4">
       {/* 한 화면에 들어오도록 시작 방법은 제목과 선택지를 한 줄에 둔다. */}
-      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
+      <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-4">
         <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>시작 방법</h2>
         <div role="radiogroup" aria-label="시작 방법" className="flex flex-wrap items-center gap-3">
           <label className={`flex items-center gap-2.5 rounded-xl border px-4 py-2 ${method === "copy" ? "border-[#1F3A5F] bg-white" : "border-[#E2DED2] bg-white"}`}>
@@ -141,7 +141,7 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-4">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>교과목 이름과 조건</h2>
 
@@ -171,7 +171,7 @@ export function NewCoursePanel({
         </div>
       </section>
 
-      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-2.5">
+      <section className="rounded-xl border border-[#E2DED2] bg-[#FFFDF8] px-5 py-4">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <h2 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>편성 주제</h2>
           <span
