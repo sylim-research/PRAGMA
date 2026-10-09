@@ -88,7 +88,7 @@ function ItemSummaryCard({ item, active, onClick }: { item: DiscussionItemView; 
       active ? "border-[#15202B] font-bold text-[#15202B]" : "border-transparent text-[#6B7780] hover:text-[#15202B]",
     ].join(" ")}
   >
-    <span className="mr-1.5 text-[12px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
+    <span className="mr-1.5 text-[13px] font-bold text-[#B8860B]">MJT {item.itemId}</span>{item.activity}
   </button>;
 }
 
@@ -102,7 +102,7 @@ function Scene({ item, size }: { item: DiscussionItemView; size: string }) {
 
 function TargetLine({ text, label, size }: { text: string; label: string; size: string }) {
   return <p className={`break-keep border-l-[3px] border-[#E4C44E] pl-3 leading-relaxed text-[#15202B] ${size}`}>
-    <span className="mr-3 inline-block text-[12px] font-semibold text-[#7A858C]">{label}</span>
+    <span className="mr-3 inline-block text-[13px] font-semibold text-[#7A858C]">{label}</span>
     <span className={zh(text)}>{text}</span>
   </p>;
 }
@@ -119,14 +119,14 @@ function ScaleDetail({ item, size, projector }: { item: ScaleItemView; size: str
         <div className="lg:hidden"><Legend slices={item.slices} size={size} /></div>
       </div>
       <div className="min-w-0 rounded-lg border border-[#EEEBE2] bg-[#FDFCF9] px-4 pt-3">
-        <p className="text-[12px] font-semibold text-[#7A858C]">척도 위 응답 분포</p>
+        <p className="text-[13.5px] font-semibold text-[#5D6970]">척도 위 응답 분포</p>
         <SpectrumStrip slices={item.slices} total={item.total} className="mx-auto h-auto w-full max-w-[600px]" />
       </div>
     </div>
     {reasons && <div className="rounded-lg border border-[#E2DED2]">
       <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#E2DED2] bg-[#FBF9F3] px-3 py-2">
         <p className={`font-bold text-[#15202B] ${size}`}>판단 × 선택 이유</p>
-        <p className="text-[12px] text-[#7A858C]">
+        <p className="text-[13px] text-[#7A858C]">
           이유를 고른 응답 {reasons.options.reduce((sum, option) => sum + option.count, 0)}건
           {reasons.revised > 0 && ` · 이유를 본 뒤 판단을 바꾼 응답 ${reasons.revised}건`}
         </p>
@@ -194,7 +194,7 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
     <ol className="space-y-3">
       {item.candidates.map((candidate) => <li key={candidate.index} className="rounded-lg border border-[#E2DED2] px-3 py-2.5">
         <p className={`flex gap-2 leading-relaxed text-[#15202B] ${projector ? "text-[19px]" : "text-[15.5px]"}`}>
-          <span className="shrink-0 text-[12px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
+          <span className="shrink-0 text-[13px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
           <span className={zh(candidate.text)}>{candidate.text}</span>
         </p>
         <div className="mt-2.5"><DivergingBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-7" : "h-6"} /></div>
@@ -211,7 +211,7 @@ function CorrectionsDetail({ item, size, projector }: { item: CorrectionsItemVie
       {item.corrections.map((correction) => <li key={correction.index}>
         <div className="flex items-start justify-between gap-3">
           <p className={`flex min-w-0 gap-2 leading-relaxed text-[#15202B] ${projector ? "text-[19px]" : "text-[15.5px]"}`}>
-            <span className="shrink-0 text-[12px] font-bold text-[#B8860B]">수정안 {correction.index + 1}</span>
+            <span className="shrink-0 text-[13px] font-bold text-[#B8860B]">수정안 {correction.index + 1}</span>
             <span className={zh(correction.text)}>{correction.text}</span>
           </p>
           <span className={`shrink-0 tabular-nums ${size}`}>
@@ -230,11 +230,11 @@ function FreeDetail({ item, size, projector }: { item: FreeItemView; size: strin
     {item.target && <TargetLine text={item.target} label="고치기 전 표현" size={projector ? "text-[20px]" : "text-[16px]"} />}
     <div className="flex items-baseline justify-between gap-2">
       <p className={`font-bold text-[#15202B] ${size}`}>익명 수정문 {item.texts.length}종</p>
-      <p className="text-[12px] text-[#7A858C]">수정문은 분류하지 않고 그대로 보여 줍니다.</p>
+      <p className="text-[13px] text-[#7A858C]">수정문은 분류하지 않고 그대로 보여 줍니다.</p>
     </div>
     <ol className="grid gap-2 sm:grid-cols-2">
       {item.texts.map((entry, index) => <li key={entry.text} className="rounded-lg border border-[#E2DED2] bg-[#FFFDF8] px-3 py-2.5">
-        <div className="flex items-baseline justify-between gap-2 text-[12px]">
+        <div className="flex items-baseline justify-between gap-2 text-[13px]">
           <span className="font-bold text-[#B8860B]">수정문 {index + 1}</span>
           <span className="tabular-nums text-[#44525C]">{entry.count > 1 ? `같은 문장 ${entry.count}건` : "1건"}</span>
         </div>
@@ -267,41 +267,41 @@ function decisionLabel(decision: DctCaseView["decision"]) {
 }
 
 function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string; projector: boolean }) {
-  const text = projector ? "text-[18px]" : "text-[15px]";
+  const text = projector ? "text-[18px]" : "text-[17px]";
   const feedback = item.feedback;
   return <article aria-label={item.id} className="min-w-0 rounded-xl border border-[#E2DED2] bg-white">
     <header className="flex flex-wrap items-center gap-2 border-b border-[#E2DED2] bg-[#FBF9F3] px-3 py-2">
       <span className={`font-bold text-[#15202B] ${size}`}>{item.id}</span>
-      <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[12px] font-bold text-[#15202B]">{decisionLabel(item.decision)}</span>
-      {item.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-0.5 text-[12px] font-bold text-white">이견 제시</span>}
+      <span className="rounded-full border border-[#15202B] px-2 py-0.5 text-[13px] font-bold text-[#15202B]">{decisionLabel(item.decision)}</span>
+      {item.dissent && <span className="rounded-full bg-[#B8860B] px-2 py-0.5 text-[13px] font-bold text-white">이견 제시</span>}
     </header>
     <ol className="divide-y divide-[#EEEBE2]">
       <li className="px-3 py-2.5">
-        <p className="text-[12px] font-semibold text-[#7A858C]">초안</p>
+        <p className="text-[13px] font-semibold text-[#7A858C]">초안</p>
         <p className={`mt-0.5 leading-relaxed text-[#15202B] ${item.first ? zh(item.first) : ""} ${text}`}>{item.first ?? "—"}</p>
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[12px] font-semibold text-[#7A858C]">AI 피드백</p>
+        <p className="text-[13px] font-semibold text-[#7A858C]">AI 피드백</p>
         {feedback ? <div className={`mt-0.5 space-y-1 ${size}`}>
           <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-[#15202B]">
             {feedback.band && <span><span className="text-[#7A858C]">화용 </span><span className="font-semibold">{feedback.band}</span></span>}
             {feedback.scope && <span><span className="text-[#7A858C]">다시 볼 곳 </span><span className="font-semibold">{feedback.scope}</span></span>}
           </p>
           {feedback.feature && <p className="break-keep leading-relaxed text-[#44525C]">{feedback.feature}</p>}
-          {feedback.alternative && <p className={`leading-relaxed text-[#44525C] ${zh(feedback.alternative)}`}><span className="mr-2 text-[12px] font-semibold text-[#7A858C]">대안</span>{feedback.alternative}</p>}
+          {feedback.alternative && <p className={`leading-relaxed text-[#44525C] ${zh(feedback.alternative)}`}><span className="mr-2 text-[13px] font-semibold text-[#7A858C]">대안</span>{feedback.alternative}</p>}
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>피드백 기록 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[12px] font-semibold text-[#7A858C]">학습자의 이견·근거</p>
+        <p className="text-[13px] font-semibold text-[#7A858C]">학습자의 이견·근거</p>
         {item.dissent ? <div className={`mt-0.5 space-y-1 ${size}`}>
           {item.dissent.conditions.length > 0 && <p className="flex flex-wrap gap-1.5">
-            {item.dissent.conditions.map((condition) => <span key={condition} className="rounded-md border border-[#D9CFA8] bg-[#FFFBEC] px-1.5 py-0.5 text-[12px] text-[#5F573D]">{condition}</span>)}
+            {item.dissent.conditions.map((condition) => <span key={condition} className="rounded-md border border-[#D9CFA8] bg-[#FFFBEC] px-1.5 py-0.5 text-[13px] text-[#5F573D]">{condition}</span>)}
           </p>}
           {item.dissent.reason && <p className="break-keep leading-relaxed text-[#15202B]">{item.dissent.reason}</p>}
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>이견 없음</p>}
       </li>
       <li className="px-3 py-2.5">
-        <p className="text-[12px] font-semibold text-[#7A858C]">최종안</p>
+        <p className="text-[13px] font-semibold text-[#7A858C]">최종안</p>
         <p className={`mt-0.5 leading-relaxed font-semibold text-[#15202B] ${item.final ? zh(item.final) : ""} ${text}`}>{item.final ?? "—"}</p>
       </li>
     </ol>
@@ -344,25 +344,25 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
   const listAll = showAll || dissentCount === 0;
   const listed = listAll ? dct.cases : dct.cases.filter((item) => item.dissent || state.compare.includes(item.id));
 
-  return <section aria-label="DCT형 통번역 과제" className="rounded-xl border border-[#E2DED2] bg-white">
-    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DED2] px-4 py-2.5">
-      <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[15px]"}`}>
-        <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />DCT형 통번역 과제{modeLabel && <span className="font-normal text-[#7A858C]">· {modeLabel}</span>}
+  return <section aria-label="통번역 과제" className="rounded-xl border border-[#E2DED2] bg-white">
+    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DED2] px-5 py-3">
+      <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[17px]"}`}>
+        <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />통번역 과제{modeLabel && <span className="font-normal text-[#7A858C]">· {modeLabel}</span>}
       </h3>
-      <div role="tablist" aria-label="DCT형 통번역 과제 보기" className="flex overflow-hidden rounded-md border border-[#15202B]">
+      <div role="tablist" aria-label="통번역 과제 보기" className="flex overflow-hidden rounded-md border border-[#15202B]">
         {([["class", "전체 응답"], ["cases", "사례 비교"]] as const).map(([key, label]) => <button
           key={key}
           type="button"
           role="tab"
           aria-selected={state.dctView === key}
           onClick={() => onChange({ ...state, dctView: key, compare: key === "cases" && demo && state.compare.length === 0 ? defaultDemoCompare(data) : state.compare })}
-          className={`px-3 py-1 text-[12.5px] font-semibold ${state.dctView === key ? "bg-[#15202B] text-white" : "bg-white text-[#15202B] hover:bg-[#F3F1EA]"}`}
+          className={`px-3 py-1 text-[13px] font-semibold ${state.dctView === key ? "bg-[#15202B] text-white" : "bg-white text-[#15202B] hover:bg-[#F3F1EA]"}`}
         >{label}</button>)}
       </div>
     </div>
 
     {dct.total === 0 ? <p className={`px-4 py-4 text-[#7A858C] ${size}`}>저장된 통번역 산출이 없습니다.</p>
-      : state.dctView === "class" ? <div className="grid gap-4 px-4 py-4 lg:grid-cols-3">
+      : state.dctView === "class" ? <div className="grid gap-6 px-5 py-5 lg:grid-cols-3">
         <div>
           <p className={`font-semibold text-[#15202B] ${size}`}>최종 결정 <span className="font-normal text-[#7A858C]">{dct.total}명</span></p>
           <div className="mt-2 flex items-center gap-4">
@@ -378,7 +378,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
             {dct.dissents > 0 && <button
               type="button"
               onClick={() => onChange({ ...state, dctView: "cases", compare: dct.cases.filter((item) => item.dissent).slice(0, 2).map((item) => item.id) })}
-              className="text-[12.5px] font-semibold text-[#15202B] underline-offset-4 hover:underline"
+              className="text-[13px] font-semibold text-[#15202B] underline-offset-4 hover:underline"
             >이견 사례 열기</button>}
           </div>
         </div>
@@ -387,7 +387,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
           {withVerdict > 0 ? <>
             <div className="mt-2"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-7" : "h-6"} labels /></div>
             <div className="mt-1.5"><Legend slices={dct.verdicts.filter((slice) => slice.count > 0)} size={size} /></div>
-          </> : <p className={`mt-2 text-[#7A858C] ${size}`}>피드백 기록 없음</p>}
+          </> : <div className={`mt-2 flex h-[104px] items-center justify-center rounded-lg border border-dashed border-[#DAD6CA] bg-[#FBFAF6] text-[#7A858C] ${size}`}>AI 피드백 기록 없음</div>}
         </div>
       </div>
       : <div className="px-4 py-4">
@@ -398,11 +398,11 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className={`font-semibold text-[#15202B] ${size}`}>비교할 응답을 두 개까지 고르세요.</p>
           <div className="flex items-center gap-3">
-            <p className="text-[12px] text-[#7A858C]">익명 번호이며 계정과 연결되지 않습니다.</p>
+            <p className="text-[13px] text-[#7A858C]">익명 번호이며 계정과 연결되지 않습니다.</p>
             {dissentCount > 0 && <button
               type="button"
               onClick={() => setShowAll(!showAll)}
-              className="rounded-md border border-[#15202B] px-2.5 py-1 text-[12px] font-semibold text-[#15202B] hover:bg-[#F3F1EA]"
+              className="rounded-md border border-[#15202B] px-2.5 py-1 text-[13px] font-semibold text-[#15202B] hover:bg-[#F3F1EA]"
             >{showAll ? `이견 제시만 보기 (${dissentCount})` : `전체 응답 보기 (${dct.cases.length})`}</button>}
           </div>
         </div>
@@ -414,7 +414,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
               aria-pressed={active}
               onClick={() => toggleCase(item.id)}
               className={[
-                "flex items-center gap-1.5 rounded-md border px-2 py-1 text-[12.5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
+                "flex items-center gap-1.5 rounded-md border px-2 py-1 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]",
                 active ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#DCD8CC] bg-white text-[#44525C] hover:border-[#B9B29C]",
               ].join(" ")}
             >
@@ -436,7 +436,7 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
 
 /** 학급 응답을 보고 토론할 지점을 고르는 보드 — 판단 분포 → 근거 비교 → 토론 질문(논문 5.2.2). */
 export function ClassDiscussionBoard({ data, demo, state, onChange, projector = false }: Props) {
-  const size = projector ? "text-[15.5px]" : "text-[13.5px]";
+  const size = projector ? "text-[15.5px]" : "text-[14.5px]";
   const selected = data.items.find((item) => item.itemId === state.itemId) ?? data.items[0] ?? null;
 
   return <div className="space-y-3" aria-label="학습자 응답 토론 보드">
@@ -453,13 +453,13 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
       </div>
 
       {selected && <section aria-label={`MJT ${selected.itemId} · ${selected.activity}`} className="rounded-xl border border-[#E2DED2] bg-white">
-        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#E2DED2] px-4 py-2.5">
-          <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[15px]"}`}>
+        <div className="flex flex-wrap items-baseline justify-between gap-2 border-b border-[#E2DED2] px-5 py-3">
+          <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[17px]"}`}>
             <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />MJT {selected.itemId} · {selected.activity}{selected.title && <span className="font-normal text-[#7A858C]">· {selected.title}</span>}
           </h3>
-          <p className="text-[12px] tabular-nums text-[#7A858C]">응답자 수 {selected.total}명</p>
+          <p className="text-[13px] tabular-nums text-[#7A858C]">응답자 수 {selected.total}명</p>
         </div>
-        <div className="space-y-4 px-4 py-4">
+        <div className="space-y-4 px-5 py-4">
           <Scene item={selected} size={size} />
           {selected.kind === "scale" && <ScaleDetail item={selected} size={size} projector={projector} />}
           {selected.kind === "candidates" && <CandidatesDetail item={selected} size={size} projector={projector} />}
@@ -467,21 +467,21 @@ export function ClassDiscussionBoard({ data, demo, state, onChange, projector = 
           {selected.kind === "free" && <FreeDetail item={selected} size={size} projector={projector} />}
           {selected.kind === "generic" && <GenericDetail item={selected} size={size} projector={projector} />}
         </div>
-        <p className="border-t border-[#EEEBE2] px-4 py-2 text-[12px] text-[#7A858C]">비율은 각 문항의 응답 수 기준입니다. 많이 고른 응답이 정답을 뜻하지 않습니다.</p>
+        <p className="border-t border-[#EEEBE2] px-5 py-2.5 text-[13px] text-[#7A858C]">비율은 각 문항의 응답 수 기준입니다. 많이 고른 응답이 정답을 뜻하지 않습니다.</p>
       </section>}
     </>}
 
     <DctSection data={data} demo={demo} state={state} onChange={onChange} size={size} projector={projector} />
 
     <section aria-label="토론에서 검토할 관점" className="rounded-xl border border-[#E2DED2] bg-white">
-      <div className="border-b border-[#E2DED2] px-4 py-2.5">
-        <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[15px]"}`}>
+      <div className="border-b border-[#E2DED2] px-5 py-3">
+        <h3 className={`flex items-center gap-2 font-bold text-[#15202B] ${projector ? "text-[18px]" : "text-[17px]"}`}>
           <span className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" aria-hidden="true" />토론에서 검토할 관점
           <span className="font-normal text-[#7A858C]">· 응답이 갈린 원인은 교수자가 판단합니다</span>
         </h3>
       </div>
       <dl className={`grid divide-y divide-[#EEEBE2] ${size} sm:grid-cols-3 sm:divide-x sm:divide-y-0`}>
-        {PERSPECTIVES.map((perspective) => <div key={perspective.title} className="px-4 py-3">
+        {PERSPECTIVES.map((perspective) => <div key={perspective.title} className="px-5 py-4">
           <dt className="font-bold text-[#15202B]">{perspective.title}</dt>
           <dd className="mt-1 break-keep leading-relaxed text-[#44525C]">{perspective.question}</dd>
         </div>)}
