@@ -896,7 +896,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         {r.core_content?.situation_ko ?? "—"}
       </p>
     ) : (
-      <p className="max-w-[54rem] text-[13.5px] leading-relaxed text-[#202B33]">
+      // 자동 품질 점검은 상황+맥락을 정확히 두 줄로 자른다(애매한 세 줄 금지, 2026-10-09). 전문은 마우스를 올리면 보인다.
+      <p className="max-w-[54rem] line-clamp-2 text-[13.5px] leading-relaxed text-[#202B33]" title={[r.core_content?.situation_ko, context.join(" · ")].filter(Boolean).join(" · ")}>
         {r.core_content?.situation_ko ?? "—"}
         {professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">맥락 · {context.join(" · ")}</span>}
         {!professorScreen && context.length > 0 && <span className="ml-2 text-[12px] text-[#7A868D]">{context.join(" · ")}</span>}
@@ -935,7 +936,11 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             </div>
           )}
           {/* 교수자 화면은 왼쪽에 승인 대기 목록 단추가 있어 제목이 가운데로 밀린다 — 제목만 한 줄 아래 왼쪽 끝에서 시작한다. */}
-          {professorScreen && <div className="basis-full"><h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2></div>}
+          {/* 제목 아래 상황 한 줄 — 넓은 화면이라 한 줄로 자르고(두 줄 금지) 전문은 마우스를 올리면 보인다(2026-10-09). */}
+          {professorScreen && <div className="basis-full space-y-1.5">
+            <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <p className="truncate pl-3 text-[13.5px] text-[#4E5A63]" title={r.core_content?.situation_ko ?? undefined}>{r.core_content?.situation_ko ?? "—"}</p>
+          </div>}
         </header>
         <div className={[professorScreen ? "space-y-3" : "space-y-2.5", "px-4 py-3 xl:px-5"].join(" ")}>
 
