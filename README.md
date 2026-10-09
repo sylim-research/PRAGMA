@@ -69,7 +69,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
 - **DCT형 통번역 과제**에서는 초안에 1차, 수정안에 2차 AI 피드백을 받고, 최종안은 학습자가 결정합니다.
-- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에는 음성 인식 STT와 음성 합성 TTS를 씁니다.
+- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에는 음성 인식과 음성 합성을 씁니다.
 
 <br>
 
@@ -167,12 +167,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 <table>
   <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
   <tbody>
-    <tr><td>MJT</td><td>메타화용적 판단 과제 · <sub>Metapragmatic Judgment Task</sub><br>제시된 표현의 화용적 적절성을 판단하는 문항</td></tr>
-    <tr><td>DCT형 통번역 과제<br><sub>약칭 통번역 과제</sub></td><td>담화완성과제 형식의 통번역 과제 · <sub>DCT: Discourse Completion Task</sub><br>상황·관계와 선행 발화를 함께 주고 원문을 통번역하게 하는 과제</td></tr>
-    <tr><td>STT·TTS</td><td>음성 인식·음성 합성 · <sub>Speech-to-Text · Text-to-Speech</sub><br>통역 미션의 원발화 재생과 발화 전사에 사용</td></tr>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
+    <tr><td>MJT 판단 문항</td><td>메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)<br>제시된 표현의 화용적 적절성을 판단하는 문항</td></tr>
+    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task)의 상황 제시 방식을 따른 통번역 과제<br>상황·관계와 선행 발화를 함께 주고 원문을 통번역하게 함. 줄여서 통번역 과제</td></tr>
     <tr><td>직접 수정</td><td>설계된 결함 표현을 판단해 고치는 MJT 활동</td></tr>
     <tr><td>AI 피드백</td><td>통번역 산출 뒤 AI가 주는 재검토 정보. 채점이나 정답 확정이 아님</td></tr>
     <tr><td>교수자 최종 승인</td><td>감수한 콘텐츠 버전의 수업 사용 여부 결정</td></tr>
