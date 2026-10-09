@@ -468,7 +468,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-[18px]">
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-4">
       <h2 id="audit-method-title" className="text-[20px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
@@ -481,7 +481,7 @@ function AuditMethodSection() {
         ))}
       </ol>
       {/* 방법 세부는 심사에서 먼저 묻는 지점이라 접지 않고 늘 보인다(2026-10-09). */}
-      <dl className="grid basis-full gap-x-10 gap-y-2.5 border-t border-[#EFE8D2] pt-3.5 text-[14px] leading-relaxed md:grid-cols-2">
+      <dl className="grid basis-full gap-x-10 gap-y-2.5 border-t border-[#EFE8D2] pt-3 text-[14px] leading-relaxed md:grid-cols-2">
           {AUDIT_METHOD_DETAILS.map((item) => (
             <div key={item.label} className="flex gap-2">
               <dt className="w-10 shrink-0 font-semibold text-[#8A7423]">{item.label}</dt>
@@ -527,7 +527,7 @@ function DatasetOverview({
 
   return (
     <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="dataset-title">
-      <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -544,7 +544,7 @@ function DatasetOverview({
         </div>
       </div>
 
-      <div className="px-4 py-4 sm:px-5">
+      <div className="px-4 py-3.5 sm:px-5">
         <div>
           <div>
             <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
