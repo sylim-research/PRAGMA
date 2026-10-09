@@ -44,12 +44,12 @@ const OMITTED_PROMPT_KEYS = new Set(["core.user.preceding_turn_repair"]);
 // 생성계약 정본(docs/contracts/PRAGMA_생성계약_정본.md)이 고정하는 것을 화면용 한 줄로 옮긴다.
 // 정본은 변경 이력·결정 ID가 섞인 긴 문서라 원문을 싣지 않는다. 계약이 바뀌면 이 목록도 고친다.
 const CONTRACT_CLAUSES: { title: string; body: string }[] = [
-  { title: "생성 조건", body: "화행·상황과 관계·수준·언어 방향·수행 방식 조합 안에서 만듭니다." },
-  { title: "두 단계 생성", body: "시나리오를 먼저 만들고, 고른 것만 학습 미션으로 만듭니다." },
-  { title: "언어 방향", body: "원문 언어와 산출 언어를 방향마다 고정하고 검사합니다." },
-  { title: "평가 경계", body: "의미·문법·상황 적절성을 따로 판정하고 점수로 합치지 않습니다." },
-  { title: "생성 기록", body: "모델·프롬프트 판본과 생성 시각을 남겨 되짚을 수 있게 합니다." },
-  { title: "공개 조건", body: "교수자가 승인한 미션만 학습자에게 공개합니다." },
+  { title: "생성 조건", body: "화행·상황과 관계·수준·언어 방향·수행 방식 조합으로만 만듭니다." },
+  { title: "두 단계 생성", body: "시나리오부터 만들고, 고른 것만 학습 미션으로 만듭니다." },
+  { title: "언어 방향", body: "원문·산출 언어를 방향마다 고정해 검사합니다." },
+  { title: "평가 경계", body: "의미·문법·상황 적절성을 따로 판정하고 합산하지 않습니다." },
+  { title: "생성 기록", body: "모델·프롬프트 판본과 생성 시각을 남겨 추적합니다." },
+  { title: "공개 조건", body: "교수자가 승인한 미션만 공개합니다." },
 ];
 
 // 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
@@ -68,6 +68,9 @@ function PartHeading({ id, title, description }: { id: string; title: string; de
   );
 }
 
+// 단계 카드의 이동·펼침 문구 — 무거운 굵은 글씨 대신 노란 알약으로 가볍게, 마우스를 올리면 화살표가 살짝 움직인다.
+const STAGE_LINK = "mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
+const STAGE_ARROW = "h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5";
 const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] p-3";
 
 function ContractSummary() {
@@ -170,9 +173,9 @@ function HarnessOverview() {
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
+          <span className={STAGE_LINK}>
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
-            {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
+            {rulesOpen ? <ChevronDown aria-hidden className={STAGE_ARROW} /> : <ChevronRight aria-hidden className={STAGE_ARROW} />}
           </span>
         </button>
         <div className={STAGE_CARD}>
@@ -184,8 +187,8 @@ function HarnessOverview() {
           <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
-          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] hover:underline underline-offset-4">
-            검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
+          <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
+            검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
           </a>
         </div>
         <div className={STAGE_CARD}>
@@ -197,8 +200,8 @@ function HarnessOverview() {
           <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
-          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] hover:underline underline-offset-4">
-            승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />
+          <Link to="/admin/review" className={`group ${STAGE_LINK}`}>
+            승인 화면으로<ChevronRight aria-hidden className={STAGE_ARROW} />
           </Link>
         </div>
       </div>
