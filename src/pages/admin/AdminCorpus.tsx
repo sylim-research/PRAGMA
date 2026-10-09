@@ -468,7 +468,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3.5">
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-3.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-[18px]">
       <h2 id="audit-method-title" className="text-[20px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
@@ -481,10 +481,10 @@ function AuditMethodSection() {
         ))}
       </ol>
       {/* 방법 세부는 심사에서 먼저 묻는 지점이라 접지 않고 늘 보인다(2026-10-09). */}
-      <dl className="grid basis-full gap-x-6 gap-y-1 border-t border-[#EFE8D2] pt-2.5 text-[13.5px] md:grid-cols-2">
+      <dl className="grid basis-full gap-x-10 gap-y-2.5 border-t border-[#EFE8D2] pt-3.5 text-[14px] leading-relaxed md:grid-cols-2">
           {AUDIT_METHOD_DETAILS.map((item) => (
             <div key={item.label} className="flex gap-2">
-              <dt className="w-8 shrink-0 font-semibold text-[#8A7423]">{item.label}</dt>
+              <dt className="w-10 shrink-0 font-semibold text-[#8A7423]">{item.label}</dt>
               <dd className="text-[#3B4A54]">{item.body}</dd>
             </div>
           ))}
