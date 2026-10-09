@@ -454,12 +454,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
                 {badge && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${badge.cls}`}>{badge.text}</span>}
               </div>
-              {/* 결정에 필요한 것은 「어디를 · 어떻게」 둘뿐이다. 지적 전문·이유는 근거 안에 둔다. */}
-              <p className="text-[13.5px] leading-relaxed text-[#233542]">{plainIssue(change)}</p>
-              {/* 논증·인용·저장 경로는 판단 자료가 아니라 추적 자료다. 삭제하지 않고 이 안으로 옮긴다. */}
+              {/* 수정 제안도 실제 감수에서는 거의 읽히지 않아 근거와 함께 접는다(2026-10-09). 판단은 위치·유형·배지로 시작한다. */}
               <details className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">검토 의견 전문·근거</summary>
+                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">수정 제안·근거 보기</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
+                  <p className="text-[13.5px] leading-relaxed">{plainIssue(change)}</p>
                   <p className="font-semibold">{noPaths(plainIssue(finding.issue_ko))}</p>
                   <p>{noPaths(finding.reason_ko)}</p>
                   {finding.quote && <blockquote className="border-l-2 border-[#C08A2E] pl-2">{finding.quote}</blockquote>}
@@ -501,7 +500,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && (pairRow
-              ? <div className="grid items-start gap-4 lg:grid-cols-2"><section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
+              ? <div className="grid items-stretch gap-4 lg:grid-cols-2"><section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
               <h4 className="flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>{finalApproval}</div>
