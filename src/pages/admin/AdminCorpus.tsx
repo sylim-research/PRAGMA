@@ -529,15 +529,14 @@ function DatasetOverview({
     <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="dataset-title">
       <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
-              </span>
-            </div>
-            <h2 id="dataset-title" className="mt-0.5 text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">
+          {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <h2 id="dataset-title" className="text-[20px] font-bold tracking-[-0.015em] text-[#15202B]">
               HSK 3.0 어휘 <span className="tabular-nums">{vocabularyEntries}개</span>
             </h2>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[12.5px] font-medium text-emerald-700">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" aria-hidden /> 최근 조회
+            </span>
           </div>
         </div>
         <div className="text-left sm:text-right">
