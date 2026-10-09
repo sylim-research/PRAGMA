@@ -330,19 +330,18 @@ function OperationsSection({
             </li>
             <li className="relative bg-[#FBFAF6] px-4 py-3">
               <span aria-hidden className="absolute -left-2.5 top-1/2 hidden -translate-y-1/2 rounded-full bg-[#FBFAF6] px-0.5 text-[16px] text-[#B5AC98] sm:block">→</span>
-              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과 <span className="font-normal text-[#655F55]">· 서로 다른 중국어 단어 {fmt(audit.distinctTokenCount ?? 0)}개 중</span></p>
+              {/* 큰 숫자는 비율 하나만 두고, 「N개 중 M개」를 한 구절로 아래에 둔다(2026-10-09). */}
+              <p className="text-[13px] font-medium text-[#8A7423]">3 · 대조 결과</p>
               <div className="mt-1.5 grid grid-cols-2 gap-2">
                 <div className="rounded-md bg-[#EEF1F2] px-3 py-2">
-                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
-                    {fmt(audit.matchedTokenCount ?? 0)}<span className="ml-1 text-[14px] font-semibold text-[#33495A]">{pct(audit.distinctTokenCount ? (audit.matchedTokenCount ?? 0) / audit.distinctTokenCount : null)}</span>
-                  </p>
-                  <p className="mt-1 text-[13px] font-medium text-[#33495A]">HSK 1–{audit.referenceCeiling}급 목록에 있음</p>
+                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">{pct(audit.distinctTokenCount ? (audit.matchedTokenCount ?? 0) / audit.distinctTokenCount : null)}</p>
+                  <p className="mt-1.5 text-[13px] font-medium text-[#33495A]">HSK 1–{audit.referenceCeiling}급 목록에 있음</p>
+                  <p className="mt-0.5 text-[12.5px] tabular-nums text-[#5A6670]">{fmt(audit.distinctTokenCount ?? 0)}개 중 {fmt(audit.matchedTokenCount ?? 0)}개</p>
                 </div>
                 <div className="rounded-md bg-[#FFF4BE] px-3 py-2">
-                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">
-                    {fmt(outsideCount)}<span className="ml-1 text-[14px] font-semibold text-[#8A6A0E]">{pct(audit.distinctTokenCount ? outsideCount / audit.distinctTokenCount : null)}</span>
-                  </p>
-                  <p className="mt-1 text-[13px] font-medium text-[#8A6A0E]">목록 밖 후보</p>
+                  <p className="text-[24px] font-semibold leading-none tabular-nums text-[#15202B]">{pct(audit.distinctTokenCount ? outsideCount / audit.distinctTokenCount : null)}</p>
+                  <p className="mt-1.5 text-[13px] font-medium text-[#8A6A0E]">목록 밖 후보</p>
+                  <p className="mt-0.5 text-[12.5px] tabular-nums text-[#7A6420]">{fmt(audit.distinctTokenCount ?? 0)}개 중 {fmt(outsideCount)}개</p>
                 </div>
               </div>
               <RatioBar matched={audit.matchedTokenCount ?? 0} outside={outsideCount} className="mt-2.5" />
