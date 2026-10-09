@@ -56,14 +56,11 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 // 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
 function PartHeading({ no, id, title }: { no: number; id: string; title: string }) {
   return (
-    <div className="mb-3 flex items-center gap-3">
-      <h2 id={id} className="flex shrink-0 items-center gap-2.5 text-[18px] font-bold leading-8 text-[#15202B]">
-        <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-        {title}
-      </h2>
-      {/* 제목 오른쪽 가는 선 — 빈 자리를 채우고 구역의 시작을 표시한다(2026-10-09). */}
-      <span aria-hidden className="h-px flex-1 bg-[#E2DED2]" />
-    </div>
+    // 선 없이 간격으로 묶는다 — 구역 사이 40px, 제목과 자기 상자 사이 8px(2026-10-09).
+    <h2 id={id} className="mb-2 flex items-center gap-2.5 text-[18px] font-bold leading-8 text-[#15202B]">
+      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+      {title}
+    </h2>
   );
 }
 
