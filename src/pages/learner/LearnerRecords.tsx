@@ -339,17 +339,17 @@ const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounde
 /** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
 function ChoiceBars({ position }: { position: ClassPosition }) {
   return (
-    <ul className="mx-auto max-w-[640px] space-y-4 pb-2 pt-4" aria-label={`${position.activity} 동료 응답 분포와 내 판단`}>
+    <ul className="mx-auto max-w-[680px] space-y-4 pb-2 pt-4" aria-label={`${position.activity} 동료 응답 분포와 내 판단`}>
       {position.slices.map((slice) => {
         const share = position.total > 0 ? Math.round((slice.count / position.total) * 100) : 0;
         const mine = position.mine === slice.key;
         return (
-          <li key={slice.key} className="grid grid-cols-[6.5rem_minmax(0,1fr)_6.5rem] items-center gap-3 text-[14px]">
+          <li key={slice.key} className="grid grid-cols-[7rem_minmax(0,1fr)_7rem] items-center gap-4 text-[15px]">
             <span className="flex items-center gap-1.5 whitespace-nowrap font-semibold text-[#15202B]">
               {slice.label}
               {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[13px] font-bold text-[#FAD338]">나</span>}
             </span>
-            <span className="h-3 overflow-hidden rounded-full bg-[#F1F2F3]" aria-hidden="true">
+            <span className="h-4 overflow-hidden rounded-full bg-[#F1F2F3]" aria-hidden="true">
               <span className="block h-full rounded-full" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone], opacity: 0.82 }} />
             </span>
             <span className="text-right tabular-nums text-[#5C6A7A]"><span className="font-bold text-[#15202B]">{share}%</span> · {slice.count}명</span>
@@ -450,7 +450,7 @@ function ClassReview({ record }: { record: ReportRecord }) {
                   </span>
                 </p>
                 {position.kind === "scale"
-                  ? <SpectrumStrip soft slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} className="mx-auto mt-3 h-auto w-full max-w-[520px]" />
+                  ? <SpectrumStrip soft slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} className="mx-auto mt-3 h-auto w-full max-w-[680px]" />
                   : <ChoiceBars position={position} />}
               </div>
             ))}
