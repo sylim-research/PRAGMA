@@ -306,7 +306,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       {arrow}
       <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={"최종안"}>
         <p className="text-[14px] font-semibold text-[#1F3A5F]">최종안</p>
-        <p className={`mt-1.5 ${zhLine} font-semibold`}>
+        <p className={`mt-1.5 ${zhLine} font-medium`}>
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
         {diff
