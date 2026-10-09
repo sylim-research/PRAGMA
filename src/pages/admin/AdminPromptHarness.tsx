@@ -68,6 +68,9 @@ function PartHeading({ id, title, description }: { id: string; title: string; de
   );
 }
 
+// 단계 카드의 이동·펼침 문구 — 무거운 굵은 글씨 대신 노란 알약으로 가볍게, 마우스를 올리면 화살표가 살짝 움직인다.
+const STAGE_LINK = "mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
+const STAGE_ARROW = "h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5";
 const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] p-3";
 
 function ContractSummary() {
@@ -170,9 +173,9 @@ function HarnessOverview() {
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
-          <span className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] underline-offset-4 group-hover:underline">
+          <span className={STAGE_LINK}>
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
-            {rulesOpen ? <ChevronDown aria-hidden className="h-3.5 w-3.5" /> : <ChevronRight aria-hidden className="h-3.5 w-3.5" />}
+            {rulesOpen ? <ChevronDown aria-hidden className={STAGE_ARROW} /> : <ChevronRight aria-hidden className={STAGE_ARROW} />}
           </span>
         </button>
         <div className={STAGE_CARD}>
@@ -184,8 +187,8 @@ function HarnessOverview() {
           <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
-          <a href="#prompts-review" className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] hover:underline underline-offset-4">
-            검토 프롬프트 보기<ChevronDown aria-hidden className="h-3.5 w-3.5" />
+          <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
+            검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
           </a>
         </div>
         <div className={STAGE_CARD}>
@@ -197,8 +200,8 @@ function HarnessOverview() {
           <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
-          <Link to="/admin/review" className="mt-2 inline-flex items-center gap-0.5 text-[14px] font-bold text-[#15202B] hover:underline underline-offset-4">
-            승인 화면으로<ChevronRight aria-hidden className="h-3.5 w-3.5" />
+          <Link to="/admin/review" className={`group ${STAGE_LINK}`}>
+            승인 화면으로<ChevronRight aria-hidden className={STAGE_ARROW} />
           </Link>
         </div>
       </div>
