@@ -265,7 +265,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
   const change = record.change;
   const arrow = <div aria-hidden="true" className="flex items-center justify-center"><ArrowRight className="h-4 w-4 rotate-90 text-[#C9BFA3]" strokeWidth={2.5} /></div>;
   return (
-    <div className="grid gap-1">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-1">
       <section className={`${card} px-4 py-3`} aria-label={"초안"}>
         <p className={cardLabel}>초안</p>
         <p className={`mt-1.5 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
@@ -321,7 +321,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
 function Attempt({ record }: { record: ReportRecord }) {
   return (
     <div className="space-y-2.5 pb-5 pt-2">
-      <p className="text-[14px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</p>
+      <p className="text-right text-[14px] font-medium tabular-nums text-[#5C6A7A]">{shortDate(record.completedAt)}</p>
       <ChangeFlow record={record} />
     </div>
   );
