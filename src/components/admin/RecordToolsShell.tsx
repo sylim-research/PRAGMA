@@ -9,7 +9,7 @@ import { AdminShell } from "@/components/AdminShell";
  */
 const TABS = [
   { key: "export", to: "/admin/export", label: "연구용 기록 내보내기", icon: FileDown, note: "동의한 학습자의 학습 수행 기록을 가명 처리해 연구용 파일로 내려받습니다." },
-  { key: "backup", to: "/admin/data-backup", label: "수업 편성 백업·복원", icon: ArchiveRestore, note: "교과목의 15주 편성과 미션 배치를 파일로 저장하고 복원합니다. 학습 수행 기록은 포함하지 않습니다." },
+  { key: "backup", to: "/admin/data-backup", label: "수업용 백업·복원", icon: ArchiveRestore, note: "교과목의 15주 편성과 미션 배치를 파일로 저장하고 복원합니다. 학습 수행 기록은 포함하지 않습니다." },
 ] as const;
 
 export function RecordToolsShell({ active, children }: { active: (typeof TABS)[number]["key"]; children: ReactNode }) {
