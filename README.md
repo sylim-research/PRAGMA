@@ -16,14 +16,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 0. 바로 가기
+### 0. 바로 가기
 
 <table>
   <thead><tr><th width="319" align="left">화면</th><th width="360" align="left">링크</th></tr></thead>
   <tbody>
-    <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;웹앱</td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
-    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;PRAGMA 시스템 구조</td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
-    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;대표 학습 미션</td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
+    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>대표 학습 미션</b></td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
   </tbody>
 </table>
 
@@ -31,7 +31,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 1. PRAGMA 시스템 구조
+### 1. PRAGMA 시스템 구조
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
@@ -39,7 +39,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 2. 학습 미션의 화용론적 설계
+### 2. 학습 미션의 화용론적 설계
 
 <table>
   <thead><tr><th width="165" align="left">조건</th><th width="595" align="left">구성</th></tr></thead>
@@ -56,7 +56,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 3. 콘텐츠 제작 워크플로우
+### 3. 콘텐츠 제작 워크플로우
 
 <p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
 
@@ -64,7 +64,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 4. 통번역 학습 워크플로우
+### 4. 통번역 학습 워크플로우
 
 <p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
@@ -76,7 +76,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 5. 수업 연계와 운영
+### 5. 수업 연계와 운영
 
 <table>
   <thead><tr><th width="165" align="left">기능</th><th width="595" align="left">내용</th></tr></thead>
@@ -92,7 +92,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 6. 시스템 아키텍처
+### 6. 시스템 아키텍처
 
 <p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
@@ -107,7 +107,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 7. 콘텐츠·학습 기록의 추적
+### 7. 콘텐츠·학습 기록의 추적
 
 <table>
   <thead><tr><th width="380" align="left">콘텐츠 이력</th><th width="380" align="left">학습 수행 기록</th></tr></thead>
@@ -123,7 +123,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 8. 연구 활용
+### 8. 연구 활용
 
 <table>
   <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
@@ -138,7 +138,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 9. 학위논문과 구현의 대응
+### 9. 학위논문과 구현의 대응
 
 <table>
   <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
@@ -162,7 +162,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 10. 주요 연구·개발 단계
+### 10. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
@@ -181,7 +181,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 11. 주요 용어
+### 11. 주요 용어
 
 <table>
   <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
