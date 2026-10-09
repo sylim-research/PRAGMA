@@ -474,8 +474,9 @@ function AuditMethodSection() {
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
             {index > 0 && <span aria-hidden className="text-[#B5AC98]">→</span>}
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 ring-1 ring-[#E5DEC9]">
-              <span className="text-[12px] font-semibold text-[#8A7423]">{index + 1}</span>{step}
+            {/* 실제 작업 순서라 관리자 화면 단계 번호(노란 원)와 같은 표지를 쓴다(2026-10-09). */}
+            <span className="inline-flex items-center gap-2 rounded-full bg-white py-1 pl-1 pr-3.5 font-medium text-[#15202B] shadow-[0_1px_2px_rgba(21,32,43,0.06)] ring-1 ring-[#E2D6AE]">
+              <span className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">{index + 1}</span>{step}
             </span>
           </li>
         ))}
