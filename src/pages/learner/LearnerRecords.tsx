@@ -225,7 +225,7 @@ function groupMeta(record: ReportRecord) {
 
 // 글자 체계: 한국어 본문 14~15px · 보조 12~13px · 중국어 표현 17px. 한 화면에서 이 값만 쓴다.
 const zhLine = "font-zh text-[17px] leading-[1.8] text-[#15202B] [word-break:keep-all] break-words";
-const lineLabel = "w-9 shrink-0 pt-[5px] text-[13.5px] font-semibold text-[#8C8471]";
+const lineLabel = "w-9 shrink-0 pt-[5px] text-[14px] font-semibold text-[#8C8471]";
 
 function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | "after" }) {
   return (
@@ -251,7 +251,7 @@ function Expression({ segments, mode }: { segments: Segment[]; mode: "before" | 
 }
 
 const card = "rounded-xl border-[1.6px] border-[#E4DFD0] bg-white";
-const cardLabel = "text-[13.5px] font-semibold text-[#8C8471]";
+const cardLabel = "text-[14px] font-semibold text-[#8C8471]";
 
 function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size?: string }) {
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
@@ -274,14 +274,14 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       <section className={`${card} px-4 py-3`} aria-label="AI 피드백">
         <p className={cardLabel}>AI 피드백</p>
         {change || record.feedback.length > 0 ? (
-          <div className="mt-1.5 space-y-1.5 text-[14.5px] leading-6 text-[#26323D]">
+          <div className="mt-1.5 space-y-1.5 text-[15px] leading-6 text-[#26323D]">
             <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
               {change?.band && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.6px] px-2.5 py-[1px] text-[13.5px] font-bold" style={{ borderColor: TONE[change.band.tone], color: "#15202B" }}>
+                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.6px] px-2.5 py-[1px] text-[14px] font-bold" style={{ borderColor: TONE[change.band.tone], color: "#15202B" }}>
                   <ToneDot tone={change.band.tone} size="h-2 w-2" />{change.band.label}
                 </span>
               )}
-              {change?.scope && <span className="text-[13.5px]"><span className="text-[#8C8471]">다시 살펴볼 점 </span><span className="font-semibold">{change.scope}</span></span>}
+              {change?.scope && <span className="text-[14px]"><span className="text-[#8C8471]">다시 살펴볼 점 </span><span className="font-semibold">{change.scope}</span></span>}
             </p>
             {change?.feature && <p className="break-keep">{change.feature}</p>}
             {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
@@ -290,28 +290,28 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
           <p className="mt-1.5 text-[14px] text-[#8C8471]">저장된 AI 피드백이 없습니다.</p>
         )}
         {record.dissent && (
-          <div className="mt-3 border-t border-[#EFEBDF] pt-2.5">
-            <p className="text-[13.5px] font-semibold text-[#8A5A14]">내 의견</p>
+          <div className="mt-[12px] border-t border-[#EFEBDF] pt-2.5">
+            <p className="text-[14px] font-semibold text-[#8A5A14]">내 의견</p>
             {record.dissent.conditions.length > 0 && (
               <p className="mt-1 flex flex-wrap gap-1.5">
                 {record.dissent.conditions.map((condition) => (
-                  <span key={condition} className="rounded-md border-[1.6px] border-[#E4C44E] px-1.5 py-[1px] text-[13.5px] text-[#5F4A12]">{condition}</span>
+                  <span key={condition} className="rounded-md border-[1.6px] border-[#E4C44E] px-1.5 py-[1px] text-[14px] text-[#5F4A12]">{condition}</span>
                 ))}
               </p>
             )}
-            {record.dissent.reason && <p className="mt-1 break-keep text-[14.5px] leading-6 text-[#26323D]">“{record.dissent.reason}”</p>}
+            {record.dissent.reason && <p className="mt-1 break-keep text-[15px] leading-6 text-[#26323D]">“{record.dissent.reason}”</p>}
           </div>
         )}
       </section>
       {arrow}
       <section className={`rounded-xl border-[1.6px] border-[#1F3A5F] bg-white px-4 py-3`} aria-label={"최종안"}>
-        <p className="text-[13.5px] font-semibold text-[#1F3A5F]">최종안</p>
+        <p className="text-[14px] font-semibold text-[#1F3A5F]">최종안</p>
         <p className={`mt-1.5 ${zhLine} font-semibold`}>
           {diff ? <Expression segments={diff.after} mode="after" /> : record.revisedResponse || record.firstResponse || "기록 없음"}
         </p>
         {diff
-          ? <p className="mt-1 text-[13.5px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
-          : <p className="mt-1 text-[13.5px] text-[#8A5A14]">초안을 그대로 유지했습니다.</p>}
+          ? <p className="mt-1 text-[14px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
+          : <p className="mt-1 text-[14px] text-[#8A5A14]">초안을 그대로 유지했습니다.</p>}
       </section>
     </div>
   );
@@ -327,7 +327,7 @@ function Attempt({ record }: { record: ReportRecord }) {
   );
 }
 
-const sectionTitle = "flex items-center gap-2 text-[15px] font-bold text-[#15202B]";
+const sectionTitle = "flex items-center gap-2 text-[17px] font-bold text-[#15202B]";
 const titleBar = <span aria-hidden="true" className="inline-block h-4 w-1 rounded-sm bg-[#FAD338]" />;
 
 /** 수정안 선택의 학급 분포 — 수정안별 가로 막대, 내 선택에 「나」. */
@@ -341,7 +341,7 @@ function ChoiceBars({ position }: { position: ClassPosition }) {
           <li key={slice.key} className="grid grid-cols-[6.5rem_minmax(0,1fr)_6.5rem] items-center gap-3 text-[14px]">
             <span className="flex items-center gap-1.5 whitespace-nowrap font-semibold text-[#15202B]">
               {slice.label}
-              {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[12.5px] font-bold text-[#FAD338]">나</span>}
+              {mine && <span className="rounded-full bg-[#15202B] px-1.5 text-[13px] font-bold text-[#FAD338]">나</span>}
             </span>
             <span className="h-4 overflow-hidden rounded-sm bg-[#EEF0F2]" aria-hidden="true">
               <span className="block h-full rounded-r-sm" style={{ width: `${share}%`, backgroundColor: TONE[slice.tone] }} />
@@ -387,19 +387,19 @@ function ClassReview({ record }: { record: ReportRecord }) {
   return (
     <>
       {positions.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="동료들의 판단">
+        <section className="border-t border-[#EFEBDF] px-6 py-6" aria-label="동료들의 판단">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h3 className={sectionTitle}>{titleBar}동료들의 판단</h3>
-            <p className="text-[13.5px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
+            <p className="text-[14px] text-[#8C8471]">많이 고른 쪽이 정답은 아닙니다</p>
           </div>
-          <div className="mt-3 grid gap-4">
+          <div className="mt-[12px] grid gap-4">
             {positions.map((position) => (
               <div key={position.itemId} className={`${card} px-5 pb-3 pt-4`}>
-                <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[13.5px]">
+                <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-[14px]">
                   <span className="font-bold text-[#15202B]">{position.activity}</span>
                   <span className="flex items-baseline gap-3">
                     {referenceLabel(position) && (
-                      <span className="rounded-full border-[1.6px] border-[#2F6B5E] px-2 py-[1px] text-[13.5px] font-semibold text-[#245449]">기준 판단: {referenceLabel(position)}</span>
+                      <span className="rounded-full border-[1.6px] border-[#2F6B5E] px-2 py-[1px] text-[14px] font-semibold text-[#245449]">기준 판단: {referenceLabel(position)}</span>
                     )}
                     <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
                   </span>
@@ -414,11 +414,11 @@ function ClassReview({ record }: { record: ReportRecord }) {
       )}
 
       {lessonPoints.length > 0 && (
-        <section className="border-t border-[#EFEBDF] px-6 py-6 sm:px-7" aria-label="핵심 정리">
+        <section className="border-t border-[#EFEBDF] px-6 py-6" aria-label="핵심 정리">
           <h3 className={sectionTitle}>{titleBar}핵심 정리</h3>
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-[12px] flex flex-col gap-3">
             {lessonPoints.map((point) => (
-              <li key={point.itemId} className="flex gap-2 break-keep text-[14.5px] leading-6 text-[#26323D]">
+              <li key={point.itemId} className="flex gap-2 break-keep text-[15px] leading-6 text-[#26323D]">
                 <span aria-hidden="true" className="mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#B8860B]" />
                 <p><span className="mr-1.5 font-bold text-[#15202B]">{point.label}</span>{point.text}</p>
               </li>
@@ -437,10 +437,10 @@ function MissionCard({ group }: { group: MissionGroup }) {
   const longSource = head.sourceText.length > 90;
   return (
     <article className="overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]">
-      <header className="border-b border-[#EFEBDF] px-6 pb-5 pt-5 sm:px-7">
+      <header className="border-b border-[#EFEBDF] px-6 pb-5 pt-5">
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <p className="text-[13.5px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
-          <p className="text-[13.5px] text-[#8C8471]">수행 {group.records.length}회</p>
+          <p className="text-[14px] font-semibold tracking-[0.01em] text-[#786022]">{groupMeta(head)}</p>
+          <p className="text-[14px] text-[#8C8471]">수행 {group.records.length}회</p>
         </div>
         {head.sourceText && (
           <div className="mt-2.5">
@@ -448,21 +448,21 @@ function MissionCard({ group }: { group: MissionGroup }) {
               {head.sourceText}
             </p>
             {longSource && (
-              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[13.5px] font-semibold text-[#344F63] hover:underline">
+              <button type="button" onClick={() => setSourceOpen((v) => !v)} className="mt-0.5 text-[14px] font-semibold text-[#344F63] hover:underline">
                 {sourceOpen ? "원문 접기" : "원문 펼치기"}
               </button>
             )}
           </div>
         )}
       </header>
-      <h3 className={`${sectionTitle} px-6 pt-4 sm:px-7`}>{titleBar}내 수행</h3>
-      <ol className="divide-y divide-[#F0ECE2] px-6 sm:px-7" aria-label="수행 기록">
+      <h3 className={`${sectionTitle} px-6 pt-6`}>{titleBar}내 수행</h3>
+      <ol className="divide-y divide-[#F0ECE2] px-6" aria-label="수행 기록">
         {group.records.map((record) => (
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
       <ClassReview record={head} />
-      <p className="border-t border-[#EFEBDF] px-6 py-3 text-[14px] text-[#5C6A7A] sm:px-7" aria-label="생각해 보기">
+      <p className="border-t border-[#EFEBDF] px-6 py-4 text-[15px] text-[#5C6A7A]" aria-label="생각해 보기">
         <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
         최종안에서도 원문의 의미와 화행목적이 유지되었나요?
       </p>
@@ -480,12 +480,12 @@ const selectClass =
 function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, number>; selected: SpeechActUI | "all"; onSelect: (act: SpeechActUI | "all") => void }) {
   const done = ACTS.filter((act) => (counts.get(act) ?? 0) > 0).length;
   return (
-    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)] sm:px-7" aria-label="화행별 학습 기록">
+    <section className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white px-6 py-5 shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]" aria-label="화행별 학습 기록">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="text-[16px] font-bold text-[#15202B]">화행별 학습 기록</h2>
-        <p className="text-[13.5px] text-[#5C6A7A]">수행한 화행 {done}/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다</p>
+        <h2 className="text-[18px] font-bold text-[#15202B]">화행별 학습 기록</h2>
+        <p className="text-[14px] text-[#5C6A7A]">수행한 화행 {done}/9 · 화행을 선택하면 해당 기록만 볼 수 있습니다</p>
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 선택">
+      <div className="mt-[12px] grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-9" role="group" aria-label="화행 선택">
         {ACTS.map((act) => {
           const count = counts.get(act) ?? 0;
           const active = selected === act;
@@ -514,7 +514,7 @@ function ActMap({ counts, selected, onSelect }: { counts: Map<SpeechActUI, numbe
                 />
                 {SPEECH_ACT_UI[act]}
               </span>
-              <span className={`text-[12.5px] font-medium ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
+              <span className={`text-[13px] font-medium ${active ? "text-[#D8DEE4]" : count > 0 ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
                 {count > 0 ? `${count}회` : "아직"}
               </span>
             </button>
@@ -611,7 +611,7 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
               {recordsError ? "학습 기록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요." : "학습 기록을 불러오는 중…"}
             </p>
             {recordsError && (
-              <button type="button" className="mt-3 text-[14px] font-semibold underline underline-offset-4" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+              <button type="button" className="mt-[12px] text-[14px] font-semibold underline underline-offset-4" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
                 다시 불러오기
               </button>
             )}
@@ -628,17 +628,17 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
           <div>
             {title}
             {records.length > 0 && (
-              <p className="mt-2 pl-4 text-[14.5px] text-[#5C6A7A]">
+              <p className="mt-[6px] pl-4 text-[15px] text-[#5C6A7A]">
                 학습 미션 {missionCount}개 · 수행 {records.length}회{courseIds.length > 0 ? ` · 교과목 ${courseIds.length}개` : ""}
               </p>
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="교과목 선택">
             {demo && (
-              <span className="rounded-full bg-[#FAD338] px-3 py-1 text-[12.5px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
+              <span className="rounded-full bg-[#FAD338] px-3 py-1 text-[13px] font-bold text-[#15202B]">{LEARNER_DEMO_NOTICE}</span>
             )}
             {usingLocalPreview && (
-              <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[12.5px] font-semibold text-[#756D5E]">
+              <span className="rounded-full bg-[#EFEBDD] px-3 py-1 text-[13px] font-semibold text-[#756D5E]">
                 localhost 시연 데이터
               </span>
             )}
@@ -654,10 +654,10 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
         {records.length === 0 ? (
           <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E4DFD0] bg-white p-6">
             <div>
-              <h2 className="text-[16px] font-bold">아직 완료한 학습 미션이 없습니다.</h2>
-              <p className="mt-1 text-[14.5px] text-[#5C6A7A]">학습 미션을 마치면 내 번역과 최종 결정이 여기에 기록됩니다.</p>
+              <h2 className="text-[18px] font-bold text-[#15202B]">아직 완료한 학습 미션이 없습니다.</h2>
+              <p className="mt-1 text-[15px] text-[#5C6A7A]">학습 미션을 마치면 내 번역과 최종 결정이 여기에 기록됩니다.</p>
             </div>
-            <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[14.5px] font-semibold text-white hover:bg-[#22303C]">
+            <Link to="/learner/course" className="rounded-lg bg-[#15202B] px-4 py-2.5 text-[15px] font-semibold text-white hover:bg-[#22303C]">
               이번 주 학습 미션으로 →
             </Link>
           </section>
@@ -666,15 +666,15 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
             <ActMap counts={actCounts} selected={actFilter} onSelect={setActFilter} />
             {filteredActLabel && (
               <p className="mt-6 flex items-baseline gap-3 text-[14px] text-[#5C6A7A]">
-                <span className="text-[15px] font-bold text-[#15202B]">{filteredActLabel}</span>
+                <span className="text-[17px] font-bold text-[#15202B]">{filteredActLabel}</span>
                 수행 {visible.length}회
                 <button type="button" onClick={() => setActFilter("all")} className="font-semibold text-[#344F63] hover:underline">전체 보기</button>
               </p>
             )}
             {groups.length === 0 ? (
-              <p className="mt-4 rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[15px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
+              <p className="mt-[12px] rounded-2xl border border-[#E4DFD0] bg-white p-6 text-[15px] text-[#5C6A7A]">{filteredActLabel} 기록이 아직 없습니다.</p>
             ) : (
-              <ol className={`${filteredActLabel ? "mt-3" : "mt-5"} space-y-5`} aria-label="완료 기록">
+              <ol className={`${filteredActLabel ? "mt-[12px]" : "mt-6"} flex flex-col gap-4`} aria-label="완료 기록">
                 {groups.map((group) => (
                   <li key={group.key}><MissionCard group={group} /></li>
                 ))}
