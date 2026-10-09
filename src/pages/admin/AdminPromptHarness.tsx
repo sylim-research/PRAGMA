@@ -54,20 +54,23 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 
 // 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
 // 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
-function PartHeading({ no, id, title }: { no: number; id: string; title: string }) {
+function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
   return (
-    // 선 없이 간격으로 묶는다 — 구역 사이 40px, 제목과 자기 상자 사이 8px(2026-10-09).
-    <h2 id={id} className="mb-2 flex items-center gap-2.5 text-[18px] font-bold leading-8 text-[#15202B]">
-      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-      {title}
-    </h2>
+    // 번호·제목 옆에 짧은 보조 설명을 같은 줄로 둔다(2026-10-09).
+    <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+      <h2 id={id} className="flex items-center gap-2.5 self-center text-[18px] font-bold leading-8 text-[#15202B]">
+        <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+        {title}
+      </h2>
+      <p className="text-[14px] text-[#5B6670]">{description}</p>
+    </div>
   );
 }
 
 function ContractSummary() {
   return (
     <section aria-labelledby="contract-title">
-      <PartHeading no={1} id="contract-title" title="생성계약" />
+      <PartHeading no={1} id="contract-title" title="생성계약" description="모든 생성이 지키는 여섯 조건" />
       {/* 넓은 화면에서는 위→아래로 읽는 2열(1~3 | 4~6)이고, 가는 세로선으로 두 열을 나눈다(2026-10-09). */}
       <ol className="grid gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-flow-col md:grid-cols-2 md:grid-rows-3">
         {CONTRACT_CLAUSES.map((clause, index) => (
@@ -169,7 +172,7 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title">
-      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" />
+      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" description="자동 점검 → AI 검토 → 교수자 승인" />
       {/* 점검 → 검토 → 승인의 순서를 화살표로 보이고, 세 카드는 같은 모양이다(2026-10-09).
           카드 하나에 이름은 하나 — 단계 이름이 제목, 성격은 배지, 방식 이름은 설명 첫머리. */}
       <ol className="grid items-stretch gap-2 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)]">
@@ -269,7 +272,7 @@ const AdminPromptHarness = () => {
       <HarnessOverview />
 
       <section aria-labelledby="prompts-title">
-        <PartHeading no={3} id="prompts-title" title="운영 프롬프트 원문" />
+        <PartHeading no={3} id="prompts-title" title="운영 프롬프트 원문" description="코드에서 그대로 가져온 실제 지시문" />
         <div className="space-y-6">
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));

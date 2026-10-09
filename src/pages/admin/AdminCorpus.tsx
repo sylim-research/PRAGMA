@@ -211,7 +211,7 @@ const AdminCorpus = () => {
       {/* 네 부분을 「묻는 것 → 답」 순서로 번호를 붙여 둔다 — 생성계약 화면의 번호 제목과 같은 양식(2026-10-09). */}
       <div className="w-full space-y-6">
         <section aria-labelledby="part-reference">
-          <PartHeading no={1} id="part-reference" title="HSK 3.0 대조 기준" />
+          <PartHeading no={1} id="part-reference" title="HSK 3.0 대조 기준" description="공식 목록과 수준별 대조 범위" />
           <div className="space-y-3">
             <DatasetOverview
               loading={loading}
@@ -233,12 +233,12 @@ const AdminCorpus = () => {
         </section>
 
         <section aria-labelledby="part-method">
-          <PartHeading no={2} id="part-method" title="어휘 대조 방식" />
+          <PartHeading no={2} id="part-method" title="어휘 대조 방식" description="분절·셈 단위·대상·산식" />
           <AuditMethodSection />
         </section>
 
         <section aria-labelledby="part-result">
-          <PartHeading no={3} id="part-result" title="미션별 대조 결과" />
+          <PartHeading no={3} id="part-result" title="미션별 대조 결과" description="기록을 고르면 아래에 상세" />
           <div className="space-y-3">
             {!loading && !auditLookupFailed && (
               <AuditHistory audits={allAudits} selected={selectedAudit ?? recentAudit} onSelect={setSelectedAudit} />
@@ -254,7 +254,7 @@ const AdminCorpus = () => {
 
         {!loading && !auditLookupFailed && (
           <section aria-labelledby="part-trend">
-            <PartHeading no={4} id="part-trend" title="목록 밖 후보 누적 경향" />
+            <PartHeading no={4} id="part-trend" title="목록 밖 후보 누적 경향" description="자주 나온 상위 20개" />
             <TopOutOfListWords audits={allAudits} />
           </section>
         )}
@@ -264,13 +264,16 @@ const AdminCorpus = () => {
 };
 
 // 번호 제목은 한 줄 — 제목이 그 부분을 요약하고 보조 설명은 두지 않는다(2026-10-09).
-function PartHeading({ no, id, title }: { no: number; id: string; title: string }) {
+function PartHeading({ no, id, title, description }: { no: number; id: string; title: string; description: string }) {
   return (
-    // 선 없이 간격으로 묶는다 — 구역 사이 40px, 제목과 자기 상자 사이 8px(2026-10-09).
-    <h2 id={id} className="mb-2 flex items-center gap-2.5 text-[18px] font-bold leading-8 text-[#15202B]">
-      <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
-      {title}
-    </h2>
+    // 번호·제목 옆에 짧은 보조 설명을 같은 줄로 둔다(2026-10-09).
+    <div className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+      <h2 id={id} className="flex items-center gap-2.5 self-center text-[18px] font-bold leading-8 text-[#15202B]">
+        <span aria-hidden className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#233542] text-[12px] font-bold text-white">{no}</span>
+        {title}
+      </h2>
+      <p className="text-[14px] text-[#5B6670]">{description}</p>
+    </div>
   );
 }
 
