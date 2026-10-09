@@ -974,7 +974,7 @@ const AdminGenerator = () => {
 
           {/* 3. 목표 화행 — 3x3 카드 */}
           <div>
-            <SectionTitle n={2} label="목표화행" accent="핵심 조건" />
+            <SectionTitle n={2} label="목표화행" />
             <div className="mt-2 grid grid-cols-3 gap-1.5">
               {(Object.keys(SPEECH_ACT_UI) as SpeechActUI[]).map((sa) => {
                 const on = form.speech_act_ui === sa;
@@ -1018,7 +1018,7 @@ const AdminGenerator = () => {
           {/* 4. P-D-R 관계 조건. 예상 화용 부담도 배지는 뺐다(2026-09-26) — 화행·P·D·R을 임의 가중치로 합산한 점수는 근거가 약하고, 관계 조건을 한 숫자로 줄이지 않는 설계와 어긋난다. */}
           {/* 노란 상자를 없앴다 — 상자 안쪽 여백 때문에 ③ 번호가 밀려 ①~⑥ 정렬이 깨졌다. 핵심 변수 표시는 꼬리표로 충분하다. */}
           <div>
-            <SectionTitle n={3} label="상황·관계 조건 (P·D·R)" accent="핵심 조건" />
+            <SectionTitle n={3} label="상황·관계 조건 (P·D·R)" />
             <p className="mt-1 pl-[30px] text-[12.75px] text-muted-foreground">Power · Distance · Ranking of imposition</p>
             <div className="mt-2 grid grid-cols-3 gap-3">
               <Field label="권력(P)">
