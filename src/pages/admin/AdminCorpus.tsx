@@ -577,7 +577,7 @@ function DatasetOverview({
       <div className="px-4 py-4 sm:px-5">
         <div>
           <div>
-            <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위 <span className="font-normal text-[#655F55]">· 연구자가 정한 잠정 참고 범위이며, 7–9급은 쓰지 않습니다</span></p>
+            <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
           </div>
         </div>
 
