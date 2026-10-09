@@ -339,12 +339,13 @@ const AdminBrowser = () => {
           {/* ── 27칸 그리드 ── */}
           <section className="overflow-x-auto rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
             {/* 색 칸 덩어리를 가운데 두려고, 왼쪽 화행 라벨 열(82px)만큼 오른쪽에도 빈자리를 둔다(2026-10-09). */}
-            <div className="mx-auto max-w-[982px] sm:pr-[88px]">
+            <div className="mx-auto w-fit sm:pr-[88px]">
             {/* 화행 × 수준이 이 화면의 본론이다. 전폭이면 칸 하나가 330px가 되어 숫자 사이가
                   벌어지고 화행 라벨은 저 멀리 왼쪽에 남는다 — 표를 내용 폭까지만 넓히고
                   라벨을 칸 쪽으로 붙인다. */}
-            <table className="w-full min-w-[620px] table-fixed border-separate border-spacing-x-1.5 border-spacing-y-1 text-[14px]">
-              <colgroup><col className="w-[82px]" /><col /><col /><col /></colgroup>
+            <table className="table-fixed border-separate border-spacing-x-1.5 border-spacing-y-1 text-[14px]">
+              {/* 색 칸 너비는 256px로 고정한다(2026-10-09). */}
+              <colgroup><col className="w-[82px]" /><col className="w-[256px]" /><col className="w-[256px]" /><col className="w-[256px]" /></colgroup>
               <thead>
                 <tr>
                   <th className="w-[82px] pr-2 text-right text-[13px] font-semibold text-muted-foreground">
@@ -374,7 +375,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-[46px] w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-12 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
