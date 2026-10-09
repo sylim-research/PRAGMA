@@ -168,7 +168,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
           </div>
-          <h3 className="mt-2 text-[14.5px] font-bold">규칙 기반 검사</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">규칙 기반 검사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
@@ -183,7 +183,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#3F6172]">AI 검토</span>
             <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
           </div>
-          <h3 className="mt-2 text-[14.5px] font-bold">프롬프트 통제 기반 검토</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">프롬프트 통제 기반 검토</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
@@ -196,7 +196,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D675D]">최종 사용 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[14.5px] font-bold">교수자 최종 승인</h3>
+          <h3 className="mt-2 text-[15.5px] font-bold">교수자 최종 승인</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
