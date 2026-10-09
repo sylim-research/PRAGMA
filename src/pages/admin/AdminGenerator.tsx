@@ -1614,7 +1614,7 @@ const SectionTitle = ({
 }) => (
   <h3
     className={[
-      "flex items-center gap-2 text-[15px] font-bold text-[#15202B]",
+      "flex items-center gap-2 text-[16.5px] font-bold text-[#15202B]",
     ].join(" ")}
   >
     <span
@@ -1625,7 +1625,7 @@ const SectionTitle = ({
       {n}
     </span>
     <span>{label}</span>
-    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[12.25px] font-semibold text-[#6D5C1F]">{accent}</span>}
+    {accent && <span className="rounded-full border border-[#E3D3A0] bg-[#FDF8EA] px-2 py-0.5 text-[13px] font-semibold text-[#6D5C1F]">{accent}</span>}
   </h3>
 );
 

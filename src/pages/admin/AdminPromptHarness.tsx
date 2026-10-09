@@ -229,7 +229,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[16px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
+            <CardTitle className="text-[15.75px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[13px] leading-5">
             {entry.sha256.slice(0, 10)}

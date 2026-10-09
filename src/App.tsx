@@ -10,6 +10,7 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import { seedIfEmpty } from "./lib/learningSessions";
 import { IS_DEMO } from "./lib/auth/useProfile";
 const RepresentativeMissionDemo = lazy(() => import("./pages/RepresentativeMissionDemo"));
+const LearnerRecordsPublicDemo = lazy(() => import("./pages/learner/LearnerRecords.tsx").then((module) => ({ default: () => <module.default demo /> })));
 const LearnerProfileDemo = lazy(() => import("./pages/LearnerProfileDemo"));
 
 const RequireApproved = lazy(() => import("./components/RequireApproved"));
@@ -116,6 +117,8 @@ const App = () => (
             }
           />
           <Route path="/demo/profile" element={IS_DEMO ? <LearnerProfileDemo /> : <Navigate to="/" replace />} />
+          {/* 체험을 마친 뒤 보는 「내 기록」 — 데모 자료로만 열고 운영 기록은 읽지 않는다. */}
+          <Route path="/demo/records" element={IS_DEMO ? <LearnerRecordsPublicDemo /> : <Navigate to="/" replace />} />
           <Route path="/student-login" element={<StudentLogin />} />
           {/* 폐기된 콘텐츠 전문가 검수 주소는 현행 품질관리 흐름으로 연결한다. */}
           <Route path="/expert-login" element={<Navigate to="/admin/research-qa/final-review" replace />} />
