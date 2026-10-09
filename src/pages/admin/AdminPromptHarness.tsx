@@ -66,9 +66,10 @@ function ContractSummary() {
   return (
     <section aria-labelledby="contract-title">
       <PartHeading no={1} id="contract-title" title="생성계약" description="모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다." />
-      <ol className="grid gap-x-6 gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-cols-2">
+      {/* 넓은 화면에서는 위→아래로 읽는 2열(1~3 | 4~6)이고, 가는 세로선으로 두 열을 나눈다(2026-10-09). */}
+      <ol className="grid gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-flow-col md:grid-cols-2 md:grid-rows-3">
         {CONTRACT_CLAUSES.map((clause, index) => (
-          <li key={clause.title} className="flex items-center gap-2.5">
+          <li key={clause.title} className={`flex items-center gap-2.5 ${index < 3 ? "md:pr-6" : "md:border-l md:border-[#E2DED2] md:pl-6"}`}>
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
             <p className="text-[13.5px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
