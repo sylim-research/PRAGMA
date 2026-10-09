@@ -444,7 +444,7 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
         {top.words.map(({ word, missionCount }, index) => (
           <li key={word} className="flex items-center gap-2.5 py-1 text-[14px]">
             <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
-            <span className="w-16 shrink-0 font-zh text-[#15202B]" lang="zh">{word}</span>
+            <span className="w-16 shrink-0 font-zh text-[14.5px] text-[#15202B]" lang="zh">{word}</span>
             <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F4F1E8]">
               <span className="block h-full rounded-full bg-[#E3C44E]" style={{ width: `${(missionCount / max) * 100}%` }} />
             </span>
