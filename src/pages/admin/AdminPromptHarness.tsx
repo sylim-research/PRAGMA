@@ -62,8 +62,8 @@ const PART_BODY = "border-t border-[#EFEAE0] px-5 py-4";
 function PartHeading({ id, title, description }: { id: string; title: string; description: string }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
-      <h2 id={id} className="text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
-      <span className="text-[14.5px] text-[#514C44]">{description}</span>
+      <h2 id={id} className="text-[17.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
+      <span className="text-[13.5px] text-[#514C44]">{description}</span>
     </div>
   );
 }
@@ -81,7 +81,7 @@ function ContractSummary() {
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
-            <p className="text-[15px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
+            <p className="text-[14px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
         ))}
       </ol>
@@ -168,8 +168,8 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 품질 점검</span>
             <Badge variant="outline" className="bg-white font-normal">재현 가능</Badge>
           </div>
-          <h3 className="mt-2 text-[15px] font-bold">규칙 기반 검사</h3>
-          <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[14.5px] font-bold">규칙 기반 검사</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             미션 형식에 해당하는 규칙으로 구성·언어·요청 조건을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
@@ -183,8 +183,8 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#3F6172]">AI 검토</span>
             <Badge variant="outline" className="bg-white font-normal">문맥 검토</Badge>
           </div>
-          <h3 className="mt-2 text-[15px] font-bold">프롬프트 통제 기반 검토</h3>
-          <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[14.5px] font-bold">프롬프트 통제 기반 검토</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             운영 프롬프트에 따라 의미·자연성·후보 자격을 검토합니다. 필요 시 모델 간 교차 검토를 실행합니다.
           </p>
           <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
@@ -196,8 +196,8 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D675D]">최종 사용 결정</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[15px] font-bold">교수자 최종 승인</h3>
-          <p className="mt-1 text-[14px] leading-relaxed text-muted-foreground">
+          <h3 className="mt-2 text-[14.5px] font-bold">교수자 최종 승인</h3>
+          <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             자동 품질 점검·AI 검토 근거를 보고 수정·보류·수업 사용 여부를 결정합니다.
           </p>
           <Link to="/admin/review" className={`group ${STAGE_LINK}`}>
@@ -229,7 +229,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             ) : (
               <ChevronRight className="h-4 w-4 shrink-0" />
             )}
-            <CardTitle className="text-[15.75px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
+            <CardTitle className="text-[15px] leading-tight">{entry.label.replace(/\s*\(([^)]*)\)/g, " $1")}</CardTitle>
           </button>
           <Badge variant="outline" className="shrink-0 px-2 py-0 font-mono text-[13px] leading-5">
             {entry.sha256.slice(0, 10)}
@@ -274,7 +274,7 @@ const AdminPromptHarness = () => {
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[18px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[16px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid gap-1.5 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
