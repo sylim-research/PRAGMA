@@ -1,3 +1,4 @@
+import { ZhRuns } from "@/components/ZhRuns";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
@@ -1928,9 +1929,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     </div>
                     {expanded
                       ? <>
-                        <p className="mt-1.5 text-[14.5px] leading-6">{conciseFeedback(criterion.body)}</p>
+                        <p className="mt-1.5 text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(criterion.body)} /></p>
                       </>
-                      : !passed && <p className="mt-1 text-[14.5px] leading-6 text-[#5A6673]">{feedbackSentences(criterion.body)[0]}</p>}
+                      : !passed && <p className="mt-1 text-[14.5px] leading-6 text-[#5A6673]"><ZhRuns text={feedbackSentences(criterion.body)[0] ?? ""} /></p>}
                   </article>
                 );
               }) : (
@@ -1951,7 +1952,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
                     && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9] px-4 py-3">
                       <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
-                      <p className="mt-1 text-[14.5px] leading-6">{conciseFeedback(primaryCriterion.body)}</p>
+                      <p className="mt-1 text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                     </div>}
                 </>
               )}
@@ -3239,7 +3240,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
             )}
             {localPilot ? <Button variant="outline" className="h-[48px] w-full" onClick={restart}><RotateCcw className="mr-2 h-4 w-4" />처음부터 다시 보기</Button>
               : <CompletionActions onRestart={restart} onRetrySave={() => void persistPendingAttempt()} runtime={Boolean(runtime) && !demoMode} saveState={saveState}
-                onShowDemoRecord={demoMode ? () => { setDemoRecordOpen(true); window.setTimeout(() => document.getElementById("demo-record")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50); } : undefined} />}
+                // 데모 학습 기록은 실제 학습자의 「내 기록」 화면(동료들의 판단 포함)을 데모 자료로 연다(2026-10-09).
+                onShowDemoRecord={demoMode ? () => navigate("/demo/records") : undefined} />}
             {demoMode && demoRecordOpen && <DemoRecord quests={mission.quests} responses={responses} />}
           </div>
         ) : (

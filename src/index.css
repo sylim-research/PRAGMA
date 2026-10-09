@@ -150,7 +150,8 @@
   }
 
   html {
-    font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    /* Pretendard에 없는 간체자는 시스템 서체가 아니라 Noto Sans SC로 받는다(2026-10-09) — 글자마다 서체가 섞이지 않게. */
+    font-family: "Pretendard Variable", Pretendard, "Noto Sans SC", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     /* 스크롤바 자리를 항상 비워 두어, 짧은 화면과 긴 화면을 오갈 때 헤더·본문이 좌우로 흔들리지 않게 한다. */
     scrollbar-gutter: stable;
   }

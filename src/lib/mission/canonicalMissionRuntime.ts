@@ -332,9 +332,25 @@ function runtimeFeedbackMode(pdr: Pdr): DctQuest["feedback"]["mode"] {
     : "avoid_over_mitigation";
 }
 
+/**
+ * 저작된 문구의 「번역안·통역안」을 실행 모드에 맞춘다. 같은 미션을 번역·통역으로 바꿔 보여 주는 시연과,
+ * 판단 2의 질문이 모드와 무관하게 「번역안」으로 저작된 미션에서 화면 꼬리표와 질문이 엇갈리지 않게 한다.
+ * 승인된 콘텐츠는 그대로 두고 화면에 보일 때만 바꾼다(2026-10-09).
+ */
+export function alignOutputTerms<T>(value: T, mode: "translation" | "interpreting"): T {
+  const [from, to] = mode === "interpreting" ? ["번역안", "통역안"] : ["통역안", "번역안"];
+  const walk = (node: unknown): unknown => {
+    if (typeof node === "string") return node.includes(from) ? node.split(from).join(to) : node;
+    if (Array.isArray(node)) return node.map(walk);
+    if (node && typeof node === "object") return Object.fromEntries(Object.entries(node).map(([key, child]) => [key, walk(child)]));
+    return node;
+  };
+  return walk(value) as T;
+}
+
 /** DB 미션을 현재 정본의 다섯 판단 활동 + DCT 흐름에 투영한다. */
 export function adaptRunnableMissionToCanonical(runnable: RunnableMission): CanonicalMissionViewModel {
-  const { mission } = runnable;
+  const mission = alignOutputTerms(runnable.mission, runnable.mission.production_task.mode === "interpreting" ? "interpreting" : "translation");
   const isNativeMpj5 = mission.schema_version === "mission_v5" && mission.mpj_items.length === 5;
   const directionRuntime = DIRECTION_RUNTIME[mission.direction];
   const activityMode = mission.production_task.mode;

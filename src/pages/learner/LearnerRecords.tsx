@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ZhRuns } from "@/components/ZhRuns";
 import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -284,7 +285,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
               )}
               {change?.scope && <span className="text-[14px]"><span className="text-[#8C8471]">다시 살펴볼 점 </span><span className="font-semibold">{change.scope}</span></span>}
             </p>
-            {change?.feature && <p className="break-keep">{change.feature}</p>}
+            {change?.feature && <p className="break-keep"><ZhRuns text={change.feature} /></p>}
             {!change?.feature && record.feedback.length > 0 && <p>{record.feedback.join(" · ")}</p>}
           </div>
         ) : (
@@ -683,13 +684,18 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
   const missionCount = groupByMission(records).length;
   const filteredActLabel = actFilter === "all" ? null : SPEECH_ACT_UI[actFilter];
 
+  // 데모(/demo/records)는 학습자 메뉴 대신 체험으로 돌아가는 링크만 둔다 — 메뉴는 로그인 화면으로 이어진다.
+  const shellProps = demo
+    ? { demo: true, headerRight: <Link to="/demo/mission" className="rounded-md px-3 py-1.5 text-[14px] font-semibold text-white hover:bg-white/10">← 체험으로 돌아가기</Link> }
+    : { nav: true };
+
   const title = (
     <h1 className="border-l-4 border-[#FAD338] pl-3 text-[26px] font-bold leading-9 tracking-[-0.04em] text-[#15202B]">내 기록</h1>
   );
 
   if (recordsError || remoteRecords === null) {
     return (
-      <LearnerJourneyShell nav>
+      <LearnerJourneyShell {...shellProps}>
         <div className="pb-24">
           {title}
           <div className="mt-6 rounded-2xl border border-[#E4DFD0] bg-white p-5" role={recordsError ? "alert" : "status"}>
@@ -708,7 +714,7 @@ const LearnerRecords = ({ demo: demoProp = false }: { demo?: boolean }) => {
   }
 
   return (
-    <LearnerJourneyShell nav>
+    <LearnerJourneyShell {...shellProps}>
       <div className="pb-24">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>

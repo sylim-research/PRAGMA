@@ -86,7 +86,7 @@ describe("demo route", () => {
     vi.spyOn(window, "confirm").mockReturnValue(true);
     window.scrollTo = vi.fn();
     Element.prototype.scrollIntoView = vi.fn();
-    render(<MemoryRouter><CanonicalMissionRun demoMode /></MemoryRouter>);
+    render(<MemoryRouter initialEntries={["/demo/mission"]}><Routes><Route path="/demo/mission" element={<CanonicalMissionRun demoMode />} /><Route path="/demo/records" element={<h1>demo records page</h1>} /></Routes></MemoryRouter>);
     fireEvent.click(await screen.findByRole("button", { name: "한 → 중 번역 시작하기" }));
     fireEvent.click(await screen.findByRole("button", { name: "번역하기 단계로 이동" }));
     fireEvent.click(screen.getByRole("button", { name: /예시 .* 넣기/ }));
@@ -96,10 +96,11 @@ describe("demo route", () => {
     fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
     fireEvent.click(await screen.findByRole("button", { name: /최종안 제출하기/ }));
     expect(await screen.findByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
-    // 시연의 학습 기록은 로그인 화면이 아니라 이 자리에서 열린다.
+    // 시연의 학습 기록은 로그인 화면으로 보내지 않는다.
     expect(screen.queryByRole("link", { name: "내 기록 보기" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "데모 학습 기록 보기" }));
-    expect(screen.getByRole("region", { name: "데모 학습 기록" })).toBeInTheDocument();
+    // 시연의 학습 기록은 실제 「내 기록」 화면의 데모판(/demo/records)으로 연다.
+    expect(await screen.findByRole("heading", { name: "demo records page" })).toBeInTheDocument();
     expect(requestFeedback).not.toHaveBeenCalled();
     expect(saveMissionAttempt).not.toHaveBeenCalled();
   });
