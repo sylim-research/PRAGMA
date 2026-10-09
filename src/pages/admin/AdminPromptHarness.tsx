@@ -53,21 +53,24 @@ const CONTRACT_CLAUSES: { title: string; body: string }[] = [
 ];
 
 // 이 화면의 세 부분(생성계약 → 품질관리 구조 → 운영 프롬프트)은 같은 급의 제목으로 나란히 둔다.
-// 번호 동그라미는 두지 않는다 — 제목과 한 줄 설명만(2026-10-09).
-function PartHeading({ id, title, description }: { no?: number; id: string; title: string; description: string }) {
+// 구역은 HSK 화면처럼 흰 카드 하나로 묶는다 — 카드 머리에 제목과 짧은 요약을 한 줄로 둔다(2026-10-09).
+const PART_CARD = "overflow-hidden rounded-xl border border-[#E2DED2] bg-white";
+const PART_BODY = "border-t border-[#EFEAE0] px-5 py-4";
+
+function PartHeading({ id, title, description }: { id: string; title: string; description: string }) {
   return (
-    <div className="mb-3">
-      <h2 id={id} className="text-[16.5px] font-bold leading-8 text-[#15202B]">{title}</h2>
-      <p className="mt-0.5 text-[14.5px] font-medium leading-relaxed text-[#4A5862]">{description}</p>
+    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
+      <h2 id={id} className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
+      <span className="text-[14px] text-[#514C44]">{description}</span>
     </div>
   );
 }
 
 function ContractSummary() {
   return (
-    <section aria-labelledby="contract-title">
-      <PartHeading no={1} id="contract-title" title="생성계약" description="모든 생성·검토·저장은 생성계약이 정한 조건 안에서 이루어집니다." />
-      <ol className="grid gap-x-6 gap-y-2 rounded-xl border border-[#E2DED2] bg-white px-4 py-3.5 sm:px-5 md:grid-cols-2">
+    <section aria-labelledby="contract-title" className={PART_CARD}>
+      <PartHeading id="contract-title" title="생성계약" description="모든 생성·검토·저장이 지키는 여섯 조건" />
+      <ol className={`grid gap-x-6 gap-y-2 md:grid-cols-2 ${PART_BODY}`}>
         {CONTRACT_CLAUSES.map((clause, index) => (
           <li key={clause.title} className="flex items-center gap-2.5">
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
@@ -148,8 +151,9 @@ function RuleCatalogPanel() {
 function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
-    <section aria-labelledby="harness-overview-title">
-      <PartHeading no={2} id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검과 AI 검토를 거친 뒤, 교수자가 감수하고 최종 승인합니다." />
+    <section aria-labelledby="harness-overview-title" className={PART_CARD}>
+      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 품질 점검 → AI 검토 → 교수자 최종 승인" />
+      <div className={PART_BODY}>
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
           className={`group rounded-lg border p-3 text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : "border-[#E2DED2] bg-white"}`}>
@@ -195,6 +199,7 @@ function HarnessOverview() {
         </div>
       </div>
       {rulesOpen && <RuleCatalogPanel />}
+      </div>
     </section>
   );
 }
@@ -250,13 +255,13 @@ const AdminPromptHarness = () => {
       title="생성계약·운영 프롬프트"
       description="생성계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
-      <div className="space-y-10">
+      <div className="space-y-4">
       <ContractSummary />
       <HarnessOverview />
 
-      <section aria-labelledby="prompts-title">
-        <PartHeading no={3} id="prompts-title" title="운영 프롬프트" description="실제 생성·검토·피드백에 쓰는 프롬프트 원문입니다. 손으로 옮겨 적지 않고 코드에서 그대로 가져와 보여 줍니다." />
-        <div className="space-y-6">
+      <section aria-labelledby="prompts-title" className={PART_CARD}>
+        <PartHeading id="prompts-title" title="운영 프롬프트" description="코드에서 그대로 가져온 생성·검토·피드백 원문" />
+        <div className={`space-y-6 ${PART_BODY}`}>
         {HARNESS_SECTION_ORDER.map((g) => {
           const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));
           if (items.length === 0) return null;
