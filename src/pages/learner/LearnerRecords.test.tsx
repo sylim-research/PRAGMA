@@ -260,7 +260,7 @@ describe("learner records", () => {
 
   it("opens a labelled demo record without reading stored logs", async () => {
     renderReport("/learner/records?demo=1");
-    expect(await screen.findByText("데모 · 가상 학습자 20명 · 실제 학습자 자료가 아닙니다")).toBeInTheDocument();
+    expect(await screen.findByText("데모 · 가상 학습자 20명")).toBeInTheDocument();
     const classView = await screen.findByRole("region", { name: "동료들의 판단" });
     expect(within(classView).getByRole("list", { name: "수정안 선택 동료 응답 분포와 내 판단" })).toHaveTextContent("수정안 2나60% · 12명");
     // 판단 비교 표 대신, 각 활동 그래프 옆에 기준 판단 라벨 하나.

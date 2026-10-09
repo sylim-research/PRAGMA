@@ -9,7 +9,7 @@ import { REPRESENTATIVE_MISSION_ID } from "./representativeMission";
 import { REPRESENTATIVE_MISSION_SNAPSHOT } from "./representativeMissionSnapshot";
 import { buildVirtualClassRows, DEMO_LEARNER_ROW, VIRTUAL_CLASS_SIZE } from "./virtualClassRows";
 
-export const LEARNER_DEMO_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명 · 실제 학습자 자료가 아닙니다`;
+export const LEARNER_DEMO_NOTICE = `데모 · 가상 학습자 ${VIRTUAL_CLASS_SIZE}명`;
 /** 학급 보드의 「응답 1」과 같은 사람. */
 export const LEARNER_DEMO_INDEX = DEMO_LEARNER_ROW;
 /** 대표 교과목(AI 한중 화용 통번역) — 대표 미션이 2주차 첫 슬롯이다. */
