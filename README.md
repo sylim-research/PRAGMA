@@ -33,7 +33,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
-> <small>콘텐츠 제작과 통번역 학습을 수업 운영으로 잇고, 학습 기록은 다시 콘텐츠 검토로 이어집니다.</small>
+> <small>콘텐츠 제작과 통번역 학습을 수업 운영으로 잇고, 학습 기록과 토론 결과를 콘텐츠 검토로 되돌립니다.</small>
 
 <br>
 
@@ -50,26 +50,26 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>9개의 목표화행과 상황·관계 조건(Brown &amp; Levinson(1987)의 P·D·R을 해석 틀로 삼음)을 달리하여 미션을 구성합니다.</small>
+> <small>9개 목표화행과 P·D·R 상황·관계 조건을 조합해 학습 미션을 구성합니다.</small>
 
 <br>
 
-## 3. 통번역 학습 워크플로우
+## 3. 콘텐츠 제작 워크플로우
+
+<p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
+
+> <small>AI가 생성한 콘텐츠는 자동 품질 점검과 AI 검토를 거쳐 교수자가 감수·최종 승인합니다.</small>
+
+<br>
+
+## 4. 통번역 학습 워크플로우
 
 <p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
-- **통번역 과제**에서는 초안에 1차 AI 피드백을 받고, 수정하면 수정안에 2차 AI 피드백을 한 번 더 받습니다. 초안을 유지할지 수정안을 택할지, 최종안은 학습자가 결정합니다.
-- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에서는 음성 인식(STT)과 음성 합성(TTS)을 사용합니다.
-
-<br>
-
-## 4. 콘텐츠 제작 워크플로우
-
-<p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
-
-> <small>AI 생성 콘텐츠는 규칙 기반 자동 품질 점검과 AI 검토를 거쳐 교수자가 감수하고 최종 승인합니다.</small>
+- **DCT형 통번역 과제**에서는 초안에 1차, 수정안에 2차 AI 피드백을 받고, 최종안은 학습자가 결정합니다.
+- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에는 음성 인식 STT와 음성 합성 TTS를 씁니다.
 
 <br>
 
@@ -95,17 +95,32 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="380" align="left">콘텐츠 이력</th><th width="380" align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
-    <tr><td>운영 프롬프트 지문 (SHA-256)</td><td>초안 · 수정안</td></tr>
+    <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
     <tr><td>자동 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
     <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견</td></tr>
   </tbody>
 </table>
 
-> <small>생성·검토·승인 이력과 학습 기록을, 저장 구조가 허용하는 범위에서 버전과 연결해 추적합니다.</small>
+> <small>생성·검토·승인 이력과 학습 기록을 콘텐츠 버전에 연결해 추적합니다.</small>
 
 <br>
 
-## 7. 학위논문과 구현의 대응
+## 7. 시스템 아키텍처
+
+<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+
+<sub>2026년 10월 기준</sub>
+
+- **학습 미션 생성**에는 GPT-5.5를 기본으로 사용하며, 교수자가 GPT-6 Astra를 선택할 수 있습니다.
+- **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
+- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
+- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
+- **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
+- **코드 관리와 배포**는 GitHub에서 자동 검사를 거쳐 Railway로 배포합니다.
+
+<br>
+
+## 8. 학위논문과 구현의 대응
 
 <table>
   <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
@@ -124,11 +139,11 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   </tbody>
 </table>
 
-> <small>학위논문 제4장과 부록을 절 단위로 실제 코드·기록과 대응시켰습니다.</small>
+> <small>학위논문 제4장과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다.</small>
 
 <br>
 
-## 8. 주요 연구·개발 단계
+## 9. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="220" align="left">단계</th><th width="430" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
@@ -147,29 +162,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <br>
 
-## 9. 시스템 아키텍처
-
-<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
-
-<sub>(2026년 10월 기준)</sub>
-
-- **학습 미션 생성**에는 GPT-5.5를 기본으로 사용하며, 교수자가 GPT-6 Astra를 선택할 수 있습니다.
-- **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
-- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
-- **구현**은 React·TypeScript와 Supabase(Edge Functions·PostgreSQL)로 구성됩니다.
-- **코드 관리와 배포**는 GitHub에서 자동 검사를 거쳐 Railway로 배포합니다.
-
-<br>
-
 ## 10. 주요 용어
 
 <table>
   <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
   <tbody>
-    <tr><td>MJT</td><td>메타화용적 판단 과제<sup>*</sup>. 표현의 화용적 적절성을 판단하는 문항</td></tr>
-    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT)<sup>*</sup> 형식을 통번역에 적용한 산출 과제. 줄여서 통번역 과제</td></tr>
-    <tr><td>STT·TTS</td><td>음성 인식·음성 합성<sup>*</sup>. 통역 미션에 사용</td></tr>
+    <tr><td>MJT</td><td>메타화용적 판단 과제 · <sub>Metapragmatic Judgment Task</sub><br>제시된 표현의 화용적 적절성을 판단하는 문항</td></tr>
+    <tr><td>DCT형 통번역 과제<br><sub>약칭 통번역 과제</sub></td><td>담화완성과제 형식의 통번역 과제 · <sub>DCT: Discourse Completion Task</sub><br>상황·관계와 선행 발화를 함께 주고 원문을 통번역하게 하는 과제</td></tr>
+    <tr><td>STT·TTS</td><td>음성 인식·음성 합성 · <sub>Speech-to-Text · Text-to-Speech</sub><br>통역 미션의 원발화 재생과 발화 전사에 사용</td></tr>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
@@ -178,8 +178,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>교수자 최종 승인</td><td>감수한 콘텐츠 버전의 수업 사용 여부 결정</td></tr>
   </tbody>
 </table>
-
-> <small>* 메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)<br>* 담화완성과제(DCT: Discourse Completion Task)<br>* 음성 인식(STT: Speech-to-Text) · 음성 합성(TTS: Text-to-Speech)</small>
 
 <br>
 <br>
