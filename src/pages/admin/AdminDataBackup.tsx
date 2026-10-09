@@ -90,8 +90,8 @@ const ScopeDetails = () => (
  */
 const BADGE_TONE = {
   brand: "border-accent bg-accent/25 text-foreground",
-  // 복원 = 남색(브랜드색). 초록은 「통과」 판정색이라 쓰지 않고, 회색은 죽은 기능처럼 보여 쓰지 않는다(2026-10-09).
-  ink: "border-[#233542] bg-[#233542] text-white",
+  // 복원 = 연한 남색(브랜드색 계열, 헤더처럼 어둡게 하지 않는다). 초록은 「통과」 판정색이라 쓰지 않고, 회색은 죽은 기능처럼 보여 쓰지 않는다(2026-10-09).
+  ink: "border-[#8AA0B3] bg-[#EEF2F6] text-[#233542]",
 } as const;
 
 const RoleBadge = ({ children, tone }: { children: string; tone: keyof typeof BADGE_TONE }) => (
@@ -397,8 +397,8 @@ const Page = () => {
         </section>
 
         {/* 복원은 보조 동작이지만 배경을 죽이지 않는다 — 위계는 배지와 테두리로만 준다. */}
-        <section className="flex h-full flex-col overflow-hidden rounded-xl border border-[#233542]/30 bg-card">
-          <div className="h-1 bg-[#233542]" />
+        <section className="flex h-full flex-col overflow-hidden rounded-xl border border-[#8AA0B3]/60 bg-card">
+          <div className="h-1 bg-[#8AA0B3]" />
           <div className="flex flex-1 flex-col p-5">
             <div className="flex items-center gap-2">
               <RoleBadge tone="ink">수업 복원</RoleBadge>
