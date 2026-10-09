@@ -12,6 +12,7 @@ import {
   myChoices,
   type ChangeMap,
   type ClassPosition,
+  type MissionReference,
 } from "@/lib/learner/recordFlow";
 import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
 import { fetchMissionByScenario } from "@/lib/mission/missionDb";
@@ -358,6 +359,50 @@ function ChoiceBars({ position }: { position: ClassPosition }) {
  * 동료들의 판단 → 판단 비교 → 핵심 정리. 학급 분포는 교수자가 공개한 미션에만 보인다.
  * 기준 판단·핵심 정리는 수행 당시와 같은 콘텐츠 판본일 때만 미션 본문에서 그대로 옮긴다(새 해석 없음).
  */
+function useRecordReference(record: ReportRecord) {
+  const mission = useQuery({
+    queryKey: ["learner-records-mission", record.missionId],
+    enabled: !record.demoMission && Boolean(record.missionId && record.contentHash),
+    queryFn: async () => (await fetchMissionByScenario(record.missionId as string, { includeV6: true })).mission,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
+  return missionReference(record.demoMission ?? mission.data ?? null, record.contentHash);
+}
+
+/** 해설 속 `중국어` 인용은 백틱 대신 중국어 서체로 보인다(완료 화면과 같은 표기). */
+function NoteText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(/(`[^`]+`)/g).map((part, index) => part.startsWith("`") && part.endsWith("`") && part.length > 2
+        ? <span key={index} className="font-zh font-semibold text-[#15202B]">{part.slice(1, -1)}</span>
+        : <span key={index}>{part}</span>)}
+    </>
+  );
+}
+
+/** 추천 표현 — 완료 화면에서 공개한 저작 예시와 해설을 그대로 다시 보여 준다(새 해석 없음). */
+function Alternatives({ items }: { items: MissionReference["alternatives"] }) {
+  return (
+    <section className="border-t border-[#EFEBDF] px-6 py-6" aria-label="추천 표현">
+      <h3 className={sectionTitle}>{titleBar}추천 표현</h3>
+      <ol className="mt-[12px] flex flex-col gap-3">
+        {items.map((item, index) => (
+          <li key={item.text} className="rounded-xl border-[1.6px] border-[#EBDDA2] bg-[#FFFCF0] px-4 py-3">
+            <p className={cardLabel}>예시 {index + 1}</p>
+            <p className={`mt-1.5 ${zhLine}`}>{item.text}</p>
+            {item.note && (
+              <p className="mt-[8px] border-t border-dashed border-[#EBDDA2] pt-2 break-keep text-[15px] leading-7 text-[#26323D]">
+                <span className="mr-1.5 font-bold text-[#8A7423]">해설</span><NoteText text={item.note} />
+              </p>
+            )}
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
 function ClassReview({ record }: { record: ReportRecord }) {
   const live = !record.demoPositions && Boolean(record.courseId && record.missionId);
   const peer = useQuery({
@@ -366,16 +411,9 @@ function ClassReview({ record }: { record: ReportRecord }) {
     queryFn: () => getLearnerPeerResponses(record.courseId as string, record.missionId as string),
     staleTime: 60_000,
   });
-  const mission = useQuery({
-    queryKey: ["learner-records-mission", record.missionId],
-    enabled: !record.demoMission && Boolean(record.missionId && record.contentHash),
-    queryFn: async () => (await fetchMissionByScenario(record.missionId as string, { includeV6: true })).mission,
-    staleTime: 5 * 60_000,
-    retry: false,
-  });
+  const reference = useRecordReference(record);
   const positions = record.demoPositions
     ?? (peer.data?.state === "released" ? classPositionsFromPattern(peer.data.pattern, record.choices) : []);
-  const reference = missionReference(record.demoMission ?? mission.data ?? null, record.contentHash);
   const shownItems = positions.length > 0 ? positions.map((position) => position.itemId) : COMPARED_ITEMS;
   const lessonPoints = (reference?.lessonPoints ?? []).filter((point) => shownItems.includes(point.itemId));
   const referenceLabel = (position: ClassPosition) => {
@@ -435,6 +473,7 @@ function MissionCard({ group }: { group: MissionGroup }) {
   const head = group.records[0];
   const [sourceOpen, setSourceOpen] = useState(false);
   const longSource = head.sourceText.length > 90;
+  const alternatives = useRecordReference(head)?.alternatives ?? [];
   return (
     <article className="overflow-hidden rounded-2xl border border-[#E4DFD0] bg-white shadow-[0_1px_2px_rgba(21,32,43,0.03),0_8px_24px_rgba(21,32,43,0.035)]">
       <header className="border-b border-[#EFEBDF] px-6 pb-5 pt-5">
@@ -461,11 +500,15 @@ function MissionCard({ group }: { group: MissionGroup }) {
           <li key={record.id}><Attempt record={record} /></li>
         ))}
       </ol>
+      {alternatives.length > 0 && <Alternatives items={alternatives} />}
       <ClassReview record={head} />
-      <p className="border-t border-[#EFEBDF] px-6 py-4 text-[15px] text-[#5C6A7A]" aria-label="생각해 보기">
-        <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
-        최종안에서도 원문의 의미와 화행목적이 유지되었나요?
-      </p>
+      {/* 추천 표현을 볼 수 없는 기록(판본이 바뀐 미션 등)에만 스스로 점검할 질문을 남긴다. */}
+      {alternatives.length === 0 && (
+        <p className="border-t border-[#EFEBDF] px-6 py-4 text-[15px] text-[#5C6A7A]" aria-label="생각해 보기">
+          <span className="mr-2 font-semibold text-[#8A5A14]">생각해 보기</span>
+          최종안에서도 원문의 의미와 화행목적이 유지되었나요?
+        </p>
+      )}
     </article>
   );
 }

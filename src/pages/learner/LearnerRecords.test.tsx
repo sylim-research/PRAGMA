@@ -275,6 +275,12 @@ describe("learner records", () => {
     expect(lessons).toHaveTextContent("맡기는 틀과 묻는 틀");
     expect(lessons).toHaveTextContent("확인 부탁의 강도와 확정성");
     expect(lessons).not.toHaveTextContent("적절한 표현은 여러 가지");
+    // 추천 표현과 해설이 있으면 추상적인 「생각해 보기」 질문은 두지 않는다.
+    const alternatives = screen.getByRole("region", { name: "추천 표현" });
+    expect(within(alternatives).getAllByText(/^예시 \d$/)).toHaveLength(2);
+    expect(within(alternatives).getAllByText("해설").length).toBeGreaterThan(0);
+    expect(alternatives).not.toHaveTextContent("`");
+    expect(screen.queryByLabelText("생각해 보기")).not.toBeInTheDocument();
     expect(screen.queryByText(/경향|편이다|강점|약점|민감/)).not.toBeInTheDocument();
     expect(mocks.from).not.toHaveBeenCalled();
     expect(mocks.fetchMission).not.toHaveBeenCalled();

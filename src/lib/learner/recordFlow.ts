@@ -29,6 +29,8 @@ export interface MissionReference {
   /** 문항 번호 → 기준 선택 키(척도 코드 또는 수정안 위치). */
   answers: Map<number, string>;
   lessonPoints: Array<{ itemId: number; label: string; text: string }>;
+  /** 통번역 과제의 추천 표현과 해설 — 완료 화면에서 이미 공개한 것과 같은 저작 본문. */
+  alternatives: Array<{ text: string; note: string }>;
 }
 
 type Obj = Record<string, unknown>;
@@ -136,5 +138,9 @@ export function missionReference(mission: unknown, recordContentHash: string | n
     const text = str(point?.text);
     return itemId !== null && label && text ? [{ itemId, label, text }] : [];
   });
-  return { answers, lessonPoints };
+  const alternatives = arr(obj(content.production_task)?.reference_alternatives).map(obj).flatMap((alternative) => {
+    const text = str(alternative?.text);
+    return text ? [{ text, note: str(alternative?.note_ko) ?? "" }] : [];
+  });
+  return { answers, lessonPoints, alternatives };
 }
