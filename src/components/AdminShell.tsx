@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ChevronDown } from "lucide-react";
+import { CAPTURE_CANVAS, useCaptureMode } from "@/lib/captureMode";
 import { HomeBrand } from "@/components/HomeBrand";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import {
@@ -19,28 +20,14 @@ interface AdminShellProps {
   hideTitle?: boolean;
 }
 
-const CAPTURE_KEY = "pragma.captureMode";
-
-function useCaptureMode(search: string) {
-  const param = new URLSearchParams(search).get("capture");
-  try {
-    if (param === "1") window.sessionStorage.setItem(CAPTURE_KEY, "1");
-    if (param === "0") window.sessionStorage.removeItem(CAPTURE_KEY);
-    return window.sessionStorage.getItem(CAPTURE_KEY) === "1";
-  } catch {
-    return param === "1";
-  }
-}
-
 export const AdminShell = ({ title, description, children, compact = false, hideTitle = false }: AdminShellProps) => {
-  const { pathname, search } = useLocation();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
-  // 원고 캡처 모드(2026-10-09): 주소에 ?capture=1을 붙이면 이 탭에서 계속 켜지고 ?capture=0으로 끈다.
-  // 사이드바를 감추고 본문을 800px로 묶어, 카드를 잘라 HWPX 본문 폭(약 14cm)에 넣었을 때 글씨가 7pt 안팎으로 읽히게 한다.
-  const capture = useCaptureMode(search);
+  // 원고 캡처 모드(?capture=1) — 사이드바를 감추고 본문을 800px로 묶는다(lib/captureMode).
+  const capture = useCaptureMode();
   const mobileNavValue = adminMobileNavValue(pathname);
   // 모든 관리자 화면은 같은 캔버스 폭을 쓴다(2026-10-08 — 메뉴를 옮길 때 본문 폭이 흔들리지 않게).
-  const canvasClass = capture ? "max-w-[800px]" : "max-w-[1465px]";
+  const canvasClass = capture ? CAPTURE_CANVAS : "max-w-[1465px]";
   const [expandedGroups, setExpandedGroups] = useState<Set<number>>(
     () => new Set(ADMIN_NAV_GROUPS.map((_, index) => index)),
   );
