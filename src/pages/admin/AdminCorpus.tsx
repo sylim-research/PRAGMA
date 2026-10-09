@@ -547,7 +547,7 @@ function DatasetOverview({
       <div className="px-4 py-3.5 sm:px-5">
         <div>
           <div>
-            <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
+            <p className="text-[14.5px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
           </div>
         </div>
 
@@ -556,7 +556,7 @@ function DatasetOverview({
             <div
               key={range.id}
               id={`pragma-${range.id}`}
-              className="scroll-mt-24 rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-4 py-3"
+              className="scroll-mt-24 rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-4 py-4"
             >
               {/* 카드 = 수준 이름 · 누적 어휘 수 · 핵심 한 줄(입문은 누적 범위, 중·고급은 추가분). */}
               <div className="flex items-baseline justify-between gap-3">
@@ -565,7 +565,7 @@ function DatasetOverview({
                   {fmt(range.entries)}<span className="ml-0.5 text-[13.5px] font-normal text-[#655F55]">개</span>
                 </p>
               </div>
-              <p className="mt-1.5 text-[14px] font-medium text-[#615B52]">{range.addition}</p>
+              <p className="mt-2 text-[14px] font-medium text-[#615B52]">{range.addition}</p>
             </div>
           ))}
         </div>
