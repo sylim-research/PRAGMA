@@ -201,7 +201,7 @@ const AdminCorpus = () => {
       title="HSK 3.0 어휘 대조"
       description="생성된 중국어 어휘를 수준별 HSK 누적 목록과 대조해 참고 기록으로 남깁니다."
     >
-      <div className="w-full space-y-3">
+      <div className="w-full space-y-4">
         <DatasetOverview
           loading={loading}
           ready={referenceReady}
@@ -380,7 +380,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
   const grid = "grid grid-cols-[6.5rem_minmax(0,1fr)_9.5rem_5.5rem_6.5rem] items-center gap-x-4";
   return (
     <section aria-labelledby="audit-history-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1.5 px-5 pb-3 pt-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-3 pt-4">
         <div className="flex items-baseline gap-3">
           <h2 id="audit-history-title" className="text-[20px] font-bold tracking-[-0.01em] text-[#15202B]">대조 기록</h2>
           <span className="text-[14px] text-[#514C44]">
@@ -468,7 +468,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
 function AuditMethodSection() {
   const steps = ["중국어 단어 추출", "HSK 누적 목록과 대조", "일치·목록 밖 후보 기록"];
   return (
-    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3">
+    <section aria-labelledby="audit-method-title" className="flex flex-wrap items-center gap-x-6 gap-y-2.5 rounded-xl border border-[#E2DED2] bg-[#FFFDF7] px-5 py-3.5">
       <h2 id="audit-method-title" className="text-[20px] font-bold text-[#15202B]">대조 방식</h2>
       <ol className="flex flex-wrap items-center gap-2 text-[14px] text-[#26333B]">
         {steps.map((step, index) => (
@@ -527,7 +527,7 @@ function DatasetOverview({
 
   return (
     <section className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white" aria-labelledby="dataset-title">
-      <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+      <div className="flex flex-col gap-3 border-b border-[#E8E2D6] px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div className="flex min-w-0 items-center gap-3">
           {/* 제목과 「최근 조회」 배지를 한 줄에 둔다(2026-10-09). */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -544,7 +544,7 @@ function DatasetOverview({
         </div>
       </div>
 
-      <div className="px-4 pb-3.5 pt-3 sm:px-5">
+      <div className="px-4 py-4 sm:px-5">
         <div>
           <div>
             <p className="text-[14px] font-semibold text-[#8A7423]">PRAGMA 수준별 HSK 참조 범위</p>
