@@ -193,15 +193,16 @@ function CandidatesDetail({ item, size, projector }: { item: CandidatesItemView;
       <span className="flex items-center gap-1.5">{leftBand && <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: TONE[leftBand.tone] }} />}← {leftBand?.label ?? "과소"}</span>
       <span className="flex items-center gap-1.5">{rightBand?.label ?? "과잉"} →{rightBand && <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: TONE[rightBand.tone] }} />}</span>
     </div>
-    <ol className="space-y-3">
-      {item.candidates.map((candidate) => <li key={candidate.index} className="rounded-lg border border-[#E2DED2] px-3 py-2.5">
+    <ol className="space-y-4">
+      {item.candidates.map((candidate) => <li key={candidate.index} className="rounded-lg border border-[#E2DED2] px-4 py-4">
         <p className={`flex gap-2 leading-relaxed text-[#15202B] ${projector ? "text-[19px]" : "text-[15.5px]"}`}>
           <span className="shrink-0 text-[13px] font-bold text-[#B8860B]">표현 {candidate.index + 1}</span>
           <span className={zh(candidate.text)}>{candidate.text}</span>
         </p>
-        {/* 막대는 모두 같은 시작선·끝선의 100% 막대 — 우회적(왼쪽) · 알맞음 · 직접적(오른쪽) 순서로 칸 크기만 다르다(2026-10-09). */}
-        <div className="mt-2.5"><StackedBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-7" : "h-6"} labels /></div>
-        <div className="mt-2"><Legend slices={axis(candidate.slices).filter((slice) => slice.count > 0)} size={size} /></div>
+        {/* 막대는 모두 같은 폭(최대 560px)·같은 시작선의 100% 막대 — 우회적 · 알맞음 · 직접적 순서로 칸 크기만 다르다.
+            표현·막대·범례 사이에 숨 쉴 틈을 두고 막대 높이를 낮춰 화면이 덜 무겁게 한다(2026-10-09). */}
+        <div className="mt-4 max-w-[560px]"><StackedBar slices={axis(candidate.slices)} total={candidate.total} height={projector ? "h-6" : "h-5"} labels /></div>
+        <div className="mt-3"><Legend slices={axis(candidate.slices).filter((slice) => slice.count > 0)} size={size} /></div>
       </li>)}
     </ol>
   </div>;
