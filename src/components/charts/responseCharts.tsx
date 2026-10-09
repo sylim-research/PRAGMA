@@ -22,13 +22,13 @@ export const ON_TONE: Record<SliceTone, string> = {
 
 /** labels=true면 칸 안에 비율을 적는다(8% 미만 칸은 비운다) — 범례에서 비율 한 층을 덜어 낸다. */
 export function StackedBar({ slices, total, height = "h-3", labels = false }: { slices: Slice[]; total: number; height?: string; labels?: boolean }) {
-  return <div className={`flex w-full overflow-hidden rounded-sm bg-[#EEF0F2] ${height}`} aria-hidden="true">
+  return <div className={`flex w-full overflow-hidden rounded-full bg-[#F1F2F3] ${height}`} aria-hidden="true">
     {slices.filter((slice) => slice.count > 0).map((slice) => {
       const share = percent(slice.count, total);
       return <span
         key={slice.key}
         className="flex h-full items-center justify-center overflow-hidden text-[12.5px] font-semibold tabular-nums"
-        style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: TONE[slice.tone], color: ON_TONE[slice.tone] }}
+        style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: `${TONE[slice.tone]}D1`, color: ON_TONE[slice.tone] }}
       >{labels && share >= 8 ? `${share}%` : null}</span>;
     })}
   </div>;
@@ -49,7 +49,7 @@ export function Donut({ slices, total, size = 150, thickness = 22, centerLabel, 
       const el = <circle
         key={slice.key}
         cx={size / 2} cy={size / 2} r={r} fill="none"
-        stroke={TONE[slice.tone]} strokeWidth={thickness}
+        stroke={TONE[slice.tone]} strokeOpacity={0.82} strokeWidth={thickness}
         strokeDasharray={`${len} ${c - len}`} strokeDashoffset={-offset}
         transform={`rotate(-90 ${size / 2} ${size / 2})`}
       />;
@@ -62,8 +62,8 @@ export function Donut({ slices, total, size = 150, thickness = 22, centerLabel, 
 }
 
 /** 4점 척도를 한 축(매우 적절 → 매우 부적절)에 놓고, 척도별 학급 비율을 원의 크기와 숫자로 보인다. */
-/** soft: 학습자 화면용 — 원 채도·「나」 고리·척도 띠를 한 단계 낮춘다(관리자 화면은 그대로). */
-export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 위 응답 분포", className = "h-auto w-full", soft = false }: { slices: Slice[]; total: number; mine?: string | null; label?: string; className?: string; soft?: boolean }) {
+/** 원 채도·「나」 고리·척도 띠는 한 단계 낮춘 값을 쓴다 — 학습자 「내 기록」과 관리자 토론 보드가 같은 모양(2026-10-09). */
+export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 위 응답 분포", className = "h-auto w-full" }: { slices: Slice[]; total: number; mine?: string | null; label?: string; className?: string }) {
   const width = 560;
   const step = width / slices.length;
   return <svg viewBox={`0 0 ${width} ${mine ? 146 : 128}`} className={className} role="img" aria-label={label}>
@@ -73,7 +73,7 @@ export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 �
         {slices.map((slice, index) => <stop key={slice.key} offset={`${(index / Math.max(1, slices.length - 1)) * 100}%`} stopColor={TONE[slice.tone]} />)}
       </linearGradient>
     </defs>
-    <rect x={step / 2} y={soft ? 77 : 76} width={width - step} height={soft ? 4 : 6} rx={soft ? 2 : 3} fill="url(#spectrum-band)" opacity={soft ? 0.35 : 0.55} />
+    <rect x={step / 2} y={77} width={width - step} height={4} rx={2} fill="url(#spectrum-band)" opacity={0.35} />
     {slices.map((slice, index) => {
       const x = step * index + step / 2;
       const share = percent(slice.count, total);
@@ -81,11 +81,11 @@ export function SpectrumStrip({ slices, total, mine, label = "적절성 척도 �
       return <g key={slice.key}>
         <line x1={x} x2={x} y1={79} y2={62} stroke="#D9D5C8" strokeWidth={1} />
         {mine === slice.key && <>
-          <circle cx={x} cy={46} r={r + 5} fill="none" stroke="#15202B" strokeWidth={soft ? 1.5 : 2.5} />
+          <circle cx={x} cy={46} r={r + 5} fill="none" stroke="#15202B" strokeWidth={1.5} />
           <rect x={x - 13} y={46 - r - 25} width={26} height={17} rx={8.5} fill="#15202B" />
           <text x={x} y={46 - r - 16.5} textAnchor="middle" dominantBaseline="central" fill="#FAD338" className="text-[13px] font-bold">나</text>
         </>}
-        <circle cx={x} cy={46} r={r} fill={TONE[slice.tone]} fillOpacity={soft ? 0.82 : 1} />
+        <circle cx={x} cy={46} r={r} fill={TONE[slice.tone]} fillOpacity={0.82} />
         <text x={x} y={46} textAnchor="middle" dominantBaseline="central" fill={ON_TONE[slice.tone]} className="text-[14.5px] font-bold tabular-nums">{share}%</text>
         <text x={x} y={104} textAnchor="middle" className="fill-[#26323D] text-[15px] font-semibold">{slice.label}</text>
         <text x={x} y={122} textAnchor="middle" className="fill-[#5C6A7A] text-[13.5px] tabular-nums">{slice.count}명</text>

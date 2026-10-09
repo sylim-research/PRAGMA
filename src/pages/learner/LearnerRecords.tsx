@@ -450,7 +450,7 @@ function ClassReview({ record }: { record: ReportRecord }) {
                   </span>
                 </p>
                 {position.kind === "scale"
-                  ? <SpectrumStrip soft slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} className="mx-auto mt-3 h-auto w-full max-w-[680px]" />
+                  ? <SpectrumStrip slices={position.slices} total={position.total} mine={position.mine} label={`${position.activity} 동료 응답 분포와 내 판단`} className="mx-auto mt-3 h-auto w-full max-w-[680px]" />
                   : <ChoiceBars position={position} />}
               </div>
             ))}
