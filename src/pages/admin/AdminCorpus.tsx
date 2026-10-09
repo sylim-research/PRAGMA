@@ -354,7 +354,6 @@ function OperationsSection({
                 <span key={word} className="rounded-md border border-[#EBDDA2] bg-[#FFF9E3] px-2 py-0.5 text-[14px] text-[#3F3A32]" lang="zh">{word}</span>
               ))}
               {outsideCount > Math.min(12, audit.candidates.length) && <span className="text-[13.5px] text-[#655F55]">외 {fmt(outsideCount - Math.min(12, audit.candidates.length))}개</span>}
-              <span className="text-[13px] text-[#7A746A]">· 분절 단위·고유명사·전문용어가 섞여 있어 자동으로 가르지 않습니다</span>
             </div>
           )}
         </div>
@@ -398,7 +397,7 @@ function AuditHistory({ audits, selected, onSelect }: { audits: AuditSnapshot[];
           ))}
         </div>
         {/* 76% 같은 평균 바로 곁에서 해석의 경계를 한 번 보인다(목록 밖 = 수준 부적합이 아님). */}
-        <p className="basis-full text-[13px] text-[#7A746A]">포함률은 서로 다른 단어(유형)를 미션 전체에서 합산한 비율로, 텍스트 커버리지(토큰 기준)와 다릅니다. 목록 밖 후보는 곧바로 수준 부적합을 뜻하지 않습니다.</p>
+        <p className="basis-full text-[13px] text-[#7A746A]">목록 밖 후보는 곧바로 수준 부적합을 뜻하지 않습니다.</p>
       </div>
       <div className={`${grid} border-y border-[#EFEAE0] bg-[#FBFAF6] px-5 py-1.5 text-[12.5px] text-[#7A746A]`}>
         <span>일시</span><span>콘텐츠</span><span>조건</span><span className="text-right">일치 / 밖</span><span className="text-right">포함률(유형)</span>
@@ -441,7 +440,7 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
     <section aria-labelledby="top-outside-title" className="overflow-hidden rounded-xl border border-[#E2DED2] bg-white">
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-2.5 pt-4">
         <h2 id="top-outside-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 후보</h2>
-        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준 · 미션당 저장된 후보 최대 40개에서 셈</span>
+        <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
       <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
         {top.words.map(({ word, missionCount }, index) => (
@@ -465,7 +464,6 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
   { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개, 넘으면 등장 순서로 자름" },
   { label: "대상", body: "한→중은 중국어 산출문(번역안·후보·추천 표현), 중→한은 중국어 원문" },
   { label: "산식", body: "목록 안 유형 수 ÷ 분석한 유형 수 — 텍스트 커버리지(토큰 기준)가 아님" },
-  { label: "쓰임", body: "참고 기록 · 생성을 막거나 수준·적절성을 판정하지 않음" },
 ];
 
 function AuditMethodSection() {
