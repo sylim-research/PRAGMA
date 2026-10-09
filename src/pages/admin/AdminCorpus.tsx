@@ -440,9 +440,10 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
         <h2 id="top-outside-title" className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">자주 나온 HSK 목록 밖 후보</h2>
         <span className="text-[14px] text-[#514C44]">상위 {top.words.length}개 · 학습 미션 {fmt(top.missionCount)}개 기준</span>
       </div>
-      <ol className="grid gap-x-6 gap-y-1 border-t border-[#EFEAE0] px-5 py-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* 순위는 위에서 아래로 센다(1–5 | 6–10 …) — 다단 배열(2026-10-09). */}
+      <ol className="gap-x-6 border-t border-[#EFEAE0] px-5 py-3 sm:columns-2 lg:columns-4">
         {top.words.map(({ word, missionCount }, index) => (
-          <li key={word} className="flex items-center gap-2.5 py-1 text-[14px]">
+          <li key={word} className="flex break-inside-avoid items-center gap-2.5 py-1 text-[14px]">
             <span className="w-5 text-right text-[12.5px] tabular-nums text-[#9A9387]">{index + 1}</span>
             <span className="w-16 shrink-0 font-zh text-[14.5px] text-[#15202B]" lang="zh">{word}</span>
             <span aria-hidden className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#F4F1E8]">
