@@ -390,7 +390,7 @@ const AdminBrowser = () => {
                                 : `번역 ${c.t} / 통역 ${c.i}`
                             }
                           >
-                            <span className="text-[17px] font-bold tabular-nums">{n === 0 ? "—" : n}</span>
+                            <span className="text-[15px] font-bold tabular-nums">{n === 0 ? "—" : n}</span>
                             {n === 0 ? null : (
                               <span
                                 className={`text-[13px] ${active ? "text-white/70" : ""}`}
