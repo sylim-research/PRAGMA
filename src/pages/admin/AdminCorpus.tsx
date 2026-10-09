@@ -457,7 +457,7 @@ function TopOutOfListWords({ audits }: { audits: AuditSnapshot[] }) {
   );
 }
 
-/** 대조 방식 세부 — 접어 두고, 펼치면 분절·단위·대상·산식을 한 줄씩 보인다(2026-10-09). */
+/** 대조 방식 세부 — 분절·단위·대상·산식을 한 줄씩 늘 보인다(2026-10-09). */
 const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
   { label: "분절", body: "ICU 단어 분절기(Intl.Segmenter, 중국어 단어 단위) · 한자가 들어간 단어만" },
   { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개, 넘으면 등장 순서로 자름" },
@@ -481,17 +481,15 @@ function AuditMethodSection() {
           </li>
         ))}
       </ol>
-      <details className="group basis-full">
-        <summary className="cursor-pointer list-none text-[13px] font-medium text-[#655F55] underline-offset-4 hover:underline">방법 세부 보기</summary>
-        <dl className="mt-2 grid gap-x-6 gap-y-1 text-[13.5px] md:grid-cols-2">
+      {/* 방법 세부는 심사에서 먼저 묻는 지점이라 접지 않고 늘 보인다(2026-10-09). */}
+      <dl className="grid basis-full gap-x-6 gap-y-1 border-t border-[#EFE8D2] pt-2.5 text-[13.5px] md:grid-cols-2">
           {AUDIT_METHOD_DETAILS.map((item) => (
             <div key={item.label} className="flex gap-2">
               <dt className="w-8 shrink-0 font-semibold text-[#8A7423]">{item.label}</dt>
               <dd className="text-[#3B4A54]">{item.body}</dd>
             </div>
           ))}
-        </dl>
-      </details>
+      </dl>
     </section>
   );
 }
