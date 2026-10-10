@@ -638,7 +638,7 @@ const REASON_PROMPT = "그렇게 판단한 이유는 무엇인가요?";
 
 // 판정은 선택지 위에서 끝낸다(DEC-20260918-03). 내가 고른 선택지에 ✓/✕ 「내 선택」, 키 쪽 선택지에 배지 하나.
 // 배지 낱말은 문항 성격을 따른다 — 적절성 판단 = 「기준 판단」+인접 허용 「허용 판단」, 키가 있는 선택형 = 「정답」.
-function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "정답", referenceId, onSelect }: {
+function OptionButton({ option, value, disabled, answered = false, acceptedIds = [], radio = false, acceptedLabel = "기준 답", referenceId, onSelect }: {
   option: ChoiceOption;
   value: string | null;
   disabled?: boolean;
@@ -670,7 +670,7 @@ function OptionButton({ option, value, disabled, answered = false, acceptedIds =
         </span>
         {answered && (
           <span className="flex shrink-0 flex-wrap items-center gap-1.5">
-            {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${accepted ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{accepted ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
+            {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${accepted ? "border-[#245E44] text-[#245E44]" : "border-[#C86E68] text-[#8B3531]"}`}>{accepted ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
             {accepted && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />{badge}</span>}
           </span>
         )}
@@ -766,7 +766,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
 
   if (sent) {
     return (
-      <div className="rounded-xl border border-[#CFE4D8] bg-[#F2FAF6] px-4 py-3 text-[13px] leading-5 text-[#2E7D5B]">
+      <div className="rounded-xl border border-[#E6D49A] bg-white px-4 py-3 text-[13px] leading-5 text-[#7A5A12]">
         내 판단을 기록했습니다.
       </div>
     );
@@ -777,7 +777,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="w-full rounded-xl border border-dashed border-[#B9C4CE] bg-white px-4 py-3 text-left text-[13px] text-[#3B4A57] transition hover:bg-[#F7F9FA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
+        className="w-full rounded-xl border border-dashed border-[#C9A62E] bg-white px-4 py-3 text-left text-[13px] text-[#15202B] transition hover:bg-[#FFFBEC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2"
       >
         AI 피드백과 내 생각이 다르다면 <b>내 판단 남기기 →</b>
       </button>
@@ -786,7 +786,7 @@ export function MissionDissentPanel({ onSubmit }: { onSubmit: (dissent: DissentR
 
   // 조건 선택지는 두지 않는다 — 한 줄 서술만 받고, 저장 구조의 조건 목록은 비워 둔다.
   return (
-    <section className="rounded-xl border border-[#B9C4CE] bg-white px-4 py-4" aria-labelledby="mission-dissent-heading">
+    <section className="rounded-xl border border-[#E2DED2] bg-white px-4 py-4" aria-labelledby="mission-dissent-heading">
       <h3 id="mission-dissent-heading" className="text-sm font-black">AI 피드백과 내 생각이 다르다면</h3>
       <Textarea className="mt-3 text-[15px] leading-7" rows={2} value={reason} onChange={(event) => setReason(event.target.value)} placeholder="어떤 점에서 다르게 봤는지 한 줄로 적어 주세요." />
       <div className="mt-3 grid grid-cols-2 gap-2">
@@ -908,23 +908,18 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
         </div>}
         {locked && (
           <div className={correctionOnly ? "mt-3" : "mt-5 border-t border-[#E4E0D5] pt-4"}>
-            {!correctionOnly && <div className={`rounded-xl border px-4 py-3 text-sm leading-6 ${judgmentMatched ? "border-[#BFD9CC] bg-white text-[#245E44]" : "border-[#E2AAA5] bg-white text-[#713E3A]"}`}>
-              <p className="flex items-center gap-2 font-black">
-                <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${judgmentMatched ? "bg-[#DCEFE4] text-[#245E44]" : "bg-[#F4D8D5] text-[#8B3531]"}`}>
-                  {judgmentMatched ? <Check className="h-4 w-4" strokeWidth={3} /> : <X className="h-4 w-4" strokeWidth={3} />}
-                </span>
-                {judgmentMatched ? "기준 판단과 같아요" : "기준 판단과 달라요"}
-              </p>
+            {/* 판정 표시는 다른 문항과 같은 VerdictBanner 한 모양으로 둔다(2026-10-10). */}
+            {!correctionOnly && <VerdictBanner tone={judgmentMatched ? "ok" : "miss"} title={judgmentMatched ? "기준 판단과 같아요" : "기준 판단과 달라요"}>
               <div className="flex flex-wrap items-center gap-2 text-xs font-black">
-                <span className="mt-2 rounded-full border border-current bg-white px-2 py-0.5">내 답안 · {judgmentLabel}</span>
-                <span className="mt-2 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[#245E44]">기준 판단 · {referenceLabel}</span>
+                <span className={`rounded-full border bg-white px-2 py-0.5 ${judgmentMatched ? "border-[#245E44] text-[#245E44]" : "border-[#C86E68] text-[#8B3531]"}`}>내 선택 · {judgmentLabel}</span>
+                <span className="rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[#245E44]">기준 판단 · {referenceLabel}</span>
               </div>
               <p className="mt-2 break-keep">
                 {judgmentMatched
                   ? "이 장면을 읽은 방향이 같습니다. 이제 같은 뜻을 더 자연스럽게 옮긴 안을 찾아보세요."
                   : "관계와 전달 방식 단서를 다시 보고 수정안을 골라보세요."}
               </p>
-            </div>}
+            </VerdictBanner>}
             <div className={correctionOnly ? "" : "mt-5"}>
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 {!correctionOnly && <h4 className="font-bold">가장 알맞게 고친 표현은 무엇일까요?</h4>}
@@ -947,7 +942,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
                         <span className={`${targetFont} min-w-0 max-w-full text-[16.5px] font-normal leading-7`}>{correction.text}</span>
                         {answered && (
                           <span className="flex max-w-full flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
-                            {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#15202B] text-[#15202B]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
+                            {picked && <span className={`inline-flex items-center gap-1 rounded-full border bg-white px-2 py-0.5 text-[11px] font-black ${correction.valid ? "border-[#245E44] text-[#245E44]" : "border-[#C86E68] text-[#8B3531]"}`}>{correction.valid ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}내 선택</span>}
                             {correction.valid && <span className="inline-flex items-center gap-1 rounded-full border border-[#80AB94] bg-white px-2 py-0.5 text-[11px] font-black text-[#245E44]"><Check className="h-3 w-3" />기준 선택</span>}
                           </span>
                         )}
@@ -1331,18 +1326,18 @@ const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
 
 const FEEDBACK_LEVEL_STYLE: Record<FeedbackLevel, string> = {
   very_good: "bg-[#EAF4ED] text-[#286247]",
-  // 수정 권장·수정 필요는 MJT 오답과 같은 빨강 계열 — 「고쳐야 한다」는 메시지를 색으로도 전한다(2026-10-01). 호박색은 허용·참고의 색.
-  recommend: "bg-[#FCE7E4] text-[#8D3B36]",
+  // 수정 필요 = 빨강 ✗, 수정 권장 = 호박색, 다음 단계 = 호박색 선(2026-10-10 — 통과 초록·수정 빨강 약속).
+  recommend: "bg-[#FBF0D2] text-[#7A5A12]",
   required: "bg-[#FCE7E4] text-[#8D3B36]",
-  deferred: "bg-[#EEECE6] text-[#635E52]",
+  deferred: "border border-[#E6D49A] bg-white text-[#7A5A12]",
 };
 
 const FEEDBACK_LEVEL_CARD_STYLE: Record<FeedbackLevel, string> = {
   // 기준 카드는 흰 면 + 색 테두리, 배지만 색을 채운다 — 카드 셋이 모두 색면이면 「경고 벽지」가 된다.
   very_good: "border-[#C6DDCE] bg-white",
-  recommend: "border-[#D79A94] bg-white",
+  recommend: "border-[#E6D49A] bg-white",
   required: "border-[#D79A94] bg-white",
-  deferred: "border-[#E2DED3] bg-[#FAF9F5]",
+  deferred: "border-[#E6D49A] bg-white",
 };
 
 /**
@@ -1926,7 +1921,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       <h3 className="text-[14.5px] font-black text-[#2B3647]">{criterion.label}</h3>
                       {!localPilot && (
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
-                          {passed && <Check aria-hidden className="h-3 w-3" strokeWidth={3} />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
+                          {passed && <Check aria-hidden className="h-3 w-3" strokeWidth={3} />}{criterion.level === "required" && <X aria-hidden className="h-3 w-3" strokeWidth={3} />}{FEEDBACK_LEVEL_LABEL[criterion.level]}
                         </span>
                       )}
                     </div>
@@ -1946,15 +1941,15 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                         <article key={criterion.key} className={`flex flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3.5 text-center ${FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
                           <h3 className="text-[14.5px] font-bold text-[#4A5566]">{criterion.label}</h3>
                           <p className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[14px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
-                            {passed ? <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /> : <span aria-hidden className="font-black">!</span>}{FEEDBACK_LEVEL_LABEL[criterion.level]}
+                            {passed ? <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /> : criterion.level === "required" ? <X aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /> : <span aria-hidden className="font-black">!</span>}{FEEDBACK_LEVEL_LABEL[criterion.level]}
                           </p>
                         </article>
                       );
                     })}
                   </div>
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className="rounded-xl border border-l-4 border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9] px-4 py-3">
-                      <p className="text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
+                    && <div className={`rounded-xl border border-l-4 bg-white px-4 py-3 ${primaryCriterion.level === "required" ? "border-[#EBD3D0] border-l-[#C86E68]" : "border-[#EEE2BC] border-l-[#C9A62E]"}`}>
+                      <p className={`text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
                       <p className="mt-1 text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                     </div>}
                 </>
@@ -1977,7 +1972,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
                   <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
-                    {needsChange && <p className="mb-1.5 text-[12.5px] font-black text-[#8B3531]">{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
+                    {needsChange && <p className={`mb-1.5 text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
                   </div>
                 )}
@@ -2544,8 +2539,8 @@ function DissentSummary({ dissent }: { dissent?: DissentResponse }) {
   if (!dissent) return null;
   const labels = dissent.conditions.map((code) => DISSENT_CONDITIONS.find((condition) => condition.code === code)?.label ?? code);
   return (
-    <section className="rounded-2xl border border-[#CFE4D8] bg-[#F2FAF6] p-5 sm:p-6">
-      <p className="text-xs font-black text-[#2E7D5B]">내가 다르게 본 부분</p>
+    <section className="rounded-2xl border border-[#E6D49A] bg-white p-5 sm:p-6">
+      <p className="text-xs font-black text-[#7A5A12]">내가 다르게 본 부분</p>
       <h2 className="mt-1 text-base font-black">내가 남긴 판단</h2>
       {labels.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
