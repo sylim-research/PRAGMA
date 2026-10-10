@@ -19,7 +19,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 0. 바로 가기
 
 <table>
-  <thead><tr><th width="165" align="left">화면</th><th width="595" align="left">링크</th></tr></thead>
+  <thead><tr><th width="319" align="left">화면</th><th width="360" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
@@ -142,7 +142,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 9. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="90" align="left">논문</th><th width="220" align="left">내용</th><th width="450" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
     <tr><td>4.2</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
@@ -166,7 +166,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 10. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th width="280" align="left">단계</th><th width="370" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
+  <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
