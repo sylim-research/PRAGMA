@@ -218,7 +218,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="space-y-[3px] p-0 px-4 py-3">
+      <CardHeader className="space-y-[3px] p-0 px-4 py-[13.5px]">
         <div className="flex items-center gap-2">
           <button
             type="button"
