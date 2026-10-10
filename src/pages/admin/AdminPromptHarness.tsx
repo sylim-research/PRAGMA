@@ -238,7 +238,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="truncate pl-5 text-[14px] leading-tight text-muted-foreground" title={entry.note}>
+        <p className="truncate pl-5 text-[13.25px] leading-tight text-muted-foreground" title={entry.note}>
           {entry.note}
         </p>
       </CardHeader>
