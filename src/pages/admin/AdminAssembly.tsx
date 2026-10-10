@@ -470,8 +470,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     if (chip === "decision") return aiReview ? "교수자 승인 대기" : "승인 대기";
     if (chip === "in_progress") return "점검 진행 중";
     // 대시보드와 같은 집합은 같은 이름으로 부른다.
-    if (chip === "needs_check") return "품질 점검 대기";
-    if (chip === "rules_error") return "점검 실패";
+    if (chip === "needs_check") return "검수 대기";
+    if (chip === "rules_error") return "규칙 점검 실패";
     // reviewed·released 상태 전체라 교수자 최종 승인 기록이 없는 옛 미션도 들어 있다 — 대시보드 「교수자 승인 완료」(최종 승인 기록 기준)와 다른 집합이다.
     if (chip === "reviewed" && professorScreen) return "검토 완료 상태";
     return STATE_KO[chip];
@@ -601,9 +601,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     try {
       const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
-        const ruleLabel = res.ruleResult ? { pass: "자동 품질 점검 통과", warning: "자동 품질 점검 주의", fail: "자동 품질 점검 실패" }[res.ruleResult] : "자동 품질 점검 결과 확인 필요";
-        const qLabel = res.qualityVerdict ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.qualityVerdict] : "AI 검토 미실행";
-        toast.success(`초안 저장 · ${ruleLabel} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 품질 점검 단계에서 확인해 주세요`);
+        const ruleLabel = res.ruleResult ? { pass: "자동 규칙 점검 통과", warning: "자동 규칙 점검 주의", fail: "자동 규칙 점검 실패" }[res.ruleResult] : "자동 규칙 점검 결과 확인 필요";
+        const qLabel = res.qualityVerdict ? { pass: "AI 품질 심사 저장", warning: "AI 품질 심사 저장(주의)", fail: "AI 품질 심사 결과 확인 필요" }[res.qualityVerdict] : "AI 품질 심사 미실행";
+        toast.success(`초안 저장 · ${ruleLabel} · ${qLabel}${res.repaired ? " · 1회 수리" : ""} — 미션 품질 검수에서 확인해 주세요`);
         await loadRows();
       } else {
         const msg = res.error ?? "생성 실패";
@@ -845,7 +845,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <p>지금 결정할 미션이 없습니다.</p>
           {dash.in_progress > 0 && (
             <Link className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4" to="/admin/ai-review">
-              점검 진행 중인 {dash.in_progress}개는 품질 점검 화면에서 확인하세요 →
+              검수 진행 중인 {dash.in_progress}개는 미션 품질 검수 화면에서 확인하세요 →
             </Link>
           )}
         </>
@@ -1004,7 +1004,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               <div className="rounded-xl border border-[#E2DED2] bg-[#FBFAF6] px-4 py-3 text-[13.5px]">
                 <p className="text-[#3F4E57]">이 미션은 아직 교수자 차례가 아닙니다 · {info?.progress ?? "진행 상태 확인 중"}</p>
                 <Link to={`/admin/ai-review?scenarioId=${r.scenario_id}`} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
-                  품질 점검 화면에서 이 미션 열기 →
+                  미션 품질 검수에서 이 미션 열기 →
                 </Link>
               </div>
             )}
@@ -1034,7 +1034,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     <AdminShell
       title={aiReview ? "미션 품질 검수" : reviewMode ? "교수자 감수·최종 승인" : "학습 미션 제작"}
       description={aiReview
-        ? "자동 품질 점검과 AI 검토로 교수자 감수에 쓸 판단 자료를 준비합니다."
+        ? "자동 규칙 점검과 AI 품질 심사로 교수자 감수에 쓸 판단 자료를 준비합니다."
         : reviewMode
           ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
           : "시나리오를 골라 학습 미션 초안을 만듭니다."}
@@ -1216,7 +1216,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                   filtered.filter((row) => reviewSelection.has(row.scenario_id) && stateOf(row) === "generated").map((row) => ({
                     target: { kind: "mission" as const, targetId: row.scenario_id },
                     label: `${SPEECH_ACT_UI[row.speech_act]} · ${row.scenario_id.slice(0, 8)}`,
-                  })))}>{reviewSelection.size}건 자동 점검 실행</Button>
+                  })))}>{reviewSelection.size}건 검수 실행</Button>
               </div>
             )}
           </aside>
@@ -1342,11 +1342,11 @@ type StepStatus = "done" | "current" | "todo";
 const currentStageLabel = (progress: string | undefined) => {
   if (!progress) return null;
   if (progress.includes("교수자 결정 대기")) return "교수자 승인 대기";
-  if (progress.includes("규칙 검사 오류")) return "자동 품질 점검 · 수정 필요";
-  if (progress.includes("규칙 검사 전")) return "자동 품질 점검 전";
-  if (progress.includes("재검토 전")) return "의견 대조 전";
-  if (progress.includes("Claude 검토 전")) return "교차 점검 전";
-  if (progress.includes("OpenAI 검토 전")) return "AI 검토 전";
+  if (progress.includes("규칙 검사 오류")) return "자동 규칙 점검 · 수정 필요";
+  if (progress.includes("규칙 검사 전")) return "자동 규칙 점검 전";
+  if (progress.includes("재검토 전")) return "재판정 전";
+  if (progress.includes("Claude 검토 전")) return "독립 검토 전";
+  if (progress.includes("OpenAI 검토 전")) return "AI 품질 심사 전";
   return progress;
 };
 
@@ -1362,7 +1362,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
   const steps: { label: string; status: StepStatus; detail?: string | null }[] = [
     { label: "시나리오", status: "done" },
     { label: "초안 작성", status: v6 ? "done" : "current", detail: v6 ? created : production === "v5_only" ? "변환 전" : "생성 대기" },
-    { label: "품질 점검·AI 검토", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
+    { label: "미션 품질 검수", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
     { label: "교수자 최종 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];

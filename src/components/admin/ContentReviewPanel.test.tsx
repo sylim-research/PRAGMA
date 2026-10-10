@@ -293,7 +293,7 @@ describe("professor approval screen (experiential)", () => {
   it("shows one plain button, no stage names or costs, when automated checks are unfinished", async () => {
     inspection.run!.openai_review = null;
     showApprovalScreen();
-    expect(await screen.findByRole("button", { name: "자동 점검 마치기" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "검수 마치기" })).toBeInTheDocument();
     expect(screen.getByText("이 버전은 자동 점검이 아직 끝나지 않았습니다.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /실행 · 유료/ })).toBeNull();
     expect(screen.queryByText(/추가 모델 검토 선택/)).toBeNull();

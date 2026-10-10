@@ -176,7 +176,7 @@ export function ProfessorMissionWorkbench({
             그 뒤 교수자가 콘텐츠를 감수해 최종 승인합니다.
           </p>
           <Link to={approvalHref} className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4">
-            품질 점검 화면에서 이 미션 열기 →
+            미션 품질 검수에서 이 미션 열기 →
           </Link>
         </div>
       </section>

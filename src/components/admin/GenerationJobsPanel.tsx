@@ -26,7 +26,7 @@ export function GenerationJobsPanel({ busy, onResume, savedIds }: {
     {error && <p role="status" className="mt-2 text-sm">{error}</p>}
     {visible.map(job => <div key={job.id} className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
       <div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm">{job.label}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Astra · {job.status === 'completed' ? '생성 완료 · 품질 점검 대기' : job.status === 'failed' ? job.error : `생성 중 · ${job.completed_steps}단계 완료`}</p>
+        <p className="mt-1 text-xs text-muted-foreground">Astra · {job.status === 'completed' ? '생성 완료 · 검수 대기' : job.status === 'failed' ? job.error : `생성 중 · ${job.completed_steps}단계 완료`}</p>
       </div>
       {(job.status !== 'failed' || job.can_resume) && <Button size="sm" variant="outline" disabled={busy} onClick={() => onResume(job.scenario_id!, job.id)}>{job.status === 'failed' ? '저장된 작업 재개' : '결과 이어받기'}</Button>}
     </div>)}
