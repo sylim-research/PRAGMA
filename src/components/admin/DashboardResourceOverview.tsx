@@ -31,7 +31,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
         {/* 위 카드 세 개는 요약이라 누르지 않는다. 아래 화행·수준·방향·수행 방식 숫자는 학습 미션 제작 목록으로 연결한다. */}
         {cards.map(({ label, value, unit, note, icon: Icon }) => (
           <div key={label} className={[
-            "flex min-h-[78px] flex-col rounded-xl border px-4 py-3",
+            "flex min-h-[82px] flex-col rounded-xl border px-4 py-3.5",
             "border-[#E2DED2] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
