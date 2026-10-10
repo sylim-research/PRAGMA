@@ -69,17 +69,18 @@ function PartHeading({ id, title, description }: { id: string; title: string; de
 }
 
 // 단계 카드의 이동·펼침 문구 — 무거운 굵은 글씨 대신 노란 알약으로 가볍게, 마우스를 올리면 화살표가 살짝 움직인다.
-const STAGE_LINK = "mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
+const STAGE_LINK = "mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
 const STAGE_ARROW = "h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5";
-const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] p-3";
+const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-3 py-3.5";
 
 function ContractSummary() {
   return (
     <section aria-labelledby="contract-title" className={PART_CARD}>
       <PartHeading id="contract-title" title="생성계약" description="모든 생성·검토·저장이 지키는 여섯 조건" />
-      <ol className={`grid gap-x-6 gap-y-2 md:grid-cols-2 ${PART_BODY}`}>
+      {/* 번호는 세로로 읽힌다(왼쪽 1~3, 오른쪽 4~6). 두 열 사이에 가는 구분선(2026-10-10). */}
+      <ol className={`grid gap-y-2 md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-0 ${PART_BODY}`}>
         {CONTRACT_CLAUSES.map((clause, index) => (
-          <li key={clause.title} className="flex items-center gap-2.5">
+          <li key={clause.title} className={`flex items-center gap-2.5 md:py-[3px] ${index >= 3 ? "md:border-l md:border-[#E7E2D6] md:pl-6" : "md:pr-6"}`}>
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
             <p className="text-[14px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
@@ -159,7 +160,7 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title" className={PART_CARD}>
-      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 규칙 점검 → AI 품질 심사 → 교수자 감수·최종 승인" />
+      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 규칙 점검 → AI 품질 심사 → 교수자 최종 승인" />
       <div className={PART_BODY}>
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
@@ -168,7 +169,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 규칙 점검</span>
             <Badge variant="outline" className="bg-white font-normal">서버 코드</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             구성·수량·언어 방향·생성 기록을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
@@ -183,9 +184,9 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#3F6172]">AI 품질 심사</span>
             <Badge variant="outline" className="bg-white font-normal">GPT-4.1</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">결함 유형별 심사</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 Claude가 따로 검토하고 GPT-4.1이 그 의견을 재판정합니다.
+            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 독립 검토와 재판정이 이어집니다.
           </p>
           <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
             검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
@@ -193,10 +194,10 @@ function HarnessOverview() {
         </div>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 감수·최종 승인</span>
+            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 최종 승인</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             각 단계의 의견과 실제 콘텐츠를 직접 대조해 수업 사용 여부를 결정합니다.
           </p>
@@ -217,7 +218,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="space-y-[5px] p-0 px-4 py-[17.75px]">
+      <CardHeader className="space-y-[3px] p-0 px-4 py-[13.5px]">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -238,7 +239,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
             {entry.text.length.toLocaleString()}자
           </Badge>
         </div>
-        <p className="truncate pl-5 text-[14px] leading-tight text-muted-foreground" title={entry.note}>
+        <p className="truncate pl-5 text-[13.25px] leading-tight text-muted-foreground" title={entry.note}>
           {entry.note}
         </p>
       </CardHeader>
@@ -275,7 +276,7 @@ const AdminPromptHarness = () => {
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
               <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[17px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="grid gap-1.5 md:grid-cols-2">
+              <div className="grid gap-x-1.5 gap-y-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
                 ))}
