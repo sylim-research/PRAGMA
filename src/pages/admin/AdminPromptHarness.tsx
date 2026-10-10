@@ -71,7 +71,7 @@ function PartHeading({ id, title, description }: { id: string; title: string; de
 // 단계 카드의 이동·펼침 문구 — 무거운 굵은 글씨 대신 노란 알약으로 가볍게, 마우스를 올리면 화살표가 살짝 움직인다.
 const STAGE_LINK = "mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
 const STAGE_ARROW = "h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5";
-const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-3 py-3";
+const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-3 py-3.5";
 
 function ContractSummary() {
   return (
