@@ -7,7 +7,7 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
-<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
+<h2 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h2>
 
 <p align="center">
 PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학습 시스템입니다.<br>
