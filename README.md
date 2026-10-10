@@ -19,7 +19,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 0. 바로 가기
 
 <table>
-  <thead><tr><th width="319" align="left">화면</th><th width="360" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
@@ -42,7 +41,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 2. 학습 미션의 화용론적 설계
 
 <table>
-  <thead><tr><th width="165" align="left">조건</th><th width="595" align="left">구성</th></tr></thead>
+  <thead><tr><th align="left">조건</th><th align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>상황·관계 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
@@ -79,7 +78,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 5. 수업 연계와 운영
 
 <table>
-  <thead><tr><th width="165" align="left">기능</th><th width="595" align="left">내용</th></tr></thead>
+  <thead><tr><th align="left">기능</th><th align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
     <tr><td>학습자 관리</td><td>프로필 작성과 교수자의 가입 승인을 마친 학습자가 교과목에 참여</td></tr>
@@ -111,7 +110,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 7. 콘텐츠·학습 기록의 추적
 
 <table>
-  <thead><tr><th width="380" align="left">콘텐츠 이력</th><th width="380" align="left">학습 수행 기록</th></tr></thead>
+  <thead><tr><th align="left">콘텐츠 이력</th><th align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
@@ -127,7 +126,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 8. 연구 활용
 
 <table>
-  <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
+  <thead><tr><th align="left">절차</th><th align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
     <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
@@ -142,7 +141,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 9. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th align="left">논문</th><th align="left">내용</th><th align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
     <tr><td>4.2</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
@@ -166,7 +165,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 10. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
+  <thead><tr><th align="left">단계</th><th align="left">핵심 설계·개선</th><th align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
@@ -185,7 +184,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 11. 주요 용어
 
 <table>
-  <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
+  <thead><tr><th align="left">용어</th><th align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>문법적 정확성</td><td>목표어 표현이 어순·형태·통사 규칙에 맞게 구성된 것</td></tr>
