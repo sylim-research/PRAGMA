@@ -129,13 +129,13 @@ export function InstructorReviewExperience({ inspection, onSave, onReady, disabl
     <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(19rem,20.5rem)]">
       <div className="min-w-0">
         {/* 왼쪽 = 학습자가 보는 화면 그대로, 오른쪽 = 교수자의 감수 기록(2026-10-08 — 한 제목 아래 섞여 있던 두 역할을 나눴다). */}
-        <h3 className="mb-4 flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>학습자 화면</h3>
+        <h3 className="mb-2.5 flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">1</span>학습자 화면</h3>
         {model.value && <Suspense fallback={<p role="status">학습 화면 준비 중…</p>}><ReviewStage mission={model.value} section={section.id} revealAnswers={answers} onNext={next} /></Suspense>}
       </div>
       {/* 확인 목록은 촘촘하게 둔다 — 상자 높이가 이 목록이 아니라 왼쪽 문항 길이를 따르도록. */}
       {/* 오른쪽 목록의 첫 줄이 왼쪽 학습자 화면 상자의 윗선과 같은 높이에서 시작하도록, 제목 아래 간격을 왼쪽과 같게 둔다(2026-10-09). */}
       <aside className="xl:sticky xl:top-24">
-        <h3 className="mb-4 flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>교수자 감수</h3>
+        <h3 className="mb-2.5 flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">2</span>교수자 감수</h3>
         <div className="space-y-3">
         {openSections.length > 0 && <Button variant="outline" className="h-9 w-full border-[#CAB23D] text-[13.25px] font-semibold" disabled={disabled || saving || approved || !model.value}
           onClick={markAllOpen}>남은 {openSections.length}개 모두 확인</Button>}

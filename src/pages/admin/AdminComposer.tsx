@@ -714,7 +714,7 @@ const AdminComposer = () => {
       <div className="w-full">
       {libraryScenarioId && <section aria-label="라이브러리에서 선택한 미션" className="mb-4 rounded-xl border border-[#D6BC40] bg-[#FFFBEA] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-[15px] font-semibold">라이브러리에서 선택한 미션</h2>
+          <h2 className="text-[16.5px] font-bold text-[#8A7423]">라이브러리에서 선택한 미션</h2>
           <Link to="/admin/library" className="text-[13px] underline">라이브러리로 돌아가기</Link>
         </div>
         {loading ? <p className="mt-2 text-[14px]">미션 확인 중…</p> : !libraryMission ? (
@@ -762,13 +762,13 @@ const AdminComposer = () => {
                   title={`${LEVEL[item.level as LearnerLevel] ?? item.level} · ${DIRECTION_LABEL[item.language_direction as LanguageDirection] ?? item.language_direction} · ${COURSE_MODE_LABEL[item.course_mode as CourseMode] ?? item.course_mode}`}
                   className={`flex items-center justify-between gap-2 rounded-xl border bg-white px-4 py-3.5 text-left transition ${
                     selected
-                      ? "border-[#7D90A8] shadow-[0_0_0_1px_#7D90A8] bg-[#F7F9FC]"
-                      : "border-[#E2DED2] hover:border-[#9FB0C6]"
+                      ? "border-[#15202B] shadow-[0_0_0_1px_#15202B] bg-[#FFF8DD]"
+                      : "border-[#E2DED2] hover:border-[#15202B]"
                   }`}
                 >
                   <span className="min-w-0 text-[16px] font-bold leading-snug text-[#15202B]">{courseDisplayTitle(item)}</span>
                   <span className="flex shrink-0 items-center gap-1.5">
-                    <span className="rounded-full border border-[#C9D3DE] bg-white px-2 py-0.5 text-[13px] font-semibold text-[#1F3A5F]">
+                    <span className="rounded-full border border-[#E2DED2] bg-white px-2 py-0.5 text-[13px] font-semibold text-[#15202B]">
                       {LEVEL[item.level as LearnerLevel] ?? item.level}
                     </span>
                     <span className={`rounded-full px-2 py-0.5 text-[13px] font-semibold ${
@@ -833,7 +833,7 @@ const AdminComposer = () => {
             {/* 상자 머리 = 교과목 이름만. 페이지 제목보다 한 단계 낮게(2026-10-08 — 네이비 띠가 페이지 제목보다 무거웠다).
                 수준·방향·수행 방식은 바로 아래 편성 조건과 위 카드에 이미 있다. */}
             <span aria-hidden className="h-[18px] w-[4px] rounded-sm bg-[#FAD338]" />
-            <span className="text-[18px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
+            <span className="text-[16.5px] font-bold tracking-tight">{courseDisplayTitle(outline)}</span>
           </h2>}
           <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3">
             <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">

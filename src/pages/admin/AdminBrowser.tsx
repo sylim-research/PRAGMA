@@ -417,7 +417,7 @@ const AdminBrowser = () => {
           {(
             <section className="rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-[18px] font-bold tracking-[-0.01em] text-[#15202B]">
+              <h3 className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">
                 {sel ? `${SPEECH_ACT_UI[sel.act]} · ${LEVEL[sel.level]}` : LIBRARY_VIEWS.find((item) => item.value === view)?.label} {cellRows.length}개
               </h3>
               {sel && <Button size="sm" variant="ghost" onClick={() => setSel(null)}>화행·수준 선택 해제</Button>}

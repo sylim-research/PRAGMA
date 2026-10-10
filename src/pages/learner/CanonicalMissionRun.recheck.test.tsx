@@ -55,9 +55,9 @@ function openDraft() {
   click("이유 제출하기"); click(/^다음:/);
   screen.getAllByRole("radio", { name: "상황에 맞음" }).forEach(button => fireEvent.click(button));
   click("판단 제출하기"); click(/^다음:/);
-  click(mission.mpj_items[2].corrections[1].text); click("수정안 확정하기"); click(/^다음:/);
+  click(mission.mpj_items[2].corrections[1].text); click("수정안 제출하기"); click(/^다음:/);
   fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
-  click("수정안 확정하기"); click(/^다음:/); click("직접 번역해 보기");
+  click("수정안 제출하기"); click(/^다음:/); click("직접 번역해 보기");
   fireEvent.change(screen.getByRole("textbox"), { target: { value: A } });
   click("번역 제출하기");
   return { mission, before };
@@ -80,7 +80,7 @@ describe("one DCT revision recheck", () => {
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
       click("최종안 제출하기");
-    } else click("이대로 확정");
+    } else click("최종안으로 정하기");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(revise ? 2 : 1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: revise ? C : A, feedback: clear });
@@ -91,9 +91,9 @@ describe("one DCT revision recheck", () => {
     openDraft();
     await screen.findByText("1차 선택권 재검토");
     expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
-    click("이대로 확정");
+    click("최종안으로 정하기");
     fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
-    click("확정");
+    fireEvent.click(screen.getByRole("button", { name: "이유와 함께 정하기" }));
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: A,

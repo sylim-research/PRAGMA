@@ -151,9 +151,9 @@ describe("CanonicalMissionRun live CTA route", () => {
       fireEvent.click(within(screen.getByRole("radiogroup", { name: `표현 ${i + 1}의 판단` })).getByRole("radio", { name: band }));
     });
     click("판단 제출하기"); click(/^다음:/);
-    click(mission.mpj_items[2].corrections[1].text); click("수정안 확정하기"); click(/^다음:/);
+    click(mission.mpj_items[2].corrections[1].text); click("수정안 제출하기"); click(/^다음:/);
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
-    click("수정안 확정하기"); click(/^다음:/);
+    click("수정안 제출하기"); click(/^다음:/);
     click("직접 번역해 보기");
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
     expect(screen.getByText("원문의 내용과 의도를 유지하면서, 상황과 관계에 맞게 작성해 보세요.")).toBeInTheDocument();
@@ -257,7 +257,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     expect(requestFeedback).not.toHaveBeenCalled();
     if (alternate !== reference) {
       fireEvent.click(screen.getByRole("button", { name: "수정안 제출하기" }));
-      await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
+      await screen.findByText(/현재 (번역|통역)안을 직접 검토한 뒤 최종 결정/);
     }
     fireEvent.click(screen.getByRole("button", { name: alternate === reference ? "최종안 제출하기" : "최종안 제출하기" }));
     expect(await screen.findByRole("heading", { name: /학습 미션 완료/ })).toBeInTheDocument();
@@ -291,7 +291,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     const first = "请问方便把报告的原文件再发给我吗？";
     fireEvent.change(screen.getByRole("textbox", { name: /중국어로 옮겨 보세요/ }), { target: { value: first } });
     fireEvent.click(screen.getByRole("button", { name: "번역 제출하기" }));
-    fireEvent.click(await screen.findByRole("button", { name: "이대로 확정" }));
+    fireEvent.click(await screen.findByRole("button", { name: "최종안으로 정하기" }));
     expect(await screen.findByRole("alert")).toHaveTextContent("학습 기록을 저장하지 못했습니다");
     expect(save).toHaveBeenCalledTimes(1);
     const [originalInput, originalId] = save.mock.calls[0];

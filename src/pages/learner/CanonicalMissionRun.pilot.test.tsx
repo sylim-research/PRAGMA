@@ -61,7 +61,7 @@ describe("local learner UX pilot", () => {
     expect(screen.getByRole("heading", { name: "원문의 뜻을 유지하면서 이 상황에 맞게 고친 표현을 골라보세요." })).toBeInTheDocument();
     expect(screen.queryByText(/가장 알맞게 고친 표현/)).not.toBeInTheDocument();
     click("助教您好，不好意思，我上周忘了签到，能帮我查一下记录吗？");
-    click("수정안 확정하기");
+    click("수정안 제출하기");
     const inventedCause = screen.getByRole("button", { name: /助教您好，不好意思，我上周忘了签到/ });
     expect(inventedCause).toHaveTextContent("원문에 없는 ‘출석 체크를 잊었다’는 원인을 사실로 덧붙였습니다.");
     expect(inventedCause).toHaveTextContent("사과 표현이 아니라 확인되지 않은 사실의 추가가 문제입니다.");
@@ -74,18 +74,18 @@ describe("local learner UX pilot", () => {
     // The correction field opens prefilled with the flawed draft; the unchanged original cannot be submitted.
     const input = screen.getByRole("textbox", { name: "내가 고친 표현" }) as HTMLTextAreaElement;
     expect(input.value).not.toBe("");
-    expect(screen.getByRole("button", { name: "수정안 확정하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
     expect(screen.queryByText(/원래 표현을 그대로 제출할 수 없습니다/)).not.toBeInTheDocument();
     expect(screen.getByText("원문에 없는 사실·이유·약속·합의는 새로 만들지 마세요.")).toBeInTheDocument();
     expect(screen.getByText(/미리 넣어 두었습니다\. 필요한 부분만 고쳐 주세요\./)).toBeInTheDocument();
     fireEvent.change(input, { target: { value: "  " } });
-    expect(screen.getByRole("button", { name: "수정안 확정하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
     fireEvent.change(input, { target: { value: "我下课晚，明天的汇报彩排就从七点改到七点半吧。" } });
-    expect(screen.getByRole("button", { name: "수정안 확정하기" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "수정안 제출하기" })).toBeDisabled();
     expect(screen.getByText(/원래 표현을 그대로 제출할 수 없습니다/)).toBeInTheDocument();
     const freeAnswer = "明天我下课比较晚，大家方便把彩排从七点推迟到七点半吗？";
     fireEvent.change(input, { target: { value: freeAnswer } });
-    click("수정안 확정하기");
+    click("수정안 제출하기");
     expect(screen.getByRole("textbox", { name: "내가 고친 표현" })).toHaveValue(freeAnswer);
     expect(screen.getByRole("heading", { name: "추천 표현" })).toBeInTheDocument();
     expect(screen.queryByText(/맞음·틀림을 자동 판정한 결과가 아닙니다/)).not.toBeInTheDocument();
@@ -118,7 +118,7 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByText("보완 권장", { exact: true })).not.toBeInTheDocument();
     expect(screen.queryByText(/AI가 생성한 참고 피드백/)).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "이대로 확정" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "최종안으로 정하기" })).toBeEnabled();
     click("수정하기");
     expect(screen.getByRole("textbox")).toHaveValue(first);
     // 다듬기 화면은 원문과 내 번역만 둔다 — 접히는 「원문·상황 다시 보기」는 없앴다.

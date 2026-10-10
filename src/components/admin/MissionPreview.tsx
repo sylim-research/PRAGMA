@@ -32,7 +32,7 @@ const QUALITY_CODE_KO: Record<string, string> = {
   gate1_violation: "불변항 위반(의미·의도 변질)",
   implausible_distractor: "비현실적 오답",
   answer_cue: "정답 단서 노출",
-  band_mismatch: "대역 불일치",
+  band_mismatch: "범주 불일치",
   focus_contamination: "초점 오염(다차원 동시 변화)",
   unnatural_language: "부자연스러운 문장",
   internal_inconsistency: "내부 불일치",
@@ -122,7 +122,7 @@ export function MissionPreview({
       {/* DCT */}
       <div className={box}>
         <div className="text-[12px] font-semibold text-muted-foreground">
-          산출 과제 (DCT · {mission.production_task.mode === "interpreting" ? "통역" : "번역"})
+          DCT형 통번역 과제 ({mission.production_task.mode === "interpreting" ? "통역" : "번역"})
         </div>
         <p className="mt-1">{mission.production_task.situation_ko}</p>
         <p className="mt-1 text-muted-foreground">원문: {mission.production_task.source_text}</p>
@@ -154,7 +154,7 @@ function MpjReview({ item, featureCode }: { item: MpjItemRuntime; featureCode: s
         <span className="text-[12px] font-semibold text-muted-foreground">{TYPE_LABEL[item.type] ?? item.type}</span>
         {accepted.length > 0 && (
           <span className="rounded bg-[#E7F5EE] px-1.5 py-0.5 text-[12px] font-semibold text-[#2E7D5B]">
-            정답 대역: {accepted.join(" / ")}
+            정답 적절성 범주: {accepted.join(" / ")}
           </span>
         )}
       </div>

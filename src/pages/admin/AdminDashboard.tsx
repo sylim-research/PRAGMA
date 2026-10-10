@@ -113,10 +113,10 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2.5 mt-7">
+  <div className="mb-2.5 mt-5">
     <div className="flex flex-wrap items-center gap-2">
       {/* 대시보드 구역은 작업 순서가 아니라 번호를 두지 않는다 — 번호는 실제 작업 흐름에만(2026-10-09). */}
-      <h2 className="text-[16.5px] font-bold text-[#15202B]">{title}</h2>
+      <h2 className="text-[16.5px] font-bold text-[#8A7423]">{title}</h2>
       {action}
     </div>
     {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
@@ -132,12 +132,12 @@ const PanelHeader = ({
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   // 표제는 기능명, 모델은 설명에 병기(2026-10-09 연구자 채택, 원고 3.4.2·4.2.2와 같은 이름).
   // 「독립」은 1차 심사 결과를 입력받지 않는다는 뜻이며 오류의 독립성·정확성 보장을 뜻하지 않는다.
-  rules: "자동 규칙 점검 완료",
-  openai: "AI 품질 심사 완료",
-  claude: "독립 AI 검토 완료",
-  adjudication: "검토 의견 재판정 완료",
-  // 전체 흐름 「교수자 최종 승인 완료」와 같은 수다.
-  professor: "교수자 최종 승인 완료",
+  rules: "자동 규칙 점검",
+  openai: "AI 품질 심사",
+  claude: "독립 AI 검토",
+  adjudication: "검토 의견 재판정",
+  // 「완료」는 카드 이름이 아니라 숫자 옆 단위에 붙인다(2026-10-10). 교수자 단계는 전체 흐름의 최종 승인 수와 같다.
+  professor: "교수자 최종 승인",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -146,12 +146,12 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: "서버 코드 · 현행 미션 규칙 검사",
+  rules: "서버 코드 · 규칙 검사",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
-  openai: "GPT-4.1 · 의미·화행·자연성 심사",
-  claude: "Claude · 교수자가 요청할 때",
+  openai: "GPT-4.1 · 의미·화행 심사",
+  claude: "Claude · 요청 시",
   // Claude 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "GPT-4.1 · Claude 의견이 있을 때",
+  adjudication: "GPT-4.1 · 의견 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -202,7 +202,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[70px] flex-col rounded-xl border bg-white px-4 py-2",
+                "group flex min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -225,9 +225,10 @@ const ReviewPipeline = ({
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 완료</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[12px] text-[#4F5D68]">
+              {/* 설명은 한 줄 — 넘치면 말줄임(2026-10-10). 두 줄로 밀리면 카드 밑줄 정렬이 깨진다. */}
+              <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -286,7 +287,7 @@ const OperationMetric = ({
     to={to}
     title={title}
     className={[
-      "group flex min-h-[70px] flex-col rounded-xl border bg-white px-4 py-2",
+      "group flex min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E2DED2]",
     ].join(" ")}
@@ -302,7 +303,7 @@ const OperationMetric = ({
         {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[12px] leading-4 text-[#4F5D68]">{description}</span>
+    <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -584,7 +585,7 @@ const AdminDashboard = () => {
           to="/admin/learners"
           label="가입 승인 학습자"
           value={snapshot?.approvedLearnerCount ?? null}
-          unit="개"
+          unit="명"
           description="전체 교과목 공통"
           error={displayError}
           changed={changedKeys.has("learners")}

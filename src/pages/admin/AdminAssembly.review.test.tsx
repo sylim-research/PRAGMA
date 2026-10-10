@@ -204,7 +204,7 @@ describe("assembly workbench", () => {
       return new Promise(resolve => { finish = resolve; });
     });
     fireEvent.click(within(bench).getByRole("button", { name: "미션 자동 생성" }));
-    expect(await screen.findByText("AI 검토 중")).toBeInTheDocument();
+    expect(await screen.findByText("AI 품질 심사 중")).toBeInTheDocument();
     finish({ ok: true, ruleResult: "pass", qualityVerdict: "pass", repaired: false });
     await waitFor(() => expect(mocks.toastSuccess).toHaveBeenCalledWith("초안 저장 · 자동 규칙 점검 통과 · AI 품질 심사 저장 — 미션 품질 검수에서 확인해 주세요"));
     expect(mocks.promoteCoreV6).toHaveBeenCalledTimes(1);

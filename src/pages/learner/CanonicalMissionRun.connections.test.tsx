@@ -128,8 +128,9 @@ describe("CanonicalMissionRun completion connections", () => {
     render(<DctFeedbackView quest={quest} response={{ first, revised: first, reflected: false }} onDone={onDone} />);
     act(() => vi.advanceTimersByTime(1300));
 
-    fireEvent.click(screen.getByRole("button", { name: "이대로 확정" }));
-    const confirm = screen.getByRole("button", { name: "확정" });
+    fireEvent.click(screen.getByRole("button", { name: "최종안으로 정하기" }));
+    // 이유 칸이 열리면 같은 이름의 확정 단추가 하나 더 생긴다 — 마지막 것이 이유와 함께 확정한다.
+    const confirm = screen.getByRole("button", { name: "이유와 함께 정하기" });
     expect(confirm).toBeDisabled();
     fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), {
       target: { value: "이미 합의된 일정이라 더 직접적으로 말해도 된다고 판단했습니다." },

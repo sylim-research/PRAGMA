@@ -74,14 +74,14 @@ describe("representative v6 reason / contrast rhythm", () => {
     });
     click("판단 제출하기");
     click("다음: 수정안 선택");
-    click(mission.mpj_items[2].corrections[0].text); click("수정안 확정하기");
+    click(mission.mpj_items[2].corrections[0].text); click("수정안 제출하기");
     const acceptedCorrection = mission.mpj_items[2].corrections.find(candidate => candidate.is_valid)!;
     expect(within(screen.getByRole("button", { name: new RegExp(acceptedCorrection.text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) })).getByText("기준 선택")).toBeInTheDocument();
     click("다음: 직접 수정");
     expect(screen.queryByRole("region", { name: "다른 맥락에서는?" })).not.toBeInTheDocument();
     const revisedText = "明天我下课晚，大家方便把彩排改到七点半吗？";
     fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: revisedText } });
-    click("수정안 확정하기");
+    click("수정안 제출하기");
     const contrast = screen.getByRole("region", { name: "다른 맥락에서는?" });
     expect(within(contrast).getByText(mission.mpj_items[3].contrast.target)).toBeInTheDocument();
     expect(within(contrast).queryByRole("button")).not.toBeInTheDocument();
@@ -97,7 +97,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。" } });
     click("번역 제출하기");
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
-    click("이대로 확정");
+    click("최종안으로 정하기");
     expect(snapshot().completed).toBe(true);
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();
   });

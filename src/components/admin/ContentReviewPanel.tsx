@@ -286,7 +286,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
               </div>
             : professorDone || professorCurrent
-              ? <span className="text-[13px] font-semibold text-white">{professorDone ? "교수자 승인 완료" : "점검·검토 완료"}</span>
+              ? <span className="text-[13px] font-semibold text-white">{professorDone ? "교수자 승인 완료" : "품질 검수 완료"}</span>
               : null}
         </div>
         <ol className="divide-y divide-[#F0EDE4] pt-2">
@@ -331,7 +331,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               "bg-[#FAD338] text-[#15202B]", professorCurrent ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
-            <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">교수자 감수·최종 승인</span>
+            <span className="min-w-0 flex-1 basis-40 text-[14.5px] font-semibold text-[#233542]">교수자 감수·최종 승인</span>
             <span className="ml-auto min-w-0 text-right text-[#5D6970]">
               {professorDone ? "승인 완료"
                 : professorCurrent ? (findings.length ? `감수 대기 · 의견 ${findings.length}건` : "감수 대기")
@@ -358,9 +358,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
   }
   // 승인 화면은 카드 단위로 캡처한다 — 「3 AI 검토 의견」과 「4 교수자 최종 승인」을 한 행 두 열로 둔다(2026-10-09).
   const pairRow = experiential && !compact && next === "professor" && !handoffHref && substantiveFindings.length > 0;
-  const finalApproval = next === "professor" && !handoffHref ? <div id="professor-final-approval" className={pairRow ? "space-y-3 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" : "space-y-3 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] px-4 py-3 sm:px-6"}>
+  const finalApproval = next === "professor" && !handoffHref ? <div id="professor-final-approval" className={pairRow ? "space-y-2.5 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:px-6 sm:py-5" : "space-y-3 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] px-4 py-3 sm:px-6"}>
         {/* 수정 필요·판단 보류가 남았을 때만 경고로 띄운다. 아직 판단 전이면 승인 버튼이 닫혀 있는 것으로 충분하다. */}
-        {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
+        {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[14px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
           <p className="font-semibold">AI 품질 심사에서 중대 문제 항목이 확인됐습니다.</p>
@@ -371,16 +371,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 품질 심사의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
-        <div className={pairRow ? "flex flex-col items-start gap-4" : "flex flex-wrap items-center justify-between gap-x-6 gap-y-3"}>
-          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">4</span>교수자 최종 승인</h4>
-          {/* 최종 의견은 기본 문구로 채워 두어, 그대로 확인·승인만 눌러도 된다(2026-10-09). */}
-          {pairRow && <label className="flex w-full flex-col gap-1.5">
-            <span className="text-[14px] font-semibold text-[#5D6970]">최종 의견</span>
-            <Textarea aria-label="교수자 최종 의견" rows={3} maxLength={2000} className="resize-y bg-white text-[14.5px] leading-6" value={note}
-              onChange={(event) => setNote(event.target.value)} disabled={busy || Boolean(locked)} />
-          </label>}
+        <div className={pairRow ? "flex flex-col items-start gap-3" : "flex flex-wrap items-center justify-between gap-x-6 gap-y-3"}>
+          <h4 className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">4</span>교수자 최종 승인</h4>
+          {/* 최종 의견 칸은 뺐다 — 승인 근거는 기본 문구로 기록한다(2026-10-10 연구자 지시). */}
           <div className={pairRow ? "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2" : "flex flex-wrap items-center justify-end gap-x-4 gap-y-2"}>
-          <label className="flex cursor-pointer items-center gap-2.5 text-[14.5px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 점검 결과를 확인했습니다.</label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-[15px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 검수 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-10 border border-[#FAD338] bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:border-[#F7E08A] disabled:bg-[#F7E08A] disabled:text-[#15202B]/60 disabled:shadow-none disabled:opacity-100" : undefined}>
             {busy ? "처리 중…" : "승인하기"}
@@ -404,14 +399,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             <span className={failed ? "rounded-full bg-red-50 px-2 py-0.5 font-semibold text-red-800"
               : running ? "rounded-full bg-[#C08A2E] px-2 py-0.5 font-semibold text-white animate-pulse"
               : current ? "rounded-full border border-[#C08A2E] px-2 py-0.5 font-semibold text-[#8A5A14]"
-              : done ? "text-[#233542]" : "text-[#8C969B]"}>
+              : done ? "text-[#233542]" : "text-[#5B6770]"}>
               {done ? "✓ " : ""}{vendorFree(step.label)}{!state ? " · 확인 중" : failed ? " · 오류" : ""}
             </span>
           </li>;
         }).flatMap((item, index) => index === 1 && handoffHref && !steps.some((step) => step.key === "claude")
           ? [item, <li key="optional-cross-check" className="flex items-center gap-1.5">
               <span aria-hidden className="text-[#B7BEC2]">›</span>
-              <span className="rounded-full border border-dashed border-[#C9CFD2] px-2 py-0.5 text-[#8C969B]">선택 · 교차 검토</span>
+              <span className="rounded-full border border-dashed border-[#C9A62E] px-2 py-0.5 text-[#8A5A14]">선택 · 독립 AI 검토</span>
             </li>]
           : [item])}
       </ol>}
@@ -432,7 +427,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div> : <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
           onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검수 중…" : "검수 마치기") : "검수 실행"}</Button>}
         {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
-        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 새로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
+        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다. 독립 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
@@ -460,12 +455,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <span className="text-[13.5px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
-                {badge && <span className={`rounded-full px-2 py-0.5 text-[12px] font-semibold ${badge.cls}`}>{badge.text}</span>}
+                <span className="text-[14px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
+                {badge && <span className={`rounded-full px-2 py-0.5 text-[12.5px] font-semibold ${badge.cls}`}>{badge.text}</span>}
               </div>
               {/* 수정 제안도 실제 감수에서는 거의 읽히지 않아 근거와 함께 접는다(2026-10-09). 판단은 위치·유형·배지로 시작한다. */}
               <details className="rounded border border-[#E7E3D8] bg-[#FBFAF6] px-2.5 py-1.5">
-                <summary className="cursor-pointer text-[12px] font-semibold text-[#8A5A14]">수정 제안·근거 보기</summary>
+                <summary className="cursor-pointer text-[12.5px] font-semibold text-[#8A5A14]">수정 제안·근거 보기</summary>
                 <div className="mt-2 space-y-2 text-[13px] text-[#233542]">
                   <p className="text-[13.5px] leading-relaxed">{plainIssue(change)}</p>
                   <p className="font-semibold">{noPaths(plainIssue(finding.issue_ko))}</p>
@@ -477,7 +472,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     <strong className="text-[12px]">검토 의견 재판정 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                     <p className="mt-1">{noPaths(decision.rationale_ko)}</p>
                     {decision.evidence_quote && <blockquote className="mt-1 border-l-2 border-[#C08A2E] pl-2">{decision.evidence_quote}</blockquote>}
-                  </div> : <p className="text-xs">{focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</p>}
+                  </div> : <p className="text-xs">{focused ? "재판정 없음 · 교수자가 직접 판단할 수 있습니다." : "재판정 전"}</p>}
                 </div>
               </details>
               {run.approved_at ? <p className="rounded bg-[#F3ECD9] px-2.5 py-2 text-[13px]">
@@ -485,14 +480,14 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                   {saved?.rationale_ko ? ` · ${saved.rationale_ko}` : ""}</p>
                 : focused || run.adjudication ? <div className="space-y-2 rounded bg-[#FDF8EC] p-2.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[12px] font-semibold text-[#7A5A12]">교수자 판단</span>
+                      <span className="text-[13.5px] font-bold text-[#7A5A12]">교수자 판단</span>
                       {Object.entries(PROFESSOR_DECISION_LABELS).map(([value, label]) => <button key={value} type="button" disabled={busy}
                         aria-label={`${label} · ${finding.id}`} aria-pressed={draft?.decision === value}
                         onClick={() => decide(value as keyof typeof PROFESSOR_DECISION_LABELS)}
-                        className={`rounded-md px-3 py-1.5 text-[13px] font-semibold ${draft?.decision === value
+                        className={`rounded-md px-3 py-1.5 text-[13.5px] font-semibold ${draft?.decision === value
                           ? DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].on : DECISION_TONE[value as keyof typeof PROFESSOR_DECISION_LABELS].off}`}>{label}</button>)}
                     </div>
-                  </div> : <p className="text-[13px]">의견 대조 후 교수자 결정을 기록합니다.</p>}
+                  </div> : <p className="text-[13px]">재판정 후 교수자 결정을 기록합니다.</p>}
             </div>;
           };
           const canDecide = next === "professor" && !run.approved_at && (focused || Boolean(run.adjudication));
@@ -509,12 +504,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                 <div className="mt-2 space-y-3">{signalFindings.map(findingCard)}</div></details>
             </section>}
             {substantiveFindings.length > 0 && (pairRow
-              ? <div className="grid items-stretch gap-4 lg:grid-cols-2"><section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
+              ? <div className="grid items-stretch gap-4 lg:grid-cols-2"><section className="space-y-2.5 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:px-6 sm:py-5" aria-label="교수자 감수 검토 의견">
+              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>{finalApproval}</div>
-              : <section className="space-y-4 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:p-6" aria-label="교수자 감수 검토 의견">
-              <h4 className="flex items-center gap-2.5 text-[17.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>AI 검토 의견 {substantiveFindings.length}건</h4>
+              : <section className="space-y-2.5 rounded-xl border border-[#E2DED2] bg-[#F8F7F2] p-4 sm:px-6 sm:py-5" aria-label="교수자 감수 검토 의견">
+              <h4 className="flex items-center gap-2.5 text-[16.5px] font-bold leading-tight text-[#15202B]"><span aria-hidden className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">3</span>검토 의견 {substantiveFindings.length}건</h4>
               {substantiveFindings.map(findingCard)}
             </section>)}
             {next === "professor" && <>

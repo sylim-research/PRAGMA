@@ -210,7 +210,7 @@ const EXAMPLE_R: Record<string, string> = { low: "R: 낮음", mid: "R: 중간", 
 // 보류 사유는 모델·검사기의 원문이라 내부 코드가 섞인다. 화면에는 우리말로 옮겨 보여 준다.
 const HOLD_STAGE_LABEL = {
   preflight: "보류 · 장면 사전 검토",
-  rule: "보류 · 자동 품질 점검",
+  rule: "보류 · 자동 규칙 점검",
   semantic: "보류 · 시나리오 조건 검토",
   system: "생성 오류",
 } as const;
@@ -218,7 +218,7 @@ const HOLD_STAGE_LABEL = {
 // 보류 카드 맨 위의 고정 안내. 아래 사유 원문을 끝까지 읽지 않아도 무엇이 일어났는지 알 수 있게 한다.
 const HOLD_STAGE_SUMMARY = {
   preflight: "지정한 관계 조건과 장면이 맞지 않아 시나리오를 만들지 않았습니다.",
-  rule: "자동 품질 점검 규칙에 걸려 보류했습니다.",
+  rule: "자동 규칙 점검에 걸려 보류했습니다.",
   semantic: "생성된 시나리오가 요청한 조건과 맞지 않아 보류했습니다.",
 } as const;
 
@@ -1285,7 +1285,7 @@ const AdminGenerator = () => {
 
         {/* RIGHT — preview */}
         <section className="rounded-lg border border-border bg-card p-5 lg:sticky lg:top-24lg:max-h-[calc(100dvh-7rem)] lg:overflow-y-auto [scrollbar-color:#D9D2BF_transparent] [scrollbar-width:thin]">
-          <h2 className="flex items-center gap-2 text-[16.5px] font-bold text-[#1d2336]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">7</span>생성 결과 미리보기</h2>
+          <h2 className="flex items-center gap-2 text-[16.5px] font-bold text-[#15202B]"><span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-[#FAD338] text-[12.5px] font-bold text-[#15202B]">7</span>생성 결과 미리보기</h2>
           {saved && savedScenarioId && (
             <div className="mt-3 rounded-lg border border-[#6EE7B7] bg-[#D1FAE5] p-3">
               <p className="text-[13.75px] font-medium text-[#065F46]">
@@ -1373,7 +1373,7 @@ const AdminGenerator = () => {
                             : r.rule === "warning" ? "border-[#EBCB8B] text-[#7A4A0A]"
                               : "border-[#FCA5A5] text-[#991B1B]",
                         ].join(" ")}>
-                          자동 품질 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
+                          자동 규칙 점검 {r.rule === "pass" ? "통과" : r.rule === "warning" ? "경고" : "실패"}
                         </span>
                       )}
                       <span className="text-[14.75px] font-semibold text-foreground">{r.title}</span>
@@ -1407,7 +1407,7 @@ const AdminGenerator = () => {
                     {r.core && typeof r.core.preceding_turn === "string" && r.core.preceding_turn && (
                       <div>
                         <div className="mb-1 text-[12.25px] font-semibold text-[#8a857c]">상황 맥락 참고</div>
-                        <div className="font-zh rounded-md border border-[#DBEAFE] bg-[#EFF6FF] p-2.5 text-[13.25px] leading-relaxed text-[#1E40AF]">{r.core.preceding_turn as string}</div>
+                        <div className="font-zh rounded-md border border-[#E3D3A0] bg-[#FFF8DD] p-2.5 text-[13.25px] leading-relaxed text-[#15202B]">{r.core.preceding_turn as string}</div>
                       </div>
                     )}
                   </div>

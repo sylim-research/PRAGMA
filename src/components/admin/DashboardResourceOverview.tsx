@@ -21,17 +21,17 @@ export function DashboardResourceOverview({ resources, error, status }: {
   ];
 
   return <>
-    <section aria-labelledby="resource-overview-title">
+    <section aria-labelledby="resource-overview-title" className="-mt-2">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         {/* 대시보드의 세 부분(보유 콘텐츠 → 품질 관리 → 수업 운영)은 같은 급 제목을 쓴다(2026-10-08). */}
-        <h2 id="resource-overview-title" className="text-[16.5px] font-bold text-[#15202B]">보유 학습 콘텐츠</h2>
+        <h2 id="resource-overview-title" className="text-[16.5px] font-bold text-[#8A7423]">보유 학습 콘텐츠</h2>
         {status}
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {/* 위 카드 세 개는 요약이라 누르지 않는다. 아래 화행·수준·방향·수행 방식 숫자는 학습 미션 제작 목록으로 연결한다. */}
         {cards.map(({ label, value, unit, note, icon: Icon }) => (
           <div key={label} className={[
-            "flex min-h-[70px] flex-col rounded-xl border px-4 py-2",
+            "flex min-h-[80px] flex-col rounded-xl border px-4 py-[13px]",
             "border-[#E2DED2] bg-white text-[#15202B]",
           ].join(" ")}>
             <div className="flex items-center justify-between gap-2">
@@ -43,7 +43,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
               <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>
             </div>
             <div className="mt-auto flex items-center justify-between gap-1 pt-1.5 text-[12px] text-[#4F5D68]">
-              <span>{note}</span>
+              <span className="truncate whitespace-nowrap">{note}</span>
             </div>
           </div>
         ))}
