@@ -1661,7 +1661,7 @@ export async function reviewMission(
   approval?: { reviewId: string; contentHash: string; professorNote: string; openaiFailOverride?: string },
 ): Promise<{ ok: boolean; mission?: LearnerMissionRuntime; error?: string }> {
   try {
-    if (!approval) return { ok: false, error: "교수자 감수·최종 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
+    if (!approval) return { ok: false, error: "교수자 최종 승인 화면에서 현재 버전을 교수자가 최종 승인해 주세요." };
     // The service prepares and checks attribution before professor decisions.
     // Never make another model call after the professor has reviewed the findings.
     const { data, error: preparedError } = await (supabase as any).from("content_review_runs")

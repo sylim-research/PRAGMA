@@ -57,7 +57,7 @@ const AdminFinalApproval = ({ preview: previewProp = false }: { preview?: boolea
 
   return (
     <AdminShell
-      title="교수자 감수·최종 승인"
+      title="교수자 최종 승인"
       description="자동 품질 점검 결과와 학습 미션을 확인하고, 교수자가 수업 사용과 학습자 공개를 최종 결정합니다."
     >
       <ResearchWorkflowGuide current="release" />

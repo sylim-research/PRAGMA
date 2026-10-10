@@ -34,7 +34,7 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/ai-review", label: "미션 품질 검수" },
     { to: "/admin/corpus", label: "HSK 3.0 어휘 대조" },
     // 제작·승인 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
-    { to: "/admin/review", label: "교수자 감수·최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
+    { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
   ]},
   { header: "4. 수업 운영", items: [
     { to: "/admin/library", label: "학습 미션 관리" },
