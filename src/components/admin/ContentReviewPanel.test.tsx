@@ -59,7 +59,7 @@ describe("quality review handoff", () => {
   });
   it("keeps optional reviews unexecuted and shows approval as a separate action", async () => {
     showCompact();
-    expect(await screen.findByText("GPT-4.1")).toBeInTheDocument();
+    expect(await screen.findByText("· GPT-4.1")).toBeInTheDocument();
     expect(screen.queryByText(/GPT-4.1-2025/)).not.toBeInTheDocument();
     expect(await screen.findByText("점검·검토 완료")).toBeInTheDocument();
     expect(screen.getByText("감수 대기")).toBeInTheDocument();

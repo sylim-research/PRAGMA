@@ -301,9 +301,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                   status === "current" ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" /> : status === "done" ? "✓" : index + 1}
                 </span>
-                <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">
-                  <span className="inline-flex flex-wrap items-center gap-2">{row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
-                  {row.metadata && <span className="block text-[12px] font-normal leading-5 text-[#5D6970]">{row.metadata}</span>}
+                {/* 실행 주체(서버 코드·모델명)는 단계명과 한 줄에 둔다(2026-10-10). */}
+                <span className="min-w-0 flex-1 basis-40 text-[14.5px] font-semibold text-[#233542]">
+                  <span className="inline-flex flex-wrap items-baseline gap-x-2 gap-y-1">{row.label}
+                    {row.metadata && <span className="text-[12.5px] font-normal text-[#5D6970]">· {row.metadata}</span>}
+                    {row.optional && <span className="self-center rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
                 </span>
                 {row.action ? <span className="ml-auto flex min-w-0 justify-end">{row.action}</span> : <span className={["ml-auto min-w-0 max-w-full text-right", status === "running" ? "font-semibold text-[#233542]"
                   : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>

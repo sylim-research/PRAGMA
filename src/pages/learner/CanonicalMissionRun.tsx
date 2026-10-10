@@ -92,6 +92,7 @@ import { representativeDemoContent, unavailableDemoFeedback, type Representative
 import { parseRepresentativeDemo, type DemoTaskMode } from "@/lib/demo/representativeMissionCatalog";
 import { RepresentativeDemoNavigation } from "@/components/mission/RepresentativeDemoNavigation";
 import { DEMO_MJT_QUEST_IDS, demoQuestIndex, demoStepForQuest, parseDemoStep } from "@/lib/demo/demoStepNavigation";
+import { sourceLineRows } from "@/lib/learner/inputRows";
 
 /** 현재 승인된 MPJ5 + DCT1 학습 경험의 유일한 정본 실행기. */
 const CanonicalMissionContext = createContext<CanonicalMissionViewModel>(CANONICAL_MISSION_PREVIEW);
@@ -1240,7 +1241,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   const targetFont = mission.targetLanguage.code === "zh" ? "font-zh" : "";
   return (
     // 토글 오른쪽으로 펼친다 — 입력창 바로 아래 한 줄에 힌트가 붙어 보면서 칠 수 있다. 꺾쇠(오른쪽)와 펼침 방향을 맞춘다.
-    <details className="group/vocabulary mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+    <details className="group/vocabulary mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
       <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-1 text-[14.5px] font-black text-[#15202B] transition-colors hover:text-[#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
         <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[#15202B]"><Lightbulb className="h-[18px] w-[18px]" strokeWidth={2.25} /></span>
         단어 힌트 보기<ChevronRight aria-hidden className="h-4 w-4 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" strokeWidth={2.5} />
@@ -1251,7 +1252,7 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
           <div key={hint.source} className="inline-flex max-w-full items-baseline gap-2">
             {index > 0 && <span aria-hidden className="text-[15px] font-bold text-[#C9A62E]">·</span>}
             <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] leading-6 text-[#5D6970]`}>{hint.source}</dt>
-            <dd lang={mission.targetLanguage.code} className={`${targetFont} min-w-0 break-words border-b-[1.5px] border-dotted border-[#C9A62E] text-[17px] font-semibold leading-6 text-[#15202B]`}>{hint.target}</dd>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} min-w-0 break-words bg-[linear-gradient(transparent_62%,#FAD338_62%,#FAD338_92%,transparent_92%)] px-0.5 text-[17px] font-semibold leading-6 text-[#15202B]`}>{hint.target}</dd>
           </div>
         ))}
       </dl>
@@ -1272,9 +1273,9 @@ function sourceAlignedRows(source: string) {
   return Math.min(6, Math.max(2, estimatedLines + 1));
 }
 
-/** DCT 입력칸 — 원문과 같은 줄 수로 시작한다(한·중 길이가 비슷하고, 작은 칸이 부담을 덜어 준다). */
+/** 학습자 입력칸 — 원문과 같은 줄 수로 시작한다(넘으면 +1까지). 작은 칸이 심리적 부담을 덜어 준다(연구자 규칙, 전역). */
 function dctInputRows(source: string) {
-  return Math.min(6, Math.max(2, sourceAlignedRows(source) - 1));
+  return sourceLineRows(source);
 }
 
 function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: DctQuest; value: string; onChange: (value: string) => void; fromExample?: boolean }) {
@@ -1285,14 +1286,14 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
   // 원문을 읽고 옮기는 한 벌 — 카드 전체에 금색 띠를 둘러 두 칸이 한 과제임을 보인다.
   return (
     <section className="overflow-hidden rounded-2xl border border-[#E2DCCB] border-l-4 border-l-[#F0D34F] bg-white shadow-sm">
-      <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-3 sm:px-5">
+      <div className="flex items-start gap-4 bg-[#FBFAF4] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#E2DCCB] bg-white text-[#4A4538]`}>{mission.sourceLanguage.badge}</span>
         <div className="min-w-0 flex-1">
           <p className="text-[12px] font-bold text-[#7A7466]">{mission.sourceLanguage.label} 원문</p>
-          <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-8 text-[#101B2B]`}>{quest.source}</p>
+          <p className={`${sourceFont} mt-0.5 break-keep text-[17px] font-semibold leading-[30px] text-[#101B2B]`}>{quest.source}</p>
         </div>
       </div>
-      <div className="border-t border-dashed border-[#E3DDCF] bg-white px-4 py-3.5 sm:px-5">
+      <div className="border-t border-dashed border-[#E3DDCF] bg-white px-4 py-3 sm:px-5">
         <div className="flex items-center gap-4">
           <span className={`${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
           <div className="min-w-0 flex-1">
@@ -1307,12 +1308,12 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={dctInputRows(quest.source)}
-          className={`${targetFont} mt-3 min-h-0 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
+          className={`${targetFont} mt-2.5 min-h-0 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
         />
         <DemoExampleNote text={value} derived={fromExample} />
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
-        <p className="mt-3 break-keep text-[12.5px] leading-5 text-[#8A939F]">
+        <p className="mt-2 break-keep text-[12.5px] leading-5 text-[#8A939F]">
           {demo ? "수정 과정을 보여 주기 위한 예시입니다." : "제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다."}
         </p>
         </div>
