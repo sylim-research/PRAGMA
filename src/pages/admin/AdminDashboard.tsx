@@ -132,12 +132,12 @@ const PanelHeader = ({
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   // 표제는 기능명, 모델은 설명에 병기(2026-10-09 연구자 채택, 원고 3.4.2·4.2.2와 같은 이름).
   // 「독립」은 1차 심사 결과를 입력받지 않는다는 뜻이며 오류의 독립성·정확성 보장을 뜻하지 않는다.
-  rules: "자동 규칙 점검 완료",
-  openai: "AI 품질 심사 완료",
-  claude: "독립 AI 검토 완료",
-  adjudication: "검토 의견 재판정 완료",
-  // 전체 흐름 「교수자 최종 승인 완료」와 같은 수다.
-  professor: "교수자 최종 승인 완료",
+  rules: "자동 규칙 점검",
+  openai: "AI 품질 심사",
+  claude: "독립 AI 검토",
+  adjudication: "검토 의견 재판정",
+  // 「완료」는 카드 이름이 아니라 숫자 옆 단위에 붙인다(2026-10-10). 교수자 단계는 전체 흐름의 최종 승인 수와 같다.
+  professor: "교수자 최종 승인",
 };
 
 // 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
@@ -225,7 +225,7 @@ const ReviewPipeline = ({
                     {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : value ?? "—"}
                   </span>
                 )}
-                {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개</span>}
+                {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 완료</span>}
               </div>
               {/* 설명은 한 줄 — 넘치면 말줄임(2026-10-10). 두 줄로 밀리면 카드 밑줄 정렬이 깨진다. */}
               <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">
