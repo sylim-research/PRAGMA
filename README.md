@@ -7,7 +7,7 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
-<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
+<h2 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h2>
 
 <p align="center">
 PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학습 시스템입니다.<br>
@@ -19,9 +19,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 0. 바로 가기
 
 <table>
-  <thead><tr><th width="319" align="left">화면</th><th width="360" align="left">링크</th></tr></thead>
+  <thead><tr><th width="239" align="left">화면</th><th width="329" align="left">링크</th></tr></thead>
   <tbody>
-    <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><b><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></b></td></tr>
+    <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
     <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>대표 학습 미션</b></td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
   </tbody>
@@ -35,14 +35,14 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
-> <small>콘텐츠 제작과 통번역 학습을 수업 운영으로 잇고, 학습 기록과 토론 결과를 콘텐츠 검토로 되돌립니다.</small>
+> <small>콘텐츠 제작과 통번역 학습은 수업 운영으로 이어지고, 학습 기록과 토론 결과는 다시 콘텐츠 검토에 쓰입니다.</small>
 
 <br>
 
 ### 2. 학습 미션의 화용론적 설계
 
 <table>
-  <thead><tr><th width="165" align="left">조건</th><th width="595" align="left">구성</th></tr></thead>
+  <thead><tr><th width="159" align="left">조건</th><th width="487" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>상황·관계 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
@@ -79,7 +79,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 5. 수업 연계와 운영
 
 <table>
-  <thead><tr><th width="165" align="left">기능</th><th width="595" align="left">내용</th></tr></thead>
+  <thead><tr><th width="156" align="left">기능</th><th width="578" align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
     <tr><td>학습자 관리</td><td>프로필 작성과 교수자의 가입 승인을 마친 학습자가 교과목에 참여</td></tr>
@@ -100,9 +100,9 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 - **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
 - **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- 콘텐츠는 서버의 **자동 규칙 점검**(현행 미션 12개 규칙)과 GPT-4.1의 **AI 품질 심사**를 거칩니다. 필요 시 Claude Opus 5가 GPT 결과를 보지 않고 **독립 AI 검토**를 하고, GPT-4.1이 자신의 1차 결과 없이 그 의견을 **재판정**한 뒤, 교수자가 감수하여 수업 사용 여부를 최종 결정합니다.
+- **AI 품질 심사**에는 GPT-4.1, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다.
 - **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
-- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
+- **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
 
@@ -111,7 +111,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 7. 콘텐츠·학습 기록의 추적
 
 <table>
-  <thead><tr><th width="380" align="left">콘텐츠 이력</th><th width="380" align="left">학습 수행 기록</th></tr></thead>
+  <thead><tr><th width="322" align="left">콘텐츠 이력</th><th width="208" align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
@@ -127,7 +127,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 8. 연구 활용
 
 <table>
-  <thead><tr><th width="165" align="left">절차</th><th width="595" align="left">내용</th></tr></thead>
+  <thead><tr><th width="175" align="left">절차</th><th width="592" align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
     <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
@@ -142,7 +142,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 9. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="100" align="left">논문</th><th width="230" align="left">내용</th><th width="507" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="108" align="left">논문</th><th width="253" align="left">내용</th><th width="419" align="left">구현 위치</th></tr></thead>
   <tbody>
     <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
     <tr><td>4.2</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
@@ -166,7 +166,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 10. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
+  <thead><tr><th width="308" align="left">단계</th><th width="403" align="left">핵심 설계·개선</th><th width="137" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
@@ -185,7 +185,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 ### 11. 주요 용어
 
 <table>
-  <thead><tr><th width="165" align="left">용어</th><th width="595" align="left">정의</th></tr></thead>
+  <thead><tr><th width="190" align="left">용어</th><th width="615" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>문법적 정확성</td><td>목표어 표현이 어순·형태·통사 규칙에 맞게 구성된 것</td></tr>
@@ -195,10 +195,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task)의 상황 제시를 응용한 통번역 과제</td></tr>
     <tr><td>직접 수정</td><td>설계된 결함 표현을 판단해 고치는 MJT 활동</td></tr>
     <tr><td>AI 피드백</td><td>통번역 산출 뒤 AI가 주는 재검토 정보. 채점이나 정답 확정이 아님</td></tr>
-    <tr><td>미션 품질 검수</td><td>자동 규칙 점검 → AI 품질 심사 → (선택) 독립 AI 검토 → 검토 의견 재판정으로 교수자 감수 자료를 준비하는 단계</td></tr>
-    <tr><td>독립 AI 검토</td><td>1차 심사 결과를 입력받지 않은 다른 모델의 검토. 오류의 독립성이나 더 높은 정확성을 뜻하지 않음</td></tr>
-    <tr><td>검토 의견 재판정</td><td>1차 심사 모델이 자신의 결과 없이 독립 검토 의견을 수용·보완·기각으로 분류하는 단계. 수정·승인이 아님</td></tr>
-    <tr><td>교수자 최종 승인</td><td>교수자가 감수한 콘텐츠 버전의 수업 사용 여부 결정</td></tr>
   </tbody>
 </table>
 
