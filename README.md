@@ -60,7 +60,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 <p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
 
-> <small>AI가 생성한 콘텐츠는 자동 품질 점검과 AI 검토를 거쳐 교수자가 감수·최종 승인합니다.</small>
+> <small>AI가 생성한 콘텐츠는 자동 규칙 점검과 AI 품질 심사를 거쳐 교수자가 감수·최종 승인합니다.</small>
 
 <br>
 
@@ -100,7 +100,8 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 
 - **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
 - **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 검토**에는 GPT-4.1, **교차 검토**에는 Claude Opus 5, **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
+- 콘텐츠는 서버의 **자동 규칙 점검**(현행 미션 12개 규칙)과 GPT-4.1의 **AI 품질 심사**를 거칩니다. 필요 시 Claude Opus 5가 GPT 결과를 보지 않고 **독립 AI 검토**를 하고, GPT-4.1이 자신의 1차 결과 없이 그 의견을 **재판정**한 뒤, 교수자가 감수하여 수업 사용 여부를 최종 결정합니다.
+- **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
 - **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
@@ -114,7 +115,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
-    <tr><td>자동 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
+    <tr><td>자동 규칙 점검 결과 · AI 품질 심사 의견</td><td>제공된 AI 피드백</td></tr>
     <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견</td></tr>
   </tbody>
 </table>
@@ -168,7 +169,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
   <thead><tr><th width="300" align="left">단계</th><th width="380" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
-    <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 품질 점검·AI 검토 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
+    <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 감수·최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
     <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
     <tr><td>MJT 판단 문항 → DCT형 통번역 과제</td><td>MJT와 통번역 과제를 한 학습 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
     <tr><td>9개 목표화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>

@@ -3,6 +3,7 @@ import { Mic, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
 import { DEFAULT_TTS_VOICE_BY_LANG, requestTtsAudio, type TtsLang, type TtsLevel } from "@/lib/tts";
+import { sourceLineRows } from "@/lib/learner/inputRows";
 
 // Demo and learner playback share full volume and sentence pauses.
 // Synthesis applies the language-specific speed; playback must not slow it again.
@@ -212,7 +213,7 @@ export function InterpretingConsole({
           <h3 className="flex items-center gap-2 text-sm font-bold text-[#15202B]">{demoMode ? "② 전사문 확인" : "③ 내가 말한 내용 확인"}{demoMode && demoTranscript && transcript.trim() && <span className="inline-flex items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518]">{transcript.trim() === demoTranscript.trim() ? "예시 사용" : "예시 수정"}</span>}</h3>
           {notice && <p className="mt-2 rounded-lg bg-white px-3 py-2 text-xs leading-5 text-[#536572]">{notice}</p>}
           {recordingUrl && <audio src={recordingUrl} controls preload="metadata" className="mt-3 h-9 w-full" aria-label="내 통역 녹음" />}
-          <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={3} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className={`${targetLanguage.code === "zh" ? "font-zh " : ""}mt-3 w-full rounded-xl border-2 border-[#15202B] bg-white p-3 text-[15.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55`} />
+          <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={sourceLineRows(sourceText)} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className={`${targetLanguage.code === "zh" ? "font-zh " : ""}mt-3 w-full rounded-xl border-2 border-[#15202B] bg-white p-3 text-[15.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55`} />
           <button type="button" onClick={() => transcript.trim() && setConfirmed(true)} disabled={transcribing || !transcript.trim()} className={`mt-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${confirmed ? "border-[#2E7D5B] bg-[#E7F5EC] text-[#256548]" : "border-[#B8B3A2] bg-white text-[#3D4B55]"}`}>
             {confirmed ? "✓ 전사 확인 완료" : demoMode ? "전사문 확정" : "말한 내용과 같아요"}
           </button>

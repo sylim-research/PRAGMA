@@ -98,14 +98,14 @@ describe("admin dashboard", () => {
     const stages = await screen.findByRole("group", { name: "품질 점검 단계" });
     // 카드 제목(규칙 검사 · OpenAI/Claude · 교수자)이 이미 세 층을 말하므로 묶음 머리표는 두지 않는다.
     expect(stages.textContent).not.toContain("AI 문맥 검토");
-    const rules = within(stages).getByRole("link", { name: /자동 품질 점검 완료/ });
+    const rules = within(stages).getByRole("link", { name: /자동 규칙 점검 완료/ });
     // 규칙 검사를 통과한 서로 다른 미션 1건(재실행 중복·불통과 제외).
     await waitFor(() => expect(rules.textContent).toMatch(/1\s*개/));
-    expect(rules.textContent).toContain("미션 형식별 규칙 검사");
+    expect(rules.textContent).toContain("서버 코드 · 현행 미션 규칙 검사");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "지금 대기 2개");
-    const claude = within(stages).getByRole("link", { name: /Claude 교차 검토 완료/ });
+    const claude = within(stages).getByRole("link", { name: /독립 AI 검토 완료/ });
     expect(claude.textContent).toMatch(/1\s*개/);
     expect(claude).toHaveAttribute("title", "지금 대기 0개");
     const professor = within(stages).getByRole("link", { name: /교수자 최종 승인 완료/ });
@@ -126,7 +126,7 @@ describe("admin dashboard", () => {
     mocks.tables.content_review_runs = [...(mocks.tables.content_review_runs as unknown[]), run("v5-ready")];
     show();
     const stages = screen.getByRole("group", { name: "품질 점검 단계" });
-    const rules = within(stages).getByRole("link", { name: /자동 품질 점검 완료/ });
+    const rules = within(stages).getByRole("link", { name: /자동 규칙 점검 완료/ });
     await waitFor(() => expect(rules).toHaveAttribute("title", "지금 대기 2개"));
     expect(rules.textContent).not.toContain("v5");
   });
@@ -153,9 +153,9 @@ describe("admin dashboard", () => {
 
   it("routes rule and AI review stages to the quality check screen and the professor stage to final approval", async () => {
     show();
-    const rulesCard = await screen.findByRole("link", { name: /자동 품질 점검 완료/ });
+    const rulesCard = await screen.findByRole("link", { name: /자동 규칙 점검 완료/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["AI 검토 완료", "Claude 교차 검토 완료", "OpenAI 재검토 완료"]) {
+    for (const label of ["AI 품질 심사 완료", "독립 AI 검토 완료", "검토 의견 재판정 완료"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
     const stages = screen.getByRole("group", { name: "품질 점검 단계" });

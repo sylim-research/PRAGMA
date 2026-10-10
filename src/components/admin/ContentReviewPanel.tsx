@@ -75,7 +75,7 @@ const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
 /** 단계 역할과 표시 모델명을 구분한다. 원본 모델 ID는 저장 기록에 유지한다. */
 const STEP_LABEL: Record<string, string> = {
-  "규칙 검사": "자동 품질 점검", "OpenAI 검토": "AI 검토", "Claude 독립 검토": "모델 간 교차 검토", "OpenAI 재검토": "AI 의견 대조", "최종 검수 자료": "감수 자료 준비",
+  "규칙 검사": "자동 규칙 점검", "OpenAI 검토": "AI 품질 심사", "Claude 독립 검토": "독립 AI 검토", "OpenAI 재검토": "검토 의견 재판정", "최종 검수 자료": "감수 자료 준비",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
 /** 모델 ID를 사람이 읽는 이름으로: gpt-4.1 → GPT-4.1, claude-opus-5 → Claude Opus 5, claude-sonnet-4-5 → Claude Sonnet 4.5. */
@@ -237,7 +237,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       setBusy(true); setError(null);
       void contentReviewRequest(target, "request_independent", state)
         .then((result) => { queryClient.setQueryData(key, result); return startReviewPreparation([{ target, label: prepLabel }]); })
-        .catch((cause) => setError(cause instanceof Error ? cause.message : "모델 간 교차 검토 요청 실패"))
+        .catch((cause) => setError(cause instanceof Error ? cause.message : "독립 AI 검토 요청 실패"))
         .finally(() => setBusy(false));
     };
     const rowStatus = (stepKey: string): "done" | "running" | "current" | "todo" | "failed" => {
@@ -253,33 +253,33 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     const resultOf = (list: ReviewFinding[] | undefined, noun = "검토 의견") => (count(list) ? `${noun} ${count(list)}건` : noun === "확인 필요" ? "규칙상 문제 없음" : "보고된 문제 없음");
     const decisions = run?.adjudication?.result.decisions ?? [];
     const adjudicationResult = run?.adjudication
-      ? `AI 의견 대조 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
+      ? `검토 의견 재판정 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
           .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "분류 없음"}`
       : null;
     type Row = { key: string; label: string; metadata?: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
     const rows: Row[] = [
-      { key: "rules", label: "자동 품질 점검", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
-      { key: "openai", label: "AI 검토", metadata: run?.openai_review ? modelName(run.openai_review.model) : run?.generation_quality ? "생성 단계 저장 결과 연결" : undefined,
+      { key: "rules", label: "자동 규칙 점검", metadata: "서버 코드", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
+      { key: "openai", label: "AI 품질 심사", metadata: run?.openai_review ? modelName(run.openai_review.model) : run?.generation_quality ? `${modelName(run.generation_quality.quality_check.model)} · 생성 단계 결과 재사용` : modelName(state?.models.openai),
         items: primary?.findings, result: primary ? resultOf(primary.findings) : null, detail: primary?.summary_ko },
-      { key: "claude", label: "모델 간 교차 검토", metadata: run?.claude_review ? modelName(run.claude_review.model) : undefined, optional: true, items: run?.claude_review?.result.findings,
+      { key: "claude", label: "독립 AI 검토", metadata: run?.claude_review ? modelName(run.claude_review.model) : modelName(state?.models.claude) || undefined, optional: true, items: run?.claude_review?.result.findings,
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
         action: canCross && !run?.claude_review
-          ? <Button size="sm" variant="outline" className="h-8 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={startCross}>교차 검토 실행</Button>
+          ? <Button size="sm" variant="outline" className="h-8 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={startCross}>독립 검토 실행</Button>
           : null },
-      { key: "adjudication", label: "AI 의견 대조", metadata: run?.adjudication ? modelName(run.adjudication.model) : undefined, optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
-        note: run?.claude_review && !run.claude_review.result.findings.length ? "미실행 · 교차 검토 의견 없음" : null },
+      { key: "adjudication", label: "검토 의견 재판정", metadata: run?.adjudication ? modelName(run.adjudication.model) : modelName(state?.models.openai) || undefined, optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
+        note: run?.claude_review && !run.claude_review.result.findings.length ? "미실행 · 독립 검토 의견 없음" : null },
       ...(steps.some((step) => step.key === "finalization")
         ? [{ key: "finalization", label: "감수 자료 준비", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
         : []),
     ];
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
-    return <section aria-label="품질 점검 파이프라인" className="space-y-3 text-sm">
+    return <section aria-label="품질 검수 워크플로우" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 점검 파이프라인</h3>
+          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 검수 워크플로우</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
@@ -301,9 +301,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                   status === "current" ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
                   {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" /> : status === "done" ? "✓" : index + 1}
                 </span>
-                <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">
-                  <span className="inline-flex flex-wrap items-center gap-2">{row.label}{row.optional && <span className="rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
-                  {row.metadata && <span className="block text-[12px] font-normal leading-5 text-[#5D6970]">{row.metadata}</span>}
+                {/* 실행 주체(서버 코드·모델명)는 단계명과 한 줄에 둔다(2026-10-10). */}
+                <span className="min-w-0 flex-1 basis-40 text-[14.5px] font-semibold text-[#233542]">
+                  <span className="inline-flex flex-wrap items-baseline gap-x-2 gap-y-1">{row.label}
+                    {row.metadata && <span className="text-[12.5px] font-normal text-[#5D6970]">· {row.metadata}</span>}
+                    {row.optional && <span className="self-center rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
                 </span>
                 {row.action ? <span className="ml-auto flex min-w-0 justify-end">{row.action}</span> : <span className={["ml-auto min-w-0 max-w-full text-right", status === "running" ? "font-semibold text-[#233542]"
                   : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
@@ -329,7 +331,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               "bg-[#FAD338] text-[#15202B]", professorCurrent ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
               {professorDone ? "✓" : rows.length + 1}
             </span>
-            <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">교수자 최종 승인</span>
+            <span className="min-w-0 flex-1 basis-40 font-semibold text-[#233542]">교수자 감수·최종 승인</span>
             <span className="ml-auto min-w-0 text-right text-[#5D6970]">
               {professorDone ? "승인 완료"
                 : professorCurrent ? (findings.length ? `감수 대기 · 의견 ${findings.length}건` : "감수 대기")
@@ -345,7 +347,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         {/* 주 실행 버튼은 학습 미션 제작 화면의 「초안 자동 생성」과 같이 상자 아래 오른쪽, 브랜드 노랑으로 둔다. */}
         {!runningLabel && !professorDone && !professorCurrent && <div className="flex justify-end border-t border-[#ECE8DE] px-4 py-3">
-          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 점검 실행</Button>
+          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 검수 실행</Button>
         </div>}
       </div>}
       {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}
@@ -361,12 +363,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {draftDecisions.some((entry) => entry.decision !== "no_change") && <p role="alert" className="rounded-md border border-[#E3C27A] bg-[#FFF8E6] px-3 py-2 text-[13.5px] text-[#8A4B08]">⚠ 모든 검토 의견에 「수정 없이 사용 가능」 판단이 있어야 최종 승인할 수 있습니다.</p>}
         {!experienceClear && <p className="text-amber-800">학생 화면의 모든 항목을 확인해야 최종 승인할 수 있습니다. 수정 필요가 남아 있으면 먼저 해결해 주세요.</p>}
         {hasOpenaiFail && <div className="space-y-2 rounded border border-amber-300 bg-amber-50 p-3">
-          <p className="font-semibold">AI 검토에서 중대 문제 항목이 확인됐습니다.</p>
-          <Textarea aria-label="AI 검토의 중대 문제 항목 사용 근거" value={openaiFailOverride}
+          <p className="font-semibold">AI 품질 심사에서 중대 문제 항목이 확인됐습니다.</p>
+          <Textarea aria-label="AI 품질 심사의 중대 문제 항목 사용 근거" value={openaiFailOverride}
             onChange={(event) => { setOpenaiFailOverride(event.target.value); setOpenaiFailConfirmed(false); setConfirmed(false); }}
             placeholder="중대 문제 항목을 검토하고도 현재 내용을 사용할 수 있는 근거를 10자 이상 기록하세요." />
           <label className="flex gap-2 text-xs"><input type="checkbox" checked={openaiFailConfirmed}
-            onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 검토의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
+            onChange={(event) => setOpenaiFailConfirmed(event.target.checked)} />AI 품질 심사의 중대 문제 항목을 확인했으며 수정 없이 사용할 수 있다고 판단했습니다.</label>
         </div>}
         {/* 한 줄: 왼쪽 번호·제목 | 오른쪽 「확인 체크 + 승인 버튼」 한 묶음. 체크하면 바로 옆 버튼이 켜진다. 화면의 유일한 주 CTA다. */}
         <div className={pairRow ? "flex flex-col items-start gap-4" : "flex flex-wrap items-center justify-between gap-x-6 gap-y-3"}>
@@ -428,7 +430,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           {vendorFree(queued?.message ?? "자동 점검")} 진행 중
           <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
         </div> : <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
-          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "자동 점검 중…" : "자동 점검 마치기") : "자동 점검 실행"}</Button>}
+          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검수 중…" : "검수 마치기") : "검수 실행"}</Button>}
         {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 검토만 새로 실행합니다. 추가 모델 검토는 선택 시에만.</p>}
       </div>}
@@ -436,24 +438,24 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
       {run && <>
         {/* 최종 승인 화면은 점검 요약 줄을 두지 않는다. 교수자가 판단할 지적만 아래 판단 카드로 보인다. */}
-        {!experiential && <ReviewFindings title={compact ? "자동 품질 점검" : "1. 자동 품질 점검"} result={run.rules} compact={compact} />}
+        {!experiential && <ReviewFindings title={compact ? "자동 규칙 점검" : "1. 자동 규칙 점검"} result={run.rules} compact={compact} />}
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
-        {primary && !experiential && <ReviewFindings title={experiential ? "AI 검토" : run.openai_review ? "AI 검토" : "AI 검토 (저장 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
-        {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 검토"result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && !experiential && <ReviewFindings title="교차 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
+        {primary && !experiential && <ReviewFindings title={experiential ? "AI 품질 심사" : run.openai_review ? "AI 품질 심사" : "AI 품질 심사 (생성 단계 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
+        {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 품질 심사"result={generationQualityResult(run.generation_quality)} />}
+        {run.claude_review && !experiential && <ReviewFindings title="독립 AI 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
         {!compact && findings.length > 0 && (() => {
           const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
-            const source = finding.id.startsWith("rule-") ? "자동 품질 점검" : finding.id.startsWith("claude-") ? "교차 검토"
-              : finding.id.startsWith("generation-") ? "생성 단계 AI 검토" : "AI 검토";
+            const source = finding.id.startsWith("rule-") ? "자동 규칙 점검" : finding.id.startsWith("claude-") ? "독립 AI 검토"
+              : finding.id.startsWith("generation-") ? "생성 단계 AI 품질 심사" : "AI 품질 심사";
             /* 두 검토가 같은 결론이면 재서술을 읽을 이유가 없다. 갈리거나 교수자 확인이 필요할 때만 펼친 채로 둔다. */
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
             const change = decision?.proposed_change_ko?.trim() || finding.suggestion_ko;
             const badge = finding.needs_professor || decision?.needs_professor ? { text: "교수자 확인 필요", cls: "bg-[#233542] text-white" }
-              : agreed ? { text: "✓ AI 검토 일치", cls: "border border-[#4D8568] bg-white text-[#245E44]" }
-              : decision ? { text: `AI 의견 대조 · ${decisionLabel[decision.decision]}`, cls: decision.decision === "reject" ? "border border-[#C86E68] text-[#8B3531]" : "border border-[#C08A2E] text-[#8A5A14]" }
+              : agreed ? { text: "✓ 재판정 수용", cls: "border border-[#4D8568] bg-white text-[#245E44]" }
+              : decision ? { text: `재판정 · ${decisionLabel[decision.decision]}`, cls: decision.decision === "reject" ? "border border-[#C86E68] text-[#8B3531]" : "border border-[#C08A2E] text-[#8A5A14]" }
               : focused ? { text: "교수자 단독 판단", cls: "border border-[#C08A2E] text-[#8A5A14]" } : null;
             const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
@@ -472,7 +474,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                   {finding.uncertainty_ko && <p className="text-xs">불확실성: {finding.uncertainty_ko}</p>}
                   <p className="text-xs">{verdictLabel[finding.severity]}</p>
                   {decision ? <div className="rounded bg-white p-2">
-                    <strong className="text-[12px]">AI 의견 대조 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
+                    <strong className="text-[12px]">검토 의견 재판정 · {decisionLabel[decision.decision]}{decision.needs_professor ? " · 교수자 확인 필요" : ""}</strong>
                     <p className="mt-1">{noPaths(decision.rationale_ko)}</p>
                     {decision.evidence_quote && <blockquote className="mt-1 border-l-2 border-[#C08A2E] pl-2">{decision.evidence_quote}</blockquote>}
                   </div> : <p className="text-xs">{focused ? "추가 의견 대조 없음 · 교수자가 직접 판단할 수 있습니다." : "의견 대조 전"}</p>}
@@ -495,12 +497,12 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           };
           const canDecide = next === "professor" && !run.approved_at && (focused || Boolean(run.adjudication));
           return <div className="space-y-3">
-            {signalFindings.length > 0 && <section className="space-y-2 rounded-lg border p-3" aria-label="자동 품질 점검 신호">
-              <h4 className="text-[14px] font-bold text-[#233542]">자동 품질 점검 신호 {signalFindings.length}건</h4>
+            {signalFindings.length > 0 && <section className="space-y-2 rounded-lg border p-3" aria-label="자동 규칙 점검 신호">
+              <h4 className="text-[14px] font-bold text-[#233542]">자동 규칙 점검 신호 {signalFindings.length}건</h4>
               <p className="text-xs">규칙·정규식·집계로 잡힌 비차단 신호입니다 — {signalSummary(signalFindings)}. 묶어서 확인하거나, 필요한 항목만 열어 수정 필요·판단 보류로 바꿀 수 있습니다.</p>
               {canDecide && (pendingSignals.length > 0
                 ? <Button variant="outline" disabled={busy || query.isFetching || Boolean(locked) || Boolean(dependencyBlocked) || approvalDisabled} onClick={() => void confirmSignals()}>
-                    미결 자동 품질 점검 신호 {pendingSignals.length}건 확인 · 현재 버전 그대로 사용
+                    미결 자동 규칙 점검 신호 {pendingSignals.length}건 확인 · 현재 버전 그대로 사용
                   </Button>
                 : <p className="text-xs text-muted-foreground">모든 신호에 교수자 결정이 있습니다.</p>)}
               <details className="rounded border p-2"><summary className="cursor-pointer text-xs font-semibold">신호 상세 {signalFindings.length}건 열람</summary>
@@ -528,18 +530,18 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         <p className="mt-1 text-xs">주차 자료 승인 전 연결 미션의 현재 버전 승인도 완료해야 합니다. 같은 해설을 출력 형식별로 중복 검토하지 않습니다.</p>
         <ul className="mt-2 space-y-1">{state.dependencies.map((item, index) => <li key={item.id}><Link className="underline" to={`/admin/review?scenarioId=${item.id}`}>미션 {index + 1} 승인 확인</Link> · {item.approved ? "현재 버전 승인" : "승인 필요"}</li>)}</ul>
       </div>}
-      {blocked && <p className="text-red-800">자동 품질 점검 오류를 수정·저장해야 AI 검토를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
+      {blocked && <p className="text-red-800">자동 규칙 점검 오류를 수정·저장해야 AI 품질 심사를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error} </p>}
-      {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 검토"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
+      {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 품질 심사"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && !(compact && historicalApproval) && (() => {
         const body = <>
-          <h4 className="text-[13.5px] font-bold text-[#233542]">교차 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
-          <p className="mt-0.5 text-xs text-[#5D6970]">AI 판단이 의심스러울 때, 다른 AI가 교차 검토하고 두 의견을 대조합니다.</p>
+          <h4 className="text-[13.5px] font-bold text-[#233542]">독립 AI 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
+          <p className="mt-0.5 text-xs text-[#5D6970]">1차 심사 결과를 보지 않은 다른 AI가 검토하고, 그 의견을 1차 심사 AI가 재판정합니다.</p>
           <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
             setBusy(true); setError(null);
             void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
               .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
-          }}>교차 검토 요청</Button>
+          }}>독립 검토 요청</Button>
         </>;
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
@@ -548,15 +550,15 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {/* 최종 승인 버튼은 승인 상자 안(확인 체크 오른쪽)에 둔다. 그 밖의 단계 실행 버튼만 여기 남는다. */}
       {next !== "approved" && !(next === "professor" && !handoffHref) && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)}
         onClick={() => void runNext()}>
-        {busy ? "처리 중…" : next === "rules" ? "자동 품질 점검 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
+        {busy ? "처리 중…" : next === "rules" ? "자동 규칙 점검 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
-      {next === "claude" && !state.models.claude && <p className="text-amber-800">Claude 교차 검토 모델이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
+      {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 검토 모델(Claude)이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
-        {run?.openai_fail_override && <p className="mt-2">AI 검토의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
+        {run?.openai_fail_override && <p className="mt-2">AI 품질 심사의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
       {!experiential && <details><summary className="cursor-pointer text-xs">콘텐츠 원본·승인 이력</summary>
         {experiential && primary && isolatedGrounding(primary).length > 0 && <div className="my-2 text-[12px] text-[#5D6970]">
-          <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 검토 의견 {isolatedGrounding(primary).length}건 — 승인 판단에 쓰이지 않습니다.</p>
+          <p className="font-semibold">근거를 확인하지 못해 따로 둔 AI 품질 심사 의견 {isolatedGrounding(primary).length}건 — 승인 판단에 쓰이지 않습니다.</p>
           <ul className="mt-1 list-disc pl-4">{isolatedGrounding(primary).map((finding) => <li key={finding.id}>{finding.issue_ko}</li>)}</ul>
         </div>}
         {experiential && <dl className="my-2 grid gap-x-3 gap-y-1 break-all text-[12px] sm:grid-cols-[10rem_1fr]">
