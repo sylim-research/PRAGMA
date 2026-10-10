@@ -113,10 +113,10 @@ const PanelHeader = ({
   description?: string;
   action?: ReactNode;
 }) => (
-  <div className="mb-2.5 mt-7">
+  <div className="mb-2.5 mt-5">
     <div className="flex flex-wrap items-center gap-2">
       {/* 대시보드 구역은 작업 순서가 아니라 번호를 두지 않는다 — 번호는 실제 작업 흐름에만(2026-10-09). */}
-      <h2 className="text-[16.5px] font-bold text-[#15202B]">{title}</h2>
+      <h2 className="text-[16.5px] font-bold text-[#8A7423]">{title}</h2>
       {action}
     </div>
     {description && <p className="mt-0.5 text-[12px] text-[#4F5D68]">{description}</p>}
@@ -146,12 +146,12 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: "서버 코드 · 현행 미션 규칙 검사",
+  rules: "서버 코드 · 규칙 검사",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
-  openai: "GPT-4.1 · 의미·화행·자연성 심사",
-  claude: "Claude · 교수자가 요청할 때",
+  openai: "GPT-4.1 · 의미·화행 심사",
+  claude: "Claude · 요청 시",
   // Claude 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "GPT-4.1 · Claude 의견이 있을 때",
+  adjudication: "GPT-4.1 · 의견 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
@@ -202,7 +202,7 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[70px] flex-col rounded-xl border bg-white px-4 py-2",
+                "group flex min-h-[74px] flex-col rounded-xl border bg-white px-4 py-2.5",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -227,7 +227,8 @@ const ReviewPipeline = ({
                 )}
                 {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개</span>}
               </div>
-              <span className="mt-auto pt-1.5 text-[12px] text-[#4F5D68]">
+              {/* 설명은 한 줄 — 넘치면 말줄임(2026-10-10). 두 줄로 밀리면 카드 밑줄 정렬이 깨진다. */}
+              <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">
                 {stage.description}
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
@@ -286,7 +287,7 @@ const OperationMetric = ({
     to={to}
     title={title}
     className={[
-      "group flex min-h-[70px] flex-col rounded-xl border bg-white px-4 py-2",
+      "group flex min-h-[74px] flex-col rounded-xl border bg-white px-4 py-2.5",
       "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4E8063]",
       changed ? "border-[#75A488] bg-[#F3FAF5] ring-2 ring-[#8FC7A4]/30" : "border-[#E2DED2]",
     ].join(" ")}
