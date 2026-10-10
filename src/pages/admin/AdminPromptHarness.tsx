@@ -80,7 +80,7 @@ function ContractSummary() {
       {/* 번호는 세로로 읽힌다(왼쪽 1~3, 오른쪽 4~6). 두 열 사이에 가는 구분선(2026-10-10). */}
       <ol className={`grid gap-y-2 md:grid-flow-col md:grid-cols-2 md:grid-rows-3 md:gap-0 ${PART_BODY}`}>
         {CONTRACT_CLAUSES.map((clause, index) => (
-          <li key={clause.title} className={`flex items-center gap-2.5 md:py-[2px] ${index >= 3 ? "md:border-l md:border-[#E7E2D6] md:pl-6" : "md:pr-6"}`}>
+          <li key={clause.title} className={`flex items-center gap-2.5 md:py-[3px] ${index >= 3 ? "md:border-l md:border-[#E7E2D6] md:pl-6" : "md:pr-6"}`}>
             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#C9A62E] text-[12px] font-bold text-[#6D5C1F]">{index + 1}</span>
             <p className="text-[14px] leading-relaxed text-[#3B4A54]"><b className="font-bold text-[#15202B]">{clause.title}</b> · {clause.body}</p>
           </li>
