@@ -159,7 +159,7 @@ function HarnessOverview() {
   const [rulesOpen, setRulesOpen] = useState(false);
   return (
     <section aria-labelledby="harness-overview-title" className={PART_CARD}>
-      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 규칙 점검 → AI 품질 심사 → 교수자 감수·최종 승인" />
+      <PartHeading id="harness-overview-title" title="품질관리 구조" description="자동 규칙 점검 → AI 품질 심사 → 교수자 최종 승인" />
       <div className={PART_BODY}>
       <div className="grid gap-2 md:grid-cols-3">
         <button type="button" aria-expanded={rulesOpen} aria-controls="quality-rules" onClick={() => setRulesOpen((o) => !o)}
@@ -193,7 +193,7 @@ function HarnessOverview() {
         </div>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 감수·최종 승인</span>
+            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 최종 승인</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
