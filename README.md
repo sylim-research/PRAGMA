@@ -193,8 +193,6 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
     <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
     <tr><td>MJT 판단 문항</td><td>메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)의 개별 문항</td></tr>
     <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task)의 상황 제시를 응용한 통번역 과제</td></tr>
-    <tr><td>직접 수정</td><td>설계된 결함 표현을 판단해 고치는 MJT 활동</td></tr>
-    <tr><td>AI 피드백</td><td>통번역 산출 뒤 AI가 주는 재검토 정보. 채점이나 정답 확정이 아님</td></tr>
   </tbody>
 </table>
 
