@@ -956,11 +956,12 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
               <div className="rounded-xl border border-[#233542]/20 bg-white px-5 py-3.5 text-[13.5px]">
                 {/* 무엇을 만드는지 보여 줘야 생성이 오래 걸리는 이유가 납득된다. 문항 활동 이름은 용어대장(MJT 문항)을 따른다. */}
                 <p className="flex items-center gap-2 text-[15px] font-bold text-[#233542]"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />다음과 같이 학습 미션을 생성합니다.</p>
-                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-5 gap-y-2 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
-                  <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항 5개</dt>
-                  <dd className="text-[#4E5A63]">단일 표현 판단 · 판단과 근거 · 복수 표현 비교 · 수정안 선택 · 직접 수정</dd>
-                  <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역 과제</dt>
-                  <dd className="text-[#4E5A63]">원문의 의미·의도를 살려 상황·관계에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
+                {/* 항목마다 한 줄 — 이름은 짧게, 설명은 줄바꿈 없이(2026-10-10 연구자 지시). */}
+                <dl className="mt-2 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-lg bg-[#FAF8F2] px-4 py-2.5 text-[13px]">
+                  <dt className="whitespace-nowrap font-semibold text-[#233542]">MJT 판단 문항</dt>
+                  <dd className="whitespace-nowrap text-[#4E5A63]">단일 판단 · 판단과 근거 · 복수 비교 · 수정안 선택 · 직접 수정</dd>
+                  <dt className="whitespace-nowrap font-semibold text-[#233542]">DCT형 통번역</dt>
+                  <dd className="whitespace-nowrap text-[#4E5A63]">의미·의도를 살려 상황·관계에 맞게 {r.mode === "stt_interpreting" ? "통역" : "번역"}</dd>
                 </dl>
                 <div className="mt-2.5 flex flex-wrap items-center justify-end gap-3">
                   {v6Stage?.id === r.scenario_id && <span className="text-[12.5px] font-semibold text-[#92400E]" role="status">{V6_STAGE_KO[v6Stage.stage]}</span>}
