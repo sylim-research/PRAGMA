@@ -102,7 +102,7 @@ PRAGMA는 화용적 적절성을 중심으로 설계한 한·중 통번역 학�
 - **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
 - **AI 품질 심사**에는 GPT-4.1, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다.
 - **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
-- **통역**의 **음성 인식(STT)**은 GPT-4o Transcribe, **음성 합성(TTS)**은 ElevenLabs로 처리합니다.
+- **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
 
