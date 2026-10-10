@@ -43,7 +43,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
               <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>
             </div>
             <div className="mt-auto flex items-center justify-between gap-1 pt-1.5 text-[12px] text-[#4F5D68]">
-              <span>{note}</span>
+              <span className="truncate whitespace-nowrap">{note}</span>
             </div>
           </div>
         ))}

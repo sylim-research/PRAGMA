@@ -176,46 +176,46 @@ export function InterpretingConsole({
 
   return (
     <div className="space-y-3" data-scene-skin="oral-console">
-      <section className="overflow-hidden rounded-2xl border border-[#CBD4DC] bg-white shadow-[0_8px_22px_rgba(21,32,43,0.07)]">
-        <div className="flex items-center justify-between gap-3 border-b border-[#E1E6EA] bg-[#F7F9FA] px-4 py-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-[#40515F]"><Mic className="h-4 w-4" />{demoMode ? "통역 과정 체험" : "직접 통역하기"}</div>
-          <span className="text-[10.5px] text-[#7B8994]">{demoMode ? "듣기 → 예시 전사문 → 피드백" : "듣기 → 녹음 → 전사 확인"}</span>
+      <section className="overflow-hidden rounded-2xl border border-[#E2DED2] bg-white shadow-[0_8px_22px_rgba(21,32,43,0.07)]">
+        <div className="flex items-center justify-between gap-3 border-b border-[#E2DED2] bg-[#FBFAF6] px-4 py-2.5">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#15202B]"><Mic className="h-4 w-4" />{demoMode ? "통역 과정 체험" : "직접 통역하기"}</div>
+          <span className="text-[12px] text-[#5B6770]">{demoMode ? "듣기 → 예시 전사문 → 피드백" : "듣기 → 녹음 → 전사 확인"}</span>
         </div>
         <div className="space-y-4 p-4">
           <section aria-label="원발화 듣기">
             <div className="flex items-baseline justify-between gap-2">
-              <h3 className="text-xs font-bold text-[#273642]">① 원발화 듣기 ({sourceLanguage.label})</h3>
-              <span className="text-[10.5px] text-[#7B8994]">최대 {maxPlays}회</span>
+              <h3 className="text-xs font-bold text-[#15202B]">① 원발화 듣기 ({sourceLanguage.label})</h3>
+              <span className="text-[12px] text-[#5B6770]">최대 {maxPlays}회</span>
             </div>
-            <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3 text-white">
+            <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#15202B] p-3 text-white">
               <button type="button" onClick={playSource} disabled={plays >= maxPlays || playing || ttsLoading} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FAD338] text-[#15202B] disabled:opacity-40" aria-label="원발화 재생">
                 <Volume2 className="h-[18px] w-[18px]" />
               </button>
-              <div><p className="text-sm font-semibold">{ttsLoading ? "음성 준비 중…" : playing ? "재생 중…" : "원발화 재생"}</p><p className="text-[11px] text-[#A5B5C1]">남은 재생 {Math.max(0, maxPlays - plays)}회</p></div>
+              <div><p className="text-sm font-semibold">{ttsLoading ? "음성 준비 중…" : playing ? "재생 중…" : "원발화 재생"}</p><p className="text-[12px] text-[#A5B5C1]">남은 재생 {Math.max(0, maxPlays - plays)}회</p></div>
             </div>
           </section>
           {/* 데모는 녹음 단계 없이 「예시 전사문 넣기」로 바로 채운다 — 안내 상자는 군더더기라 두지 않는다(2026-10-08). */}
           {!demoMode && <section aria-label="통역 녹음">
-            <h3 className="text-xs font-bold text-[#273642]">② 통역 녹음 ({targetLanguage.label})</h3>
-            <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#101922] p-3">
+            <h3 className="text-xs font-bold text-[#15202B]">② 통역 녹음 ({targetLanguage.label})</h3>
+            <div className="mt-2 flex items-center gap-3 rounded-xl bg-[#15202B] p-3">
               <button type="button" onClick={recording ? stopRecording : startRecording} disabled={transcribing} className={`rounded-lg border px-4 py-2 text-xs font-bold ${recording ? "border-[#B44647] bg-[#B44647] text-white" : "border-[#C4494A] text-[#F0A3A4]"}`}>
                 {recording ? "■ 녹음 정지" : transcribing ? "전사 중…" : recorded ? "● 다시 녹음" : "● 녹음 시작"}
               </button>
-              <span className="text-[11px] text-[#A5B5C1]">{recording ? "녹음 중…" : transcribing ? "자동 전사 중…" : recorded ? "아래에서 전사를 확인하세요" : "버튼을 누른 뒤 통역 시작"}</span>
+              <span className="text-[12px] text-[#A5B5C1]">{recording ? "녹음 중…" : transcribing ? "자동 전사 중…" : recorded ? "아래에서 전사를 확인하세요" : "버튼을 누른 뒤 통역 시작"}</span>
             </div>
-            <p className="mt-2 text-[10.5px] leading-5 text-[#7B8994]">음성은 자동 전사를 위해 OpenAI 음성 인식 API로 전송됩니다. 음성 파일은 저장하지 않고 확인한 전사만 제출합니다.</p>
+            <p className="mt-2 text-[12px] leading-5 text-[#5B6770]">음성은 OpenAI 음성 인식으로 전사만 하고 저장하지 않습니다.</p>
           </section>}
         </div>
       </section>
 
       {(demoMode || recorded || notice || transcribing) && (
         <section className="rounded-2xl border border-[#E1DED5] bg-[#F7F6F2] p-4">
-          <h3 className="flex items-center gap-2 text-sm font-bold text-[#15202B]">{demoMode ? "② 전사문 확인" : "③ 내가 말한 내용 확인"}{demoMode && demoTranscript && transcript.trim() && <span className="inline-flex items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518]">{transcript.trim() === demoTranscript.trim() ? "예시 사용" : "예시 수정"}</span>}</h3>
+          <h3 className="flex items-center gap-2 text-sm font-bold text-[#15202B]">③ 내가 말한 내용 확인{demoMode && demoTranscript && transcript.trim() && <span className="inline-flex items-center rounded-md border border-[#C9A62E] bg-white px-1.5 py-0.5 text-[11.5px] font-black leading-4 text-[#6B5518]">{transcript.trim() === demoTranscript.trim() ? "예시 사용" : "예시 수정"}</span>}</h3>
           {notice && <p className="mt-2 rounded-lg bg-white px-3 py-2 text-xs leading-5 text-[#536572]">{notice}</p>}
           {recordingUrl && <audio src={recordingUrl} controls preload="metadata" className="mt-3 h-9 w-full" aria-label="내 통역 녹음" />}
-          <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={sourceLineRows(sourceText)} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className={`${targetLanguage.code === "zh" ? "font-zh " : ""}mt-3 w-full rounded-xl border-2 border-[#15202B] bg-white p-3 text-[15.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55`} />
-          <button type="button" onClick={() => transcript.trim() && setConfirmed(true)} disabled={transcribing || !transcript.trim()} className={`mt-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${confirmed ? "border-[#2E7D5B] bg-[#E7F5EC] text-[#256548]" : "border-[#B8B3A2] bg-white text-[#3D4B55]"}`}>
-            {confirmed ? "✓ 전사 확인 완료" : demoMode ? "전사문 확정" : "말한 내용과 같아요"}
+          <textarea value={transcript} onChange={(event) => { setTranscript(event.target.value); setConfirmed(false); }} rows={sourceLineRows(sourceText)} disabled={transcribing} placeholder={`통역한 ${targetLanguage.label} 문장`} className={`${targetLanguage.code === "zh" ? "font-zh " : ""}mt-3 w-full rounded-xl border-[1.6px] border-[#15202B] bg-white p-3 text-[16.5px] leading-7 outline-none focus:ring-2 focus:ring-[#FAD338]/55`} />
+          <button type="button" onClick={() => transcript.trim() && setConfirmed(true)} disabled={transcribing || !transcript.trim()} className={`mt-2 rounded-md border px-3 py-1.5 text-xs font-semibold ${confirmed ? "border-[#2E7D5B] bg-[#E7F5EC] text-[#256548]" : "border-[#15202B] bg-white text-[#15202B]"}`}>
+            {confirmed ? "✓ 전사 확인 완료" : "말한 내용과 같아요"}
           </button>
         </section>
       )}

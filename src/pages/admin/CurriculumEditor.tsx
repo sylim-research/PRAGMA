@@ -284,7 +284,7 @@ export const CurriculumEditor = ({
       <div className="max-w-[58rem] space-y-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">교과목 추가</h2>
+            <h2 className="text-[16.5px] font-bold text-[#8A7423]">교과목 추가</h2>
             <p className="mt-1 text-[13px] leading-relaxed text-muted-foreground">
               세 가지만 정하면 표준 15주 계획을 자동으로 준비하고 바로 미션 편성으로 이어집니다.
             </p>
@@ -371,7 +371,7 @@ export const CurriculumEditor = ({
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">주차 계획 수정</h2>
+        <h2 className="text-[16.5px] font-bold text-[#8A7423]">주차 계획 수정</h2>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onClose} disabled={saving}>
             취소

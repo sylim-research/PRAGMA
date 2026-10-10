@@ -61,7 +61,7 @@ describe("quality review handoff", () => {
     showCompact();
     expect(await screen.findByText("· GPT-4.1")).toBeInTheDocument();
     expect(screen.queryByText(/GPT-4.1-2025/)).not.toBeInTheDocument();
-    expect(await screen.findByText("점검·검토 완료")).toBeInTheDocument();
+    expect(await screen.findByText("품질 검수 완료")).toBeInTheDocument();
     expect(screen.getByText("감수 대기")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "교수자 감수·최종 승인으로" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
     expect(mocks.approve).not.toHaveBeenCalled();
@@ -121,7 +121,7 @@ describe("professor finding decisions", () => {
     const approve = await screen.findByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
@@ -146,7 +146,7 @@ describe("professor finding decisions", () => {
     fireEvent.click(await screen.findByRole("button", { name: `${PROFESSOR_DECISION_LABELS.no_change} · claude-1` }));
     await screen.findByText("교수자 판단이 현재 버전에 저장되어 있습니다.", undefined, { timeout: 3000 });
     // 승인 근거를 비워 둔 채 확인 체크만 하고 승인한다 — 타이핑 없이 승인이 열려야 한다.
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     const approve = screen.getByRole("button", { name: "교수자 최종 승인" });
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
@@ -192,12 +192,12 @@ describe("professor finding decisions", () => {
     expect(screen.getByText("중대 지적")).toBeInTheDocument();
     expect(screen.getByText("지적 없음")).toBeInTheDocument();
     expect(screen.getAllByText(/보고된 문제 항목 없음/).length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.change(screen.getByRole("textbox", { name: "AI 품질 심사의 중대 문제 항목 사용 근거" }), { target: { value: rationale } });
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     fireEvent.click(screen.getByRole("checkbox", { name: /AI 품질 심사의 중대 문제 항목을 확인했으며/ }));
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledWith(expect.objectContaining({ openaiFailOverride: rationale })));
     expect(await screen.findByText(`AI 품질 심사의 중대 문제 항목 사용 근거: ${rationale}`)).toBeVisible();
@@ -234,7 +234,7 @@ describe("automated quality signals", () => {
       { finding_id: "rule-1", decision: "no_change", rationale_ko: BULK_SIGNAL_RATIONALE, mode: "bulk_signal" },
       { finding_id: "claude-1", decision: "no_change", rationale_ko: DEFAULT_RATIONALE.no_change },
     ]);
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     fireEvent.click(screen.getByRole("button", { name: "교수자 최종 승인" }));
     await waitFor(() => expect(mocks.approve).toHaveBeenCalledTimes(1));
     expect(await screen.findByText(/교수자 · 수정 없이 사용 가능 \(묶음 확인\)/)).toBeInTheDocument();
@@ -252,7 +252,7 @@ describe("automated quality signals", () => {
     expect(mocks.save).toHaveBeenLastCalledWith("review-1", "hash-current", expect.arrayContaining([
       { finding_id: "rule-2", decision: "defer", rationale_ko: DEFAULT_RATIONALE.defer },
     ]));
-    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 점검 결과를 확인했습니다." }));
+    fireEvent.click(screen.getByRole("checkbox", { name: "학습자 화면과 품질 검수 결과를 확인했습니다." }));
     expect(screen.getByRole("button", { name: "교수자 최종 승인" })).toBeDisabled();
     expect(mocks.approve).not.toHaveBeenCalled();
   });

@@ -303,7 +303,7 @@ const OperationMetric = ({
         {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">{unit}</span>}
       </span>
     )}
-    <span className="mt-auto pt-1.5 text-[12px] leading-4 text-[#4F5D68]">{description}</span>
+    <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] leading-4 text-[#4F5D68]">{description}</span>
   </Link>
 );
 
@@ -585,7 +585,7 @@ const AdminDashboard = () => {
           to="/admin/learners"
           label="가입 승인 학습자"
           value={snapshot?.approvedLearnerCount ?? null}
-          unit="개"
+          unit="명"
           description="전체 교과목 공통"
           error={displayError}
           changed={changedKeys.has("learners")}

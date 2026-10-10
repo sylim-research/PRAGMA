@@ -27,9 +27,9 @@ function activityCopy(week: LearnerCourseWeek): string {
     return "앞서 수행한 미션의 표현 선택과 수정 근거를 함께 돌아봅니다.";
   }
   if (week.type === "midterm" || week.type === "final") {
-    return "교수자 안내에 따라 지금까지의 화용 판단과 산출을 통합해 점검합니다.";
+    return "교수자 안내에 따라 지금까지의 판단과 번역·통역을 함께 돌아봅니다.";
   }
-  return "강좌의 학습 흐름을 살펴보고 출발점 수행을 확인합니다.";
+  return "강좌의 학습 흐름을 살펴보고 첫 수행을 해 봅니다.";
 }
 
 const LearnerCourseLive = () => {
@@ -83,8 +83,8 @@ const LearnerCourseLive = () => {
           </div>
         ) : (
           <>
-            <Link to="/learner/course" className="text-[12.5px] font-medium text-muted-foreground hover:text-foreground">← 교과목 선택</Link>
-            <h1 className="mt-5 break-keep text-[22px] font-bold leading-snug tracking-tight text-[#15202B] sm:text-[24px]">{courseDisplayTitle(course.outline)}</h1>
+            <Link to="/learner/course" className="text-[12.5px] font-medium text-[#15202B] hover:underline">← 교과목 선택</Link>
+            <h1 className="mt-5 break-keep text-[26px] font-bold leading-snug tracking-tight text-[#15202B]">{courseDisplayTitle(course.outline)}</h1>
 
             <h2 className="mb-2.5 mt-7 text-[16px] font-semibold tracking-tight text-[#15202B]">주차별 학습계획</h2>
             <ol aria-label="주차별 학습계획" className="overflow-hidden rounded-xl border border-[#E8E3D8] bg-white">
@@ -125,7 +125,7 @@ const LearnerCourseLive = () => {
                           <span className={`block break-keep leading-5 ${expanded ? "text-[17px] font-semibold" : "text-[14px] font-medium"}`}>{title}</span>
                           {expanded && goal && <span className="mt-1 block break-keep text-[13px] font-normal leading-5 text-[#52606A]">학습 목표 · {goal}</span>}
                         </span>
-                        <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#969E9E]"}`} />
+                        <ChevronDown aria-hidden="true" strokeWidth={1.5} className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 motion-reduce:transition-none ${expanded ? "rotate-180 text-[#8A6B24]" : "text-[#15202B]"}`} />
                       </button>
                     </h3>
                     <div id={panelId} role="region" aria-labelledby={headingId} hidden={!expanded}>
@@ -152,7 +152,7 @@ const LearnerCourseLive = () => {
                                       >
                                         <span className="text-[11px] font-medium text-[#967B3E]">미션 {index + 1} · {modeLabel}</span>
                                         <h5 className="mb-3 mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]">{label ?? `${modeLabel} 학습 미션`}</h5>
-                                        <span className="mt-auto inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-md bg-[#243441] px-3 py-2 text-[12px] font-medium text-white transition-colors group-hover:bg-[#354B5B]">
+                                        <span className="mt-auto inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-md bg-[#15202B] px-3 py-2 text-[12px] font-medium text-white transition-colors group-hover:bg-[#15202B]/90">
                                           {modeLabel} 미션 시작 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                         </span>
                                       </Link>
@@ -160,7 +160,7 @@ const LearnerCourseLive = () => {
                                   );
                                 })}
                                 {missingModes.map((mode, index) => (
-                                  <li key={`${mode}-${index}`} className="rounded-lg border border-dashed border-[#EAE5DB] p-3.5 text-[12px] text-muted-foreground">
+                                  <li key={`${mode}-${index}`} className="rounded-lg border border-dashed border-[#C9A62E] p-3.5 text-[12px] text-[#15202B]">
                                     <p className="font-semibold">{MODE_LABEL[mode]}</p>
                                     <p className="mt-2">{week.speech_act ? "미션 준비 중" : "화행 선정 후 안내"}</p>
                                   </li>

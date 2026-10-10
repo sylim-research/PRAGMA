@@ -62,7 +62,7 @@ const PART_BODY = "border-t border-[#EFEAE0] px-5 py-4";
 function PartHeading({ id, title, description }: { id: string; title: string; description: string }) {
   return (
     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 pb-3 pt-4">
-      <h2 id={id} className="text-[17.5px] font-bold tracking-[-0.01em] text-[#15202B]">{title}</h2>
+      <h2 id={id} className="text-[16.5px] font-bold tracking-[-0.01em] text-[#8A7423]">{title}</h2>
       <span className="text-[13.5px] text-[#514C44]">{description}</span>
     </div>
   );
@@ -120,7 +120,7 @@ function RuleCatalogPanel() {
       <p className="mt-2 text-[13px] leading-relaxed text-[#52616B]">
         {scope === "current"
           ? "지금 만드는 시나리오와 학습 미션에 실제로 실행되는 규칙입니다."
-          : "이전 미션 형식에만 실행되는 규칙입니다. 현행 미션의 문항 품질은 AI 검토와 교수자 승인으로 확인합니다."}
+          : "이전 미션 형식에만 실행되는 규칙입니다. 현행 미션의 문항 품질은 AI 품질 심사와 교수자 최종 승인으로 확인합니다."}
       </p>
       <div className="mt-3 space-y-4">
         {QUALITY_RULE_CATEGORIES.map((category) => {
@@ -181,7 +181,7 @@ function HarnessOverview() {
         </button>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#3F6172]">AI 품질 심사</span>
+            <span className="text-[13px] font-semibold text-[#6D5C1F]">AI 품질 심사</span>
             <Badge variant="outline" className="bg-white font-normal">GPT-4.1</Badge>
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
@@ -194,7 +194,7 @@ function HarnessOverview() {
         </div>
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[13px] font-semibold text-[#6D675D]">교수자 최종 승인</span>
+            <span className="text-[13px] font-semibold text-[#6D5C1F]">교수자 최종 승인</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
@@ -261,7 +261,7 @@ const AdminPromptHarness = () => {
   return (
     <AdminShell
       title="생성계약·운영 프롬프트"
-      description="생성계약과 버전이 관리되는 운영 프롬프트, 자동 품질 점검 규칙, 교수자 감수와 최종 승인의 관계를 확인합니다."
+      description="생성계약과 버전이 관리되는 운영 프롬프트, 규칙 점검 목록, 교수자 감수와 최종 승인의 관계를 확인합니다."
     >
       <div className="flex flex-col gap-4">
       <ContractSummary />
@@ -275,7 +275,7 @@ const AdminPromptHarness = () => {
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[17px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[15px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid gap-x-1.5 gap-y-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />

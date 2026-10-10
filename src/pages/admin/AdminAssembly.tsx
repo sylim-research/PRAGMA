@@ -154,8 +154,8 @@ type StateChip = "all" | AssemblyState | ProductionState | ProfessorQueue | Excl
 // 화면을 열면 바로 만들 수 있게 「초안 생성 대기」를 맨 앞(기본 칩)에 둔다.
 const ASSEMBLY_CHIPS: StateChip[] = ["core_only", "v6_review", "v6_done", "all"];
 const V6_STAGE_KO: Record<PromoteV6Stage, string> = {
-  preparing: "시나리오 확인 중", generating: "초안 생성 중", checking: "자동 품질 점검 중",
-  repairing: "지적된 곳 고치는 중", quality: "AI 검토 중", saving: "저장 중",
+  preparing: "시나리오 확인 중", generating: "초안 생성 중", checking: "자동 규칙 점검 중",
+  repairing: "지적된 곳 고치는 중", quality: "AI 품질 심사 중", saving: "저장 중",
 };
 const PRODUCTION_KO: Record<ProductionState, string> = {
   v6_review: "검토 중",
@@ -211,7 +211,7 @@ const ROW_CAP = 4000;
 const CORE_ROW_SELECT =
   "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, supersedes_scenario_id, created_at, core_content";
 
-const PROGRESS_STEPS = ["초안 생성", "자동 품질 점검", "AI 검토", "초안 저장", "문항 보완"] as const;
+const PROGRESS_STEPS = ["초안 생성", "자동 규칙 점검", "AI 품질 심사", "초안 저장", "문항 보완"] as const;
 
 const progressIndex = (stage: PromoteStage) => {
   if (stage.phase === "generating" || stage.phase === "preparing") return 0;
@@ -224,8 +224,8 @@ const progressIndex = (stage: PromoteStage) => {
 const progressLabel = (stage: PromoteStage) => {
   if (stage.phase === "preparing") return "조립 조건 확인";
   if (stage.phase === "generating") return `미션 생성 · ${stage.attempt}/${stage.maxAttempts}차`;
-  if (stage.phase === "checking") return `자동 품질 점검 · ${stage.attempt}/${stage.maxAttempts}차`;
-  if (stage.phase === "quality") return "AI 검토";
+  if (stage.phase === "checking") return `자동 규칙 점검 · ${stage.attempt}/${stage.maxAttempts}차`;
+  if (stage.phase === "quality") return "AI 품질 심사";
   if (stage.phase === "saving") return "초안 저장";
   if (stage.phase === "repairing") return "지적된 문항 1회 보완";
   return "보완본 재점검";
@@ -627,7 +627,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         generationModel: resumeAstra ? "astra" : generationModel,
         generationJobId,
         onGenerationJob: (job) => setRowMsg(m => ({ ...m, [r.scenario_id]: job.status === "completed"
-          ? "백그라운드 생성 완료 · AI 검토 시작" : "백그라운드 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
+          ? "백그라운드 생성 완료 · AI 품질 심사 시작" : "백그라운드 생성 중 · " + job.completed_steps + "단계 완료. 화면을 닫아도 결과를 보존합니다." })),
         onProgress: (stage) =>
           setAssemblyProgress((current) =>
             current?.id === r.scenario_id ? { ...current, stage } : current,
@@ -641,8 +641,8 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         });
         // 검증②(0-n·94) 결과가 있으면 함께 알린다 — 없으면(호출 실패) 침묵하지 않고 표기.
         const qLabel = res.quality
-          ? { pass: "AI 검토 의견 저장", warning: "AI 검토 의견 저장(주의)", fail: "AI 검토 결과 확인 필요" }[res.quality.verdict]
-          : "AI 검토 미실행";
+          ? { pass: "AI 품질 심사 저장", warning: "AI 품질 심사 저장(주의)", fail: "AI 품질 심사 결과 확인 필요" }[res.quality.verdict]
+          : "AI 품질 심사 미실행";
         setRowMsg((m) => ({
           ...m,
           [r.scenario_id]: `초안 저장(${res.ruleResult}, 전체 생성 ${res.attempts}회) · ${qLabel}${res.repaired ? " · 지적된 문항 보완 완료" : ""}${res.repairError ? ` · 자동 보완 보류: ${res.repairError}` : ""}`,
@@ -702,9 +702,9 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       }));
       setRowMsg((current) => ({
         ...current,
-        [r.scenario_id]: `교수자 수정본 저장 · ${res.quality ? "AI 검토 의견 저장" : "AI 검토 미확인"}`,
+        [r.scenario_id]: `교수자 수정본 저장 · ${res.quality ? "AI 품질 심사 저장" : "AI 품질 심사 미확인"}`,
       }));
-      toast.success("수정한 문항을 자동 품질 점검·AI 재검토 후 새 이력으로 저장했습니다.");
+      toast.success("수정한 문항을 자동 규칙 점검·AI 품질 심사 후 새 이력으로 저장했습니다.");
     } finally {
       setBusy(null);
     }
@@ -921,7 +921,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
                 </p>
               )}
             </div>
-            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>}
+            {!professorScreen && <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#15202B]">{titleOf(r)}</h2>}
           </div>
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
@@ -938,7 +938,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {/* 교수자 화면은 왼쪽에 승인 대기 목록 단추가 있어 제목이 가운데로 밀린다 — 제목만 한 줄 아래 왼쪽 끝에서 시작한다. */}
           {/* 제목 아래 상황 한 줄 — 넓은 화면이라 한 줄로 자르고(두 줄 금지) 전문은 마우스를 올리면 보인다(2026-10-09). */}
           {professorScreen && <div className="basis-full space-y-1.5">
-            <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#202B33]">{titleOf(r)}</h2>
+            <h2 className="line-clamp-2 pl-3 text-[16.5px] font-bold leading-snug text-[#15202B]">{titleOf(r)}</h2>
             <p className="truncate pl-3 text-[13.5px] text-[#4E5A63]" title={r.core_content?.situation_ko ?? undefined}>{r.core_content?.situation_ko ?? "—"}</p>
           </div>}
         </header>
@@ -1363,7 +1363,7 @@ const ProductionPath = ({ production, row, info }: { production: ProductionState
     { label: "시나리오", status: "done" },
     { label: "초안 작성", status: v6 ? "done" : "current", detail: v6 ? created : production === "v5_only" ? "변환 전" : "생성 대기" },
     { label: "미션 품질 검수", status: approved || decision ? "done" : production === "v6_review" ? "current" : "todo", detail: production === "v6_review" && !decision ? currentStageLabel(info?.progress) : null },
-    { label: "교수자 최종 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "승인 대기" : null },
+    { label: "교수자 최종 승인", status: approved ? "done" : decision ? "current" : "todo", detail: decision ? "교수자 승인 대기" : null },
     { label: "편성", status: placed ? "done" : approved ? "current" : "todo", detail: placed ? info?.placement : approved ? "편성 전" : null },
   ];
   return (

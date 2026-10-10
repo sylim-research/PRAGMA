@@ -223,7 +223,7 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     fireEvent.click(cards[1]);
     expect(screen.getByText("판단 × 선택 이유")).toBeVisible();
     // 통번역 과제 — 수정 여부와 이견 여부를 따로 세고, 사례 비교에서만 이견 사유가 보인다.
-    const dct = within(screen.getByLabelText("통번역 과제"));
+    const dct = within(screen.getByLabelText("DCT형 통번역 과제"));
     const decisionLegend = dct.getByText("초안 유지").closest("ul")!;
     expect(decisionLegend).toHaveTextContent("초안 유지10");
     expect(decisionLegend).toHaveTextContent("수정10");

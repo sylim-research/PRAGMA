@@ -445,7 +445,7 @@ function ClassReview({ record }: { record: ReportRecord }) {
                   <span className="font-bold text-[#15202B]">{position.activity}</span>
                   <span className="flex items-baseline gap-3">
                     {referenceLabel(position) && (
-                      <span className="rounded-full border-[1.6px] border-[#2F6B5E] px-2 py-[1px] text-[14px] font-semibold text-[#245449]">기준 판단: {referenceLabel(position)}</span>
+                      <span className="rounded-full border-[1.6px] border-[#245E44] px-2 py-[1px] text-[14px] font-semibold text-[#245E44]">기준 판단: {referenceLabel(position)}</span>
                     )}
                     <span className="tabular-nums text-[#8C8471]">{position.total}명</span>
                   </span>

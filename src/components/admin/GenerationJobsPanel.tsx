@@ -22,7 +22,7 @@ export function GenerationJobsPanel({ busy, onResume, savedIds }: {
   if (!visible.length && !error) return null;
   return <section className="my-4 rounded-xl border border-[#E2DED2] bg-white p-5" aria-label="서버 생성 작업">
     <h2 className="text-[16.5px] font-bold">서버 생성 작업</h2>
-    <p className="mt-1 text-sm text-muted-foreground">화면을 닫아도 생성 결과를 보존합니다. 완료 후 이어받으면 품질 점검과 초안 저장을 진행합니다.</p>
+    <p className="mt-1 text-sm text-muted-foreground">화면을 닫아도 생성 결과는 보존되며, 완료 후 이어받으면 품질 검수와 초안 저장이 진행됩니다.</p>
     {error && <p role="status" className="mt-2 text-sm">{error}</p>}
     {visible.map(job => <div key={job.id} className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
       <div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm">{job.label}</p>

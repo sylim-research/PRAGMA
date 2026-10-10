@@ -119,7 +119,7 @@ export function CurriculumSyllabus({
         <div className="mt-2 grid gap-2 text-[12px] leading-relaxed sm:grid-cols-2">
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">같은 화행의 {missionModesSummary(expectedMissionModesForWeek({ courseMode: outline.course_mode as CourseMode }, 2))}를 서로 다른 상황에서 수행합니다. 각 미션은 MJT5+DCT1로 완결됩니다.</p>
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">MJT 수행 뒤 5 POINT LESSON으로 핵심 판단 근거를 확인합니다.</p>
-          <p className="rounded-md bg-[#F7F9F8] px-3 py-2">DCT형 통번역 과제는 초안 → AI 피드백 → 수정 → 참고 표현 비교 순서로 진행합니다.</p>
+          <p className="rounded-md bg-[#F7F9F8] px-3 py-2">DCT형 통번역 과제는 초안 → AI 피드백 → 수정안 → 최종안 → 참고 표현 비교 순서로 진행합니다.</p>
           <p className="rounded-md bg-[#F7F9F8] px-3 py-2">교수자는 승인된 미션의 6단계 수업자료와 학생 활동지를 함께 활용합니다.</p>
         </div>
       </section>

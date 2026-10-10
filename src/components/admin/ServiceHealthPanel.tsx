@@ -23,7 +23,7 @@ import {
 
 const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
   elevenlabs: { name: "ElevenLabs", role: "음성 합성" },
-  openai: { name: "OpenAI", role: "생성·AI 검토·STT" },
+  openai: { name: "OpenAI", role: "생성·AI 품질 심사·STT" },
   anthropic: { name: "Anthropic", role: "콘텐츠 검토" },
   supabase: { name: "Supabase", role: "로그인·데이터" },
   // 다른 칸처럼 제공사 이름을 쓰되, 이 칸은 Railway에 묻지 않고 「이 화면이 열렸다」만 보므로
@@ -169,7 +169,7 @@ export const ServiceHealthPanel = () => {
           data-testid="summary-dot"
           aria-hidden="true"
         />
-        <h2 id="service-health-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#1B2A36]">
+        <h2 id="service-health-title" className="text-[16.5px] font-bold tracking-[-0.01em] text-[#15202B]">
           외부 서비스 연동
         </h2>
         <span className={`text-sm ${tone.text}`}>{pending ? "점검 중…" : summary.text}</span>
