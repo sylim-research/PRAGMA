@@ -857,7 +857,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           <p>지금 점검할 미션이 없습니다.</p>
           {dash.decision > 0 && (
             <Link className="mt-2 inline-block font-semibold text-[#15202B] underline underline-offset-4" to="/admin/review">
-              교수자 승인 대기 {dash.decision}개는 교수자 감수·최종 승인 화면에서 확인하세요 →
+              교수자 승인 대기 {dash.decision}개는 교수자 최종 승인 화면에서 확인하세요 →
             </Link>
           )}
         </>
@@ -978,7 +978,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
             {(productionOf(r) === "v6_review" || productionOf(r) === "v6_done") && (
               <Link to={`${productionOf(r) === "v6_done" ? "/admin/review" : "/admin/ai-review"}?scenarioId=${r.scenario_id}`}
                 className="inline-flex items-center gap-1 text-[13px] font-semibold text-[#15202B] underline underline-offset-4">
-                {productionOf(r) === "v6_done" ? "교수자 감수·최종 승인 화면에서 보기" : "품질 점검 화면에서 열기"}<ChevronRight className="size-3.5" />
+                {productionOf(r) === "v6_done" ? "교수자 최종 승인 화면에서 보기" : "미션 품질 검수에서 열기"}<ChevronRight className="size-3.5" />
               </Link>
             )}
           </>
@@ -1032,7 +1032,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
 
   return (
     <AdminShell
-      title={aiReview ? "미션 품질 검수" : reviewMode ? "교수자 감수·최종 승인" : "학습 미션 제작"}
+      title={aiReview ? "미션 품질 검수" : reviewMode ? "교수자 최종 승인" : "학습 미션 제작"}
       description={aiReview
         ? "자동 규칙 점검과 AI 품질 심사로 교수자 감수에 쓸 판단 자료를 준비합니다."
         : reviewMode
