@@ -7,7 +7,7 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
-<h2 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h2>
+<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
 
 <p align="center">
 PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,<br>
