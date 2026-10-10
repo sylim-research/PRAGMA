@@ -30,6 +30,17 @@ describe("representative mission model house", () => {
     // 2026-10-09: MJT5 explanation reads as commentary on the fix, not a second instruction.
     corrected.mission_content.mpj_items[3].explanation_ko = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content.mpj_items[3].explanation_ko;
     expect(corrected.mission_content.mpj_items[3].explanation_ko).not.toContain("고쳐 보세요");
+    // 2026-10-10: Chinese expression review accepted by the researcher (DEC-20261010-01).
+    // MJT2 target loses the awkward "交给您写" collocation but keeps the intended "entrusting" frame;
+    // its explanation and lesson quote follow. MJT3 situation states the senior is female (all candidates say 学姐).
+    const snap = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content;
+    corrected.mission_content.mpj_items[1].target = snap.mpj_items[1].target;
+    corrected.mission_content.mpj_items[1].explanation_ko = snap.mpj_items[1].explanation_ko;
+    corrected.mission_content.lesson_points[1].text = snap.lesson_points[1].text;
+    corrected.mission_content.mpj_items[4].situation_ko = snap.mpj_items[4].situation_ko;
+    expect(snap.mpj_items[1].target).toContain("想把写推荐信这件事交给您");
+    expect(JSON.stringify(snap)).not.toContain("交给您写");
+    expect(snap.mpj_items[4].situation_ko).toContain("여자 선배");
     expect(REPRESENTATIVE_MISSION_SNAPSHOT).toEqual(corrected);
     const task = REPRESENTATIVE_MISSION_SNAPSHOT.mission_content.production_task;
     expect(task.vocabulary_hints.map((hint) => hint.target)).toEqual(["快递", "保管"]);
