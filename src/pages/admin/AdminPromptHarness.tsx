@@ -69,9 +69,9 @@ function PartHeading({ id, title, description }: { id: string; title: string; de
 }
 
 // 단계 카드의 이동·펼침 문구 — 무거운 굵은 글씨 대신 노란 알약으로 가볍게, 마우스를 올리면 화살표가 살짝 움직인다.
-const STAGE_LINK = "mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
+const STAGE_LINK = "mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-[#FFF3C4] px-3 py-1 text-[13px] font-semibold text-[#15202B] transition-colors hover:bg-[#FAD338]";
 const STAGE_ARROW = "h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5";
-const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] p-3";
+const STAGE_CARD = "rounded-lg border border-[#DED8CB] border-t-[3px] border-t-[#E2C847] bg-[#FCFBF7] px-3 py-2.5";
 
 function ContractSummary() {
   return (
@@ -168,7 +168,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 규칙 점검</span>
             <Badge variant="outline" className="bg-white font-normal">서버 코드</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
             구성·수량·언어 방향·생성 기록을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
@@ -183,9 +183,9 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#3F6172]">AI 품질 심사</span>
             <Badge variant="outline" className="bg-white font-normal">GPT-4.1</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">결함 유형별 심사</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 Claude가 따로 검토하고 GPT-4.1이 그 의견을 재판정합니다.
+            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 독립 검토와 재판정이 이어집니다.
           </p>
           <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
             검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
@@ -196,7 +196,7 @@ function HarnessOverview() {
             <span className="text-[13px] font-semibold text-[#6D675D]">교수자 감수·최종 승인</span>
             <Badge variant="outline" className="bg-white font-normal">최종 권한</Badge>
           </div>
-          <h3 className="mt-2 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">수정·보류·사용 결정</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             각 단계의 의견과 실제 콘텐츠를 직접 대조해 수업 사용 여부를 결정합니다.
           </p>
