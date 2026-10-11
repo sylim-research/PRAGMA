@@ -33,15 +33,17 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 #### 화면 한눈에 보기
 
-<p align="center"><img src="docs/figures/screen-landing.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-admin-dashboard.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+
+> <small>교수자 · PRAGMA 대시보드와 관리자 메뉴</small>
 
 <table>
   <tr>
-    <td width="58%" valign="top"><img src="docs/figures/screen-admin-dashboard.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></td>
-    <td width="42%" valign="top"><img src="docs/figures/screen-learner-course.png" alt="학습자 화면: 내 수업의 교과목 목록과 진행 상황" width="100%"></td>
+    <td width="57%" valign="top"><img src="docs/figures/screen-landing.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></td>
+    <td width="43%" valign="top"><img src="docs/figures/screen-learner-course.png" alt="학습자 화면: 내 수업의 교과목 목록과 진행 상황" width="100%"></td>
   </tr>
   <tr>
-    <td align="center"><small>교수자 · PRAGMA 대시보드와 관리자 메뉴</small></td>
+    <td align="center"><small>첫 화면 · 학습자와 교수자의 두 입구</small></td>
     <td align="center"><small>학습자 · 내 수업</small></td>
   </tr>
 </table>
