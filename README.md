@@ -33,7 +33,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 #### 화면 한눈에 보기
 
-<p align="center"><img src="docs/figures/screen-landing-v4.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-landing-v5.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
 
 > <small>첫 화면 · 학습자와 교수자의 두 입구</small>
 
@@ -74,15 +74,15 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 3. 콘텐츠 제작 워크플로우
 
-<p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
+<p align="center"><img src="docs/figures/fig2-content-workflow-authority-1011b.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
 
-> <small>AI가 생성한 콘텐츠는 자동 규칙 점검과 AI 품질 심사를 거쳐 교수자가 감수·최종 승인합니다.</small>
+> <small>AI가 생성한 콘텐츠는 자동 규칙 점검과 AI 검토(품질 심사·독립 검토·중국어 표현 검토)를 거쳐 교수자가 감수·최종 승인합니다.</small>
 
 <br>
 
 ### 4. 통번역 학습 워크플로우
 
-<p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
+<p align="center"><img src="docs/figures/fig3-learning-mission-1011b.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
@@ -110,7 +110,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 6. 시스템 아키텍처
 
-<p align="center"><img src="docs/figures/fig4-system-architecture-1011.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+<p align="center"><img src="docs/figures/fig4-system-architecture-1011b.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
 <sub>2026년 10월 기준</sub>
 
