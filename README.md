@@ -31,18 +31,6 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <br>
 
-#### 화면 한눈에 보기
-
-<p align="center"><img src="docs/figures/screen-learning-mission-v5.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
-
-> <small>PRAGMA 학습 미션</small>
-
-<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
-
-> <small>PRAGMA 대시보드</small>
-
-<br>
-
 ### 1. PRAGMA 시스템 구조
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 실제 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
@@ -101,6 +89,12 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 </table>
 
 > <small>교수자는 승인한 미션을 교과목에 편성하고, 학습자의 응답을 다시 수업으로 연결합니다.</small>
+
+<br>
+
+<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+
+> <small>PRAGMA 대시보드</small>
 
 <br>
 
