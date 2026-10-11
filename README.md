@@ -110,7 +110,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 6. 시스템 아키텍처
 
-<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+<p align="center"><img src="docs/figures/fig4-system-architecture-1011.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
 <sub>2026년 10월 기준</sub>
 
