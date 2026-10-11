@@ -136,24 +136,26 @@
 ### 8. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="108" align="left">논문</th><th width="253" align="left">내용</th><th width="419" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="92" align="left">논문</th><th width="250" align="left">내용</th><th width="438" align="left">구현 위치</th></tr></thead>
   <tbody>
-    <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
-    <tr><td>4.2</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
-    <tr><td>4.3</td><td>통번역 학습 워크플로우 구현</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
+    <tr><td>3.3</td><td>목표화행과 적절성 판단 기준</td><td><a href="src/lib/pragma/enums.ts"><code>enums.ts</code></a> · <a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>PRAGMA_생성계약_정본.md</code></a></td></tr>
+    <tr><td>3.4</td><td>통번역 학습 워크플로우 설계</td><td><a href="docs/product/PRAGMA_학습자구조_정본.md"><code>PRAGMA_학습자구조_정본.md</code></a></td></tr>
+    <tr><td>3.5</td><td>콘텐츠 제작 워크플로우 설계</td><td><a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>PRAGMA_생성계약_정본.md</code></a></td></tr>
+    <tr><td>3.6</td><td>수업 운영 설계</td><td><a href="docs/product/PRAGMA_관리자구조_정본.md"><code>PRAGMA_관리자구조_정본.md</code></a> · <a href="src/lib/curriculum/template.ts"><code>template.ts</code></a></td></tr>
+    <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href=".github/workflows/ci.yml"><code>ci.yml</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a></td></tr>
+    <tr><td>4.2</td><td>통번역 학습 워크플로우 구현</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
+    <tr><td>4.3</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td>4.4</td><td>수업 운영 기능</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
-    <tr><td>4.5</td><td>개발 과정의 반복적 개선</td><td><a href=".github/workflows/"><code>workflows/</code></a> · <a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a></td></tr>
+    <tr><td>4.5</td><td>개발 과정의 문제 발견과 설계 개선</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
     <tr><td>5.3</td><td>PRAGMA 기반 연구 활용</td><td><a href="analysis/content_coverage.py"><code>content_coverage.py</code></a></td></tr>
-    <tr><td>부록&nbsp;A</td><td>운영 프롬프트</td><td><a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;B</td><td>연구자 판정과 후속 점검</td><td><a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
-    <tr><td>부록&nbsp;C</td><td>자동 품질 점검 규칙</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;D</td><td>대표 학습 미션</td><td><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;E</td><td>교과목 편성</td><td><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
-    <tr><td>부록&nbsp;F</td><td>주요 연구·개발 단계</td><td><a href="docs/research-trail/01_design_traceability.md"><code>01_design_traceability.md</code></a> · <a href="docs/research-trail/02_decision_log.md"><code>02_decision_log.md</code></a></td></tr>
+    <tr><td>부록&nbsp;A</td><td>대표 학습 미션</td><td><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
+    <tr><td>부록&nbsp;B</td><td>콘텐츠 제작·검토 기준</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a> · <a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
+    <tr><td>부록&nbsp;C</td><td>주요 설계 판단과 개선 기록</td><td><a href="docs/research-trail/02_decision_log.md"><code>02_decision_log.md</code></a> · <a href="docs/research-trail/01_design_traceability.md"><code>01_design_traceability.md</code></a></td></tr>
+    <tr><td>부록&nbsp;D</td><td>수업 편성 예시</td><td><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
   </tbody>
 </table>
 
-> <small>학위논문 제4장·5.3절과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다.</small>
+> <small>학위논문 제3·4장, 5.3절과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다. 학위논문은 심사 중이며, 장·절 구성은 최종본에서 달라질 수 있습니다.</small>
 
 <br>
 
