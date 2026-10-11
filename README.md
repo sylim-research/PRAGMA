@@ -39,7 +39,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
 
-> <small>PRAGMA 대시보드와 교수자 메뉴</small>
+> <small>PRAGMA 대시보드</small>
 
 <br>
 
