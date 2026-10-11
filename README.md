@@ -33,16 +33,13 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 #### 화면 한눈에 보기
 
-<table>
-  <tr>
-    <td width="55%" valign="top"><img src="docs/figures/screen-landing-1011.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></td>
-    <td width="45%" valign="top"><img src="docs/figures/screen-learning-mission.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></td>
-  </tr>
-  <tr>
-    <td align="center"><small>첫 화면 · 학습자와 교수자의 두 입구</small></td>
-    <td align="center"><small>학습자 · 학습 미션 도입</small></td>
-  </tr>
-</table>
+<p align="center"><img src="docs/figures/screen-landing-1011.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
+
+> <small>첫 화면 · 학습자와 교수자의 두 입구</small>
+
+<p align="center"><img src="docs/figures/screen-learning-mission.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
+
+> <small>학습자 · 학습 미션 도입</small>
 
 <p align="center"><img src="docs/figures/screen-admin-dashboard-1011.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
 
