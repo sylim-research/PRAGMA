@@ -133,22 +133,7 @@
 
 <br>
 
-### 8. 연구 활용
-
-<table>
-  <thead><tr><th width="175" align="left">절차</th><th width="592" align="left">내용</th></tr></thead>
-  <tbody>
-    <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
-    <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
-    <tr><td>연구자 해석</td><td>표현의 적절성과 수정 이유는 연구자가 원자료로 돌아가 판단</td></tr>
-  </tbody>
-</table>
-
-> <small>현재 도구는 사용할 콘텐츠의 범위를 확인하는 단계이며, 학습 효과를 분석한 결과는 아닙니다.</small>
-
-<br>
-
-### 9. 학위논문과 구현의 대응
+### 8. 학위논문과 구현의 대응
 
 <table>
   <thead><tr><th width="108" align="left">논문</th><th width="253" align="left">내용</th><th width="419" align="left">구현 위치</th></tr></thead>
@@ -172,7 +157,7 @@
 
 <br>
 
-### 10. 주요 연구·개발 단계
+### 9. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="308" align="left">단계</th><th width="403" align="left">핵심 설계·개선</th><th width="137" align="left">근거</th></tr></thead>
@@ -191,7 +176,7 @@
 
 <br>
 
-### 11. 주요 용어
+### 10. 주요 용어
 
 <table>
   <thead><tr><th width="190" align="left">용어</th><th width="615" align="left">정의</th></tr></thead>
