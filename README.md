@@ -26,10 +26,6 @@
 
 #### 화면 한눈에 보기
 
-<p align="center"><img src="docs/figures/screen-landing-v7.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
-
-> <small>PRAGMA 랜딩 페이지</small>
-
 <p align="center"><img src="docs/figures/screen-learning-mission-v5.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
 
 > <small>PRAGMA 학습 미션</small>
