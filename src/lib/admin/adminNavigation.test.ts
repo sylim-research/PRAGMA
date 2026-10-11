@@ -38,17 +38,17 @@ describe("admin navigation reachability", () => {
       "/admin/generator",
       "/admin/batch",
     ]);
-    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작·승인");
+    const production = ADMIN_NAV_GROUPS.find((group) => group.header === "3. 학습 미션 제작");
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly", "/admin/ai-review", "/admin/corpus", "/admin/review",
     ]);
     // 학습 미션 라이브러리는 메뉴에서 뺐다(2026-09-26).
     expect(ADMIN_NAV_GROUPS.flatMap((group) => group.items).some((item) => item.to === "/admin/library")).toBe(true);
-    const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 수업 운영");
+    const operations = ADMIN_NAV_GROUPS.find((group) => group.header === "4. 실제 수업 운영");
     expect(operations?.items.map((item) => item.to)).toEqual([
       "/admin/library", "/admin/composer/new", "/admin/composer", "/admin/discussion",
     ]);
-    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 관리 도구");
+    const research = ADMIN_NAV_GROUPS.find((group) => group.header === "5. 데이터 관리");
     expect(research?.items.map((item) => item.to)).toEqual([
       "/admin/export",
     ]);
@@ -126,7 +126,7 @@ describe("admin navigation reachability", () => {
     expect(adminMobileNavValue("/admin/research-qa/releases")).toBe("/admin/review");
     expect(adminMobileNavValue("/admin/research-qa/calibration")).toBe("");
     const production = ADMIN_NAV_GROUPS.find(
-      (group) => group.header === "3. 학습 미션 제작·승인",
+      (group) => group.header === "3. 학습 미션 제작",
     );
     expect(production?.items.map((item) => item.to)).toEqual([
       "/admin/assembly",

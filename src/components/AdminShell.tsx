@@ -57,7 +57,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const itemClasses = (active: boolean) =>
     [
-      "mr-2 rounded-md px-3 py-[2.5px] text-[14.25px] leading-5 whitespace-nowrap transition-colors",
+      "mr-2 rounded-md px-3 py-[2px] text-[14.25px] leading-5 whitespace-nowrap transition-colors",
       active
         ? "bg-[#F3ECD9] text-foreground font-normal"
         : "text-foreground font-normal hover:bg-[#F7F2E3] hover:text-foreground",
@@ -116,7 +116,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-8 items-center gap-2 px-2.5 py-1.5 text-left text-[15px] font-semibold transition-colors",
+                      "mr-2 flex min-h-[31px] items-center gap-2 px-2.5 py-[5.5px] text-left text-[15px] font-semibold transition-colors",
                       groupActive
                         ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",
@@ -138,7 +138,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                   <div
                     id={panelId}
                     className={[
-                      "mt-1 flex flex-col gap-px border-l pl-3",
+                      "mt-1 flex flex-col gap-px border-l pl-[25px]",
                       expanded ? "" : "hidden",
                       groupActive ? "border-[#D6BC40]" : "border-[#e5e1d8]",
                     ].join(" ")}

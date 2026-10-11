@@ -27,23 +27,23 @@ export const ADMIN_NAV_GROUPS: readonly AdminNavGroup[] = [
     { to: "/admin/generator", label: "시나리오 개별 생성" },
     { to: "/admin/batch", label: "시나리오 배치 생성" },
   ]},
-  { header: "3. 학습 미션 제작·승인", items: [
+  { header: "3. 학습 미션 제작", items: [
     { to: "/admin/assembly", label: "학습 미션 제작" },
     // HSK 대조는 미션 생성 직후 자동으로 남는 참고 기록이다 — 제작 기준·생성계약과 같은 층위가 아니다(2026-09-27 정본).
     // 화면 폭은 옮기기 전과 같게 둔다.
-    { to: "/admin/ai-review", label: "미션 품질 검수" },
+    { to: "/admin/ai-review", label: "학습 미션 품질 검수" },
     { to: "/admin/corpus", label: "HSK 3.0 어휘 대조" },
     // 제작·승인 묶음은 교수자 최종 승인으로 끝난다. 승인된 미션을 고르는 라이브러리는 수업 운영의 첫 단계다.
     { to: "/admin/review", label: "교수자 최종 승인", activePaths: ["/admin/research-qa/final-review", "/admin/research-qa/releases", "/admin/cross-vendor"] },
   ]},
-  { header: "4. 수업 운영", items: [
+  { header: "4. 실제 수업 운영", items: [
     { to: "/admin/library", label: "학습 미션 관리" },
     { to: "/admin/composer/new", label: "신규 교과목 개설" },
-    { to: "/admin/composer", label: "주차별 미션 배치" },
+    { to: "/admin/composer", label: "주차별 학습 미션 배치" },
     // 학습 수행 기록(/admin/decision-traces)은 학습자 관리처럼 메뉴에 두지 않는다 — 대시보드 카드·시스템 구조도 링크로 연다(2026-10-08).
-    { to: "/admin/discussion", label: "메타화용 토론", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
+    { to: "/admin/discussion", label: "메타화용 토론 활동", activePaths: ["/admin/class-responses", "/admin/package", "/admin/teaching-generator"] },
   ]},
-  { header: "5. 관리 도구", items: [
+  { header: "5. 데이터 관리", items: [
     { to: "/admin/export", label: "연구 기록·수업 백업", activePaths: ["/admin/data-backup"] },
   ]},
 ] as const;
