@@ -33,7 +33,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 #### 화면 한눈에 보기
 
-<p align="center"><img src="docs/figures/screen-landing-v5.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-landing-v6.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
 
 > <small>첫 화면 · 학습자와 교수자의 두 입구</small>
 
