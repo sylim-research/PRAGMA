@@ -33,9 +33,9 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 1. PRAGMA 시스템 구조
 
-<p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
+<p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 실제 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
-> <small>콘텐츠 제작과 통번역 학습은 수업 운영으로 이어지고, 학습 기록과 토론 결과는 다시 콘텐츠 검토에 쓰입니다.</small>
+> <small>콘텐츠 제작과 통번역 학습은 실제 수업 운영으로 이어지고, 학습 기록과 토론 결과는 다시 콘텐츠 검토에 쓰입니다.</small>
 
 <br>
 

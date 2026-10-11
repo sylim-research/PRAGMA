@@ -53,7 +53,7 @@ const Connector = ({ label }: { label: string }) => (
 // 되먹임 고리 — 학습 수행 기록이 수업 운영(메타화용 토론)을 거쳐, 교수자의 후속 콘텐츠 검토·재승인으로 반영된다.
 // 세 칸 아래 가운데에서 내려온 선이 한 줄로 이어져, 세 칸이 하나의 순환으로 묶인다. 칸 폭은 (전체 − 연결 칸 200px) ÷ 3.
 const FeedbackLoop = () => (
-  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 수행 기록 → 메타화용 토론 → 학습 기록·토론 결과 반영(후속 콘텐츠 검토·재승인)">
+  <div className="relative mt-0 hidden h-[52px] lg:block" aria-label="되먹임: 학습 수행 기록 → 메타화용 토론 활동 → 학습 기록·토론 결과 반영(후속 콘텐츠 검토·재승인)">
     {/* 가로선: 제작 칸 가운데 ~ 학습 칸 가운데 */}
     <span aria-hidden className="absolute bottom-[14px] left-[calc((100%-200px)/6)] right-[calc((100%-200px)/6)] border-b-2 border-dashed border-[#4A5764]" />
     {/* 세 칸 가운데에서 내려오는 선 */}
@@ -79,7 +79,7 @@ const CLASS_STEPS: readonly Step[] = [
   ["15주 교과목 편성", "주차별 학습 미션 배치"],
   ["학습자 관리", "계정 · 교과목 · 최근 활동"],
   ["주차별 운영", "교과목 공개와 접근 조건"],
-  ["메타화용 토론", "익명 응답 분포를 바탕으로 판단의 차이와 근거 논의"],
+  ["메타화용 토론 활동", "익명 응답 분포를 바탕으로 판단의 차이와 근거 논의"],
   ["후속 콘텐츠 검토", "필요 시 수정 · 재승인"],
 ];
 const LEARNING_STEPS: readonly Step[] = [
@@ -133,7 +133,7 @@ const Architecture = () => (
 
         <Connector label="승인 후 편성" />
 
-        <Lane title="수업 운영" role="두 워크플로우의 연계·관리 기능" head="bg-[#4A5764] text-white">
+        <Lane title="실제 수업 운영" role="두 워크플로우의 연계·관리 기능" head="bg-[#4A5764] text-white">
           <Steps steps={CLASS_STEPS} dot="bg-[#4A5764] text-white" />
         </Lane>
 
