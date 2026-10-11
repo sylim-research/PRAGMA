@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
 import { ServiceHealthPanel } from "@/components/admin/ServiceHealthPanel";
 import { DashboardResourceOverview } from "@/components/admin/DashboardResourceOverview";
@@ -233,9 +232,7 @@ const ReviewPipeline = ({
                 {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
               </span>
             </Link>
-            {stage.step < REVIEW_STAGE_ITEMS.length && (
-              <ArrowRight aria-hidden className="absolute -right-[26px] top-1/2 hidden h-5 w-5 -translate-y-1/2 text-[#81909A] xl:block" />
-            )}
+            {/* 단계 사이 화살표는 뺐다(2026-10-11) — 좁은 간격에서 카드 테두리에 걸려 잘려 보였고, 순서는 번호 1~5가 이미 보여 준다. */}
           </div>
         );
       };

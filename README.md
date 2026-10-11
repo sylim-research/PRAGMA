@@ -7,13 +7,6 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
-<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
-
-<p align="center">
-PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,<br>
-상황과 관계에 알맞은 표현을 탐구하는 통번역 학습 시스템입니다.
-</p>
-
 <br>
 
 ### 0. 바로 가기
@@ -22,12 +15,28 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
   <thead><tr><th width="239" align="left">화면</th><th width="329" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></td></tr>
-    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
     <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>대표 학습 미션</b></td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
   </tbody>
 </table>
 
 > <small>PRAGMA의 핵심 화면 세 곳으로 바로 이동할 수 있습니다.</small>
+
+<br>
+
+#### 화면 한눈에 보기
+
+<p align="center"><img src="docs/figures/screen-landing-v7.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
+
+> <small>PRAGMA 랜딩 페이지</small>
+
+<p align="center"><img src="docs/figures/screen-learning-mission-v5.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
+
+> <small>PRAGMA 학습 미션</small>
+
+<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+
+> <small>PRAGMA 대시보드와 교수자 메뉴</small>
 
 <br>
 
@@ -58,15 +67,15 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 3. 콘텐츠 제작 워크플로우
 
-<p align="center"><img src="docs/figures/fig2-content-workflow-authority.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
+<p align="center"><img src="docs/figures/fig2-content-workflow-authority-1011c.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
 
-> <small>AI가 생성한 콘텐츠는 자동 규칙 점검과 AI 품질 심사를 거쳐 교수자가 감수·최종 승인합니다.</small>
+> <small>AI 생성 콘텐츠는 자동 점검과 AI 검토를 거쳐 교수자가 감수·최종 승인합니다.</small>
 
 <br>
 
 ### 4. 통번역 학습 워크플로우
 
-<p align="center"><img src="docs/figures/fig3-learning-mission.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
+<p align="center"><img src="docs/figures/fig3-learning-mission-1011c.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
@@ -94,7 +103,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 ### 6. 시스템 아키텍처
 
-<p align="center"><img src="docs/figures/fig4-system-architecture.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+<p align="center"><img src="docs/figures/fig4-system-architecture-1011c.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
 <sub>2026년 10월 기준</sub>
 
@@ -124,22 +133,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <br>
 
-### 8. 연구 활용
-
-<table>
-  <thead><tr><th width="175" align="left">절차</th><th width="592" align="left">내용</th></tr></thead>
-  <tbody>
-    <tr><td>콘텐츠 분포 집계</td><td><a href="analysis/"><code>analysis/</code></a>의 Python 도구가 화행·P·D·R·언어방향·수행 방식별 미션 분포를 집계</td></tr>
-    <tr><td>수행 기록 연결</td><td>가명 식별자·콘텐츠 버전·수행 회차로 MJT 응답, 통번역 산출, AI 피드백을 연결</td></tr>
-    <tr><td>연구자 해석</td><td>표현의 적절성과 수정 이유는 연구자가 원자료로 돌아가 판단</td></tr>
-  </tbody>
-</table>
-
-> <small>현재 도구는 사용할 콘텐츠의 범위를 확인하는 단계이며, 학습 효과를 분석한 결과는 아닙니다.</small>
-
-<br>
-
-### 9. 학위논문과 구현의 대응
+### 8. 학위논문과 구현의 대응
 
 <table>
   <thead><tr><th width="108" align="left">논문</th><th width="253" align="left">내용</th><th width="419" align="left">구현 위치</th></tr></thead>
@@ -163,7 +157,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <br>
 
-### 10. 주요 연구·개발 단계
+### 9. 주요 연구·개발 단계
 
 <table>
   <thead><tr><th width="308" align="left">단계</th><th width="403" align="left">핵심 설계·개선</th><th width="137" align="left">근거</th></tr></thead>
@@ -182,7 +176,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <br>
 
-### 11. 주요 용어
+### 10. 주요 용어
 
 <table>
   <thead><tr><th width="190" align="left">용어</th><th width="615" align="left">정의</th></tr></thead>

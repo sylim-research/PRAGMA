@@ -926,7 +926,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
           {/* 제작 현황·AI 검토는 왼쪽 목록에서 고른다 — 이전·다음은 승인을 연속으로 하는 교수자 작업대에만 둔다. */}
           {reviewMode && (
             <div className="flex shrink-0 items-center gap-1.5 text-[12px] text-[#66727A]">
-              {selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
+              {professorScreen && selectedIndex >= 0 && <span className="tabular-nums">{selectedIndex + 1} / {filtered.length}</span>}
               {professorScreen && (
                 <>
                   <Button size="sm" variant="outline" className="h-7 px-2 text-[12px]" disabled={!prevRow} onClick={() => selectRow(prevRow)}><ChevronLeft className="size-3.5" />이전</Button>
@@ -1048,7 +1048,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         </div>
       ) : (
         <div ref={fitScreen ? splitRef : undefined} className={professorScreen ? "grid items-start"
-          : aiReview ? "grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,9fr)_minmax(0,11fr)]"}>
+          : aiReview ? "grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,45fr)_minmax(0,55fr)]" : "grid items-start gap-4 xl:grid-cols-[minmax(0,45fr)_minmax(0,55fr)]"}>
           {/* ── 왼쪽 대기열 (교수자 최종 승인에서는 서랍) ── */}
           {(!professorScreen || queueOpen) && <>
           {professorScreen && <div aria-hidden className="fixed inset-0 z-40 bg-[#15202B]/30" onClick={() => setQueueOpen(false)} />}

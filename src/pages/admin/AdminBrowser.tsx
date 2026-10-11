@@ -84,14 +84,12 @@ const AUTHENTIC_SOURCE_KO: Record<string, string> = {
 
 const ACTS = Object.keys(SPEECH_ACT_UI) as SpeechActUI[];
 const LEVELS: LearnerLevel[] = ["beginner_intermediate", "intermediate", "advanced"];
-// 수준별 은은한 파스텔(입문 살구 · 중급 세이지 · 고급 하늘), 개수가 많을수록 조금 진하다(2026-10-09).
-// 세 색의 밝기를 비슷하게 맞춰 어느 수준도 혼자 튀지 않게 한다. 노랑·회색은 쓰지 않는다.
-// 피치 코럴 → 옐로 → 그린(2026-10-09): 핑크와 주황 사이의 피치 · 샴페인 · 세이지, 차분하되 생기 있게.
-// 사탕색이 아니라 회색이 한 방울 섞인 색이라 차분하다. 테두리 없음, 숫자는 기본 짙은 색.
-const LEVEL_CELL_TONE: Record<LearnerLevel, { rgb: string; text: string }> = {
-  beginner_intermediate: { rgb: "248, 228, 219", text: "#8A5442" },
-  intermediate: { rgb: "247, 240, 217", text: "#756636" },
-  advanced: { rgb: "223, 237, 226", text: "#4E6C55" },
+// 칸 색 = 수준마다 다른 색 하나(2026-10-11). 개수에 따른 농도 차이는 두지 않는다 — 논문 도판(흑백·축소)에서 구분되지 않아 숫자로 읽는다.
+// 살구회 · 모래크림 · 세이지크림 — 배경에 가까운 조용한 색이라 숫자가 주인공이다. 노랑은 버튼·현재 위치 색이라 쓰지 않는다.
+const LEVEL_CELL_TONE: Record<LearnerLevel, { bg: string; text: string }> = {
+  beginner_intermediate: { bg: "#F6E5DF", text: "#6E4038" },
+  intermediate: { bg: "#F4EDDA", text: "#5E5638" },
+  advanced: { bg: "#E3EFE6", text: "#3E5A4C" },
 };
 const CORE_QUERY_TIMEOUT_MS = 15_000;
 const LIST_PAGE_SIZE = 10;
@@ -101,11 +99,6 @@ const LIST_PAGE_SIZE = 10;
  */
 const ARCHIVE_VIEWS = ["current", "archived", "all"] as const;
 type ArchiveView = (typeof ARCHIVE_VIEWS)[number];
-const ARCHIVE_VIEW_LABEL: Record<ArchiveView, string> = {
-  current: "현재",
-  archived: "보관",
-  all: "전체",
-};
 // JSON 경로 별칭 조회는 생성된 Supabase 타입의 재귀 추론 한계를 넘는다.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const libraryDb = supabase as unknown as { from: (table: string) => any };
@@ -140,8 +133,9 @@ const AdminBrowser = () => {
   const [fAct, setFAct] = useState(() => ACTS.includes(searchParams.get("act") as SpeechActUI) ? searchParams.get("act") as SpeechActUI : "all");
   const [fLevel, setFLevel] = useState(() => LEVELS.includes(searchParams.get("level") as LearnerLevel) ? searchParams.get("level") as LearnerLevel : "all");
   const [fSource, setFSource] = useState<"all" | "ai" | "authentic">("all");
-  const [fArchive, setFArchive] = useState<ArchiveView>("current");
-  const [fFormat, setFFormat] = useState<"all" | "v6" | "v5">("all");
+  // 미션 형식·보관 상태는 화면에서 고르지 않는다(2026-10-11) — 늘 전체 형식의 현재 미션을 본다.
+  const fArchive = "current" as ArchiveView;
+  const fFormat = "all" as "all" | "v6" | "v5";
   const [sel, setSel] = useState<{ act: SpeechActUI; level: LearnerLevel } | null>(null);
   // 눈검사 미리보기 — scenario_id → {mission, warnings}. openId = 펼친 행.
   const [preview, setPreview] = useState<Record<string, { mission: LearnerMissionRuntime; warnings: string[] }>>({});
@@ -281,7 +275,6 @@ const AdminBrowser = () => {
     fSource !== "all" ||
     fFormat !== "all" ||
     fArchive !== "current";
-  const maxCellCount = Math.max(0, ...Object.values(counts).map((count) => count.total));
 
   return (
     <AdminShell
@@ -292,24 +285,30 @@ const AdminBrowser = () => {
       <div className="flex w-full flex-col gap-4">
         {/* ── 요약 ── */}
         <section className="rounded-xl border border-[#E2DED2] bg-white px-5 py-4">
-          <div className="mb-4 flex flex-wrap gap-2" aria-label="라이브러리 보기">
+          {/* 보기 전환은 필터다 — 남색 채움 대신 한 덩어리 전환 막대로 둔다(2026-10-11). 선택 칸은 남색으로 채우고,
+              개수는 작은 배지로 — 선택 칸만 브랜드 남색이라 어디를 보고 있는지 한눈에 보인다. */}
+          {/* 전환 막대는 아래 필터 세 칸(목표화행~학습자 수준)과 같은 폭이다 — 양 끝이 필터 칸 선에 맞는다. */}
+          <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="col-span-2 flex gap-1 rounded-xl border border-[#E2DED2] bg-[#F1EDE3] p-1 sm:col-span-4 lg:col-span-3" aria-label="라이브러리 보기">
             {LIBRARY_VIEWS.map((item) => (
               <button key={item.value} type="button" aria-pressed={view === item.value} onClick={() => setView(item.value)}
-                className={`rounded-lg border px-3 py-2 text-[15px] font-medium ${view === item.value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#52616B] hover:bg-[#F5F4EF]"}`}>
-                {item.label} <span className="ml-2 font-bold tabular-nums">{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
+                className={`inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-[14px] transition-colors ${view === item.value ? "bg-[#15202B] font-semibold text-white shadow-[0_1px_3px_rgba(21,32,43,0.18)]" : "font-medium text-[#52616B] hover:bg-[#F8F6F0]"}`}>
+                {item.label}
+                <span className={`rounded-full px-2 py-px text-[12.5px] font-semibold tabular-nums ${view === item.value ? "bg-white/15 text-white" : "bg-[#E4DFD2] text-[#52616B]"}`}>{loading || error ? "—" : matching.filter((row) => matchesView(row, item.value)).length}</span>
               </button>
             ))}
           </div>
+          </div>
           <div>
             {/* ── 필터 ── */}
-            {/* 필터 8개를 카드 폭에 같은 너비로 채운다(2026-10-09). */}
-            <div className="grid grid-cols-2 items-end gap-2 text-[13px] sm:grid-cols-4 lg:grid-cols-8" aria-label="라이브러리 필터">
-              {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인) → 관리 정보(생성 출처·미션 형식·상태). */}
-              <Filter className="w-full" label="화행" value={fAct} onChange={setFAct}
+            {/* 필터 6개를 카드 폭에 같은 너비로 채운다(2026-10-09). 미션 형식·보관 상태 필터는 뺐다(2026-10-11) — 늘 전체 형식·현재 미션으로 본다. */}
+            <div className="grid grid-cols-2 items-end gap-2 text-[13px] sm:grid-cols-4 lg:grid-cols-6" aria-label="라이브러리 필터">
+              {/* 순서 = 미션을 정하는 조건(화행·방향·수준·수행 방식) → 장면 맥락(도메인) → 관리 정보(생성 출처). */}
+              <Filter className="w-full" label="목표화행" value={fAct} onChange={setFAct}
                 opts={[["all", "전체"], ...Object.entries(SPEECH_ACT_UI)]} />
-              <Filter className="w-full" label="방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
+              <Filter className="w-full" label="언어방향" value={fDirection} onChange={(v) => setFDirection(v as typeof fDirection)}
                 opts={[["all", "전체"], ...Object.entries(DIRECTION_LABEL)]} />
-              <Filter className="w-full" label="수준" value={fLevel} onChange={setFLevel}
+              <Filter className="w-full" label="학습자 수준" value={fLevel} onChange={setFLevel}
                 opts={[["all", "전체"], ...Object.entries(LEVEL)]} />
               <Filter className="w-full" label="수행 방식" value={fMode} onChange={(v) => setFMode(v as typeof fMode)}
                 opts={[["all", "전체"], ["translation", MODE_LABEL.translation], ["stt_interpreting", MODE_LABEL.stt_interpreting]]} />
@@ -317,10 +316,6 @@ const AdminBrowser = () => {
                 opts={[["all", "전체"], ...Object.entries(DOMAIN)]} />
               <Filter className="w-full" label="생성 출처" value={fSource} onChange={(v) => setFSource(v as typeof fSource)}
                 opts={[["all", "전체"], ["ai", "AI 생성"], ["authentic", "실제 자료 기반"]]} />
-              <Filter className="w-full" label="미션 형식" value={fFormat} onChange={(v) => setFFormat(v as typeof fFormat)}
-                opts={[["all", "전체"], ["v6", "현행(v6)"], ["v5", "이전 형식"]]} />
-              <Filter className="w-full" label="상태" value={fArchive} onChange={(v) => setFArchive(v as ArchiveView)}
-                opts={ARCHIVE_VIEWS.map((item) => [item, ARCHIVE_VIEW_LABEL[item]])} />
             </div>
           </div>
         </section>
@@ -365,9 +360,8 @@ const AdminBrowser = () => {
                     {LEVELS.map((lv) => {
                       const c = counts[`${act}|${lv}`] ?? { total: 0, t: 0, i: 0 };
                       const n = c.total;
-                      const active = sel?.act === act && sel?.level === lv;
-                      const density = maxCellCount > 0 ? n / maxCellCount : 0;
                       const tone = LEVEL_CELL_TONE[lv];
+                      const active = sel?.act === act && sel?.level === lv;
                       return (
                         <td key={lv} className="text-center">
                           <button
@@ -375,7 +369,7 @@ const AdminBrowser = () => {
                             onClick={() => setSel(active ? null : { act, level: lv })}
                             aria-pressed={active}
                             aria-label={`${SPEECH_ACT_UI[act]} · ${LEVEL[lv]} ${view === "materials" ? "시나리오" : "미션"} ${n}개 보기`}
-                            className={`flex h-12 w-full cursor-pointer flex-col items-center justify-center gap-1 rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
+                            className={`flex h-11 w-full cursor-pointer flex-col items-center justify-center gap-[3px] rounded-md leading-none transition-[filter] duration-150 hover:brightness-[0.94] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E2F3A]/50 ${
                               active
                                 ? "bg-[#1E2F3A] text-white shadow-[0_3px_9px_rgba(30,47,58,0.18)]"
                                 : n === 0
@@ -384,7 +378,7 @@ const AdminBrowser = () => {
                             }`}
                             style={
                               !active && n > 0
-                                ? { backgroundColor: `rgba(${tone.rgb}, ${0.6 + density * 0.4})` }
+                                ? { backgroundColor: tone.bg }
                                 : undefined
                             }
                             title={
