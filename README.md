@@ -7,6 +7,13 @@
   <a href="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml"><img src="https://github.com/sylim-research/PRAGMA/actions/workflows/ci.yml/badge.svg?branch=main" alt="자동 검사"></a>
 </p>
 
+<h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
+
+<p align="center">
+PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,<br>
+상황과 관계에 알맞은 표현을 탐구하는 통번역 학습 시스템입니다.
+</p>
+
 <br>
 
 ### 0. 바로 가기
@@ -21,22 +28,6 @@
 </table>
 
 > <small>PRAGMA의 핵심 화면 세 곳으로 바로 이동할 수 있습니다.</small>
-
-<br>
-
-#### 화면 한눈에 보기
-
-<p align="center"><img src="docs/figures/screen-landing-v7.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></p>
-
-> <small>PRAGMA 랜딩 페이지</small>
-
-<p align="center"><img src="docs/figures/screen-learning-mission-v5.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
-
-> <small>PRAGMA 학습 미션</small>
-
-<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
-
-> <small>PRAGMA 대시보드와 교수자 메뉴</small>
 
 <br>
 
@@ -98,6 +89,12 @@
 </table>
 
 > <small>교수자는 승인한 미션을 교과목에 편성하고, 학습자의 응답을 다시 수업으로 연결합니다.</small>
+
+<br>
+
+<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+
+> <small>PRAGMA 대시보드</small>
 
 <br>
 
