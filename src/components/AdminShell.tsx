@@ -1,9 +1,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { CAPTURE_CANVAS, CAPTURE_WIDE_CANVAS, useCaptureMode, useWideCaptureMode } from "@/lib/captureMode";
 import { HomeBrand } from "@/components/HomeBrand";
-import { IS_DEMO } from "@/lib/auth/useProfile";
 import {
   ADMIN_DASHBOARD_ITEM,
   ADMIN_NAV_GROUPS,
@@ -50,7 +49,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
 
   const standaloneClasses = (active: boolean) =>
     [
-      "ml-3 mr-2 rounded-lg py-2 pl-[38px] pr-3 text-[15.5px] font-semibold whitespace-nowrap shadow-sm transition-colors",
+      "ml-3 mr-2 rounded-lg py-2 pl-[38px] pr-3 text-[16.25px] font-semibold whitespace-nowrap shadow-sm transition-colors",
       // 평소 = 한 단계 더 연한 노랑(2026-10-09), 대시보드에 있을 때 = PRAGMA 옐로우(2026-10-08 — 옛 미색은 탁해 보였다).
       active
         ? "bg-[#FAD338] text-[#15202B]"
@@ -74,16 +73,17 @@ export const AdminShell = ({ title, description, children, compact = false, hide
             <HomeBrand />
           </div>
           <div className="flex flex-wrap justify-end gap-x-5 gap-y-2">
-          {/* 공개 시연에서는 오른쪽 링크를 두지 않는다 — 왼쪽 PRAGMA 로고가 랜딩으로 가고, 체험은 랜딩에서 시작한다.
-              학습자 화면 링크는 학습자 로그인 벽으로 이어져 운영에서만 둔다(2026-10-08). */}
-          {!IS_DEMO && <Link
+          {/* 교수자가 학습자 화면으로 바로 갈 수 있게 헤더 오른쪽에 둔다(2026-10-11 연구자 지시 — 10-08의 「운영에서만」을 대체).
+              관리자 작업을 잃지 않게 새 탭으로 연다. 모양은 랜딩 헤더의 「시스템 구조 보기」와 같다. */}
+          <Link
             to="/learner/course"
             target="_blank"
             rel="noreferrer"
-            className="text-sm text-[#8899A6] transition-colors hover:text-[#F1EFE8]"
+            className="group inline-flex shrink-0 items-center gap-1.5 rounded-sm text-[14px] font-semibold text-[#F1EFE8] decoration-[#FAD338] decoration-2 underline-offset-[6px] transition-colors hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FAD338] focus-visible:ring-offset-2 focus-visible:ring-offset-[#15202B]"
           >
-            학습자 화면 열기 ↗
-          </Link>}
+            학습자 화면 보기
+            <ArrowUpRight aria-hidden size={14} strokeWidth={2} className="transition-transform duration-150 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </Link>
           </div>
         </div>
       </header>
@@ -118,7 +118,7 @@ export const AdminShell = ({ title, description, children, compact = false, hide
                     aria-controls={panelId}
                     onClick={() => toggleGroup(groupIndex)}
                     className={[
-                      "mr-2 flex min-h-[31px] items-center gap-2 px-2.5 py-[5.5px] text-left text-[15px] font-semibold transition-colors",
+                      "mr-2 flex min-h-[31px] items-center gap-2 px-2.5 py-[5.5px] text-left text-[15.75px] font-semibold transition-colors",
                       groupActive
                         ? "border-b-[1.5px] border-[#C9A21A] bg-transparent text-[#15202B] hover:bg-[#F7F2E3]"
                         : "border-b border-[#D8D3C6] bg-transparent text-[#15202B] hover:bg-[#F2F0E8]",
