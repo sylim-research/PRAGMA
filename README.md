@@ -37,7 +37,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 > <small>첫 화면 · 학습자와 교수자의 두 입구</small>
 
-<p align="center"><img src="docs/figures/screen-learning-mission.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-learning-mission-wide.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
 
 > <small>학습자 · 학습 미션 도입</small>
 
