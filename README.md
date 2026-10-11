@@ -33,10 +33,6 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 #### 화면 한눈에 보기
 
-<p align="center"><img src="docs/figures/screen-admin-dashboard.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
-
-> <small>교수자 · PRAGMA 대시보드와 관리자 메뉴</small>
-
 <table>
   <tr>
     <td width="57%" valign="top"><img src="docs/figures/screen-landing.png" alt="PRAGMA 첫 화면: 학습자 영역과 교수자 영역, 로그인 없이 하는 학습 미션 체험" width="100%"></td>
@@ -47,6 +43,10 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
     <td align="center"><small>학습자 · 내 수업</small></td>
   </tr>
 </table>
+
+<p align="center"><img src="docs/figures/screen-admin-dashboard.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+
+> <small>교수자 · PRAGMA 대시보드와 관리자 메뉴</small>
 
 <br>
 
