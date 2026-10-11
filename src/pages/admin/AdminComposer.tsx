@@ -123,7 +123,7 @@ const AdminComposer = () => {
   // 교과목 단위 설정 메뉴와, 그 안의 확인 대화상자(메뉴가 닫혀도 대화상자는 유지되도록 밖에 둔다).
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [conditionsOpen, setConditionsOpen] = useState(true);
-  // 「신규 교과목 개설」(/admin/composer/new)과 「주차별 미션 배치」(/admin/composer)는 메뉴가 따로다(2026-09-26 연구자 결정, 2026-10-08 이름 변경).
+  // 「신규 교과목 개설」(/admin/composer/new)과 「주차별 학습 미션 배치」(/admin/composer)는 메뉴가 따로다(2026-09-26 연구자 결정, 2026-10-08 이름 변경).
   const location = useLocation();
   const navigate = useNavigate();
   const tab: "existing" | "new" = location.pathname === "/admin/composer/new" ? "new" : "existing";
@@ -705,7 +705,7 @@ const AdminComposer = () => {
 
   return (
     <AdminShell
-      title={tab === "new" ? "신규 교과목 개설" : "주차별 미션 배치"}
+      title={tab === "new" ? "신규 교과목 개설" : "주차별 학습 미션 배치"}
       description={tab === "new"
         ? "수준·방향·수행 방식과 편성 주제를 정하면 승인된 학습 미션으로 15주를 자동 편성합니다."
         : "교수자가 최종 승인한 학습 미션을 교과목의 15주에 배치합니다."}
@@ -971,7 +971,7 @@ const AdminComposer = () => {
           <div className="overflow-hidden rounded-b-xl border border-t-0 border-[#E2DED2] bg-white">
           <div className="flex flex-wrap items-baseline justify-between gap-2 border-t border-[#CFC8B6] px-5 pb-2 pt-5">
             {/* 새 주제가 아니라 위 교과목의 하위 항목 — 작은 소제목으로 둔다. */}
-            <h3 className="text-[16.5px] font-bold text-[#15202B]">주차별 미션 배치</h3>
+            <h3 className="text-[16.5px] font-bold text-[#15202B]">주차별 학습 미션 배치</h3>
             <span className="text-[13px] text-[#66727A]">
               배치 {assignedMissionCount}개
             </span>

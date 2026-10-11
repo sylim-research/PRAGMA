@@ -13,10 +13,16 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
 const demoLink =
   "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
+// 역할 카드는 통째로 하나의 링크다(2026-10-11) — 버튼만 클릭되면 카드 본문을 누른 방문자가 놓친다.
+// 반응은 두 단계: 카드 어디든 올리면 카드가 살짝 떠오르고 버튼에 테두리가 진해진다(1단계),
+// 버튼 위에 직접 올리면 버튼 색이 한 번 더 바뀐다(2단계). 그래서 카드와 버튼이 구분된다.
+const roleCard =
+  "group/card flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-[#CFC7B0] hover:shadow-[0_2px_4px_rgba(21,32,43,0.06),0_16px_34px_-14px_rgba(21,32,43,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 motion-reduce:hover:translate-y-0";
+const cardArrow = "transition-transform duration-150 group-hover/card:translate-x-0.5 group-hover/btn:translate-x-1";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
-  "group inline-flex items-center gap-1.5 rounded-sm text-[14.333px] font-bold text-[#15202B] underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
-const cardButton = "group inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[14.333px] font-bold transition-shadow duration-150 hover:shadow-[0_0_0_1px_#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2";
+  "group/btn inline-flex items-center gap-1.5 rounded-sm text-[14.583px] font-bold text-[#15202B] underline-offset-4 decoration-[#15202B]/30 group-hover/card:underline hover:decoration-[#15202B] hover:decoration-2";
+const cardButton = "group/btn inline-flex min-w-[148px] items-center justify-center gap-1.5 rounded-lg border border-[#15202B] px-5 py-2.5 text-[14.583px] font-bold transition-[box-shadow,background-color] duration-150 group-hover/card:shadow-[0_0_0_1px_#15202B]";
 
 
 const Landing = () => {
@@ -89,9 +95,7 @@ const Landing = () => {
             남색. 카드를 통째로 칠하지 않는 것은 후크의 형광펜과 색이 부딪히기 때문이다. */}
         {/* 헤더·본문·푸터는 같은 804px 칼럼을 사용한다. */}
         <section className="mx-auto mt-[22px] grid w-full max-w-[650px] grid-cols-1 gap-5 sm:grid-cols-2">
-          <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#FAD338] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
-          >
+          <Link to="/student-login" className={`${roleCard} border-l-[#FAD338]`}>
             {/* 이모지는 기기마다 다르게 그려지고 색이 튄다 — 앱이 이미 쓰는 lucide
                 라인 아이콘으로 바꿔 글자와 같은 무게로 맞춘다. */}
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
@@ -107,16 +111,14 @@ const Landing = () => {
             {/* hover에서 어둡게 눌리면 '비활성'처럼 보인다 — 같은 색상을 한 단계
                 밝혀서 떠오르는 쪽으로 반응하게 한다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/student-login" className={IS_DEMO ? cardTextLink : `${cardButton} text-[#15202B] bg-[#FAD338] hover:bg-[#FAD338]`}>
+              <span className={IS_DEMO ? cardTextLink : `${cardButton} text-[#15202B] bg-[#FAD338] hover:bg-[#FCE27A]`}>
                 학습자 로그인
-                <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
-              </Link>
+                <ArrowRight aria-hidden size={14} strokeWidth={2} className={cardArrow} />
+              </span>
             </span>
-          </article>
+          </Link>
 
-          <article
-            className="flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] border-l-[#3E4C57] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)]"
-          >
+          <Link to="/admin-login" className={`${roleCard} border-l-[#3E4C57]`}>
             <span className="flex items-center gap-2.5 text-[19.167px] font-bold tracking-[-0.01em] text-[#15202B]">
               <span aria-hidden className="grid h-8 w-8 place-items-center rounded-lg bg-[#EDF0F2]">
                 <SlidersHorizontal size={18} strokeWidth={1.75} className="text-[#3E4C57]" />
@@ -132,12 +134,12 @@ const Landing = () => {
                 채움색은 헤더의 #15202B보다 한 단계 연한 남색이다. 순검정-흰색 대비는
                 노랑 버튼보다 훨씬 세서, 같은 크기여도 교수자 쪽이 앞으로 튀어나온다. */}
             <span className="mt-auto pt-3.5">
-              <Link to="/admin-login" className={IS_DEMO ? cardTextLink : `${cardButton} bg-[#15202B] text-white`}>
+              <span className={IS_DEMO ? cardTextLink : `${cardButton} bg-[#15202B] text-white hover:bg-[#2C3B49]`}>
                 교수자 로그인
-                <ArrowRight aria-hidden size={14} strokeWidth={2} className={arrow} />
-              </Link>
+                <ArrowRight aria-hidden size={14} strokeWidth={2} className={cardArrow} />
+              </span>
             </span>
-          </article>
+          </Link>
         </section>
 
         {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 시스템 구조는 헤더 오른쪽 링크로 옮겼다. */}

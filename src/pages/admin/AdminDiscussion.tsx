@@ -7,7 +7,7 @@ import { ClassResponsePanel } from "@/components/admin/ClassResponsePanel";
  */
 const AdminDiscussion = () => (
   <AdminShell
-    title="메타화용 토론"
+    title="메타화용 토론 활동"
     description="학습자 응답 분포를 바탕으로 판단의 차이와 근거를 논의할 지점을 고릅니다."
   >
     <ClassResponsePanel />
