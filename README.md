@@ -69,7 +69,7 @@
 
 <p align="center"><img src="docs/figures/fig2-content-workflow-authority-1011c.png" alt="콘텐츠 제작 워크플로우" width="100%"></p>
 
-> <small>AI가 생성한 콘텐츠는 자동 규칙 점검과 AI 검토(품질 심사·독립 검토·중국어 표현 검토)를 거쳐 교수자가 감수·최종 승인합니다.</small>
+> <small>AI 생성 콘텐츠는 자동 점검과 AI 검토를 거쳐 교수자가 감수·최종 승인합니다.</small>
 
 <br>
 
