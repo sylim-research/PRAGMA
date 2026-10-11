@@ -30,7 +30,7 @@
 
 > <small>PRAGMA 랜딩 페이지</small>
 
-<p align="center"><img src="docs/figures/screen-learning-mission-v4.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="78%"></p>
+<p align="center"><img src="docs/figures/screen-learning-mission-v5.png" alt="학습 미션 도입: 다섯 MJT 판단 문항에서 DCT형 통번역 과제로 이어지는 순서" width="100%"></p>
 
 > <small>PRAGMA 학습 미션</small>
 
