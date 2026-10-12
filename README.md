@@ -10,8 +10,8 @@
 <h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
 
 <p align="center">
-PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지하면서,<br>
-상황과 관계에 알맞은 표현을 탐구하는 통번역 학습 시스템입니다.
+PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하면서,<br>
+상황과 관계에 더 잘 맞는 표현을 탐구하는 통번역 학습 시스템입니다.
 </p>
 
 <br>
@@ -92,9 +92,9 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 <br>
 
-<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 교수자 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
 
-> <small>PRAGMA 대시보드</small>
+> <small>PRAGMA 교수자 대시보드</small>
 
 <br>
 
@@ -177,7 +177,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 10. 주요 용어
 
 <table>
-  <thead><tr><th width="180" align="left">용어</th><th width="620" align="left">본 연구에서의 뜻</th></tr></thead>
+  <thead><tr><th width="180" align="left">용어</th><th width="620" align="left">본 연구에서의 정의</th></tr></thead>
   <tbody>
     <tr><td nowrap>워크플로우</td><td nowrap>주체별 활동의 순서와 수정·결정 조건을 명시한 절차</td></tr>
     <tr><td nowrap>시나리오</td><td nowrap>상황·관계와 원문을 하나로 묶은 콘텐츠 단위</td></tr>
