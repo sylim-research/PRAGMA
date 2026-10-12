@@ -211,10 +211,10 @@ describe("학습 수행 기록 › 학습자 응답 분포", () => {
     expect(await screen.findByText("데모 · 가상 학습자 20명")).toBeVisible();
     expect(screen.getByRole("radio", { name: "데모 응답" })).toHaveAttribute("aria-checked", "true");
     expect(screen.getAllByRole("img", { name: "20 명 응답" })[0]).toBeVisible();
-    // 학습자 제시 순서(1 → 2 → 5 → 3 → 4)로 다섯 문항이 늘어선다.
+    // 학습자 제시 순서(내부 1 → 2 → 5 → 3 → 4)로 늘어서며, 번호는 학습자가 본 화면 순서(1~5)로 붙는다.
     const cards = within(screen.getByLabelText("MJT 판단 문항")).getAllByRole("button");
     expect(cards.map((card) => card.getAttribute("aria-label"))).toEqual([
-      "MJT 1 · 단일 표현 판단", "MJT 2 · 판단과 근거", "MJT 5 · 복수 표현 비교", "MJT 3 · 수정안 선택", "MJT 4 · 직접 수정",
+      "MJT 1 · 단일 표현 판단", "MJT 2 · 판단과 근거", "MJT 3 · 복수 표현 비교", "MJT 4 · 수정안 선택", "MJT 5 · 직접 수정",
     ]);
     // 데모에서는 마감·공개 운영 단계가 없다.
     expect(screen.queryByLabelText("응답 공개 단계")).not.toBeInTheDocument();

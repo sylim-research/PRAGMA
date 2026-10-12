@@ -247,6 +247,9 @@ describe("CanonicalMissionRun live CTA route", () => {
       fireEvent.click(screen.getByRole("button", { name: "확인한 전사로 제출" }));
     }
     await screen.findByText("이 답안에는 AI 피드백 기록이 없습니다.");
+    // 예시 수정안은 「수정하기」를 고른 뒤의 재검토 화면에만 있다(2026-10-12).
+    expect(screen.queryByRole("button", { name: /예시 .* 넣기/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     fill();
     const revision = screen.getByRole("textbox");
     const alternate = mission.production_task.reference_alternatives.find(item => item.text !== reference)?.text ?? reference;
