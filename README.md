@@ -188,7 +188,6 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
     <tr><td nowrap>문법적 정확성</td><td nowrap>목표어의 어순·형태·통사 규칙 부합을 보는 기준</td></tr>
     <tr><td nowrap>화용적 적절성</td><td nowrap>상황·관계에 비추어 표현 선택의 적절성을 보는 기준</td></tr>
     <tr><td nowrap>적절성 판단 범주</td><td nowrap>표현을 과소·적정·과잉으로 나누는 교육적 분류</td></tr>
-    <tr><td nowrap>최종안</td><td nowrap>AI 피드백을 검토한 뒤 학습자가 확정한 통번역 결과</td></tr>
   </tbody>
 </table>
 
@@ -198,3 +197,4 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 <br>
 
 <p align="center"><b>박사학위논문 「AI 기반 한·중 통번역 학습 워크플로우 개발 연구」의 설계·개발 결과물입니다.</b><br><img src="docs/brand/rule.svg" width="100%" height="3" alt=""><br><sub>© 2026 Soyoung Lim · 한국외국어대학교</sub></p>
+
