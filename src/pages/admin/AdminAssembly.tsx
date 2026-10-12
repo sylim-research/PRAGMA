@@ -97,6 +97,8 @@ interface CoreRow {
   prompt_snapshot_hash: string | null;
   supersedes_scenario_id?: string | null;
   created_at?: string | null;
+  /** true when core_content holds only the list fields (see LIST_ROW_SELECT). */
+  core_partial?: boolean;
   core_content: {
     /** 명사구 한 줄 요약. 학습자 메뉴 제목과 같은 필드이며 목록에서 미션을 판별하는 이름으로 쓴다. */
     brief_note_ko?: string;
@@ -210,6 +212,33 @@ const LIST_CAP = 20;
 const ROW_CAP = 4000;
 const CORE_ROW_SELECT =
   "scenario_id, speech_act, learner_level, domain, industry_sector, mode, source_modality, theme_code, topic_code, mission_status, generation_run_id, generation_item_key, prompt_snapshot_hash, supersedes_scenario_id, created_at, core_content";
+// The queue only shows a title, a one-line situation and the direction, so the list reads just those
+// fields of core_content instead of the whole document for every row (thousands of rows per open).
+// Actions that need the full core fetch that one row first (withFullCore).
+const LIST_ROW_SELECT =
+  CORE_ROW_SELECT.replace(", core_content", "") +
+  ", core_brief:core_content->>brief_note_ko, core_situation:core_content->>situation_ko, core_direction:core_content->>direction, core_focal:core_content->focal_segments";
+type ListRow = Omit<CoreRow, "core_content"> & {
+  core_brief?: string | null;
+  core_situation?: string | null;
+  core_direction?: string | null;
+  core_focal?: { role?: string }[] | null;
+};
+const fromListRow = (listRow: ListRow): CoreRow => {
+  // A row that already carries the full core (e.g. older callers or fixtures) is used as is.
+  if ((listRow as Partial<CoreRow>).core_content) return listRow as unknown as CoreRow;
+  const { core_brief, core_situation, core_direction, core_focal, ...row } = listRow;
+  return {
+  ...row,
+  core_content: {
+    ...(core_brief != null ? { brief_note_ko: core_brief } : {}),
+    ...(core_situation != null ? { situation_ko: core_situation } : {}),
+    ...(core_direction != null ? { direction: core_direction } : {}),
+    ...(core_focal != null ? { focal_segments: core_focal } : {}),
+  } as CoreRow["core_content"],
+  core_partial: true,
+  };
+};
 
 const PROGRESS_STEPS = ["초안 생성", "자동 규칙 점검", "AI 품질 심사", "초안 저장", "문항 보완"] as const;
 
@@ -343,7 +372,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       // scenarios의 신규 조립 메타 컬럼이 생성 타입보다 앞서 배포돼 임시 query builder cast가 필요하다.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const db = supabase as unknown as { from: (t: string) => any };
-      const select = CORE_ROW_SELECT + REVIEW_META_SELECT;
+      const select = LIST_ROW_SELECT + REVIEW_META_SELECT;
       let request = db
         .from("scenarios")
         .select(select)
@@ -379,7 +408,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         timeout,
       ]);
       if (queryError) throw new Error(queryError.message);
-      let loaded = (data ?? []) as CoreRow[];
+      let loaded = ((data ?? []) as ListRow[]).map(fromListRow);
       const linkedId = searchParams.get("scenarioId");
       // 더 새 판이 대체한 옛 판(다른 행의 supersedes_scenario_id가 가리키는 행)은 목록·숫자에서 뺀다. DB는 그대로다.
       loaded = excludeSupersededRows(loaded, linkedId);
@@ -387,7 +416,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       if (reviewMode) loaded = loaded.filter((row) => row.mission_schema_version === "mission_v6" || row.scenario_id === linkedId);
       if (linkedId && !loaded.some((row) => row.scenario_id === linkedId)) {
         const { data: linked } = await db.from("scenarios").select(select).eq("scenario_id", linkedId).maybeSingle();
-        if (linked) loaded = [linked as CoreRow, ...loaded];
+        if (linked) loaded = [fromListRow(linked as ListRow), ...loaded];
       }
       setReviewMeta(meta);
       setRows(loaded);
@@ -590,6 +619,20 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
       .finally(() => previewLoading.current.delete(id));
   }, [selectedRow, stateOf, preview]);
 
+  // List rows carry only part of core_content; generation, revision and review need the whole core.
+  const withFullCore = async (r: CoreRow): Promise<PromotableCore> => {
+    if (!r.core_partial) return r as unknown as PromotableCore;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error: fetchError } = await (supabase as unknown as { from: (t: string) => any })
+      .from("scenarios")
+      .select("core_content")
+      .eq("scenario_id", r.scenario_id)
+      .maybeSingle();
+    if (fetchError || !data) throw new Error(fetchError?.message ?? "시나리오 내용을 불러오지 못했습니다.");
+    const { core_partial: _partial, ...row } = r;
+    return { ...row, core_content: (data as { core_content: CoreRow["core_content"] }).core_content } as unknown as PromotableCore;
+  };
+
   const setStatus = (id: string, status: string) =>
     setRows((prev) => prev.map((r) => (r.scenario_id === id ? { ...r, mission_status: status } : r)));
 
@@ -599,7 +642,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     setRowMsg((m) => ({ ...m, [r.scenario_id]: "" }));
     setFailures((f) => { const { [r.scenario_id]: _drop, ...rest } = f; return rest; });
     try {
-      const res = await promoteCoreV6(r as unknown as PromotableCore, (stage) => setV6Stage({ id: r.scenario_id, stage }));
+      const res = await promoteCoreV6(await withFullCore(r), (stage) => setV6Stage({ id: r.scenario_id, stage }));
       if (res.ok) {
         const ruleLabel = res.ruleResult ? { pass: "자동 규칙 점검 통과", warning: "자동 규칙 점검 주의", fail: "자동 규칙 점검 실패" }[res.ruleResult] : "자동 규칙 점검 결과 확인 필요";
         const qLabel = res.qualityVerdict ? { pass: "AI 품질 심사 저장", warning: "AI 품질 심사 저장(주의)", fail: "AI 품질 심사 결과 확인 필요" }[res.qualityVerdict] : "AI 품질 심사 미실행";
@@ -623,7 +666,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
     setAssemblyProgress({ id: r.scenario_id, stage: { phase: "preparing" } });
     setRowMsg((m) => ({ ...m, [r.scenario_id]: "" }));
     try {
-      const res = await promoteCore(r as unknown as PromotableCore, {
+      const res = await promoteCore(await withFullCore(r), {
         generationModel: resumeAstra ? "astra" : generationModel,
         generationJobId,
         onGenerationJob: (job) => setRowMsg(m => ({ ...m, [r.scenario_id]: job.status === "completed"
@@ -685,7 +728,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const onSaveEdits = async (r: CoreRow, edits: ProfessorMissionEdits) => {
     setBusy(r.scenario_id);
     try {
-      const res = await reviseMissionDraft(r as unknown as PromotableCore, edits);
+      const res = await reviseMissionDraft(await withFullCore(r), edits);
       if (!res.ok || !res.mission) {
         toast.error(res.error ?? "교수자 수정본 저장 실패");
         return;
@@ -713,7 +756,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
   const onReview = async (r: CoreRow, overrides: ProfessorIssueOverride[], approval: ContentReviewApproval) => {
     setBusy(r.scenario_id);
     try {
-      const res = await reviewMission(r as unknown as PromotableCore, overrides, approval);
+      const res = await reviewMission(await withFullCore(r), overrides, approval);
       if (res.ok) {
         setStatus(r.scenario_id, "reviewed");
         if (res.mission) {

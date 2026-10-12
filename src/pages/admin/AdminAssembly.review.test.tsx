@@ -92,6 +92,28 @@ beforeEach(() => {
 afterEach(cleanup);
 
 describe("professor final approval workbench", () => {
+  it("lists missions from a few core fields and loads the full core only for the approved one", async () => {
+    const lite = (row: ReturnType<typeof scenario>) => {
+      const { core_content, ...rest } = row;
+      return { ...rest, core_brief: core_content.brief_note_ko, core_situation: core_content.situation_ko, core_direction: core_content.direction, core_focal: null };
+    };
+    mocks.tables.scenarios = (mocks.tables.scenarios as ReturnType<typeof scenario>[]).map(lite);
+    show();
+    const bench = await screen.findByRole("region", { name: "작업대" });
+    expect(await within(bench).findByRole("heading", { name: "결정할 미션" })).toBeInTheDocument();
+    const listSelect = mocks.selects.find((entry) => entry.startsWith("scenarios:")) ?? "";
+    expect(listSelect).toContain("core_brief:core_content->>brief_note_ko");
+    expect(listSelect).not.toMatch(/created_at, core_content(,|$)/);
+    // The database still holds the full core; the approval reads it for this one mission.
+    const full = { brief_note_ko: "결정할 미션", situation_ko: "결정할 미션 상황", direction: "ko_zh", source_text: "원문" };
+    Object.assign((mocks.tables.scenarios as Record<string, unknown>[]).find((row) => row.scenario_id === "m-ready")!, { core_content: full });
+    await within(bench).findByText("교수자 작업대");
+    fireEvent.click(within(workbench()).getByRole("button", { name: "승인 실행" }));
+    await waitFor(() => expect(mocks.reviewMission).toHaveBeenCalledTimes(1));
+    expect(mocks.reviewMission.mock.calls[0][0]).toMatchObject({ scenario_id: "m-ready", core_content: full });
+    expect(mocks.reviewMission.mock.calls[0][0]).not.toHaveProperty("core_partial");
+  });
+
   it("opens the longest-waiting decision on the workbench without an extra click", async () => {
     show();
     const bench = await screen.findByRole("region", { name: "작업대" });

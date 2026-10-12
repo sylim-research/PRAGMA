@@ -112,7 +112,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
 }) {
   const queryClient = useQueryClient();
   const key = ["content-review", target.kind, target.targetId, target.weekNo ?? 0, refreshKey];
-  const query = useQuery({ queryKey: key, queryFn: () => contentReviewRequest(target), retry: false, staleTime: 0 });
+  // Inspecting is a 1–2 s server round trip. Re-run it on actions, mounts and the refresh button,
+  // not every time the professor switches back to this window.
+  const query = useQuery({ queryKey: key, queryFn: () => contentReviewRequest(target), retry: false, staleTime: 0, refetchOnWindowFocus: false });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState(DEFAULT_APPROVAL_NOTE);

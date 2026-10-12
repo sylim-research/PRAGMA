@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { APPROVAL_STATUS, APP_ROLE, type Profile } from "./constants";
@@ -109,7 +109,12 @@ export function useProfile(): UseProfileResult {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [devStub, setDevStub] = useState<DevStub | null>(() => readDevStub());
 
-  const loadProfile = useCallback(async (uid: string) => {
+  // Supabase re-emits SIGNED_IN / TOKEN_REFRESHED when a tab regains focus; the profile only
+  // needs reading again when the signed-in user actually changes.
+  const loadedFor = useRef<string | null>(null);
+  const loadProfile = useCallback(async (uid: string, force = false) => {
+    if (!force && loadedFor.current === uid) return;
+    loadedFor.current = uid;
     const { data } = await supabase
       .from("profiles")
       .select("id,user_id,role,approval_status,profile_completed,email,anonymous_participant_id")
@@ -125,13 +130,14 @@ export function useProfile(): UseProfileResult {
       writeDevStub(null);
       setDevStub(null);
       setSession(s.session);
-      await loadProfile(s.session.user.id);
+      await loadProfile(s.session.user.id, true);
       setLoading(false);
       return;
     }
     const stub = readDevStub();
     setDevStub(stub);
     if (stub) {
+      loadedFor.current = null;
       setSession(null);
       setProfile({
         id: stub.user_id,
@@ -145,6 +151,7 @@ export function useProfile(): UseProfileResult {
       setLoading(false);
       return;
     }
+    loadedFor.current = null;
     setSession(null);
     setProfile(null);
     setLoading(false);
@@ -161,6 +168,7 @@ export function useProfile(): UseProfileResult {
         // Defer to avoid recursive supabase calls in callback
         setTimeout(() => loadProfile(s.user.id), 0);
       } else {
+        loadedFor.current = null;
         setProfile(null);
       }
     });
