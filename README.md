@@ -19,10 +19,10 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 0. 바로 가기
 
 <table>
-  <thead><tr><th width="239" align="left">화면</th><th width="329" align="left">링크</th></tr></thead>
+  <thead><tr><th width="251" align="left">화면</th><th width="350" align="left">링크</th></tr></thead>
   <tbody>
     <tr><td><img src="docs/brand/icons/webapp.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>웹앱</b></td><td><a href="https://pragma.up.railway.app">pragma.up.railway.app</a></td></tr>
-    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>대표 학습 미션</b></td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
+    <tr><td><img src="docs/brand/icons/mission.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>학습 미션 체험</b></td><td><a href="https://pragma.up.railway.app/demo/mission">pragma.up.railway.app/demo/mission</a></td></tr>
     <tr><td><img src="docs/brand/icons/structure.svg" width="18" height="18" align="absmiddle" alt="">&nbsp;&nbsp;<b>PRAGMA 시스템 구조</b></td><td><a href="https://pragma.up.railway.app/architecture">pragma.up.railway.app/architecture</a></td></tr>
   </tbody>
 </table>
@@ -42,7 +42,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 2. 학습 미션의 화용론적 설계
 
 <table>
-  <thead><tr><th width="159" align="left">조건</th><th width="487" align="left">구성</th></tr></thead>
+  <thead><tr><th width="172" align="left">조건</th><th width="507" align="left">구성</th></tr></thead>
   <tbody>
     <tr><td>목표화행</td><td>요청&ensp;|&ensp;거절&ensp;|&ensp;사과&ensp;|&ensp;감사&ensp;|&ensp;불만&ensp;|&ensp;칭찬&ensp;|&ensp;초대&ensp;|&ensp;제안&ensp;|&ensp;반대</td></tr>
     <tr><td>상황·관계 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
@@ -79,7 +79,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 5. 수업 연계와 운영
 
 <table>
-  <thead><tr><th width="156" align="left">기능</th><th width="578" align="left">내용</th></tr></thead>
+  <thead><tr><th width="168" align="left">기능</th><th width="598" align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
     <tr><td>학습자 관리</td><td>프로필 작성과 교수자의 가입 승인을 마친 학습자가 교과목에 참여</td></tr>
@@ -117,7 +117,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 7. 콘텐츠·학습 기록의 추적
 
 <table>
-  <thead><tr><th width="322" align="left">콘텐츠 이력</th><th width="208" align="left">학습 수행 기록</th></tr></thead>
+  <thead><tr><th width="343" align="left">콘텐츠 이력</th><th width="228" align="left">학습 수행 기록</th></tr></thead>
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
@@ -133,33 +133,32 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 8. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="92" align="left">논문</th><th width="250" align="left">내용</th><th width="438" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="88" align="left">논문</th><th width="314" align="left">내용</th><th width="414" align="left">구현 위치</th></tr></thead>
   <tbody>
-    <tr><td>3.3</td><td>목표화행과 적절성 판단 기준</td><td><a href="src/lib/pragma/enums.ts"><code>enums.ts</code></a> · <a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>PRAGMA_생성계약_정본.md</code></a></td></tr>
-    <tr><td>3.4</td><td>통번역 학습 워크플로우 설계</td><td><a href="docs/product/PRAGMA_학습자구조_정본.md"><code>PRAGMA_학습자구조_정본.md</code></a></td></tr>
-    <tr><td>3.5</td><td>콘텐츠 제작 워크플로우 설계</td><td><a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>PRAGMA_생성계약_정본.md</code></a></td></tr>
-    <tr><td>3.6</td><td>수업 운영 설계</td><td><a href="docs/product/PRAGMA_관리자구조_정본.md"><code>PRAGMA_관리자구조_정본.md</code></a> · <a href="src/lib/curriculum/template.ts"><code>template.ts</code></a></td></tr>
-    <tr><td>4.1</td><td>개발 환경과 시스템 아키텍처</td><td><a href=".github/workflows/ci.yml"><code>ci.yml</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a> · <a href="src/components/RequireAdmin.tsx"><code>RequireAdmin.tsx</code></a></td></tr>
-    <tr><td>4.2</td><td>통번역 학습 워크플로우 구현</td><td><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
-    <tr><td>4.3</td><td>콘텐츠 제작 워크플로우 구현</td><td><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
-    <tr><td>4.4</td><td>수업 운영 기능</td><td><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
-    <tr><td>4.5</td><td>개발 과정의 문제 발견과 설계 개선</td><td><a href="docs/research-trail/03_iteration_log.md"><code>03_iteration_log.md</code></a> · <a href="docs/research-trail/04_evidence_index.md"><code>04_evidence_index.md</code></a></td></tr>
-    <tr><td>5.3</td><td>PRAGMA 기반 연구 활용</td><td><a href="analysis/content_coverage.py"><code>content_coverage.py</code></a></td></tr>
-    <tr><td>부록&nbsp;A</td><td>대표 학습 미션</td><td><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;B</td><td>콘텐츠 제작·검토 기준</td><td><a href="src/lib/pragma/qualityRuleCatalog.ts"><code>qualityRuleCatalog.ts</code></a> · <a href="src/lib/pragma/promptSnapshot.generated.ts"><code>promptSnapshot.generated.ts</code></a></td></tr>
-    <tr><td>부록&nbsp;C</td><td>주요 설계 판단과 개선 기록</td><td><a href="docs/research-trail/02_decision_log.md"><code>02_decision_log.md</code></a> · <a href="docs/research-trail/01_design_traceability.md"><code>01_design_traceability.md</code></a></td></tr>
-    <tr><td>부록&nbsp;D</td><td>수업 편성 예시</td><td><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
+    <tr><td nowrap>3.3</td><td nowrap>목표화행과 적절성 판단 기준</td><td nowrap><a href="src/lib/pragma/enums.ts"><code>enums.ts</code></a></td></tr>
+    <tr><td nowrap>3.4</td><td nowrap>통번역 학습 워크플로우 설계</td><td nowrap><a href="src/lib/mission/canonicalMissionRuntime.ts"><code>canonicalMissionRuntime.ts</code></a></td></tr>
+    <tr><td nowrap>3.5</td><td nowrap>콘텐츠 제작 워크플로우 설계</td><td nowrap><a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
+    <tr><td nowrap>3.6</td><td nowrap>수업 운영 설계</td><td nowrap><a href="src/lib/curriculum/template.ts"><code>template.ts</code></a></td></tr>
+    <tr><td nowrap>4.1</td><td nowrap>개발 환경과 시스템 아키텍처</td><td nowrap><a href=".github/workflows/ci.yml"><code>ci.yml</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
+    <tr><td nowrap>4.2</td><td nowrap>통번역 학습 워크플로우 구현</td><td nowrap><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
+    <tr><td nowrap>4.3</td><td nowrap>콘텐츠 제작 워크플로우 구현</td><td nowrap><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
+    <tr><td nowrap>4.4</td><td nowrap>수업 운영 기능</td><td nowrap><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
+    <tr><td nowrap>4.5</td><td nowrap>개발 과정의 문제 발견과 설계 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;A</td><td nowrap>사례 A · 한→중 번역 미션</td><td nowrap><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;B</td><td nowrap>콘텐츠 제작·검토 기준</td><td nowrap><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;C</td><td nowrap>주요 설계 판단과 개선 기록</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;D</td><td nowrap>수업 편성 예시</td><td nowrap><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
   </tbody>
 </table>
 
-> <small>학위논문 제3·4장, 5.3절과 부록을 절 단위로 실제 코드·기록에 대응시켰습니다. 학위논문은 심사 중이며, 장·절 구성은 최종본에서 달라질 수 있습니다.</small>
+> <small>학위논문 제3·4장과 부록을 절 단위로 실제 코드에 대응시켰습니다.</small>
 
 <br>
 
 ### 9. 주요 연구·개발 단계
 
 <table>
-  <thead><tr><th width="308" align="left">단계</th><th width="403" align="left">핵심 설계·개선</th><th width="137" align="left">근거</th></tr></thead>
+  <thead><tr><th width="300" align="left">단계</th><th width="395" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
@@ -178,7 +177,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 10. 주요 용어
 
 <table>
-  <thead><tr><th width="190" align="left">용어</th><th width="615" align="left">정의</th></tr></thead>
+  <thead><tr><th width="180" align="left">용어</th><th width="620" align="left">정의</th></tr></thead>
   <tbody>
     <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
     <tr><td>문법적 정확성</td><td>목표어 표현이 어순·형태·통사 규칙에 맞게 구성된 것</td></tr>
