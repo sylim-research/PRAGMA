@@ -97,7 +97,8 @@ describe("canonical document routing", () => {
     expect(manifest).toContain("과거 `mission_v5` MJT4 행은 legacy 구현으로 읽기 호환");
     expect(contract).toContain("최신 채택 format: **`mission_v6`, MJT5 + DCT1**");
     expect(contract).toContain("기존 `mission_v5` native/legacy 및 과거 응답 계약은 유지한다");
-    expect(contract).toContain("현행 소스의 `mission_v5`는 네이티브 MJT5+DCT1");
+    expect(contract).toContain("이전 형식 `mission_v5`(v6 채택 전 현행)는 네이티브 MJT5+DCT1");
+    expect(contract).toContain("현행 학습 미션 형식은 `mission_v6`");
     expect(contract).toContain("mpj_response_v2");
   });
 
