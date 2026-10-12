@@ -133,12 +133,12 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 ### 8. 학위논문과 구현의 대응
 
 <table>
-  <thead><tr><th width="88" align="left">논문</th><th width="314" align="left">내용</th><th width="414" align="left">구현 위치</th></tr></thead>
+  <thead><tr><th width="88" align="left">논문</th><th width="314" align="left">내용</th><th width="414" align="left">설계 문서·구현 위치</th></tr></thead>
   <tbody>
-    <tr><td nowrap>3.3</td><td nowrap>목표화행과 적절성 판단 기준</td><td nowrap><a href="src/lib/pragma/enums.ts"><code>enums.ts</code></a></td></tr>
-    <tr><td nowrap>3.4</td><td nowrap>통번역 학습 워크플로우 설계</td><td nowrap><a href="src/lib/mission/canonicalMissionRuntime.ts"><code>canonicalMissionRuntime.ts</code></a></td></tr>
-    <tr><td nowrap>3.5</td><td nowrap>콘텐츠 제작 워크플로우 설계</td><td nowrap><a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
-    <tr><td nowrap>3.6</td><td nowrap>수업 운영 설계</td><td nowrap><a href="src/lib/curriculum/template.ts"><code>template.ts</code></a></td></tr>
+    <tr><td nowrap>3.3</td><td nowrap>목표화행과 적절성 판단 기준</td><td nowrap><a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>생성계약 정본</code></a> · <a href="src/lib/pragma/enums.ts"><code>enums.ts</code></a></td></tr>
+    <tr><td nowrap>3.4</td><td nowrap>통번역 학습 워크플로우 설계</td><td nowrap><a href="docs/product/PRAGMA_학습자구조_정본.md"><code>학습자구조 정본</code></a> · <a href="src/lib/mission/canonicalMissionRuntime.ts"><code>canonicalMissionRuntime.ts</code></a></td></tr>
+    <tr><td nowrap>3.5</td><td nowrap>콘텐츠 제작 워크플로우 설계</td><td nowrap><a href="docs/contracts/PRAGMA_생성계약_정본.md"><code>생성계약 정본</code></a> · <a href="supabase/functions/generate-scenario/"><code>generate-scenario/</code></a></td></tr>
+    <tr><td nowrap>3.6</td><td nowrap>수업 운영 설계</td><td nowrap><a href="docs/product/PRAGMA_관리자구조_정본.md"><code>관리자구조 정본</code></a> · <a href="src/lib/curriculum/template.ts"><code>template.ts</code></a></td></tr>
     <tr><td nowrap>4.1</td><td nowrap>개발 환경과 시스템 아키텍처</td><td nowrap><a href=".github/workflows/ci.yml"><code>ci.yml</code></a> · <a href="supabase/migrations/"><code>migrations/</code></a></td></tr>
     <tr><td nowrap>4.2</td><td nowrap>통번역 학습 워크플로우 구현</td><td nowrap><a href="src/pages/learner/CanonicalMissionRun.tsx"><code>CanonicalMissionRun.tsx</code></a> · <a href="src/lib/mission/missionFeedback.ts"><code>missionFeedback.ts</code></a></td></tr>
     <tr><td nowrap>4.3</td><td nowrap>콘텐츠 제작 워크플로우 구현</td><td nowrap><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
@@ -151,7 +151,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
   </tbody>
 </table>
 
-> <small>학위논문 제3·4장과 부록을 절 단위로 실제 코드에 대응시켰습니다.</small>
+> <small>학위논문 제3·4장과 부록을 절 단위로 설계 문서와 실제 코드에 대응시켰습니다.</small>
 
 <br>
 
