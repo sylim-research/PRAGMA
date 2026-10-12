@@ -200,7 +200,7 @@ export function ClassResponsePanel() {
     : "bg-white text-[#5D6970] hover:bg-[#F6F5F0]";
 
   return <>
-    <div className="max-w-[1120px] space-y-4">
+    <div className="max-w-[1280px] space-y-4">
       {/* 고르는 것은 한 줄(교과목 · 주차 · 미션), 보조 동작은 오른쪽의 작은 글자 버튼. 검은 강조는 아래 MJT 탭 하나만 쓴다. */}
       <div className="flex flex-wrap items-center gap-2 border-b border-[#E2DED2] pb-3">
         <select
@@ -248,7 +248,7 @@ export function ClassResponsePanel() {
           </div>}
           <button type="button" aria-label="응답 새로고침" title="응답 새로고침" disabled={rowsQuery.isFetching} onClick={() => void rowsQuery.refetch()} className={ghost}><RefreshCw className="h-3.5 w-3.5" /></button>
           {/* 보드가 없을 때도 자리를 지켜 실제/데모 전환 때 단추들이 밀리지 않게 한다(2026-10-09). */}
-          <button type="button" onClick={() => setProjector(true)} disabled={!boardVisible} aria-hidden={!boardVisible} tabIndex={boardVisible ? 0 : -1} className={`${ghost} ${boardVisible ? "" : "invisible"}`}><Maximize2 className="h-3.5 w-3.5" />크게 보기</button>
+          <button type="button" onClick={() => { setBoard((current) => ({ ...current, section: "item" })); setProjector(true); }} disabled={!boardVisible} aria-hidden={!boardVisible} tabIndex={boardVisible ? 0 : -1} className={`${ghost} ${boardVisible ? "" : "invisible"}`}><Maximize2 className="h-3.5 w-3.5" />크게 보기</button>
           {week && selectedMission && <Link
             target="_blank"
             rel="noreferrer"
@@ -341,13 +341,14 @@ export function ClassResponsePanel() {
       aria-modal="true"
       aria-label="학습자 응답 크게 보기"
       tabIndex={-1}
-      className="fixed inset-0 z-[110] overflow-y-auto bg-[#F8F6EE] p-4 sm:p-6"
+      className="fixed inset-0 z-[110] overflow-y-auto bg-[#F8F6EE] px-4 py-4 sm:px-[3vw] sm:py-6"
     >
-      <div className="mx-auto max-w-6xl">
+      {/* 교실 프로젝터용: 폭을 묶지 않고 화면 전체를 쓴다(2026-10-12). */}
+      <div className="mx-auto w-full">
         <div className="mb-4 flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-bold text-[#B8860B]">{showingDemo ? VIRTUAL_CLASS_NOTICE : "익명 응답 집계"}</p>
-            <h1 className="mt-1 break-keep text-3xl font-black text-[#15202B]">이 수업은 어떻게 판단했을까?</h1>
+            <p className="text-[length:clamp(15px,0.95vw,20px)] font-bold text-[#B8860B]">{showingDemo ? VIRTUAL_CLASS_NOTICE : "익명 응답 집계"}</p>
+            <h1 className="mt-1 break-keep text-[length:clamp(28px,2vw,40px)] font-black text-[#15202B]">이 수업은 어떻게 판단했을까?</h1>
           </div>
           <Button variant="outline" onClick={() => setProjector(false)}>
             <X className="mr-2 h-4 w-4" />닫기

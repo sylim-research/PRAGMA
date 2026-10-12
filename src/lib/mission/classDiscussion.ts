@@ -167,8 +167,12 @@ const obj = (value: unknown): Obj | null => (value && typeof value === "object" 
 const str = (value: unknown): string | null => (typeof value === "string" && value.trim() ? value : null);
 const arr = (value: unknown): unknown[] => (Array.isArray(value) ? value : []);
 
-/** 대역 코드 → 짧은 라벨·색 역할. 가운데 범주는 teal, 나머지는 내용 순서대로 rust·slate. */
-export function bandPalette(featureId: string | null): Array<{ code: string; label: string; tone: SliceTone }> {
+/**
+ * 대역 코드 → 짧은 라벨·색 역할. 가운데 범주는 teal, 나머지는 내용 순서대로 rust·slate.
+ * 라벨은 학습자가 MJT에서 본 이름과 같게 쓴다(2026-10-12): 가운데 = 「상황에 맞음」, 한→중 번역 요청은 「너무 직접적 / 너무 우회적」
+ * (canonicalMissionRuntime의 v6BandOptions와 같은 규칙). 순서도 학습자 선택지 순서(카탈로그 순서) 그대로다.
+ */
+export function bandPalette(featureId: string | null, requestOptionality = false): Array<{ code: string; label: string; tone: SliceTone }> {
   const feature = featureId ? getTargetFeature(featureId) : undefined;
   if (!feature) return [];
   const within = feature.within_band_code;
@@ -177,7 +181,10 @@ export function bandPalette(featureId: string | null): Array<{ code: string; lab
   let outer = 0;
   const bands = feature.band_schema.map((band) => ({
     code: band.code,
-    label: band.label_ko.replace(/\s*\([^)]*\)\s*$/, ""),
+    label: band.code === within ? "상황에 맞음"
+      : requestOptionality && band.code === "too_direct" ? "너무 직접적"
+        : requestOptionality && band.code === "too_indirect" ? "너무 우회적"
+          : band.label_ko.replace(/\s*\([^)]*\)\s*$/, ""),
     tone: band.code === within ? ("teal" as SliceTone) : outerTones[outer++ % outerTones.length],
   }));
   // 요청 화행은 가운데 범주를 「appropriate」로 저장한다(동결 예외). 같은 범주로 읽는다.
@@ -253,8 +260,8 @@ function buildScaleItem(itemId: number, meta: Obj | null, traces: Obj[]): ScaleI
   return { ...itemBase(itemId, meta, "scale4", traces.length), kind: "scale", slices, reasons };
 }
 
-function buildCandidatesItem(itemId: number, meta: Obj | null, traces: Obj[], featureId: string | null): CandidatesItemView {
-  const bands = bandPalette(featureId);
+function buildCandidatesItem(itemId: number, meta: Obj | null, traces: Obj[], featureId: string | null, requestOptionality = false): CandidatesItemView {
+  const bands = bandPalette(featureId, requestOptionality);
   const texts = arr(meta?.candidates).map(obj).map((candidate) => str(candidate?.text) ?? "");
   const perCandidate = texts.map((text, index) => ({ index, text: text || `표현 ${index + 1}`, total: 0, counts: new Map<string, number>() }));
   for (const trace of traces) {
@@ -358,6 +365,8 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
   const content = obj(mission);
   const rowsLatest = latestRows(missionId, rows);
   const featureId = str(obj(content?.unit)?.target_feature);
+  const requestOptionality = featureId === "request_mitigation_optionality"
+    && str(content?.direction) === "ko_zh" && str(obj(content?.production_task)?.mode) === "translation";
   const mpjItems = arr(content?.mpj_items).map(obj).filter((item): item is Obj => item !== null);
   const itemMeta = (itemId: number) => mpjItems.find((item) => item.id === itemId) ?? null;
 
@@ -384,7 +393,7 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
     const { type, traces } = tracesByItem.get(itemId)!;
     const meta = itemMeta(itemId);
     if (type === "scale4") items.push(buildScaleItem(itemId, meta, traces));
-    else if (type === "multi_judge" && traces.some((trace) => Array.isArray(trace.candidate_band_codes))) items.push(buildCandidatesItem(itemId, meta, traces, featureId));
+    else if (type === "multi_judge" && traces.some((trace) => Array.isArray(trace.candidate_band_codes))) items.push(buildCandidatesItem(itemId, meta, traces, featureId, requestOptionality));
     else if (type === "fix_choice" && !traces.some((trace) => typeof trace.band_code === "string")) items.push(buildCorrectionsItem(itemId, meta, traces));
     else if (type === "free_correction") items.push(buildFreeItem(itemId, meta, traces));
     else {
@@ -399,7 +408,7 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
   for (const item of cases) {
     if (item.feedback?.bandCode) verdictCounts.set(item.feedback.bandCode, (verdictCounts.get(item.feedback.bandCode) ?? 0) + 1);
   }
-  const palette = bandPalette(featureId);
+  const palette = bandPalette(featureId, requestOptionality);
   const verdicts: Slice[] = palette.map((band) => ({ key: band.code, label: band.label, tone: band.tone, count: verdictCounts.get(band.code) ?? 0 }));
   for (const [code, count] of verdictCounts) {
     if (!palette.some((band) => band.code === code)) verdicts.push({ key: code, label: code, tone: "slate", count });

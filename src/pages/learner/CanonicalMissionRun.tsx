@@ -219,7 +219,8 @@ const taskPanelBody = `${taskPanel} px-4 py-3 sm:px-5`;
 const optionGrid = "mt-3 grid gap-1.5";
 // break-keep — 없으면 한국어 낱말 중간에서 줄이 끊긴다(좁은 화면에서 특히).
 // 비활성 상태를 옅게 — 기본 disabled 회색이 활성 버튼만큼 무거워 「지금 눌러야 할 것」이 흐려진다.
-const actionButton = "w-full sm:w-auto sm:min-w-[240px] disabled:bg-[#E9E7E0] disabled:text-[#98A0AC] disabled:opacity-100";
+// 답을 고르기 전 버튼은 꺼진 회색이 아니라 옅은 남색으로 — 「아직 할 일이 남았다」로 읽히게(회색 금지 원칙, 2026-10-12).
+const actionButton = "w-full sm:w-auto sm:min-w-[240px] disabled:bg-[#DDE4EE] disabled:text-[#2B3F4F] disabled:opacity-100";
 const optionBase = "w-full rounded-xl border px-4 py-2 text-left text-[15px] break-keep transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-1";
 
 type SceneIntroConfig = {
@@ -351,7 +352,9 @@ function v6IntroSteps(outputName: string) {
       // 오른쪽 열은 행이 셋뿐이라 높이 여유가 있다 — 피드백 기준은 정본 명칭·순서대로 적고 두 줄을 허용한다.
       { title: `${outputName}하기`, desc: `상황에 맞게 ${outputName}하기` },
       { title: "AI 피드백", desc: "의미·문법·화용 기준" },
-      { title: "최종안 제출", desc: "검토한 답안 제출하기" },
+      // 진행 막대와 같은 한 벌: AI 피드백 다음은 재검토(초안 유지 또는 수정)다(2026-10-12).
+      { title: "재검토", desc: "초안 유지 또는 수정" },
+      { title: "최종안 결정", desc: "최종안 정하기" },
     ],
   };
 }
@@ -475,11 +478,18 @@ function HighlightedText({ text, highlights = [], target = false }: {
   );
 }
 
+// 해설 속 중국어 인용은 한 가지 표기(칩)로 보인다(2026-10-12). 콘텐츠에 섞인 '…'·‘…’·「…」 인용도 중국어가 들었으면 칩으로 바꾸고,
+// 칩 바로 뒤 조사(로·는·처럼…) 앞의 띄어쓰기를 지워 「可以吗? 로」처럼 조사가 떨어져 보이지 않게 한다.
+const QUOTED_HAN = /[‘'「]([^‘’'「」\n]*\p{Script=Han}[^‘’'「」\n]*)[’'」]/gu;
+const CHIP_PARTICLE = /(`[^`]+`)\s+(?=(?:으로|로|은|는|이|가|을|를|와|과|처럼|보다|도|에서|에게|에|의|라는|이라는|라고|이라고|만|까지|와는|과는|이나|나)(?=[\s,.)·]|$))/gu;
+// eslint-disable-next-line react-refresh/only-export-components -- 해설 렌더링 시험용.
+export const normalizeQuotedHan = (text: string) => text.replace(QUOTED_HAN, "`$1`").replace(CHIP_PARTICLE, "$1");
+
 function RichLine({ text, highlights = [] }: { text: string; highlights?: string[] }) {
   return (
     <>
-      {text.split(/(`[^`]+`)/g).map((part, index) => part.startsWith("`") && part.endsWith("`") ? (
-        <span key={index} className="font-zh rounded bg-white/75 px-1.5 py-0.5 text-[15.5px] font-medium text-[#183E2E]">
+      {normalizeQuotedHan(text).split(/(`[^`]+`)/g).map((part, index) => part.startsWith("`") && part.endsWith("`") ? (
+        <span key={index} className="font-zh rounded bg-[#F1EDE1] px-1.5 py-0.5 text-[15.5px] font-medium text-[#183E2E]">
           <HighlightedText text={part.slice(1, -1)} highlights={highlights} target />
         </span>
       ) : <span key={index}><HighlightedText text={part} highlights={highlights} target /></span>)}
@@ -844,8 +854,9 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
             : judgmentLocked ? `판단을 확정했습니다. 내 선택 ${pickLabel}. 이제 판단한 이유를 골라 확정하면 판단과 근거의 결과가 함께 공개됩니다.` : ""}
         </p>
         {quest.reasonChoice && judgmentCommitted && <fieldset className="mt-5 border-t border-[#DDD8CB] pt-4">
-          <legend className={`pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
-          <div className="mt-3 space-y-2" role="radiogroup" aria-label="판단 이유">
+          {/* 범례를 띄워 놓아야 구분선이 제목 줄을 가로지르지 않는다(2026-10-12). */}
+          <legend className={`float-left w-full pt-4 ${questionTitle}`}><QuestionChip n={2} /><span className="pt-[3px]">{REASON_PROMPT}</span></legend>
+          <div className="clear-both space-y-2 pt-3" role="radiogroup" aria-label="판단 이유">
             {quest.reasonChoice.options.map(option => <OptionButton key={option.id} option={option} value={reasonId} radio disabled={answered}
               answered={answered && Boolean(reasonAcceptedId)} acceptedIds={reasonAcceptedId ? [reasonAcceptedId] : []} acceptedLabel="기준 이유" onSelect={setReasonId} />)}
           </div>
@@ -1000,7 +1011,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
   return <QuestScaffold quest={quest} target={quest.target}>
     <section className={taskPanelBody}>
       <h3 className={questionTitle}><QuestionChip /><span className="pt-[3px]">{freeCorrectionInstruction(output)}</span>{!submitted && <DemoFillButton label="예시 수정안 넣기" />}</h3>
-      <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#8B3531]">{FREE_CORRECTION_FIDELITY}</p>
+      {/* 주의문은 오답이 아니라 지시라 빨강을 쓰지 않는다 — 진한 호박색(2026-10-12). */}
+      <p className="mt-1 pl-10 text-[13.5px] font-bold text-[#7A5A12]">{FREE_CORRECTION_FIDELITY}</p>
       {/* 답 영역은 MJT1~4의 선택지 버튼처럼 카드 여백선에 맞춘다 — 해설·참고 표현과 같은 선. Q 줄과 주의문만 들여쓴다. */}
       <div className="mt-4">
         <Textarea id="free-correction-draft" aria-label="내가 고친 표현" className={`${targetFont} text-[16.5px] leading-7`} rows={sourceAlignedRows(quest.target)} value={draft} readOnly={submitted} onChange={event => { setDraft(event.target.value); setTouched(true); }} />
@@ -1017,7 +1029,8 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
       {submitted && quest.contrast && <section className="mt-5 rounded-xl border border-dashed border-[#DDD8CB] px-4 py-3" aria-label="다른 맥락에서는?">
         <h4 className="flex items-center text-[14px] font-black text-[#15202B]"><SectionIcon icon={ArrowLeftRight} tone="slate" />다른 맥락에서는?</h4>
         <p className="mt-0.5 text-[14.5px] leading-6 text-[#15202B]">{quest.contrast.context}</p>
-        {/* 메신저의 「내가 보낸 말」 — 단색 블루·흰 글자로 메시지의 생동감을 살리되, 블루는 말풍선 한 곳에만 쓴다(2026-10-01). */}
+        {/* 메신저의 「내가 보낸 말」 — 단색 블루·흰 글자로 메시지의 생동감을 살리되, 블루는 말풍선 한 곳에만 쓴다(2026-10-01).
+            인스타그램 DM 느낌으로 가기로 한 의도된 예외라 브랜드 색 규칙을 적용하지 않는다(2026-10-12 재확인). */}
         <div className="mt-2">
           <div className="flex justify-end">
             <p className={`${targetFont} max-w-[75%] rounded-[18px] rounded-br-md bg-[#326BD6] px-3.5 py-2 text-[15px] leading-7 text-white`}>{quest.contrast.target}</p>
@@ -1237,17 +1250,18 @@ function VocabularyHints({ quest }: { quest: DctQuest }) {
   return (
     // 토글 오른쪽으로 펼친다 — 입력창 바로 아래 한 줄에 힌트가 붙어 보면서 칠 수 있다. 꺾쇠(오른쪽)와 펼침 방향을 맞춘다.
     <details className="group/vocabulary mt-2 flex flex-wrap items-center gap-x-3 gap-y-2">
-      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-1 text-[14.5px] font-black text-[#15202B] transition-colors hover:text-[#000] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-[#FAD338] text-[#15202B]"><Lightbulb className="h-[18px] w-[18px]" strokeWidth={2.25} /></span>
+      <summary className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-md pr-1 text-[14.5px] font-bold text-[#44525C] transition-colors hover:text-[#15202B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B59A32] focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
+        {/* 단어 힌트는 차분하게 — 노랑 원 대신 크림 바탕·남회색 아이콘(2026-10-12). 생동감은 마지막 「다른 맥락에서는?」 말풍선이 맡는다. */}
+        <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full border border-[#E2DCCB] bg-[#F7F4EC] text-[#5B6770]"><Lightbulb className="h-[17px] w-[17px]" strokeWidth={2} /></span>
         단어 힌트 보기<ChevronRight aria-hidden className="h-4 w-4 transition-transform group-open/vocabulary:rotate-180 motion-reduce:transition-none" strokeWidth={2.5} />
       </summary>
       {/* 칩 없이 사전식 한 줄(2026-10-10 연구자 선택 D안). 파란 채움 칩은 화면의 CTA보다 먼저 눈에 들어와 뺐다. */}
       <dl className="flex flex-wrap items-baseline gap-x-3 gap-y-1" aria-label="단어 힌트">
         {hints.map((hint, index) => (
           <div key={hint.source} className="inline-flex max-w-full items-baseline gap-2">
-            {index > 0 && <span aria-hidden className="text-[15px] font-bold text-[#C9A62E]">·</span>}
+            {index > 0 && <span aria-hidden className="text-[15px] font-bold text-[#B9B29C]">·</span>}
             <dt lang={mission.sourceLanguage.code} className={`${sourceFont} min-w-0 break-words text-[15px] leading-6 text-[#5D6970]`}>{hint.source}</dt>
-            <dd lang={mission.targetLanguage.code} className={`${targetFont} min-w-0 break-words bg-[linear-gradient(transparent_62%,#FAD338_62%,#FAD338_92%,transparent_92%)] px-0.5 text-[17px] font-semibold leading-6 text-[#15202B]`}>{hint.target}</dd>
+            <dd lang={mission.targetLanguage.code} className={`${targetFont} min-w-0 break-words px-0.5 text-[17px] font-semibold leading-6 text-[#15202B]`}>{hint.target}</dd>
           </div>
         ))}
       </dl>
@@ -1309,7 +1323,8 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
         <VocabularyHints quest={quest} />
         {/* 세 기준은 피드백 화면에서 만난다. 여기서는 부담을 더는 한 줄만. */}
         <p className="mt-2 break-keep text-[12.5px] leading-5 text-[#5B6770]">
-          {demo ? "수정 과정을 보여 주기 위한 예시입니다." : "제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다."}
+          {/* 시연에서도 학습자와 같은 안내를 둔다 — 예시를 넣었는지는 바로 위 「예시 사용」 표시가 알린다(2026-10-12). */}
+          제출하면 AI 피드백을 확인하고 다시 검토합니다. 한 번에 완성하지 않아도 됩니다.
         </p>
         </div>
       </div>
@@ -1709,10 +1724,12 @@ function FeedbackLoading({ outputName = "번역" }: { outputName?: string }) {
  * 원문과 내 번역을 한 줄에 나란히 둔다 — 화면이 바뀌어도 원문이 곁에 있고,
  * 라벨 줄이 둘 사이를 벌리지 않도록 배지 옆에 바로 문장을 붙인다.
  */
-function SourceAnswerCompare({ source, answer, highlights = [] }: {
+function SourceAnswerCompare({ source, answer, highlights = [], answerLabel }: {
   source: string;
   answer: string;
   highlights?: string[];
+  /** 답안 이름표(기본 「내 번역·통역」). 2차 피드백에서는 「수정안」으로 부른다. */
+  answerLabel?: string;
 }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
@@ -1730,7 +1747,7 @@ function SourceAnswerCompare({ source, answer, highlights = [] }: {
       <div className="flex items-start gap-3.5 border-t border-dashed border-[#E3DDCF] px-4 py-2.5 sm:px-5">
         <span className={`mt-0.5 ${languageBadge} border-[#15202B] bg-[#15202B] text-white`}>{mission.targetLanguage.badge}</span>
         <div className="min-w-0 flex-1">
-          <p className="flex items-center gap-2 text-[12px] font-bold text-[#7A7466]">내 {outputName}<DemoExampleTag text={answer} /></p>
+          <p className="flex items-center gap-2 text-[12px] font-bold text-[#7A7466]">{answerLabel ?? `내 ${outputName}`}<DemoExampleTag text={answer} /></p>
           <p className={`${targetFont} break-keep text-[16.5px] leading-7 text-[#101B2B]`}>
             <HighlightedText text={answer} highlights={highlights} target />
           </p>
@@ -1846,7 +1863,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
   const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 이전 화면의 「이대로 확정」에서 이유를 적고 초안을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => {
     markDemoEdited(revised, revisedFromExample);
@@ -1893,8 +1910,8 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   }
   return (
     <div className="space-y-2.5">
-      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-[18px] font-bold">{recheckRequested ? "수정안 AI 피드백" : "AI 피드백"}</h1>{ready && !revisionOpen && !recheckRequested && <DemoFillButton label="예시 수정안 넣기" />}</div>
-      <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} highlights={ready ? evaluation.highlights : []} />
+      <div className="flex flex-wrap items-center gap-2 px-1"><h1 className="text-[18px] font-bold">{recheckRequested ? "AI 피드백 2차" : "AI 피드백"}</h1></div>
+      <SourceAnswerCompare source={quest.source} answer={recheck?.answer ?? (recheckRequested ? revised : first)} answerLabel={recheckRequested ? "수정안" : undefined} highlights={ready ? evaluation.highlights : []} />
       {!ready ? <FeedbackLoading outputName={outputName} /> : (
         <>
           {/* 판정 한 줄 요약과 배지는 두지 않는다 — 세 기준 각각이 이미 등급과 이유를 말한다. */}
@@ -1950,7 +1967,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!evaluation.criteria.every(criterion => criterion.level === "very_good")
                     && <div className={`rounded-xl border border-l-4 bg-white px-4 py-3 ${primaryCriterion.level === "required" ? "border-[#EBD3D0] border-l-[#C86E68]" : "border-[#EEE2BC] border-l-[#C9A62E]"}`}>
                       <p className={`text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
-                      <p className="mt-1 text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
+                      <p className="mt-1 break-keep text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                     </div>}
                 </>
               )}
@@ -1971,9 +1988,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" />}
                 </div>
                 {!recheckRequested && (needsChange || localPilot) && (
-                  <div className={`mt-4 rounded-xl border-l-4 px-4 py-3 ${needsChange ? "border border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#E0C247] bg-[#FFFBEC]"}`}>
+                  <div className={`mt-4 rounded-xl border border-l-4 px-4 py-3 ${needsChange && primaryCriterion.level === "required" ? "border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#EEE2BC] border-l-[#C9A62E] bg-[#FFFBEC]"}`}>
                     {needsChange && <p className={`mb-1.5 text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
-                    <p className="text-sm leading-6">{conciseFeedback(primaryCriterion.body)}</p>
+                    <p className="break-keep text-sm leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                   </div>
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-7`} />
@@ -2071,9 +2088,11 @@ function macroStages(outputName: string): string[] {
   return MACRO_PROGRESS.map((label) => label === "직접 옮기기" ? `${outputName}하기` : label);
 }
 
-function macroProgressIndex(activeIndex: number, completed: boolean | undefined, revisionOpen: boolean, sceneIntroStep: number | null) {
+function macroProgressIndex(activeIndex: number, completed: boolean | undefined, revisionOpen: boolean, sceneIntroStep: number | null, mpjRecapOpen = false) {
   if (completed) return MACRO_PROGRESS.length;
   if (sceneIntroStep !== null) return 0;
+  // 핵심 정리는 다섯 판단을 묶는 자리라 아직 「적절성 판단」에 머문다 — 번역 전에 「번역하기」가 켜지지 않게(2026-10-12).
+  if (mpjRecapOpen) return 1;
   if (activeIndex <= 4) return 1;
   if (activeIndex === 5) return 2;
   return revisionOpen ? 4 : 3;
@@ -2099,7 +2118,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
   const mission = useCanonicalMission();
   const quests = mission.quests;
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
-  const macroIndex = macroProgressIndex(activeIndex, completed, revisionOpen, sceneIntroStep) - (skipIntro ? 1 : 0);
+  const macroIndex = macroProgressIndex(activeIndex, completed, revisionOpen, sceneIntroStep, mpjRecapOpen) - (skipIntro ? 1 : 0);
   const stages = skipIntro ? macroStages(outputName).slice(1) : macroStages(outputName);
   // 다섯 문항 동안 큰 단계가 「적절성 판단」에 머무르므로, 그 안의 진행은 점 다섯 개가 따로 나른다.
   const judging = activeIndex <= 4 && sceneIntroStep === null && !completed && reviewIndex === null && !mpjRecapOpen;
@@ -2110,7 +2129,7 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
       : sceneIntroStep !== null
         ? { phase: "미션 안내", activity: sceneIntroConfig.missionLabel }
       : mpjRecapOpen
-        ? { phase: `${outputName}하기`, activity: "핵심 정리" }
+        ? { phase: "적절성 판단", activity: "핵심 정리" }
       : activeIndex <= 4
         ? { phase: `적절성 판단 · ${activeIndex + 1}/5`, activity: progressLabel(quests[activeIndex], outputName) }
         : activeIndex === 5
@@ -2124,13 +2143,14 @@ function Progress({ activeIndex, completed, reviewIndex = null, revisionOpen = f
         {/* 단계를 점과 선으로 따로 그리지 않고 이어진 막대 하나로 — 지난 구간 금색, 현재 구간 남색. */}
         <ol className="flex min-w-0 flex-1 gap-1.5" aria-label={stages.join(", ")}>
           {stages.map((label, index) => {
-            const done = freeJump
+            // 완료 화면에서는 시연에서도 다섯 단계를 모두 마친 것으로 표시한다(2026-10-12).
+            const done = completed ? true : freeJump
               ? (label === "적절성 판단"
                 ? DEMO_MJT_QUEST_IDS.every(id => answeredQuestIds.includes(id))
                 : label === `${outputName}하기`
                   ? quests.some(quest => quest.kind === "dct" && answeredQuestIds.includes(quest.id))
-                  : false)
-              : Boolean(completed) || index < macroIndex;
+                  : label === "미션 안내" ? false : index < macroIndex)
+              : index < macroIndex;
             const active = !completed && index === macroIndex;
             const jumpStage = label === "미션 안내" ? "intro" : label === "적절성 판단" ? "judge" : label === `${outputName}하기` ? "produce" : null;
             // 시연에서는 산출 단계 이름을 「직접 번역」으로 보이되(약어 없음, 2026-10-09), 모양은 다른 단계와 같은 막대+이름 한 벌로 통일한다(2026-10-08).
@@ -2341,7 +2361,7 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
               ? progressLabel(mission.quests.find(quest => quest.id === point.questId)!, outputName)
               : point.label}</p>
             <p className="col-start-2 min-w-0 break-keep text-[16.5px] font-normal leading-[30px] text-[#263444] [overflow-wrap:anywhere] sm:col-start-3">
-              <HighlightedText text={point.text} highlights={point.highlights} target />
+              <RichLine text={point.text} highlights={point.highlights} />
             </p>
           </li>
         ))}

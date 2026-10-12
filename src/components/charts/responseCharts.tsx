@@ -21,13 +21,13 @@ export const ON_TONE: Record<SliceTone, string> = {
 };
 
 /** labels=true면 칸 안에 비율을 적는다(8% 미만 칸은 비운다) — 범례에서 비율 한 층을 덜어 낸다. */
-export function StackedBar({ slices, total, height = "h-3", labels = false }: { slices: Slice[]; total: number; height?: string; labels?: boolean }) {
+export function StackedBar({ slices, total, height = "h-3", labels = false, labelSize = "text-[12.5px]" }: { slices: Slice[]; total: number; height?: string; labels?: boolean; labelSize?: string }) {
   return <div className={`flex w-full overflow-hidden rounded-full bg-[#F1F2F3] ${height}`} aria-hidden="true">
     {slices.filter((slice) => slice.count > 0).map((slice) => {
       const share = percent(slice.count, total);
       return <span
         key={slice.key}
-        className="flex h-full items-center justify-center overflow-hidden text-[12.5px] font-semibold tabular-nums"
+        className={`flex h-full items-center justify-center overflow-hidden ${labelSize} font-semibold tabular-nums`}
         style={{ width: `${(slice.count / Math.max(1, total)) * 100}%`, backgroundColor: `${TONE[slice.tone]}D1`, color: ON_TONE[slice.tone] }}
       >{labels && share >= 8 ? `${share}%` : null}</span>;
     })}
