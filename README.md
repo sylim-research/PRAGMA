@@ -48,7 +48,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
     <tr><td>상황·관계 조건</td><td>상대적 권력(P)&ensp;|&ensp;사회적 거리(D)&ensp;|&ensp;행위 부담도(R)</td></tr>
     <tr><td>언어방향</td><td>한→중 · 중→한</td></tr>
     <tr><td>수행 방식</td><td>번역 · 통역</td></tr>
-    <tr><td>학습자 수준</td><td>입문&ensp;|&ensp;중급&ensp;|&ensp;고급</td></tr>
+    <tr><td>학습자 수준</td><td>입문&ensp;|&ensp;중급&ensp;|&ensp;고급&ensp;(HSK 4·5·6급 누적 어휘 상한)</td></tr>
   </tbody>
 </table>
 
@@ -106,7 +106,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 
 - **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
 - **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 품질 심사**에는 GPT-4.1, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다.
+- **AI 검토**에는 GPT-4.1, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다.
 - **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
 - **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
@@ -121,7 +121,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
   <tbody>
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
-    <tr><td>자동 규칙 점검 결과 · AI 품질 심사 의견</td><td>제공된 AI 피드백</td></tr>
+    <tr><td>자동 규칙 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
     <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견</td></tr>
   </tbody>
 </table>
@@ -144,9 +144,9 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
     <tr><td nowrap>4.3</td><td nowrap>콘텐츠 제작 워크플로우 구현</td><td nowrap><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td nowrap>4.4</td><td nowrap>수업 운영 기능</td><td nowrap><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
     <tr><td nowrap>4.5</td><td nowrap>개발 과정의 문제 발견과 설계 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
-    <tr><td nowrap>부록&nbsp;A</td><td nowrap>사례 A · 한→중 번역 미션</td><td nowrap><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;A</td><td nowrap>한→중 번역 미션 사례</td><td nowrap><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
     <tr><td nowrap>부록&nbsp;B</td><td nowrap>콘텐츠 제작·검토 기준</td><td nowrap><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
-    <tr><td nowrap>부록&nbsp;C</td><td nowrap>주요 설계 판단과 개선 기록</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;C</td><td nowrap>주요 설계 판단과 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
     <tr><td nowrap>부록&nbsp;D</td><td nowrap>수업 편성 예시</td><td nowrap><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
   </tbody>
 </table>
@@ -161,7 +161,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
   <thead><tr><th width="300" align="left">단계</th><th width="395" align="left">핵심 설계·개선</th><th width="110" align="left">근거</th></tr></thead>
   <tbody>
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
-    <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 품질 심사 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
+    <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 검토 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
     <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
     <tr><td>MJT 판단 문항 → DCT형 통번역 과제</td><td>MJT와 통번역 과제를 한 학습 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
     <tr><td>9개 목표화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
@@ -177,16 +177,22 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행 목적을 유지�
 ### 10. 주요 용어
 
 <table>
-  <thead><tr><th width="180" align="left">용어</th><th width="620" align="left">정의</th></tr></thead>
+  <thead><tr><th width="180" align="left">용어</th><th width="620" align="left">본 연구에서의 뜻</th></tr></thead>
   <tbody>
-    <tr><td>의미적 충실성</td><td>원문의 핵심 의미와 화행목적을 도착어에서 함부로 바꾸지 않는 것</td></tr>
-    <tr><td>문법적 정확성</td><td>목표어 표현이 어순·형태·통사 규칙에 맞게 구성된 것</td></tr>
-    <tr><td>화용적 적절성</td><td>상황·관계와 담화 목적에 비추어 도착어 표현이 적절한 것</td></tr>
-    <tr><td>적절성 판단 범주</td><td>표현을 과소·적정·과잉으로 나누는 교육적 분류. 단일 점수척도가 아님</td></tr>
-    <tr><td>MJT 판단 문항</td><td>메타화용적 판단 과제(MJT: Metapragmatic Judgment Task)의 개별 문항</td></tr>
-    <tr><td>DCT형 통번역 과제</td><td>담화완성과제(DCT: Discourse Completion Task)의 상황 제시를 응용한 통번역 과제</td></tr>
+    <tr><td nowrap>워크플로우</td><td nowrap>주체별 활동의 순서와 수정·결정 조건을 명시한 절차</td></tr>
+    <tr><td nowrap>시나리오</td><td nowrap>상황·관계와 원문을 하나로 묶은 콘텐츠 단위</td></tr>
+    <tr><td nowrap>학습 미션</td><td nowrap>MJT 5문항과 DCT형 통번역 과제 1문항의 학습 단위</td></tr>
+    <tr><td nowrap>MJT 판단 문항</td><td nowrap>제시된 표현의 적절성을 판단·선택·수정하는 문항</td></tr>
+    <tr><td nowrap>DCT형 통번역 과제</td><td nowrap>DCT의 상황 제시 방식을 응용한 통번역 과제</td></tr>
+    <tr><td nowrap>의미적 충실성</td><td nowrap>원문의 내용·화행목적·의도된 태도의 유지를 보는 기준</td></tr>
+    <tr><td nowrap>문법적 정확성</td><td nowrap>목표어의 어순·형태·통사 규칙 부합을 보는 기준</td></tr>
+    <tr><td nowrap>화용적 적절성</td><td nowrap>상황·관계에 비추어 표현 선택의 적절성을 보는 기준</td></tr>
+    <tr><td nowrap>적절성 판단 범주</td><td nowrap>표현을 과소·적정·과잉으로 나누는 교육적 분류</td></tr>
+    <tr><td nowrap>최종안</td><td nowrap>AI 피드백을 검토한 뒤 학습자가 확정한 통번역 결과</td></tr>
   </tbody>
 </table>
+
+> <small>MJT: Metapragmatic Judgment Task · DCT: Discourse Completion Task</small>
 
 <br>
 <br>
