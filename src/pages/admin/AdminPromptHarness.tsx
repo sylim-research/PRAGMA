@@ -218,7 +218,7 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   const [open, setOpen] = useState(false);
   return (
     <Card className={`border-[#E2DED2] ${open ? "md:col-span-2" : ""}`}>
-      <CardHeader className="space-y-[3px] p-0 px-4 py-[13.5px]">
+      <CardHeader className="space-y-[5px] p-0 px-4 py-[15.5px]">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -275,7 +275,7 @@ const AdminPromptHarness = () => {
           if (items.length === 0) return null;
           return (
             <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[15px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
+              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[16.5px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
               <div className="grid gap-x-1.5 gap-y-2 md:grid-cols-2">
                 {items.map((p) => (
                   <SnapshotCard key={p.key} entry={p} />
