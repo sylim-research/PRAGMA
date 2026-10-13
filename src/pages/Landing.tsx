@@ -12,12 +12,12 @@ const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
 // 네이비 헤더 아래에서 네이비 버튼은 가라앉는다. 헤드라인 형광펜과 같은 노랑으로 잇는다),
 // 나머지 이동은 텍스트 링크로 한 단계 낮춘다.
 const demoLink =
-  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-3 text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
+  "group inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#FAD338] px-8 py-[13.5px] text-[15px] font-bold text-[#15202B] shadow-[0_6px_18px_rgba(201,166,46,0.25)] transition-colors hover:bg-[#FCE27A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2";
 // 역할 카드는 통째로 하나의 링크다(2026-10-11) — 버튼만 클릭되면 카드 본문을 누른 방문자가 놓친다.
 // 반응은 두 단계: 카드 어디든 올리면 카드가 살짝 떠오르고 버튼에 테두리가 진해진다(1단계),
 // 버튼 위에 직접 올리면 버튼 색이 한 번 더 바뀐다(2단계). 그래서 카드와 버튼이 구분된다.
 const roleCard =
-  "group/card flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] bg-white px-6 py-[17px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-[#CFC7B0] hover:shadow-[0_2px_4px_rgba(21,32,43,0.06),0_16px_34px_-14px_rgba(21,32,43,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 motion-reduce:hover:translate-y-0";
+  "group/card flex flex-col items-start rounded-2xl border border-[#E6E1D2] border-l-[5px] bg-white px-6 py-[19px] text-left shadow-[0_1px_2px_rgba(21,32,43,0.04),0_10px_28px_-16px_rgba(21,32,43,0.18)] transition-[transform,box-shadow,border-color] duration-150 hover:-translate-y-0.5 hover:border-[#CFC7B0] hover:shadow-[0_2px_4px_rgba(21,32,43,0.06),0_16px_34px_-14px_rgba(21,32,43,0.28)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] focus-visible:ring-offset-2 motion-reduce:hover:translate-y-0";
 const cardArrow = "transition-transform duration-150 group-hover/card:translate-x-0.5 group-hover/btn:translate-x-1";
 // 공개 시연에서 역할 카드 입구는 상자 버튼이 아니라 화살표 텍스트 링크다 — 같은 무게의 상자가 넷이면 시선이 튄다.
 const cardTextLink =
@@ -104,7 +104,7 @@ const Landing = () => {
               </span>
               학습자 영역
             </span>
-            <span className="mt-3 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+            <span className="mt-3 break-keep text-[13.833px] leading-[1.75] tracking-[-0.01em] text-[#56636D]">
               상황과 관계에 맞게 통번역합니다.<br />
               AI 피드백을 검토해 최종안을 제출합니다.
             </span>
@@ -125,7 +125,7 @@ const Landing = () => {
               </span>
               교수자 영역
             </span>
-            <span className="mt-3 break-keep text-[13.833px] leading-relaxed tracking-[-0.01em] text-[#56636D]">
+            <span className="mt-3 break-keep text-[13.833px] leading-[1.75] tracking-[-0.01em] text-[#56636D]">
               자동 검사와 AI 검토로 콘텐츠를 점검합니다.<br />
               교수자가 감수·승인해 수업에 활용합니다.
             </span>

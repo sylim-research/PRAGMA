@@ -593,12 +593,12 @@ const AdminDashboard = () => {
           to="/admin/decision-traces"
           // 교과목 맥락에서 나온 기록을 큰 수로 둔다
           // (교과목 연결 여부만 가른다 — 실제 수업과 시범을 나누는 근거는 아니다).
-          label="편성 안 학습 수행 기록"
+          label="수업 수행 기록"
           value={snapshot?.courseLinkedRecordCount ?? null}
           unit="건"
           description={snapshot && snapshot.courseLinkedRecordCount !== null
             ? `편성 외 수행 ${snapshot.learnerRecordCount - snapshot.courseLinkedRecordCount}건 별도`
-            : "교과목 편성 안의 학습 수행"}
+            : "교과목에 편성된 미션의 학습 수행"}
           error={displayError ?? (snapshot && snapshot.courseLinkedRecordCount === null ? "교과목 연결 조회 실패" : null)}
           changed={changedKeys.has("records")}
         />
