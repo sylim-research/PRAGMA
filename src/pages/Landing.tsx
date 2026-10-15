@@ -5,6 +5,7 @@ import { HomeBrand } from "@/components/HomeBrand";
 import { ensureSession } from "@/lib/tracking";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
+import { SHOW_REPRESENTATIVE_MISSION_ENTRY } from "@/lib/demo/representativeMissionCatalog";
 
 // 진입 링크에 마우스를 올리면 화살표가 진행 방향으로 살짝 이동한다.
 const arrow = "transition-transform duration-150 group-hover:translate-x-0.5";
@@ -143,7 +144,7 @@ const Landing = () => {
         </section>
 
         {/* 공개 시연의 주 행동 — 역할 카드 아래 하나만 둔다. 시스템 구조는 헤더 오른쪽 링크로 옮겼다. */}
-        {IS_DEMO && (
+        {IS_DEMO && SHOW_REPRESENTATIVE_MISSION_ENTRY && (
           <section className="mt-[26px] flex justify-center" aria-label="대표 미션 체험">
             <Link
               to={REPRESENTATIVE_MISSION_PATH}
