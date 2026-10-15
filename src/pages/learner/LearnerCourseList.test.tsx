@@ -35,7 +35,7 @@ function mockCourses(data: CurriculumOutlineRow[], error: Error | null = null, i
 
 function renderCourses() {
   return render(
-    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <MemoryRouter>
       <LearnerCourseList />
     </MemoryRouter>,
   );
