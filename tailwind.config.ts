@@ -4,6 +4,8 @@ import tailwindcssAnimate from "tailwindcss-animate";
 export default {
   darkMode: ["class"],
   content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  // Keep source regexes such as /[-:T]/ from being emitted as utility classes (invalid CSS rejected by lightningcss).
+  blocklist: ["[-:T]"],
   prefix: "",
   theme: {
     container: {

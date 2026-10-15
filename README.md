@@ -112,6 +112,18 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
 
+**로컬에서 실행하기**
+
+```bash
+npm ci                 # Node.js 22 (package.json engines)
+cp .env.example .env   # VITE_SUPABASE_URL · VITE_SUPABASE_PUBLISHABLE_KEY 값을 채운다
+npm run dev            # http://localhost:8080
+```
+
+- 이 저장소는 Supabase 프로젝트(DB·인증·Edge Functions)에 연결돼야 로그인과 데이터가 동작합니다. 환경 변수 없이 실행하면 첫 화면에서 「supabaseUrl is required」 오류로 멈춥니다. 검토 목적이면 위 바로 가기의 배포 웹앱과 학습 미션 체험 링크를 쓰는 것이 빠릅니다.
+- 검사 명령은 CI와 같습니다: `npm run typecheck` · `npm test` · `npm run build`. 테스트와 빌드는 Supabase 값이 자리표시자여도 통과합니다(CI도 자리표시자를 씁니다).
+
+
 <br>
 
 ### 7. 콘텐츠·학습 기록의 추적
