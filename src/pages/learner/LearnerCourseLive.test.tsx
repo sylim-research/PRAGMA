@@ -26,7 +26,7 @@ function show(weeks = [orientation, missionWeek, thanksWeek], entry = `/learner/
   vi.mocked(useLearnerCourse).mockReturnValue({ data: {
     outline: { id: courseId, title: "한중 통번역", course_mode: "mixed", language_direction: "ko_zh", level: "intermediate" }, weeks,
   } as LearnerCourse, error: null, isPending: false } as ReturnType<typeof useLearnerCourse>);
-  render(<MemoryRouter initialEntries={[entry]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+  render(<MemoryRouter initialEntries={[entry]}>
     <Routes>
       <Route path="/learner/course/:courseId" element={<LearnerCourseLive />} />
       <Route path="/learner/course/:courseId/week/:weekNo" element={<LearnerCourseWeekRoute />} />
