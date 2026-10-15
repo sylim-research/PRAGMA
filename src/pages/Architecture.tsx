@@ -4,6 +4,7 @@ import { HomeBrand } from "@/components/HomeBrand";
 import { MPJ_ITEM_COUNT } from "@/lib/curriculum/learnerWorkflow";
 import { IS_DEMO } from "@/lib/auth/useProfile";
 import { REPRESENTATIVE_MISSION_PATH } from "@/lib/demo/representativeMission";
+import { SHOW_REPRESENTATIVE_MISSION_ENTRY } from "@/lib/demo/representativeMissionCatalog";
 
 // 심사 설명용 read-only 화면. README의 Fig. 1(docs/figures/fig1-pragma-workflow.png)과
 // 같은 구조·같은 용어로 그린다 — GitHub·웹·논문이 하나의 그림을 공유한다.
@@ -106,7 +107,7 @@ const Architecture = () => (
         {/* 브랜드 옆 설명어 자리에 화면 이름을 둔다 — 「PRAGMA | 시스템 구조」. 전체 = 시스템, 그 안의 두 절차 = 워크플로우(2026-10-08 연구자 확정). */}
         <HomeBrand largerText subtitle="시스템 구조" />
         <div className="flex items-center gap-2">
-          {IS_DEMO && (
+          {IS_DEMO && SHOW_REPRESENTATIVE_MISSION_ENTRY && (
             <Link to={REPRESENTATIVE_MISSION_PATH}
               className="inline-flex items-center gap-1.5 rounded-lg border border-white/35 px-3 py-1.5 text-[12.5px] font-semibold text-white transition-colors hover:bg-white/10">
               학습 미션 체험
