@@ -6,10 +6,12 @@
 -- one of them, and those that need a human appear in the professor's required findings.
 -- Existing reviews, approvals and evidence are untouched; nothing is backfilled.
 
+-- SQL NULL = not run. An object must carry a known status: a CHECK that evaluates to NULL passes, so a missing
+-- or null status is coalesced to '' and rejected rather than slipping through as an unknown state.
 ALTER TABLE public.content_review_runs
   ADD COLUMN deepseek_review jsonb CHECK (
     deepseek_review IS NULL OR (jsonb_typeof(deepseek_review) = 'object'
-      AND deepseek_review->>'status' IN ('completed', 'failed')));
+      AND COALESCE(deepseek_review->>'status', '') IN ('completed', 'failed')));
 
 ALTER TABLE public.content_review_runs DROP CONSTRAINT content_review_runs_running_stage_check;
 ALTER TABLE public.content_review_runs ADD CONSTRAINT content_review_runs_running_stage_check
@@ -23,7 +25,10 @@ RETURNS jsonb LANGUAGE sql IMMUTABLE SET search_path = public AS $$
 $$;
 REVOKE ALL ON FUNCTION public.content_review_deepseek_findings(public.content_review_runs) FROM PUBLIC, anon, authenticated;
 
--- Same definition as 20260909230000 with the completed Chinese expression findings added after Claude's.
+-- Same definition as 20260909230000 with the completed Chinese expression findings added after Claude's, and the
+-- focused-policy rule the admin UI already applies (professorReviewFindings, 2026-09-19): a finding the
+-- adjudication accepted or refined goes to the professor whatever its severity. Without it the UI asked for a
+-- decision the DB then refused to save (count mismatch); the gap predates this stage and would carry into it.
 CREATE OR REPLACE FUNCTION public.content_review_required_findings(p_review public.content_review_runs)
 RETURNS jsonb LANGUAGE plpgsql IMMUTABLE SET search_path = public AS $$
 DECLARE v_findings jsonb; v_generation jsonb; v_rules jsonb; v_cross jsonb;
@@ -40,7 +45,9 @@ BEGIN
   v_findings := v_rules || COALESCE(p_review.openai_review#>'{result,findings}','[]'::jsonb) || v_generation || v_cross;
   RETURN (SELECT COALESCE(jsonb_agg(f ORDER BY i),'[]'::jsonb) FROM jsonb_array_elements(v_findings) WITH ORDINALITY x(f,i)
     WHERE f->>'severity' = 'fail' OR f->>'needs_professor' = 'true'
-      OR EXISTS (SELECT 1 FROM jsonb_array_elements(p_review.professor_decisions) d WHERE d->>'finding_id' = f->>'id'));
+      OR EXISTS (SELECT 1 FROM jsonb_array_elements(p_review.professor_decisions) d WHERE d->>'finding_id' = f->>'id')
+      OR EXISTS (SELECT 1 FROM jsonb_array_elements(COALESCE(p_review.adjudication#>'{result,decisions}','[]'::jsonb)) d
+        WHERE d->>'finding_id' = f->>'id' AND d->>'decision' IN ('accept','refine')));
 END;
 $$;
 
@@ -96,7 +103,7 @@ BEGIN
       NOT EXISTS (SELECT 1 FROM jsonb_array_elements(v_findings) f WHERE f->>'id' = d->>'finding_id')
       OR COALESCE(d->>'decision','') NOT IN ('accept','refine','reject')
       OR length(btrim(COALESCE(d->>'rationale_ko',''))) = 0) THEN
-    RAISE EXCEPTION 'Adjudicate every cross-check finding exactly once';
+    RAISE EXCEPTION 'Adjudicate every Claude and DeepSeek finding exactly once';
   END IF;
 END;
 $$;

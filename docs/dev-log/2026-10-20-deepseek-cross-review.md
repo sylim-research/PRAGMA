@@ -24,3 +24,13 @@ The manual DeepSeek web-chat reviews of 2026-09-18 to 10-10 (about 23 runs, prov
 - Prompt revision is recorded as `stage_prompt_version: zh_expression_v2_20261020` (the DB pins `prompt_version` to criteria:stage). The first prompt never ran.
 
 Validation: `npm run typecheck` 0 errors; targeted tests 111/111 including the three key cases and judgment routing; review bundle `--check` verified; `npm run build` passes.
+
+## Migration fixes before applying (same day, after a read-only review)
+
+- `deepseek_review` CHECK now coalesces a missing or null `status` to '' so `{}` and `{"status": null}` are refused; SQL NULL stays the only "not run" state.
+- `content_review_required_findings` now includes, under the focused policy, findings the adjudication accepted or refined — the rule the admin UI has applied since 2026-09-19. Before, the UI asked for such a decision and the DB refused the save (count mismatch); the gap predated this stage.
+- The adjudication error keeps its old prefix ("Adjudicate every Claude and DeepSeek finding exactly once").
+
+Real SQL check: `scripts/content-review-db.test.mjs` (PGlite, no network) now applies this migration on top of the existing chain. 40/40 pass: the 32 existing approval tests unchanged (existing approvals, multimodel_v2, weekly materials, rebind) plus 8 new ones — unknown states refused, not-run and failed do not block while a failure must state its cause, DeepSeek-only opinions require adjudication and a professor decision, zero opinions need no adjudication, incomplete results and a cross-check without Claude refused, accepted/refined warnings save, rebind copies the column, and a missing definition anchor aborts the whole batch including earlier statements.
+
+Rollback, if ever needed, is a new forward migration, not an undo: drop `deepseek_review` (this discards any stored DeepSeek results), restore `running_stage_check` without 'deepseek', drop `content_review_deepseek_findings`, and restore the previous definitions of four functions — `content_review_required_findings` (20260909230000), `validate_content_review_outputs` (20260906100000), `assert_content_review_base_ready` (current deployed definition minus the one replaced condition) and `rebind_content_review_gate` (20260912140000). Atomic abort on error relies on the migration running as one transaction (standard `supabase db push`); running its statements one by one could leave earlier ones applied.
