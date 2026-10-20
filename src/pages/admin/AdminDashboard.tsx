@@ -205,7 +205,8 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
+                // h-full: 긴 단계 이름(교차 검토 · 중국어 표현)이 두 줄이 되어도 같은 줄의 카드 높이를 맞춘다.
+                "group flex h-full min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
