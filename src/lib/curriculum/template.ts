@@ -86,7 +86,7 @@ interface StandardWeekSpec {
  * 화행 연쇄(협상)는 이번 구현에서 제외하고 논문 6장 후속 연구로 남긴다.
  */
 export const STANDARD_15WEEK: readonly StandardWeekSpec[] = [
-  { week_no: 1, db_type: "orientation", role: "orientation", speech_act: null, title: "오리엔테이션 · 출발점 확인" },
+  { week_no: 1, db_type: "orientation", role: "orientation", speech_act: null, title: "오리엔테이션" },
   { week_no: 2, db_type: "regular", role: "foundation", speech_act: "request", title: "요청" },
   { week_no: 3, db_type: "regular", role: "foundation", speech_act: "thanks", title: "감사" },
   { week_no: 4, db_type: "regular", role: "foundation", speech_act: "compliment", title: "칭찬" },

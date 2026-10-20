@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Printer } from "lucide-react";
 import { toast } from "sonner";
 import { AdminShell } from "@/components/AdminShell";
 import { CurriculumSyllabus } from "@/components/admin/CurriculumSyllabus";
@@ -1104,7 +1105,7 @@ function WeekRow({
   return (
     <div role="group" aria-label={`${week.week_no}주차 편성`} className="bg-white px-3 py-2">
       {/* 한 주차 = 한 줄. 열 너비를 고정해 15개 주차의 칸이 세로로 맞는다. 주차마다 같은 「번역 1개 · 통역 1개」 열은 두지 않는다 — 그 폭을 미션 제목에 준다. */}
-      <div className="grid min-h-9 grid-cols-[3.5rem_10rem_minmax(0,1fr)_3.75rem] items-center gap-x-3">
+      <div className="grid min-h-9 grid-cols-[3.5rem_10rem_minmax(0,1fr)_6.5rem] items-center gap-x-3">
         <span className="inline-flex h-6 items-center justify-center rounded-md bg-[#ECEFF1] text-[13px] font-semibold text-[#46515A]">
           {week.week_no}주차
         </span>
@@ -1136,19 +1137,22 @@ function WeekRow({
                 const feature = core?.target_feature ? getTargetFeature(core.target_feature) : undefined;
                 const featureLabel = core?.target_feature ? feature?.learner_label ?? core.target_feature : plannedLabel ?? "초점 미지정";
                 const title = core ? core.brief_note_ko?.trim() || core.situation_ko : "(누락된 시나리오)";
+                // 배치표에는 미션 전체(MJT 다섯 문항 + 통번역 과제)에 걸린 화용 초점만 보인다. 상황 요약은 마지막 통번역 과제
+                // 한 장면만 가리키므로 미션 이름으로 쓰지 않고, 마우스를 올렸을 때만 참고로 보인다.
+                const shortTitle = core ? featureLabel : "(누락된 시나리오)";
                 const needsReplace = Boolean(core && (core.schema_version !== "mission_v6" || replaced?.has(item.scenario_id)));
                 return (
                   <span
                     key={item.scenario_id}
-                    className="group flex min-w-0 items-center gap-1.5 rounded-md border border-[#E6E1D4] bg-[#FCFBF8] px-2 py-1"
-                    title={[title, `초점 · ${featureLabel}`, needsReplace ? (replaced?.has(item.scenario_id) ? "새 판 있음 · 교체 필요" : "교체 필요") : ""].filter(Boolean).join("\n")}
+                    className="group flex min-w-0 items-center gap-2 px-1 py-1"
+                    title={[`목표 화용요소 · ${featureLabel}`, core?.theme_code ? `주제 · ${THEME_LABEL[core.theme_code]}` : "", `통번역 과제 장면 · ${title}`, needsReplace ? (replaced?.has(item.scenario_id) ? "새 판 있음 · 교체 필요" : "교체 필요") : ""].filter(Boolean).join("\n")}
                   >
-                    <span className={`shrink-0 rounded px-1.5 py-px text-[13px] font-bold ${core?.mode === "stt_interpreting" ? "bg-[#E4ECF7] text-[#1F3A5F]" : "bg-[#F3E9D2] text-[#8A5A14]"}`}>
+                    <span className={`shrink-0 text-[13px] font-bold ${core?.mode === "stt_interpreting" ? "text-[#1F3A5F]" : "text-[#8A5A14]"}`}>
                       {core ? (core.mode === "stt_interpreting" ? MODE_LABEL.stt_interpreting : MODE_LABEL.translation) : "?"}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-[14px] text-[#202B33]">{title}</span>
+                    <span className="min-w-0 flex-1 truncate text-[14px] text-[#202B33]">{shortTitle}</span>
                     {needsReplace && <button type="button" onClick={() => onReplace(item.scenario_id)} aria-label={`${title} 교체하기`}
-                      className="shrink-0 text-[13px] font-semibold text-[#9A3F1C] underline-offset-4 hover:underline">교체</button>}
+                      className="shrink-0 text-[12.5px] font-medium text-[#9A3F1C]/80 underline-offset-4 hover:text-[#9A3F1C] hover:underline">교체</button>}
                     {/* 제거 ×는 평소 숨기고 칩에 마우스를 올리거나 키보드로 닿을 때만 보인다 — 배치표가 삭제 목록처럼 보이지 않게. */}
                     <button
                       type="button"
@@ -1179,14 +1183,15 @@ function WeekRow({
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`${week.week_no}주차 수업 자료 열기`}
-                className="inline-flex h-7 items-center justify-center rounded-md px-2 text-[13px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-[#1F3A5F] bg-white px-2.5 text-[13px] font-bold text-[#1F3A5F] hover:bg-[#EEF2F7]"
               >
-                자료
+                <Printer aria-hidden className="h-3.5 w-3.5" />
+                수업 자료
               </a>
             ) : <span />}
           </>
         ) : (
-          <span className="col-span-3 text-[14px] font-semibold text-[#46515A]">{displayTitle}</span>
+          <span className="col-span-3 text-[14px] font-bold text-[#15202B]">{displayTitle}</span>
         )}
       </div>
 

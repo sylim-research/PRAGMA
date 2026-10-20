@@ -55,7 +55,7 @@ describe("주차 학습 노트 조립", () => {
     expect(note.features[0].resources.join(" ")).toContain("주실 수 있을까요");
   });
 
-  it("칭찬 주차는 칭찬하기와 칭찬 대응 초점을 모두 유지한다", () => {
+  it("칭찬 주차도 기본 강좌의 목표 화용요소 하나만 보인다(칭찬 대응은 확장점)", () => {
     const note = buildWeeklyLearnerNote(
       week({
         title: "칭찬",
@@ -67,7 +67,6 @@ describe("주차 학습 노트 조립", () => {
 
     expect(note.features.map((feature) => feature.code)).toEqual([
       "compliment_grounding_sensitivity",
-      "compliment_response_uptake",
     ]);
   });
 

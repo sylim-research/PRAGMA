@@ -3,7 +3,7 @@ import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 type GuidanceWeek = { week_no: number; type: string; speech_act: string | null; title?: string | null };
 
 export const REINFORCEMENT_WEEK = 13;
-export const REINFORCEMENT_TITLE = "선택 화행 집중 보완";
+export const REINFORCEMENT_TITLE = "집중 보완";
 export const REINFORCEMENT_DESCRIPTION = "교강사가 기학습 화행 하나를 선택해 새 상황의 미션 두 개로 집중 보완합니다. 수행 결과는 14주 종합 토론으로 이어집니다.";
 export const CENTRAL_QUESTION_GUIDANCE = "중심 질문은 수업의 방향을 안내하는 대표 질문입니다. 관계(P)·거리(D)·부담(R), 상황과 원문의 의도에 따라 구체화하거나 바꿔 사용할 수 있습니다. 특정 표현 전략이나 정답을 요구하지 않습니다.";
 
@@ -35,11 +35,13 @@ export function previouslyLearnedActs(weeks: readonly GuidanceWeek[]): SpeechAct
 /** 화행·활동 표시 전용. 저장 제목과 역사적 편성은 재작성하지 않는다. */
 export function weekActivityLabel(week: GuidanceWeek): string {
   if (isReinforcementWeek(week)) return REINFORCEMENT_TITLE;
+  // 1주차 저장 제목(「오리엔테이션 · 출발점 확인」)은 그대로 두고 표시만 짧게 한다.
+  if (week.type === "orientation") return "오리엔테이션";
   if (week.type === "midterm") return "중간고사";
   if (week.type === "final") return "기말고사";
   if (week.type === "regular" && !week.speech_act) {
-    if (week.week_no === 7) return "중간 메타화용 토론";
-    if (week.week_no === 14) return "종합 메타화용 토론";
+    // 7·14주 = 누적 응답으로 하는 메타화용 토론 주차. 화행 주차(「요청 화행」)와 길이를 맞춘다.
+    if (week.week_no === 7 || week.week_no === 14) return "토론 활동";
   }
   if (week.speech_act && Object.prototype.hasOwnProperty.call(SPEECH_ACT_UI, week.speech_act)) {
     return SPEECH_ACT_UI[week.speech_act as SpeechActUI];
@@ -50,7 +52,8 @@ export function weekActivityLabel(week: GuidanceWeek): string {
 /** 주차 목록·칩에 쓰는 제목. 화행 주차는 「칭찬 화행」처럼, 나머지는 활동명으로. 학습자·교수자 화면이 같이 쓴다. */
 export function weekDisplayTitle(week: GuidanceWeek): string {
   if (!week.speech_act || !Object.prototype.hasOwnProperty.call(SPEECH_ACT_UI, week.speech_act)) return weekActivityLabel(week);
-  return `${SPEECH_ACT_UI[week.speech_act as SpeechActUI]} 화행${isReinforcementWeek(week) ? " · 새 상황에 적용하기" : ""}`;
+  if (isReinforcementWeek(week)) return `${REINFORCEMENT_TITLE} · ${SPEECH_ACT_UI[week.speech_act as SpeechActUI]}`;
+  return `${SPEECH_ACT_UI[week.speech_act as SpeechActUI]} 화행`;
 }
 
 export function weekCentralQuestion(week: GuidanceWeek): string | null {

@@ -10,7 +10,7 @@ import {
   type PdrPower,
 } from "@/lib/pragma/enums";
 import {
-  FEATURE_CODES_BY_ACT,
+  BASE_FEATURE_BY_ACT,
   getTargetFeature,
 } from "@/lib/pragma/targetFeatures";
 
@@ -59,8 +59,8 @@ const BURDEN_CONTEXT: Record<PdrBurden, string> = {
 function featureCodesForWeek(week: LearnerCourseWeek): string[] {
   // 수업 내용의 기준은 주차 계획이다. 배정 미션의 내부 진단 태그로 본문을 바꾸지 않는다.
   return week.speech_act
-    ? [...FEATURE_CODES_BY_ACT[week.speech_act]]
-    : [...new Set(week.scenarios.flatMap((scenario) => scenario.speech_act ? FEATURE_CODES_BY_ACT[scenario.speech_act] : []))];
+    ? [...BASE_FEATURE_BY_ACT[week.speech_act]]
+    : [...new Set(week.scenarios.flatMap((scenario) => scenario.speech_act ? BASE_FEATURE_BY_ACT[scenario.speech_act] : []))];
 }
 
 function contextCuesForWeek(week: LearnerCourseWeek): LearnerNoteContextCue[] {
