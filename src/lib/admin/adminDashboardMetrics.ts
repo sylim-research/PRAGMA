@@ -49,12 +49,18 @@ export type DashboardReviewRunRow = {
   generation_quality_hash?: string | null;
   /** Claude 별도 검토에 의견이 하나라도 있는가(첫 의견 id — 있으면 재검토 대상). */
   claude_first_finding?: string | null;
+  /** 교차 검토 · 중국어 표현의 상태: 없음 = 미실행, 'failed' = 실패, 'completed' = 완료(의견 0건 포함). */
+  deepseek_status?: string | null;
+  /** 완료된 중국어 표현 검토의 첫 의견 id — 있으면 재검토 대상. */
+  deepseek_first_finding?: string | null;
+  /** 감수 자료가 준비됐는가(단계 도입 전 기록을 소급해서 멈추지 않는 판단에 쓴다). */
+  finalization_stage?: string | null;
   approved_at?: string | null;
 };
 
 /** content_review_runs에서 DashboardReviewRunRow를 읽는 선택 컬럼. 대시보드와 승인 목록이 같은 규칙으로 센다. */
 export const DASHBOARD_REVIEW_RUN_SELECT =
-  "target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id";
+  "target_id,kind,criteria_version,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,created_at,approval_policy,independent_review_requested,approved_at,generation_quality_hash:generation_quality->>mission_content_hash,claude_first_finding:claude_review->result->findings->0->>id,deepseek_status:deepseek_review->>status,deepseek_first_finding:deepseek_review->result->findings->0->>id,finalization_stage:prepared_finalization->authoring->>stage";
 
 export type DashboardAssignmentRow = {
   outline_id: string;
@@ -71,6 +77,7 @@ export type DashboardReviewQueueStage =
   | "rules"
   | "openai"
   | "claude"
+  | "deepseek"
   | "adjudication"
   | "professor";
 
@@ -80,6 +87,7 @@ const REVIEW_QUEUE_STAGES: readonly DashboardReviewQueueStage[] = [
   "rules",
   "openai",
   "claude",
+  "deepseek",
   "adjudication",
   "professor",
 ];
@@ -190,7 +198,10 @@ export function nextDashboardReviewStage(
   if (run.approval_policy === FOCUSED_POLICY) {
     if (!run.openai_response_id && !run.generation_quality_hash) return "openai";
     if (run.independent_review_requested && !run.claude_response_id) return "claude";
-    if (run.independent_review_requested && run.claude_first_finding && !run.adjudication_response_id) return "adjudication";
+    // 패널의 nextReviewStage와 같은 규칙: 종합 검토 뒤 중국어 표현 검토 한 번(실패도 기록으로 남고 넘어간다).
+    if (run.independent_review_requested && !run.deepseek_status && !run.adjudication_response_id && !run.finalization_stage) return "deepseek";
+    const deepseekFinding = run.deepseek_status === "completed" && run.deepseek_first_finding;
+    if (run.independent_review_requested && (run.claude_first_finding || deepseekFinding) && !run.adjudication_response_id) return "adjudication";
     return "professor";
   }
   if (!run.openai_response_id) return "openai";
@@ -241,11 +252,11 @@ export function countRulesFailures(
 /** 누적 완료 집계용 run 행. 기준 버전·게이트 재결합(superseded) 구분 없이 모든 mission run을 읽는다. */
 export type DashboardCumulativeRunRow = Pick<
   DashboardReviewRunRow,
-  "target_id" | "kind" | "rules_verdict" | "openai_response_id" | "claude_response_id" | "adjudication_response_id" | "generation_quality_hash"
+  "target_id" | "kind" | "rules_verdict" | "openai_response_id" | "claude_response_id" | "adjudication_response_id" | "generation_quality_hash" | "deepseek_status"
 >;
 
 export const DASHBOARD_CUMULATIVE_RUN_SELECT =
-  "target_id,kind,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,generation_quality_hash:generation_quality->>mission_content_hash";
+  "target_id,kind,rules_verdict:rules->>verdict,openai_response_id:openai_review->>response_id,claude_response_id:claude_review->>response_id,adjudication_response_id:adjudication->>response_id,generation_quality_hash:generation_quality->>mission_content_hash,deepseek_status:deepseek_review->>status";
 
 export type DashboardCumulativeReviewCounts = Record<Exclude<DashboardReviewQueueStage, "professor">, number>;
 
@@ -262,19 +273,22 @@ export function summarizeCumulativeReviewCompletion(
   runs: readonly DashboardCumulativeRunRow[],
 ): DashboardCumulativeReviewCounts {
   const missionIds = new Set(rows.filter(isGeneratedMission).map((row) => row.scenario_id));
-  const done = { rules: new Set<string>(), openai: new Set<string>(), claude: new Set<string>(), adjudication: new Set<string>() };
+  const done = { rules: new Set<string>(), openai: new Set<string>(), claude: new Set<string>(), deepseek: new Set<string>(), adjudication: new Set<string>() };
   for (const run of runs) {
     if (run.kind !== "mission" || !missionIds.has(run.target_id)) continue;
     if (!run.rules_verdict || run.rules_verdict === "fail") continue;
     done.rules.add(run.target_id);
     if (run.openai_response_id || run.generation_quality_hash) done.openai.add(run.target_id);
     if (run.claude_response_id) done.claude.add(run.target_id);
+    // 실패는 완료로 세지 않는다.
+    if (run.deepseek_status === "completed") done.deepseek.add(run.target_id);
     if (run.adjudication_response_id) done.adjudication.add(run.target_id);
   }
   return {
     rules: done.rules.size,
     openai: done.openai.size,
     claude: done.claude.size,
+    deepseek: done.deepseek.size,
     adjudication: done.adjudication.size,
   };
 }

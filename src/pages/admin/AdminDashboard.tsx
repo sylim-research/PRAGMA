@@ -91,6 +91,7 @@ function dashboardMetricValues(snapshot: DashboardSnapshot): Record<DashboardMet
     "review.rules": snapshot.review.rules,
     "review.openai": snapshot.review.openai,
     "review.claude": snapshot.review.claude,
+    "review.deepseek": snapshot.review.deepseek,
     "review.adjudication": snapshot.review.adjudication,
     "review.professor": snapshot.review.professor,
     courses: snapshot.courses.total,
@@ -130,10 +131,12 @@ const PanelHeader = ({
 // (focused_v1: 자동 품질 점검 → AI 검토(OpenAI, 저장된 생성 품질점검 재사용) → 선택 시에만 Claude 교차 검토 → Claude 의견이 있을 때만 OpenAI 재검토 → 교수자 최종 승인).
 const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   // 표제는 기능명, 모델은 설명에 병기(2026-10-09 연구자 채택, 원고 3.4.2·4.2.2와 같은 이름).
-  // 「독립」은 1차 심사 결과를 입력받지 않는다는 뜻이며 오류의 독립성·정확성 보장을 뜻하지 않는다.
+  // 교차 검토 = 종합 검토 + 중국어 표현 검토(2026-10-20 연구자 확정, 원고 3.5 용어). 1차 심사 결과를 입력받지
+  // 않는다는 뜻이며 오류의 독립성·정확성 보장을 뜻하지 않는다.
   rules: "자동 규칙 점검",
   openai: "AI 품질 심사",
-  claude: "독립 AI 검토",
+  claude: "교차 검토 · 종합",
+  deepseek: "교차 검토 · 중국어 표현",
   adjudication: "검토 의견 재판정",
   // 「완료」는 카드 이름이 아니라 숫자 옆 단위에 붙인다(2026-10-10). 교수자 단계는 전체 흐름의 최종 승인 수와 같다.
   professor: "교수자 최종 승인",
@@ -149,14 +152,15 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "GPT-4.1 · 의미·화행 심사",
   claude: "Claude · 요청 시",
-  // Claude 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
+  deepseek: "DeepSeek · 요청 시",
+  // 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
   adjudication: "GPT-4.1 · 의견 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
-const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "adjudication"]);
+const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "deepseek", "adjudication"]);
 
 // Final evidence preparation belongs to the professor-work queue on this overview.
 const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== "finalization").map((stage, index) => ({
@@ -185,7 +189,7 @@ const ReviewPipeline = ({
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
   <div role="group" aria-label="품질 점검 단계">
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-6">
     {(() => {
       const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
         // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
@@ -201,7 +205,8 @@ const ReviewPipeline = ({
             <Link
               to={REVIEW_STAGE_ROUTE(stage.key)}
               className={[
-                "group flex min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
+                // h-full: 긴 단계 이름(교차 검토 · 중국어 표현)이 두 줄이 되어도 같은 줄의 카드 높이를 맞춘다.
+                "group flex h-full min-h-[80px] flex-col rounded-xl border bg-white px-4 py-[13px]",
                 "motion-safe:transition-colors motion-safe:duration-200 hover:border-[#B9C3CA] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C8AA2F]",
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
@@ -241,14 +246,14 @@ const ReviewPipeline = ({
       return (
         <>
           {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
-          {/* 선택 단계(3·4)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
+          {/* 선택 단계(3·4·5)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
           <div
             role="group"
-            aria-label="필요 시 독립 검토와 재판정"
-            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-2 sm:grid-cols-2"
+            aria-label="필요 시 교차 검토와 재판정"
+            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-3 sm:grid-cols-3"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[12px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              필요 시 독립 검토와 재판정
+              필요 시 교차 검토와 재판정
             </span>
             {optional.map(renderStage)}
           </div>
@@ -537,7 +542,7 @@ const AdminDashboard = () => {
 
       <DashboardResourceOverview resources={snapshot?.resources ?? null} error={displayError} status={liveStatus(true)} />
 
-      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4는 선택 단계라 점선이다. */}
+      {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4·5는 선택 단계라 점선이다. */}
       <PanelHeader no={2} title="콘텐츠 품질 관리" />
       <ReviewPipeline
         review={snapshot?.review ?? null}

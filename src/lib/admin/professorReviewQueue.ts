@@ -40,8 +40,9 @@ export function qualityCheckQueueOf(
 
 const STAGE_STATUS:Record<Exclude<DashboardReviewQueueStage, "rules">, string> = {
   openai: "규칙 통과 · OpenAI 검토 전",
-  claude: "규칙 통과 · OpenAI 검토 완료 · Claude 검토 전",
-  adjudication: "규칙 통과 · Claude 의견 OpenAI 재검토 전",
+  claude: "규칙 통과 · OpenAI 검토 완료 · 교차 검토 전",
+  deepseek: "규칙 통과 · 교차 검토 · 종합 완료 · 중국어 표현 검토 전",
+  adjudication: "규칙 통과 · 교차 검토 의견 OpenAI 재검토 전",
   professor: "규칙 통과 · OpenAI 검토 완료 · 교수자 결정 대기",
 };
 

@@ -100,10 +100,10 @@ describe("admin dashboard metrics", () => {
     ];
 
     const counts = summarizeDashboardReviewStages(rows, runs);
-    expect(counts).toEqual({ rules: 2, openai: 1, claude: 1, adjudication: 1, professor: 1 });
+    expect(counts).toEqual({ rules: 2, openai: 1, claude: 1, deepseek: 0, adjudication: 1, professor: 1 });
     expect(Object.values(counts).reduce((sum, value) => sum + value, 0)).toBe(rows.length);
     expect(dominantDashboardReviewStage(counts)).toBe("rules");
-    expect(dominantDashboardReviewStage({ rules: 0, openai: 0, claude: 0, adjudication: 0, professor: 0 })).toBeNull();
+    expect(dominantDashboardReviewStage({ rules: 0, openai: 0, claude: 0, deepseek: 0, adjudication: 0, professor: 0 })).toBeNull();
   });
 
   it("경량 검수(focused_v1)는 AI 검토 1회 뒤 곧바로 교수자로 가고, 추가 검토는 선택했을 때만 거친다", () => {
@@ -116,12 +116,20 @@ describe("admin dashboard metrics", () => {
     // 재사용할 것이 없으면 AI 검토 1회.
     expect(focused({})).toBe("openai");
     expect(focused({ openai_response_id: "o" })).toBe("professor");
-    // 추가 검토를 선택한 경우에만 Claude → (의견이 있을 때만) 재검토 → 교수자.
+    // 추가 검토를 선택한 경우에만 Claude → DeepSeek(중국어 표현) → (의견이 있을 때만) 재검토 → 교수자.
     expect(focused({ openai_response_id: "o", independent_review_requested: true })).toBe("claude");
     expect(focused({ openai_response_id: "o", independent_review_requested: true, claude_response_id: "c", claude_first_finding: "f1" }))
-      .toBe("adjudication");
-    expect(focused({ openai_response_id: "o", independent_review_requested: true, claude_response_id: "c", claude_first_finding: null }))
-      .toBe("professor");
+      .toBe("deepseek");
+    const cross = { openai_response_id: "o", independent_review_requested: true, claude_response_id: "c" };
+    expect(focused({ ...cross, claude_first_finding: "f1", deepseek_status: "completed" })).toBe("adjudication");
+    // 실패는 승인을 막지 않는다 — Claude 의견만 재검토로 넘어간다.
+    expect(focused({ ...cross, claude_first_finding: "f1", deepseek_status: "failed" })).toBe("adjudication");
+    expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "failed" })).toBe("professor");
+    expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "completed" })).toBe("professor");
+    // DeepSeek 의견만 있어도 재검토를 거친다.
+    expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "completed", deepseek_first_finding: "deepseek-1" })).toBe("adjudication");
+    // 단계 도입 전에 감수 자료까지 준비된 기록은 소급해서 멈추지 않는다.
+    expect(focused({ ...cross, claude_first_finding: null, finalization_stage: "professor_finalized" })).toBe("professor");
     expect(focused({ openai_response_id: "o", independent_review_requested: true, claude_response_id: "c", claude_first_finding: "f1", adjudication_response_id: "a" }))
       .toBe("professor");
     // 규칙 검사 fail은 정책과 무관하게 규칙 검사로 남는다.

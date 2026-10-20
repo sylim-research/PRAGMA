@@ -105,7 +105,7 @@ describe("admin dashboard", () => {
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "지금 대기 2개");
-    const claude = within(stages).getByRole("link", { name: /독립 AI 검토/ });
+    const claude = within(stages).getByRole("link", { name: /교차 검토 · 종합/ });
     expect(claude.textContent).toMatch(/1\s*개/);
     expect(claude).toHaveAttribute("title", "지금 대기 0개");
     const professor = within(stages).getByRole("link", { name: /교수자 최종 승인/ });
@@ -155,7 +155,7 @@ describe("admin dashboard", () => {
     show();
     const rulesCard = await screen.findByRole("link", { name: /자동 규칙 점검/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["AI 품질 심사", "독립 AI 검토", "검토 의견 재판정"]) {
+    for (const label of ["AI 품질 심사", "교차 검토 · 종합", "교차 검토 · 중국어 표현", "검토 의견 재판정"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
     const stages = screen.getByRole("group", { name: "품질 점검 단계" });

@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type ReviewInspection, type ReviewTarget } from "../_shared/contentReview.ts";
+import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, canRetryDeepseek, DEEPSEEK_PROMPT_VERSION, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type DeepseekReview, type ReviewInspection, type ReviewResult, type ReviewTarget } from "../_shared/contentReview.ts";
 import { callContentReviewer } from "../_shared/contentReviewProvider.ts";
 import { OPENAI_MODEL_ROUTES } from "../_shared/openaiRequestContract.ts";
 import { buildContentReviewDomain, missionFinalizationInput } from "./domain.generated.mjs";
@@ -27,14 +27,16 @@ Deno.serve(async (req) => {
     const { action, target, expectedVersion } = JSON.parse(rawBody) as {
       action: string; target: ReviewTarget; expectedVersion?: { contentHash: string; sourceHash: string };
     };
-    if (!["inspect", "rules", "openai", "claude", "adjudication", "finalization", "request_independent"].includes(action)
+    if (!["inspect", "rules", "openai", "claude", "deepseek", "deepseek_retry", "adjudication", "finalization", "request_independent"].includes(action)
       || !target || !["mission", "weekly_material"].includes(target.kind) || !uuid.test(target.targetId)
       || (target.kind === "weekly_material" && (!Number.isInteger(target.weekNo) || target.weekNo! < 1 || target.weekNo! > 15))) {
       return json({ error: "검수 대상·단계를 확인해 주세요." }, 400);
     }
     const db = createClient(url, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     const weekNo = target.kind === "mission" ? 0 : target.weekNo!;
-    const models = { openai: OPENAI_MODEL_ROUTES.critic.primary, claude: Deno.env.get("CLAUDE_AUDIT_MODEL") || null };
+    // DeepSeek model id is managed in one place (DEEPSEEK_REVIEW_MODEL); deepseek-chat was retired on 2026-07-24.
+    const models = { openai: OPENAI_MODEL_ROUTES.critic.primary, claude: Deno.env.get("CLAUDE_AUDIT_MODEL") || null,
+      deepseek: Deno.env.get("DEEPSEEK_REVIEW_MODEL") || "deepseek-v4-pro" };
     const sourceFor = async (kind: string, id: string, week = 0) => {
       const { data, error } = await db.rpc("get_content_review_source", { p_kind: kind, p_target_id: id, p_week_no: week });
       if (error) throw new Error(`검수 원본 조회 실패: ${error.message}`);
@@ -104,7 +106,42 @@ Deno.serve(async (req) => {
       if (error) throw new Error("추가 검토 선택 저장 실패");
       return json(await inspect());
     }
-    if (!run || run.rules.verdict === "fail" || nextReviewStage(run) !== action) return json({ error: "선행 단계를 완료하거나 현재 콘텐츠의 규칙 오류를 수정해 주세요." }, 409);
+    const retry = action === "deepseek_retry";
+    if (!run || run.rules.verdict === "fail" || (retry ? !canRetryDeepseek(run) : nextReviewStage(run) !== action)) return json({ error: "선행 단계를 완료하거나 현재 콘텐츠의 규칙 오류를 수정해 주세요." }, 409);
+    if (action === "deepseek" || retry) {
+      // Optional cross-check: a missing key, an empty balance or a provider error is saved as a failed state and
+      // the flow continues. Only content is sent — the snapshot, never learner records or earlier model opinions.
+      const token = crypto.randomUUID();
+      let claim = db.from("content_review_runs").update({ running_stage: "deepseek", lease_token: token,
+        lease_until: new Date(Date.now() + 5 * 60_000).toISOString(), last_error: null,
+      }).eq("id", run.id).is("approved_at", null).or(`running_stage.is.null,lease_until.lt.${new Date().toISOString()}`);
+      claim = retry ? claim.eq("deepseek_review->>status", "failed") : claim.is("deepseek_review", null);
+      const { data: claimed, error: claimError } = await claim.select("id").maybeSingle();
+      if (claimError) throw new Error("검수 실행 잠금 실패");
+      if (!claimed) return json({ error: "이미 실행 중이거나 완료된 단계입니다. 잠시 후 결과를 새로고침하세요." }, 409);
+      const apiKey = Deno.env.get("DEEPSEEK_API_KEY");
+      let review: DeepseekReview;
+      try {
+        if (!apiKey) throw new Error("DEEPSEEK_API_KEY 설정이 필요합니다. 호출하지 않았습니다.");
+        const result = await callContentReviewer({ stage: "deepseek", run, apiKey, model: models.deepseek });
+        review = { ...(result as typeof result & { result: ReviewResult }), status: "completed" };
+      } catch (cause) {
+        review = { status: "failed", provider: "deepseek", requested_model: models.deepseek, checked_at: new Date().toISOString(),
+          prompt_version: `${CONTENT_REVIEW_VERSION}:deepseek`, stage_prompt_version: DEEPSEEK_PROMPT_VERSION, error_ko: (cause instanceof Error ? cause.message : "중국어 표현 검토 실패").slice(0, 400) };
+      }
+      // A retry that finally yields opinions after a Claude-only adjudication re-opens adjudication, so every
+      // completed cross-check opinion is judged before the professor decides (retry is refused once decisions exist).
+      const reopen = retry && review.status === "completed" && review.result.findings.length > 0 && run.adjudication;
+      const { data: saved, error } = await db.from("content_review_runs").update({ deepseek_review: review,
+        ...(reopen ? { adjudication: null } : {}), running_stage: null, lease_token: null, lease_until: null,
+      }).eq("id", run.id).eq("lease_token", token).select("id").maybeSingle();
+      if (error || !saved) {
+        await db.from("content_review_runs").update({ running_stage: null, lease_token: null, lease_until: null,
+          last_error: "중국어 표현 검토 결과 저장 실패" }).eq("id", run.id).eq("lease_token", token);
+        throw new Error("응답 저장 실패. 재실행 전에 기존 호출 결과와 저장소 상태를 확인해 주세요.");
+      }
+      return json(await inspect());
+    }
     if (action === "finalization") {
       const token = crypto.randomUUID();
       const { data: claimed, error: claimError } = await db.from("content_review_runs").update({

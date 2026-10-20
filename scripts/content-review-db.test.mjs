@@ -119,6 +119,8 @@ before(async () => {
   // Every test below runs on the v3-compatible approval contract; the v2 tests above double as compatibility checks.
   await db.exec(await sqlFile('20260912090000_content_review_v3_approval.sql'));
   await db.exec(await sqlFile('20260912140000_content_review_gate_rebind.sql'));
+  // Chinese expression cross-check (2026-10-20): every earlier test also runs on top of it.
+  await db.exec(await sqlFile('20261020120000_deepseek_cross_review.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -679,4 +681,108 @@ test('prepared signal evidence is stale after a source edit and cannot be replac
   await modelRoleSetPrepared(r.id,prepared);
   await db.query("update scenarios set core_content=core_content || '{\"situation_ko\":\"수정된 원본\"}'::jsonb where scenario_id=$1",[m.id]);
   await assert.rejects(finalize(m,r,{mission_content:prepared}),/Content changed/);
+});
+
+// ── Chinese expression cross-check (DeepSeek, 2026-10-20) ──
+// Three states: SQL NULL = not run, 'failed' = attempted and failed, 'completed' = finished (zero findings included).
+const dsCompleted=(findings=[])=>({...model('deepseek',{verdict:findings.length?'warning':'pass',findings}),status:'completed',provider:'deepseek'});
+const dsFailed=(extra={})=>({status:'failed',provider:'deepseek',requested_model:'deepseek-v4-pro',checked_at:'2026-10-20T00:00:00Z',
+  prompt_version:'content_review_v2:deepseek',error_ko:'DEEPSEEK_API_KEY 설정이 필요합니다.',...extra});
+const dsFinding={id:'deepseek-1',severity:'warning',needs_professor:true,issue_ko:'의도 결함 불분명 확인'};
+/** Focused review with the cross-check requested and a Claude review that found nothing. */
+async function crossCheckReview() {
+  const f=await focusedReview();
+  await db.query('update content_review_runs set independent_review_requested=true,claude_review=$2 where id=$1',[f.r.id,model('claude',pass)]);
+  return f;
+}
+const setDeepseek=(id,value)=>db.query('update content_review_runs set deepseek_review=$2 where id=$1',[id,value]);
+const decide=(r,ids)=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[r.id,hash,ids.map((finding_id)=>({finding_id,decision:'no_change',rationale_ko:rationale}))]));
+
+test('deepseek: an object without a known status is refused, so no unknown fourth state can be stored', async () => {
+  const {r}=await crossCheckReview();
+  for (const bad of [{}, {status:null}, {status:'running'}, ['completed'], '"completed"']) {
+    await assert.rejects(setDeepseek(r.id,bad),/check constraint/);
+  }
+  await setDeepseek(r.id,null);
+  await setDeepseek(r.id,dsFailed());
+  await db.query("update content_review_runs set running_stage='deepseek' where id=$1",[r.id]);
+  await db.query('update content_review_runs set running_stage=null where id=$1',[r.id]);
+});
+
+test('deepseek: not run and failed never block approval; a failure must still say why', async () => {
+  const notRun=await crossCheckReview();
+  assert.equal(await finalize(notRun.m,notRun.r),notRun.m.id);
+  const failed=await crossCheckReview();
+  await setDeepseek(failed.r.id,dsFailed({error_ko:'  '}));
+  await assert.rejects(finalize(failed.m,failed.r),/must record its cause/);
+  await setDeepseek(failed.r.id,dsFailed());
+  assert.equal(await finalize(failed.m,failed.r),failed.m.id);
+});
+
+test('deepseek: completed opinions alone require adjudication of each one and a professor decision', async () => {
+  const {m,r}=await crossCheckReview();
+  await setDeepseek(r.id,dsCompleted([dsFinding]));
+  await assert.rejects(finalize(m,r),/required quality evidence/);
+  await db.query('update content_review_runs set adjudication=$2 where id=$1',[r.id,model('adjudication',{decisions:[]})]);
+  await assert.rejects(finalize(m,r),/Adjudicate every Claude and DeepSeek finding exactly once/);
+  await db.query('update content_review_runs set adjudication=$2 where id=$1',
+    [r.id,model('adjudication',{decisions:[{finding_id:'deepseek-1',decision:'reject',rationale_ko:rationale}]})]);
+  await assert.rejects(finalize(m,r),/Record every professor decision/);
+  await decide(r,['deepseek-1']);
+  assert.equal(await finalize(m,r),m.id);
+});
+
+test('deepseek: a completed review with zero opinions needs no adjudication', async () => {
+  const {m,r}=await crossCheckReview();
+  await setDeepseek(r.id,dsCompleted());
+  assert.equal(await finalize(m,r),m.id);
+});
+
+test('deepseek: an incomplete completed result or a cross-check without Claude is refused', async () => {
+  const {m,r}=await crossCheckReview();
+  await setDeepseek(r.id,{...dsCompleted(),response_id:''});
+  await assert.rejects(finalize(m,r),/Incomplete model review output/);
+  await setDeepseek(r.id,dsCompleted());
+  await db.query('update content_review_runs set claude_review=null,independent_review_requested=false where id=$1',[r.id]);
+  await assert.rejects(finalize(m,r),/belongs to the cross-check after Claude/);
+});
+
+test('a warning the adjudication accepted or refined is a required decision the DB accepts (UI and DB agree)', async () => {
+  for (const kind of ['accept','refine']) {
+    const {m,r}=await crossCheckReview();
+    const warning={id:'deepseek-1',severity:'warning',needs_professor:false,issue_ko:'연어 확인'};
+    await setDeepseek(r.id,dsCompleted([warning]));
+    await db.query('update content_review_runs set adjudication=$2 where id=$1',
+      [r.id,model('adjudication',{decisions:[{finding_id:'deepseek-1',decision:kind,rationale_ko:rationale}]})]);
+    assert.deepEqual((await scalar('select content_review_required_findings(r) from content_review_runs r where id=$1',[r.id])).map((f)=>f.id),['deepseek-1']);
+    await assert.rejects(finalize(m,r),/Record every professor decision/);
+    await decide(r,['deepseek-1']);
+    assert.equal(await finalize(m,r),m.id);
+  }
+  // A rejected warning stays out of the required list, as before.
+  const {r}=await crossCheckReview();
+  await setDeepseek(r.id,dsCompleted([{id:'deepseek-1',severity:'warning',needs_professor:false}]));
+  await db.query('update content_review_runs set adjudication=$2 where id=$1',
+    [r.id,model('adjudication',{decisions:[{finding_id:'deepseek-1',decision:'reject',rationale_ko:rationale}]})]);
+  assert.deepEqual(await scalar('select content_review_required_findings(r) from content_review_runs r where id=$1',[r.id]),[]);
+});
+
+test('deepseek: the gate rebind carries the Chinese expression review forward unchanged', async () => {
+  const {r}=await gateRebindFixture('pass','pass');
+  const ds=dsCompleted();
+  await db.query("update content_review_runs set deepseek_review=$2, criteria_version='content_review_v3' where id=$1",
+    [r.id,{...ds,prompt_version:'content_review_v3:deepseek'}]);
+  const id=await rebind(r.id);
+  assert.deepEqual((await rowOf(id)).deepseek_review,{...ds,prompt_version:'content_review_v3:deepseek'});
+  assert.deepEqual((await rowOf(r.id)).deepseek_review,{...ds,prompt_version:'content_review_v3:deepseek'});
+});
+
+test('deepseek migration: a missing definition anchor aborts the whole statement batch, earlier changes included', async () => {
+  const migration=await sqlFile('20261020120000_deepseek_cross_review.sql');
+  const guarded=migration.slice(migration.indexOf('DO $migration$'))
+    .replace("v_anchor := $a$(jsonb_array_length(v_review.claude_review#>'{result,findings}') > 0 AND v_review.adjudication IS NULL)$a$;",
+      "v_anchor := 'definition text that does not exist';");
+  assert.notEqual(guarded,migration.slice(migration.indexOf('DO $migration$')));
+  await assert.rejects(db.exec(`ALTER TABLE public.content_review_runs ADD COLUMN atomic_probe int;\n${guarded}`),/Unexpected review readiness definition/);
+  assert.equal(await scalar("select count(*)::int from information_schema.columns where table_name='content_review_runs' and column_name='atomic_probe'"),0);
 });
