@@ -40,6 +40,7 @@ const AdminGoldCalibration = lazy(() => import("./pages/admin/AdminGoldCalibrati
 const AdminMissionRelease = lazy(() => import("./pages/admin/AdminFinalApproval.tsx"));
 const AdminFinalCorpusReview = lazy(() => import("./pages/admin/AdminFinalCorpusReview.tsx"));
 const AdminImprovementFlywheel = lazy(() => import("./pages/admin/AdminImprovementFlywheel.tsx"));
+const AdminMissionHandout = lazy(() => import("./pages/admin/AdminMissionHandout.tsx"));
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin.tsx"));
 const StudentLogin = lazy(() => import("./pages/StudentLogin.tsx"));
 const PendingApproval = lazy(() => import("./pages/PendingApproval.tsx"));
@@ -59,6 +60,10 @@ const LearnerRecordsDemo = import.meta.env.DEV
   : null;
 const ClassDiscussionDemo = import.meta.env.DEV
   ? lazy(() => import("./pages/dev/ClassDiscussionDemo.tsx"))
+  : null;
+// 주차 미션 자료(문항지·해설지) 시연 — 개발 모드 전용, 로그인 없이 대표 미션으로 연다.
+const MissionHandoutDemo = import.meta.env.DEV
+  ? lazy(() => import("./pages/dev/MissionHandoutDemo.tsx"))
   : null;
 const CourseOverview = lazy(() => import("./pages/learner/CourseOverview.tsx"));
 const WeekDetail = lazy(() => import("./pages/learner/WeekDetail.tsx"));
@@ -148,6 +153,9 @@ const App = () => (
           )}
           {ClassDiscussionDemo && (
             <Route path="/dev/class-discussion-demo" element={<ClassDiscussionDemo />} />
+          )}
+          {MissionHandoutDemo && (
+            <Route path="/dev/handout-demo" element={<MissionHandoutDemo />} />
           )}
           {/* 홈은 폐지 — 학습자 착지 화면은 수업이다(2026-08-01). 옛 링크·북마크는 그대로 잇는다. */}
           <Route path="/learner/home" element={<Navigate to="/learner/course" replace />} />
@@ -313,6 +321,7 @@ const App = () => (
           <Route path="/admin/curriculum" element={<Navigate to="/admin/composer" replace />} />
           <Route path="/admin/composer" element={<RequireAdmin><AdminComposer /></RequireAdmin>} />
           <Route path="/admin/composer/new" element={<RequireAdmin><AdminComposer /></RequireAdmin>} />
+          <Route path="/admin/handout" element={<RequireAdmin><AdminMissionHandout /></RequireAdmin>} />
           <Route path="/admin/prompt-harness" element={<RequireAdmin><AdminPromptHarness /></RequireAdmin>} />
           {/* 같은 미션 목록을 목적별로 나눠 본다. AI 화면에는 승인 기능이 없다. */}
           <Route path="/admin/ai-review" element={<RequireAdmin><AdminAssembly key="ai-review" reviewMode aiReview /></RequireAdmin>} />

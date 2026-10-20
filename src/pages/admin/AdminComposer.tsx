@@ -1172,6 +1172,17 @@ function WeekRow({
               >
                 {adding ? "닫기" : "+ 미션"}
               </Button>
+            ) : items.length > 0 ? (
+              // 자리가 다 찬 주차 = 그 주의 문항지·해설지를 새 탭으로 연다(플랫폼을 쓸 수 없는 수업 대비).
+              <a
+                href={`/admin/handout?ids=${encodeURIComponent(items.map((item) => item.scenario_id).join(","))}&title=${encodeURIComponent(`${week.week_no}주차 ${displayTitle}`)}`}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${week.week_no}주차 수업 자료 열기`}
+                className="inline-flex h-7 items-center justify-center rounded-md px-2 text-[13px] font-semibold text-[#1F3A5F] hover:bg-[#EEF2F7]"
+              >
+                자료
+              </a>
             ) : <span />}
           </>
         ) : (
