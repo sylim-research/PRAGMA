@@ -2,7 +2,7 @@ import { webcrypto } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { buildContentReviewDomain } from "./contentReviewDomain";
-import { BULK_SIGNAL_RATIONALE, buildReviewPrompt, effectiveReviewSteps, instructionalMission, isBulkEligibleSignal, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
+import { BULK_SIGNAL_RATIONALE, buildReviewPrompt, canRetryDeepseek, crossReviewFindings, effectiveReviewSteps, instructionalMission, isBulkEligibleSignal, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
@@ -46,7 +46,9 @@ describe("current content five-stage review", () => {
       openai_review: null, claude_review: null};
     expect(nextReviewStage(focused)).toBe("professor");
     expect(nextReviewStage({...focused, independent_review_requested: true})).toBe("claude");
-    expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review})).toBe("adjudication");
+    expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review})).toBe("deepseek");
+    expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review,
+      deepseek_review: { status: "failed", provider: "deepseek", requested_model: "deepseek-v4-pro", error_ko: "키 없음", checked_at: "x", prompt_version: "v" }})).toBe("adjudication");
     expect(nextReviewStage({...focused, generation_quality: null})).toBe("openai");
     expect(effectiveReviewSteps(focused)).toEqual([
       { key: "rules", label: "규칙 검사" },
@@ -54,7 +56,7 @@ describe("current content five-stage review", () => {
       { key: "professor", label: "교수자 최종 승인" },
     ]);
     expect(effectiveReviewSteps({...focused, independent_review_requested: true, claude_review: run().claude_review})
-      .map(step => step.key)).toEqual(["rules", "openai", "claude", "adjudication", "professor"]);
+      .map(step => step.key)).toEqual(["rules", "openai", "claude", "deepseek", "adjudication", "professor"]);
   });
   it("keeps critical and uncertain findings from both models for human decisions", () => {
     const original = run();
@@ -88,14 +90,14 @@ describe("current content five-stage review", () => {
   it("requires exactly one reasoned disposition per Claude finding, including rejection", () => {
     const decision = { finding_id: "claude-1", decision: "reject", rationale_ko: "원문에 참여 행위가 명시됨", proposed_change_ko: "", needs_professor: true,
       evidence_path: "/content/source", evidence_quote: "参加活动" };
-    expect(validateAdjudication({ summary_ko: "확인", decisions: [decision] }, audit, snapshot).decisions[0].decision).toBe("reject");
+    expect(validateAdjudication({ summary_ko: "확인", decisions: [decision] }, audit.findings, snapshot).decisions[0].decision).toBe("reject");
     for (const decisions of [[], [decision, decision], [{ ...decision, finding_id: "invented" }], [{ ...decision, rationale_ko: "" }]]) {
-      expect(() => validateAdjudication({ summary_ko: "확인", decisions }, audit, snapshot)).toThrow();
+      expect(() => validateAdjudication({ summary_ko: "확인", decisions }, audit.findings, snapshot)).toThrow();
     }
     expect(audit.findings[0].issue_ko).toBe("지적");
     const { evidence_quote: _quote, ...wireDecision } = decision;
     const restored = materializeReviewEvidence({ summary_ko: "확인", decisions: [wireDecision] }, snapshot, true);
-    expect(validateAdjudication(restored, audit, snapshot).decisions[0].evidence_quote).toBe(snapshot.content.source);
+    expect(validateAdjudication(restored, audit.findings, snapshot).decisions[0].evidence_quote).toBe(snapshot.content.source);
   });
 
   it("rejects invented evidence and inconsistent pass verdicts", () => {
@@ -343,5 +345,60 @@ describe("current content five-stage review", () => {
     await expect(callContentReviewer({ stage: "claude", run: run(), apiKey: "test", model: "claude-opus-5", fetcher }))
       .rejects.toThrow("Claude 응답 대기 130초를 초과했습니다. 이전 단계 결과는 보존되며 자동 재호출은 없습니다.");
     expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("cross-check: Chinese expression review (DeepSeek)", () => {
+  const { quote: _quote, ...wireFinding } = finding;
+  const deepseekResult = validateReviewResult({ verdict: "warning", summary_ko: "표현", findings: [{ ...finding, problem_type_ko: "제작 결함 · 어휘" }] }, snapshot, "deepseek");
+  const completed = { status: "completed" as const, result: deepseekResult, provider: "deepseek" as const, model: "deepseek-v4-pro", requested_model: "deepseek-v4-pro",
+    response_id: "ds-1", usage: {}, checked_at: "2026-10-20T00:00:00Z", prompt_version: "content_review_v3:deepseek", input_hash: "a".repeat(64) };
+  const failed = { status: "failed" as const, provider: "deepseek" as const, requested_model: "deepseek-v4-pro", error_ko: "DEEPSEEK_API_KEY 설정이 필요합니다.",
+    checked_at: "2026-10-20T00:00:00Z", prompt_version: "content_review_v3:deepseek" };
+  const cross = () => ({ ...run(), approval_policy: "focused_v1" as const, independent_review_requested: true });
+
+  it("sends only content to DeepSeek and keeps the learning-material role rules in the prompt", async () => {
+    const output = { verdict: "warning", summary_ko: "표현", findings: [wireFinding] };
+    const fetcher = vi.fn().mockResolvedValue(new Response(JSON.stringify({ id: "ds-reply", model: "deepseek-v4-pro", usage: { total_tokens: 10 },
+      choices: [{ finish_reason: "stop", message: { content: JSON.stringify(output), reasoning_content: "private" } }] })));
+    const result = await callContentReviewer({ stage: "deepseek", run: cross(), apiKey: "test", model: "deepseek-v4-pro", fetcher });
+    expect(fetcher.mock.calls[0][0]).toBe("https://api.deepseek.com/chat/completions");
+    const request = JSON.parse(fetcher.mock.calls[0][1].body);
+    expect(request.response_format).toEqual({ type: "json_object" });
+    expect(JSON.parse(request.messages[1].content)).toEqual(snapshot);
+    const prompt = request.messages.map((m: { content: string }) => m.content).join("\n");
+    for (const hidden of ["OPENAI_PRIVATE_VERDICT", "claude-1", "모어 화자"]) expect(prompt).not.toContain(hidden);
+    for (const rule of ["의도된 대비와 제작 결함을 구별", "판단을 유보", "유일한 정답으로 확정하지 마라", "json"]) expect(prompt).toContain(rule);
+    expect(result).toMatchObject({ provider: "deepseek", prompt_version: "content_review_v3:deepseek", result: { findings: [{ id: "deepseek-1" }] } });
+    expect(JSON.stringify(result)).not.toContain("private");
+  });
+
+  it("runs after Claude, records failure without blocking, and never runs on records adjudicated before the stage existed", () => {
+    expect(nextReviewStage(cross())).toBe("deepseek");
+    expect(nextReviewStage({ ...cross(), deepseek_review: failed })).toBe("adjudication");
+    const noClaudeFindings = { ...cross(), claude_review: { ...run().claude_review!, result: { verdict: "pass" as const, summary_ko: "없음", findings: [] } } };
+    expect(nextReviewStage({ ...noClaudeFindings, deepseek_review: failed })).toBe("professor");
+    expect(nextReviewStage({ ...noClaudeFindings, deepseek_review: completed })).toBe("adjudication");
+    expect(nextReviewStage({ ...cross(), adjudication: { result: { summary_ko: "x", decisions: [] } } as any })).toBe("professor");
+    expect(canRetryDeepseek({ ...cross(), deepseek_review: failed })).toBe(true);
+    expect(canRetryDeepseek({ ...cross(), deepseek_review: completed })).toBe(false);
+    expect(canRetryDeepseek({ ...cross(), deepseek_review: failed, professor_decisions: [{ finding_id: "claude-1", decision: "no_change", rationale_ko: "충분한 근거가 있습니다" }] })).toBe(false);
+  });
+
+  it("puts completed DeepSeek opinions under the same adjudication and professor rules as Claude's", () => {
+    const withDeepseek = { ...cross(), deepseek_review: completed };
+    expect(professorReviewFindings(withDeepseek).map(f => f.id)).toEqual(["claude-1", "deepseek-1"]);
+    expect(professorReviewFindings({ ...cross(), deepseek_review: failed }).map(f => f.id)).toEqual(["claude-1"]);
+    const prompt = buildReviewPrompt("adjudication", snapshot, withDeepseek);
+    expect(JSON.parse(prompt.user)).toEqual({ snapshot, claude_review: audit, deepseek_review: deepseekResult });
+    expect(prompt.system).toContain("다수결");
+    expect(prompt.user).not.toContain("OPENAI_PRIVATE_VERDICT");
+    const decision = (id: string) => ({ finding_id: id, decision: "accept", rationale_ko: "근거", proposed_change_ko: "수정", needs_professor: false,
+      evidence_path: "/content/source", evidence_quote: "请您参加活动。" });
+    const findings = crossReviewFindings(withDeepseek);
+    expect(validateAdjudication({ summary_ko: "확인", decisions: [decision("claude-1"), decision("deepseek-1")] }, findings, snapshot).decisions).toHaveLength(2);
+    expect(() => validateAdjudication({ summary_ko: "확인", decisions: [decision("claude-1")] }, findings, snapshot)).toThrow();
+    // Without a completed DeepSeek review the adjudication input is unchanged.
+    expect(JSON.parse(buildReviewPrompt("adjudication", snapshot, { ...cross(), deepseek_review: failed }).user)).toEqual({ snapshot, claude_review: audit });
   });
 });

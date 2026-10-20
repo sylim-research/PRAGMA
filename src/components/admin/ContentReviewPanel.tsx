@@ -7,7 +7,7 @@ import { approveContentReview, contentReviewRequest, saveProfessorDecisions, sav
 import { InstructorReviewExperience } from "./InstructorReviewExperience";
 import { experienceComplete } from "@/lib/pragma/instructorExperience";
 import { reviewTargetKey, startReviewPreparation, useReviewPreparationQueue } from "@/lib/pragma/reviewPreparationQueue";
-import { CONTENT_APPROVAL_POLICY, BULK_SIGNAL_RATIONALE, effectiveReviewSteps, isBulkEligibleSignal, primaryReviewResult, generationQualityResult, professorReviewFindings, PROFESSOR_DECISION_LABELS, nextReviewStage, professorDecisionsComplete,
+import { CONTENT_APPROVAL_POLICY, BULK_SIGNAL_RATIONALE, canRetryDeepseek, crossReviewFindings, deepseekPending, effectiveReviewSteps, isBulkEligibleSignal, primaryReviewResult, generationQualityResult, professorReviewFindings, PROFESSOR_DECISION_LABELS, nextReviewStage, professorDecisionsComplete,
   type InstructorExperience, type ReviewFinding, type ModelReview, type ProfessorFindingDecision, type ReviewResult, type ReviewTarget } from "../../../supabase/functions/_shared/contentReview";
 
 const verdictLabel = { pass: "보고된 문제 항목 없음", warning: "확인 필요", fail: "수정 검토 필요" };
@@ -75,7 +75,9 @@ const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 
 /** 단계 역할과 표시 모델명을 구분한다. 원본 모델 ID는 저장 기록에 유지한다. */
 const STEP_LABEL: Record<string, string> = {
-  "규칙 검사": "자동 규칙 점검", "OpenAI 검토": "AI 품질 심사", "Claude 독립 검토": "독립 AI 검토", "OpenAI 재검토": "검토 의견 재판정", "최종 검수 자료": "감수 자료 준비",
+  // 교차 검토 = 종합 검토 + 중국어 표현 검토(2026-10-20 연구자 확정, 원고 3.5 용어).
+  "규칙 검사": "자동 규칙 점검", "OpenAI 검토": "AI 품질 심사", "Claude 독립 검토": "교차 검토 · 종합", "DeepSeek 중국어 표현 검토": "교차 검토 · 중국어 표현",
+  "OpenAI 재검토": "검토 의견 재판정", "최종 검수 자료": "감수 자료 준비",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
 /** 모델 ID를 사람이 읽는 이름으로: gpt-4.1 → GPT-4.1, claude-opus-5 → Claude Opus 5, claude-sonnet-4-5 → Claude Sonnet 4.5. */
@@ -87,10 +89,12 @@ const modelName = (id: string | null | undefined) => {
   const words = rest.filter((part) => !/^\d{8}$/.test(part));
   const firstNum = words.findIndex((part) => /^\d/.test(part));
   const name = firstNum < 0 ? words : [...words.slice(0, firstNum), words.slice(firstNum).join(".")];
-  return [family, ...name].map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ");
+  return [family, ...name].map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ").replace(/^Deepseek\b/, "DeepSeek");
 };
+/** 교차 검토 의견의 출처. 종합 검토 = Claude, 중국어 표현 검토 = DeepSeek. */
+const crossSource = (finding: ReviewFinding) => finding.id.startsWith("claude-") ? "Claude" : finding.id.startsWith("deepseek-") ? "DeepSeek" : null;
 const CONTENT_REVIEW_STEP_LABELS: Record<string, string> = {
-  rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
+  rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", deepseek: "DeepSeek 중국어 표현 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
 };
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
@@ -239,9 +243,25 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       setBusy(true); setError(null);
       void contentReviewRequest(target, "request_independent", state)
         .then((result) => { queryClient.setQueryData(key, result); return startReviewPreparation([{ target, label: prepLabel }]); })
-        .catch((cause) => setError(cause instanceof Error ? cause.message : "독립 AI 검토 요청 실패"))
+        .catch((cause) => setError(cause instanceof Error ? cause.message : "교차 검토 요청 실패"))
         .finally(() => setBusy(false));
     };
+    // 실패한 중국어 표현 검토만 다시 실행한다. 새 의견이 나오면 재판정 등 남은 단계를 이어서 실행한다.
+    const canRetry = canRetryDeepseek(run) && !historicalApproval && !locked && !queue.active && !busy && !blocked;
+    const retryDeepseek = () => {
+      if (!state) return;
+      setBusy(true); setError(null);
+      void contentReviewRequest(target, "deepseek_retry", state)
+        .then((result) => {
+          queryClient.setQueryData(key, result);
+          const after = nextReviewStage(result.run);
+          return after !== "professor" && after !== "approved" ? startReviewPreparation([{ target, label: prepLabel }]) : undefined;
+        })
+        .catch((cause) => setError(cause instanceof Error ? cause.message : "중국어 표현 검토 다시 실행 실패"))
+        .finally(() => setBusy(false));
+    };
+    const deepseekReview = run?.deepseek_review ?? null;
+    const deepseekFailure = deepseekReview?.status === "failed" ? deepseekReview : null;
     const rowStatus = (stepKey: string): "done" | "running" | "current" | "todo" | "failed" => {
       const label = vendorFree(CONTENT_REVIEW_STEP_LABELS[stepKey] ?? "");
       if (runningLabel && runningLabel === label) return "running";
@@ -258,18 +278,30 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       ? `검토 의견 재판정 · ${(["accept", "refine", "reject"] as const).map((kind) => [decisionLabel[kind], decisions.filter((item) => item.decision === kind).length] as const)
           .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "분류 없음"}`
       : null;
-    type Row = { key: string; label: string; metadata?: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode };
+    type Row = { key: string; label: string; metadata?: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode; failed?: boolean };
     const rows: Row[] = [
       { key: "rules", label: "자동 규칙 점검", metadata: "서버 코드", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
       { key: "openai", label: "AI 품질 심사", metadata: run?.openai_review ? modelName(run.openai_review.model) : run?.generation_quality ? `${modelName(run.generation_quality.quality_check.model)} · 생성 단계 결과 재사용` : modelName(state?.models.openai),
         items: primary?.findings, result: primary ? resultOf(primary.findings) : null, detail: primary?.summary_ko },
-      { key: "claude", label: "독립 AI 검토", metadata: run?.claude_review ? modelName(run.claude_review.model) : modelName(state?.models.claude) || undefined, optional: true, items: run?.claude_review?.result.findings,
+      { key: "claude", label: "교차 검토 · 종합", metadata: run?.claude_review ? modelName(run.claude_review.model) : modelName(state?.models.claude) || undefined, optional: true, items: run?.claude_review?.result.findings,
         result: run?.claude_review ? resultOf(run.claude_review.result.findings) : null,
         action: canCross && !run?.claude_review
-          ? <Button size="sm" variant="outline" className="h-8 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={startCross}>독립 검토 실행</Button>
+          ? <Button size="sm" variant="outline" className="h-8 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={startCross}>교차 검토 실행</Button>
+          : null },
+      { key: "deepseek", label: "교차 검토 · 중국어 표현", optional: true,
+        metadata: deepseekReview?.status === "completed" ? modelName(deepseekReview.model) : modelName(deepseekFailure?.requested_model ?? state?.models.deepseek) || undefined,
+        items: deepseekReview?.status === "completed" ? deepseekReview.result.findings : undefined,
+        result: deepseekReview?.status === "completed" ? resultOf(deepseekReview.result.findings) : deepseekFailure ? "검토 실패" : null,
+        detail: deepseekFailure ? `${deepseekFailure.error_ko} 실패해도 종합 검토 결과·재판정·승인은 그대로 진행됩니다.` : null,
+        failed: Boolean(deepseekFailure),
+        // 이 단계가 생기기 전에 교차 검토를 마친 기록은 이 단계를 거치지 않았다.
+        note: run?.claude_review && !deepseekReview && !deepseekPending(run) ? "미실행 · 단계 도입 전 검토" : null,
+        action: deepseekFailure && canRetry
+          ? <span className="inline-flex items-center gap-2"><span className="font-semibold text-[#A8433D]">검토 실패</span>
+              <Button size="sm" variant="outline" className="h-8 border-[#233542] px-2.5 text-[12.5px] font-semibold text-[#233542] hover:bg-[#EEF1F4] hover:text-[#15202B]" onClick={retryDeepseek}>다시 실행</Button></span>
           : null },
       { key: "adjudication", label: "검토 의견 재판정", metadata: run?.adjudication ? modelName(run.adjudication.model) : modelName(state?.models.openai) || undefined, optional: true, result: adjudicationResult, detail: run?.adjudication?.result.summary_ko ?? null,
-        note: run?.claude_review && !run.claude_review.result.findings.length ? "미실행 · 독립 검토 의견 없음" : null },
+        note: run?.claude_review && !deepseekPending(run) && !crossReviewFindings(run).length ? "미실행 · 교차 검토 의견 없음" : null },
       ...(steps.some((step) => step.key === "finalization")
         ? [{ key: "finalization", label: "감수 자료 준비", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
         : []),
@@ -299,9 +331,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {status === "running" && <span aria-hidden className="absolute inset-y-0 left-0 w-1 animate-pulse bg-[#233542]" />}
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                 <span className={["flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-[12.5px] font-bold",
-                  status === "failed" ? "bg-red-700 text-white" : "bg-[#FAD338] text-[#15202B]",
+                  status === "failed" || row.failed ? "bg-red-700 text-white" : "bg-[#FAD338] text-[#15202B]",
                   status === "current" ? "ring-2 ring-[#233542] ring-offset-2" : ""].join(" ")}>
-                  {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" /> : status === "done" ? "✓" : index + 1}
+                  {status === "running" ? <span className="size-3 animate-spin rounded-full border-2 border-[#15202B]/30 border-t-[#15202B]" /> : row.failed ? "!" : status === "done" ? "✓" : index + 1}
                 </span>
                 {/* 실행 주체(서버 코드·모델명)는 단계명과 한 줄에 둔다(2026-10-10). */}
                 <span className="min-w-0 flex-1 basis-40 text-[14.5px] font-semibold text-[#233542]">
@@ -310,7 +342,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
                     {row.optional && <span className="self-center rounded-full border border-[#8C98A3] px-1.5 py-px text-[12px] font-semibold text-[#233542]">선택</span>}</span>
                 </span>
                 {row.action ? <span className="ml-auto flex min-w-0 justify-end">{row.action}</span> : <span className={["ml-auto min-w-0 max-w-full text-right", status === "running" ? "font-semibold text-[#233542]"
-                  : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
+                  : row.failed ? "font-semibold text-[#A8433D]" : /\d+건$/.test(row.result ?? "") ? "text-[#8A5A14]" : skipped ? "text-[#3F4E57]" : "text-[#5D6970]"].join(" ")}>
                   {status === "running" ? "진행 중" : status === "failed" ? `수정 필요 ${count(row.items)}건` : row.result ?? row.note ?? (skipped ? "미실행 · 선택 단계" : status === "current" ? "실행 전" : "대기")}
                 </span>}
               </div>
@@ -413,7 +445,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         }).flatMap((item, index) => index === 1 && handoffHref && !steps.some((step) => step.key === "claude")
           ? [item, <li key="optional-cross-check" className="flex items-center gap-1.5">
               <span aria-hidden className="text-[#B7BEC2]">›</span>
-              <span className="rounded-full border border-dashed border-[#C9A62E] px-2 py-0.5 text-[#8A5A14]">선택 · 독립 AI 검토</span>
+              <span className="rounded-full border border-dashed border-[#C9A62E] px-2 py-0.5 text-[#8A5A14]">선택 · 교차 검토</span>
             </li>]
           : [item])}
       </ol>}
@@ -434,7 +466,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div> : <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
           onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검수 중…" : "검수 마치기") : "검수 실행"}</Button>}
         {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
-        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다. 독립 검토는 선택 시에만.</p>}
+        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다. 교차 검토는 선택 시에만.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
@@ -444,14 +476,15 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         {/* 모델명·검사 시각은 교수자 결정에 필요한 정보가 아니라 추적 정보라, 승인 화면에서는 세부 추적 정보로 옮긴다. */}
         {primary && !experiential && <ReviewFindings title={experiential ? "AI 품질 심사" : run.openai_review ? "AI 품질 심사" : "AI 품질 심사 (생성 단계 결과)"} result={experiential ? withoutIsolatedGrounding(primary) : primary} metadata={experiential || compact ? undefined : run.openai_review ?? undefined} compact={compact || experiential} />}
         {run.openai_review && run.generation_quality && <ReviewFindings title="생성 단계 AI 품질 심사"result={generationQualityResult(run.generation_quality)} />}
-        {run.claude_review && !experiential && <ReviewFindings title="독립 AI 검토"result={run.claude_review.result} metadata={experiential || compact ? undefined : run.claude_review} compact={compact || experiential} />}
+        {run.claude_review && !experiential && <ReviewFindings title="교차 검토 · 종합" result={run.claude_review.result} metadata={compact ? undefined : run.claude_review} compact={compact} />}
+        {run.deepseek_review?.status === "completed" && !experiential && <ReviewFindings title="교차 검토 · 중국어 표현" result={run.deepseek_review.result} metadata={compact ? undefined : run.deepseek_review} compact={compact} />}
+        {run.deepseek_review?.status === "failed" && !experiential && <p className="border-l-2 border-[#C86E68] py-0.5 pl-3 text-[#8B3531]">교차 검토 · 중국어 표현 · 검토 실패 — {run.deepseek_review.error_ko} 실패해도 승인 경로는 그대로입니다.</p>}
         {!compact && findings.length > 0 && (() => {
           const findingCard = (finding: ReviewFinding) => {
             const decision = run.adjudication?.result.decisions.find((item) => item.finding_id === finding.id);
             const draft = decisionDrafts[finding.id];
             const saved = run.professor_decisions.find((item) => item.finding_id === finding.id);
-            const source = finding.id.startsWith("rule-") ? "자동 규칙 점검" : finding.id.startsWith("claude-") ? "독립 AI 검토"
-              : finding.id.startsWith("generation-") ? "생성 단계 AI 품질 심사" : "AI 품질 심사";
+            const source = crossSource(finding);
             /* 두 검토가 같은 결론이면 재서술을 읽을 이유가 없다. 갈리거나 교수자 확인이 필요할 때만 펼친 채로 둔다. */
             const agreed = decision?.decision === "accept" && !decision.needs_professor && !finding.needs_professor;
             const change = decision?.proposed_change_ko?.trim() || finding.suggestion_ko;
@@ -462,7 +495,8 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             const decide = (value: keyof typeof PROFESSOR_DECISION_LABELS) => updateDecision(finding.id, { decision: value, rationale_ko: DEFAULT_FINDING_RATIONALE[value] });
             return <div key={finding.id} className="space-y-2.5 rounded-lg border border-[#E2DED2] p-3">
               <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                <span className="text-[14px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}</span>
+                <span className="text-[14px] font-semibold text-[#233542]">{whereLabel(finding.where)} · {finding.problem_type_ko}
+                  {source && <span className="ml-1.5 text-[12.5px] font-normal text-[#5D6970]">· 교차 검토 출처 {source}</span>}</span>
                 {badge && <span className={`rounded-full px-2 py-0.5 text-[12.5px] font-semibold ${badge.cls}`}>{badge.text}</span>}
               </div>
               {/* 수정 제안도 실제 감수에서는 거의 읽히지 않아 근거와 함께 접는다(2026-10-09). 판단은 위치·유형·배지로 시작한다. */}
@@ -537,13 +571,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 품질 심사"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && !(compact && historicalApproval) && (() => {
         const body = <>
-          <h4 className="text-[13.5px] font-bold text-[#233542]">독립 AI 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
-          <p className="mt-0.5 text-xs text-[#5D6970]">1차 심사 결과를 보지 않은 다른 AI가 검토하고, 그 의견을 1차 심사 AI가 재판정합니다.</p>
+          <h4 className="text-[13.5px] font-bold text-[#233542]">교차 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
+          <p className="mt-0.5 text-xs text-[#5D6970]">1차 심사 결과를 보지 않은 다른 AI가 종합 검토와 중국어 표현 검토를 하고, 그 의견을 1차 심사 AI가 재판정합니다.</p>
           <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
             setBusy(true); setError(null);
             void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
               .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
-          }}>독립 검토 요청</Button>
+          }}>교차 검토 요청</Button>
         </>;
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
@@ -554,7 +588,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         onClick={() => void runNext()}>
         {busy ? "처리 중…" : next === "rules" ? "자동 규칙 점검 시작" : `${vendorFree(steps[stepIndex].label)} 실행`}
       </Button>}
-      {next === "claude" && !state.models.claude && <p className="text-amber-800">독립 검토 모델(Claude)이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
+      {next === "claude" && !state.models.claude && <p className="text-amber-800">교차 검토 모델(Claude)이 설정되지 않았습니다. 운영 설정을 먼저 확인해 주세요.</p>}
       {next === "approved" && !handoffHref && <div className="rounded bg-emerald-50 p-3">현재 버전 교수자 승인 · {run?.approved_at}<p className="mt-1">{run?.professor_note}</p>
         {run?.openai_fail_override && <p className="mt-2">AI 품질 심사의 중대 문제 항목 사용 근거: {run.openai_fail_override}</p>}
       </div>}
@@ -573,6 +607,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             ["승인 정책", run?.approval_policy],
             ["OpenAI 검토 모델", run?.openai_review ? modelName(run.openai_review.model) : null],
             ["Claude 교차 검토 모델", run?.claude_review ? modelName(run.claude_review.model) : null],
+            ["DeepSeek 교차 검토 모델", run?.deepseek_review?.status === "completed" ? modelName(run.deepseek_review.model) : null],
             ["AI 재검토 모델",run?.adjudication ? modelName(run.adjudication.model) : null],
           ] as Array<[string, string | null | undefined]>).filter(([, value]) => value).map(([label, value]) => <div key={label} className="contents">
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>

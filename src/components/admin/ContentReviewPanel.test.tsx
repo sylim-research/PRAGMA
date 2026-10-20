@@ -71,11 +71,32 @@ describe("quality review handoff", () => {
     inspection.run!.approved_at = "2026-10-01T12:26:48Z";
     showCompact();
     expect(await screen.findByText("교수자 승인 완료")).toBeInTheDocument();
-    expect(screen.getAllByText("미실행 · 선택 단계")).toHaveLength(2);
-    expect(screen.queryByRole("button", { name: "독립 검토 실행" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("미실행 · 선택 단계")).toHaveLength(3);
+    expect(screen.queryByRole("button", { name: "교차 검토 실행" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "교수자 승인 기록 보기" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
     expect(inspection.run!.openai_review!.model).toBe("gpt-4.1-2025-04-14");
     expect(mocks.approve).not.toHaveBeenCalled();
+  });
+  it("shows a failed Chinese expression review as failed with a retry, while the approval path stays open", async () => {
+    inspection.run!.independent_review_requested = true;
+    inspection.run!.claude_review = { ...metadata({ verdict: "pass", summary_ko: "없음", findings: [] } as ReviewResult), provider: "anthropic" };
+    inspection.run!.deepseek_review = { status: "failed", provider: "deepseek", requested_model: "deepseek-v4-pro",
+      error_ko: "DEEPSEEK_API_KEY 설정이 필요합니다. 호출하지 않았습니다.", checked_at: "2026-10-20", prompt_version: `${CONTENT_REVIEW_VERSION}:deepseek` };
+    mocks.inspect.mockImplementation(async (_target: unknown, action?: string) => {
+      if (action === "deepseek_retry") inspection = { ...inspection, run: { ...inspection.run!, deepseek_review: {
+        ...metadata({ verdict: "pass", summary_ko: "없음", findings: [] } as ReviewResult), provider: "deepseek", model: "deepseek-v4-pro", status: "completed" } } };
+      return inspection;
+    });
+    showCompact();
+    expect(await screen.findByText("교차 검토 · 중국어 표현")).toBeInTheDocument();
+    expect(screen.getByText("· DeepSeek V4 Pro")).toBeInTheDocument();
+    expect(screen.getByText("검토 실패")).toBeInTheDocument();
+    expect(screen.getByText("품질 검수 완료")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "교수자 감수·최종 승인으로" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "다시 실행" }));
+    await waitFor(() => expect(mocks.inspect).toHaveBeenCalledWith({ kind: "mission", targetId: "mission-1" }, "deepseek_retry", expect.anything()));
+    expect(await screen.findAllByText("보고된 문제 없음")).not.toHaveLength(0);
+    expect(screen.queryByText("검토 실패")).not.toBeInTheDocument();
   });
 });
 
