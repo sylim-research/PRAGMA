@@ -1,6 +1,6 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
-import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, canRetryDeepseek, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type DeepseekReview, type ReviewInspection, type ReviewResult, type ReviewTarget } from "../_shared/contentReview.ts";
+import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, canRetryDeepseek, DEEPSEEK_PROMPT_VERSION, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type DeepseekReview, type ReviewInspection, type ReviewResult, type ReviewTarget } from "../_shared/contentReview.ts";
 import { callContentReviewer } from "../_shared/contentReviewProvider.ts";
 import { OPENAI_MODEL_ROUTES } from "../_shared/openaiRequestContract.ts";
 import { buildContentReviewDomain, missionFinalizationInput } from "./domain.generated.mjs";
@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
         review = { ...(result as typeof result & { result: ReviewResult }), status: "completed" };
       } catch (cause) {
         review = { status: "failed", provider: "deepseek", requested_model: models.deepseek, checked_at: new Date().toISOString(),
-          prompt_version: `${CONTENT_REVIEW_VERSION}:deepseek`, error_ko: (cause instanceof Error ? cause.message : "중국어 표현 검토 실패").slice(0, 400) };
+          prompt_version: `${CONTENT_REVIEW_VERSION}:deepseek`, stage_prompt_version: DEEPSEEK_PROMPT_VERSION, error_ko: (cause instanceof Error ? cause.message : "중국어 표현 검토 실패").slice(0, 400) };
       }
       // A retry that finally yields opinions after a Claude-only adjudication re-opens adjudication, so every
       // completed cross-check opinion is judged before the professor decides (retry is refused once decisions exist).

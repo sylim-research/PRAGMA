@@ -2,7 +2,7 @@ import { webcrypto } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SAMPLE_MISSION_V5_NATIVE } from "@/lib/mission/missionV4Sample";
 import { buildContentReviewDomain } from "./contentReviewDomain";
-import { BULK_SIGNAL_RATIONALE, buildReviewPrompt, canRetryDeepseek, crossReviewFindings, effectiveReviewSteps, instructionalMission, isBulkEligibleSignal, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
+import { BULK_SIGNAL_RATIONALE, buildReviewPrompt, canRetryDeepseek, crossReviewFindings, DEEPSEEK_JUDGMENTS, DEEPSEEK_PROMPT_VERSION, routeDeepseekJudgments, effectiveReviewSteps, instructionalMission, isBulkEligibleSignal, materializeReviewEvidence, nextReviewStage, professorDecisionsComplete, professorReviewFindings, reusableGenerationQuality, reviewHash, validateAdjudication, validateReviewResult,
   type ContentReviewRun, type ReviewResult } from "../../../supabase/functions/_shared/contentReview";
 import { callContentReviewer } from "../../../supabase/functions/_shared/contentReviewProvider";
 import { REFUSAL_TEACHING_CASE } from "@/lib/curriculum/refusalTeachingCase";
@@ -368,9 +368,34 @@ describe("cross-check: Chinese expression review (DeepSeek)", () => {
     expect(JSON.parse(request.messages[1].content)).toEqual(snapshot);
     const prompt = request.messages.map((m: { content: string }) => m.content).join("\n");
     for (const hidden of ["OPENAI_PRIVATE_VERDICT", "claude-1", "모어 화자"]) expect(prompt).not.toContain(hidden);
-    for (const rule of ["의도된 대비와 제작 결함을 구별", "판단을 유보", "유일한 정답으로 확정하지 마라", "json"]) expect(prompt).toContain(rule);
-    expect(result).toMatchObject({ provider: "deepseek", prompt_version: "content_review_v3:deepseek", result: { findings: [{ id: "deepseek-1" }] } });
+    for (const rule of [
+      "중국 대륙 보통화의 실제 사용을 기준으로",
+      // 세 핵심 경우: 의도한 결함만 있으면 유지 / 의도 밖 오류는 결함을 보존한 최소 수정 / 결함이 읽히지 않으면 교수자 확인.
+      "의도한 결함만 있고 그것이 잘 읽히면 지적하지 않는다",
+      "의도한 결함의 종류·강도를 보존하는 최소 수정안",
+      "의도 결함 불분명과 기준 판단 이견은 needs_professor:true",
+      "의도한 결함이 읽히지 않는 경우에는 수정안을 확정하지 말고",
+      "의도된 공손함·단호함·불만·주저함", "한국어 후보의 품질은 평가하지 않는다",
+      ...DEEPSEEK_JUDGMENTS, "유일한 정답으로 확정하지 마라", "json",
+    ]) expect(prompt).toContain(rule);
+    for (const banned of ["모어 화자", "원어민", "가장 자연스럽고 공손한 하나의 정답", "검증된 정답"]) expect(prompt).not.toContain(banned);
+    expect(result).toMatchObject({ provider: "deepseek", prompt_version: "content_review_v3:deepseek", stage_prompt_version: DEEPSEEK_PROMPT_VERSION,
+      result: { findings: [{ id: "deepseek-1" }] } });
     expect(JSON.stringify(result)).not.toContain("private");
+  });
+
+  it("always sends unclear intended flaws and category disagreements to the professor without rewriting the opinion", () => {
+    const base = { ...finding, severity: "warning" as const, id: "deepseek-1", needs_professor: false, uncertainty_ko: "" };
+    const routed = routeDeepseekJudgments({ verdict: "warning", summary_ko: "x", findings: [
+      { ...base, problem_type_ko: "의도 결함 불분명 · 강도" },
+      { ...base, id: "deepseek-2", problem_type_ko: "기준 판단 이견 · 양태", uncertainty_ko: "후보가 오히려 적절하게 들림" },
+      { ...base, id: "deepseek-3", problem_type_ko: "의도 외 결함 · 연어" },
+    ] });
+    expect(routed.findings.map(f => f.needs_professor)).toEqual([true, true, false]);
+    expect(routed.findings[0].uncertainty_ko).toContain("의도 결함 불분명");
+    expect(routed.findings[1].uncertainty_ko).toBe("후보가 오히려 적절하게 들림");
+    expect(routed.findings.map(f => [f.issue_ko, f.suggestion_ko, f.problem_type_ko])).toEqual([
+      [base.issue_ko, base.suggestion_ko, "의도 결함 불분명 · 강도"], [base.issue_ko, base.suggestion_ko, "기준 판단 이견 · 양태"], [base.issue_ko, base.suggestion_ko, "의도 외 결함 · 연어"]]);
   });
 
   it("runs after Claude, records failure without blocking, and never runs on records adjudicated before the stage existed", () => {

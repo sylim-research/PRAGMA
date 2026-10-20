@@ -1,5 +1,5 @@
 import {
-  buildReviewPrompt, CONTENT_REVIEW_VERSION, crossReviewFindings, materializeReviewEvidence, reviewHash, validateAdjudication, validateReviewResult,
+  buildReviewPrompt, CONTENT_REVIEW_VERSION, crossReviewFindings, DEEPSEEK_PROMPT_VERSION, routeDeepseekJudgments, materializeReviewEvidence, reviewHash, validateAdjudication, validateReviewResult,
   type Adjudication, type ContentReviewRun, type ModelReview, type ReviewResult,
 } from "./contentReview.ts";
 
@@ -62,6 +62,7 @@ export async function callContentReviewer(options: {
   const raw = JSON.parse(text);
   const grounded = materializeReviewEvidence(raw, run.snapshot, stage === "adjudication");
   const result = stage === "adjudication" ? validateAdjudication(grounded, crossReviewFindings(run), run.snapshot)
+    : deepseek ? routeDeepseekJudgments(validateReviewResult(grounded, run.snapshot, stage))
     : validateReviewResult(grounded, run.snapshot, stage);
   return { result, provider: anthropic ? "anthropic" : deepseek ? "deepseek" : "openai", model: body.model, requested_model: model,
     response_id: body.id, usage: body.usage ?? {}, checked_at: new Date().toISOString(),
@@ -71,7 +72,9 @@ export async function callContentReviewer(options: {
       primary_review_ref: run.openai_review?.input_hash ?? run.generation_quality?.mission_content_hash ?? null,
     } : {}),
     // DB approval expects the criteria/stage version; wire format is separate.
-    prompt_version: `${CONTENT_REVIEW_VERSION}:${stage}`, output_format_version: "evidence_refs_v2", raw_result: raw,
+    prompt_version: `${CONTENT_REVIEW_VERSION}:${stage}`,
+    // The DB pins prompt_version to criteria:stage, so the DeepSeek operating-prompt revision travels separately.
+    ...(deepseek ? { stage_prompt_version: DEEPSEEK_PROMPT_VERSION } : {}), output_format_version: "evidence_refs_v2", raw_result: raw,
     input_hash: await reviewHash({ system: prompt.system, user: prompt.user, schema: prompt.schema }),
     request_parameters: { max_tokens: request.max_tokens, timeout_ms: timeoutMs, ...(effort ? { effort } : {}) },
   };

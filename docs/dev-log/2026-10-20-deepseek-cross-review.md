@@ -12,3 +12,15 @@ Changes (branch `claude/deepseek-cross-review-2026-10-20`)
 Validation: `npm run typecheck` 0 errors; targeted tests 140/140 (`contentReview`, `contentReviewApi`, `reviewPreparation`, `qualitySignalFlow`, `ContentReviewPanel`, `src/lib/admin`, `AdminDashboard`, `moatMigrationContracts`), including new DeepSeek cases (request shape and content-only input, prompt rules, three states, retry, adjudication coverage, failed-state panel). `npm run review:bundle` regenerated and `--check` verified (minifier naming only; no domain change). `npm run build` passes.
 
 Not yet done: the migration is not pushed and the Edge function is not deployed, so live admin screens that read the new column cannot load until the migration is applied. No real DeepSeek call has been made (key and balance pending).
+
+## Prompt v2 (same day, after comparing with the manual review history)
+
+The manual DeepSeek web-chat reviews of 2026-09-18 to 10-10 (about 23 runs, provisional count; prompts and results kept outside the repo) were compared with the first prompt, and the researcher adopted the following:
+- Explicit review standard: actual usage in Mainland Putonghua for the given relation and situation. No native-speaker identity or accuracy claim.
+- For intentionally inappropriate expressions: ask whether the intended flaw actually reads as that flaw, and separately whether an unintended language error also gives the answer away. A flaw that reads as intended is not reported.
+- Judgment labels shared with the manual records: naturalness / register-scene mismatch / implicature-strength mismatch / unintended defect / intended flaw unclear / disagreement with the stored category, plus a problem type. The last two always go to the professor (`routeDeepseekJudgments`; the model's raw output stays in `raw_result`).
+- zh→ko source utterances: check that the intended force (politeness, firmness, complaint, hesitation) is carried; Korean candidates are out of scope; preserved real-world source text is not rewritten.
+- Minimal fixes only for unintended defects, keeping the kind and strength of the intended flaw; when the intended flaw does not read, no fix is fixed — redesign is the professor's call.
+- Prompt revision is recorded as `stage_prompt_version: zh_expression_v2_20261020` (the DB pins `prompt_version` to criteria:stage). The first prompt never ran.
+
+Validation: `npm run typecheck` 0 errors; targeted tests 111/111 including the three key cases and judgment routing; review bundle `--check` verified; `npm run build` passes.
