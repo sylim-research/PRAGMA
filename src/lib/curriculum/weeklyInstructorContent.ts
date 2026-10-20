@@ -1,5 +1,5 @@
 import type { LearnerCourseWeek } from "./learnerCourse";
-import { FEATURE_CODES_BY_ACT, getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { BASE_FEATURE_BY_ACT, getTargetFeature } from "@/lib/pragma/targetFeatures";
 import { refusalTeachingCaseFor } from "./refusalTeachingCase";
 
 /** 고유 교수자 설명의 단일 원본. 공용 출력 모델에서는 가져오지 않는다. */
@@ -11,7 +11,7 @@ export function weeklyInstructorContent(week: LearnerCourseWeek, direction: stri
   return {
     // 무관한 주차의 검수 해시를 바꾸지 않도록 빈 속성은 추가하지 않는다.
     ...(missionCases.length ? { missionCases } : {}),
-    features: (week.speech_act ? FEATURE_CODES_BY_ACT[week.speech_act] : []).flatMap((code) => {
+    features: (week.speech_act ? BASE_FEATURE_BY_ACT[week.speech_act] : []).flatMap((code) => {
       const feature = getTargetFeature(code);
       return feature ? [{ code, label: feature.learner_label,
         note: direction === "zh_ko" ? feature.counter_rule_note_zh_ko ?? feature.counter_rule_note : feature.counter_rule_note,

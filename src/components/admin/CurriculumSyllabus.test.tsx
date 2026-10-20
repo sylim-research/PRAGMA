@@ -63,7 +63,7 @@ describe("CurriculumSyllabus", () => {
     for (const weekNo of [2, 3, 4, 5, 6, 9, 10, 11, 12]) {
       expect(within(rows[weekNo]).getAllByRole("cell")[1].textContent).toHaveLength(2);
     }
-    expect(within(rows[13]).getByText("선택 화행 집중 보완")).toBeInTheDocument();
+    expect(within(rows[13]).getByText("집중 보완")).toBeInTheDocument();
     expect(within(rows[13]).getByText("요청")).toBeInTheDocument();
     expect(screen.getByText(/구체화하거나 바꿔 사용할 수 있습니다/)).toBeInTheDocument();
     expect(screen.queryByText("고부담 맥락 집중 실전")).not.toBeInTheDocument();

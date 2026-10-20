@@ -103,17 +103,17 @@ describe("주차를 펼쳐 보는 강의계획서", () => {
     ]);
     const link = screen.getByRole("link", { name: /번역 미션 시작/ });
     expect(new URL(link.getAttribute("href")!, "https://example.test").searchParams.get("weekNo")).toBe("13");
-    fireEvent.click(screen.getByRole("button", { name: "7주차 중간 메타화용 토론" }));
-    expect(screen.getByRole("region", { name: "7주차 중간 메타화용 토론" })).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "7주차 토론 활동" }));
+    expect(screen.getByRole("region", { name: "7주차 토론 활동" })).toBeVisible();
     expect(screen.queryByRole("link", { name: /미션 시작/ })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "이번 주 수업자료" })).toBeNull();
-    expect(screen.getByRole("button", { name: "14주차 종합 메타화용 토론" })).toHaveAttribute("aria-expanded", "false");
+    expect(screen.getByRole("button", { name: "14주차 토론 활동" })).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByText(/클리닉/)).not.toBeInTheDocument();
   });
 
   it("기존 주차 상세·미션 복귀 주소는 선택 주차가 열린 통합 화면으로 연결한다", () => {
     show([missionWeek, { ...missionWeek, week_no: 13 }], `/learner/course/${courseId}/week/13`);
-    expect(screen.getByRole("button", { name: "13주차 요청 화행 · 새 상황에 적용하기" })).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "13주차 집중 보완 · 요청" })).toHaveAttribute("aria-expanded", "true");
     expect(screen.getByRole("button", { name: "2주차 요청 화행" })).toHaveAttribute("aria-expanded", "false");
     expect(screen.queryByRole("link", { name: "이번 주 수업자료" })).toBeNull();
   });

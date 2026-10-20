@@ -716,7 +716,8 @@ export const DEFAULT_FEATURE_BY_ACT: Record<SpeechActUI, string> = {
   complaint: COMPLAINT_PROBLEM_ACCOUNTABILITY.code,
 };
 
-/** 한 화행에 속한 승인 feature 목록. 칭찬은 주차 안에서 두 미션으로 분리한다. */
+/** 미션 형식 검사가 받아들이는 feature 목록. 칭찬 대응(compliment_response_uptake)은 확장점으로만 남아 있다 —
+ * 기본 강좌에서는 제외(research-trail 02_decision_log). 화면 안내에는 BASE_FEATURE_BY_ACT를 쓴다. */
 export const FEATURE_CODES_BY_ACT: Record<SpeechActUI, readonly string[]> = {
   request: [REQUEST_MITIGATION_OPTIONALITY.code],
   refusal: [REFUSAL_SOFTENING.code],
@@ -728,6 +729,11 @@ export const FEATURE_CODES_BY_ACT: Record<SpeechActUI, readonly string[]> = {
   compliment: [COMPLIMENT_GROUNDING_SENSITIVITY.code, COMPLIMENT_RESPONSE_UPTAKE.code],
   complaint: [COMPLAINT_PROBLEM_ACCOUNTABILITY.code],
 };
+
+/** 기본 강좌의 목표 화용요소 = 화행당 하나(9개 화행 = 9개 요소). 주차 안내·교수자 자료는 이것만 보인다. */
+export const BASE_FEATURE_BY_ACT: Record<SpeechActUI, readonly string[]> = Object.fromEntries(
+  Object.entries(DEFAULT_FEATURE_BY_ACT).map(([act, code]) => [act, [code]]),
+) as unknown as Record<SpeechActUI, readonly string[]>;
 
 export function getTargetFeature(code: string): TargetFeature | undefined {
   return TARGET_FEATURES[code];

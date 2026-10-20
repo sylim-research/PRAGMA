@@ -9,6 +9,7 @@ import { weekDisplayTitle } from "@/lib/curriculum/weekGuidance";
 import { courseDisplayTitle } from "@/lib/pragma/scenarioTopics";
 import { expectedMissionModesForWeek, remainingMissionModes, type CourseMode } from "@/lib/curriculum/courseModePolicy";
 import { missionMenuTitle } from "@/lib/curriculum/missionMenuTitle";
+import { getTargetFeature } from "@/lib/pragma/targetFeatures";
 import type { LearnerCourseWeek } from "@/lib/curriculum/learnerCourse";
 import { LEGACY_TEACHING_MATERIALS as materialsOn } from "@/lib/admin/legacyFeatures";
 
@@ -139,7 +140,11 @@ const LearnerCourseLive = () => {
                               </p>}
                               <ul className="grid gap-2.5 sm:grid-cols-2">
                                 {missions.map((scenario, index) => {
-                                  const label = missionMenuTitle(scenario.brief_note_ko);
+                                  // 미션 이름 = 미션 전체(MJT 다섯 문항 + 통번역 과제)에 걸린 목표 화용요소의 표시명.
+                                  // 상황 요약은 마지막 통번역 과제 한 장면이라 작은 글씨로만 붙인다.
+                                  const scene = missionMenuTitle(scenario.brief_note_ko);
+                                  const focus = scenario.target_feature ? getTargetFeature(scenario.target_feature)?.learner_label ?? null : null;
+                                  const label = focus ?? scene;
                                   const modeLabel = MODE_LABEL[scenario.mode!];
                                   const query = new URLSearchParams({ courseId, weekNo: String(week.week_no), assignmentId: scenario.assignment_id! });
                                   const missionPath = `/learner/practice/${scenario.scenario_id}?${query}`;
@@ -151,7 +156,8 @@ const LearnerCourseLive = () => {
                                         className="group flex flex-1 flex-col rounded-lg p-3.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#B8860B]"
                                       >
                                         <span className="text-[11px] font-medium text-[#967B3E]">미션 {index + 1} · {modeLabel}</span>
-                                        <h5 className="mb-3 mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]">{label ?? `${modeLabel} 학습 미션`}</h5>
+                                        <h5 className={`${focus && scene ? "mb-1" : "mb-3"} mt-1.5 break-keep text-[15px] font-semibold leading-5 text-[#24323D]`}>{label ?? `${modeLabel} 학습 미션`}</h5>
+                                        {focus && scene && <p className="mb-3 break-keep text-[12px] leading-5 text-[#66727A]">{modeLabel} 과제 · {scene}</p>}
                                         <span className="mt-auto inline-flex min-h-9 items-center justify-center gap-2 self-start rounded-md bg-[#15202B] px-3 py-2 text-[12px] font-medium text-white transition-colors group-hover:bg-[#15202B]/90">
                                           {modeLabel} 미션 시작 <ArrowRight aria-hidden="true" strokeWidth={1.5} className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                                         </span>

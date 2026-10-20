@@ -35,7 +35,7 @@ type RoadmapItem = {
 // 공통 표준 15주 골격(2026-07-25) — mockLearnerCourse.ts(COURSE_WEEKS) ·
 // curriculum/template.ts(STANDARD_15WEEK)와 동기화. 단계 = 기초 적용→관계 조정→통합 수행.
 const ROADMAP: RoadmapItem[] = [
-  { week: 1, stage: "시작", topic: "오리엔테이션 · 출발점 확인" },
+  { week: 1, stage: "시작", topic: "오리엔테이션" },
   { week: 2, stage: "기초 적용", topic: "요청" },
   { week: 3, stage: "기초 적용", topic: "감사" },
   { week: 4, stage: "기초 적용", topic: "초대 · 공동행동 권유" },
