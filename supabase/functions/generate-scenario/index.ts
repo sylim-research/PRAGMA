@@ -3946,7 +3946,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
 
     // ── core action: scenario_core_v1 상황·원문 생성 (v1.4 §7-0, temp 0.7) ──
     if (input.action === 'core') {
-      const b = input.core
+      // 선행 발화는 9개 화행 모두에서 생성하지 않는다(2026-10-25). 오래된 클라이언트가 보내도 무시한다.
+      const b = input.core ? { ...input.core, is_response_act: false } : input.core
       if (!b?.situation_seed_ko) {
         return new Response(JSON.stringify({ error: 'core body required' }), { status: 400, headers: jsonHeaders })
       }

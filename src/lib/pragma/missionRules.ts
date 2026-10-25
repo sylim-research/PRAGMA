@@ -441,10 +441,7 @@ function checkCoreCommon(
   ctx: CheckContext,
 ) {
   const dir = core.direction ?? DEFAULT_DIRECTION;
-  // R8 거절·응답류인데 preceding_turn 없음
-  if (isResponseAct(ctx.speech_act) && !core.preceding_turn) {
-    add(v, "R8", "fail", `${ctx.speech_act}는 인접쌍 둘째 짝 — preceding_turn 필수`);
-  }
+  // R8(코어 preceding_turn 필수)은 2026-10-25 폐기: 선행 발화는 9개 화행 모두에서 생성하지 않는다.
   // R10 source·선행발화 방향 언어
   checkSourceLang(v, dir, core.source_text, "source_text");
   checkPrecedingLang(v, dir, core.preceding_turn, "시나리오");

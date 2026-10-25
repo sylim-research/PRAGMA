@@ -81,7 +81,8 @@ export interface CoreQualityPilotOptions {
   onProgress?: (done: number, total: number, last: CoreQualityPilotResult) => void;
 }
 
-const RESPONSE_ACTS = new Set(["refusal", "opposition"]);
+// 선행 발화는 9개 화행 모두에서 생성하지 않는다(2026-10-25 연구자 결정). 응답·대응 과제는 후속 연구로 둔다.
+const RESPONSE_ACTS = new Set<string>();
 
 async function auditOne(source: CoreCellResult): Promise<CoreQualityPilotResult> {
   if (!source.coreContent) {
