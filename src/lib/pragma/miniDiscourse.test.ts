@@ -137,6 +137,20 @@ describe("R29 focal segments", () => {
     expect(v.some((x) => x.level === "fail" && x.message.includes("head"))).toBe(true);
   });
 
+  it("support가 3개여도 개수만으로 fail하지 않는다(상한 없음)", () => {
+    const v = r29(
+      coreV3({
+        focal_segments: [
+          { text: "오늘 중으로 하나 더 보내주실 수 있을까요?", role: "head" },
+          { text: "가능하시다면", role: "support" },
+          { text: "내부 품질 검토 자료로 샘플 하나가 더 꼭 필요해서요.", role: "support" },
+          { text: "지난번에 보내주신 샘플은 잘 받았습니다.", role: "support" },
+        ],
+      }),
+    );
+    expect(v.filter((x) => x.level === "fail")).toEqual([]);
+  });
+
   it("head가 없으면 fail", () => {
     const v = r29(coreV3({ focal_segments: [{ text: "내부 검토에 하나가 더 필요해서요.", role: "support" }] }));
     expect(v.some((x) => x.level === "fail")).toBe(true);
