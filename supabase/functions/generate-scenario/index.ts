@@ -981,7 +981,8 @@ function buildCoreSystemPrompt(direction: Direction): string {
 [focal_segments = 화용 집중 구간]
 학습자는 담화 전체를 옮기지만, 이번 주 학습 초점의 화용 평가는 이 구간에만 적용된다.
 - head: 중심 화행을 실제로 수행하는 절 **정확히 1개**.
-- support: head의 강도·완화·선택권·명료성을 **직접** 조절하는 구간 0~2개.
+- support: head 밖에서 head의 강도·완화·선택권·명료성을 **직접** 조절하는 구간. 개수 제한은 없다.
+  head 안의 수식(예: 의문형·「좀」)은 head에 포함하고 따로 떼지 않는다.
   (예: "가능하시다면", "번거롭게 해드려 죄송합니다"처럼 요청의 부담을 조절하는 표현)
 - 중심 목적과 무관한 요소(서두 인사, 별개 용건의 감사·설명)는 **넣지 않는다.**
 - 각 text는 source_text에서 **그대로 복사한 연속된 문자열**이어야 한다. 요약·재작성·
@@ -3945,7 +3946,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
 
     // ── core action: scenario_core_v1 상황·원문 생성 (v1.4 §7-0, temp 0.7) ──
     if (input.action === 'core') {
-      const b = input.core
+      // 선행 발화는 9개 화행 모두에서 생성하지 않는다(2026-10-25). 오래된 클라이언트가 보내도 무시한다.
+      const b = input.core ? { ...input.core, is_response_act: false } : input.core
       if (!b?.situation_seed_ko) {
         return new Response(JSON.stringify({ error: 'core body required' }), { status: 400, headers: jsonHeaders })
       }
@@ -4112,7 +4114,6 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
               return { text, role } as { text: string; role: 'head' | 'support' }
             })
             .filter((seg) => seg.text.length > 0 && sourceText.includes(seg.text))
-            .slice(0, 3)
         : []
       const corePromptVersion = sourceRepairApplied || precedingTurnRepairApplied || bilingualSceneRepairApplied || learnerSceneRepairApplied
         ? CURRENT_CORE_PROMPT_VERSIONS[1]
@@ -4307,7 +4308,6 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
               role: seg?.role === 'support' ? ('support' as const) : ('head' as const),
             }))
             .filter((seg) => seg.text.length > 0 && b.core.source_text_ko.includes(seg.text))
-            .slice(0, 3)
         : []
       const isMiniDiscourse = inheritedFocal.some((seg) => seg.role === 'head')
       let frozenTopology: NativeMpj5FrozenTopology | null = null
@@ -4694,7 +4694,6 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
               role: seg?.role === 'support' ? ('support' as const) : ('head' as const),
             }))
             .filter((seg) => seg.text.length > 0 && (b.source_text ?? '').includes(seg.text))
-            .slice(0, 3)
         : []
       const feedbackPromptVersion = feedbackFocal.length
         ? CURRENT_FEEDBACK_PROMPT_VERSIONS[0]

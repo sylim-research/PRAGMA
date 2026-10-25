@@ -28,7 +28,8 @@ import type { ThemeCode } from "@/lib/pragma/scenarioTopics";
 import { coreSemanticGate, coreSemanticContent } from '../../../supabase/functions/_shared/sceneGrounding';
 import { CURRENT_CORE_QUALITY_PROMPT_VERSION } from '../../../supabase/functions/_shared/contentRelease';
 
-const RESPONSE_ACTS = new Set(["refusal", "opposition"]);
+// 선행 발화는 9개 화행 모두에서 생성하지 않는다(2026-10-25 연구자 결정). 응답·대응 과제는 후속 연구로 둔다.
+const RESPONSE_ACTS = new Set<string>();
 
 export interface CoreIndustryCriticResult {
   verdict: "pass" | "warning" | "fail" | "UNKNOWN";

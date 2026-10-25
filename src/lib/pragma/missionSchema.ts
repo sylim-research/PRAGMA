@@ -512,8 +512,8 @@ export type MissionV4 = z.infer<typeof MissionV4Schema>;
 // 기존 mission_v5 MPJ4 행은 삭제·백필하지 않고 legacy 스키마로 계속 읽는다.
 // 두 형태 모두 production_task.source_text 2~4문장과 focal_segments를 사용한다.
 const ProductionTaskV3Schema = ProductionTaskV2Schema.extend({
-  /** 코어 계승(R23·R29). head 1 + support 0~2, 각 text는 source_text의 부분문자열. */
-  focal_segments: z.array(FocalSegmentSchema).min(1).max(3),
+  /** 코어 계승(R23·R29). head 1 + support(개수 제한 없음), 각 text는 source_text의 부분문자열. */
+  focal_segments: z.array(FocalSegmentSchema).min(1),
 });
 export type ProductionTaskV3 = z.infer<typeof ProductionTaskV3Schema>;
 

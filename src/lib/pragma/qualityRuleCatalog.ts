@@ -86,8 +86,8 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R8: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "응답형 화행 시나리오의 preceding_turn 존재, legacy 미션의 preceding_turn 존재, native MJT5의 preceding_turn 부재를 확인한다.",
-    applicability_ko: "시나리오·legacy·native 계약별로 조건이 다르다.",
+    summary_ko: "legacy 미션의 preceding_turn 존재와 native MJT5의 preceding_turn 부재를 확인한다. 시나리오의 preceding_turn 필수 조건은 2026-10-25 폐기(선행 발화 미생성).",
+    applicability_ko: "legacy·native 미션 계약별로 조건이 다르다. 현행 시나리오 검사에는 쓰지 않는다.",
   },
   R9: {
     category: "일반화·사전 정보 노출 위험",
@@ -234,7 +234,7 @@ export const RETIRED_QUALITY_RULES: Record<RetiredRuleId, { retired_on: string; 
  * qualityRuleCatalog.test.ts의 실행 대조 테스트가 이 표의 갱신을 요구한다.
  * 여기에 없는 ID는 mission_v5(native·legacy) 전용이다(계약 정본 서두 — v5 규칙을 v6에 자동 적용하지 않는다).
  */
-export const CURRENT_SCENARIO_RULE_IDS = ["R1c", "R8", "R9", "R10", "R16", "R17", "R25", "R26", "R29", "R30"] as const satisfies readonly RuleId[];
+export const CURRENT_SCENARIO_RULE_IDS = ["R1c", "R9", "R10", "R16", "R17", "R25", "R26", "R29", "R30"] as const satisfies readonly RuleId[];
 export const CURRENT_MISSION_V6_RULE_IDS = ["R1", "R9", "R10", "R13", "R15", "R16", "R20", "R23", "R24", "R30", "R31", "R32"] as const satisfies readonly RuleId[];
 export const CURRENT_PIPELINE_RULE_IDS = new Set<RuleId>([...CURRENT_SCENARIO_RULE_IDS, ...CURRENT_MISSION_V6_RULE_IDS]);
 

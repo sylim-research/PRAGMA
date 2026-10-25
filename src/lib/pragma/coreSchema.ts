@@ -242,8 +242,8 @@ export type CoreLengthPolicySnapshot = z.infer<typeof CoreLengthPolicySnapshotSc
 
 export const ScenarioCoreV3Schema = ScenarioCoreV2Schema.extend({
   schema_version: z.literal("scenario_core_v3"),
-  /** head 정확히 1 + support 0~2 (R29). legacy 코어는 부재. */
-  focal_segments: z.array(FocalSegmentSchema).min(1).max(3).optional(),
+  /** head 정확히 1 + support(개수 제한 없음) (R29). legacy 코어는 부재. */
+  focal_segments: z.array(FocalSegmentSchema).min(1).optional(),
   /** 생성 당시 길이 정책과 실측값. legacy 코어는 부재. */
   length_policy: CoreLengthPolicySnapshotSchema.optional(),
 });
