@@ -265,7 +265,7 @@ function checkDirectionMatch(v: RuleViolation[], dataDir: LanguageDirection, ctx
 // ── R29 미니 담화형 원문 + focal segments (DEC-20260730-01) ────────────
 // 중국어 쉼표 연결 장문과 한국어 문장 경계의 비대칭을 피하기 위해 maximum hard 경계는
 // 공백·문장부호 제외 유효 글자 수로 판정한다. minimum과 2~4문장은 warning이다.
-// focal_segments는 head 정확히 1 + support 0~2이고, 각 text는 source_text의
+// focal_segments는 head 정확히 1 + support(개수 제한 없음)이고, 각 text는 source_text의
 // 정확한 부분문자열이어야 한다 — 저장·화면 강조·피드백이 같은 문자열을 본다.
 export const coreLengthHintKo = sharedCoreLengthHintKo;
 export const countSentences = countCoreSourceSentences;
@@ -349,16 +349,7 @@ function checkFocalDiscourse(
       direction: ctx.direction,
     });
   }
-  const supportCount = segments.length - heads.length;
-  if (supportCount > 2) {
-    add(v, "R29", "fail", `${label}: support 구간은 최대 2개(실제 ${supportCount}개)`, {
-      subrule: "support_count",
-      actual: supportCount,
-      threshold: 2,
-      modality: ctx.mode,
-      direction: ctx.direction,
-    });
-  }
+  // support 개수 상한은 두지 않는다(2026-10-25): 수량으로 평가 범위를 줄이지 않는다.
   for (const seg of segments) {
     if (!sourceText.includes(seg.text)) {
       add(v, "R29", "fail", `${label}: focal segment가 원문의 부분문자열이 아님 — "${seg.text.slice(0, 30)}"`, {
