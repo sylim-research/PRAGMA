@@ -13,7 +13,10 @@ export async function callContentReviewer(options: {
   const anthropic = stage === "claude";
   // DeepSeek speaks the OpenAI chat format but only guarantees a JSON object, not a strict schema, so the
   // schema travels in the prompt and the same server-side evidence validation decides what is saved.
-  const deepseek = stage === "deepseek";
+  // 중국어 표현 검토 단계(stage 이름은 저장 형식상 "deepseek")는 2026-10-26부터 GPT-6 Astra가 맡는다.
+  // DeepSeek 모델을 명시적으로 지정한 경우에만 DeepSeek API로 보낸다.
+  const zhStage = stage === "deepseek";
+  const deepseek = zhStage && model.startsWith("deepseek");
   const vendor = anthropic ? "Claude" : deepseek ? "DeepSeek" : "OpenAI";
   // Leave time for DB persistence before Supabase's 150s request limit.
   const reasoning = !anthropic && !deepseek && isReasoningModel(model);
@@ -69,7 +72,7 @@ export async function callContentReviewer(options: {
   const raw = JSON.parse(text);
   const grounded = materializeReviewEvidence(raw, run.snapshot, stage === "adjudication");
   const result = stage === "adjudication" ? validateAdjudication(grounded, crossReviewFindings(run), run.snapshot)
-    : deepseek ? routeDeepseekJudgments(validateReviewResult(grounded, run.snapshot, stage))
+    : zhStage ? routeDeepseekJudgments(validateReviewResult(grounded, run.snapshot, stage))
     : validateReviewResult(grounded, run.snapshot, stage);
   return { result, provider: anthropic ? "anthropic" : deepseek ? "deepseek" : "openai", model: body.model, requested_model: model,
     response_id: body.id, usage: body.usage ?? {}, checked_at: new Date().toISOString(),
@@ -81,7 +84,7 @@ export async function callContentReviewer(options: {
     // DB approval expects the criteria/stage version; wire format is separate.
     prompt_version: `${CONTENT_REVIEW_VERSION}:${stage}`,
     // The DB pins prompt_version to criteria:stage, so the DeepSeek operating-prompt revision travels separately.
-    ...(deepseek ? { stage_prompt_version: DEEPSEEK_PROMPT_VERSION } : {}), output_format_version: "evidence_refs_v2", raw_result: raw,
+    ...(zhStage ? { stage_prompt_version: DEEPSEEK_PROMPT_VERSION } : {}), output_format_version: "evidence_refs_v2", raw_result: raw,
     input_hash: await reviewHash({ system: prompt.system, user: prompt.user, schema: prompt.schema }),
     request_parameters: { max_tokens: "max_tokens" in request ? request.max_tokens : request.max_completion_tokens, timeout_ms: timeoutMs, ...(effort ? { effort } : {}) },
   };
