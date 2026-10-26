@@ -150,11 +150,11 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
   rules: "서버 코드 · 규칙 검사",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
-  openai: "GPT-4.1 · 의미·화행 심사",
+  openai: "GPT-6 Astra · 의미·화행 심사",
   claude: "Claude · 요청 시",
   deepseek: "중국어 표현 · 요청 시",
   // 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
-  adjudication: "GPT-4.1 · 의견 있을 때",
+  adjudication: "GPT-6 Astra · 의견 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
