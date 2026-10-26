@@ -104,8 +104,13 @@ export const FeedbackDraftSchema = z.object({
     .default([]),
 });
 
+export const FEEDBACK_HELD_AXES = ["meaning", "grammar", "pragmatics"] as const;
+export type FeedbackHeldAxis = (typeof FEEDBACK_HELD_AXES)[number];
+
 export const FeedbackSchema = FeedbackDraftSchema.extend({
   schema_version: z.literal("feedback_v1"),
+  /** 검수 모델을 통과하지 못해 판정을 보류한 축(2026-10-26). 보류 축은 학습자에게 판정·설명을 보이지 않는다. */
+  held_axes: z.array(z.enum(FEEDBACK_HELD_AXES)).default([]),
   rubric_version: z.string().default(""),
   revision_scope: z.enum(REVISION_SCOPES),
   provenance: z.object({

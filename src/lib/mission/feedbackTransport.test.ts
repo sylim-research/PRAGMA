@@ -7,7 +7,7 @@ import {
 
 describe("feedback transport", () => {
   it("uses a bounded learner wait time", () => {
-    expect(FEEDBACK_TIMEOUT_MS).toBe(30_000);
+    expect(FEEDBACK_TIMEOUT_MS).toBe(60_000);
   });
 
   it("recognizes direct and Supabase-wrapped abort errors", () => {

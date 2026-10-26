@@ -16,11 +16,11 @@ export type PromptSnapshot = {
   prompts: PromptSnapshotEntry[];
 };
 export const PROMPT_SNAPSHOT: PromptSnapshot = {
-  "generated_at": "2026-10-25T18:49:59+09:00",
-  "git_commit": "485b327e",
+  "generated_at": "2026-10-26T17:06:27+09:00",
+  "git_commit": "8265470b",
   "git_dirty": true,
   "edge_source": "supabase/functions/generate-scenario/index.ts",
-  "edge_source_sha256": "9799df284e0b669f8f86cac6fb500244fbb36b51a4684259e78bb6b4fc764719",
+  "edge_source_sha256": "beb990627e8678b9978e80ddb9722365f48455af95e7d8f901b095083c29b12c",
   "core_surface_hash": "3e21ff25d04cd6a7f813992a9c76b768ca1686843f12df75b17ff3fe09fea23c",
   "generation_config": {
     "model": "gemini-3.1-pro-preview",
