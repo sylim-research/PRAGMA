@@ -4006,8 +4006,11 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const usr = buildCoreUserPrompt(requestBody) + '\n[사전 확인한 장면 — 사실·인물 유지]\n' + JSON.stringify(scenePlan)
         + '\n[원 사건 시드 — 장면을 압축하며 생략한 사실도 임의로 바꾸지 않음]\n' + b.situation_seed_ko
         + '\n원문은 이 사건의 말이다. 시간·소유자·행위자·수령 장소를 바꾸거나 없는 피해·변명·약속을 추가하지 않는다. 길이를 채우려고 사과·안심·거절 가능 안내를 반복하지 않는다.'
-      let model = PRIMARY_MODEL
-      const att = await callOpenAI(PRIMARY_MODEL, apiKey, sys, usr, CORE_TEMPERATURE, {
+      // 중→한 시나리오의 원문은 중국어다. 중국어 원문은 중국어에 강한 검토 모델(GPT-6 Astra)이 쓰고,
+      // 학습자가 보는 한국어 상황문은 미션 생성(Gemini)이 다시 쓴다(2026-10-26 연구자 수용).
+      const coreModel = coreDir === 'zh_ko' ? REVIEW_PRIMARY_MODEL : PRIMARY_MODEL
+      let model = coreModel
+      const att = await callOpenAI(coreModel, apiKey, sys, usr, CORE_TEMPERATURE, {
         responseFormat: CORE_STRUCTURED_RESPONSE_FORMAT,
         telemetry: telemetryFor('core_generate', true, {
           promptVersion: CURRENT_CORE_PROMPT_VERSIONS[0],
