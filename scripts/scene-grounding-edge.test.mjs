@@ -29,7 +29,7 @@ const core = { direction: 'ko_zh', speech_act: 'request', speech_act_ko: '요청
   situation_seed_ko: '동급생에게 이미 공유하기로 한 발표 파일을 보내 달라고 요청한다.' };
 
 before(async () => {
-  globalThis.Deno = { env: { get: key => ({ OPENAI_API_KEY: 'fixture', SUPABASE_URL: 'https://db.test',
+  globalThis.Deno = { env: { get: key => ({ OPENAI_API_KEY: 'fixture', GEMINI_API_KEY: 'fixture', SUPABASE_URL: 'https://db.test',
     SUPABASE_SERVICE_ROLE_KEY: 'fixture' })[key] } };
   const built = await build({ entryPoints: ['supabase/functions/generate-scenario/index.ts'], bundle: true,
     platform: 'node', format: 'esm', write: false, define: { 'import.meta.main': 'false' } });
@@ -44,10 +44,14 @@ async function invoke(outputs, input = { action: 'core', core }) {
     if (url === 'https://db.test/rest/v1/llm_invocation_events') {
       ledger.push(JSON.parse(init.body)); return new Response(null, { status: 201 });
     }
-    assert.equal(url, 'https://api.openai.com/v1/chat/completions');
+    // Generation runs on Gemini and review on OpenAI (2026-10-26 role assignment); both are mocked.
+    const gemini = String(url).startsWith('https://generativelanguage.googleapis.com/');
+    if (!gemini) assert.equal(url, 'https://api.openai.com/v1/chat/completions');
     assert.ok(calls < outputs.length, 'unexpected extra model call');
     const output = outputs[calls++];
     if (output === 'unavailable') return new Response('{}', { status: 503 });
+    if (gemini) return Response.json({ modelVersion: 'gemini-fixture', candidates: [{ finishReason: 'STOP',
+      content: { parts: [{ text: JSON.stringify(output) }] } }], usageMetadata: { promptTokenCount: 1, candidatesTokenCount: 1, totalTokenCount: 2 } });
     return Response.json({ choices: [{ message: { content: JSON.stringify(output) }, finish_reason: 'stop' }],
       model: JSON.parse(init.body).model, usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } });
   };

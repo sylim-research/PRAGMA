@@ -1,5 +1,5 @@
-/** 학습자가 피드백 화면에서 무한 대기하지 않게 하는 런타임 상한. */
-export const FEEDBACK_TIMEOUT_MS = 30_000;
+/** 학습자가 피드백 화면에서 무한 대기하지 않게 하는 런타임 상한. 작성 + 검수를 합친 시간(2026-10-26 30초 → 60초). */
+export const FEEDBACK_TIMEOUT_MS = 60_000;
 
 type ErrorLike = {
   name?: unknown;

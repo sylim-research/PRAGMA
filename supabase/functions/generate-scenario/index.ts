@@ -1,4 +1,6 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
+import { callGeminiChat, isGeminiModel } from '../_shared/geminiChat.ts'
+import { applyFeedbackReview, buildFeedbackReviewSystemPrompt, buildFeedbackReviewUserPrompt, FEEDBACK_REVIEW_PROMPT_VERSION, FEEDBACK_REVIEW_RESPONSE_FORMAT, readFeedbackReview } from '../_shared/feedbackReview.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import {
@@ -36,6 +38,7 @@ import {
   CORE_RESPONSE_FORMAT_LABEL,
   CORE_STRUCTURED_RESPONSE_FORMAT,
   OPENAI_MODEL_ROUTES,
+  REVIEW_PRIMARY_MODEL,
   parseOpenAIInvocationMetadata,
   type OpenAIResponseFormat,
   type OpenAIUserContent,
@@ -746,6 +749,24 @@ async function callOpenAI(
   temperature = 0.8,
   options: OpenAICallOptions,
 ) {
+  // Gemini는 백그라운드(Responses API) 경로가 없으므로 항상 동기 호출한다. 응답은 OpenAI 형식으로 감싸 온다.
+  if (isGeminiModel(model)) {
+    const geminiKey = Deno.env.get('GEMINI_API_KEY')
+    if (!geminiKey) {
+      return { ok: false as const, status: 503, raw: JSON.stringify({ error: 'GEMINI_API_KEY가 설정되지 않았습니다. 호출하지 않았습니다.' }) }
+    }
+    const startedAt = Date.now()
+    const g = await callGeminiChat({ model, system, user, temperature,
+      maxCompletionTokens: options.maxCompletionTokens, responseFormat: options.responseFormat }, geminiKey)
+    const logged = await recordOpenAIInvocation({
+      telemetry: options.telemetry, modelRequested: model, statusCode: g.status, ok: g.ok,
+      raw: g.raw, durationMs: Date.now() - startedAt, requestId: g.requestId,
+    })
+    if (g.ok && !logged && options.telemetry.required) {
+      return { ok: false as const, status: 503, raw: JSON.stringify({ error: 'LLM 호출 장부 저장 실패 — 연구 산출물을 저장하지 않습니다.' }) }
+    }
+    return g.ok ? { ok: true as const, raw: g.raw } : { ok: false as const, status: g.status, raw: g.raw }
+  }
   const context = backgroundContext.getStore()
   if (context) {
     const completed = await context.call({ model, system, user, temperature,
@@ -4677,6 +4698,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
 
     // ── feedback: feedback_v1(계약 §4) — 학습자 산출 3층 진단. 런타임·저지연 ──
     if (input.action === 'feedback') {
+      const feedbackStartedAt = Date.now()
       const b = input.feedback
       const payloadIssue = feedbackPayloadIssue(b)
       if (payloadIssue) {
@@ -4733,6 +4755,25 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       // 모델이 통역 전사에서 완화·선택권 소실을 의미 손실로 이중 계산하는 경향을
       // 결정론적으로 막는다. 실제 사실·조건 누락 근거가 있으면 교정하지 않는다.
       repairFeedbackPragmaticLeak(parsed)
+      // 검수(UI 브리프 v2): 다른 회사 모델이 축마다 판정·설명을 확인한다. 학습자 대기 상한 60초 안에서
+      // 남은 시간만 기다리고, 늦거나 실패하면 모든 축을 보류한다(미검증 판정을 확정 노출하지 않는다).
+      const reviewBudgetMs = 55_000 - (Date.now() - feedbackStartedAt)
+      let review: ReturnType<typeof readFeedbackReview> = null
+      if (reviewBudgetMs > 5_000) {
+        const reviewCall = callOpenAI(REVIEW_PRIMARY_MODEL, apiKey, buildFeedbackReviewSystemPrompt(dir),
+          buildFeedbackReviewUserPrompt({ direction: dir, mode: b.mode ?? '', situation_ko: b.situation_ko, relation_ko: b.relation_ko,
+            source_text: b.source_text, answer: b.answer ?? '', feature: b.feature ?? undefined, feedback: parsed }), 0, {
+            maxCompletionTokens: 12_000,
+            responseFormat: FEEDBACK_REVIEW_RESPONSE_FORMAT,
+            telemetry: telemetryFor('learner_feedback', false, { invocationAttempt: 3, promptVersion: FEEDBACK_REVIEW_PROMPT_VERSION }),
+          }).catch(() => null)
+        const timedOut = new Promise<null>((resolve) => setTimeout(() => resolve(null), reviewBudgetMs))
+        const reviewAtt = await Promise.race([reviewCall, timedOut])
+        if (reviewAtt?.ok) {
+          try { review = readFeedbackReview(parseOpenAIContent(reviewAtt.raw)) } catch { review = null }
+        }
+      }
+      parsed = applyFeedbackReview(parsed, review, { model: REVIEW_PRIMARY_MODEL, status: 'reviewed' })
       return new Response(
         JSON.stringify({
           feedback: {

@@ -1,6 +1,11 @@
+// 역할 배정(2026-10-26 연구자 확정, 모델 비교 실험 결과표 10): 생성·피드백 = Gemini 3.1 Pro, 검토 = GPT-6 Astra.
+// preview 판이므로 정식판이 나오면 이 상수 하나만 바꾼다.
+export const GEMINI_PRIMARY_MODEL = 'gemini-3.1-pro-preview'
+export const REVIEW_PRIMARY_MODEL = 'gpt-6-astra'
+
 export const OPENAI_MODEL_ROUTES = {
   default: {
-    primary: 'gpt-4.1-mini',
+    primary: GEMINI_PRIMARY_MODEL,
     // 연구 콘텐츠는 실패를 숨기고 다른 모델로 강등하지 않는다.
     fallback: null,
   },
@@ -10,17 +15,18 @@ export const OPENAI_MODEL_ROUTES = {
   },
   // mission_v6 초안 생성기(2026-09-21 파일럿: gpt-4o·4.1보다 원문 충실성·사건 다양성이 확연히 나음).
   mission_v6: {
-    primary: 'gpt-5.5',
+    primary: GEMINI_PRIMARY_MODEL,
     fallback: null,
   },
   critic: {
-    primary: 'gpt-4.1',
+    primary: REVIEW_PRIMARY_MODEL,
     fallback: null,
   },
   // 학습자 런타임 피드백은 연구 정본과 분리된 가용성 정책을 쓴다.
   feedback: {
-    primary: 'gpt-4.1-mini',
-    fallback: 'gpt-4o-mini',
+    primary: GEMINI_PRIMARY_MODEL,
+    // 대체 경로는 같은 체급(상위)의 다른 공급자로 둔다. 소형 모델로 강등하지 않는다.
+    fallback: 'gpt-5.5',
   },
 } as const
 
@@ -141,9 +147,9 @@ interface OpenAIChatRequestInput {
   responseFormat?: OpenAIResponseFormat
 }
 
-/** 추론 모델(gpt-5·o 계열)은 temperature를 받지 않는다(기본값만 허용). */
+/** 추론 모델(gpt-5·gpt-6·o 계열)은 temperature를 받지 않는다(기본값만 허용). */
 export function isReasoningModel(model: string): boolean {
-  return /^(gpt-5|o\d)/.test(model)
+  return /^(gpt-5|gpt-6|o\d)/.test(model)
 }
 
 export function buildOpenAIChatRequest(input: OpenAIChatRequestInput) {

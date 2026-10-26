@@ -1,3 +1,4 @@
+import { isReasoningModel } from "./openaiRequestContract.ts";
 import {
   buildReviewPrompt, CONTENT_REVIEW_VERSION, crossReviewFindings, DEEPSEEK_PROMPT_VERSION, routeDeepseekJudgments, materializeReviewEvidence, reviewHash, validateAdjudication, validateReviewResult,
   type Adjudication, type ContentReviewRun, type ModelReview, type ReviewResult,
@@ -15,7 +16,8 @@ export async function callContentReviewer(options: {
   const deepseek = stage === "deepseek";
   const vendor = anthropic ? "Claude" : deepseek ? "DeepSeek" : "OpenAI";
   // Leave time for DB persistence before Supabase's 150s request limit.
-  const timeoutMs = anthropic || deepseek ? 130_000 : 90_000;
+  const reasoning = !anthropic && !deepseek && isReasoningModel(model);
+  const timeoutMs = anthropic || deepseek || reasoning ? 130_000 : 90_000;
   const effort = anthropic && model.startsWith("claude-opus-5") ? "medium" : undefined;
   const signal = AbortSignal.timeout(timeoutMs);
   const request = anthropic ? {
@@ -26,6 +28,11 @@ export async function callContentReviewer(options: {
     model, max_tokens: 16000,
     messages: [{ role: "system", content: prompt.system }, { role: "user", content: prompt.user }],
     response_format: { type: "json_object" },
+  } : reasoning ? {
+    // 추론 모델(GPT-6 Astra 등)은 temperature를 받지 않고, 사고 토큰이 출력 상한에 들어간다.
+    model, max_completion_tokens: 23000,
+    messages: [{ role: "system", content: prompt.system }, { role: "user", content: prompt.user }],
+    response_format: { type: "json_schema", json_schema: { name: stage === "adjudication" ? "pragma_adjudication" : "pragma_content_review", strict: true, schema: prompt.schema } },
   } : {
     model, temperature: 0, max_tokens: 7000,
     messages: [{ role: "system", content: prompt.system }, { role: "user", content: prompt.user }],
@@ -76,6 +83,6 @@ export async function callContentReviewer(options: {
     // The DB pins prompt_version to criteria:stage, so the DeepSeek operating-prompt revision travels separately.
     ...(deepseek ? { stage_prompt_version: DEEPSEEK_PROMPT_VERSION } : {}), output_format_version: "evidence_refs_v2", raw_result: raw,
     input_hash: await reviewHash({ system: prompt.system, user: prompt.user, schema: prompt.schema }),
-    request_parameters: { max_tokens: request.max_tokens, timeout_ms: timeoutMs, ...(effort ? { effort } : {}) },
+    request_parameters: { max_tokens: "max_tokens" in request ? request.max_tokens : request.max_completion_tokens, timeout_ms: timeoutMs, ...(effort ? { effort } : {}) },
   };
 }
