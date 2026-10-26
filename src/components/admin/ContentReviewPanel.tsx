@@ -76,7 +76,7 @@ const approvalNote = (note: string) => note.trim() || DEFAULT_APPROVAL_NOTE;
 /** 단계 역할과 표시 모델명을 구분한다. 원본 모델 ID는 저장 기록에 유지한다. */
 const STEP_LABEL: Record<string, string> = {
   // 교차 검토 = 종합 검토 + 중국어 표현 검토(2026-10-20 연구자 확정, 원고 3.5 용어).
-  "규칙 검사": "자동 규칙 점검", "OpenAI 검토": "AI 품질 심사", "Claude 독립 검토": "교차 검토 · 종합", "DeepSeek 중국어 표현 검토": "교차 검토 · 중국어 표현",
+  "규칙 검사": "자동 규칙 점검", "OpenAI 검토": "AI 품질 심사", "Claude 독립 검토": "교차 검토 · 종합", "중국어 표현 검토": "교차 검토 · 중국어 표현",
   "OpenAI 재검토": "검토 의견 재판정", "최종 검수 자료": "감수 자료 준비",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
@@ -91,10 +91,10 @@ const modelName = (id: string | null | undefined) => {
   const name = firstNum < 0 ? words : [...words.slice(0, firstNum), words.slice(firstNum).join(".")];
   return [family, ...name].map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ").replace(/^Deepseek\b/, "DeepSeek");
 };
-/** 교차 검토 의견의 출처. 종합 검토 = Claude, 중국어 표현 검토 = DeepSeek. */
-const crossSource = (finding: ReviewFinding) => finding.id.startsWith("claude-") ? "Claude" : finding.id.startsWith("deepseek-") ? "DeepSeek" : null;
+/** 교차 검토 의견의 출처. 종합 검토 = Claude, 중국어 표현 검토 = 중국어 표현(2026-10-26부터 GPT-6 Astra). */
+const crossSource = (finding: ReviewFinding) => finding.id.startsWith("claude-") ? "Claude" : finding.id.startsWith("deepseek-") ? "중국어 표현" : null;
 const CONTENT_REVIEW_STEP_LABELS: Record<string, string> = {
-  rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", deepseek: "DeepSeek 중국어 표현 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
+  rules: "규칙 검사", openai: "OpenAI 검토", claude: "Claude 독립 검토", deepseek: "중국어 표현 검토", adjudication: "OpenAI 재검토", finalization: "최종 검수 자료",
 };
 
 export function ContentReviewPanel({ target, onApprove, approvalDisabled = false, refreshKey = "", historicalApproval = false, experiential = false, handoffHref, decisionSlot, missionContentHash, framed = true }: {
@@ -607,7 +607,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             ["승인 정책", run?.approval_policy],
             ["OpenAI 검토 모델", run?.openai_review ? modelName(run.openai_review.model) : null],
             ["Claude 교차 검토 모델", run?.claude_review ? modelName(run.claude_review.model) : null],
-            ["DeepSeek 교차 검토 모델", run?.deepseek_review?.status === "completed" ? modelName(run.deepseek_review.model) : null],
+            ["중국어 표현 검토 모델", run?.deepseek_review?.status === "completed" ? modelName(run.deepseek_review.model) : null],
             ["AI 재검토 모델",run?.adjudication ? modelName(run.adjudication.model) : null],
           ] as Array<[string, string | null | undefined]>).filter(([, value]) => value).map(([label, value]) => <div key={label} className="contents">
             <dt className="font-semibold text-[#5D6970]">{label}</dt><dd className="font-mono">{value}</dd>

@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { CONTENT_REVIEW_VERSION, CONTENT_APPROVAL_POLICY, canRetryDeepseek, DEEPSEEK_PROMPT_VERSION, reusableGenerationQuality, nextReviewStage, reviewHash, type ContentReviewRun, type DeepseekReview, type ReviewInspection, type ReviewResult, type ReviewTarget } from "../_shared/contentReview.ts";
 import { callContentReviewer } from "../_shared/contentReviewProvider.ts";
-import { OPENAI_MODEL_ROUTES } from "../_shared/openaiRequestContract.ts";
+import { OPENAI_MODEL_ROUTES, REVIEW_PRIMARY_MODEL } from "../_shared/openaiRequestContract.ts";
 import { buildContentReviewDomain, missionFinalizationInput } from "./domain.generated.mjs";
 import { prepareReviewFinalization } from "../_shared/contentReviewFinalization.ts";
 
@@ -36,7 +36,8 @@ Deno.serve(async (req) => {
     const weekNo = target.kind === "mission" ? 0 : target.weekNo!;
     // DeepSeek model id is managed in one place (DEEPSEEK_REVIEW_MODEL); deepseek-chat was retired on 2026-07-24.
     const models = { openai: OPENAI_MODEL_ROUTES.critic.primary, claude: Deno.env.get("CLAUDE_AUDIT_MODEL") || null,
-      deepseek: Deno.env.get("DEEPSEEK_REVIEW_MODEL") || "deepseek-v4-pro" };
+      // 중국어 표현 검토 = GPT-6 Astra(2026-10-26 역할 배정). DeepSeek은 앱에 넣지 않는다(연구자 수동 확인만).
+      deepseek: REVIEW_PRIMARY_MODEL };
     const sourceFor = async (kind: string, id: string, week = 0) => {
       const { data, error } = await db.rpc("get_content_review_source", { p_kind: kind, p_target_id: id, p_week_no: week });
       if (error) throw new Error(`검수 원본 조회 실패: ${error.message}`);
@@ -119,10 +120,10 @@ Deno.serve(async (req) => {
       const { data: claimed, error: claimError } = await claim.select("id").maybeSingle();
       if (claimError) throw new Error("검수 실행 잠금 실패");
       if (!claimed) return json({ error: "이미 실행 중이거나 완료된 단계입니다. 잠시 후 결과를 새로고침하세요." }, 409);
-      const apiKey = Deno.env.get("DEEPSEEK_API_KEY");
+      const apiKey = Deno.env.get("OPENAI_API_KEY");
       let review: DeepseekReview;
       try {
-        if (!apiKey) throw new Error("DEEPSEEK_API_KEY 설정이 필요합니다. 호출하지 않았습니다.");
+        if (!apiKey) throw new Error("OPENAI_API_KEY 설정이 필요합니다. 호출하지 않았습니다.");
         const result = await callContentReviewer({ stage: "deepseek", run, apiKey, model: models.deepseek });
         review = { ...(result as typeof result & { result: ReviewResult }), status: "completed" };
       } catch (cause) {
