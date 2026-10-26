@@ -1,4 +1,5 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
+import { callGeminiChat, isGeminiModel } from '../_shared/geminiChat.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import {
@@ -746,6 +747,24 @@ async function callOpenAI(
   temperature = 0.8,
   options: OpenAICallOptions,
 ) {
+  // Gemini는 백그라운드(Responses API) 경로가 없으므로 항상 동기 호출한다. 응답은 OpenAI 형식으로 감싸 온다.
+  if (isGeminiModel(model)) {
+    const geminiKey = Deno.env.get('GEMINI_API_KEY')
+    if (!geminiKey) {
+      return { ok: false as const, status: 503, raw: JSON.stringify({ error: 'GEMINI_API_KEY가 설정되지 않았습니다. 호출하지 않았습니다.' }) }
+    }
+    const startedAt = Date.now()
+    const g = await callGeminiChat({ model, system, user, temperature,
+      maxCompletionTokens: options.maxCompletionTokens, responseFormat: options.responseFormat }, geminiKey)
+    const logged = await recordOpenAIInvocation({
+      telemetry: options.telemetry, modelRequested: model, statusCode: g.status, ok: g.ok,
+      raw: g.raw, durationMs: Date.now() - startedAt, requestId: g.requestId,
+    })
+    if (g.ok && !logged && options.telemetry.required) {
+      return { ok: false as const, status: 503, raw: JSON.stringify({ error: 'LLM 호출 장부 저장 실패 — 연구 산출물을 저장하지 않습니다.' }) }
+    }
+    return g.ok ? { ok: true as const, raw: g.raw } : { ok: false as const, status: g.status, raw: g.raw }
+  }
   const context = backgroundContext.getStore()
   if (context) {
     const completed = await context.call({ model, system, user, temperature,

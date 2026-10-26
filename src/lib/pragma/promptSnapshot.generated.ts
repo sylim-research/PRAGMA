@@ -16,14 +16,14 @@ export type PromptSnapshot = {
   prompts: PromptSnapshotEntry[];
 };
 export const PROMPT_SNAPSHOT: PromptSnapshot = {
-  "generated_at": "2026-10-25T15:27:26+09:00",
-  "git_commit": "28bd96ff",
+  "generated_at": "2026-10-25T18:49:59+09:00",
+  "git_commit": "485b327e",
   "git_dirty": true,
   "edge_source": "supabase/functions/generate-scenario/index.ts",
-  "edge_source_sha256": "8042e4a12852f71790a4b9867fa23c595c3591e5ec4c1657a5a5a389c7fbb9f1",
-  "core_surface_hash": "423a3deccad4e0da70d930a0f4ce9159f8e94f0f77f4afce5e4b5b9308c36ca7",
+  "edge_source_sha256": "9799df284e0b669f8f86cac6fb500244fbb36b51a4684259e78bb6b4fc764719",
+  "core_surface_hash": "3e21ff25d04cd6a7f813992a9c76b768ca1686843f12df75b17ff3fe09fea23c",
   "generation_config": {
-    "model": "gpt-4.1-mini",
+    "model": "gemini-3.1-pro-preview",
     "model_fallback": null,
     "temperature": 0.7,
     "response_format": "json_schema:pragma_scenario_core_v2"
@@ -472,5 +472,5 @@ export const PROMPT_SNAPSHOT: PromptSnapshot = {
       "text": "[분석 요청]\n- 기본 언어 방향(참고): 중국어 → 한국어 (자료 성격에 따라 후보별로 조정 가능)\n- 입력 문구(원자료): PROBE_SOURCE_TEXT\n\n위 자료를 분석해 활용 후보를 JSON으로만 반환하세요."
     }
   ],
-  "pack_prompt_surface_hash": "97c5385fdb39ac070a4f376affc50bed8b0331f9cd3fd85792d002335c3af53a"
+  "pack_prompt_surface_hash": "9a7939579b45e2e170fb0e60643369fe2217f567efe6918b7d87e3c6a93c19bd"
 } as const;

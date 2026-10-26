@@ -14,7 +14,7 @@ describe("OpenAI request contract", () => {
   it("keeps the current model roles explicit and centralized", () => {
     expect(OPENAI_MODEL_ROUTES).toEqual({
       default: {
-        primary: "gpt-4.1-mini",
+        primary: "gemini-3.1-pro-preview",
         fallback: null,
       },
       mission: {
@@ -22,16 +22,16 @@ describe("OpenAI request contract", () => {
         fallback: null,
       },
       mission_v6: {
-        primary: "gpt-5.5",
+        primary: "gemini-3.1-pro-preview",
         fallback: null,
       },
       critic: {
-        primary: "gpt-4.1",
+        primary: "gpt-6-astra",
         fallback: null,
       },
       feedback: {
-        primary: "gpt-4.1-mini",
-        fallback: "gpt-4o-mini",
+        primary: "gemini-3.1-pro-preview",
+        fallback: "gpt-5.5",
       },
     });
   });
@@ -39,6 +39,7 @@ describe("OpenAI request contract", () => {
   it("omits temperature only for reasoning models", () => {
     const base = { system: "s", user: "u", temperature: 0.4 };
     expect(buildOpenAIChatRequest({ ...base, model: "gpt-5.5" })).not.toHaveProperty("temperature");
+    expect(buildOpenAIChatRequest({ ...base, model: "gpt-6-astra" })).not.toHaveProperty("temperature");
     expect(buildOpenAIChatRequest({ ...base, model: "o3" })).not.toHaveProperty("temperature");
     expect(buildOpenAIChatRequest({ ...base, model: "gpt-4.1" }).temperature).toBe(0.4);
   });
