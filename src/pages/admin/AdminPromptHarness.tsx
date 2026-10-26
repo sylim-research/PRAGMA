@@ -182,7 +182,7 @@ function HarnessOverview() {
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[13px] font-semibold text-[#6D5C1F]">AI 품질 심사</span>
-            <Badge variant="outline" className="bg-white font-normal">GPT-4.1</Badge>
+            <Badge variant="outline" className="bg-white font-normal">GPT-6 Astra</Badge>
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">

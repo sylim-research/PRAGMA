@@ -104,10 +104,11 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <sub>2026년 10월 기준</sub>
 
-- **학습 미션 생성**은 GPT-5.5가 기본이며, 필요시 상위 모델인 GPT-6 Astra를 선택할 수 있습니다.
-- **시나리오 생성**에는 GPT-4.1 mini를 사용합니다.
-- **AI 검토**에는 GPT-4.1, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다.
-- **AI 피드백**에는 GPT-4.1 mini를 사용합니다.
+- **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다. 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡습니다.
+- **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다.
+- **학습 미션 생성**에는 Gemini 3.1 Pro를 사용합니다.
+- **AI 검토**와 **중국어 표현 검토**에는 GPT-6 Astra를, 필요시 **독립 AI 검토**에는 Claude Opus 5를 사용합니다. 최종 승인은 교수자가 합니다.
+- **AI 피드백**은 Gemini 3.1 Pro가 쓰고 GPT-6 Astra가 학습자에게 보이기 전에 검수합니다. 검수를 통과하지 못한 판정은 보류하고, 참고 표현은 교수자가 승인한 저장본만 보여 줍니다.
 - **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.

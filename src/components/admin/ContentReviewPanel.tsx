@@ -84,7 +84,17 @@ const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
 const modelName = (id: string | null | undefined) => {
   if (!id) return "";
   id = id.replace(/[-_]\d{4}-\d{2}-\d{2}$|[-_]\d{8}$/, "");
-  if (/^gpt-/i.test(id)) return `GPT-${id.slice(4)}`;
+  // gpt-6-astra → GPT-6 Astra, gemini-3.1-pro-preview → Gemini 3.1 Pro (preview)
+  if (/^gpt-/i.test(id)) {
+    const [version, ...tail] = id.slice(4).split("-");
+    return [`GPT-${version}`, ...tail.map((part) => part.charAt(0).toUpperCase() + part.slice(1))].join(" ");
+  }
+  if (/^gemini-/i.test(id)) {
+    const [version, ...tail] = id.slice(7).split("-");
+    const preview = tail.at(-1) === "preview";
+    const words = (preview ? tail.slice(0, -1) : tail).map((part) => part.charAt(0).toUpperCase() + part.slice(1));
+    return [`Gemini ${version}`, ...words].join(" ") + (preview ? " (preview)" : "");
+  }
   const [family, ...rest] = id.split("-");
   const words = rest.filter((part) => !/^\d{8}$/.test(part));
   const firstNum = words.findIndex((part) => /^\d/.test(part));
