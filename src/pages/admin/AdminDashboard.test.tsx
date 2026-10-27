@@ -105,9 +105,9 @@ describe("admin dashboard", () => {
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "지금 대기 2개");
-    const claude = within(stages).getByRole("link", { name: /교차 검토 · 종합/ });
-    expect(claude.textContent).toMatch(/1\s*개/);
-    expect(claude).toHaveAttribute("title", "지금 대기 0개");
+    // 2026-10-27: Claude 종합 검토·재판정 카드는 없고, 1번은 생성 모델(Gemini) 안내다.
+    expect(within(stages).queryByRole("link", { name: /교차 검토 · 종합/ })).toBeNull();
+    expect(stages.textContent).toContain("Gemini 3.1 Pro");
     const professor = within(stages).getByRole("link", { name: /교수자 최종 승인/ });
     expect(professor.textContent).toMatch(/2\s*개/);
     expect(professor).toHaveAttribute("title", "지금 대기 1개");
@@ -155,7 +155,7 @@ describe("admin dashboard", () => {
     show();
     const rulesCard = await screen.findByRole("link", { name: /자동 규칙 점검/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["AI 품질 심사", "교차 검토 · 종합", "교차 검토 · 중국어 표현", "검토 의견 재판정"]) {
+    for (const label of ["AI 품질 심사", "중국어 표현 검토"]) {
       expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
     }
     const stages = screen.getByRole("group", { name: "품질 점검 단계" });

@@ -45,8 +45,11 @@ describe("current content five-stage review", () => {
     const focused = {...run(), approval_policy: "focused_v1" as const, generation_quality: evidence,
       openai_review: null, claude_review: null};
     expect(nextReviewStage(focused)).toBe("professor");
-    expect(nextReviewStage({...focused, independent_review_requested: true})).toBe("claude");
-    expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review})).toBe("deepseek");
+    // 현행(2026-10-27): 선택 시 Claude 없이 중국어 표현 검토 → 교수자.
+    expect(nextReviewStage({...focused, independent_review_requested: true})).toBe("deepseek");
+    expect(nextReviewStage({...focused, independent_review_requested: true,
+      deepseek_review: { status: "failed", provider: "deepseek", requested_model: "gpt-6-astra", error_ko: "키 없음", checked_at: "x", prompt_version: "v" }})).toBe("professor");
+    // 이전 흐름의 Claude 의견이 남은 기록만 재판정을 거친다.
     expect(nextReviewStage({...focused, independent_review_requested: true, claude_review: run().claude_review,
       deepseek_review: { status: "failed", provider: "deepseek", requested_model: "deepseek-v4-pro", error_ko: "키 없음", checked_at: "x", prompt_version: "v" }})).toBe("adjudication");
     expect(nextReviewStage({...focused, generation_quality: null})).toBe("openai");
@@ -55,6 +58,8 @@ describe("current content five-stage review", () => {
       { key: "openai", label: "OpenAI 검토" },
       { key: "professor", label: "교수자 최종 승인" },
     ]);
+    expect(effectiveReviewSteps({...focused, independent_review_requested: true})
+      .map(step => step.key)).toEqual(["rules", "openai", "deepseek", "professor"]);
     expect(effectiveReviewSteps({...focused, independent_review_requested: true, claude_review: run().claude_review})
       .map(step => step.key)).toEqual(["rules", "openai", "claude", "deepseek", "adjudication", "professor"]);
   });
@@ -398,12 +403,14 @@ describe("cross-check: Chinese expression review (DeepSeek)", () => {
       [base.issue_ko, base.suggestion_ko, "의도 결함 불분명 · 강도"], [base.issue_ko, base.suggestion_ko, "기준 판단 이견 · 양태"], [base.issue_ko, base.suggestion_ko, "의도 외 결함 · 연어"]]);
   });
 
-  it("runs after Claude, records failure without blocking, and never runs on records adjudicated before the stage existed", () => {
+  it("runs after the primary review, records failure without blocking, and never runs on records adjudicated before the stage existed", () => {
     expect(nextReviewStage(cross())).toBe("deepseek");
     expect(nextReviewStage({ ...cross(), deepseek_review: failed })).toBe("adjudication");
     const noClaudeFindings = { ...cross(), claude_review: { ...run().claude_review!, result: { verdict: "pass" as const, summary_ko: "없음", findings: [] } } };
     expect(nextReviewStage({ ...noClaudeFindings, deepseek_review: failed })).toBe("professor");
-    expect(nextReviewStage({ ...noClaudeFindings, deepseek_review: completed })).toBe("adjudication");
+    // 2026-10-27: 중국어 표현 의견은 재판정 없이 교수자가 바로 본다.
+    expect(nextReviewStage({ ...noClaudeFindings, deepseek_review: completed })).toBe("professor");
+    expect(nextReviewStage({ ...cross(), claude_review: null, deepseek_review: completed })).toBe("professor");
     expect(nextReviewStage({ ...cross(), adjudication: { result: { summary_ko: "x", decisions: [] } } as any })).toBe("professor");
     expect(canRetryDeepseek({ ...cross(), deepseek_review: failed })).toBe(true);
     expect(canRetryDeepseek({ ...cross(), deepseek_review: completed })).toBe(false);

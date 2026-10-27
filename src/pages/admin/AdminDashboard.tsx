@@ -136,7 +136,7 @@ const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   rules: "자동 규칙 점검",
   openai: "AI 품질 심사",
   claude: "교차 검토 · 종합",
-  deepseek: "교차 검토 · 중국어 표현",
+  deepseek: "중국어 표현 검토",
   adjudication: "검토 의견 재판정",
   // 「완료」는 카드 이름이 아니라 숫자 옆 단위에 붙인다(2026-10-10). 교수자 단계는 전체 흐름의 최종 승인 수와 같다.
   professor: "교수자 최종 승인",
@@ -152,7 +152,7 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "GPT-6 Astra · 의미·화행 심사",
   claude: "Claude · 요청 시",
-  deepseek: "중국어 표현 · 요청 시",
+  deepseek: "GPT-6 Astra · 요청 시",
   // 교차 검토에 의견이 있을 때만, OpenAI가 그 의견을 항목별로 다시 판단한다(nextDashboardReviewStage·ContentReviewPanel).
   adjudication: "GPT-6 Astra · 의견 있을 때",
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
@@ -160,12 +160,13 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
 };
 // 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
 // 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
-const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["claude", "deepseek", "adjudication"]);
+const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["deepseek"]);
 
 // Final evidence preparation belongs to the professor-work queue on this overview.
-const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== "finalization").map((stage, index) => ({
+// 2026-10-27 현행 흐름: Claude 종합 검토와 재판정은 쓰지 않는다. 1번 카드는 생성(Gemini)이라 검수 단계는 2번부터.
+const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== "finalization").filter((stage) => stage.key !== "claude" && stage.key !== "adjudication").map((stage, index) => ({
   ...stage,
-  step: index + 1,
+  step: index + 2,
   displayLabel: REVIEW_STAGE_DISPLAY_LABELS[stage.key],
   description: REVIEW_STAGE_DESCRIPTIONS[stage.key],
   optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
@@ -189,7 +190,7 @@ const ReviewPipeline = ({
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
   <div role="group" aria-label="품질 점검 단계">
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
     {(() => {
       const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
         // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
@@ -245,15 +246,24 @@ const ReviewPipeline = ({
       const firstOptional = REVIEW_STAGE_ITEMS.findIndex((stage) => stage.optional);
       return (
         <>
+          {/* 1. 생성 — 만드는 일은 Gemini, 중→한 중국어 원문만 Astra(2026-10-26 모델 배정). 대기열이 아니라 숫자 대신 모델을 보인다. */}
+          <div className="flex min-h-[80px] min-w-0 flex-col rounded-xl border border-[#E6CF7A] bg-[#FBF6E4] px-4 py-[13px]">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#F4E6B3] text-[12px] font-semibold tabular-nums text-[#6D5C1F]">1</span>
+              <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">시나리오·학습 미션 생성</span>
+            </div>
+            <span className="mt-1.5 text-[20px] font-semibold leading-tight tracking-[-0.02em] text-[#15202B]">Gemini 3.1 Pro</span>
+            <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">중→한 중국어 원문은 GPT-6 Astra</span>
+          </div>
           {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
-          {/* 선택 단계(3·4·5)는 한 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
+          {/* 선택 단계는 점선 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
           <div
             role="group"
-            aria-label="필요 시 교차 검토와 재판정"
-            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px] sm:col-span-3 sm:grid-cols-3"
+            aria-label="필요 시 중국어 표현 검토"
+            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px]"
           >
             <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[12px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              필요 시 교차 검토와 재판정
+              필요 시
             </span>
             {optional.map(renderStage)}
           </div>

@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1240" width="2000" height="1240" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1E2A44" stroke-width="1.6"/>
+    </marker>
+    <style>
+      .t { fill:#1E2A44; }
+      .num { font-size:28px; font-weight:800; letter-spacing:2px; fill:#1E2A44; }
+      .h { font-size:31px; font-weight:800; }
+      .s { font-size:23px; fill:#3F4A61; }
+      .sw { font-size:23px; fill:#E6E9F2; }
+      .chip { font-size:21px; font-weight:700; }
+      .row { font-size:27px; font-weight:800; fill:#1E2A44; }
+      .rowsub { font-size:22px; fill:#5B647A; }
+      .leg { font-size:22px; fill:#3F4A61; }
+      .line { stroke:#1E2A44; stroke-width:2.2; fill:none; }
+    </style>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1997" height="1237" rx="34" fill="#FFFFFF" stroke="#DADDE6" stroke-width="3"/>
+
+  <!-- 제목 -->
+  <text x="70" y="96" font-size="27" font-weight="700" letter-spacing="4" fill="#5B647A">Fig. 2</text>
+  <text x="182" y="96" font-size="32" font-weight="800" class="t">콘텐츠 제작·학습 워크플로우와 AI 모델 배정</text>
+  <line x1="880" y1="87" x2="1930" y2="87" stroke="#E3E6EE" stroke-width="2"/>
+
+  <!-- 범례 -->
+  <g transform="translate(70,138)">
+    <rect width="34" height="26" rx="7" fill="#FBF3D6" stroke="#D9B23A" stroke-width="2.5"/>
+    <text x="46" y="21" class="leg"><tspan font-weight="800" fill="#1E2A44">만드는 일</tspan> Gemini 3.1 Pro</text>
+    <rect x="390" width="34" height="26" rx="7" fill="#FFFFFF" stroke="#1E2A44" stroke-width="2.5"/>
+    <text x="436" y="21" class="leg"><tspan font-weight="800" fill="#1E2A44">검사하는 일</tspan> GPT-6 Astra</text>
+    <rect x="770" width="34" height="26" rx="7" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2" stroke-dasharray="6 5"/>
+    <text x="816" y="21" class="leg"><tspan font-weight="800" fill="#1E2A44">서버 코드</tspan> 규칙 검사</text>
+    <rect x="1080" width="34" height="26" rx="7" fill="#1E2A44"/>
+    <text x="1126" y="21" class="leg"><tspan font-weight="800" fill="#1E2A44">교수자</tspan> 감수·최종 결정</text>
+  </g>
+
+  <!-- ── 1줄: 콘텐츠 제작 ── -->
+  <text x="70" y="248" class="row">콘텐츠 제작</text>
+  <text x="232" y="248" class="rowsub">관리자 화면 · 학습자에게 공개되기 전</text>
+
+  <!-- 01 시나리오 생성 (Gemini, 중→한 Astra) -->
+  <text x="70" y="306" class="num">01</text>
+  <rect x="70" y="322" width="332" height="250" rx="22" fill="#FBF3D6" stroke="#D9B23A" stroke-width="3"/>
+  <text x="236" y="380" text-anchor="middle" class="h t">시나리오 생성</text>
+  <text x="236" y="420" text-anchor="middle" class="s">상황·관계·원문</text>
+  <rect x="121" y="446" width="230" height="40" rx="20" fill="#FFFFFF" stroke="#D9B23A" stroke-width="2"/>
+  <text x="236" y="474" text-anchor="middle" class="chip t">Gemini 3.1 Pro</text>
+  <text x="236" y="525" text-anchor="middle" font-size="21" fill="#3F4A61">중→한의 중국어 원문은</text>
+  <text x="236" y="553" text-anchor="middle" font-size="21" font-weight="700" fill="#1E2A44">GPT-6 Astra</text>
+
+  <!-- 02 학습 미션 생성 (Gemini) -->
+  <text x="452" y="306" class="num">02</text>
+  <rect x="452" y="322" width="332" height="250" rx="22" fill="#FBF3D6" stroke="#D9B23A" stroke-width="3"/>
+  <text x="618" y="380" text-anchor="middle" class="h t">학습 미션 생성</text>
+  <text x="618" y="420" text-anchor="middle" class="s">MJT 판단 문항 5개</text>
+  <text x="618" y="452" text-anchor="middle" class="s">DCT형 통번역 과제·참고 표현</text>
+  <rect x="503" y="476" width="230" height="40" rx="20" fill="#FFFFFF" stroke="#D9B23A" stroke-width="2"/>
+  <text x="618" y="504" text-anchor="middle" class="chip t">Gemini 3.1 Pro</text>
+
+  <!-- 03 자동 규칙 점검 (서버 코드) -->
+  <text x="834" y="306" class="num">03</text>
+  <rect x="834" y="322" width="332" height="250" rx="22" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2.5" stroke-dasharray="9 7"/>
+  <text x="1000" y="400" text-anchor="middle" class="h t">자동 규칙 점검</text>
+  <text x="1000" y="442" text-anchor="middle" class="s">형식·문항 구성·조건</text>
+  <rect x="905" y="476" width="190" height="40" rx="20" fill="#FFFFFF" stroke="#8A93A8" stroke-width="2"/>
+  <text x="1000" y="504" text-anchor="middle" class="chip" fill="#3F4A61">서버 코드</text>
+
+  <!-- 04 AI 품질 심사 (Astra) -->
+  <text x="1216" y="306" class="num">04</text>
+  <rect x="1216" y="322" width="332" height="250" rx="22" fill="#FFFFFF" stroke="#1E2A44" stroke-width="3"/>
+  <text x="1382" y="380" text-anchor="middle" class="h t">AI 품질 심사</text>
+  <text x="1382" y="420" text-anchor="middle" class="s">의미·화행·해설 일치</text>
+  <text x="1382" y="452" text-anchor="middle" class="s">+ 중국어 표현 검토(선택)</text>
+  <rect x="1277" y="476" width="210" height="40" rx="20" fill="#1E2A44"/>
+  <text x="1382" y="504" text-anchor="middle" class="chip" fill="#FFFFFF">GPT-6 Astra</text>
+
+  <!-- 05 교수자 감수·최종 승인 -->
+  <text x="1598" y="306" class="num">05</text>
+  <rect x="1598" y="322" width="332" height="250" rx="22" fill="#1E2A44"/>
+  <text x="1764" y="392" text-anchor="middle" class="h" fill="#FFFFFF">교수자 감수·</text>
+  <text x="1764" y="432" text-anchor="middle" class="h" fill="#FFFFFF">최종 승인</text>
+  <text x="1764" y="480" text-anchor="middle" class="sw">언어·의미·화용·교육 적합성</text>
+  <text x="1764" y="514" text-anchor="middle" class="sw">승인 · 보류 · 수업 사용 결정</text>
+
+  <!-- 1줄 화살표 -->
+  <line x1="402" y1="447" x2="448" y2="447" class="line" marker-end="url(#arrow)"/>
+  <line x1="784" y1="447" x2="830" y2="447" class="line" marker-end="url(#arrow)"/>
+  <line x1="1166" y1="447" x2="1212" y2="447" class="line" marker-end="url(#arrow)"/>
+  <line x1="1548" y1="447" x2="1594" y2="447" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 승인 → 편성 → 학습 -->
+  <text x="1930" y="628" text-anchor="end" font-size="25" font-weight="800" class="t">승인된 학습 미션 → 15주 교과목 편성</text>
+  <path d="M1764,646 L1764,712 L236,712 L236,754" class="line" marker-end="url(#arrow)"/>
+
+  <!-- ── 2줄: 학습 (실시간) ── -->
+  <text x="70" y="690" class="row">학습</text>
+  <text x="138" y="690" class="rowsub">학습자 화면 · 실시간, 교수자 승인을 거칠 수 없는 구간</text>
+
+  <!-- A MJT -->
+  <rect x="70" y="760" width="332" height="230" rx="22" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="236" y="830" text-anchor="middle" class="h t">MJT 판단 문항</text>
+  <text x="236" y="872" text-anchor="middle" class="s">5개 문항 판단</text>
+  <text x="236" y="930" text-anchor="middle" font-size="21" fill="#5B647A">승인된 저장 콘텐츠</text>
+
+  <!-- B DCT 답안 -->
+  <rect x="452" y="760" width="332" height="230" rx="22" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="618" y="830" text-anchor="middle" class="h t">DCT형 통번역</text>
+  <text x="618" y="872" text-anchor="middle" class="s">학습자 답안 제출</text>
+  <text x="618" y="930" text-anchor="middle" font-size="21" fill="#5B647A">번역·통역</text>
+
+  <!-- C 피드백 작성 (Gemini) -->
+  <rect x="834" y="760" width="332" height="230" rx="22" fill="#FBF3D6" stroke="#D9B23A" stroke-width="3"/>
+  <text x="1000" y="822" text-anchor="middle" class="h t">피드백 작성</text>
+  <text x="1000" y="862" text-anchor="middle" class="s">의미·문법·화용 판정과</text>
+  <text x="1000" y="894" text-anchor="middle" class="s">한국어 설명</text>
+  <rect x="885" y="918" width="230" height="40" rx="20" fill="#FFFFFF" stroke="#D9B23A" stroke-width="2"/>
+  <text x="1000" y="946" text-anchor="middle" class="chip t">Gemini 3.1 Pro</text>
+
+  <!-- D 피드백 검수 (Astra) -->
+  <rect x="1216" y="760" width="332" height="230" rx="22" fill="#FFFFFF" stroke="#1E2A44" stroke-width="3"/>
+  <text x="1382" y="822" text-anchor="middle" class="h t">피드백 검수</text>
+  <text x="1382" y="862" text-anchor="middle" class="s">판정과 설명이 맞는지</text>
+  <text x="1382" y="894" text-anchor="middle" class="s">축마다 확인</text>
+  <rect x="1277" y="918" width="210" height="40" rx="20" fill="#1E2A44"/>
+  <text x="1382" y="946" text-anchor="middle" class="chip" fill="#FFFFFF">GPT-6 Astra</text>
+
+  <!-- E 학습자 화면 -->
+  <rect x="1598" y="760" width="332" height="230" rx="22" fill="#FFFFFF" stroke="#1E2A44" stroke-width="2.5"/>
+  <text x="1764" y="822" text-anchor="middle" class="h t">학습자에게 표시</text>
+  <text x="1764" y="862" text-anchor="middle" class="s">통과한 판정만 보여 줌</text>
+  <text x="1764" y="894" text-anchor="middle" class="s">갈리면 「판정 보류」</text>
+  <text x="1764" y="940" text-anchor="middle" font-size="21" fill="#5B647A">참고 표현 = 교수자 승인 저장본</text>
+
+  <!-- 2줄 화살표 -->
+  <line x1="402" y1="875" x2="448" y2="875" class="line" marker-end="url(#arrow)"/>
+  <line x1="784" y1="875" x2="830" y2="875" class="line" marker-end="url(#arrow)"/>
+  <line x1="1166" y1="875" x2="1212" y2="875" class="line" marker-end="url(#arrow)"/>
+  <line x1="1548" y1="875" x2="1594" y2="875" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 원칙 -->
+  <line x1="70" y1="1052" x2="1930" y2="1052" stroke="#E3E6EE" stroke-width="2"/>
+  <text x="70" y="1110" font-size="26" font-weight="800" class="t">원칙</text>
+  <text x="150" y="1110" font-size="25" fill="#3F4A61">만드는 모델과 검사하는 모델을 다른 회사로 나누고, 사람이 최종 승인한다.</text>
+  <text x="150" y="1152" font-size="25" fill="#3F4A61">교수자 승인을 거칠 수 없는 실시간 피드백도 같은 원칙으로 검수한다. 교차 검토는 오류를 발견할 기회를 늘리는 장치다.</text>
+  <text x="150" y="1194" font-size="21" fill="#8A93A8">모델 배정은 과제별 블라인드 비교(2026년 10월)로 정했다. 음성 인식 GPT-4o Transcribe · 음성 합성 ElevenLabs.</text>
+</svg>

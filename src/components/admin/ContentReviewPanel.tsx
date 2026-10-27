@@ -581,13 +581,13 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 품질 심사"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
       {focused && primary && !run?.approved_at && !run?.independent_review_requested && !(compact && historicalApproval) && (() => {
         const body = <>
-          <h4 className="text-[13.5px] font-bold text-[#233542]">교차 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
-          <p className="mt-0.5 text-xs text-[#5D6970]">1차 심사 결과를 보지 않은 다른 AI가 종합 검토와 중국어 표현 검토를 하고, 그 의견을 1차 심사 AI가 재판정합니다.</p>
+          <h4 className="text-[13.5px] font-bold text-[#233542]">중국어 표현 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
+          <p className="mt-0.5 text-xs text-[#5D6970]">GPT-6 Astra가 중국어 문장만 한 번 더 봅니다. 의견은 교수자 최종 승인에서 바로 확인합니다.</p>
           <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
             setBusy(true); setError(null);
             void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
               .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
-          }}>교차 검토 요청</Button>
+          }}>중국어 표현 검토 요청</Button>
         </>;
         // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
         return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;

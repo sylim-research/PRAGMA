@@ -121,6 +121,7 @@ before(async () => {
   await db.exec(await sqlFile('20260912140000_content_review_gate_rebind.sql'));
   // Chinese expression cross-check (2026-10-20): every earlier test also runs on top of it.
   await db.exec(await sqlFile('20261020120000_deepseek_cross_review.sql'));
+  await db.exec(await sqlFile('20261027100000_review_without_claude.sql'));
 });
 after(async () => { await db.close(); });
 
@@ -695,6 +696,12 @@ async function crossCheckReview() {
   await db.query('update content_review_runs set independent_review_requested=true,claude_review=$2 where id=$1',[f.r.id,model('claude',pass)]);
   return f;
 }
+/** Current flow (2026-10-27): the Chinese expression review is requested right after the primary review, no Claude. */
+async function chineseReviewRequested() {
+  const f=await focusedReview();
+  await db.query('update content_review_runs set independent_review_requested=true where id=$1',[f.r.id]);
+  return f;
+}
 const setDeepseek=(id,value)=>db.query('update content_review_runs set deepseek_review=$2 where id=$1',[id,value]);
 const decide=(r,ids)=>admin(()=>scalar('select save_content_review_decisions($1,$2,$3)',[r.id,hash,ids.map((finding_id)=>({finding_id,decision:'no_change',rationale_ko:rationale}))]));
 
@@ -719,17 +726,27 @@ test('deepseek: not run and failed never block approval; a failure must still sa
   assert.equal(await finalize(failed.m,failed.r),failed.m.id);
 });
 
-test('deepseek: completed opinions alone require adjudication of each one and a professor decision', async () => {
-  const {m,r}=await crossCheckReview();
-  await setDeepseek(r.id,dsCompleted([dsFinding]));
+test('chinese review: opinions go straight to the professor without Claude or adjudication', async () => {
+  const {m,r}=await chineseReviewRequested();
   await assert.rejects(finalize(m,r),/required quality evidence/);
-  await db.query('update content_review_runs set adjudication=$2 where id=$1',[r.id,model('adjudication',{decisions:[]})]);
-  await assert.rejects(finalize(m,r),/Adjudicate every Claude and DeepSeek finding exactly once/);
-  await db.query('update content_review_runs set adjudication=$2 where id=$1',
-    [r.id,model('adjudication',{decisions:[{finding_id:'deepseek-1',decision:'reject',rationale_ko:rationale}]})]);
+  await setDeepseek(r.id,dsCompleted([dsFinding]));
   await assert.rejects(finalize(m,r),/Record every professor decision/);
   await decide(r,['deepseek-1']);
   assert.equal(await finalize(m,r),m.id);
+});
+
+test('chinese review: a failed run still lets the instructor approve, and must say why', async () => {
+  const {m,r}=await chineseReviewRequested();
+  await setDeepseek(r.id,dsFailed({error_ko:'  '}));
+  await assert.rejects(finalize(m,r),/must record its cause/);
+  await setDeepseek(r.id,dsFailed());
+  assert.equal(await finalize(m,r),m.id);
+});
+
+test('legacy: a run that already holds Claude findings still needs adjudication', async () => {
+  const {m,r}=await crossCheckReview();
+  await db.query('update content_review_runs set claude_review=$2 where id=$1',[r.id,model('claude',{verdict:'warning',findings:[finding]})]);
+  await assert.rejects(finalize(m,r),/required quality evidence/);
 });
 
 test('deepseek: a completed review with zero opinions needs no adjudication', async () => {
@@ -738,13 +755,13 @@ test('deepseek: a completed review with zero opinions needs no adjudication', as
   assert.equal(await finalize(m,r),m.id);
 });
 
-test('deepseek: an incomplete completed result or a cross-check without Claude is refused', async () => {
+test('deepseek: an incomplete completed result is refused; without Claude it is accepted in the focused flow', async () => {
   const {m,r}=await crossCheckReview();
   await setDeepseek(r.id,{...dsCompleted(),response_id:''});
   await assert.rejects(finalize(m,r),/Incomplete model review output/);
   await setDeepseek(r.id,dsCompleted());
-  await db.query('update content_review_runs set claude_review=null,independent_review_requested=false where id=$1',[r.id]);
-  await assert.rejects(finalize(m,r),/belongs to the cross-check after Claude/);
+  await db.query('update content_review_runs set claude_review=null where id=$1',[r.id]);
+  assert.equal(await finalize(m,r),m.id);
 });
 
 test('a warning the adjudication accepted or refined is a required decision the DB accepts (UI and DB agree)', async () => {

@@ -197,11 +197,10 @@ export function nextDashboardReviewStage(
   if (!run || run.rules_verdict === "fail") return "rules";
   if (run.approval_policy === FOCUSED_POLICY) {
     if (!run.openai_response_id && !run.generation_quality_hash) return "openai";
-    if (run.independent_review_requested && !run.claude_response_id) return "claude";
-    // 패널의 nextReviewStage와 같은 규칙: 종합 검토 뒤 중국어 표현 검토 한 번(실패도 기록으로 남고 넘어간다).
+    // 패널의 nextReviewStage와 같은 규칙(2026-10-27): AI 품질 심사 뒤 요청 시 중국어 표현 검토 한 번(실패도 기록으로 남고 넘어간다).
     if (run.independent_review_requested && !run.deepseek_status && !run.adjudication_response_id && !run.finalization_stage) return "deepseek";
-    const deepseekFinding = run.deepseek_status === "completed" && run.deepseek_first_finding;
-    if (run.independent_review_requested && (run.claude_first_finding || deepseekFinding) && !run.adjudication_response_id) return "adjudication";
+    // 이전 흐름에서 Claude 의견을 받고 재판정 전에 멈춘 기록만 재판정을 거친다.
+    if (run.claude_first_finding && !run.adjudication_response_id) return "adjudication";
     return "professor";
   }
   if (!run.openai_response_id) return "openai";

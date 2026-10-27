@@ -116,8 +116,11 @@ describe("admin dashboard metrics", () => {
     // 재사용할 것이 없으면 AI 검토 1회.
     expect(focused({})).toBe("openai");
     expect(focused({ openai_response_id: "o" })).toBe("professor");
-    // 추가 검토를 선택한 경우에만 Claude → DeepSeek(중국어 표현) → (의견이 있을 때만) 재검토 → 교수자.
-    expect(focused({ openai_response_id: "o", independent_review_requested: true })).toBe("claude");
+    // 현행(2026-10-27): 선택 시 중국어 표현 검토 → 교수자. Claude 단계는 없다.
+    expect(focused({ openai_response_id: "o", independent_review_requested: true })).toBe("deepseek");
+    expect(focused({ openai_response_id: "o", independent_review_requested: true, deepseek_status: "completed", deepseek_first_finding: "deepseek-1" }))
+      .toBe("professor");
+    // 이전 흐름의 Claude 기록.
     expect(focused({ openai_response_id: "o", independent_review_requested: true, claude_response_id: "c", claude_first_finding: "f1" }))
       .toBe("deepseek");
     const cross = { openai_response_id: "o", independent_review_requested: true, claude_response_id: "c" };
@@ -126,8 +129,8 @@ describe("admin dashboard metrics", () => {
     expect(focused({ ...cross, claude_first_finding: "f1", deepseek_status: "failed" })).toBe("adjudication");
     expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "failed" })).toBe("professor");
     expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "completed" })).toBe("professor");
-    // DeepSeek 의견만 있어도 재검토를 거친다.
-    expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "completed", deepseek_first_finding: "deepseek-1" })).toBe("adjudication");
+    // 중국어 표현 의견만 있으면 재검토 없이 교수자로 간다(2026-10-27).
+    expect(focused({ ...cross, claude_first_finding: null, deepseek_status: "completed", deepseek_first_finding: "deepseek-1" })).toBe("professor");
     // 단계 도입 전에 감수 자료까지 준비된 기록은 소급해서 멈추지 않는다.
     expect(focused({ ...cross, claude_first_finding: null, finalization_stage: "professor_finalized" })).toBe("professor");
     expect(focused({ openai_response_id: "o", independent_review_requested: true, claude_response_id: "c", claude_first_finding: "f1", adjudication_response_id: "a" }))
