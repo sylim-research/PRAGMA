@@ -1,5 +1,6 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
 import { callGeminiChat, isGeminiModel } from '../_shared/geminiChat.ts'
+import { concretenessHeldAxes, concretenessRetryNote, findConcretenessIssues } from '../_shared/feedbackConcreteness.ts'
 import { applyFeedbackReview, buildFeedbackReviewSystemPrompt, buildFeedbackReviewUserPrompt, FEEDBACK_REVIEW_PROMPT_VERSION, FEEDBACK_REVIEW_RESPONSE_FORMAT, readFeedbackReview } from '../_shared/feedbackReview.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
@@ -3777,12 +3778,30 @@ ${zhKoTranslationBoundary}${zhKoLiteralCheck}
 
 [층별 어조 — 다르게 쓴다]
 - 의미·문법은 **명시적으로** 판정한다("~가 빠졌습니다").
-- 각 층의 설명은 구체적인 문제 한 가지와 그 이유·점검 행동을 합쳐 짧은 1~2문장, 140자 이내로 쓴다.
+- 각 층의 설명은 구체적인 문제 한 가지와 그 이유·고칠 행동을 합쳐 짧은 1~2문장, 140자 이내로 쓴다.
   원문 전체를 되풀이하거나 "학습자 번역문은"으로 시작하는 보고서 문체를 쓰지 않는다.
   내용 누락은 "무엇이 전달되지 않았는지", 변경·추가는 "무엇이 달라졌는지" 구분해 설명한다.
   누락을 무조건 "따라서 의미가 왜곡되었습니다"로 마무리하지 않는다. 근거 없는 칭찬도 만들지 않는다.
-- 화용은 **단정하지 않는다**. "이 상황에서는 ~하게 들릴 수 있습니다" 형태로,
-  위험의 방향만 알려준다. 확신이 없으면 uncertainty_flags에 적고 단정을 피하라.
+- 화용은 **단정하지 않는다**. "이 상황에서는 ~하게 들릴 수 있습니다" 형태로 쓴다.
+  확신이 없으면 uncertainty_flags에 적고 단정을 피하라.
+
+[구체성 — 학습자가 실제로 고칠 수 있는 정보만 쓴다]
+- 문제가 있는 층은 **학습자 답안의 해당 표현을 글자 그대로 따옴표로 인용**하고, 그 표현이
+  왜 문제인지와 **학습자가 할 수 있는 행동 하나**를 쓴다. 행동은 "~을 묻는 형태로 바꿔 보세요",
+  "~에 해당하는 말을 넣어 보세요"처럼 무엇을 어떻게 바꿀지가 드러나야 한다.
+  예) ${tgt === 'zh'
+    ? `"'麻烦您帮我保管一下了'의 了 때문에 이미 맡아 주기로 한 일처럼 들릴 수 있습니다.
+       상대가 거절할 수 있도록 가능한지 묻는 형태로 바꿔 보세요."`
+    : `"'내일까지 보내 주세요'는 마감을 정해 알리는 말처럼 들릴 수 있습니다.
+       상대가 가능한지 먼저 묻는 형태로 바꿔 보세요."`}
+- 원문 내용이 빠졌으면 빠진 내용을 원문에서 그대로 인용해 무엇이 빠졌는지 쓴다.
+- **새 ${targetLanguage} 표현을 만들지 마라.** meaning_ko·feature_ko·discourse_ko에서 ${targetLanguage} 표현을
+  보여 줄 때는 학습자 답안이나 원문에 이미 있는 표현을 인용할 때뿐이다. 고친 ${targetLanguage} 문장·
+  추천 단어·모범 표현을 쓰지 않는다.
+- 일반론·추상적 권고는 금지한다: "검토할 필요가 있습니다", "검토해 보세요", "고려해 보세요",
+  "살펴보세요", "다시 확인해 보세요", "보완이 필요합니다", "개선이 필요합니다",
+  "더 자연스러운/적절한 표현" 같은 문구를 쓰지 않는다. 이런 문장 대신 위의 인용+행동을 쓴다.
+- 문제가 없는 층은 짧게 문제가 없다고만 쓴다. 근거 없는 칭찬이나 덧붙임 조언을 만들지 않는다.
 
 [금지]
 - 더 길고·간접적이고·강하거나 공손한 표현을 자동으로 상향 교정하지 마라. 적정 대역은
@@ -4758,6 +4777,27 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       // 모델이 통역 전사에서 완화·선택권 소실을 의미 손실로 이중 계산하는 경향을
       // 결정론적으로 막는다. 실제 사실·조건 누락 근거가 있으면 교정하지 않는다.
       repairFeedbackPragmaticLeak(parsed)
+      // 구체성 검사(2026-10-27 연구자 결정): 일반론 문구나 답안·원문에 없는 새 중국어가 있으면
+      // 시간이 남을 때 한 번만 다시 쓰게 하고, 그래도 남은 축은 판정 보류로 내보낸다.
+      let concreteness = findConcretenessIssues(parsed, b.answer ?? '', b.source_text ?? '')
+      let concretenessRetried = false
+      if (concreteness.length && Date.now() - feedbackStartedAt < 25_000) {
+        concretenessRetried = true
+        const retry = await callOpenAI(model, apiKey, sys, `${usr}\n\n${concretenessRetryNote(concreteness)}`, 0.2, {
+          maxCompletionTokens: FEEDBACK_MAX_COMPLETION_TOKENS,
+          telemetry: telemetryFor('learner_feedback', false, { invocationAttempt: 2, promptVersion: feedbackPromptVersion }),
+        }).catch(() => null)
+        if (retry?.ok) {
+          try {
+            const reparsed = parseOpenAIContent(retry.raw) as Record<string, unknown>
+            delete (reparsed as { revision_scope?: unknown }).revision_scope
+            repairFeedbackPragmaticLeak(reparsed)
+            parsed = reparsed
+            concreteness = findConcretenessIssues(parsed, b.answer ?? '', b.source_text ?? '')
+          } catch { /* 첫 출력을 유지하고 남은 문제 축을 보류한다 */ }
+        }
+      }
+      const concretenessHeld = concretenessHeldAxes(concreteness)
       // 검수(UI 브리프 v2): 다른 회사 모델이 축마다 판정·설명을 확인한다. 학습자 대기 상한 60초 안에서
       // 남은 시간만 기다리고, 늦거나 실패하면 모든 축을 보류한다(미검증 판정을 확정 노출하지 않는다).
       const reviewBudgetMs = 55_000 - (Date.now() - feedbackStartedAt)
@@ -4776,7 +4816,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           try { review = readFeedbackReview(parseOpenAIContent(reviewAtt.raw)) } catch { review = null }
         }
       }
-      parsed = applyFeedbackReview(parsed, review, { model: REVIEW_PRIMARY_MODEL, status: 'reviewed' })
+      parsed = applyFeedbackReview(parsed, review, { model: REVIEW_PRIMARY_MODEL, status: 'reviewed' },
+        { heldAxes: concretenessHeld, retried: concretenessRetried, issues: concreteness.map((issue) => `${issue.block}:${issue.kind}:${issue.detail}`) })
       return new Response(
         JSON.stringify({
           feedback: {

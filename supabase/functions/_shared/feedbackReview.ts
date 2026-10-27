@@ -4,7 +4,7 @@
 // - 통과 못 한 축 = 판정 보류(감점·재작성 강제 없음). 검수 실패·시간 초과 = 모든 축 보류.
 // - 실시간 새 문장(대안 표현)은 내보내지 않는다. 화면은 미션에 저장된 참고 표현(T3 검토·교수자 승인본)을 쓴다.
 
-export const FEEDBACK_REVIEW_PROMPT_VERSION = 'feedback_review_v1'
+export const FEEDBACK_REVIEW_PROMPT_VERSION = 'feedback_review_v2_concrete'
 export const FEEDBACK_REVIEW_AXES = ['meaning', 'grammar', 'pragmatics'] as const
 export type FeedbackReviewAxis = typeof FEEDBACK_REVIEW_AXES[number]
 
@@ -46,7 +46,8 @@ ${target}
 각 축에서 두 가지를 모두 확인한다.
 1) 판정이 맞는가. 원문의 뜻과 의도가 답안에 보존됐는지를 먼저 본다.
 2) 그 축의 설명에 틀린 말이 없는가. 답안에 없는 내용을 지적하거나, 틀린 언어 규칙을 말하거나, 관용적인 사과·감사 표현을 과도하게 해석하는 것은 틀린 말이다.
-둘 다 맞으면 pass=true, 하나라도 틀렸거나 확신할 수 없으면 pass=false다. 표현 취향의 차이만으로 false를 주지 않는다.
+3) 문제를 지적한 설명이 학습자에게 실제로 쓸모 있는가. 학습자 답안(또는 빠진 원문)의 표현을 그대로 인용하고, 무엇을 어떻게 바꿀지 행동 하나를 말해야 한다. 「검토해 보세요·고려해 보세요·더 자연스럽게」처럼 고칠 방향이 없는 일반론이거나, 답안·원문에 없는 새 목표어 문장·표현을 제시하면 이 항목은 틀린 것이다. 문제가 없다고 짧게 쓴 설명은 이 항목을 통과한다.
+셋 다 맞으면 pass=true, 하나라도 틀렸거나 확신할 수 없으면 pass=false다. 표현 취향의 차이만으로 false를 주지 않는다.
 reason_ko는 한국어 한 줄로 쓴다(pass=true면 빈 문자열 가능). JSON만 출력한다.`
 }
 
@@ -93,8 +94,11 @@ export function applyFeedbackReview(
   feedback: Record<string, unknown>,
   review: ReturnType<typeof readFeedbackReview>,
   reviewer: { model: string; status: 'reviewed' | 'unavailable' },
+  /** 구체성 검사(feedbackConcreteness)에서 재생성 뒤에도 일반론·새 목표어 표현이 남은 축. */
+  concreteness: { heldAxes: FeedbackReviewAxis[]; retried: boolean; issues: string[] } = { heldAxes: [], retried: false, issues: [] },
 ) {
-  const held = review ? FEEDBACK_REVIEW_AXES.filter((axis) => !review[axis].pass) : [...FEEDBACK_REVIEW_AXES]
+  const reviewHeld = review ? FEEDBACK_REVIEW_AXES.filter((axis) => !review[axis].pass) : [...FEEDBACK_REVIEW_AXES]
+  const held = FEEDBACK_REVIEW_AXES.filter((axis) => reviewHeld.includes(axis) || concreteness.heldAxes.includes(axis))
   const blocks = { ...((feedback.blocks as Record<string, unknown>) ?? {}) }
   blocks.alternatives = []
   if (held.includes('meaning')) blocks.meaning_ko = ''
@@ -113,6 +117,7 @@ export function applyFeedbackReview(
       model: reviewer.model,
       held_axes: held,
       reasons: review ? Object.fromEntries(FEEDBACK_REVIEW_AXES.map((axis) => [axis, review[axis].reason_ko])) : {},
+      concreteness: { held_axes: concreteness.heldAxes, retried: concreteness.retried, issues: concreteness.issues },
     },
   }
 }
