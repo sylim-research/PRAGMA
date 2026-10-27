@@ -60,7 +60,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <p align="center"><img src="docs/figures/fig2-workflow-model-roles-1027.png" alt="콘텐츠 제작·학습 워크플로우와 AI 모델 배정: 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra, 최종 승인은 교수자" width="100%"></p>
 
-> <small>만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡고 교수자가 최종 승인합니다. 학습자에게 실시간으로 가는 피드백도 같은 원칙으로 검수합니다.</small>
+> <small>만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡고, 최종 승인은 교수자가 합니다.</small>
 
 <br>
 
@@ -72,7 +72,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
 - **DCT형 통번역 과제**에서는 초안과 수정안에 각각 AI 피드백을 받은 뒤, 학습자가 최종안을 결정합니다.
 - **AI 피드백**은 의미적 충실성·문법적 정확성·화용적 적절성의 세 기준으로 통번역을 검토합니다.
-- **번역과 통역** 미션은 같은 구성을 따르며, 통역 미션에서는 속도와 휴지를 조정한 합성 음성을 듣고 통역합니다.
+- **번역과 통역** 미션은 구성이 같고, 통역은 속도와 휴지를 조정한 합성 음성을 듣고 수행합니다.
 
 <br>
 
@@ -104,26 +104,14 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <sub>2026년 10월 기준</sub>
 
-- **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다. 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡습니다.
+- **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다.
 - **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다.
 - **학습 미션 생성**에는 Gemini 3.1 Pro를 사용합니다.
-- **AI 품질 심사**와 필요시 **중국어 표현 검토**에는 GPT-6 Astra를 사용합니다. 최종 승인은 교수자가 합니다.
-- **AI 피드백**은 Gemini 3.1 Pro가 쓰고 GPT-6 Astra가 학습자에게 보이기 전에 검수합니다. 검수를 통과하지 못한 판정은 보류하고, 참고 표현은 교수자가 승인한 저장본만 보여 줍니다.
+- **AI 품질 심사**와 필요시 **중국어 표현 검토**에는 GPT-6 Astra를 사용합니다.
+- **AI 피드백**은 Gemini 3.1 Pro가 쓰고, 학습자에게 보이기 전에 GPT-6 Astra가 검수합니다.
 - **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
 - **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
-
-**로컬에서 실행하기**
-
-```bash
-npm ci                 # Node.js 22 (package.json engines)
-cp .env.example .env   # VITE_SUPABASE_URL · VITE_SUPABASE_PUBLISHABLE_KEY 값을 채운다
-npm run dev            # http://localhost:8080
-```
-
-- 이 저장소는 Supabase 프로젝트(DB·인증·Edge Functions)에 연결돼야 로그인과 데이터가 동작합니다. 환경 변수 없이 실행하면 첫 화면에서 「supabaseUrl is required」 오류로 멈춥니다. 검토 목적이면 위 바로 가기의 배포 웹앱과 학습 미션 체험 링크를 쓰는 것이 빠릅니다.
-- 검사 명령은 CI와 같습니다: `npm run typecheck` · `npm test` · `npm run build`. 테스트와 빌드는 Supabase 값이 자리표시자여도 통과합니다(CI도 자리표시자를 씁니다).
-
 
 <br>
 
