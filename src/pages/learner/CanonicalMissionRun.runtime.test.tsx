@@ -173,7 +173,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     // Stage 4: final confirmation and save.
     click("수정안 제출하기");
     await screen.findByText(/현재 번역안을 직접 검토한 뒤 최종 결정/);
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("최종안 제출하기");
     expect(await screen.findByRole("heading", { name: /학습 미션 완료/ })).toBeInTheDocument();
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));

@@ -132,7 +132,7 @@ describe("CanonicalMissionRun completion connections", () => {
     // 수정 권고에도 초안을 유지하면 최종 선택 메모가 곧 이견 이유다 — 메모를 남겨야 확정된다.
     const confirm = screen.getByRole("button", { name: "메모와 함께 초안 유지하기" });
     expect(confirm).toBeDisabled();
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), {
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), {
       target: { value: "이미 합의된 일정이라 더 직접적으로 말해도 된다고 판단했습니다." },
     });
     expect(confirm).toBeEnabled();

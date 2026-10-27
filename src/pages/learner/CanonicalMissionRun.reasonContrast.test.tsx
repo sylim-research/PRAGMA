@@ -99,7 +99,7 @@ describe("representative v6 reason / contrast rhythm", () => {
     click("번역 제출하기");
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     click("최종안으로 정하기");
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("초안을 최종안으로 정하기");
     expect(snapshot().completed).toBe(true);
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();

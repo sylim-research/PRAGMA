@@ -122,7 +122,7 @@ describe("instructor experience", () => {
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
     fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: revised } });
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     fireEvent.click(screen.getByRole("button", { name: /최종안 제출하기/ }));
     const final = screen.getByRole("region", { name: "최종 확정 미리보기" });
     expect(within(final).getByText(first)).toBeInTheDocument();

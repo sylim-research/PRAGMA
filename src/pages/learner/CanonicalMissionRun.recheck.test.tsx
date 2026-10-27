@@ -80,11 +80,11 @@ describe("one DCT revision recheck", () => {
       await screen.findByRole("heading", { name: "AI 피드백 2차" });
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
-      fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+      fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
       click("최종안 제출하기");
     } else {
       click("최종안으로 정하기");
-      fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+      fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
       click("초안을 최종안으로 정하기");
     }
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
@@ -98,7 +98,7 @@ describe("one DCT revision recheck", () => {
     await screen.findByText("1차 선택권 재검토");
     expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     click("최종안으로 정하기");
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
     fireEvent.click(screen.getByRole("button", { name: "메모와 함께 초안 유지하기" }));
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(1);
@@ -130,7 +130,7 @@ describe("one DCT revision recheck", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
     expect(screen.queryByText(/추가 수정에는 AI 피드백을 다시 실행하지 않습니다/)).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "최종안 제출하기" })).toBeDisabled();
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("최종안 제출하기");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(2);

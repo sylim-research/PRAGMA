@@ -127,7 +127,7 @@ describe("local learner UX pilot", () => {
     expectCompactContext("A-DCT");
     const final = `${first}谢谢！`;
     fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: final } });
-    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("최종안 제출하기");
     expect(screen.getByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     const record = screen.getByRole("region", { name: /번역 완성본/ });

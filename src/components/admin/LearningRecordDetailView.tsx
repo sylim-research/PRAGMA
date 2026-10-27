@@ -115,7 +115,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           <Box key="first" className="h-full">
             <Caption>초안</Caption>
             <p className="text-sm leading-relaxed">{task.first ?? "—"}</p>
-            {memos && <MemoNote title={memos.firstTitle} text={memos.first} />}
+            {memos && <MemoNote title={`${memos.firstTitle} · 초안 단계`} text={memos.first} />}
           </Box>,
           <Box key="feedback" className="h-full bg-[#FAF8F3]">
             <Caption>AI 피드백</Caption>
@@ -132,7 +132,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
             {task.hintOpened !== null && (
               <p className="mt-2 text-[12px] text-[#6B645A]">어휘 힌트 {task.hintOpened ? "열어 봄" : "열지 않음"}</p>
             )}
-            {memos && <MemoNote title="최종 선택 메모" text={memos.final} badge={memos.finalIsDissentReason ? "수정 권고에도 초안 유지(이견)" : undefined} />}
+            {memos && <MemoNote title={`${memos.firstTitle} · 최종안 단계`} text={memos.final} badge={memos.finalIsDissentReason ? "수정 권고에도 초안 유지(이견)" : undefined} />}
           </Box>,
         ]}
       </Flow>

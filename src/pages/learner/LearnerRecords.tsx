@@ -286,7 +286,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       <section className={`${card} px-4 py-2.5`} aria-label={"초안"}>
         <p className={cardLabel}>초안</p>
         <p className={`mt-1 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
-        {record.memos && <MemoLine title={record.memos.firstTitle} text={record.memos.first} />}
+        {record.memos && <MemoLine title={`${record.memos.firstTitle} · 초안 단계`} text={record.memos.first} />}
       </section>
       {arrow}
       <section className={`${card} px-4 py-2.5`} aria-label="AI 피드백">
@@ -330,7 +330,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         {diff
           ? <p className="mt-1 text-[14px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
           : <p className="mt-1 text-[14px] text-[#8A5A14]">초안을 그대로 유지했습니다.</p>}
-        {record.memos && <MemoLine title="최종 선택 메모" text={record.memos.final} />}
+        {record.memos && <MemoLine title={`${record.memos.firstTitle} · 최종안 단계`} text={record.memos.final} />}
       </section>
     </div>
   );

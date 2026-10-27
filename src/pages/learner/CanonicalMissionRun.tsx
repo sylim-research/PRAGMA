@@ -1315,7 +1315,11 @@ function ProcessMemoField({ id, title, guide, value, onChange, rows }: {
 
 const TRANSLATION_MEMO = { title: "번역 과정 메모", guide: "어떤 점을 생각하며 이렇게 번역했는지 자유롭게 적어 보세요." };
 const INTERPRETING_MEMO = { title: "통역 과정 메모", guide: "통역하면서 생각했던 점과, 통역을 마친 뒤 돌아보게 된 점을 자유롭게 적어 보세요." };
-const FINAL_MEMO = { title: "최종 선택 메모", guide: "피드백을 보고 무엇을 생각했는지, 왜 고치거나 그대로 두었는지 자유롭게 적어 보세요." };
+// 최종안 단계의 메모도 같은 이름(번역·통역 과정 메모)으로 부른다. 안내문만 고친 경우·그대로 둔 경우에 맞춘다(연구자 결정, 2026-10-27).
+const FINAL_MEMO_GUIDE = {
+  revised: "피드백을 보고 무엇을 생각했는지, 왜 이렇게 고쳤는지 자유롭게 적어 보세요.",
+  retained: "피드백을 보고 무엇을 생각했는지, 왜 초안을 그대로 두었는지 자유롭게 적어 보세요.",
+};
 
 function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: DctQuest; value: string; onChange: (value: string) => void; fromExample?: boolean }) {
   const mission = useCanonicalMission();
@@ -1920,7 +1924,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const finalizesNow = recheckRequested || !runtime || localPilot || !reflected;
   const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected) && (!finalizesNow || finalMemoReady)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : finalizesNow && !finalMemoReady ? "최종 선택 메모를 적어 주세요." : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : finalizesNow && !finalMemoReady ? `${outputName} 과정 메모를 적어 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => {
     markDemoEdited(revised, revisedFromExample);
@@ -2053,7 +2057,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-7`} />
                 <DemoExampleNote text={revised} derived={revisedFromExample} />
-                {finalizesNow && <div className="mt-4"><ProcessMemoField id={`${quest.id}-final-memo`} {...FINAL_MEMO} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} /></div>}
+                {finalizesNow && <div className="mt-4"><ProcessMemoField id={`${quest.id}-final-memo`} title={`${outputName} 과정 메모`} guide={reflected ? FINAL_MEMO_GUIDE.revised : FINAL_MEMO_GUIDE.retained} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} /></div>}
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
@@ -2076,7 +2080,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               {/* 초안을 최종안으로 정할 때 최종 선택 메모를 남긴다. 수정 권장이었다면 이 메모가 이견 이유로도 기록된다. */}
               {keepOpen && (
                 <div className="w-full space-y-2">
-                  <ProcessMemoField id={`${quest.id}-final-memo`} {...FINAL_MEMO} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} />
+                  <ProcessMemoField id={`${quest.id}-final-memo`} title={`${outputName} 과정 메모`} guide={FINAL_MEMO_GUIDE.retained} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} />
                   <div className="flex justify-end">
                     <Button className="h-[48px] shrink-0 bg-[#F7CE3E] px-5 font-bold text-[#15202B] hover:bg-[#F9D960] disabled:bg-[#FBE8A6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!finalMemoReady} onClick={needsChange && !localPilot ? keepWithReason : retainFirstResponse}>{needsChange && !localPilot ? "메모와 함께 초안 유지하기" : "초안을 최종안으로 정하기"}</Button>
                   </div>
