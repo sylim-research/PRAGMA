@@ -338,4 +338,26 @@ describe("mission attempt row", () => {
     });
     expect(JSON.stringify(row.context_judgment)).not.toContain("confidence");
   });
+
+  it("keeps the pre-feedback process memo apart from the final-choice memo", () => {
+    const row = buildMissionAttemptRow({
+      mission: sampleMissionV2(),
+      scenarioId: "11111111-1111-1111-1111-111111111111",
+      speechAct: "request",
+      level: "intermediate",
+      firstResponse: "처음 답",
+      revisedResponse: "처음 답",
+      startedAtIso: "2026-07-27T01:00:00.000Z",
+      contextJudgment: { kind: "learner_dissent", at: "feedback", conditions: [], reason_ko: "관계상 이대로가 자연스럽다", final_decision: "retained_first_response", created_at: "2026-07-27T01:05:00.000Z" },
+      processMemos: {
+        schema_version: "process_memo_v1",
+        first: { stage: "translation_draft", text: "공손함을 살리려 했다", submitted_at: "2026-07-27T01:02:00.000Z" },
+        final: { text: "관계상 이대로가 자연스럽다", decision: "retained_first_response", used_as_dissent_reason: true, submitted_at: "2026-07-27T01:05:00.000Z" },
+      },
+    }, "profile-1", "user-1");
+    const envelope = row.context_judgment as Record<string, any>;
+    expect(envelope.process_memos.first.text).toBe("공손함을 살리려 했다");
+    expect(envelope.process_memos.final.text).toBe("관계상 이대로가 자연스럽다");
+    expect(envelope.learner_dissent.reason_ko).toBe("관계상 이대로가 자연스럽다");
+  });
 });

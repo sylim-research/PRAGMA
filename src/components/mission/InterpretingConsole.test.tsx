@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useState } from "react";
 
 vi.mock("@/lib/mission/missionStt", () => ({
   requestSttTranscript: vi.fn(),
@@ -176,6 +177,35 @@ describe("InterpretingConsole", () => {
     expect(await screen.findByDisplayValue("가능하시면 수정 의견을 보내 주세요.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "말한 내용과 같아요" }));
+    fireEvent.click(screen.getByRole("button", { name: "확인한 전사로 제출" }));
+    expect(onSubmit).toHaveBeenCalledWith("가능하시면 수정 의견을 보내 주세요.");
+  });
+
+  it("asks for the process memo only after recording and transcript confirmation, and requires it", async () => {
+    vi.mocked(requestSttTranscript).mockResolvedValue({
+      ok: true,
+      text: "가능하시면 수정 의견을 보내 주세요.",
+      provenance: { provider: "openai", model: "gpt-4o-transcribe", language: "ko" },
+    });
+    const onSubmit = vi.fn();
+    function Harness() {
+      const [memo, setMemo] = useState("");
+      return <InterpretingConsole sourceText="方便的话，请把修改意见发给我。" sourceLanguage={{ code: "zh", label: "중국어" }}
+        targetLanguage={{ code: "ko", label: "한국어" }}
+        memo={<label>통역 과정 메모<textarea value={memo} onChange={(event) => setMemo(event.target.value)} /></label>}
+        memoReady={memo.trim().length > 0} onSubmit={onSubmit} />;
+    }
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: "● 녹음 시작" }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "■ 녹음 정지" })).toBeInTheDocument());
+    // 녹음 중에는 메모 칸이 없다.
+    expect(screen.queryByRole("textbox", { name: "통역 과정 메모" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "■ 녹음 정지" }));
+    expect(await screen.findByDisplayValue("가능하시면 수정 의견을 보내 주세요.")).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "통역 과정 메모" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "말한 내용과 같아요" }));
+    expect(screen.getByRole("button", { name: "통역 과정 메모를 적어 주세요" })).toBeDisabled();
+    fireEvent.change(screen.getByRole("textbox", { name: "통역 과정 메모" }), { target: { value: "존댓말을 놓쳤다" } });
     fireEvent.click(screen.getByRole("button", { name: "확인한 전사로 제출" }));
     expect(onSubmit).toHaveBeenCalledWith("가능하시면 수정 의견을 보내 주세요.");
   });

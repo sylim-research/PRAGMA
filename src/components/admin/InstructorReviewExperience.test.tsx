@@ -112,7 +112,8 @@ describe("instructor experience", () => {
       mission: instructionalMission(SAMPLE_MISSION_V6_REASON_CONTRAST) } } };
     render(<MemoryRouter><CanonicalReviewStage mission={viewModelFromReview(v6)} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
     const first = "您好，请问下周三下午三点到四点可以借用研讨室吗？";
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: first } });
+    fireEvent.change(screen.getByRole("textbox", { name: /옮겨 보세요/ }), { target: { value: first } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "관계를 생각해 부드럽게 옮겼다." } });
     fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
     // Same stage order as the learner runner: feedback → revision → final confirm.
     expect(await screen.findByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
@@ -120,7 +121,8 @@ describe("instructor experience", () => {
     expect(screen.getByText(/실제 학습자 화면에서는 이 단계에서 AI 피드백을 받습니다/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     const revised = "您好，我们想在下周三下午三点到四点借用研讨室，请问可以吗？";
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: revised } });
+    fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: revised } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     fireEvent.click(screen.getByRole("button", { name: /최종안 제출하기/ }));
     const final = screen.getByRole("region", { name: "최종 확정 미리보기" });
     expect(within(final).getByText(first)).toBeInTheDocument();
@@ -137,7 +139,8 @@ describe("instructor experience", () => {
   it("submits a trial DCT locally and shows references without requesting feedback or saving an attempt", () => {
     const model = viewModelFromReview(inspection());
     render(<MemoryRouter><CanonicalReviewStage mission={model} section="dct" revealAnswers={false} onNext={vi.fn()} /></MemoryRouter>);
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，请问您方便的时候可以帮我确认一下这份资料吗？非常感谢您的帮助。" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /옮겨 보세요/ }), { target: { value: "您好，请问您方便的时候可以帮我确认一下这份资料吗？非常感谢您的帮助。" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "관계를 생각해 부드럽게 옮겼다." } });
     fireEvent.click(screen.getByRole("button", { name: /번역 제출하기/ }));
     expect(screen.getByText("DCT형 통번역 과제 참고 표현·해설")).toBeInTheDocument();
     expect(effects.save).not.toHaveBeenCalled(); expect(effects.event).not.toHaveBeenCalled(); expect(effects.feedback).not.toHaveBeenCalled();

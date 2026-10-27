@@ -61,8 +61,18 @@ function Flow({ children }: { children: ReactNode[] }) {
   );
 }
 
+/** 통번역 과정 메모 한 칸. 남기지 않은 메모는 성찰 부족이 아니라 「기록 없음」으로만 적는다. */
+function MemoNote({ title, text, badge }: { title: string; text: string | null; badge?: string }) {
+  return (
+    <div className="mt-2 border-t border-dashed border-[#E2DED2] pt-2">
+      <div className="flex flex-wrap items-center gap-2"><Caption>{title}</Caption>{badge && text && <span className="mb-1 rounded bg-[#FFF6D6] px-1.5 text-[11px] font-semibold text-[#7A5A12]">{badge}</span>}</div>
+      {text ? <p className="whitespace-pre-wrap text-[13px] leading-relaxed">{text}</p> : <p className="text-[12px] text-[#6B645A]">기록 없음</p>}
+    </div>
+  );
+}
+
 export function LearningRecordDetailView({ detail }: { detail: LearningRecordDetail }) {
-  const { context, mjt, task, dissent } = detail;
+  const { context, mjt, task, dissent, memos } = detail;
   const steps: Array<{ title: string; aside?: ReactNode; body: ReactNode }> = [];
 
   if (mjt.length > 0) {
@@ -105,6 +115,7 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
           <Box key="first" className="h-full">
             <Caption>초안</Caption>
             <p className="text-sm leading-relaxed">{task.first ?? "—"}</p>
+            {memos && <MemoNote title={`${memos.firstTitle} · 초안 단계`} text={memos.first} />}
           </Box>,
           <Box key="feedback" className="h-full bg-[#FAF8F3]">
             <Caption>AI 피드백</Caption>
@@ -121,14 +132,17 @@ export function LearningRecordDetailView({ detail }: { detail: LearningRecordDet
             {task.hintOpened !== null && (
               <p className="mt-2 text-[12px] text-[#6B645A]">어휘 힌트 {task.hintOpened ? "열어 봄" : "열지 않음"}</p>
             )}
+            {memos && <MemoNote title={`${memos.firstTitle} · 최종안 단계`} text={memos.final} badge={memos.finalIsDissentReason ? "수정 권고에도 초안 유지(이견)" : undefined} />}
           </Box>,
         ]}
       </Flow>
+      {!memos && task.first && <p className="px-1 text-[12px] text-[#6B645A]">과정 메모 기능 도입 전 수행이라 메모 칸이 없었습니다.</p>}
       </div>
     ),
   });
 
-  if (dissent) {
+  // 최종 선택 메모가 이견 이유로 쓰였으면 위 최종안 칸에 이미 있다 — 조건 선택이 없으면 따로 싣지 않는다.
+  if (dissent && (dissent.conditions.length > 0 || dissent.reason)) {
     steps.push({
       title: "AI 피드백에 대한 이견",
       body: (
