@@ -1308,7 +1308,7 @@ function ProcessMemoField({ id, title, guide, value, onChange, rows }: {
     <section className="rounded-xl border border-[#E2DCCB] bg-[#FCFBF8] px-4 py-3 sm:px-5">
       <label htmlFor={id} className="text-[14.5px] font-bold text-[#15202B]">{title}</label>
       <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#5B6770]">{guide}</p>
-      <Textarea id={id} value={value} onChange={(event) => onChange(event.target.value)} rows={rows} className="mt-2 min-h-0 resize-y bg-white text-[15px] leading-7" />
+      <Textarea id={id} value={value} onChange={(event) => onChange(event.target.value)} rows={rows} className="mt-2 min-h-0 resize-y bg-white py-1.5 text-[15px] leading-6" />
     </section>
   );
 }
@@ -1347,7 +1347,7 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
           value={value}
           onChange={(event) => onChange(event.target.value)}
           rows={dctInputRows(quest.source)}
-          className={`${targetFont} mt-2.5 min-h-0 resize-y border-[#E2DCCB] bg-white text-[16.5px] leading-7 focus-visible:ring-[#C9A62E]`}
+          className={`${targetFont} mt-2.5 min-h-0 resize-y border-[#E2DCCB] bg-white py-1.5 text-[16.5px] leading-[26px] focus-visible:ring-[#C9A62E]`}
         />
         <DemoExampleNote text={value} derived={fromExample} />
         <VocabularyHints quest={quest} />
