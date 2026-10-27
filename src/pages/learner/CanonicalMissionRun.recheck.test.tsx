@@ -58,7 +58,8 @@ function openDraft() {
   click(mission.mpj_items[2].corrections[1].text); click("수정안 제출하기"); click(/^다음:/);
   fireEvent.change(screen.getByRole("textbox", { name: "내가 고친 표현" }), { target: { value: "明天我下课晚，彩排能改到七点半吗？" } });
   click("수정안 제출하기"); click(/^다음:/); click("직접 번역해 보기");
-  fireEvent.change(screen.getByRole("textbox"), { target: { value: A } });
+  fireEvent.change(screen.getByRole("textbox", { name: /옮겨 보세요/ }), { target: { value: A } });
+  fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "관계를 생각해 부드럽게 옮겼다." } });
   click("번역 제출하기");
   return { mission, before };
 }
@@ -79,8 +80,13 @@ describe("one DCT revision recheck", () => {
       await screen.findByRole("heading", { name: "AI 피드백 2차" });
       expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
+      fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
       click("최종안 제출하기");
-    } else click("최종안으로 정하기");
+    } else {
+      click("최종안으로 정하기");
+      fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+      click("초안을 최종안으로 정하기");
+    }
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(revise ? 2 : 1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: revise ? C : A, feedback: clear });
@@ -92,8 +98,8 @@ describe("one DCT revision recheck", () => {
     await screen.findByText("1차 선택권 재검토");
     expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     click("최종안으로 정하기");
-    fireEvent.change(screen.getByPlaceholderText("예: 이 관계에선 이 말투가 자연스러워요"), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
-    fireEvent.click(screen.getByRole("button", { name: "이유와 함께 정하기" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "이 상황에서는 첫 표현을 유지하겠습니다." } });
+    fireEvent.click(screen.getByRole("button", { name: "메모와 함께 초안 유지하기" }));
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(1);
     expect(vi.mocked(saveMissionAttempt).mock.calls[0][0]).toMatchObject({ firstResponse: A, revisedResponse: A,
@@ -123,6 +129,8 @@ describe("one DCT revision recheck", () => {
     // 2차가 수정 권고여도 AI 승인을 기다리지 않는다. 최종 텍스트는 세 번째 호출을 만들지 않는다.
     fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
     expect(screen.queryByText(/추가 수정에는 AI 피드백을 다시 실행하지 않습니다/)).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "최종안 제출하기" })).toBeDisabled();
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("최종안 제출하기");
     await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
     expect(requestFeedback).toHaveBeenCalledTimes(2);

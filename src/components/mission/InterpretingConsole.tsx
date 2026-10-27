@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Mic, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { requestSttTranscript, type SttLang } from "@/lib/mission/missionStt";
@@ -29,6 +29,8 @@ export function InterpretingConsole({
   replayLimit = 2,
   demoTranscript,
   demoMode = false,
+  memo,
+  memoReady = true,
   onSubmit,
 }: {
   sourceText: string;
@@ -39,6 +41,10 @@ export function InterpretingConsole({
   /** 데모에서만 명시적으로 채운 예시. 녹음·전사 API는 호출하지 않는다. */
   demoTranscript?: string;
   demoMode?: boolean;
+  /** 통역 과정 메모 칸. 녹음 중에는 요구하지 않고, 전사 확인을 마친 뒤에만 보인다. */
+  memo?: ReactNode;
+  /** 메모가 제출 조건을 채웠는가(필수 메모가 비었으면 false). */
+  memoReady?: boolean;
   onSubmit: (transcript: string) => void;
 }) {
   const maxPlays = Math.max(1, replayLimit);
@@ -172,7 +178,8 @@ export function InterpretingConsole({
     setRecording(false);
   };
 
-  const canSubmit = !transcribing && confirmed && transcript.trim().length > 0;
+  const transcriptReady = !transcribing && !recording && confirmed && transcript.trim().length > 0;
+  const canSubmit = transcriptReady && memoReady;
 
   return (
     <div className="space-y-3" data-scene-skin="oral-console">
@@ -220,7 +227,9 @@ export function InterpretingConsole({
         </section>
       )}
 
-      <Button className="h-[50px] w-full" disabled={!canSubmit} onClick={() => onSubmit(transcript.trim())}>확인한 전사로 제출</Button>
+      {memo && transcriptReady && memo}
+
+      <Button className="h-[50px] w-full" disabled={!canSubmit} onClick={() => onSubmit(transcript.trim())}>{transcriptReady && !memoReady ? "통역 과정 메모를 적어 주세요" : "확인한 전사로 제출"}</Button>
     </div>
   );
 }
