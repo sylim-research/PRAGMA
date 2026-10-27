@@ -10,8 +10,10 @@ export const CONTENT_APPROVAL_POLICY = "focused_v1";
 export const CONTENT_REVIEW_STEPS = [
   { key: "rules", label: "규칙 검사" },
   { key: "openai", label: "OpenAI 검토" },
+  // 2026-10-27: 현행 흐름에서 Claude 종합 검토와 그 재판정은 쓰지 않는다(모델 배정 = Gemini 생성·Astra 검사).
+  // 이전 기록을 읽기 위해 단계 이름은 남긴다.
   { key: "claude", label: "Claude 독립 검토" },
-  { key: "deepseek", label: "DeepSeek 중국어 표현 검토" },
+  { key: "deepseek", label: "중국어 표현 검토" },
   { key: "adjudication", label: "OpenAI 재검토" },
   { key: "finalization", label: "최종 검수 자료" },
   { key: "professor", label: "교수자 최종 승인" },
@@ -142,7 +144,8 @@ export function crossReviewFindings(run: ContentReviewRun | null): ReviewFinding
  * 이전 기록(이 단계가 생기기 전)은 소급해서 멈추지 않는다.
  */
 export function deepseekPending(run: ContentReviewRun | null): boolean {
-  return Boolean(run && run.approval_policy === CONTENT_APPROVAL_POLICY && run.independent_review_requested && run.claude_review
+  // 2026-10-27: Claude 종합 검토 없이 AI 품질 심사 바로 뒤에 실행한다.
+  return Boolean(run && run.approval_policy === CONTENT_APPROVAL_POLICY && run.independent_review_requested
     && !run.deepseek_review && !run.adjudication && !run.prepared_finalization);
 }
 /** 실패한 중국어 표현 검토는 교수자 판단을 시작하기 전까지 다시 실행할 수 있다. */
@@ -174,8 +177,10 @@ export function isBulkEligibleSignal(finding: ReviewFinding): boolean {
 export function effectiveReviewSteps(run: ContentReviewRun | null) {
   const steps = CONTENT_REVIEW_STEPS.filter(s => s.key !== "finalization" || requiresReviewFinalization(run));
   if (run && run.approval_policy !== CONTENT_APPROVAL_POLICY) return steps.filter(s => s.key !== "deepseek");
-  return steps.filter(s => s.key === "claude" || s.key === "deepseek" ? run?.independent_review_requested
-    : s.key === "adjudication" ? run?.independent_review_requested && (!run.claude_review || deepseekPending(run) || crossReviewFindings(run).length > 0 || run.adjudication)
+  // 현행: 규칙 → AI 품질 심사 → (요청 시) 중국어 표현 검토 → 교수자. Claude 검토·재판정은 이전 기록이 있을 때만 보인다.
+  return steps.filter(s => s.key === "deepseek" ? run?.independent_review_requested
+    : s.key === "claude" ? Boolean(run?.claude_review)
+    : s.key === "adjudication" ? Boolean(run?.adjudication || (run?.claude_review && legacyClaudeFindings(run).length > 0))
     : true);
 }
 
@@ -199,14 +204,18 @@ export function instructionalMission(raw: Record<string, unknown>): Record<strin
   for (const key of ["provenance", "quality_check", "hsk_lexical_audit", "authoring", "item_lineage"]) delete content[key];
   return content;
 }
+/** 이전 흐름에서 받은 Claude 종합 검토 의견(재판정이 필요했던 기록). */
+function legacyClaudeFindings(run: ContentReviewRun | null): ReviewFinding[] {
+  return run?.claude_review?.result.findings ?? [];
+}
 export function nextReviewStage(run: ContentReviewRun | null): ReviewStage | "professor" | "approved" {
   if (!run) return "rules";
   if (run.approved_at) return "approved";
   if (run.approval_policy === CONTENT_APPROVAL_POLICY) {
     if (!run.openai_review && !run.generation_quality) return "openai";
-    if (run.independent_review_requested && !run.claude_review) return "claude";
     if (deepseekPending(run)) return "deepseek";
-    if (run.independent_review_requested && crossReviewFindings(run).length && !run.adjudication) return "adjudication";
+    // 이전 흐름에서 Claude 의견을 받고 재판정 전에 멈춘 기록만 재판정을 거친다. 중국어 표현 의견은 교수자가 바로 본다.
+    if (legacyClaudeFindings(run).length && !run.adjudication) return "adjudication";
     return requiresReviewFinalization(run) && !run.prepared_finalization ? "finalization" : "professor";
   }
   if (!run.openai_review) return "openai";
