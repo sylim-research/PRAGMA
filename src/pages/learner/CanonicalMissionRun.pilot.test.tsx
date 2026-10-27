@@ -107,10 +107,12 @@ describe("local learner UX pilot", () => {
     expect(within(screen.getByRole("group", { name: "표현 2" })).getByText("기준 판단 · 상황에 맞음")).toBeInTheDocument();
     click("다음: 번역하기"); click("직접 번역해 보기");
     expectCompactContext("A-DCT", "처음 연락하는 학생회관 담당 직원에게 보내는 이메일입니다.");
-    const dct = screen.getByRole("textbox");
+    const dct = screen.getByRole("textbox", { name: /옮겨 보세요/ });
     expect(dct).toHaveValue("");
     const first = "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。";
-    fireEvent.change(dct, { target: { value: first } }); click("번역 제출하기");
+    fireEvent.change(dct, { target: { value: first } });
+    expect(screen.getByRole("button", { name: "번역 과정 메모를 적어 주세요" })).toBeDisabled();
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "관계를 생각해 부드럽게 옮겼다." } }); click("번역 제출하기");
     expect(screen.getByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
     expect(screen.getByText(first)).toBeInTheDocument();
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
@@ -120,18 +122,21 @@ describe("local learner UX pilot", () => {
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "최종안으로 정하기" })).toBeEnabled();
     click("수정하기");
-    expect(screen.getByRole("textbox")).toHaveValue(first);
+    expect(screen.getByRole("textbox", { name: "수정안" })).toHaveValue(first);
     // 다듬기 화면은 원문과 내 번역만 둔다 — 접히는 「원문·상황 다시 보기」는 없앴다.
     expectCompactContext("A-DCT");
     const final = `${first}谢谢！`;
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: final } });
+    fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: final } });
+    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
     click("최종안 제출하기");
     expect(screen.getByRole("heading", { name: "학습 미션 완료" })).toBeInTheDocument();
     const record = screen.getByRole("region", { name: /번역 완성본/ });
     expect(record).toHaveTextContent(first);
     expect(record).toHaveTextContent(final);
     const completed = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
-    expect(completed.responses["A-DCT"]).toEqual({ first, revised: final, reflected: true });
+    // 최초 과정 메모와 최종 선택 메모는 따로 남는다 — 최종 메모가 최초 메모를 덮어쓰지 않는다.
+    expect(completed.responses["A-DCT"]).toEqual({ first, revised: final, reflected: true,
+      processMemo: { text: "관계를 생각해 부드럽게 옮겼다.", at: expect.any(String) }, finalMemo: "피드백을 보고 결정했다." });
     expect(completed.responses["A-FEEDBACK"]).not.toHaveProperty("evaluation");
     expect(screen.queryByText("초안에 대한 AI 피드백 보기")).not.toBeInTheDocument();
     expect(completed.responses.A4.revisedText).toBe(freeAnswer);

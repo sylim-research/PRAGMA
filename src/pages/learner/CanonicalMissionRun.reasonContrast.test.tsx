@@ -94,10 +94,13 @@ describe("representative v6 reason / contrast rhythm", () => {
     expect(traces[4].candidate_band_codes).toEqual(["appropriate", "too_direct", "too_indirect", "appropriate"]);
     expect(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)).toBeNull();
     click("직접 번역해 보기");
-    fireEvent.change(screen.getByRole("textbox"), { target: { value: "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。" } });
+    fireEvent.change(screen.getByRole("textbox", { name: /옮겨 보세요/ }), { target: { value: "您好，下周三下午三点到四点能借用研讨室吗？我们社团想和新成员开第一次见面会。" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "관계를 생각해 부드럽게 옮겼다." } });
     click("번역 제출하기");
     expect(screen.getByText("AI 미실행")).toBeInTheDocument();
     click("최종안으로 정하기");
+    fireEvent.change(screen.getByRole("textbox", { name: "최종 선택 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    click("초안을 최종안으로 정하기");
     expect(snapshot().completed).toBe(true);
     for (const external of [fetchMissionByScenario, requestFeedback, saveMissionAttempt, appendMissionEvent]) expect(external).not.toHaveBeenCalled();
   });

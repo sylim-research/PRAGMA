@@ -40,6 +40,17 @@ export interface LearningRecordDetail {
     hintOpened: boolean | null;
   };
   dissent: { conditions: string[]; reason: string | null } | null;
+  /**
+   * 통번역 과정 메모. null = 메모 기능 도입 전 수행(메모 칸이 없었다) — 미작성으로 읽지 않는다.
+   * 각 메모의 text가 null이면 그 단계에서 남긴 메모가 없다.
+   */
+  memos: {
+    firstTitle: string;
+    first: string | null;
+    final: string | null;
+    /** 최종 선택 메모가 이견 이유로도 기록됐는가(같은 글을 두 번 보여 주지 않는다). */
+    finalIsDissentReason: boolean;
+  } | null;
   meta: string[];
 }
 
@@ -200,6 +211,13 @@ export function buildLearningRecordDetail(
         ? (first.trim() === final.trim() ? "초안 유지" : "수정")
         : null;
   const support = obj(envelope?.production_support);
+  const memoTrace = obj(envelope?.process_memos);
+  const firstMemo = obj(memoTrace?.first);
+  const finalMemo = obj(memoTrace?.final);
+  const dissentReason = str(dissent?.reason_ko);
+  const finalMemoText = str(finalMemo?.text);
+  const finalIsDissentReason = Boolean(finalMemoText && dissentReason
+    && (finalMemo?.used_as_dissent_reason === true || finalMemoText.trim() === dissentReason.trim()));
 
   return {
     context: {
@@ -222,7 +240,15 @@ export function buildLearningRecordDetail(
           conditions: arr(dissent.conditions)
             .map((code) => (typeof code === "string" ? DISSENT_LABELS[code] ?? code : ""))
             .filter(Boolean),
-          reason: str(dissent.reason_ko),
+          reason: finalIsDissentReason ? null : dissentReason,
+        }
+      : null,
+    memos: memoTrace
+      ? {
+          firstTitle: interpreting ? "통역 과정 메모" : "번역 과정 메모",
+          first: str(firstMemo?.text),
+          final: finalMemoText,
+          finalIsDissentReason,
         }
       : null,
     meta: [

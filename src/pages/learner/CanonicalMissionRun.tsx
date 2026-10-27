@@ -40,7 +40,6 @@ function NoteTag() {
   return <span className="inline-flex items-center gap-1 whitespace-nowrap rounded bg-[#FFF3C4] px-1.5 py-px text-[12px] font-black leading-5 text-[#6B5518]"><BookOpenText aria-hidden className="h-3 w-3" strokeWidth={2.5} />해설</span>;
 }
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
 import { PeerResponsesPanel } from "@/components/learner/PeerResponsesPanel";
@@ -208,6 +207,10 @@ type DctResponse = {
   /** A/B의 입력·피드백을 기존 수행 이벤트 JSON에 보존한다. 최종안은 revised다. */
   feedbackRounds?: DctFeedbackSnapshot[];
   dissent?: DissentResponse;
+  /** 번역·통역 과정 메모 — 초안 제출과 함께 고정되며 AI 피드백 공개 전에 남긴다. */
+  processMemo?: { text: string; at: string };
+  /** 최종 선택 메모 — 최종안 확정 때 남긴다. 최초 메모를 덮어쓰지 않는다. */
+  finalMemo?: string;
 };
 type DevPreviewPreset = "all_good" | "direct" | "over_mitigated" | "mixed";
 
@@ -1288,6 +1291,32 @@ function dctInputRows(source: string) {
   return sourceLineRows(source);
 }
 
+/**
+ * 통번역 과정 메모 — 자유 서술 한 칸. 비워 둘 수는 없지만 분량·문장 수·필수 용어는 정하지 않는다.
+ * 자동 채점하거나 AI 피드백 입력에 넣지 않는다.
+ */
+function ProcessMemoField({ id, title, guide, value, onChange, rows }: {
+  id: string;
+  title: string;
+  guide: string;
+  value: string;
+  onChange: (value: string) => void;
+  /** 초안·수정안 입력칸과 같은 줄 수 — 메모 칸이 더 커 보여 부담을 주지 않게 한다. */
+  rows: number;
+}) {
+  return (
+    <section className="rounded-xl border border-[#E2DCCB] bg-[#FCFBF8] px-4 py-3 sm:px-5">
+      <label htmlFor={id} className="text-[14.5px] font-bold text-[#15202B]">{title}</label>
+      <p className="mt-0.5 break-keep text-[13px] leading-5 text-[#5B6770]">{guide}</p>
+      <Textarea id={id} value={value} onChange={(event) => onChange(event.target.value)} rows={rows} className="mt-2 min-h-0 resize-y bg-white text-[15px] leading-7" />
+    </section>
+  );
+}
+
+const TRANSLATION_MEMO = { title: "번역 과정 메모", guide: "어떤 점을 생각하며 이렇게 번역했는지 자유롭게 적어 보세요." };
+const INTERPRETING_MEMO = { title: "통역 과정 메모", guide: "통역하면서 생각했던 점과, 통역을 마친 뒤 돌아보게 된 점을 자유롭게 적어 보세요." };
+const FINAL_MEMO = { title: "최종 선택 메모", guide: "피드백을 보고 무엇을 생각했는지, 왜 고치거나 그대로 두었는지 자유롭게 적어 보세요." };
+
 function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: DctQuest; value: string; onChange: (value: string) => void; fromExample?: boolean }) {
   const mission = useCanonicalMission();
   const demo = useContext(DemoModeContext);
@@ -1683,7 +1712,11 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   const fromExample = useDemoLineage(draft, devAutofill && Boolean(devDraft));
   const markDemoEdited = useMarkDemoEdited();
   const validation = validateDraft(draft, mission.targetLanguage.label);
-  const canSubmit = devMode || validation.valid;
+  const [memo, setMemo] = useState("");
+  // 메모는 필수다(분량은 묻지 않는다). 시연·개발 미리보기는 저장하지 않으므로 막지 않는다.
+  const memoReady = devMode || demo || memo.trim().length > 0;
+  const canSubmit = devMode || (validation.valid && memoReady);
+  const processMemo = () => ({ text: memo.trim(), at: new Date().toISOString() });
   if (mission.activityMode === "interpreting") {
     return (
       <QuestScaffold quest={quest}>
@@ -1696,7 +1729,10 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
           replayLimit={quest.replayLimit}
           demoMode={demo}
           demoTranscript={devAutofill ? devDraft : undefined}
-          onSubmit={(transcript) => { markDemoEdited(transcript, demo && devAutofill && Boolean(devDraft)); onDone({ first: transcript, revised: transcript, reflected: false }); }}
+          // 녹음과 전사 확인을 마친 뒤에만 메모 칸을 연다 — 녹음 중에는 메모를 요구하지 않는다.
+          memo={<ProcessMemoField id={`${quest.id}-process-memo`} {...INTERPRETING_MEMO} value={memo} onChange={setMemo} rows={dctInputRows(quest.source)} />}
+          memoReady={memoReady}
+          onSubmit={(transcript) => { markDemoEdited(transcript, demo && devAutofill && Boolean(devDraft)); onDone({ first: transcript, revised: transcript, reflected: false, processMemo: processMemo() }); }}
         />
       </QuestScaffold>
     );
@@ -1704,8 +1740,9 @@ function DctDraftView({ quest, onDone, devMode = false, devAutofill = false, dev
   return (
     <QuestScaffold quest={quest}>
       <DctDraftCard quest={quest} value={draft} onChange={setDraft} fromExample={fromExample} />
+      <ProcessMemoField id={`${quest.id}-process-memo`} {...TRANSLATION_MEMO} value={memo} onChange={setMemo} rows={dctInputRows(quest.source)} />
       <ActionBar hint={devMode || !draft.trim() ? undefined : validation.hint}>
-        <Button className={`h-[48px] ${actionButton}`} disabled={!canSubmit} onClick={() => { markDemoEdited(draft, fromExample); onDone({ first: draft.trim(), revised: draft.trim(), reflected: false }); }}>{canSubmit ? "번역 제출하기" : "번역안을 작성해 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
+        <Button className={`h-[48px] ${actionButton}`} disabled={!canSubmit} onClick={() => { markDemoEdited(draft, fromExample); onDone({ first: draft.trim(), revised: draft.trim(), reflected: false, processMemo: processMemo() }); }}>{canSubmit ? "번역 제출하기" : !validation.valid ? "번역안을 작성해 주세요" : "번역 과정 메모를 적어 주세요"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
       </ActionBar>
     </QuestScaffold>
   );
@@ -1876,14 +1913,19 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const needsChange = feedbackNeedsRevision(evaluation);
   const primaryCriterion = primaryFeedbackCriterion(evaluation.criteria);
   const revisionValidation = validateDraft(revised, mission.targetLanguage.label, outputName);
-  const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected)));
+  const [finalMemo, setFinalMemo] = useState("");
+  // 최종 선택 메모는 필수다(분량은 묻지 않는다). 시연·개발 미리보기는 저장하지 않으므로 막지 않는다.
+  const finalMemoReady = devMode || demo || finalMemo.trim().length > 0;
+  // 이 화면의 다음 버튼이 곧바로 최종안을 확정하는가(아니면 수정안을 AI에 다시 보낸다).
+  const finalizesNow = recheckRequested || !runtime || localPilot || !reflected;
+  const canConfirmRevision = ready && (devMode || (revisionValidation.valid && (recheckRequested || !needsChange || reflected) && (!finalizesNow || finalMemoReady)));
   const canRetainWithDissent = Boolean(dissent);
-  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : undefined);
+  const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : finalizesNow && !finalMemoReady ? "최종 선택 메모를 적어 주세요." : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
   const confirmRevision = () => {
     markDemoEdited(revised, revisedFromExample);
     onDone({ first, revised: revised.trim(), reflected,
-      evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent });
+      evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent, finalMemo: finalMemo.trim() });
   };
   const checkRevision = async () => {
     if (!runtime || !ready || !canConfirmRevision || !reflected || recheckStarted.current) return;
@@ -1900,11 +1942,11 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     setReady(true);
   };
   const [keepOpen, setKeepOpen] = useState(false);
-  const [keepReason, setKeepReason] = useState("");
+  // 수정 권고에도 초안을 유지하면 최종 선택 메모가 곧 이견 이유다 — 같은 이유를 두 번 적게 하지 않는다.
   const keepWithReason = () => {
-    const reason = { conditions: [], reason: keepReason.trim() };
+    const reason = { conditions: [], reason: finalMemo.trim() };
     setDissent(reason);
-    onDone({ first, revised: first.trim(), reflected: false, evaluation, runtimeFeedback, feedbackRounds, dissent: reason });
+    onDone({ first, revised: first.trim(), reflected: false, evaluation, runtimeFeedback, feedbackRounds, dissent: reason, finalMemo: finalMemo.trim() });
   };
   const retainFirstResponse = () => onDone({
     first,
@@ -1914,6 +1956,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     runtimeFeedback,
     feedbackRounds,
     dissent,
+    finalMemo: finalMemo.trim(),
   });
   if (!isMeaningfulDraft(first, mission.targetLanguage.label, outputName)) {
     return (
@@ -2010,13 +2053,14 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                 )}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-7`} />
                 <DemoExampleNote text={revised} derived={revisedFromExample} />
+                {finalizesNow && <div className="mt-4"><ProcessMemoField id={`${quest.id}-final-memo`} {...FINAL_MEMO} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} /></div>}
               </section>
               <ActionBar hint={actionHint}>
                 <div className="flex w-full flex-wrap justify-end gap-2">
                   <Button className={`h-[48px] ${actionButton}`} disabled={!canConfirmRevision} onClick={runtime && !localPilot && reflected && !recheckRequested ? checkRevision : confirmRevision}>{recheckRequested ? "최종안 제출하기" : runtime && !localPilot && reflected ? "수정안 제출하기" : reflected ? "최종안 제출하기" : needsChange ? "수정안 제출하기" : "최종안 제출하기"} <ChevronRight className="ml-1 h-4 w-4" /></Button>
                   {/* 수정 화면에서도 첫 산출 유지 경로로 되돌아갈 수 있다 — 피드백 화면의 「최종안으로 정하기」(이유 한 줄)을 연 채로 돌아간다. */}
                   {!recheckRequested && (
-                    <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(needsChange && !localPilot); }}>초안 유지하기</Button>
+                    <Button variant="outline" className="h-[48px] w-full" onClick={() => { setRevisionOpen(false); setKeepOpen(true); }}>초안 유지하기</Button>
                   )}
                 </div>
               </ActionBar>
@@ -2026,16 +2070,15 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
               {/* 양자택일 한 줄. 둘 다 타당한 학습자 결정이므로 같은 무게로 채운다 — 수정하기는 네이비, 최종안으로 정하기는 노랑. */}
               <div className="grid w-full grid-cols-2 gap-2">
                 <Button className="h-[48px] w-full font-bold" onClick={() => { setKeepOpen(false); setRevisionOpen(true); }}>수정하기 <ChevronRight className="ml-1 h-4 w-4" /></Button>
-                <Button className="h-[48px] w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={needsChange && !localPilot ? keepOpen : undefined}
-                  onClick={needsChange && !localPilot ? () => setKeepOpen(open => !open) : retainFirstResponse}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />최종안으로 정하기</Button>
+                <Button className="h-[48px] w-full bg-[#F7CE3E] font-bold text-[#15202B] shadow-[0_2px_8px_rgba(201,166,46,0.3)] hover:bg-[#F9D960]" aria-expanded={keepOpen}
+                  onClick={() => setKeepOpen(open => !open)}><Check aria-hidden className="mr-1.5 h-4 w-4" strokeWidth={3} />최종안으로 정하기</Button>
               </div>
-              {/* 수정 권장인데 그대로 두려면 이유 한 줄을 남긴다(이견 기록). */}
-              {needsChange && !localPilot && keepOpen && (
-                <div className="w-full rounded-xl border border-[#DDD8CB] bg-[#FCFBF8] p-3">
-                  <label htmlFor={`${quest.id}-keep-reason`} className="text-[13.5px] font-bold text-[#2B3647]">이대로 두는 이유를 한 줄만 적어 주세요.</label>
-                  <div className="mt-2 flex gap-2">
-                    <Input id={`${quest.id}-keep-reason`} value={keepReason} onChange={(event) => setKeepReason(event.target.value)} placeholder="예: 이 관계에선 이 말투가 자연스러워요" className="h-11 flex-1 bg-white text-[14.5px]" />
-                    <Button className="h-[48px] shrink-0 bg-[#F7CE3E] px-5 font-bold text-[#15202B] hover:bg-[#F9D960] disabled:bg-[#FBE8A6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!keepReason.trim()} onClick={keepWithReason}>이유와 함께 정하기</Button>
+              {/* 초안을 최종안으로 정할 때 최종 선택 메모를 남긴다. 수정 권장이었다면 이 메모가 이견 이유로도 기록된다. */}
+              {keepOpen && (
+                <div className="w-full space-y-2">
+                  <ProcessMemoField id={`${quest.id}-final-memo`} {...FINAL_MEMO} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} />
+                  <div className="flex justify-end">
+                    <Button className="h-[48px] shrink-0 bg-[#F7CE3E] px-5 font-bold text-[#15202B] hover:bg-[#F9D960] disabled:bg-[#FBE8A6] disabled:text-[#6B5518] disabled:opacity-100" disabled={!finalMemoReady} onClick={needsChange && !localPilot ? keepWithReason : retainFirstResponse}>{needsChange && !localPilot ? "메모와 함께 초안 유지하기" : "초안을 최종안으로 정하기"}</Button>
                   </div>
                 </div>
               )}
@@ -3015,7 +3058,11 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     }
   };
 
-  const finishQuest = (response: QuestResponse | DctResponse) => {
+  const finishQuest = (questResponse: QuestResponse | DctResponse) => {
+    // 피드백 화면의 응답에 초안 단계에서 고정한 과정 메모를 이어 붙인다(최종 메모가 덮어쓰지 않게).
+    const response = quest.kind === "dct_feedback"
+      ? { processMemo: (responses[quest.dctId] as DctResponse | undefined)?.processMemo, ...questResponse } as DctResponse
+      : questResponse;
     const nextResponses = quest.kind === "dct_feedback"
       ? { ...responses, [quest.id]: response, [quest.dctId]: response }
       : { ...responses, [quest.id]: response };
@@ -3024,7 +3071,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
       emitMissionEvent("mpj_response_submitted", { quest_id: quest.id, response });
     } else if (quest.kind === "dct") {
       const dct = response as DctResponse;
-      emitMissionEvent("first_response_submitted", { response: dct.first });
+      // 과정 메모는 AI 피드백을 요청하기 전에 초안과 함께 이벤트로 남긴다.
+      emitMissionEvent("first_response_submitted", { response: dct.first, process_memo: dct.processMemo ?? null });
     }
     if (questIndex === mission.quests.length - 1) {
       setCompleted(true);
@@ -3059,6 +3107,24 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           ...(finalResponse.runtimeFeedback ? { feedback: finalResponse.runtimeFeedback } : {}),
           startedAtIso: startedAtRef.current,
           mpjResponses: buildRuntimeMpjTraces(runtime, nextResponses),
+          processMemos: {
+            schema_version: "process_memo_v1" as const,
+            first: finalResponse.processMemo
+              ? {
+                  stage: runtime.mission.production_task.mode === "interpreting" ? "interpreting_after_recording" as const : "translation_draft" as const,
+                  text: finalResponse.processMemo.text,
+                  submitted_at: finalResponse.processMemo.at,
+                }
+              : null,
+            final: finalResponse.finalMemo !== undefined
+              ? {
+                  text: finalResponse.finalMemo,
+                  decision: finalResponse.reflected ? "revised_response" as const : "retained_first_response" as const,
+                  used_as_dissent_reason: Boolean(finalResponse.dissent && finalResponse.dissent.reason === finalResponse.finalMemo),
+                  submitted_at: new Date().toISOString(),
+                }
+              : null,
+          },
           ...(finalResponse.dissent
             ? {
                 contextJudgment: {

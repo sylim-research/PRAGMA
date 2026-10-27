@@ -33,6 +33,28 @@ export interface SaveAttemptInput {
    * 결함 문항 발견·채점키 캘리브레이션 근거를 함께 남긴다. 남기지 않으면 undefined.
    */
   contextJudgment?: LearnerDissent;
+  /** 통번역 과정 메모(자유 서술, 비채점). 기능 도입 전 수행에는 없다. */
+  processMemos?: ProcessMemoTrace;
+}
+
+/**
+ * 통번역 과정 메모 — 최초 메모(AI 피드백 공개 전)와 최종 선택 메모를 따로 보존한다.
+ * text가 빈 문자열이면 칸은 있었으나 남기지 않은 것이다(선택 항목). 자동 채점·AI 피드백 입력에 쓰지 않는다.
+ */
+export interface ProcessMemoTrace extends Record<string, Json | undefined> {
+  schema_version: "process_memo_v1";
+  first: {
+    stage: "translation_draft" | "interpreting_after_recording";
+    text: string;
+    submitted_at: string;
+  } | null;
+  final: {
+    text: string;
+    decision: "retained_first_response" | "revised_response";
+    /** 수정 권고에도 초안을 유지해 이 메모를 이견 이유(learner_dissent.reason_ko)로도 기록했는가. */
+    used_as_dissent_reason: boolean;
+    submitted_at: string;
+  } | null;
 }
 
 export interface CourseAttemptContext {
@@ -130,7 +152,7 @@ export function buildMissionAttemptRow(
     return withoutConfidence;
   });
   const contextJudgment =
-    (mpjResponses && mpjResponses.length > 0) || input.productionSupport
+    (mpjResponses && mpjResponses.length > 0) || input.productionSupport || input.processMemos
       ? ({
           schema_version:
             (input.mission.schema_version === "mission_v5" && input.mission.mpj_items.length === 5) || input.mission.schema_version === "mission_v6"
@@ -143,6 +165,7 @@ export function buildMissionAttemptRow(
           responses: mpjResponses ?? [],
           production_support: input.productionSupport ?? null,
           learner_dissent: input.contextJudgment ?? null,
+          ...(input.processMemos ? { process_memos: input.processMemos } : {}),
         } as unknown as Json)
       : input.contextJudgment ?? null;
 

@@ -18,7 +18,7 @@ import {
 import { getLearnerPeerResponses } from "@/lib/mission/classResponseRelease";
 import { fetchMissionByScenario } from "@/lib/mission/missionDb";
 import { LearnerJourneyShell } from "@/components/learner/LearnerJourneyShell";
-import { buildLearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
+import { buildLearningRecordDetail, type LearningRecordDetail, type RecordDetailRow } from "@/lib/admin/learningRecordDetail";
 import { getSessions, type LearningSession } from "@/lib/learningSessions";
 import { SPEECH_ACT_UI, type SpeechActUI } from "@/lib/pragma/enums";
 import { COURSE_PRESETS } from "@/lib/pragma/scenarioTopics";
@@ -43,6 +43,8 @@ type ReportRecord = {
   feedback: string[];
   decision: "초안 유지" | "수정" | null;
   dissent: { conditions: string[]; reason: string | null } | null;
+  /** 통번역 과정 메모. null = 메모 기능 도입 전 수행이라 보여 줄 칸이 없다. */
+  memos: LearningRecordDetail["memos"];
   /** 저장된 AI 피드백의 화용 판정·다시 살펴볼 점·설명. */
   change: ChangeMap | null;
   /** 내 선택(문항 번호 → 척도 코드 또는 수정안 위치). 동료들의 판단·판단 비교에 쓴다. */
@@ -109,6 +111,7 @@ function localRecord(session: LearningSession): ReportRecord {
     feedback: [],
     decision: null,
     dissent: null,
+    memos: null,
     change: null,
     choices: new Map(),
     contentHash: null,
@@ -137,6 +140,7 @@ function missionLogRecord(row: MissionLogRecord): ReportRecord {
     feedback: detail.task.feedback,
     decision: detail.task.decision,
     dissent: detail.dissent,
+    memos: detail.memos,
     change: buildChangeMap(row.target_feature_observed, row.feature_id),
     choices: myChoices(row.context_judgment),
     contentHash: row.content_hash ?? null,
@@ -259,6 +263,17 @@ function ToneDot({ tone, size = "h-2.5 w-2.5" }: { tone: keyof typeof TONE; size
   return <span aria-hidden="true" className={`inline-block shrink-0 rounded-full ${size}`} style={{ backgroundColor: TONE[tone] }} />;
 }
 
+/** 내가 남긴 과정 메모 — 남기지 않았으면 적지 않는다(평가처럼 보이지 않게). */
+function MemoLine({ title, text }: { title: string; text: string | null }) {
+  if (!text) return null;
+  return (
+    <div className="mt-2 border-t border-dashed border-[#EFEBDF] pt-2">
+      <p className="text-[13px] font-bold text-[#8A7423]">{title}</p>
+      <p className="mt-0.5 whitespace-pre-wrap break-keep text-[15px] leading-6 text-[#26323D]">{text}</p>
+    </div>
+  );
+}
+
 /** 표현 변화 지도 — 최초 → AI 피드백 → 최종을 세 칸으로. 바뀐 구절은 최초에서 지우고 최종에서 밑줄. */
 function ChangeFlow({ record }: { record: ReportRecord }) {
   const task = TASK_LABEL[record.taskType];
@@ -271,6 +286,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
       <section className={`${card} px-4 py-2.5`} aria-label={"초안"}>
         <p className={cardLabel}>초안</p>
         <p className={`mt-1 ${zhLine}`}>{record.firstResponse || "기록 없음"}</p>
+        {record.memos && <MemoLine title={record.memos.firstTitle} text={record.memos.first} />}
       </section>
       {arrow}
       <section className={`${card} px-4 py-2.5`} aria-label="AI 피드백">
@@ -291,7 +307,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         ) : (
           <p className="mt-1.5 text-[14px] text-[#8C8471]">저장된 AI 피드백이 없습니다.</p>
         )}
-        {record.dissent && (
+        {record.dissent && (record.dissent.conditions.length > 0 || record.dissent.reason) && (
           <div className="mt-[12px] border-t border-[#EFEBDF] pt-2.5">
             <p className={cardLabel}>내 의견</p>
             {record.dissent.conditions.length > 0 && (
@@ -314,6 +330,7 @@ function ChangeFlow({ record }: { record: ReportRecord }) {
         {diff
           ? <p className="mt-1 text-[14px] text-[#5C6A7A]">밑줄: 처음 {task}에서 바뀐 부분</p>
           : <p className="mt-1 text-[14px] text-[#8A5A14]">초안을 그대로 유지했습니다.</p>}
+        {record.memos && <MemoLine title="최종 선택 메모" text={record.memos.final} />}
       </section>
     </div>
   );

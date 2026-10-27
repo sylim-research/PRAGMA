@@ -51,4 +51,27 @@ describe("buildLearningRecordDetail", () => {
     );
     expect(detail.mjt[0].rows[0].value).not.toBe("appropriate");
   });
+
+  it("shows process memos once and keeps pre-feature records distinct from blank memos", () => {
+    const withMemos = buildLearningRecordDetail({
+      ...row,
+      task_type: "interpreting",
+      context_judgment: {
+        responses: [],
+        learner_dissent: { kind: "learner_dissent", conditions: [], reason_ko: "이대로 둔다", final_decision: "retained_first_response" },
+        process_memos: {
+          schema_version: "process_memo_v1",
+          first: { stage: "interpreting_after_recording", text: "빨리 말하느라 높임을 놓쳤다", submitted_at: "t1" },
+          final: { text: "이대로 둔다", decision: "retained_first_response", used_as_dissent_reason: true, submitted_at: "t2" },
+        },
+      },
+    }, null, "", () => "");
+    expect(withMemos.memos).toEqual({ firstTitle: "통역 과정 메모", first: "빨리 말하느라 높임을 놓쳤다", final: "이대로 둔다", finalIsDissentReason: true });
+    // 같은 이유를 이견 칸에 다시 싣지 않는다.
+    expect(withMemos.dissent?.reason).toBeNull();
+
+    const legacy = buildLearningRecordDetail(row, null, "", () => "");
+    expect(legacy.memos).toBeNull();
+    expect(legacy.dissent?.reason).toBe("이유");
+  });
 });
