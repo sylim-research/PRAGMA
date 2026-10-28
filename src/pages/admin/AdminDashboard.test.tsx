@@ -101,7 +101,7 @@ describe("admin dashboard", () => {
     const rules = within(stages).getByRole("link", { name: /자동 규칙 점검/ });
     // 규칙 검사를 통과한 서로 다른 미션 1건(재실행 중복·불통과 제외).
     await waitFor(() => expect(rules.textContent).toMatch(/1\s*개/));
-    expect(rules.textContent).toContain("서버 코드 · 규칙 검사");
+    expect(rules.textContent).toContain("규칙 점검 코드 · AI 없음");
     // 저장 결과 재사용 같은 구현 사정은 첫 화면에 두지 않는다.
     expect(stages.textContent).not.toContain("재사용");
     expect(rules).toHaveAttribute("title", "지금 대기 2개");
@@ -155,10 +155,10 @@ describe("admin dashboard", () => {
     show();
     const rulesCard = await screen.findByRole("link", { name: /자동 규칙 점검/ });
     expect(rulesCard).toHaveAttribute("href", "/admin/ai-review");
-    for (const label of ["AI 품질 심사", "중국어 표현 검토"]) {
-      expect(screen.getByRole("link", { name: new RegExp(`^\\d+\\s*${label}`) })).toHaveAttribute("href", "/admin/ai-review");
-    }
+    expect(screen.getByRole("link", { name: /^\d+\s*AI 품질 심사/ })).toHaveAttribute("href", "/admin/ai-review");
     const stages = screen.getByRole("group", { name: "품질 점검 단계" });
+    // 중국어 표현 검토는 앱 밖 수동 참고로 옮겨 카드에서 뺐다(2026-10-29).
+    expect(within(stages).queryByRole("link", { name: /중국어 표현 검토/ })).toBeNull();
     const professorCards = within(stages).getAllByRole("link", { name: /교수자 최종 승인/ });
     expect(professorCards).toHaveLength(1);
     expect(professorCards[0]).toHaveAttribute("href", "/admin/review");
