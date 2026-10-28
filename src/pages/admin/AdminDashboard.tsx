@@ -172,7 +172,20 @@ const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== 
   optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
 }));
 
+// 단계 카드 아래 줄 — 「누가 맡는가」(모델·서버 코드)를 앞에 진하게, 하는 일은 뒤에 흐리게.
+const StageCaption = ({ text, suffix = "" }: { text: string; suffix?: string }) => {
+  const [lead, ...rest] = text.split(" · ");
+  return (
+    <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]" title={text + suffix}>
+      <span className="font-semibold text-[#273B4A]">{lead}</span>
+      {rest.length > 0 && ` · ${rest.join(" · ")}`}
+      {suffix}
+    </span>
+  );
+};
+
 const ReviewPipeline = ({
+  generatedCount,
   review,
   cumulative,
   professorFinalized,
@@ -181,6 +194,7 @@ const ReviewPipeline = ({
   error,
   changedKeys,
 }: {
+  generatedCount: number | null;
   review: DashboardReviewStageCounts | null;
   cumulative: DashboardCumulativeReviewCounts | null;
   professorFinalized: number | null;
@@ -233,10 +247,7 @@ const ReviewPipeline = ({
                 {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 완료</span>}
               </div>
               {/* 설명은 한 줄 — 넘치면 말줄임(2026-10-10). 두 줄로 밀리면 카드 밑줄 정렬이 깨진다. */}
-              <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">
-                {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
-              </span>
+              <StageCaption text={stage.description} suffix={stage.key === "rules" && rulesFailCount > 0 ? ` · 불통과 ${rulesFailCount}` : ""} />
             </Link>
             {/* 단계 사이 화살표는 뺐다(2026-10-11) — 좁은 간격에서 카드 테두리에 걸려 잘려 보였고, 순서는 번호 1~5가 이미 보여 준다. */}
           </div>
@@ -246,14 +257,28 @@ const ReviewPipeline = ({
       const firstOptional = REVIEW_STAGE_ITEMS.findIndex((stage) => stage.optional);
       return (
         <>
-          {/* 1. 생성 — 만드는 일은 Gemini, 중→한 중국어 원문만 Astra(2026-10-26 모델 배정). 대기열이 아니라 숫자 대신 모델을 보인다. */}
+          {/* 1. 생성 — 만드는 일은 Gemini, 중→한 중국어 원문만 Astra(2026-10-26 모델 배정).
+              다른 단계와 같은 틀(숫자 메인 · 모델은 아래 줄)로 맞춘다(2026-10-29). */}
           <div className="flex min-h-[80px] min-w-0 flex-col rounded-xl border border-[#E6CF7A] bg-[#FBF6E4] px-4 py-[13px]">
             <div className="flex items-center gap-2">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#F4E6B3] text-[12px] font-semibold tabular-nums text-[#6D5C1F]">1</span>
-              <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">시나리오·학습 미션 생성</span>
+              <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">학습 콘텐츠 생성</span>
             </div>
-            <span className="mt-1.5 text-[20px] font-semibold leading-tight tracking-[-0.02em] text-[#15202B]">Gemini 3.1 Pro</span>
-            <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">중→한 중국어 원문은 GPT-6 Astra</span>
+            <div className="mt-1.5 flex items-end gap-1.5">
+              {generatedCount === null && !error ? (
+                <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
+              ) : (
+                <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : generatedCount ?? "—"}
+                </span>
+              )}
+              {!error && generatedCount !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 생성</span>}
+            </div>
+            {/* 모델이 둘이라 한 줄에 다 들어가지 않는다 — 두 줄로 쌓고 아래 끝을 다른 카드와 맞춘다. */}
+            <span className="mt-auto flex flex-col pt-1.5 text-[12px] text-[#4F5D68]">
+              <span className="truncate font-semibold text-[#273B4A]">Gemini 3.1 Pro</span>
+              <span className="truncate">중→한 원문 <span className="font-semibold text-[#273B4A]">GPT-6 Astra</span></span>
+            </span>
           </div>
           {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
           {/* 선택 단계는 점선 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
@@ -555,6 +580,7 @@ const AdminDashboard = () => {
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4·5는 선택 단계라 점선이다. */}
       <PanelHeader no={2} title="콘텐츠 품질 관리" />
       <ReviewPipeline
+        generatedCount={snapshot?.content.generatedMissionCount ?? null}
         review={snapshot?.review ?? null}
         cumulative={snapshot?.cumulative ?? null}
         professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
