@@ -1,4 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
+import type { OwnerLabel } from "@/lib/admin/modelOwners";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 import { CAPTURE_CANVAS, CAPTURE_WIDE_CANVAS, useCaptureMode, useWideCaptureMode } from "@/lib/captureMode";
@@ -14,7 +15,7 @@ interface AdminShellProps {
   title: string;
   description?: string;
   /** 이 화면의 일을 맡는 쪽(모델명·규칙 점검 코드·교수자). 설명 줄 끝에 작은 표로 붙는다(2026-10-29). */
-  owner?: ReactNode;
+  owner?: string | OwnerLabel[];
   children?: ReactNode;
   compact?: boolean;
   /** 제목을 화면에서 숨기고 보조기기용 제목으로만 남긴다(사이드바에 같은 이름이 있는 홈 화면용). */
@@ -212,11 +213,13 @@ export const AdminShell = ({ title, description, owner, children, compact = fals
               {(description || owner) && (
                 <p className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-muted-foreground">
                   {description && <span>{description}</span>}
-                  {owner && (
-                    <span className="inline-flex items-center rounded-md border border-[#E2DED2] bg-white px-2 py-0.5 text-[12.5px] font-semibold leading-5 text-[#15202B]">
-                      {owner}
+                  {owner && (typeof owner === "string" ? [{ model: owner }] : owner).map((label) => (
+                    <span key={`${label.prefix ?? ""}${label.model}`}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E2DED2] bg-white px-2 py-0.5 text-[12.5px] leading-5 text-[#4F5D68]">
+                      {label.prefix && <span>{label.prefix}</span>}
+                      <span className="font-semibold text-[#15202B]">{label.model}</span>
                     </span>
-                  )}
+                  ))}
                 </p>
               )}
             </div>

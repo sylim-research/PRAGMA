@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
-import { SCENARIO_AUTHOR_LABEL } from "@/lib/admin/modelOwners";
+import { SCENARIO_AUTHOR_LABELS } from "@/lib/admin/modelOwners";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -899,7 +899,7 @@ const AdminGenerator = () => {
     <AdminShell
       title="시나리오 개별 생성"
       description="상황·관계 조건을 정해 시나리오를 한 건씩 만들고, 교수자 감수 대기 상태로 저장합니다."
-      owner={SCENARIO_AUTHOR_LABEL}
+      owner={SCENARIO_AUTHOR_LABELS}
     >
       {gridPrefill && (
         <div className="mt-3 rounded-md border border-amber-300 bg-amber-50 px-4 py-3 text-[13.25px] text-amber-950">

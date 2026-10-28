@@ -11,5 +11,14 @@ export const RULE_CHECK_LABEL = "규칙 점검 코드";
 export const scenarioAuthorModel = (direction: LanguageDirection) =>
   direction === "zh_ko" ? REVIEW_MODEL_LABEL : GENERATION_MODEL_LABEL;
 
-/** 방향을 고르기 전에도 읽히도록 두 방향을 함께 적는다(2026-10-29 연구자 요청). */
-export const SCENARIO_AUTHOR_LABEL = `한→중 ${scenarioAuthorModel("ko_zh")} · 중→한 ${scenarioAuthorModel("zh_ko")}`;
+/** 방향을 고르기 전에도 읽히도록 두 방향을 따로 적는다 — 한 표에 묶으면 읽기 어려웠다(2026-10-29 연구자 요청). */
+export const SCENARIO_AUTHOR_LABELS: OwnerLabel[] = [
+  { prefix: "한→중", model: scenarioAuthorModel("ko_zh") },
+  { prefix: "중→한", model: scenarioAuthorModel("zh_ko") },
+];
+
+/** 화면 머리 표 하나. prefix(방향 등)는 보통 굵기, model은 굵게. */
+export interface OwnerLabel {
+  prefix?: string;
+  model: string;
+}

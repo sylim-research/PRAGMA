@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { AdminShell } from "@/components/AdminShell";
-import { SCENARIO_AUTHOR_LABEL } from "@/lib/admin/modelOwners";
+import { SCENARIO_AUTHOR_LABELS } from "@/lib/admin/modelOwners";
 import { BatchPlanItems } from "@/components/admin/BatchPlanItems";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -294,7 +294,7 @@ const AdminBatch = () => {
 
   return (
     <AdminShell title="시나리오 배치 생성"
-      owner={SCENARIO_AUTHOR_LABEL}
+      owner={SCENARIO_AUTHOR_LABELS}
       description="상황·관계 조건별 생성 계획을 세우고 시나리오를 한꺼번에 만듭니다. 결과를 확인한 뒤 학습 미션 제작으로 연결합니다.">
       <div className="flex flex-col gap-4">
         <div className="space-y-5">
