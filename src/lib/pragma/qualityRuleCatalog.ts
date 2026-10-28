@@ -72,7 +72,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R5: {
     category: "문항 구성·판정 데이터",
     nature: "structural",
-    summary_ko: "복수 비교 문항의 후보 수·판정 분포·문장 중복과 관계 조건이 한 축만 다른지 확인한다. 문장 길이만으로 정답이 갈리면(4자 이상이면서 10% 이상 차이) warning으로 남긴다.",
+    summary_ko: "복수 비교 문항의 후보 수·판정 분포·중복을 확인한다. 길이만으로 정답이 갈리면 warning이다.",
   },
   R6: {
     category: "문항 구성·판정 데이터",
@@ -82,23 +82,23 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R7: {
     category: "문항 구성·판정 데이터",
     nature: "structural",
-    summary_ko: "4단계 척도 문항의 정답 구간이 이어진 두 칸이고 기준 판정을 포함하는지 확인한다. 정답이 적절 쪽으로 기운 반례는 warning이다.",
+    summary_ko: "4단계 척도 문항의 정답이 이어진 두 칸이고 기준 판정을 포함하는지 확인한다.",
   },
   R8: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "이전 형식 미션은 앞선 발화가 있는지, 현행 MJT5는 앞선 발화 없이 장면만으로 성립하는지 확인한다. 시나리오의 앞선 발화 조건은 2026-10-25에 폐기했다.",
+    summary_ko: "현행 MJT5는 앞선 발화 없이 장면만으로, 이전 형식은 앞선 발화가 있는지 확인한다.",
     applicability_ko: "이전 형식·현행 MJT5 미션에 따라 조건이 다르다. 현행 시나리오 검사에는 쓰지 않는다.",
   },
   R9: {
     category: "일반화·사전 정보 노출 위험",
     nature: "signal",
-    summary_ko: "상황·관계·해설에 「중국인은…」「한국에서는…」처럼 국가 단위로 일반화하는 표현이 있는지 찾는다. 부정문·인용·장소 표현을 가려내지 못하므로 교수자 확인 신호다.",
+    summary_ko: "「중국인은…」처럼 국가 단위로 일반화하는 표현을 찾는다(교수자 확인 신호).",
   },
   R10: {
     category: "언어 방향·문자 형식",
     nature: "structural",
-    summary_ko: "요청한 언어 방향과 데이터 방향이 같은지, 원문·참고 표현이 맞는 문자(한글·한자)로 쓰였는지 확인한다. 중국어 산출에 한글이 섞이면 불통과, 그 밖의 문자 추정은 warning이다.",
+    summary_ko: "언어 방향과 원문·참고 표현의 문자(한글·한자)를 확인한다. 중국어에 한글이 섞이면 불통과다.",
   },
   R11: {
     category: "문항 구성·판정 데이터",
@@ -128,7 +128,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R16: {
     category: "수행 방식·역할·채널",
     nature: "structural",
-    summary_ko: "번역·통역 요청과 글·말 매체가 맞는지 확인한다(불통과). 상황문이 반대 수행 장면을 적은 것처럼 보이면 글자 패턴 추정이라 warning이다.",
+    summary_ko: "번역·통역 요청과 글·말 매체가 맞는지 확인한다. 상황문 속 장면 추정은 warning이다.",
   },
   R17: {
     category: "요청 조건·카탈로그 정합",
@@ -143,7 +143,7 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R19: {
     category: "문항 구성·판정 데이터",
     nature: "signal",
-    summary_ko: "문항의 문장·수정안·후보가 글자 그대로 겹치는지 찾는다(교수자 확인 신호). 일부러 같은 장면을 쓰는 MJT2·3·4의 공유는 제외한다.",
+    summary_ko: "문항의 문장·후보가 글자 그대로 겹치는지 찾는다(교수자 확인 신호, MJT2·3·4 제외).",
   },
   R20: {
     category: "생성 기록·계승·근거 귀속",
@@ -176,13 +176,13 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R26: {
     category: "장면·원문 구성",
     nature: "signal",
-    summary_ko: "직장 시나리오에 지정 산업을 보여 주는 어휘 단서가 실제로 있는지 찾는다(교수자 확인 신호). 일괄 생성에서는 이 신호가 뜨면 산업 적합성 AI 검토를 1회 붙인다.",
+    summary_ko: "직장 시나리오에 지정 산업의 어휘 단서가 있는지 찾는다(교수자 확인 신호).",
     applicability_ko: "직장 영역이고 산업이 지정된 시나리오에만 실행한다.",
   },
   R27: {
     category: "장면·원문 구성",
     nature: "structural",
-    summary_ko: "MJT 상황문의 장면 배치(X-A-A-A-Y-C)와 겹침, 관계 조건이 한 축만 다른지, 상황문 형식(문장 수 근사)을 확인한다. DCT 형식은 warning이다.",
+    summary_ko: "MJT 장면 배치(X-A-A-A-Y-C)·겹침·한 축 차이·상황문 형식을 확인한다(DCT 형식은 warning).",
     applicability_ko: "이전 형식(mission_v4·v5)의 장면 계획 여부에 따라 조건이 다르다.",
   },
   R28: {
@@ -193,19 +193,19 @@ export const QUALITY_RULE_CATALOG: Record<RuleId, QualityRuleDescription> = {
   R29: {
     category: "장면·원문 구성",
     nature: "structural",
-    summary_ko: "원문 분량이 수준별 상한을 넘지 않는지(넘으면 불통과), 하한·문장 수(2~4문장)를 지키는지, 화용 집중 구간이 원문 안에 정확히 있는지 확인한다(하한·문장 수는 warning).",
+    summary_ko: "원문 분량 상한(불통과)·하한·문장 수(2~4)·화용 집중 구간 위치를 확인한다.",
     applicability_ko: "화용 집중 구간이 있는 시나리오와 이전 형식(mission_v5)에서 실행한다.",
   },
   R30: {
     category: "일반화·사전 정보 노출 위험",
     nature: "signal",
-    summary_ko: "학습자에게 보이는 상황문이 정중성·완화·선택권·강도 같은 답의 평가 기준을 미리 드러내는지 찾는다(교수자 확인 신호). 단어를 금지하거나 자동으로 지우는 규칙이 아니다.",
+    summary_ko: "상황문이 정중성·완화 같은 답의 평가 기준을 미리 드러내는지 찾는다(교수자 확인 신호).",
     applicability_ko: "시나리오와 미션의 MJT·DCT 상황문이 대상이다.",
   },
   R31: {
     category: "생성 기록·계승·근거 귀속",
     nature: "governance",
-    summary_ko: "문항별로 어느 모델이 무엇을 만들었는지 기록이 형식대로 남아 있는지 확인한다. 문헌이 그 표현을 실제로 뒷받침하는지는 판정하지 않는다.",
+    summary_ko: "문항별 모델 귀속 기록이 형식대로 있는지 확인한다(문헌 뒷받침 여부는 판정하지 않음).",
     applicability_ko: "현행 판본으로 만든 미션 중 기록 작성이 끝난 미션만 검사하고, 오래된 판본은 건너뛴다.",
   },
   R32: {
