@@ -74,7 +74,7 @@ export function DashboardResourceOverview({ resources, error, status }: {
               {Object.entries(labels).map(([code, label]) => {
                 const count = counts[code] ?? 0;
                 return key === 'speech_act' ? <Link key={code} to={resourceAssemblyHref(scope, key, code)} title={`${label} 학습 미션 보기`}
-                  className="flex items-baseline justify-between gap-2 rounded-lg border border-[#E2DED2] bg-white px-3.5 py-[7px] transition-colors hover:border-[#C9B76A] hover:bg-[#FFFCF0] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
+                  className="flex items-baseline justify-between gap-2 rounded-lg border border-[#E2DED2] bg-white px-3.5 py-[10px] transition-colors hover:border-[#C9B76A] hover:bg-[#FFFCF0] focus-visible:ring-2 focus-visible:ring-[#B3932F]">
                   <span className="text-sm text-[#3F4C55]">{label}</span>
                   <span className="text-[17px] font-semibold leading-6 tabular-nums text-[#243640]">{selected ? number(count) : "—"}</span>
                 </Link> : <Link key={code} to={resourceAssemblyHref(scope, key, code)} className="group block rounded focus-visible:ring-2 focus-visible:ring-[#B3932F]">

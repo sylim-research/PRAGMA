@@ -62,6 +62,8 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 > <small>만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡고, 최종 승인은 교수자가 합니다.</small>
 
+- 단계별로 누가 무엇을 보는지, 자동 규칙 점검이 실제로 확인하는 규칙 17개는 [콘텐츠 품질 관리 설명](docs/content-quality-check.md)에 정리했습니다.
+
 <br>
 
 ### 4. 통번역 학습 워크플로우
@@ -107,7 +109,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 - **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다.
 - **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다.
 - **학습 미션 생성**에는 Gemini 3.1 Pro를 사용합니다.
-- **AI 품질 심사**와 필요시 **중국어 표현 검토**에는 GPT-6 Astra를 사용합니다.
+- **AI 품질 심사**에는 GPT-6 Astra를 사용합니다. 중국어 표현 자연성도 이 심사에서 함께 봅니다.
 - **AI 피드백**은 Gemini 3.1 Pro가 쓰고, 학습자에게 보이기 전에 GPT-6 Astra가 검수합니다.
 - **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.

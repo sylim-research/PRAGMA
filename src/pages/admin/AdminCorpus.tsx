@@ -3,6 +3,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -200,6 +201,7 @@ const AdminCorpus = () => {
     <AdminShell
       title="HSK 3.0 어휘 대조"
       description="생성된 중국어 어휘를 수준별 HSK 누적 목록과 대조해 참고 기록으로 남깁니다."
+      owner="HSK 어휘표 대조"
     >
       <div className="flex w-full flex-col gap-4">
         <DatasetOverview

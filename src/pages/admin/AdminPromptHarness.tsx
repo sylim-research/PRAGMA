@@ -24,7 +24,7 @@ import type { RuleId } from "@/lib/pragma/missionRules";
 const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
   core: "시나리오 생성",
   mission: "학습 미션 생성",
-  review: "AI 품질 심사와 독립 검토",
+  review: "AI 품질 심사",
   runtime: "학습자 AI 피드백",
   authoring: "실제 자료 활용",
 };
@@ -32,6 +32,9 @@ const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authorin
 // 화면 조작으로 호출될 수 없는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
 // 집중 구간 없는 피드백은 편성된 4문항 미션이 학습자에게 열리지 않아 호출 경로가 없다.
 const HIDDEN_PROMPT_KEYS = new Set([
+  // 2026-10-27부터 Claude 교차 검토와 그 의견 재판정은 쓰지 않는다(migration review_without_claude).
+  "content_review.claude",
+  "content_review.adjudication",
   "feedback.system",
   "feedback.system.zh_ko",
   "feedback.system.zh_ko.spoken",
@@ -107,7 +110,7 @@ function RuleCatalogPanel() {
   return (
     <div id="quality-rules" className="mt-3 rounded-lg border border-[#E2DED2] bg-[#FFFDF7] p-3 sm:p-4">
       <div className="flex flex-wrap items-center gap-2">
-        {([["current", `현행 미션에 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
+        {([["current", `현행 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
           <button key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
             className={`rounded-lg border px-3 py-1.5 text-[13.75px] font-medium ${scope === value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#3B4A54] hover:bg-[#F5F4EF]"}`}>
             {label}
@@ -167,12 +170,12 @@ function HarnessOverview() {
           className={`group ${STAGE_CARD} text-left transition-colors hover:border-[#C9A62E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#15202B] ${rulesOpen ? "border-[#C9A62E] bg-[#FFFDF7]" : ""}`}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[13px] font-semibold text-[#6D5C1F]">자동 규칙 점검</span>
-            <Badge variant="outline" className="bg-white font-normal">서버 코드</Badge>
+            <Badge variant="outline" className="bg-white font-normal">규칙 점검 코드</Badge>
           </div>
-          <h3 className="mt-1.5 text-[15.5px] font-bold">현행 미션 규칙 {MISSION_RULES.size}개</h3>
+          <h3 className="mt-1.5 text-[15.5px] font-bold">현행 규칙 {CURRENT_PIPELINE_RULE_IDS.size}개</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
             {/* HSK 어휘 대조는 점검·승인 조건이 아니라 생성 후 참고 기록이라 여기 두지 않는다(2026-09-27 정본). */}
-            구성·수량·언어 방향·생성 기록을 확인합니다. 같은 입력에는 같은 결과를 냅니다.
+            규칙 점검 코드가 시나리오 {SCENARIO_RULES.size}개·학습 미션 {MISSION_RULES.size}개 규칙으로 구성·수량·언어 방향·생성 기록을 세고 대조합니다. 같은 입력에는 같은 결과를 냅니다.
           </p>
           <span className={STAGE_LINK}>
             {rulesOpen ? "규칙 접기" : "규칙 보기"}
@@ -186,7 +189,7 @@ function HarnessOverview() {
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            의미·화행·자연성·해설 일치를 심사합니다. 필요 시 독립 검토와 재판정이 이어집니다.
+            의미·화행·해설 일치와 한중 양방향 자연성을 한 번에 심사합니다.
           </p>
           <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
             검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />

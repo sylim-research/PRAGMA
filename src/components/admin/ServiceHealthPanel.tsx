@@ -23,8 +23,10 @@ import {
 
 const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
   elevenlabs: { name: "ElevenLabs", role: "음성 합성" },
-  openai: { name: "OpenAI", role: "생성·AI 품질 심사·STT" },
-  anthropic: { name: "Anthropic", role: "콘텐츠 검토" },
+  // 2026-10-26 역할 배정: 생성·피드백은 Gemini(이 점검 목록에는 아직 없음), OpenAI는 검사(GPT-6 Astra)와 STT.
+  openai: { name: "OpenAI", role: "AI 품질 심사·피드백 검수·STT" },
+  // Claude 교차 검토는 2026-10-27부터 쓰지 않는다. 키 상태만 남겨 둔다.
+  anthropic: { name: "Anthropic", role: "현재 사용 안 함" },
   supabase: { name: "Supabase", role: "로그인·데이터" },
   // 다른 칸처럼 제공사 이름을 쓰되, 이 칸은 Railway에 묻지 않고 「이 화면이 열렸다」만 보므로
   // 실제로 Railway에서 열렸을 때만 Railway라고 부른다(로컬에서 「Railway 정상」은 틀린 표시다).

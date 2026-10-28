@@ -10,6 +10,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AdminShell } from "@/components/AdminShell";
+import { GENERATION_MODEL_LABEL } from "@/lib/admin/modelOwners";
 import { Button } from "@/components/ui/button";
 import AuthenticImportPanel, {
   type AuthenticApply,
@@ -261,6 +262,7 @@ const AdminAuthentic = () => {
     <AdminShell
       title="실제 자료 활용 분석"
       description="실제 한·중 자료를 AI가 분석해 시나리오 재료 후보를 제안하고, 교수자가 사용 여부를 정합니다."
+      owner={GENERATION_MODEL_LABEL}
     >
       {saveNote && (
         <p

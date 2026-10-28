@@ -21,6 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight, ListChecks } from "lucide-react";
 import { AdminShell } from "@/components/AdminShell";
+import { GENERATION_MODEL_LABEL, REVIEW_MODEL_LABEL, RULE_CHECK_LABEL } from "@/lib/admin/modelOwners";
 import { MissionOutline } from "@/components/admin/MissionOutline";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -1081,6 +1082,7 @@ const AdminAssembly = ({ reviewMode = false, aiReview = false }: { reviewMode?: 
         : reviewMode
           ? "교수자가 콘텐츠를 감수하고 최종 승인하면 15주 수업 편성에 쓸 수 있습니다."
           : "시나리오를 골라 학습 미션 초안을 만듭니다."}
+      owner={aiReview ? `${RULE_CHECK_LABEL} → ${REVIEW_MODEL_LABEL}` : reviewMode ? undefined : GENERATION_MODEL_LABEL}
     >
       {loading ? (
         <p className="mt-4 text-[13px] text-muted-foreground">불러오는 중…</p>

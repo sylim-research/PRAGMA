@@ -142,13 +142,14 @@ const REVIEW_STAGE_DISPLAY_LABELS: Record<DashboardReviewQueueStage, string> = {
   professor: "교수자 최종 승인",
 };
 
-// 1~4단계는 품질 점검 화면이, 5단계는 교수자 최종 승인 화면이 처리한다.
+// 2~3단계는 품질 점검 화면이, 4단계는 교수자 최종 승인 화면이 처리한다.
 const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "professor" ? "/admin/review" : "/admin/ai-review");
 
 // 카드 폭 안에서 한 줄. 무엇을 하는지만 남기고 방법은 뺀다.
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
-  rules: "서버 코드 · 규칙 검사",
+  // AI 없이 저장된 코드가 세고 대조한다(missionRules.ts) — 「서버 코드」는 개발 용어라 바꿨다(2026-10-29).
+  rules: "규칙 점검 코드",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "GPT-6 Astra · 의미·화행 심사",
   claude: "Claude · 요청 시",
@@ -158,21 +159,32 @@ const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 교수자는 학습자에게 보일 장면·문항을 그대로 확인한 뒤 따로 최종 승인한다(ContentReviewPanel 「학생 화면으로 감수하기」).
   professor: "학습자 화면 확인 후 승인",
 };
-// 2026-09-06 경량 검수부터 Claude 별도 검토와 재검토는 교수자가 선택했을 때만 거친다.
-// 화살표만 두면 다섯 단계를 모두 지나는 것처럼 읽히므로, 선택 단계는 점선으로 구분한다.
-const OPTIONAL_REVIEW_STAGES: ReadonlySet<DashboardReviewQueueStage> = new Set(["deepseek"]);
 
 // Final evidence preparation belongs to the professor-work queue on this overview.
 // 2026-10-27 현행 흐름: Claude 종합 검토와 재판정은 쓰지 않는다. 1번 카드는 생성(Gemini)이라 검수 단계는 2번부터.
-const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== "finalization").filter((stage) => stage.key !== "claude" && stage.key !== "adjudication").map((stage, index) => ({
+// 2026-10-29 연구자 결정: 중국어 표현 검토는 앱 밖 수동 참고(DeepSeek Chat, 공개 가능한 문장만)로 옮겨 카드에서 뺀다.
+// 앱 안의 선택 기능 코드는 그대로 둔다(화면 표시만 4단계).
+const REVIEW_STAGE_ITEMS = CONTENT_REVIEW_STEPS.filter((stage) => stage.key !== "finalization").filter((stage) => stage.key !== "claude" && stage.key !== "adjudication" && stage.key !== "deepseek").map((stage, index) => ({
   ...stage,
   step: index + 2,
   displayLabel: REVIEW_STAGE_DISPLAY_LABELS[stage.key],
   description: REVIEW_STAGE_DESCRIPTIONS[stage.key],
-  optional: OPTIONAL_REVIEW_STAGES.has(stage.key),
 }));
 
+// 단계 카드 아래 줄 — 「누가 맡는가」(모델·서버 코드)를 앞에 진하게, 하는 일은 뒤에 흐리게.
+const StageCaption = ({ text, suffix = "" }: { text: string; suffix?: string }) => {
+  const [lead, ...rest] = text.split(" · ");
+  return (
+    <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]" title={text + suffix}>
+      <span className="font-semibold text-[#273B4A]">{lead}</span>
+      {rest.length > 0 && ` · ${rest.join(" · ")}`}
+      {suffix}
+    </span>
+  );
+};
+
 const ReviewPipeline = ({
+  generatedCount,
   review,
   cumulative,
   professorFinalized,
@@ -181,6 +193,7 @@ const ReviewPipeline = ({
   error,
   changedKeys,
 }: {
+  generatedCount: number | null;
   review: DashboardReviewStageCounts | null;
   cumulative: DashboardCumulativeReviewCounts | null;
   professorFinalized: number | null;
@@ -190,7 +203,7 @@ const ReviewPipeline = ({
   changedKeys: ReadonlySet<DashboardMetricKey>;
 }) => (
   <div role="group" aria-label="품질 점검 단계">
-  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
     {(() => {
       const renderStage = (stage: (typeof REVIEW_STAGE_ITEMS)[number]) => {
         // 메인은 누적 완료(서로 다른 미션 수)다. 지금 기다리는 수는 마우스를 올릴 때 보인다.
@@ -212,7 +225,6 @@ const ReviewPipeline = ({
                 stage.key === "professor" ? "border-[#D9CB8F]" : "border-[#E2DED2]",
                 changed ? "ring-2 ring-[#F4D85E]/35" : "",
               ].join(" ")}
-              data-optional={stage.optional ? "true" : undefined}
               data-dominant={active ? "true" : undefined}
               title={waiting === null || error ? undefined : `지금 대기 ${waiting}개`}
             >
@@ -233,41 +245,41 @@ const ReviewPipeline = ({
                 {!error && value !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 완료</span>}
               </div>
               {/* 설명은 한 줄 — 넘치면 말줄임(2026-10-10). 두 줄로 밀리면 카드 밑줄 정렬이 깨진다. */}
-              <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">
-                {stage.description}
-                {stage.key === "rules" && rulesFailCount > 0 && ` · 불통과 ${rulesFailCount}`}
-              </span>
+              <StageCaption text={stage.description} suffix={stage.key === "rules" && rulesFailCount > 0 ? ` · 불통과 ${rulesFailCount}` : ""} />
             </Link>
             {/* 단계 사이 화살표는 뺐다(2026-10-11) — 좁은 간격에서 카드 테두리에 걸려 잘려 보였고, 순서는 번호 1~5가 이미 보여 준다. */}
           </div>
         );
       };
-      const optional = REVIEW_STAGE_ITEMS.filter((stage) => stage.optional);
-      const firstOptional = REVIEW_STAGE_ITEMS.findIndex((stage) => stage.optional);
       return (
         <>
-          {/* 1. 생성 — 만드는 일은 Gemini, 중→한 중국어 원문만 Astra(2026-10-26 모델 배정). 대기열이 아니라 숫자 대신 모델을 보인다. */}
+          {/* 1. 생성 — 만드는 일은 Gemini, 중→한 중국어 원문만 Astra(2026-10-26 모델 배정).
+              다른 단계와 같은 틀(숫자 메인 · 모델은 아래 줄)로 맞춘다(2026-10-29). */}
           <div className="flex min-h-[80px] min-w-0 flex-col rounded-xl border border-[#E6CF7A] bg-[#FBF6E4] px-4 py-[13px]">
             <div className="flex items-center gap-2">
               <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#F4E6B3] text-[12px] font-semibold tabular-nums text-[#6D5C1F]">1</span>
-              <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">시나리오·학습 미션 생성</span>
+              <span className="text-[13px] font-semibold leading-4 text-[#3F4E59]">학습 콘텐츠 생성</span>
             </div>
-            <span className="mt-1.5 text-[20px] font-semibold leading-tight tracking-[-0.02em] text-[#15202B]">Gemini 3.1 Pro</span>
-            <span className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]">중→한 중국어 원문은 GPT-6 Astra</span>
-          </div>
-          {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
-          {/* 선택 단계는 점선 틀로 묶는다 — 모든 미션이 거치는 기본 경로가 아니라는 것을 글이 아니라 모양으로 보인다. */}
-          <div
-            role="group"
-            aria-label="필요 시 중국어 표현 검토"
-            className="relative -mb-[7px] -mt-3 grid grid-cols-1 gap-2.5 rounded-xl border border-dashed border-[#B3AA94] bg-[#F3F0E7] px-1.5 pb-1.5 pt-[11px]"
-          >
-            <span className="absolute -top-2 left-3 rounded bg-background px-1.5 text-[12px] font-semibold leading-4 tracking-[0.02em] text-[#5A6670]">
-              필요 시
+            <div className="mt-1.5 flex items-end gap-1.5">
+              {generatedCount === null && !error ? (
+                <span aria-label="불러오는 중" className="h-7 w-12 rounded bg-muted motion-safe:animate-pulse" />
+              ) : (
+                <span className="text-[26px] font-semibold leading-none tracking-[-0.025em] text-[#15202B] tabular-nums">
+                  {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : generatedCount ?? "—"}
+                </span>
+              )}
+              {!error && generatedCount !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 미션</span>}
+            </div>
+            {/* 기본은 Gemini, 중→한 시나리오의 중국어 원문만 Astra(2026-10-26). 「중→한」만 적으면 한→중이 기본처럼 읽혀
+                두 모델만 적고 역할 구분은 툴팁에 둔다 — 「중국어 원문」까지 넣으면 실제 화면 글꼴에서 잘렸다(2026-10-29). 한 줄로 다른 카드와 밑줄을 맞춘다. */}
+            <span
+              className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]"
+              title="학습 미션은 모두 Gemini 3.1 Pro · 중→한 시나리오의 중국어 원문만 GPT-6 Astra"
+            >
+              <span className="font-semibold text-[#273B4A]">Gemini 3.1 Pro</span> · <span className="font-semibold text-[#273B4A]">GPT-6 Astra</span>
             </span>
-            {optional.map(renderStage)}
           </div>
-          {REVIEW_STAGE_ITEMS.slice(firstOptional + optional.length).map(renderStage)}
+          {REVIEW_STAGE_ITEMS.map(renderStage)}
         </>
       );
     })()}
@@ -555,6 +567,7 @@ const AdminDashboard = () => {
       {/* 단계마다 그 단계를 마친 서로 다른 미션 수(누적). 3·4·5는 선택 단계라 점선이다. */}
       <PanelHeader no={2} title="콘텐츠 품질 관리" />
       <ReviewPipeline
+        generatedCount={snapshot?.content.generatedMissionCount ?? null}
         review={snapshot?.review ?? null}
         cumulative={snapshot?.cumulative ?? null}
         professorFinalized={snapshot?.content.professorFinalizedCount ?? null}
