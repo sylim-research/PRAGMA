@@ -110,7 +110,7 @@ function RuleCatalogPanel() {
   return (
     <div id="quality-rules" className="mt-3 rounded-lg border border-[#E2DED2] bg-[#FFFDF7] p-3 sm:p-4">
       <div className="flex flex-wrap items-center gap-2">
-        {([["current", `현행 미션에 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
+        {([["current", `현행 적용 ${currentCount}`], ["legacy", `이전 형식 전용 ${legacyCount}`]] as const).map(([value, label]) => (
           <button key={value} type="button" aria-pressed={scope === value} onClick={() => setScope(value)}
             className={`rounded-lg border px-3 py-1.5 text-[13.75px] font-medium ${scope === value ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#3B4A54] hover:bg-[#F5F4EF]"}`}>
             {label}
