@@ -274,10 +274,12 @@ const ReviewPipeline = ({
               )}
               {!error && generatedCount !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 생성</span>}
             </div>
-            {/* 모델이 둘이라 한 줄에 다 들어가지 않는다 — 두 줄로 쌓고 아래 끝을 다른 카드와 맞춘다. */}
-            <span className="mt-auto flex flex-col pt-1.5 text-[12px] text-[#4F5D68]">
-              <span className="truncate font-semibold text-[#273B4A]">Gemini 3.1 Pro</span>
-              <span className="truncate">중→한 원문 <span className="font-semibold text-[#273B4A]">GPT-6 Astra</span></span>
+            {/* 다른 카드와 밑줄을 맞추려고 한 줄로 둔다(2026-10-29). 좁은 폭에 맞춰 Astra만 줄여 쓰고, 정식 이름은 마우스를 올리면 보인다. */}
+            <span
+              className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]"
+              title="Gemini 3.1 Pro · 중→한 중국어 원문은 GPT-6 Astra"
+            >
+              <span className="font-semibold text-[#273B4A]">Gemini 3.1 Pro</span> · 중→한 <span className="font-semibold text-[#273B4A]">Astra</span>
             </span>
           </div>
           {REVIEW_STAGE_ITEMS.slice(0, firstOptional).map(renderStage)}
