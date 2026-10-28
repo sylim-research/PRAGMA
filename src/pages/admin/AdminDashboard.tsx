@@ -268,15 +268,15 @@ const ReviewPipeline = ({
                   {error ? <span className="text-xs font-normal text-destructive">확인 필요</span> : generatedCount ?? "—"}
                 </span>
               )}
-              {!error && generatedCount !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 생성</span>}
+              {!error && generatedCount !== null && <span className="pb-0.5 text-[12px] text-[#4F5D68]">개 미션</span>}
             </div>
             {/* 기본은 Gemini, 중→한 시나리오의 중국어 원문만 Astra(2026-10-26). 「중→한」만 적으면 한→중이 기본처럼 읽혀
-                「중국어 원문」으로 쓴다(2026-10-29). 한 줄 — 다른 카드와 밑줄을 맞춘다. 1440px 폭에 맞게 자간만 살짝 좁혔다. */}
+                두 모델만 적고 역할 구분은 툴팁에 둔다 — 「중국어 원문」까지 넣으면 실제 화면 글꼴에서 잘렸다(2026-10-29). 한 줄로 다른 카드와 밑줄을 맞춘다. */}
             <span
-              className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] tracking-[-0.01em] text-[#4F5D68]"
+              className="mt-auto truncate whitespace-nowrap pt-1.5 text-[12px] text-[#4F5D68]"
               title="학습 미션은 모두 Gemini 3.1 Pro · 중→한 시나리오의 중국어 원문만 GPT-6 Astra"
             >
-              <span className="font-semibold text-[#273B4A]">Gemini 3.1 Pro</span> · 중국어 원문 <span className="font-semibold text-[#273B4A]">GPT-6 Astra</span>
+              <span className="font-semibold text-[#273B4A]">Gemini 3.1 Pro</span> · <span className="font-semibold text-[#273B4A]">GPT-6 Astra</span>
             </span>
           </div>
           {REVIEW_STAGE_ITEMS.map(renderStage)}
