@@ -149,7 +149,7 @@ const REVIEW_STAGE_ROUTE = (stage: DashboardReviewQueueStage) => (stage === "pro
 const REVIEW_STAGE_DESCRIPTIONS: Record<DashboardReviewQueueStage, string> = {
   // 규칙은 형식만이 아니라 문항 구성·요청 조건·역할·언어 방향까지 본다 — 좁혀 부르지 않는다.
   // AI 없이 저장된 코드가 세고 대조한다(missionRules.ts) — 「서버 코드」는 개발 용어라 바꿨다(2026-10-29).
-  rules: "규칙 점검 코드 · AI 없음",
+  rules: "규칙 점검 코드",
   // 저장된 생성 품질 점검 재사용 여부는 구현 사정이라 첫 화면에 두지 않는다. 검토가 보는 것만 쓴다.
   openai: "GPT-6 Astra · 의미·화행 심사",
   claude: "Claude · 요청 시",

@@ -71,7 +71,9 @@ describe("quality review handoff", () => {
     inspection.run!.approved_at = "2026-10-01T12:26:48Z";
     showCompact();
     expect(await screen.findByText("교수자 승인 완료")).toBeInTheDocument();
-    expect(screen.getAllByText("미실행 · 선택 단계")).toHaveLength(3);
+    // 쓰지 않는 선택 단계(교차 검토·중국어 표현·재판정)는 실행 기록이 없으면 줄을 두지 않는다(2026-10-29).
+    expect(screen.queryByText("미실행 · 선택 단계")).not.toBeInTheDocument();
+    expect(screen.queryByText("교차 검토 · 종합")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "교차 검토 실행" })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "교수자 승인 기록 보기" })).toHaveAttribute("href", "/admin/review?scenarioId=mission-1");
     expect(inspection.run!.openai_review!.model).toBe("gpt-4.1-2025-04-14");

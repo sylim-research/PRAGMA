@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
+import { GENERATION_MODEL_LABEL, RULE_CHECK_LABEL } from "@/lib/admin/modelOwners";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -80,6 +81,9 @@ const STEP_LABEL: Record<string, string> = {
   "OpenAI 재검토": "검토 의견 재판정", "최종 검수 자료": "감수 자료 준비",
 };
 const vendorFree = (label: string) => STEP_LABEL[label] ?? label;
+/** 현행 흐름에서 쓰지 않는 단계 — 지난 실행 기록이 있을 때만 줄을 보인다(2026-10-29). */
+const RETIRED_REVIEW_ROWS = new Set(["claude", "deepseek", "adjudication"]);
+
 /** 모델 ID를 사람이 읽는 이름으로: gpt-4.1 → GPT-4.1, claude-opus-5 → Claude Opus 5, claude-sonnet-4-5 → Claude Sonnet 4.5. */
 const modelName = (id: string | null | undefined) => {
   if (!id) return "";
@@ -275,6 +279,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     const rowStatus = (stepKey: string): "done" | "running" | "current" | "todo" | "failed" => {
       const label = vendorFree(CONTENT_REVIEW_STEP_LABELS[stepKey] ?? "");
       if (runningLabel && runningLabel === label) return "running";
+      if (stepKey === "generation") return "done";
       if (stepKey === "rules" && blocked) return "failed";
       const index = steps.findIndex((step) => step.key === stepKey);
       if (index < 0) return "todo";
@@ -289,8 +294,11 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           .filter(([, n]) => n > 0).map(([label, n]) => `${label} ${n}`).join(" · ") || "분류 없음"}`
       : null;
     type Row = { key: string; label: string; metadata?: string; optional?: boolean; result?: string | null; items?: ReviewFinding[]; detail?: string | null; note?: string | null; action?: ReactNode; failed?: boolean };
-    const rows: Row[] = [
-      { key: "rules", label: "자동 규칙 점검", metadata: "서버 코드", items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
+    const allRows: Row[] = [
+      // 검수 앞의 생성 단계도 한 줄로 보여 전체 흐름(생성 → 점검 → 심사 → 승인)이 한눈에 보이게 한다(2026-10-29).
+      // 검수 대상이 있다는 것은 생성이 끝났다는 뜻이라 늘 완료로 둔다. 주차 자료에는 해당하지 않는다.
+      ...(target.kind === "mission" ? [{ key: "generation", label: "학습 미션 생성", metadata: GENERATION_MODEL_LABEL, result: "생성 완료" }] : []),
+      { key: "rules", label: "자동 규칙 점검", metadata: RULE_CHECK_LABEL, items: run?.rules.findings, result: run ? resultOf(run.rules.findings, "확인 필요") : null },
       { key: "openai", label: "AI 품질 심사", metadata: run?.openai_review ? modelName(run.openai_review.model) : run?.generation_quality ? `${modelName(run.generation_quality.quality_check.model)} · 생성 단계 결과 재사용` : modelName(state?.models.openai),
         items: primary?.findings, result: primary ? resultOf(primary.findings) : null, detail: primary?.summary_ko },
       { key: "claude", label: "교차 검토 · 종합", metadata: run?.claude_review ? modelName(run.claude_review.model) : modelName(state?.models.claude) || undefined, optional: true, items: run?.claude_review?.result.findings,
@@ -316,6 +324,9 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         ? [{ key: "finalization", label: "감수 자료 준비", result: rowStatus("finalization") === "done" ? "준비 완료" : null }]
         : []),
     ];
+    // 2026-10-29 현행 흐름 = 자동 규칙 점검 → AI 품질 심사 → 교수자 최종 승인. 교차 검토·중국어 표현·재판정은
+    // 쓰지 않으므로 줄을 숨기고, 예전에 실제로 돈 기록이 있는 미션에서만 그 기록 줄을 남긴다.
+    const rows = allRows.filter((row) => !RETIRED_REVIEW_ROWS.has(row.key) || Boolean(row.result || row.items?.length || row.failed || row.detail));
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
     return <section aria-label="품질 검수 워크플로우" className="space-y-3 text-sm">
@@ -452,12 +463,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               {done ? "✓ " : ""}{vendorFree(step.label)}{!state ? " · 확인 중" : failed ? " · 오류" : ""}
             </span>
           </li>;
-        }).flatMap((item, index) => index === 1 && handoffHref && !steps.some((step) => step.key === "claude")
-          ? [item, <li key="optional-cross-check" className="flex items-center gap-1.5">
-              <span aria-hidden className="text-[#B7BEC2]">›</span>
-              <span className="rounded-full border border-dashed border-[#C9A62E] px-2 py-0.5 text-[#8A5A14]">선택 · 교차 검토</span>
-            </li>]
-          : [item])}
+        })}
       </ol>}
       {!compact && <Button size="sm" variant="ghost" className="h-7 px-2 text-xs" disabled={busy || query.isFetching} onClick={() => void query.refetch()}>결과 새로고침</Button>}
     </div>}
@@ -476,7 +482,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div> : <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
           onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검수 중…" : "검수 마치기") : "검수 실행"}</Button>}
         {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
-        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다. 교차 검토는 선택 시에만.</p>}
+        {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다.</p>}
       </div>}
       {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">버전 {state.contentHash.slice(0, 12)}</p>}
       {!run && <p className="text-[13px] text-[#7A5A12]">{compact && historicalApproval ? "교수자 승인 완료 미션입니다. 승인된 미션은 다시 점검하지 않습니다." : state.history.length ? "내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다. 이전 결과는 이력에 남아 있습니다." : historicalApproval ? "기존 교수자 승인은 유지됩니다. 이 버전의 점검 연결 기록은 아직 없습니다." : "이 버전의 점검 기록이 없습니다."}</p>}
@@ -579,19 +585,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
       {blocked && <p className="text-red-800">자동 규칙 점검 오류를 수정·저장해야 AI 품질 심사를 진행할 수 있습니다. 원본은 자동으로 수정하지 않습니다.</p>}
       {run?.last_error && <p role="alert" className="text-red-800">직전 실행: {run.last_error} </p>}
       {locked && <p role="status">{steps.find(step => step.key === run?.running_stage)?.label ?? "AI 품질 심사"} 실행 중입니다. 결과를 새로고침하세요. 응답이 없으면 실행 잠금 만료 후 수동 재시도할 수 있습니다.</p>}
-      {focused && primary && !run?.approved_at && !run?.independent_review_requested && !(compact && historicalApproval) && (() => {
-        const body = <>
-          <h4 className="text-[13.5px] font-bold text-[#233542]">중국어 표현 검토 <span className="font-normal text-[#7A868D]">(선택)</span></h4>
-          <p className="mt-0.5 text-xs text-[#5D6970]">GPT-6 Astra가 중국어 문장만 한 번 더 봅니다. 의견은 교수자 최종 승인에서 바로 확인합니다.</p>
-          <Button variant="outline" size="sm" className="mt-2" disabled={busy || Boolean(locked) || queue.active || blocked} onClick={() => {
-            setBusy(true); setError(null);
-            void contentReviewRequest(target, "request_independent", state).then(result => queryClient.setQueryData(key, result))
-              .catch(cause => setError(cause instanceof Error ? cause.message : "추가 검토 선택 실패")).finally(() => setBusy(false));
-          }}>중국어 표현 검토 요청</Button>
-        </>;
-        // 승인 화면에서는 보이지 않는다(운영에서 쓰지 않는 선택 기능). 기능과 조건은 품질 점검 화면에 그대로 있다.
-        return experiential ? null : <div className="rounded-lg border p-3">{body}</div>;
-      })()}
+      {/* 중국어 표현 검토 요청 상자는 2026-10-29에 뺐다 — 앱 밖 수동 참고로 옮김(연구자 결정). 서버 기능(request_independent)은 보존. */}
       {!pairRow && finalApproval}
       {/* 최종 승인 버튼은 승인 상자 안(확인 체크 오른쪽)에 둔다. 그 밖의 단계 실행 버튼만 여기 남는다. */}
       {next !== "approved" && !(next === "professor" && !handoffHref) && !(handoffHref && (next === "professor" || next === "rules" || next === "openai")) && !(experiential && next !== "professor") && <Button disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || (next === "claude" && !state.models.claude)}
@@ -615,7 +609,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
             ["점검 실행 ID", run?.id],
             ["점검 기준", run?.criteria_version],
             ["승인 정책", run?.approval_policy],
-            ["OpenAI 검토 모델", run?.openai_review ? modelName(run.openai_review.model) : null],
+            ["AI 품질 심사 모델", run?.openai_review ? modelName(run.openai_review.model) : null],
             ["Claude 교차 검토 모델", run?.claude_review ? modelName(run.claude_review.model) : null],
             ["중국어 표현 검토 모델", run?.deepseek_review?.status === "completed" ? modelName(run.deepseek_review.model) : null],
             ["AI 재검토 모델",run?.adjudication ? modelName(run.adjudication.model) : null],

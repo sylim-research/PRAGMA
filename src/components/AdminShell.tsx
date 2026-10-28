@@ -13,13 +13,15 @@ import {
 interface AdminShellProps {
   title: string;
   description?: string;
+  /** 이 화면의 일을 맡는 쪽(모델명·규칙 점검 코드·교수자). 설명 줄 끝에 작은 표로 붙는다(2026-10-29). */
+  owner?: ReactNode;
   children?: ReactNode;
   compact?: boolean;
   /** 제목을 화면에서 숨기고 보조기기용 제목으로만 남긴다(사이드바에 같은 이름이 있는 홈 화면용). */
   hideTitle?: boolean;
 }
 
-export const AdminShell = ({ title, description, children, compact = false, hideTitle = false }: AdminShellProps) => {
+export const AdminShell = ({ title, description, owner, children, compact = false, hideTitle = false }: AdminShellProps) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   // 원고 캡처 모드(?capture=1) — 사이드바를 감추고 본문을 800px로 묶는다(lib/captureMode).
@@ -207,8 +209,15 @@ export const AdminShell = ({ title, description, children, compact = false, hide
               <h1 className="text-2xl font-bold leading-tight text-foreground sm:text-3xl">
                 {title}
               </h1>
-              {description && (
-                <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+              {(description || owner) && (
+                <p className="mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-sm text-muted-foreground">
+                  {description && <span>{description}</span>}
+                  {owner && (
+                    <span className="inline-flex items-center rounded-md border border-[#E2DED2] bg-white px-2 py-0.5 text-[12.5px] font-semibold leading-5 text-[#15202B]">
+                      {owner}
+                    </span>
+                  )}
+                </p>
               )}
             </div>
           </div>
