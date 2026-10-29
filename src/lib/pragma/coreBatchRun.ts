@@ -4,6 +4,7 @@
 //   action:'core'(엣지함수) → checkCore(클라 검사) → save_generated_core RPC
 // RPC는 is_admin() 가드 → 관리자 세션에서만 성공(브라우저 AdminBatch).
 
+import { legacyChannelOf } from "@/lib/pragma/coreChannel";
 import { supabase } from "@/integrations/supabase/client";
 import {
   DOMAIN,
@@ -91,7 +92,6 @@ const modalityOf = (mode: GenMode) => (mode === "stt_interpreting" ? "spoken" : 
 // genre 행 태그(legacy)를 task_mode에서 파생하기 위한 legacy channel 토큰.
 // channel은 더 이상 축이 아니지만, save_generated_core RPC가 core_content.channel로
 // genre를 파생하므로(DB 무변경 유지) 저장 직전 mode에서 이 값을 주입한다.
-const legacyChannelOf = (mode: GenMode) => (mode === "stt_interpreting" ? "facetoface" : "messenger");
 
 function ctxOf(cell: BatchCell): CheckContext {
   const mode = cell.mode;
@@ -291,7 +291,7 @@ export async function runCoreCell(
           topic_code: cell.topic_code,
           mode, // channel 폐기(2026-07-25) — 수행 방식이 1차 축(매체 관습 강제 제거)
           // 재배포 전 live 엣지 호환용 legacy channel(mode 파생). 재배포 후 엣지는 mode를 본다.
-          channel: legacyChannelOf(mode),
+          channel: legacyChannelOf(mode, cell.situation_seed_ko),
           channel_ko: mode === "stt_interpreting" ? "구두(통역)" : "서면(번역)",
           pdr: {
             p: PDR_POWER_ENUM_TO_JSON[cell.pdr_power],
@@ -384,7 +384,7 @@ export async function runCoreCell(
     // 3. save_generated_core RPC (검증 통과분만)
     // genre 행 태그(legacy)를 task_mode에서 파생 — RPC가 core_content.channel로 genre를
     // 만들므로(DB 무변경) 저장 직전 mode에서 legacy channel을 주입한다. channel은 축이 아님.
-    core.channel = legacyChannelOf(mode);
+    core.channel = legacyChannelOf(mode, cell.situation_seed_ko);
     const payload = {
       title: core.brief_note_ko || core.situation_ko?.slice(0, 40),
       speech_act: cell.speech_act_ui,

@@ -36,6 +36,7 @@ import {
 import { checkCore, coreLengthHintKo, type CheckContext } from "@/lib/pragma/missionRules";
 import { createCoreGenerationRunId } from "@/lib/pragma/coreGenerationRun";
 import { checkCoreSemanticFit } from "@/lib/pragma/coreBatchRun";
+import { legacyChannelOf } from "@/lib/pragma/coreChannel";
 import {
   PDR_POWER_ENUM_TO_JSON,
   PDR_DISTANCE_ENUM_TO_JSON,
@@ -588,7 +589,6 @@ const AdminGenerator = () => {
   const topicCode = topic?.code ?? "";
 
   const modalityOf = (m: GenMode) => (m === "stt_interpreting" ? "spoken" : "written");
-  const legacyChannelOf = (m: GenMode) => (m === "stt_interpreting" ? "facetoface" : "messenger");
   const RESPONSE_ACTS = new Set(["refusal", "opposition"]);
   const coreHash = (s: string) => {
     let h = 0;
@@ -642,7 +642,7 @@ const AdminGenerator = () => {
               func: null,
               topic_code: topicCode,
               mode,
-              channel: legacyChannelOf(mode),
+              channel: legacyChannelOf(mode, seed),
               channel_ko: mode === "stt_interpreting" ? "구두(통역)" : "서면(번역)",
               pdr: {
                 p: PDR_POWER_ENUM_TO_JSON[form.pdr_power],
@@ -725,7 +725,7 @@ const AdminGenerator = () => {
           }
         }
 
-        core.channel = legacyChannelOf(mode);
+        core.channel = legacyChannelOf(mode, seed);
         // content_hash는 provenance를 **포함하지 않는다** — 내용이 같은 코어는 출처가
         // 달라도 같은 해시여야 중복 탐지가 작동한다(미션 provenance와 같은 취급).
         const contentHash = coreHash(JSON.stringify(coreContentForHash(core)));
