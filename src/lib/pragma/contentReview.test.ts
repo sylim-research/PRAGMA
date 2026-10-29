@@ -33,6 +33,9 @@ describe("current content five-stage review", () => {
     const v5 = { ...raw, schema_version: "mission_v5", quality_check: { ...raw.quality_check, prompt_version: CURRENT_MISSION_QUALITY_PROMPT_VERSION } };
     expect(reusableGenerationQuality(v5)).not.toBeNull();
     expect(reusableGenerationQuality({ ...v5, schema_version: "mission_v6" })).toBeNull();
+    // v3 results quarantined every finding (no evidence_excerpt in the prompt), so they are reviewed again.
+    const v3 = { ...raw, quality_check: { ...raw.quality_check, prompt_version: "quality_mission_v6_act_general_v3_scene_plausibility" } };
+    expect(reusableGenerationQuality(v3)).toBeNull();
   });
   it("reuses matching generation evidence and makes additional models opt-in", () => {
     const hash = "a".repeat(64);
