@@ -192,6 +192,8 @@ export const QualityCheckSchema = z.object({
   checked_at: z.string().default(""),
   /** critic이 실제로 검사한 현재 mission_content 버전. DB 열 추가 없이 JSON에 함께 보존한다. */
   mission_content_hash: z.string().optional(),
+  /** 근거(경로·인용)를 확인하지 못해 격리한 AI finding의 원래 모양. 진단용 — 판정·화면에 쓰지 않는다. */
+  isolated_findings_raw: z.array(z.record(z.unknown())).optional(),
 });
 export type QualityFinding = z.infer<typeof QualityFindingSchema>;
 export type QualityCheck = z.infer<typeof QualityCheckSchema>;

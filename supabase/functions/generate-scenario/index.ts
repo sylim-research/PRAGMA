@@ -4990,12 +4990,27 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         note_ko: string
       }> = []
       const groundingFailures: string[] = []
+      // 격리한 finding의 원래 모양을 진단용으로만 남긴다(2026-10-29). 판정·화면에는 쓰지 않는다.
+      // GPT-6 Astra 전환 뒤 첫 미션 심사에서 9건이 모두 「인용 없음」으로 격리되었는데,
+      // 원응답이 어디에도 남지 않아 원인을 확인할 수 없었다.
+      const isolatedFindingsRaw: Array<Record<string, unknown>> = []
+      const clip = (v: unknown) => typeof v === 'string' ? v.slice(0, 400) : v ?? null
       const findingKeys = new Set<string>()
       rawFindings.slice(0, 28).forEach((raw) => {
         const f = (raw ?? {}) as Record<string, unknown>
         const grounding = groundCriticFinding(missionRecord, f)
         if (!grounding.ok) {
           groundingFailures.push(grounding.reason)
+          isolatedFindingsRaw.push({
+            reason: grounding.reason.slice(0, 200),
+            keys: Object.keys(f).slice(0, 20),
+            code: clip(f.code),
+            where: clip(f.where),
+            evidence_excerpt: typeof f.evidence_excerpt === 'string' || f.evidence_excerpt == null
+              ? clip(f.evidence_excerpt)
+              : JSON.stringify(f.evidence_excerpt).slice(0, 400),
+            note_ko: clip(f.note_ko),
+          })
           return
         }
         const code = typeof f.code === 'string' && CODES.includes(f.code) ? f.code : 'internal_inconsistency'
@@ -5071,6 +5086,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
             model,
             prompt_version: qualityVersion,
             checked_at: checkedAt,
+            ...(isolatedFindingsRaw.length > 0 ? { isolated_findings_raw: isolatedFindingsRaw } : {}),
           },
           meta: { provider: PROVIDER, model, prompt_version: qualityVersion, generated_at: checkedAt },
         }),
