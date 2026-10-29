@@ -38,4 +38,6 @@ export const CURRENT_MISSION_QUALITY_PROMPT_VERSION = CURRENT_CONTENT_RELEASE.qu
 // v2: the header names the mission's own speech act instead of assuming request;
 // the judgment axis was already the feature block passed with the request.
 // v3: carries the shared scene-plausibility rule that every v5 generation/review prompt has.
-export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_act_general_v3_scene_plausibility";
+// v4(2026-10-29): 출력 형식에 evidence_excerpt를 넣고 경로 하나만 쓰게 했다. v3까지는 형식에 인용 칸이 없어
+// 주 심사 finding이 모두 grounding에서 격리되었다.
+export const MISSION_V6_QUALITY_PROMPT_VERSION = "quality_mission_v6_act_general_v4_grounded_excerpt";

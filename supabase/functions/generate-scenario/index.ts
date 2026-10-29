@@ -3326,6 +3326,54 @@ function buildAuthenticUserPrompt(b: AuthenticBody): OpenAIUserContent {
 }
 
 // ── 검증② 프롬프트 (0-n·94 / 0-q·99) ──────────────────────────────────────
+// 주 품질 심사 응답 형식 — 프롬프트의 출력 예시와 같은 칸을 strict로 강제한다.
+// band·reason 칸은 해당 code에서만 뜻이 있고, 그 밖에는 빈 문자열·null로 채운다.
+const MISSION_QUALITY_FINDING_CODES = [
+  'gate1_violation', 'implausible_distractor', 'answer_cue', 'band_mismatch',
+  'focus_contamination', 'unnatural_language', 'internal_inconsistency',
+  'scene_underspecified', 'implausible_scene', 'primary_reason_ambiguity', 'context_plan_mismatch',
+  'comparison_quality_mismatch', 'diagnostic_coverage_mismatch',
+  'feedback_quality_mismatch',
+]
+const MISSION_QUALITY_RESPONSE_FORMAT = {
+  type: 'json_schema',
+  json_schema: {
+    name: 'pragma_mission_quality',
+    strict: true,
+    schema: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['verdict', 'summary_ko', 'findings'],
+      properties: {
+        verdict: { type: 'string', enum: ['pass', 'warning', 'fail'] },
+        summary_ko: { type: 'string' },
+        findings: {
+          type: 'array',
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['code', 'severity', 'where', 'evidence_excerpt', 'intended_band_code', 'actual_band_code',
+              'direction_from_within', 'boundary_crossed', 'reason_observation_present', 'reason_competition', 'note_ko'],
+            properties: {
+              code: { type: 'string', enum: MISSION_QUALITY_FINDING_CODES },
+              severity: { type: 'string', enum: ['warning', 'fail'] },
+              where: { type: 'string' },
+              evidence_excerpt: { type: 'string' },
+              intended_band_code: { type: 'string' },
+              actual_band_code: { type: 'string' },
+              direction_from_within: { type: 'string', enum: ['', 'within', 'toward_lower', 'toward_upper', 'uncertain'] },
+              boundary_crossed: { type: ['boolean', 'null'] },
+              reason_observation_present: { type: ['boolean', 'null'] },
+              reason_competition: { type: 'string', enum: ['', 'none', 'possible', 'clear'] },
+              note_ko: { type: 'string' },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+
 function buildQualitySystemPrompt(
   direction: Direction,
   speechActKo: string,
@@ -3351,7 +3399,9 @@ ${SCENE_PLAUSIBILITY_RULE}
 DCT는 코어 원문·PDR·usable_facts를 따른다. 통역이면 실제 발화 상황과 spoken 원문을 확인한다.
 취향·변이를 결함으로 세지 말고 학습자가 잘못 배우게 되는 경우만 보고하라. 확신이 없으면 warning으로 남겨라.
 기존 결과 형식의 JSON만 출력:
-{"verdict":"pass|warning|fail","summary_ko":"짧은 요약","findings":[{"code":"gate1_violation|implausible_distractor|answer_cue|band_mismatch|unnatural_language|internal_inconsistency|scene_underspecified|implausible_scene|feedback_quality_mismatch","severity":"warning|fail","where":"mpj_items[0] 등 실제 문항 경로","note_ko":"현재 원문의 실제 인용과 결함 근거"}]}
+{"verdict":"pass|warning|fail","summary_ko":"짧은 요약","findings":[{"code":"gate1_violation|implausible_distractor|answer_cue|band_mismatch|unnatural_language|internal_inconsistency|scene_underspecified|implausible_scene|feedback_quality_mismatch","severity":"warning|fail","where":"mpj_items[0].target 같은 실제 경로 하나","evidence_excerpt":"where가 가리키는 현재 값에서 그대로 복사한 짧은 부분문자열","note_ko":"결함과 그 근거"}]}
+where에는 경로를 하나만 쓴다. 번호는 0부터 세고(MJT1=mpj_items[0]) *나 쉼표로 여러 경로를 묶지 않는다.
+같은 결함이 여러 곳에 있으면 finding을 나누어 쓴다. evidence_excerpt는 그 경로의 현재 값에 실제로 있는 문자열이어야 한다.
 새 점수·코드를 만들지 마라. 문제가 없으면 findings=[]이다.`
   const politenessMarkers = tgt === 'zh'
     ? '请·谢谢·不好意思·호칭·완화어'
@@ -4929,6 +4979,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       const usr = buildQualityUserPrompt(b)
       const model = CRITIC_PRIMARY_MODEL
       const att = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey, sys, usr, 0.2, {
+        // 형식을 글로만 요구하면 인용 칸을 빼먹어 finding이 grounding에서 모두 격리된다(2026-10-29 실측).
+        responseFormat: MISSION_QUALITY_RESPONSE_FORMAT,
         telemetry: telemetryFor('mission_critic', true, {
           promptVersion: qualityVersion,
         }),
@@ -4943,13 +4995,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         return new Response(JSON.stringify({ error: '파싱 실패', detail: (e as Error).message }), { status: 502, headers: jsonHeaders })
       }
 
-      const CODES = [
-        'gate1_violation', 'implausible_distractor', 'answer_cue', 'band_mismatch',
-        'focus_contamination', 'unnatural_language', 'internal_inconsistency',
-        'scene_underspecified', 'implausible_scene', 'primary_reason_ambiguity', 'context_plan_mismatch',
-        'comparison_quality_mismatch', 'diagnostic_coverage_mismatch',
-        'feedback_quality_mismatch',
-      ]
+      const CODES = MISSION_QUALITY_FINDING_CODES
       let relationalRawFindings: unknown[] = []
       if (nativeMpj5) {
         try {
