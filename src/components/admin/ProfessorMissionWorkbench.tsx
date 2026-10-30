@@ -49,8 +49,19 @@ export function ProfessorMissionWorkbench({
     () => JSON.stringify(mission.production_task.reference_alternatives, null, 2),
     [mission],
   );
+  // 핵심 정리와 DCT 안내문은 mission_v6에만 있다.
+  const initialLessons = useMemo(
+    () => ("lesson_points" in mission ? JSON.stringify(mission.lesson_points, null, 2) : null),
+    [mission],
+  );
+  const initialTaskContext = useMemo(() => {
+    const context = (mission.production_task as { learner_context_ko?: unknown }).learner_context_ko;
+    return typeof context === "string" ? context : null;
+  }, [mission]);
   const [itemTexts, setItemTexts] = useState(initialItems);
   const [referenceText, setReferenceText] = useState(initialReferences);
+  const [lessonText, setLessonText] = useState(initialLessons);
+  const [taskContext, setTaskContext] = useState(initialTaskContext);
   const [parseError, setParseError] = useState<string | null>(null);
   const [rationales, setRationales] = useState<Record<number, string>>({});
   const failFindings = (mission.quality_check?.findings ?? [])
@@ -72,13 +83,21 @@ export function ProfessorMissionWorkbench({
       if (referencesChanged && !Array.isArray(references)) {
         throw new Error("DCT 참고안 JSON은 배열이어야 합니다.");
       }
-      if (itemBlocks.length === 0 && !referencesChanged) {
-        throw new Error("변경한 문항이나 DCT 참고안이 없습니다.");
+      const lessonsChanged = lessonText !== initialLessons && lessonText !== null;
+      const lessons = lessonsChanged ? JSON.parse(lessonText) as unknown : undefined;
+      if (lessonsChanged && !Array.isArray(lessons)) {
+        throw new Error("핵심 정리 JSON은 배열이어야 합니다.");
+      }
+      const taskContextChanged = taskContext !== initialTaskContext && taskContext !== null;
+      if (itemBlocks.length === 0 && !referencesChanged && !lessonsChanged && !taskContextChanged) {
+        throw new Error("변경한 내용이 없습니다.");
       }
       setParseError(null);
       await onSave({
         itemBlocks,
         ...(referencesChanged ? { referenceAlternatives: references as unknown[] } : {}),
+        ...(lessonsChanged ? { lessonPoints: lessons as unknown[] } : {}),
+        ...(taskContextChanged ? { taskLearnerContextKo: taskContext } : {}),
       });
     } catch (error) {
       setParseError(error instanceof Error ? error.message : String(error));
@@ -92,7 +111,8 @@ export function ProfessorMissionWorkbench({
     rationale_ko: rationales[issueIndex]?.trim() ?? "",
   }));
   const canReview = overrides.every((override) => override.rationale_ko.length >= 10);
-  const dirty = referenceText !== initialReferences || itemTexts.some((text, index) => text !== initialItems[index]);
+  const dirty = referenceText !== initialReferences || lessonText !== initialLessons || taskContext !== initialTaskContext
+    || itemTexts.some((text, index) => text !== initialItems[index]);
 
   const failFindingsBlock = failFindings.length > 0 && (
         <div className="mt-3 space-y-2 rounded-lg border border-red-200 bg-red-50 p-3">
@@ -148,6 +168,26 @@ export function ProfessorMissionWorkbench({
               onChange={(event) => setReferenceText(event.target.value)}
             />
           </label>
+          {lessonText !== null && (
+            <label className="block">
+              <span className="mb-1 block font-medium">MJT 핵심 정리</span>
+              <Textarea
+                className="min-h-28 font-mono text-[12px] leading-4"
+                value={lessonText}
+                onChange={(event) => setLessonText(event.target.value)}
+              />
+            </label>
+          )}
+          {taskContext !== null && (
+            <label className="block">
+              <span className="mb-1 block font-medium">DCT 안내문</span>
+              <Textarea
+                className="min-h-20 text-[12px] leading-4"
+                value={taskContext}
+                onChange={(event) => setTaskContext(event.target.value)}
+              />
+            </label>
+          )}
           {parseError && <p className="text-red-700">{parseError}</p>}
           <Button size="sm" variant="outline" disabled={busy} onClick={() => void save()}>
             수정본 구조검사·AI 재점검 후 저장
@@ -193,6 +233,7 @@ export function ProfessorMissionWorkbench({
         missionContentHash={traceHash ?? mission.provenance?.mission_content_hash}
         decisionSlot={failFindingsBlock || undefined}
         onApprove={(approval) => onReview(overrides, approval)} />
+      {editor}
     </section>
   );
 }

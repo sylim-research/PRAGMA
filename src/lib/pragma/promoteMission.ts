@@ -108,7 +108,7 @@ export interface PromotableCore {
 export interface PromoteResult {
   ok: boolean;
   /** 생성된 미션(검사 통과 여부와 무관 — 눈검사용으로 항상 반환 시도). 정규화 v2 형태. */
-  mission?: MissionRuntime;
+  mission?: LearnerMissionRuntime;
   ruleResult?: "pass" | "warning" | "fail";
   violations?: RuleViolation[];
   attempts?: number;
@@ -1554,6 +1554,8 @@ export interface ProfessorMissionEdits {
   referenceAlternatives?: unknown[];
   vocabularyHints?: Array<{ source: string; target: string }>;
   diagnosticDimensions?: unknown[];
+  lessonPoints?: unknown[];
+  taskLearnerContextKo?: string;
 }
 
 /** 교수자가 선택한 item block만 바꾸고, 구조검사·critic 후 append-only draft를 저장한다. */
@@ -1582,6 +1584,10 @@ export async function reviseMissionDraft(
     }
     const patched = applyMissionRepairOperations(current, operations);
     if (edits.vocabularyHints && isRecord(patched.production_task)) patched.production_task.vocabulary_hints = edits.vocabularyHints;
+    if (edits.lessonPoints) patched.lesson_points = edits.lessonPoints;
+    if (edits.taskLearnerContextKo !== undefined && isRecord(patched.production_task)) {
+      patched.production_task.learner_context_ko = edits.taskLearnerContextKo;
+    }
     if (edits.diagnosticDimensions) patched.diagnostic_dimensions = edits.diagnosticDimensions;
     const currentAuthoring = isRecord(current.authoring) ? current.authoring : {};
     patched.authoring = {
@@ -1611,9 +1617,13 @@ export async function reviseMissionDraft(
       level: violation.level,
       message: violation.message,
     }));
-    const parsed = normalizeMission(patched);
+    // mission_v6도 저장할 수 있도록 형식별 정규화를 쓴다.
+    const parsed = normalizeLearnerMission(patched);
     if (!parsed.ok || !parsed.data || check.result === "fail") {
-      return { ok: false, ruleResult: "fail", violations, error: "수정본이 구조검사를 통과하지 못했습니다." };
+      const detail = parsed.error?.issues[0]
+        ? `${parsed.error.issues[0].path.join(".")} ${parsed.error.issues[0].message}`
+        : violations.find((violation) => violation.level === "fail")?.message;
+      return { ok: false, ruleResult: "fail", violations, error: `수정본이 구조검사를 통과하지 못했습니다.${detail ? ` (${detail})` : ""}` };
     }
     const checked = await runQualityCheck({
       missionContent: patched,
@@ -1636,7 +1646,7 @@ export async function reviseMissionDraft(
     if (error) return { ok: false, error: (error as { message?: string }).message ?? String(error) };
     return {
       ok: true,
-      mission: normalizeMission(patched).data,
+      mission: normalizeLearnerMission(patched).data,
       ruleResult: check.result as "pass" | "warning",
       violations,
       quality: checked.quality,
