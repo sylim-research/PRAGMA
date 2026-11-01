@@ -38,6 +38,7 @@ import {
   buildOpenAIChatRequest,
   CORE_RESPONSE_FORMAT_LABEL,
   CORE_STRUCTURED_RESPONSE_FORMAT,
+  GEMINI_PRIMARY_MODEL,
   OPENAI_MODEL_ROUTES,
   REVIEW_PRIMARY_MODEL,
   parseOpenAIInvocationMetadata,
@@ -101,6 +102,8 @@ const FALLBACK_MODEL = OPENAI_MODEL_ROUTES.default.fallback
 const MISSION_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.mission.primary
 const missionModel = () => backgroundContext.getStore() ? ASTRA_GENERATION_MODEL : MISSION_PRIMARY_MODEL
 const CRITIC_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.critic.primary
+// 저장 전 의미 검토는 작성 모델과 다른 회사의 모델이 맡는다. 중→한 뼈대는 GPT-6 Astra가 쓰므로 Gemini가 검토한다(2026-11-01 연구자 확정).
+const coreGateModel = (direction: Direction) => direction === 'zh_ko' ? GEMINI_PRIMARY_MODEL : CRITIC_PRIMARY_MODEL
 const FEEDBACK_PRIMARY_MODEL = OPENAI_MODEL_ROUTES.feedback.primary
 const FEEDBACK_FALLBACK_MODEL = OPENAI_MODEL_ROUTES.feedback.fallback
 
@@ -1280,14 +1283,14 @@ async function corePromptSnapshotHash(): Promise<string> {
     ),
   )
   coreSnapshotHashCache = await sha256Hex(canonicalJson({
-    v: 10,
+    v: 11,
     scope: 'core_generation',
     scene_preflight_prompt: CORE_SCENE_PREFLIGHT_PROMPT,
     scene_preflight_model: CRITIC_PRIMARY_MODEL,
     scene_preflight_temperature: 0.2,
     semantic_gate_prompts: directions.map(buildCoreQualitySystemPrompt),
     semantic_gate_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
-    semantic_gate_model: CRITIC_PRIMARY_MODEL,
+    semantic_gate_models: Object.fromEntries(directions.map((direction) => [direction, coreGateModel(direction)])),
     semantic_gate_temperature: 0.1,
     action: 'core',
     model: PRIMARY_MODEL,
@@ -4257,7 +4260,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
         situation_seed_ko: b.situation_seed_ko, is_response_act: b.is_response_act,
         expected_context_spec: contextSpec,
       }
-      const critic = await callOpenAI(CRITIC_PRIMARY_MODEL, apiKey,
+      const gateModel = coreGateModel(coreDir)
+      const critic = await callOpenAI(gateModel, apiKey,
         buildCoreQualitySystemPrompt(coreDir), buildCoreQualityUserPrompt(qualityInput), 0.1, {
           telemetry: telemetryFor('core_critic', true, { promptVersion: CURRENT_CORE_QUALITY_PROMPT_VERSION, promptSnapshotHash }),
         })
@@ -4267,7 +4271,7 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       }
       const semanticGate = coreSemanticGate(rawQuality)
       const semanticCheck = {
-        ...rawQuality, model: CRITIC_PRIMARY_MODEL, prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
+        ...rawQuality, model: gateModel, prompt_version: CURRENT_CORE_QUALITY_PROMPT_VERSION,
         checked_at: new Date().toISOString(), core_content_hash: await sha256Hex(coreSemanticContent(core_content, {
           direction: coreDir, speech_act: coreSpeechActCode(b), level: coreLengthLevel(b), domain: coreDomainCode(b),
           industry: b.industry, mode: coreLengthMode(b), topic_code: b.topic_code, pdr: b.pdr,
