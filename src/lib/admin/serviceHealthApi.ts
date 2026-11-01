@@ -1,10 +1,10 @@
 // 관리자 「외부 서비스 연동 점검」의 데이터 접근 계층.
 //
 // 시연·수업 전에 버튼 한 번으로 "연결이 살아 있는가"를 답한다. 잔액은 ElevenLabs만 API로 읽을 수
-// 있다(OpenAI·Anthropic은 선불 잔액 조회 API가 없다 — 콘솔의 자동 충전 설정이 답이다).
+// 있다(OpenAI·Gemini는 잔액 조회 API가 없다 — 콘솔에서 확인한다).
 //
 // - ElevenLabs: 기존 `tts?action=usage`(PR #97)를 그대로 부른다. 여기서 다시 만들지 않는다.
-// - OpenAI·Anthropic: `service-health` 함수가 /v1/models 인증만 확인한다(토큰 소비 0).
+// - OpenAI·Gemini: `service-health` 함수가 /v1/models 인증만 확인한다(토큰 소비 0).
 //   설정된 모델명도 함께 받아 화면에 보인다 — 「키가 산다」보다 「이 키로 이 모델을 부른다」가 더 쓸모 있다.
 // - Supabase·앱 배포: 이 화면이 열려 있고 세션이 있으면 정상이다. 추가 호출을 만들지 않는다.
 // - 키·청구 정보·제공자 오류 본문은 어디에서도 화면에 오지 않는다. 정해진 코드만 옮긴다.
@@ -14,9 +14,10 @@ import { supabase } from "@/integrations/supabase/client";
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
-export type ServiceId = "elevenlabs" | "openai" | "anthropic" | "supabase" | "app";
+export type ServiceId = "elevenlabs" | "openai" | "gemini" | "supabase" | "app";
+const SERVICE_IDS: readonly ServiceId[] = ["elevenlabs", "openai", "gemini", "supabase", "app"];
 // manual = 우리 쪽 자동 점검 경로가 없어 판정을 못 한 상태. 서비스가 죽었다는 뜻이 아니므로
-// 빨간불을 켜지 않고, 사람이 직접 볼 수 있는 콘솔 링크를 준다.
+// 빨간불을 켜지 않는다. 사람이 직접 볼 콘솔 링크는 모든 줄에 있다.
 export type ServiceTone = "ok" | "warn" | "fail" | "manual" | "idle";
 
 export type ServiceStatus = {
@@ -27,8 +28,6 @@ export type ServiceStatus = {
   /** 잔량 등 부가 정보. 없으면 생략. */
   detail?: string;
   latencyMs?: number | null;
-  /** 자동 판정을 못 했을 때 사람이 직접 확인할 곳. */
-  link?: { label: string; href: string };
 };
 
 export type ServiceHealthReport = {
@@ -54,6 +53,8 @@ export function readStoredReport(): ServiceHealthReport | null {
     // 로그인 전에 돈 결과(또는 이 필드가 없던 옛 형식)는 「관리자 로그인이 필요합니다」 다섯 줄이다.
     // 그것을 로그인 뒤에도 보여 주면 멀쩡한 시스템이 죽은 것처럼 보인다 — 없는 것으로 보고 다시 확인한다.
     if (parsed.authenticated !== true) return null;
+    // 지금 점검하지 않는 항목(옛 Anthropic 줄 등)이 든 결과는 없는 것으로 보고 다시 확인한다.
+    if (parsed.statuses.some((status) => !SERVICE_IDS.includes(status?.id))) return null;
     return parsed as ServiceHealthReport;
   } catch {
     // 사생활 보호 모드 등에서 접근이 막힐 수 있다 — 없는 것으로 본다.
@@ -99,7 +100,7 @@ const idle = (id: ServiceId): ServiceStatus => ({ id, tone: "idle", summary: "�
 /** jsdom 등 AbortSignal.timeout이 없는 환경에서는 신호 없이 보낸다(브라우저는 모두 지원). */
 const timeoutSignal = (ms: number): AbortSignal | undefined =>
   typeof AbortSignal !== "undefined" && typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(ms) : undefined;
-export const IDLE_STATUSES: ServiceStatus[] = (["elevenlabs", "openai", "anthropic", "supabase", "app"] as ServiceId[]).map(idle);
+export const IDLE_STATUSES: ServiceStatus[] = SERVICE_IDS.map(idle);
 
 const formatResetDate = (unix: number | null | undefined) => {
   if (!unix || !Number.isFinite(unix)) return null;
@@ -178,19 +179,14 @@ export async function fetchElevenLabsStatus(token: string, deps: Deps = {}): Pro
 }
 
 type ProviderHealth = {
-  provider: "openai" | "anthropic";
+  provider: "openai" | "gemini";
   code: "ok" | "missing_key" | "auth_failed" | "unreachable" | "provider_error";
   httpStatus: number | null;
   latencyMs: number | null;
   models?: string[];
 };
 
-const KEY_NAME: Record<ProviderHealth["provider"], string> = { openai: "OPENAI_API_KEY", anthropic: "ANTHROPIC_API_KEY" };
-
-export const PROVIDER_CONSOLE: Record<ProviderHealth["provider"], { label: string; href: string }> = {
-  openai: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/settings/organization/billing/overview" },
-  anthropic: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/dashboard" },
-};
+const KEY_NAME: Record<ProviderHealth["provider"], string> = { openai: "OPENAI_API_KEY", gemini: "GEMINI_API_KEY" };
 
 const providerStatus = (health: ProviderHealth): ServiceStatus => {
   const { provider: id, latencyMs } = health;
@@ -208,18 +204,16 @@ const providerStatus = (health: ProviderHealth): ServiceStatus => {
 
 const bothFail = (summary: string): ServiceStatus[] => [
   { id: "openai", tone: "fail", summary },
-  { id: "anthropic", tone: "fail", summary },
+  { id: "gemini", tone: "fail", summary },
 ];
 
 /**
  * 점검 함수 자체에 닿지 못했을 때. 제공자의 상태는 우리가 모르는 것이지 나쁜 것이 아니다 —
- * 실패로 칠하지 않고 직접 볼 곳을 준다(예: service-health 배포 전).
+ * 실패로 칠하지 않고 「직접 확인」으로 둔다(예: service-health 배포 전).
  */
-const bothManual = (): ServiceStatus[] =>
-  (["openai", "anthropic"] as const).map((id) => ({
-    // 문장으로 사정을 설명하지 않는다 — 할 수 있는 일(콘솔에서 보기)만 남긴다.
-    id, tone: "manual" as const, summary: "", link: PROVIDER_CONSOLE[id],
-  }));
+// 문장으로 사정을 설명하지 않는다 — 할 수 있는 일(콘솔에서 보기)은 줄 오른쪽 링크가 맡는다.
+const providerManual = (id: ProviderHealth["provider"]): ServiceStatus => ({ id, tone: "manual", summary: "" });
+const bothManual = (): ServiceStatus[] => (["openai", "gemini"] as const).map(providerManual);
 
 export async function fetchProviderStatuses(token: string, deps: Deps = {}): Promise<ServiceStatus[]> {
   const fetcher = deps.fetcher ?? fetch;
@@ -236,9 +230,8 @@ export async function fetchProviderStatuses(token: string, deps: Deps = {}): Pro
     const payload = (await response.json()) as { providers?: ProviderHealth[] };
     const providers = Array.isArray(payload.providers) ? payload.providers : [];
     const byId = new Map(providers.map((health) => [health.provider, providerStatus(health)]));
-    return (["openai", "anthropic"] as const).map(
-      (id) => byId.get(id) ?? { id, tone: "fail", summary: "점검 결과가 없습니다" },
-    );
+    // 답에 없는 제공자도 「우리가 못 물어봤다」이다(예: Gemini 점검이 든 함수를 배포하기 전).
+    return (["openai", "gemini"] as const).map((id) => byId.get(id) ?? providerManual(id));
   } catch {
     return bothManual();
   }
