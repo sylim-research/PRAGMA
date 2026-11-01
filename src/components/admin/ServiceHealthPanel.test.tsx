@@ -8,7 +8,7 @@ const STORE_KEY = "pragma.admin.serviceHealth.v1";
 const storeAgeMs = (ms: number, statuses: unknown[]) =>
   localStorage.setItem(STORE_KEY, JSON.stringify({ checkedAt: new Date(Date.now() - ms).toISOString(), statuses, authenticated: true }));
 
-const ALL_OK = (["elevenlabs", "openai", "anthropic", "supabase", "app"] as const).map((id) => ({
+const ALL_OK = (["elevenlabs", "openai", "gemini", "supabase", "app"] as const).map((id) => ({
   id, tone: "ok" as const, summary: "정상",
 }));
 
@@ -32,7 +32,7 @@ beforeEach(() => {
     statuses: [
       { id: "elevenlabs", tone: "ok", summary: "정상", detail: "잔량 9,558 / 10,000자 (95.6%) · free", latencyMs: 412 },
       { id: "openai", tone: "ok", summary: "정상", detail: "gpt-4o · gpt-4.1 · gpt-4o-transcribe", latencyMs: 331 },
-      { id: "anthropic", tone: "fail", summary: "ANTHROPIC_API_KEY가 등록되지 않았습니다", detail: "claude-opus-5", latencyMs: null },
+      { id: "gemini", tone: "fail", summary: "GEMINI_API_KEY가 등록되지 않았습니다", detail: "gemini-3.1-pro-preview", latencyMs: null },
       { id: "supabase", tone: "ok", summary: "정상", detail: "로그인 세션이 있습니다" },
       { id: "app", tone: "ok", summary: "정상", detail: "이 화면이 열려 있습니다" },
     ],
@@ -64,13 +64,13 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("점검하지 못한 항목이 있어도 확인된 문제가 없으면 초록으로 두고 어디를 볼지 적는다", () => {
     storeAgeMs(60_000, [
       ...ALL_OK.slice(0, 1),
-      { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://x" } },
-      { id: "anthropic", tone: "manual", summary: "", link: { label: "Anthropic 콘솔에서 확인", href: "https://y" } },
+      { id: "openai", tone: "manual", summary: "" },
+      { id: "gemini", tone: "manual", summary: "" },
       ...ALL_OK.slice(3),
     ]);
     render(<ServiceHealthPanel />);
     // 「모르는 것」이 「나쁜 것」이 되지 않는다 — 살아 있음을 초록으로 보여 준다.
-    expect(screen.getByText("3개 정상 · OpenAI·Anthropic 직접 확인")).toBeVisible();
+    expect(screen.getByText("3개 정상 · OpenAI·Gemini 직접 확인")).toBeVisible();
     expect(screen.getByTestId("summary-dot")).toHaveClass("bg-emerald-500");
   });
 
@@ -126,7 +126,7 @@ describe("외부 서비스 연동 점검 패널", () => {
 
     await waitFor(() => expect(mocks.run).toHaveBeenCalledTimes(1));
     expect(await screen.findByText("잔량 9,558 / 10,000자 (95.6%) · free")).toBeVisible();
-    expect(screen.getByText("ANTHROPIC_API_KEY가 등록되지 않았습니다")).toBeVisible();
+    expect(screen.getByText("GEMINI_API_KEY가 등록되지 않았습니다")).toBeVisible();
     expect(screen.getAllByRole("img", { name: "정상" })).toHaveLength(4);
     expect(screen.getAllByRole("img", { name: "실패" })).toHaveLength(1);
     expect(screen.getByText(/마지막 점검 · 2026\. 9\. 7\./)).toBeVisible();
@@ -136,21 +136,31 @@ describe("외부 서비스 연동 점검 패널", () => {
   it("잔액 안내는 행마다 반복하지 않고 목록 아래 한 줄로만 둔다", async () => {
     render(<ServiceHealthPanel />);
     await screen.findByTestId("service-openai");
-    expect(screen.getByText(/선불 잔액은 콘솔의 자동 충전으로 관리합니다/)).toBeVisible();
-    expect(screen.getByRole("link", { name: "OpenAI 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
-    expect(screen.getByRole("link", { name: "Anthropic 콘솔" })).toHaveAttribute("href", expect.stringContaining("platform.claude.com"));
+    expect(screen.getByText("OpenAI·Gemini 선불 잔액은 콘솔의 자동 충전으로 관리합니다")).toBeVisible();
     // 행에는 상태만 — 같은 안내를 되풀이하면 상태 목록이 사과문처럼 읽힌다.
     expect(screen.queryByText(/확인할 수 없습니다/)).not.toBeInTheDocument();
   });
 
-  it("점검 경로가 없을 때는 빨간불 대신 회색 「직접 확인」과 콘솔 링크를 보여 준다", async () => {
+  it("모든 줄 오른쪽에 그 서비스의 콘솔 링크를 둔다", () => {
+    storeAgeMs(60_000, ALL_OK);
+    render(<ServiceHealthPanel />);
+    const links = screen.getAllByRole("link");
+    expect(links.map((link) => link.textContent)).toEqual([
+      "ElevenLabs 콘솔 ↗", "OpenAI 콘솔 ↗", "Google AI Studio ↗", "Supabase 콘솔 ↗", "Railway 콘솔 ↗",
+    ]);
+    expect(links.every((link) => link.getAttribute("target") === "_blank")).toBe(true);
+    expect(links[1]).toHaveAttribute("href", expect.stringContaining("platform.openai.com"));
+    expect(links[2]).toHaveAttribute("href", expect.stringContaining("aistudio.google.com"));
+  });
+
+  it("점검 경로가 없을 때는 빨간불 대신 회색 「직접 확인」을 보여 준다", async () => {
     mocks.run.mockResolvedValueOnce({
       checkedAt: "2026-09-07T12:04:00.000Z",
       authenticated: true,
       statuses: [
         { id: "elevenlabs", tone: "ok", summary: "정상" },
-        { id: "openai", tone: "manual", summary: "", link: { label: "OpenAI 콘솔에서 확인", href: "https://platform.openai.com/x" } },
-        { id: "anthropic", tone: "manual", summary: "", link: { label: "Anthropic 콘솔에서 확인", href: "https://platform.claude.com/x" } },
+        { id: "openai", tone: "manual", summary: "" },
+        { id: "gemini", tone: "manual", summary: "" },
         { id: "supabase", tone: "ok", summary: "정상" },
         { id: "app", tone: "ok", summary: "정상" },
       ],
@@ -159,13 +169,13 @@ describe("외부 서비스 연동 점검 패널", () => {
     expect(await screen.findAllByRole("img", { name: "직접 확인" })).toHaveLength(2);
     expect(screen.queryByRole("img", { name: "실패" })).not.toBeInTheDocument();
     expect(screen.queryByText(/자동 점검을 쓸 수 없습니다/)).not.toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /OpenAI 콘솔에서 확인/ })).toHaveAttribute("href", "https://platform.openai.com/x");
+    expect(screen.getByTestId("service-gemini")).toHaveTextContent("직접 확인");
   });
 
   it("설정된 모델명을 각 줄에 보여 준다", async () => {
     render(<ServiceHealthPanel />);
     expect(await screen.findByText("gpt-4o · gpt-4.1 · gpt-4o-transcribe")).toBeVisible();
-    expect(screen.getByText("claude-opus-5")).toBeVisible();
+    expect(screen.getByText("gemini-3.1-pro-preview")).toBeVisible();
   });
 
   it("점검이 실패해도 버튼은 다시 살아난다", async () => {

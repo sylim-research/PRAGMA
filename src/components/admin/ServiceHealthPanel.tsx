@@ -18,21 +18,39 @@ import {
 //   빈 목록으로 시작하면 무엇을 보는 화면인지 알 수 없어 그냥 지나치게 된다.
 // - 기본은 펼쳐 둔다(연구자 요청 2026-09-26). 항목별 상태·모델명을 한눈에 본다. 접기는 그대로 둔다.
 // - 이 점검이 부르는 것은 잔량 조회와 인증 확인뿐이라 토큰·글자 수를 쓰지 않는다.
-// - 각 줄에는 상태만 둔다. 잔액 관리 안내는 목록 아래 한 줄로 모았다 —
+// - 각 줄에는 상태와 오른쪽 끝의 콘솔 링크만 둔다. 잔액 관리 안내는 목록 아래 한 줄로 모았다 —
 //   같은 안내를 행마다 반복하면 상태 목록이 사과문처럼 읽힌다.
 
-const SERVICE_META: Record<ServiceId, { name: string; role: string }> = {
-  elevenlabs: { name: "ElevenLabs", role: "음성 합성" },
-  // 2026-10-26 역할 배정: 생성·피드백은 Gemini(이 점검 목록에는 아직 없음), OpenAI는 검사(GPT-6 Astra)와 STT.
-  openai: { name: "OpenAI", role: "AI 품질 심사·피드백 검수·STT" },
-  // Claude 교차 검토는 2026-10-27부터 쓰지 않는다. 키 상태만 남겨 둔다.
-  anthropic: { name: "Anthropic", role: "현재 사용 안 함" },
-  supabase: { name: "Supabase", role: "로그인·데이터" },
+type ServiceConsole = { label: string; href: string };
+
+const SERVICE_META: Record<ServiceId, { name: string; role: string; console: ServiceConsole }> = {
+  elevenlabs: {
+    name: "ElevenLabs",
+    role: "음성 합성",
+    console: { label: "ElevenLabs 콘솔", href: "https://elevenlabs.io/app/subscription" },
+  },
+  // 2026-10-26 역할 배정: 생성·피드백은 Gemini, OpenAI는 검사(GPT-6 Astra)와 STT.
+  openai: {
+    name: "OpenAI",
+    role: "AI 품질 심사·피드백 검수·STT",
+    console: { label: "OpenAI 콘솔", href: "https://platform.openai.com/settings/organization/billing/overview" },
+  },
+  gemini: {
+    name: "Gemini",
+    role: "콘텐츠 생성·학습자 피드백",
+    console: { label: "Google AI Studio", href: "https://aistudio.google.com/apikey" },
+  },
+  supabase: {
+    name: "Supabase",
+    role: "로그인·데이터",
+    console: { label: "Supabase 콘솔", href: "https://supabase.com/dashboard/project/tlnjxagqwvefeqdagtkq" },
+  },
   // 다른 칸처럼 제공사 이름을 쓰되, 이 칸은 Railway에 묻지 않고 「이 화면이 열렸다」만 보므로
   // 실제로 Railway에서 열렸을 때만 Railway라고 부른다(로컬에서 「Railway 정상」은 틀린 표시다).
   app: {
     name: typeof window !== "undefined" && window.location.hostname.endsWith(".railway.app") ? "Railway" : "로컬 개발 서버",
     role: "화면 제공",
+    console: { label: "Railway 콘솔", href: "https://railway.com/dashboard" },
   },
 };
 
@@ -44,11 +62,6 @@ const TONE: Record<ServiceTone, { label: string; dot: string; text: string }> = 
   manual: { label: "직접 확인", dot: "bg-slate-400", text: "text-muted-foreground" },
   idle: { label: "미점검", dot: "bg-slate-300", text: "text-muted-foreground" },
 };
-
-const CONSOLES = [
-  { label: "OpenAI 콘솔", href: "https://platform.openai.com/settings/organization/billing/overview" },
-  { label: "Anthropic 콘솔", href: "https://platform.claude.com/dashboard" },
-];
 
 const NAMES = (statuses: ServiceStatus[], tone: ServiceTone) =>
   statuses.filter((status) => status.tone === tone).map((status) => SERVICE_META[status.id].name);
@@ -102,24 +115,22 @@ const StatusRow = ({ status, pending }: { status: ServiceStatus; pending: boolea
           <span className="text-sm font-semibold">{meta.name}</span>
           <span className="text-xs text-muted-foreground">{meta.role}</span>
           <span className={`text-sm ${tone.text}`}>
-            {pending ? "점검 중…" : status.summary}
+            {pending ? "점검 중…" : status.summary || tone.label}
             {!pending && status.tone !== "idle" && typeof status.latencyMs === "number" && (
               <span className="text-muted-foreground"> · {status.latencyMs}ms</span>
             )}
           </span>
-          {!pending && status.link && (
-            <a
-              className="text-sm text-muted-foreground underline underline-offset-2"
-              href={status.link.href}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {status.link.label} ↗
-            </a>
-          )}
         </div>
         {!pending && status.detail && <p className="mt-0.5 text-xs text-muted-foreground">{status.detail}</p>}
       </div>
+      <a
+        className="shrink-0 self-center text-right text-[13px] text-muted-foreground underline underline-offset-2 hover:text-foreground"
+        href={meta.console.href}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {meta.console.label} ↗
+      </a>
     </li>
   );
 };
@@ -205,15 +216,7 @@ export const ServiceHealthPanel = () => {
             ))}
           </ul>
           <p className="border-t border-[#EEEAE0] px-5 py-2.5 text-[12px] text-muted-foreground">
-            OpenAI·Anthropic 선불 잔액은 콘솔의 자동 충전으로 관리합니다 ·{" "}
-            {CONSOLES.map((item, index) => (
-              <span key={item.href}>
-                {index > 0 && " · "}
-                <a className="underline underline-offset-2" href={item.href} target="_blank" rel="noreferrer">
-                  {item.label}
-                </a>
-              </span>
-            ))}
+            OpenAI·Gemini 선불 잔액은 콘솔의 자동 충전으로 관리합니다
           </p>
         </div>
       )}

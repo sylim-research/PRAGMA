@@ -75,42 +75,40 @@ describe("fetchElevenLabsStatus", () => {
 });
 
 describe("fetchProviderStatuses", () => {
-  it("service-health 응답을 OpenAI·Anthropic 두 줄로 옮긴다", async () => {
+  it("service-health 응답을 OpenAI·Gemini 두 줄로 옮긴다", async () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({
       providers: [
         { provider: "openai", code: "ok", httpStatus: 200, latencyMs: 331, models: ["gpt-4o", "gpt-4.1"] },
-        { provider: "anthropic", code: "missing_key", httpStatus: null, latencyMs: null, models: ["claude-opus-5"] },
+        { provider: "gemini", code: "missing_key", httpStatus: null, latencyMs: null, models: ["gemini-3.1-pro-preview"] },
       ],
     }));
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(fetcher.mock.calls[0][0]).toContain("/functions/v1/service-health");
-    expect(statuses.map((s) => s.id)).toEqual(["openai", "anthropic"]);
+    expect(statuses.map((s) => s.id)).toEqual(["openai", "gemini"]);
     expect(statuses[0]).toMatchObject({ tone: "ok", summary: "정상", detail: "gpt-4o · gpt-4.1", latencyMs: 331 });
     expect(statuses[1].tone).toBe("fail");
-    expect(statuses[1].summary).toContain("ANTHROPIC_API_KEY");
+    expect(statuses[1].summary).toContain("GEMINI_API_KEY");
     // 키가 죽어 있어도 「무엇을 부르려 했는가」는 보여 준다.
-    expect(statuses[1].detail).toBe("claude-opus-5");
+    expect(statuses[1].detail).toBe("gemini-3.1-pro-preview");
   });
 
   it("인증 실패 코드는 키 재확인으로 안내한다", async () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({
       providers: [
         { provider: "openai", code: "auth_failed", httpStatus: 401, latencyMs: 200 },
-        { provider: "anthropic", code: "unreachable", httpStatus: null, latencyMs: 10000 },
+        { provider: "gemini", code: "unreachable", httpStatus: null, latencyMs: 10000 },
       ],
     }));
-    const [openai, anthropic] = await fetchProviderStatuses("t", { fetcher });
+    const [openai, gemini] = await fetchProviderStatuses("t", { fetcher });
     expect(openai.summary).toContain("키 인증에 실패");
-    expect(anthropic.summary).toBe("응답이 없습니다");
+    expect(gemini.summary).toBe("응답이 없습니다");
   });
 
-  it("점검 함수에 닿지 못하면 제공자를 실패로 칠하지 않고 콘솔 링크를 준다", async () => {
+  it("점검 함수에 닿지 못하면 제공자를 실패로 칠하지 않는다", async () => {
     const fetcher = vi.fn().mockRejectedValue(new Error("down"));
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(statuses.every((s) => s.tone === "manual")).toBe(true);
     expect(statuses.every((s) => s.tone !== "fail")).toBe(true);
-    expect(statuses[0].link?.href).toContain("platform.openai.com");
-    expect(statuses[1].link?.href).toContain("platform.claude.com");
   });
 
   it("함수가 아직 배포되지 않았을 때(404)도 같은 처리다 — 제공자 상태를 우리가 모를 뿐이다", async () => {
@@ -118,7 +116,17 @@ describe("fetchProviderStatuses", () => {
     const statuses = await fetchProviderStatuses("t", { fetcher });
     expect(statuses.map((s) => s.tone)).toEqual(["manual", "manual"]);
     expect(statuses[0].summary).toBe("");
-    expect(statuses[0].link?.label).toContain("OpenAI 콘솔");
+  });
+
+  it("Gemini 점검이 든 함수를 배포하기 전에는 옛 Anthropic 답을 버리고 Gemini를 직접 확인으로 둔다", async () => {
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse({
+      providers: [
+        { provider: "openai", code: "ok", httpStatus: 200, latencyMs: 1 },
+        { provider: "anthropic", code: "ok", httpStatus: 200, latencyMs: 2 },
+      ],
+    }));
+    const statuses = await fetchProviderStatuses("t", { fetcher });
+    expect(statuses.map((s) => [s.id, s.tone])).toEqual([["openai", "ok"], ["gemini", "manual"]]);
   });
 
   it("관리자 권한 문제는 우리가 고칠 실제 문제이므로 실패로 남긴다", async () => {
@@ -138,7 +146,7 @@ describe("runServiceHealthCheck", () => {
     localStorage.clear();
     storeReport(report);
     expect(readStoredReport()).toBeNull();
-    expect(report.statuses.map((s) => s.id)).toEqual(["elevenlabs", "openai", "anthropic", "supabase", "app"]);
+    expect(report.statuses.map((s) => s.id)).toEqual(["elevenlabs", "openai", "gemini", "supabase", "app"]);
     expect(report.statuses.find((s) => s.id === "supabase")?.tone).toBe("fail");
     expect(report.statuses.find((s) => s.id === "app")?.tone).toBe("ok");
   });
@@ -148,7 +156,7 @@ describe("runServiceHealthCheck", () => {
       Promise.resolve(url.includes("service-health")
         ? jsonResponse({ providers: [
             { provider: "openai", code: "ok", httpStatus: 200, latencyMs: 1 },
-            { provider: "anthropic", code: "ok", httpStatus: 200, latencyMs: 2 },
+            { provider: "gemini", code: "ok", httpStatus: 200, latencyMs: 2 },
           ] })
         : jsonResponse({ used: 0, limit: 10000, remaining: 10000 })));
     const report = await runServiceHealthCheck({ fetcher, token: "t" });
@@ -159,6 +167,16 @@ describe("runServiceHealthCheck", () => {
     localStorage.clear();
     storeReport(report);
     expect(readStoredReport()?.checkedAt).toBe(report.checkedAt);
+  });
+
+  it("옛 Anthropic 줄이 든 보관 결과는 없는 것으로 보고 다시 확인하게 한다", () => {
+    localStorage.clear();
+    localStorage.setItem("pragma.admin.serviceHealth.v1", JSON.stringify({
+      checkedAt: new Date().toISOString(),
+      authenticated: true,
+      statuses: [{ id: "anthropic", tone: "ok", summary: "정상" }],
+    }));
+    expect(readStoredReport()).toBeNull();
   });
 
   it("로그인 전에 보관된 옛 형식(authenticated 없음)은 없는 것으로 보고 다시 확인하게 한다", () => {
