@@ -42,6 +42,8 @@ const EXPOSE = `
   buildMissionTopologyPrompt, buildMissionRepairPrompt,
   buildCandidateGenerationSystemPrompt, buildCandidateCheckSystemPrompt, CANDIDATE_FEEDBACK_SYSTEM_PROMPT,
   buildRelationalFeedbackAuditSystemPrompt,
+  buildMissionV6SystemPrompt, buildMissionV6UserPrompt, buildMissionV6RepairUserPrompt,
+  buildFeedbackReviewSystemPrompt,
   PRIMARY_MODEL, FALLBACK_MODEL, CORE_TEMPERATURE, CORE_RESPONSE_FORMAT,
   CORE_LENGTH_POLICY_VERSION, CORE_LENGTH_RANGES,
   PROVIDER,
@@ -127,6 +129,28 @@ const probeMissionBody = (direction, sourceModality, isResponseAct) => ({
   contrast_plan: PROBE_CONTRAST_PLAN,
 });
 
+// mission_v6 생성기는 카탈로그의 v6 판(featureForV6Prompt)을 받는다 — 지시문만 보이도록 센티넬을 넣는다.
+// 화행별 제작 요령은 화행마다 다르므로 스냅숏에는 요청(request) 판을 대표로 싣는다.
+const PROBE_V6_FEATURE = {
+  code: "PROBE_FEATURE", learner_label: "PROBE_LABEL",
+  operational_definition: "PROBE_DEFINITION",
+  band_schema: [{ code: "PROBE_BAND_LOW", label_ko: "PROBE_BAND_LOW_KO" },
+                { code: "within_band", label_ko: "PROBE_BAND_OK_KO" },
+                { code: "PROBE_BAND_HIGH", label_ko: "PROBE_BAND_HIGH_KO" }],
+  within_band_code: "PROBE_WITHIN_BAND",
+  relevant_resources: ["PROBE_RESOURCE"], excluded_confounds: ["PROBE_CONFOUND"],
+  counter_rule_note: "PROBE_COUNTER_RULE", fidelity_note: "PROBE_FIDELITY",
+};
+const PROBE_V6_CORE = {
+  source_text: "PROBE_SOURCE_TEXT",
+  focal_segments: [{ role: "head", text: "PROBE_SOURCE_TEXT" }],
+  situation_ko: "PROBE_SITUATION", relation_ko: "PROBE_RELATION",
+  pdr: { p: "equal", d: "acquaintance", r: "mid" }, channel: "messenger",
+};
+const PROBE_V6_ROW = { learner_level: "PROBE_LEVEL", domain: "PROBE_DOMAIN", theme_code: "PROBE_THEME", topic_code: "PROBE_TOPIC" };
+const v6System = (direction, mode) =>
+  S.buildMissionV6SystemPrompt({ act: "request", direction, mode, feature: PROBE_V6_FEATURE });
+
 const entry = (key, label, group, note, text) => ({ key, label, group, note, sha256: sha(text), text });
 
 const prompts = [
@@ -211,6 +235,28 @@ const prompts = [
       sourceIssue: null,
       precedingTurnIssue: null,
       bilingualSceneIssue: { sourceLanguage: "zh", targetLanguage: "ko", missing: ["source_speaker", "target_speaker", "interpreting"], message: "PROBE_BILINGUAL_SCENE_ERROR" },
+    })),
+  entry("mission_v6.system", "v6 미션 생성 (한→중 번역)", "mission",
+    "MJT 5문항·해설·참고 표현·DCT 안내를 한 번에 씁니다. 화행별 제작 요령은 요청 판을 예시로 싣습니다.",
+    v6System("ko_zh", "translation")),
+  entry("mission_v6.system.spoken", "v6 미션 생성 (한→중 통역)", "mission",
+    "번역 판과 같은 구조에 대면·전화 장면과 구어 조건을 더합니다.",
+    v6System("ko_zh", "interpreting")),
+  entry("mission_v6.system.zh_ko", "v6 미션 생성 (중→한 번역)", "mission",
+    "목표문을 한국어로 쓰고 한국어 연어·주어 처리 조건을 더합니다.",
+    v6System("zh_ko", "translation")),
+  entry("mission_v6.system.zh_ko.spoken", "v6 미션 생성 (중→한 통역)", "mission",
+    "중→한 번역 판에 대면·전화 장면과 구어 조건을 더합니다.",
+    v6System("zh_ko", "interpreting")),
+  entry("mission_v6.user", "v6 미션 요청 프롬프트", "mission",
+    "시나리오의 원문·핵심 구간·장면을 그대로 넘기고 학습 맥락을 붙입니다.",
+    S.buildMissionV6UserPrompt({ core: PROBE_V6_CORE, row: PROBE_V6_ROW })),
+  entry("mission_v6.repair.user", "v6 미션 수리 요청", "mission",
+    "규칙 검사에서 걸린 곳만 고쳐 다시 내게 합니다(1회).",
+    S.buildMissionV6RepairUserPrompt({
+      core: PROBE_V6_CORE, row: PROBE_V6_ROW,
+      previousDraft: { PROBE_PREVIOUS_DRAFT: true },
+      violations: [{ path: "PROBE_PATH", message: "PROBE_VIOLATION" }],
     })),
   entry("mission.topology.system", "장면 구조 확정", "mission",
     "문항별 장면(X·A·Y)과 관계 조건을 먼저 고정합니다.",
@@ -325,6 +371,12 @@ const prompts = [
   entry("feedback.system.focal.spoken", "프롬프트 (통역)", "runtime",
     "말로 산출한 통역 답안을 진단합니다.",
     S.buildFeedbackSystemPrompt("ko_zh", true, [{ text: "PROBE_FOCAL_SEGMENT", role: "head" }])),
+  entry("feedback.review.system", "피드백 재검토 (한→중)", "runtime",
+    "다른 회사 모델이 축마다 판정·설명을 확인합니다. 시간 안에 못 끝나면 판정을 보류합니다.",
+    S.buildFeedbackReviewSystemPrompt("ko_zh")),
+  entry("feedback.review.system.zh_ko", "피드백 재검토 (중→한)", "runtime",
+    "중→한 답안의 뜻·높임·자연스러움 판단을 다시 확인합니다.",
+    S.buildFeedbackReviewSystemPrompt("zh_ko")),
   entry("authentic.system", "자료 분석 프롬프트", "authoring",
     "실제 중·한 자료에서 화용 학습 후보를 제안합니다.",
     S.buildAuthenticSystemPrompt()),
