@@ -16,33 +16,20 @@ import {
   type QualityRuleNature,
 } from "@/lib/pragma/qualityRuleCatalog";
 import type { RuleId } from "@/lib/pragma/missionRules";
+import {
+  PROMPT_WORKFLOW,
+  SIDE_FEATURE_PROMPTS,
+  STEP_KIND_LABEL,
+  type WorkflowDirection,
+  type WorkflowMode,
+  type WorkflowStep,
+} from "@/lib/pragma/promptWorkflow";
 
 // ── 저장소 정본(읽기 전용) ─────────────────────────────────────────────
 // 이 섹션의 원문은 promptSnapshot.generated.ts에서 온다. 그 파일은 build마다
 // 실제 edge 소스에서 자동 재생성되므로(prebuild) 화면이 코드보다 낡을 수 없다.
 // 편집 경로는 만들지 않는다 — 프롬프트를 고치려면 코드를 고쳐야 한다.
-const SNAPSHOT_GROUP_LABEL: Record<string, string> = {
-  core: "시나리오 생성",
-  mission: "학습 미션 생성",
-  review: "AI 품질 심사",
-  runtime: "학습자 AI 피드백",
-  authoring: "실제 자료 활용",
-};
-const HARNESS_SECTION_ORDER = ["core", "mission", "review", "runtime", "authoring"];
-// 화면 조작으로 호출될 수 없는 지시문. 스냅숏(감사 기록)에는 남기고 화면에서만 뺀다.
-// 집중 구간 없는 피드백은 편성된 4문항 미션이 학습자에게 열리지 않아 호출 경로가 없다.
-const HIDDEN_PROMPT_KEYS = new Set([
-  // 2026-10-27부터 Claude 교차 검토와 그 의견 재판정은 쓰지 않는다(migration review_without_claude).
-  "content_review.claude",
-  "content_review.adjudication",
-  "feedback.system",
-  "feedback.system.zh_ko",
-  "feedback.system.zh_ko.spoken",
-  "feedback.system.spoken",
-]);
-// 호출은 되지만 화면에서는 생략하는 지시문(2026-10-09). 선행발화의 언어 표기만 1회 고치는 기술 보정이라
-// 연구 서술과 관련이 가장 적다. 스냅숏(감사 기록)에는 그대로 남는다. 카드를 2열로 짝 맞추기 위해 뺐다.
-const OMITTED_PROMPT_KEYS = new Set(["core.user.preceding_turn_repair"]);
+
 
 // 생성계약 정본(docs/contracts/PRAGMA_생성계약_정본.md)이 고정하는 것을 화면용 한 줄로 옮긴다.
 // 정본은 변경 이력·결정 ID가 섞인 긴 문서라 원문을 싣지 않는다. 계약이 바뀌면 이 목록도 고친다.
@@ -185,13 +172,13 @@ function HarnessOverview() {
         <div className={STAGE_CARD}>
           <div className="flex items-center justify-between gap-2">
             <span className="text-[13px] font-semibold text-[#6D5C1F]">AI 품질 심사</span>
-            <Badge variant="outline" className="bg-white font-normal">GPT-6 Astra</Badge>
+            <Badge variant="outline" className="bg-white font-normal">교차 검토</Badge>
           </div>
           <h3 className="mt-1.5 text-[15.5px] font-bold">결함 유형별 심사</h3>
           <p className="mt-1 text-[13.5px] leading-relaxed text-muted-foreground">
-            의미·화행·해설 일치와 한중 양방향 자연성을 한 번에 심사합니다.
+            생성과 검토는 서로 다른 AI가 맡음. 의미·화행·해설 일치와 한중 양방향 자연성을 한 번에 심사합니다.
           </p>
-          <a href="#prompts-review" className={`group ${STAGE_LINK}`}>
+          <a href="#prompts-mission" className={`group ${STAGE_LINK}`}>
             검토 프롬프트 보기<ChevronDown aria-hidden className={STAGE_ARROW} />
           </a>
         </div>
@@ -260,6 +247,101 @@ function SnapshotCard({ entry }: { entry: PromptSnapshotEntry }) {
   );
 }
 
+const SNAPSHOT_BY_KEY = new Map(PROMPT_SNAPSHOT.prompts.map((p) => [p.key, p]));
+const STAGE_NUMBERS = ["①", "②", "③", "④"];
+const DIRECTION_OPTIONS: [WorkflowDirection, string][] = [["ko_zh", "한→중"], ["zh_ko", "중→한"]];
+const MODE_OPTIONS: [WorkflowMode, string][] = [["translation", "번역"], ["interpreting", "통역"]];
+const KIND_CLASS: Record<string, string> = {
+  always: "border-[#C9A62E] bg-[#FFF3C4] text-[#15202B]",
+  conditional: "border-[#DED8CB] bg-white text-[#514C44]",
+  optional: "border-[#DED8CB] bg-white text-[#514C44]",
+  code: "border-[#C9CFD4] bg-[#F3F5F6] text-[#3B4A54]",
+  human: "border-[#15202B] bg-[#15202B] text-white",
+};
+
+function ChoiceGroup<T extends string>({ label, value, options, onChange }: {
+  label: string; value: T; options: [T, string][]; onChange: (v: T) => void;
+}) {
+  return (
+    <div role="group" aria-label={label} className="flex items-center gap-1.5">
+      <span className="text-[13.5px] font-semibold text-[#514C44]">{label}</span>
+      {options.map(([v, text]) => (
+        <button key={v} type="button" aria-pressed={value === v} onClick={() => onChange(v)}
+          className={`rounded-lg border px-3 py-1.5 text-[13.75px] font-medium ${value === v ? "border-[#15202B] bg-[#15202B] text-white" : "border-[#E2DED2] bg-white text-[#3B4A54] hover:bg-[#F5F4EF]"}`}>
+          {text}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function WorkflowStepRow({ step, index, dir, mode }: { step: WorkflowStep; index: number; dir: WorkflowDirection; mode: WorkflowMode }) {
+  const entries = step.prompts(dir, mode)
+    .map((key) => SNAPSHOT_BY_KEY.get(key))
+    .filter((entry): entry is PromptSnapshotEntry => Boolean(entry));
+  const model = step.model?.(dir);
+  return (
+    <li className="grid gap-2 sm:grid-cols-[1.75rem_minmax(0,1fr)]">
+      <span className="flex h-6 w-6 items-center justify-center rounded-full border border-[#C9A62E] bg-white text-[12.5px] font-bold text-[#6D5C1F]">{index + 1}</span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <h4 className="text-[15px] font-bold text-[#15202B]">{step.title}</h4>
+          <span className={`rounded-full border px-2 py-0 text-[12.5px] font-semibold leading-5 ${KIND_CLASS[step.kind]}`}>{STEP_KIND_LABEL[step.kind]}</span>
+          {model && <Badge variant="outline" className="bg-white px-2 py-0 font-normal leading-5">{model}</Badge>}
+          {step.fallback && <span className="text-[13px] text-[#6D675D]">실패 시 {step.fallback}</span>}
+        </div>
+        <p className="mt-1 text-[13.75px] leading-relaxed text-[#26333B]">
+          <span className="text-[#6D675D]">{step.when} · </span>{step.does}
+        </p>
+        {step.stop && <p className="mt-0.5 text-[13.25px] leading-relaxed text-[#8A5A1F]">멈춤 · {step.stop}</p>}
+        {step.reuseNote && <p className="mt-0.5 text-[13.25px] text-[#6D675D]">프롬프트 · {step.reuseNote}</p>}
+        {entries.length > 0 && (
+          <div className="mt-2 grid gap-x-1.5 gap-y-2 md:grid-cols-2">
+            {entries.map((entry) => <SnapshotCard key={entry.key} entry={entry} />)}
+          </div>
+        )}
+      </div>
+    </li>
+  );
+}
+
+function WorkflowView() {
+  const [dir, setDir] = useState<WorkflowDirection>("ko_zh");
+  const [mode, setMode] = useState<WorkflowMode>("translation");
+  const sideEntries = SIDE_FEATURE_PROMPTS.map((key) => SNAPSHOT_BY_KEY.get(key)).filter((e): e is PromptSnapshotEntry => Boolean(e));
+  return (
+    <div className={PART_BODY}>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 rounded-lg border border-[#E2DED2] bg-[#FCFBF7] px-3 py-2.5">
+        <ChoiceGroup<WorkflowDirection> label="방향" value={dir} options={DIRECTION_OPTIONS} onChange={(v) => setDir(v)} />
+        <ChoiceGroup<WorkflowMode> label="방식" value={mode} options={MODE_OPTIONS} onChange={(v) => setMode(v)} />
+        <span className="text-[13px] text-[#6D675D]">고른 조합에서 실제로 쓰이는 프롬프트와 모델만 보입니다.</span>
+      </div>
+      <ol className="mt-5 space-y-7">
+        {PROMPT_WORKFLOW.map((stage, stageIndex) => (
+          <li key={stage.id} id={`prompts-${stage.id}`} className="scroll-mt-4">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 border-l-[3px] border-[#C9A62E] pl-2.5">
+              <h3 className="text-[16.5px] font-bold leading-6 text-[#8A7423]">{STAGE_NUMBERS[stageIndex]} {stage.title}</h3>
+              {stage.route
+                ? <Link to={stage.route} className="text-[13.5px] text-[#514C44] underline-offset-2 hover:underline">화면 · {stage.screen}</Link>
+                : <span className="text-[13.5px] text-[#514C44]">{stage.screen}</span>}
+            </div>
+            <ol className="mt-3 space-y-4">
+              {stage.steps.map((step, i) => <WorkflowStepRow key={step.id} step={step} index={i} dir={dir} mode={mode} />)}
+            </ol>
+            <p className="mt-3 rounded-md bg-[#F5F4EF] px-3 py-1.5 text-[13.5px] font-semibold text-[#3B4A54]">▸ {stage.result}</p>
+          </li>
+        ))}
+      </ol>
+      <div className="mt-7 border-t border-[#EFEAE0] pt-4">
+        <h3 className="text-[15px] font-bold text-[#514C44]">별도 기능 · 실제 자료 활용</h3>
+        <div className="mt-2 grid gap-x-1.5 gap-y-2 md:grid-cols-2">
+          {sideEntries.map((entry) => <SnapshotCard key={entry.key} entry={entry} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const AdminPromptHarness = () => {
   return (
     <AdminShell
@@ -271,23 +353,8 @@ const AdminPromptHarness = () => {
       <HarnessOverview />
 
       <section aria-labelledby="prompts-title" className={PART_CARD}>
-        <PartHeading id="prompts-title" title="운영 프롬프트" description="코드에서 그대로 가져온 생성·검토·피드백 원문" />
-        <div className={`space-y-9 ${PART_BODY}`}>
-        {HARNESS_SECTION_ORDER.map((g) => {
-          const items = PROMPT_SNAPSHOT.prompts.filter((p) => p.group === g && !HIDDEN_PROMPT_KEYS.has(p.key) && !OMITTED_PROMPT_KEYS.has(p.key));
-          if (items.length === 0) return null;
-          return (
-            <div key={g} id={`prompts-${g}`} className="scroll-mt-4">
-              <h3 className="mb-3 border-l-[3px] border-[#C9A62E] pl-2.5 text-[16.5px] font-bold leading-6 text-[#8A7423]">{SNAPSHOT_GROUP_LABEL[g] ?? g}</h3>
-              <div className="grid gap-x-1.5 gap-y-2 md:grid-cols-2">
-                {items.map((p) => (
-                  <SnapshotCard key={p.key} entry={p} />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-        </div>
+        <PartHeading id="prompts-title" title="운영 프롬프트" description="제작 순서대로, 코드에서 그대로 가져온 생성·검토·피드백 원문" />
+        <WorkflowView />
       </section>
       </div>
     </AdminShell>
