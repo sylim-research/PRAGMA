@@ -39,6 +39,31 @@ const HIDDEN_PROMPT_KEYS = new Set([
   "feedback.system.zh_ko",
   "feedback.system.zh_ko.spoken",
   "feedback.system.spoken",
+  // 2026-11-07: 미션 조립 화면은 v6만 만든다. v5 생성·검토 경로와 옛 개별 생성 경로는 화면 버튼과 연결돼 있지 않다.
+  // (legacy.outline.system.zh_ko는 이름과 달리 현행 중→한 개요 생성이라 남긴다.)
+  "legacy.individual.system.zh_ko",
+  "legacy.individual.system.zh_ko.spoken",
+  "mission.topology.system",
+  "mission.system",
+  "mission.system.zh_ko",
+  "mission.system.zh_ko.spoken",
+  "mission.system.proposal",
+  "mission.system.spoken",
+  "mission.system.legacy_v4",
+  "mission.user.contrast_plan",
+  "mission.candidate.generate.system",
+  "mission.candidate.check.system",
+  "mission.candidate.feedback.system",
+  "mission.repair.system",
+  "mission.consistency.system",
+  "mission.item_lineage.system",
+  "quality.system",
+  "quality.system.zh_ko",
+  "quality.system.zh_ko.spoken",
+  "quality.system.legacy_v4",
+  // 2026-10-25부터 선행 발화를 만들지 않으므로(서버가 is_response_act를 false로 고정) 응답 화행 판은 호출되지 않는다.
+  "core.user.response_act",
+  "core.user.spoken.zh_ko.response_act",
 ]);
 // 호출은 되지만 화면에서는 생략하는 지시문(2026-10-09). 선행발화의 언어 표기만 1회 고치는 기술 보정이라
 // 연구 서술과 관련이 가장 적다. 스냅숏(감사 기록)에는 그대로 남는다. 카드를 2열로 짝 맞추기 위해 뺐다.
