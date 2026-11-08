@@ -95,7 +95,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <br>
 
-<p align="center"><img src="docs/figures/screen-admin-dashboard-v4.png" alt="교수자 화면: PRAGMA 교수자 대시보드와 다섯 묶음의 관리자 메뉴" width="100%"></p>
+<p align="center"><img src="docs/figures/screen-admin-dashboard-v5.png" alt="교수자 화면: PRAGMA 교수자 대시보드, 다섯 묶음의 관리자 메뉴와 네 단계 콘텐츠 품질 관리" width="100%"></p>
 
 > <small>PRAGMA 교수자 대시보드</small>
 
