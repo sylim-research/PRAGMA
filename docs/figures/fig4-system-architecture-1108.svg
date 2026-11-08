@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 900" width="2000" height="900" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1E2A44" stroke-width="1.6"/>
+    </marker>
+    <style>
+      .t { fill:#1E2A44; }
+      .lay { font-size:36px; font-weight:800; fill:#1E2A44; }
+      .lays { font-size:26px; fill:#5B647A; }
+      .chip { font-size:27px; font-weight:700; fill:#1E2A44; }
+      .host { font-size:26px; font-weight:800; letter-spacing:3px; fill:#4A5568; }
+      .svc { font-size:31px; font-weight:800; fill:#1E2A44; }
+      .svcs { font-size:23px; fill:#3F4A61; }
+      .line { stroke:#1E2A44; stroke-width:2.4; fill:none; }
+    </style>
+  </defs>
+
+  <rect x="1.5" y="1.5" width="1997" height="897" rx="34" fill="#FFFFFF" stroke="#DADDE6" stroke-width="3"/>
+
+  <!-- 제목 -->
+  <text x="58" y="92" font-size="27" font-weight="700" letter-spacing="4" fill="#5B647A">Fig. 4</text>
+  <text x="168" y="92" font-size="32" font-weight="800" class="t">시스템 아키텍처</text>
+  <line x1="390" y1="83" x2="1942" y2="83" stroke="#E3E6EE" stroke-width="2"/>
+
+  <!-- 클라이언트 층 -->
+  <rect x="58" y="160" width="1335" height="155" rx="24" fill="#FFFFFF" stroke="#1E2A44" stroke-width="2.5"/>
+  <text x="90" y="230" class="lay">클라이언트 층</text>
+  <text x="90" y="272" class="lays">웹 브라우저</text>
+  <g>
+    <rect x="368" y="208" width="170" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="453" y="246" text-anchor="middle" class="chip">학습자 화면</text>
+    <rect x="552" y="208" width="170" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="637" y="246" text-anchor="middle" class="chip">교수자 화면</text>
+    <rect x="736" y="208" width="280" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="876" y="246" text-anchor="middle" class="chip">React · TypeScript</text>
+  </g>
+  <text x="1362" y="248" text-anchor="end" class="host">RAILWAY</text>
+
+  <line x1="725" y1="330" x2="725" y2="392" class="line" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+  <!-- 서버 함수 층 -->
+  <rect x="58" y="408" width="1335" height="155" rx="24" fill="#F5F6FA" stroke="#1E2A44" stroke-width="2.5"/>
+  <text x="90" y="478" class="lay">서버 함수 층</text>
+  <text x="90" y="520" class="lays">Edge Functions</text>
+  <g>
+    <rect x="368" y="456" width="300" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="518" y="494" text-anchor="middle" class="chip">시나리오·학습 미션 생성</text>
+    <rect x="682" y="456" width="180" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="772" y="494" text-anchor="middle" class="chip">AI 품질 심사</text>
+    <rect x="876" y="456" width="226" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="989" y="494" text-anchor="middle" class="chip">AI 피드백·검수</text>
+    <rect x="1116" y="456" width="130" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="1181" y="494" text-anchor="middle" class="chip">음성 처리</text>
+  </g>
+  <text x="1378" y="548" text-anchor="end" font-size="22" font-weight="800" letter-spacing="3" fill="#4A5568">SUPABASE</text>
+
+  <line x1="725" y1="578" x2="725" y2="640" class="line" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+
+  <!-- 데이터 층 -->
+  <rect x="58" y="656" width="1335" height="155" rx="24" fill="#FFFFFF" stroke="#1E2A44" stroke-width="2.5"/>
+  <text x="90" y="726" class="lay">데이터 층</text>
+  <text x="90" y="768" class="lays">PostgreSQL</text>
+  <g>
+    <rect x="368" y="704" width="110" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="423" y="742" text-anchor="middle" class="chip">인증</text>
+    <rect x="492" y="704" width="230" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="607" y="742" text-anchor="middle" class="chip">행 단위 접근 권한</text>
+    <rect x="736" y="704" width="200" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="836" y="742" text-anchor="middle" class="chip">학습 수행 기록</text>
+    <rect x="950" y="704" width="200" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
+    <text x="1050" y="742" text-anchor="middle" class="chip">모델 호출 기록</text>
+  </g>
+  <text x="1362" y="744" text-anchor="end" class="host">SUPABASE</text>
+
+  <!-- 서버 → 외부 -->
+  <line x1="1393" y1="485" x2="1470" y2="485" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 외부 서비스 -->
+  <rect x="1478" y="190" width="464" height="600" rx="26" fill="#FFFFFF" stroke="#8A93A8" stroke-width="2.2" stroke-dasharray="9 7"/>
+  <text x="1512" y="252" font-size="34" font-weight="800" class="t">외부 서비스</text>
+  <text x="1512" y="292" font-size="24" fill="#5B647A">서버 함수 층에서만 호출</text>
+
+  <rect x="1512" y="326" width="396" height="138" rx="16" fill="#EBF1FB" stroke="#C9D8F0" stroke-width="2"/>
+  <rect x="1512" y="326" width="8" height="138" rx="4" fill="#4A7BD0"/>
+  <text x="1542" y="378" class="svc">Google Gemini</text>
+  <text x="1542" y="414" class="svcs">생성 · 학습자 피드백</text>
+  <text x="1542" y="446" class="svcs">중→한 원문의 저장 전 검토</text>
+
+  <rect x="1512" y="482" width="396" height="138" rx="16" fill="#EAF5EF" stroke="#C6E2D3" stroke-width="2"/>
+  <rect x="1512" y="482" width="8" height="138" rx="4" fill="#4E9A78"/>
+  <text x="1542" y="534" class="svc">OpenAI</text>
+  <text x="1542" y="570" class="svcs">품질 심사·피드백 검수 (GPT-6 Astra)</text>
+  <text x="1542" y="602" class="svcs">중→한 원문 작성 · 음성 인식</text>
+
+  <rect x="1512" y="638" width="396" height="118" rx="16" fill="#F1EDF8" stroke="#DCD3EE" stroke-width="2"/>
+  <rect x="1512" y="638" width="8" height="118" rx="4" fill="#7D6BB8"/>
+  <text x="1542" y="690" class="svc">ElevenLabs</text>
+  <text x="1542" y="726" class="svcs">음성 합성</text>
+</svg>

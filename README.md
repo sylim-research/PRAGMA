@@ -58,7 +58,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 ### 3. 콘텐츠 제작·학습 워크플로우와 AI 모델 배정
 
-<p align="center"><img src="docs/figures/fig2-workflow-model-roles-1027.png" alt="콘텐츠 제작·학습 워크플로우와 AI 모델 배정: 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra, 최종 승인은 교수자" width="100%"></p>
+<p align="center"><img src="docs/figures/fig2-workflow-model-roles-1108.png" alt="콘텐츠 제작·학습 워크플로우와 AI 모델 배정: 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra, 최종 승인은 교수자" width="100%"></p>
 
 > <small>만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡고, 최종 승인은 교수자가 합니다.</small>
 
@@ -68,11 +68,12 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 ### 4. 통번역 학습 워크플로우
 
-<p align="center"><img src="docs/figures/fig3-learning-mission-1011c.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
+<p align="center"><img src="docs/figures/fig3-learning-mission-1108.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
 - **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
-- **DCT형 통번역 과제**에서는 초안과 수정안에 각각 AI 피드백을 받은 뒤, 학습자가 최종안을 결정합니다.
+- **DCT형 통번역 과제**에서는 초안과 수정안에 각각 AI 피드백을 받은 뒤, 학습자가 최종안을 결정합니다. 수정 권고를 받아도 이의 근거를 남기면 초안을 최종안으로 유지할 수 있습니다.
+- **통번역 과정 메모**는 필수 자유 서술입니다. 최초 메모는 AI 피드백을 보기 전에, 최종 메모는 최종안을 확정할 때 씁니다.
 - **AI 피드백**은 의미적 충실성·문법적 정확성·화용적 적절성의 세 기준으로 통번역을 검토합니다.
 - **번역과 통역** 미션은 구성이 같고, 통역은 속도와 휴지를 조정한 합성 음성을 듣고 수행합니다.
 
@@ -84,7 +85,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
   <thead><tr><th width="168" align="left">기능</th><th width="598" align="left">내용</th></tr></thead>
   <tbody>
     <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
-    <tr><td>학습자 관리</td><td>프로필 작성과 교수자의 가입 승인을 마친 학습자가 교과목에 참여</td></tr>
+    <tr><td>학습자 관리</td><td>프로필 작성과 수업 기록 동의를 마친 학습자가 바로 교과목에 참여하고, 교수자는 언제든 반려할 수 있음</td></tr>
     <tr><td>메타화용 토론</td><td>학습자 응답 분포와 선택 이유를 바탕으로 판단의 차이와 근거를 수업에서 논의</td></tr>
     <tr><td>수행 현황</td><td>학습자별 미션 수행 상태와 기록을 확인</td></tr>
   </tbody>
@@ -102,14 +103,14 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 ### 6. 시스템 아키텍처
 
-<p align="center"><img src="docs/figures/fig4-system-architecture-1011c.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+<p align="center"><img src="docs/figures/fig4-system-architecture-1108.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
-<sub>2026년 10월 기준</sub>
+<sub>2026년 11월 기준</sub>
 
 - **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다.
-- **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다. 저장 전 의미 검토는 작성 모델과 다른 회사의 모델이 맡습니다(한→중 GPT-6 Astra, 중→한 Gemini 3.1 Pro).
+- **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다. 저장 전 의미 검토는 작성 모델과 다른 계열의 모델이 맡습니다(한→중 GPT-6 Astra, 중→한 Gemini 3.1 Pro).
 - **학습 미션 생성**에는 Gemini 3.1 Pro를 사용합니다.
-- **AI 품질 심사**에는 GPT-6 Astra를 사용합니다. 중국어 표현 자연성도 이 심사에서 함께 봅니다.
+- **AI 품질 심사**에는 GPT-6 Astra를 사용합니다. 중국어 표현 자연성도 이 심사에서 함께 보며, 필요하면 중국어 표현 검토를 따로 요청할 수 있습니다.
 - **AI 피드백**은 Gemini 3.1 Pro가 쓰고, 학습자에게 보이기 전에 GPT-6 Astra가 검수합니다.
 - **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
