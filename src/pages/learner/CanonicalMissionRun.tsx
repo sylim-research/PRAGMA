@@ -1402,6 +1402,41 @@ export function primaryFeedbackCriterion(criteria: FeedbackCriterion[]) {
     ?? criteria[0];
 }
 
+/**
+ * 설명을 펼쳐 보여 줄 기준 — 검수를 통과한 「수정 필요」·「수정 권장」을 의미 → 문법 → 화용 순서 그대로(2026-11-15 연구자 승인).
+ * 「좋음」은 판정 칸만, 「판정 보류」는 보류 칸만, 「다음 단계」(의미가 옮겨지지 않음, DEC-20260918-04)는 설명 없이 둔다.
+ */
+export function feedbackExplanationCriteria(criteria: FeedbackCriterion[]) {
+  return criteria.filter((criterion) => criterion.level === "required" || criterion.level === "recommend");
+}
+
+/** 걸린 기준을 한 개만 고르지 않고 모두 펼친다. 접기 없음 — 접힌 설명은 읽지 않고 넘어가기 쉽다(2026-11-15). */
+function FeedbackExplanationList({ criteria, inPanel = false }: { criteria: FeedbackCriterion[]; inPanel?: boolean }) {
+  const shown = feedbackExplanationCriteria(criteria);
+  const fidelityFirst = criteria.some((criterion) => criterion.key === "meaning" && criterion.level === "required")
+    && criteria.some((criterion) => criterion.level === "deferred");
+  if (shown.length === 0) {
+    return criteria.length > 0 && criteria.every((criterion) => criterion.level === "held")
+      ? <p className="rounded-xl border border-[#E6D49A] bg-white px-4 py-3 text-[14.5px] leading-6 text-[#7A5A12]">{FEEDBACK_HELD_NOTE}</p>
+      : null;
+  }
+  return (
+    <div className="space-y-2">
+      {fidelityFirst && <p className="px-1 text-[13.5px] font-black text-[#8B3531]">원문의 뜻을 먼저 보완하세요.</p>}
+      {shown.map((criterion) => {
+        const required = criterion.level === "required";
+        return (
+          <div key={criterion.key} className={`rounded-xl border border-l-4 px-4 py-3 ${required ? "border-[#EBD3D0] border-l-[#C86E68]" : "border-[#EEE2BC] border-l-[#C9A62E]"} ${inPanel ? (required ? "bg-[#FFFAF9]" : "bg-[#FFFBEC]") : "bg-white"}`}>
+            <p className={`text-[12.5px] font-black ${required ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{criterion.label} · {FEEDBACK_LEVEL_LABEL[criterion.level]}</p>
+            <p className={`mt-1 break-keep leading-6 ${inPanel ? "text-sm" : "text-[14.5px]"}`}><ZhRuns text={conciseFeedback(criterion.body)} /></p>
+          </div>
+        );
+      })}
+      {fidelityFirst && <p className="px-1 text-[13px] leading-5 text-[#5A6673]">{FIDELITY_FIRST_NOTE}</p>}
+    </div>
+  );
+}
+
 function collectHighlights(text: string, expressions: string[]) {
   return expressions.filter((expression) => text.includes(expression));
 }
@@ -2026,11 +2061,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       );
                     })}
                   </div>
-                  {!evaluation.criteria.every(criterion => criterion.level === "very_good")
-                    && <div className={`rounded-xl border border-l-4 bg-white px-4 py-3 ${primaryCriterion.level === "required" ? "border-[#EBD3D0] border-l-[#C86E68]" : "border-[#EEE2BC] border-l-[#C9A62E]"}`}>
-                      <p className={`text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>
-                      <p className="mt-1 break-keep text-[14.5px] leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
-                    </div>}
+                  <FeedbackExplanationList criteria={evaluation.criteria} />
                 </>
               )}
             </div>
@@ -2049,12 +2080,12 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                   </div>
                   {!recheckRequested && <DemoFillButton label="예시 수정안 넣기" />}
                 </div>
-                {!recheckRequested && (needsChange || localPilot) && (
+                {!recheckRequested && (needsChange || localPilot) && (localPilot ? (
                   <div className={`mt-4 rounded-xl border border-l-4 px-4 py-3 ${needsChange && primaryCriterion.level === "required" ? "border-[#EBD3D0] border-l-[#C86E68] bg-[#FFFAF9]" : "border-[#EEE2BC] border-l-[#C9A62E] bg-[#FFFBEC]"}`}>
                     {needsChange && <p className={`mb-1.5 text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="break-keep text-sm leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                   </div>
-                )}
+                ) : <div className="mt-4"><FeedbackExplanationList criteria={evaluation.criteria} inPanel /></div>)}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-7`} />
                 <DemoExampleNote text={revised} derived={revisedFromExample} />
                 {finalizesNow && <div className="mt-4"><ProcessMemoField id={`${quest.id}-final-memo`} title={`${outputName} 과정 메모`} guide={reflected ? FINAL_MEMO_GUIDE.revised : FINAL_MEMO_GUIDE.retained} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} /></div>}
@@ -2539,10 +2570,58 @@ function CompletedQuestReview({ quest, response }: {
   );
 }
 
-export function CompletionRecord({ source, response, alternatives = [] }: {
+/** 회차별 AI 피드백 정리(DCT 핵심 정리) — 새 AI 호출 없이, 검수를 통과해 저장된 판정·설명만 모은다(2026-11-15 연구자 승인).
+ * 1차는 초안, 2차는 그때 제출한 수정안이 평가 대상이다. 최종안을 다시 평가한 것처럼 보이지 않게 하고, 판정 변화를 요약하지 않는다. */
+export function FeedbackRoundsSummary({ rounds, runtime, quest }: { rounds: DctFeedbackSnapshot[]; runtime: RunnableMission; quest: DctFeedbackQuest }) {
+  const byRound = (round: 1 | 2) => {
+    const snapshot = rounds.find((item) => item.round === round);
+    if (!snapshot) return { state: "none" as const };
+    if (!snapshot.result.ok || !snapshot.result.feedback) return { state: "failed" as const };
+    return { state: "ok" as const, criteria: evaluationFromRuntimeFeedback(runtime, quest, snapshot.result.feedback).criteria };
+  };
+  const first = byRound(1);
+  const second = byRound(2);
+  if (first.state === "none") return null;
+  const keys: FeedbackCriterion["key"][] = ["meaning", "language", "pragmatics"];
+  const labelOf = (key: FeedbackCriterion["key"]) => (first.state === "ok" ? first.criteria : second.state === "ok" ? second.criteria : [])
+    .find((criterion) => criterion.key === key)?.label ?? key;
+  const cell = (entry: ReturnType<typeof byRound>, key: FeedbackCriterion["key"], round: 1 | 2) => {
+    if (entry.state === "none") return <p className="text-[13.5px] leading-6 text-[#6D7788]">2차 피드백 없음</p>;
+    if (entry.state === "failed") return <p className="text-[13.5px] leading-6 text-[#6D7788]">{round === 1 ? "1차" : "2차"} 피드백을 불러오지 못했습니다.</p>;
+    const criterion = entry.criteria.find((item) => item.key === key);
+    if (!criterion) return null;
+    const explain = criterion.level === "required" || criterion.level === "recommend";
+    return <>
+      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>{FEEDBACK_LEVEL_LABEL[criterion.level]}</span>
+      {explain && <p className="mt-1.5 break-keep text-[14px] leading-6 text-[#15202B]"><ZhRuns text={conciseFeedback(criterion.body)} /></p>}
+    </>;
+  };
+  return (
+    <section className="rounded-2xl border border-[#E2DCCB] bg-white p-5 sm:p-6" aria-label="AI 피드백 정리">
+      <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={ListChecks} />AI 피드백 정리</h2>
+      <p className="mt-1.5 break-keep text-[13.5px] leading-6 text-[#635E52]">1차는 초안, 2차는 그때 제출한 수정안을 보고 준 피드백입니다. 최종안을 다시 평가한 것이 아닙니다.</p>
+      <div className="mt-4 divide-y divide-[#ECE7DA] rounded-xl border border-[#ECE7DA]">
+        <div className="hidden grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-4 py-2 text-[12.5px] font-black text-[#6B6453] sm:grid">
+          <span>기준</span><span>1차(초안)</span><span>2차(수정안)</span>
+        </div>
+        {keys.map((key) => (
+          <div key={key} className="grid gap-2 px-4 py-3 sm:grid-cols-[7.5rem_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3">
+            <span className="text-[13.5px] font-black text-[#2B3647]">{labelOf(key)}</span>
+            <div><span className="mb-1 block text-[11.5px] font-black text-[#6B6453] sm:hidden">1차(초안)</span>{cell(first, key, 1)}</div>
+            <div><span className="mb-1 block text-[11.5px] font-black text-[#6B6453] sm:hidden">2차(수정안)</span>{cell(second, key, 2)}</div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export function CompletionRecord({ source, response, alternatives = [], feedbackSummary }: {
   source?: string;
   response?: DctResponse;
   alternatives?: DctQuest["feedback"]["alternatives"];
+  /** 완성본과 추천 표현 사이에 두는 회차별 AI 피드백 정리(학습자 본인 수행에서만). */
+  feedbackSummary?: React.ReactNode;
 }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
@@ -2578,6 +2657,7 @@ export function CompletionRecord({ source, response, alternatives = [] }: {
           </div>
         </div>
       </section>
+      {feedbackSummary}
       {alternatives.length > 0 && <section className="rounded-2xl border-2 border-[#F0D34F] bg-[#FFFCEB] p-5 sm:p-6" aria-label="추천 표현">
         <h2 className={`flex items-center ${panelHeading}`}><SectionIcon icon={Quote} iconClassName="rotate-180" />추천 표현</h2>
         <ol className="mt-4 space-y-3">{alternatives.map((alternative, index) => <li key={alternative.text} className="rounded-xl border border-[#F3E3A2] bg-white p-4 shadow-[0_1px_4px_rgba(201,166,46,0.15)]">
@@ -3188,6 +3268,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
 
   const primaryDct = mission.quests.find((item): item is DctQuest => item.kind === "dct");
   const aDct = primaryDct ? responses[primaryDct.id] as DctResponse | undefined : undefined;
+  const summaryFeedbackQuest = mission.quests.find((item): item is DctFeedbackQuest => item.kind === "dct_feedback");
   const completionOutput = mission.activityMode === "interpreting" ? "통역" : "번역";
   const peerCourseId = new URLSearchParams(window.location.search).get("courseId");
   const peerChoices = useMemo(
@@ -3329,6 +3410,9 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
                 source={primaryDct?.source}
                 response={aDct}
                 alternatives={primaryDct?.feedback.alternatives}
+                feedbackSummary={runtime && !demoMode && !localPilot && summaryFeedbackQuest && aDct?.feedbackRounds?.length
+                  ? <FeedbackRoundsSummary rounds={aDct.feedbackRounds} runtime={runtime} quest={summaryFeedbackQuest} />
+                  : undefined}
               />
             </div>
             <DissentSummary dissent={aDct?.dissent} />
