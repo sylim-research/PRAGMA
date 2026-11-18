@@ -30,16 +30,17 @@ const keysOf = (semantic: "preserved" | "minor_loss" | "distorted", grammar: "cl
   feedbackExplanationCriteria(evaluationFromRuntimeFeedback(runtime, quest, feedback(semantic, grammar, held)).criteria).map(c => c.key);
 
 describe("all flagged criteria are explained", () => {
-  it("explains grammar ('수정 필요') and pragmatics ('수정 권장') together, in fixed order", () => {
-    expect(keysOf("preserved", "issue")).toEqual(["language", "pragmatics"]);
+  it("explains all three criteria, including '좋음', in fixed order (DEC-20261118-03)", () => {
+    expect(keysOf("preserved", "issue")).toEqual(["meaning", "language", "pragmatics"]);
+    expect(keysOf("preserved", "clean")).toEqual(["meaning", "language", "pragmatics"]);
   });
   it("explains a minor meaning loss first, then the rest", () => {
     expect(keysOf("minor_loss", "issue")).toEqual(["meaning", "language", "pragmatics"]);
   });
-  it("keeps grammar and pragmatics as 'next step' when the meaning was not carried over (DEC-20260918-04)", () => {
-    expect(keysOf("distorted", "issue")).toEqual(["meaning"]);
+  it("explains grammar and pragmatics even when the meaning was not carried over (DEC-20261118-03)", () => {
+    expect(keysOf("distorted", "issue")).toEqual(["meaning", "language", "pragmatics"]);
   });
-  it("never explains a held criterion", () => {
-    expect(keysOf("preserved", "issue", ["pragmatics"])).toEqual(["language"]);
+  it("still lists a criterion held in older stored feedback, with the held note as its body", () => {
+    expect(keysOf("preserved", "issue", ["pragmatics"])).toEqual(["meaning", "language", "pragmatics"]);
   });
 });

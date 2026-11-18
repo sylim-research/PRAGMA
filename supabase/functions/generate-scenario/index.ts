@@ -1,7 +1,6 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
 import { callGeminiChat, isGeminiModel } from '../_shared/geminiChat.ts'
-import { concretenessHeldAxes, concretenessRetryNote, findConcretenessIssues } from '../_shared/feedbackConcreteness.ts'
-import { applyFeedbackReview, buildFeedbackReviewSystemPrompt, buildFeedbackReviewUserPrompt, FEEDBACK_REVIEW_PROMPT_VERSION, FEEDBACK_REVIEW_RESPONSE_FORMAT, readFeedbackReview } from '../_shared/feedbackReview.ts'
+import { concretenessRetryNote, findConcretenessIssues } from '../_shared/feedbackConcreteness.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import {
@@ -4805,7 +4804,8 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
           promptVersion: feedbackPromptVersion,
         }),
       })
-      if (!att.ok && (att.status === 404 || att.status === 400)) {
+      // 어떤 실패든 대체 모델로 한 번 더 시도한다 — 학습자가 피드백을 못 받는 경우를 줄인다.
+      if (!att.ok && FEEDBACK_FALLBACK_MODEL) {
         model = FEEDBACK_FALLBACK_MODEL
         att = await callOpenAI(FEEDBACK_FALLBACK_MODEL, apiKey, sys, usr, 0.2, {
           maxCompletionTokens: FEEDBACK_MAX_COMPLETION_TOKENS,
@@ -4831,13 +4831,16 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
       // 모델이 통역 전사에서 완화·선택권 소실을 의미 손실로 이중 계산하는 경향을
       // 결정론적으로 막는다. 실제 사실·조건 누락 근거가 있으면 교정하지 않는다.
       repairFeedbackPragmaticLeak(parsed)
-      // 구체성 검사(2026-10-27 연구자 결정): 일반론 문구나 답안·원문에 없는 새 중국어가 있으면
-      // 시간이 남을 때 한 번만 다시 쓰게 하고, 그래도 남은 축은 판정 보류로 내보낸다.
+      // 구체성 검사(2026-10-27 연구자 결정): 일반론 문구나 답안·원문에 없는 새 목표어가 있으면
+      // 시간이 남을 때 한 번만 다시 쓰게 한다. 남은 문제는 기록만 하고 판정을 보류하지 않는다
+      // (2026-11-18 연구자 결정: 학습자는 어떤 경우에도 피드백 전문을 본다).
       let concreteness = findConcretenessIssues(parsed, b.answer ?? '', b.source_text ?? '')
       let concretenessRetried = false
-      if (concreteness.length && Date.now() - feedbackStartedAt < 25_000) {
+      if (concreteness.length && Date.now() - feedbackStartedAt < 20_000) {
         concretenessRetried = true
-        const retry = await callOpenAI(model, apiKey, sys, `${usr}\n\n${concretenessRetryNote(concreteness)}`, 0.2, {
+        const retry = await callOpenAI(model, apiKey, sys, `${usr}
+
+${concretenessRetryNote(concreteness)}`, 0.2, {
           maxCompletionTokens: FEEDBACK_MAX_COMPLETION_TOKENS,
           telemetry: telemetryFor('learner_feedback', false, { invocationAttempt: 2, promptVersion: feedbackPromptVersion }),
         }).catch(() => null)
@@ -4848,30 +4851,15 @@ export async function handleGenerateScenario(req: Request): Promise<Response> {
             repairFeedbackPragmaticLeak(reparsed)
             parsed = reparsed
             concreteness = findConcretenessIssues(parsed, b.answer ?? '', b.source_text ?? '')
-          } catch { /* 첫 출력을 유지하고 남은 문제 축을 보류한다 */ }
+          } catch { /* 첫 출력을 그대로 보여 준다 */ }
         }
       }
-      const concretenessHeld = concretenessHeldAxes(concreteness)
-      // 검수(UI 브리프 v2): 다른 회사 모델이 축마다 판정·설명을 확인한다. 학습자 대기 상한 60초 안에서
-      // 남은 시간만 기다리고, 늦거나 실패하면 모든 축을 보류한다(미검증 판정을 확정 노출하지 않는다).
-      const reviewBudgetMs = 55_000 - (Date.now() - feedbackStartedAt)
-      let review: ReturnType<typeof readFeedbackReview> = null
-      if (reviewBudgetMs > 5_000) {
-        const reviewCall = callOpenAI(REVIEW_PRIMARY_MODEL, apiKey, buildFeedbackReviewSystemPrompt(dir),
-          buildFeedbackReviewUserPrompt({ direction: dir, mode: b.mode ?? '', situation_ko: b.situation_ko, relation_ko: b.relation_ko,
-            source_text: b.source_text, answer: b.answer ?? '', feature: b.feature ?? undefined, feedback: parsed }), 0, {
-            maxCompletionTokens: 12_000,
-            responseFormat: FEEDBACK_REVIEW_RESPONSE_FORMAT,
-            telemetry: telemetryFor('learner_feedback', false, { invocationAttempt: 3, promptVersion: FEEDBACK_REVIEW_PROMPT_VERSION }),
-          }).catch(() => null)
-        const timedOut = new Promise<null>((resolve) => setTimeout(() => resolve(null), reviewBudgetMs))
-        const reviewAtt = await Promise.race([reviewCall, timedOut])
-        if (reviewAtt?.ok) {
-          try { review = readFeedbackReview(parseOpenAIContent(reviewAtt.raw)) } catch { review = null }
-        }
+      // 대안 문장은 학습자 화면에 노출하지 않는다(기존 정책 유지).
+      parsed = {
+        ...parsed,
+        blocks: { ...((parsed.blocks as Record<string, unknown>) ?? {}), alternatives: [] },
+        quality: { concreteness: { retried: concretenessRetried, issues: concreteness.map((issue) => `${issue.block}:${issue.kind}:${issue.detail}`) } },
       }
-      parsed = applyFeedbackReview(parsed, review, { model: REVIEW_PRIMARY_MODEL, status: 'reviewed' },
-        { heldAxes: concretenessHeld, retried: concretenessRetried, issues: concreteness.map((issue) => `${issue.block}:${issue.kind}:${issue.detail}`) })
       return new Response(
         JSON.stringify({
           feedback: {

@@ -1403,36 +1403,32 @@ export function primaryFeedbackCriterion(criteria: FeedbackCriterion[]) {
 }
 
 /**
- * 설명을 펼쳐 보여 줄 기준 — 검수를 통과한 「수정 필요」·「수정 권장」을 의미 → 문법 → 화용 순서 그대로(2026-11-15 연구자 승인).
- * 「좋음」은 판정 칸만, 「판정 보류」는 보류 칸만, 「다음 단계」(의미가 옮겨지지 않음, DEC-20260918-04)는 설명 없이 둔다.
+ * 설명을 펼쳐 보여 줄 기준 — 세 기준 모두, 의미 → 문법 → 화용 순서 그대로.
+ * 맞든 틀리든 학습자는 언제나 세 설명을 다 본다(DEC-20261118-03, 연구자 승인 2026-11-18).
  */
 export function feedbackExplanationCriteria(criteria: FeedbackCriterion[]) {
-  return criteria.filter((criterion) => criterion.level === "required" || criterion.level === "recommend");
+  return criteria;
 }
 
 /** 걸린 기준을 한 개만 고르지 않고 모두 펼친다. 접기 없음 — 접힌 설명은 읽지 않고 넘어가기 쉽다(2026-11-15). */
 function FeedbackExplanationList({ criteria, inPanel = false }: { criteria: FeedbackCriterion[]; inPanel?: boolean }) {
   const shown = feedbackExplanationCriteria(criteria);
-  const fidelityFirst = criteria.some((criterion) => criterion.key === "meaning" && criterion.level === "required")
-    && criteria.some((criterion) => criterion.level === "deferred");
-  if (shown.length === 0) {
-    return criteria.length > 0 && criteria.every((criterion) => criterion.level === "held")
-      ? <p className="rounded-xl border border-[#E6D49A] bg-white px-4 py-3 text-[14.5px] leading-6 text-[#7A5A12]">{FEEDBACK_HELD_NOTE}</p>
-      : null;
-  }
+  // 뜻이 옮겨지지 않았으면 고칠 순서만 알린다. 설명은 하나도 가리지 않는다.
+  const fidelityFirst = criteria.some((criterion) => criterion.key === "meaning" && criterion.level === "required");
+  if (shown.length === 0) return null;
   return (
     <div className="space-y-2">
       {fidelityFirst && <p className="px-1 text-[13.5px] font-black text-[#8B3531]">원문의 뜻을 먼저 보완하세요.</p>}
       {shown.map((criterion) => {
         const required = criterion.level === "required";
+        const good = criterion.level === "very_good";
         return (
-          <div key={criterion.key} className={`rounded-xl border border-l-4 px-4 py-3 ${required ? "border-[#EBD3D0] border-l-[#C86E68]" : "border-[#EEE2BC] border-l-[#C9A62E]"} ${inPanel ? (required ? "bg-[#FFFAF9]" : "bg-[#FFFBEC]") : "bg-white"}`}>
-            <p className={`text-[12.5px] font-black ${required ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{criterion.label} · {FEEDBACK_LEVEL_LABEL[criterion.level]}</p>
+          <div key={criterion.key} className={`rounded-xl border border-l-4 px-4 py-3 ${required ? "border-[#EBD3D0] border-l-[#C86E68]" : good ? "border-[#C6DDCE] border-l-[#4F8A68]" : "border-[#EEE2BC] border-l-[#C9A62E]"} ${inPanel ? (required ? "bg-[#FFFAF9]" : good ? "bg-[#F5FAF6]" : "bg-[#FFFBEC]") : "bg-white"}`}>
+            <p className={`text-[12.5px] font-black ${required ? "text-[#8B3531]" : good ? "text-[#286247]" : "text-[#7A5A12]"}`}>{criterion.label} · {FEEDBACK_LEVEL_LABEL[criterion.level]}</p>
             <p className={`mt-1 break-keep leading-6 ${inPanel ? "text-sm" : "text-[14.5px]"}`}><ZhRuns text={conciseFeedback(criterion.body)} /></p>
           </div>
         );
       })}
-      {fidelityFirst && <p className="px-1 text-[13px] leading-5 text-[#5A6673]">{FIDELITY_FIRST_NOTE}</p>}
     </div>
   );
 }
@@ -1531,7 +1527,6 @@ function evaluateDct(quest: DctFeedbackQuest, text: string): DctEvaluation {
   };
 }
 
-const FIDELITY_FIRST_NOTE = "의미적 충실성을 먼저 보완하면, 재검토 단계에서 문법과 화용을 이어서 검토합니다.";
 const FEEDBACK_HELD_NOTE = "이 부분은 자동 평가에서 판단이 갈려 이번에는 판정을 보류합니다.";
 
 function feedbackLevel(ok: boolean, warning = false): FeedbackLevel {
@@ -1555,10 +1550,10 @@ export function evaluationFromRuntimeFeedback(
     : feedback.verdicts.semantic_fidelity === "minor_loss"
       ? "recommend"
       : "required";
-  // 네 층 순서(Gate B 충실성 → 대역 → 자연성): 뜻이 옮겨지지 않았으면 뒤 층 판정을 보여 주지 않고 순서만 알린다.
+  // 뜻이 옮겨지지 않았어도 문법·화용 판정과 설명을 모두 보인다(DEC-20261118-03). 고칠 순서 안내만 남긴다.
   const fidelityFirst = meaningLevel === "required";
-  const grammarLevel: FeedbackLevel = held.has("grammar") ? "held" : fidelityFirst ? "deferred" : feedbackLevel(feedback.verdicts.grammatical_accuracy === "clean");
-  const pragmaticLevel: FeedbackLevel = held.has("pragmatics") ? "held" : fidelityFirst ? "deferred" : feedbackLevel(pragmaticOk, true);
+  const grammarLevel: FeedbackLevel = held.has("grammar") ? "held" : feedbackLevel(feedback.verdicts.grammatical_accuracy === "clean");
+  const pragmaticLevel: FeedbackLevel = held.has("pragmatics") ? "held" : feedbackLevel(pragmaticOk, true);
   const heldBody = (level: FeedbackLevel, body: string) => level === "held" ? FEEDBACK_HELD_NOTE : body;
   const grammarNote = feedback.blocks.grammar[0];
   const criteria: FeedbackCriterion[] = [
@@ -1577,7 +1572,7 @@ export function evaluationFromRuntimeFeedback(
       question: `${targetLanguage} 표현에 문법적인 문제가 없나요?`,
       level: grammarLevel,
       // 지적만 남기지 않고 고쳐 쓴 문장까지 함께 — 「어떻게 고치지」가 바로 보이게.
-      body: heldBody(grammarLevel, fidelityFirst ? FIDELITY_FIRST_NOTE : [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
+      body: heldBody(grammarLevel, [grammarNote?.explanation_ko, grammarNote?.suggested_correction && `고쳐 쓰면: ${grammarNote.suggested_correction}`]
         .filter(Boolean).join(" ") || (grammarLevel === "very_good"
         ? "의미 이해를 막는 문법 문제는 확인되지 않았습니다."
         : "이해를 방해하는 표현을 다시 확인해 주세요.")),
@@ -1587,7 +1582,7 @@ export function evaluationFromRuntimeFeedback(
       label: "화용적 적절성",
       question: "이 상황과 관계에 잘 맞나요?",
       level: pragmaticLevel,
-      body: heldBody(pragmaticLevel, fidelityFirst ? FIDELITY_FIRST_NOTE : feedback.blocks.feature_ko || (pragmaticOk
+      body: heldBody(pragmaticLevel, feedback.blocks.feature_ko || (pragmaticOk
         ? "이번 목표 화용요소의 적정 범위에 들어갑니다."
         : "상황과 관계에 맞게 표현의 정도를 다시 조절해 보세요.")),
     },
@@ -1610,7 +1605,7 @@ export function evaluationFromRuntimeFeedback(
       : allGood ? (someHeld ? "확인된 부분은 좋습니다." : `아주 좋습니다. 이 ${outputName}으로 충분합니다.`)
         : fidelityFirst ? "먼저 원문의 뜻을 옮겨 주세요." : "피드백을 확인하고 한 번 다듬어 보세요.",
     body: primary.body,
-    highlights: !fidelityFirst && grammarNote?.anchor_text ? [grammarNote.anchor_text] : [],
+    highlights: grammarNote?.anchor_text ? [grammarNote.anchor_text] : [],
     feedback: primary.body,
     action: !fidelityFirst && action && action !== primary.body ? action : undefined,
     example: feedback.blocks.alternatives[0]?.text ?? quest.referenceAnswer,
