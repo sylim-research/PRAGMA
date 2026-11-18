@@ -165,7 +165,7 @@ export const PROMPT_WORKFLOW: WorkflowStage[] = [
     id: "feedback",
     title: "학습자 피드백",
     screen: "학습자가 DCT를 제출할 때만 (MJT1~5는 ②의 해설을 보여 줌)",
-    result: "확인된 판정만 학습자에게 보여 줌",
+    result: "판정과 설명을 모두 학습자에게 보여 줌(판정 보류 없음)",
     steps: [
       {
         id: "feedback_generate", title: "피드백 작성", kind: "always", when: "DCT 답안을 제출할 때",
@@ -180,13 +180,6 @@ export const PROMPT_WORKFLOW: WorkflowStage[] = [
         model: fixed(R.feedback.primary),
         prompts: () => [],
         reuseNote: "「피드백 작성」과 같은 지시문",
-      },
-      {
-        id: "feedback_review", title: "재검토", kind: "always", when: "피드백이 나온 뒤",
-        does: "다른 AI가 축마다 판정·설명을 다시 확인합니다.",
-        model: fixed(REVIEW_PRIMARY_MODEL),
-        stop: "55초 안에 끝나지 않으면 판정을 확정해 보여 주지 않고 보류합니다.",
-        prompts: (dir) => [dirKey("feedback.review.system", dir)],
       },
     ],
   },

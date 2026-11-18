@@ -22,11 +22,11 @@ export const OPENAI_MODEL_ROUTES = {
     primary: REVIEW_PRIMARY_MODEL,
     fallback: null,
   },
-  // 학습자 런타임 피드백은 연구 정본과 분리된 가용성 정책을 쓴다.
+  // 학습자 런타임 피드백(2026-11-18 연구자 결정): 한중·중한 모두 Astra 한 모델이 쓴다. 검토 모델·판정 보류 없음.
   feedback: {
-    primary: GEMINI_PRIMARY_MODEL,
-    // 대체 경로는 같은 체급(상위)의 다른 공급자로 둔다. 소형 모델로 강등하지 않는다.
-    fallback: 'gpt-5.5',
+    primary: REVIEW_PRIMARY_MODEL,
+    // Astra 호출이 실패했을 때만 쓰는 대체 경로. 학습자가 피드백을 못 받는 일이 없게 한다.
+    fallback: GEMINI_PRIMARY_MODEL,
   },
 } as const
 

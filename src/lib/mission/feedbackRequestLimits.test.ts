@@ -9,7 +9,7 @@ import {
 
 describe("feedback request cost boundary", () => {
   it("caps model output well below the provider defaults", () => {
-    expect(FEEDBACK_MAX_COMPLETION_TOKENS).toBe(1_200);
+    expect(FEEDBACK_MAX_COMPLETION_TOKENS).toBe(12_000);
   });
 
   it("accepts a normal mission feedback payload", () => {

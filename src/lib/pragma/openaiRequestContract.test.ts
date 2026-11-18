@@ -30,8 +30,8 @@ describe("OpenAI request contract", () => {
         fallback: null,
       },
       feedback: {
-        primary: "gemini-3.1-pro-preview",
-        fallback: "gpt-5.5",
+        primary: "gpt-6-astra",
+        fallback: "gemini-3.1-pro-preview",
       },
     });
   });

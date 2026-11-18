@@ -7,8 +7,9 @@
 export const FEEDBACK_MAX_ANSWER_CHARS = 4_000
 export const FEEDBACK_MAX_PAYLOAD_CHARS = 32_000
 // feedback_v1은 짧은 3층 진단 JSON이다. 모델 기본 최대치(수만 토큰)를 그대로
-// 열어 두지 않고, 정상 응답에는 충분한 범위에서 출력 비용의 절대 상한을 둔다.
-export const FEEDBACK_MAX_COMPLETION_TOKENS = 1_200
+// 열어 두지 않고 출력 비용의 절대 상한을 둔다. 작성 모델 Astra는 추론 토큰도 이
+// 한도에 포함되므로 피드백 검토 호출과 같은 12,000으로 둔다(2026-11-18).
+export const FEEDBACK_MAX_COMPLETION_TOKENS = 12_000
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === 'string' && value.trim().length > 0
