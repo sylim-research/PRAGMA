@@ -22,10 +22,10 @@ const feedback = (semantic: "preserved" | "minor_loss" | "distorted") => ({
 }) as never;
 
 describe("fidelity first", () => {
-  it("defers grammar and pragmatics when the meaning was not carried over", () => {
+  it("still judges and explains grammar and pragmatics when the meaning was not carried over (DEC-20261118-03)", () => {
     const evaluation = evaluationFromRuntimeFeedback(runtime, quest, feedback("distorted"));
-    expect(evaluation.criteria.map(c => c.level)).toEqual(["required", "deferred", "deferred"]);
-    expect(evaluation.criteria[1].body).toBe("의미적 충실성을 먼저 보완하면, 재검토 단계에서 문법과 화용을 이어서 검토합니다.");
+    expect(evaluation.criteria.map(c => c.level)).toEqual(["required", "very_good", "recommend"]);
+    expect(evaluation.criteria[2].body).toBe("감사가 약하게 들릴 수 있습니다.");
     expect(evaluation.headline).toBe("먼저 원문의 뜻을 옮겨 주세요.");
   });
 
