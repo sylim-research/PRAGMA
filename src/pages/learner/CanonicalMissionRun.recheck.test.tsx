@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { StrictMode } from "react";
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CanonicalMissionRunner } from "./CanonicalMissionRun";
@@ -145,5 +145,32 @@ describe("one DCT revision recheck", () => {
     ]);
     expect(screen.getByRole("region", { name: "추천 표현" })).toBeInTheDocument();
     expect(JSON.stringify(mission)).toBe(before);
+  });
+
+  it("reopens the same lesson points during DCT and records openings per stage", async () => {
+    vi.mocked(requestFeedback).mockResolvedValueOnce({ ok: true, feedback: feedback(1) })
+      .mockResolvedValueOnce({ ok: true, feedback: feedback(2) });
+    const { mission } = openDraft();
+    await screen.findByText("1차 선택권 재검토");
+    const toggle = screen.getByRole("button", { name: "핵심 정리 다시 보기" });
+    const recap = toggle.closest("section")!;
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(within(recap).queryAllByRole("listitem")).toHaveLength(0);
+    click("핵심 정리 다시 보기");
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(within(recap).getAllByRole("listitem")).toHaveLength(mission.lesson_points.length);
+    expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
+    click("핵심 정리 다시 보기");
+    click("수정하기");
+    click("핵심 정리 다시 보기");
+    fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
+    click("수정안 제출하기");
+    await screen.findByRole("heading", { name: "AI 피드백 2차" });
+    fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
+    click("최종안 제출하기");
+    await waitFor(() => expect(saveMissionAttempt).toHaveBeenCalledTimes(1));
+    const event = vi.mocked(appendMissionEvent).mock.calls.find(([event]) => event.eventType === "feedback_received")![0];
+    expect(event.payload?.lesson_recap_reopen).toEqual({ schema_version: 1, available: true,
+      opens: { first_feedback: 1, revision_input: 1, second_feedback: 0 } });
   });
 });

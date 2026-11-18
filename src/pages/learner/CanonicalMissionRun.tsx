@@ -211,7 +211,12 @@ type DctResponse = {
   processMemo?: { text: string; at: string };
   /** 최종 선택 메모 — 최종안 확정 때 남긴다. 최초 메모를 덮어쓰지 않는다. */
   finalMemo?: string;
+  /** 「핵심 정리 다시 보기」를 단계별로 펼친 횟수(2026-11-18). 펼침만 뜻하며 읽음·활용은 뜻하지 않는다. */
+  lessonRecapReopen?: LessonRecapReopenRecord;
 };
+type LessonRecapStage = "first_feedback" | "revision_input" | "second_feedback";
+/** available=false는 미제공, 모두 0은 미열람, 기록 자체가 없으면(이전 수행) 미기록이다. */
+type LessonRecapReopenRecord = { schema_version: 1; available: boolean; opens: Record<LessonRecapStage, number> };
 type DevPreviewPreset = "all_good" | "direct" | "over_mitigated" | "mixed";
 
 /** 학급 응답 열람은 학습자 완료 화면에서 내려 둔다(2026-09-17). 기능과 관리자 공개는 그대로, 진입만 끈다. */
@@ -1956,10 +1961,14 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const canRetainWithDissent = Boolean(dissent);
   const actionHint = devMode ? undefined : revisionValidation.hint ?? (!recheckRequested && needsChange && !reflected && !canRetainWithDissent ? `피드백을 참고해 한 곳 이상 수정하거나, 아래 「초안 유지하기」를 눌러 이유를 적고 초안을 유지해 주세요.` : finalizesNow && !finalMemoReady ? `${outputName} 과정 메모를 적어 주세요.` : undefined);
   const feedbackRounds = runtime ? feedbackSession.snapshot() : undefined;
+  const lessonPoints = mission.lessonPoints ?? [];
+  const [recapOpens, setRecapOpens] = useState<Record<LessonRecapStage, number>>({ first_feedback: 0, revision_input: 0, second_feedback: 0 });
+  const recapStage: LessonRecapStage = recheckRequested ? "second_feedback" : revisionOpen ? "revision_input" : "first_feedback";
+  const lessonRecapReopen: LessonRecapReopenRecord = { schema_version: 1, available: lessonPoints.length > 0, opens: recapOpens };
   const confirmRevision = () => {
     markDemoEdited(revised, revisedFromExample);
     onDone({ first, revised: revised.trim(), reflected,
-      evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent, finalMemo: finalMemo.trim() });
+      evaluation: localPilot ? undefined : evaluation, runtimeFeedback, feedbackRounds, dissent, finalMemo: finalMemo.trim(), lessonRecapReopen });
   };
   const checkRevision = async () => {
     if (!runtime || !ready || !canConfirmRevision || !reflected || recheckStarted.current) return;
@@ -1980,7 +1989,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
   const keepWithReason = () => {
     const reason = { conditions: [], reason: finalMemo.trim() };
     setDissent(reason);
-    onDone({ first, revised: first.trim(), reflected: false, evaluation, runtimeFeedback, feedbackRounds, dissent: reason, finalMemo: finalMemo.trim() });
+    onDone({ first, revised: first.trim(), reflected: false, evaluation, runtimeFeedback, feedbackRounds, dissent: reason, finalMemo: finalMemo.trim(), lessonRecapReopen });
   };
   const retainFirstResponse = () => onDone({
     first,
@@ -1991,6 +2000,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
     feedbackRounds,
     dissent,
     finalMemo: finalMemo.trim(),
+    lessonRecapReopen,
   });
   if (!isMeaningfulDraft(first, mission.targetLanguage.label, outputName)) {
     return (
@@ -2064,6 +2074,9 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
             {(localPilot || !feedbackUnavailable) && <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? demoContent?.feedbackNote ?? "이 시연의 피드백 기록을 찾을 수 없습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>}
           </section>}
 
+          {/* 단계가 바뀌면 접힌 상태로 다시 그려 단계별 펼침을 따로 센다. */}
+          <LessonRecapReopen key={recapStage} lessonPoints={lessonPoints}
+            onOpen={() => setRecapOpens(current => ({ ...current, [recapStage]: current[recapStage] + 1 }))} />
 
           {revisionOpen ? (
             <>
@@ -2430,15 +2443,12 @@ export function withoutExpressionMemo(feedback: string): string {
   return start < 0 ? feedback : lines.slice(0, start).join("\n").trimEnd();
 }
 
-function MpjLessonBridge({ lessonPoints, onContinue }: {
-  lessonPoints: MissionLessonPoint[];
-  onContinue: () => void;
-}) {
+/** 문항별 핵심 정리 목록 — MJT 뒤 전환 화면과 DCT의 「핵심 정리 다시 보기」가 같은 목록을 쓴다(내용·순서 동일). */
+function LessonPointList({ lessonPoints }: { lessonPoints: MissionLessonPoint[] }) {
   const mission = useCanonicalMission();
   const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
   return (
-    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-4 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
-      <h1 className="break-keep text-[18px] font-bold text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">문항별 요점</span></h1>
+    <>
       {/* 다섯 줄을 한 패널의 표처럼 — 이름 칸 폭을 고정해 한 줄 요약이 같은 선에서 시작하고, 스크롤 없이 한 화면에 들어온다. */}
       <ol className="mt-3 divide-y divide-[#EEEAE1] overflow-hidden rounded-xl border border-[#EAE5D8] bg-white">
         {lessonPoints.map((point, index) => (
@@ -2454,6 +2464,37 @@ function MpjLessonBridge({ lessonPoints, onContinue }: {
           </li>
         ))}
       </ol>
+    </>
+  );
+}
+
+/** DCT 피드백·재검토 화면에서 앞서 본 핵심 정리를 접힌 채로 다시 펼쳐 보게 한다(2026-11-18 연구자 승인).
+ *  새 내용·DCT 추천 표현·AI 대안은 넣지 않는다. 핵심 정리가 없으면 그리지 않는다. */
+function LessonRecapReopen({ lessonPoints, onOpen }: { lessonPoints: MissionLessonPoint[]; onOpen: () => void }) {
+  const [open, setOpen] = useState(false);
+  if (lessonPoints.length === 0) return null;
+  return (
+    <section className={`${panel} overflow-hidden`}>
+      <button type="button" aria-expanded={open} onClick={() => { if (!open) onOpen(); setOpen(!open); }}
+        className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-[15px] font-bold text-[#2B3647]">
+        핵심 정리 다시 보기
+        <ChevronDown aria-hidden className={`h-4 w-4 shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="border-t border-[#EEEAE1] px-3 pb-3 sm:px-4"><LessonPointList lessonPoints={lessonPoints} /></div>}
+    </section>
+  );
+}
+
+function MpjLessonBridge({ lessonPoints, onContinue }: {
+  lessonPoints: MissionLessonPoint[];
+  onContinue: () => void;
+}) {
+  const mission = useCanonicalMission();
+  const outputName = mission.activityMode === "interpreting" ? "통역" : "번역";
+  return (
+    <section className="rounded-2xl border border-[#DED9CD] bg-[#FCFBF7] px-5 py-4 shadow-[0_10px_28px_rgba(21,32,43,0.05)] sm:px-6" aria-label="문항별 핵심 정리">
+      <h1 className="break-keep text-[18px] font-bold text-[#15202B]">핵심 정리 <span className="ml-1 text-[14px] font-bold text-[#8A8375]">문항별 요점</span></h1>
+      <LessonPointList lessonPoints={lessonPoints} />
 
       <div className="mt-3 flex justify-end">
         <Button type="button" className={`h-[48px] font-black ${actionButton}`} onClick={onContinue}>
@@ -3163,6 +3204,8 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
           revision_scope: finalResponse.runtimeFeedback?.revision_scope ?? null,
           // 1차 snapshot은 기존 완료 로그에 유지하고 A/B 원문·결과는 이벤트 JSON에 보존한다.
           feedback_rounds: finalResponse.feedbackRounds ?? [],
+          // 「핵심 정리 다시 보기」 펼침 기록(2026-11-18). 확정 전 이탈 시에는 남지 않는다.
+          lesson_recap_reopen: finalResponse.lessonRecapReopen ?? null,
         });
         if (finalResponse.revised !== finalResponse.first) {
           emitMissionEvent("revision_submitted", { revised_response: finalResponse.revised });
