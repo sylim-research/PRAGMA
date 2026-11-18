@@ -161,13 +161,17 @@ const DEFAULT_FORM: FormState = {
   batchSize: "10",
   speech_act_ui: "refusal",
   channel: "email",
-  complex_task: "negotiate",
+  // 2026-11-18: complex_task·reasons·coordination have no control on the current
+  // generator screen, so these defaults reached every request unseen and every
+  // outline came back as "two reasons + an offered alternative + negotiation".
+  // Default to a single-act request with one reason and no added coordination.
+  complex_task: "none",
   level: "intermediate",
   industry: "culture_content_media",
   func: "marketing_pr",
   multi: false,
-  reasons: "2",
-  coordination: true,
+  reasons: "1",
+  coordination: false,
   pdr_power: "higher",
   pdr_distance: "formal",
   pdr_burden: "low",
