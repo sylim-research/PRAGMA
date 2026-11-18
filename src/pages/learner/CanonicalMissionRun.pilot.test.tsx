@@ -136,7 +136,8 @@ describe("local learner UX pilot", () => {
     const completed = JSON.parse(sessionStorage.getItem(LEARNER_UX_PILOT_STORAGE_KEY)!);
     // 최초 과정 메모와 최종 선택 메모는 따로 남는다 — 최종 메모가 최초 메모를 덮어쓰지 않는다.
     expect(completed.responses["A-DCT"]).toEqual({ first, revised: final, reflected: true,
-      processMemo: { text: "관계를 생각해 부드럽게 옮겼다.", at: expect.any(String) }, finalMemo: "피드백을 보고 결정했다." });
+      processMemo: { text: "관계를 생각해 부드럽게 옮겼다.", at: expect.any(String) }, finalMemo: "피드백을 보고 결정했다.",
+      lessonRecapReopen: { schema_version: 1, available: true, opens: { first_feedback: 0, revision_input: 0, second_feedback: 0 } } });
     expect(completed.responses["A-FEEDBACK"]).not.toHaveProperty("evaluation");
     expect(screen.queryByText("초안에 대한 AI 피드백 보기")).not.toBeInTheDocument();
     expect(completed.responses.A4.revisedText).toBe(freeAnswer);
