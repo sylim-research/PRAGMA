@@ -14,6 +14,12 @@ export type AuditSnapshot = {
   distinctTokenCount: number | null;
   matchedTokenCount: number | null;
   candidates: string[];
+  /** v2 분절 보정 기록. v1 기록이면 null. */
+  rawMatchedTokenCount: number | null;
+  repairedTokenCount: number | null;
+  repairedExamples: string[];
+  /** 보정 출처: 저장된 v2 기록(stored), 화면에서 계산(on_read), 보정 없음(null). */
+  repairSource: "stored" | "on_read" | null;
 };
 
 export type AuditSnapshotContext = {
@@ -75,6 +81,16 @@ export function auditSnapshotFromContent(
     referenceCeiling: typeof audit.reference_ceiling === "number" ? audit.reference_ceiling : null,
     distinctTokenCount: typeof audit.distinct_token_count === "number" ? audit.distinct_token_count : null,
     matchedTokenCount: typeof audit.matched_token_count === "number" ? audit.matched_token_count : null,
+    rawMatchedTokenCount: typeof recordValue(audit.segmentation_repair)?.raw_matched_token_count === "number"
+      ? recordValue(audit.segmentation_repair)!.raw_matched_token_count as number
+      : null,
+    repairedTokenCount: typeof recordValue(audit.segmentation_repair)?.repaired_token_count === "number"
+      ? recordValue(audit.segmentation_repair)!.repaired_token_count as number
+      : null,
+    repairedExamples: Array.isArray(recordValue(audit.segmentation_repair)?.repaired_examples)
+      ? (recordValue(audit.segmentation_repair)!.repaired_examples as unknown[]).filter((item): item is string => typeof item === "string")
+      : [],
+    repairSource: recordValue(audit.segmentation_repair) ? "stored" : null,
     candidates: Array.isArray(audit.out_of_reference_candidates)
       ? audit.out_of_reference_candidates.filter((item): item is string => typeof item === "string")
       : [],

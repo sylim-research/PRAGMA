@@ -6,6 +6,7 @@ import { AdminShell } from "@/components/AdminShell";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { repairAuditsOnRead } from "@/lib/pragma/hskAuditRepairOnRead";
 import {
   auditSnapshotFromContent,
   completedAuditsNewestFirst,
@@ -180,6 +181,26 @@ const AdminCorpus = () => {
         setRecentAudit(selectRecentAudit(snapshots));
         setAllAudits(snapshots);
         setAuditLookupFailed(false);
+        // v1 기록(분절 보정 전)은 저장값을 바꾸지 않고 화면에서 보정한다. 조회가 실패하면 저장값을 그대로 둔다.
+        const rpc = supabase as unknown as {
+          rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
+        };
+        void repairAuditsOnRead(snapshots, async (tokens) => {
+          const { data, error: rpcError } = await rpc.rpc("hsk3_match_tokens", {
+            p_source_id: HSK3_REFERENCE_SOURCE_ID,
+            p_max_intro_level: 9,
+            p_tokens: tokens,
+          });
+          if (rpcError) throw new Error(rpcError.message);
+          return Array.isArray(data)
+            ? data.map((row: { headword?: unknown; intro_level?: unknown }) => ({ headword: String(row.headword ?? ""), intro_level: Number(row.intro_level) }))
+            : [];
+        }).then((repaired) => {
+          if (cancelled || repaired === snapshots) return;
+          setAllAudits(repaired);
+          setRecentAudit(selectRecentAudit(repaired));
+          setSelectedAudit((prev) => (prev ? repaired[snapshots.indexOf(prev)] ?? prev : prev));
+        }).catch(() => { /* 보정 실패: 저장값 표시 유지 */ });
       }
 
       setLoading(false);
@@ -347,6 +368,16 @@ function OperationsSection({
               <RatioBar matched={audit.matchedTokenCount ?? 0} outside={outsideCount} className="mt-2.5" />
             </li>
           </ol>
+          {audit.repairedTokenCount != null && audit.rawMatchedTokenCount != null && audit.distinctTokenCount ? (
+            <p className="text-[13.5px] text-[#514C44]">
+              분절 보정 반영{audit.repairSource === "on_read" ? "(화면 계산)" : ""} · 결합형 {fmt(audit.repairedTokenCount)}개를 HSK 단어로 나눠 목록 안으로 셈(보정 전 {pct(audit.rawMatchedTokenCount / audit.distinctTokenCount)})
+              {audit.repairedExamples.length > 0 && (
+                <span className="font-zh text-[#655F55]" lang="zh"> · {audit.repairedExamples.slice(0, 4).join(", ")}</span>
+              )}
+            </p>
+          ) : (
+            <p className="text-[13.5px] text-[#655F55]">분절 보정 전 기록</p>
+          )}
           {audit.candidates.length > 0 && (
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="mr-1 text-[13.5px] font-medium text-[#514C44]">목록 밖 후보 예</span>
@@ -465,6 +496,7 @@ const AUDIT_METHOD_DETAILS: { label: string; body: string }[] = [
   { label: "단위", body: "서로 다른 단어(유형) · 미션당 최대 160개(등장 순)" },
   { label: "대상", body: "한→중은 중국어 산출문, 중→한은 중국어 원문" },
   { label: "산식", body: "목록 안 유형 ÷ 분석한 유형 · 토큰 커버리지 아님" },
+  { label: "보정", body: "분절기가 묶은 결합형(예: 您好)은 HSK 단어로 나눠, 조각이 모두 대조 범위 안이면 목록 안으로 셈" },
 ];
 
 /** 대조 방식 — 설명 대신 세 단계와 「판정하지 않는 것」을 한 띠로 보여 준다. */
