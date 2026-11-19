@@ -24,13 +24,16 @@
 - 분절기, 상한(입문 4급·중급 5급·고급 6급), 「목록 밖 = 수준 부적합 아님」 안내.
 - 콘텐츠 해시: 점검값은 원래 해시에서 빠진다.
 
+전후 자료: `docs/research-trail/evidence/2026-11-19-hsk-audit-segment-repair/README.md` (EVD-20261119-01), ITER-20261119-01.
+
 ## 검증
 - `npm run typecheck` 통과.
 - `hskLexicalAudit.edge.test.ts`(보정 2건 추가), `hskAuditRepairOnRead.test.ts`(2건), `hskAuditSnapshot.test.ts` 통과.
 - `src/lib/pragma`·`src/lib/mission`·`src/lib/demo`·`src/pages/admin` 실행에서 9개 파일이 `supabaseUrl is required`로 실패. 변경 전 `origin/main`에서도 같다(환경 변수 없는 worktree).
 - 같은 규칙의 브라우저 재계산(2026-11-19, 읽기 전용): 택배 미션 72→88/98(89.8%).
-- 운영 화면 확인·Edge 함수 배포는 아직 안 함.
+- 운영 화면 확인(2026-11-19, 병합·배포 뒤): 전체 75%→89%, 중급 88%·고급 90%, 상세 카드 보정 줄 표시.
+- Edge `generate-scenario`·`content-review` 배포(2026-11-19, main `8cbd43c0`, 연구자 승인). 새 미션의 v2 저장은 다음 생성 때 확인 필요.
 
 ## 남은 일
-- `generate-scenario` 배포 뒤부터 새 미션이 v2로 저장된다(배포 승인 필요).
+- 새 미션이 v2(`segmentation_repair` 포함)로 저장되는지 다음 생성 때 확인.
 - `hsk3_match_tokens`는 migration에서 service_role에만 실행 권한을 주지만, 운영 DB에서는 로그인한 교수자 계정으로도 실행된다(기본 권한으로 보임, 확인 필요). 화면 보정은 이 권한에 기댄다.
