@@ -79,7 +79,8 @@ describe("HSK audit aggregates", () => {
   const snap = (over: Partial<AuditSnapshot>): AuditSnapshot => ({
     status: "complete", direction: "ko_zh", createdAt: "2026-09-26T00:00:00Z", contentKind: "mission",
     title: null, learnerLevel: null, mode: null, speechAct: null, speechActText: null,
-    referenceCeiling: 5, distinctTokenCount: 10, matchedTokenCount: 8, candidates: [], ...over,
+    referenceCeiling: 5, distinctTokenCount: 10, matchedTokenCount: 8, candidates: [],
+    rawMatchedTokenCount: null, repairedTokenCount: null, repairedExamples: [], repairSource: null, ...over,
   });
   it("ranks out-of-list words by the number of missions they appear in, missions only", () => {
     const top = topOutOfListWords([

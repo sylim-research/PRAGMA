@@ -4,6 +4,7 @@ import {
   createHskLexicalAudit,
   extractDistinctChineseTokens,
   hskReferenceCeiling,
+  repairSegmentation,
 } from '../../../supabase/functions/_shared/hskLexicalAudit'
 
 describe('HSK 3.0 lexical reference policy', () => {
@@ -65,5 +66,38 @@ describe('HSK 3.0 lexical reference policy', () => {
     })
     expect(audit.status).toBe('unavailable')
     expect(audit.non_blocking).toBe(true)
+  })
+})
+
+describe('HSK audit segmentation repair (v2)', () => {
+  // 작은 HSK 사전: 표제어 → 등급
+  const DICT: Record<string, number> = { 您: 1, 好: 1, 我: 1, 只: 1, 想: 1, 把: 3, 周: 2, 五: 1, 保管: 6, 保: 5, 管: 4, 合同: 4, 核实: 7, 核: 7 }
+  const matchTokens = vi.fn(async (tokens: string[], ceiling: number) =>
+    tokens.filter((t) => DICT[t] !== undefined && DICT[t] <= ceiling).map((headword) => ({ headword, intro_level: DICT[headword] })),
+  )
+
+  it('splits combined tokens into HSK headwords and counts them when every part is within the ceiling', async () => {
+    const repaired = await repairSegmentation({ unmatched: ['您好', '我只', '周五', '助教'], referenceCeiling: 5, matchTokens })
+    expect(repaired).toEqual([
+      { token: '您好', parts: ['您', '好'] },
+      { token: '我只', parts: ['我', '只'] },
+      { token: '周五', parts: ['周', '五'] },
+    ])
+  })
+
+  it('does not split genuine higher-level headwords and keeps the raw value for traceability', async () => {
+    const audit = await createHskLexicalAudit({
+      texts: ['您好', '保管', '核实', '合同'],
+      direction: 'ko_zh',
+      scope: 'zh_target_mission',
+      referenceCeiling: 5,
+      matchTokens: async (tokens, ceiling) => matchTokens(tokens, ceiling),
+    })
+    // 保管(6급)·核实(7급)은 표제어이므로 쪼개 세지 않는다.
+    expect(audit.out_of_reference_candidates).toEqual(expect.arrayContaining(['保管', '核实']))
+    expect(audit.out_of_reference_candidates).not.toContain('您好')
+    expect(audit.segmentation_repair?.repaired_examples).toContain('您好→您+好')
+    expect(audit.segmentation_repair?.raw_matched_token_count).toBe(audit.matched_token_count - (audit.segmentation_repair?.repaired_token_count ?? 0))
+    expect(audit.policy_version).toBe('hsk3_lexical_reference_v2')
   })
 })
