@@ -1,74 +1,113 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 840" width="1600" height="840" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 980" width="2000" height="980" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1E2A44" stroke-width="1.8"/>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1E2A44" stroke-width="1.6"/>
     </marker>
     <style>
       .t { fill:#1E2A44; }
-      .h { font-size:30px; font-weight:800; fill:#1E2A44; }
-      .s { font-size:27px; fill:#3F4A61; }
-      .row { font-size:30px; font-weight:800; fill:#1E2A44; }
-      .rowsub { font-size:26px; fill:#5B647A; }
-      .chip { font-size:26px; font-weight:700; }
-      .leg { font-size:26px; fill:#3F4A61; }
-      .line { stroke:#1E2A44; stroke-width:2.4; fill:none; }
-      .dline { stroke:#5B647A; stroke-width:2.4; fill:none; stroke-dasharray:10 8; }
+      .h { font-size:32px; font-weight:800; fill:#1E2A44; }
+      .s { font-size:25px; fill:#3F4A61; }
+      .sy { font-size:25px; fill:#6B5410; }
+      .lab { font-size:36px; font-weight:800; fill:#1E2A44; }
+      .labs { font-size:26px; fill:#5B647A; }
+      .line { stroke:#1E2A44; stroke-width:2.2; fill:none; }
+      .note { font-size:21px; fill:#5B647A; }
     </style>
   </defs>
-  <rect x="1.5" y="1.5" width="1597" height="837" rx="28" fill="#FFFFFF" stroke="#DADDE6" stroke-width="3"/>
-  <text x="50" y="78" font-size="26" font-weight="700" letter-spacing="3" fill="#5B647A">Fig. 3</text>
-  <text x="150" y="78" font-size="34" font-weight="800" class="t">통번역 학습 워크플로우 · 하나의 학습 미션</text>
-  <rect x="1130" y="54" width="40" height="30" rx="7" fill="#FDF6E0" stroke="#E2C766" stroke-width="2.5"/>
-  <text x="1182" y="78" text-anchor="start" class="leg">학습자</text>
-  <rect x="1330" y="54" width="40" height="30" rx="7" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2" stroke-dasharray="6 5"/>
-  <text x="1382" y="78" text-anchor="start" class="leg">AI</text>
-  <text x="50" y="170" text-anchor="start" class="row">MJT 판단 문항</text>
-  <text x="262" y="170" text-anchor="start" class="rowsub">제시된 표현의 적절성 판단</text>
-  <rect x="50" y="194" width="268" height="104" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
-  <text x="184.0" y="256" text-anchor="middle" class="h">단일 표현 판단</text>
-  <line x1="318" y1="246.0" x2="354" y2="246.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="358" y="194" width="268" height="104" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
-  <text x="492.0" y="256" text-anchor="middle" class="h">판단과 이유</text>
-  <line x1="626" y1="246.0" x2="662" y2="246.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="666" y="194" width="268" height="104" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
-  <text x="800.0" y="256" text-anchor="middle" class="h">복수 표현 비교</text>
-  <line x1="934" y1="246.0" x2="970" y2="246.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="974" y="194" width="268" height="104" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="3"/>
-  <text x="1108.0" y="256" text-anchor="middle" class="h">수정안 선택</text>
-  <line x1="1242" y1="246.0" x2="1278" y2="246.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="1282" y="194" width="268" height="104" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="3"/>
-  <text x="1416.0" y="256" text-anchor="middle" class="h">직접 수정</text>
-  <path d="M1416.0,298 L1416.0,346 L184.0,346 L184.0,420" class="line" marker-end="url(#arrow)"/>
-  <rect x="710.0" y="324" width="180" height="44" rx="22" fill="#EEF0F6" stroke="#C9CEDA" stroke-width="2"/>
-  <text x="800.0" y="356" text-anchor="middle" class="chip" style="fill:#1E2A44">핵심 정리</text>
-  <text x="212.0" y="398" text-anchor="start" class="row">DCT형 통번역 과제</text>
-  <rect x="50" y="424" width="268" height="140" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
-  <text x="184.0" y="482" text-anchor="middle" class="h">원문 제시</text>
-  <text x="184.0" y="526" text-anchor="middle" class="s">상황·관계 조건</text>
-  <line x1="318" y1="494.0" x2="354" y2="494.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="358" y="424" width="268" height="140" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="3"/>
-  <text x="492.0" y="482" text-anchor="middle" class="h">초안</text>
-  <text x="492.0" y="526" text-anchor="middle" class="s">+ 과정 메모</text>
-  <line x1="626" y1="494.0" x2="662" y2="494.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="666" y="424" width="268" height="140" rx="20" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2.4" stroke-dasharray="9 7"/>
-  <text x="800.0" y="482" text-anchor="middle" class="h">AI 피드백 1차</text>
-  <text x="800.0" y="526" text-anchor="middle" class="s">의미·문법·화용</text>
-  <line x1="934" y1="494.0" x2="970" y2="494.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="974" y="424" width="268" height="140" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="3"/>
-  <text x="1108.0" y="482" text-anchor="middle" class="h">재검토</text>
-  <text x="1108.0" y="526" text-anchor="middle" class="s">유지 또는 수정</text>
-  <line x1="1242" y1="494.0" x2="1278" y2="494.0" class="line" marker-end="url(#arrow)"/>
-  <rect x="1282" y="424" width="268" height="140" rx="20" fill="#F2C744"/>
-  <text x="1416.0" y="482" text-anchor="middle" class="h">최종안</text>
-  <text x="1416.0" y="526" text-anchor="middle" class="s">+ 과정 메모</text>
-  <line x1="1108.0" y1="564" x2="1108.0" y2="640" class="line" marker-end="url(#arrow)"/>
-  <text x="1124.0" y="614" text-anchor="start" class="chip" style="fill:#1E2A44">수정</text>
-  <rect x="974" y="644" width="268" height="120" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="3"/>
-  <text x="1108.0" y="696" text-anchor="middle" class="h">수정안</text>
-  <text x="1108.0" y="738" text-anchor="middle" class="s">직접 고쳐 쓰기</text>
-  <rect x="1282" y="644" width="268" height="120" rx="20" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2.4" stroke-dasharray="9 7"/>
-  <text x="1416.0" y="696" text-anchor="middle" class="h">AI 피드백 2차</text>
-  <text x="1416.0" y="738" text-anchor="middle" class="s">수정안 대상</text>
-  <line x1="1242" y1="704" x2="1278" y2="704" class="line" marker-end="url(#arrow)"/>
-  <line x1="1416.0" y1="644" x2="1416.0" y2="568" class="line" marker-end="url(#arrow)"/>
+
+  <rect x="1.5" y="1.5" width="1997" height="977" rx="34" fill="#FFFFFF" stroke="#DADDE6" stroke-width="3"/>
+
+  <!-- 제목 -->
+  <text x="58" y="92" font-size="27" font-weight="700" letter-spacing="4" fill="#5B647A">Fig. 3</text>
+  <text x="168" y="92" font-size="32" font-weight="800" class="t">통번역 학습 워크플로우 · 하나의 학습 미션</text>
+  <line x1="800" y1="83" x2="1942" y2="83" stroke="#E3E6EE" stroke-width="2"/>
+
+  <!-- ── 1줄: MJT ── -->
+  <rect x="58" y="172" width="6" height="104" fill="#1E2A44"/>
+  <text x="84" y="216" class="lab">MJT 판단 문항</text>
+  <text x="84" y="258" class="labs">화용적 적절성 판단</text>
+
+  <rect x="405" y="160" width="277" height="128" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="543" y="236" text-anchor="middle" class="h">단일 표현 판단</text>
+
+  <rect x="720" y="160" width="277" height="128" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="858" y="214" text-anchor="middle" class="h">판단과 이유</text>
+  <text x="858" y="254" text-anchor="middle" class="s">이유 뒤 결과 공개</text>
+
+  <rect x="1035" y="160" width="277" height="128" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="1173" y="236" text-anchor="middle" class="h">복수 표현 비교</text>
+
+  <rect x="1350" y="160" width="277" height="128" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="2.5"/>
+  <text x="1488" y="214" text-anchor="middle" class="h">수정안 선택</text>
+  <text x="1488" y="254" text-anchor="middle" class="sy">보기에서 고르기</text>
+
+  <rect x="1665" y="160" width="277" height="128" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="2.5"/>
+  <text x="1803" y="214" text-anchor="middle" class="h">직접 수정</text>
+  <text x="1803" y="254" text-anchor="middle" class="sy">스스로 고쳐 쓰기</text>
+
+  <line x1="682" y1="224" x2="716" y2="224" class="line" marker-end="url(#arrow)"/>
+  <line x1="997" y1="224" x2="1031" y2="224" class="line" marker-end="url(#arrow)"/>
+  <line x1="1312" y1="224" x2="1346" y2="224" class="line" marker-end="url(#arrow)"/>
+  <line x1="1627" y1="224" x2="1661" y2="224" class="line" marker-end="url(#arrow)"/>
+
+  <!-- 핵심 정리 -->
+  <path d="M1803,316 L1803,384 L537,384 L537,446" class="line" marker-end="url(#arrow)"/>
+  <rect x="1083" y="356" width="180" height="56" rx="28" fill="#EEF0F6" stroke="#C9CEDA" stroke-width="2"/>
+  <text x="1173" y="393" text-anchor="middle" font-size="25" font-weight="800" class="t">핵심 정리</text>
+
+  <!-- ── 2줄: DCT ── -->
+  <rect x="58" y="488" width="6" height="104" fill="#E2B93B"/>
+  <text x="84" y="532" class="lab">DCT형 통번역 과제</text>
+  <text x="84" y="574" class="labs">주어진 원문의 번역·통역</text>
+
+  <rect x="405" y="460" width="265" height="160" rx="20" fill="#FFFFFF" stroke="#C9CEDA" stroke-width="2.5"/>
+  <text x="537" y="530" text-anchor="middle" class="h">원문 제시</text>
+  <text x="537" y="572" text-anchor="middle" class="s">상황·관계 조건</text>
+
+  <rect x="713" y="460" width="265" height="160" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="2.5"/>
+  <text x="845" y="514" text-anchor="middle" class="h">초안</text>
+  <text x="845" y="556" text-anchor="middle" class="sy">직접 번역·통역</text>
+  <text x="845" y="592" text-anchor="middle" class="sy">+ 최초 과정 메모</text>
+
+  <rect x="1021" y="460" width="265" height="160" rx="20" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2.2" stroke-dasharray="9 7"/>
+  <text x="1153" y="530" text-anchor="middle" class="h">AI 피드백 1차</text>
+  <text x="1153" y="572" text-anchor="middle" class="s">의미, 문법, 화용</text>
+
+  <rect x="1329" y="460" width="265" height="160" rx="20" fill="#FDF6E0" stroke="#D9B23A" stroke-width="3.5"/>
+  <text x="1461" y="530" text-anchor="middle" class="h">학습자의 재검토</text>
+  <text x="1461" y="572" text-anchor="middle" class="sy">유지 또는 수정</text>
+
+  <rect x="1680" y="460" width="262" height="160" rx="20" fill="#F2C744"/>
+  <text x="1811" y="514" text-anchor="middle" class="h">최종안</text>
+  <text x="1811" y="556" text-anchor="middle" font-size="24" fill="#3A2E08">학습자 최종 결정</text>
+  <text x="1811" y="592" text-anchor="middle" font-size="24" fill="#3A2E08">+ 최종 과정 메모</text>
+
+  <line x1="670" y1="540" x2="709" y2="540" class="line" marker-end="url(#arrow)"/>
+  <line x1="978" y1="540" x2="1017" y2="540" class="line" marker-end="url(#arrow)"/>
+  <line x1="1286" y1="540" x2="1325" y2="540" class="line" marker-end="url(#arrow)"/>
+  <line x1="1594" y1="540" x2="1676" y2="540" class="line" marker-end="url(#arrow)"/>
+  <text x="1637" y="508" text-anchor="middle" font-size="24" font-weight="700" class="t">유지</text>
+  <text x="1637" y="578" text-anchor="middle" font-size="22" fill="#5B647A">이의 근거</text>
+
+  <!-- ── 3줄: 수정 경로 ── -->
+  <line x1="1461" y1="620" x2="1461" y2="716" class="line" marker-end="url(#arrow)"/>
+  <text x="1484" y="676" font-size="24" font-weight="700" class="t">수정</text>
+
+  <rect x="1329" y="720" width="265" height="150" rx="20" fill="#FDF6E0" stroke="#E2C766" stroke-width="2.5"/>
+  <text x="1461" y="786" text-anchor="middle" class="h">수정안</text>
+  <text x="1461" y="828" text-anchor="middle" class="sy">직접 고쳐 쓰기</text>
+
+  <rect x="1680" y="720" width="262" height="150" rx="20" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2.2" stroke-dasharray="9 7"/>
+  <text x="1811" y="786" text-anchor="middle" class="h">AI 피드백 2차</text>
+  <text x="1811" y="828" text-anchor="middle" class="s">수정안 대상</text>
+
+  <line x1="1594" y1="795" x2="1676" y2="795" class="line" marker-end="url(#arrow)"/>
+  <line x1="1811" y1="720" x2="1811" y2="624" class="line" marker-end="url(#arrow)"/>
+
+
+  <!-- 범례 -->
+  <rect x="1606" y="912" width="44" height="28" rx="6" fill="#FDF6E0" stroke="#E2C766" stroke-width="2"/>
+  <text x="1660" y="936" font-size="26" font-weight="700" class="t">학습자</text>
+  <rect x="1790" y="912" width="44" height="28" rx="6" fill="#EEF0F6" stroke="#8A93A8" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="1844" y="936" font-size="26" font-weight="700" class="t">AI</text>
 </svg>
