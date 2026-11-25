@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/brand/banner.svg" alt="PRAGMA: AI 기반 한·중 통번역 학습 워크플로우" width="100%">
+  <img src="docs/brand/banner.svg" alt="PRAGMA: AI 기반 한·중 통번역 학습 웹앱" width="100%">
 </p>
 
 <p align="center">
@@ -9,10 +9,7 @@
 
 <h3 align="center">같은 뜻도, 상황과 관계에 따라 다르게 표현합니다.</h3>
 
-<p align="center">
-PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하면서,<br>
-상황과 관계에 더 잘 맞는 표현을 탐구하는 통번역 학습 시스템입니다.
-</p>
+<p align="center">원문의 뜻을 지키며 상황·관계에 맞는 표현을 고르는 한·중 통번역 학습 웹앱입니다.</p>
 
 <br>
 
@@ -35,7 +32,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 실제 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
-> <small>콘텐츠 제작과 통번역 학습은 실제 수업 운영으로 이어지고, 학습 기록과 토론 결과는 다시 콘텐츠 검토에 쓰입니다.</small>
+> <small>콘텐츠 제작과 학습은 수업으로 이어지고, 학습 기록과 토론 결과는 콘텐츠 검토로 돌아갑니다.</small>
 
 <br>
 
@@ -58,11 +55,11 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 ### 3. 콘텐츠 제작·학습 워크플로우와 AI 모델 배정
 
-<p align="center"><img src="docs/figures/fig2-workflow-model-roles-1108.png" alt="콘텐츠 제작·학습 워크플로우와 AI 모델 배정: 만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra, 최종 승인은 교수자" width="100%"></p>
+<p align="center"><img src="docs/figures/fig2-workflow-model-roles-1125.png" alt="콘텐츠 제작·학습 워크플로우와 AI 모델 배정: 생성은 Gemini 3.1 Pro, 심사와 실시간 피드백은 GPT-6 Astra, 최종 승인은 교수자" width="100%"></p>
 
-> <small>만드는 일은 Gemini 3.1 Pro, 검사하는 일은 GPT-6 Astra가 맡고, 최종 승인은 교수자가 합니다.</small>
+> <small>생성은 Gemini 3.1 Pro, 심사와 실시간 피드백은 GPT-6 Astra, 최종 승인은 교수자가 맡습니다.</small>
 
-- 단계별로 누가 무엇을 보는지, 자동 규칙 점검이 실제로 확인하는 규칙 17개는 [콘텐츠 품질 관리 설명](docs/content-quality-check.md)에 정리했습니다.
+- 단계별 역할과 자동 규칙 점검의 규칙 17개는 [콘텐츠 품질 관리 설명](docs/content-quality-check.md)에 있습니다.
 
 <br>
 
@@ -70,12 +67,15 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 <p align="center"><img src="docs/figures/fig3-learning-mission-1108.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
-- **학습 미션**은 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성됩니다.
-- **MJT 판단 문항**에서는 제시된 표현의 화용적 적절성을 판단하고 선택하거나 수정합니다.
-- **DCT형 통번역 과제**에서는 초안과 수정안에 각각 AI 피드백을 받은 뒤, 학습자가 최종안을 결정합니다. 수정 권고를 받아도 이의 근거를 남기면 초안을 최종안으로 유지할 수 있습니다.
-- **통번역 과정 메모**는 필수 자유 서술입니다. 최초 메모는 AI 피드백을 보기 전에, 최종 메모는 최종안을 확정할 때 씁니다.
-- **AI 피드백**은 의미적 충실성·문법적 정확성·화용적 적절성의 세 기준으로 통번역을 검토합니다.
-- **번역과 통역** 미션은 구성이 같고, 통역은 속도와 휴지를 조정한 합성 음성을 듣고 수행합니다.
+- **학습 미션**은 MJT 판단 문항 5개와 DCT형 통번역 과제 1개로 구성됩니다.
+- **MJT 판단 문항**에서는 제시된 표현의 적절성을 판단하고 선택하거나 수정합니다.
+- **DCT형 통번역 과제**는 초안과 수정안에 AI 피드백을 받고, 최종안은 학습자가 정합니다.
+- **AI 피드백**은 의미·문법·화용을 기준 통과·보완 권장·수정 필요로 판정해 설명합니다.
+- **고칠 순서**는 고칠 기준이 둘 이상일 때 의미→화용→문법 순으로 번호를 붙입니다.
+- **표현 힌트**는 완성 문장 대신 앞선 MJT에서 승인된 표현을 실마리로 보여 줍니다.
+- **통번역 과정 메모**는 피드백을 보기 전과 최종안을 정할 때 한 번씩 씁니다.
+- **손들기**로 학습자는 해설·피드백 뒤 수업에서 다룰 점을 익명으로 남깁니다.
+- **번역과 통역**은 구성이 같고, 통역은 속도를 조정한 합성 음성을 듣고 수행합니다.
 
 <br>
 
@@ -84,9 +84,9 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 <table>
   <thead><tr><th width="168" align="left">기능</th><th width="598" align="left">내용</th></tr></thead>
   <tbody>
-    <tr><td>교과목 편성</td><td>번역·통역·통번역 교과목의 15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
-    <tr><td>학습자 관리</td><td>프로필 작성과 수업 기록 동의를 마친 학습자가 바로 교과목에 참여하고, 교수자는 언제든 반려할 수 있음</td></tr>
-    <tr><td>메타화용 토론</td><td>학습자 응답 분포와 선택 이유를 바탕으로 판단의 차이와 근거를 수업에서 논의</td></tr>
+    <tr><td>교과목 편성</td><td>15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
+    <tr><td>학습자 관리</td><td>기록 동의를 마친 학습자가 바로 참여하고, 교수자가 반려 가능</td></tr>
+    <tr><td>메타화용 토론</td><td>응답 분포·선택 이유·손들기로 판단의 근거를 수업에서 논의</td></tr>
     <tr><td>수행 현황</td><td>학습자별 미션 수행 상태와 기록을 확인</td></tr>
   </tbody>
 </table>
@@ -103,18 +103,19 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 
 ### 6. 시스템 아키텍처
 
-<p align="center"><img src="docs/figures/fig4-system-architecture-1108.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
+<p align="center"><img src="docs/figures/fig4-system-architecture-1125.png" alt="시스템 아키텍처: 클라이언트 층, 서버 함수 층, 데이터 층과 외부 서비스" width="100%"></p>
 
 <sub>2026년 11월 기준</sub>
 
 - **모델 배정**은 과제별 블라인드 비교를 거쳐 정했습니다.
-- **시나리오 생성**은 한→중이면 Gemini 3.1 Pro, 중→한이면 중국어 원문을 쓰는 GPT-6 Astra가 맡습니다. 저장 전 의미 검토는 작성 모델과 다른 계열의 모델이 맡습니다(한→중 GPT-6 Astra, 중→한 Gemini 3.1 Pro).
+- **시나리오 생성**은 한→중 Gemini 3.1 Pro, 중→한 GPT-6 Astra가 맡습니다.
+- **저장 전 의미 검토**는 시나리오를 작성한 모델과 다른 계열의 모델이 맡습니다.
 - **학습 미션 생성**에는 Gemini 3.1 Pro를 사용합니다.
-- **AI 품질 심사**에는 GPT-6 Astra를 사용합니다. 중국어 표현 자연성도 이 심사에서 함께 보며, 필요하면 중국어 표현 검토를 따로 요청할 수 있습니다.
-- **AI 피드백**은 Gemini 3.1 Pro가 쓰고, 학습자에게 보이기 전에 GPT-6 Astra가 검수합니다.
-- **통역**의 <b>음성 인식(STT)</b>은 GPT-4o Transcribe, <b>음성 합성(TTS)</b>은 ElevenLabs로 처리합니다.
+- **AI 품질 심사**에는 GPT-6 Astra를 쓰며, 중국어 표현의 자연성도 함께 봅니다.
+- **AI 피드백**은 GPT-6 Astra가 쓰고, 호출이 실패하면 Gemini 3.1 Pro가 대신 씁니다.
+- **통역**의 음성 인식은 GPT-4o Transcribe, 음성 합성은 ElevenLabs가 맡습니다.
 - **구현**은 React·TypeScript와 Supabase Edge Functions·PostgreSQL로 구성됩니다.
-- **코드 관리와 배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 자동 실행한 뒤 Railway로 배포합니다.
+- **배포**는 PR과 main 갱신마다 자료형 검사·테스트·빌드를 거쳐 Railway로 합니다.
 
 <br>
 
@@ -126,7 +127,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
     <tr><td>자동 규칙 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
-    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견</td></tr>
+    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견 · 손들기</td></tr>
   </tbody>
 </table>
 
@@ -148,14 +149,15 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
     <tr><td nowrap>4.3</td><td nowrap>콘텐츠 제작 워크플로우 구현</td><td nowrap><a href="src/pages/admin/AdminGenerator.tsx"><code>AdminGenerator.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td nowrap>4.4</td><td nowrap>수업 운영 기능</td><td nowrap><a href="src/pages/admin/AdminComposer.tsx"><code>AdminComposer.tsx</code></a> · <a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a></td></tr>
     <tr><td nowrap>4.5</td><td nowrap>개발 과정의 문제 발견과 설계 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
+    <tr><td nowrap>5.1</td><td nowrap>수업 구성과 실습·토론</td><td nowrap><a href="src/components/admin/ClassDiscussionBoard.tsx"><code>ClassDiscussionBoard.tsx</code></a> · <a href="src/components/admin/HandRaisePanel.tsx"><code>HandRaisePanel.tsx</code></a></td></tr>
+    <tr><td nowrap>5.2</td><td nowrap>AI 피드백과 콘텐츠의 재검토</td><td nowrap><a href="src/components/admin/ClassResponsePanel.tsx"><code>ClassResponsePanel.tsx</code></a> · <a href="src/components/admin/ContentReviewPanel.tsx"><code>ContentReviewPanel.tsx</code></a></td></tr>
     <tr><td nowrap>부록&nbsp;A</td><td nowrap>한→중 번역 미션 사례</td><td nowrap><a href="src/lib/demo/representativeMissionSnapshot.ts"><code>representativeMissionSnapshot.ts</code></a></td></tr>
-    <tr><td nowrap>부록&nbsp;B</td><td nowrap>콘텐츠 제작·검토 기준</td><td nowrap><a href="supabase/functions/content-review/"><code>content-review/</code></a></td></tr>
-    <tr><td nowrap>부록&nbsp;C</td><td nowrap>주요 설계 판단과 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
-    <tr><td nowrap>부록&nbsp;D</td><td nowrap>수업 편성 예시</td><td nowrap><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;B</td><td nowrap>주요 설계 판단과 개선</td><td nowrap><a href="https://github.com/sylim-research/PRAGMA/pulls?q=is%3Apr+is%3Amerged"><code>merged PRs</code></a></td></tr>
+    <tr><td nowrap>부록&nbsp;C</td><td nowrap>수업 편성 예시</td><td nowrap><a href="src/components/admin/CurriculumSyllabus.tsx"><code>CurriculumSyllabus.tsx</code></a></td></tr>
   </tbody>
 </table>
 
-> <small>학위논문 제3·4장과 부록을 절 단위로 설계 문서와 실제 코드에 대응시켰습니다.</small>
+> <small>학위논문 제3~5장과 부록을 절 단위로 설계 문서와 실제 코드에 대응시켰습니다.</small>
 
 <br>
 
@@ -167,10 +169,12 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
     <tr><td>통번역 학습 워크플로우</td><td>학습 미션 수행 흐름과 중→한 번역·통역 구현</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/4">#4</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/62">#62</a></td></tr>
     <tr><td>콘텐츠 품질 관리·최종 승인</td><td>자동 규칙 점검·AI 검토 뒤 교수자 최종 승인</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/27">#27</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/122">#122</a></td></tr>
     <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
-    <tr><td>MJT 판단 문항 → DCT형 통번역 과제</td><td>MJT와 통번역 과제를 한 학습 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
-    <tr><td>9개 목표화행 확장</td><td>요청 전용 미션 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
+    <tr><td>MJT 판단 문항 → DCT형 통번역 과제</td><td>MJT와 통번역 과제를 한 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
+    <tr><td>9개 목표화행 확장</td><td>요청 전용 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
     <tr><td>의미적 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용보다 의미를 먼저 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
     <tr><td>수정안의 2차 AI 피드백</td><td>초안에만 주던 AI 피드백을 수정안에도 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
+    <tr><td>세 기준 피드백의 상시 표시</td><td>고칠 기준의 설명을 GPT-6 Astra가 모두 제시</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/396">#396</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/399">#399</a></td></tr>
+    <tr><td>판정 체계 v2와 손들기</td><td>세 단계 판정·표현 힌트·익명 손들기</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/403">#403</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/404">#404</a></td></tr>
   </tbody>
 </table>
 
@@ -190,7 +194,7 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
     <tr><td nowrap>DCT형 통번역 과제</td><td nowrap>DCT의 상황 제시 방식을 응용한 통번역 과제</td></tr>
     <tr><td nowrap>의미적 충실성</td><td nowrap>원문의 내용·화행목적·의도된 태도의 유지를 보는 기준</td></tr>
     <tr><td nowrap>문법적 정확성</td><td nowrap>목표어의 어순·형태·통사 규칙 부합을 보는 기준</td></tr>
-    <tr><td nowrap>화용적 적절성</td><td nowrap>상황·관계에 비추어 표현 선택의 적절성을 보는 기준</td></tr>
+    <tr><td nowrap>화용적 적절성</td><td nowrap>상황·관계에 맞는 표현을 골랐는지 보는 기준</td></tr>
     <tr><td nowrap>적절성 판단 범주</td><td nowrap>표현을 과소·적정·과잉으로 나누는 교육적 분류</td></tr>
   </tbody>
 </table>
@@ -200,4 +204,4 @@ PRAGMA는 한·중 통번역에서 원문의 의미와 화행목적을 유지하
 <br>
 <br>
 
-<p align="center"><b>박사학위논문 「AI 기반 한·중 통번역 학습 워크플로우 개발 연구」의 설계·개발 결과물입니다.</b><br><img src="docs/brand/rule.svg" width="100%" height="3" alt=""><br><sub>© 2026 Soyoung Lim · 한국외국어대학교</sub></p>
+<p align="center"><b>박사학위논문 「AI 기반 한·중 통번역 학습 웹앱 개발 연구」의 설계·개발 결과물입니다.</b><br><img src="docs/brand/rule.svg" width="100%" height="3" alt=""><br><sub>© 2026 Soyoung Lim · 한국외국어대학교</sub></p>

@@ -48,7 +48,7 @@
     <rect x="682" y="456" width="180" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
     <text x="772" y="494" text-anchor="middle" class="chip">AI 품질 심사</text>
     <rect x="876" y="456" width="226" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
-    <text x="989" y="494" text-anchor="middle" class="chip">AI 피드백·검수</text>
+    <text x="989" y="494" text-anchor="middle" class="chip">AI 피드백</text>
     <rect x="1116" y="456" width="130" height="58" rx="12" fill="#FFFFFF" stroke="#D3D7E0" stroke-width="2"/>
     <text x="1181" y="494" text-anchor="middle" class="chip">음성 처리</text>
   </g>
@@ -83,13 +83,13 @@
   <rect x="1512" y="326" width="396" height="138" rx="16" fill="#EBF1FB" stroke="#C9D8F0" stroke-width="2"/>
   <rect x="1512" y="326" width="8" height="138" rx="4" fill="#4A7BD0"/>
   <text x="1542" y="378" class="svc">Google Gemini</text>
-  <text x="1542" y="414" class="svcs">생성 · 학습자 피드백</text>
+  <text x="1542" y="414" class="svcs">생성 · 피드백 대체 경로</text>
   <text x="1542" y="446" class="svcs">중→한 원문의 저장 전 검토</text>
 
   <rect x="1512" y="482" width="396" height="138" rx="16" fill="#EAF5EF" stroke="#C6E2D3" stroke-width="2"/>
   <rect x="1512" y="482" width="8" height="138" rx="4" fill="#4E9A78"/>
   <text x="1542" y="534" class="svc">OpenAI</text>
-  <text x="1542" y="570" class="svcs">품질 심사·피드백 검수 (GPT-6 Astra)</text>
+  <text x="1542" y="570" class="svcs">품질 심사 · 실시간 피드백</text>
   <text x="1542" y="602" class="svcs">중→한 원문 작성 · 음성 인식</text>
 
   <rect x="1512" y="638" width="396" height="118" rx="16" fill="#F1EDF8" stroke="#DCD3EE" stroke-width="2"/>
