@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" font-family="Pretendard, 'Noto Sans KR', 'Malgun Gothic', sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10" fill="none" stroke="#1E2A44" stroke-width="1.8"/>
+    </marker>
+    <style>
+      .t { fill:#1E2A44; }
+      .h { font-size:30px; font-weight:800; fill:#1E2A44; }
+      .s { font-size:27px; fill:#3F4A61; }
+      .row { font-size:30px; font-weight:800; fill:#1E2A44; }
+      .rowsub { font-size:26px; fill:#5B647A; }
+      .chip { font-size:26px; font-weight:700; }
+      .leg { font-size:26px; fill:#3F4A61; }
+      .line { stroke:#1E2A44; stroke-width:2.4; fill:none; }
+      .dline { stroke:#5B647A; stroke-width:2.4; fill:none; stroke-dasharray:10 8; }
+    </style>
+  </defs>
+  <rect x="1.5" y="1.5" width="1597" height="897" rx="28" fill="#FFFFFF" stroke="#DADDE6" stroke-width="3"/>
+  <text x="50" y="78" font-size="26" font-weight="700" letter-spacing="3" fill="#5B647A">Fig. 1</text>
+  <text x="150" y="78" font-size="34" font-weight="800" class="t">PRAGMA 시스템 구조</text>
+  <rect x="50" y="118" width="430" height="640" rx="22" fill="#FFFFFF" stroke="#DADDE6" stroke-width="2.5"/>
+  <path d="M50,140 a22,22 0 0 1 22,-22 h386 a22,22 0 0 1 22,22 v84 h-430 z" fill="#1E2A44"/>
+  <text x="78" y="168" text-anchor="start" class="h" style="fill:#FFFFFF">콘텐츠 제작 워크플로우</text>
+  <text x="78" y="206" text-anchor="start" class="rowsub" style="fill:#C9D1E0">핵심 워크플로우</text>
+  <line x1="102" y1="278" x2="102" y2="694" stroke="#E3DED0" stroke-width="5"/>
+  <circle cx="102" cy="278" r="24" fill="#1E2A44"/>
+  <text x="102" y="288" text-anchor="middle" class="chip" style="fill:#FFFFFF">1</text>
+  <text x="144" y="276" text-anchor="start" class="h" font-size="28">시나리오·학습 미션 생성</text>
+  <text x="144" y="314" text-anchor="start" class="rowsub" style="fill:#3F4A61">화행 × P·D·R × 도메인</text>
+  <circle cx="102" cy="382" r="24" fill="#1E2A44"/>
+  <text x="102" y="392" text-anchor="middle" class="chip" style="fill:#FFFFFF">2</text>
+  <text x="144" y="380" text-anchor="start" class="h" font-size="28">자동 규칙 점검</text>
+  <text x="144" y="418" text-anchor="start" class="rowsub" style="fill:#3F4A61">형식·구성 조건 확인</text>
+  <circle cx="102" cy="486" r="24" fill="#1E2A44"/>
+  <text x="102" y="496" text-anchor="middle" class="chip" style="fill:#FFFFFF">3</text>
+  <text x="144" y="484" text-anchor="start" class="h" font-size="28">AI 품질 심사</text>
+  <text x="144" y="522" text-anchor="start" class="rowsub" style="fill:#3F4A61">의미·화행·해설 일치</text>
+  <circle cx="102" cy="590" r="24" fill="#1E2A44"/>
+  <text x="102" y="600" text-anchor="middle" class="chip" style="fill:#FFFFFF">4</text>
+  <text x="144" y="588" text-anchor="start" class="h" font-size="28">교수자 감수</text>
+  <text x="144" y="626" text-anchor="start" class="rowsub" style="fill:#3F4A61">단계별 확인·수정</text>
+  <circle cx="102" cy="694" r="24" fill="#1E2A44"/>
+  <text x="102" y="704" text-anchor="middle" class="chip" style="fill:#FFFFFF">5</text>
+  <text x="144" y="692" text-anchor="start" class="h" font-size="28">교수자 최종 승인</text>
+  <text x="144" y="730" text-anchor="start" class="rowsub" style="fill:#3F4A61">수업 사용·공개 결정</text>
+  <rect x="585" y="118" width="430" height="640" rx="22" fill="#FFFFFF" stroke="#DADDE6" stroke-width="2.5"/>
+  <path d="M585,140 a22,22 0 0 1 22,-22 h386 a22,22 0 0 1 22,22 v84 h-430 z" fill="#4A5568"/>
+  <text x="613" y="168" text-anchor="start" class="h" style="fill:#FFFFFF">실제 수업 운영</text>
+  <text x="613" y="206" text-anchor="start" class="rowsub" style="fill:#D5DBE6">두 워크플로우의 연계</text>
+  <line x1="637" y1="278" x2="637" y2="694" stroke="#E3DED0" stroke-width="5"/>
+  <circle cx="637" cy="278" r="24" fill="#4A5568"/>
+  <text x="637" y="288" text-anchor="middle" class="chip" style="fill:#FFFFFF">1</text>
+  <text x="679" y="276" text-anchor="start" class="h" font-size="28">15주 교과목 편성</text>
+  <text x="679" y="314" text-anchor="start" class="rowsub" style="fill:#3F4A61">주차별 미션 배치</text>
+  <circle cx="637" cy="382" r="24" fill="#4A5568"/>
+  <text x="637" y="392" text-anchor="middle" class="chip" style="fill:#FFFFFF">2</text>
+  <text x="679" y="380" text-anchor="start" class="h" font-size="28">학습자 관리</text>
+  <text x="679" y="418" text-anchor="start" class="rowsub" style="fill:#3F4A61">계정·교과목·활동</text>
+  <circle cx="637" cy="486" r="24" fill="#4A5568"/>
+  <text x="637" y="496" text-anchor="middle" class="chip" style="fill:#FFFFFF">3</text>
+  <text x="679" y="484" text-anchor="start" class="h" font-size="28">주차별 운영</text>
+  <text x="679" y="522" text-anchor="start" class="rowsub" style="fill:#3F4A61">공개와 접근 조건</text>
+  <circle cx="637" cy="590" r="24" fill="#4A5568"/>
+  <text x="637" y="600" text-anchor="middle" class="chip" style="fill:#FFFFFF">4</text>
+  <text x="679" y="588" text-anchor="start" class="h" font-size="28">메타화용 토론</text>
+  <text x="679" y="626" text-anchor="start" class="rowsub" style="fill:#3F4A61">응답 분포·손들기</text>
+  <circle cx="637" cy="694" r="24" fill="#4A5568"/>
+  <text x="637" y="704" text-anchor="middle" class="chip" style="fill:#FFFFFF">5</text>
+  <text x="679" y="692" text-anchor="start" class="h" font-size="28">후속 콘텐츠 검토</text>
+  <text x="679" y="730" text-anchor="start" class="rowsub" style="fill:#3F4A61">필요 시 수정·재승인</text>
+  <rect x="1120" y="118" width="430" height="640" rx="22" fill="#FFFFFF" stroke="#DADDE6" stroke-width="2.5"/>
+  <path d="M1120,140 a22,22 0 0 1 22,-22 h386 a22,22 0 0 1 22,22 v84 h-430 z" fill="#F2C744"/>
+  <text x="1148" y="168" text-anchor="start" class="h" style="fill:#1E2A44">통번역 학습 워크플로우</text>
+  <text x="1148" y="206" text-anchor="start" class="rowsub" style="fill:#5E4A0C">핵심 워크플로우</text>
+  <line x1="1172" y1="278" x2="1172" y2="694" stroke="#E3DED0" stroke-width="5"/>
+  <circle cx="1172" cy="278" r="24" fill="#F2C744"/>
+  <text x="1172" y="288" text-anchor="middle" class="chip" style="fill:#1E2A44">1</text>
+  <text x="1214" y="276" text-anchor="start" class="h" font-size="28">MJT 판단 문항</text>
+  <text x="1214" y="314" text-anchor="start" class="rowsub" style="fill:#3F4A61">판단·이유·비교·수정</text>
+  <circle cx="1172" cy="382" r="24" fill="#F2C744"/>
+  <text x="1172" y="392" text-anchor="middle" class="chip" style="fill:#1E2A44">2</text>
+  <text x="1214" y="380" text-anchor="start" class="h" font-size="28">DCT형 통번역 과제</text>
+  <text x="1214" y="418" text-anchor="start" class="rowsub" style="fill:#3F4A61">번역·통역, 양방향</text>
+  <circle cx="1172" cy="486" r="24" fill="#F2C744"/>
+  <text x="1172" y="496" text-anchor="middle" class="chip" style="fill:#1E2A44">3</text>
+  <text x="1214" y="484" text-anchor="start" class="h" font-size="28">AI 피드백</text>
+  <text x="1214" y="522" text-anchor="start" class="rowsub" style="fill:#3F4A61">세 기준 판정·설명</text>
+  <circle cx="1172" cy="590" r="24" fill="#F2C744"/>
+  <text x="1172" y="600" text-anchor="middle" class="chip" style="fill:#1E2A44">4</text>
+  <text x="1214" y="588" text-anchor="start" class="h" font-size="28">학습자의 재검토</text>
+  <text x="1214" y="626" text-anchor="start" class="rowsub" style="fill:#3F4A61">초안 유지 또는 수정</text>
+  <circle cx="1172" cy="694" r="24" fill="#F2C744"/>
+  <text x="1172" y="704" text-anchor="middle" class="chip" style="fill:#1E2A44">5</text>
+  <text x="1214" y="692" text-anchor="start" class="h" font-size="28">학습자 최종 결정</text>
+  <text x="1214" y="730" text-anchor="start" class="rowsub" style="fill:#3F4A61">과정 메모와 함께 저장</text>
+  <line x1="490" y1="448" x2="573" y2="448" class="line" marker-end="url(#arrow)"/>
+  <text x="532.5" y="498" text-anchor="middle" class="rowsub" style="fill:#1E2A44" font-weight="700">편성</text>
+  <line x1="1025" y1="448" x2="1108" y2="448" class="line" marker-end="url(#arrow)"/>
+  <text x="1067.5" y="498" text-anchor="middle" class="rowsub" style="fill:#1E2A44" font-weight="700">공개</text>
+  <path d="M1335.0,758 L1335.0,828 L265.0,828 L265.0,764" class="dline" marker-end="url(#arrow)"/>
+  <line x1="800.0" y1="758" x2="800.0" y2="828" class="dline"/>
+  <rect x="362.5" y="806" width="340" height="44" fill="#FFFFFF"/>
+  <text x="532.5" y="838" text-anchor="middle" class="rowsub" style="fill:#1E2A44" font-weight="700">← 학습 기록·토론 결과 반영</text>
+  <rect x="947.5" y="806" width="240" height="44" fill="#FFFFFF"/>
+  <text x="1067.5" y="838" text-anchor="middle" class="rowsub" style="fill:#1E2A44" font-weight="700">← 학습 수행 기록</text>
+</svg>
