@@ -59,8 +59,6 @@
 
 > <small>생성은 Gemini 3.1 Pro, 심사와 실시간 피드백은 GPT-6 Astra, 최종 승인은 교수자가 맡습니다.</small>
 
-- 단계별 역할과 자동 규칙 점검의 규칙 17개는 [콘텐츠 품질 관리 설명](docs/content-quality-check.md)에 있습니다.
-
 <br>
 
 ### 4. 통번역 학습 워크플로우
