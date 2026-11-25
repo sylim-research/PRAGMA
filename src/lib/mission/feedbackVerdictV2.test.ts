@@ -96,3 +96,14 @@ describe("hand raise", () => {
     expect(handRaiseTargetLabel("dct_feedback_2", [1, 2, 5, 3, 4])).toBe("통번역 과제 · 2차 AI 피드백");
   });
 });
+
+import { feedbackFixOrder } from "@/pages/learner/CanonicalMissionRun";
+
+describe("fix order (2026-11-25)", () => {
+  const c = (key: "meaning" | "language" | "pragmatics", level: "very_good" | "recommend" | "required") => ({ key, label: key, question: "", level, body: "" });
+  it("numbers only criteria to fix, meaning → pragmatics → grammar", () => {
+    const order = feedbackFixOrder([c("meaning", "recommend"), c("language", "required"), c("pragmatics", "required")]);
+    expect([...order]).toEqual([["meaning", 1], ["pragmatics", 2], ["language", 3]]);
+    expect([...feedbackFixOrder([c("meaning", "very_good"), c("language", "required"), c("pragmatics", "very_good")])]).toEqual([["language", 1]]);
+  });
+});

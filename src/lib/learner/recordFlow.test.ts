@@ -14,7 +14,7 @@ describe("buildChangeMap — record badge", () => {
       band: { label: "보완 권장" }, scope: "상대에게 주는 인상", feature: "판정 설명",
     });
     expect(buildChangeMap(feedback("within_band", "clear"), "request_mitigation_optionality")).toMatchObject({
-      band: { label: "아주 좋음" }, scope: "특별히 고칠 곳 없음",
+      band: { label: "기준 통과" }, scope: "특별히 고칠 곳 없음",
     });
   });
 

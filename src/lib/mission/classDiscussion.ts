@@ -118,7 +118,7 @@ export interface DctView {
   dissents: number;
   /** 1차 AI 피드백의 화용 판정 분포(기록이 있는 응답만). */
   verdicts: Slice[];
-  /** 1차 AI 피드백의 세 기준 판정 분포(아주 좋음·보완 권장·수정 필요). */
+  /** 1차 AI 피드백의 세 기준 판정 분포(기준 통과·보완 권장·수정 필요). */
   criteria: Array<{ key: "meaning" | "grammar" | "pragmatics"; label: string; slices: Slice[] }>;
   cases: DctCaseView[];
 }
@@ -363,7 +363,7 @@ function dctCase(index: number, row: ClassDiscussionRow, featureId: string | nul
 }
 
 export const VERDICT_LEVEL_LABEL: Record<FeedbackVerdictLevel, string> = {
-  very_good: "아주 좋음",
+  very_good: "기준 통과",
   recommend: "보완 권장",
   required: "수정 필요",
 };
