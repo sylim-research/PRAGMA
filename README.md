@@ -69,11 +69,6 @@
 - **MJT 판단 문항**에서는 제시된 표현의 적절성을 판단하고 선택하거나 수정합니다.
 - **DCT형 통번역 과제**는 초안과 수정안에 AI 피드백을 받고, 최종안은 학습자가 정합니다.
 - **AI 피드백**은 의미·문법·화용을 기준 통과·보완 권장·수정 필요로 판정해 설명합니다.
-- **고칠 순서**는 고칠 기준이 둘 이상일 때 의미→화용→문법 순으로 번호를 붙입니다.
-- **표현 힌트**는 완성 문장 대신 앞선 MJT에서 승인된 표현을 실마리로 보여 줍니다.
-- **통번역 과정 메모**는 피드백을 보기 전과 최종안을 정할 때 한 번씩 씁니다.
-- **손들기**로 학습자는 해설·피드백 뒤 수업에서 다룰 점을 익명으로 남깁니다.
-- **번역과 통역**은 구성이 같고, 통역은 속도를 조정한 합성 음성을 듣고 수행합니다.
 
 <br>
 
@@ -84,7 +79,7 @@
   <tbody>
     <tr><td>교과목 편성</td><td>15주 계획에 승인된 학습 미션을 주차별로 배치</td></tr>
     <tr><td>학습자 관리</td><td>기록 동의를 마친 학습자가 바로 참여하고, 교수자가 반려 가능</td></tr>
-    <tr><td>메타화용 토론</td><td>응답 분포·선택 이유·손들기로 판단의 근거를 수업에서 논의</td></tr>
+    <tr><td>메타화용 토론</td><td>응답 분포와 선택 이유로 판단의 근거를 수업에서 논의</td></tr>
     <tr><td>수행 현황</td><td>학습자별 미션 수행 상태와 기록을 확인</td></tr>
   </tbody>
 </table>
@@ -125,7 +120,7 @@
     <tr><td>생성 조건 · AI 모델</td><td>MJT 응답과 선택 이유</td></tr>
     <tr><td>운영 프롬프트 SHA-256 지문</td><td>초안 · 수정안</td></tr>
     <tr><td>자동 규칙 점검 결과 · AI 검토 의견</td><td>제공된 AI 피드백</td></tr>
-    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견 · 손들기</td></tr>
+    <tr><td>교수자 최종 승인 이력 · 모델 호출 기록</td><td>최종안 · 학습자 의견</td></tr>
   </tbody>
 </table>
 
@@ -169,10 +164,8 @@
     <tr><td>교과목·주차 편성</td><td>3개 교과목의 15주 계획과 주차 미션 연결</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/25">#25</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/87">#87</a></td></tr>
     <tr><td>MJT 판단 문항 → DCT형 통번역 과제</td><td>MJT와 통번역 과제를 한 미션으로 승인·저장</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/155">#155</a></td></tr>
     <tr><td>9개 목표화행 확장</td><td>요청 전용 형식을 화행별 판단 기준으로 일반화</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/184">#184</a></td></tr>
-    <tr><td>의미적 충실성 우선 피드백</td><td>의미가 왜곡되면 문법·화용보다 의미를 먼저 안내</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/196">#196</a></td></tr>
     <tr><td>수정안의 2차 AI 피드백</td><td>초안에만 주던 AI 피드백을 수정안에도 1회 추가</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/248">#248</a></td></tr>
-    <tr><td>세 기준 피드백의 상시 표시</td><td>고칠 기준의 설명을 GPT-6 Astra가 모두 제시</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/396">#396</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/399">#399</a></td></tr>
-    <tr><td>판정 체계 v2와 손들기</td><td>세 단계 판정·표현 힌트·익명 손들기</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/403">#403</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/404">#404</a></td></tr>
+    <tr><td>AI 피드백 판정 체계 개선</td><td>세 기준 상시 설명과 세 단계 판정</td><td><a href="https://github.com/sylim-research/PRAGMA/pull/399">#399</a> · <a href="https://github.com/sylim-research/PRAGMA/pull/403">#403</a></td></tr>
   </tbody>
 </table>
 
