@@ -30,7 +30,7 @@
 
 ### 1. PRAGMA 시스템 구조
 
-<p align="center"><img src="docs/figures/fig1-pragma-workflow.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 실제 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
+<p align="center"><img src="docs/figures/fig1-pragma-workflow-1125.png" alt="PRAGMA 시스템 구조: 콘텐츠 제작 워크플로우, 실제 수업 운영, 통번역 학습 워크플로우와 되먹임" width="100%"></p>
 
 > <small>콘텐츠 제작과 학습은 수업으로 이어지고, 학습 기록과 토론 결과는 콘텐츠 검토로 돌아갑니다.</small>
 
@@ -63,7 +63,7 @@
 
 ### 4. 통번역 학습 워크플로우
 
-<p align="center"><img src="docs/figures/fig3-learning-mission-1108.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
+<p align="center"><img src="docs/figures/fig3-learning-mission-1125.png" alt="통번역 학습 워크플로우: 다섯 개의 MJT 판단 문항과 하나의 DCT형 통번역 과제로 구성된 학습 미션" width="100%"></p>
 
 - **학습 미션**은 MJT 판단 문항 5개와 DCT형 통번역 과제 1개로 구성됩니다.
 - **MJT 판단 문항**에서는 제시된 표현의 적절성을 판단하고 선택하거나 수정합니다.
