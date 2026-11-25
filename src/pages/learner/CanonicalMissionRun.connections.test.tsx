@@ -63,7 +63,7 @@ describe("CanonicalMissionRun completion connections", () => {
     ["의미적 충실성", "문법적 정확성", "화용적 적절성"].forEach((label) => expect(screen.getByRole("heading", { name: label })).toBeInTheDocument());
     expect(screen.queryByText("언어 자연성")).not.toBeInTheDocument();
     // 판정은 가로 한 줄, 걸린 기준의 설명은 아래 상자 하나에만 있다.
-    const point = screen.getByText(/^의미적 충실성 · /).nextElementSibling!.textContent!;
+    const point = screen.getByText(/^(?:[①②③] )?의미적 충실성 · /).nextElementSibling!.textContent!;
     expect(screen.getAllByText(point)).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "수정하기" }));
     expect(screen.getByRole("heading", { name: "피드백을 참고해 다시 써보세요." })).toBeInTheDocument();

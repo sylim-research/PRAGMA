@@ -1385,7 +1385,7 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
 }
 
 const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
-  very_good: "아주 좋음",
+  very_good: "기준 통과",
   recommend: "보완 권장",
   required: "수정 필요",
   deferred: "다음 단계",
@@ -1428,21 +1428,38 @@ export function feedbackExplanationCriteria(criteria: FeedbackCriterion[]) {
   return criteria;
 }
 
+/**
+ * 고칠 순서(2026-11-25 연구자 승인): 보완 권장·수정 필요인 기준에만 번호를 붙인다.
+ * 순서 = 의미 → 화용 → 문법. 의미 전달을 먼저 회복하고, 의미가 살아 있으면 이 미션이 훈련하는
+ * 화용을 문법보다 먼저 다룬다(feedbackSchema.deriveRevisionScope와 같은 우선순위).
+ */
+const FIX_ORDER: FeedbackCriterion["key"][] = ["meaning", "pragmatics", "language"];
+export function feedbackFixOrder(criteria: FeedbackCriterion[]): Map<FeedbackCriterion["key"], number> {
+  const order = new Map<FeedbackCriterion["key"], number>();
+  for (const key of FIX_ORDER) {
+    const criterion = criteria.find((item) => item.key === key);
+    if (criterion && (criterion.level === "recommend" || criterion.level === "required")) order.set(key, order.size + 1);
+  }
+  return order;
+}
+const ORDER_MARK = ["", "①", "②", "③"];
+
 /** 걸린 기준을 한 개만 고르지 않고 모두 펼친다. 접기 없음 — 접힌 설명은 읽지 않고 넘어가기 쉽다(2026-11-15). */
 function FeedbackExplanationList({ criteria, inPanel = false }: { criteria: FeedbackCriterion[]; inPanel?: boolean }) {
   const shown = feedbackExplanationCriteria(criteria);
-  // 뜻이 옮겨지지 않았으면 고칠 순서만 알린다. 설명은 하나도 가리지 않는다.
-  const fidelityFirst = criteria.some((criterion) => criterion.key === "meaning" && criterion.level === "required");
+  // 고칠 기준이 둘 이상이면 고칠 순서를 번호로 알린다. 설명은 하나도 가리지 않는다.
+  const order = feedbackFixOrder(criteria);
   if (shown.length === 0) return null;
   return (
     <div className="space-y-2">
-      {fidelityFirst && <p className="px-1 text-[13.5px] font-black text-[#8B3531]">원문의 뜻을 먼저 보완하세요.</p>}
+      {order.size > 1 && <p className="px-1 text-[13.5px] font-black text-[#5F4A12]">고칠 순서: {FIX_ORDER.filter((key) => order.has(key)).map((key) => `${ORDER_MARK[order.get(key)!]} ${criteria.find((item) => item.key === key)?.label}`).join(" → ")}</p>}
       {shown.map((criterion) => {
         const required = criterion.level === "required";
         const good = criterion.level === "very_good";
+        const rank = order.get(criterion.key);
         return (
           <div key={criterion.key} className={`rounded-xl border border-l-4 px-4 py-3 ${required ? "border-[#EBD3D0] border-l-[#C86E68]" : good ? "border-[#C6DDCE] border-l-[#4F8A68]" : "border-[#EEE2BC] border-l-[#C9A62E]"} ${inPanel ? (required ? "bg-[#FFFAF9]" : good ? "bg-[#F5FAF6]" : "bg-[#FFFBEC]") : "bg-white"}`}>
-            <p className={`text-[12.5px] font-black ${required ? "text-[#8B3531]" : good ? "text-[#286247]" : "text-[#7A5A12]"}`}>{criterion.label} · {FEEDBACK_LEVEL_LABEL[criterion.level]}</p>
+            <p className={`text-[12.5px] font-black ${required ? "text-[#8B3531]" : good ? "text-[#286247]" : "text-[#7A5A12]"}`}>{rank && order.size > 1 ? `${ORDER_MARK[rank]} ` : ""}{criterion.label} · {FEEDBACK_LEVEL_LABEL[criterion.level]}</p>
             <p className={`mt-1 break-keep leading-6 ${inPanel ? "text-sm" : "text-[14.5px]"}`}><ZhRuns text={conciseFeedback(criterion.body)} /></p>
           </div>
         );
@@ -1562,7 +1579,7 @@ export function evaluationFromRuntimeFeedback(
   const pragmaticOk = Boolean(
     feature && feedback.verdicts.pragmatic_appropriateness.band_code === feature.within_band_code,
   );
-  // 판정 체계 v2(2026-11-25): 세 기준 모두 「아주 좋음·보완 권장·수정 필요」. 화용은 MJT 네 단계에 대응한다.
+  // 판정 체계 v2(2026-11-25): 세 기준 모두 「기준 통과·보완 권장·수정 필요」. 화용은 MJT 네 단계에 대응한다.
   const levels = feedbackVerdictLevels(feedback.verdicts, feature?.within_band_code ?? "within_band");
   const held = new Set(feedback.held_axes ?? []);
   const meaningLevel: FeedbackLevel = held.has("meaning") ? "held" : levels.meaning;
