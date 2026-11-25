@@ -29,15 +29,15 @@ const SERVICE_META: Record<ServiceId, { name: string; role: string; console: Ser
     role: "음성 합성",
     console: { label: "ElevenLabs 콘솔", href: "https://elevenlabs.io/app/subscription" },
   },
-  // 2026-10-26 역할 배정: 생성·피드백은 Gemini, OpenAI는 검사(GPT-6 Astra)와 STT.
+  // 2026-11-18 재배정(DEC-20261118-03): 실시간 AI 피드백은 GPT-6 Astra가 쓰고, Gemini는 콘텐츠 생성과 피드백 대체 경로.
   openai: {
     name: "OpenAI",
-    role: "AI 품질 심사·피드백 검수·STT",
+    role: "AI 품질 심사·실시간 피드백·STT",
     console: { label: "OpenAI 콘솔", href: "https://platform.openai.com/settings/organization/billing/overview" },
   },
   gemini: {
     name: "Gemini",
-    role: "콘텐츠 생성·학습자 피드백",
+    role: "콘텐츠 생성",
     console: { label: "Google AI Studio", href: "https://aistudio.google.com/apikey" },
   },
   supabase: {

@@ -78,7 +78,7 @@ describe("one DCT revision recheck", () => {
       fireEvent.change(screen.getByRole("textbox", { name: "수정안" }), { target: { value: B } });
       click("수정안 제출하기");
       await screen.findByRole("heading", { name: "AI 피드백 2차" });
-      expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
+      expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B, expect.any(Array));
       fireEvent.change(screen.getByRole("textbox", { name: "최종안" }), { target: { value: C } });
       fireEvent.change(screen.getByRole("textbox", { name: "번역 과정 메모" }), { target: { value: "피드백을 보고 결정했다." } });
       click("최종안 제출하기");
@@ -118,8 +118,8 @@ describe("one DCT revision recheck", () => {
     const recheckButton = screen.getByRole("button", { name: "수정안 제출하기" });
     fireEvent.click(recheckButton); fireEvent.click(recheckButton);
     await waitFor(() => expect(requestFeedback).toHaveBeenCalledTimes(2));
-    expect(requestFeedback).toHaveBeenNthCalledWith(1, mission, A);
-    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B);
+    expect(requestFeedback).toHaveBeenNthCalledWith(1, mission, A, expect.any(Array));
+    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, B, expect.any(Array));
     expect(screen.queryByRole("button", { name: "최종안 제출하기" })).not.toBeInTheDocument();
     expect(screen.queryByRole("region", { name: "추천 표현" })).not.toBeInTheDocument();
     await act(async () => settle(status === "success" ? { ok: true, feedback: feedback(2) } : { ok: false, error: "offline" }));

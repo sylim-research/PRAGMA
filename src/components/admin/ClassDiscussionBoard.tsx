@@ -12,6 +12,9 @@ import type {
   Slice,
   SliceTone,
 } from "@/lib/mission/classDiscussion";
+import { VERDICT_LEVEL_LABEL } from "@/lib/mission/classDiscussion";
+
+const CASE_CRITERIA_LABEL = { meaning: "의미", grammar: "문법", pragmatics: "화용" } as const;
 import { Donut, ON_TONE, SpectrumStrip, StackedBar, TONE } from "@/components/charts/responseCharts";
 import { VIRTUAL_CLASS_NOTICE } from "@/lib/demo/virtualClassRows";
 
@@ -77,12 +80,12 @@ const percent = (count: number, total: number) => (total > 0 ? Math.round((count
 const hasHan = (text: string) => /\p{Script=Han}/u.test(text);
 const zh = (text: string) => (hasHan(text) ? "font-zh" : "break-keep");
 
-function Legend({ slices, size, column = false }: { slices: Slice[]; size: string; column?: boolean }) {
+function Legend({ slices, size, column = false, counts = true }: { slices: Slice[]; size: string; column?: boolean; counts?: boolean }) {
   return <ul className={`flex ${column ? "flex-col gap-y-1.5" : "flex-wrap gap-x-4 gap-y-1"} ${size}`}>
     {slices.map((slice) => <li key={slice.key} className="flex items-center gap-1.5 text-[#44525C]">
       <span className="inline-block h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: TONE[slice.tone] }} aria-hidden="true" />
       <span className="break-keep">{slice.label}</span>
-      <span className="font-semibold tabular-nums text-[#15202B]">{slice.count}</span>
+      {counts && <span className="font-semibold tabular-nums text-[#15202B]">{slice.count}</span>}
     </li>)}
   </ul>;
 }
@@ -311,12 +314,14 @@ function CaseColumn({ item, size, projector }: { item: DctCaseView; size: string
       <li className="px-3 py-2.5">
         <p className={`${t.small} font-semibold text-[#7A858C]`}>AI 피드백</p>
         {feedback ? <div className={`mt-0.5 space-y-1 ${size}`}>
+          {feedback.levels && <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-[#15202B]">
+            {(["meaning", "grammar", "pragmatics"] as const).map((key) => <span key={key}><span className="text-[#7A858C]">{CASE_CRITERIA_LABEL[key]} </span><span className="font-semibold">{VERDICT_LEVEL_LABEL[feedback.levels![key]]}</span></span>)}
+          </p>}
           <p className="flex flex-wrap gap-x-3 gap-y-0.5 text-[#15202B]">
-            {feedback.band && <span><span className="text-[#7A858C]">화용 </span><span className="font-semibold">{feedback.band}</span></span>}
+            {feedback.band && <span><span className="text-[#7A858C]">화용 방향 </span><span className="font-semibold">{feedback.band}</span></span>}
             {feedback.scope && <span><span className="text-[#7A858C]">다시 볼 곳 </span><span className="font-semibold">{feedback.scope}</span></span>}
           </p>
           {feedback.feature && <p className="break-keep leading-relaxed text-[#44525C]">{feedback.feature}</p>}
-          {feedback.alternative && <p className={`leading-relaxed text-[#44525C] ${zh(feedback.alternative)}`}><span className={`mr-2 ${t.small} font-semibold text-[#7A858C]`}>대안</span>{feedback.alternative}</p>}
         </div> : <p className={`mt-0.5 text-[#7A858C] ${size}`}>피드백 기록 없음</p>}
       </li>
       <li className="px-3 py-2.5">
@@ -413,9 +418,21 @@ function DctSection({ data, demo, state, onChange, size, projector }: { data: Cl
           </div>
         </div>
         <div>
-          <p className={`font-semibold text-[#15202B] ${size}`}>AI 피드백의 화용 판정 <span className="font-normal text-[#7A858C]">초안 기준 {withVerdict}건</span></p>
+          <p className={`font-semibold text-[#15202B] ${size}`}>AI 피드백의 판정 <span className="font-normal text-[#7A858C]">초안 기준 {withVerdict}건</span></p>
           {withVerdict > 0 ? <>
-            <div className="mt-2"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-9" : "h-6"} labels labelSize={projector ? "text-[length:clamp(14px,0.9vw,18px)]" : undefined} /></div>
+            <div className="mt-2 space-y-2">
+              {dct.criteria.map((criterion) => {
+                const total = criterion.slices.reduce((sum, slice) => sum + slice.count, 0);
+                return <div key={criterion.key}>
+                  <p className={`${t.small} font-semibold text-[#44525C]`}>{criterion.label}</p>
+                  {total > 0 && <div className="mt-1"><StackedBar slices={criterion.slices} total={total} height={projector ? "h-7" : "h-5"} labels labelSize={projector ? "text-[length:clamp(13px,0.85vw,17px)]" : undefined} /></div>}
+                </div>;
+              })}
+            </div>
+            {/* 범례는 색 이름만 — 세 기준의 건수를 합치면 응답 수와 맞지 않아 오해를 부른다. */}
+            <div className="mt-1.5"><Legend slices={dct.criteria[0]?.slices ?? []} size={size} counts={false} /></div>
+            <p className={`mt-3 ${t.small} font-semibold text-[#44525C]`}>화용의 방향</p>
+            <div className="mt-1"><StackedBar slices={dct.verdicts} total={withVerdict} height={projector ? "h-7" : "h-5"} labels labelSize={projector ? "text-[length:clamp(13px,0.85vw,17px)]" : undefined} /></div>
             <div className="mt-1.5"><Legend slices={dct.verdicts.filter((slice) => slice.count > 0)} size={size} /></div>
           </> : <div className={`mt-2 flex ${projector ? "h-[150px]" : "h-[104px]"} items-center justify-center rounded-lg border border-dashed border-[#DAD6CA] bg-[#FBFAF6] text-[#7A858C] ${size}`}>AI 피드백 기록 없음</div>}
         </div>

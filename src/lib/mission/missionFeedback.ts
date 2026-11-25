@@ -12,6 +12,7 @@ import {
 } from "@/lib/mission/feedbackTransport";
 import { normalizeFeedbackResponse } from "@/lib/mission/normalizeFeedback";
 import type { RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
+import type { FeedbackHintReference } from "@/lib/mission/feedbackHintReferences";
 import type { MissionRuntime } from "@/lib/pragma/missionSchema";
 
 export interface FeedbackRequestResult {
@@ -29,6 +30,8 @@ export interface FeedbackRequestResult {
 export async function requestFeedback(
   mission: Pick<MissionRuntime, "direction" | "unit" | "production_task">,
   answer: string,
+  /** 앞선 MJT에서 「적절」로 승인된 표현. 모델은 번호만 고르고 화면은 이 문구를 그대로 보인다. */
+  hintReferences: readonly FeedbackHintReference[] = [],
 ): Promise<FeedbackRequestResult> {
   const feature = getTargetFeature(mission.unit.target_feature);
   if (!feature) return { ok: false, error: "화용 초점 카탈로그를 찾을 수 없습니다." };
@@ -69,6 +72,7 @@ export async function requestFeedback(
                 : feature.excluded_confounds,
           },
           rubric_version: `${feature.code}@${feature.version}`,
+          hint_references: hintReferences.map(({ id, text }) => ({ id, text })),
         },
       },
       timeout: FEEDBACK_TIMEOUT_MS,
@@ -76,7 +80,7 @@ export async function requestFeedback(
     if (error) return { ok: false, error: feedbackInvokeErrorMessage(error) };
 
     const raw = (data as { feedback?: unknown })?.feedback;
-    return normalizeFeedbackResponse(raw, answer, feature);
+    return normalizeFeedbackResponse(raw, answer, feature, hintReferences);
   } catch (e) {
     return { ok: false, error: feedbackInvokeErrorMessage(e) };
   }

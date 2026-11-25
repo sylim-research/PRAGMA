@@ -18,8 +18,8 @@ export const CURRENT_CONTENT_RELEASE = {
   ],
   itemLineagePromptVersion: "item_lineage_attribution_v4_mission_v5_mpj5",
   feedbackPromptVersions: [
-    "feedback_v1_minidiscourse_v7_concrete",
-    "feedback_v1_feature_general_v4_concrete",
+    "feedback_v1_minidiscourse_v8_scale4_hint",
+    "feedback_v1_feature_general_v5_scale4_hint",
   ],
   qualityPromptVersions: {
     core: "core_quality_v11_observed_pdr_scene_gate",

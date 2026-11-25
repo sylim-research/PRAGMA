@@ -858,6 +858,42 @@ export type Database = {
         }
         Relationships: []
       }
+      learner_hand_raises: {
+        Row: {
+          attempt_id: string
+          auth_user_id: string
+          course_id: string | null
+          created_at: string
+          id: string
+          mission_id: string
+          profile_id: string | null
+          reason: string
+          target: string
+        }
+        Insert: {
+          attempt_id: string
+          auth_user_id?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          mission_id: string
+          profile_id?: string | null
+          reason: string
+          target: string
+        }
+        Update: {
+          attempt_id?: string
+          auth_user_id?: string
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          mission_id?: string
+          profile_id?: string | null
+          reason?: string
+          target?: string
+        }
+        Relationships: []
+      }
       learner_mission_logs: {
         Row: {
           assignment_id: string | null

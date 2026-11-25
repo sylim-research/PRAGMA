@@ -71,3 +71,25 @@ export function concretenessRetryNote(issues: ConcretenessIssue[]): string {
 export function concretenessHeldAxes(issues: ConcretenessIssue[]): FeedbackReviewAxis[] {
   return [...new Set(issues.map((issue) => issue.axis))]
 }
+
+/** 판정 체계 판본(2026-11-25). 클라이언트 feedbackSchema.FEEDBACK_VERDICT_SCHEME과 같은 값이다. */
+export const FEEDBACK_VERDICT_SCHEME = 'verdict_v2_scale4_20261125'
+
+/** 힌트의 목표어 조각 상한. 이보다 긴 새 조각은 문형 실마리가 아니라 완성 문장에 가깝다. */
+export const HINT_FRAGMENT_MAX = 6
+
+/**
+ * 표현 힌트의 문형 실마리를 결정론으로 점검한다(치환 검사의 결정론 부분).
+ * 답안·원문·승인 표현에 없는 목표어 조각이 상한보다 길면 그 실마리 칸만 비운다.
+ * 판정과 다른 설명은 건드리지 않는다. 반환값은 기록용 문제 목록이다.
+ */
+export function sanitizeHintPattern(feedback: Record<string, unknown>, allowedTexts: string[]): string[] {
+  const blocks = feedback.blocks as Record<string, unknown> | undefined
+  const hint = blocks?.hint as Record<string, unknown> | undefined
+  if (!hint || typeof hint.pattern_ko !== 'string' || !hint.pattern_ko.trim()) return []
+  const allowed = compact(allowedTexts.join('\n'))
+  const long = (hint.pattern_ko.match(HAN_RUN) ?? []).filter((run) => run.length > HINT_FRAGMENT_MAX && !allowed.includes(run))
+  if (!long.length) return []
+  hint.pattern_ko = ''
+  return long.map((run) => `hint.pattern_ko:long_fragment:${run}`)
+}
