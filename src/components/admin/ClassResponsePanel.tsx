@@ -4,6 +4,8 @@ import { ExternalLink, Maximize2, RefreshCw, X } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { ClassDiscussionBoard, INITIAL_BOARD_STATE, type ClassDiscussionBoardState } from "@/components/admin/ClassDiscussionBoard";
+import { HandRaisePanel } from "@/components/admin/HandRaisePanel";
+import { fetchHandRaises } from "@/lib/mission/handRaise";
 import { Button } from "@/components/ui/button";
 import { getCurriculumOutline, listCurriculumOutlines } from "@/lib/curriculum/api";
 import { listCoreScenarios, listWeekAssignments } from "@/lib/curriculum/composer";
@@ -126,6 +128,14 @@ export function ClassResponsePanel() {
     enabled: Boolean(missionId),
     refetchInterval: demo || (releaseState && releaseState.status !== "collecting") ? false : 5000,
     queryFn: () => fetchMissionClassRows(missionId),
+  });
+
+  // 손들기(2026-11-25): 실제 응답 화면에서만 불러온다. 데모 학급에는 손들기 기록이 없다.
+  const handRaisesQuery = useQuery({
+    queryKey: ["class-hand-raises", courseId, missionId],
+    enabled: Boolean(missionId) && !demo,
+    refetchInterval: 15000,
+    queryFn: () => fetchHandRaises(missionId, courseId || null),
   });
 
   const transition = useMutation({
@@ -281,6 +291,7 @@ export function ClassResponsePanel() {
 
         {rowsQuery.isPending && <p role="status" className="mt-4 text-sm">응답 분포를 불러오는 중…</p>}
         {rowsQuery.isError && <p role="alert" className="mt-4 text-sm text-destructive">응답 분포를 불러오지 못했습니다.</p>}
+        {missionId && !showingDemo && <HandRaisePanel raises={handRaisesQuery.data ?? []} loading={handRaisesQuery.isPending} failed={handRaisesQuery.isError} />}
         {boardVisible && discussion && <div className="mt-4"><ClassDiscussionBoard
           data={discussion}
           demo={showingDemo}

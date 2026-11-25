@@ -163,7 +163,7 @@ describe("CanonicalMissionRun live CTA route", () => {
     click("번역 제출하기");
     // Stage 2: feedback for the submitted draft (live request, not a preview).
     expect(await screen.findByRole("heading", { name: "AI 피드백" })).toBeInTheDocument();
-    expect(requestFeedback).toHaveBeenCalledWith(mission, first);
+    expect(requestFeedback).toHaveBeenCalledWith(mission, first, expect.any(Array));
     await screen.findByText("자동 피드백을 확인하지 못했습니다.");
     // Stage 3: revision.
     click("수정하기");
@@ -191,7 +191,7 @@ describe("CanonicalMissionRun live CTA route", () => {
       final: { text: "피드백을 보고 결정했다.", decision: "revised_response", used_as_dissent_reason: false },
     });
     expect(requestFeedback).toHaveBeenCalledTimes(2);
-    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, revised);
+    expect(requestFeedback).toHaveBeenNthCalledWith(2, mission, revised, expect.any(Array));
     await screen.findByText("학습 기록에 저장되었습니다.");
     const firstEntry = vi.mocked(appendMissionEvent).mock.calls.find(([event]) => event.eventType === "mission_session_opened")![0];
     // Completing, viewing records and re-entering mounts a fresh runner with empty answers.

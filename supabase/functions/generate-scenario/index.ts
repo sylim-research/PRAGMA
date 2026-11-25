@@ -1,6 +1,6 @@
 import { ASTRA_GENERATION_MODEL, backgroundContext, GenerationPending, GenerationStopped } from '../_shared/backgroundGeneration.ts'
 import { callGeminiChat, isGeminiModel } from '../_shared/geminiChat.ts'
-import { concretenessRetryNote, findConcretenessIssues } from '../_shared/feedbackConcreteness.ts'
+import { concretenessRetryNote, FEEDBACK_VERDICT_SCHEME, findConcretenessIssues, sanitizeHintPattern } from '../_shared/feedbackConcreteness.ts'
 import { applyCandidateFeedback, candidateFeedbackPackets, CANDIDATE_FEEDBACK_PROMPT_VERSION, type CandidateFeedbackUpdate } from '../_shared/missionCandidateFeedback.ts'
 import { missionTopologySchema } from "../_shared/missionTopologySchema.ts"
 import {
@@ -318,6 +318,8 @@ interface FeedbackBody {
   } | null
   /** 카탈로그 version + 프롬프트 버전(D22) — 응답에 기록만 한다. */
   rubric_version?: string
+  /** 앞선 MJT에서 「적절」로 승인된 표현(판정 체계 v2). 모델은 번호만 고른다. */
+  hint_references?: { id: string; text: string }[]
 }
 
 // ── 검증②: AI 품질·일관성 점검 (계약 0-n·94 정의, 0-q·99 세칙) ─────────────
@@ -3827,6 +3829,15 @@ ${zhKoTranslationBoundary}${zhKoLiteralCheck}
    적지 마라. 지적은 **최대 1건**, 반드시 학습자 문장에 실제로 있는 부분만 인용한다.
 ③ 화용 인상: 이 상대·이 부담에서 목표 초점이 어느 대역으로 실현되었는가.
    대역 코드는 **주어진 카탈로그 코드 중에서만** 고른다.
+   이어서 그 정도를 MJT와 같은 네 단계(scale_code)로 판정한다.
+   - very_appropriate(매우 적절): 이 관계·상황에서 그대로 써도 좋다.
+   - somewhat_appropriate(다소 적절): 적절한 범위 안이지만 더 잘 맞출 여지가 있다.
+     고치지 않아도 되는 **선택 제안**으로 쓴다. 미달로 다루지 마라.
+   - somewhat_inappropriate·very_inappropriate(다소·매우 부적절): 이 관계·상황에서 오해나
+     관계 손상을 부를 수 있다.
+   - 알맞음 대역이면 앞의 두 단계, 대역 밖이면 뒤의 두 단계 가운데서만 고른다.
+   - **부적절로 판정하려면** feature_ko에 학습자의 어떤 표현이 어떤 조건(관계·상황·화행 목적)과
+     충돌하는지 반드시 쓴다. 그 충돌을 구체적으로 댈 수 없으면 부적절로 판정하지 마라.
 
 [층별 어조 — 다르게 쓴다]
 - 의미·문법은 **명시적으로** 판정한다("~가 빠졌습니다").
@@ -3849,11 +3860,29 @@ ${zhKoTranslationBoundary}${zhKoLiteralCheck}
 - 원문 내용이 빠졌으면 빠진 내용을 원문에서 그대로 인용해 무엇이 빠졌는지 쓴다.
 - **새 ${targetLanguage} 표현을 만들지 마라.** meaning_ko·feature_ko·discourse_ko에서 ${targetLanguage} 표현을
   보여 줄 때는 학습자 답안이나 원문에 이미 있는 표현을 인용할 때뿐이다. 고친 ${targetLanguage} 문장·
-  추천 단어·모범 표현을 쓰지 않는다.
+  추천 단어·모범 표현을 쓰지 않는다. 고칠 실마리는 아래 [표현 힌트]의 hint 칸에만 쓴다.
 - 일반론·추상적 권고는 금지한다: "검토할 필요가 있습니다", "검토해 보세요", "고려해 보세요",
   "살펴보세요", "다시 확인해 보세요", "보완이 필요합니다", "개선이 필요합니다",
   "더 자연스러운/적절한 표현" 같은 문구를 쓰지 않는다. 이런 문장 대신 위의 인용+행동을 쓴다.
 - 문제가 없는 층은 짧게 문제가 없다고만 쓴다. 근거 없는 칭찬이나 덧붙임 조언을 만들지 않는다.
+
+[완화 편향 금지]
+- 더 완화적·간접적·공손한 표현이 언제나 더 적절한 것은 아니다. 원문이 단호한 거절·항의·
+  기한 통보라면, 지나친 완화로 그 의사·기한·책임이 흐려지는 것도 부적절이다.
+- 판정의 기준은 원문의 화행 목적과 태도, 그리고 이 관계·상황이다. 공손할수록 좋다는 기준을 쓰지 마라.
+
+[표현 힌트 — 완성 문장 대신 실마리만]
+- hint는 문제가 있는 층(보완 권장·수정 필요)이 있을 때만 쓴다. 없으면 생략한다.
+- reference_id: 사용자 요청서의 [앞선 판단 문항의 승인 표현] 목록에서, 이번 문제와 **같은 기능**을
+  보여 주는 표현이 있으면 번호 하나만 고른다. 표현을 옮겨 적지 마라 — 화면이 원문을 보여 준다.
+  reference_note_ko에는 그 표현이 어떤 기능을 하는지와, 이번 장면과 무엇이 다른지를 한 문장으로 쓴다.
+  알맞은 표현이 없으면 reference_id를 생략한다.
+- pattern_ko: 문형·어휘 단위의 실마리를 한국어 한 문장으로 쓴다. ${targetLanguage} 조각은 6자 이내의
+  문형·어휘만 쓸 수 있다(예: 가능 여부를 묻는 문형, 상대의 부담을 인정하는 어휘).
+- 두 가지를 지킨다.
+  ① 치환 검사: 학습자가 힌트의 단어 몇 개만 바꿔 그대로 제출할 수 있으면 힌트가 아니라 답이다. 쓰지 마라.
+  ② 핵심 선택 검사: 이 과제에서 학습자가 직접 골라야 할 핵심 선택(예: 요청을 어떤 형식으로 할지)을
+     대신 정해 주지 마라. 표현의 기능과 쓰이는 조건을 설명하고, 선택은 학습자에게 남긴다.
 
 [금지]
 - 더 길고·간접적이고·강하거나 공손한 표현을 자동으로 상향 교정하지 마라. 적정 대역은
@@ -3889,7 +3918,8 @@ ${focal.map((s) => `- ${s.role === 'head' ? '중심 화행' : '조절 구간'}: 
   "verdicts": {
     "semantic_fidelity": "preserved | minor_loss | distorted",
     "grammatical_accuracy": "clean | impeding_errors",
-    "pragmatic_appropriateness": { "feature_code": "<주어진 코드>", "band_code": "<카탈로그 코드>" }
+    "pragmatic_appropriateness": { "feature_code": "<주어진 코드>", "band_code": "<카탈로그 코드>",
+      "scale_code": "very_appropriate | somewhat_appropriate | somewhat_inappropriate | very_inappropriate" }
   },
   "blocks": {
     "meaning_ko": "의미 층 1~2문장",
@@ -3898,7 +3928,9 @@ ${focal.map((s) => `- ${s.role === 'head' ? '중심 화행' : '조절 구간'}: 
     "feature_ko": "화용 층 1~2문장(비단정)",
     "alternatives": [ { "text": "최소대조안", "note_ko": "무엇을 하나 바꿨는지" } ],
     "discourse_ko": "담화 전체의 연결·자연성 한 줄 (미니 담화형이 아니면 "")",
-    "offfocus_warnings": [ { "text": "집중 구간 밖 인용", "note_ko": "왜 심각한지 1문장" } ]
+    "offfocus_warnings": [ { "text": "집중 구간 밖 인용", "note_ko": "왜 심각한지 1문장" } ],
+    "hint": { "reference_id": "H번호(없으면 생략)", "reference_note_ko": "그 표현의 기능과 이번 장면과의 차이 1문장",
+              "pattern_ko": "문형·어휘 실마리 1문장" }
   },
   "uncertainty_flags": [ { "dimension": "grammar | pragmatic", "reason": "왜 확신이 없는지" } ]
 }
@@ -3925,6 +3957,13 @@ function buildFeedbackUserPrompt(b: FeedbackBody): string {
         .map((s, i) => `  ${i + 1}. ${s}`)
         .join('\n')
     : '  (없음 — 원문 밖 명제적 Supportive Move 추가 금지)'
+  const hintRefs = Array.isArray(b.hint_references) && b.hint_references.length
+    ? b.hint_references
+        .filter((ref) => typeof ref?.id === 'string' && typeof ref?.text === 'string' && ref.text.trim())
+        .slice(0, 8)
+        .map((ref) => `  ${ref.id}. ${ref.text.trim()}`)
+        .join('\n')
+    : '  (없음 — reference_id를 쓰지 마라)'
   return `[상황]
 ${b.situation_ko ?? ''}
 [상대]
@@ -3946,6 +3985,9 @@ ${usable}
 - 조작적 정의: ${f.operational_definition ?? ''}
 - 대역 코드(이 중에서만 고를 것): ${bands}
 - 이 초점에서 **다루지 않는 축**(지적 금지): ${(f.excluded_confounds ?? []).join(' / ') || '(없음)'}
+
+[앞선 판단 문항의 승인 표현 — 힌트로 번호만 고를 수 있음]
+${hintRefs}
 
 [${outputLabel}]
 ${b.answer ?? ''}`
@@ -4854,6 +4896,8 @@ ${concretenessRetryNote(concreteness)}`, 0.2, {
           } catch { /* 첫 출력을 그대로 보여 준다 */ }
         }
       }
+      // 힌트의 목표어 조각이 6자를 넘으면 완성 문장에 가까우므로 그 실마리만 지운다(치환 검사의 결정론 부분).
+      sanitizeHintPattern(parsed, [b.answer ?? '', b.source_text ?? '', ...(b.hint_references ?? []).map((ref) => ref.text)])
       // 대안 문장은 학습자 화면에 노출하지 않는다(기존 정책 유지).
       parsed = {
         ...parsed,
@@ -4865,6 +4909,7 @@ ${concretenessRetryNote(concreteness)}`, 0.2, {
           feedback: {
             ...parsed,
             rubric_version: b.rubric_version ?? '',
+            verdict_scheme: FEEDBACK_VERDICT_SCHEME,
             provenance: { model, prompt_version: feedbackPromptVersion, content_release_id: CURRENT_CONTENT_RELEASE_ID, generated_at: new Date().toISOString() },
           },
           meta: { provider: PROVIDER, model, prompt_version: feedbackPromptVersion, content_release_id: CURRENT_CONTENT_RELEASE_ID },

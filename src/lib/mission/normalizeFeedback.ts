@@ -2,6 +2,7 @@ import {
   FeedbackDraftSchema,
   deriveRevisionScope,
   reconcileFeedback,
+  reconcilePragmaticScale,
   repairPragmaticLeakIntoMeaning,
   stripPhantomAnchors,
   stripVacuousAlternatives,
@@ -48,6 +49,8 @@ export function normalizeFeedbackResponse(
   raw: unknown,
   answer: string,
   feature: FeedbackFeature,
+  /** 이번 요청에 보낸 승인 표현. 모델이 목록에 없는 번호를 고르면 그 힌트를 버린다. */
+  hintReferences: readonly { id: string; text: string; source_label?: string }[] = [],
 ): FeedbackNormalizationResult {
   const parsed = FeedbackDraftSchema.safeParse(raw);
   if (!parsed.success) {
@@ -64,6 +67,16 @@ export function normalizeFeedbackResponse(
   }
 
   const { verdicts, blocks, issues } = reconcileFeedback(parsed.data);
+  const scaleIssues = reconcilePragmaticScale(verdicts, feature.within_band_code);
+  const hintIssues: string[] = [];
+  if (blocks.hint) {
+    // 화면 문구는 모델이 아니라 요청 목록에서 채운다. 모델이 쓴 reference_text는 믿지 않는다.
+    const chosen = hintReferences.find((reference) => reference.id === blocks.hint?.reference_id);
+    if (blocks.hint.reference_id && !chosen) hintIssues.push(`목록에 없는 힌트 번호(${blocks.hint.reference_id})를 버림`);
+    blocks.hint = chosen
+      ? { ...blocks.hint, reference_text: chosen.text, reference_label: chosen.source_label ?? "" }
+      : { ...blocks.hint, reference_id: undefined, reference_text: "", reference_label: "", reference_note_ko: "" };
+  }
   const layerIssues = repairPragmaticLeakIntoMeaning(verdicts, blocks);
   const anchorIssues = stripPhantomAnchors(blocks, answer);
   const alternativeIssues = stripVacuousAlternatives(blocks, answer);
@@ -85,6 +98,7 @@ export function normalizeFeedbackResponse(
   }
   const envelope = raw as {
     rubric_version?: unknown;
+    verdict_scheme?: unknown;
     provenance?: { model?: unknown; prompt_version?: unknown; generated_at?: unknown };
   };
   const provenance = envelope?.provenance;
@@ -95,6 +109,7 @@ export function normalizeFeedbackResponse(
       schema_version: "feedback_v1",
       held_axes,
       rubric_version: typeof envelope?.rubric_version === "string" ? envelope.rubric_version : "",
+      verdict_scheme: typeof envelope?.verdict_scheme === "string" ? envelope.verdict_scheme : "",
       verdicts,
       revision_scope,
       blocks,
@@ -106,6 +121,6 @@ export function normalizeFeedbackResponse(
         generated_at: typeof provenance?.generated_at === "string" ? provenance.generated_at : "",
       },
     },
-    issues: [...issues, ...layerIssues, ...anchorIssues, ...alternativeIssues],
+    issues: [...issues, ...scaleIssues, ...hintIssues, ...layerIssues, ...anchorIssues, ...alternativeIssues],
   };
 }

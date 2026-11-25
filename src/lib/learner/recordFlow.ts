@@ -58,10 +58,14 @@ export function buildChangeMap(feedbackRaw: unknown, featureId: string | null): 
     ? feature.find((candidate) => candidate.code === code) ?? (code === "within_band" ? feature.find((candidate) => candidate.tone === "teal") : undefined)
     : undefined;
   const scope = str(feedback?.revision_scope);
-  // 요청 화행은 미션 피드백 화면과 같은 공통 상태(좋음/수정 권장)로 보여 준다. 설명과 다시 살펴볼 점은 그대로 둔다.
-  const label = band && featureId === "request_mitigation_optionality"
-    ? (band.tone === "teal" ? "좋음" : "수정 권장")
-    : band?.label;
+  // 판정 체계 v2(2026-11-25): 정도(scale_code)가 있으면 미션 피드백 화면과 같은 세 단계 이름으로 보인다.
+  // 정도가 없는 옛 기록은 요청 화행만 옛 대응(알맞음 → 아주 좋음, 그 밖 → 보완 권장)으로, 그 밖은 범주 이름으로 둔다.
+  const scale = str(pragmatic?.scale_code);
+  const label = band && scale
+    ? (scale === "very_appropriate" ? "아주 좋음" : scale === "somewhat_appropriate" ? "보완 권장" : "수정 필요")
+    : band && featureId === "request_mitigation_optionality"
+      ? (band.tone === "teal" ? "아주 좋음" : "보완 권장")
+      : band?.label;
   return {
     band: band && label ? { label, tone: band.tone } : null,
     scope: scope ? SCOPE_LABEL[scope as keyof typeof SCOPE_LABEL] ?? scope : null,

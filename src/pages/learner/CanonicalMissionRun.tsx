@@ -81,7 +81,11 @@ import {
   type MissionCourseLocation,
 } from "@/lib/mission/missionCourseContext";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
-import type { RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
+import { feedbackVerdictLevels, type RuntimeFeedback } from "@/lib/pragma/feedbackSchema";
+import { requestFeedback } from "@/lib/mission/missionFeedback";
+import { feedbackHintReferencesFor } from "@/lib/mission/feedbackHintReferences";
+import { HandRaise } from "@/components/learner/HandRaise";
+import type { HandRaiseTarget } from "@/lib/mission/handRaise";
 import { CONSENT_VERSION, POLICY_VERSION } from "@/lib/research/versions";
 import LegacyMissionRun from "@/pages/learner/LegacyMissionRun";
 import { LEARNER_UX_PILOT, LEARNER_UX_PILOT_STORAGE_KEY } from "@/lib/mission/learnerUxPilot";
@@ -170,6 +174,8 @@ function DemoFillButton({ label }: { label: string }) {
 }
 /** 교수자 감수 화면(CanonicalReviewStage)에서 학습자 화면을 그릴 때 true. 학습자 화면에는 영향이 없다. */
 const ReviewHostContext = createContext(false);
+/** 손들기에 필요한 수행 정보. null이면 손들기를 그리지 않는다(미리보기·감수 화면). */
+const HandRaiseContext = createContext<{ missionId: string; attemptId: string; courseId: string | null; demo: boolean } | null>(null);
 
 type QuestResponse = Record<string, unknown>;
 // deferred = 의미 충실성이 무너져 뒤 층을 아직 보지 않음(DEC-20260918-04). 판정 원자료(verdicts)는 그대로 저장된다.
@@ -185,6 +191,8 @@ type FeedbackCriterion = {
 type DctEvaluation = {
   /** false면 자동 판정이 없으므로 수정 필요 여부를 추론하지 않는다. */
   available?: boolean;
+  /** 표현 힌트(판정 체계 v2). 완성 문장이 아니라 고칠 실마리다. */
+  hint?: { reference?: { text: string; label: string; note: string }; pattern?: string };
   criteria: FeedbackCriterion[];
   headline: string;
   body: string;
@@ -877,6 +885,7 @@ function ScaleView({ quest, onDone, devAutofill = false, revealAnswers = false }
         {answered && <div className="mt-4"><FeedbackBox verdict="해설" feedback={quest.feedback} highlights={quest.targetHighlights} asList={Boolean(quest.reasonChoice)} /></div>}
         {answered && quest.revisionExamples && <ReferenceExamples title="추천 표현" items={quest.revisionExamples} font="font-zh" />}
       </section>
+      {answered && <MjtHandRaise quest={quest} />}
       <ActionBar hint={!answered && !pick ? "가장 알맞은 답을 하나 선택해 주세요." : !answered && judgmentCommitted && !reasonId ? "판단한 이유를 하나 선택해 주세요." : undefined}>
         {!answered && quest.reasonChoice ? (
           <Button className={`h-[48px] ${actionButton}`} disabled={!pick || (judgmentCommitted && !reasonId)} onClick={() => {
@@ -981,6 +990,7 @@ function FixChoiceView({ quest, responses, onDone, devAutofill = false, revealAn
         {/* v6(correctionOnly): 후보별 해설이 본 해설이므로 공통 해설 문단은 감춘다. 저장된 콘텐츠는 그대로다. */}
         {answered && !correctionOnly && <div className="mt-4"><FeedbackBox verdict={`기준 판단 · 이 상황에서는 ${referenceLabel}`} feedback={quest.feedback} highlights={quest.targetHighlights} /></div>}
       </section>
+      {answered && <MjtHandRaise quest={quest} />}
       <ActionBar hint={!locked && !judgment ? "이 상황에서의 적절성을 먼저 판단해 주세요." : locked && !answered && !correctionId ? correctionOnly ? "상황에 맞게 고친 표현 하나를 선택해 주세요." : "가장 알맞은 수정안 하나를 선택해 주세요." : undefined}>
         {!locked ? (
           <Button className={`h-[48px] ${actionButton}`} disabled={!judgment} onClick={() => setLocked(true)}>{judgment ? "판단 제출하기" : "답을 선택해 주세요"}</Button>
@@ -1048,6 +1058,7 @@ function FreeCorrectionView({ quest, onDone, devAutofill = false }: { quest: Fre
         </div>
       </section>}
     </section>
+    {submitted && <MjtHandRaise quest={quest} />}
     <ActionBar hint={!submitted && unchanged && touched ? "원래 표현을 그대로 제출할 수 없습니다. 한 곳 이상 고쳐 주세요." : undefined}>
       {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!draft.trim() || unchanged} onClick={() => { markDemoEdited(draft, fromExample); setSubmitted(true); }}>수정안 제출하기</Button>
         : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ revisedText: draft.trim() })}>{nextActionLabel(quest)} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
@@ -1100,6 +1111,7 @@ function SpectrumView({ quest, onDone, devAutofill = false }: { quest: SpectrumQ
         })()}
       </fieldset>)}</div>
     </section>
+    {submitted && <MjtHandRaise quest={quest} />}
     <ActionBar hint={!submitted ? `${Object.keys(picks).length}/${total}개 표현을 판단했습니다.` : undefined}>
       {!submitted ? <Button className={`h-[48px] ${actionButton}`} disabled={!allPicked} onClick={() => setSubmitted(true)}>판단 제출하기</Button>
         : <Button className={`h-[48px] ${actionButton}`} onClick={() => onDone({ candidateJudgments: picks })}>{quest.nextLabel ?? `다음: ${outputName}하기`} <ChevronRight className="ml-1 h-4 w-4" /></Button>}
@@ -1155,6 +1167,7 @@ export function ReasonView({ quest, onDone, devAutofill = false, revealAnswers =
           </div>
         )}
       </section>
+      {answered && <MjtHandRaise quest={quest} />}
       <ActionBar hint={!answered && !reasonId ? "가장 큰 이유 하나를 선택해 주세요." : undefined}>
         {!answered ? (
           <Button className={`h-[48px] ${actionButton}`} disabled={!reasonId} onClick={() => setAnswered(true)}>이유 확인하기</Button>
@@ -1372,8 +1385,8 @@ function DctDraftCard({ quest, value, onChange, fromExample = false }: { quest: 
 }
 
 const FEEDBACK_LEVEL_LABEL: Record<FeedbackLevel, string> = {
-  very_good: "좋음",
-  recommend: "수정 권장",
+  very_good: "아주 좋음",
+  recommend: "보완 권장",
   required: "수정 필요",
   deferred: "다음 단계",
   held: "판정 보류",
@@ -1549,16 +1562,14 @@ export function evaluationFromRuntimeFeedback(
   const pragmaticOk = Boolean(
     feature && feedback.verdicts.pragmatic_appropriateness.band_code === feature.within_band_code,
   );
+  // 판정 체계 v2(2026-11-25): 세 기준 모두 「아주 좋음·보완 권장·수정 필요」. 화용은 MJT 네 단계에 대응한다.
+  const levels = feedbackVerdictLevels(feedback.verdicts, feature?.within_band_code ?? "within_band");
   const held = new Set(feedback.held_axes ?? []);
-  const meaningLevel: FeedbackLevel = held.has("meaning") ? "held" : feedback.verdicts.semantic_fidelity === "preserved"
-    ? "very_good"
-    : feedback.verdicts.semantic_fidelity === "minor_loss"
-      ? "recommend"
-      : "required";
+  const meaningLevel: FeedbackLevel = held.has("meaning") ? "held" : levels.meaning;
   // 뜻이 옮겨지지 않았어도 문법·화용 판정과 설명을 모두 보인다(DEC-20261118-03). 고칠 순서 안내만 남긴다.
   const fidelityFirst = meaningLevel === "required";
-  const grammarLevel: FeedbackLevel = held.has("grammar") ? "held" : feedbackLevel(feedback.verdicts.grammatical_accuracy === "clean");
-  const pragmaticLevel: FeedbackLevel = held.has("pragmatics") ? "held" : feedbackLevel(pragmaticOk, true);
+  const grammarLevel: FeedbackLevel = held.has("grammar") ? "held" : levels.grammar;
+  const pragmaticLevel: FeedbackLevel = held.has("pragmatics") ? "held" : levels.pragmatics;
   const heldBody = (level: FeedbackLevel, body: string) => level === "held" ? FEEDBACK_HELD_NOTE : body;
   const grammarNote = feedback.blocks.grammar[0];
   const criteria: FeedbackCriterion[] = [
@@ -1615,7 +1626,55 @@ export function evaluationFromRuntimeFeedback(
     action: !fidelityFirst && action && action !== primary.body ? action : undefined,
     example: feedback.blocks.alternatives[0]?.text ?? quest.referenceAnswer,
     takeaway: runtime.mission.unit.closing_ko,
+    hint: feedbackHintView(feedback),
   };
+}
+
+/**
+ * 판단 문항의 손들기(2026-11-25 승인 UI 브리프). 해설을 본 뒤에만 보인다.
+ * 실제 수행·시연에서만 그린다 — 미리보기·감수 화면에서는 저장할 수행이 없으므로 숨긴다.
+ */
+function MjtHandRaise({ quest }: { quest: MissionQuest }) {
+  const context = useContext(HandRaiseContext);
+  const itemId = Number(quest.id.replace(/^A/, ""));
+  if (!context || !Number.isInteger(itemId) || itemId < 1 || itemId > 5) return null;
+  return <HandRaise key={`${context.attemptId}-mjt${itemId}`} {...context} target={`mjt${itemId}` as HandRaiseTarget} />;
+}
+
+function DctHandRaise({ round }: { round: 1 | 2 }) {
+  const context = useContext(HandRaiseContext);
+  if (!context) return null;
+  return <HandRaise key={`${context.attemptId}-dct${round}`} {...context} target={`dct_feedback_${round}`} />;
+}
+
+/** 표현 힌트 칸. 완성 문장이 아니라 실마리임을 밝히고, 앞선 판단 문항의 승인 표현은 출처와 함께 보인다. */
+function FeedbackHintBox({ hint }: { hint?: DctEvaluation["hint"] }) {
+  if (!hint) return null;
+  return (
+    <section aria-label="표현 힌트" className="mt-3 rounded-xl border border-[#E6D49A] bg-[#FFFCEB] px-4 py-3">
+      <p className="text-[12.5px] font-black text-[#7A5A12]">표현 힌트</p>
+      {hint.reference && (
+        <div className="mt-1.5">
+          <p className="text-[12.5px] text-[#6D7788]">{hint.reference.label ? `${hint.reference.label}에서 본 표현` : "앞선 판단 문항에서 본 표현"}</p>
+          <p className="font-zh mt-0.5 text-[16px] leading-7 text-[#1E2A36]">{hint.reference.text}</p>
+          {hint.reference.note && <p className="mt-0.5 break-keep text-[14px] leading-6 text-[#3E4A57]"><ZhRuns text={hint.reference.note} /></p>}
+        </div>
+      )}
+      {hint.pattern && <p className={`${hint.reference ? "mt-2" : "mt-1.5"} break-keep text-[14px] leading-6 text-[#3E4A57]`}><ZhRuns text={hint.pattern} /></p>}
+      <p className="mt-1.5 text-[11.5px] text-[#6D7788]">그대로 옮기기보다, 이번 상황에 맞게 내 표현으로 바꿔 보세요.</p>
+    </section>
+  );
+}
+
+/** 표현 힌트(판정 체계 v2). 승인 표현은 요청 때 보낸 문구 그대로, 문형 실마리는 모델 설명 그대로 보인다. */
+function feedbackHintView(feedback: RuntimeFeedback): DctEvaluation["hint"] {
+  const hint = feedback.blocks.hint;
+  if (!hint) return undefined;
+  const reference = hint.reference_text?.trim()
+    ? { text: hint.reference_text, label: hint.reference_label ?? "", note: hint.reference_note_ko ?? "" }
+    : undefined;
+  const pattern = hint.pattern_ko?.trim() || undefined;
+  return reference || pattern ? { reference, pattern } : undefined;
 }
 
 function unavailableRuntimeEvaluation(
@@ -2059,7 +2118,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                       return (
                         <article key={criterion.key} className={`flex flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3.5 text-center ${FEEDBACK_LEVEL_CARD_STYLE[criterion.level]}`}>
                           <h3 className="text-[14.5px] font-bold text-[#4A5566]">{criterion.label}</h3>
-                          <p className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[14px] font-black ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
+                          <p className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-1 text-[13.5px] font-black sm:px-3 sm:text-[14px] ${FEEDBACK_LEVEL_STYLE[criterion.level]}`}>
                             {passed ? <Check aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /> : criterion.level === "required" ? <X aria-hidden className="h-3.5 w-3.5" strokeWidth={3} /> : <span aria-hidden className="font-black">!</span>}{FEEDBACK_LEVEL_LABEL[criterion.level]}
                           </p>
                         </article>
@@ -2067,12 +2126,15 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     })}
                   </div>
                   <FeedbackExplanationList criteria={evaluation.criteria} />
+                  <FeedbackHintBox hint={evaluation.hint} />
                 </>
               )}
             </div>
 
             {(localPilot || !feedbackUnavailable) && <p className="border-t border-[#EEEAE1] px-4 py-2 text-[11.5px] leading-5 text-[#6D7788]">{localPilot ? "이번 로컬 체험에서는 AI 피드백을 실행하지 않습니다. 위 내용은 미리 작성한 확인 기준이며, 내 답안을 평가한 결과가 아닙니다." : demo ? demoContent?.feedbackNote ?? "이 시연의 피드백 기록을 찾을 수 없습니다." : "AI 피드백입니다. 상황에 따라 다른 판단도 가능합니다."}</p>}
           </section>}
+          {/* 손들기: 피드백을 본 뒤에만. 회차마다 따로 남긴다. */}
+          {(!revisionOpen || recheckRequested) && !localPilot && !feedbackUnavailable && <DctHandRaise round={recheckRequested ? 2 : 1} />}
 
           {/* 단계가 바뀌면 접힌 상태로 다시 그려 단계별 펼침을 따로 센다. */}
           <LessonRecapReopen key={recapStage} lessonPoints={lessonPoints}
@@ -2093,7 +2155,7 @@ export function DctFeedbackView({ quest, response, onDone, onRevisionStateChange
                     {needsChange && <p className={`mb-1.5 text-[12.5px] font-black ${primaryCriterion.level === "required" ? "text-[#8B3531]" : "text-[#7A5A12]"}`}>{primaryCriterion.label} · {FEEDBACK_LEVEL_LABEL[primaryCriterion.level]}</p>}
                     <p className="break-keep text-sm leading-6"><ZhRuns text={conciseFeedback(primaryCriterion.body)} /></p>
                   </div>
-                ) : <div className="mt-4"><FeedbackExplanationList criteria={evaluation.criteria} inPanel /></div>)}
+                ) : <div className="mt-4"><FeedbackExplanationList criteria={evaluation.criteria} inPanel /><FeedbackHintBox hint={evaluation.hint} /></div>)}
                 <Textarea id={`${quest.id}-revise`} aria-label={recheckRequested ? "최종안" : "수정안"} value={revised} onChange={(event) => setRevised(event.target.value)} rows={dctInputRows(quest.source)} className={`${targetFont} mt-4 resize-y bg-white text-[16.5px] leading-7`} />
                 <DemoExampleNote text={revised} derived={revisedFromExample} />
                 {finalizesNow && <div className="mt-4"><ProcessMemoField id={`${quest.id}-final-memo`} title={`${outputName} 과정 메모`} guide={reflected ? FINAL_MEMO_GUIDE.revised : FINAL_MEMO_GUIDE.retained} value={finalMemo} onChange={setFinalMemo} rows={dctInputRows(quest.source)} /></div>}
@@ -3029,9 +3091,18 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     : getOrCreateMissionAttemptId(attemptStorageKey));
   // 모델 하우스: 대표 미션 시연에서만 준비된 예시 답안·피드백을 쓴다.
   const demoContent = demoMode ? representativeDemoContent(runtime?.scenario_id) : null;
+  // 손들기: 실제 수행과 시연에서만. 미리보기(DEV)·로컬 체험에서는 저장할 수행이 없다.
+  const handRaiseContext = useMemo(() => runtime && !localPilot && !isDevPreview
+    ? { missionId: runtime.scenario_id, attemptId, courseId: courseContext?.courseId ?? null, demo: demoMode }
+    : null, [attemptId, courseContext?.courseId, demoMode, isDevPreview, localPilot, runtime]);
+  const hintReferences = useMemo(() => feedbackHintReferencesFor(mission.quests, runtime?.mission.unit.target_feature),
+    [mission.quests, runtime?.mission.unit.target_feature]);
   const feedbackSession = useMemo(() => createDctFeedbackSession(runtime
     ? `pragma:dct-feedback:${attemptId}:${runtime.mission.provenance?.mission_content_hash ?? "legacy"}` : undefined,
-    demoMode ? demoContent?.requestFeedback ?? unavailableDemoFeedback : undefined), [attemptId, demoMode, demoContent, runtime?.mission.provenance?.mission_content_hash]);
+    demoMode
+      ? demoContent?.requestFeedback ?? unavailableDemoFeedback
+      : (target, answer) => requestFeedback(target, answer, hintReferences)),
+  [attemptId, demoMode, demoContent, hintReferences, runtime?.mission.provenance?.mission_content_hash]);
   const quest = mission.quests[questIndex];
 
   useEffect(() => {
@@ -3385,6 +3456,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
   } : {};
 
   return (
+    <HandRaiseContext.Provider value={handRaiseContext}>
     <LocalPilotContext.Provider value={localPilot}>
     <DemoModeContext.Provider value={demoMode}>
     <DemoContentContext.Provider value={demoContent}>
@@ -3496,6 +3568,7 @@ export function CanonicalMissionRunner({ mission, runtime, isDevPreview, demoMod
     </DemoContentContext.Provider>
     </DemoModeContext.Provider>
     </LocalPilotContext.Provider>
+    </HandRaiseContext.Provider>
   );
 }
 

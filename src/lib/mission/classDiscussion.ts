@@ -9,7 +9,7 @@
 // - 자유 수정문·산출·이견 사유는 익명 사례로만 옮긴다. 이름·계정·개별 ID는 모델에 넣지 않는다.
 // - 「수정 여부」와 「이견 여부」는 따로 센다. 표현을 바꾼 사실을 AI 의견 수용으로 읽지 않는다.
 
-import { SCOPE_LABEL, SEMANTIC_LABEL, GRAMMAR_LABEL } from "@/lib/pragma/feedbackSchema";
+import { SCOPE_LABEL, SEMANTIC_LABEL, GRAMMAR_LABEL, FeedbackVerdictsSchema, feedbackVerdictLevels, type FeedbackVerdictLevel } from "@/lib/pragma/feedbackSchema";
 import { withinBandCodeFor } from "@/lib/pragma/missionV6";
 import { getTargetFeature } from "@/lib/pragma/targetFeatures";
 import {
@@ -101,7 +101,8 @@ export interface DctCaseView {
     semantic: string | null;
     grammar: string | null;
     feature: string | null;
-    alternative: string | null;
+    /** 세 기준의 판정 단계(판정 체계 v2 이름). 옛 기록은 옛 대응으로 읽는다. */
+    levels: { meaning: FeedbackVerdictLevel; grammar: FeedbackVerdictLevel; pragmatics: FeedbackVerdictLevel } | null;
   } | null;
   dissent: { conditions: string[]; reason: string | null } | null;
 }
@@ -117,6 +118,8 @@ export interface DctView {
   dissents: number;
   /** 1차 AI 피드백의 화용 판정 분포(기록이 있는 응답만). */
   verdicts: Slice[];
+  /** 1차 AI 피드백의 세 기준 판정 분포(아주 좋음·보완 권장·수정 필요). */
+  criteria: Array<{ key: "meaning" | "grammar" | "pragmatics"; label: string; slices: Slice[] }>;
   cases: DctCaseView[];
 }
 
@@ -331,7 +334,6 @@ function dctCase(index: number, row: ClassDiscussionRow, featureId: string | nul
   const verdicts = obj(feedbackRaw?.verdicts);
   const pragmatic = obj(verdicts?.pragmatic_appropriateness);
   const blocks = obj(feedbackRaw?.blocks);
-  const alternative = obj(arr(blocks?.alternatives)[0]);
   const scope = str(feedbackRaw?.revision_scope);
   const rawBand = str(pragmatic?.band_code);
   const bandCode = rawBand ? normalizeBand(featureId, rawBand) : null;
@@ -348,7 +350,7 @@ function dctCase(index: number, row: ClassDiscussionRow, featureId: string | nul
           semantic: typeof verdicts.semantic_fidelity === "string" ? SEMANTIC_LABEL[verdicts.semantic_fidelity] ?? verdicts.semantic_fidelity : null,
           grammar: typeof verdicts.grammatical_accuracy === "string" ? GRAMMAR_LABEL[verdicts.grammatical_accuracy] ?? verdicts.grammatical_accuracy : null,
           feature: str(blocks?.feature_ko),
-          alternative: str(alternative?.text),
+          levels: caseLevels(verdicts, featureId),
         }
       : null,
     dissent: dissentRaw
@@ -358,6 +360,22 @@ function dctCase(index: number, row: ClassDiscussionRow, featureId: string | nul
         }
       : null,
   };
+}
+
+export const VERDICT_LEVEL_LABEL: Record<FeedbackVerdictLevel, string> = {
+  very_good: "아주 좋음",
+  recommend: "보완 권장",
+  required: "수정 필요",
+};
+const VERDICT_LEVEL_TONE: Record<FeedbackVerdictLevel, SliceTone> = { very_good: "teal", recommend: "amber", required: "rust" };
+const CRITERIA_LABEL = { meaning: "의미적 충실성", grammar: "문법적 정확성", pragmatics: "화용적 적절성" } as const;
+
+/** 저장된 판정을 세 단계로 읽는다. 형식이 맞지 않는 기록은 null이다. */
+function caseLevels(verdicts: Obj, featureId: string | null): NonNullable<DctCaseView["feedback"]>["levels"] {
+  const parsed = FeedbackVerdictsSchema.safeParse(verdicts);
+  if (!parsed.success) return null;
+  const within = (featureId ? getTargetFeature(featureId)?.within_band_code : undefined) ?? "within_band";
+  return feedbackVerdictLevels(parsed.data, within);
 }
 
 /** 미션 1개의 로그 행을 토론 보드 뷰 모델로 바꾼다. mission은 normalize 전 원본 JSON이어도 된다. */
@@ -414,6 +432,14 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
     if (!palette.some((band) => band.code === code)) verdicts.push({ key: code, label: code, tone: "slate", count });
   }
   const mode = str(task?.mode);
+  const criteria = (["meaning", "grammar", "pragmatics"] as const).map((key) => ({
+    key,
+    label: CRITERIA_LABEL[key],
+    slices: (["very_good", "recommend", "required"] as const).map((level) => ({
+      key: level, label: VERDICT_LEVEL_LABEL[level], tone: VERDICT_LEVEL_TONE[level],
+      count: cases.filter((item) => item.feedback?.levels?.[key] === level).length,
+    })),
+  }));
 
   return {
     missionId,
@@ -434,6 +460,7 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
       retained: cases.filter((item) => item.decision === "retained").length,
       dissents: cases.filter((item) => item.dissent !== null).length,
       verdicts,
+      criteria,
       cases,
     },
   };

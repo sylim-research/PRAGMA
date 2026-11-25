@@ -38,12 +38,29 @@ const GrammarNoteSchema = z.object({
 });
 export type GrammarNote = z.infer<typeof GrammarNoteSchema>;
 
+/**
+ * 화용 판정의 정도(2026-11-25 연구자 결정, 판정 체계 v2). MJT의 네 단계 척도를 그대로 쓴다.
+ * band_code는 방향(너무 직접적·알맞음·지나치게 우회적 등), scale_code는 정도를 나타낸다.
+ * v2 이전 기록에는 이 값이 없다 — 그 기록은 옛 대응(알맞음 → 좋음, 그 밖 → 권장)으로 읽는다.
+ */
+export const PRAGMATIC_SCALE_CODES = [
+  "very_appropriate",
+  "somewhat_appropriate",
+  "somewhat_inappropriate",
+  "very_inappropriate",
+] as const;
+export type PragmaticScaleCode = (typeof PRAGMATIC_SCALE_CODES)[number];
+
+/** 판정 체계 판본. 변경 전후 기록을 같은 기준으로 비교하지 않도록 응답마다 남긴다. */
+export const FEEDBACK_VERDICT_SCHEME = "verdict_v2_scale4_20261125";
+
 export const FeedbackVerdictsSchema = z.object({
   semantic_fidelity: z.enum(SEMANTIC_FIDELITY),
   grammatical_accuracy: z.enum(GRAMMATICAL_ACCURACY),
   pragmatic_appropriateness: z.object({
     feature_code: z.string().min(1),
     band_code: z.string().min(1),
+    scale_code: z.enum(PRAGMATIC_SCALE_CODES).optional(),
   }),
 });
 export type FeedbackVerdicts = z.infer<typeof FeedbackVerdictsSchema>;
@@ -65,6 +82,57 @@ export function validatePragmaticCodes(
     return `허용되지 않은 band_code(${pragmatic.band_code})`;
   }
   return null;
+}
+
+/**
+ * 화용의 방향(band)과 정도(scale)를 맞춘다(판정 체계 v2). 방향을 기준으로 삼는다 —
+ * 알맞음 대역인데 부적절로 매기면 「다소 적절」로, 대역 밖인데 적절로 매기면 「다소 부적절」로
+ * 가장 가까운 쪽에 붙인다. 정도가 없으면 그대로 둔다(v2 이전 응답·녹화 데모).
+ */
+export function reconcilePragmaticScale(verdicts: FeedbackVerdicts, withinBandCode: string): string[] {
+  const pragmatic = verdicts.pragmatic_appropriateness;
+  const scale = pragmatic.scale_code;
+  if (!scale) return [];
+  const within = pragmatic.band_code === withinBandCode;
+  const appropriate = scale === "very_appropriate" || scale === "somewhat_appropriate";
+  if (within && !appropriate) {
+    pragmatic.scale_code = "somewhat_appropriate";
+    return [`알맞음 대역인데 ${scale}로 판정해 somewhat_appropriate로 맞춤`];
+  }
+  if (!within && appropriate) {
+    pragmatic.scale_code = "somewhat_inappropriate";
+    return [`대역 밖(${pragmatic.band_code})인데 ${scale}로 판정해 somewhat_inappropriate로 맞춤`];
+  }
+  return [];
+}
+
+/** 화면에 보이는 세 단계. 이름은 화면이 정한다(아주 좋음·보완 권장·수정 필요). */
+export type FeedbackVerdictLevel = "very_good" | "recommend" | "required";
+
+/**
+ * 세 기준의 판정을 화면의 세 단계로 옮긴다(판정 체계 v2, 2026-11-25).
+ * - 의미: 보존 → 아주 좋음 / 일부 누락 → 보완 권장 / 왜곡 → 수정 필요
+ * - 문법: 오류 없음 → 아주 좋음 / 이해를 막는 오류 → 수정 필요
+ * - 화용: 매우 적절 → 아주 좋음 / 다소 적절 → 보완 권장 / 다소·매우 부적절 → 수정 필요
+ *   정도가 없는 v2 이전 기록은 옛 대응대로 읽는다(알맞음 → 아주 좋음, 그 밖 → 보완 권장).
+ *   과거에 없던 「수정 필요」를 옛 기록에 소급해 붙이지 않기 위해서다.
+ */
+export function feedbackVerdictLevels(
+  verdicts: FeedbackVerdicts,
+  withinBandCode: string,
+): { meaning: FeedbackVerdictLevel; grammar: FeedbackVerdictLevel; pragmatics: FeedbackVerdictLevel } {
+  const meaning: FeedbackVerdictLevel = verdicts.semantic_fidelity === "preserved"
+    ? "very_good"
+    : verdicts.semantic_fidelity === "minor_loss" ? "recommend" : "required";
+  const grammar: FeedbackVerdictLevel = verdicts.grammatical_accuracy === "clean" ? "very_good" : "required";
+  const pragmatic = verdicts.pragmatic_appropriateness;
+  const within = pragmatic.band_code === withinBandCode;
+  const pragmatics: FeedbackVerdictLevel = !pragmatic.scale_code
+    ? (within ? "very_good" : "recommend")
+    : pragmatic.scale_code === "very_appropriate"
+      ? "very_good"
+      : pragmatic.scale_code === "somewhat_appropriate" ? "recommend" : "required";
+  return { meaning, grammar, pragmatics };
 }
 
 /** 모델이 돌려주는 형태 — revision_scope 없음(코드가 도출한다). */
@@ -93,6 +161,22 @@ export const FeedbackDraftSchema = z.object({
       .array(z.object({ text: z.string().trim().min(1), note_ko: z.string().default("") }))
       .max(2)
       .default([]),
+    /**
+     * 표현 힌트(판정 체계 v2). 완성 문장을 주지 않고 학습자가 고칠 실마리만 준다.
+     * - reference_id: 앞선 MJT에서 교수자가 승인한 「적절」 표현 목록에서 고른 번호.
+     *   화면은 모델이 쓴 문장이 아니라 저장된 원문을 그대로 보여 준다.
+     * - pattern_ko: 문형·어휘 단위의 짧은 실마리(한국어 설명 + 짧은 목표어 조각).
+     */
+    hint: z
+      .object({
+        reference_id: z.string().trim().min(1).optional(),
+        /** 화면에 보일 승인 문구. 모델 출력이 아니라 요청 때 보낸 목록에서 코드가 채운다. */
+        reference_text: z.string().default(""),
+        reference_label: z.string().default(""),
+        reference_note_ko: z.string().default(""),
+        pattern_ko: z.string().default(""),
+      })
+      .optional(),
   }),
   uncertainty_flags: z
     .array(
@@ -112,6 +196,8 @@ export const FeedbackSchema = FeedbackDraftSchema.extend({
   /** 검수 모델을 통과하지 못해 판정을 보류한 축(2026-10-26). 보류 축은 학습자에게 판정·설명을 보이지 않는다. */
   held_axes: z.array(z.enum(FEEDBACK_HELD_AXES)).default([]),
   rubric_version: z.string().default(""),
+  /** 판정 체계 판본. 비어 있으면 v2 이전 기록이다. */
+  verdict_scheme: z.string().default(""),
   revision_scope: z.enum(REVISION_SCOPES),
   provenance: z.object({
     model: z.string().default(""),
