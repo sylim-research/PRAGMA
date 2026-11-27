@@ -1,4 +1,4 @@
-import { getTargetFeature, SCALE4_LABELS, type Scale4Code } from "@/lib/pragma/targetFeatures";
+import { currentClosingPrinciple, currentFeatureLabel, getTargetFeature, SCALE4_LABELS, type Scale4Code } from "@/lib/pragma/targetFeatures";
 import type { MissionRuntime, MpjItemRuntime } from "@/lib/pragma/missionSchema";
 import { DIRECTION_LABEL } from "@/lib/pragma/enums";
 
@@ -59,7 +59,7 @@ export function MissionPreview({
     <div className="mt-3 space-y-3 rounded-xl border border-[#D8D0BC] bg-[#FAF8F2] p-3.5 text-[13px]">
       {/* unit + provenance */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span className="font-semibold">내부 문항 초점 · {mission.unit.learner_label}</span>
+        <span className="font-semibold">내부 문항 초점 · {currentFeatureLabel(mission.unit.learner_label)}</span>
         <span className="rounded bg-[#E7EFF5] px-1.5 py-0.5 text-[12px] font-semibold text-[#2B5B7A]">{DIRECTION_LABEL[mission.direction]}</span>
         <span className="text-muted-foreground">({feat} v{mission.unit.target_feature_version})</span>
         {p && (
@@ -68,7 +68,7 @@ export function MissionPreview({
           </span>
         )}
       </div>
-      <p className="text-[12.5px] text-muted-foreground">완료 원칙: {mission.unit.closing_ko}</p>
+      <p className="text-[12.5px] text-muted-foreground">완료 원칙: {currentClosingPrinciple(mission.unit.closing_ko)}</p>
 
       {warnings && warnings.length > 0 && (
         <div className="rounded-md bg-amber-50 px-3 py-2 text-[12px] text-amber-900">

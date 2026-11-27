@@ -1,7 +1,7 @@
 import { naturalLearnerScene } from "../../../supabase/functions/_shared/learnerScene";
 import { LEVEL, SPEECH_ACT_UI, type ChannelUI } from "@/lib/pragma/enums";
 import type { Pdr } from "@/lib/pragma/coreSchema";
-import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { currentClosingPrinciple, getTargetFeature } from "@/lib/pragma/targetFeatures";
 import { withinBandCodeFor } from "@/lib/pragma/missionV6";
 import type { CanonicalRunnableMission as RunnableMission } from "@/lib/mission/missionDb";
 import type {
@@ -768,7 +768,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
   const feedback: DctQuest["feedback"] = {
     mode: runtimeFeedbackMode(task.pdr),
     issue: task.reference_alternatives[0].note_ko,
-    action: mission.unit.closing_ko,
+    action: currentClosingPrinciple(mission.unit.closing_ko),
     success: "원문의 핵심 의미와 상황에 맞는 표현을 함께 확인했습니다.",
     alternatives: task.reference_alternatives.map((alternative) => ({
       text: alternative.text,
@@ -840,7 +840,7 @@ export function adaptRunnableMissionToCanonical(runnable: RunnableMission): Cano
       changedDimensions: [],
       note: mission.schema_version === "mission_v6" ? "서로 다른 장면에서 표현의 적절성을 살펴봅니다." : "첫인상 판단과 맥락 대비 판단에서 상황에 따라 달라지는 적절성을 비교합니다.",
     },
-    summaryPrinciple: mission.unit.closing_ko,
+    summaryPrinciple: currentClosingPrinciple(mission.unit.closing_ko),
     lessonPoints,
     quests,
   };

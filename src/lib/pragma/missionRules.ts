@@ -14,7 +14,7 @@
 // v2 형태(중립 필드명 + direction)로 통일한 뒤 검사한다. R10은 데이터의 direction으로
 // source/target 언어를 스왑한다. R9는 중국·한국 국가 일반화를 양방향 공통으로 잡는다.
 
-import { getTargetFeature, TARGET_FEATURES } from "@/lib/pragma/targetFeatures";
+import { currentClosingPrinciple, currentFeatureLabel, getTargetFeature, TARGET_FEATURES } from "@/lib/pragma/targetFeatures";
 import { MissionV6Schema, type MissionV6 } from "./missionV6";
 import {
   normalizeMission,
@@ -870,10 +870,10 @@ export function checkMission(
     if (m.unit.target_feature_version !== feature.version) {
       add(v, "R13", "fail", `target_feature_version(${m.unit.target_feature_version}) ≠ 카탈로그(${feature.version})`);
     }
-    if (m.unit.learner_label !== feature.learner_label) {
+    if (currentFeatureLabel(m.unit.learner_label) !== feature.learner_label) {
       add(v, "R14", "fail", `learner_label이 카탈로그 고정 문구와 다름`);
     }
-    if (m.unit.closing_ko !== feature.closing_principle_ko) {
+    if (currentClosingPrinciple(m.unit.closing_ko) !== feature.closing_principle_ko) {
       add(v, "R14", "fail", `closing_ko가 카탈로그 고정 문구와 다름`);
     }
     // R15 카탈로그의 speech_act와 요청 화행 일치

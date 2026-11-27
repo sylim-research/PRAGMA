@@ -1,6 +1,6 @@
 import type { MpjResponseTrace } from "@/lib/mission/missionAttemptRow";
 import type { MissionRuntime } from "@/lib/pragma/missionSchema";
-import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { currentFeatureLabel, getTargetFeature } from "@/lib/pragma/targetFeatures";
 
 export interface MpjSummaryRow {
   label: string;
@@ -42,7 +42,7 @@ export function buildMpjSummaryRows(
           label: "첫인상 판단",
           comment: sameDirection
             ? summary?.first_impression ??
-              `상황과 관계에 비춰 「${mission.unit.learner_label}」의 정도를 살폈습니다.`
+              `상황과 관계에 비춰 「${currentFeatureLabel(mission.unit.learner_label)}」의 정도를 살폈습니다.`
             : MPJ_SUMMARY_DIVERGENCE_COPY,
         };
       }
