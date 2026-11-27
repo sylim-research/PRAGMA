@@ -26,7 +26,7 @@ export const COURSE_WEEKS: CourseWeekRow[] = [
   { weekNo: 4, title: "초대 · 공동행동 권유", stageLabel: "기초 적용", weekType: "speech_act", status: "locked" },
   { weekNo: 5, title: "칭찬하기", stageLabel: "기초 적용", weekType: "speech_act", status: "locked" },
   { weekNo: 6, title: "거절", stageLabel: "관계 조정", weekType: "speech_act", status: "locked" },
-  { weekNo: 7, title: "사과 · 수리", stageLabel: "관계 조정", weekType: "speech_act", status: "locked" },
+  { weekNo: 7, title: "사과 · 보상", stageLabel: "관계 조정", weekType: "speech_act", status: "locked" },
   { weekNo: 8, title: "중간 통합 점검", stageLabel: "중간 평가", weekType: "assessment", status: "locked" },
   { weekNo: 9, title: "불만 · 문제 제기", stageLabel: "관계 조정", weekType: "speech_act", status: "locked" },
   { weekNo: 10, title: "제안 · 조언", stageLabel: "관계 조정", weekType: "speech_act", status: "locked" },

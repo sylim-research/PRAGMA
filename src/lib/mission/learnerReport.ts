@@ -88,7 +88,7 @@ const NEXT_STEP_BY_FEATURE: Record<string, string> = {
   gratitude_calibration:
     "받은 도움의 크기와 관계에 비추어 감사 표현의 강도는 알맞았나요?",
   apology_accountability_repair:
-    "이번 사과는 책임과 상대가 받은 영향, 이후의 수리를 어떻게 드러냈나요?",
+    "이번 사과는 책임과 상대가 받은 영향, 이후의 보상을 어떻게 드러냈나요?",
   proposal_optionality_clarity:
     "제안의 핵심과 상대가 선택할 수 있는 여지가 함께 드러났나요?",
   invitation_choice_commitment:
@@ -112,7 +112,7 @@ const EXPRESSION_COPY: Record<string, string> = {
   "您看方便吗": "“괜찮으실까요?”",
 };
 
-// 라벨은 받침 유무가 섞여 있다("완화와 선택권"=받침 / "책임 인정과 수리"=모음).
+// 라벨은 받침 유무가 섞여 있다("완화와 선택권"=받침 / "문제 명료화와 책임 범위"=모음).
 // 조사를 하드코딩하면 "들림'로"처럼 깨지므로 항상 이 함수로 고른다.
 const JOSA_FORMS = {
   을: ["을", "를"],

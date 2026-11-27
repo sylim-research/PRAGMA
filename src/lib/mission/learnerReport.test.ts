@@ -34,7 +34,8 @@ describe("josa", () => {
   it("받침 유무에 따라 조사를 고른다", () => {
     expect(josa("조금 단정적으로 들림", "로")).toBe("으로");
     expect(josa("알맞은 범위", "로")).toBe("로");
-    expect(josa("책임 인정과 수리", "을")).toBe("를");
+    expect(josa("책임 인정과 보상", "을")).toBe("을");
+    expect(josa("평가 강도와 민감도", "을")).toBe("를");
     expect(josa("완화와 선택권", "을")).toBe("을");
     expect(josa("평가 강도와 민감도", "는")).toBe("는");
     expect(josa("문제 명료화와 책임 범위", "는")).toBe("는");
