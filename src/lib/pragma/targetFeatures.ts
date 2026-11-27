@@ -760,3 +760,28 @@ export const SCALE4_LABELS: Record<Scale4Code, string> = {
   somewhat_inappropriate: "다소 부적절",
   very_inappropriate: "매우 부적절",
 };
+
+// ── 옛 고정 문구 호환 ─────────────────────────────────────────────
+// 승인된 미션은 DB에서 고칠 수 없으므로(guard_content_review_scenario) 저장본에
+// 옛 카탈로그 문구가 남는다. 화면과 R14 검사는 읽을 때 현행 문구로 맞춘다.
+const LEGACY_LEARNER_LABELS: Record<string, string> = {
+  "책임 인정과 수리": "책임 인정과 보상",
+};
+const LEGACY_CLOSING_PRINCIPLES: Record<string, string> = {
+  "사과는 세게 말하는 것이 아니라, 실제 책임과 상대가 받은 영향에 맞게 인정하고 필요한 수리를 제시할 때 적절합니다.":
+    "사과는 세게 말하는 것이 아니라, 실제 책임과 상대가 받은 영향에 맞게 인정하고 필요한 보상을 제시할 때 적절합니다.",
+};
+
+/** 저장된 learner_label을 현행 카탈로그 표시명으로 읽는다. */
+export function currentFeatureLabel(label: string): string;
+export function currentFeatureLabel(label: string | undefined): string | undefined;
+export function currentFeatureLabel(label: string | undefined): string | undefined {
+  return label === undefined ? label : (LEGACY_LEARNER_LABELS[label] ?? label);
+}
+
+/** 저장된 closing_ko를 현행 카탈로그 문구로 읽는다. */
+export function currentClosingPrinciple(text: string): string;
+export function currentClosingPrinciple(text: string | undefined): string | undefined;
+export function currentClosingPrinciple(text: string | undefined): string | undefined {
+  return text === undefined ? text : (LEGACY_CLOSING_PRINCIPLES[text] ?? text);
+}

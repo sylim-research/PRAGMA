@@ -1,3 +1,4 @@
+import { currentFeatureLabel } from "@/lib/pragma/targetFeatures";
 import type { Pdr } from "@/lib/pragma/coreSchema";
 import type { MissionRuntime, MpjItemRuntime } from "@/lib/pragma/missionSchema";
 
@@ -234,7 +235,7 @@ export function buildInstructorMissionGuide(
 
   return {
     speechActKo,
-    itemFocusKo: mission.unit.learner_label,
+    itemFocusKo: currentFeatureLabel(mission.unit.learner_label),
     situationKo: mission.production_task.situation_ko,
     relationKo: mission.production_task.relation_ko,
     pdrKo: formatPdr(productionPdr),

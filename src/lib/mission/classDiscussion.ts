@@ -11,7 +11,7 @@
 
 import { SCOPE_LABEL, SEMANTIC_LABEL, GRAMMAR_LABEL, FeedbackVerdictsSchema, feedbackVerdictLevels, type FeedbackVerdictLevel } from "@/lib/pragma/feedbackSchema";
 import { withinBandCodeFor } from "@/lib/pragma/missionV6";
-import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { currentFeatureLabel, getTargetFeature } from "@/lib/pragma/targetFeatures";
 import {
   aggregateMissionResponses,
   parseJudgmentEnvelope,
@@ -446,7 +446,7 @@ export function buildClassDiscussion(missionId: string, rows: ClassDiscussionRow
     schemaVersion: str(content?.schema_version),
     speechAct: str(obj(content?.learning_goal)?.speech_act),
     direction: str(content?.direction),
-    focus: str(obj(content?.unit)?.learner_label),
+    focus: currentFeatureLabel(str(obj(content?.unit)?.learner_label)),
     learners: rowsLatest.length,
     dissents,
     items,

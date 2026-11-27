@@ -17,7 +17,7 @@ import {
   type LanguageDirection,
   type LearnerLevel,
 } from "@/lib/pragma/enums";
-import { getTargetFeature } from "@/lib/pragma/targetFeatures";
+import { currentFeatureLabel, getTargetFeature } from "@/lib/pragma/targetFeatures";
 import { SCALE4_CODES, SCALE4_LABELS, type Scale4Code } from "@/lib/pragma/targetFeatures";
 import {
   normalizeMission,
@@ -865,7 +865,7 @@ function MissionRunner({
   const feat = getTargetFeature(mission.unit.target_feature);
   const learnerActLabel = feat?.speech_act ? SPEECH_ACT_UI[feat.speech_act] : "화행";
   const learnerFocusCopy =
-    LEARNER_FOCUS_COPY[mission.unit.target_feature] ?? mission.unit.learner_label;
+    LEARNER_FOCUS_COPY[mission.unit.target_feature] ?? currentFeatureLabel(mission.unit.learner_label);
 
   const feedbackClear = fbState === "ready" && fb?.revision_scope === "clear";
   const revisionReady = responseHasSubstantiveRevision(draft, revised);
@@ -874,7 +874,7 @@ function MissionRunner({
   const reviseAction = revisionActionLine(
     fb,
     mission.unit.target_feature,
-    mission.unit.learner_label,
+    currentFeatureLabel(mission.unit.learner_label),
   );
   const completionAdvice = completionAdviceLine({
     fb,
@@ -2504,7 +2504,7 @@ function MissionBriefDrawer({
         <p>
           {/* 첫 판단 전에는 초점명(「완화와 선택권」 등)을 쓰지 않는다 — 그 자체가 판정 방향이다. */}
           뜻 전달 · 이해를 막는 문법 ·{" "}
-          {focusRevealed ? `이 상황에 맞는 「${mission.unit.learner_label}」` : "이 상황에 맞는 표현"}을 봅니다.
+          {focusRevealed ? `이 상황에 맞는 「${currentFeatureLabel(mission.unit.learner_label)}」` : "이 상황에 맞는 표현"}을 봅니다.
           <b className="text-foreground"> 참고 표현은 제출 뒤에 공개됩니다.</b>
         </p>
         <ul className="space-y-0.5">
