@@ -33,7 +33,7 @@ export function isCurrentMissionReleasedForLearner(
 
 export function missionReleaseLabel(state: MissionReleaseState): string {
   if (state.mission_status === "released") return "최종 공개 완료";
-  if (state.mission_status === "reviewed") return "교수자 최종 검수 완료";
+  if (state.mission_status === "reviewed") return "교수자 최종 검토 완료";
   if (state.mission_status === "generated") return "학습 콘텐츠 생성 완료";
-  return "검수 대기";
+  return "검토 대기";
 }

@@ -268,7 +268,7 @@ const IntroArc = () => {
           </p>
           <p className="mt-1 text-[11.5px] leading-relaxed text-muted-foreground">
             상대의 반응은 하나로 결정되지 않습니다. 아래는 표현이 대화의 다음 차례에
-            어떤 여지를 만들 수 있는지 보여주는 검수된 예시입니다.
+            어떤 여지를 만들 수 있는지 보여주는 검토된 예시입니다.
           </p>
           <div className="mt-3 grid gap-3 lg:grid-cols-2">
             {[REPLAY_CASES.first, REPLAY_CASES.alternative].map((c, i) => (

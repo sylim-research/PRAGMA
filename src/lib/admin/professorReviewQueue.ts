@@ -52,7 +52,7 @@ export function reviewProgressLabel(
   runs: readonly DashboardReviewRunRow[],
 ): string {
   if (["reviewed", "released"].includes(row.mission_status ?? "")) return "교수자 승인 완료";
-  if (!isDashboardReviewTarget(row)) return "검수 대상 아님";
+  if (!isDashboardReviewTarget(row)) return "검토 대상 아님";
   const stage = nextDashboardReviewStage(row, runs);
   if (stage === "rules") {
     return latestDashboardReviewRun(row, runs)?.rules_verdict === "fail" ? "규칙 검사 오류 · 수정 필요" : "규칙 검사 전";

@@ -107,7 +107,7 @@ export const PROMPT_WORKFLOW: WorkflowStage[] = [
     title: "학습 미션 MJT1~5 + DCT",
     screen: "학습 미션 조립 → v6 초안 만들기",
     route: "/admin/assembly",
-    result: "검수 대기로 저장 (DCT 원문은 ①의 원문을 그대로 씀)",
+    result: "검토 대기로 저장 (DCT 원문은 ①의 원문을 그대로 씀)",
     steps: [
       {
         id: "mission_generate", title: "미션 전체 작성", kind: "always", when: "「v6 초안 만들기」를 누를 때",
@@ -138,8 +138,8 @@ export const PROMPT_WORKFLOW: WorkflowStage[] = [
   },
   {
     id: "review",
-    title: "검수와 승인",
-    screen: "학습 미션 품질 검수 → 교수자 최종 승인",
+    title: "검토와 승인",
+    screen: "학습 미션 품질 검토 → 교수자 최종 승인",
     route: "/admin/ai-review",
     result: "승인된 미션만 편성·공개",
     steps: [
@@ -149,7 +149,7 @@ export const PROMPT_WORKFLOW: WorkflowStage[] = [
         prompts: () => [],
       },
       {
-        id: "review_zh", title: "중국어 표현 검수", kind: "always", when: "검수 화면에서 실행할 때",
+        id: "review_zh", title: "중국어 표현 검토", kind: "always", when: "검토 화면에서 실행할 때",
         does: "중국어 표현의 자연성·격식·호칭·화행 실현을 검토합니다. 판단 범주를 바꾸지는 않습니다.",
         model: fixed(REVIEW_PRIMARY_MODEL),
         prompts: () => ["content_review.zh_expression"],
