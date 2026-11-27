@@ -41,7 +41,7 @@ const ROADMAP: RoadmapItem[] = [
   { week: 4, stage: "기초 적용", topic: "초대 · 공동행동 권유" },
   { week: 5, stage: "기초 적용", topic: "칭찬하기" },
   { week: 6, stage: "관계 조정", topic: "거절" },
-  { week: 7, stage: "관계 조정", topic: "사과 · 수리" },
+  { week: 7, stage: "관계 조정", topic: "사과 · 보상" },
   { week: 8, stage: "중간점검", topic: "중간 통합 점검" },
   { week: 9, stage: "관계 조정", topic: "불만 · 문제 제기" },
   { week: 10, stage: "관계 조정", topic: "제안 · 조언" },
