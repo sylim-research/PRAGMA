@@ -76,7 +76,7 @@ export function buildContentReviewDomain(kind: string, source: Record<string, an
     const week = course.weeks[0];
     act = week.speech_act;
     const expected = act || weekRole(week.week_no) === "contextualization" ? 2 : 0;
-    if (expected && week.scenarios.length !== expected) add(`완전한 공개 미션 ${expected}개를 편성한 뒤 주차 자료를 검수하세요.`);
+    if (expected && week.scenarios.length !== expected) add(`완전한 공개 미션 ${expected}개를 편성한 뒤 주차 자료를 검토하세요.`);
     const draft = source.teaching_draft;
     const kind = teachingKind(week.week_no, week.type);
     let publicMaterial = buildWeeklyCourseMaterial(course.outline, week);

@@ -22,11 +22,11 @@ export function GenerationJobsPanel({ busy, onResume, savedIds }: {
   if (!visible.length && !error) return null;
   return <section className="my-4 rounded-xl border border-[#E2DED2] bg-white p-5" aria-label="서버 생성 작업">
     <h2 className="text-[16.5px] font-bold">서버 생성 작업</h2>
-    <p className="mt-1 text-sm text-muted-foreground">화면을 닫아도 생성 결과는 보존되며, 완료 후 이어받으면 품질 검수와 초안 저장이 진행됩니다.</p>
+    <p className="mt-1 text-sm text-muted-foreground">화면을 닫아도 생성 결과는 보존되며, 완료 후 이어받으면 품질 검토와 초안 저장이 진행됩니다.</p>
     {error && <p role="status" className="mt-2 text-sm">{error}</p>}
     {visible.map(job => <div key={job.id} className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t pt-3">
       <div className="min-w-0 flex-1"><p className="line-clamp-2 text-sm">{job.label}</p>
-        <p className="mt-1 text-xs text-muted-foreground">Astra · {job.status === 'completed' ? '생성 완료 · 검수 대기' : job.status === 'failed' ? job.error : `생성 중 · ${job.completed_steps}단계 완료`}</p>
+        <p className="mt-1 text-xs text-muted-foreground">Astra · {job.status === 'completed' ? '생성 완료 · 검토 대기' : job.status === 'failed' ? job.error : `생성 중 · ${job.completed_steps}단계 완료`}</p>
       </div>
       {(job.status !== 'failed' || job.can_resume) && <Button size="sm" variant="outline" disabled={busy} onClick={() => onResume(job.scenario_id!, job.id)}>{job.status === 'failed' ? '저장된 작업 재개' : '결과 이어받기'}</Button>}
     </div>)}

@@ -329,19 +329,19 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
     const rows = allRows.filter((row) => !RETIRED_REVIEW_ROWS.has(row.key) || Boolean(row.result || row.items?.length || row.failed || row.detail));
     const professorDone = next === "approved" || historicalApproval;
     const professorCurrent = next === "professor" && !historicalApproval;
-    return <section aria-label="품질 검수 워크플로우" className="space-y-3 text-sm">
+    return <section aria-label="품질 검토 워크플로우" className="space-y-3 text-sm">
       {query.isPending && <p role="status">점검 기록을 확인하는 중…</p>}
       {query.isError && <p role="alert" className="text-red-800">{query.error.message}</p>}
       {state && <div className="overflow-hidden rounded-xl border border-[#E2DED2]">
         <div className="flex flex-wrap items-center justify-between gap-2 bg-[#233542] px-4 py-2.5">
-          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 검수 워크플로우</h3>
+          <h3 className="flex items-center gap-2 text-[15px] font-bold leading-6 text-white"><span aria-hidden className="h-4 w-[4px] rounded-sm bg-[#FAD338]" />품질 검토 워크플로우</h3>
           {runningLabel
             ? <div role="status" className="relative inline-flex items-center gap-2 overflow-hidden rounded-md bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
                 <span aria-hidden className="size-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />{runningLabel} 진행 중
                 <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
               </div>
             : professorDone || professorCurrent
-              ? <span className="text-[13px] font-semibold text-white">{professorDone ? "교수자 승인 완료" : "품질 검수 완료"}</span>
+              ? <span className="text-[13px] font-semibold text-white">{professorDone ? "교수자 승인 완료" : "품질 검토 완료"}</span>
               : null}
         </div>
         <ol className="divide-y divide-[#F0EDE4] pt-2">
@@ -402,7 +402,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
         </div>}
         {/* 주 실행 버튼은 학습 미션 제작 화면의 「초안 자동 생성」과 같이 상자 아래 오른쪽, 브랜드 노랑으로 둔다. */}
         {!runningLabel && !professorDone && !professorCurrent && <div className="flex justify-end border-t border-[#ECE8DE] px-4 py-3">
-          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 검수 실행</Button>
+          <Button className="h-10 rounded-lg bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C71E] disabled:bg-[#FAD338]" disabled={!canRun} onClick={() => void startReviewPreparation([{ target, label: prepLabel }])}>품질 검토 실행</Button>
         </div>}
       </div>}
       {state && !run && !historicalApproval && state.history.length > 0 && <p className="text-[13px] text-[#7A5A12]">내용이나 점검 기준이 바뀌어 다시 점검이 필요합니다.</p>}
@@ -435,7 +435,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
               onChange={(event) => setNote(event.target.value)} disabled={busy || Boolean(locked)} />
           </label>}
           <div className={pairRow ? "flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2" : "flex flex-wrap items-center justify-end gap-x-4 gap-y-2"}>
-          <label className="flex cursor-pointer items-center gap-2.5 text-[15px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 검수 결과를 확인했습니다.</label>
+          <label className="flex cursor-pointer items-center gap-2.5 text-[15px] font-medium text-[#233542]"><input type="checkbox" className="size-[18px] shrink-0 accent-[#233542]" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} />학습자 화면과 품질 검토 결과를 확인했습니다.</label>
           <Button aria-label="교수자 최종 승인" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || !ready || !confirmed} onClick={() => void runNext()}
             className={experiential ? "h-10 border border-[#FAD338] bg-[#FAD338] px-7 text-[15px] font-bold text-[#15202B] shadow-sm hover:bg-[#F2C521] disabled:border-[#F7E08A] disabled:bg-[#F7E08A] disabled:text-[#15202B]/60 disabled:shadow-none disabled:opacity-100" : undefined}>
             {busy ? "처리 중…" : "승인하기"}
@@ -480,7 +480,7 @@ export function ContentReviewPanel({ target, onApprove, approvalDisabled = false
           {vendorFree(queued?.message ?? "자동 점검")} 진행 중
           <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 animate-pulse bg-[#E0B45A]" />
         </div> : <Button size="sm" disabled={busy || query.isFetching || queue.active || Boolean(locked) || blocked || approvalDisabled}
-          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검수 중…" : "검수 마치기") : "검수 실행"}</Button>}
+          onClick={() => void startReviewPreparation([{ target, label: target.kind === "mission" ? `미션 ${target.targetId.slice(0, 8)}` : `${target.weekNo}주차 자료` }])}>{experiential ? (queue.active ? "검토 중…" : "검토 마치기") : "검토 실행"}</Button>}
         {!experiential && queued && queuedStatus === "held" && <p role="alert" className="text-[13px] text-amber-800">{queued.message}</p>}
         {!experiential && !handoffHref && <p className="text-xs text-muted-foreground">저장 결과는 재사용하고, 없는 AI 품질 심사만 새로 실행합니다.</p>}
       </div>}

@@ -608,7 +608,7 @@ export function qualityAfterCandidateRegeneration(
       ? recheckedQuality
         ? "후보 재생성과 수정본의 전체 품질점검을 통과했습니다."
         : "실패 후보를 within 기준 최소대조로 재생성하고 국소 검사를 통과했습니다."
-      : "후보 재생성 뒤 남은 지적과 수정본 재검수 결과를 보존했습니다.",
+      : "후보 재생성 뒤 남은 지적과 수정본 재검토 결과를 보존했습니다.",
     findings,
     model: recheckedQuality?.model ?? meta.model,
     prompt_version: recheckedQuality?.prompt_version ?? meta.promptVersion,
@@ -1680,7 +1680,7 @@ export async function reviewMission(
       // A review replaced by a gate rebind is history; finalization must consume the current row's artifact.
       .is("superseded_by", null).maybeSingle();
     if (preparedError || !data?.prepared_finalization) {
-      return { ok: false, error: "최종 검수 자료를 먼저 준비하고 교수자 판단을 저장해 주세요." };
+      return { ok: false, error: "최종 검토 자료를 먼저 준비하고 교수자 판단을 저장해 주세요." };
     }
     const finalized = data.prepared_finalization;
     const parsed = normalizeLearnerMission(finalized);

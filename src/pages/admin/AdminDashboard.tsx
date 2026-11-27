@@ -416,7 +416,7 @@ const AdminDashboard = () => {
           .order("created_at", { ascending: false })
           .range(from, to)),
         // 누적 완료는 기준 버전·재결합 이력까지 모든 mission run에서 미션 단위로 센다. 실패해도 대기열은 보여야 해서 null로 받는다.
-        fetchAllDashboardRows<DashboardCumulativeRunRow>("검수 누적 이력", (from, to) => db
+        fetchAllDashboardRows<DashboardCumulativeRunRow>("검토 누적 이력", (from, to) => db
           .from("content_review_runs")
           .select(DASHBOARD_CUMULATIVE_RUN_SELECT)
           .eq("kind", "mission")

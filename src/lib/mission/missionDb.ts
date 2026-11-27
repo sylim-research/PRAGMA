@@ -63,7 +63,7 @@ export async function fetchMissionByScenario(scenarioId: string, formats?: { inc
   if (!runnable) {
     throw new Error(
       status === "generated"
-        ? "이 학습 콘텐츠는 아직 교수자 최종 검수를 마치지 않았습니다."
+        ? "이 학습 콘텐츠는 아직 교수자 최종 검토를 마치지 않았습니다."
         : `실행할 수 없는 학습 콘텐츠 상태입니다(${status ?? "없음"}).`,
     );
   }
